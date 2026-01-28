@@ -1,0 +1,12 @@
+{
+	// See http://go.microsoft.com/fwlink/?LinkId=827846
+	// for the documentation about the extensions.json format
+	"recommendations": [
+		"dbaeumer.vscode-eslint",
+		"ms-vscode.extension-test-runner",
+		"ms-python.python",
+		"ms-vscode.powershell",
+		"mads-hartmann.bash-ide-vscode",
+		"timonwong.shellcheck"
+	]
+}
