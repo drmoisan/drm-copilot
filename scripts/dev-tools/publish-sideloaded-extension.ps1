@@ -24,7 +24,7 @@ All state-changing actions are gated behind ShouldProcess so you can use -WhatIf
 param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path,
+    [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
