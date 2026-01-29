@@ -4,7 +4,8 @@ $script:PesterSettings = Join-Path $ModuleRoot 'settings/pester.runsettings.psd1
 
 $script:DefaultExcludedDirs = @(
     '.git', '.venv', 'venv', 'node_modules', 'dist', 'build', '.pytest_cache',
-    '__pycache__', '.mypy_cache', '.ruff_cache', '.vscode', '.idea', 'artifacts'
+    '__pycache__', '.mypy_cache', '.ruff_cache', '.vscode', '.idea', 'artifacts',
+    '.vscode-test'
 )
 
 <#

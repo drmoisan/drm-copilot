@@ -216,12 +216,10 @@ Use the commands above instead of the `QC: 0 Fix All` task.
 
 ```powershell
 # Load from LastPass
-pwsh src/lexile_corpus_tuner/lexile_scoring_model/pipeline_scripts/load-openai-key.ps1 -ItemName "Lexile OpenAI Key"
+pwsh scripts/dev-tools/load-openai-key.ps1 -ItemName "Lexile OpenAI Key"
 
 # Options:
-# -UsePasswordField    # Pull from password field instead of note
 # -EnvVar "VAR_NAME"   # Override target environment variable
-# -PrintOnly           # Output without exporting (for CI)
 ```
 
 **VS Code task:** `Load OpenAI Key`

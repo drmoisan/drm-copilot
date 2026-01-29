@@ -4,7 +4,7 @@ Describe "load-openai-key.ps1" {
     BeforeAll {
         $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
         . (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "..\..\powershell\Support\TestHelpers.ps1"))
-        $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\src\lexile_corpus_tuner\lexile_scoring_model\pipeline_scripts\load-openai-key.ps1"
+        $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\scripts\dev-tools\load-openai-key.ps1"
     }
 
     It "sets environment variable when secret is returned" {
