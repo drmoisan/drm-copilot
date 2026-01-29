@@ -146,6 +146,24 @@
 			"type": "shell"
 		},
 		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/dev-tools/publish-sideloaded-extension.ps1",
+				"-Force"
+			],
+			"command": "pwsh",
+			"label": "Publish (Side-load) VSIX",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
 		"args": [
 			"run",
 			"black",
