@@ -4,3 +4,4 @@ node_modules
 .vscode-test/
 *.vsix
 artifacts
+.agent_logs

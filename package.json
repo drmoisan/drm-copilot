@@ -10,7 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:drm-copilot.applyCustomizations"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -18,23 +18,237 @@
       {
         "command": "drm-copilot.applyCustomizations",
         "title": "DRM Copilot: Apply Agentic Customizations"
+      },
+      {
+        "command": "drm-copilot.loadOpenAIKey",
+        "title": "DRM Copilot: Load OpenAI Key"
+      },
+      {
+        "command": "drm-copilot.qcBlackFormat",
+        "title": "DRM Copilot: QC 1 - Black Format"
+      },
+      {
+        "command": "drm-copilot.qcRuffLint",
+        "title": "DRM Copilot: QC 2 - Ruff Lint"
+      },
+      {
+        "command": "drm-copilot.qcRuffFix",
+        "title": "DRM Copilot: QC 2 - Ruff Fix"
+      },
+      {
+        "command": "drm-copilot.qcPyrightTypeCheck",
+        "title": "DRM Copilot: QC 3 - Pyright Type Check"
+      },
+      {
+        "command": "drm-copilot.qcPytestRunTests",
+        "title": "DRM Copilot: QC 4 - Pytest Run Tests"
+      },
+      {
+        "command": "drm-copilot.qcPytestRunTestsCoverage",
+        "title": "DRM Copilot: QC 4 - Pytest Run Tests with Coverage"
+      },
+      {
+        "command": "drm-copilot.poshQCFormat",
+        "title": "DRM Copilot: PoshQC 1 - Format PowerShell"
+      },
+      {
+        "command": "drm-copilot.poshQCAnalyze",
+        "title": "DRM Copilot: PoshQC 2 - Analyze PowerShell"
+      },
+      {
+        "command": "drm-copilot.poshQCAutofix",
+        "title": "DRM Copilot: PoshQC 2b - Autofix (PSSA -Fix)"
+      },
+      {
+        "command": "drm-copilot.poshQCTest",
+        "title": "DRM Copilot: PoshQC 4 - Test (Pester)"
+      },
+      {
+        "command": "drm-copilot.qcRunAllChecks",
+        "title": "DRM Copilot: QC 5 - Run All Checks"
+      },
+      {
+        "command": "drm-copilot.qcFixAll",
+        "title": "DRM Copilot: QC 0 - Fix All"
+      },
+      {
+        "command": "drm-copilot.jsonFormat",
+        "title": "DRM Copilot: JSON Format"
+      },
+      {
+        "command": "drm-copilot.jsonValidate",
+        "title": "DRM Copilot: JSON Validate"
+      },
+      {
+        "command": "drm-copilot.formatChatFile",
+        "title": "DRM Copilot: Format Current Chat File"
+      },
+      {
+        "command": "drm-copilot.gitCollectCommitContext",
+        "title": "DRM Copilot: Git - Collect Commit Context"
+      },
+      {
+        "command": "drm-copilot.gitCollectPRContext",
+        "title": "DRM Copilot: Git - Collect PR Context"
+      },
+      {
+        "command": "drm-copilot.devCopyResearchToActive",
+        "title": "DRM Copilot: Dev - Copy Research to Active Folder"
+      },
+      {
+        "command": "drm-copilot.devNewGitHubFeatureIssue",
+        "title": "DRM Copilot: Dev - New GitHub Feature Issue (manual)"
+      },
+      {
+        "command": "drm-copilot.devPromotePotentialToIssue",
+        "title": "DRM Copilot: Dev 2 - Promote Potential to GitHub Issue"
+      },
+      {
+        "command": "drm-copilot.devLinkFeatureDocs",
+        "title": "DRM Copilot: Dev 5 - Link Feature Docs to GitHub"
+      },
+      {
+        "command": "drm-copilot.devLinkParentChild",
+        "title": "DRM Copilot: Dev 4 - Link GitHub Parent/Child Issues"
+      },
+      {
+        "command": "drm-copilot.devCreateActiveFolder",
+        "title": "DRM Copilot: Dev 3 - Create Active Folder"
+      },
+      {
+        "command": "drm-copilot.devNewGitHubBugIssue",
+        "title": "DRM Copilot: Dev - New GitHub Bug Issue"
+      },
+      {
+        "command": "drm-copilot.devInstallPowerShellTooling",
+        "title": "DRM Copilot: Dev - Install PowerShell Tooling"
+      },
+      {
+        "command": "drm-copilot.devResolveExecutePlanPrompt",
+        "title": "DRM Copilot: Dev - Resolve Execute Plan Prompt"
+      },
+      {
+        "command": "drm-copilot.devNewPotentialBug",
+        "title": "DRM Copilot: Dev 1A - New Potential Bug"
+      },
+      {
+        "command": "drm-copilot.devNewPotentialEntry",
+        "title": "DRM Copilot: Dev 1 - New Potential Entry"
+      },
+      {
+        "command": "drm-copilot.devResolveAtomicPlanPrompt",
+        "title": "DRM Copilot: Dev - Resolve Atomic Plan Prompt"
+      },
+      {
+        "command": "drm-copilot.atomicExecutorExecute",
+        "title": "DRM Copilot: Atomic Executor - Execute"
+      },
+      {
+        "command": "drm-copilot.devSyncAgentsFromInstructions",
+        "title": "DRM Copilot: Dev - Sync AGENTS.md from Instructions"
+      },
+      {
+        "command": "drm-copilot.tsPrettierFormat",
+        "title": "DRM Copilot: TS 1 - Prettier Format"
+      },
+      {
+        "command": "drm-copilot.tsEslintLint",
+        "title": "DRM Copilot: TS 2 - ESLint Lint"
+      },
+      {
+        "command": "drm-copilot.tsTscTypeCheck",
+        "title": "DRM Copilot: TS 3 - TSC Type Check"
+      },
+      {
+        "command": "drm-copilot.tsJestUnitTests",
+        "title": "DRM Copilot: TS 4 - Jest Unit Tests"
+      },
+      {
+        "command": "drm-copilot.npmWatch",
+        "title": "DRM Copilot: NPM Watch"
       }
-    ]
+    ],
+    "submenus": [
+      {
+        "id": "drm-copilot.qcMenu",
+        "label": "DRM: Quality Checks"
+      },
+      {
+        "id": "drm-copilot.devMenu",
+        "label": "DRM: Developer Tools"
+      },
+      {
+        "id": "drm-copilot.gitMenu",
+        "label": "DRM: Git Tools"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "drm-copilot.applyCustomizations" },
+        { "command": "drm-copilot.loadOpenAIKey" },
+        { "command": "drm-copilot.qcBlackFormat" },
+        { "command": "drm-copilot.qcRuffLint" },
+        { "command": "drm-copilot.qcRuffFix" },
+        { "command": "drm-copilot.qcPyrightTypeCheck" },
+        { "command": "drm-copilot.qcPytestRunTests" },
+        { "command": "drm-copilot.qcPytestRunTestsCoverage" },
+        { "command": "drm-copilot.poshQCFormat" },
+        { "command": "drm-copilot.poshQCAnalyze" },
+        { "command": "drm-copilot.poshQCAutofix" },
+        { "command": "drm-copilot.poshQCTest" },
+        { "command": "drm-copilot.qcRunAllChecks" },
+        { "command": "drm-copilot.qcFixAll" },
+        { "command": "drm-copilot.jsonFormat" },
+        { "command": "drm-copilot.jsonValidate" },
+        { "command": "drm-copilot.formatChatFile" },
+        { "command": "drm-copilot.gitCollectCommitContext" },
+        { "command": "drm-copilot.gitCollectPRContext" },
+        { "command": "drm-copilot.devCopyResearchToActive" },
+        { "command": "drm-copilot.devNewGitHubFeatureIssue" },
+        { "command": "drm-copilot.devPromotePotentialToIssue" },
+        { "command": "drm-copilot.devLinkFeatureDocs" },
+        { "command": "drm-copilot.devLinkParentChild" },
+        { "command": "drm-copilot.devCreateActiveFolder" },
+        { "command": "drm-copilot.devNewGitHubBugIssue" },
+        { "command": "drm-copilot.devInstallPowerShellTooling" },
+        { "command": "drm-copilot.devResolveExecutePlanPrompt" },
+        { "command": "drm-copilot.devNewPotentialBug" },
+        { "command": "drm-copilot.devNewPotentialEntry" },
+        { "command": "drm-copilot.devResolveAtomicPlanPrompt" },
+        { "command": "drm-copilot.atomicExecutorExecute" },
+        { "command": "drm-copilot.devSyncAgentsFromInstructions" },
+        { "command": "drm-copilot.tsPrettierFormat" },
+        { "command": "drm-copilot.tsEslintLint" },
+        { "command": "drm-copilot.tsTscTypeCheck" },
+        { "command": "drm-copilot.tsJestUnitTests" },
+        { "command": "drm-copilot.npmWatch" }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
+    "compile:integration-tests": "tsc -p ./tsconfig.vscode-test.json",
+    "typecheck": "tsc -p ./ --noEmit && tsc -p ./tsconfig.tests.json",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
+    "pretest": "npm run compile && npm run compile:integration-tests && npm run lint",
+    "lint": "eslint src tests",
+    "test:unit": "jest --config jest.config.cjs",
+    "test:integration": "vscode-test",
     "test": "vscode-test"
   },
   "devDependencies": {
     "@types/vscode": "^1.108.1",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@jest/globals": "^30.0.0",
     "typescript-eslint": "^8.52.0",
     "eslint": "^9.39.2",
+    "jest": "^30.0.0",
+    "prettier": "^3.6.0",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.9.3",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
