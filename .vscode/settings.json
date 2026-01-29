@@ -48,6 +48,37 @@
     "/run-dev-sql\\.ps1\\b/i": true
   },
   "chat.tools.urls.autoApprove": {
+    "https://www.google.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://cli.github.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://r.jina.ai": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://r.jina.ai/https://code.visualstudio.com/api/extension-guides/ai-chat": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://github.com": true,
+    "https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences": true,
+    "https://learn.microsoft.com/en-us/windows/console": true,
+    "https://learn.microsoft.com/en-us/windows": true,
+    "https://learn.microsoft.com/en-us": true,
+    "https://learn.microsoft.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://*.microsoft.com": true,
+    "https://docs.python.org/3/library/sys.html": true,
+    "https://docs.python.org/3/library": true,
+    "https://docs.python.org/3": true,
+    "https://docs.python.org": true,
+    "https://*.python.org": true,
     "/^https:\\/\\/github\\.com\\/microsoft\\/.*$/": {
       "approveRequest": true,
       "approveResponse": true
@@ -73,21 +104,15 @@
     "https://*.githubstatus.com": true,
     "https://*.githubusercontent.com": true,
     "https://*.google.com": true,
-    "https://*.microsoft.com": true,
     "https://*.mozilla.org": true,
     "https://*.opera.com": true,
     "https://*.pytest.org": true,
-    "https://*.python.org": true,
     "https://*.readthedocs.io": true,
     "https://*.visualstudio.com": true,
     "https://*.wikimedia.org": true,
     "https://black.readthedocs.io": true,
     "https://black.readthedocs.io/en": true,
     "https://black.readthedocs.io/en/stable": true,
-    "https://cli.github.com": {
-      "approveRequest": true,
-      "approveResponse": true
-    },
     "https://code.visualstudio.com": {
       "approveRequest": false,
       "approveResponse": true
@@ -115,10 +140,6 @@
     "https://docs.pytest.org/en/stable/how-to/skipping.html": true,
     "https://docs.pytest.org/en/stable/reference": true,
     "https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags": true,
-    "https://docs.python.org": true,
-    "https://docs.python.org/3": true,
-    "https://docs.python.org/3/library": true,
-    "https://docs.python.org/3/library/sys.html": true,
     "https://dr282zn36sxxg.cloudfront.net": true,
     "https://dr282zn36sxxg.cloudfront.net/datastreams": true,
     "https://dr282zn36sxxg.cloudfront.net/datastreams/f-d:7a2401fac0b00f8c17ae80229f9a8c199c134578287a46ccd8a70dfe+COVER_PAGE_THUMB_POSTCARD_TINY+COVER_PAGE_THUMB_POSTCARD_TINY.1": true,
@@ -134,7 +155,6 @@
     "https://geminicli.com/docs/cli/headless": true,
     "https://gh.io": true,
     "https://gh.io/dpa": true,
-    "https://github.com": true,
     "https://github.com/ryanluker": true,
     "https://github.com/ryanluker/vscode-coverage-gutters": true,
     "https://github.com/simonkagstrom": true,
@@ -146,14 +166,6 @@
     "https://help.opera.com": true,
     "https://help.opera.com/latest": true,
     "https://help.opera.com/latest/web-preferences": true,
-    "https://learn.microsoft.com": {
-      "approveRequest": false,
-      "approveResponse": true
-    },
-    "https://learn.microsoft.com/en-us": true,
-    "https://learn.microsoft.com/en-us/windows": true,
-    "https://learn.microsoft.com/en-us/windows/console": true,
-    "https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences": true,
     "https://manpages.debian.org": true,
     "https://manpages.debian.org/bookworm": true,
     "https://manpages.debian.org/bookworm/apt": true,
@@ -163,14 +175,6 @@
     "https://marketplace.visualstudio.com/items": true,
     "https://pypi.org": {
       "approveRequest": false,
-      "approveResponse": true
-    },
-    "https://r.jina.ai": {
-      "approveRequest": false,
-      "approveResponse": true
-    },
-    "https://r.jina.ai/https://code.visualstudio.com/api/extension-guides/ai-chat": {
-      "approveRequest": true,
       "approveResponse": true
     },
     "https://r.jina.ai/https://code.visualstudio.com/api/extension-guides/source-control": {
@@ -218,17 +222,26 @@
     "https://www.ck12info.org/about": true,
     "https://www.ck12info.org/about//terms-of-use": true,
     "https://www.githubstatus.com": true,
-    "https://www.google.com": {
-      "approveRequest": true,
-      "approveResponse": true
-    },
     "https://www.google.com/*": true,
     "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d": true,
     "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces": true,
     "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner": true,
     "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github": true,
     "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github/prompts": true,
-    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github/prompts/fillout-prd-feature.prompt.md": true
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github/prompts/fillout-prd-feature.prompt.md": true,
+    "https://jestjs.io/docs/getting-started": true,
+    "https://jestjs.io/docs": true,
+    "https://jestjs.io": true,
+    "https://kulshekhar.github.io/ts-jest/docs/getting-started/installation": true,
+    "https://kulshekhar.github.io/ts-jest/docs/getting-started": true,
+    "https://kulshekhar.github.io/ts-jest/docs": true,
+    "https://kulshekhar.github.io/ts-jest": true,
+    "https://kulshekhar.github.io": true,
+    "https://*.github.io": true,
+    "https://prettier.io/docs/en/install": true,
+    "https://prettier.io/docs/en": true,
+    "https://prettier.io/docs": true,
+    "https://prettier.io": true
   },
   "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
   "coverage-gutters.coverageFileNames": [

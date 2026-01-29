@@ -856,6 +856,86 @@
 			"type": "shell"
 		},
 		{
+			"args": [
+				"run",
+				"format"
+			],
+			"command": "npm",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"label": "TS: 1 Prettier: format",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"lint"
+			],
+			"command": "npm",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "TS: 2 ESLint: lint",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"typecheck"
+			],
+			"command": "npm",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "TS: 3 TSC: type-check",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"test:unit"
+			],
+			"command": "npm",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "TS: 4 Jest: unit tests",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
 			"type": "npm",
 			"script": "watch",
 			"problemMatcher": "$tsc-watch",
