@@ -68,21 +68,29 @@ function Invoke-ExternalCommand {
         [string]$WorkingDirectory
     )
 
-    $displayArgs = ($ArgumentList | ForEach-Object {
-            if ($_ -match "\\s") { '"{0}"' -f $_ } else { $_ }
-        }) -join " "
-
+    $displayArgs = $ArgumentList -join " "
     Write-Verbose ("Running: {0} {1}" -f $FilePath, $displayArgs)
 
-    Push-Location -LiteralPath $WorkingDirectory
-    try {
-        & $FilePath $ArgumentList
-        if ($LASTEXITCODE -ne 0) {
-            throw ("Command failed with exit code {0}: {1} {2}" -f $LASTEXITCODE, $FilePath, $displayArgs)
-        }
+    # Build the full command line for cmd /c execution.
+    # This avoids PowerShell call-operator parsing issues with external tools.
+    $cmdLine = if ($ArgumentList.Count -gt 0) {
+        "{0} {1}" -f $FilePath, $displayArgs
+    } else {
+        $FilePath
     }
-    finally {
-        Pop-Location
+
+    $processParams = @{
+        FilePath         = "cmd.exe"
+        ArgumentList     = @("/c", $cmdLine)
+        WorkingDirectory = $WorkingDirectory
+        Wait             = $true
+        NoNewWindow      = $true
+        PassThru         = $true
+    }
+
+    $process = Start-Process @processParams
+    if ($process.ExitCode -ne 0) {
+        throw ("Command failed with exit code {0}: {1} {2}" -f $process.ExitCode, $FilePath, $displayArgs)
     }
 }
 
@@ -121,7 +129,7 @@ if (-not $SkipCompile) {
 }
 
 if ($PSCmdlet.ShouldProcess($RepoRoot, "npx vsce package")) {
-    Invoke-ExternalCommand -FilePath "npx" -ArgumentList @("vsce", "package", "--out", $vsixPath) -WorkingDirectory $RepoRoot
+    Invoke-ExternalCommand -FilePath "npx" -ArgumentList @("--yes", "@vscode/vsce", "package", "--allow-missing-repository", "--skip-license", "--out", $vsixPath) -WorkingDirectory $RepoRoot
 }
 
 if (-not (Test-Path -LiteralPath $vsixPath)) {

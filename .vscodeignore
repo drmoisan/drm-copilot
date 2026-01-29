@@ -9,3 +9,32 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+# Python environment and tooling
+.venv/**
+__pycache__/**
+.coverage
+.pytest_cache/**
+.mypy_cache/**
+.ruff_cache/**
+
+# Development artifacts
+artifacts/**
+.agent_logs/**
+tests/**
+scripts/**
+docs/**
+
+# Python project files
+poetry.lock
+poetry.toml
+pyproject.toml
+pyrightconfig.json
+
+# TypeScript test configs
+tsconfig.jest.json
+tsconfig.tests.json
+tsconfig.vscode-test.json
+jest.config.cjs
+
+# GitHub
+.github/**
