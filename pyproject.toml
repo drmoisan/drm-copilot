@@ -1,0 +1,140 @@
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "drm-copilot"
+version = "0.1.1"
+description = "Tool for optimizing use of copilot and streamlining documentation."
+authors = ["Dan Moisan"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    { include = "scripts" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+typer = ">=0.9.0"
+PyYAML = ">=6.0"
+numpy = ">=1.23"
+click = ">=8.1"
+pandas = ">=2.0"
+scikit-learn = ">=1.3"
+scipy = ">=1.10"
+requests = ">=2.31"
+beautifulsoup4 = ">=4.12"
+lxml = ">=5.3.0"
+pyarrow = ">=15.0"
+pdfplumber = ">=0.10.0"
+tensorflow = { version = ">=2.10.0", optional = true }
+joblib = { version = ">=1.1.0", optional = true }
+nltk = { version = ">=3.8", optional = true }
+keras-preprocessing = { version = ">=1.1", optional = true }
+openai = { version = ">=1.40.0", optional = true }
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0"
+pytest-cov = ">=7.0"
+black = ">=23.0"
+ruff = "^0.5.3"
+pyright = "^1.1.407"
+pyperclip = "^1.11.0"
+jsonschema = "^4.25.1"
+types-beautifulsoup4 = ">=4.12.0.0"
+types-requests = ">=2.31.0.6"
+
+[tool.poetry.scripts]
+atomic-executor = "scripts.dev_tools.atomic_executor.cli:main"
+shell-qc = "scripts.dev_tools.shell_qc:main"
+shell-qc-check = "scripts.dev_tools.shell_qc:main_check"
+shell-qc-format = "scripts.dev_tools.shell_qc:main_format"
+shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
+
+# Dev Tools Aliases
+"dev.atomic-executor" = "scripts.dev_tools.atomic_executor.cli:main"
+"dev.clean-devcontainer" = "scripts.dev_tools.clean_devcontainer:main"
+"dev.collect-commit-context" = "scripts.dev_tools.collect_commit_context:main"
+"dev.fix-all" = "scripts.dev_tools.fix_all:main"
+"dev.format-json" = "scripts.dev_tools.format_json:main"
+"dev.format-markdown" = "scripts.dev_tools.markdown_label_formatter:main"
+"dev.new-active-feature" = "scripts.dev_tools.new_active_feature_folder:main"
+"dev.new-potential-bug" = "scripts.dev_tools.new_potential_bug_entry:main"
+"dev.potential-to-issue" = "scripts.dev_tools.potential_to_issue:main"
+"dev.pr-context" = "scripts.dev_tools.pr_context.collector:main"
+"dev.resolve-execute-plan" = "scripts.dev_tools.resolve_execute_plan_prompt:main"
+"dev.resolve-file-prompt" = "scripts.dev_tools.resolve_file_prompt:main"
+"dev.shell-qc" = "scripts.dev_tools.shell_qc:main"
+"dev.validate-json" = "scripts.dev_tools.validate_json:main"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+fix = true
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "S",    # flake8-bandit (security)
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["S101"]
+"src/lexile_corpus_tuner/cli.py" = ["B008"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "tests/*",
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@abc.abstractmethod",
+]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+diagnosticMode = "workspace"
+reportMissingTypeArgument = "none"
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+exclude = [
+  "**/__pycache__",
+  ".idea",
+  ".ruff_cache",
+  ".venv",
+  "build",
+  "dist"
+]
+
+
+
+

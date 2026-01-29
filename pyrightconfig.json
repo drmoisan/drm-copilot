@@ -1,0 +1,35 @@
+{
+  "include": ["src", "tests", "scripts"],
+  "exclude": [
+    ".venv",
+    "dist",
+    "build",
+    "artifacts"
+  ],
+  "extraPaths": [
+    "src",
+    "scripts"
+  ],
+  "venvPath": ".",
+  "venv": ".venv",
+  "typeCheckingMode": "strict",
+  "reportMissingTypeStubs": false,
+  "reportUnknownParameterType": "error",
+  "reportUnknownArgumentType": "error",
+  "reportUnknownVariableType": "error",
+  "reportUnknownMemberType": "error",
+  "reportMissingImports": "error",
+  "reportGeneralTypeIssues": "error",
+  "reportOptionalMemberAccess": "error",
+  "reportOptionalSubscript": "error",
+  "reportPrivateUsage": "error",
+  "reportUntypedFunctionDecorator": "error",
+  "reportUntypedClassDecorator": "error"
+}
+
+
+
+
+
+
+

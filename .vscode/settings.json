@@ -7,5 +7,257 @@
 		"out": true // set this to false to include "out" folder in search results
 	},
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off"
+	"typescript.tsc.autoDetect": "off",
+	  "chat.tools.terminal.autoApprove": {
+    "/.*fix-all.ps1$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/.*run-actionlint\\.ps1$/i": true,
+    "/Import-Module PSScriptAnalyzer; Invoke-ScriptAnalyzer .*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/Import-Module\\s+(\"([^\"]+)\"|'([^']+)'|(?:\\.[\\\\/]|[A-Za-z]:[\\\\/])[^;|&><]*)\\s*;\\s*Invoke-PoshQC\\w*\\s+[^;\\r\\n]*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/Invoke-ScriptAnalyzer\\b[^;\\r\\n]*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/Start-Sleep .*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/cd .*$/": true,
+    "/git checkout .*$/": true,
+    "/git ls.*$/": true,
+    "/poetry .*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/pyright\b.*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/pytest .*$/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/run-dev-sql\\.ps1\\b/i": true
+  },
+  "chat.tools.urls.autoApprove": {
+    "/^https:\\/\\/github\\.com\\/microsoft\\/.*$/": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "/^https:\\/\\/r\\.jina\\.ai\\/https:\\/\\/code.visualstudio.com\\/api\\/.*$/": {
+      "approveRequest": true,
+      "approveResponse": false
+    },
+    "/^https:\\/\\/raw\\.githubusercontent\\.com\\/microsoft\\/.*$/": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "^https:\\/\\/r\\.jina\\.ai\\/https:\\/\\/www\\.google\\.com\\/search\\?q=.*$": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://*.apple.com": true,
+    "https://*.ck12.org": true,
+    "https://*.ck12info.org": true,
+    "https://*.cloudfront.net": true,
+    "https://*.debian.org": true,
+    "https://*.github.com": true,
+    "https://*.githubstatus.com": true,
+    "https://*.githubusercontent.com": true,
+    "https://*.google.com": true,
+    "https://*.microsoft.com": true,
+    "https://*.mozilla.org": true,
+    "https://*.opera.com": true,
+    "https://*.pytest.org": true,
+    "https://*.python.org": true,
+    "https://*.readthedocs.io": true,
+    "https://*.visualstudio.com": true,
+    "https://*.wikimedia.org": true,
+    "https://black.readthedocs.io": true,
+    "https://black.readthedocs.io/en": true,
+    "https://black.readthedocs.io/en/stable": true,
+    "https://cli.github.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://code.visualstudio.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://docs.github.com": true,
+    "https://docs.github.com/*": true,
+    "https://docs.github.com/en": true,
+    "https://docs.github.com/en/copilot": true,
+    "https://docs.github.com/en/copilot/concepts": true,
+    "https://docs.github.com/en/copilot/concepts/agents": true,
+    "https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli": true,
+    "https://docs.github.com/en/copilot/how-tos": true,
+    "https://docs.github.com/en/copilot/how-tos/use-copilot-agents": true,
+    "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent": true,
+    "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp": true,
+    "https://docs.github.com/en/site-policy": true,
+    "https://docs.github.com/en/site-policy/github-terms": true,
+    "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service": true,
+    "https://docs.github.com/en/site-policy/privacy-policies": true,
+    "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement": true,
+    "https://docs.pytest.org": true,
+    "https://docs.pytest.org/en": true,
+    "https://docs.pytest.org/en/stable": true,
+    "https://docs.pytest.org/en/stable/how-to": true,
+    "https://docs.pytest.org/en/stable/how-to/skipping.html": true,
+    "https://docs.pytest.org/en/stable/reference": true,
+    "https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags": true,
+    "https://docs.python.org": true,
+    "https://docs.python.org/3": true,
+    "https://docs.python.org/3/library": true,
+    "https://docs.python.org/3/library/sys.html": true,
+    "https://dr282zn36sxxg.cloudfront.net": true,
+    "https://dr282zn36sxxg.cloudfront.net/datastreams": true,
+    "https://dr282zn36sxxg.cloudfront.net/datastreams/f-d:7a2401fac0b00f8c17ae80229f9a8c199c134578287a46ccd8a70dfe+COVER_PAGE_THUMB_POSTCARD_TINY+COVER_PAGE_THUMB_POSTCARD_TINY.1": true,
+    "https://dumps.wikimedia.org": true,
+    "https://dumps.wikimedia.org/simplewiki": true,
+    "https://dumps.wikimedia.org/simplewiki/latest": true,
+    "https://flexbooks.ck12.org": true,
+    "https://flexbooks.ck12.org/cbook": true,
+    "https://flexbooks.ck12.org/cbook/ck-12-interactive-middle-school-math-6-for-ccss": true,
+    "https://geminicli.com": true,
+    "https://geminicli.com/docs": true,
+    "https://geminicli.com/docs/cli": true,
+    "https://geminicli.com/docs/cli/headless": true,
+    "https://gh.io": true,
+    "https://gh.io/dpa": true,
+    "https://github.com": true,
+    "https://github.com/ryanluker": true,
+    "https://github.com/ryanluker/vscode-coverage-gutters": true,
+    "https://github.com/simonkagstrom": true,
+    "https://github.com/simonkagstrom/kcov": true,
+    "https://github.com/simonkagstrom/kcov/blob": true,
+    "https://github.com/simonkagstrom/kcov/blob/master": true,
+    "https://github.com/simonkagstrom/kcov/blob/master/readme.md": true,
+    "https://github.community": true,
+    "https://help.opera.com": true,
+    "https://help.opera.com/latest": true,
+    "https://help.opera.com/latest/web-preferences": true,
+    "https://learn.microsoft.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://learn.microsoft.com/en-us": true,
+    "https://learn.microsoft.com/en-us/windows": true,
+    "https://learn.microsoft.com/en-us/windows/console": true,
+    "https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences": true,
+    "https://manpages.debian.org": true,
+    "https://manpages.debian.org/bookworm": true,
+    "https://manpages.debian.org/bookworm/apt": true,
+    "https://manpages.debian.org/bookworm/apt/apt-get.8.en.html": true,
+    "https://manpages.debian.org/bookworm/apt/apt.conf.5.en.html": true,
+    "https://marketplace.visualstudio.com": true,
+    "https://marketplace.visualstudio.com/items": true,
+    "https://pypi.org": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://r.jina.ai": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://r.jina.ai/https://code.visualstudio.com/api/extension-guides/ai-chat": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://r.jina.ai/https://code.visualstudio.com/api/extension-guides/source-control": {
+      "approveRequest": true,
+      "approveResponse": false
+    },
+    "https://r.jina.ai/https://code.visualstudio.com/api/references/vscode-api#SourceControl": {
+      "approveRequest": true,
+      "approveResponse": false
+    },
+    "https://raw.githubusercontent.com": true,
+    "https://raw.githubusercontent.com/github": true,
+    "https://raw.githubusercontent.com/github/copilot-cli": true,
+    "https://raw.githubusercontent.com/github/copilot-cli/refs": true,
+    "https://raw.githubusercontent.com/github/copilot-cli/refs/heads": true,
+    "https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main": true,
+    "https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/README.md": true,
+    "https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/install.sh": true,
+    "https://registry.npmjs.org": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://support.google.com": true,
+    "https://support.google.com/chrome": true,
+    "https://support.google.com/chrome/answer": true,
+    "https://support.google.com/chrome/answer/114662": true,
+    "https://support.microsoft.com": true,
+    "https://support.microsoft.com/en-us": true,
+    "https://support.microsoft.com/en-us/microsoft-edge": true,
+    "https://support.mozilla.org": true,
+    "https://support.mozilla.org/kb": true,
+    "https://support.mozilla.org/kb/javascript-settings-for-interactive-web-pages": true,
+    "https://www.apple.com": true,
+    "https://www.apple.com/support": true,
+    "https://www.apple.com/support/safari": true,
+    "https://www.bing.com": {
+      "approveRequest": true,
+      "approveResponse": false
+    },
+    "https://www.ck12.org": true,
+    "https://www.ck12.org/flx": true,
+    "https://www.ck12.org/flx/browse": true,
+    "https://www.ck12.org/flx/browse/flexbook": true,
+    "https://www.ck12info.org": true,
+    "https://www.ck12info.org/about": true,
+    "https://www.ck12info.org/about//terms-of-use": true,
+    "https://www.githubstatus.com": true,
+    "https://www.google.com": {
+      "approveRequest": true,
+      "approveResponse": true
+    },
+    "https://www.google.com/*": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github/prompts": true,
+    "vscode-remote://dev-container+7b22686f737450617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e6572222c226c6f63616c446f636b6572223a66616c73652c2273657474696e6773223a7b22636f6e74657874223a226465736b746f702d6c696e7578227d2c22636f6e66696746696c65223a7b22246d6964223a312c22667350617468223a22643a5c5c7265706f735c5c6c6578696c652d636f727075732d74756e65725c5c2e646576636f6e7461696e65725c5c6c6f63616c5c5c646576636f6e7461696e65722e6a736f6e222c225f736570223a312c2270617468223a222f643a2f7265706f732f6c6578696c652d636f727075732d74756e65722f2e646576636f6e7461696e65722f6c6f63616c2f646576636f6e7461696e65722e6a736f6e222c22736368656d65223a2266696c65227d7d/workspaces/lexile-corpus-tuner/.github/prompts/fillout-prd-feature.prompt.md": true
+  },
+  "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
+  "coverage-gutters.coverageFileNames": [
+    "lcov.info",
+    "cov.xml",
+    "coverage.xml",
+    "cobertura.xml",
+    "jacoco.xml",
+    "coverage.cobertura.xml",
+    "powershell-coverage.xml"
+  ],
+  "coverage-gutters.showGutterCoverage": true,
+  "coverage-gutters.showLineCoverage": true,
+  "koverage.coverageFileNames": [
+    "lcov.info",
+    "cov.xml",
+    "clover.xml",
+    "coverage.xml",
+    "jacoco.xml",
+    "powershell-coverage.koverage.xml"
+  ],
+  "koverage.coverageFilePaths": [
+    "artifacts/pester",
+    "artifacts/pester/kcov/kcov-merged"
+  ],
+  "powershell.cwd": "${workspaceFolder}",
+
+	"python.testing.pytestEnabled": true,
+	"python.testing.unittestEnabled": false,
+	"python.testing.pytestArgs": ["tests"],
+	"python.testing.autoTestDiscoverOnSaveEnabled": true
 }
