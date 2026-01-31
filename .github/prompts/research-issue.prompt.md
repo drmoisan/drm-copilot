@@ -21,7 +21,7 @@ Follow the operating rules in your agent definition (research-only, write to `ar
 ## Inputs / Context (authoritative)
 
 After this kickoff prompt, you will be given one or more feature documents. Treat them as the primary specification.
-
+ 
 Common examples (not exhaustive):
 
 - `docs/features/active/<feature>/issue.md` (usually)
