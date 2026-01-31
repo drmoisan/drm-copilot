@@ -97,6 +97,7 @@ class RealGhClient(GhClient):
             [gh_exe, *args],
             input=body,
             text=True,
+            encoding="utf-8",
             capture_output=True,
             check=False,
         )

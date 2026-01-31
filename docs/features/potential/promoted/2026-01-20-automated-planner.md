@@ -1,12 +1,12 @@
-# automated-planner (Issue #97)
+# automated-planner (Issue #1)
 
 - Date captured: 2026-01-20
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/automated-planner/ (Issue #97)
+- Status: Promoted -> docs/features/active/automated-planner/ (Issue #1)
 
-- Issue: #97
-- Issue URL: https://github.com/drmoisan/lexile-corpus-tuner/issues/97
-- Last Updated: 2026-01-21
+- Issue: #1
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/1
+- Last Updated: 2026-01-31
 ## Problem / Why
 
 Today, taking an idea from “potential feature” to an actionable, executable implementation plan is manual and inconsistent. The repo already has strong building blocks (notably the `atomic_executor` package and prompt-driven agents), but there is no scripted, repeatable workflow that:
