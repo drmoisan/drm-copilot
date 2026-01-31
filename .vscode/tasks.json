@@ -826,6 +826,26 @@
 			"args": [
 				"run",
 				"python",
+				"scripts/dev_tools/resolve_hard_lock_prompt.py",
+				"--target",
+				"${file}",
+				"--workspace",
+				"${workspaceFolder}"
+			],
+			"command": "poetry",
+			"detail": "Resolves ${file} in the execute-hard-lock prompt with the active plan file path and copies to clipboard.",
+			"label": "Dev: Resolve Execute Hard-Lock Prompt",
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"python",
 				"-m",
 				"scripts.dev_tools.atomic_executor.cli",
 				"execute-all",

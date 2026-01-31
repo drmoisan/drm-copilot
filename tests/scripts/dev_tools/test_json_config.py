@@ -13,7 +13,8 @@ def test_governed_globs_constant() -> None:
     """Verify GOVERNED_GLOBS constant is defined."""
     assert isinstance(GOVERNED_GLOBS, tuple)
     assert len(GOVERNED_GLOBS) > 0
-    assert ".vscode/*.json" in GOVERNED_GLOBS
+    # .vscode and .devcontainer contain JSONC (not pure JSON) and are excluded
+    assert "scripts/**/*.json" in GOVERNED_GLOBS
 
 
 def test_exclude_globs_constant() -> None:
@@ -29,26 +30,26 @@ def test_iter_governed_files_empty(tmp_path: Path) -> None:
     assert result == []
 
 
-def test_iter_governed_files_finds_vscode_json(tmp_path: Path) -> None:
-    """Files in .vscode/*.json should be found."""
+def test_iter_governed_files_excludes_vscode_json(tmp_path: Path) -> None:
+    """Files in .vscode/*.json should NOT be found (JSONC, not pure JSON)."""
     vscode_dir = tmp_path / ".vscode"
     vscode_dir.mkdir()
     tasks_json = vscode_dir / "tasks.json"
     tasks_json.write_text("{}")
 
     result = list(iter_governed_files(tmp_path))
-    assert tasks_json in result
+    assert tasks_json not in result
 
 
-def test_iter_governed_files_finds_nested_vscode_json(tmp_path: Path) -> None:
-    """Files matching .vscode/**/*.json should be found."""
+def test_iter_governed_files_excludes_nested_vscode_json(tmp_path: Path) -> None:
+    """Files matching .vscode/**/*.json should NOT be found (JSONC)."""
     nested_dir = tmp_path / ".vscode" / "subdir"
     nested_dir.mkdir(parents=True)
     nested_json = nested_dir / "config.json"
     nested_json.write_text("{}")
 
     result = list(iter_governed_files(tmp_path))
-    assert nested_json in result
+    assert nested_json not in result
 
 
 def test_iter_governed_files_excludes_data_dir(tmp_path: Path) -> None:
@@ -84,15 +85,15 @@ def test_iter_governed_files_excludes_parent_in_excluded(tmp_path: Path) -> None
     assert report_json not in result
 
 
-def test_iter_governed_files_finds_devcontainer_json(tmp_path: Path) -> None:
-    """Files in .devcontainer/*.json should be found."""
+def test_iter_governed_files_excludes_devcontainer_json(tmp_path: Path) -> None:
+    """Files in .devcontainer/*.json should NOT be found (JSONC)."""
     devcontainer_dir = tmp_path / ".devcontainer"
     devcontainer_dir.mkdir()
     devcontainer_json = devcontainer_dir / "devcontainer.json"
     devcontainer_json.write_text("{}")
 
     result = list(iter_governed_files(tmp_path))
-    assert devcontainer_json in result
+    assert devcontainer_json not in result
 
 
 def test_iter_governed_files_finds_scripts_json(tmp_path: Path) -> None:
@@ -130,20 +131,20 @@ def test_iter_governed_files_finds_examples_json(tmp_path: Path) -> None:
 
 def test_iter_governed_files_accepts_str_path(tmp_path: Path) -> None:
     """iter_governed_files should accept str paths."""
-    vscode_dir = tmp_path / ".vscode"
-    vscode_dir.mkdir()
-    tasks_json = vscode_dir / "tasks.json"
-    tasks_json.write_text("{}")
+    scripts_dir = tmp_path / "scripts"
+    scripts_dir.mkdir()
+    script_json = scripts_dir / "config.json"
+    script_json.write_text("{}")
 
     result = list(iter_governed_files(str(tmp_path)))
-    assert tasks_json in result
+    assert script_json in result
 
 
 def test_iter_governed_files_mixed_included_excluded(tmp_path: Path) -> None:
     """Mix of included and excluded files should only yield included ones."""
-    vscode_dir = tmp_path / ".vscode"
-    vscode_dir.mkdir()
-    included_json = vscode_dir / "settings.json"
+    scripts_dir = tmp_path / "scripts"
+    scripts_dir.mkdir()
+    included_json = scripts_dir / "config.json"
     included_json.write_text("{}")
 
     data_dir = tmp_path / "data"
@@ -158,10 +159,10 @@ def test_iter_governed_files_mixed_included_excluded(tmp_path: Path) -> None:
 
 def test_iter_governed_files_handles_non_file_matches(tmp_path: Path) -> None:
     """glob matches that are directories should be skipped."""
-    vscode_dir = tmp_path / ".vscode"
-    vscode_dir.mkdir()
+    scripts_dir = tmp_path / "scripts"
+    scripts_dir.mkdir()
     # Create a directory with .json suffix (unusual but possible)
-    json_dir = vscode_dir / "weird.json"
+    json_dir = scripts_dir / "weird.json"
     json_dir.mkdir()
 
     result = list(iter_governed_files(tmp_path))
