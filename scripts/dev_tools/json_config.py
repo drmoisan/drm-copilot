@@ -7,10 +7,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
 
 # Governed JSON config globs (relative to repo root)
+# Note: .vscode and .devcontainer files are JSONC (JSON with Comments)
+# and cannot be formatted by jq. They are excluded from formatting.
 GOVERNED_GLOBS: Sequence[str] = (
-    ".vscode/*.json",
-    ".vscode/**/*.json",
-    ".devcontainer/*.json",
     "scripts/**/*.json",
     "docs/**/*.json",
     "examples/**/*.json",
