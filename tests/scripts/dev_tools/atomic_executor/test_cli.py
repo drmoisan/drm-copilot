@@ -895,7 +895,11 @@ class TestMainEdgeCases:
         # Mock QCRunner methods to succeed
         from scripts.dev_tools.atomic_executor.qc_runner import QCRunner
 
-        monkeypatch.setattr(QCRunner, "run_scoped", lambda self: None)
+        monkeypatch.setattr(
+            QCRunner,
+            "run_scoped",
+            lambda self, expectations=None: None,  # Accept expectations param
+        )
 
         exit_code = main(
             [
@@ -922,12 +926,14 @@ class TestPreflightQC:
     def test_preflight_qc_result_dataclass(self) -> None:
         """PreflightQCResult stores success status and output."""
         from scripts.dev_tools.atomic_executor.cli import PreflightQCResult
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
 
         # Success case
         result = PreflightQCResult(success=True, output="All passed")
         assert result.success is True
         assert result.output == "All passed"
         assert result.failed_step is None
+        assert result.toolchain == QCToolchain.PYTHON
 
         # Failure case
         result = PreflightQCResult(
@@ -936,6 +942,7 @@ class TestPreflightQC:
         assert result.success is False
         assert result.output == "Ruff failed"
         assert result.failed_step == "ruff"
+        assert result.toolchain == QCToolchain.PYTHON
 
     def test_build_preflight_qc_fix_prompt_includes_workspace(
         self,
@@ -943,9 +950,12 @@ class TestPreflightQC:
     ) -> None:
         """_build_preflight_qc_fix_prompt includes workspace in prompt."""
         from scripts.dev_tools.atomic_executor.cli import _build_preflight_qc_fix_prompt
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
 
         prompt = _build_preflight_qc_fix_prompt(
-            workspace=tmp_path, qc_output="Black failed: file.py"
+            workspace=tmp_path,
+            qc_output="Black failed: file.py",
+            toolchain=QCToolchain.PYTHON,
         )
 
         # Check key elements are present
@@ -957,6 +967,22 @@ class TestPreflightQC:
         assert "poetry run pyright" in prompt
         assert "poetry run pytest" in prompt
         assert "Do NOT end your turn until all QC steps pass" in prompt
+
+    def test_build_preflight_qc_fix_prompt_typescript(self) -> None:
+        """_build_preflight_qc_fix_prompt uses npm commands for TypeScript."""
+        from scripts.dev_tools.atomic_executor.cli import _build_preflight_qc_fix_prompt
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
+
+        prompt = _build_preflight_qc_fix_prompt(
+            workspace=Path.cwd(),
+            qc_output="npm run test:unit failed",
+            toolchain=QCToolchain.TYPESCRIPT,
+        )
+
+        assert "npm run format" in prompt
+        assert "npm run lint" in prompt
+        assert "npm run typecheck" in prompt
+        assert "npm run test:unit" in prompt
 
     def test_run_preflight_qc_with_capture_returns_success(
         self,
@@ -1121,6 +1147,8 @@ class TestPhaseEndQC:
         expectations = ResolvedTestExpectations(
             expected_fail_refs={"tests/bugs/2026/test_issue_98.py::test_expected_fail"},
             expected_pass_refs=set(),
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
             missing_test_refs=[],
         )
 
@@ -1153,6 +1181,63 @@ class TestPhaseEndQC:
         assert result.failed_step is None
         assert "expected pytest failures" in result.output.lower()
 
+    def test_preflight_expected_fail_allows_known_jest_failures(
+        self,
+        monkeypatch: "MonkeyPatch",
+    ) -> None:
+        """
+        Preflight QC should allow failures covered by expected Jest refs.
+
+        Purpose:
+            Ensure expected-fail refs suppress baseline fix behavior for Jest.
+        """
+        from scripts.dev_tools.atomic_executor.cli import (
+            _run_preflight_qc_with_capture,
+        )
+        from scripts.dev_tools.atomic_executor.pytest_expectations import (
+            ResolvedTestExpectations,
+        )
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
+
+        expectations = ResolvedTestExpectations(
+            expected_fail_refs=set(),
+            expected_pass_refs=set(),
+            missing_test_refs=[],
+            expected_fail_jest_refs={
+                "tests/unit/task-execution-spec.test.ts::"
+                "getTaskExecutionSpec returns QC black"
+            },
+            expected_pass_jest_refs=set(),
+        )
+
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            """Return a failing npm test run for the expected-fail ref."""
+            cmd = args[0]
+            if isinstance(cmd, list) and cmd[:3] == ["npm", "run", "test:unit"]:
+                output = "\n".join(
+                    [
+                        "FAIL tests/unit/task-execution-spec.test.ts",
+                        "  \u25cf getTaskExecutionSpec returns QC black",
+                    ]
+                )
+                return subprocess.CompletedProcess(
+                    args=cmd, returncode=1, stdout=output, stderr=""
+                )
+            return subprocess.CompletedProcess(
+                args=cmd, returncode=0, stdout="OK", stderr=""
+            )
+
+        monkeypatch.setattr("subprocess.run", mock_run)
+
+        result = _run_preflight_qc_with_capture(
+            Path.cwd(), expectations=expectations, toolchain=QCToolchain.TYPESCRIPT
+        )
+
+        assert result.success is True
+        assert result.failed_step is None
+
     def test_preflight_expected_pass_wins(
         self,
         monkeypatch: "MonkeyPatch",
@@ -1173,6 +1258,8 @@ class TestPhaseEndQC:
         expectations = ResolvedTestExpectations(
             expected_fail_refs={"tests/bugs/2026/test_issue_98.py::test_expected_fail"},
             expected_pass_refs={"tests/bugs/2026/test_issue_98.py::test_expected_fail"},
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
             missing_test_refs=[],
         )
 
@@ -1225,6 +1312,8 @@ class TestPhaseEndQC:
         expectations = ResolvedTestExpectations(
             expected_fail_refs=set(),
             expected_pass_refs=set(),
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
             missing_test_refs=["P1-T1"],
         )
 
@@ -1497,7 +1586,7 @@ class TestRunCopilot:
         assert captured_argv[0] == str(fake_copilot)
         assert "--agent" in captured_argv
         agent_idx = captured_argv.index("--agent")
-        assert captured_argv[agent_idx + 1] == "atomic_execution"
+        assert captured_argv[agent_idx + 1] == "atomic_executor"
         assert "--model" in captured_argv
         assert "gpt-5.1-codex-max" in captured_argv
         assert "--session-path" not in captured_argv

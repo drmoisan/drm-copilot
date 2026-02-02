@@ -371,8 +371,8 @@ For TDD-first development, the executor supports tasks that intentionally create
 ```
 
 Behavior:
-- The tag inverts pytest success criteria: **pytest must fail** for the task to succeed.
-- Black, Ruff, and Pyright must still pass (formatting, linting, and type-checking are not inverted).
+- The tag inverts test success criteria for the active toolchain: **pytest or Jest must fail** for the task to succeed.
+- Black/Ruff/Pyright or npm format/lint/typecheck must still pass (formatting, linting, and type-checking are not inverted).
 - If all QC passes (unexpected green), the executor retries (Copilot should ensure the test actually fails).
 - On success, the executor logs: `Task {task_id} failed as expected (TDD Red). Verified.`
 

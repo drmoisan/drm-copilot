@@ -99,7 +99,8 @@ addopts = "-ra"
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["src"]
+source = ["src", "scripts/dev_tools"]
+data_file = "artifacts/.coverage"
 omit = [
     "tests/*",
     "*/tests/*",

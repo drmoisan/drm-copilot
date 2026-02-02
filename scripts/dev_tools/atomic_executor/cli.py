@@ -44,10 +44,16 @@ from scripts.dev_tools.atomic_executor.plan_parser import (
 from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
 from scripts.dev_tools.atomic_executor.pytest_expectations import (
     ResolvedTestExpectations,
+    parse_jest_failure_output,
     parse_pytest_failure_output,
     resolve_checked_test_expectations,
+    split_jest_expected_ref,
 )
 from scripts.dev_tools.atomic_executor.qc_runner import QCLoopResult, QCRunner
+from scripts.dev_tools.atomic_executor.qc_toolchain import (
+    TOOLCHAIN_COMMANDS,
+    QCToolchain,
+)
 
 DEFAULT_PROMPT_TEMPLATE = ".github/prompts/execute-plan-template.md"
 PROTECTED_BRANCHES = {"main", "master", "development"}
@@ -62,7 +68,7 @@ DEFAULT_COPILOT_CLI_BACKOFF_BASE_SECONDS = 2.0
 DEFAULT_COPILOT_CLI_BACKOFF_MAX_SECONDS = 60.0
 DEFAULT_COPILOT_CLI_OUTPUT_TAIL_BYTES = 4096
 DEFAULT_COPILOT_CLI_MAX_RETRIES = 8
-DEFAULT_COPILOT_AGENT = "atomic_execution"
+DEFAULT_COPILOT_AGENT = "atomic_executor"
 DEFAULT_COPILOT_ALLOW_SHELL = True
 DEFAULT_COPILOT_ALLOW_ALL_PATHS = True
 DEFAULT_COPILOT_ALLOW_ALL_URLS = False
@@ -1257,11 +1263,13 @@ class PreflightQCResult:
         success: True if all QC steps passed.
         output: Combined stdout/stderr from all QC steps.
         failed_step: Name of the first step that failed (or None if success).
+        toolchain: Toolchain used for the pre-flight QC run.
     """
 
     success: bool
     output: str
     failed_step: str | None = None
+    toolchain: QCToolchain = QCToolchain.PYTHON
 
 
 def _resolve_plan_expectations(
@@ -1284,10 +1292,34 @@ def _resolve_plan_expectations(
     if (
         not expectations.expected_fail_refs
         and not expectations.expected_pass_refs
+        and not expectations.expected_fail_jest_refs
+        and not expectations.expected_pass_jest_refs
         and not expectations.missing_test_refs
     ):
         return None
     return expectations
+
+
+def _resolve_preflight_toolchains(parser: PlanParser) -> list[QCToolchain]:
+    """
+    Resolve toolchains to run during preflight and phase gates.
+
+    Purpose:
+        Use auto-QC detection to select toolchains for validation.
+    """
+    detected_attr = getattr(parser, "detected_qc_toolchains", None)
+    if not callable(detected_attr):
+        return [QCToolchain.PYTHON]
+
+    detected_raw = detected_attr()
+    if not isinstance(detected_raw, set):
+        return [QCToolchain.PYTHON]
+    detected = cast(set[QCToolchain], detected_raw)
+    if not detected:
+        return [QCToolchain.PYTHON]
+
+    ordering = {QCToolchain.PYTHON: 0, QCToolchain.TYPESCRIPT: 1}
+    return sorted(detected, key=lambda tool: ordering.get(tool, 99))
 
 
 def _matches_expected_ref(nodeid: str, expected_refs: set[str]) -> bool:
@@ -1311,10 +1343,39 @@ def _matches_expected_ref(nodeid: str, expected_refs: set[str]) -> bool:
     return False
 
 
+def _jest_test_matches_expected(test_name: str, expected_refs: set[str]) -> bool:
+    """
+    Check whether a Jest test name matches any expected ref pattern.
+
+    Purpose:
+        Support substring matching for Jest test names.
+    """
+    for expected_ref in expected_refs:
+        _, test_pattern = split_jest_expected_ref(expected_ref)
+        if test_pattern and test_pattern in test_name:
+            return True
+    return False
+
+
+def _jest_file_matches_expected(file_path: str, expected_refs: set[str]) -> bool:
+    """
+    Check whether a Jest file path matches any expected ref file path.
+
+    Purpose:
+        Support file-level matching when Jest output lacks test names.
+    """
+    for expected_ref in expected_refs:
+        expected_file, _ = split_jest_expected_ref(expected_ref)
+        if expected_file and expected_file == file_path:
+            return True
+    return False
+
+
 def _run_preflight_qc_with_capture(
     workspace: Path,
     *,
     expectations: ResolvedTestExpectations | None = None,
+    toolchain: QCToolchain = QCToolchain.PYTHON,
 ) -> PreflightQCResult:
     """
     Run full QC toolchain and capture combined output.
@@ -1325,51 +1386,75 @@ def _run_preflight_qc_with_capture(
 
     Args:
         workspace: Repository root.
+        expectations: Optional resolved plan expectations.
+        toolchain: Toolchain to run for pre-flight QC.
 
     Returns:
         PreflightQCResult: Success status and captured output.
     """
-    steps = [
-        ("black", ["poetry", "run", "black", "--check", "."]),
-        ("ruff", ["poetry", "run", "ruff", "check"]),
-        ("pyright", ["poetry", "run", "pyright"]),
-        (
-            "pytest",
-            [
-                "poetry",
-                "run",
+    if toolchain is QCToolchain.PYTHON:
+        steps = [
+            ("black", ["poetry", "run", "black", "--check", "."]),
+            ("ruff", ["poetry", "run", "ruff", "check"]),
+            ("pyright", ["poetry", "run", "pyright"]),
+            (
                 "pytest",
-                "--color=no",
-                "--cov=src/lexile_corpus_tuner",
-                "--cov=scripts/dev_tools",
-                "--cov-report=term-missing",
-            ],
-        ),
-    ]
+                [
+                    "poetry",
+                    "run",
+                    "pytest",
+                    "--color=no",
+                    "--cov=src/lexile_corpus_tuner",
+                    "--cov=scripts/dev_tools",
+                    "--cov-report=term-missing",
+                ],
+            ),
+        ]
+        test_step_name = "pytest"
+        expected_refs = (
+            set[str]()
+            if expectations is None
+            else expectations.expected_fail_refs | expectations.expected_pass_refs
+        )
+    elif toolchain is QCToolchain.TYPESCRIPT:
+        steps = [
+            ("format", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["format"]),
+            ("lint", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["lint"]),
+            ("typecheck", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["typecheck"]),
+            ("test-unit", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["test-unit"]),
+        ]
+        test_step_name = "test-unit"
+        expected_refs = (
+            set[str]()
+            if expectations is None
+            else expectations.expected_fail_jest_refs
+            | expectations.expected_pass_jest_refs
+        )
+    else:
+        raise RuntimeError(f"Unsupported QC toolchain: {toolchain}")
 
     all_output: list[str] = []
-    expected_refs: set[str] = set()
-
-    if expectations is not None:
-        expected_refs = (
-            expectations.expected_fail_refs | expectations.expected_pass_refs
+    if expectations is not None and expectations.missing_test_refs:
+        missing_refs = ", ".join(expectations.missing_test_refs)
+        message = (
+            "Missing test reference for expectation-tagged tasks: " f"{missing_refs}"
         )
-        if expectations.missing_test_refs:
-            missing_refs = ", ".join(expectations.missing_test_refs)
-            message = (
-                "Missing test reference for expectation-tagged tasks: "
-                f"{missing_refs}"
-            )
-            return PreflightQCResult(
-                success=False,
-                output=message,
-                failed_step="pytest-collect",
-            )
+        return PreflightQCResult(
+            success=False,
+            output=message,
+            failed_step=f"{test_step_name}-collect",
+            toolchain=toolchain,
+        )
 
     for step_name, cmd in steps:
         all_output.append(f"=== {step_name.upper()} ===")
 
-        if step_name == "pytest" and expectations is not None and expected_refs:
+        if (
+            toolchain is QCToolchain.PYTHON
+            and step_name == "pytest"
+            and expectations is not None
+            and expected_refs
+        ):
             all_output.append("=== PYTEST COLLECT ===")
             collect_cmd = [
                 "poetry",
@@ -1396,6 +1481,7 @@ def _run_preflight_qc_with_capture(
                     success=False,
                     output="\n\n".join(all_output),
                     failed_step="pytest-collect",
+                    toolchain=toolchain,
                 )
 
         # Commands are static hardcoded constants (poetry run black/ruff/pyright/pytest)
@@ -1409,62 +1495,139 @@ def _run_preflight_qc_with_capture(
         all_output.append(combined.strip() if combined else "(no output)")
 
         if result.returncode != 0:
-            if step_name != "pytest" or expectations is None:
+            if step_name != test_step_name or expectations is None:
                 return PreflightQCResult(
                     success=False,
                     output="\n\n".join(all_output),
                     failed_step=step_name,
+                    toolchain=toolchain,
                 )
 
-            summary = parse_pytest_failure_output(combined)
-            if summary.has_collection_error:
-                all_output.append(
-                    "Pytest collection/import errors detected; failing QC."
-                )
-                return PreflightQCResult(
-                    success=False,
-                    output="\n\n".join(all_output),
-                    failed_step=step_name,
-                )
-
-            unexpected_failures: list[str] = []
-            expected_pass_hits: list[str] = []
-
-            # Compare failing nodeids against expected refs with prefix matching.
-            for nodeid in summary.failed_nodeids:
-                if _matches_expected_ref(nodeid, expectations.expected_pass_refs):
-                    expected_pass_hits.append(nodeid)
-                    unexpected_failures.append(nodeid)
-                elif _matches_expected_ref(nodeid, expectations.expected_fail_refs):
-                    continue
-                else:
-                    unexpected_failures.append(nodeid)
-
-            if unexpected_failures:
-                all_output.append("Unexpected pytest failures detected.")
-                if expected_pass_hits:
+            if toolchain is QCToolchain.PYTHON:
+                summary = parse_pytest_failure_output(combined)
+                if summary.has_collection_error:
                     all_output.append(
-                        "Expected-pass override applied to: "
-                        + ", ".join(expected_pass_hits)
+                        "Pytest collection/import errors detected; failing QC."
                     )
-                return PreflightQCResult(
-                    success=False,
-                    output="\n\n".join(all_output),
-                    failed_step=step_name,
-                )
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                    )
 
-            all_output.append(
-                "Expected pytest failures allowed: "
-                + ", ".join(sorted(summary.failed_nodeids))
-            )
+                unexpected_failures: list[str] = []
+                expected_pass_hits: list[str] = []
+
+                # Compare failing nodeids against expected refs with prefix matching.
+                for nodeid in summary.failed_nodeids:
+                    if _matches_expected_ref(nodeid, expectations.expected_pass_refs):
+                        expected_pass_hits.append(nodeid)
+                        unexpected_failures.append(nodeid)
+                    elif _matches_expected_ref(nodeid, expectations.expected_fail_refs):
+                        continue
+                    else:
+                        unexpected_failures.append(nodeid)
+
+                if unexpected_failures:
+                    all_output.append("Unexpected pytest failures detected.")
+                    if expected_pass_hits:
+                        all_output.append(
+                            "Expected-pass override applied to: "
+                            + ", ".join(expected_pass_hits)
+                        )
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                    )
+
+                all_output.append(
+                    "Expected pytest failures allowed: "
+                    + ", ".join(sorted(summary.failed_nodeids))
+                )
+            elif toolchain is QCToolchain.TYPESCRIPT:
+                summary = parse_jest_failure_output(combined)
+                if summary.has_runtime_error:
+                    all_output.append("Jest runtime errors detected; failing QC.")
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                    )
+                if not summary.failed_tests and not summary.failed_files:
+                    all_output.append("Jest failures could not be parsed; failing QC.")
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                    )
+
+                unexpected_failures: list[str] = []
+                expected_pass_hits: list[str] = []
+
+                if summary.failed_tests:
+                    for test_name in summary.failed_tests:
+                        if _jest_test_matches_expected(
+                            test_name, expectations.expected_pass_jest_refs
+                        ):
+                            expected_pass_hits.append(test_name)
+                            unexpected_failures.append(test_name)
+                        elif _jest_test_matches_expected(
+                            test_name, expectations.expected_fail_jest_refs
+                        ):
+                            continue
+                        else:
+                            unexpected_failures.append(test_name)
+                else:
+                    for file_path in summary.failed_files:
+                        if _jest_file_matches_expected(
+                            file_path, expectations.expected_pass_jest_refs
+                        ):
+                            expected_pass_hits.append(file_path)
+                            unexpected_failures.append(file_path)
+                        elif _jest_file_matches_expected(
+                            file_path, expectations.expected_fail_jest_refs
+                        ):
+                            continue
+                        else:
+                            unexpected_failures.append(file_path)
+
+                if unexpected_failures:
+                    all_output.append("Unexpected Jest failures detected.")
+                    if expected_pass_hits:
+                        all_output.append(
+                            "Expected-pass override applied to: "
+                            + ", ".join(expected_pass_hits)
+                        )
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                    )
+
+                all_output.append(
+                    "Expected Jest failures allowed: "
+                    + ", ".join(sorted(summary.failed_tests or summary.failed_files))
+                )
 
     return PreflightQCResult(
         success=True,
         output="\n\n".join(all_output),
+        toolchain=toolchain,
     )
 
 
-def _build_preflight_qc_fix_prompt(workspace: Path, qc_output: str) -> str:
+def _build_preflight_qc_fix_prompt(
+    workspace: Path,
+    qc_output: str,
+    *,
+    toolchain: QCToolchain = QCToolchain.PYTHON,
+) -> str:
     """
     Build a prompt directing Copilot to fix pre-flight QC failures.
 
@@ -1476,10 +1639,33 @@ def _build_preflight_qc_fix_prompt(workspace: Path, qc_output: str) -> str:
     Args:
         workspace: Repository root path for context.
         qc_output: Captured output from the failed QC run.
+        toolchain: Toolchain used for the pre-flight QC run.
 
     Returns:
         str: Prompt text for Copilot CLI execution.
     """
+    if toolchain is QCToolchain.PYTHON:
+        command_lines = "\n".join(
+            [
+                "   - `poetry run black .`",
+                "   - `poetry run ruff check`",
+                "   - `poetry run pyright`",
+                "   - `poetry run pytest --cov=src/lexile_corpus_tuner "
+                "--cov=scripts/dev_tools --cov-report=term-missing`",
+            ]
+        )
+    elif toolchain is QCToolchain.TYPESCRIPT:
+        command_lines = "\n".join(
+            [
+                "   - `npm run format`",
+                "   - `npm run lint`",
+                "   - `npm run typecheck`",
+                "   - `npm run test:unit`",
+            ]
+        )
+    else:
+        raise RuntimeError(f"Unsupported QC toolchain: {toolchain}")
+
     return (
         "# Pre-flight QC Fix Required\n\n"
         "The atomic executor detected baseline QC failures before task execution.\n"
@@ -1493,11 +1679,7 @@ def _build_preflight_qc_fix_prompt(workspace: Path, qc_output: str) -> str:
         "1. Analyze the QC failures above.\n"
         "2. Make the minimal code changes required to fix each issue.\n"
         "3. **Run the full QC toolchain yourself** to verify your fixes:\n"
-        "   - `poetry run black .`\n"
-        "   - `poetry run ruff check`\n"
-        "   - `poetry run pyright`\n"
-        "   - `poetry run pytest --cov=src/lexile_corpus_tuner "
-        "--cov=scripts/dev_tools --cov-report=term-missing`\n"
+        f"{command_lines}\n"
         "4. If any step fails, fix the issues and re-run from step 3.\n"
         "5. **Do NOT end your turn until all QC steps pass.**\n"
         "6. Once all checks pass, reply with a brief summary of what you fixed.\n\n"
@@ -1522,6 +1704,7 @@ def _run_preflight_qc_fix_loop(
     copilot_trust_workspace: bool,
     max_fix_attempts: int,
     expectations: ResolvedTestExpectations | None,
+    toolchains: list[QCToolchain],
 ) -> int:
     """
     Run the pre-flight QC fix loop until baseline passes or attempts exhausted.
@@ -1554,7 +1737,8 @@ def _run_preflight_qc_fix_loop(
         copilot_allow_all_urls: Allow all URLs without approval.
         copilot_trust_workspace: Add workspace to trusted folders.
         max_fix_attempts: Max number of fix attempts (0 = infinite).
-        expectations: Optional resolved plan expectations for pytest gating.
+        expectations: Optional resolved plan expectations for pytest/Jest gating.
+        toolchains: Toolchains to run for pre-flight QC.
 
     Returns:
         int: 0 on success, 6 on failure.
@@ -1563,6 +1747,11 @@ def _run_preflight_qc_fix_loop(
     copilot_invocation_count = 0
 
     while True:
+        # Check for graceful shutdown request
+        if is_shutdown_requested():
+            print("[atomic_executor] Shutdown requested during pre-flight QC.")
+            return 130  # Standard exit code for SIGINT
+
         if max_fix_attempts > 0 and attempt > max_fix_attempts:
             msg = f"Pre-flight QC fix failed after {max_fix_attempts} attempts."
             print(msg, file=sys.stderr)
@@ -1573,10 +1762,16 @@ def _run_preflight_qc_fix_loop(
         print("Running pre-flight QC check...")
         _log_msg(log_file, "INFO: Running pre-flight QC check")
 
-        preflight_check = _run_preflight_qc_with_capture(
-            workspace, expectations=expectations
-        )
-        if preflight_check.success:
+        preflight_check: PreflightQCResult | None = None
+        for toolchain in toolchains:
+            preflight_check = _run_preflight_qc_with_capture(
+                workspace,
+                expectations=expectations,
+                toolchain=toolchain,
+            )
+            if not preflight_check.success:
+                break
+        if preflight_check is None or preflight_check.success:
             # QC passed - we're done
             print("Pre-flight QC passed.")
             _log_msg(log_file, "INFO: Pre-flight QC passed")
@@ -1584,6 +1779,7 @@ def _run_preflight_qc_fix_loop(
 
         # QC failed - extract output for prompt
         qc_output = preflight_check.output
+        failed_toolchain = preflight_check.toolchain
 
         limit_str = str(max_fix_attempts) if max_fix_attempts > 0 else "∞"
         msg = (
@@ -1594,7 +1790,9 @@ def _run_preflight_qc_fix_loop(
         _log_msg(log_file, f"WARN: {msg}")
 
         # Build prompt for Copilot
-        prompt_text = _build_preflight_qc_fix_prompt(workspace, qc_output)
+        prompt_text = _build_preflight_qc_fix_prompt(
+            workspace, qc_output, toolchain=failed_toolchain
+        )
 
         # Write prompt to file for debugging
         prompt_dir = workspace / LOG_DIR / "prompts"
@@ -1606,6 +1804,11 @@ def _run_preflight_qc_fix_loop(
         throttle_retries = 0
 
         while True:
+            # Check for graceful shutdown request
+            if is_shutdown_requested():
+                print("[atomic_executor] Shutdown requested during pre-flight QC.")
+                return 130  # Standard exit code for SIGINT
+
             copilot_rate_limiter.acquire()
 
             copilot_result = run_copilot(
@@ -1735,6 +1938,7 @@ def _execute_auto_qc_phase(
         try:
             result = qc_runner.run_full_loop_with_artifacts(
                 artifact_paths=phase.artifact_paths,
+                toolchain=phase.toolchain,
             )
         except RuntimeError as exc:
             err_msg = f"Auto-QC phase {phase.phase} failed: {exc}"
@@ -1973,6 +2177,11 @@ def execute_one_task(
     retry_ctx = None
 
     while True:
+        # Check for graceful shutdown request
+        if is_shutdown_requested():
+            print(f"[atomic_executor] Shutdown requested, exiting task {cur.task_id}.")
+            return 130  # Standard exit code for SIGINT
+
         if max_fix_attempts > 0 and attempt > max_fix_attempts:
             msg = (
                 f"Failed to complete task {cur.task_id} after "
@@ -2004,6 +2213,11 @@ def execute_one_task(
         # - On throttle-like failures, apply bounded exponential backoff and retry.
         # - On non-throttle failures, fail fast with actionable context.
         while True:
+            # Check for graceful shutdown request
+            if is_shutdown_requested():
+                print(f"[atomic_executor] Shutdown at task {cur.task_id}.")
+                return 130  # Standard exit code for SIGINT
+
             copilot_rate_limiter.acquire()
 
             copilot_result = run_copilot(
@@ -2078,7 +2292,9 @@ def execute_one_task(
 
         # Task-step QC (scoped)
         try:
-            qc_runner.run_scoped()
+            # Resolve expectations so expected-fail tests don't cause QC failure
+            scoped_expectations = _resolve_plan_expectations(parser)
+            qc_runner.run_scoped(expectations=scoped_expectations)
             # QC passed (no exception)
             if cur.expect_fail:
                 # Unexpected: test should have failed but all QC passed
@@ -2102,8 +2318,9 @@ def execute_one_task(
             else:
                 cmd_str = " ".join(str(arg) for arg in e.cmd)
             is_pytest_failure = "pytest" in cmd_str
+            is_npm_failure = "npm" in cmd_str and "test" in cmd_str
 
-            if cur.expect_fail and is_pytest_failure:
+            if cur.expect_fail and (is_pytest_failure or is_npm_failure):
                 # SUCCESS: Expected pytest failure achieved (TDD Red workflow)
                 success_msg = (
                     f"Task {cur.task_id} failed as expected (TDD Red). Verified."
@@ -2253,6 +2470,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         qc_runner = QCRunner(workspace)
         preflight_expectations = _resolve_plan_expectations(parser)
+        preflight_toolchains = _resolve_preflight_toolchains(parser)
 
         # Per-run throttling controls. The limiter must persist across tasks to
         # regulate overall call cadence.
@@ -2287,6 +2505,7 @@ def main(argv: list[str] | None = None) -> int:
                 copilot_trust_workspace=args.copilot_trust_workspace,
                 max_fix_attempts=args.max_fix_attempts,
                 expectations=preflight_expectations,
+                toolchains=preflight_toolchains,
             )
             if preflight_result != 0:
                 return preflight_result
@@ -2356,7 +2575,11 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"Phase {cur.phase} complete -> running full toolchain...")
                     try:
                         phase_expectations = _resolve_plan_expectations(parser)
-                        qc_runner.run_full(expectations=phase_expectations)
+                        for toolchain in preflight_toolchains:
+                            qc_runner.run_full(
+                                expectations=phase_expectations,
+                                toolchain=toolchain,
+                            )
                     except subprocess.CalledProcessError as e:
                         print(
                             f"Full QC failed after completing Phase {cur.phase}: {e}",

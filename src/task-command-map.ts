@@ -51,6 +51,33 @@ export const TASK_COMMAND_MAP = {
 
 export type TaskCommandId = keyof typeof TASK_COMMAND_MAP;
 
+export type TaskExecutionSpec = {
+  command: string;
+  args: string[];
+};
+
+const TASK_EXECUTION_MAP: Partial<Record<TaskCommandId, TaskExecutionSpec>> = {
+  "drm-copilot.qcBlackFormat": {
+    command: "poetry",
+    args: ["run", "black", "."],
+  },
+  "drm-copilot.devPromotePotentialToIssue": {
+    command: "poetry",
+    args: [
+      "run",
+      "python",
+      "-m",
+      "scripts.dev_tools.potential_to_issue",
+      "--potential-path",
+      "${relativeFile}",
+      "--promotion-type",
+      "${input:PotentialPromotionType}",
+    ],
+  },
+};
+
+const INPUT_TOKEN_PATTERN = /\$\{input:([^}]+)\}/g;
+
 /**
  * Returns the VS Code task label for a command ID, if the command is task-backed.
  */
@@ -65,4 +92,35 @@ export function getTaskLabelForCommandId(
  */
 export function getAllTaskCommandIds(): TaskCommandId[] {
   return Object.keys(TASK_COMMAND_MAP) as TaskCommandId[];
+}
+
+/**
+ * Returns the execution spec for a command ID, if defined.
+ */
+export function getTaskExecutionSpec(
+  commandId: TaskCommandId,
+): TaskExecutionSpec | undefined {
+  return TASK_EXECUTION_MAP[commandId];
+}
+
+/**
+ * Extracts task input IDs used by a command's argument list.
+ */
+export function getTaskInputIdsForCommand(commandId: TaskCommandId): string[] {
+  const spec = getTaskExecutionSpec(commandId);
+  if (!spec) {
+    return [];
+  }
+
+  const inputIds: string[] = [];
+  for (const arg of spec.args) {
+    for (const match of arg.matchAll(INPUT_TOKEN_PATTERN)) {
+      const inputId = match[1];
+      if (inputId && !inputIds.includes(inputId)) {
+        inputIds.push(inputId);
+      }
+    }
+  }
+
+  return inputIds;
 }

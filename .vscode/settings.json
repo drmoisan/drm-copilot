@@ -300,6 +300,9 @@
   ],
   "powershell.cwd": "${workspaceFolder}",
 
+  "jest.jestCommandLine": "npm run test:unit --",
+  "jest.rootPath": ".",
+
 	"python.testing.pytestEnabled": true,
 	"python.testing.unittestEnabled": false,
 	"python.testing.pytestArgs": ["tests"],

@@ -194,6 +194,51 @@ class TestPlanParserParse:
             == "tests/bugs/2026/test_issue_98.py::test_expected_fail"
         )
 
+    def test_parse_extracts_test_ref_from_jest_ref_form(self) -> None:
+        """
+        PlanParser.parse should extract a test_ref from the Jest form.
+
+        Purpose:
+            Validate "jest <path> --testNamePattern" forms are parsed into
+            test_ref.
+
+        Side Effects:
+            Reads a committed fixture file from tests/fixtures (no temp files).
+        """
+        parser = PlanParser(
+            Path("tests/fixtures/atomic_executor/plan_expect_fail_with_jest_ref.md")
+        )
+        model = parser.parse()
+
+        expected_ref = (
+            "tests/unit/task-execution-spec.test.ts "
+            '--testNamePattern="getTaskExecutionSpec returns QC black"'
+        )
+        assert model.tasks[0].test_ref == expected_ref
+
+    def test_parse_extracts_test_ref_from_jest_prose_form(self) -> None:
+        """
+        PlanParser.parse should extract a test_ref from the Jest prose form.
+
+        Purpose:
+            Ensure "Add Jest test in `path` for `name`" yields a stable test
+            reference.
+
+        Side Effects:
+            Reads a committed fixture file from tests/fixtures (no temp files).
+        """
+        parser = PlanParser(
+            Path(
+                "tests/fixtures/atomic_executor/" "plan_expect_fail_with_jest_prose.md"
+            )
+        )
+        model = parser.parse()
+
+        assert (
+            model.tasks[0].test_ref == "tests/unit/task-execution-spec.test.ts::"
+            "getTaskExecutionSpec returns QC black"
+        )
+
     def test_parse_defaults_expect_fail_false_when_tag_missing(
         self, tmp_path: Path
     ) -> None:

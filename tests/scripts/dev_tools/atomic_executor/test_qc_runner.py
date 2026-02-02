@@ -418,6 +418,34 @@ class TestQCRunnerRunFull:
             "--cov-report=term-missing",
         ]
 
+    def test_run_full_typescript_runs_npm_toolchain(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
+        """run_full() runs npm toolchain steps for TypeScript."""
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
+
+        calls: list[list[str]] = []
+
+        def mock_run(
+            argv: list[str], *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
+            calls.append(argv)
+            result = Mock()
+            result.returncode = 0
+            return result  # type: ignore[return-value]
+
+        monkeypatch.setattr("subprocess.run", mock_run)
+
+        runner = QCRunner(Path.cwd())
+        runner.run_full(toolchain=QCToolchain.TYPESCRIPT)
+
+        assert calls == [
+            ["npm", "run", "format"],
+            ["npm", "run", "lint"],
+            ["npm", "run", "typecheck"],
+            ["npm", "run", "test:unit"],
+        ]
+
     def test_run_full_raises_on_tool_failure(
         self, tmp_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
@@ -457,6 +485,8 @@ class TestQCRunnerRunFull:
         expectations = ResolvedTestExpectations(
             expected_fail_refs={"tests/bugs/2026/test_issue_98.py::test_expected_fail"},
             expected_pass_refs=set(),
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
             missing_test_refs=[],
         )
 
@@ -498,6 +528,8 @@ class TestQCRunnerRunFull:
         expectations = ResolvedTestExpectations(
             expected_fail_refs=set(),
             expected_pass_refs=set(),
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
             missing_test_refs=[],
         )
 

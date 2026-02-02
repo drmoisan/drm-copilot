@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1769975829667" clover="3.2.0">
+  <project timestamp="1769975829667" name="All files">
+    <metrics statements="5" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1" elements="7" coveredelements="5" complexity="0" loc="5" ncloc="5" packages="1" files="1" classes="1"/>
+    <file name="task-command-map.ts" path="D:\repos\drm-copilot\src\task-command-map.ts">
+      <metrics statements="5" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+      <line num="7" count="2" type="stmt"/>
+      <line num="57" count="2" type="stmt"/>
+      <line num="60" count="3" type="stmt"/>
+      <line num="66" count="2" type="stmt"/>
+      <line num="67" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>

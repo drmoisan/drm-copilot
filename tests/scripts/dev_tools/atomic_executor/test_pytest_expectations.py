@@ -4,9 +4,73 @@ Tests for pytest expectation resolution and failure parsing helpers.
 
 from scripts.dev_tools.atomic_executor.plan_parser import PlanModel, PlanTask
 from scripts.dev_tools.atomic_executor.pytest_expectations import (
+    is_jest_ref,
+    is_pytest_ref,
+    parse_jest_failure_output,
     parse_pytest_failure_output,
     resolve_checked_test_expectations,
 )
+
+
+class TestIsPytestRef:
+    """Tests for is_pytest_ref helper function."""
+
+    def test_identifies_typescript_test_files(self) -> None:
+        """
+        TypeScript test file references should be excluded from pytest.
+
+        Purpose:
+            Ensure Jest/TypeScript tests don't get passed to pytest.
+        """
+        assert is_pytest_ref("tests/unit/task-execution-spec.test.ts") is False
+        assert is_pytest_ref("tests/unit/task-execution-spec.spec.ts") is False
+        assert (
+            is_pytest_ref(
+                "tests/unit/task-execution-spec.test.ts::getTaskExecutionSpec"
+            )
+            is False
+        )
+
+    def test_identifies_python_test_files(self) -> None:
+        """
+        Python test file references should be accepted by pytest.
+
+        Purpose:
+            Ensure pytest nodeids pass through filtering.
+        """
+        assert is_pytest_ref("tests/bugs/2026/test_issue_98.py::test_foo") is True
+        assert is_pytest_ref("tests/unit/test_module.py") is True
+        assert is_pytest_ref("tests/integration/test_flow.py::TestClass") is True
+
+    def test_handles_ambiguous_refs(self) -> None:
+        """
+        References without clear file extensions default to pytest.
+
+        Purpose:
+            Preserve backward compatibility for prose-style refs.
+        """
+        assert is_pytest_ref("test_something") is True
+        assert is_pytest_ref("tests/module::test_name") is True
+
+
+class TestIsJestRef:
+    """Tests for is_jest_ref helper function."""
+
+    def test_identifies_typescript_test_refs(self) -> None:
+        """TypeScript/Jest refs should be detected for npm test gating."""
+        assert is_jest_ref("tests/unit/task-execution-spec.test.ts") is True
+        assert is_jest_ref("tests/unit/task-execution-spec.spec.ts") is True
+        assert is_jest_ref("tests/unit/task-execution-spec.test.tsx") is True
+        assert (
+            is_jest_ref("tests/unit/task-execution-spec.test.ts::getTaskExecutionSpec")
+            is True
+        )
+
+    def test_rejects_python_refs(self) -> None:
+        """Python refs should not be classified as Jest."""
+        assert is_jest_ref("tests/bugs/2026/test_issue_98.py::test_expected_fail") is (
+            False
+        )
 
 
 class TestResolveCheckedTestExpectations:
@@ -93,6 +157,53 @@ class TestResolveCheckedTestExpectations:
         }
         assert expectations.missing_test_refs == []
 
+    def test_filters_out_jest_typescript_test_refs(self) -> None:
+        """
+        Jest/TypeScript test references should be routed to Jest expectations.
+
+        Purpose:
+            Prevent pytest from attempting to run TypeScript test files.
+        """
+        plan = PlanModel(
+            tasks=[
+                PlanTask(
+                    "P1-T1",
+                    1,
+                    1,
+                    "jest tests/unit/task-execution-spec.test.ts",
+                    True,
+                    0,
+                    expect_fail=True,
+                    test_ref="tests/unit/task-execution-spec.test.ts::getTaskExecutionSpec",
+                ),
+                PlanTask(
+                    "P1-T2",
+                    1,
+                    2,
+                    "pytest tests/bugs/2026/test_issue_98.py::test_expected_fail",
+                    True,
+                    1,
+                    expect_fail=True,
+                    test_ref="tests/bugs/2026/test_issue_98.py::test_expected_fail",
+                ),
+            ],
+            phases=[1],
+        )
+
+        expectations = resolve_checked_test_expectations(plan)
+
+        # Python test ref should be included for pytest
+        assert expectations.expected_fail_refs == {
+            "tests/bugs/2026/test_issue_98.py::test_expected_fail"
+        }
+        assert expectations.expected_pass_refs == set()
+        # Jest test ref should be routed to jest expectations
+        assert expectations.expected_fail_jest_refs == {
+            "tests/unit/task-execution-spec.test.ts::getTaskExecutionSpec"
+        }
+        assert expectations.expected_pass_jest_refs == set()
+        assert expectations.missing_test_refs == []
+
 
 class TestParsePytestFailureOutput:
     """Tests for parse_pytest_failure_output."""
@@ -171,3 +282,39 @@ class TestParsePytestFailureOutput:
 
         assert summary.failed_nodeids == set()
         assert summary.has_collection_error is True
+
+
+class TestParseJestFailureOutput:
+    """Tests for parse_jest_failure_output."""
+
+    def test_parses_failing_files_and_tests(self) -> None:
+        """Jest failures should capture file paths and test names."""
+        output = "\n".join(
+            [
+                "FAIL tests/unit/task-execution-spec.test.ts",
+                "  \u25cf getTaskExecutionSpec returns QC black",
+                "",
+                "Test Suites: 1 failed, 1 total",
+            ]
+        )
+
+        summary = parse_jest_failure_output(output)
+
+        assert summary.failed_files == {"tests/unit/task-execution-spec.test.ts"}
+        assert summary.failed_tests == {"getTaskExecutionSpec returns QC black"}
+        assert summary.has_runtime_error is False
+
+    def test_detects_runtime_errors(self) -> None:
+        """Runtime errors should be flagged to fail QC immediately."""
+        output = "\n".join(
+            [
+                "FAIL tests/unit/task-execution-spec.test.ts",
+                "Test suite failed to run",
+                "SyntaxError: Unexpected token",
+            ]
+        )
+
+        summary = parse_jest_failure_output(output)
+
+        assert summary.failed_files == {"tests/unit/task-execution-spec.test.ts"}
+        assert summary.has_runtime_error is True

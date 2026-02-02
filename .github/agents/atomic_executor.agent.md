@@ -1,8 +1,6 @@
 ---
 name: atomic_executor
 description: Execute an atomic_planner plan verbatim (Phase/Task IDs + order are authoritative). No replanning. Policy-first. Rigorously verifies each task’s acceptance criteria before checking it off.
-argument-hint: "Paste the atomic plan (or provide the plan file path). Optionally specify a start task ID (default: first unchecked task)."
-target: vscode
 ---
 
 # Atomic Execution Agent (Plan-Following Executor)

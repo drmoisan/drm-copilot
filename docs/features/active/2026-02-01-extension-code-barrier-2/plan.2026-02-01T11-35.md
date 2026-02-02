@@ -14,6 +14,18 @@ Status Badge: ![Status](https://img.shields.io/badge/status-Planned-blue)
 
 Execution Notes:
 - Copilot instructions file path to verify: `.github/copilot-instructions.md` (re-check during Phase 0).
+- copilot-instructions.md: missing
+- general-code-change.instructions.md: read
+- general-unit-test.instructions.md: read
+- typescript-code-change.instructions.md: read
+- typescript-unit-test.instructions.md: read
+- typescript-suppressions.instructions.md: read
+- spec.last_updated: 2026-02-01T11-35
+- research.recommended_approach: task provider + extension-path resolution
+- baseline.format.exit_code: 0
+- baseline.lint.exit_code: 0
+- baseline.typecheck.exit_code: 0
+- baseline.test_unit.exit_code: 0
 
 Requirements Table:
 
@@ -58,37 +70,37 @@ Requirements Traceability:
 | SEC-001 | P2-T4, P2-T5 |
 
 ### Phase 0 — Context & Inputs
-- [ ] [P0-T1] Read `.github/copilot-instructions.md` and record the result in Execution Notes.
+- [x] [P0-T1] Read `.github/copilot-instructions.md` and record the result in Execution Notes.
 	- Acceptance: Execution Notes includes a line stating either `copilot-instructions.md: read` or `copilot-instructions.md: missing`.
-- [ ] [P0-T2] Read `.github/instructions/general-code-change.instructions.md` and record completion in Execution Notes.
+- [x] [P0-T2] Read `.github/instructions/general-code-change.instructions.md` and record completion in Execution Notes.
 	- Acceptance: Execution Notes includes `general-code-change.instructions.md: read`.
-- [ ] [P0-T3] Read `.github/instructions/general-unit-test.instructions.md` and record completion in Execution Notes.
+- [x] [P0-T3] Read `.github/instructions/general-unit-test.instructions.md` and record completion in Execution Notes.
 	- Acceptance: Execution Notes includes `general-unit-test.instructions.md: read`.
-- [ ] [P0-T4] Read `.github/instructions/typescript-code-change.instructions.md` and record completion in Execution Notes.
+- [x] [P0-T4] Read `.github/instructions/typescript-code-change.instructions.md` and record completion in Execution Notes.
 	- Acceptance: Execution Notes includes `typescript-code-change.instructions.md: read`.
-- [ ] [P0-T5] Read `.github/instructions/typescript-unit-test.instructions.md` and record completion in Execution Notes.
+- [x] [P0-T5] Read `.github/instructions/typescript-unit-test.instructions.md` and record completion in Execution Notes.
 	- Acceptance: Execution Notes includes `typescript-unit-test.instructions.md: read`.
-- [ ] [P0-T6] Read `.github/instructions/typescript-suppressions.instructions.md` and record completion in Execution Notes.
+- [x] [P0-T6] Read `.github/instructions/typescript-suppressions.instructions.md` and record completion in Execution Notes.
 	- Acceptance: Execution Notes includes `typescript-suppressions.instructions.md: read`.
-- [ ] [P0-T7] Read `docs/features/active/2026-02-01-extension-code-barrier-2/spec.md` and record the `Last Updated` value in Execution Notes.
+- [x] [P0-T7] Read `docs/features/active/2026-02-01-extension-code-barrier-2/spec.md` and record the `Last Updated` value in Execution Notes.
 	- Acceptance: Execution Notes includes `spec.last_updated: 2026-02-01T11-35`.
-- [ ] [P0-T8] Read `artifacts/research/20260201-extension-code-barrier-implementation-research.md` and record the recommended approach in Execution Notes.
+- [x] [P0-T8] Read `artifacts/research/20260201-extension-code-barrier-implementation-research.md` and record the recommended approach in Execution Notes.
 	- Acceptance: Execution Notes includes `research.recommended_approach: task provider + extension-path resolution`.
-- [ ] [P0-T9] Capture baseline formatting result with `npm run format` and record exit code in Execution Notes.
+- [x] [P0-T9] Capture baseline formatting result with `npm run format` and record exit code in Execution Notes.
 	- Acceptance: Execution Notes includes `baseline.format.exit_code: 0`.
-- [ ] [P0-T10] Capture baseline lint result with `npm run lint` and record exit code in Execution Notes.
+- [x] [P0-T10] Capture baseline lint result with `npm run lint` and record exit code in Execution Notes.
 	- Acceptance: Execution Notes includes `baseline.lint.exit_code: 0`.
-- [ ] [P0-T11] Capture baseline typecheck result with `npm run typecheck` and record exit code in Execution Notes.
+- [x] [P0-T11] Capture baseline typecheck result with `npm run typecheck` and record exit code in Execution Notes.
 	- Acceptance: Execution Notes includes `baseline.typecheck.exit_code: 0`.
-- [ ] [P0-T12] Capture baseline unit test result with `npm run test:unit` and record exit code in Execution Notes.
+- [x] [P0-T12] Capture baseline unit test result with `npm run test:unit` and record exit code in Execution Notes.
 	- Acceptance: Execution Notes includes `baseline.test_unit.exit_code: 0`.
 
 ### Phase 1 — Regression Tests (TDD, expect fail)
-- [ ] [P1-T1] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `getTaskExecutionSpec` returning the command/args for `drm-copilot.qcBlackFormat`.
+- [x] [P1-T1] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `getTaskExecutionSpec` returning the command/args for `drm-copilot.qcBlackFormat`.
 	- Preconditions: `src/task-command-map.ts` exports `getTaskExecutionSpec` (to be added in Phase 2).
 	- Line numbers: new file `tests/unit/task-execution-spec.test.ts` (line numbers N/A).
 	- Acceptance: `npm run test:unit -- --runTestsByPath tests/unit/task-execution-spec.test.ts -t "getTaskExecutionSpec returns QC black"` fails with missing export or incorrect mapping.
-- [ ] [P1-T2] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `getTaskInputIdsForCommand` returning `["PotentialPromotionType"]` for `drm-copilot.devPromotePotentialToIssue`.
+- [x] [P1-T2] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `getTaskInputIdsForCommand` returning `["PotentialPromotionType"]` for `drm-copilot.devPromotePotentialToIssue`.
 	- Preconditions: `src/task-command-map.ts` exports `getTaskInputIdsForCommand` (to be added in Phase 2).
 	- Line numbers: new file `tests/unit/task-execution-spec.test.ts` (line numbers N/A).
 	- Acceptance: `npm run test:unit -- --runTestsByPath tests/unit/task-execution-spec.test.ts -t "getTaskInputIdsForCommand uses inputs"` fails with missing export or incorrect input mapping.

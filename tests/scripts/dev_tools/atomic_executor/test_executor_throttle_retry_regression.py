@@ -88,6 +88,10 @@ class _FakePlanParser:
             raise RuntimeError(f"Unexpected task id: {task_id}")
         return self._task
 
+    def parse(self) -> object:
+        """Return empty plan model for expectations resolution."""
+        return type("PlanModel", (), {"phase_tasks": {}, "tasks": []})()
+
     def flip_checkbox(self, _task_to_check: PlanTask) -> None:
         """Fail if called.
 
@@ -114,7 +118,7 @@ class _FakeQCRunner:
     def __init__(self) -> None:
         self.scoped_runs: int = 0
 
-    def run_scoped(self) -> None:
+    def run_scoped(self, *, expectations: object = None) -> None:
         """Record a scoped QC run."""
 
         self.scoped_runs += 1

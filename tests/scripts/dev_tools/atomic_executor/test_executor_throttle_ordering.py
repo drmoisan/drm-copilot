@@ -104,6 +104,10 @@ class _FakePlanParser:
 
         self.call_log.append(f"flip:{task_to_check.task_id}")
 
+    def parse(self) -> object:
+        """Return empty plan model for expectations resolution."""
+        return type("PlanModel", (), {"phase_tasks": {}, "tasks": []})()
+
 
 @dataclass
 class _FakePromptBuilder:
@@ -155,7 +159,7 @@ class _FakeQCRunner:
 
     call_log: list[str]
 
-    def run_scoped(self) -> None:
+    def run_scoped(self, *, expectations: object = None) -> None:
         """Record that scoped QC ran."""
 
         self.call_log.append("qc")
