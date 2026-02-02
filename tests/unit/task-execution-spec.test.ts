@@ -10,7 +10,7 @@ import { describe, expect, it } from "@jest/globals";
 import {
   getTaskExecutionSpec,
   getTaskInputIdsForCommand,
-  // resolveTaskArgs, // Not yet implemented - Phase 2
+  resolveTaskArgs, // Not yet implemented - Phase 2
 } from "../../src/task-command-map";
 
 describe("task-execution-spec", () => {
@@ -21,6 +21,13 @@ describe("task-execution-spec", () => {
       expect(spec).toBeDefined();
       expect(spec?.command).toBe("poetry");
       expect(spec?.args).toEqual(["run", "black", "."]);
+    });
+
+    it("returns undefined for unknown command id", () => {
+      // @ts-expect-error - Testing with invalid command ID
+      const spec = getTaskExecutionSpec("drm-copilot.unknownCommand");
+
+      expect(spec).toBeUndefined();
     });
   });
 
@@ -34,7 +41,7 @@ describe("task-execution-spec", () => {
     });
   });
 
-  describe.skip("resolveTaskArgs", () => {
+  describe("resolveTaskArgs", () => {
     it("replaces tokens with provided context values", () => {
       const args = [
         "${workspaceFolder}/scripts/test.ps1",
@@ -58,19 +65,19 @@ describe("task-execution-spec", () => {
         },
       };
 
-      // const resolved = resolveTaskArgs(args, context);
+      const resolved = resolveTaskArgs(args, context);
 
-      // expect(resolved).toEqual([
-      //   "/home/user/workspace/scripts/test.ps1",
-      //   "-ExtensionRoot",
-      //   "/home/user/.vscode/extensions/drm-copilot-1.0.0",
-      //   "-File",
-      //   "/home/user/workspace/src/main.ts",
-      //   "-RelativeFile",
-      //   "src/main.ts",
-      //   "-ShortName",
-      //   "my-feature",
-      // ]);
+      expect(resolved).toEqual([
+        "/home/user/workspace/scripts/test.ps1",
+        "-ExtensionRoot",
+        "/home/user/.vscode/extensions/drm-copilot-1.0.0",
+        "-File",
+        "/home/user/workspace/src/main.ts",
+        "-RelativeFile",
+        "src/main.ts",
+        "-ShortName",
+        "my-feature",
+      ]);
     });
 
     it("throws error when missing input value", () => {
@@ -82,9 +89,9 @@ describe("task-execution-spec", () => {
         inputValues: {}, // Empty - missing PotentialShortName
       };
 
-      // expect(() => resolveTaskArgs(args, context)).toThrow(
-      //   "Missing input value: PotentialShortName",
-      // );
+      expect(() => resolveTaskArgs(args, context)).toThrow(
+        "Missing input value: PotentialShortName",
+      );
     });
   });
 });

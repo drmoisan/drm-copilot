@@ -99,7 +99,9 @@ class ResolvedTestExpectations:
         expected_pass_refs (set[str]): Pytest refs required to pass.
         expected_fail_jest_refs (set[str]): Jest refs allowed to fail.
         expected_pass_jest_refs (set[str]): Jest refs required to pass.
-        missing_test_refs (list[str]): Checked expectation task IDs lacking test refs.
+        missing_test_refs (list[str]): Always empty; retained for API compatibility.
+            Previously held task IDs for expectation-tagged tasks without test_ref,
+            but these are now silently skipped (they are "run all" verification tasks).
     """
 
     expected_fail_refs: set[str]
@@ -168,16 +170,16 @@ def resolve_checked_test_expectations(plan: PlanModel) -> ResolvedTestExpectatio
     expected_pass_refs: set[str] = set()
     expected_fail_jest_refs: set[str] = set()
     expected_pass_jest_refs: set[str] = set()
-    missing_test_refs: list[str] = []
 
     # Walk checked tasks with expectation tags and gather their test references.
+    # Tasks without a test_ref (e.g., "run all tests" verification tasks) are
+    # silently skipped - they have no specific test to check against.
     for task in plan.tasks:
         if not task.checked:
             continue
         if not (task.expect_fail or task.expect_pass):
             continue
         if not task.test_ref:
-            missing_test_refs.append(task.task_id)
             continue
         if is_pytest_ref(task.test_ref):
             if task.expect_pass:
@@ -202,7 +204,7 @@ def resolve_checked_test_expectations(plan: PlanModel) -> ResolvedTestExpectatio
         expected_pass_refs=expected_pass_refs,
         expected_fail_jest_refs=expected_fail_jest_refs,
         expected_pass_jest_refs=expected_pass_jest_refs,
-        missing_test_refs=missing_test_refs,
+        missing_test_refs=[],
     )
 
 

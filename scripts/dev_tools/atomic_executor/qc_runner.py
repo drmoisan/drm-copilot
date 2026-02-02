@@ -218,6 +218,7 @@ class QCRunner:
             check=False,
             capture_output=True,
             text=True,
+            errors="replace",
             env=env,
         )
         combined = (result.stdout or "") + (result.stderr or "")
@@ -289,6 +290,7 @@ class QCRunner:
             check=False,
             capture_output=True,
             text=True,
+            errors="replace",
             env=env,
         )
         combined = (result.stdout or "") + (result.stderr or "")
@@ -459,6 +461,7 @@ class QCRunner:
             check=False,
             capture_output=True,
             text=True,
+            errors="replace",
         )
         combined = (result.stdout or "") + (result.stderr or "")
         return parse_jest_failure_output(combined)
@@ -624,7 +627,10 @@ class QCRunner:
             Calls git status --porcelain.
         """
         result = self._run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            errors="replace",
         )
         files: list[str] = []
         # Extract the path column so scoped QC targets only changed files.
@@ -653,7 +659,10 @@ class QCRunner:
                 False otherwise.
         """
         result = self._run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            errors="replace",
         )
 
         excluded = self._normalize_excluded_paths(exclude_paths)
@@ -689,7 +698,12 @@ class QCRunner:
             tuple[tuple[str, str, str], ...]: Sorted tuples of
                 (path, additions, deletions) for each changed file.
         """
-        result = self._run(["git", "diff", "--numstat"], capture_output=True, text=True)
+        result = self._run(
+            ["git", "diff", "--numstat"],
+            capture_output=True,
+            text=True,
+            errors="replace",
+        )
         excluded = self._normalize_excluded_paths(exclude_paths)
 
         signature: list[tuple[str, str, str]] = []
@@ -797,12 +811,80 @@ class QCRunner:
             and (p.endswith(".test.ts") or p.endswith(".spec.ts"))
         ]
 
+    def resolve_executable(self, argv: list[str]) -> list[str]:
+        """
+        Resolve a command argv to a full executable path.
+
+        Purpose:
+            Ensure PATH and PATHEXT resolution works on Windows
+            (e.g., npm.cmd, poetry.exe) to avoid WinError 2.
+
+        Args:
+            argv (list[str]): Command argv where argv[0] is the executable.
+
+        Returns:
+            list[str]: Resolved argv with full executable path.
+
+        Raises:
+            FileNotFoundError: If the executable is not found on PATH.
+            ValueError: If argv is empty.
+        """
+        if not argv:
+            raise ValueError("Command argv must not be empty.")
+
+        exe = shutil.which(argv[0])
+        if exe is None:
+            raise FileNotFoundError(f"Required executable not found on PATH: {argv[0]}")
+
+        return [exe, *argv[1:]]
+
+    def run_command(
+        self,
+        argv: list[str],
+        *,
+        capture_output: bool = False,
+        text: bool = True,
+        errors: str | None = "replace",
+        env: dict[str, str] | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        """
+        Run a subprocess command using the QC runner execution defaults.
+
+        Purpose:
+            Provide a public wrapper around the internal subprocess handling
+            to support integration tests and external callers.
+
+        Args:
+            argv (list[str]): Command and arguments to execute.
+            capture_output (bool): Whether to capture stdout/stderr.
+            text (bool): Whether to decode output as text.
+            errors (str | None): Text decoding error handler
+                ('replace', 'ignore', etc.). Defaults to "replace" when
+                text output is enabled.
+            env (dict[str, str] | None): Environment overrides for the command.
+
+        Returns:
+            CompletedProcess: Result of subprocess execution.
+
+        Raises:
+            FileNotFoundError: If executable is not found on PATH.
+            CalledProcessError: If command exits with non-zero status.
+        """
+        return self._run(
+            argv,
+            capture_output=capture_output,
+            text=text,
+            errors=errors,
+            env=env,
+        )
+
     def _run(
         self,
         argv: list[str],
         *,
         capture_output: bool = False,
         text: bool = True,
+        errors: str | None = "replace",
         env: dict[str, str] | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """
@@ -816,6 +898,9 @@ class QCRunner:
             argv (list[str]): Command and arguments to execute.
             capture_output (bool): Whether to capture stdout/stderr.
             text (bool): Whether to decode output as text.
+            errors (str | None): Text decoding error handler
+                ('replace', 'ignore', etc.). Defaults to "replace" when
+                text output is enabled.
             env (dict[str, str] | None): Environment overrides for the command.
 
         Returns:
@@ -825,19 +910,15 @@ class QCRunner:
             FileNotFoundError: If executable is not found on PATH.
             CalledProcessError: If command exits with non-zero status.
         """
-        # Resolve executable via shutil.which() for cross-platform compatibility.
-        # On Windows, commands like 'npm' are actually 'npm.cmd' which require
-        # explicit resolution to avoid FileNotFoundError.
-        exe = shutil.which(argv[0])
-        if exe is None:
-            raise FileNotFoundError(f"Required executable not found on PATH: {argv[0]}")
-        resolved_argv = [exe, *argv[1:]]
+        # Resolve executable via PATH/PATHEXT for cross-platform compatibility.
+        resolved_argv = self.resolve_executable(argv)
         return subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
             resolved_argv,
             cwd=self.workspace,
             check=True,
             capture_output=capture_output,
             text=text,
+            errors=errors if text else None,
             env=env,
         )
 
@@ -867,12 +948,14 @@ class QCRunner:
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
+        resolved_argv = self.resolve_executable(argv)
         result = subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            argv,
+            resolved_argv,
             cwd=self.workspace,
             check=False,
             capture_output=True,
             text=True,
+            errors="replace",
             env=env,
         )
 

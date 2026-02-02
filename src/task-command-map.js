@@ -1,16 +1,22 @@
+"use strict";
 /**
  * Maps extension command IDs to their corresponding VS Code task labels.
  *
  * This file intentionally has no dependency on the VS Code API so it can be unit-tested
  * under Jest without launching an Extension Host.
  */
-
-export type TaskExecutionSpec = {
-  command: string;
-  args: string[];
-};
-
-export const TASK_COMMAND_MAP = {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TASK_INPUT_DEFINITIONS =
+  exports.TASK_EXECUTION_MAP =
+  exports.TASK_COMMAND_MAP =
+    void 0;
+exports.getTaskLabelForCommandId = getTaskLabelForCommandId;
+exports.getAllTaskCommandIds = getAllTaskCommandIds;
+exports.getTaskExecutionSpec = getTaskExecutionSpec;
+exports.getTaskInputIdsForCommand = getTaskInputIdsForCommand;
+exports.getTaskInputDefinition = getTaskInputDefinition;
+exports.resolveTaskArgs = resolveTaskArgs;
+exports.TASK_COMMAND_MAP = {
   "drm-copilot.loadOpenAIKey": "Load OpenAI Key",
   "drm-copilot.qcBlackFormat": "QC: 1 Black: format",
   "drm-copilot.qcRuffLint": "QC: 2 Ruff: lint",
@@ -48,16 +54,12 @@ export const TASK_COMMAND_MAP = {
   "drm-copilot.devSyncAgentsFromInstructions":
     "Dev: Sync AGENTS.md from Instructions",
   "drm-copilot.npmWatch": "npm: watch",
-
   "drm-copilot.tsPrettierFormat": "TS: 1 Prettier: format",
   "drm-copilot.tsEslintLint": "TS: 2 ESLint: lint",
   "drm-copilot.tsTscTypeCheck": "TS: 3 TSC: type-check",
   "drm-copilot.tsJestUnitTests": "TS: 4 Jest: unit tests",
-} as const satisfies Record<string, string>;
-
-export type TaskCommandId = keyof typeof TASK_COMMAND_MAP;
-
-export const TASK_EXECUTION_MAP = {
+};
+exports.TASK_EXECUTION_MAP = {
   "drm-copilot.loadOpenAIKey": {
     command: "pwsh",
     args: [
@@ -373,17 +375,8 @@ export const TASK_EXECUTION_MAP = {
     command: "npm",
     args: ["run", "test:unit"],
   },
-} as const satisfies Record<TaskCommandId, TaskExecutionSpec>;
-
-export type TaskInputDefinition = {
-  id: string;
-  type: "promptString" | "pickString";
-  description: string;
-  default: string;
-  options?: string[];
 };
-
-export const TASK_INPUT_DEFINITIONS: TaskInputDefinition[] = [
+exports.TASK_INPUT_DEFINITIONS = [
   {
     id: "PRBaseBranch",
     type: "promptString",
@@ -500,44 +493,34 @@ export const TASK_INPUT_DEFINITIONS: TaskInputDefinition[] = [
     default: "docs/features/active/",
   },
 ];
-
 const INPUT_TOKEN_PATTERN = /\$\{input:([^}]+)\}/g;
-
 /**
  * Returns the VS Code task label for a command ID, if the command is task-backed.
  */
-export function getTaskLabelForCommandId(
-  commandId: string,
-): string | undefined {
-  return TASK_COMMAND_MAP[commandId as TaskCommandId];
+function getTaskLabelForCommandId(commandId) {
+  return exports.TASK_COMMAND_MAP[commandId];
 }
-
 /**
  * Returns all registered task command IDs.
  */
-export function getAllTaskCommandIds(): TaskCommandId[] {
-  return Object.keys(TASK_COMMAND_MAP) as TaskCommandId[];
+function getAllTaskCommandIds() {
+  return Object.keys(exports.TASK_COMMAND_MAP);
 }
-
 /**
  * Returns the execution spec for a command ID, if defined.
  */
-export function getTaskExecutionSpec(
-  commandId: TaskCommandId,
-): TaskExecutionSpec | undefined {
-  return TASK_EXECUTION_MAP[commandId];
+function getTaskExecutionSpec(commandId) {
+  return exports.TASK_EXECUTION_MAP[commandId];
 }
-
 /**
  * Extracts task input IDs used by a command's argument list.
  */
-export function getTaskInputIdsForCommand(commandId: TaskCommandId): string[] {
+function getTaskInputIdsForCommand(commandId) {
   const spec = getTaskExecutionSpec(commandId);
   if (!spec) {
     return [];
   }
-
-  const inputIds: string[] = [];
+  const inputIds = [];
   for (const arg of spec.args) {
     for (const match of arg.matchAll(INPUT_TOKEN_PATTERN)) {
       const inputId = match[1];
@@ -546,19 +529,14 @@ export function getTaskInputIdsForCommand(commandId: TaskCommandId): string[] {
       }
     }
   }
-
   return inputIds;
 }
-
 /**
  * Returns the task input definition for a given input ID.
  */
-export function getTaskInputDefinition(
-  id: string,
-): TaskInputDefinition | undefined {
-  return TASK_INPUT_DEFINITIONS.find((def) => def.id === id);
+function getTaskInputDefinition(id) {
+  return exports.TASK_INPUT_DEFINITIONS.find((def) => def.id === id);
 }
-
 /**
  * Resolves task argument tokens with provided context values.
  *
@@ -571,33 +549,20 @@ export function getTaskInputDefinition(
  *
  * @throws Error when ${input:<id>} token is missing from inputValues
  */
-export function resolveTaskArgs(
-  args: string[],
-  context: {
-    workspaceRoot: string;
-    extensionRoot: string;
-    activeFilePath?: string;
-    activeRelativePath?: string;
-    inputValues: Record<string, string>;
-  },
-): string[] {
+function resolveTaskArgs(args, context) {
   return args.map((arg) => {
     let resolved = arg;
-
     // Replace ${workspaceFolder}
     resolved = resolved.replace(
       /\$\{workspaceFolder\}/g,
       context.workspaceRoot,
     );
-
     // Replace ${extensionRoot}
     resolved = resolved.replace(/\$\{extensionRoot\}/g, context.extensionRoot);
-
     // Replace ${file}
     if (context.activeFilePath) {
       resolved = resolved.replace(/\$\{file\}/g, context.activeFilePath);
     }
-
     // Replace ${relativeFile}
     if (context.activeRelativePath) {
       resolved = resolved.replace(
@@ -605,7 +570,6 @@ export function resolveTaskArgs(
         context.activeRelativePath,
       );
     }
-
     // Replace ${input:<id>}
     resolved = resolved.replace(INPUT_TOKEN_PATTERN, (match, inputId) => {
       const value = context.inputValues[inputId];
@@ -614,7 +578,7 @@ export function resolveTaskArgs(
       }
       return value;
     });
-
     return resolved;
   });
 }
+//# sourceMappingURL=task-command-map.js.map

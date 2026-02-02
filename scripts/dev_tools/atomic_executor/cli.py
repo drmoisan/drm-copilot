@@ -365,6 +365,7 @@ def ensure_clean_tree(workspace: Path) -> None:
             cwd=workspace,
             capture_output=True,
             text=True,
+            errors="replace",
             check=True,
         )
     )
@@ -400,6 +401,7 @@ def _current_branch(workspace: Path) -> str | None:
             cwd=workspace,
             capture_output=True,
             text=True,
+            errors="replace",
             check=True,
         )
         b = result.stdout.strip()
@@ -515,6 +517,7 @@ def copy_to_clipboard(text: str) -> bool:
             [exe, *cmd[1:]],
             input=text,
             text=True,
+            errors="replace",
             check=True,
         )
         return True
@@ -1504,6 +1507,7 @@ def _run_preflight_qc_with_capture(
                 cwd=workspace,
                 capture_output=True,
                 text=True,
+                errors="replace",
             )
             collect_output = (collect_result.stdout or "") + (
                 collect_result.stderr or ""
@@ -1535,6 +1539,7 @@ def _run_preflight_qc_with_capture(
             cwd=workspace,
             capture_output=True,
             text=True,
+            errors="replace",
         )
         combined = (result.stdout or "") + (result.stderr or "")
         all_output.append(combined.strip() if combined else "(no output)")

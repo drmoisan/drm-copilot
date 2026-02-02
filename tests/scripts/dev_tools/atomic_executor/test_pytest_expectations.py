@@ -76,6 +76,54 @@ class TestIsJestRef:
 class TestResolveCheckedTestExpectations:
     """Tests for resolve_checked_test_expectations."""
 
+    def test_expect_fail_without_test_ref_is_silently_skipped(self) -> None:
+        """
+        Expect-fail tasks without test_ref should be skipped, not flagged as missing.
+
+        Purpose:
+            Support "run all tests" verification tasks (like P1-T5) that don't
+            reference a specific test but are still tagged [expect-fail].
+
+        Context:
+            Bug: Tasks like "Run the new tests to confirm the regression coverage
+            fails" are tagged [expect-fail] but don't match any test_ref extraction
+            pattern. Previously these were added to missing_test_refs, causing
+            QC runner to raise RuntimeError. The fix skips them silently.
+        """
+        plan = PlanModel(
+            tasks=[
+                PlanTask(
+                    "P1-T1",
+                    1,
+                    1,
+                    "Add Jest test in `tests/unit/foo.test.ts` for `bar`",
+                    True,
+                    0,
+                    expect_fail=True,
+                    test_ref="tests/unit/foo.test.ts::bar",
+                ),
+                PlanTask(
+                    "P1-T5",
+                    1,
+                    5,
+                    "Run the new tests to confirm the regression coverage fails",
+                    True,
+                    1,
+                    expect_fail=True,
+                    # No test_ref - this is a "run all" verification task
+                    test_ref=None,
+                ),
+            ],
+            phases=[1],
+        )
+
+        expectations = resolve_checked_test_expectations(plan)
+
+        # P1-T5 should NOT be in missing_test_refs since it has no specific ref to check
+        assert expectations.missing_test_refs == []
+        # P1-T1's ref should still be captured
+        assert expectations.expected_fail_jest_refs == {"tests/unit/foo.test.ts::bar"}
+
     def test_expect_pass_overrides_expect_fail(self) -> None:
         """
         Expected-pass overrides expected-fail for the same test ref.
