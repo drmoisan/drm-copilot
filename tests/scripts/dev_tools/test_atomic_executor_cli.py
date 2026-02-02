@@ -723,3 +723,67 @@ class TestExpectFailBehavior:
         # Non-pytest failure should still return failure (exit 5 after retries).
         # This test should pass both before and after implementation.
         assert exit_code == 5
+
+    def test_execute_one_task_expect_fail_succeeds_on_jest_skipped_tests(
+        self, mock_dependencies: dict[str, Any]
+    ) -> None:
+        """
+        Task with expect_fail=True should succeed when Jest tests are skipped.
+
+        Purpose:
+            TDD Red workflow for TypeScript: tests marked with describe.skip()
+            pass QC (no failure) but should be accepted as valid for TDD Red
+            since the implementation doesn't exist yet.
+
+        Verifies:
+            - exit_code == 0 (success)
+            - Checkbox is flipped
+            - Skipped tests are detected and accepted
+        """
+        from scripts.dev_tools.atomic_executor.pytest_expectations import (
+            JestFailureSummary,
+        )
+
+        mocks = mock_dependencies
+
+        # Create expect-fail task for a TypeScript test
+        task = PlanTask(
+            task_id="P1-T4",
+            phase=1,
+            task_num=4,
+            title="Add failing Jest test",
+            checked=False,
+            line_index=10,
+            expect_fail=True,
+            test_ref="tests/unit/task-command-map.test.ts::resolveTaskArgs missing",
+        )
+        mocks["parser"].next_unchecked_task.return_value = task
+        mocks["parser"].find_task_by_id.return_value = task
+
+        # QC passes (no exception) - this is the bug scenario
+        qc_instance = mocks["qc_runner"].return_value
+        qc_instance.run_scoped.return_value = None
+
+        # Mock changed_files to return TypeScript test files
+        # Note: The path must match the inline filter logic in cli.py which
+        # checks for (p.startswith("tests/") or "/tests/" in p) and
+        # (p.endswith(".test.ts") or p.endswith(".spec.ts"))
+        qc_instance.changed_files.return_value = [
+            "tests/unit/task-command-map.test.ts",
+        ]
+
+        # Mock check_jest_skipped_tests to return a summary with skipped tests
+        qc_instance.check_jest_skipped_tests.return_value = JestFailureSummary(
+            failed_files=set(),
+            failed_tests=set(),
+            has_runtime_error=False,
+            skipped_count=2,  # 2 tests skipped (describe.skip())
+            output="Tests: 2 skipped, 4 passed, 6 total",
+        )
+
+        argv = ["execute", "feature-folder", "--max-fix-attempts", "1"]
+        exit_code = main(argv)
+
+        # After fix: expect_fail + skipped Jest tests = success
+        assert exit_code == 0
+        mocks["parser"].flip_checkbox.assert_called_once_with(task)

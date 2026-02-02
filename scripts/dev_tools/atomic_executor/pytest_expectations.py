@@ -19,6 +19,13 @@ JEST_RUNTIME_ERROR_RE = re.compile(r"test suite failed to run", re.IGNORECASE)
 JEST_UNEXPECTED_TOKEN_RE = re.compile(
     r"jest encountered an unexpected token", re.IGNORECASE
 )
+# Matches "Tests: 2 skipped, 4 passed, 6 total" or "Tests: 4 passed, 6 total"
+JEST_SUMMARY_LINE_RE = re.compile(
+    r"^Tests:\s+"
+    r"(?:(?P<skipped>\d+)\s+skipped,\s+)?"
+    r"(?:(?P<passed>\d+)\s+passed,\s+)?"
+    r"(?P<total>\d+)\s+total$"
+)
 
 
 def is_pytest_ref(test_ref: str) -> bool:
@@ -131,12 +138,14 @@ class JestFailureSummary:
         failed_files (set[str]): Test file paths reported as failed.
         failed_tests (set[str]): Test names reported as failed.
         has_runtime_error (bool): True when Jest reports a runtime error.
+        skipped_count (int): Number of tests that were skipped.
         output (str): Original Jest output for fallback matching.
     """
 
     failed_files: set[str]
     failed_tests: set[str]
     has_runtime_error: bool
+    skipped_count: int
     output: str
 
 
@@ -259,6 +268,7 @@ def parse_jest_failure_output(output: str) -> JestFailureSummary:
     failed_files: set[str] = set()
     failed_tests: set[str] = set()
     has_runtime_error = False
+    skipped_count = 0
 
     for line in output.splitlines():
         stripped = line.strip()
@@ -285,10 +295,20 @@ def parse_jest_failure_output(output: str) -> JestFailureSummary:
             has_runtime_error = True
             continue
 
+        # Extract skipped count from Jest summary line
+        # (e.g., "Tests: 2 skipped, 4 passed, 6 total")
+        summary_match = JEST_SUMMARY_LINE_RE.match(stripped)
+        if summary_match:
+            skipped_str = summary_match.group("skipped")
+            if skipped_str:
+                skipped_count = int(skipped_str)
+            continue
+
     return JestFailureSummary(
         failed_files=failed_files,
         failed_tests=failed_tests,
         has_runtime_error=has_runtime_error,
+        skipped_count=skipped_count,
         output=output,
     )
 

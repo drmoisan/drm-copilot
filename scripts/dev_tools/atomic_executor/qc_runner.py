@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.atomic_executor.pytest_expectations import (
+    JestFailureSummary,
     ResolvedTestExpectations,
     parse_jest_failure_output,
     parse_pytest_failure_output,
@@ -418,6 +419,49 @@ class QCRunner:
         """
         cmd = ["npm", "run", "test:unit", "--", *test_files]
         self._run_jest_with_expectations(cmd=cmd, expectations=expectations)
+
+    def check_jest_skipped_tests(
+        self, *, test_files: list[str] | None = None
+    ) -> JestFailureSummary:
+        """
+        Run Jest and return a summary including skipped test count.
+
+        Purpose:
+            Check whether Jest tests were skipped (e.g., describe.skip()),
+            which is relevant for TDD Red tasks where tests should fail but
+            may be skipped if the implementation doesn't exist.
+
+        Args:
+            test_files (list[str] | None): Optional list of test files to run.
+                If None, runs the full Jest test suite.
+
+        Returns:
+            JestFailureSummary: Summary including skipped_count and output.
+
+        Side Effects:
+            Runs Jest via subprocess. Does NOT raise on test failures.
+        """
+        if test_files:
+            cmd = ["npm", "run", "test:unit", "--", *test_files]
+        else:
+            cmd = self.FULL_TS_TEST
+
+        # Resolve executable for Windows compatibility
+        exe = shutil.which(cmd[0])
+        if exe is None:
+            raise FileNotFoundError(f"Required executable not found on PATH: {cmd[0]}")
+        resolved_cmd = [exe, *cmd[1:]]
+
+        # Run Jest, capturing output regardless of exit code
+        result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+            resolved_cmd,
+            cwd=self.workspace,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        combined = (result.stdout or "") + (result.stderr or "")
+        return parse_jest_failure_output(combined)
 
     def run_full_loop_with_artifacts(
         self,

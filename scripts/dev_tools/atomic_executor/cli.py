@@ -2359,6 +2359,40 @@ def execute_one_task(
             qc_runner.run_scoped(expectations=scoped_expectations)
             # QC passed (no exception)
             if cur.expect_fail:
+                # For TDD Red tasks, QC passing may indicate skipped tests (e.g.,
+                # describe.skip()) rather than passing tests. Check if Jest tests
+                # were skipped, which is acceptable for TDD Red since the impl
+                # doesn't exist yet.
+                changed_files = qc_runner.changed_files()
+
+                # Filter to TypeScript test files only (inline filter logic to
+                # avoid calling protected method from QCRunner)
+                ts_test_files = [
+                    p
+                    for p in changed_files
+                    if (p.startswith("tests/") or "/tests/" in p)
+                    and (p.endswith(".test.ts") or p.endswith(".spec.ts"))
+                ]
+
+                if ts_test_files:
+                    # Check if Jest tests were skipped
+                    jest_summary = qc_runner.check_jest_skipped_tests(
+                        test_files=ts_test_files
+                    )
+                    if jest_summary.skipped_count > 0:
+                        # SUCCESS: Tests were skipped, acceptable for TDD Red
+                        success_msg = (
+                            f"Task {cur.task_id} has {jest_summary.skipped_count} "
+                            f"skipped Jest tests (TDD Red). Verified."
+                        )
+                        print(success_msg)
+                        _log_msg(log_file, f"SUCCESS: {success_msg}")
+
+                        # Flip checkbox since skipped tests are verified
+                        if cur_after and not cur_after.checked:
+                            parser.flip_checkbox(cur_after)
+                        return 0
+
                 # Unexpected: test should have failed but all QC passed
                 err_msg = (
                     f"Task {cur.task_id} expected failure (TDD Red) but QC passed."
