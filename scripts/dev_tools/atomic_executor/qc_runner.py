@@ -8,6 +8,7 @@ Supports both scoped QC (changed files only, fast task gate) and full QC
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -763,6 +764,10 @@ class QCRunner:
         """
         Execute a subprocess command with consistent settings.
 
+        Purpose:
+            Cross-platform subprocess execution with PATH-based executable
+            resolution for Windows compatibility (e.g., npm.cmd, poetry.exe).
+
         Args:
             argv (list[str]): Command and arguments to execute.
             capture_output (bool): Whether to capture stdout/stderr.
@@ -773,10 +778,18 @@ class QCRunner:
             CompletedProcess: Result of subprocess execution.
 
         Raises:
+            FileNotFoundError: If executable is not found on PATH.
             CalledProcessError: If command exits with non-zero status.
         """
-        return subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            argv,
+        # Resolve executable via shutil.which() for cross-platform compatibility.
+        # On Windows, commands like 'npm' are actually 'npm.cmd' which require
+        # explicit resolution to avoid FileNotFoundError.
+        exe = shutil.which(argv[0])
+        if exe is None:
+            raise FileNotFoundError(f"Required executable not found on PATH: {argv[0]}")
+        resolved_argv = [exe, *argv[1:]]
+        return subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+            resolved_argv,
             cwd=self.workspace,
             check=True,
             capture_output=capture_output,

@@ -80,6 +80,7 @@ DEFAULT_COPILOT_TRUST_WORKSPACE = True
 COPILOT_PERMISSION_DENIED_SUBSTRING = (
     "Permission denied and could not request permission from user"
 )
+MISSING_EXECUTABLE_PREFIX = "Required executable not found on PATH:"
 
 # Graceful shutdown state: set by signal handler to request termination.
 _shutdown_requested = False
@@ -1322,6 +1323,30 @@ def _resolve_preflight_toolchains(parser: PlanParser) -> list[QCToolchain]:
     return sorted(detected, key=lambda tool: ordering.get(tool, 99))
 
 
+def _resolve_executable(argv: list[str]) -> list[str]:
+    """
+    Resolve the executable for a command by validating PATH lookup.
+
+    Args:
+        argv: Command argv list where argv[0] is the executable name.
+
+    Returns:
+        list[str]: Command argv with the resolved executable path.
+
+    Raises:
+        FileNotFoundError: If the executable is not found on PATH.
+        ValueError: If argv is empty.
+    """
+    if not argv:
+        raise ValueError("Command argv must not be empty.")
+
+    exe = shutil.which(argv[0])
+    if not exe:
+        raise FileNotFoundError(f"{MISSING_EXECUTABLE_PREFIX} {argv[0]}")
+
+    return [exe, *argv[1:]]
+
+
 def _matches_expected_ref(nodeid: str, expected_refs: set[str]) -> bool:
     """
     Check whether a failing nodeid matches any expected ref prefix.
@@ -1464,8 +1489,18 @@ def _run_preflight_qc_with_capture(
                 "--color=no",
                 *sorted(expected_refs),
             ]
+            try:
+                resolved_collect_cmd = _resolve_executable(collect_cmd)
+            except FileNotFoundError as exc:
+                all_output.append(str(exc))
+                return PreflightQCResult(
+                    success=False,
+                    output="\n\n".join(all_output),
+                    failed_step="pytest-collect",
+                    toolchain=toolchain,
+                )
             collect_result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-                collect_cmd,
+                resolved_collect_cmd,
                 cwd=workspace,
                 capture_output=True,
                 text=True,
@@ -1484,9 +1519,19 @@ def _run_preflight_qc_with_capture(
                     toolchain=toolchain,
                 )
 
-        # Commands are static hardcoded constants (poetry run black/ruff/pyright/pytest)
+        # Commands are static hardcoded constants (poetry/npm run)
+        try:
+            resolved_cmd = _resolve_executable(cmd)
+        except FileNotFoundError as exc:
+            all_output.append(str(exc))
+            return PreflightQCResult(
+                success=False,
+                output="\n\n".join(all_output),
+                failed_step=step_name,
+                toolchain=toolchain,
+            )
         result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-            cmd,
+            resolved_cmd,
             cwd=workspace,
             capture_output=True,
             text=True,
@@ -1780,6 +1825,23 @@ def _run_preflight_qc_fix_loop(
         # QC failed - extract output for prompt
         qc_output = preflight_check.output
         failed_toolchain = preflight_check.toolchain
+
+        if MISSING_EXECUTABLE_PREFIX in qc_output:
+            missing_line = next(
+                (
+                    line
+                    for line in qc_output.splitlines()
+                    if MISSING_EXECUTABLE_PREFIX in line
+                ),
+                qc_output,
+            )
+            err_msg = (
+                "Pre-flight QC cannot run because a required executable "
+                f"is missing. {missing_line}"
+            )
+            print(err_msg, file=sys.stderr)
+            _log_msg(log_file, f"ERROR: {err_msg}")
+            return 6
 
         limit_str = str(max_fix_attempts) if max_fix_attempts > 0 else "∞"
         msg = (

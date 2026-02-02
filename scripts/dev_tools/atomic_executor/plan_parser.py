@@ -501,6 +501,7 @@ class PlanParser:
         plan = self.parse()
         lines = self._read_text().splitlines()
         phases: dict[int, AutoQCPhase] = {}
+        loop_phases: set[int] = set()
 
         # Index tasks by phase and scan their blocks for QC-related cues.
         # Skip Phase 0 entirely: by convention it captures baselines, not QC loops.
@@ -522,6 +523,8 @@ class PlanParser:
 
             # Identify explicit loop tasks without a concrete command.
             is_loop_task = QC_LOOP_PATTERN.search(block_text) is not None
+            if is_loop_task:
+                loop_phases.add(task.phase)
 
             # Skip tasks that do not reference QC commands or the loop control.
             if not matched_steps_by_toolchain and not is_loop_task:
@@ -580,23 +583,27 @@ class PlanParser:
             )
 
         # Validate required steps for any detected QC phase.
+        filtered_phases: dict[int, AutoQCPhase] = {}
         for phase_num, phase_meta in phases.items():
             required_steps = set(TOOLCHAIN_STEPS[phase_meta.toolchain])
             missing_steps = sorted(required_steps - set(phase_meta.step_task_ids))
             if missing_steps:
-                raise RuntimeError(
-                    "Auto-QC detection missing required steps "
-                    f"{missing_steps} for phase {phase_num}."
-                )
+                if phase_num in loop_phases:
+                    raise RuntimeError(
+                        "Auto-QC detection missing required steps "
+                        f"{missing_steps} for phase {phase_num}."
+                    )
+                continue
+            filtered_phases[phase_num] = phase_meta
 
         # Auto-generate artifact paths for each detected QC phase.
         # Uses standard naming: artifacts/qc-{step}.txt
-        for phase_num, phase_meta in phases.items():
+        for phase_num, phase_meta in filtered_phases.items():
             auto_paths = {
                 step: Path(f"artifacts/qc-{step}.txt")
                 for step in phase_meta.step_task_ids
             }
-            phases[phase_num] = AutoQCPhase(
+            filtered_phases[phase_num] = AutoQCPhase(
                 phase=phase_meta.phase,
                 task_ids=phase_meta.task_ids,
                 step_task_ids=phase_meta.step_task_ids,
@@ -604,7 +611,7 @@ class PlanParser:
                 toolchain=phase_meta.toolchain,
             )
 
-        return phases
+        return filtered_phases
 
     def _task_block_lines(self, lines: list[str], start_index: int) -> list[str]:
         """

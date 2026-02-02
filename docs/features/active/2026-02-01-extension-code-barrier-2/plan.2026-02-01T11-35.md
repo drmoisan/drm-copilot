@@ -104,11 +104,11 @@ Requirements Traceability:
 	- Preconditions: `src/task-command-map.ts` exports `getTaskInputIdsForCommand` (to be added in Phase 2).
 	- Line numbers: new file `tests/unit/task-execution-spec.test.ts` (line numbers N/A).
 	- Acceptance: `npm run test:unit -- --runTestsByPath tests/unit/task-execution-spec.test.ts -t "getTaskInputIdsForCommand uses inputs"` fails with missing export or incorrect input mapping.
-- [ ] [P1-T3] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `resolveTaskArgs` replacing `${workspaceFolder}`, `${extensionRoot}`, `${file}`, `${relativeFile}`, and `${input:PotentialShortName}` tokens.
+- [x] [P1-T3] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `resolveTaskArgs` replacing `${workspaceFolder}`, `${extensionRoot}`, `${file}`, `${relativeFile}`, and `${input:PotentialShortName}` tokens.
 	- Preconditions: `src/task-command-map.ts` exports `resolveTaskArgs` (to be added in Phase 2).
 	- Line numbers: new file `tests/unit/task-execution-spec.test.ts` (line numbers N/A).
 	- Acceptance: `npm run test:unit -- --runTestsByPath tests/unit/task-execution-spec.test.ts -t "resolveTaskArgs replaces tokens"` fails with missing export or incorrect substitution.
-- [ ] [P1-T4] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `resolveTaskArgs` throwing `Missing input value: <id>` when `${input:<id>}` is not provided.
+- [x] [P1-T4] [expect-fail] Add Jest test in `tests/unit/task-execution-spec.test.ts` for `resolveTaskArgs` throwing `Missing input value: <id>` when `${input:<id>}` is not provided.
 	- Preconditions: `src/task-command-map.ts` exports `resolveTaskArgs` (to be added in Phase 2).
 	- Line numbers: new file `tests/unit/task-execution-spec.test.ts` (line numbers N/A).
 	- Acceptance: `npm run test:unit -- --runTestsByPath tests/unit/task-execution-spec.test.ts -t "resolveTaskArgs missing input"` fails with missing export or missing error handling.

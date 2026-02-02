@@ -546,6 +546,22 @@ class TestPlanParserPreflightValidate:
         # Should not raise
         parser.preflight_validate()
 
+    def test_preflight_validate_ignores_partial_ts_toolchain_phase(self) -> None:
+        """
+        Partial TypeScript toolchain phases should not block preflight.
+
+        Purpose:
+            Ensure a phase with only npm test does not trigger auto-QC validation.
+        """
+        parser = PlanParser(
+            Path("tests/fixtures/atomic_executor/plan_ts_partial_toolchain.md")
+        )
+
+        parser.preflight_validate()
+
+        assert parser.auto_qc_phase_by_number(3) is None
+        assert parser.auto_qc_phase_by_number(5) is not None
+
     def test_preflight_validate_raises_when_phase_0_missing(
         self, tmp_path: Path
     ) -> None:

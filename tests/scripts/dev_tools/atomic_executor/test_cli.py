@@ -1055,6 +1055,32 @@ class TestPreflightQC:
         # Should not have pyright/pytest since ruff failed
         assert "=== PYRIGHT ===" not in result.output
 
+    def test_run_preflight_qc_with_capture_handles_missing_executable(
+        self,
+        monkeypatch: "MonkeyPatch",
+    ) -> None:
+        """_run_preflight_qc_with_capture fails fast when an executable is missing."""
+        from scripts.dev_tools.atomic_executor.cli import (
+            MISSING_EXECUTABLE_PREFIX,
+            _run_preflight_qc_with_capture,
+        )
+        from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
+
+        monkeypatch.setattr("shutil.which", lambda _cmd: None)
+
+        def _should_not_run(*args: object, **kwargs: object) -> None:
+            pytest.fail("subprocess.run should not be called when executable missing")
+
+        monkeypatch.setattr("subprocess.run", _should_not_run)
+
+        result = _run_preflight_qc_with_capture(
+            Path.cwd(), toolchain=QCToolchain.TYPESCRIPT
+        )
+
+        assert result.success is False
+        assert result.failed_step == "format"
+        assert MISSING_EXECUTABLE_PREFIX in result.output
+
     def test_skip_preflight_qc_flag_parses(self) -> None:
         """parse_args() parses --skip-preflight-qc flag."""
         args = parse_args(["execute", "feature", "--skip-preflight-qc"])
