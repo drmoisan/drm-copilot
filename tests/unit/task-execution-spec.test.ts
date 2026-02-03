@@ -8,10 +8,11 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  getDefaultInputValuesForCommand,
   getTaskExecutionSpec,
   getTaskInputIdsForCommand,
   resolveTaskArgs, // Not yet implemented - Phase 2
-} from "../../src/task-command-map";
+} from "../../src/task-command-map.ts";
 
 describe("task-execution-spec", () => {
   describe("getTaskExecutionSpec", () => {
@@ -38,6 +39,32 @@ describe("task-execution-spec", () => {
       );
 
       expect(inputIds).toEqual(["PotentialPromotionType"]);
+    });
+
+    it("uses inputs for devNewPotentialEntry command", () => {
+      const inputIds = getTaskInputIdsForCommand(
+        "drm-copilot.devNewPotentialEntry",
+      );
+
+      expect(inputIds).toEqual(["PotentialShortName"]);
+    });
+  });
+
+  describe("getDefaultInputValuesForCommand", () => {
+    it("returns default input values for promptString inputs", () => {
+      const defaults = getDefaultInputValuesForCommand(
+        "drm-copilot.devNewPotentialEntry",
+      );
+
+      expect(defaults).toEqual({ PotentialShortName: "notes-feature" });
+    });
+
+    it("returns default input values for pickString inputs", () => {
+      const defaults = getDefaultInputValuesForCommand(
+        "drm-copilot.devPromotePotentialToIssue",
+      );
+
+      expect(defaults).toEqual({ PotentialPromotionType: "feature" });
     });
   });
 

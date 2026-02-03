@@ -560,6 +560,48 @@ export function getTaskInputDefinition(
 }
 
 /**
+ * Builds a default input value map for a task command.
+ *
+ * Purpose:
+ *     Some tasks include `${input:<id>}` tokens in their argument lists.
+ *     When we need to render tasks before prompting the user (e.g., to list
+ *     tasks in the task provider), we still want argument resolution to be
+ *     deterministic and not throw.
+ *
+ * Args:
+ *     commandId (TaskCommandId): The task-backed command to inspect.
+ *
+ * Returns:
+ *     Record<string, string>: A map of required input IDs to their default
+ *     values, suitable for passing into `resolveTaskArgs`.
+ *
+ * Raises:
+ *     Error: If an input token references an undefined input definition.
+ *
+ * Side Effects:
+ *     None.
+ */
+export function getDefaultInputValuesForCommand(
+  commandId: TaskCommandId,
+): Record<string, string> {
+  const inputValues: Record<string, string> = {};
+
+  // Collect required input IDs from the command's argument list and map them
+  // to defaults to keep provider-side resolution deterministic.
+  for (const inputId of getTaskInputIdsForCommand(commandId)) {
+    const def = getTaskInputDefinition(inputId);
+    if (!def) {
+      throw new Error(
+        `Task input is referenced but not defined: ${inputId} (command: ${commandId})`,
+      );
+    }
+    inputValues[inputId] = def.default;
+  }
+
+  return inputValues;
+}
+
+/**
  * Resolves task argument tokens with provided context values.
  *
  * Supported tokens:

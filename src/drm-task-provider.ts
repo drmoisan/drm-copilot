@@ -11,6 +11,7 @@ import * as vscode from "vscode";
 import {
   type TaskCommandId,
   type TaskExecutionSpec,
+  getDefaultInputValuesForCommand,
   getAllTaskCommandIds,
   getTaskExecutionSpec,
   getTaskLabelForCommandId,
@@ -91,6 +92,7 @@ class DrmCopilotTaskProvider implements vscode.TaskProvider {
     );
 
     // Resolve remaining tokens (workspace, file, input tokens)
+    const defaultInputValues = getDefaultInputValuesForCommand(commandId);
     const resolvedArgs = resolveTaskArgs(argsWithExtensionRoot, {
       workspaceRoot: workspaceFolder.uri.fsPath.replace(/\\/g, "/"),
       extensionRoot: this.context.asAbsolutePath("").replace(/\\/g, "/"),
@@ -101,7 +103,7 @@ class DrmCopilotTaskProvider implements vscode.TaskProvider {
             vscode.window.activeTextEditor.document.uri,
           )
         : undefined,
-      inputValues: {}, // Inputs will be resolved at execution time
+      inputValues: defaultInputValues,
     });
 
     // Create shell execution with workspace folder as cwd

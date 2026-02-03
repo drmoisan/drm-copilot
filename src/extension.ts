@@ -5,8 +5,12 @@ import * as vscode from "vscode";
 import type { TaskCommandId } from "./task-command-map";
 import {
   TASK_COMMAND_MAP,
+  getDefaultInputValuesForCommand,
+  getTaskInputDefinition,
+  getTaskInputIdsForCommand,
   getTaskExecutionSpec,
   getTaskLabelForCommandId,
+  resolveTaskArgs,
 } from "./task-command-map";
 import { createDrmCopilotTaskProvider } from "./drm-task-provider";
 
@@ -43,11 +47,77 @@ async function getTargetWorkspaceFolder(): Promise<
 }
 
 /**
+ * Collects any `${input:<id>}` values required by a command.
+ *
+ * Purpose:
+ *     Some tasks include input tokens in their argument lists. VS Code's native
+ *     task input resolution is driven by tasks.json, but these tasks are
+ *     provider-backed, so we prompt directly.
+ *
+ * Args:
+ *     commandId (TaskCommandId): The command whose inputs should be collected.
+ *
+ * Returns:
+ *     Record<string, string> | undefined: The resolved input values, or
+ *     undefined if the user cancels.
+ */
+async function collectTaskInputs(
+  commandId: TaskCommandId,
+): Promise<Record<string, string> | undefined> {
+  const inputIds = getTaskInputIdsForCommand(commandId);
+  if (inputIds.length === 0) {
+    return {};
+  }
+
+  const inputValues = getDefaultInputValuesForCommand(commandId);
+
+  // Prompt for each required input in a stable order (as discovered in args).
+  for (const inputId of inputIds) {
+    const def = getTaskInputDefinition(inputId);
+    if (!def) {
+      vscode.window.showErrorMessage(
+        `Task input is referenced but not defined: ${inputId} (command: ${commandId})`,
+      );
+      return undefined;
+    }
+
+    if (def.type === "promptString") {
+      const value = await vscode.window.showInputBox({
+        prompt: def.description,
+        value: inputValues[inputId] ?? def.default,
+      });
+      if (value === undefined) {
+        return undefined;
+      }
+      inputValues[inputId] = value;
+      continue;
+    }
+
+    if (def.type === "pickString") {
+      const options = def.options ?? [];
+      const picked = await vscode.window.showQuickPick(options, {
+        placeHolder: def.description,
+      });
+      if (picked === undefined) {
+        return undefined;
+      }
+      inputValues[inputId] = picked;
+      continue;
+    }
+  }
+
+  return inputValues;
+}
+
+/**
  * Executes a VS Code task by command ID using the task provider.
  *
  * @param commandId - The command ID to execute
  */
-async function runTaskByCommandId(commandId: TaskCommandId): Promise<void> {
+async function runTaskByCommandId(
+  context: vscode.ExtensionContext,
+  commandId: TaskCommandId,
+): Promise<void> {
   const workspaceFolder = await getTargetWorkspaceFolder();
   if (!workspaceFolder) {
     return;
@@ -69,19 +139,44 @@ async function runTaskByCommandId(commandId: TaskCommandId): Promise<void> {
     return;
   }
 
-  // Fetch tasks from our provider
-  const tasks = await vscode.tasks.fetchTasks({ type: "drm-copilot" });
-  const targetTask = tasks.find(
-    (t) => t.name === taskLabel && t.scope === workspaceFolder,
+  const inputValues = await collectTaskInputs(commandId);
+  if (!inputValues) {
+    return;
+  }
+
+  const resolvedArgs = resolveTaskArgs(spec.args, {
+    workspaceRoot: workspaceFolder.uri.fsPath.replace(/\\/g, "/"),
+    extensionRoot: context.asAbsolutePath("").replace(/\\/g, "/"),
+    activeFilePath: vscode.window.activeTextEditor?.document.uri.fsPath.replace(
+      /\\/g,
+      "/",
+    ),
+    activeRelativePath: vscode.window.activeTextEditor
+      ? vscode.workspace.asRelativePath(
+          vscode.window.activeTextEditor.document.uri,
+        )
+      : undefined,
+    inputValues,
+  });
+
+  const execution = new vscode.ShellExecution(spec.command, resolvedArgs, {
+    cwd: workspaceFolder.uri.fsPath,
+  });
+
+  const taskDefinition: vscode.TaskDefinition = {
+    type: "drm-copilot",
+    commandId,
+  };
+
+  const task = new vscode.Task(
+    taskDefinition,
+    workspaceFolder,
+    taskLabel,
+    "drm-copilot",
+    execution,
   );
 
-  if (targetTask) {
-    await vscode.tasks.executeTask(targetTask);
-  } else {
-    vscode.window.showErrorMessage(
-      `Task "${taskLabel}" not found in provider. Please report this issue.`,
-    );
-  }
+  await vscode.tasks.executeTask(task);
 }
 
 /**
@@ -95,7 +190,7 @@ function registerTaskCommand(
   commandId: TaskCommandId,
 ): void {
   const disposable = vscode.commands.registerCommand(commandId, () =>
-    runTaskByCommandId(commandId),
+    runTaskByCommandId(context, commandId),
   );
   context.subscriptions.push(disposable);
 }
