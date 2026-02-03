@@ -1,5 +1,6 @@
 {
   "name": "drm-copilot",
+  "publisher": "drm-copilot",
   "displayName": "drm-copilot",
   "description": "VS Code extension to apply agentic programming customizations to projects.",
   "version": "0.0.1",

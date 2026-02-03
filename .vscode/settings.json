@@ -235,10 +235,7 @@
     "https://www.apple.com": true,
     "https://www.apple.com/support": true,
     "https://www.apple.com/support/safari": true,
-    "https://www.bing.com": {
-      "approveRequest": true,
-      "approveResponse": false
-    },
+    "https://www.bing.com": true,
     "https://www.ck12.org": true,
     "https://www.ck12.org/flx": true,
     "https://www.ck12.org/flx/browse": true,
@@ -272,7 +269,15 @@
     "file:///d:/repos/drm-copilot/.github": true,
     "file:///d:/repos/drm-copilot": true,
     "file:///d:/repos": true,
-    "file:///d:": true
+    "file:///d:": true,
+    "https://www.bing.com/search": true,
+    "https://*.bing.com": true,
+    "https://docs.npmjs.com/cli/v7/configuring-npm/package-json": true,
+    "https://docs.npmjs.com/cli/v7/configuring-npm": true,
+    "https://docs.npmjs.com/cli/v7": true,
+    "https://docs.npmjs.com/cli": true,
+    "https://docs.npmjs.com": true,
+    "https://*.npmjs.com": true
   },
   "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
   "coverage-gutters.coverageFileNames": [

@@ -90,7 +90,90 @@ function Invoke-ExternalCommand {
 
     $process = Start-Process @processParams
     if ($process.ExitCode -ne 0) {
-        throw ("Command failed with exit code {0}: {1} {2}" -f $process.ExitCode, $FilePath, $displayArgs)
+        $message = "Command failed with exit code {0}: {1} {2}" -f $process.ExitCode, $FilePath, $displayArgs
+        $exception = [System.Exception]::new($message)
+        $exception.Data["ExitCode"] = $process.ExitCode
+        $exception.Data["FilePath"] = $FilePath
+        $exception.Data["Arguments"] = $displayArgs
+        throw $exception
+    }
+}
+
+function Invoke-NpmCiWithRetry {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$WorkingDirectory,
+
+        [Parameter()]
+        [ValidateRange(1, 10)]
+        [int]$MaxAttempts = 3,
+
+        [Parameter()]
+        [ValidateRange(1, 60)]
+        [int]$DelaySeconds = 5,
+
+        [Parameter()]
+        [switch]$ForceCleanup
+    )
+
+    function Stop-NodeProcess {
+        [CmdletBinding(SupportsShouldProcess = $true)]
+        param()
+
+        $nodeProcesses = Get-Process -Name "node" -ErrorAction SilentlyContinue
+        if (-not $nodeProcesses) {
+            return
+        }
+
+        foreach ($process in $nodeProcesses) {
+            if ($PSCmdlet.ShouldProcess($process.ProcessName, "Stop-Process")) {
+                Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    $attempt = 1
+    while ($true) {
+        try {
+            Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci") -WorkingDirectory $WorkingDirectory
+            return
+        } catch {
+            $exitCode = $null
+            if ($_.Exception.Data.Contains("ExitCode")) {
+                $exitCode = $_.Exception.Data["ExitCode"]
+            }
+
+            $message = $_.Exception.Message
+            $isEperm = ($exitCode -eq -4048) -or ($message -match "EPERM") -or ($message -match "operation not permitted")
+            if (-not $isEperm -or $attempt -ge $MaxAttempts) {
+                throw
+            }
+
+            Write-Warning ("npm ci failed with EPERM (attempt {0}/{1}). Retrying after {2}s." -f $attempt, $MaxAttempts, $DelaySeconds)
+
+            if ($ForceCleanup) {
+                if ($PSCmdlet.ShouldProcess($WorkingDirectory, "Stop node.exe processes")) {
+                    Stop-NodeProcess
+                }
+
+                $nodeModulesPath = Join-Path $WorkingDirectory "node_modules"
+                if (Test-Path -LiteralPath $nodeModulesPath) {
+                    if ($PSCmdlet.ShouldProcess($nodeModulesPath, "Remove-Item -Recurse -Force")) {
+                        Remove-Item -LiteralPath $nodeModulesPath -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+
+                if ($PSCmdlet.ShouldProcess($WorkingDirectory, "npm cache clean --force")) {
+                    Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("cache", "clean", "--force") -WorkingDirectory $WorkingDirectory
+                }
+            }
+
+            # Backoff between retries to allow file locks to clear.
+            Start-Sleep -Seconds ($DelaySeconds * $attempt)
+            $attempt += 1
+        }
     }
 }
 
@@ -118,7 +201,7 @@ $vsixPath = Join-Path $VsixOutputDir ("drm-copilot-{0}.vsix" -f $timestamp)
 
 if (-not $SkipNpmCi) {
     if ($PSCmdlet.ShouldProcess($RepoRoot, "npm ci")) {
-        Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci") -WorkingDirectory $RepoRoot
+        Invoke-NpmCiWithRetry -WorkingDirectory $RepoRoot -ForceCleanup:$Force
     }
 }
 
