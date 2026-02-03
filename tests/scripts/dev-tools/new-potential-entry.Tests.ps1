@@ -128,21 +128,63 @@ Describe "new-potential-entry.ps1 - Convert-TemplateContent" {
         }
 
         It "replaces feature-name placeholder" {
-            $content = "# <feature-name> (Potential)"
+            $content = '# <feature-name> (Potential)'
             $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User"
             $result | Should -Be "# my-feature (Potential)"
         }
 
         It "replaces date placeholder" {
-            $content = "- Date captured: YYYY-MM-DD"
+            $content = '- Date captured: YYYY-MM-DD'
             $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User"
             $result | Should -Be "- Date captured: 2025-12-10"
         }
 
         It "replaces author placeholder" {
-            $content = "- Author: name"
+            $content = '- Author: name'
             $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User"
             $result | Should -Be "- Author: Test User"
+        }
+
+        It "replaces frontmatter owner placeholder" {
+            $content = 'owner: "<name>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User"
+            $result | Should -Be 'owner: "Test User"'
+        }
+
+        It "replaces frontmatter last_updated placeholder" {
+            $content = 'last_updated: "<yyyy-MM-ddTHH-mm>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -LastUpdated "2026-02-03T09-15"
+            $result | Should -Be 'last_updated: "2026-02-03T09-15"'
+        }
+
+        It "replaces frontmatter status placeholder" {
+            $content = 'status: "<status>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -Status "Draft"
+            $result | Should -Be 'status: "Draft"'
+        }
+
+        It "replaces frontmatter status_color placeholder" {
+            $content = 'status_color: "<color>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -StatusColor "lightgrey"
+            $result | Should -Be 'status_color: "lightgrey"'
+        }
+
+        It "replaces frontmatter issue placeholder" {
+            $content = 'issue: "<issue>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -Issue "TBD"
+            $result | Should -Be 'issue: "TBD"'
+        }
+
+        It "replaces frontmatter parent placeholder" {
+            $content = 'parent: "<parent-id>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -Parent "none"
+            $result | Should -Be 'parent: "none"'
+        }
+
+        It "replaces frontmatter version placeholder" {
+            $content = 'version: "<version_number>"'
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -Version "0.1"
+            $result | Should -Be 'version: "0.1"'
         }
 
         It "replaces all placeholders in complete template" {
@@ -153,7 +195,7 @@ Describe "new-potential-entry.ps1 - Convert-TemplateContent" {
 - Author: name
 - Status: Draft
 "@
-            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User"
+            $result = Convert-TemplateContent -Content $content -ShortName "my-feature" -Date "2025-12-10" -Author "Test User" -LastUpdated "2026-02-03T09-15" -Status "Draft" -StatusColor "lightgrey" -Issue "TBD" -Parent "none" -Version "0.1"
             $result | Should -Match "# my-feature \(Potential\)"
             $result | Should -Match "- Date captured: 2025-12-10"
             $result | Should -Match "- Author: Test User"

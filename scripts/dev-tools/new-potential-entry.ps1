@@ -43,7 +43,7 @@ function Convert-TemplateContent {
 
     .DESCRIPTION
     This is a pure string transformation function that does not modify system state.
-    It replaces feature-name, date, and author placeholders in the provided content.
+    It replaces frontmatter and body placeholders in the provided content.
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -53,11 +53,38 @@ function Convert-TemplateContent {
         [Parameter(Mandatory = $true)]
         [string] $Date,
         [Parameter(Mandatory = $true)]
-        [string] $Author
+        [string] $Author,
+        [string] $LastUpdated,
+        [string] $Status,
+        [string] $StatusColor,
+        [string] $Issue,
+        [string] $Parent,
+        [string] $Version
     )
     $updatedContent = $Content -replace '<feature-name>', $ShortName
-    $updatedContent = $updatedContent -replace 'YYYY-MM-DD', $Date
     $updatedContent = $updatedContent -replace '- Author: name', "- Author: $Author"
+    if ($Author) {
+        $updatedContent = $updatedContent -replace '<name>', $Author
+    }
+    if ($LastUpdated) {
+        $updatedContent = $updatedContent -replace '<yyyy-MM-ddTHH-mm>', $LastUpdated
+    }
+    $updatedContent = $updatedContent -replace '- Date captured: YYYY-MM-DD', "- Date captured: $Date"
+    if ($Status) {
+        $updatedContent = $updatedContent -replace '<status>', $Status
+    }
+    if ($StatusColor) {
+        $updatedContent = $updatedContent -replace '<color>', $StatusColor
+    }
+    if ($Issue) {
+        $updatedContent = $updatedContent -replace '<issue>', $Issue
+    }
+    if ($Parent) {
+        $updatedContent = $updatedContent -replace '<parent-id>', $Parent
+    }
+    if ($Version) {
+        $updatedContent = $updatedContent -replace '<version_number>', $Version
+    }
     return $updatedContent
 }
 
@@ -91,6 +118,7 @@ if (-not (Test-ValidShortName -CandidateName $ShortName)) {
 
 $workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $today = Get-Date -Format 'yyyy-MM-dd'
+$lastUpdated = Get-Date -Format 'yyyy-MM-ddTHH-mm'
 $target = Join-Path $workspace "docs/features/potential/$today-$ShortName.md"
 $template = Join-Path $workspace 'docs/features/potential/template.md'
 $backlog = Join-Path $workspace 'docs/features/backlog.md'
@@ -100,8 +128,13 @@ Write-Output "Created: $target"
 
 # Populate placeholders in the new file
 $author = Get-AuthorName
+$status = 'Draft'
+$statusColor = 'lightgrey'
+$issue = 'TBD'
+$parent = 'none'
+$version = '0.1'
 $content = Get-Content -Raw -Path $target
-$content = Convert-TemplateContent -Content $content -ShortName $ShortName -Date $today -Author $author
+$content = Convert-TemplateContent -Content $content -ShortName $ShortName -Date $today -Author $author -LastUpdated $lastUpdated -Status $status -StatusColor $statusColor -Issue $issue -Parent $parent -Version $version
 Set-Content -Path $target -Value $content -Encoding UTF8
 
 $opened = Invoke-VSCodeOpen -Files @($target, $backlog)
@@ -110,3 +143,4 @@ if (-not $opened) {
     Write-Output "  $target"
     Write-Output "  $backlog"
 }
+

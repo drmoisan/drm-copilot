@@ -1,11 +1,19 @@
+---
+title: "expose-atomic-executor - Issue"
+issue: "2"
+parent: "none"
+owner: "Dan Moisan"
+last_updated: "2026-02-01T11-35"
+status: "Promoted"
+status_color: "blue"
+version: "0.1"
+---
+
 # extension-code-barrier (Issue #2)
 
 - Date captured: 2026-02-01
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/extension-code-barrier/ (Issue #2)
-
-> Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
-
 - Issue: #2
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/2
 - Last Updated: 2026-02-01

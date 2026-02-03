@@ -1,3 +1,14 @@
+---
+title: "<feature-name> - Plan"
+issue: "<issue>"
+parent: "<parent-id>"
+owner: "<name>"
+last_updated: "<yyyy-MM-ddTHH-mm>"
+status: "<status>"
+status_color: "<color>"
+version: "<version_number>"
+---
+
 # <feature-name> (Potential)
 
 - Date captured: YYYY-MM-DD
