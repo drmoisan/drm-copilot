@@ -1,0 +1,4 @@
+
+> drm-copilot@0.0.1 lint
+> eslint src tests
+

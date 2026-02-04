@@ -1,0 +1,19 @@
+
+> drm-copilot@0.0.1 format
+> prettier --write "src/**/*.{ts,tsx,js,mjs,cjs,json}" "tests/**/*.{ts,tsx,js,mjs,cjs,json}" "eslint.config.mjs" "jest.config.cjs" ".vscode-test.mjs" "tsconfig*.json"
+
+src/drm-task-provider.ts 62ms (unchanged)
+src/extension.ts 18ms (unchanged)
+src/task-command-map.js 36ms (unchanged)
+src/task-command-map.ts 24ms (unchanged)
+tests/_deprecated/task-command-map.test.ts 1ms (unchanged)
+tests/integration/extension.test.ts 2ms (unchanged)
+tests/unit/task-command-map.test.ts 2ms (unchanged)
+tests/unit/task-execution-spec.test.ts 5ms (unchanged)
+eslint.config.mjs 2ms (unchanged)
+jest.config.cjs 1ms (unchanged)
+.vscode-test.mjs 1ms (unchanged)
+tsconfig.jest.json 1ms (unchanged)
+tsconfig.json 1ms (unchanged)
+tsconfig.tests.json 1ms (unchanged)
+tsconfig.vscode-test.json 1ms (unchanged)

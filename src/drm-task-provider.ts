@@ -1,9 +1,26 @@
 /**
  * VS Code Task Provider for DRM Copilot commands.
  *
- * This provider programmatically creates tasks for each command ID,
- * resolving extension script paths and workspace context without
- * requiring workspace-local tasks.json entries.
+ * Purpose:
+ *   This provider programmatically creates tasks for display in VS Code's
+ *   task explorer UI, allowing users to browse available DRM Copilot tasks.
+ *
+ * Usage:
+ *   Tasks created by this provider are for **listing only**. Command execution
+ *   is handled by the utility dispatcher (dispatchUtility), not by executing
+ *   provider-backed tasks. When users invoke commands via the Command Palette,
+ *   the command handler routes through dispatchUtility instead of
+ *   vscode.tasks.executeTask.
+ *
+ * Flow:
+ *   1. provideTasks() generates task definitions for all command IDs
+ *   2. Tasks appear in VS Code's task list for user reference
+ *   3. Command execution (from Command Palette) bypasses this provider
+ *      and uses dispatchUtility directly
+ *
+ * Side Effects:
+ *   None. This provider only creates task definitions; it does not
+ *   execute commands or modify workspace state.
  */
 
 import * as vscode from "vscode";
@@ -21,8 +38,15 @@ import {
 /**
  * Task provider for DRM Copilot commands.
  *
- * Implements vscode.TaskProvider to programmatically create tasks
- * based on command IDs and execution specs.
+ * Purpose:
+ *   Implements vscode.TaskProvider to programmatically create task definitions
+ *   for display in VS Code's task explorer. These tasks are for listing/browsing
+ *   only; actual command execution is handled by the utility dispatcher.
+ *
+ * Invariants:
+ *   - Command handlers in extension.ts do NOT use vscode.tasks.executeTask
+ *   - This provider is registered solely for task UI integration
+ *   - Task definitions use ShellExecution but are never executed via this provider
  */
 class DrmCopilotTaskProvider implements vscode.TaskProvider {
   private readonly context: vscode.ExtensionContext;

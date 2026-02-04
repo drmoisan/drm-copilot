@@ -1,0 +1,12 @@
+
+> drm-copilot@0.0.1 test:unit
+> jest --config jest.config.cjs
+
+PASS tests/unit/task-execution-spec.test.ts
+PASS tests/unit/task-command-map.test.ts
+
+Test Suites: 2 passed, 2 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        0.239 s, estimated 1 s
+Ran all test suites.

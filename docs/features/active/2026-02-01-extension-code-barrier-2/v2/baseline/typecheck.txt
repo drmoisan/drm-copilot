@@ -1,0 +1,4 @@
+
+> drm-copilot@0.0.1 typecheck
+> tsc -p ./ --noEmit && tsc -p ./tsconfig.tests.json
+
