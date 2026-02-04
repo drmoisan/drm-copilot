@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-04T12-35
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
 
 ## Overview
 
@@ -18,7 +18,7 @@ This feature adds a repo-aligned TypeScript engineer agent definition under `.gi
 - enforces suppression governance (only the pre-authorized single-line patterns)
 - reinforces the repo’s unit test boundary (Jest-only, no VS Code host)
 
-As a supporting repo-alignment improvement, this feature also describes (and may implement) enabling type-aware ESLint rules for TypeScript files in `eslint.config.mjs` using typescript-eslint’s typed-linting configuration.
+This spec is intentionally limited to delivering the agent definition file only.
 
 
 ## Behavior
@@ -33,7 +33,6 @@ At a high level, the feature provides a standardized “contract” for TypeScri
 	- suppression usage (allowed formats only; discourage suppressions by default)
 	- deterministic verification (repeat toolchain loop until green).
 
-If typed linting is enabled as part of the feature, ESLint should apply type-aware rules to TypeScript files without breaking linting for JavaScript files and without requiring file-level disables.
 
 
 ## Inputs / Outputs
@@ -53,27 +52,21 @@ Inputs
 	- `.github/instructions/typescript-suppressions.instructions.md`
 - Toolchain scripts (must be referenced verbatim): `package.json` scripts
 	- `format`, `lint`, `typecheck`, `test:unit`
-- Existing TypeScript sources/tests that may require adjustments when typed linting is enabled:
-	- `src/drm-task-provider.ts`
-	- `src/task-command-map.ts`
-	- `src/utilities/utility-dispatcher.ts`
-	- `src/utilities/utility-spec.ts`
 - No new CLI flags or environment variables are introduced by this feature.
 
 Outputs
 
 - A new agent definition file under `.github/agents/` describing the TypeScript engineer agent (policy-aligned, toolchain-aligned).
-- (Optional but in-scope if adopted) Updated `eslint.config.mjs` to enable typed linting for TypeScript files only.
-- (If typed linting is enabled) Minimal code fixes to satisfy the newly enforced type-aware rules while preserving runtime behavior.
+
 
 Config keys and defaults
 
-- ESLint typed linting (if enabled): configure type-aware parsing/rules for TS-family files using `parserOptions.projectService: true` and `tsconfigRootDir` (per typescript-eslint guidance).
+- No new runtime configuration keys are introduced.
 
 Versioning / backward compatibility
 
 - No changes to published runtime APIs are required. The primary outcome is developer workflow and agent-template behavior.
-- Enabling typed linting may introduce new lint failures until code is adjusted; the feature must keep `npm run lint` green at the end of the change.
+
 
 ## API / CLI Surface
 
@@ -131,7 +124,7 @@ Data transformations and invariants
 
 Caching / persistence details
 
-- If typed linting is enabled, ESLint’s TypeScript project service may cache project graph information during lint runs (an implementation detail of the lint toolchain). No repo-managed cache files are introduced by this feature.
+- No new repo-managed caches or persistent files are introduced.
 
 Migration / backfill
 
@@ -141,11 +134,9 @@ Migration / backfill
 
 Constraints and risks to account for:
 
-- Performance: Type-aware ESLint rules require TypeScript project analysis; `npm run lint` may be slower when typed linting is enabled.
-- Compatibility: The repo includes JavaScript files under `src/` and `tests/`; typed linting must be scoped to TS-family files so linting does not break on `.js`.
-- Scope control: This feature should not become a broad refactor of TypeScript code. If enabling typed linting triggers many findings, address the minimal set required to keep the toolchain green.
-- Suppression governance: The typed linting wave may tempt broad suppressions; the feature must remain aligned with `typescript-suppressions.instructions.md` and prefer real fixes.
-- Test boundary: Unit tests must remain Node/Jest-only and must not require the VS Code extension host.
+- Scope control: This feature is documentation-only (agent definition markdown) and must not expand into code/config changes.
+- Suppression governance: The agent definition must enforce the repo suppression policy and prohibit broad suppressions.
+- Test boundary: The agent definition must state and enforce that unit tests remain Node/Jest-only and must not require the VS Code extension host.
 
 
 ## Implementation Strategy
@@ -160,14 +151,11 @@ Implementation scope (what changes)
 
 - Add a new agent definition template under `.github/agents/` for a “TypeScript engineer” role.
 - Ensure the agent template mirrors existing agent rigor where appropriate (policy precedence, toolchain loop, and quality gates), but uses the TypeScript-specific policies and scripts.
-- If typed linting is adopted as part of this feature:
-	- Update `eslint.config.mjs` to enable typescript-eslint typed linting scoped to TS-family files (avoid applying TS parser/rules to `.js`).
-	- Fix the initial set of type-aware lint findings in the existing TypeScript sources while keeping behavior stable.
 
 New classes/functions/commands
 
 - No new runtime commands are required. This is a documentation + configuration feature.
-- If enabling typed linting requires small code adjustments, prefer local type refinements and boundary guards rather than introducing new abstractions.
+
 
 Dependency changes
 
@@ -176,12 +164,12 @@ Dependency changes
 Logging/telemetry
 
 - No new runtime telemetry is introduced.
-- If code changes are required to satisfy typed linting, prefer improving error messages and invariants at existing boundaries rather than adding new logging.
+
 
 Rollout plan
 
 - No feature flag is required (this is a developer workflow change).
-- If typed linting is enabled, rollout is “all at once” by updating `eslint.config.mjs`; success is measured by `npm run lint` returning success and the full toolchain pass staying green.
+
 
 ## Definition of Done
 
@@ -197,18 +185,11 @@ Evidence expectations for this feature (how DoD will be verified)
 
 - Agent definition exists and is reviewable under `.github/agents/`.
 - The agent definition text explicitly names the required repo scripts and the suppression patterns.
-- If typed linting is enabled:
-	- `npm run lint` passes with type-aware rules for TypeScript files.
-	- The full toolchain loop completes successfully in a single pass:
-		- `npm run format`
-		- `npm run lint`
-		- `npm run typecheck`
-		- `npm run test:unit`
+
 
 ## Seeded Test Conditions (from potential)
 - [ ] Unit coverage areas
-	- [ ] New or modified pure-logic helpers (if any are introduced while fixing typed-lint errors) have Jest unit tests under `tests/unit/`.
-	- [ ] Unit tests explicitly avoid VS Code extension host dependencies (mock `vscode` where needed).
+	- [ ] None required (markdown-only agent definition).
 - [ ] Integration scenarios
 	- [ ] None required for the agent definition itself; integration tests remain owned by the existing VS Code test harness (`npm test`) and are out of scope unless a change unintentionally affects them.
 - [ ] CLI/API examples

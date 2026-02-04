@@ -7,7 +7,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-04T12-35
 - **Status:** Planned
-- **Version:** 0.2
+- **Version:** 1.0
 
 ## Required References
 

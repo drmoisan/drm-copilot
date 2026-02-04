@@ -1,0 +1,6 @@
+.github/copilot-instructions.md
+.github/instructions/general-code-change.instructions.md
+.github/instructions/general-unit-test.instructions.md
+.github/instructions/typescript-code-change.instructions.md
+.github/instructions/typescript-suppressions.instructions.md
+.github/instructions/typescript-unit-test.instructions.md
