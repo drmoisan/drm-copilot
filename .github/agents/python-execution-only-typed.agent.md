@@ -4,23 +4,7 @@ description: Implement small, highly testable, pythonic modules and classes with
 argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will baseline → design → plan → implement in small batches with gates."
 target: vscode
 tools:
-  - search
-  - search/usages
-  - search/codebase
-  - search/fileSearch
-  - search/listDirectory
-  - read/readFile
-  - read/problems
-  - edit/createDirectory
-  - edit/createFile
-  - edit/editFiles
-  - execute/runInTerminal
-  - execute/runTask
-  - execute/runTests
-  - execute/getTaskOutput
-  - execute/getTerminalOutput
-  - execute/testFailure
-  - todo
+  ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'todo']
 handoffs:
   - label: Architecture + testability plan only (no edits)
     agent: atomic_planner
