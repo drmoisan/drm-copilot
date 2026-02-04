@@ -10,7 +10,7 @@ jest.mock(
   { virtual: true },
 );
 
-import { dispatchUtility } from "../../src/utilities/utility-dispatcher.ts";
+import { dispatchUtility } from "../../src/utilities/utility-dispatcher";
 
 describe("utility-dispatcher", () => {
   it("returns error when tool preflight fails", async () => {

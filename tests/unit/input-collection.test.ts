@@ -12,7 +12,7 @@ jest.mock(
 
 import * as vscode from "vscode";
 
-import { collectCommandInputs } from "../../src/utilities/input-collection.ts";
+import { collectCommandInputs } from "../../src/utilities/input-collection";
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -20,7 +20,11 @@ afterEach(() => {
 
 describe("input-collection", () => {
   it("cancel returns undefined", async () => {
-    (vscode.window.showInputBox as jest.Mock).mockResolvedValue(undefined);
+    (
+      vscode.window.showInputBox as jest.MockedFunction<
+        typeof vscode.window.showInputBox
+      >
+    ).mockResolvedValue(undefined);
 
     const result = await collectCommandInputs(
       "drm-copilot.devNewPotentialEntry",

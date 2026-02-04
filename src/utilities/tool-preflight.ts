@@ -19,7 +19,7 @@ import * as path from "path";
  *     Performs synchronous filesystem checks on PATH directories.
  */
 export function resolveExecutable(executableName: string): string | undefined {
-  const pathEnv = process.env.PATH ?? "";
+  const pathEnv = process.env["PATH"] ?? "";
   if (!pathEnv) {
     return undefined;
   }

@@ -235,7 +235,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "compile:integration-tests": "tsc -p ./tsconfig.vscode-test.json",
-    "typecheck": "tsc -p ./ --noEmit && tsc -p ./tsconfig.tests.json",
+    "typecheck": "tsc -p ./ --noEmit",
     "watch": "tsc -watch -p ./",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",

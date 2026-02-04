@@ -12,7 +12,7 @@ import {
   getTaskExecutionSpec,
   getTaskInputIdsForCommand,
   resolveTaskArgs, // Not yet implemented - Phase 2
-} from "../../src/task-command-map.ts";
+} from "../../src/task-command-map";
 
 describe("task-execution-spec", () => {
   describe("getTaskExecutionSpec", () => {

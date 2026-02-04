@@ -649,7 +649,7 @@ export function resolveTaskArgs(
     }
 
     // Replace ${input:<id>}
-    resolved = resolved.replace(INPUT_TOKEN_PATTERN, (match, inputId) => {
+    resolved = resolved.replace(INPUT_TOKEN_PATTERN, (_match, inputId) => {
       const value = context.inputValues[inputId];
       if (value === undefined) {
         throw new Error(`Missing input value: ${inputId}`);

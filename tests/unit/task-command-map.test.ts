@@ -3,7 +3,7 @@ import { describe, expect, test } from "@jest/globals";
 import {
   getTaskLabelForCommandId,
   TASK_COMMAND_MAP,
-} from "../../src/task-command-map.ts";
+} from "../../src/task-command-map";
 
 describe("task-command-map", () => {
   test("maps known commands to stable task labels", () => {

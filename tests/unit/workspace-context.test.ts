@@ -16,7 +16,7 @@ jest.mock(
 
 import * as vscode from "vscode";
 
-import { resolveWorkspaceFolder } from "../../src/utilities/workspace-context.ts";
+import { resolveWorkspaceFolder } from "../../src/utilities/workspace-context";
 
 afterEach(() => {
   jest.resetAllMocks();

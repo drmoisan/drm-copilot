@@ -1,14 +1,11 @@
 import { describe, expect, it } from "@jest/globals";
 
-import {
-  getAllTaskCommandIds,
-  TASK_COMMAND_MAP,
-} from "../../src/task-command-map.ts";
+import { getAllTaskCommandIds } from "../../src/task-command-map";
 import {
   getRequiredInputIds,
   getUtilitySpec,
   UTILITY_COMMAND_SPECS,
-} from "../../src/utilities/utility-spec.ts";
+} from "../../src/utilities/utility-spec";
 
 describe("utility-spec", () => {
   it("all task commands have utility specs", () => {
@@ -40,8 +37,10 @@ describe("utility-spec", () => {
 
     expect(spec).toBeDefined();
     expect(spec.kind).toBe("external");
-    expect(spec.env).toBeDefined();
-    expect(spec.env.PYTHONPATH).toBe("${extensionRoot}");
+    if (spec.kind === "external") {
+      expect(spec.env).toBeDefined();
+      expect(spec.env["PYTHONPATH"]).toBe("${extensionRoot}");
+    }
   });
 
   it("devNewPotentialEntry uses extensionRoot script", () => {
@@ -49,9 +48,11 @@ describe("utility-spec", () => {
 
     expect(spec).toBeDefined();
     expect(spec.kind).toBe("powershell");
-    expect(spec.scriptPath).toBe(
-      "${extensionRoot}/scripts/dev-tools/new-potential-entry.ps1",
-    );
+    if (spec.kind === "powershell") {
+      expect(spec.scriptPath).toBe(
+        "${extensionRoot}/scripts/dev-tools/new-potential-entry.ps1",
+      );
+    }
   });
 
   it("devNewPotentialEntry requires PotentialShortName", () => {

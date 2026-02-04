@@ -27,7 +27,6 @@ import * as vscode from "vscode";
 
 import {
   type TaskCommandId,
-  type TaskExecutionSpec,
   getDefaultInputValuesForCommand,
   getAllTaskCommandIds,
   getTaskExecutionSpec,
@@ -74,7 +73,7 @@ class DrmCopilotTaskProvider implements vscode.TaskProvider {
   /**
    * Resolves a task definition into a fully configured task.
    */
-  resolveTask(task: vscode.Task): vscode.Task | undefined {
+  resolveTask(_task: vscode.Task): vscode.Task | undefined {
     // For now, we don't support resolving user-provided task definitions
     return undefined;
   }
@@ -117,18 +116,28 @@ class DrmCopilotTaskProvider implements vscode.TaskProvider {
 
     // Resolve remaining tokens (workspace, file, input tokens)
     const defaultInputValues = getDefaultInputValuesForCommand(commandId);
-    const resolvedArgs = resolveTaskArgs(argsWithExtensionRoot, {
+
+    const context: {
+      workspaceRoot: string;
+      extensionRoot: string;
+      activeFilePath?: string;
+      activeRelativePath?: string;
+      inputValues: Record<string, string>;
+    } = {
       workspaceRoot: workspaceFolder.uri.fsPath.replace(/\\/g, "/"),
       extensionRoot: this.context.asAbsolutePath("").replace(/\\/g, "/"),
-      activeFilePath:
-        vscode.window.activeTextEditor?.document.uri.fsPath.replace(/\\/g, "/"),
-      activeRelativePath: vscode.window.activeTextEditor
-        ? vscode.workspace.asRelativePath(
-            vscode.window.activeTextEditor.document.uri,
-          )
-        : undefined,
       inputValues: defaultInputValues,
-    });
+    };
+
+    if (vscode.window.activeTextEditor) {
+      context.activeFilePath =
+        vscode.window.activeTextEditor.document.uri.fsPath.replace(/\\/g, "/");
+      context.activeRelativePath = vscode.workspace.asRelativePath(
+        vscode.window.activeTextEditor.document.uri,
+      );
+    }
+
+    const resolvedArgs = resolveTaskArgs(argsWithExtensionRoot, context);
 
     // Create shell execution with workspace folder as cwd
     const execution = new vscode.ShellExecution(spec.command, resolvedArgs, {
