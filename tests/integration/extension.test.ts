@@ -1,6 +1,13 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 
+/**
+ * Integration tests for the drm-copilot extension.
+ *
+ * NOTE: These tests require a GUI environment and cannot run in headless containers.
+ * Run `npm run test:unit` for tests that work in dev containers.
+ * Run `npm test` or `npm run test:integration` only on desktop environments.
+ */
 suite("Extension Test Suite", () => {
   vscode.window.showInformationMessage("Start all tests.");
 
@@ -8,7 +15,11 @@ suite("Extension Test Suite", () => {
     // Ensure extension is activated
     const ext = vscode.extensions.getExtension("drm-copilot.drm-copilot");
     assert.ok(ext, "Extension should be installed");
-    await ext.activate();
+
+    // Activate and wait for it to complete
+    if (!ext.isActive) {
+      await ext.activate();
+    }
 
     // Get all registered commands
     const allCommands = await vscode.commands.getCommands(true);
