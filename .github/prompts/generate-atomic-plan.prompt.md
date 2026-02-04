@@ -16,6 +16,7 @@ This prompt is designed for AI-to-AI communication and automated processing. All
 
 - Generate implementation plans that are fully executable by AI agents
 - Plan should deliver all of the requirements detailed in the `${spec}` and the `${user-story}` 
+- Plan should leverage the extensive research that has been done on how to implement and can be found at `${research}`
 - Use deterministic language with zero ambiguity
 - Structure all content for automated parsing and execution
 - Ensure complete self-containment with no external dependencies for understanding
