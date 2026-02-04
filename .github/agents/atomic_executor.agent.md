@@ -2,7 +2,7 @@
 name: atomic_executor
 description: Execute an atomic_planner plan verbatim (Phase/Task IDs + order are authoritative). No replanning. Policy-first. Rigorously verifies each task’s acceptance criteria before checking it off.
 tools:
-  ['execute', 'read', 'edit', 'search', 'agent', 'todo']
+  ['execute', 'read', 'edit', 'search', 'agent']
 ---
 
 # Atomic Execution Agent (Plan-Following Executor)
