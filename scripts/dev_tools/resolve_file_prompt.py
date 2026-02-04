@@ -8,6 +8,7 @@ Supported variables:
     - ${name}: Feature name derived from folder naming convention.
     - ${spec}: Path to spec.md under ${folderpath}.
     - ${user-story}: Path to user-story.md under ${folderpath}, annotated when missing.
+    - ${research}: Path to research.md under ${folderpath}, removed when missing.
 
 Usage:
     python resolve_file_prompt.py \\
@@ -294,6 +295,34 @@ def _resolve_user_story_value(folderpath: str, workspace_root: Path) -> str:
     return f"{rel_story} (missing)"
 
 
+def _resolve_research_value(folderpath: str, workspace_root: Path) -> str | None:
+    """Resolve ${research} with existence awareness.
+
+    Purpose:
+        Some atomic-plan prompts reference a research document (e.g.,
+        `${research}`) that is optional per-feature. When the file does not
+        exist, the prompt should omit that instruction line entirely.
+
+    Args:
+        folderpath (str): Workspace-relative folder path.
+        workspace_root (Path): Workspace root used for existence checks.
+
+    Returns:
+        str | None: Workspace-relative path to `research.md` if present,
+        otherwise None.
+
+    Side Effects:
+        None.
+    """
+    rel_research = Path(folderpath) / "research.md"
+    full_research = workspace_root / rel_research
+
+    if full_research.exists():
+        return str(rel_research)
+
+    return None
+
+
 def _remove_user_story_clause_when_missing(template: str) -> str:
     """Remove the user-story clause from the template when no user story exists.
 
@@ -309,6 +338,34 @@ def _remove_user_story_clause_when_missing(template: str) -> str:
         str: Updated template content with the clause removed.
     """
     return template.replace(" and the `${user-story}`", "")
+
+
+def _remove_lines_referencing_variable(template: str, variable_name: str) -> str:
+    """Remove any line containing a specific ${variable} reference.
+
+    Purpose:
+        Some templates include optional variables that should be deleted when
+        the referenced file does not exist. For `${research}`, the desired
+        behavior is to remove the entire line to avoid leaving confusing or
+        broken instructions.
+
+    Args:
+        template (str): Template content (no front matter).
+        variable_name (str): The variable name without ${...} braces.
+
+    Returns:
+        str: Template with any lines referencing `${variable_name}` removed.
+    """
+    token = f"${{{variable_name}}}"
+
+    kept_lines: list[str] = []
+    # Keep only lines that do not reference the optional variable.
+    for line in template.splitlines(keepends=True):
+        if token in line:
+            continue
+        kept_lines.append(line)
+
+    return "".join(kept_lines)
 
 
 def _extract_template_variables(template: str) -> set[str]:
@@ -373,6 +430,14 @@ def resolve_prompt(template_content: str, target_path: Path, cwd: Path) -> str:
         "spec": _resolve_spec_path(folderpath),
         "user-story": _resolve_user_story_value(folderpath, cwd),
     }
+
+    # Resolve optional research path. If missing, delete any instruction line
+    # that references it (per prompt requirements).
+    research_value = _resolve_research_value(folderpath, cwd)
+    if research_value is None:
+        content = _remove_lines_referencing_variable(content, "research")
+    else:
+        variables["research"] = research_value
 
     # If the user story is missing, remove the specific clause that references it.
     # This keeps the prompt deterministic and avoids instructing agents to read a

@@ -75,6 +75,69 @@ def test_resolve_prompt_resolves_folderpath_name_spec_and_user_story_exists() ->
     assert "${" not in result
 
 
+def test_resolve_prompt_resolves_research_when_exists() -> None:
+    """Resolves ${research} to a workspace-relative path when research.md exists.
+
+    This test simulates a workspace where research.md exists without touching
+    the filesystem.
+    """
+    template = (
+        "Spec=${spec}\n"
+        "Research=${research}\n"
+        "Story=${user-story}\n"
+        "File=${file}\n"
+    )
+
+    cwd = Path.cwd()
+    feature_dir = (
+        cwd
+        / "docs"
+        / "features"
+        / "active"
+        / "2026-01-10-atomic-executor-throttling-80"
+    )
+    target = feature_dir / "plan.2026-01-10T15-21.md"
+
+    expected_folderpath = str(feature_dir.relative_to(cwd))
+    expected_research = str(Path(expected_folderpath) / "research.md")
+
+    def _exists(self: Path) -> bool:
+        # Simulate that both user-story.md and research.md exist.
+        return self.name in {"user-story.md", "research.md"}
+
+    with patch.object(Path, "exists", _exists):
+        result = resolve_prompt(template, target, cwd)
+
+    assert expected_research in result
+    assert "${" not in result
+
+
+def test_resolve_prompt_removes_research_line_when_missing() -> None:
+    """When research.md is absent, remove the entire line containing ${research}."""
+    template = (
+        "Line1\n"
+        "Plan should leverage research at `${research}`\n"
+        "Line3\n"
+        "Spec=${spec}\n"
+    )
+
+    cwd = Path.cwd()
+    target = cwd / "docs" / "features" / "active" / "2026-01-10-x-1" / "plan.md"
+
+    def _exists_false(self: Path) -> bool:
+        return False
+
+    with patch.object(Path, "exists", _exists_false):
+        result = resolve_prompt(template, target, cwd)
+
+    assert "`${research}`" not in result
+    assert "Plan should leverage research" not in result
+    assert "Line1" in result
+    assert "Line3" in result
+    assert "spec.md" in result
+    assert "${" not in result
+
+
 def test_resolve_prompt_outside_cwd():
     """Test fallback when target is not relative to CWD."""
     template = "Analyze ${file}"
