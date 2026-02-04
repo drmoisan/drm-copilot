@@ -112,11 +112,15 @@ class TestResolveWorkspace:
         result = resolve_workspace(str(tmp_path))
         assert result == tmp_path.resolve()
 
-    def test_resolve_infers_from_file_location(self, monkeypatch: "MonkeyPatch") -> None:
+    def test_resolve_infers_from_file_location(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """resolve_workspace() infers from __file__ location when no arg."""
         # Mock __file__ to be at repo/scripts/dev_tools/atomic_executor/cli.py
         fake_file = Path("/fake/repo/scripts/dev_tools/atomic_executor/cli.py")
-        monkeypatch.setattr("scripts.dev_tools.atomic_executor.cli.__file__", str(fake_file))
+        monkeypatch.setattr(
+            "scripts.dev_tools.atomic_executor.cli.__file__", str(fake_file)
+        )
 
         result = resolve_workspace(None)
         # Should go up 3 levels: atomic_executor -> dev_tools -> scripts -> repo
@@ -233,7 +237,9 @@ class TestRefuseProtectedBranch:
         # Should not raise
         refuse_protected_branch(tmp_path)
 
-    def test_refuse_handles_git_error(self, tmp_path: Path, monkeypatch: "MonkeyPatch") -> None:
+    def test_refuse_handles_git_error(
+        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """refuse_protected_branch() handles git errors gracefully."""
 
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -249,7 +255,9 @@ class TestRefuseProtectedBranch:
 class TestCopyToClipboard:
     """Tests for copy_to_clipboard() function."""
 
-    def test_copy_uses_pyperclip_when_available(self, monkeypatch: "MonkeyPatch") -> None:
+    def test_copy_uses_pyperclip_when_available(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """copy_to_clipboard() uses pyperclip when available."""
         copied_text = None
 
@@ -321,7 +329,9 @@ class TestCopyToClipboard:
         assert result is True
         assert captured_input == "fallback text"
 
-    def test_copy_returns_false_when_all_methods_fail(self, monkeypatch: "MonkeyPatch") -> None:
+    def test_copy_returns_false_when_all_methods_fail(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """copy_to_clipboard() returns False when all methods fail."""
         # Mock pyperclip import to fail
         import builtins
@@ -342,7 +352,9 @@ class TestCopyToClipboard:
 
         assert result is False
 
-    def test_copy_tries_multiple_fallback_commands(self, monkeypatch: "MonkeyPatch") -> None:
+    def test_copy_tries_multiple_fallback_commands(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """copy_to_clipboard() tries multiple fallback commands on Linux."""
         # Mock pyperclip import to fail
         import builtins
@@ -412,7 +424,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock all subprocess calls
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -467,7 +481,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock all subprocess calls
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -559,7 +575,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock git to be clean
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -655,7 +673,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock all subprocess calls
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -715,7 +735,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock git to be clean
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -769,7 +791,9 @@ class TestMainEdgeCases:
 
         template_dir = tmp_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
-        (template_dir / "execute-plan-template.md").write_text("TEMPLATE\n", encoding="utf-8")
+        (template_dir / "execute-plan-template.md").write_text(
+            "TEMPLATE\n", encoding="utf-8"
+        )
 
         # Mock git to be clean
         def mock_run(*args: object, **kwargs: object) -> Mock:
@@ -851,7 +875,9 @@ class TestMainEdgeCases:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 subprocess_calls.append(argv)
                 self.stdout = MockStdout()
                 self.returncode = 0
@@ -910,7 +936,9 @@ class TestPreflightQC:
         assert result.toolchain == QCToolchain.PYTHON
 
         # Failure case
-        result = PreflightQCResult(success=False, output="Ruff failed", failed_step="ruff")
+        result = PreflightQCResult(
+            success=False, output="Ruff failed", failed_step="ruff"
+        )
         assert result.success is False
         assert result.output == "Ruff failed"
         assert result.failed_step == "ruff"
@@ -967,7 +995,9 @@ class TestPreflightQC:
         )
 
         # Mock subprocess.run to always succeed
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             return subprocess.CompletedProcess(
                 args=args,
                 returncode=0,
@@ -999,7 +1029,9 @@ class TestPreflightQC:
         call_count = 0
 
         # Mock subprocess.run to fail on second step (ruff)
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             nonlocal call_count
             call_count += 1
             if call_count == 1:  # black
@@ -1041,7 +1073,9 @@ class TestPreflightQC:
 
         monkeypatch.setattr("subprocess.run", _should_not_run)
 
-        result = _run_preflight_qc_with_capture(Path.cwd(), toolchain=QCToolchain.TYPESCRIPT)
+        result = _run_preflight_qc_with_capture(
+            Path.cwd(), toolchain=QCToolchain.TYPESCRIPT
+        )
 
         assert result.success is False
         assert result.failed_step == "format"
@@ -1061,7 +1095,9 @@ class TestPreflightQC:
 class TestPhaseEndQC:
     """Tests for phase-end QC behavior in the CLI."""
 
-    def test_phase_end_expectations_passed_to_qc_runner(self, monkeypatch: "MonkeyPatch") -> None:
+    def test_phase_end_expectations_passed_to_qc_runner(
+        self, monkeypatch: "MonkeyPatch"
+    ) -> None:
         """
         CLI should pass resolved expectations to phase-end QC.
 
@@ -1142,7 +1178,9 @@ class TestPhaseEndQC:
             missing_test_refs=[],
         )
 
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             """Return a failing pytest run for the expected-fail nodeid."""
             cmd = args[0]
             if isinstance(cmd, list) and "pytest" in cmd and "--collect-only" in cmd:
@@ -1154,8 +1192,12 @@ class TestPhaseEndQC:
                     "FAILED tests/bugs/2026/test_issue_98.py::"
                     "test_expected_fail - AssertionError"
                 )
-                return subprocess.CompletedProcess(args=cmd, returncode=1, stdout=output, stderr="")
-            return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="OK", stderr="")
+                return subprocess.CompletedProcess(
+                    args=cmd, returncode=1, stdout=output, stderr=""
+                )
+            return subprocess.CompletedProcess(
+                args=cmd, returncode=0, stdout="OK", stderr=""
+            )
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
@@ -1188,12 +1230,15 @@ class TestPhaseEndQC:
             expected_pass_refs=set(),
             missing_test_refs=[],
             expected_fail_jest_refs={
-                "tests/unit/task-execution-spec.test.ts::" "getTaskExecutionSpec returns QC black"
+                "tests/unit/task-execution-spec.test.ts::"
+                "getTaskExecutionSpec returns QC black"
             },
             expected_pass_jest_refs=set(),
         )
 
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             """Return a failing npm test run for the expected-fail ref."""
             cmd = args[0]
             if isinstance(cmd, list) and cmd[:3] == ["npm", "run", "test:unit"]:
@@ -1203,8 +1248,12 @@ class TestPhaseEndQC:
                         "  \u25cf getTaskExecutionSpec returns QC black",
                     ]
                 )
-                return subprocess.CompletedProcess(args=cmd, returncode=1, stdout=output, stderr="")
-            return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="OK", stderr="")
+                return subprocess.CompletedProcess(
+                    args=cmd, returncode=1, stdout=output, stderr=""
+                )
+            return subprocess.CompletedProcess(
+                args=cmd, returncode=0, stdout="OK", stderr=""
+            )
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
@@ -1240,7 +1289,9 @@ class TestPhaseEndQC:
             missing_test_refs=[],
         )
 
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             """Return a failing pytest run for the expected-pass nodeid."""
             cmd = args[0]
             if isinstance(cmd, list) and "pytest" in cmd and "--collect-only" in cmd:
@@ -1252,8 +1303,12 @@ class TestPhaseEndQC:
                     "FAILED tests/bugs/2026/test_issue_98.py::"
                     "test_expected_fail - AssertionError"
                 )
-                return subprocess.CompletedProcess(args=cmd, returncode=1, stdout=output, stderr="")
-            return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="OK", stderr="")
+                return subprocess.CompletedProcess(
+                    args=cmd, returncode=1, stdout=output, stderr=""
+                )
+            return subprocess.CompletedProcess(
+                args=cmd, returncode=0, stdout="OK", stderr=""
+            )
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
@@ -1288,10 +1343,14 @@ class TestPhaseEndQC:
             missing_test_refs=["P1-T1"],
         )
 
-        def mock_run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        def mock_run(
+            *args: object, **kwargs: object
+        ) -> subprocess.CompletedProcess[str]:
             """Return success for non-pytest steps."""
             cmd = args[0]
-            return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="OK", stderr="")
+            return subprocess.CompletedProcess(
+                args=cmd, returncode=0, stdout="OK", stderr=""
+            )
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
@@ -1341,7 +1400,12 @@ class TestRunCopilot:
         # Pattern: .../Code/User/globalStorage/github.copilot-chat/copilotCli/
         # Use nested dirs to ensure we hit the pattern matching logic
         shim_dir = (
-            tmp_path / "Code" / "User" / "globalStorage" / "github.copilot-chat" / "copilotCli"
+            tmp_path
+            / "Code"
+            / "User"
+            / "globalStorage"
+            / "github.copilot-chat"
+            / "copilotCli"
         )
         shim_dir.mkdir(parents=True)
 
@@ -1440,7 +1504,9 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 self.stdout = MockStdout()
                 self.returncode = 0
 
@@ -1498,7 +1564,9 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 captured_argv.extend(argv)
                 self.stdout = MockStdout()
                 self.returncode = 0
@@ -1548,18 +1616,24 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 nonlocal captured_stdin
                 nonlocal captured_stdin_was_provided
                 captured_argv.extend(argv)
                 # Capture stdin content if provided
                 stdin_arg = kwargs.get("stdin")
-                captured_stdin_was_provided = "stdin" in kwargs and stdin_arg is not None
+                captured_stdin_was_provided = (
+                    "stdin" in kwargs and stdin_arg is not None
+                )
                 if stdin_arg and hasattr(stdin_arg, "read"):
                     # Type narrowing: we know it has a read method and returns bytes
                     raw_content = stdin_arg.read()  # type: ignore[union-attr]
                     # Explicitly cast to bytes for type checker
-                    content_bytes: bytes = raw_content if isinstance(raw_content, bytes) else b""
+                    content_bytes: bytes = (
+                        raw_content if isinstance(raw_content, bytes) else b""
+                    )
                     captured_stdin = content_bytes.decode("utf-8")
                 self.stdout = MockStdout()
                 self.returncode = 0
@@ -1583,7 +1657,9 @@ class TestRunCopilot:
             run_id="2026-01-07_000000",
         )
 
-        expected_prompt_file = log_file.parent / "prompts" / "prompt_2026-01-07_000000_P1-T1.md"
+        expected_prompt_file = (
+            log_file.parent / "prompts" / "prompt_2026-01-07_000000_P1-T1.md"
+        )
         assert expected_prompt_file.exists()
         assert expected_prompt_file.read_text(encoding="utf-8") == "test prompt"
 
@@ -1640,7 +1716,9 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 captured_argv.extend(argv)
                 self.stdout = MockStdout()
                 self.returncode = 0
@@ -1687,7 +1765,9 @@ class TestRunCopilot:
 
         captured_argv: list[str] = []
 
-        permission_denied = "Permission denied and could not request permission from user"
+        permission_denied = (
+            "Permission denied and could not request permission from user"
+        )
 
         class MockStdout:
             def __init__(self) -> None:
@@ -1700,7 +1780,9 @@ class TestRunCopilot:
                 return self.read(size)
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 captured_argv.extend(argv)
                 self.stdout = MockStdout()
                 self.returncode = 1
@@ -1759,7 +1841,9 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 captured_argv.extend(argv)
                 self.stdout = MockStdout()
                 self.returncode = 0
@@ -1808,7 +1892,9 @@ class TestRunCopilot:
                 return b""
 
         class MockPopen:
-            def __init__(self, argv: list[str], *args: object, **kwargs: object) -> None:
+            def __init__(
+                self, argv: list[str], *args: object, **kwargs: object
+            ) -> None:
                 self.stdout = MockStdout()
                 self.returncode = 0
 

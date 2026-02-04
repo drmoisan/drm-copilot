@@ -22,6 +22,66 @@ export type UtilitySpec = ExternalUtilitySpec | PowerShellUtilitySpec;
 export const UTILITY_COMMAND_SPECS: Partial<
   Record<TaskCommandId, UtilitySpec>
 > = {
+  "drm-copilot.loadOpenAIKey": {
+    kind: "powershell",
+    commandId: "drm-copilot.loadOpenAIKey",
+    scriptPath: "${extensionRoot}/scripts/dev-tools/load-openai-key.ps1",
+  },
+  "drm-copilot.qcBlackFormat": {
+    kind: "external",
+    commandId: "drm-copilot.qcBlackFormat",
+    env: {},
+  },
+  "drm-copilot.qcRuffLint": {
+    kind: "external",
+    commandId: "drm-copilot.qcRuffLint",
+    env: {},
+  },
+  "drm-copilot.qcRuffFix": {
+    kind: "external",
+    commandId: "drm-copilot.qcRuffFix",
+    env: {},
+  },
+  "drm-copilot.qcPyrightTypeCheck": {
+    kind: "external",
+    commandId: "drm-copilot.qcPyrightTypeCheck",
+    env: {},
+  },
+  "drm-copilot.qcPytestRunTests": {
+    kind: "external",
+    commandId: "drm-copilot.qcPytestRunTests",
+    env: {},
+  },
+  "drm-copilot.qcPytestRunTestsCoverage": {
+    kind: "external",
+    commandId: "drm-copilot.qcPytestRunTestsCoverage",
+    env: {},
+  },
+  "drm-copilot.poshQCFormat": {
+    kind: "powershell",
+    commandId: "drm-copilot.poshQCFormat",
+    scriptPath: "${extensionRoot}/scripts/powershell/PoshQC/PoshQC.psm1",
+  },
+  "drm-copilot.poshQCAnalyze": {
+    kind: "powershell",
+    commandId: "drm-copilot.poshQCAnalyze",
+    scriptPath: "${extensionRoot}/scripts/powershell/PoshQC/PoshQC.psm1",
+  },
+  "drm-copilot.poshQCAutofix": {
+    kind: "powershell",
+    commandId: "drm-copilot.poshQCAutofix",
+    scriptPath: "${extensionRoot}/scripts/powershell/PoshQC/PoshQC.psm1",
+  },
+  "drm-copilot.poshQCTest": {
+    kind: "powershell",
+    commandId: "drm-copilot.poshQCTest",
+    scriptPath: "${extensionRoot}/scripts/powershell/PoshQC/PoshQC.psm1",
+  },
+  "drm-copilot.qcRunAllChecks": {
+    kind: "external",
+    commandId: "drm-copilot.qcRunAllChecks",
+    env: {},
+  },
   "drm-copilot.qcFixAll": {
     kind: "external",
     commandId: "drm-copilot.qcFixAll",
@@ -71,6 +131,11 @@ export const UTILITY_COMMAND_SPECS: Partial<
       PYTHONPATH: "${extensionRoot}",
     },
   },
+  "drm-copilot.devNewGitHubFeatureIssue": {
+    kind: "external",
+    commandId: "drm-copilot.devNewGitHubFeatureIssue",
+    env: {},
+  },
   "drm-copilot.devPromotePotentialToIssue": {
     kind: "external",
     commandId: "drm-copilot.devPromotePotentialToIssue",
@@ -78,12 +143,32 @@ export const UTILITY_COMMAND_SPECS: Partial<
       PYTHONPATH: "${extensionRoot}",
     },
   },
+  "drm-copilot.devLinkFeatureDocs": {
+    kind: "powershell",
+    commandId: "drm-copilot.devLinkFeatureDocs",
+    scriptPath: "${extensionRoot}/scripts/dev-tools/link-feature-docs.ps1",
+  },
+  "drm-copilot.devLinkParentChild": {
+    kind: "powershell",
+    commandId: "drm-copilot.devLinkParentChild",
+    scriptPath: "${extensionRoot}/scripts/dev-tools/link-parent-child.ps1",
+  },
   "drm-copilot.devCreateActiveFolder": {
     kind: "external",
     commandId: "drm-copilot.devCreateActiveFolder",
     env: {
       PYTHONPATH: "${extensionRoot}",
     },
+  },
+  "drm-copilot.devNewGitHubBugIssue": {
+    kind: "external",
+    commandId: "drm-copilot.devNewGitHubBugIssue",
+    env: {},
+  },
+  "drm-copilot.devInstallPowerShellTooling": {
+    kind: "powershell",
+    commandId: "drm-copilot.devInstallPowerShellTooling",
+    scriptPath: "${extensionRoot}/scripts/powershell/PoshQC/PoshQC.psm1",
   },
   "drm-copilot.devResolveExecutePlanPrompt": {
     kind: "external",
@@ -99,6 +184,11 @@ export const UTILITY_COMMAND_SPECS: Partial<
       PYTHONPATH: "${extensionRoot}",
     },
   },
+  "drm-copilot.devNewPotentialEntry": {
+    kind: "powershell",
+    commandId: "drm-copilot.devNewPotentialEntry",
+    scriptPath: "${extensionRoot}/scripts/dev-tools/new-potential-entry.ps1",
+  },
   "drm-copilot.devResolveAtomicPlanPrompt": {
     kind: "external",
     commandId: "drm-copilot.devResolveAtomicPlanPrompt",
@@ -113,10 +203,36 @@ export const UTILITY_COMMAND_SPECS: Partial<
       PYTHONPATH: "${extensionRoot}",
     },
   },
-  "drm-copilot.devNewPotentialEntry": {
+  "drm-copilot.devSyncAgentsFromInstructions": {
     kind: "powershell",
-    commandId: "drm-copilot.devNewPotentialEntry",
-    scriptPath: "${extensionRoot}/scripts/dev-tools/new-potential-entry.ps1",
+    commandId: "drm-copilot.devSyncAgentsFromInstructions",
+    scriptPath:
+      "${extensionRoot}/scripts/dev-tools/sync-agents-from-instructions.ps1",
+  },
+  "drm-copilot.npmWatch": {
+    kind: "external",
+    commandId: "drm-copilot.npmWatch",
+    env: {},
+  },
+  "drm-copilot.tsPrettierFormat": {
+    kind: "external",
+    commandId: "drm-copilot.tsPrettierFormat",
+    env: {},
+  },
+  "drm-copilot.tsEslintLint": {
+    kind: "external",
+    commandId: "drm-copilot.tsEslintLint",
+    env: {},
+  },
+  "drm-copilot.tsTscTypeCheck": {
+    kind: "external",
+    commandId: "drm-copilot.tsTscTypeCheck",
+    env: {},
+  },
+  "drm-copilot.tsJestUnitTests": {
+    kind: "external",
+    commandId: "drm-copilot.tsJestUnitTests",
+    env: {},
   },
 } as const;
 

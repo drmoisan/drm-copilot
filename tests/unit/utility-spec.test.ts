@@ -1,12 +1,40 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  getAllTaskCommandIds,
+  TASK_COMMAND_MAP,
+} from "../../src/task-command-map.ts";
+import {
   getRequiredInputIds,
   getUtilitySpec,
   UTILITY_COMMAND_SPECS,
 } from "../../src/utilities/utility-spec.ts";
 
 describe("utility-spec", () => {
+  it("all task commands have utility specs", () => {
+    // Validates that every command in TASK_COMMAND_MAP has a corresponding
+    // utility spec, preventing "Unknown utility command ID" runtime errors
+    const allCommandIds = getAllTaskCommandIds();
+    const missingSpecs: string[] = [];
+
+    for (const commandId of allCommandIds) {
+      if (!UTILITY_COMMAND_SPECS[commandId]) {
+        missingSpecs.push(commandId);
+      }
+    }
+
+    expect(missingSpecs).toEqual([]);
+  });
+
+  it("all utility specs can be retrieved without errors", () => {
+    // Validates that getUtilitySpec() works for all registered commands
+    const allCommandIds = getAllTaskCommandIds();
+
+    for (const commandId of allCommandIds) {
+      expect(() => getUtilitySpec(commandId)).not.toThrow();
+    }
+  });
+
   it("qcFixAll uses extension PYTHONPATH", () => {
     const spec = getUtilitySpec("drm-copilot.qcFixAll");
 

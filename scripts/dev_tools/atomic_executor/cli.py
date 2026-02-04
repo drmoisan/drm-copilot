@@ -77,7 +77,9 @@ DEFAULT_COPILOT_TRUST_WORKSPACE = True
 # When Copilot CLI cannot request approval (common in headless/non-interactive
 # runs), it emits this exact substring and may then stall until an idle-timeout.
 # We detect it during output streaming and fail fast with actionable guidance.
-COPILOT_PERMISSION_DENIED_SUBSTRING = "Permission denied and could not request permission from user"
+COPILOT_PERMISSION_DENIED_SUBSTRING = (
+    "Permission denied and could not request permission from user"
+)
 MISSING_EXECUTABLE_PREFIX = "Required executable not found on PATH:"
 
 # Graceful shutdown state: set by signal handler to request termination.
@@ -186,7 +188,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "--copilot-cli-max-calls-per-window",
             type=int,
             default=DEFAULT_COPILOT_CLI_MAX_CALLS_PER_WINDOW,
-            help=("Max Copilot CLI calls per time window " "(call-rate based; not token based)."),
+            help=(
+                "Max Copilot CLI calls per time window "
+                "(call-rate based; not token based)."
+            ),
         )
         sp.add_argument(
             "--copilot-cli-window-seconds",
@@ -226,7 +231,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
             "--copilot-allow-shell",
             action=argparse.BooleanOptionalAction,
             default=DEFAULT_COPILOT_ALLOW_SHELL,
-            help=("Allow all shell commands without approval (adds --allow-tool shell)."),
+            help=(
+                "Allow all shell commands without approval (adds --allow-tool shell)."
+            ),
         )
         sp.add_argument(
             "--copilot-allow-all-paths",
@@ -315,7 +322,9 @@ def acquire_executor_lock(workspace: Path) -> Path:
         return lock_path
 
     if lock_path.exists():
-        raise RuntimeError(f"Atomic executor lock already exists: {lock_path.as_posix()}")
+        raise RuntimeError(
+            f"Atomic executor lock already exists: {lock_path.as_posix()}"
+        )
 
     lock_path.write_text("atomic_executor_lock\n", encoding="utf-8")
     return lock_path
@@ -350,13 +359,15 @@ def ensure_clean_tree(workspace: Path) -> None:
     if not git_exe:
         raise FileNotFoundError("Required executable not found on PATH: git")
 
-    result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-        [git_exe, "status", "--porcelain"],
-        cwd=workspace,
-        capture_output=True,
-        text=True,
-        errors="replace",
-        check=True,
+    result = (
+        subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+            [git_exe, "status", "--porcelain"],
+            cwd=workspace,
+            capture_output=True,
+            text=True,
+            errors="replace",
+            check=True,
+        )
     )
     if result.stdout.strip():
         raise RuntimeError("Working tree is not clean. Commit/stash before running.")
@@ -760,7 +771,9 @@ def run_copilot(
             f.write(f"preferred_model: {preferred_model}\n")
         if normalized_model:
             f.write(f"normalized_model: {normalized_model}\n")
-        session_mode = "continue" if use_continue else "resume" if resume_session else "new"
+        session_mode = (
+            "continue" if use_continue else "resume" if resume_session else "new"
+        )
         f.write(f"session_mode: {session_mode}\n")
         f.write(f"share_path: {share_path}\n")
         f.write(f"prompt_file: {prompt_file}\n")
@@ -896,7 +909,8 @@ def _ensure_trusted_workspace(*, workspace: Path) -> None:
             config_data = json.loads(config_file.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
             raise RuntimeError(
-                "Copilot CLI config.json is invalid JSON. " f"Fix or remove: {config_file}"
+                "Copilot CLI config.json is invalid JSON. "
+                f"Fix or remove: {config_file}"
             ) from exc
 
     trusted_folders = config_data.get("trusted_folders")
@@ -905,10 +919,13 @@ def _ensure_trusted_workspace(*, workspace: Path) -> None:
         trusted_folders_list: list[str] = []
     elif isinstance(trusted_folders, list):
         # Normalize trusted folder entries to strings for stable comparisons.
-        trusted_folders_list = [str(item) for item in cast(list[object], trusted_folders)]
+        trusted_folders_list = [
+            str(item) for item in cast(list[object], trusted_folders)
+        ]
     else:
         raise RuntimeError(
-            "Copilot CLI config.json has non-list trusted_folders. " f"Fix: {config_file}"
+            "Copilot CLI config.json has non-list trusted_folders. "
+            f"Fix: {config_file}"
         )
 
     workspace_path = str(workspace.resolve())
@@ -916,7 +933,9 @@ def _ensure_trusted_workspace(*, workspace: Path) -> None:
     if workspace_path not in trusted_folders_list:
         trusted_folders_list.append(workspace_path)
         config_data["trusted_folders"] = trusted_folders_list
-        config_file.write_text(json.dumps(config_data, indent=2, sort_keys=True), encoding="utf-8")
+        config_file.write_text(
+            json.dumps(config_data, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
 
 def _stream_copilot_output(
@@ -997,7 +1016,9 @@ def _stream_copilot_output(
             # Continuously drain Copilot stdout in chunks so the main thread can
             # enforce idle timeouts without blocking on reads.
             while True:
-                chunk: bytes = cast(bytes, read1(4096)) if callable(read1) else stream.read(4096)
+                chunk: bytes = (
+                    cast(bytes, read1(4096)) if callable(read1) else stream.read(4096)
+                )
 
                 if not chunk:
                     break
@@ -1043,7 +1064,9 @@ def _stream_copilot_output(
                 ]
                 if COPILOT_PERMISSION_DENIED_SUBSTRING in permission_scan_window:
                     _terminate_process(process)
-                    raise CopilotPermissionDeniedError(COPILOT_PERMISSION_DENIED_SUBSTRING)
+                    raise CopilotPermissionDeniedError(
+                        COPILOT_PERMISSION_DENIED_SUBSTRING
+                    )
                 print(text_chunk, end="", flush=True)
                 log_file.write(text_chunk)
                 log_file.flush()
@@ -1433,7 +1456,8 @@ def _run_preflight_qc_with_capture(
         expected_refs = (
             set[str]()
             if expectations is None
-            else expectations.expected_fail_jest_refs | expectations.expected_pass_jest_refs
+            else expectations.expected_fail_jest_refs
+            | expectations.expected_pass_jest_refs
         )
     else:
         raise RuntimeError(f"Unsupported QC toolchain: {toolchain}")
@@ -1441,7 +1465,9 @@ def _run_preflight_qc_with_capture(
     all_output: list[str] = []
     if expectations is not None and expectations.missing_test_refs:
         missing_refs = ", ".join(expectations.missing_test_refs)
-        message = "Missing test reference for expectation-tagged tasks: " f"{missing_refs}"
+        message = (
+            "Missing test reference for expectation-tagged tasks: " f"{missing_refs}"
+        )
         return PreflightQCResult(
             success=False,
             output=message,
@@ -1477,17 +1503,19 @@ def _run_preflight_qc_with_capture(
                     failed_step="pytest-collect",
                     toolchain=toolchain,
                 )
-            collect_result = (
-                subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-                    resolved_collect_cmd,
-                    cwd=workspace,
-                    capture_output=True,
-                    text=True,
-                    errors="replace",
-                )
+            collect_result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+                resolved_collect_cmd,
+                cwd=workspace,
+                capture_output=True,
+                text=True,
+                errors="replace",
             )
-            collect_output = (collect_result.stdout or "") + (collect_result.stderr or "")
-            all_output.append(collect_output.strip() if collect_output else "(no output)")
+            collect_output = (collect_result.stdout or "") + (
+                collect_result.stderr or ""
+            )
+            all_output.append(
+                collect_output.strip() if collect_output else "(no output)"
+            )
             if collect_result.returncode != 0:
                 return PreflightQCResult(
                     success=False,
@@ -1529,7 +1557,9 @@ def _run_preflight_qc_with_capture(
             if toolchain is QCToolchain.PYTHON:
                 summary = parse_pytest_failure_output(combined)
                 if summary.has_collection_error:
-                    all_output.append("Pytest collection/import errors detected; failing QC.")
+                    all_output.append(
+                        "Pytest collection/import errors detected; failing QC."
+                    )
                     return PreflightQCResult(
                         success=False,
                         output="\n\n".join(all_output),
@@ -1554,7 +1584,8 @@ def _run_preflight_qc_with_capture(
                     all_output.append("Unexpected pytest failures detected.")
                     if expected_pass_hits:
                         all_output.append(
-                            "Expected-pass override applied to: " + ", ".join(expected_pass_hits)
+                            "Expected-pass override applied to: "
+                            + ", ".join(expected_pass_hits)
                         )
                     return PreflightQCResult(
                         success=False,
@@ -1564,7 +1595,8 @@ def _run_preflight_qc_with_capture(
                     )
 
                 all_output.append(
-                    "Expected pytest failures allowed: " + ", ".join(sorted(summary.failed_nodeids))
+                    "Expected pytest failures allowed: "
+                    + ", ".join(sorted(summary.failed_nodeids))
                 )
             elif toolchain is QCToolchain.TYPESCRIPT:
                 summary = parse_jest_failure_output(combined)
@@ -1619,7 +1651,8 @@ def _run_preflight_qc_with_capture(
                     all_output.append("Unexpected Jest failures detected.")
                     if expected_pass_hits:
                         all_output.append(
-                            "Expected-pass override applied to: " + ", ".join(expected_pass_hits)
+                            "Expected-pass override applied to: "
+                            + ", ".join(expected_pass_hits)
                         )
                     return PreflightQCResult(
                         success=False,
@@ -1801,7 +1834,11 @@ def _run_preflight_qc_fix_loop(
 
         if MISSING_EXECUTABLE_PREFIX in qc_output:
             missing_line = next(
-                (line for line in qc_output.splitlines() if MISSING_EXECUTABLE_PREFIX in line),
+                (
+                    line
+                    for line in qc_output.splitlines()
+                    if MISSING_EXECUTABLE_PREFIX in line
+                ),
                 qc_output,
             )
             err_msg = (
@@ -1813,7 +1850,10 @@ def _run_preflight_qc_fix_loop(
             return 6
 
         limit_str = str(max_fix_attempts) if max_fix_attempts > 0 else "∞"
-        msg = f"Pre-flight QC failed (attempt {attempt}/{limit_str}), " "invoking Copilot to fix..."
+        msg = (
+            f"Pre-flight QC failed (attempt {attempt}/{limit_str}), "
+            "invoking Copilot to fix..."
+        )
         print(msg)
         _log_msg(log_file, f"WARN: {msg}")
 
@@ -2211,7 +2251,10 @@ def execute_one_task(
             return 130  # Standard exit code for SIGINT
 
         if max_fix_attempts > 0 and attempt > max_fix_attempts:
-            msg = f"Failed to complete task {cur.task_id} after " f"{max_fix_attempts} attempts."
+            msg = (
+                f"Failed to complete task {cur.task_id} after "
+                f"{max_fix_attempts} attempts."
+            )
             print(msg, file=sys.stderr)
             _log_msg(log_file, f"ERROR: {msg}")
             print(f"See log: {log_file}", file=sys.stderr)
@@ -2339,7 +2382,9 @@ def execute_one_task(
 
                 if ts_test_files:
                     # Check if Jest tests were skipped
-                    jest_summary = qc_runner.check_jest_skipped_tests(test_files=ts_test_files)
+                    jest_summary = qc_runner.check_jest_skipped_tests(
+                        test_files=ts_test_files
+                    )
                     if jest_summary.skipped_count > 0:
                         # SUCCESS: Tests were skipped, acceptable for TDD Red
                         success_msg = (
@@ -2355,7 +2400,9 @@ def execute_one_task(
                         return 0
 
                 # Unexpected: test should have failed but all QC passed
-                err_msg = f"Task {cur.task_id} expected failure (TDD Red) but QC passed."
+                err_msg = (
+                    f"Task {cur.task_id} expected failure (TDD Red) but QC passed."
+                )
                 print(err_msg, file=sys.stderr)
                 _log_msg(log_file, f"WARN: {err_msg}")
 
@@ -2368,13 +2415,17 @@ def execute_one_task(
         except subprocess.CalledProcessError as e:
             # Determine which command failed to distinguish pytest from other tools.
             # e.cmd can be str | Sequence[str]; normalize to string for matching.
-            cmd_str = e.cmd if isinstance(e.cmd, str) else " ".join(str(arg) for arg in e.cmd)
+            cmd_str = (
+                e.cmd if isinstance(e.cmd, str) else " ".join(str(arg) for arg in e.cmd)
+            )
             is_pytest_failure = "pytest" in cmd_str
             is_npm_failure = "npm" in cmd_str and "test" in cmd_str
 
             if cur.expect_fail and (is_pytest_failure or is_npm_failure):
                 # SUCCESS: Expected pytest failure achieved (TDD Red workflow)
-                success_msg = f"Task {cur.task_id} failed as expected (TDD Red). Verified."
+                success_msg = (
+                    f"Task {cur.task_id} failed as expected (TDD Red). Verified."
+                )
                 print(success_msg)
                 _log_msg(log_file, f"SUCCESS: {success_msg}")
 
