@@ -30,6 +30,27 @@ line2
             $normalized = $result -replace "`r`n", "`n"
             $normalized | Should -Be "line1`nline2"
         }
+
+        It "returns empty string for empty file" {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-Content -MockWith { $null }
+
+            $result = Get-InstructionsBody -Path "empty.md"
+            $result | Should -Be ""
+        }
+
+        It "returns empty string for file with only frontmatter" {
+            $content = @"
+---
+applyTo: "**"
+---
+"@
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-Content -MockWith { $content }
+
+            $result = Get-InstructionsBody -Path "frontmatter-only.md"
+            $result | Should -Be ""
+        }
     }
 
     Context "Get-AgentContent" {

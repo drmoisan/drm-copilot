@@ -18,6 +18,7 @@ $sections = @(
 
 function Get-InstructionsBody {
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [string]$Path
@@ -29,8 +30,18 @@ function Get-InstructionsBody {
 
     $content = Get-Content -Raw -LiteralPath $Path
 
+    # Handle null or empty content
+    if ([string]::IsNullOrEmpty($content)) {
+        return ""
+    }
+
     if ($content -match '^\s*---\s*[\s\S]*?---\s*') {
         $content = $content -replace '^\s*---\s*[\s\S]*?---\s*', ''
+    }
+
+    # Handle content that becomes empty after frontmatter removal
+    if ([string]::IsNullOrEmpty($content)) {
+        return ""
     }
 
     return $content.Trim()
@@ -38,6 +49,7 @@ function Get-InstructionsBody {
 
 function Get-AgentContent {
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [string]$RepoRootParam
