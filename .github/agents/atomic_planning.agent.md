@@ -4,18 +4,7 @@ description: Generate phased implementation plans with atomic checkbox tasks tha
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
 target: vscode
 tools:
-  - web/fetch
-  - search/codebase
-  - search/fileSearch
-  - search
-  - search/usages
-  - todo
-  - search/listDirectory
-  - read/readFile
-  - edit/createDirectory
-  - edit/createFile
-  - edit/editFiles
-  - web/githubRepo
+  ['read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'agent', 'todo']
 ---
 # Atomic Planning & Execution Agent
 
