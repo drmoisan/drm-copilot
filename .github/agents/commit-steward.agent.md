@@ -1,10 +1,3 @@
----
-name: commit_steward
-model: GPT-5.2 (copilot)
-description: Write commit messages for the current repo based on staged changes
-target: vscode
----
-
 # Commit Message Steward
 
 ## Purpose
@@ -92,6 +85,12 @@ Rules:
 
 Your output **must contain only** the commit message, formatted exactly as follows:
 
+OUTPUT WRAPPER (required)
+
+- Your response MUST be a single fenced code block (```text) containing ONLY the commit message.
+- Do not include any text outside the code block.
+- This is required so the commit message can be copied cleanly.
+
 ```
 (type[optional-scope]): concise imperative summary
 
@@ -174,7 +173,7 @@ Refs: #<issue>, #<issue>
 ## Hard Prohibitions
 
 * No emojis
-* No markdown formatting in the output
+* No markdown formatting inside the commit message (the only allowed Markdown is the required ```text wrapper fence)
 * No references to "this commit"
 * No speculation about unstaged changes
 * No multi‑paragraph prose
