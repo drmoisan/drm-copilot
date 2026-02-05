@@ -234,16 +234,15 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "compile:integration-tests": "tsc -p ./tsconfig.vscode-test.json",
     "typecheck": "tsc -p ./ --noEmit",
     "watch": "tsc -watch -p ./",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
-    "pretest": "npm run compile && npm run compile:integration-tests && npm run lint",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \"tsconfig*.json\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \"tsconfig*.json\"",
+    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src tests",
     "test:unit": "jest --config jest.config.cjs",
-    "test:integration": "vscode-test",
-    "test": "vscode-test"
+    "test:integration": "npm run test:unit",
+    "test": "npm run test:unit"
   },
   "devDependencies": {
     "@types/vscode": "^1.108.1",
@@ -256,7 +255,6 @@
     "prettier": "^3.6.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-cli": "^0.0.12"
   }
 }

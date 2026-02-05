@@ -1,0 +1,33 @@
+Timestamp: 2026-02-04T19:10:00Z
+Command: npm run test:unit -- --runTestsByPath tests/unit/vscode-test-removal.test.ts -t "vscode-test tsconfig removed"
+EXIT_CODE: 1
+Failure: expect(exists).toBe(false)
+Output:
+> drm-copilot@0.0.1 test:unit
+> jest --config jest.config.cjs --runTestsByPath tests/unit/vscode-test-removal.test.ts -t vscode-test tsconfig removed
+
+FAIL  tests/unit/vscode-test-removal.test.ts
+  VS Code test harness removal
+    ✕ vscode-test tsconfig removed (3 ms)
+    ○ skipped scripts avoid vscode-test electron harness
+    ○ skipped vscode-test mjs removed
+
+● VS Code test harness removal › vscode-test tsconfig removed
+  expect(received).toBe(expected) // Object.is equality
+  Expected: false
+  Received: true
+
+    53 |
+    54 |     // Assert
+>   55 |     expect(exists).toBe(false);
+       |                    ^
+    56 |   });
+    57 | });
+    58 |
+
+    at Object.<anonymous> (tests/unit/vscode-test-removal.test.ts:55:20)
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 skipped, 3 total
+Snapshots:   0 total
+Time:        0.257 s, estimated 1 s
+Ran all test suites within paths "tests/unit/vscode-test-removal.test.ts".

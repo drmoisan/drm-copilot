@@ -115,6 +115,12 @@ poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-re
 ```
 Prefer these commands instead of the `QC: 4 Pytest: run tests` / `QC: 4 Pytest: run tests with coverage` tasks.
 
+### TypeScript Extension Tests (Jest)
+
+- `npm test` runs the Jest unit test suite (no VS Code test runner).
+- `npm run test:integration` also runs Jest unit tests for container-safe verification.
+- `npm run test:unit` runs Jest directly for focused execution.
+
 ### JSON Config Quality: jq + jsonschema
 
 - **Governed globs**: `.vscode/*.json`, `.vscode/**/*.json`, `.devcontainer/*.json`, `scripts/**/*.json`, `docs/**/*.json`, `examples/**/*.json`

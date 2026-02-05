@@ -1,0 +1,53 @@
+Timestamp: 2026-02-04T19:03:00Z
+Command: npm run test:unit
+EXIT_CODE: 0
+Output:
+> drm-copilot@0.0.1 test:unit
+> jest --config jest.config.cjs
+
+PASS  tests/unit/extension.test.ts
+  ● Console
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+    console.log
+      DRM Copilot extension is now active.
+
+      at activate (src/extension.ts:75:11)
+
+PASS  tests/unit/utility-spec.test.ts
+PASS  tests/unit/task-execution-spec.test.ts
+PASS  tests/unit/utility-dispatcher.test.ts
+PASS  tests/unit/task-command-map.test.ts
+PASS  tests/unit/input-collection.test.ts
+PASS  tests/unit/workspace-context.test.ts
+PASS  tests/unit/tool-preflight.test.ts
+
+Test Suites: 8 passed, 8 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        0.546 s, estimated 1 s
+Ran all test suites.

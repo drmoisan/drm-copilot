@@ -1,0 +1,32 @@
+Timestamp: 2026-02-04T19:00:00Z
+Command: npm run format
+EXIT_CODE: 0
+Output:
+> drm-copilot@0.0.1 format
+> prettier --write "src/**/*.{ts,tsx,js,mjs,cjs,json}" "tests/**/*.{ts,tsx,js,mjs,cjs,json}" "eslint.config.mjs" "jest.config.cjs" ".vscode-test.mjs" "tsconfig*.json"
+src/drm-task-provider.ts 59ms (unchanged)
+src/extension.ts 10ms (unchanged)
+src/task-command-map.js 35ms (unchanged)
+src/task-command-map.ts 29ms (unchanged)
+src/utilities/input-collection.ts 6ms (unchanged)
+src/utilities/tool-preflight.ts 4ms (unchanged)
+src/utilities/utility-dispatcher.ts 10ms (unchanged)
+src/utilities/utility-spec.ts 9ms (unchanged)
+src/utilities/workspace-context.ts 2ms (unchanged)
+tests/_deprecated/task-command-map.test.ts 1ms (unchanged)
+tests/integration/extension.test.ts 2ms (unchanged)
+tests/unit/extension.test.ts 5ms (unchanged)
+tests/unit/input-collection.test.ts 3ms (unchanged)
+tests/unit/task-command-map.test.ts 2ms (unchanged)
+tests/unit/task-execution-spec.test.ts 6ms (unchanged)
+tests/unit/tool-preflight.test.ts 2ms (unchanged)
+tests/unit/utility-dispatcher.test.ts 2ms (unchanged)
+tests/unit/utility-spec.test.ts 4ms (unchanged)
+tests/unit/workspace-context.test.ts 4ms (unchanged)
+eslint.config.mjs 2ms (unchanged)
+jest.config.cjs 2ms (unchanged)
+.vscode-test.mjs 1ms (unchanged)
+tsconfig.jest.json 1ms (unchanged)
+tsconfig.json 1ms (unchanged)
+tsconfig.tests.json 1ms (unchanged)
+tsconfig.vscode-test.json 1ms (unchanged)
