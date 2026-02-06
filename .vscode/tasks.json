@@ -273,6 +273,7 @@
 				"pytest",
 				"--cov=src/lexile_corpus_tuner",
 				"--cov=scripts/dev_tools",
+				"--cov=verify_parser",
 				"--cov-report=term-missing"
 			],
 			"command": "poetry",

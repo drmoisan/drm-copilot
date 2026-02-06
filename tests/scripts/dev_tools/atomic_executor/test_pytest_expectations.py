@@ -6,9 +6,11 @@ from scripts.dev_tools.atomic_executor.plan_parser import PlanModel, PlanTask
 from scripts.dev_tools.atomic_executor.pytest_expectations import (
     is_jest_ref,
     is_pytest_ref,
+    matches_jest_expected_ref,
     parse_jest_failure_output,
     parse_pytest_failure_output,
     resolve_checked_test_expectations,
+    split_jest_expected_ref,
 )
 
 
@@ -366,3 +368,82 @@ class TestParseJestFailureOutput:
 
         assert summary.failed_files == {"tests/unit/task-execution-spec.test.ts"}
         assert summary.has_runtime_error is True
+
+    def test_strips_timing_suffix_from_fail_lines(self) -> None:
+        """FAIL lines with timing suffixes should be normalized to file paths."""
+        output = "\n".join(
+            [
+                "FAIL tests/unit/task-execution-spec.test.ts (6.216 s)",
+                "  \u25cf some test name",
+            ]
+        )
+
+        summary = parse_jest_failure_output(output)
+
+        assert summary.failed_files == {"tests/unit/task-execution-spec.test.ts"}
+
+    def test_parses_skipped_count_from_summary_line(self) -> None:
+        """Skipped count should be extracted from Jest's Tests: summary line."""
+        output = "\n".join(
+            [
+                "Tests: 2 skipped, 4 passed, 6 total",
+                "Test Suites: 0 failed, 1 passed, 1 total",
+            ]
+        )
+
+        summary = parse_jest_failure_output(output)
+
+        assert summary.skipped_count == 2
+
+
+class TestSplitJestExpectedRef:
+    """Tests for split_jest_expected_ref."""
+
+    def test_splits_double_colon_file_and_pattern(self) -> None:
+        """file::pattern should return both parts."""
+        file_path, pattern = split_jest_expected_ref("tests/x.test.ts::my name")
+        assert file_path == "tests/x.test.ts"
+        assert pattern == "my name"
+
+    def test_splits_test_name_pattern_flag_with_quotes(self) -> None:
+        """--testNamePattern with quotes should unquote the pattern."""
+        file_path, pattern = split_jest_expected_ref(
+            'tests/x.test.ts --testNamePattern "my test"'
+        )
+        assert file_path == "tests/x.test.ts"
+        assert pattern == "my test"
+
+    def test_returns_file_only_for_test_files(self) -> None:
+        """A bare test file path should be treated as file-only ref."""
+        file_path, pattern = split_jest_expected_ref("tests/x.spec.ts")
+        assert file_path == "tests/x.spec.ts"
+        assert pattern is None
+
+    def test_returns_none_none_for_unrecognized_format(self) -> None:
+        """Unknown formats should return (None, None) for conservative matching."""
+        assert split_jest_expected_ref("just some text") == (None, None)
+
+
+class TestMatchesJestExpectedRef:
+    """Tests for matches_jest_expected_ref."""
+
+    def test_matches_by_file_when_only_file_expected(self) -> None:
+        """File-only expected refs should match when the file failed."""
+        summary = parse_jest_failure_output("FAIL tests/x.test.ts")
+        assert matches_jest_expected_ref(summary, "tests/x.test.ts") is True
+
+    def test_matches_by_test_pattern_when_test_name_present(self) -> None:
+        """Pattern refs should match against failed test names."""
+        output = "\n".join(
+            [
+                "FAIL tests/x.test.ts",
+                "  \u25cf my test should fail",
+            ]
+        )
+        summary = parse_jest_failure_output(output)
+        assert matches_jest_expected_ref(summary, "tests/x.test.ts::my test") is True
+
+    def test_does_not_match_when_file_differs(self) -> None:
+        """Expected refs should not match if the file differs."""
+        summary = parse_jest_failure_output("FAIL tests/x.test.ts")
+        assert matches_jest_expected_ref(summary, "tests/y.test.ts::my test") is False
