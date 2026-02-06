@@ -33,6 +33,11 @@ Primary outcomes:
 2) Synchronize documentation and GitHub issue status/content (best-effort, with safe defaults).
 3) If ALL acceptance criteria in spec.md and user-story.md are delivered, document evidence that they have been delivered.
 
+# Shared skills (apply before proceeding)
+
+Use these reusable skills to avoid duplicating shared operations:
+- `evidence-and-timestamp-conventions`
+
 Your output is NOT new feature work. Your output is:
 - Updated markdown files (plans + issue/spec/user-story) where evidence supports changes.
 - A single epic-root report: `<EPIC_FOLDER>/status-sync.<timestamp>.md`.
