@@ -36,8 +36,9 @@ def resolve_workspace_root(script_path: Path | None = None) -> Path:
         Path: Repo root directory.
     """
 
-    anchor = script_path or Path(__file__)
-    return anchor.resolve().parents[2]
+    # Prefer a caller-supplied path to keep tests deterministic across platforms.
+    anchor = script_path if script_path is not None else Path(__file__).resolve()
+    return anchor.parents[2]
 
 
 def resolve_initial_dir(
