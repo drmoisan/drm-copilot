@@ -67,26 +67,161 @@ class _InMemoryPathIo:
     """
 
     def __init__(self) -> None:
+        """
+        Initialize the in-memory store.
+
+        Purpose:
+            Provide empty storage for file contents and created directories.
+
+        Args:
+            None.
+
+        Returns:
+            None: The instance is initialized in-place.
+
+        Raises:
+            None.
+        """
         self._files: dict[str, str] = {}
         self._dirs_created: set[str] = set()
 
+    def _normalize_path(self, path: str) -> str:
+        """
+        Normalize path strings for cross-platform comparisons.
+
+        Purpose:
+            Treat Windows and POSIX path separators as equivalent so tests are
+            deterministic across OSes.
+
+        Args:
+            path (str): Path string to normalize.
+
+        Returns:
+            str: Normalized path string using POSIX-style separators.
+
+        Raises:
+            None.
+        """
+
+        # Normalize separators so Windows-style paths map to the POSIX keys
+        # used in test fixtures.
+        return path.replace("\\", "/")
+
     def add_file(self, path: str, content: str) -> None:
-        self._files[path] = content
+        """
+        Add or replace a file in the in-memory store.
+
+        Purpose:
+            Seed the store with deterministic file contents for tests.
+
+        Args:
+            path (str): File path key.
+            content (str): File contents.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
+        self._files[self._normalize_path(path)] = content
 
     def exists(self, path: str) -> bool:
-        return path in self._files
+        """
+        Determine whether a file path exists in the store.
+
+        Purpose:
+            Mirror Path.exists() using the normalized in-memory mapping.
+
+        Args:
+            path (str): File path key.
+
+        Returns:
+            bool: True if the file exists in the store.
+
+        Raises:
+            None.
+        """
+
+        return self._normalize_path(path) in self._files
 
     def is_file(self, path: str) -> bool:
-        return path in self._files
+        """
+        Determine whether the path is a file in the store.
+
+        Purpose:
+            Match Path.is_file() for the in-memory mapping.
+
+        Args:
+            path (str): File path key.
+
+        Returns:
+            bool: True if the file exists in the store.
+
+        Raises:
+            None.
+        """
+
+        return self._normalize_path(path) in self._files
 
     def read_text(self, path: str) -> str:
-        return self._files[path]
+        """
+        Read file contents from the in-memory store.
+
+        Purpose:
+            Provide deterministic file contents for patched Path.read_text().
+
+        Args:
+            path (str): File path key.
+
+        Returns:
+            str: Stored file contents.
+
+        Raises:
+            KeyError: When the file does not exist in the store.
+        """
+
+        return self._files[self._normalize_path(path)]
 
     def write_text(self, path: str, content: str) -> None:
-        self._files[path] = content
+        """
+        Write file contents to the in-memory store.
+
+        Purpose:
+            Capture writes made by validate_json without touching disk.
+
+        Args:
+            path (str): File path key.
+            content (str): File contents.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
+        self._files[self._normalize_path(path)] = content
 
     def mkdir(self, path: str) -> None:
-        self._dirs_created.add(path)
+        """
+        Record a directory creation request.
+
+        Purpose:
+            Track directory creation in tests without touching the filesystem.
+
+        Args:
+            path (str): Directory path key.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+        """
+
+        self._dirs_created.add(self._normalize_path(path))
 
 
 def _patch_path_io(monkeypatch: pytest.MonkeyPatch, store: _InMemoryPathIo) -> None:

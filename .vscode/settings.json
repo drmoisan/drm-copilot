@@ -279,7 +279,7 @@
     "https://docs.npmjs.com": true,
     "https://*.npmjs.com": true
   },
-  "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
+  "coverage-gutters.coverageBaseDir": ".",
   "coverage-gutters.coverageFileNames": [
     "lcov.info",
     "cov.xml",
@@ -288,6 +288,11 @@
     "jacoco.xml",
     "coverage.cobertura.xml",
     "powershell-coverage.xml"
+  ],
+  "coverage-gutters.coverageFilePaths": [
+    "coverage",
+    "artifacts/pester",
+    "artifacts/pester/kcov/kcov-merged"
   ],
   "coverage-gutters.showGutterCoverage": true,
   "coverage-gutters.showLineCoverage": true,
@@ -300,12 +305,13 @@
     "powershell-coverage.koverage.xml"
   ],
   "koverage.coverageFilePaths": [
+    "coverage",
     "artifacts/pester",
     "artifacts/pester/kcov/kcov-merged"
   ],
   "powershell.cwd": "${workspaceFolder}",
 
-  "jest.jestCommandLine": "npm run test:unit --",
+  "jest.jestCommandLine": "npm run test:unit -- --coverage --coverageReporters=lcov",
   "jest.rootPath": ".",
 
 	"python.testing.pytestEnabled": true,
