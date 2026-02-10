@@ -23,6 +23,10 @@ VS Code extension scaffolding to apply agentic programming customizations to pro
 
 - `drm-copilot.applyCustomizations`: Placeholder command to validate activation wiring.
 
+## Skills
+
+- [Skills taxonomy](.github/skills/README.md)
+
 ## Notes
 
 You can drop a devcontainer configuration and additional customization logic once ready.
