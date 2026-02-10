@@ -49,20 +49,20 @@ Requirements and constraints (machine-parseable):
 
 ### Phase 0 — Compliance & Baseline
 
-- [ ] [P0-T1] Read `.github/copilot-instructions.md` and record completion in `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/baseline/policy-read.<timestamp>.md`.
+- [x] [P0-T1] Read `.github/copilot-instructions.md` and record completion in `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/baseline/policy-read.<timestamp>.md`.
   - Acceptance: Evidence file exists with `Timestamp`, `FilesRead`, and `Reader` fields; `FilesRead` includes `.github/copilot-instructions.md`.
-- [ ] [P0-T2] Read `.github/instructions/general-code-change.instructions.md` and `.github/instructions/general-unit-test.instructions.md` in order and append them to the same policy-read evidence file.
+- [x] [P0-T2] Read `.github/instructions/general-code-change.instructions.md` and `.github/instructions/general-unit-test.instructions.md` in order and append them to the same policy-read evidence file.
   - Acceptance: Evidence file lists both policy paths in order under `FilesRead`.
-- [ ] [P0-T3] Read `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, and `.github/instructions/self-explanatory-code-commenting.instructions.md` and append them to the same policy-read evidence file.
+- [x] [P0-T3] Read `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, and `.github/instructions/self-explanatory-code-commenting.instructions.md` and append them to the same policy-read evidence file.
   - Acceptance: Evidence file lists all four Python policy paths in order under `FilesRead`.
-- [ ] [P0-T4] Capture baseline toolchain results (format, lint, type-check, tests) and store them in `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/baseline/toolchain-baseline.<timestamp>.md`.
+- [x] [P0-T4] Capture baseline toolchain results (format, lint, type-check, tests) and store them in `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/baseline/toolchain-baseline.<timestamp>.md`.
   - Acceptance: Evidence file contains `Timestamp`, `Command`, and `EXIT_CODE` for each command run in the exact order: `poetry run black .`, `poetry run ruff check`, `poetry run pyright`, `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`.
 
 ### Phase 1 — Taxonomy Documentation (REQ-1, CON-1, CON-2)
 
-- [ ] [P1-T1] Create `.github/skills/README.md` describing the SKILL taxonomy, required frontmatter keys, and the canonical-location rule.
+- [x] [P1-T1] Create `.github/skills/README.md` describing the SKILL taxonomy, required frontmatter keys, and the canonical-location rule.
   - Acceptance: File exists with sections titled `Taxonomy`, `Frontmatter Requirements`, `Canonical Location`, and `Examples`, and includes the example frontmatter from `research.md`.
-- [ ] [P1-T2] Update `README.md` to link to `.github/skills/README.md` under a new `Skills` subsection.
+- [x] [P1-T2] Update `README.md` to link to `.github/skills/README.md` under a new `Skills` subsection.
   - Acceptance: `README.md` contains a bullet link to `.github/skills/README.md` under a `Skills` subsection.
 
 ### Phase 2 — Feature Review Skill Extraction (REQ-2, CON-1)
