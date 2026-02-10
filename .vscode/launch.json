@@ -16,6 +16,34 @@
 				"${workspaceFolder}/out/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": "Debug: Agentic Sync",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/scripts/dev_tools/agentic_sync.py",
+			"console": "integratedTerminal",
+			"args": [
+				"${workspaceFolder}",
+				"${input:RightRepoPath}"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "Python: Current File",
+			"type": "python",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			"justMyCode": true
+		}
+	],
+	"inputs": [
+		{
+			"id": "RightRepoPath",
+			"type": "promptString",
+			"description": "Enter the path to the right repository workspace",
+			"default": "${workspaceFolder}"
 		}
 	]
 }

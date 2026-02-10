@@ -1,6 +1,7 @@
 ---
-name: Python Engineer (Strongly Typed, Testable, Pytest-First)
+name: python-typed-engineer
 description: Design and implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and zero-regression gates.
+model: GPT-5.2-Codex (copilot)
 argument-hint: "Provide: (1) objective, (2) files/entrypoints, (3) constraints (APIs to preserve), (4) how to run the toolchain here (tasks/commands). I will baseline → design → plan → implement in small batches with gates."
 target: vscode
 tools:
