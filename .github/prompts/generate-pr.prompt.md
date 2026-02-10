@@ -88,6 +88,14 @@ No preamble. No explanation of your reasoning.
 
 ---
 
+## Output Rules (strict)
+
+- Output ONLY one fenced code block.
+- Use the language tag `markdown`.
+- Inside that code block, include ONLY the pull request message.
+
+---
+
 ## Section Rules
 
 ### Suggested title
