@@ -23,7 +23,8 @@ Example: `2026-02-06T14-30`.
 
 - Baseline evidence: `evidence/baseline/`
 - Regression testing evidence: `evidence/regression-testing/`
-- Other QA gate evidence: `evidence/qa-gates/`
+- Other evidence: `evidence/other/`
+- QA gate evidence: `evidence/qa-gates/`
 - Issue update mirrors: `evidence/issue-updates/`
 
 Epic rollups may mirror these under the epic root when needed.
@@ -45,14 +46,16 @@ When locating evidence artifacts for audits or plan reconciliation, use this ord
 
 1) `<FEATURE>/evidence/issue-updates/` (issue update mirrors)
 2) `<FEATURE>/evidence/regression-testing/`
-3) `<FEATURE>/evidence/qa-gates/`
-4) `<FEATURE>/evidence/baseline/`
-5) `<FEATURE>/evidence/remediation-baseline/`
-6) `<EPIC>/evidence/issue-updates/` (issue update mirrors)
-7) `<EPIC>/evidence/regression-testing/` (optional rollup)
-8) `<EPIC>/evidence/qa-gates/` (optional rollup)
-9) `<EPIC>/evidence/baseline/` (optional rollup)
-10) `<EPIC>/evidence/remediation-baseline/` (optional rollup)
+3) `<FEATURE>/evidence/other/`
+4) `<FEATURE>/evidence/qa-gates/`
+5) `<FEATURE>/evidence/baseline/`
+6) `<FEATURE>/evidence/remediation-baseline/`
+7) `<EPIC>/evidence/issue-updates/` (issue update mirrors)
+8) `<EPIC>/evidence/regression-testing/` (optional rollup)
+9) `<EPIC>/evidence/other/`
+10) `<EPIC>/evidence/qa-gates/` (optional rollup)
+11) `<EPIC>/evidence/baseline/` (optional rollup)
+12) `<EPIC>/evidence/remediation-baseline/` (optional rollup)
 
 Rule:
 - Use the list order by default for audit fidelity.
@@ -79,6 +82,13 @@ When evidence artifacts are used for automated checking or plan reconciliation, 
 - `Timestamp: <ISO-8601>`
 - `Command: <exact command>`
 - `EXIT_CODE: <int>`
+
+### Baseline Evidence Output Summary (Required)
+
+For baseline evidence artifacts stored under `evidence/baseline/`, include an output summary in addition to the schema fields above:
+- `Output Summary: <1–20 lines capturing the essential outcome>`
+
+The summary should be concise, human-readable, and include the most important result signal (e.g., “All checks passed”, “767 passed”, coverage total, or a brief error description).
 
 If a fail-before run is required but impossible, include a short exception dossier with:
 - `WhyFailingRunImpossible: <1–3 sentences>`
