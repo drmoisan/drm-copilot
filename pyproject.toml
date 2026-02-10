@@ -122,7 +122,7 @@ exclude_lines = [
 
 [tool.pyright]
 typeCheckingMode = "strict"
-diagnosticMode = "workspace"
+reportUnknownVariableType = "error"
 reportMissingTypeArgument = "none"
 pythonVersion = "3.12"
 venvPath = "."

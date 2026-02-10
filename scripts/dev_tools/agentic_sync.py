@@ -17,7 +17,7 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Literal, Protocol, TypedDict
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,6 +30,94 @@ ROOT_FOLDERS: tuple[Path, ...] = (
 
 DecisionType = Literal["equivalent-mtime", "equivalent-content", "synced"]
 ForceDirection = Literal["left-to-right", "right-to-left"]
+
+
+class SyncActionPayload(TypedDict):
+    """
+    Typed payload shape for serialized sync actions.
+
+    Purpose:
+        Provide an explicit JSON-serializable schema for a single sync action
+        so static analysis can fully resolve the payload structure.
+
+    Usage:
+        Constructed in render_sync_summary from SyncAction instances prior to
+        JSON serialization.
+
+    Flow:
+        1. Populate fields from SyncAction.
+        2. Emit as part of the actions list in SyncSummaryPayload.
+
+    Invariants / Constraints:
+        - Fields map 1:1 with SyncAction attributes.
+        - Values are JSON-serializable primitives or None.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        root (str): Root folder (e.g., ".github/agents").
+        relative_path (str): File path relative to root.
+        left_path (str): Full path to the left repo file.
+        right_path (str): Full path to the right repo file.
+        left_mtime (float): Left file modification time before sync.
+        right_mtime (float): Right file modification time before sync.
+        decision (DecisionType): Sync decision type.
+        source (str | None): "left" or "right" when synced.
+        sync_mtime (float | None): Applied mtime when synced.
+        forced (bool): Whether forced direction influenced the decision.
+    """
+
+    root: str
+    relative_path: str
+    left_path: str
+    right_path: str
+    left_mtime: float
+    right_mtime: float
+    decision: DecisionType
+    source: str | None
+    sync_mtime: float | None
+    forced: bool
+
+
+class SyncSummaryPayload(TypedDict):
+    """
+    Typed payload shape for the serialized sync summary.
+
+    Purpose:
+        Provide a fully-typed JSON-serializable schema for the summary payload
+        to satisfy static analysis and document the contract.
+
+    Usage:
+        Built in render_sync_summary from SyncSummary and actions payloads.
+
+    Flow:
+        1. Convert datetimes to ISO strings.
+        2. Attach typed action payloads.
+        3. Serialize to JSON.
+
+    Invariants / Constraints:
+        - Fields are JSON-serializable primitives or lists.
+        - actions list preserves processing order.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        repo_left (str): Left repository path.
+        repo_right (str): Right repository path.
+        started_at (str): ISO-8601 UTC start timestamp.
+        finished_at (str): ISO-8601 UTC finish timestamp.
+        force_direction (ForceDirection | None): Forced direction, if any.
+        actions (list[SyncActionPayload]): Per-file outcomes.
+    """
+
+    repo_left: str
+    repo_right: str
+    started_at: str
+    finished_at: str
+    force_direction: ForceDirection | None
+    actions: list[SyncActionPayload]
 
 
 class SyncFileSystem(Protocol):
@@ -650,7 +738,7 @@ def render_sync_summary(summary: SyncSummary) -> str:
     """
 
     # Serialize dataclasses into JSON-friendly structures.
-    actions_payload: list[dict[str, object]] = []
+    actions_payload: list[SyncActionPayload] = []
     # Serialize actions in order to preserve traceability.
     for action in summary.actions:
         actions_payload.append(
@@ -668,7 +756,7 @@ def render_sync_summary(summary: SyncSummary) -> str:
             }
         )
 
-    payload = {
+    payload: SyncSummaryPayload = {
         "repo_left": summary.repo_left,
         "repo_right": summary.repo_right,
         "started_at": summary.started_at.isoformat(),

@@ -45,3 +45,18 @@ Skills, agent instructions, and prompt scaffolding live in multiple places with 
 - Syncing non-`.github` content or arbitrary workspace files.
 - Automatic conflict resolution beyond explicit forced direction flags.
 - Network-only synchronization or SaaS-backed storage.
+
+## Acceptance Criteria Evidence (partial, as of 2026-02-10T13-45)
+
+| Criterion | Evidence | Verification command(s) |
+| --- | --- | --- |
+| SKILL taxonomy is documented and used to locate and load skills consistently across agent flows. | `.github/skills/README.md`; `scripts/dev_tools/skill_taxonomy.py`; `tests/scripts/dev_tools/test_skill_taxonomy.py`. | `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` (see `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/qa-gates/toolchain-pytest.2026-02-10T13-41.md`). |
+| Canonical locations are defined for repeatable guidance, with explicit references to prevent drift. | `.github/skills/README.md` (Canonical Location section); `.github/skills/skill-canonical-location-audit/SKILL.md`. | Review files above (document evidence). |
+| MVP synchronization workflow can pull/push agentic files between repos without manual diff hunting. | `scripts/dev_tools/agentic_sync.py`; `tests/scripts/dev_tools/test_agentic_sync.py` (unit coverage for sync decisions). | `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` (see `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/qa-gates/toolchain-pytest.2026-02-10T13-41.md`). |
+| Failure cases (missing skill, conflicting canonical location, sync conflict) produce actionable messages. | Regression artifacts for missing skill + duplicate canonical: `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/regression-testing/missing-skill.2026-02-10T13-10.md`, `duplicate-canonical.2026-02-10T13-12.md`; CLI tests in `tests/scripts/dev_tools/test_skill_taxonomy.py`. | `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` (see `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/qa-gates/toolchain-pytest.2026-02-10T13-41.md`). |
+| Edge cases (renamed skill folder, deleted canonical file, partial sync) are handled deterministically. | No evidence yet. | None recorded. |
+
+Open criteria:
+- Integration sync across two repos not demonstrated.
+- Sync conflict messaging not evidenced.
+- Edge-case handling (renamed folder, deleted canonical file, partial sync) not evidenced.

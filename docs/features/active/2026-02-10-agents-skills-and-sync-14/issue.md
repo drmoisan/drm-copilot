@@ -42,3 +42,23 @@ Establish a GitHub-style taxonomy for `SKILL.md` files that allows agents to dis
 
 - [ ] Promote to GitHub issue (feature request template)
 - [ ] Create `docs/features/active/agents-skills-and-sync/` folder from the template
+
+## Sync Summary (as of 2026-02-10T13-45)
+
+- Status: Not Delivered (partial evidence only).
+- Canonical references:
+	- Spec: `docs/features/active/2026-02-10-agents-skills-and-sync-14/spec.md`
+	- User story: `docs/features/active/2026-02-10-agents-skills-and-sync-14/user-story.md`
+	- Plan: `docs/features/active/2026-02-10-agents-skills-and-sync-14/plan.2026-02-10T09-08.md`
+- Evidence highlights:
+	- QA toolchain evidence: `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/qa-gates/toolchain-pytest.2026-02-10T13-41.md`.
+	- Regression evidence for skill taxonomy failures: `docs/features/active/2026-02-10-agents-skills-and-sync-14/evidence/regression-testing/`.
+- Gaps:
+	- Integration sync across two repos not demonstrated.
+	- Sync conflict messaging not evidenced.
+	- Edge-case handling (renamed folder, deleted canonical file, partial sync) not evidenced.
+	- Plan item [P3-T5] acceptance not yet evidenced (see plan for details).
+
+## History / Prior Notes
+
+Original issue content retained above.
