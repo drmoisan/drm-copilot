@@ -186,6 +186,28 @@ Describe "bootstrap-host.ps1" {
             }
         }
 
+        It "forwards arguments to git via Invoke-GitExe" {
+            # Arrange
+            $script:capturedGitArgs = @()
+
+            function global:git {
+                param([Parameter(ValueFromRemainingArguments = $true)][object[]]$Args)
+                $script:capturedGitArgs = @($Args)
+                $global:LASTEXITCODE = 0
+            }
+
+            try {
+                # Act
+                Invoke-GitExe -GitArgs @('clone', 'https://github.com/drmoisan/drm-copilot.git', 'C:\bootstrap\drm-copilot')
+
+                # Assert
+                $script:capturedGitArgs | Should -Be @('clone', 'https://github.com/drmoisan/drm-copilot.git', 'C:\bootstrap\drm-copilot')
+            }
+            finally {
+                Remove-Item -Path function:\git -ErrorAction SilentlyContinue
+            }
+        }
+
         It "forwards arguments to wsl via Invoke-WslExe" {
             # Arrange
             $script:capturedWslArgs = @()
@@ -369,6 +391,219 @@ Describe "bootstrap-host.ps1" {
             }
         }
 
+        It "throws when git exits with non-zero code" {
+            # Arrange
+            function global:git {
+                $global:LASTEXITCODE = 1
+            }
+
+            try {
+                # Act & Assert
+                { Invoke-GitExe -GitArgs @('clone', 'https://github.com/drmoisan/drm-copilot.git', 'C:\bootstrap\drm-copilot') } | Should -Throw -ExpectedMessage '*git command failed*'
+            }
+            finally {
+                Remove-Item -Path function:\git -ErrorAction SilentlyContinue
+            }
+        }
+
+    }
+
+    Context "Project repository manifest helpers" {
+        It "returns project repositories when configured" {
+            # Arrange
+            $manifest = [pscustomobject]@{
+                projectRepositories = @(
+                    [pscustomobject]@{ name = 'drm-copilot'; url = 'https://github.com/drmoisan/drm-copilot.git'; targetPath = 'drm-copilot' }
+                )
+            }
+
+            # Act
+            $result = Get-ProjectRepositoriesFromManifest -Manifest $manifest
+
+            # Assert
+            $result.Count | Should -Be 1
+            $result[0].name | Should -Be 'drm-copilot'
+        }
+
+        It "returns empty array when project repositories are missing" {
+            # Arrange
+            $manifest = [pscustomobject]@{ minimumVersions = [pscustomobject]@{ python = '3.13.0' } }
+
+            # Act
+            $result = Get-ProjectRepositoriesFromManifest -Manifest $manifest
+
+            # Assert
+            @($result).Count | Should -Be 0
+        }
+    }
+
+    Context "Workspace and project helpers" {
+        It "uses current location when workspace root is not provided" {
+            # Act
+            $result = Resolve-WorkspaceRoot -WorkspaceRootPath ''
+
+            # Assert
+            $result | Should -Be (Get-Location).Path
+        }
+
+        It "resolves explicit workspace root path" {
+            # Act
+            $result = Resolve-WorkspaceRoot -WorkspaceRootPath '.\\'
+
+            # Assert
+            $result | Should -Not -BeNullOrEmpty
+        }
+
+        It "syncs projects via git clone in apply mode" {
+            # Arrange
+            $projects = @(
+                [pscustomobject]@{ name = 'drm-copilot'; url = 'https://github.com/drmoisan/drm-copilot.git'; targetPath = 'drm-copilot' }
+            )
+            Mock -CommandName Join-Path -MockWith { 'C:\bootstrap\drm-copilot' }
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName Invoke-GitExe -MockWith { }
+
+            # Act
+            Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\bootstrap' -ApplyMode
+
+            # Assert
+            Should -Invoke Invoke-GitExe -Times 1 -Exactly -ParameterFilter {
+                ($GitArgs -join ' ') -eq 'clone https://github.com/drmoisan/drm-copilot.git C:\bootstrap\drm-copilot'
+            }
+        }
+
+        It "prints dry-run clone message when apply mode is false" {
+            # Arrange
+            $projects = @(
+                [pscustomobject]@{ name = 'drm-copilot'; url = 'https://github.com/drmoisan/drm-copilot.git'; targetPath = 'drm-copilot' }
+            )
+            Mock -CommandName Join-Path -MockWith { 'C:\bootstrap\drm-copilot' }
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName Write-Output -MockWith { }
+            Mock -CommandName Invoke-GitExe -MockWith { }
+
+            # Act
+            Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\bootstrap'
+
+            # Assert
+            Should -Invoke Invoke-GitExe -Times 0 -Exactly
+            Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -like '- Would clone *' }
+        }
+
+        It "skips clone when project path already exists" {
+            # Arrange
+            $projects = @(
+                [pscustomobject]@{ name = 'drm-copilot'; url = 'https://github.com/drmoisan/drm-copilot.git'; targetPath = 'drm-copilot' }
+            )
+            Mock -CommandName Join-Path -MockWith { 'C:\bootstrap\drm-copilot' }
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Invoke-GitExe -MockWith { }
+
+            # Act
+            Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\bootstrap' -ApplyMode
+
+            # Assert
+            Should -Invoke Invoke-GitExe -Times 0 -Exactly
+        }
+
+        It "throws when project entry is missing url" {
+            # Arrange
+            $projects = @(
+                [pscustomobject]@{ name = 'missing-url'; targetPath = 'missing-url' }
+            )
+
+            # Act & Assert
+            { Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\bootstrap' -ApplyMode } | Should -Throw -ExpectedMessage '*must include a non-empty ''url''*'
+        }
+
+        It "resolves repo root from explicit path" {
+            # Arrange
+            $projects = @([pscustomobject]@{ name = 'drm-copilot'; targetPath = 'drm-copilot' })
+
+            # Act
+            $result = Resolve-ProjectRepoRoot -RepoRootPath 'C:\repo' -WorkspaceRootPath 'C:\bootstrap' -Projects $projects
+
+            # Assert
+            $result | Should -Be ([System.IO.Path]::GetFullPath('C:\repo'))
+        }
+
+        It "resolves repo root from default script location when pyproject exists" {
+            # Arrange
+            $projects = @([pscustomobject]@{ name = 'drm-copilot'; targetPath = 'drm-copilot' })
+            Mock -CommandName Test-Path -MockWith { $true }
+
+            # Act
+            $result = Resolve-ProjectRepoRoot -WorkspaceRootPath 'C:\bootstrap' -Projects $projects
+
+            # Assert
+            $result | Should -Not -BeNullOrEmpty
+        }
+
+        It "resolves repo root from manifest drm-copilot target path when default pyproject is missing" {
+            # Arrange
+            $projects = @([pscustomobject]@{ name = 'drm-copilot'; targetPath = 'drm-copilot' })
+            Mock -CommandName Test-Path -MockWith { $false }
+
+            # Act
+            $result = Resolve-ProjectRepoRoot -WorkspaceRootPath 'C:\bootstrap' -Projects $projects
+
+            # Assert
+            $result | Should -Be ([System.IO.Path]::GetFullPath('C:\bootstrap\drm-copilot'))
+        }
+
+        It "returns empty repo root when neither default pyproject nor drm project target exists" {
+            # Arrange
+            $projects = @([pscustomobject]@{ name = 'other-project'; targetPath = 'other-project' })
+            Mock -CommandName Test-Path -MockWith { $false }
+
+            # Act
+            $result = Resolve-ProjectRepoRoot -WorkspaceRootPath 'C:\bootstrap' -Projects $projects
+
+            # Assert
+            $result | Should -Be ''
+        }
+
+        It "creates workspace root in apply mode when missing" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName New-Item -MockWith { }
+
+            # Act
+            Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\bootstrap' -ApplyMode
+
+            # Assert
+            Should -Invoke New-Item -Times 1 -Exactly -ParameterFilter {
+                $Path -eq 'C:\bootstrap' -and $ItemType -eq 'Directory' -and $Force
+            }
+        }
+
+        It "reports dry-run workspace creation when apply mode is false and directory is missing" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName New-Item -MockWith { }
+            Mock -CommandName Write-Output -MockWith { }
+
+            # Act
+            Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\bootstrap'
+
+            # Assert
+            Should -Invoke New-Item -Times 0 -Exactly
+            Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -eq '- Would create workspace root: C:\bootstrap' }
+        }
+
+        It "reports workspace exists when path is already present" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName New-Item -MockWith { }
+            Mock -CommandName Write-Output -MockWith { }
+
+            # Act
+            Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\bootstrap' -ApplyMode
+
+            # Assert
+            Should -Invoke New-Item -Times 0 -Exactly
+            Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -eq '[OK] Workspace root exists: C:\bootstrap' }
+        }
     }
 
     Context "Install-WslIfMissing" {
@@ -417,6 +652,55 @@ Describe "bootstrap-host.ps1" {
         }
     }
 
+    Context "RunOnce resume helpers" {
+        It "creates RunOnce resume entry when registry path is missing" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName New-Item -MockWith { }
+            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\dev-tools\bootstrap-host.ps1' }
+            Mock -CommandName New-ItemProperty -MockWith { }
+
+            # Act
+            Set-BootstrapResumeRunOnce -ResumeArguments '-WorkspaceRoot "C:\bootstrap"'
+
+            # Assert
+            Should -Invoke New-Item -Times 1 -Exactly
+            Should -Invoke New-ItemProperty -Times 1 -Exactly -ParameterFilter {
+                $Path -eq 'HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce' -and
+                $Name -eq 'DrmCopilotHostBootstrapResume' -and
+                $PropertyType -eq 'String' -and
+                $Force
+            }
+        }
+
+        It "removes RunOnce resume entry when registry path exists" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Remove-ItemProperty -MockWith { }
+
+            # Act
+            Remove-BootstrapResumeRunOnce
+
+            # Assert
+            Should -Invoke Remove-ItemProperty -Times 1 -Exactly -ParameterFilter {
+                $Path -eq 'HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce' -and
+                $Name -eq 'DrmCopilotHostBootstrapResume'
+            }
+        }
+
+        It "returns when RunOnce registry path does not exist" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith { $false }
+            Mock -CommandName Remove-ItemProperty -MockWith { }
+
+            # Act
+            Remove-BootstrapResumeRunOnce
+
+            # Assert
+            Should -Invoke Remove-ItemProperty -Times 0 -Exactly
+        }
+    }
+
     Context "Invoke-BootstrapHost" {
         BeforeEach {
             Mock -CommandName Get-HostManifest -MockWith {
@@ -442,13 +726,25 @@ Describe "bootstrap-host.ps1" {
                     [pscustomobject]@{ id = 'GitHub.cli'; name = 'gh' }
                 )
             }
+            Mock -CommandName Get-ProjectRepositoriesFromManifest -MockWith {
+                @(
+                    [pscustomobject]@{ name = 'drm-copilot'; url = 'https://github.com/drmoisan/drm-copilot.git'; targetPath = 'drm-copilot' }
+                )
+            }
+            Mock -CommandName Resolve-WorkspaceRoot -MockWith { 'C:\bootstrap' }
+            Mock -CommandName Initialize-WorkspaceRoot -MockWith { }
+            Mock -CommandName Sync-ProjectsFromManifest -MockWith { }
+            Mock -CommandName Resolve-ProjectRepoRoot -MockWith { 'C:\repo' }
             Mock -CommandName Install-WithWinget -MockWith { }
             Mock -CommandName Install-WslIfMissing -MockWith { }
             Mock -CommandName Install-Module -MockWith { }
             Mock -CommandName Invoke-NpmExe -MockWith { }
             Mock -CommandName Invoke-PoetryExe -MockWith { }
             Mock -CommandName Invoke-VerifyHostScript -MockWith { }
+            Mock -CommandName Push-Location -MockWith { }
+            Mock -CommandName Pop-Location -MockWith { }
             Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\dev-tools\verify-host.ps1' }
+            Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Write-Output -MockWith { }
             Mock -CommandName Get-Command -MockWith {
                 param([string]$Name)
@@ -484,6 +780,8 @@ Describe "bootstrap-host.ps1" {
             # Assert
             Should -Invoke Install-WithWinget -Times 2 -Exactly
             Should -Invoke Install-WslIfMissing -Times 1 -Exactly
+            Should -Invoke Initialize-WorkspaceRoot -Times 1 -Exactly
+            Should -Invoke Sync-ProjectsFromManifest -Times 1 -Exactly
             Should -Invoke Install-Module -Times 0 -Exactly
             Should -Invoke Invoke-NpmExe -Times 0 -Exactly
             Should -Invoke Invoke-PoetryExe -Times 0 -Exactly
@@ -496,6 +794,7 @@ Describe "bootstrap-host.ps1" {
             # Assert
             Should -Invoke Install-WithWinget -Times 2 -Exactly
             Should -Invoke Install-WslIfMissing -Times 1 -Exactly -ParameterFilter { $ApplyMode }
+            Should -Invoke Sync-ProjectsFromManifest -Times 1 -Exactly -ParameterFilter { $ApplyMode }
             Should -Invoke Install-Module -Times 2 -Exactly
             Should -Invoke Invoke-NpmExe -Times 1 -Exactly -ParameterFilter { ($NpmArgs -join ' ') -eq 'install -g @withgraphite/graphite-cli@1.7.14' }
             Should -Invoke Invoke-PoetryExe -Times 1 -Exactly -ParameterFilter { ($PoetryArgs -join ' ') -eq 'install --no-interaction' }
@@ -519,6 +818,7 @@ Describe "bootstrap-host.ps1" {
             # Assert
             Should -Invoke Invoke-NpmExe -Times 0 -Exactly
             Should -Invoke Install-WslIfMissing -Times 1 -Exactly -ParameterFilter { $ApplyMode }
+            Should -Invoke Sync-ProjectsFromManifest -Times 1 -Exactly -ParameterFilter { $ApplyMode }
             Should -Invoke Invoke-PoetryExe -Times 1 -Exactly
             Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -eq '[WARN] npm not found; Graphite CLI install skipped' }
             Should -Invoke Invoke-VerifyHostScript -Times 1 -Exactly
@@ -535,6 +835,34 @@ Describe "bootstrap-host.ps1" {
             Should -Invoke Write-Output -Times 1 -ParameterFilter {
                 $InputObject -eq '[WARN] Poetry dependency install failed; python quality tools may be unavailable'
             }
+        }
+
+        It "skips poetry install when skip switch is set" {
+            # Act
+            Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost:$true
+
+            # Assert
+            Should -Invoke Invoke-PoetryExe -Times 0 -Exactly
+            Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -eq '[INFO] Skipping project poetry install by request' }
+        }
+
+        It "skips verify when verify script does not exist" {
+            # Arrange
+            Mock -CommandName Test-Path -MockWith {
+                param([string]$Path)
+                if ($Path -eq 'C:\repo\scripts\dev-tools\verify-host.ps1') {
+                    return $false
+                }
+
+                return $true
+            }
+
+            # Act
+            Invoke-BootstrapHost -Apply -IsWindowsHost:$true
+
+            # Assert
+            Should -Invoke Invoke-VerifyHostScript -Times 0 -Exactly
+            Should -Invoke Write-Output -Times 1 -ParameterFilter { $InputObject -eq '[WARN] verify-host.ps1 not found beside bootstrap-host.ps1; verification skipped' }
         }
     }
 
