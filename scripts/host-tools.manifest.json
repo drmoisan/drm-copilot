@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "source": {
+    "devcontainer": [
+      ".devcontainer/local/devcontainer.json",
+      ".devcontainer/local/Dockerfile",
+      ".devcontainer/post-create.sh",
+      ".devcontainer/verify-container.sh"
+    ]
+  },
+  "minimumVersions": {
+    "python": "3.13.0",
+    "poetry": "2.2.1",
+    "pwsh": "7.5.0",
+    "node": "20.0.0"
+  },
+  "requiredCommands": [
+    "git",
+    "gh",
+    "shellcheck",
+    "shfmt",
+    "bashdb",
+    "actionlint",
+    "docker",
+    "npm",
+    "copilot"
+  ],
+  "optionalCommands": [
+    "xclip",
+    "wl-copy"
+  ],
+  "powershellModules": [
+    {
+      "name": "PSScriptAnalyzer",
+      "minimumVersion": "1.22.0"
+    },
+    {
+      "name": "Pester",
+      "minimumVersion": "5.6.1"
+    }
+  ],
+  "pythonTools": [
+    "black",
+    "ruff",
+    "pyright",
+    "pytest"
+  ],
+  "installPackages": {
+    "linux": {
+      "apt": [
+        {
+          "package": "git",
+          "command": "git"
+        },
+        {
+          "package": "gh",
+          "command": "gh"
+        },
+        {
+          "package": "shellcheck",
+          "command": "shellcheck"
+        },
+        {
+          "package": "shfmt",
+          "command": "shfmt"
+        },
+        {
+          "package": "bashdb",
+          "command": "bashdb"
+        },
+        {
+          "package": "actionlint",
+          "command": "actionlint"
+        },
+        {
+          "package": "docker.io",
+          "command": "docker"
+        },
+        {
+          "package": "nodejs",
+          "command": "node"
+        },
+        {
+          "package": "npm",
+          "command": "npm"
+        },
+        {
+          "package": "xclip",
+          "command": "xclip"
+        },
+        {
+          "package": "wl-clipboard",
+          "command": "wl-copy"
+        }
+      ]
+    },
+    "macos": {
+      "brew": [
+        {
+          "package": "git",
+          "command": "git"
+        },
+        {
+          "package": "gh",
+          "command": "gh"
+        },
+        {
+          "package": "shellcheck",
+          "command": "shellcheck"
+        },
+        {
+          "package": "shfmt",
+          "command": "shfmt"
+        },
+        {
+          "package": "bashdb",
+          "command": "bashdb"
+        },
+        {
+          "package": "actionlint",
+          "command": "actionlint"
+        },
+        {
+          "package": "docker",
+          "command": "docker"
+        },
+        {
+          "package": "node",
+          "command": "node"
+        }
+      ]
+    },
+    "windows": {
+      "winget": [
+        {
+          "id": "Python.Python.3.13",
+          "name": "python"
+        },
+        {
+          "id": "Python.Poetry",
+          "name": "poetry"
+        },
+        {
+          "id": "Microsoft.PowerShell",
+          "name": "pwsh"
+        },
+        {
+          "id": "Git.Git",
+          "name": "git"
+        },
+        {
+          "id": "GitHub.cli",
+          "name": "gh"
+        },
+        {
+          "id": "OpenJS.NodeJS.LTS",
+          "name": "node"
+        },
+        {
+          "id": "koalaman.shellcheck",
+          "name": "shellcheck"
+        },
+        {
+          "id": "mvdan.shfmt",
+          "name": "shfmt"
+        },
+        {
+          "id": "rhysd.actionlint",
+          "name": "actionlint"
+        },
+        {
+          "id": "Docker.DockerDesktop",
+          "name": "docker"
+        }
+      ]
+    }
+  }
+}
