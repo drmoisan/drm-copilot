@@ -5,11 +5,27 @@ param(
     [switch]$Apply,
 
     [Parameter()]
-    [switch]$EnableAutoResumeAfterReboot
+    [switch]$EnableAutoResumeAfterReboot,
+
+    [Parameter()]
+    [string]$WorkspaceRoot,
+
+    [Parameter()]
+    [string]$RepoRoot,
+
+    [Parameter()]
+    [switch]$SkipProjectPoetryInstall
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+$helperScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "bootstrap-host.helpers.ps1"
+if (-not (Test-Path -Path $helperScriptPath)) {
+    throw "Bootstrap helper script not found at $helperScriptPath"
+}
+
+. $helperScriptPath
 
 function Get-HostManifest {
     [CmdletBinding()]
@@ -263,7 +279,10 @@ function Get-WingetPackagesFromManifest {
 
 function Set-BootstrapResumeRunOnce {
     [CmdletBinding(SupportsShouldProcess)]
-    param()
+    param(
+        [Parameter()]
+        [string]$ResumeArguments = ""
+    )
 
     $runOncePath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce"
     if (-not (Test-Path $runOncePath)) {
@@ -271,7 +290,7 @@ function Set-BootstrapResumeRunOnce {
     }
 
     $scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "bootstrap-host.ps1"
-    $command = "pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Apply -EnableAutoResumeAfterReboot"
+    $command = "pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -Apply -EnableAutoResumeAfterReboot $ResumeArguments"
     if ($PSCmdlet.ShouldProcess("$runOncePath\\DrmCopilotHostBootstrapResume", "Set RunOnce bootstrap resume command")) {
         New-ItemProperty -Path $runOncePath -Name "DrmCopilotHostBootstrapResume" -Value $command -PropertyType String -Force | Out-Null
     }
@@ -301,6 +320,15 @@ function Invoke-BootstrapHost {
         [switch]$EnableAutoResumeAfterReboot,
 
         [Parameter()]
+        [string]$WorkspaceRoot,
+
+        [Parameter()]
+        [string]$RepoRoot,
+
+        [Parameter()]
+        [switch]$SkipProjectPoetryInstall,
+
+        [Parameter()]
         [bool]$IsWindowsHost = $IsWindows
     )
 
@@ -318,15 +346,33 @@ function Invoke-BootstrapHost {
         exit 1
     }
 
-    Install-WslIfMissing -ApplyMode:$Apply
+    $resolvedWorkspaceRoot = Resolve-WorkspaceRoot -WorkspaceRootPath $WorkspaceRoot
+    Write-Output "Workspace root: $resolvedWorkspaceRoot"
+    Initialize-WorkspaceRoot -WorkspaceRootPath $resolvedWorkspaceRoot -ApplyMode:$Apply
 
-    if ($Apply -and $EnableAutoResumeAfterReboot) {
-        Set-BootstrapResumeRunOnce
-        Write-Output "[INFO] Registered one-time bootstrap resume after reboot."
-    }
+    Install-WslIfMissing -ApplyMode:$Apply
 
     $manifest = Get-HostManifest
     $wingetPackages = Get-WingetPackagesFromManifest -Manifest $manifest
+    $projects = Get-ProjectRepositoriesFromManifest -Manifest $manifest
+
+    if ($Apply -and $EnableAutoResumeAfterReboot) {
+        $resumeArgs = @()
+        if (-not [string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
+            $resumeArgs += "-WorkspaceRoot `"$WorkspaceRoot`""
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($RepoRoot)) {
+            $resumeArgs += "-RepoRoot `"$RepoRoot`""
+        }
+
+        if ($SkipProjectPoetryInstall) {
+            $resumeArgs += "-SkipProjectPoetryInstall"
+        }
+
+        Set-BootstrapResumeRunOnce -ResumeArguments ($resumeArgs -join " ")
+        Write-Output "[INFO] Registered one-time bootstrap resume after reboot."
+    }
 
     Write-Output ""
     Write-Output "Installing required packages:"
@@ -361,12 +407,33 @@ function Invoke-BootstrapHost {
         }
 
         Write-Output ""
-        Write-Output "Installing Python project dependencies via poetry"
-        try {
-            Invoke-PoetryExe -PoetryArgs @("install", "--no-interaction")
+        if ($projects.Count -gt 0) {
+            Write-Output "Syncing project repositories from manifest"
+            Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $resolvedWorkspaceRoot -ApplyMode
         }
-        catch {
-            Write-Output "[WARN] Poetry dependency install failed; python quality tools may be unavailable"
+
+        if (-not $SkipProjectPoetryInstall) {
+            $projectRepoRoot = Resolve-ProjectRepoRoot -RepoRootPath $RepoRoot -WorkspaceRootPath $resolvedWorkspaceRoot -Projects $projects
+            if ($projectRepoRoot -and (Test-Path -Path (Join-Path -Path $projectRepoRoot -ChildPath "pyproject.toml"))) {
+                Write-Output ""
+                Write-Output "Installing Python project dependencies via poetry in $projectRepoRoot"
+                Push-Location -Path $projectRepoRoot
+                try {
+                    Invoke-PoetryExe -PoetryArgs @("install", "--no-interaction")
+                }
+                catch {
+                    Write-Output "[WARN] Poetry dependency install failed; python quality tools may be unavailable"
+                }
+                finally {
+                    Pop-Location
+                }
+            }
+            else {
+                Write-Output "[WARN] pyproject.toml not found; skipping poetry project install"
+            }
+        }
+        else {
+            Write-Output "[INFO] Skipping project poetry install by request"
         }
     }
     else {
@@ -374,6 +441,15 @@ function Invoke-BootstrapHost {
             ForEach-Object { "$($_.name) $($_.minimumVersion)" } |
                 Join-String -Separator ", "
         Write-Output "- Would install PowerShell modules: $modulePreview"
+
+        if ($projects.Count -gt 0) {
+            Write-Output "- Would sync project repositories to $resolvedWorkspaceRoot"
+            Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $resolvedWorkspaceRoot
+        }
+
+        if (-not $SkipProjectPoetryInstall) {
+            Write-Output "- Would install Python project dependencies via poetry"
+        }
     }
 
     Write-Output ""
@@ -383,7 +459,13 @@ function Invoke-BootstrapHost {
 
         Write-Output ""
         Write-Output "Running host verification"
-        Invoke-VerifyHostScript -ScriptPath (Join-Path -Path $PSScriptRoot -ChildPath "verify-host.ps1")
+        $verifyScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "verify-host.ps1"
+        if (Test-Path -Path $verifyScriptPath) {
+            Invoke-VerifyHostScript -ScriptPath $verifyScriptPath
+        }
+        else {
+            Write-Output "[WARN] verify-host.ps1 not found beside bootstrap-host.ps1; verification skipped"
+        }
 
         if ($EnableAutoResumeAfterReboot) {
             Remove-BootstrapResumeRunOnce
@@ -398,5 +480,5 @@ function Invoke-BootstrapHost {
 }
 
 if ($MyInvocation.InvocationName -ne '.') {
-    Invoke-BootstrapHost -Apply:$Apply -EnableAutoResumeAfterReboot:$EnableAutoResumeAfterReboot
+    Invoke-BootstrapHost -Apply:$Apply -EnableAutoResumeAfterReboot:$EnableAutoResumeAfterReboot -WorkspaceRoot $WorkspaceRoot -RepoRoot $RepoRoot -SkipProjectPoetryInstall:$SkipProjectPoetryInstall
 }

@@ -46,6 +46,13 @@
     "pyright",
     "pytest"
   ],
+  "projectRepositories": [
+    {
+      "name": "drm-copilot",
+      "url": "https://github.com/drmoisan/drm-copilot.git",
+      "targetPath": "drm-copilot"
+    }
+  ],
   "installPackages": {
     "linux": {
       "apt": [

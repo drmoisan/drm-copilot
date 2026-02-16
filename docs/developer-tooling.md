@@ -48,7 +48,7 @@ pip install -e .[llm-openai]       # With OpenAI
 If you want to run all repo tooling directly on your host machine, use the new host bootstrap and verify scripts.
 
 - Tool manifest: `scripts/host-tools.manifest.json`
-- Windows bootstrap: `pwsh -File scripts/dev-tools/bootstrap-host.ps1 -Apply`
+- Windows bootstrap: `pwsh -File scripts/dev-tools/bootstrap-host.ps1 -Apply -EnableAutoResumeAfterReboot -WorkspaceRoot "$env:USERPROFILE\OneDrive\bootstrap-workspace"`
 - Linux/macOS bootstrap: `bash scripts/bash/bootstrap-host.sh --apply`
 - Host verification (PowerShell): `pwsh -File scripts/dev-tools/verify-host.ps1`
 - Host verification (Bash): `bash scripts/bash/verify-host.sh`
@@ -56,6 +56,14 @@ If you want to run all repo tooling directly on your host machine, use the new h
 Both PowerShell and Bash host scripts read `scripts/host-tools.manifest.json` so required tools and minimum versions are defined in one place.
 The Windows `winget` package mapping used by `bootstrap-host.ps1` is also defined in that manifest under `installPackages.windows.winget`.
 The Linux `apt` and macOS `brew` package mappings used by `scripts/bash/bootstrap-host.sh` are defined under `installPackages.linux.apt` and `installPackages.macos.brew`.
+The project clone list used by the PowerShell bootstrap script is defined under `projectRepositories` in `scripts/host-tools.manifest.json`.
+
+Useful bootstrap options for first-time machine provisioning:
+
+- `-WorkspaceRoot <path>`: clone repositories into a stable root (for example under OneDrive).
+- `-RepoRoot <path>`: set the project root used for `poetry install --no-interaction`.
+- `-SkipProjectPoetryInstall`: skip project dependency installation when you only want host tooling + cloning.
+- `-EnableAutoResumeAfterReboot`: register a one-time resume command so bootstrap can continue after restart.
 
 Recommended onboarding flow on a new host:
 
