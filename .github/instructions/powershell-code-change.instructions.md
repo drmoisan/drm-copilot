@@ -19,6 +19,12 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 ## 1. Tooling & Baseline for PowerShell
 
+**Agent execution requirement (explicit):**
+
+- Agents must invoke the underlying PoshQC commands directly via `pwsh -Command ...`.
+- Agents must **not** use VS Code task wrappers (for example, `PoshQC: 1 format`, `PoshQC: 2 analyze`, `PoshQC: 2b autofix (PSSA -Fix)`, `PoshQC: 4 test (Pester)`) as a substitute for direct command execution.
+- VS Code tasks are convenience wrappers for interactive human use only.
+
 1) **Formatting - Invoke-Formatter**
 
 - Format all PowerShell files using the PoshQC formatter (Invoke-Formatter). Example:
@@ -70,6 +76,8 @@ When PowerShell code changes, your toolchain loop must include:
 2. `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`
 3. (Type checking is not applicable for PowerShell; skip to testing.)
 4. Run Pester per the unit test policy.
+
+The commands above are the approved toolchain contract for agents and must be executed directly (no task wrappers).
 
 Rerun the loop from step 1 if any step changes code or fails.
 
