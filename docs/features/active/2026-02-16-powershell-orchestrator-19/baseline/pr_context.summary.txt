@@ -1,0 +1,108 @@
+
+===== GitHub CLI status =====
+
+GitHub CLI authenticated for drmoisan/drm-copilot
+
+===== PR Intent =====
+
+Primary outcome:
+User/dev impact:
+Risks:
+Author-asserted autoclose issues:
+
+===== Base/Head =====
+
+Base ref (requested): origin/main
+Base ref (resolved): (unknown) @ (unknown)
+Head ref (resolved): feature/powershell-orchestrator-#19 @ (unknown)
+Merge base: (unknown)
+Range: (unknown)
+
+
+===== Close candidates =====
+
+Auto-close issues (verified from GitHub PR metadata):
+None (no PR exists yet for this branch)
+
+Auto-close issues (author asserted):
+- #19
+
+Referenced issues (detected):
+(none)
+
+
+===== Additional context files =====
+
+(none)
+
+
+===== Feature doc excerpts =====
+
+(none)
+
+
+===== Referenced issues (classified) =====
+
+- #19
+
+
+===== PRs in range (classified) =====
+
+(none)
+
+
+===== Invalid references (not found) =====
+
+(none)
+
+
+===== Scoping docs changed =====
+
+(none)
+
+
+===== Changed files overview =====
+
+Core logic changes: 0 files
+
+Mechanical moves/renames: 0 files
+
+Docs/templates/agents/tooling: 3 files
+- docs/features/active/2026-02-16-powershell-orchestrator-19/plan.2026-02-16T20-34.md (+55/-49)
+- docs/features/active/2026-02-16-powershell-orchestrator-19/spec.md (+9/-9)
+- docs/features/active/2026-02-16-powershell-orchestrator-19/user-story.md (+7/-7)
+
+
+===== Issue digests =====
+
+Identifier: #19
+Title: Feature: powershell-orchestrator
+Author: drmoisan
+Assignees: (none)
+Labels: feature
+State: open
+Last updated: 2026-02-17T01:33:14Z
+Key bullets:
+- Acceptance Criteria: [ ] The orchestration routes to Flow A when the change budget is ≤ 2 production PowerShell files and only touches those production files plus the minimal corresponding `*.Tests.ps1` files.
+- Acceptance Criteria: [ ] The orchestration routes to Flow B when the change budget is > 2 production PowerShell files, and it produces the required documentation artifacts (potential → promote → active folder → research → `spec.md`, optional `user-story.md`) before any broad implementation begins.
+- Acceptance Criteria: [ ] Flow A enforces "thin DI seam" rules: external executables are not mocked directly; they are invoked through a wrapper function that can be mocked in Pester.
+- Acceptance Criteria: [ ] Flow A and Flow B both enforce zero-regression gates: no new PSScriptAnalyzer findings, no new failing tests, and no coverage regressions for touched files.
+- Acceptance Criteria: [ ] The orchestrator is deterministic and does not depend on PATH, working directory, profiles, network, or machine-specific state to decide routing.
+
+Recent comments:
+(no comments)
+
+
+===== PR digests =====
+
+(none)
+
+
+===== CI status (HEAD) =====
+
+(not available)
+
+
+===== Appendix pointer =====
+
+See artifacts\pr_context.appendix.txt
