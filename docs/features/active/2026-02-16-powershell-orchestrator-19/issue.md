@@ -7,6 +7,16 @@
 - Issue: #19
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/19
 - Last Updated: 2026-02-17
+
+## Sync Summary (as of 2026-02-16T21-16)
+
+- Canonical short description: PowerShell orchestration routes work by production-file change budget into Flow A (`<=2`) or Flow B (`>2`) with deterministic guardrails.
+- Current delivery status: Not Delivered (acceptance criteria in `spec.md` and `user-story.md` are not fully evidenced).
+- Plan status: `plan.2026-02-16T20-34.md` has Phase 0, Phase 1, and `P2-T1` completed with objective evidence artifacts; no additional unchecked tasks were auto-checked during this sync.
+- Remote issue sync (read-only): GitHub Issue #19 is OPEN and currently aligned with Not Delivered status.
+- Orchestrator file location evidence: `.github/agents/powershell-orchestrator.agent.md` exists; `powershell-orchestrator.agent.md` does not exist at repo root.
+
+## History / Prior Notes
 ## Problem / Why
 
 The repo has multiple agent workflows (direct implementation vs. feature/bug documentation + atomic planning/execution), but there is no single, repeatable orchestration rule to choose the right workflow based on scope.

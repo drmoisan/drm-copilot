@@ -19,6 +19,7 @@ We need a PowerShell-specific orchestration feature that:
 - Uses a **change budget** (production files + corresponding test files) as the routing signal.
 - Ensures minimal, testable changes for small scope.
 - Ensures correct documentation/research/planning/execution/audit for larger scope.
+- Is implemented as an orchestrating agent definition file named `powershell-orchestrator.agent.md` (not as a PowerShell script).
 
 Research sufficiency: the promoted issue context in `issue.md` is sufficient to complete this v0.1 spec draft without additional research.
 
@@ -34,7 +35,7 @@ Orchestrate PowerShell development by routing each request into one of two flows
 
 ### Flow A: Small scope (≤ 2 production files)
 If the change budget is **two production files (or fewer)** plus their corresponding test files:
-- Plan and execute directly with a single PowerShell agent that combines:
+- Plan and execute directly with a single orchestrating agent (`powershell-orchestrator.agent.md`) that combines:
 	- Strong gating discipline and typed-toolchain habits (baseline → plan → small-batch edits → final QA), and
 	- PowerShell DI + Pester expertise (thin seams for mocking external executables/cmdlets).
 - Enforce the guardrails:
@@ -69,6 +70,7 @@ The orchestrator must ask for (or infer from the request) the intended change bu
 		- candidate file list (when available) for pre-flight scope validation
 	- Repository policy and workflow inputs:
 		- issue and active feature docs in `docs/features/active/2026-02-16-powershell-orchestrator-19/`
+		- orchestrator definition file `powershell-orchestrator.agent.md`
 		- PowerShell quality tooling and tasks under `scripts/dev-tools/` and `scripts/powershell/PoshQC/`
 	- Environment assumptions for routing logic:
 		- routing decision must not use PATH lookup, shell profile state, network calls, or current working directory heuristics
@@ -90,12 +92,12 @@ The orchestrator must ask for (or infer from the request) the intended change bu
 	- `deterministic_routing`: default `true` (disallow machine/environment-dependent routing conditions).
 - Versioning or backward-compatibility constraints:
 	- Existing PowerShell scripts/modules retain current invocation contracts.
-	- This feature adds orchestration policy and state tracking; it does not require breaking changes to current script parameters.
+	- This feature adds orchestration policy and state tracking in an agent definition; it does not require breaking changes to existing script parameters.
 
 ## API / CLI Surface
 
 List commands, flags, request/response shapes, and examples.
-- Request shape (agent/orchestrator contract):
+- Request shape (agent/orchestrator contract consumed by `powershell-orchestrator.agent.md`):
 	- `work_type`: `feature | bug`
 	- `budget.production_files`: integer `>= 1`
 	- `budget.test_files`: optional integer hint
@@ -114,6 +116,7 @@ List commands, flags, request/response shapes, and examples.
 	- Budget must be explicit before implementation starts.
 	- Production scope counting includes touched PowerShell production files only; imported dependencies do not count unless modified.
 	- Touching a third production file during Flow A is blocked until explicit scope expansion approval.
+	- `powershell-orchestrator.agent.md` is the orchestration authority for route selection and precondition enforcement.
 	- When `requires_external_executable=true` in Flow A, implementation must use a wrapper seam mockable in Pester.
 
 ## Data & State
@@ -144,19 +147,19 @@ Data flow, storage, or state changes introduced by this feature.
 ## Implementation Strategy
 
 - Implementation scope (what changes, not sequencing):
-	- Add orchestration routing logic for PowerShell requests based on explicit production file budget.
+	- Implement/maintain orchestration routing logic in `powershell-orchestrator.agent.md` for PowerShell requests based on explicit production file budget.
 	- Add scope-accounting and budget-enforcement checks for touched production/test files.
 	- Integrate Flow A gating contract (format → analyze → test) and Flow B documentation-first checkpoints.
 	- Record deterministic routing and gate outcomes to existing orchestration artifact state.
 - New classes/functions/commands to add or update:
-	- Update the existing PowerShell orchestration entry path and supporting helper functions that classify touched files and compute budget utilization.
-	- Add/update helper function(s) for wrapper-seam enforcement when external executables are involved in Flow A.
-	- Add/update validation helpers for Flow B pre-implementation artifact checkpoints.
+	- Add/update sections and decision rules in `powershell-orchestrator.agent.md` to classify touched files and compute budget utilization.
+	- Add/update orchestration guard rules in `powershell-orchestrator.agent.md` for wrapper-seam enforcement when external executables are involved in Flow A.
+	- Add/update orchestration precondition rules in `powershell-orchestrator.agent.md` for Flow B documentation checkpoints.
 - Dependency changes (new/removed packages) and rationale:
 	- No new runtime dependencies expected.
-	- Reuse existing repository PowerShell tooling under `scripts/powershell/PoshQC/` and existing script infrastructure.
+	- Reuse existing repository PowerShell tooling under `scripts/powershell/PoshQC/`; orchestration logic itself remains in markdown agent configuration.
 - Logging/telemetry additions and locations:
-	- Add structured routing decision logs and budget enforcement events in orchestrator execution logs.
+	- Add structured routing decision logs and budget enforcement events emitted by `powershell-orchestrator.agent.md` runs.
 	- Persist summary fields to `artifacts/orchestration/powershell-orchestrator-state.json` for auditability.
 	- Capture gate pass/fail status and touched-file deltas in the same orchestration artifact context.
 - Rollout plan (feature flags, staged deploys, fallback path):
@@ -167,17 +170,30 @@ Data flow, storage, or state changes introduced by this feature.
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or demos (see Acceptance Criteria + Seeded Test Conditions)
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
 - [ ] Edge cases and error handling covered by tests
 - [x] Docs updated (feature `spec.md` and `user-story.md` completed for Issue #19)
 - [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (PowerShell sequence: format → analyze → test)
+- [x] Toolchain pass completed (PowerShell sequence: format → analyze → test)
 
 ## Seeded Test Conditions (from potential)
-- [ ] Flow A: Request that can be implemented by changing 1–2 PowerShell production files and a single `*.Tests.ps1` file; verify it plans + executes directly and runs format/analyze/test gates.
-- [ ] Flow A: Request that involves an external executable call; verify it introduces a wrapper function and mocks the wrapper in Pester (not the executable).
-- [ ] Flow A: Verify budget enforcement blocks attempts to touch a 3rd production file unless the user explicitly approves a scope expansion.
-- [ ] Flow B: Request that would require touching 3+ production files; verify it creates/promotes the potential entry and fills `spec.md` (and `user-story.md` when requested) before implementation.
-- [ ] Flow B: Verify delegation order is enforced (planner → validator → executor → audit).
-- [ ] Regression: Verify reruns are deterministic across shells/hosts (no dependence on `$PWD`, profiles, PATH, or network).
+- [x] Flow A: Request that can be implemented by changing 1–2 PowerShell production files and a single `*.Tests.ps1` file; verify it plans + executes directly and runs format/analyze/test gates.
+- [x] Flow A: Request that involves an external executable call; verify it introduces a wrapper function and mocks the wrapper in Pester (not the executable).
+- [x] Flow A: Verify budget enforcement blocks attempts to touch a 3rd production file unless the user explicitly approves a scope expansion.
+- [x] Flow B: Request that would require touching 3+ production files; verify it creates/promotes the potential entry and fills `spec.md` (and `user-story.md` when requested) before implementation.
+- [x] Flow B: Verify delegation order is enforced (planner → validator → executor → audit).
+- [x] Regression: Verify reruns are deterministic across shells/hosts (no dependence on `$PWD`, profiles, PATH, or network).
+
+## Acceptance Criteria Evidence (partial, as of 2026-02-16T21-16)
+
+| Criterion | Evidence | Verification command(s) |
+|---|---|---|
+| Baseline PowerShell formatter/analyzer/test captures exist for this feature run | `evidence/baseline/format.2026-02-16T20-34.md`, `evidence/baseline/analyze.2026-02-16T20-34.md`, `evidence/baseline/test.2026-02-16T20-34.md` with `EXIT_CODE: 0` | `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`; `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`; `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."` |
+| TDD-red failure scenarios for missing Flow rules and deterministic guardrails are captured | `evidence/regression-testing/P1-T1.2026-02-16T20-34.md` through `P1-T5.2026-02-16T20-34.md` each include failure message and non-zero exit code | Commands embedded in each `P1-T*` evidence artifact under `Command:` |
+| Initial orchestrator agent file presence is confirmed | `.github/agents/powershell-orchestrator.agent.md` exists | `Test-Path ".github/agents/powershell-orchestrator.agent.md"` |
+
+Open criteria:
+- Behavior-level Flow A/Flow B routing success criteria remain unverified (`P2+` and `P4+` tasks not complete).
+- Telemetry/state-write and deterministic runtime validation tasks remain open.
+- Final QA-gates evidence (`evidence/qa-gates/*`) remains open.

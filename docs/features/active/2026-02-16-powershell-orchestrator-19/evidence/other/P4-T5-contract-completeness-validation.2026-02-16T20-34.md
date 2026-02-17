@@ -1,0 +1,5 @@
+Timestamp: 2026-02-16T20-34
+Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$a = Select-String -Path '.github/prompts/orchestrate-powershell-work.prompt.md' -Pattern '^- **Request summary (required):** clear objective and expected outcome$' -Quiet; $b = Select-String -Path '.github/prompts/orchestrate-powershell-work.prompt.md' -Pattern '^- **Likely affected files (optional):** any known production/test files$' -Quiet; $c = Select-String -Path '.github/prompts/orchestrate-powershell-work.prompt.md' -Pattern '^- **Initial classification hint (optional):** `feature` or `bug`$' -Quiet; $d = Select-String -Path '.github/prompts/orchestrate-powershell-work.prompt.md' -Pattern '^- **Constraints (optional):** APIs/paths/behavior that must remain unchanged$' -Quiet; if ($a -and $b -and $c -and $d) { 'Agent contract input fields => complete'; exit 0 } else { 'Failure: contract input fields incomplete'; exit 1 }"
+EXIT_CODE: 0
+Output Summary:
+Agent contract input fields => complete
