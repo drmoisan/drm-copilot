@@ -10,7 +10,7 @@ function Get-ManifestPath {
     [OutputType([string])]
     param()
 
-    return (Join-Path -Path $PSScriptRoot -ChildPath "..\host-tools.manifest.json")
+    return (Join-Path -Path $PSScriptRoot -ChildPath "host-tools.manifest.json")
 }
 
 function Get-CommandVersion {
@@ -321,5 +321,5 @@ if ($failureCount -eq 0) {
 }
 
 Write-Output "[WARN] Host verification failed with $failureCount issue(s)"
-Write-Output "Run: ./scripts/dev-tools/bootstrap-host.ps1 -Apply"
+Write-Output "Run: ./scripts/powershell/BootstrapPC/bootstrap-host.ps1 -Apply"
 exit 1

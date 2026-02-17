@@ -1,11 +1,11 @@
 Set-StrictMode -Version Latest
 
 $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
+. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../Support/TestHelpers.ps1"))
 
 Describe "bootstrap-host.ps1" {
     BeforeAll {
-        $script:scriptPath = Join-Path $PSScriptRoot '..\..\..\scripts\dev-tools\bootstrap-host.ps1' -Resolve
+        $script:scriptPath = Join-Path $PSScriptRoot '..\..\..\..\scripts\powershell\BootstrapPC\bootstrap-host.ps1' -Resolve
 
         # Dot-source the script so coverage is attributed to the source file.
         . $script:scriptPath
@@ -14,7 +14,7 @@ Describe "bootstrap-host.ps1" {
     Context "Get-HostManifest" {
         It "returns parsed manifest object when file exists" {
             # Arrange
-            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\host-tools.manifest.json' }
+            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\powershell\BootstrapPC\host-tools.manifest.json' }
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-Content -MockWith {
                 '{"minimumVersions":{"python":"3.13.0"},"installPackages":{"windows":{"winget":[{"id":"X","name":"x"}]}}}'
@@ -31,7 +31,7 @@ Describe "bootstrap-host.ps1" {
 
         It "throws when manifest path does not exist" {
             # Arrange
-            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\host-tools.manifest.json' }
+            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\powershell\BootstrapPC\host-tools.manifest.json' }
             Mock -CommandName Test-Path -MockWith { $false }
 
             # Act & Assert
@@ -232,7 +232,7 @@ Describe "bootstrap-host.ps1" {
 
         It "executes verify script path via Invoke-VerifyHostScript" {
             # Arrange
-            $verifyScript = Join-Path $PSScriptRoot '..\..\fixtures\shell_qc\scripts\pwsh_script.ps1' -Resolve
+            $verifyScript = Join-Path $PSScriptRoot '..\..\..\fixtures\shell_qc\scripts\pwsh_script.ps1' -Resolve
 
             # Act
             $result = Invoke-VerifyHostScript -ScriptPath $verifyScript
@@ -657,7 +657,7 @@ Describe "bootstrap-host.ps1" {
             # Arrange
             Mock -CommandName Test-Path -MockWith { $false }
             Mock -CommandName New-Item -MockWith { }
-            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\dev-tools\bootstrap-host.ps1' }
+            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\powershell\BootstrapPC\bootstrap-host.ps1' }
             Mock -CommandName New-ItemProperty -MockWith { }
 
             # Act
@@ -743,7 +743,7 @@ Describe "bootstrap-host.ps1" {
             Mock -CommandName Invoke-VerifyHostScript -MockWith { }
             Mock -CommandName Push-Location -MockWith { }
             Mock -CommandName Pop-Location -MockWith { }
-            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\dev-tools\verify-host.ps1' }
+            Mock -CommandName Join-Path -MockWith { 'C:\repo\scripts\powershell\BootstrapPC\verify-host.ps1' }
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Write-Output -MockWith { }
             Mock -CommandName Get-Command -MockWith {
@@ -850,7 +850,7 @@ Describe "bootstrap-host.ps1" {
             # Arrange
             Mock -CommandName Test-Path -MockWith {
                 param([string]$Path)
-                if ($Path -eq 'C:\repo\scripts\dev-tools\verify-host.ps1') {
+                if ($Path -eq 'C:\repo\scripts\powershell\BootstrapPC\verify-host.ps1') {
                     return $false
                 }
 

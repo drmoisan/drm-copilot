@@ -740,11 +740,11 @@
 				"-ExecutionPolicy",
 				"Bypass",
 				"-File",
-				"${workspaceFolder}/scripts/dev-tools/bootstrap-host.ps1",
+				"${workspaceFolder}/scripts/powershell/BootstrapPC/bootstrap-host.ps1",
 				"-Apply"
 			],
 			"command": "pwsh",
-			"detail": "Installs host prerequisites from the devcontainer-derived host tooling manifest.",
+			"detail": "Installs host prerequisites from scripts/powershell/BootstrapPC/host-tools.manifest.json.",
 			"label": "Dev: Host Bootstrap (PowerShell)",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -763,10 +763,10 @@
 				"-ExecutionPolicy",
 				"Bypass",
 				"-File",
-				"${workspaceFolder}/scripts/dev-tools/verify-host.ps1"
+				"${workspaceFolder}/scripts/powershell/BootstrapPC/verify-host.ps1"
 			],
 			"command": "pwsh",
-			"detail": "Verifies host prerequisites against scripts/host-tools.manifest.json.",
+			"detail": "Verifies host prerequisites against scripts/powershell/BootstrapPC/host-tools.manifest.json.",
 			"label": "Dev: Host Verify (PowerShell)",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -784,7 +784,7 @@
 				"--apply"
 			],
 			"command": "bash",
-			"detail": "Installs host prerequisites on Linux/macOS from the devcontainer-derived host tooling manifest.",
+			"detail": "Installs host prerequisites on Linux/macOS from scripts/powershell/BootstrapPC/host-tools.manifest.json.",
 			"label": "Dev: Host Bootstrap (Bash)",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -801,7 +801,7 @@
 				"${workspaceFolder}/scripts/bash/verify-host.sh"
 			],
 			"command": "bash",
-			"detail": "Verifies host prerequisites on Linux/macOS against scripts/host-tools.manifest.json.",
+			"detail": "Verifies host prerequisites on Linux/macOS against scripts/powershell/BootstrapPC/host-tools.manifest.json.",
 			"label": "Dev: Host Verify (Bash)",
 			"options": {
 				"cwd": "${workspaceFolder}"

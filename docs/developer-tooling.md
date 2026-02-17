@@ -47,16 +47,16 @@ pip install -e .[llm-openai]       # With OpenAI
 
 If you want to run all repo tooling directly on your host machine, use the new host bootstrap and verify scripts.
 
-- Tool manifest: `scripts/host-tools.manifest.json`
-- Windows bootstrap: `pwsh -File scripts/dev-tools/bootstrap-host.ps1 -Apply -EnableAutoResumeAfterReboot -WorkspaceRoot "$env:USERPROFILE\OneDrive\bootstrap-workspace"`
+- Tool manifest: `scripts/powershell/BootstrapPC/host-tools.manifest.json`
+- Windows bootstrap: `pwsh -File scripts/powershell/BootstrapPC/bootstrap-host.ps1 -Apply -EnableAutoResumeAfterReboot -WorkspaceRoot "$env:USERPROFILE\OneDrive\bootstrap-workspace"`
 - Linux/macOS bootstrap: `bash scripts/bash/bootstrap-host.sh --apply`
-- Host verification (PowerShell): `pwsh -File scripts/dev-tools/verify-host.ps1`
+- Host verification (PowerShell): `pwsh -File scripts/powershell/BootstrapPC/verify-host.ps1`
 - Host verification (Bash): `bash scripts/bash/verify-host.sh`
 
-Both PowerShell and Bash host scripts read `scripts/host-tools.manifest.json` so required tools and minimum versions are defined in one place.
+Both PowerShell and Bash host scripts read `scripts/powershell/BootstrapPC/host-tools.manifest.json` so required tools and minimum versions are defined in one place.
 The Windows `winget` package mapping used by `bootstrap-host.ps1` is also defined in that manifest under `installPackages.windows.winget`.
 The Linux `apt` and macOS `brew` package mappings used by `scripts/bash/bootstrap-host.sh` are defined under `installPackages.linux.apt` and `installPackages.macos.brew`.
-The project clone list used by the PowerShell bootstrap script is defined under `projectRepositories` in `scripts/host-tools.manifest.json`.
+The project clone list used by the PowerShell bootstrap script is defined under `projectRepositories` in `scripts/powershell/BootstrapPC/host-tools.manifest.json`.
 
 Useful bootstrap options for first-time machine provisioning:
 

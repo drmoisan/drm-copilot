@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MANIFEST_PATH="${SCRIPT_DIR}/../host-tools.manifest.json"
+MANIFEST_PATH="${SCRIPT_DIR}/../powershell/BootstrapPC/host-tools.manifest.json"
 
 failure_count=0
 

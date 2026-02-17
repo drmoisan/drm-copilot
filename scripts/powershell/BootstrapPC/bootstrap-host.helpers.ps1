@@ -134,7 +134,7 @@ function Resolve-ProjectRepoRoot {
         return [System.IO.Path]::GetFullPath($RepoRootPath)
     }
 
-    $defaultRepoRoot = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath "..\.."))
+    $defaultRepoRoot = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."))
     if (Test-Path -Path (Join-Path -Path $defaultRepoRoot -ChildPath "pyproject.toml")) {
         return $defaultRepoRoot
     }

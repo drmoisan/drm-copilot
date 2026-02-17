@@ -1,0 +1,65 @@
+Timestamp: 2026-02-16T16-15
+Command: baseline-old-path-reference-scan
+EXIT_CODE: 0
+Output Summary: 60 matches
+
+scripts\dev-tools\verify-host.ps1:324:Write-Output "Run: ./scripts/dev-tools/bootstrap-host.ps1 -Apply"
+docs\developer-tooling.md:50:- Tool manifest: `scripts/host-tools.manifest.json`
+docs\developer-tooling.md:51:- Windows bootstrap: `pwsh -File scripts/dev-tools/bootstrap-host.ps1 -Apply -EnableAutoResumeAfterReboot -WorkspaceRoot "$env:USERPROFILE\OneDrive\bootstrap-workspace"`
+docs\developer-tooling.md:53:- Host verification (PowerShell): `pwsh -File scripts/dev-tools/verify-host.ps1`
+docs\developer-tooling.md:56:Both PowerShell and Bash host scripts read `scripts/host-tools.manifest.json` so required tools and minimum versions are defined in one place.
+docs\developer-tooling.md:59:The project clone list used by the PowerShell bootstrap script is defined under `projectRepositories` in `scripts/host-tools.manifest.json`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\issue.md:20:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\issue.md:21:- `scripts/dev-tools/bootstrap-host.helpers.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\issue.md:22:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\issue.md:23:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\issue.md:32:- [ ] Data/config previously sourced from `scripts/host-tools.manifest.json` is relocated into the new module location and consumed there.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:12:Migrate bootstrap host tooling and manifest ownership from legacy paths under `scripts/dev-tools` and `scripts/host-tools.manifest.json` into `scripts/powershell/BootstrapPC`, redirect all active references without shims, move and retarget tests, preserve behavior, and finish with a clean PowerShell quality loop.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:28:- Command: `poetry run python -c "from pathlib import Path; import re; roots=['scripts','tests','docs','.vscode']; pats=[r'scripts/dev-tools/bootstrap-host.ps1',r'scripts/dev-tools/bootstrap-host.helpers.ps1',r'scripts/dev-tools/verify-host.ps1',r'scripts/host-tools.manifest.json']; lines=[]; [lines.extend([f'{p}:{i}:{line.strip()}' for i,line in enumerate(Path(p).read_text(encoding='utf-8', errors='ignore').splitlines(),1) if any(re.search(pt,line) for pt in pats)]) for r in roots for p in Path(r).rglob('*') if p.is_file()]; out=Path('docs/features/active/2026-02-16-bootstrap-pc-module-migration-17/evidence/baseline/reference-scan.before.md'); out.parent.mkdir(parents=True,exist_ok=True); out.write_text('Timestamp: 2026-02-16T16-15\nCommand: baseline-old-path-reference-scan\nEXIT_CODE: 0\n\n'+'\n'.join(lines), encoding='utf-8')"`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:36:- Command: `poetry run python -c "from pathlib import Path; import json; src=Path('scripts/host-tools.manifest.json'); keys=sorted(json.loads(src.read_text(encoding='utf-8')).keys()); out=Path('docs/features/active/2026-02-16-bootstrap-pc-module-migration-17/evidence/baseline/manifest-keys.before.txt'); out.parent.mkdir(parents=True,exist_ok=True); out.write_text('Timestamp: 2026-02-16T16-15\nCommand: baseline-manifest-key-snapshot\nEXIT_CODE: 0\n\n'+'\n'.join(keys), encoding='utf-8')"`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:40:- [ ] [P1-T1] Move `scripts/dev-tools/bootstrap-host.ps1` to `scripts/powershell/BootstrapPC/bootstrap-host.ps1` and preserve existing parameter surface and exit behavior
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:41:- Acceptance: `Test-Path ./scripts/dev-tools/bootstrap-host.ps1` is `$false`; `Test-Path ./scripts/powershell/BootstrapPC/bootstrap-host.ps1` is `$true`; and `Select-String -Path ./scripts/powershell/BootstrapPC/bootstrap-host.ps1 -Pattern 'param\(|Set-StrictMode|CmdletBinding|exit\s+[0-9]+'` returns at least one match
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:42:- [ ] [P1-T2] Move `scripts/dev-tools/bootstrap-host.helpers.ps1` to `scripts/powershell/BootstrapPC/bootstrap-host.helpers.ps1` and preserve helper function names consumed by bootstrap flow
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:43:- Acceptance: `Test-Path ./scripts/dev-tools/bootstrap-host.helpers.ps1` is `$false`; `Test-Path ./scripts/powershell/BootstrapPC/bootstrap-host.helpers.ps1` is `$true`; and `Select-String -Path ./scripts/powershell/BootstrapPC/bootstrap-host.ps1 -Pattern 'bootstrap-host.helpers.ps1'` returns at least one match
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:44:- [ ] [P1-T3] [expect-fail] Move `scripts/dev-tools/verify-host.ps1` to `scripts/powershell/BootstrapPC/verify-host.ps1` and preserve verification result semantics
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:45:- Acceptance: `Test-Path ./scripts/dev-tools/verify-host.ps1` is `$false`; `Test-Path ./scripts/powershell/BootstrapPC/verify-host.ps1` is `$true`; and `docs/features/active/2026-02-16-bootstrap-pc-module-migration-17/evidence/regression-testing/verify-host.negative.md` records `Timestamp:`, `Command:`, and nonzero `EXIT_CODE:` from a controlled negative invocation
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:46:- [ ] [P1-T4] Move `scripts/host-tools.manifest.json` to `scripts/powershell/BootstrapPC/host-tools.manifest.json` and keep schema/content equivalent
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:47:- Acceptance: `Test-Path ./scripts/host-tools.manifest.json` is `$false`; `Test-Path ./scripts/powershell/BootstrapPC/host-tools.manifest.json` is `$true`; and a key-compare command between `docs/features/active/2026-02-16-bootstrap-pc-module-migration-17/evidence/baseline/manifest-keys.before.txt` and new-manifest sorted keys exits `0`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:51:- Acceptance: no task arguments in `.vscode/tasks.json` reference `scripts/dev-tools/bootstrap-host.ps1` and at least one task references new bootstrap path
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:53:- Acceptance: no task arguments in `.vscode/tasks.json` reference `scripts/dev-tools/verify-host.ps1` and at least one task references new verify path
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:56:- Acceptance: both scripts contain no reference to `scripts/host-tools.manifest.json` and contain the new module manifest path expression
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:74:- Acceptance: `scripts/dev-tools/bootstrap-host.ps1`, `scripts/dev-tools/bootstrap-host.helpers.ps1`, and `scripts/dev-tools/verify-host.ps1` do not exist
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\plan.2026-02-16T16-15.md:76:- Command: `poetry run python -c "from pathlib import Path; import re,sys; roots=['scripts','tests','docs','.vscode']; pats=[r'scripts/dev-tools/bootstrap-host.ps1',r'scripts/dev-tools/bootstrap-host.helpers.ps1',r'scripts/dev-tools/verify-host.ps1',r'scripts/host-tools.manifest.json']; hits=[]; [hits.extend([f'{p}:{i}:{line.strip()}' for i,line in enumerate(Path(p).read_text(encoding='utf-8', errors='ignore').splitlines(),1) if any(re.search(pt,line) for pt in pats)]) for r in roots for p in Path(r).rglob('*') if p.is_file()]; out=Path('docs/features/active/2026-02-16-bootstrap-pc-module-migration-17/evidence/other/reference-scan.after.md'); out.parent.mkdir(parents=True,exist_ok=True); out.write_text('Timestamp: 2026-02-16T16-15\nCommand: post-migration-reference-scan\nEXIT_CODE: '+('1' if hits else '0')+'\n\n'+'\n'.join(hits), encoding='utf-8'); sys.exit(1 if hits else 0)"`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:10:- Relocate manifest ownership from `scripts/host-tools.manifest.json` into module-local assets.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:23:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:24:- `scripts/dev-tools/bootstrap-host.helpers.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:25:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:26:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:36:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:37:- `scripts/dev-tools/bootstrap-host.helpers.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:38:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:39:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:50:- `Dev: Host Bootstrap (PowerShell)` path arg currently targets `scripts/dev-tools/bootstrap-host.ps1`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:51:- `Dev: Host Verify (PowerShell)` path arg currently targets `scripts/dev-tools/verify-host.ps1`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:52:- Task `detail` strings currently mention `scripts/host-tools.manifest.json`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:79:- Update legacy recommendation string in `scripts/dev-tools/verify-host.ps1` currently showing `Run: ./scripts/dev-tools/bootstrap-host.ps1 -Apply` (or remove file entirely when decommissioned).
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:93:- Move `scripts/host-tools.manifest.json` into `scripts/powershell/BootstrapPC/host-tools.manifest.json`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:114:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:115:- `scripts/dev-tools/bootstrap-host.helpers.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:116:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:117:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:163:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:164:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\research.md:165:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:21:- `scripts/dev-tools/bootstrap-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:22:- `scripts/dev-tools/bootstrap-host.helpers.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:23:- `scripts/dev-tools/verify-host.ps1`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:24:- `scripts/host-tools.manifest.json`
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:35:- Module-local configuration/data relocated from `scripts/host-tools.manifest.json` into `scripts/powershell/BootstrapPC`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:36:- Repository task invocations from `.vscode/tasks.json` that previously targeted `scripts/dev-tools/bootstrap-host.ps1` and `scripts/dev-tools/verify-host.ps1`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\spec.md:64:- Manifest/config data used by bootstrap/verify is moved from `scripts/host-tools.manifest.json` into module-owned assets under `scripts/powershell/BootstrapPC`.
+docs\features\active\2026-02-16-bootstrap-pc-module-migration-17\user-story.md:43:- [ ] Data/config previously sourced from `scripts/host-tools.manifest.json` is relocated into the new module location and consumed there.
+.vscode\tasks.json:743:"${workspaceFolder}/scripts/dev-tools/bootstrap-host.ps1",
+.vscode\tasks.json:766:"${workspaceFolder}/scripts/dev-tools/verify-host.ps1"
+.vscode\tasks.json:769:"detail": "Verifies host prerequisites against scripts/host-tools.manifest.json.",
+.vscode\tasks.json:804:"detail": "Verifies host prerequisites on Linux/macOS against scripts/host-tools.manifest.json.",

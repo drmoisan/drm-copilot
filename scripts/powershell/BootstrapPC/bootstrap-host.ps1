@@ -32,7 +32,7 @@ function Get-HostManifest {
     [OutputType([psobject])]
     param()
 
-    $manifestPath = Join-Path -Path $PSScriptRoot -ChildPath "..\host-tools.manifest.json"
+    $manifestPath = Join-Path -Path $PSScriptRoot -ChildPath "host-tools.manifest.json"
     if (-not (Test-Path $manifestPath)) {
         throw "Host tools manifest not found at $manifestPath"
     }
