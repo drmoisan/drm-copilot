@@ -1,0 +1,35 @@
+---
+name: powershell-change-budget-router
+description: Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, and enforce direct-mode escalation to orchestrator.
+---
+
+# PowerShell Change Budget Router
+
+Canonical guidance for deciding whether work should execute directly in `powershell-typed-engineer` or be escalated to `powershell-orchestrator`.
+
+## When to Use This Skill
+
+Use this skill when:
+- Intake starts from a natural-language PowerShell request.
+- An agent must decide execution path before planning or implementation.
+- A direct implementation agent must reject over-budget requests and route to orchestrator.
+
+## Canonical Routing Rules
+
+1) Estimate rough change budget first based on likely **production PowerShell files** touched.
+2) Route:
+- `1-2` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
+- `>2` production files → **large path** (`powershell-orchestrator`).
+
+## Direct-Mode Rejection Rule
+
+If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:
+- Stop before implementation.
+- Return explicit routing instruction to invoke `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`).
+
+## Documentation Expectations
+
+Record in response/logs:
+- estimated production file count,
+- chosen path (`small`/`large`),
+- rationale summary (1-3 bullets).

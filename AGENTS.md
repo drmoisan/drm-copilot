@@ -1364,6 +1364,12 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 ## 1. Tooling & Baseline for PowerShell
 
+**Agent execution requirement (explicit):**
+
+- Agents must invoke the underlying PoshQC commands directly via `pwsh -Command ...`.
+- Agents must **not** use VS Code task wrappers (for example, `PoshQC: 1 format`, `PoshQC: 2 analyze`, `PoshQC: 2b autofix (PSSA -Fix)`, `PoshQC: 4 test (Pester)`) as a substitute for direct command execution.
+- VS Code tasks are convenience wrappers for interactive human use only.
+
 1) **Formatting - Invoke-Formatter**
 
 - Format all PowerShell files using the PoshQC formatter (Invoke-Formatter). Example:
@@ -1416,6 +1422,8 @@ When PowerShell code changes, your toolchain loop must include:
 3. (Type checking is not applicable for PowerShell; skip to testing.)
 4. Run Pester per the unit test policy.
 
+The commands above are the approved toolchain contract for agents and must be executed directly (no task wrappers).
+
 Rerun the loop from step 1 if any step changes code or fails.
 
 > Install prerequisites once with `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Install-PoshQCTools"` (installs PSScriptAnalyzer + Pester to CurrentUser).
@@ -1444,6 +1452,7 @@ If there is any conflict between these documents, halt and notify the user.
 - Use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`. Run via PoshQC:
   - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
 - VS Code task: `PoshQC: 4 test (Pester)`
+- Agent execution requirement: invoke `Invoke-PoshQCTest` directly via `pwsh -Command ...`; do **not** use task wrappers as a substitute.
 - Keep tests compatible with PowerShell 7+.
 
 ---
@@ -1486,6 +1495,7 @@ If there is any conflict between these documents, halt and notify the user.
 
 - When running the "After Making Changes" toolchain, the **testing step** for PowerShell must use:
   - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
+- For agents, run the command above directly; VS Code tasks are convenience wrappers for humans and are not an approved substitute.
 - Do **not** substitute other test runners for PowerShell work without explicit approval.
 
 This file defines **how** PowerShell tests are written and executed; the general code change policy defines **when** to run the toolchain and how strictly to enforce it.

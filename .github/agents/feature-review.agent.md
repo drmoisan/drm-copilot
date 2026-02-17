@@ -64,6 +64,7 @@ Use these reusable skills to avoid duplicating shared operations:
 ## Phase A — Collect baseline context (pr_context)
 1) Confirm you are on the feature branch (do not switch branches unless necessary).
 2) Identify the base branch from `${input:PRBaseBranch}`.
+   - If `${input:PRBaseBranch}` is missing/empty, default to `main` and document this assumption in all generated artifacts.
 3) Ensure PR context artifacts exist and match the current branch state:
     - Prefer the canonical PR context artifacts defined in `pr-context-artifacts`
    - If missing OR clearly stale (e.g., branch head advanced, diff no longer matches working tree):
@@ -193,7 +194,7 @@ Trigger remediation if ANY of the following:
 - FeatureAudit.md has any FAIL or PARTIAL criteria that are required for feature completion
 
 If remediation is triggered:
-1) Create `<FEATURE_FOLDER>/remediation-inputs-<timestamp>.md` (same timestamp) containing:
+1) Create `<FEATURE_FOLDER>/remediation-inputs.<timestamp>.md` (same timestamp) containing:
    - A numbered list of required fixes with:
      - Exact file(s) and location(s)
      - Expected behavior
@@ -203,7 +204,7 @@ If remediation is triggered:
    - A section explicitly listing which acceptance criteria are not yet met and the minimum changes required to meet them
 
 2) Create the remediation plan target file (template-first)
-   - Create `<FEATURE_FOLDER>/remediation-plan-<timestamp>.md` by copying the repo plan template:
+   - Create `<FEATURE_FOLDER>/remediation-plan.<timestamp>.md` by copying the repo plan template:
      - Default: `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
    - Replace high-level placeholders (feature name, owner if known, last-updated timestamp), but leave the atomic tasks section for atomic_planner to fill.
 
@@ -211,8 +212,8 @@ If remediation is triggered:
    - Use the provided handoff “Create remediation plan (atomic_planner)”.
    - Construct the delegated prompt by taking `.github/prompts/generate-atomic-plan.prompt.md` as the base prompt template and filling:
      - `${name}` = `Remediation Plan: <feature-folder-name> (<timestamp>)`
-     - `${file}` = `<FEATURE_FOLDER>/remediation-plan-<timestamp>.md`
-     - `${spec}` = `<FEATURE_FOLDER>/remediation-inputs-<timestamp>.md` (PRIMARY)
+       - `${file}` = `<FEATURE_FOLDER>/remediation-plan.<timestamp>.md`
+       - `${spec}` = `<FEATURE_FOLDER>/remediation-inputs.<timestamp>.md` (PRIMARY)
      - `${user-story}` = best-effort secondary scoping doc path (e.g., `<FEATURE_FOLDER>/spec.md` if present)
    - Append a “Context package” that inlines the FULL TEXT of the required context files listed in the handoff instructions.
 
@@ -228,5 +229,9 @@ When finished, respond with:
    - `<FEATURE_FOLDER>/remediation-plan.<timestamp>.md` (if remediation was triggered)
 - A one-paragraph go/no-go recommendation for PR readiness.
 - If remediation is needed: confirm the atomic_planner delegation occurred and that the remediation plan file exists at the expected path.
+
+Mandatory artifact existence check before final response:
+- Verify each reported artifact path exists on disk before reporting completion.
+- If any required artifact is missing, continue execution and create/regenerate it; do not claim completion.
 
 End of agent instructions.
