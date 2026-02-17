@@ -1,0 +1,15 @@
+Timestamp: 2026-02-16T16-15
+Command: baseline-manifest-key-snapshot
+EXIT_CODE: 0
+Output Summary: 10 top-level keys
+
+$schema
+installPackages
+minimumVersions
+optionalCommands
+powershellModules
+projectRepositories
+pythonTools
+requiredCommands
+source
+version
