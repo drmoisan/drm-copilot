@@ -36,6 +36,21 @@
 			"program": "${file}",
 			"console": "integratedTerminal",
 			"justMyCode": true
+		},
+		{
+			"name": "Debug: Link GitHub Parent/Child Issues (21 -> 25)",
+			"type": "PowerShell",
+			"request": "launch",
+			"script": "${workspaceFolder}/scripts/dev-tools/link-parent-child.ps1",
+			"createTemporaryIntegratedConsole": true,
+			"internalConsoleOptions": "neverOpen",
+			"args": [
+				"-ChildIssueNumber",
+				"25",
+				"-ParentIssueNumber",
+				"21"
+			],
+			"cwd": "${workspaceFolder}"
 		}
 	],
 	"inputs": [
