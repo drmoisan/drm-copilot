@@ -9,44 +9,45 @@
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
 	"typescript.tsc.autoDetect": "off",
 	  "chat.tools.terminal.autoApprove": {
-    "/.*fix-all.ps1$/i": {
-      "approve": true,
-      "matchCommandLine": true
+      "/.*fix-all.ps1$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/.*run-actionlint\\.ps1$/i": true,
+      "/Import-Module PSScriptAnalyzer; Invoke-ScriptAnalyzer .*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/Import-Module\\s+(\"([^\"]+)\"|'([^']+)'|(?:\\.[\\\\/]|[A-Za-z]:[\\\\/])[^;|&><]*)\\s*;\\s*Invoke-PoshQC\\w*\\s+[^;\\r\\n]*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/Invoke-ScriptAnalyzer\\b[^;\\r\\n]*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/Start-Sleep .*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/cd .*$/": true,
+      "/git checkout .*$/": true,
+      "/git ls.*$/": true,
+      "/poetry .*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/pyright\b.*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/pytest .*$/i": {
+        "approve": true,
+        "matchCommandLine": true
+      },
+      "/run-dev-sql\\.ps1\\b/i": true,
+      "git rev-parse": true
     },
-    "/.*run-actionlint\\.ps1$/i": true,
-    "/Import-Module PSScriptAnalyzer; Invoke-ScriptAnalyzer .*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/Import-Module\\s+(\"([^\"]+)\"|'([^']+)'|(?:\\.[\\\\/]|[A-Za-z]:[\\\\/])[^;|&><]*)\\s*;\\s*Invoke-PoshQC\\w*\\s+[^;\\r\\n]*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/Invoke-ScriptAnalyzer\\b[^;\\r\\n]*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/Start-Sleep .*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/cd .*$/": true,
-    "/git checkout .*$/": true,
-    "/git ls.*$/": true,
-    "/poetry .*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/pyright\b.*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/pytest .*$/i": {
-      "approve": true,
-      "matchCommandLine": true
-    },
-    "/run-dev-sql\\.ps1\\b/i": true
-  },
   "chat.tools.urls.autoApprove": {
     "https://www.google.com": {
       "approveRequest": true,
