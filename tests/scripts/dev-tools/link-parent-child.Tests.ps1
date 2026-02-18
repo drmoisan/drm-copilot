@@ -59,6 +59,23 @@ Describe "link-parent-child.ps1 - Test-GhCli" {
 }
 
 Describe "link-parent-child.ps1 - Get-Issue" {
+    It "passes --json fields as a single comma-separated gh argument" {
+        $script:capturedGhArgs = $null
+        $invokeGh = {
+            param([string[]] $GhArgs)
+            $script:capturedGhArgs = $GhArgs
+            return @{
+                Output   = '{"number":25,"title":"Child title","url":"https://example.com/25","body":"body"}'
+                ExitCode = 0
+            }
+        }
+
+        $null = Get-Issue -IssueNumber "25" -Label "child" -InvokeGh $invokeGh
+
+        $script:capturedGhArgs.Count | Should -Be 5
+        ($script:capturedGhArgs -join '|') | Should -Be 'issue|view|25|--json|number,title,url,body'
+    }
+
     It "returns parsed JSON when gh succeeds" {
         $mockJson = '{"number":42,"title":"Test Issue","url":"https://github.com/test/repo/issues/42","body":"Issue body"}'
         Mock -CommandName Invoke-GhCli -MockWith {

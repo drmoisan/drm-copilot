@@ -328,7 +328,8 @@ function Get-Issue {
         [scriptblock] $InvokeGh = { param([string[]] $GhArgs) Invoke-GhCli -GhArgs $GhArgs }
     )
 
-    $result = & $InvokeGh @('issue', 'view', $IssueNumber, '--json', 'number', 'title', 'url', 'body')
+    # Pass --json fields as a single comma-separated argument to satisfy gh CLI parsing.
+    $result = & $InvokeGh @('issue', 'view', $IssueNumber, '--json', 'number,title,url,body')
     # Surface classified errors immediately when gh fails to return the requested issue payload.
     if ($result.ExitCode -ne 0 -or -not $result.Output) {
         $failureCategory = Get-IssueFetchFailureCategory -ExitCode $result.ExitCode -Output $result.Output
