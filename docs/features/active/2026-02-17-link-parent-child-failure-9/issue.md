@@ -90,3 +90,25 @@ The script throws early when child issue retrieval fails and currently provides 
 
 - [ ] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Implementation Outcome (2026-02-18)
+
+Completed in-scope bugfix for `Get-Issue` failure diagnostics with no success-path behavior regressions.
+
+Changed files:
+
+- `scripts/dev-tools/link-parent-child.ps1`
+- `tests/scripts/dev-tools/link-parent-child.Tests.ps1`
+- `docs/features/active/2026-02-17-link-parent-child-failure-9/spec.md`
+- `docs/features/active/2026-02-17-link-parent-child-failure-9/issue.md`
+
+Validation commands executed:
+
+- `Invoke-Pester -Path ./tests/scripts/dev-tools/link-parent-child.Tests.ps1 -FullNameFilter '*auth-required failure messaging*'`
+- `Invoke-Pester -Path ./tests/scripts/dev-tools/link-parent-child.Tests.ps1 -FullNameFilter '*not-found failure messaging*'`
+- `Invoke-Pester -Path ./tests/scripts/dev-tools/link-parent-child.Tests.ps1 -FullNameFilter '*permission/repo-context failure messaging*'`
+- `Invoke-Pester -Path ./tests/scripts/dev-tools/link-parent-child.Tests.ps1 -FullNameFilter '*unknown failure messaging fallback*'`
+- `Invoke-Pester -Path ./tests/scripts/dev-tools/link-parent-child.Tests.ps1 -FullNameFilter '*success path stability*'`
+- `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`
+- `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`
+- `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`

@@ -105,6 +105,62 @@ Describe "link-parent-child.ps1 - Get-Issue" {
         $script:errors.Count | Should -Be 1
         $script:errors[0] | Should -Match "Unable to fetch child issue"
     }
+
+    It "emits auth-required failure messaging with child issue context" {
+        $invokeGh = {
+            param([string[]]$GhArgs)
+            [void] $GhArgs
+            return @{
+                Output   = "To get started with GitHub CLI, please run: gh auth login"
+                ExitCode = 1
+            }
+        }
+
+        $action = { Get-Issue -IssueNumber "2" -Label "child" -InvokeGh $invokeGh }
+        Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage "*child*#2*gh auth status*"
+    }
+
+    It "emits not-found failure messaging with validation guidance" {
+        $invokeGh = {
+            param([string[]]$GhArgs)
+            [void] $GhArgs
+            return @{
+                Output   = "GraphQL: Could not resolve to an issue with the number of 999"
+                ExitCode = 1
+            }
+        }
+
+        $action = { Get-Issue -IssueNumber "999" -Label "parent" -InvokeGh $invokeGh }
+        Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage "*parent*#999*verify*issue number*"
+    }
+
+    It "emits permission/repo-context failure messaging with access guidance" {
+        $invokeGh = {
+            param([string[]]$GhArgs)
+            [void] $GhArgs
+            return @{
+                Output   = "GraphQL: Resource not accessible by integration"
+                ExitCode = 1
+            }
+        }
+
+        $action = { Get-Issue -IssueNumber "321" -Label "child" -InvokeGh $invokeGh }
+        Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage "*child*#321*access*repo*"
+    }
+
+    It "emits unknown failure messaging fallback with explicit next-step guidance" {
+        $invokeGh = {
+            param([string[]]$GhArgs)
+            [void] $GhArgs
+            return @{
+                Output   = "unexpected transport timeout"
+                ExitCode = 2
+            }
+        }
+
+        $action = { Get-Issue -IssueNumber "777" -Label "parent" -InvokeGh $invokeGh }
+        Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage "*parent*#777*Check gh CLI output*--repo*"
+    }
 }
 
 Describe "link-parent-child.ps1 - Invoke-LinkParentChild" {
@@ -147,6 +203,23 @@ Describe "link-parent-child.ps1 - Invoke-LinkParentChild" {
         $script:lastWrite.Value | Should -Match "#1"
         $script:messages | Should -Contain "Updated parent issue #10 with child link."
         $script:messages | Should -Contain "Added parent link comment to child issue #1."
+    }
+
+    It "preserves success path stability for parent update plus child comment" {
+        Mock -CommandName Get-Issue -ParameterFilter { $IssueNumber -eq '4' } -MockWith {
+            [pscustomobject]@{ number = 4; title = 'Child feature'; url = 'https://example.com/4'; body = 'child body' }
+        }
+        Mock -CommandName Get-Issue -ParameterFilter { $IssueNumber -eq '40' } -MockWith {
+            [pscustomobject]@{ number = 40; title = 'Tracking issue'; url = 'https://example.com/40'; body = "## Child Issues`n- [ ] #3 - Existing child`n" }
+        }
+
+        Invoke-LinkParentChild -ChildIssueNumberParam '4' -ParentIssueNumberParam '40'
+
+        $script:lastWrite.Value | Should -Match "#4"
+        ($script:ghCalls | Where-Object { $_ -contains 'edit' }).Count | Should -BeGreaterThan 0
+        ($script:ghCalls | Where-Object { $_ -contains 'comment' }).Count | Should -BeGreaterThan 0
+        $script:messages | Should -Contain "Updated parent issue #40 with child link."
+        $script:messages | Should -Contain "Added parent link comment to child issue #4."
     }
 
     It "skips updates when parent already lists child and child links back" {
@@ -235,4 +308,5 @@ Describe "link-parent-child.ps1 - Invoke-LinkParentChild" {
         Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage "Aborting: parent issue lacks a 'Child Issues' section*declined."
     }
 }
+
 

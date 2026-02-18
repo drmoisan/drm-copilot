@@ -49,6 +49,90 @@ function Read-IssueNumber {
     return $Value.Trim()
 }
 
+function Get-IssueFetchFailureCategory {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [int] $ExitCode,
+
+        [Parameter()]
+        [AllowNull()]
+        [object] $Output
+    )
+
+    $outputText = ""
+    if ($null -ne $Output) {
+        $outputText = @($Output) -join "`n"
+    }
+
+    if ($ExitCode -ne 0 -and (
+            $outputText -match '(?i)gh\s+auth\s+login' -or
+            $outputText -match '(?i)authentication' -or
+            $outputText -match '(?i)not\s+logged\s+in')) {
+        return 'auth-required'
+    }
+
+    if ($outputText -match '(?i)could\s+not\s+resolve\s+to\s+an\s+issue' -or
+        $outputText -match '(?i)issue\s+.*\s+not\s+found') {
+        return 'not-found'
+    }
+
+    if ($outputText -match '(?i)resource\s+not\s+accessible' -or
+        $outputText -match '(?i)permission\s+denied' -or
+        $outputText -match '(?i)repository\s+not\s+found') {
+        return 'permission-repo-context'
+    }
+
+    return 'unknown'
+}
+
+function Get-IssueFetchFailureMessage {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Category,
+
+        [Parameter(Mandatory = $true)]
+        [string] $IssueLabel,
+
+        [Parameter(Mandatory = $true)]
+        [string] $IssueNumber,
+
+        [Parameter()]
+        [AllowNull()]
+        [object] $Output
+    )
+
+    $outputText = ""
+    if ($null -ne $Output) {
+        $outputText = ((@($Output) -join "`n").Trim())
+    }
+
+    $baseMessage = "Unable to fetch $IssueLabel issue #$IssueNumber."
+    $guidance = switch ($Category) {
+        'auth-required' {
+            "Run 'gh auth status' and, if needed, authenticate with 'gh auth login'."
+        }
+        'not-found' {
+            "Verify the issue number and repository context (for example: gh issue view $IssueNumber)."
+        }
+        'permission-repo-context' {
+            "Check repository access and active repo context (for example: gh repo view and gh auth status)."
+        }
+        default {
+            "Check gh CLI output and retry with explicit repo context (for example: gh issue view $IssueNumber --repo <owner>/<repo>)."
+        }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($outputText)) {
+        return "$baseMessage $guidance"
+    }
+
+    return "$baseMessage $guidance CLI output: $outputText"
+}
+
 function Get-Issue {
     param(
         [string] $IssueNumber,
@@ -58,7 +142,9 @@ function Get-Issue {
 
     $result = & $InvokeGh @('issue', 'view', $IssueNumber, '--json', 'number', 'title', 'url', 'body')
     if ($result.ExitCode -ne 0 -or -not $result.Output) {
-        Write-ScriptError "Unable to fetch $Label issue #$IssueNumber. Check the number and gh auth."
+        $failureCategory = Get-IssueFetchFailureCategory -ExitCode $result.ExitCode -Output $result.Output
+        $failureMessage = Get-IssueFetchFailureMessage -Category $failureCategory -IssueLabel $Label -IssueNumber $IssueNumber -Output $result.Output
+        Write-ScriptError $failureMessage
     }
 
     return $result.Output | ConvertFrom-Json
