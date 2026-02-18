@@ -68,3 +68,20 @@ Required script UX:
 - [ ] Create `docs/features/active/devcontainer-to-host/` folder from the template
 - [ ] Add `spec.md` defining required dependency matrix by OS, minimum versions, and command contracts.
 - [ ] Add `user-story.md` acceptance criteria for first-time host setup success and repeatable re-runs.
+
+## Sync Summary (as of 2026-02-18T08-26)
+
+- Canonical short description: Host bootstrap verify/install workflow aligned to devcontainer-derived dependency expectations.
+- Current status: Not Delivered (implementation and green QA acceptance criteria are not fully evidenced).
+- Source references:
+	- `spec.md`
+	- `user-story.md`
+	- `plan.2026-02-17T16-38.md`
+- Status sync updates applied:
+	- Restored checked status for completed Phase 1 test-authoring tasks (`P1-T1..P1-T13`) backed by canonical scenario-presence evidence.
+	- Confirmed red-suite evidence remains valid for fail-before task (`P1-T14`).
+	- Confirmed Phase 3/Phase 5 green-gate tasks remain open because targeted bootstrap-host function contracts are currently missing from `scripts/dev-tools/bootstrap-host.ps1`.
+
+## History / Prior Notes
+
+- Original issue narrative and acceptance criteria are preserved above.

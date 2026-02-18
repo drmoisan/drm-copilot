@@ -3,7 +3,7 @@ title: "2026-02-17-devcontainer-to-host - Plan"
 issue: "#25"
 parent: "none"
 owner: "drmoisan"
-last_updated: "2026-02-18T00-45"
+last_updated: "2026-02-18T08-26"
 status: "Planned"
 status_color: "blue"
 version: "1.0"
@@ -16,7 +16,7 @@ version: "1.0"
 - **Issue:** #25
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-02-18T00-45
+- **Last Updated:** 2026-02-18T08-26
 - **Status:** Planned
 - **Version:** 1.0
 
@@ -115,31 +115,44 @@ Phase 1 evidence rule for audited completion:
 - `P1-T1..P1-T13` are satisfied only when canonical scenario-presence proof artifact `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md` contains `Command:` as the exact command line executed.
 - `P1-T14` is satisfied by canonical fail-before run artifact `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`.
 
-- [ ] [P1-T1] Add Pester test for `Resolve-DependencyCatalog` scenario A in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting catalog includes `git`, `python`, `poetry`, `pwsh`, `node`, and `npm` with minimum-version metadata.
+- [x] [P1-T1] Add Pester test for `Resolve-DependencyCatalog` scenario A in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting catalog includes `git`, `python`, `poetry`, `pwsh`, `node`, and `npm` with minimum-version metadata.
+  - Evidence (status_updater, 2026-02-18T08-26): `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` contains scenario A test; canonical anchor is recorded in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md` as `P1-T1|FOUND|LINE=14`.
   - Acceptance: Test name contains `Resolve-DependencyCatalog` and `scenario A`, and assertion checks all six dependency names.
-- [ ] [P1-T2] Add Pester test for `Resolve-DependencyCatalog` scenario B in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting deterministic error when devcontainer input parse fails.
+- [x] [P1-T2] Add Pester test for `Resolve-DependencyCatalog` scenario B in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting deterministic error when devcontainer input parse fails.
+  - Evidence (status_updater, 2026-02-18T08-26): `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` contains scenario B test; canonical anchor is `P1-T2|FOUND|LINE=26` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Resolve-DependencyCatalog` and `scenario B`, and expected message contains `devcontainer parse failed`.
-- [ ] [P1-T3] Add Pester test for `Test-DependencyPresence` scenario C in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting command-missing classification returns `missing` and remediation hint text.
+- [x] [P1-T3] Add Pester test for `Test-DependencyPresence` scenario C in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting command-missing classification returns `missing` and remediation hint text.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T3|FOUND|LINE=42` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Test-DependencyPresence` and `scenario C`, and assertion checks status plus non-empty remediation string.
-- [ ] [P1-T4] Add Pester test for `Test-DependencyPresence` scenario D in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting below-minimum version classification returns `missing` with version guidance.
+- [x] [P1-T4] Add Pester test for `Test-DependencyPresence` scenario D in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting below-minimum version classification returns `missing` with version guidance.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T4|FOUND|LINE=51` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Test-DependencyPresence` and `scenario D`, and assertion checks message contains both detected and required versions.
-- [ ] [P1-T5] Add Pester test for `Test-DependencyPresence` scenario E in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting compatible version classification returns `present`.
+- [x] [P1-T5] Add Pester test for `Test-DependencyPresence` scenario E in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting compatible version classification returns `present`.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T5|FOUND|LINE=64` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Test-DependencyPresence` and `scenario E`, and assertion checks status equals `present`.
-- [ ] [P1-T6] Add Pester test for `Resolve-InstallStrategy` scenario F in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting supported Windows dependency maps to deterministic install action metadata.
+- [x] [P1-T6] Add Pester test for `Resolve-InstallStrategy` scenario F in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting supported Windows dependency maps to deterministic install action metadata.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T6|FOUND|LINE=83` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Resolve-InstallStrategy` and `scenario F`, and assertion checks installer command token is non-empty.
-- [ ] [P1-T7] Add Pester test for `Resolve-InstallStrategy` scenario G in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting unsupported OS returns unsupported classification.
+- [x] [P1-T7] Add Pester test for `Resolve-InstallStrategy` scenario G in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting unsupported OS returns unsupported classification.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T7|FOUND|LINE=94` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Resolve-InstallStrategy` and `scenario G`, and assertion checks status equals `unsupported`.
-- [ ] [P1-T8] Add Pester test for `Invoke-BootstrapVerify` scenario H in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting missing dependency leads to non-zero exit code.
+- [x] [P1-T8] Add Pester test for `Invoke-BootstrapVerify` scenario H in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting missing dependency leads to non-zero exit code.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T8|FOUND|LINE=113` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Invoke-BootstrapVerify` and `scenario H`, and assertion checks exit code is non-zero.
-- [ ] [P1-T9] Add Pester test for `Invoke-BootstrapVerify` scenario I in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting unknown `--only` dependency returns deterministic validation message.
+- [x] [P1-T9] Add Pester test for `Invoke-BootstrapVerify` scenario I in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting unknown `--only` dependency returns deterministic validation message.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T9|FOUND|LINE=122` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Invoke-BootstrapVerify` and `scenario I`, and expected message contains `Unknown dependency filter`.
-- [ ] [P1-T10] Add Pester test for `Invoke-BootstrapInstall` scenario J in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting `--dry-run` performs no install calls.
+- [x] [P1-T10] Add Pester test for `Invoke-BootstrapInstall` scenario J in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting `--dry-run` performs no install calls.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T10|FOUND|LINE=136` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Invoke-BootstrapInstall` and `scenario J`, and assertion checks installer mock invocation count equals `0`.
-- [ ] [P1-T11] Add Pester test for `Invoke-BootstrapInstall` scenario K in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting repeated install skips already-present dependencies.
+- [x] [P1-T11] Add Pester test for `Invoke-BootstrapInstall` scenario K in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting repeated install skips already-present dependencies.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T11|FOUND|LINE=151` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Invoke-BootstrapInstall` and `scenario K`, and assertion checks second run emits `skipped`.
-- [ ] [P1-T12] Add Pester test for `Invoke-BootstrapInstall` scenario L in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting partial failure continues best-effort and returns aggregate non-zero exit.
+- [x] [P1-T12] Add Pester test for `Invoke-BootstrapInstall` scenario L in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting partial failure continues best-effort and returns aggregate non-zero exit.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T12|FOUND|LINE=174` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Invoke-BootstrapInstall` and `scenario L`, and assertion checks one dependency `failed` while at least one later dependency is still processed.
-- [ ] [P1-T13] Add Pester test for `Format-BootstrapReport` scenario M in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting JSON output rows always contain keys `name`, `required_version`, `detected_version`, `status`, `install_action`, and `message`.
+- [x] [P1-T13] Add Pester test for `Format-BootstrapReport` scenario M in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting JSON output rows always contain keys `name`, `required_version`, `detected_version`, `status`, `install_action`, and `message`.
+  - Evidence (status_updater, 2026-02-18T08-26): canonical anchor is `P1-T13|FOUND|LINE=205` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test name contains `Format-BootstrapReport` and `scenario M`, and assertion checks all six keys on each row.
 - [x] [P1-T14] [expect-fail] Run targeted test command `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Invoke-Pester -Path ./tests/scripts/dev-tools/bootstrap-host.Tests.ps1 -Output Detailed"` before implementing `scripts/dev-tools/bootstrap-host.ps1` and save fail-before evidence at `evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`.
   - Acceptance: Command exits non-zero and evidence artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and a `Failure:` excerpt attributable to missing implementation.
@@ -184,7 +197,8 @@ Phase 1 evidence rule for audited completion:
   - Acceptance: Test explicitly asserts accepted/rejected boundaries for PowerShell version logic.
 - [ ] [P3-T3] Add Pester test in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` validating REQ-011 by asserting Poetry minimum version comparison accepts `2.2.1` and rejects `2.2.0`.
   - Acceptance: Test explicitly asserts accepted/rejected boundaries for Poetry version logic.
-- [ ] [P3-T4] Add Pester test in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` validating REQ-009 by asserting install flow continues after first dependency failure.
+- [x] [P3-T4] Add Pester test in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` validating REQ-009 by asserting install flow continues after first dependency failure.
+  - Evidence (status_updater, 2026-02-18T08-26): `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` contains `Invoke-BootstrapInstall scenario L` with assertions that first dependency fails and a later dependency is processed; canonical presence anchor is `P1-T12|FOUND|LINE=174` in `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`.
   - Acceptance: Test verifies at least one dependency after the failure is evaluated and reported.
 - [ ] [P3-T5] Add Pester test in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` validating SEC-002 by asserting remediation guidance is non-empty for each `failed` or `missing` row.
   - Acceptance: Test checks `message` field for non-empty actionable text whenever status is `failed` or `missing`.
