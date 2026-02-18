@@ -3,7 +3,7 @@ title: "2026-02-17-devcontainer-to-host - Plan"
 issue: "#25"
 parent: "none"
 owner: "drmoisan"
-last_updated: "2026-02-17T23-59"
+last_updated: "2026-02-18T00-45"
 status: "Planned"
 status_color: "blue"
 version: "1.0"
@@ -16,7 +16,7 @@ version: "1.0"
 - **Issue:** #25
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-02-17T23-59
+- **Last Updated:** 2026-02-18T00-45
 - **Status:** Planned
 - **Version:** 1.0
 
@@ -36,6 +36,24 @@ version: "1.0"
 - General policy: `.github/instructions/general-unit-test.instructions.md`
 - PowerShell policy: `.github/instructions/powershell-code-change.instructions.md`
 - PowerShell unit-test policy: `.github/instructions/powershell-unit-test.instructions.md`
+
+## Evidence Conventions (Canonical Contract)
+
+- Canonical evidence folders for this feature are:
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/baseline/`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/other/`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/qa-gates/`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/issue-updates/`
+- Evidence filenames must use ISO-8601 timestamp format `yyyy-MM-ddTHH-mm`.
+- Every machine-checkable evidence artifact must include:
+  - `Timestamp: <ISO-8601>`
+  - `Command: <exact command>`
+  - `EXIT_CODE: <int>`
+- Baseline evidence artifacts must also include:
+  - `Output Summary: <1–20 lines>`
+- For fail-before (`[expect-fail]`) tasks, evidence must be under `evidence/regression-testing/` and include a `Failure:` excerpt attributable to the target scenario.
+- Completion rule: a checkbox may remain checked only if its required evidence exists in canonical folders and satisfies the schema above.
 
 ## Requirement Catalog
 
@@ -93,6 +111,10 @@ version: "1.0"
 
 ### Phase 1 — TDD Red: Add Deterministic Failing Tests First
 
+Phase 1 evidence rule for audited completion:
+- `P1-T1..P1-T13` are satisfied only when canonical scenario-presence proof artifact `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md` contains `Command:` as the exact command line executed.
+- `P1-T14` is satisfied by canonical fail-before run artifact `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`.
+
 - [ ] [P1-T1] Add Pester test for `Resolve-DependencyCatalog` scenario A in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting catalog includes `git`, `python`, `poetry`, `pwsh`, `node`, and `npm` with minimum-version metadata.
   - Acceptance: Test name contains `Resolve-DependencyCatalog` and `scenario A`, and assertion checks all six dependency names.
 - [ ] [P1-T2] Add Pester test for `Resolve-DependencyCatalog` scenario B in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting deterministic error when devcontainer input parse fails.
@@ -119,8 +141,19 @@ version: "1.0"
   - Acceptance: Test name contains `Invoke-BootstrapInstall` and `scenario L`, and assertion checks one dependency `failed` while at least one later dependency is still processed.
 - [ ] [P1-T13] Add Pester test for `Format-BootstrapReport` scenario M in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1` asserting JSON output rows always contain keys `name`, `required_version`, `detected_version`, `status`, `install_action`, and `message`.
   - Acceptance: Test name contains `Format-BootstrapReport` and `scenario M`, and assertion checks all six keys on each row.
-- [ ] [P1-T14] [expect-fail] Run targeted test command `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Invoke-Pester -Path ./tests/scripts/dev-tools/bootstrap-host.Tests.ps1 -Output Detailed"` before implementing `scripts/dev-tools/bootstrap-host.ps1` and save fail-before evidence at `evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`.
+- [x] [P1-T14] [expect-fail] Run targeted test command `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Invoke-Pester -Path ./tests/scripts/dev-tools/bootstrap-host.Tests.ps1 -Output Detailed"` before implementing `scripts/dev-tools/bootstrap-host.ps1` and save fail-before evidence at `evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`.
   - Acceptance: Command exits non-zero and evidence artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and a `Failure:` excerpt attributable to missing implementation.
+- [x] [P1-T15] Regenerate `evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md` using the exact command line executed and retain deterministic `P1-T1..P1-T13` line anchors.
+  - Acceptance: Artifact contains `Timestamp:`, `Command:` with exact executed command line (verbatim), `EXIT_CODE: 0`, and `Output Summary:` entries for `P1-T1..P1-T13` line anchors in `tests/scripts/dev-tools/bootstrap-host.Tests.ps1`.
+
+### Phase 1 Canonical Evidence Index
+
+- Scenario presence proof for `P1-T1..P1-T13`: `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/phase1-task-proof.2026-02-17T23-59.md`
+- Expect-fail execution proof for `P1-T14`: `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/regression-testing/bootstrap-host-red-suite.2026-02-17T23-59.md`
+- Baseline conformance proofs for Phase 0:
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/baseline/powershell-format-baseline.2026-02-17T23-59.md`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/baseline/powershell-analyze-baseline.2026-02-17T23-59.md`
+  - `docs/features/active/2026-02-17-bootstrap-pc-host-21/2026-02-17-devcontainer-to-host-25/evidence/baseline/powershell-test-baseline.2026-02-17T23-59.md`
 
 ### Phase 2 — Implement Verify/Install Commands and Core Functions
 
