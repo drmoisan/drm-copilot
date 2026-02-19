@@ -8,3 +8,9 @@ Use these templates to keep planning consistent.
 - When the feature ships, move the folder to `docs/features/archive/<YYYY-MM-DD>-<feature-name>/` to keep a clean working set.
 - For refactors (no user-facing change), use `refactor/spec.md` and `refactor/plan.md` to capture intent, invariants, and execution steps.
 - For epics/initiatives (tracking multiple child features/workstreams), use `epic/initiative.md` to record goals, decomposition, milestones, and validation across children.
+
+
+- Decision tree paths:
+  - `minor-audit`: use for bootstrapped/pre-cooked work or <=3 production files with low integration risk.
+  - `feature`: use for standard user-facing feature development requiring full docs.
+  - `refactor`: use for non-user-facing structural/code-quality work.

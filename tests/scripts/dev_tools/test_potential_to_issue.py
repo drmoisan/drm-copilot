@@ -521,18 +521,26 @@ def test_parse_args_and_main_paths(
         str(potential),
         "--promotion-type",
         "epic",
+        "--work-mode",
+        "minor-audit",
     ]
     monkeypatch.setattr(sys, "argv", args)
     parsed = mod.parse_args()
     assert parsed.potential_path == str(potential)
     assert parsed.promotion_type == "epic"
+    assert parsed.work_mode == "minor-audit"
 
-    fake_args = SimpleNamespace(potential_path=str(potential), promotion_type="feature")
+    fake_args = SimpleNamespace(
+        potential_path=str(potential), promotion_type="feature", work_mode="full"
+    )
 
     def fake_parse_args() -> SimpleNamespace:
         return fake_args
 
-    def fake_promote(potential_path: str, promotion_type: str) -> mod.PromotionOutcome:
+    def fake_promote(
+        potential_path: str, promotion_type: str, work_mode: str
+    ) -> mod.PromotionOutcome:
+        assert work_mode in {"full", "minor-audit"}
         return mod.PromotionOutcome(0, [], None)
 
     monkeypatch.setattr(mod, "parse_args", fake_parse_args)
@@ -546,7 +554,9 @@ def test_main_exits_on_promotion_error(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     fake_args = SimpleNamespace(
-        potential_path=str(tmp_path / "p.md"), promotion_type="feature"
+        potential_path=str(tmp_path / "p.md"),
+        promotion_type="feature",
+        work_mode="full",
     )
 
     def fake_parse_args() -> SimpleNamespace:
@@ -561,3 +571,141 @@ def test_main_exits_on_promotion_error(
     with pytest.raises(SystemExit) as exc:
         mod.main()
     assert exc.value.code == 1
+
+
+def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/minor.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Minor Audit Feature",
+            "- File: scripts/dev_tools/potential_to_issue.py",
+            "- File: tests/scripts/dev_tools/test_potential_to_issue.py",
+            "- Risk: low",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "intent",
+            "## Acceptance Criteria (early draft)",
+            "- [ ] done",
+            "## Constraints & Risks",
+            "low integration risk",
+            "## Test Conditions to Consider",
+            "verify this",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/55"], 0), mod.GhResult([], 0)
+    )
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+    )
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    assert "## Implementation Intent" in body
+    assert "## Verification Steps" in body
+    assert "## Evidence Checklist" in body
+
+
+def test_promote_potential_minor_audit_rejects_missing_eligibility_inputs() -> None:
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/not-eligible.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Not Eligible",
+            "- File: a.py",
+            "- File: b.py",
+            "- File: c.py",
+            "- File: d.py",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+        ]
+    )
+    messages: list[str] = []
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/77"], 0), mod.GhResult([], 0)
+    )
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+        emit=messages.append,
+    )
+    assert outcome.exit_code == 0
+    assert any("Selected mode: full" in m for m in messages)
+    assert any("Fallback reason:" in m for m in messages)
+
+
+def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/full-mode.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Full Mode",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+            "## Acceptance Criteria (early draft)",
+            "criteria",
+            "## Constraints & Risks",
+            "constraints",
+            "## Test Conditions to Consider",
+            "tests",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/99"], 0), mod.GhResult([], 0)
+    )
+    mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="full",
+    )
+    body = gh.calls[0][1][1]
+    assert "## Proposed Behavior" in body
+    assert "## Implementation Intent" not in body
+
+
+def test_promote_potential_body_omits_token_like_secret_strings() -> None:
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/security.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = (
+        "# Security\n"
+        "## Problem / Why\n"
+        "no tokens\n"
+        "## Proposed Behavior\n"
+        "no tokens\n"
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/12"], 0), mod.GhResult([], 0)
+    )
+    mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+    )
+    body = gh.calls[0][1][1]
+    assert "ghp_" not in body
+    assert "xoxb-" not in body
+    assert "AIza" not in body
