@@ -5,6 +5,7 @@ node_modules
 *.vsix
 artifacts
 .agent_logs
+
 # Python
 __pycache__/
 *.py[cod]
@@ -38,8 +39,9 @@ env/
 # PyCharm
 .idea/
 
-# VS Code Python
+# VS Code
 .vscode/settings.json.bak
+.vscode/settings.json
 
 # Testing
 .pytest_cache/
