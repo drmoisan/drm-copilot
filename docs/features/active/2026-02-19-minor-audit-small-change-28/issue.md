@@ -69,3 +69,21 @@ Define and adopt a **Minor Change Audit Path** that uses an expanded `issue.md` 
 - [ ] Propose and document bootstrapped eligibility criteria (pre-cooked solve, narrow blast radius, low integration risk).
 - [ ] Draft a minimal evidence contract (baseline, end-state, targeted verification) and note when expanded regression is required.
 - [ ] Update playbook/template guidance so bootstrapped path is explicit and consistently applied.
+
+
+## Evidence Contract
+
+Canonical folders:
+- evidence/baseline/
+- evidence/regression-testing/
+- evidence/other/
+- evidence/qa-gates/
+
+Required schema fields in each evidence artifact:
+- Timestamp
+- Command
+- EXIT_CODE
+
+## PR Recovery Note
+
+- Branch recovery: if a PR reports "Branch is either deleted or invalid", push a fresh commit from the current working branch before reopening.

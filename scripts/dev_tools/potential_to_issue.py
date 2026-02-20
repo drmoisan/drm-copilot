@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 PLACEHOLDER = "(not provided in potential file)"
 ISSUE_URL_PATTERN = re.compile(r"https?://\S+/issues/(\d+)")
 PROMOTION_TYPES = ("epic", "feature", "refactor", "bug")
+WORK_MODES = ("minor-audit", "full")
 TITLE_PREFIXES = {
     "epic": "Epic",
     "feature": "Feature",
@@ -237,6 +238,46 @@ def build_bug_body(sections: dict[str, str], relative_path: str) -> str:
     return "\n\n".join(parts) + "\n"
 
 
+def evaluate_minor_audit_eligibility(content: str) -> tuple[bool, str]:
+    """Evaluate deterministic eligibility for minor-audit mode."""
+
+    lower = content.lower()
+    if "bootstrapped" in lower or "pre-cooked" in lower:
+        return True, "eligible: bootstrapped/pre-cooked"
+
+    production_files = len(
+        re.findall(r"^\s*-\s*(?:production\s+)?file\s*:", content, flags=re.MULTILINE)
+    )
+    has_low_risk = "low integration risk" in lower or "risk: low" in lower
+    if production_files <= 3 and has_low_risk:
+        return True, "eligible: <=3 production files and low integration risk"
+    if production_files > 3:
+        return False, "fallback: production file count exceeds 3"
+    return False, "fallback: missing low integration risk signal"
+
+
+def build_minor_audit_body(
+    problem: str,
+    implementation_intent: str,
+    acceptance_criteria: str,
+    dependencies_risks: str,
+    verification_steps: str,
+    evidence_checklist: str,
+    relative_path: str,
+) -> str:
+    """Build required issue sections for the minor-audit mode."""
+
+    return (
+        f"## Problem / Why\n{problem}\n\n"
+        f"## Implementation Intent\n{implementation_intent}\n\n"
+        f"## Acceptance Criteria\n{acceptance_criteria}\n\n"
+        f"## Dependencies / Risks\n{dependencies_risks}\n\n"
+        f"## Verification Steps\n{verification_steps}\n\n"
+        f"## Evidence Checklist\n{evidence_checklist}\n\n"
+        f"## Source\nFrom: {relative_path}\n"
+    )
+
+
 def parse_issue_reference(output: Iterable[str]) -> tuple[str | None, str | None]:
     text = "\n".join(output)
     match = ISSUE_URL_PATTERN.search(text)
@@ -334,10 +375,13 @@ def promote_potential(
     fs: FileSystem | None = None,
     gh: GhClient | None = None,
     workspace: Path | None = None,
+    work_mode: str = "full",
     emit: Callable[[str], None] = _default,
 ) -> PromotionOutcome:
     if promotion_type not in PROMOTION_TYPES:
         raise PromotionError(f"Invalid promotion type: {promotion_type}")
+    if work_mode not in WORK_MODES:
+        raise PromotionError(f"Invalid work mode: {work_mode}")
 
     filesystem = fs or RealFileSystem()
     gh_client = gh or RealGhClient()
@@ -369,12 +413,45 @@ def promote_potential(
 
     relative_path = Path(_relative_path()).as_posix()
 
+    selected_mode = "full"
+    fallback_reason = ""
+    if work_mode == "minor-audit" and promotion_type != "bug":
+        eligible, eligibility_reason = evaluate_minor_audit_eligibility(content)
+        if eligible:
+            selected_mode = "minor-audit"
+        else:
+            fallback_reason = eligibility_reason
+
     if promotion_type == "bug":
         bug_sections = {
             heading: get_section(content, heading) or PLACEHOLDER
             for heading in BUG_SECTION_HEADINGS
         }
         body = build_bug_body(bug_sections, relative_path)
+    elif selected_mode == "minor-audit":
+        problem = get_section(content, "Problem / Why") or PLACEHOLDER
+        implementation_intent = get_section(content, "Proposed Behavior") or PLACEHOLDER
+        acceptance_criteria = (
+            get_section(content, "Acceptance Criteria (early draft)") or PLACEHOLDER
+        )
+        dependencies_risks = get_section(content, "Constraints & Risks") or PLACEHOLDER
+        verification_steps = (
+            get_section(content, "Test Conditions to Consider") or PLACEHOLDER
+        )
+        evidence_checklist = get_section(content, "Evidence Checklist")
+        if not evidence_checklist:
+            evidence_checklist = (
+                "- [ ] Baseline\n- [ ] End-state\n- [ ] Targeted verification"
+            )
+        body = build_minor_audit_body(
+            problem,
+            implementation_intent,
+            acceptance_criteria,
+            dependencies_risks,
+            verification_steps,
+            evidence_checklist,
+            relative_path,
+        )
     else:
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         behavior = get_section(content, "Proposed Behavior") or PLACEHOLDER
@@ -394,6 +471,9 @@ def promote_potential(
         messages.append(msg)
         emit(msg)
 
+    _emit(f"Selected mode: {selected_mode}")
+    if fallback_reason:
+        _emit(f"Fallback reason: {fallback_reason}")
     _emit(f"Creating issue: {issue_title} (label: {promotion_type})")
     create_result = gh_client.issue_create(issue_title, body, promotion_type)
 
@@ -453,6 +533,12 @@ def parse_args() -> argparse.Namespace:
         default="feature",
         help="Promotion type label to attach to the issue.",
     )
+    parser.add_argument(
+        "--work-mode",
+        choices=WORK_MODES,
+        default="full",
+        help="Work mode routing for full vs minor-audit issue body generation.",
+    )
     return parser.parse_args()
 
 
@@ -462,6 +548,7 @@ def main() -> None:
         outcome = promote_potential(
             potential_path=args.potential_path,
             promotion_type=args.promotion_type,
+            work_mode=args.work_mode,
         )
     except (PromotionError, FileNotFoundError) as exc:
         print(str(exc))

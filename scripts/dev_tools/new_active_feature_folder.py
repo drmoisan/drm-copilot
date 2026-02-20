@@ -858,16 +858,49 @@ def update_feature_docs(
     return files_to_open
 
 
+def should_use_minor_audit_mode(
+    work_mode: str,
+    feature_type: str,
+    potential_content: str,
+) -> tuple[bool, str]:
+    """Return whether minor-audit path should be used and fallback reason."""
+
+    if work_mode not in ("minor-audit", "full"):
+        raise ValueError("work_mode must be one of: minor-audit, full")
+    if work_mode == "full":
+        return False, ""
+    if feature_type != "feature":
+        return False, "fallback: minor-audit only applies to feature type"
+
+    lower = potential_content.lower()
+    if "bootstrapped" in lower or "pre-cooked" in lower:
+        return True, ""
+
+    production_files = len(
+        re.findall(
+            r"^\s*-\s*(?:production\s+)?file\s*:", potential_content, flags=re.MULTILINE
+        )
+    )
+    has_low_risk = "low integration risk" in lower or "risk: low" in lower
+    if production_files <= 3 and has_low_risk:
+        return True, ""
+    if production_files > 3:
+        return False, "fallback: production file count exceeds 3"
+    return False, "fallback: missing low integration risk signal"
+
+
 def create_active_folder(
     feature_name: str,
-    feature_type: str,
+    feature_type: str = "feature",
     issue_number: str | None = None,
     force: bool = False,
+    *,
     workspace: Path | None = None,
     fs: FileSystem | None = None,
     issue_fetcher: Callable[[str], IssueMeta | None] = default_issue_fetcher,
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     now_provider: Callable[[], datetime] | None = None,
+    work_mode: str = "full",
 ) -> ActiveFolderResult:
     if feature_type not in {"feature", "refactor", "epic", "bug"}:
         raise ValueError("Type must be one of: feature, refactor, epic, bug")
@@ -882,6 +915,11 @@ def create_active_folder(
 
     potential_file = find_potential_file(feature_name, workspace_path, filesystem)
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
+    use_minor_audit, fallback_reason = should_use_minor_audit_mode(
+        work_mode=work_mode,
+        feature_type=feature_type,
+        potential_content=potential_content,
+    )
 
     normalized_issue_number = (issue_number or "").strip() or None
     if normalized_issue_number and normalized_issue_number.lower() == "auto":
@@ -953,30 +991,70 @@ def create_active_folder(
         ),
     }
 
-    files_to_open = update_feature_docs(
-        feature_type,
-        feature_name,
-        target_dir,
-        issue_field,
-        owner_field,
-        updated_field,
-        parent_field,
-        status_field,
-        version_field,
-        plan_updated_field,
-        filesystem,
-        sections,
-        plan_path=plan_path,
-    )
+    files_to_open: list[Path]
+    if use_minor_audit:
+        issue_doc = target_dir / "issue.md"
+        issue_body = "\n".join(
+            [
+                f"# {feature_name}",
+                "",
+                "## Problem / Why",
+                sections["problem"] or "(not provided in potential file)",
+                "",
+                "## Implementation Intent",
+                sections["behavior"] or "(not provided in potential file)",
+                "",
+                "## Acceptance Criteria",
+                sections["criteria"] or "(not provided in potential file)",
+                "",
+                "## Dependencies / Risks",
+                sections["constraints"] or "(not provided in potential file)",
+                "",
+                "## Verification Steps",
+                sections["tests"] or "(not provided in potential file)",
+                "",
+                "## Evidence Checklist",
+                "- [ ] baseline",
+                "- [ ] targeted verification",
+                "- [ ] end-state",
+            ]
+        )
+        filesystem.write_text(issue_doc, issue_body)
+        files_to_open = [issue_doc]
+    else:
+        files_to_open = update_feature_docs(
+            feature_type,
+            feature_name,
+            target_dir,
+            issue_field,
+            owner_field,
+            updated_field,
+            parent_field,
+            status_field,
+            version_field,
+            plan_updated_field,
+            filesystem,
+            sections,
+            plan_path=plan_path,
+        )
 
     potential_issue_path = None
     if potential_file:
         potential_issue_path = target_dir / "issue.md"
-        filesystem.move(potential_file, potential_issue_path)
-        print(f"Moved potential file to {potential_issue_path}")
+        if use_minor_audit:
+            print(
+                f"Kept generated issue.md for minor-audit mode: {potential_issue_path}"
+            )
+        else:
+            filesystem.move(potential_file, potential_issue_path)
+            print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:
         print(f"Seeded docs from potential: {potential_file.name}")
+
+    print(f"Selected mode: {'minor-audit' if use_minor_audit else 'full'}")
+    if fallback_reason:
+        print(f"Fallback reason: {fallback_reason}")
 
     if files_to_open:
         existing = [path for path in files_to_open if filesystem.exists(path)]
@@ -1018,6 +1096,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--force", action="store_true", help="Overwrite existing target"
     )
+    parser.add_argument(
+        "--work-mode",
+        choices=["minor-audit", "full"],
+        default="full",
+        help="Work mode routing for minor-audit vs full feature flow.",
+    )
     return parser.parse_args()
 
 
@@ -1029,6 +1113,7 @@ def main() -> None:
             feature_type=args.feature_type,
             issue_number=args.issue_number,
             force=args.force,
+            work_mode=args.work_mode,
         )
     except (ValueError, FileExistsError) as exc:
         print(str(exc))

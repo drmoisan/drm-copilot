@@ -597,7 +597,9 @@
 				"--potential-path",
 				"${relativeFile}",
 				"--promotion-type",
-				"${input:PotentialPromotionType}"
+				"${input:PotentialPromotionType}",
+				"--work-mode",
+				"${input:PotentialWorkMode}"
 			],
 			"command": "poetry",
 			"detail": "Creates a feature issue from the active editor file (workspace-relative) using gh issue create (non-interactive) via Python.",
@@ -675,7 +677,9 @@
 				"--type",
 				"${input:ActiveWorkType}",
 				"--issue-number",
-				"${input:ActiveIssueNumber}"
+				"${input:ActiveIssueNumber}",
+				"--work-mode",
+				"${input:ActiveWorkMode}"
 			],
 			"command": "poetry",
 			"detail": "Creates docs/features/active/<name>/ from the selected template (feature/refactor/epic/bug) and opens the relevant files.",
