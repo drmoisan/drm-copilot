@@ -1,0 +1,49 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
+// Use IntelliSense to learn about possible attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		},
+		{
+			"name": "Debug: Agentic Sync",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/scripts/dev_tools/agentic_sync.py",
+			"console": "integratedTerminal",
+			"args": [
+				"${workspaceFolder}",
+				"${input:RightRepoPath}"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "Python: Current File",
+			"type": "python",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			"justMyCode": true
+		}
+	],
+	"inputs": [
+		{
+			"id": "RightRepoPath",
+			"type": "promptString",
+			"description": "Enter the path to the right repository workspace",
+			"default": "${workspaceFolder}"
+		}
+	]
+}
