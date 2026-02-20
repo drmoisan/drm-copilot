@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -953,3 +954,123 @@ def test_default_issue_fetcher_handles_exception_in_date_parsing() -> None:
             assert result is not None
             # When updatedAt is null or missing, should default to YYYY-MM-DD
             assert result.updated_date == "YYYY-MM-DD"
+
+
+def test_create_active_folder_minor_audit_materializes_issue_md_and_skips_full_docs():
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "minor-audit.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #28",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "intent",
+                "## Acceptance Criteria (early draft)",
+                "criteria",
+                "## Constraints & Risks",
+                "low integration risk",
+                "## Test Conditions to Consider",
+                "verify",
+            ]
+        ),
+    )
+    result = mod.create_active_folder(
+        feature_name="minor-audit",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    assert fs.exists(result.target / "issue.md")
+    assert "Implementation Intent" in fs.read_text(result.target / "issue.md")
+
+
+def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "fallback.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #29",
+                "- File: a.py",
+                "- File: b.py",
+                "- File: c.py",
+                "- File: d.py",
+                "## Problem / Why",
+                "problem",
+            ]
+        ),
+    )
+    result = mod.create_active_folder(
+        feature_name="fallback",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    out = capsys.readouterr().out
+    assert fs.exists(result.target / "user-story.md")
+    assert "Selected mode: full" in out
+    assert "Fallback reason:" in out
+
+
+def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    result = mod.create_active_folder(
+        feature_name="full-compatible",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="full",
+    )
+    assert fs.exists(result.target / "user-story.md")
+
+
+def test_create_active_folder_fallback_reason_output(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    result = mod.create_active_folder(
+        feature_name="no-potential",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    assert result.target
+    out = capsys.readouterr().out
+    assert "Fallback reason:" in out
+
+
+def test_parse_args_includes_work_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "prog",
+            "--feature-name",
+            "sample",
+            "--type",
+            "feature",
+            "--work-mode",
+            "minor-audit",
+        ],
+    )
+    parsed = mod.parse_args()
+    assert parsed.work_mode == "minor-audit"

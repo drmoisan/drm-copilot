@@ -120,3 +120,9 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 | **8**                                      | **Atomic Development Plan Authoring (Plan-of-Record)**  | **Atomic Planning Agent**               | **Critical distinction**: this is the *true* atomic plan. It cannot exist until the spec is complete. Tasks are binary, ordered, verifiable.                                     |
 | **9**                                      | **Deterministic Plan Execution**                        | **Atomic Execution Agent**              | Executes the atomic plan verbatim. No replanning, no scope change, strict policy and acceptance-criteria verification.                                                           |
 | **10 (Optional but Strongly Recommended)** | **Post-Execution Feature & Policy Audit**               | **Feature Review Agent**                | Audits the completed feature against repo policy *and* against the committed documentation (user story, spec, acceptance criteria). Generates remediation inputs if gaps exist.  |
+
+
+## Minor Change Audit Path
+
+Use `minor-audit` only when work is bootstrapped/pre-cooked or when scope stays at 3 or fewer production files with low integration risk.
+If a requested minor-audit is not eligible, use full feature path.
