@@ -52,6 +52,29 @@ class PromotionError(Exception):
 
 @dataclass
 class GhResult:
+    """Capture gh command execution output and exit status.
+
+    Purpose:
+        Provide a typed transport object for gh subprocess results used by promotion
+        workflows.
+
+    Usage:
+        Created by gh client implementations and consumed by promotion logic.
+
+    Flow:
+        Store output lines and integer exit code from a single gh invocation.
+
+    Invariants / Constraints:
+        `exit_code` is the process return code for the related command.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        output (list[str]): Combined stdout/stderr lines from gh command execution.
+        exit_code (int): Process return code from the gh command.
+    """
+
     output: list[str]
     exit_code: int
 
@@ -66,6 +89,28 @@ class GhClient(Protocol):
 
 @dataclass
 class RealGhClient(GhClient):
+    """Invoke the GitHub CLI and translate results into typed records.
+
+    Purpose:
+        Provide the concrete gh-backed implementation for issue creation/view flows.
+
+    Usage:
+        Instantiated by `promote_potential` unless a fake client is injected.
+
+    Flow:
+        Resolve `gh` path, validate authentication, execute commands, and return
+        `GhResult` payloads.
+
+    Invariants / Constraints:
+        `gh_path` must resolve to an executable before command execution.
+
+    Side Effects:
+        Executes subprocess calls to the local `gh` CLI.
+
+    Attributes:
+        gh_path (str | None): Resolved gh executable path.
+    """
+
     gh_path: str | None = None
 
     def __post_init__(self) -> None:
@@ -82,7 +127,7 @@ class RealGhClient(GhClient):
         if gh_exe is None:
             return False
 
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
             [gh_exe, "auth", "status"],
             capture_output=True,
             check=False,
@@ -94,13 +139,15 @@ class RealGhClient(GhClient):
         if gh_exe is None:
             raise RuntimeError("gh CLI path was not resolved")
 
-        proc: subprocess.CompletedProcess[str] = subprocess.run(  # noqa: S603
-            [gh_exe, *args],
-            input=body,
-            text=True,
-            encoding="utf-8",
-            capture_output=True,
-            check=False,
+        proc: subprocess.CompletedProcess[str] = (
+            subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+                [gh_exe, *args],
+                input=body,
+                text=True,
+                encoding="utf-8",
+                capture_output=True,
+                check=False,
+            )
         )
         stdout = proc.stdout or ""
         stderr = proc.stderr or ""
@@ -132,6 +179,27 @@ class RealGhClient(GhClient):
 
 
 class FileSystem(Protocol):
+    """Define filesystem operations required by promotion workflows.
+
+    Purpose:
+        Provide an abstraction boundary for filesystem interactions.
+
+    Usage:
+        Implemented by `RealFileSystem` and test doubles.
+
+    Flow:
+        Expose read/write/move/exists primitives used by promotion orchestration.
+
+    Invariants / Constraints:
+        Implementations must preserve UTF-8 behavior for markdown IO.
+
+    Side Effects:
+        Implementations may perform local disk IO.
+
+    Attributes:
+        None.
+    """
+
     def resolve_path(self, path_str: str) -> Path: ...
 
     def exists(self, path: Path) -> bool: ...
@@ -149,6 +217,27 @@ class FileSystem(Protocol):
 
 @dataclass
 class RealFileSystem(FileSystem):
+    """Concrete filesystem adapter using local disk operations.
+
+    Purpose:
+        Execute production file operations behind the `FileSystem` protocol.
+
+    Usage:
+        Used by default in promotion workflows and replaceable in tests.
+
+    Flow:
+        Resolve paths, read/write text, ensure directories, and move files.
+
+    Invariants / Constraints:
+        Paths are treated as UTF-8 text files when reading/writing markdown content.
+
+    Side Effects:
+        Reads/writes/moves files on the local filesystem.
+
+    Attributes:
+        None.
+    """
+
     def resolve_path(self, path_str: str) -> Path:
         return Path(path_str).expanduser().resolve()
 
@@ -175,21 +264,99 @@ class RealFileSystem(FileSystem):
 
 @dataclass
 class PromotionOutcome:
+    """Represent the final outcome of a potential-promotion execution.
+
+    Purpose:
+        Return deterministic status, emitted messages, and destination metadata.
+
+    Usage:
+        Returned by `promote_potential` and consumed by CLI entry points/tests.
+
+    Flow:
+        Capture run status and destination path after move operations complete.
+
+    Invariants / Constraints:
+        `exit_code` reflects the terminal success/failure result for the operation.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        exit_code (int): Final process-style exit code.
+        messages (list[str]): Ordered emitted status lines.
+        destination (Path | None): Promoted file destination when successful.
+    """
+
     exit_code: int
     messages: list[str]
     destination: Path | None = None
 
 
 def _resolve_workspace() -> Path:
+    """Resolve repository workspace root from script location.
+
+    Purpose:
+        Provide a stable workspace root for relative path computations.
+
+    Args:
+        None.
+
+    Returns:
+        Path: Repository root path.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     return Path(__file__).resolve().parents[2]
 
 
 def _strip_potential_marker(value: str) -> str:
+    """Remove `(Potential...)` suffix markers from heading values.
+
+    Purpose:
+        Normalize feature names derived from potential-file headings.
+
+    Args:
+        value (str): Raw heading text.
+
+    Returns:
+        str: Cleaned heading text without potential marker noise.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     cleaned = re.sub(r"\s*\(Potential[^)]*\)", "", value, flags=re.IGNORECASE).strip()
     return cleaned or value.strip()
 
 
 def get_feature_name(content: str, file_path: Path) -> str:
+    """Derive feature name from markdown heading or filename fallback.
+
+    Purpose:
+        Produce a deterministic feature name for issue title/path generation.
+
+    Args:
+        content (str): Potential markdown content.
+        file_path (Path): Source potential file path.
+
+    Returns:
+        str: Best-available feature name.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     heading_match = re.search(r"^\s*#\s+(.+)$", content, flags=re.MULTILINE)
     if heading_match:
         feature_name = _strip_potential_marker(heading_match.group(1))
@@ -201,11 +368,48 @@ def get_feature_name(content: str, file_path: Path) -> str:
 
 
 def get_feature_path(feature_name: str) -> str:
+    """Convert feature name into safe path token.
+
+    Purpose:
+        Generate deterministic folder slug segments from feature names.
+
+    Args:
+        feature_name (str): Human-readable feature name.
+
+    Returns:
+        str: Sanitized token suitable for folder naming.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     replaced = re.sub(r"\s+", "_", feature_name)
     return re.sub(r"[^A-Za-z0-9_-]", "", replaced)
 
 
 def get_section(content: str, heading: str) -> str:
+    """Extract markdown section body for a top-level `##` heading.
+
+    Purpose:
+        Reuse structured section extraction across issue body builders.
+
+    Args:
+        content (str): Full markdown content.
+        heading (str): Section heading name without `##`.
+
+    Returns:
+        str: Trimmed section body or empty string when missing.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     escaped = re.escape(heading)
     pattern = rf"^##\s+{escaped}\s*\r?\n(.*?)(?=^##\s+|\Z)"
     match = re.search(pattern, content, flags=re.MULTILINE | re.DOTALL)
@@ -222,6 +426,29 @@ def build_body(
     tests: str,
     relative_path: str,
 ) -> str:
+    """Construct the standard full-mode issue body.
+
+    Purpose:
+        Assemble deterministic full workflow issue content from extracted sections.
+
+    Args:
+        problem (str): Problem/why section text.
+        behavior (str): Proposed behavior section text.
+        criteria (str): Acceptance criteria section text.
+        constraints (str): Constraints and risks section text.
+        tests (str): Test conditions section text.
+        relative_path (str): Source potential file path relative to workspace.
+
+    Returns:
+        str: Fully rendered issue body markdown.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     return (
         f"## Problem / Why\n{problem}\n\n"
         f"## Proposed Behavior\n{behavior}\n\n"
@@ -233,6 +460,26 @@ def build_body(
 
 
 def build_bug_body(sections: dict[str, str], relative_path: str) -> str:
+    """Construct the bug issue body from canonical bug section headings.
+
+    Purpose:
+        Render bug issue content in a predictable section order.
+
+    Args:
+        sections (dict[str, str]): Heading-to-content mapping.
+        relative_path (str): Source potential file path relative to workspace.
+
+    Returns:
+        str: Rendered bug issue body markdown.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Build bug issue sections in template order to preserve heading sequence.
     parts = [f"## {heading}\n{sections[heading]}" for heading in BUG_SECTION_HEADINGS]
     parts.append(f"## Source\nFrom: {relative_path}")
     return "\n\n".join(parts) + "\n"
@@ -279,6 +526,24 @@ def build_minor_audit_body(
 
 
 def parse_issue_reference(output: Iterable[str]) -> tuple[str | None, str | None]:
+    """Parse created issue URL/number from gh output lines.
+
+    Purpose:
+        Extract issue metadata required for post-create file updates.
+
+    Args:
+        output (Iterable[str]): gh command output lines.
+
+    Returns:
+        tuple[str | None, str | None]: (issue_url, issue_number) when found.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     text = "\n".join(output)
     match = ISSUE_URL_PATTERN.search(text)
     if not match:
@@ -287,6 +552,24 @@ def parse_issue_reference(output: Iterable[str]) -> tuple[str | None, str | None
 
 
 def _extract_last_updated(issue_json: str) -> str | None:
+    """Extract issue updated date from gh JSON payload.
+
+    Purpose:
+        Convert gh issue-view JSON into an ISO date for metadata stamping.
+
+    Args:
+        issue_json (str): JSON string from `gh issue view --json ...`.
+
+    Returns:
+        str | None: ISO date (`YYYY-MM-DD`) when parse succeeds.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     try:
         data = json.loads(issue_json)
     except json.JSONDecodeError:
@@ -304,6 +587,25 @@ def _extract_last_updated(issue_json: str) -> str | None:
 
 
 def _find_meta_end(lines: list[str]) -> int:
+    """Locate insertion point where header metadata block ends.
+
+    Purpose:
+        Keep metadata updates above markdown content sections.
+
+    Args:
+        lines (list[str]): Markdown document lines.
+
+    Returns:
+        int: Index where metadata entries should stop being inserted.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Scan for the first section header to determine where metadata ends.
     for idx, line in enumerate(lines):
         if line.lstrip().startswith("## "):
             return idx
@@ -332,8 +634,30 @@ def normalize_smart_punctuation(text: str) -> str:
 
 
 def _set_line_value(lines: list[str], label: str, value: str, meta_end: int) -> int:
+    """Set or insert a metadata list line and return updated boundary index.
+
+    Purpose:
+        Apply deterministic metadata updates without duplicating labels.
+
+    Args:
+        lines (list[str]): Markdown document lines.
+        label (str): Metadata label (for `- Label: value`).
+        value (str): Value to assign.
+        meta_end (int): Current metadata insertion boundary.
+
+    Returns:
+        int: Updated metadata insertion boundary index.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Mutates `lines` in place.
+    """
+
     pattern = re.compile(rf"^- {re.escape(label)}:")
     for idx, line in enumerate(lines):
+        # Update existing metadata entry before inserting a new line.
         if pattern.match(line):
             lines[idx] = f"- {label}: {value}"
             return meta_end
@@ -349,6 +673,29 @@ def update_metadata_lines(
     last_updated: str | None,
     feature_path: str,
 ) -> list[str]:
+    """Apply issue metadata updates to potential markdown lines.
+
+    Purpose:
+        Keep promoted potential files synchronized with created issue metadata.
+
+    Args:
+        lines (list[str]): Original markdown lines.
+        feature_name (str): Feature heading text.
+        issue_number (str): Created issue number.
+        issue_url (str): Created issue URL.
+        last_updated (str | None): Optional issue updated date.
+        feature_path (str): Active feature path token used in status line.
+
+    Returns:
+        list[str]: Updated markdown lines with metadata edits applied.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Mutates list content used for file write-back.
+    """
+
     if lines:
         lines[0] = f"# {feature_name} (Issue #{issue_number})"
 
@@ -365,6 +712,24 @@ def update_metadata_lines(
 
 
 def _default(message: str) -> None:
+    """Default emitter that prints messages to stdout.
+
+    Purpose:
+        Provide a fallback logger callback for CLI-visible status messages.
+
+    Args:
+        message (str): Message line to emit.
+
+    Returns:
+        None.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Writes to standard output.
+    """
+
     print(message)
 
 
@@ -378,6 +743,32 @@ def promote_potential(
     work_mode: str = "full",
     emit: Callable[[str], None] = _default,
 ) -> PromotionOutcome:
+    """Promote a potential file to a GitHub issue and archive the source.
+
+    Purpose:
+        Orchestrate validation, issue body generation, gh issue creation, metadata
+        stamping, and promoted-file relocation.
+
+    Args:
+        potential_path (str): Path to potential markdown file.
+        promotion_type (str): One of supported promotion labels.
+        fs (FileSystem | None): Optional filesystem adapter override.
+        gh (GhClient | None): Optional gh client adapter override.
+        workspace (Path | None): Optional workspace root override.
+        work_mode (str): Work-mode routing (`minor-audit` or `full`).
+        emit (Callable[[str], None]): Status message emitter callback.
+
+    Returns:
+        PromotionOutcome: Final exit code, emitted messages, and destination path.
+
+    Raises:
+        PromotionError: When validation or promotion preconditions fail.
+        RuntimeError: When gh path is unavailable in command execution.
+
+    Side Effects:
+        Executes gh CLI subprocesses and mutates filesystem state.
+    """
+
     if promotion_type not in PROMOTION_TYPES:
         raise PromotionError(f"Invalid promotion type: {promotion_type}")
     if work_mode not in WORK_MODES:
@@ -422,6 +813,7 @@ def promote_potential(
         else:
             fallback_reason = eligibility_reason
 
+    # Route issue-body generation based on promotion type and eligible work mode.
     if promotion_type == "bug":
         bug_sections = {
             heading: get_section(content, heading) or PLACEHOLDER
@@ -485,6 +877,7 @@ def promote_potential(
             _emit(line)
         return PromotionOutcome(exit_code=create_result.exit_code, messages=messages)
 
+    # Emit every gh output line to preserve context for callers.
     for line in create_result.output:
         _emit(line)
 
@@ -519,6 +912,24 @@ def promote_potential(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for potential-promotion command execution.
+
+    Purpose:
+        Define and parse deterministic CLI inputs for promotion scripts.
+
+    Args:
+        None.
+
+    Returns:
+        argparse.Namespace: Parsed CLI arguments.
+
+    Raises:
+        SystemExit: Raised by argparse on invalid CLI input.
+
+    Side Effects:
+        Reads process CLI argv through argparse.
+    """
+
     parser = argparse.ArgumentParser(
         description="Create a GitHub issue from a potential feature file using gh CLI.",
     )
@@ -543,6 +954,24 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """CLI entry point for potential-to-issue promotion.
+
+    Purpose:
+        Execute argument parsing, run promotion, and return process-style exit code.
+
+    Args:
+        None.
+
+    Returns:
+        None.
+
+    Raises:
+        SystemExit: Raised with success/error exit code for CLI execution.
+
+    Side Effects:
+        Invokes promotion workflow and prints status/error messages.
+    """
+
     args = parse_args()
     try:
         outcome = promote_potential(

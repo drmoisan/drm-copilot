@@ -126,3 +126,4 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 
 Use `minor-audit` only when work is bootstrapped/pre-cooked or when scope stays at 3 or fewer production files with low integration risk.
 If a requested minor-audit is not eligible, use full feature path.
+For minor-audit work, broad regression and extended design docs are not required by default; escalate only when risk or scope warrants it.

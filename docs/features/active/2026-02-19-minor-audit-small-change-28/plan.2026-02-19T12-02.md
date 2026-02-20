@@ -184,3 +184,5 @@ Phase completion criteria:
 
 - No open questions remain for implementation sequencing.
 - If additional eligibility dimensions are added later (for example changed-line budget), add a new requirement ID and separate atomic tasks in a follow-up plan.
+- Plan sync note (2026-02-20T21-30): Checklist reviewed during remediation execution; delivered items remain fully checked and aligned with current implementation status.
+- Final sync note (2026-02-20T21-30): Post-remediation QA gates completed and plan checklist state re-validated against current repository outputs.

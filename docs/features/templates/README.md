@@ -14,3 +14,5 @@ Use these templates to keep planning consistent.
   - `minor-audit`: use for bootstrapped/pre-cooked work or <=3 production files with low integration risk.
   - `feature`: use for standard user-facing feature development requiring full docs.
   - `refactor`: use for non-user-facing structural/code-quality work.
+
+Minor-audit does not require broad regression or extended design docs by default; add them only when risk warrants.

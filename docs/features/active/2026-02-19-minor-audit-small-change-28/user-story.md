@@ -49,11 +49,11 @@ The repo's playbooks and templates expect an active feature folder before coding
 
 ## Acceptance Criteria
 
-- [ ] A bootstrapped work item can be completed and reviewed using an expanded `issue.md` without requiring full template completion (`user-story.md`, full `spec.md`, or deep plan) when scope remains small and pre-cooked.
-- [ ] Expanded `issue.md` includes minimum required sections: problem/why, implementation intent, acceptance criteria, dependencies/risks, verification steps, and evidence checklist.
-- [ ] Minimum audit evidence is explicitly defined and captured as baseline + end-state + targeted verification for changed behavior.
-- [ ] Policy for bootstrapped path explicitly states that broad regression and extended design documentation are not required by default.
-- [ ] A reviewer can determine whether the change is complete and safe from `issue.md` plus minimum evidence artifacts alone.
+- [x] A bootstrapped work item can be completed and reviewed using an expanded `issue.md` without requiring full template completion (`user-story.md`, full `spec.md`, or deep plan) when scope remains small and pre-cooked.
+- [x] Expanded `issue.md` includes minimum required sections: problem/why, implementation intent, acceptance criteria, dependencies/risks, verification steps, and evidence checklist.
+- [x] Minimum audit evidence is explicitly defined and captured as baseline + end-state + targeted verification for changed behavior.
+- [x] Policy for bootstrapped path explicitly states that broad regression and extended design documentation are not required by default.
+- [x] A reviewer can determine whether the change is complete and safe from `issue.md` plus minimum evidence artifacts alone.
 
 
 ## Non-Goals
