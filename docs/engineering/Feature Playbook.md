@@ -120,3 +120,20 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 | **8**                                      | **Atomic Development Plan Authoring (Plan-of-Record)**  | **Atomic Planning Agent**               | **Critical distinction**: this is the *true* atomic plan. It cannot exist until the spec is complete. Tasks are binary, ordered, verifiable.                                     |
 | **9**                                      | **Deterministic Plan Execution**                        | **Atomic Execution Agent**              | Executes the atomic plan verbatim. No replanning, no scope change, strict policy and acceptance-criteria verification.                                                           |
 | **10 (Optional but Strongly Recommended)** | **Post-Execution Feature & Policy Audit**               | **Feature Review Agent**                | Audits the completed feature against repo policy *and* against the committed documentation (user story, spec, acceptance criteria). Generates remediation inputs if gaps exist.  |
+
+
+## Minor Change Audit Path
+
+Use `minor-audit` only when work is bootstrapped/pre-cooked or when scope stays at 3 or fewer production files with low integration risk.
+If a requested minor-audit is not eligible, use full feature path.
+For minor-audit work, broad regression and extended design docs are not required by default; escalate only when risk or scope warrants it.
+
+### Persisted Work-Mode Marker Contract (deterministic)
+
+- Every promoted/active `issue.md` must persist exactly one marker line directly above the first `##` heading:
+  - `- Work Mode: minor-audit`
+  - `- Work Mode: full`
+- The marker value must reflect the selected mode **after** eligibility evaluation (not merely the requested mode).
+- Fail closed for automation/reviewers: if marker is missing or malformed, treat the feature as `full` mode.
+- Eligibility fallback behavior:
+  - Requested `minor-audit` + ineligible conditions => selected mode is `full`, and marker must be `- Work Mode: full`.

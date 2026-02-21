@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -17,23 +18,30 @@ if TYPE_CHECKING:
 
 
 class FakeFileSystem(mod.FileSystem):
+    """In-memory filesystem fake for active-folder workflow tests."""
+
     def __init__(self) -> None:
+        """Initialize in-memory file and directory stores."""
         self.files: dict[Path, str] = {}
         self.dirs: set[Path] = set()
 
     def exists(self, path: Path) -> bool:
+        """Return whether a file or directory exists in fake storage."""
         return path in self.files or path in self.dirs
 
     def ensure_dir(self, path: Path) -> None:
+        """Record directory creation in fake storage."""
         self.dirs.add(path)
 
     def copy_file(self, src: Path, dest: Path) -> None:
+        """Copy fake file content from source path to destination path."""
         if src not in self.files:
             raise FileNotFoundError(src)
         self.files[dest] = self.files[src]
         self.dirs.add(dest.parent)
 
     def copy_tree(self, src: Path, dest: Path) -> None:
+        """Copy all fake files under source tree into destination tree."""
         for path, content in list(self.files.items()):
             try:
                 relative = path.relative_to(src)
@@ -43,16 +51,20 @@ class FakeFileSystem(mod.FileSystem):
             self.dirs.add((dest / relative).parent)
 
     def list_files(self, path: Path) -> Iterable[Path]:
+        """List immediate fake files in the provided directory path."""
         return [file_path for file_path in self.files if file_path.parent == path]
 
     def read_text(self, path: Path) -> str:
+        """Read fake file content from memory."""
         return self.files[path]
 
     def write_text(self, path: Path, content: str) -> None:
+        """Write fake file content into memory and track parent directory."""
         self.files[path] = content
         self.dirs.add(path.parent)
 
     def move(self, src: Path, dest: Path) -> None:
+        """Move fake file content to a new path in memory."""
         if src not in self.files:
             raise FileNotFoundError(src)
         self.files[dest] = self.files.pop(src)
@@ -60,6 +72,7 @@ class FakeFileSystem(mod.FileSystem):
 
 
 def test_format_checklist_matches_expected_rules() -> None:
+    """Verify checklist normalization preserves expected bullet formatting rules."""
     raw = "Item one\n- [ ] existing\n- bullet\n   \nItem two"
     result = mod.format_checklist(raw)
     lines = result.splitlines()
@@ -70,6 +83,7 @@ def test_format_checklist_matches_expected_rules() -> None:
 
 
 def test_set_section_replaces_and_appends() -> None:
+    """Verify section replacement and append behavior for markdown helpers."""
     content = "## Header\nold\n"
     updated = mod.set_section(content, "Header", "new")
     assert "new" in updated and "old" not in updated
@@ -79,6 +93,7 @@ def test_set_section_replaces_and_appends() -> None:
 
 
 def test_set_header_placeholder_replaces_placeholders() -> None:
+    """Verify header placeholder tokens are replaced with runtime metadata."""
     content = "\n".join(
         [
             "- **Issue:** <issue>",
@@ -138,13 +153,17 @@ def test_set_header_placeholder_does_not_prepend_plain_issue_line() -> None:
 
 
 def test_build_folder_slug_uses_potential_and_issue_number() -> None:
+    """Verify slug generation prefers potential stem and appends issue number."""
     potential = Path("/w/docs/features/potential/promoted/2025-12-23-json-quality.md")
     slug = mod.build_folder_slug("json-quality", potential, "63")
     assert slug == "2025-12-23-json-quality-63"
 
 
 class FakeIssueFetcher:
+    """Callable fake for deterministic issue metadata fetch behavior."""
+
     def __init__(self, meta: mod.IssueMeta | None = None) -> None:
+        """Initialize fake fetcher with optional metadata payload."""
         self.meta = meta
         self.calls: list[str] = []
 
@@ -155,7 +174,10 @@ class FakeIssueFetcher:
 
 
 class FakeCodeLauncher:
+    """Callable fake that records editor-launch file requests."""
+
     def __init__(self) -> None:
+        """Initialize fake launcher call tracking."""
         self.calls: list[list[Path]] = []
 
     def __call__(self, files: Iterable[Path]) -> bool:
@@ -166,6 +188,7 @@ class FakeCodeLauncher:
 
 
 def _seed_feature_template(fs: FakeFileSystem, workspace: Path) -> None:
+    """Seed in-memory feature templates used by active-folder tests."""
     template_dir = workspace / "docs" / "features" / "templates" / "feature"
     fs.write_text(
         template_dir / "user-story.md",
@@ -222,6 +245,7 @@ def _seed_feature_template(fs: FakeFileSystem, workspace: Path) -> None:
 
 
 def _seed_bug_template(fs: FakeFileSystem, workspace: Path) -> None:
+    """Seed in-memory bug templates used by bug-folder tests."""
     template_dir = workspace / "docs" / "features" / "templates" / "bug"
     fs.write_text(
         template_dir / "spec.md",
@@ -259,6 +283,7 @@ def _seed_bug_template(fs: FakeFileSystem, workspace: Path) -> None:
 
 
 def test_create_feature_folder_moves_potential_and_updates_files() -> None:
+    """Verify feature-folder creation moves potential file and updates docs."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -325,6 +350,7 @@ def test_create_feature_folder_moves_potential_and_updates_files() -> None:
 
 
 def test_create_bug_folder_uses_issue_metadata_and_sections() -> None:
+    """Verify bug-folder creation uses fetched metadata and seeded sections."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_bug_template(fs, workspace)
@@ -400,17 +426,20 @@ def test_create_bug_folder_uses_issue_metadata_and_sections() -> None:
 
 
 def test_validate_feature_name_rejects_invalid() -> None:
+    """Verify invalid feature names raise ValueError."""
     with pytest.raises(ValueError):
         mod.validate_feature_name("INVALID")
 
 
 def test_set_section_handles_empty_body() -> None:
+    """Verify empty section bodies leave original markdown content unchanged."""
     content = "## Header\nold\n"
     result = mod.set_section(content, "Header", "")
     assert result == content
 
 
 def test_find_potential_file_returns_none_when_no_match() -> None:
+    """Verify no potential file is returned when no candidate matches."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     result = mod.find_potential_file("nonexistent", workspace, fs)
@@ -418,12 +447,14 @@ def test_find_potential_file_returns_none_when_no_match() -> None:
 
 
 def test_parse_issue_number_returns_none_when_no_match() -> None:
+    """Verify issue parsing returns None when no issue metadata line exists."""
     content = "Some content without issue"
     result = mod.parse_issue_number(content)
     assert result is None
 
 
 def test_build_folder_slug_raises_on_invalid_slug() -> None:
+    """Verify invalid derived slugs raise ValueError."""
     with pytest.raises(ValueError, match="invalid"):
         mod.build_folder_slug("name", Path("/some/INVALID-FILE.md"), None)
 
@@ -562,6 +593,7 @@ def test_update_feature_docs_for_epic_type() -> None:
 
 
 def test_create_refactor_folder_seeds_refactor_docs() -> None:
+    """Verify refactor-folder creation seeds refactor template sections."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     template_dir = workspace / "docs" / "features" / "templates" / "refactor"
@@ -635,6 +667,7 @@ def test_create_refactor_folder_seeds_refactor_docs() -> None:
 
 
 def test_create_epic_folder_seeds_epic_docs() -> None:
+    """Verify epic-folder creation materializes initiative metadata."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     template_dir = workspace / "docs" / "features" / "templates" / "epic"
@@ -681,6 +714,7 @@ def test_create_epic_folder_seeds_epic_docs() -> None:
 
 
 def test_create_active_folder_raises_on_invalid_feature_type() -> None:
+    """Verify invalid feature type inputs raise ValueError."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     with pytest.raises(ValueError, match="must be one of"):
@@ -693,6 +727,7 @@ def test_create_active_folder_raises_on_invalid_feature_type() -> None:
 
 
 def test_create_active_folder_raises_on_missing_template() -> None:
+    """Verify missing template directories raise FileNotFoundError."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     with pytest.raises(FileNotFoundError, match="Template folder not found"):
@@ -705,6 +740,7 @@ def test_create_active_folder_raises_on_missing_template() -> None:
 
 
 def test_create_active_folder_with_force_overwrites_existing() -> None:
+    """Verify force mode allows reuse of existing target folder paths."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -728,6 +764,7 @@ def test_create_active_folder_with_force_overwrites_existing() -> None:
 
 
 def test_create_active_folder_without_potential_file() -> None:
+    """Verify folder creation succeeds when no potential file is available."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -747,6 +784,7 @@ def test_create_active_folder_without_potential_file() -> None:
 
 
 def test_create_active_folder_with_auto_issue_detection() -> None:
+    """Verify `issue_number=auto` resolves issue metadata from potential content."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -778,12 +816,14 @@ def test_create_active_folder_with_auto_issue_detection() -> None:
 
 
 def test_issue_fetcher_returns_none_when_gh_missing() -> None:
+    """Verify default issue fetcher handles missing gh executable safely."""
     result = mod.default_issue_fetcher("123")
     # If gh is missing, returns None; if present, may return data or None
     assert result is None or isinstance(result, mod.IssueMeta)
 
 
 def test_code_launcher_returns_false_when_code_missing() -> None:
+    """Verify code launcher returns False and avoids subprocess when code is absent."""
     with mock.patch("shutil.which", return_value=None):
         with mock.patch("subprocess.run") as mock_run:
             result = mod.default_code_launcher([Path("/test.md")])
@@ -793,6 +833,7 @@ def test_code_launcher_returns_false_when_code_missing() -> None:
 
 
 def test_apply_header_and_sections_skips_missing_file() -> None:
+    """Verify folder creation tolerates optional missing files without crashing."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     # Create template without the file we'll try to update
@@ -813,6 +854,7 @@ def test_apply_header_and_sections_skips_missing_file() -> None:
 
 
 def test_create_active_folder_raises_when_exists_without_force() -> None:
+    """Verify existing targets raise FileExistsError when force is not enabled."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -830,11 +872,13 @@ def test_create_active_folder_raises_when_exists_without_force() -> None:
 
 
 def test_create_active_folder_prints_fallback_when_code_launcher_fails() -> None:
+    """Verify create flow continues when editor launcher callback returns False."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
 
     def failing_launcher(files: Iterable[Path]) -> bool:
+        """Simulate a launcher callback that cannot open files."""
         return False
 
     # This should not raise, just print fallback message
@@ -953,3 +997,309 @@ def test_default_issue_fetcher_handles_exception_in_date_parsing() -> None:
             assert result is not None
             # When updatedAt is null or missing, should default to YYYY-MM-DD
             assert result.updated_date == "YYYY-MM-DD"
+
+
+def test_create_active_folder_minor_audit_materializes_issue_md_and_skips_full_docs():
+    """Verify eligible minor-audit mode creates issue.md-centric outputs."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "minor-audit.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #28",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "intent",
+                "## Acceptance Criteria (early draft)",
+                "criteria",
+                "## Constraints & Risks",
+                "low integration risk",
+                "## Test Conditions to Consider",
+                "verify",
+            ]
+        ),
+    )
+    result = mod.create_active_folder(
+        feature_name="minor-audit",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    assert fs.exists(result.target / "issue.md")
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: minor-audit" in issue_md
+    assert "## Proposed Behavior" in issue_md
+    assert not fs.exists(result.target / "spec.md")
+    assert not fs.exists(result.target / "user-story.md")
+
+
+def test_work_mode_marker_minor_issue_md() -> None:
+    """Verify minor-audit issue.md persists marker above first section heading."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "minor-marker.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #30",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "intent",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="minor-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 2] == "- Work Mode: minor-audit"
+    assert lines[first_section_index - 1] == ""
+
+
+def scenario_single_work_mode_marker_before_first_heading() -> None:
+    """Verify generated issue.md has one marker before the first section."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "single-marker.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #40",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "behavior",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="single-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    marker_lines = [line for line in lines if line.startswith("- Work Mode:")]
+    first_section_index = lines.index("## Problem / Why")
+    marker_index = lines.index("- Work Mode: minor-audit")
+
+    assert len(marker_lines) == 1
+    assert marker_index == first_section_index - 2
+    assert lines[first_section_index - 1] == ""
+
+
+test_new_active_feature_folder_writes_single_work_mode_marker_before_first_heading = (
+    scenario_single_work_mode_marker_before_first_heading
+)
+
+
+def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
+    """Verify minor-audit preserves promoted issue frontmatter and spacing."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "frontmatter.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "# bootstrap-typescript (Issue #33)",
+                "",
+                "- Date captured: 2026-02-20",
+                "- Author: Dan Moisan",
+                "- Status: Promoted -> "
+                "docs/features/active/bootstrap-typescript/ (Issue #33)",
+                "- Risk: low",
+                "",
+                "- Issue: #33",
+                "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33",
+                "- Last Updated: 2026-02-21",
+                "",
+                "## Problem / Why",
+                "problem",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="frontmatter",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    assert lines[0] == "# bootstrap-typescript (Issue #33)"
+    assert lines[1] == ""
+    assert "- Date captured: 2026-02-20" in lines
+    assert "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33" in lines
+    assert "- Work Mode: minor-audit" in lines
+
+    issue_url_index = lines.index(
+        "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33"
+    )
+    marker_index = lines.index("- Work Mode: minor-audit")
+    problem_index = lines.index("## Problem / Why")
+    assert issue_url_index < marker_index < problem_index
+    assert lines[marker_index + 1] == ""
+    assert lines[marker_index + 2] == "## Problem / Why"
+
+
+def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Verify ineligible minor-audit requests fall back to full mode with reason."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "fallback.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #29",
+                "- File: a.py",
+                "- File: b.py",
+                "- File: c.py",
+                "- File: d.py",
+                "## Problem / Why",
+                "problem",
+            ]
+        ),
+    )
+    result = mod.create_active_folder(
+        feature_name="fallback",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    out = capsys.readouterr().out
+    assert fs.exists(result.target / "user-story.md")
+    assert "Selected mode: full" in out
+    assert "Fallback reason:" in out
+
+
+def test_work_mode_marker_fallback_issue_md_full() -> None:
+    """Verify minor-audit fallback issue.md persists full marker above first section."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = (
+        workspace / "docs" / "features" / "potential" / "fallback-marker.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #31",
+                "- File: a.py",
+                "- File: b.py",
+                "- File: c.py",
+                "- File: d.py",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "behavior",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="fallback-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 2] == "- Work Mode: full"
+    assert lines[first_section_index - 1] == ""
+
+
+def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
+    """Verify explicit full mode keeps backward-compatible document outputs."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    result = mod.create_active_folder(
+        feature_name="full-compatible",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="full",
+    )
+    assert fs.exists(result.target / "user-story.md")
+
+
+def test_create_active_folder_fallback_reason_output(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Verify fallback reason output appears when minor-audit cannot be used."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    result = mod.create_active_folder(
+        feature_name="no-potential",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+    assert result.target
+    out = capsys.readouterr().out
+    assert "Fallback reason:" in out
+
+
+def test_parse_args_includes_work_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify parser includes and accepts the `--work-mode` argument."""
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "prog",
+            "--feature-name",
+            "sample",
+            "--type",
+            "feature",
+            "--work-mode",
+            "minor-audit",
+        ],
+    )
+    parsed = mod.parse_args()
+    assert parsed.work_mode == "minor-audit"

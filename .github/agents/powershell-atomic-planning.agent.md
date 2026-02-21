@@ -87,6 +87,20 @@ Phase 0 content, baseline capture schema, and toolchain mapping are defined in t
 
 Use the `atomic-plan-contract` skill as the system-of-record for plan format, Phase 0 requirements, baseline schema, and final QA loop checks.
 
+### 2.5.0 Mode source precedence and fail-closed routing (Mandatory)
+
+When planning from a feature folder, resolve mode from `issue.md` marker first:
+
+- `- Work Mode: minor-audit`
+- `- Work Mode: full`
+
+If marker is missing or malformed, fail closed to `full`.
+
+Branch-specific required task sets:
+
+- `minor-audit`: include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `full`: retain full-document expectations and full QA obligations.
+
 ---
 
 ### 2.5.1 Mandatory preflight validation loop via `powershell_atomic_executor`

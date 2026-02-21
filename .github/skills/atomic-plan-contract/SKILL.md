@@ -48,3 +48,19 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: ALL CLEAR`
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
+
+## Mode source precedence (Mandatory)
+
+When a plan is generated or validated from a feature folder, resolve selected mode in this order:
+
+1) Persisted marker in `issue.md` metadata block:
+	- `- Work Mode: minor-audit`
+	- `- Work Mode: full`
+2) Explicit workflow override only when repo policy allows and only when reconciled against `issue.md`
+3) Fail closed to `full` when marker is missing or malformed
+
+## Mode-Specific Mandatory Plan Gates
+
+- `minor-audit` plans MUST include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
+- `full` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.

@@ -31,6 +31,16 @@ PLAN_TIMESTAMP_TEMPLATE_NAME = "plan.yyyy-MM-ddTHH-mm.md"
 
 @dataclass
 class IssueMeta:
+    """Issue metadata container.
+
+    Purpose: Store fetched issue fields.
+    Usage: Passed into document/header updates.
+    Flow: Created by issue fetcher then consumed by folder creation.
+    Invariants / Constraints: Number/author/date represent one issue snapshot.
+    Side Effects: None.
+    Attributes: number, author, updated_date.
+    """
+
     number: str
     author: str
     updated_date: str
@@ -38,11 +48,31 @@ class IssueMeta:
 
 @dataclass
 class ActiveFolderResult:
+    """Result payload for active-folder creation.
+
+    Purpose: Return created folder and optional issue path.
+    Usage: Consumed by CLI/tests.
+    Flow: Built at end of create_active_folder.
+    Invariants / Constraints: target points to active folder path.
+    Side Effects: None.
+    Attributes: target, potential_issue_path.
+    """
+
     target: Path
     potential_issue_path: Path | None
 
 
 class FileSystem(Protocol):
+    """Filesystem contract for folder creation workflows.
+
+    Purpose: Abstract file IO for production and tests.
+    Usage: Implemented by RealFileSystem/fakes.
+    Flow: Called by orchestration helpers.
+    Invariants / Constraints: Implementations preserve markdown text fidelity.
+    Side Effects: May perform disk IO.
+    Attributes: None.
+    """
+
     def exists(self, path: Path) -> bool: ...
 
     def ensure_dir(self, path: Path) -> None: ...
@@ -62,6 +92,16 @@ class FileSystem(Protocol):
 
 @dataclass
 class RealFileSystem(FileSystem):
+    """Disk-backed FileSystem implementation.
+
+    Purpose: Execute concrete filesystem operations.
+    Usage: Default adapter in create_active_folder.
+    Flow: Provides copy/read/write/move primitives.
+    Invariants / Constraints: Uses UTF-8 for text files.
+    Side Effects: Reads/writes/moves local files.
+    Attributes: None.
+    """
+
     def exists(self, path: Path) -> bool:
         return path.exists()
 
@@ -73,6 +113,7 @@ class RealFileSystem(FileSystem):
         shutil.copyfile(src, dest)
 
     def copy_tree(self, src: Path, dest: Path) -> None:
+        # Copy template files while preserving relative paths under the target folder.
         for file_path in src.rglob("*"):
             if file_path.is_dir():
                 continue
@@ -101,6 +142,15 @@ class RealFileSystem(FileSystem):
 
 
 def resolve_workspace() -> Path:
+    """Resolve repository workspace root.
+
+    Purpose: Compute deterministic workspace base path.
+    Args: None.
+    Returns: Path to repo root.
+    Raises: None.
+    Side Effects: None.
+    """
+
     return Path(__file__).resolve().parents[2]
 
 
@@ -144,6 +194,15 @@ def extract_date_from_timestamp(timestamp: str) -> str:
 
 
 def validate_feature_name(feature_name: str) -> None:
+    """Validate feature-name slug format.
+
+    Purpose: Enforce allowed naming convention.
+    Args: feature_name (str) input slug.
+    Returns: None.
+    Raises: ValueError when name is invalid.
+    Side Effects: None.
+    """
+
     if not feature_name or not NAME_PATTERN.fullmatch(feature_name):
         raise ValueError(
             f"Aborted: '{feature_name}' is invalid. Use kebab/underscore-case "
@@ -152,7 +211,17 @@ def validate_feature_name(feature_name: str) -> None:
 
 
 def format_checklist(text: str) -> str:
+    """Normalize freeform checklist text into markdown checkboxes.
+
+    Purpose: Convert mixed checklist input into canonical task lines.
+    Args: text (str) raw checklist content.
+    Returns: str normalized checklist block.
+    Raises: None.
+    Side Effects: None.
+    """
+
     lines: list[str] = []
+    # Normalize checklist lines while preserving existing checkbox formatting.
     for raw_line in text.splitlines():
         trimmed = raw_line.strip()
         if not trimmed:
@@ -167,6 +236,15 @@ def format_checklist(text: str) -> str:
 
 
 def get_section(content: str, name: str) -> str:
+    """Extract a markdown section body by heading.
+
+    Purpose: Reuse section parsing for seeded doc updates.
+    Args: content (str), name (str).
+    Returns: str section body or empty string.
+    Raises: None.
+    Side Effects: None.
+    """
+
     pattern = re.compile(
         rf"^\s*##\s+{re.escape(name)}\s*\r?\n(.*?)(?=^\s*##\s+|\Z)",
         re.DOTALL | re.MULTILINE,
@@ -177,7 +255,47 @@ def get_section(content: str, name: str) -> str:
     return match.group(1).strip()
 
 
+def upsert_work_mode_marker(content: str, mode: str) -> str:
+    """Insert or update work-mode marker directly above first `##` heading.
+
+    Purpose:
+        Ensure downstream reviewers can deterministically branch on persisted mode.
+
+    Args:
+        content (str): Markdown content to update.
+        mode (str): Work mode marker value (`minor-audit` or `full`).
+
+    Returns:
+        str: Updated markdown containing exactly one marker line.
+    """
+
+    marker_line = f"- Work Mode: {mode}"
+    marker_pattern = re.compile(r"^- Work Mode:\s*(minor-audit|full)\s*$")
+    lines = [line for line in content.splitlines() if not marker_pattern.match(line)]
+
+    for idx, line in enumerate(lines):
+        # Place marker immediately above first top-level section heading.
+        if line.lstrip().startswith("## "):
+            lines.insert(idx, "")
+            lines.insert(idx, marker_line)
+            return "\n".join(lines)
+
+    if lines and lines[-1] != "":
+        lines.append("")
+    lines.append(marker_line)
+    return "\n".join(lines)
+
+
 def set_section(content: str, name: str, body: str) -> str:
+    """Set or append a markdown section body.
+
+    Purpose: Apply deterministic section updates in templated docs.
+    Args: content (str), name (str), body (str).
+    Returns: str updated document.
+    Raises: None.
+    Side Effects: None.
+    """
+
     if not body or not body.strip():
         return content
 
@@ -408,12 +526,22 @@ def set_header_placeholder(
 def find_potential_file(
     feature_name: str, workspace: Path, fs: FileSystem
 ) -> Path | None:
+    """Find the best matching potential file for a feature name.
+
+    Purpose: Locate seed content for active-folder generation.
+    Args: feature_name (str), workspace (Path), fs (FileSystem).
+    Returns: Path | None for selected source file.
+    Raises: None.
+    Side Effects: Reads directory listings.
+    """
+
     normalized = feature_name.replace("_", "-")
     potential_dirs = [
         workspace / "docs" / "features" / "potential",
         workspace / "docs" / "features" / "potential" / "promoted",
     ]
 
+    # Scan potential directories in priority order and return the most recent match.
     for directory in potential_dirs:
         candidates = [
             file
@@ -428,6 +556,15 @@ def find_potential_file(
 
 
 def parse_issue_number(content: str) -> str | None:
+    """Parse an issue number from markdown metadata lines.
+
+    Purpose: Auto-resolve issue linkage when explicit CLI value is absent.
+    Args: content (str) markdown body.
+    Returns: str | None issue number.
+    Raises: None.
+    Side Effects: None.
+    """
+
     match = re.search(r"^\s*-\s*Issue\s*:\s*#?(\d+)", content, flags=re.MULTILINE)
     if match:
         return match.group(1)
@@ -437,6 +574,15 @@ def parse_issue_number(content: str) -> str | None:
 def build_folder_slug(
     feature_name: str, potential_file: Path | None, issue_number: str | None
 ) -> str:
+    """Build canonical active-folder slug.
+
+    Purpose: Produce stable target folder naming from inputs.
+    Args: feature_name (str), potential_file (Path | None), issue_number (str | None).
+    Returns: str valid slug.
+    Raises: ValueError when slug is invalid.
+    Side Effects: None.
+    """
+
     slug = feature_name.replace("_", "-")
     if potential_file:
         slug = potential_file.stem
@@ -453,16 +599,62 @@ def build_folder_slug(
 def copy_template(
     feature_type: str, template_dir: Path, target_dir: Path, fs: FileSystem
 ) -> None:
+    """Copy template files for the selected feature type.
+
+    Purpose: Materialize starter docs into the new active folder.
+    Args: feature_type (str), template_dir (Path), target_dir (Path), fs (FileSystem).
+    Returns: None.
+    Raises: None.
+    Side Effects: Copies files/directories.
+    """
+
     if feature_type == "bug":
+        # Prefer the timestamped plan template when both plan templates exist.
         for name in ("spec.md", PLAN_TIMESTAMP_TEMPLATE_NAME, "plan.md"):
             src = template_dir / name
             if fs.exists(src):
                 fs.copy_file(src, target_dir / name)
-                # Prefer the timestamped plan template when both exist.
                 if name == PLAN_TIMESTAMP_TEMPLATE_NAME:
                     break
     else:
         fs.copy_tree(template_dir, target_dir)
+
+
+def copy_feature_template_for_minor_audit(
+    template_dir: Path, target_dir: Path, fs: FileSystem
+) -> None:
+    """Copy only the plan template for minor-audit feature flows.
+
+    Purpose:
+        Ensure minimal-audit feature folders do not include spec/user-story
+        templates while still materializing a plan when available.
+
+    Args:
+        template_dir (Path): Source feature template directory.
+        target_dir (Path): Destination active feature folder.
+        fs (FileSystem): File abstraction for copy operations.
+
+    Returns:
+        None
+
+    Raises:
+        FileNotFoundError: If expected template files are missing when accessed
+            by the FileSystem implementation.
+
+    Side Effects:
+        Copies the plan template into the active folder when present.
+    """
+
+    # Prefer the timestamped plan template to preserve the repo convention.
+    timestamped_plan = template_dir / PLAN_TIMESTAMP_TEMPLATE_NAME
+    if fs.exists(timestamped_plan):
+        fs.copy_file(timestamped_plan, target_dir / PLAN_TIMESTAMP_TEMPLATE_NAME)
+        return
+
+    # Fall back to legacy plan.md if timestamped template is not present.
+    legacy_plan = template_dir / "plan.md"
+    if fs.exists(legacy_plan):
+        fs.copy_file(legacy_plan, target_dir / "plan.md")
 
 
 def materialize_plan_file(
@@ -533,21 +725,32 @@ def materialize_plan_file(
 
 
 def default_issue_fetcher(issue_number: str) -> IssueMeta | None:
+    """Fetch issue metadata from GitHub CLI.
+
+    Purpose: Hydrate issue owner/date details for document headers.
+    Args: issue_number (str) issue identifier.
+    Returns: IssueMeta | None when unavailable.
+    Raises: None.
+    Side Effects: Executes `gh issue view` subprocess.
+    """
+
     gh_cmd = shutil.which("gh")
     if not gh_cmd:
         return None
-    result = subprocess.run(  # noqa: S603
-        [
-            gh_cmd,
-            "issue",
-            "view",
-            issue_number,
-            "--json",
-            "number,title,url,author,updatedAt",
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
+    result = (
+        subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
+            [
+                gh_cmd,
+                "issue",
+                "view",
+                issue_number,
+                "--json",
+                "number,title,url,author,updatedAt",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
     )
     if result.returncode != 0 or not result.stdout.strip():
         return None
@@ -570,10 +773,19 @@ def default_issue_fetcher(issue_number: str) -> IssueMeta | None:
 
 
 def default_code_launcher(files: Iterable[Path]) -> bool:
+    """Open created files in VS Code when available.
+
+    Purpose: Improve post-create editing flow in interactive use.
+    Args: files (Iterable[Path]) paths to open.
+    Returns: bool true when launch command found and invoked.
+    Raises: None.
+    Side Effects: Executes `code` subprocess.
+    """
+
     code_cmd = shutil.which("code")
     if not code_cmd:
         return False
-    subprocess.run(  # noqa: S603
+    subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
         [code_cmd, *[f.as_posix() for f in files]],
         check=False,
     )
@@ -858,17 +1070,62 @@ def update_feature_docs(
     return files_to_open
 
 
+def should_use_minor_audit_mode(
+    work_mode: str,
+    feature_type: str,
+    potential_content: str,
+) -> tuple[bool, str]:
+    """Return whether minor-audit path should be used and fallback reason."""
+
+    if work_mode not in ("minor-audit", "full"):
+        raise ValueError("work_mode must be one of: minor-audit, full")
+    if work_mode == "full":
+        return False, ""
+    if feature_type != "feature":
+        return False, "fallback: minor-audit only applies to feature type"
+
+    lower = potential_content.lower()
+    if "bootstrapped" in lower or "pre-cooked" in lower:
+        return True, ""
+
+    production_files = len(
+        re.findall(
+            r"^\s*-\s*(?:production\s+)?file\s*:", potential_content, flags=re.MULTILINE
+        )
+    )
+    has_low_risk = "low integration risk" in lower or "risk: low" in lower
+    if production_files <= 3 and has_low_risk:
+        return True, ""
+    if production_files > 3:
+        return False, "fallback: production file count exceeds 3"
+    return False, "fallback: missing low integration risk signal"
+
+
 def create_active_folder(
     feature_name: str,
-    feature_type: str,
+    feature_type: str = "feature",
     issue_number: str | None = None,
     force: bool = False,
+    *,
     workspace: Path | None = None,
     fs: FileSystem | None = None,
     issue_fetcher: Callable[[str], IssueMeta | None] = default_issue_fetcher,
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     now_provider: Callable[[], datetime] | None = None,
+    work_mode: str = "full",
 ) -> ActiveFolderResult:
+    """Create and seed an active feature folder from templates and potential docs.
+
+    Purpose: Orchestrate folder creation, mode routing, metadata application,
+        and optional source moves.
+    Args: feature_name (str), feature_type (str), issue_number (str | None),
+        force (bool), workspace (Path | None), fs (FileSystem | None),
+        issue_fetcher, code_launcher, now_provider, work_mode (str).
+    Returns: ActiveFolderResult with created paths.
+    Raises: ValueError, FileNotFoundError, FileExistsError.
+    Side Effects: Reads/writes/moves files and may launch editor.
+    """
+
     if feature_type not in {"feature", "refactor", "epic", "bug"}:
         raise ValueError("Type must be one of: feature, refactor, epic, bug")
 
@@ -882,6 +1139,12 @@ def create_active_folder(
 
     potential_file = find_potential_file(feature_name, workspace_path, filesystem)
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
+    # Decide minor-audit usage once to keep routing deterministic.
+    use_minor_audit, fallback_reason = should_use_minor_audit_mode(
+        work_mode=work_mode,
+        feature_type=feature_type,
+        potential_content=potential_content,
+    )
 
     normalized_issue_number = (issue_number or "").strip() or None
     if normalized_issue_number and normalized_issue_number.lower() == "auto":
@@ -900,7 +1163,11 @@ def create_active_folder(
         )
 
     filesystem.ensure_dir(target_dir)
-    copy_template(feature_type, template_dir, target_dir, filesystem)
+    # Branch copy behavior to avoid spec/user-story templates in minor-audit.
+    if feature_type == "feature" and use_minor_audit:
+        copy_feature_template_for_minor_audit(template_dir, target_dir, filesystem)
+    else:
+        copy_template(feature_type, template_dir, target_dir, filesystem)
 
     issue_meta = None
     if normalized_issue_number:
@@ -953,30 +1220,88 @@ def create_active_folder(
         ),
     }
 
-    files_to_open = update_feature_docs(
-        feature_type,
-        feature_name,
-        target_dir,
-        issue_field,
-        owner_field,
-        updated_field,
-        parent_field,
-        status_field,
-        version_field,
-        plan_updated_field,
-        filesystem,
-        sections,
-        plan_path=plan_path,
-    )
+    files_to_open: list[Path]
+    potential_issue_path: Path | None = None
+    if use_minor_audit:
+        if potential_file:
+            # Preserve promoted frontmatter/content and only inject marker line.
+            potential_issue_path = target_dir / "issue.md"
+            filesystem.move(potential_file, potential_issue_path)
+            moved_content = filesystem.read_text(potential_issue_path)
+            filesystem.write_text(
+                potential_issue_path,
+                upsert_work_mode_marker(moved_content, "minor-audit"),
+            )
+            files_to_open = [potential_issue_path]
+        else:
+            issue_doc = target_dir / "issue.md"
+            # Build fallback issue.md content for minor-audit mode.
+            issue_body = "\n".join(
+                [
+                    f"# {feature_name}",
+                    "",
+                    "- Work Mode: minor-audit",
+                    "## Problem / Why",
+                    sections["problem"] or "(not provided in potential file)",
+                    "",
+                    "## Implementation Intent",
+                    sections["behavior"] or "(not provided in potential file)",
+                    "",
+                    "## Acceptance Criteria",
+                    sections["criteria"] or "(not provided in potential file)",
+                    "",
+                    "## Dependencies / Risks",
+                    sections["constraints"] or "(not provided in potential file)",
+                    "",
+                    "## Verification Steps",
+                    sections["tests"] or "(not provided in potential file)",
+                    "",
+                    "## Evidence Checklist",
+                    "- [ ] baseline",
+                    "- [ ] targeted verification",
+                    "- [ ] end-state",
+                ]
+            )
+            filesystem.write_text(issue_doc, issue_body)
+            files_to_open = [issue_doc]
+    else:
+        files_to_open = update_feature_docs(
+            feature_type,
+            feature_name,
+            target_dir,
+            issue_field,
+            owner_field,
+            updated_field,
+            parent_field,
+            status_field,
+            version_field,
+            plan_updated_field,
+            filesystem,
+            sections,
+            plan_path=plan_path,
+        )
 
-    potential_issue_path = None
     if potential_file:
-        potential_issue_path = target_dir / "issue.md"
-        filesystem.move(potential_file, potential_issue_path)
-        print(f"Moved potential file to {potential_issue_path}")
+        if use_minor_audit:
+            if potential_issue_path is not None:
+                print(f"Moved potential file to {potential_issue_path}")
+        else:
+            potential_issue_path = target_dir / "issue.md"
+            filesystem.move(potential_file, potential_issue_path)
+            if work_mode == "minor-audit" and fallback_reason:
+                moved_content = filesystem.read_text(potential_issue_path)
+                filesystem.write_text(
+                    potential_issue_path,
+                    upsert_work_mode_marker(moved_content, "full"),
+                )
+            print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:
         print(f"Seeded docs from potential: {potential_file.name}")
+
+    print(f"Selected mode: {'minor-audit' if use_minor_audit else 'full'}")
+    if fallback_reason:
+        print(f"Fallback reason: {fallback_reason}")
 
     if files_to_open:
         existing = [path for path in files_to_open if filesystem.exists(path)]
@@ -996,6 +1321,15 @@ def create_active_folder(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for active-folder creation.
+
+    Purpose: Define deterministic CLI interface for folder creation flow.
+    Args: None.
+    Returns: argparse.Namespace parsed arguments.
+    Raises: SystemExit on invalid input.
+    Side Effects: Reads process argv.
+    """
+
     parser = argparse.ArgumentParser(
         description="Create docs/features/active/<name>/ from the selected template."
     )
@@ -1018,10 +1352,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--force", action="store_true", help="Overwrite existing target"
     )
+    parser.add_argument(
+        "--work-mode",
+        choices=["minor-audit", "full"],
+        default="full",
+        help="Work mode routing for minor-audit vs full feature flow.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
+    """CLI entry point for active-folder creation script.
+
+    Purpose: Parse CLI input and execute folder creation with clean exit behavior.
+    Args: None.
+    Returns: None.
+    Raises: SystemExit for expected CLI outcomes.
+    Side Effects: Prints status/errors and triggers filesystem operations.
+    """
+
     args = parse_args()
     try:
         create_active_folder(
@@ -1029,6 +1378,7 @@ def main() -> None:
             feature_type=args.feature_type,
             issue_number=args.issue_number,
             force=args.force,
+            work_mode=args.work_mode,
         )
     except (ValueError, FileExistsError) as exc:
         print(str(exc))
