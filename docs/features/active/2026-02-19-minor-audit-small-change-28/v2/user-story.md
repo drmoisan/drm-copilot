@@ -1,9 +1,12 @@
 # `2026-02-19-minor-audit-small-change` — User Story
 
-- Issue: #28
-- Owner: drmoisan
-- Status: Draft
-- Last Updated: 2026-02-19T12-02
+- **Issue:** #28
+- **Owner:** drmoisan
+- **Status:** Superceded by 3.0
+- **Last Updated:** 2026-02-19T12-02
+- **Version:** 2.0
+
+![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
 
 ## Story Statement
 

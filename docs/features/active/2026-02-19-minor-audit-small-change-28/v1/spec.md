@@ -4,8 +4,10 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-19T12-02
-- **Status:** Draft
-- **Version:** 0.1
+- **Status:** Superceded by 2.0
+- **Version:** 1.0
+
+![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
 
 ## Overview
 

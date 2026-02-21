@@ -4,12 +4,12 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-20T09-21
-- **Status:** Planned
+- **Status:** Superceded
 - **Version:** 2.0
 
-## Introduction
+![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
 
-![Status: Planned](https://img.shields.io/badge/Status-Planned-blue)
+## Introduction
 
 This plan implements deterministic minor-audit mode branching by persisting `- Work Mode: minor-audit|full` in `issue.md`, then updating producer tooling, reviewer/status agents, tests, and process docs so minor-audit work is audited correctly without false failures.
 

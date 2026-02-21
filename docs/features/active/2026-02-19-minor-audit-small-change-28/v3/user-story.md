@@ -2,11 +2,11 @@
 
 - **Issue:** #28
 - **Owner:** drmoisan
-- **Status:** Superceded by 2.0
+- **Status:** Draft
 - **Last Updated:** 2026-02-19T12-02
-- **Version:** 1.0
+- **Version:** 3.0
 
-![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
+![Status: Planned](https://img.shields.io/badge/Status-Draft-grey)
 
 ## Story Statement
 
@@ -21,6 +21,8 @@ Small or bootstrapped feature work currently has two sub-optimal choices:
 2. Skip active feature docs and lose the repository's required traceability and audit trail.
 
 The repo's playbooks and templates expect an active feature folder before coding, but there is no explicit lightweight standard for minimal-scope feature documentation.
+
+The producer flow now persists a machine-readable marker (`- Work Mode: ...`) in `issue.md`, but key planning/execution agents still do not consistently branch on that marker. This creates drift where issue-level mode selection says `minor-audit` while downstream plans and preflight validation still behave like generic `full` mode.
 
 
 ## Personas & Scenarios
@@ -52,11 +54,20 @@ The repo's playbooks and templates expect an active feature folder before coding
 
 ## Acceptance Criteria
 
-- [x] A bootstrapped work item can be completed and reviewed using an expanded `issue.md` without requiring full template completion (`user-story.md`, full `spec.md`, or deep plan) when scope remains small and pre-cooked.
-- [x] Expanded `issue.md` includes minimum required sections: problem/why, implementation intent, acceptance criteria, dependencies/risks, verification steps, and evidence checklist.
-- [x] Minimum audit evidence is explicitly defined and captured as baseline + end-state + targeted verification for changed behavior.
-- [x] Policy for bootstrapped path explicitly states that broad regression and extended design documentation are not required by default.
-- [x] A reviewer can determine whether the change is complete and safe from `issue.md` plus minimum evidence artifacts alone.
+- [ ] A bootstrapped work item can be completed and reviewed using an expanded `issue.md` without requiring full template completion (`user-story.md`, full `spec.md`, or deep plan) when scope remains small and pre-cooked.
+- [ ] Expanded `issue.md` includes minimum required sections: problem/why, implementation intent, acceptance criteria, dependencies/risks, verification steps, and evidence checklist.
+- [ ] `issue.md` includes a persisted work-mode marker line above the first `##` heading in the exact format `- Work Mode: minor-audit` or `- Work Mode: full`.
+- [ ] When a `minor-audit` request is rejected by eligibility checks, the producer flow falls back to `full` and the persisted marker reflects the selected mode (`- Work Mode: full`), not just the requested mode.
+- [ ] Minimum audit evidence is explicitly defined and captured as baseline + end-state + targeted verification for changed behavior.
+- [ ] Policy for bootstrapped path explicitly states that broad regression and extended design documentation are not required by default.
+- [ ] A reviewer can determine whether the change is complete and safe from `issue.md` plus minimum evidence artifacts alone.
+- [ ] Review automation does not mark minor-audit work as incomplete solely due to missing `spec.md`/`user-story.md` when the persisted marker is `- Work Mode: minor-audit`.
+- [ ] Status determination for “Delivered” branches by work mode: `minor-audit` uses acceptance criteria in `issue.md`; `full` uses acceptance criteria in `spec.md` + `user-story.md`.
+- [ ] Planning and execution agents that consume feature docs (`atomic_planner`, `atomic_executor`, `python-typed-engineer`, `powershell-atomic-planning`, `powershell-atomic-executor`) resolve mode from `issue.md` marker first and fail closed to `full` if marker is missing or malformed.
+- [ ] Preflight validation rejects a `minor-audit` plan when mode-specific requirements are missing, including baseline evidence capture, targeted verification evidence, and end-state evidence tasks.
+- [ ] A generated plan for `minor-audit` contains explicit mode-aware acceptance criteria and evidence gates, and does not require `spec.md`/`user-story.md` as completion blockers by default.
+- [ ] A generated plan for `full` preserves existing full-document expectations (`spec.md` + `user-story.md`) and full QA toolchain requirements.
+- [ ] Deterministic routing behavior is covered by contract tests and smoke tests for three marker states: valid `minor-audit`, valid `full`, and missing/malformed marker (must route to `full`).
 
 
 ## Non-Goals
@@ -66,3 +77,4 @@ The repo's playbooks and templates expect an active feature folder before coding
 - Eliminating evidence requirements; this feature reduces scope to minimum viable evidence, not zero evidence.
 - Introducing new runtime dependencies to implement the process change.
 - Retroactively rewriting historical feature documentation for previously completed work.
+- Achieving perfect deterministic behavior from probabilistic LLM generation; the objective is bounded determinism through machine-readable control signals, fail-closed routing, and enforced preflight/evidence gates.

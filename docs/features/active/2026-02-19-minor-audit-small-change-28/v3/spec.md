@@ -4,10 +4,10 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-19T12-02
-- **Status:** Superceded by 3.0
-- **Version:** 2.0
+- **Status:** Draft
+- **Version:** 3.0
 
-![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
+![Status: Planned](https://img.shields.io/badge/Status-Draft-grey)
 
 ## Overview
 
@@ -75,6 +75,19 @@ Additionally, define a deterministic, persisted mode signal so downstream review
 	- `full`: acceptance criteria remain extracted from `spec.md` + `user-story.md` (backward-compatible with existing expectations).
 - “Fail closed” rule: if the marker is missing or malformed, consumers must assume `full` mode to avoid under-auditing.
 
+Define a shared mode-resolution contract for planning and execution stages so downstream behavior is deterministic and auditable:
+
+- Mode source precedence:
+	1. Persisted marker in `issue.md` (`- Work Mode: minor-audit|full`)
+	2. Explicit CLI/workflow override only when policy allows, and only if reconciled against `issue.md`
+	3. Fail-closed default to `full`
+- Preflight branch expectations:
+	- For `minor-audit`, plans MUST include explicit baseline evidence, targeted verification evidence, and end-state evidence tasks.
+	- For `minor-audit`, missing `spec.md`/`user-story.md` is not an automatic failure.
+	- For `full`, existing full-feature expectations remain in effect.
+- Determinism objective:
+	- The system targets bounded determinism (machine-readable routing + hard preflight gates + test enforcement), not perfect deterministic generation.
+
 
 ## Inputs / Outputs
 
@@ -85,9 +98,12 @@ Additionally, define a deterministic, persisted mode signal so downstream review
 	- Existing active-folder input: feature name/type/issue number consumed by `scripts/dev_tools/new_active_feature_folder.py`.
 	- Mode input: `--work-mode {minor-audit|full}` (already supported by the producer scripts).
 	- Persisted mode marker: `- Work Mode: <value>` (must be written into `issue.md` by the producer flow so reviewers can branch deterministically).
+	- Planner/executor mode input: resolved mode value derived from `issue.md` marker and validated during preflight.
 - Outputs (artifacts, logs, telemetry)
 	- Expanded `issue.md` containing required minor-audit sections and acceptance criteria.
 	- Expanded `issue.md` metadata includes the persisted work-mode marker line above the first `##` heading.
+	- Mode-aware plan content where acceptance and evidence gates branch by resolved work mode.
+	- Preflight output indicating whether mode-specific requirements are satisfied (`PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`).
 	- Minimum evidence artifacts under active feature evidence folders:
 		- `evidence/baseline/` (before state)
 		- `evidence/other/` (end-state + targeted verification)
@@ -138,6 +154,10 @@ Additionally, define a deterministic, persisted mode signal so downstream review
 - Consumer branching contract (review/status automation):
 	- Read `issue.md` metadata and branch based on `- Work Mode: ...`.
 	- If absent/malformed, treat as `full`.
+- Consumer branching contract (planning/execution automation):
+	- Resolve mode from `issue.md` and enforce mode-specific plan requirements at preflight.
+	- Reject mode-inconsistent plan content before execution starts.
+	- If marker is absent/malformed, enforce `full` path requirements.
 
 ## Data & State
 
@@ -150,6 +170,7 @@ Data flow, storage, or state changes introduced by this feature.
 	- No runtime cache introduced.
 	- Persistent state remains markdown artifacts in feature docs and evidence folders.
 	- New persisted state element: the `- Work Mode: ...` marker line in `issue.md` metadata.
+	- No new required state files are introduced; determinism is enforced from existing persisted marker + existing plan/evidence artifacts.
 - Migration or backfill requirements (if any):
 	- No mandatory historical backfill required for prior features.
 	- Existing active features may opt into minor-audit policy only when eligibility and evidence contracts are satisfied.
@@ -159,8 +180,10 @@ Data flow, storage, or state changes introduced by this feature.
 - Must remain compatible with existing Feature Playbook governance while adding a formal bootstrapped exception path.
 - Risk: teams may over-classify work as "bootstrapped" to avoid appropriate design/testing rigor.
 - Risk: reduced regression scope may miss adjacent breakage if boundaries are not clearly defined.
+- Risk: mode drift between issue metadata and downstream plan/execution behavior may create false passes or false failures.
 - Constraint: bootstrapped path should define clear eligibility criteria (pre-cooked solve, narrow blast radius, low integration risk).
 - Constraint: no net loss of auditability; minimum evidence requirements must be explicit and enforceable.
+- Constraint: agentic execution is probabilistic; reliability must come from constrained branch inputs, fail-closed defaults, and objective preflight checks.
 - Limits (latency/throughput/memory) and acceptable trade-offs:
 	- Primary objective is process overhead reduction, not runtime performance improvement.
 	- Accept slight tooling complexity increase to reduce repeated documentation effort for qualifying work.
@@ -172,6 +195,8 @@ Data flow, storage, or state changes introduced by this feature.
 		- Mitigation: deterministic gate checklist in `issue.md` plus reviewer confirmation requirement.
 	- Risk: process fork confusion.
 		- Mitigation: full path stays default; minor-audit requires explicit mode signal and eligibility pass.
+	- Risk: over-constraining prompts without machine-checkable validation still allows nondeterministic misses.
+		- Mitigation: enforce branch behavior through preflight acceptance criteria and contract tests, not prompt text alone.
 
 
 ## Implementation Strategy
@@ -179,6 +204,7 @@ Data flow, storage, or state changes introduced by this feature.
 - Implementation scope (what changes, not sequencing):
 	- Persist a deterministic work-mode marker into `issue.md` so downstream agents can branch without heuristics.
 	- Align reviewers/status automation to branch acceptance-criteria extraction and doc-completeness expectations based on the marker.
+	- Add mode-aware branching requirements to planning/execution agents and shared skills so plan generation and execution behavior matches persisted mode.
 	- Preserve existing producer behavior (including existing `--work-mode` support and eligibility fallback) while making the chosen mode durable.
 - New classes/functions/commands to add or update:
 	- `scripts/dev_tools/potential_to_issue.py`
@@ -197,6 +223,18 @@ Data flow, storage, or state changes introduced by this feature.
 		- update AC extraction to use `issue.md` for `minor-audit` and `spec.md` + `user-story.md` for `full`.
 	- `.github/agents/status_updater.agent.md`
 		- update “Delivered” definition and evidence-writing targets to branch based on work mode (issue-centric for `minor-audit`).
+	- `.github/agents/atomic_planning.agent.md`
+		- require mode resolution from `issue.md` and require mode-specific plan requirements at preflight.
+	- `.github/agents/atomic_executor.agent.md`
+		- require preflight rejection when selected mode requirements are missing from the approved plan.
+	- `.github/agents/python-typed-engineer.agent.md`
+		- require mode-aware planning handoff expectations so baseline/verification shape matches selected mode.
+	- `.github/agents/powershell-atomic-planning.agent.md`
+		- require mode-aware plan structure and preflight criteria analogous to generic atomic planner.
+	- `.github/agents/powershell-atomic-executor.agent.md`
+		- require mode-aware preflight checks before execution loop starts.
+	- `.github/skills/atomic-plan-contract/SKILL.md`
+		- add explicit mode-branch preflight requirements and fail-closed routing semantics.
 	- `.github/skills/feature-promotion-lifecycle/SKILL.md`
 		- update canonical commands and required outputs to include `--work-mode` and to treat minor-audit as first-class.
 	- `docs/engineering/Feature Playbook.md`
@@ -220,7 +258,10 @@ Data flow, storage, or state changes introduced by this feature.
 - [ ] Producer tooling persists a deterministic work-mode marker in the resulting `issue.md` (and the created GitHub issue body) that reflects the selected mode.
 - [ ] Review agents branch deterministically on the persisted marker and do not false-fail minor-audit work for missing full-doc artifacts.
 - [ ] Status updater branches deterministically on the persisted marker when assessing Delivered and when appending evidence.
+- [ ] Atomic planning/execution agents and typed-engineer planners enforce mode-aware preflight branching from `issue.md` marker and fail closed to `full` when marker is missing/malformed.
+- [ ] Shared planning contract (`atomic-plan-contract`) requires mode-specific plan/evidence gates during preflight.
 - [ ] Tests are updated/added for mode routing, eligibility checks, and issue/evidence validation behavior.
+- [ ] Contract tests verify mode-aware requirements are present in all targeted agents/skills and smoke tests verify mode routing for valid and malformed markers.
 - [ ] Edge cases are covered (eligibility failure, missing evidence, scope/risk escalation).
 - [ ] Process docs are updated (`Feature Playbook` + templates guidance) to reflect deterministic mode selection.
 - [ ] Script output clearly indicates selected mode and fallback reason when minor-audit is rejected.
@@ -232,3 +273,5 @@ Data flow, storage, or state changes introduced by this feature.
 - [ ] Capture end-state evidence after implementation and confirm acceptance criteria pass.
 - [ ] Run targeted verification for touched behavior only; document why broad regression is unnecessary for this case.
 - [ ] Validate reviewer usability: another maintainer can approve based on `issue.md` + minimum evidence package.
+- [ ] Validate planning preflight behavior for three marker states: `minor-audit`, `full`, and missing/malformed marker (must route to `full`).
+- [ ] Validate generated plan content includes mode-aware evidence requirements for `minor-audit` and full-doc expectations for `full`.

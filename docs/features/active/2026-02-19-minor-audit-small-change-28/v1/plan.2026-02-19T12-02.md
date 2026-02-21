@@ -12,7 +12,7 @@ version: 1.0
 
 ## Introduction
 
-![Status: Planned](https://img.shields.io/badge/Status-Superceded-orange)
+![Status: Superceded](https://img.shields.io/badge/Status-Superceded-orange)
 
 This plan delivers the Minor Change Audit Path defined in `spec.md`, `user-story.md`, and `research.md` for issue #28.
 All tasks are deterministic, atomic, and executor-compatible.
