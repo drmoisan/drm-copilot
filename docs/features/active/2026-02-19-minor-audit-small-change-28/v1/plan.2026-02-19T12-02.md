@@ -3,8 +3,8 @@ issue: 28
 parent: none
 owner: drmoisan
 last_updated: 2026-02-19T12-02
-status: Planned
-status_color: blue
+status: Superceded by 2.0
+status_color: orange
 version: 1.0
 ---
 
@@ -12,7 +12,7 @@ version: 1.0
 
 ## Introduction
 
-![Status: Planned](https://img.shields.io/badge/Status-Planned-blue)
+![Status: Planned](https://img.shields.io/badge/Status-Superceded-orange)
 
 This plan delivers the Minor Change Audit Path defined in `spec.md`, `user-story.md`, and `research.md` for issue #28.
 All tasks are deterministic, atomic, and executor-compatible.
