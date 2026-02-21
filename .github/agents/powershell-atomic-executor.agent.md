@@ -27,6 +27,12 @@ If the plan is incomplete or non-executable, stop only during preflight and requ
 ## 2) Mandatory preflight
 Before any execution, validate plan structure and policy compatibility:
 
+- Resolve mode from `issue.md` marker first:
+	- `- Work Mode: minor-audit`
+	- `- Work Mode: full`
+- If marker is missing or malformed, fail closed to `full`.
+- When selected mode is `minor-audit`, reject plans that do not include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+
 - Canonical headings: `### Phase N — <Title>`
 - Canonical tasks: `- [ ] [P#-T#] ...` / `- [x] [P#-T#] ...`
 - Stable/sequential task IDs within each phase

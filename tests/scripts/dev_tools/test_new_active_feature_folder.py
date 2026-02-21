@@ -1077,6 +1077,51 @@ def test_work_mode_marker_minor_issue_md() -> None:
     assert lines[first_section_index - 1] == ""
 
 
+def scenario_single_work_mode_marker_before_first_heading() -> None:
+    """Verify generated issue.md has one marker before the first section."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "single-marker.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #40",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "behavior",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="single-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    marker_lines = [line for line in lines if line.startswith("- Work Mode:")]
+    first_section_index = lines.index("## Problem / Why")
+    marker_index = lines.index("- Work Mode: minor-audit")
+
+    assert len(marker_lines) == 1
+    assert marker_index == first_section_index - 2
+    assert lines[first_section_index - 1] == ""
+
+
+test_new_active_feature_folder_writes_single_work_mode_marker_before_first_heading = (
+    scenario_single_work_mode_marker_before_first_heading
+)
+
+
 def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
     """Verify minor-audit preserves promoted issue frontmatter and spacing."""
     fs = FakeFileSystem()

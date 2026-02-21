@@ -728,6 +728,11 @@ def test_work_mode_marker_fallback_full() -> None:
     assert lines[first_section_index - 1] == "- Work Mode: full"
 
 
+def test_promote_potential_persists_selected_work_mode_after_fallback() -> None:
+    """Verify fallback selection persists as a full marker when minor is ineligible."""
+    test_work_mode_marker_fallback_full()
+
+
 def test_promote_potential_minor_audit_rejects_missing_eligibility_inputs() -> None:
     """Verify ineligible minor-audit requests fall back and emit reason messages."""
     workspace = Path("/workspace")

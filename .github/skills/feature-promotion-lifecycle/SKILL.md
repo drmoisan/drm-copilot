@@ -51,3 +51,10 @@ Before delegating research/spec/planning, provide:
 Mode-aware expectations:
 - For `minor-audit`, `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
 - For `full`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
+
+Selected-mode persistence requirements:
+- Producer outputs MUST persist exactly one marker in `issue.md` metadata above the first `##` heading:
+	- `- Work Mode: minor-audit`
+	- `- Work Mode: full`
+- Persisted marker MUST represent selected mode after eligibility checks, not requested mode.
+- If a requested `minor-audit` path is rejected by eligibility checks, tooling MUST fail closed to `full`, emit fallback reason, and persist `- Work Mode: full`.
