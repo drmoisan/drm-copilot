@@ -93,6 +93,15 @@ Within the selected current version scope:
 - Select the latest `plan.<timestamp>.md` by max lexicographic ISO timestamp (`yyyy-MM-ddTHH-mm` sorts correctly).
 - If none exists, mark MISSING and do not attempt plan checkbox updates for that feature.
 
+## 4.5) Work-mode marker contract (deterministic)
+- Read the persisted marker from `issue.md` using exact line format:
+   - `- Work Mode: minor-audit`
+   - `- Work Mode: full`
+- Branch `Delivered` computation and evidence targets by marker value:
+   - For `Work Mode: minor-audit`, evaluate acceptance completion from `issue.md` criteria and write acceptance evidence to `issue.md`.
+   - For `Work Mode: full`, evaluate acceptance completion from `spec.md` and `user-story.md` and write acceptance evidence to `spec.md` and `user-story.md`.
+- Fail closed: if marker is missing or malformed, fallback to full behavior (`spec.md` + `user-story.md`) for Delivered computation and evidence writing.
+
 # GitHub Issues mutation rules (safe by default)
 
 ## Default: NO remote mutations

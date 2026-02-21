@@ -16,3 +16,16 @@ Use these templates to keep planning consistent.
   - `refactor`: use for non-user-facing structural/code-quality work.
 
 Minor-audit does not require broad regression or extended design docs by default; add them only when risk warrants.
+
+Marker-driven branch criteria (deterministic):
+- Persist work mode in `issue.md` using exactly one marker line directly above the first `##` heading:
+  - `- Work Mode: minor-audit`
+  - `- Work Mode: full`
+- Review/audit automation must branch from this persisted marker (not inferred intent):
+  - `minor-audit` => `issue.md` is the acceptance-criteria source of truth.
+  - `full` => `spec.md` and `user-story.md` are required acceptance-criteria sources.
+- If marker is missing or malformed, fail closed to `full` behavior.
+
+Minor-audit artifact expectations:
+- Required: `issue.md` with persisted work-mode marker.
+- Optional by design: `spec.md` and `user-story.md` may be absent when marker is `minor-audit`.

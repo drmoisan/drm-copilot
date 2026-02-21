@@ -419,6 +419,7 @@ def get_section(content: str, heading: str) -> str:
 
 
 def build_body(
+    work_mode: str,
     problem: str,
     behavior: str,
     criteria: str,
@@ -450,6 +451,7 @@ def build_body(
     """
 
     return (
+        f"- Work Mode: {work_mode}\n"
         f"## Problem / Why\n{problem}\n\n"
         f"## Proposed Behavior\n{behavior}\n\n"
         f"## Acceptance Criteria\n{criteria}\n\n"
@@ -504,6 +506,7 @@ def evaluate_minor_audit_eligibility(content: str) -> tuple[bool, str]:
 
 
 def build_minor_audit_body(
+    work_mode: str,
     problem: str,
     implementation_intent: str,
     acceptance_criteria: str,
@@ -515,6 +518,7 @@ def build_minor_audit_body(
     """Build required issue sections for the minor-audit mode."""
 
     return (
+        f"- Work Mode: {work_mode}\n"
         f"## Problem / Why\n{problem}\n\n"
         f"## Implementation Intent\n{implementation_intent}\n\n"
         f"## Acceptance Criteria\n{acceptance_criteria}\n\n"
@@ -836,6 +840,7 @@ def promote_potential(
                 "- [ ] Baseline\n- [ ] End-state\n- [ ] Targeted verification"
             )
         body = build_minor_audit_body(
+            selected_mode,
             problem,
             implementation_intent,
             acceptance_criteria,
@@ -853,7 +858,13 @@ def promote_potential(
         constraints = get_section(content, "Constraints & Risks") or PLACEHOLDER
         tests = get_section(content, "Test Conditions to Consider") or PLACEHOLDER
         body = build_body(
-            problem, behavior, criteria, constraints, tests, relative_path
+            selected_mode,
+            problem,
+            behavior,
+            criteria,
+            constraints,
+            tests,
+            relative_path,
         )
     body = normalize_smart_punctuation(body)
 

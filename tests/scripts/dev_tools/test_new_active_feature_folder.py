@@ -1036,6 +1036,42 @@ def test_create_active_folder_minor_audit_materializes_issue_md_and_skips_full_d
     assert "Implementation Intent" in fs.read_text(result.target / "issue.md")
 
 
+def test_work_mode_marker_minor_issue_md() -> None:
+    """Verify minor-audit issue.md persists marker above first section heading."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "minor-marker.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #30",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "intent",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="minor-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 1] == "- Work Mode: minor-audit"
+
+
 def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
@@ -1069,6 +1105,46 @@ def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
     assert fs.exists(result.target / "user-story.md")
     assert "Selected mode: full" in out
     assert "Fallback reason:" in out
+
+
+def test_work_mode_marker_fallback_issue_md_full() -> None:
+    """Verify minor-audit fallback issue.md persists full marker above first section."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = (
+        workspace / "docs" / "features" / "potential" / "fallback-marker.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #31",
+                "- File: a.py",
+                "- File: b.py",
+                "- File: c.py",
+                "- File: d.py",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "behavior",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="fallback-marker",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 1] == "- Work Mode: full"
 
 
 def test_create_active_folder_full_mode_remains_backward_compatible() -> None:

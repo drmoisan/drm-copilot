@@ -255,6 +255,36 @@ def get_section(content: str, name: str) -> str:
     return match.group(1).strip()
 
 
+def upsert_work_mode_marker(content: str, mode: str) -> str:
+    """Insert or update work-mode marker directly above first `##` heading.
+
+    Purpose:
+        Ensure downstream reviewers can deterministically branch on persisted mode.
+
+    Args:
+        content (str): Markdown content to update.
+        mode (str): Work mode marker value (`minor-audit` or `full`).
+
+    Returns:
+        str: Updated markdown containing exactly one marker line.
+    """
+
+    marker_line = f"- Work Mode: {mode}"
+    marker_pattern = re.compile(r"^- Work Mode:\s*(minor-audit|full)\s*$")
+    lines = [line for line in content.splitlines() if not marker_pattern.match(line)]
+
+    for idx, line in enumerate(lines):
+        # Place marker immediately above first top-level section heading.
+        if line.lstrip().startswith("## "):
+            lines.insert(idx, marker_line)
+            return "\n".join(lines)
+
+    if lines and lines[-1] != "":
+        lines.append("")
+    lines.append(marker_line)
+    return "\n".join(lines)
+
+
 def set_section(content: str, name: str, body: str) -> str:
     """Set or append a markdown section body.
 
@@ -1155,7 +1185,7 @@ def create_active_folder(
         issue_body = "\n".join(
             [
                 f"# {feature_name}",
-                "",
+                "- Work Mode: minor-audit",
                 "## Problem / Why",
                 sections["problem"] or "(not provided in potential file)",
                 "",
@@ -1205,6 +1235,12 @@ def create_active_folder(
             )
         else:
             filesystem.move(potential_file, potential_issue_path)
+            if work_mode == "minor-audit" and fallback_reason:
+                moved_content = filesystem.read_text(potential_issue_path)
+                filesystem.write_text(
+                    potential_issue_path,
+                    upsert_work_mode_marker(moved_content, "full"),
+                )
             print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:

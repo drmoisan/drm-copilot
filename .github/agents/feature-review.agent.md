@@ -58,6 +58,15 @@ Use these reusable skills to avoid duplicating shared operations:
 - Do not “clean up” code during review.
 - If format/lint/type failures exist, document them and include exact fix guidance in remediation inputs.
 
+## 3) Work-mode marker contract (deterministic)
+- Read the persisted marker from `issue.md` using the exact line format:
+   - `- Work Mode: minor-audit`
+   - `- Work Mode: full`
+- Branch acceptance-criteria (AC) source by marker value:
+   - When `Work Mode: minor-audit`, treat `issue.md` as the AC source of truth.
+   - When `Work Mode: full`, treat `spec.md` and `user-story.md` as AC sources of truth.
+- Fail closed: if marker is missing or malformed, fallback to full mode behavior (`spec.md` + `user-story.md`).
+
 
 # Execution plan (phased, deterministic)
 

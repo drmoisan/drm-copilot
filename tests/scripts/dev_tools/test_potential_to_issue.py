@@ -652,6 +652,82 @@ def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
     assert "## Evidence Checklist" in body
 
 
+def test_work_mode_marker_minor_audit() -> None:
+    """Verify minor-audit issue bodies persist marker above first section heading."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/minor-marker.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Minor Marker Feature",
+            "- File: scripts/dev_tools/potential_to_issue.py",
+            "- Risk: low",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/56"], 0), mod.GhResult([], 0)
+    )
+
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+    )
+
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    lines = body.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 1] == "- Work Mode: minor-audit"
+
+
+def test_work_mode_marker_fallback_full() -> None:
+    """Verify fallback-to-full issue bodies persist full marker above first section."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/fallback-marker.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Fallback Marker Feature",
+            "- File: a.py",
+            "- File: b.py",
+            "- File: c.py",
+            "- File: d.py",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/57"], 0), mod.GhResult([], 0)
+    )
+
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+    )
+
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    lines = body.splitlines()
+    first_section_index = lines.index("## Problem / Why")
+    assert first_section_index > 0
+    assert lines[first_section_index - 1] == "- Work Mode: full"
+
+
 def test_promote_potential_minor_audit_rejects_missing_eligibility_inputs() -> None:
     """Verify ineligible minor-audit requests fall back and emit reason messages."""
     workspace = Path("/workspace")

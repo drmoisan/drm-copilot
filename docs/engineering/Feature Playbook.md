@@ -127,3 +127,13 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 Use `minor-audit` only when work is bootstrapped/pre-cooked or when scope stays at 3 or fewer production files with low integration risk.
 If a requested minor-audit is not eligible, use full feature path.
 For minor-audit work, broad regression and extended design docs are not required by default; escalate only when risk or scope warrants it.
+
+### Persisted Work-Mode Marker Contract (deterministic)
+
+- Every promoted/active `issue.md` must persist exactly one marker line directly above the first `##` heading:
+  - `- Work Mode: minor-audit`
+  - `- Work Mode: full`
+- The marker value must reflect the selected mode **after** eligibility evaluation (not merely the requested mode).
+- Fail closed for automation/reviewers: if marker is missing or malformed, treat the feature as `full` mode.
+- Eligibility fallback behavior:
+  - Requested `minor-audit` + ineligible conditions => selected mode is `full`, and marker must be `- Work Mode: full`.
