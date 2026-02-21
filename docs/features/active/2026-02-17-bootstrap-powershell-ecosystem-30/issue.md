@@ -61,5 +61,5 @@ Required output behavior:
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/bootstrap-powershell-ecosystem/` folder from the template
+- [x] Promote to GitHub issue (feature request template)
+- [x] Create `docs/features/active/bootstrap-powershell-ecosystem/` folder from the template
