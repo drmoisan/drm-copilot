@@ -1,4 +1,29 @@
 {	
+    "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
+    "coverage-gutters.coverageFileNames": [
+        "lcov.info",
+        "cov.xml",
+        "coverage.xml",
+        "cobertura.xml",
+        "jacoco.xml",
+        "coverage.cobertura.xml",
+        "powershell-coverage.xml"
+    ],
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.showLineCoverage": true,
+    "koverage.coverageFileNames": [
+        "lcov.info",
+        "cov.xml",
+        "clover.xml",
+        "coverage.xml",
+        "jacoco.xml",
+        "powershell-coverage.koverage.xml"
+    ],
+    "koverage.coverageFilePaths": [
+        "artifacts/pester",
+        "artifacts/pester/kcov/kcov-merged"
+    ],
+    "powershell.cwd": "${workspaceFolder}",
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": ["tests"],
