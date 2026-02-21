@@ -2,11 +2,11 @@
 
 - **Issue:** #28
 - **Owner:** drmoisan
-- **Status:** Draft
+- **Status:** Locked
 - **Last Updated:** 2026-02-19T12-02
 - **Version:** 3.0
 
-![Status: Planned](https://img.shields.io/badge/Status-Draft-grey)
+![Status: Locked](https://img.shields.io/badge/Status-Locked-brightgreen)
 
 ## Story Statement
 

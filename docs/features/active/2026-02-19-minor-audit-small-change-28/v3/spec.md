@@ -4,10 +4,10 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-02-19T12-02
-- **Status:** Draft
+- **Status:** Locked
 - **Version:** 3.0
 
-![Status: Planned](https://img.shields.io/badge/Status-Draft-grey)
+![Status: Locked](https://img.shields.io/badge/Status-Locked-brightgreen)
 
 ## Overview
 

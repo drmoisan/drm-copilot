@@ -7,6 +7,8 @@
 - Issue: #28
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/28
 - Last Updated: 2026-02-19
+- Work Mode: full
+
 ## Problem / Why
 
 Small or bootstrapped feature work currently has two sub-optimal choices:
