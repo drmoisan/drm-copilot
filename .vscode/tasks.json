@@ -35,6 +35,16 @@
 		"type": "pickString"
 		},
 		{
+		"default": "full",
+		"description": "Work mode for promoting potential docs",
+		"id": "PotentialWorkMode",
+		"options": [
+			"full",
+			"minor-audit"
+		],
+		"type": "pickString"
+		},
+		{
 		"default": "new_feature",
 		"description": "Feature folder name (kebab/underscore-case, e.g., notes_feature)",
 		"id": "ActiveFeatureName",
@@ -63,6 +73,16 @@
 		"description": "Issue number (optional, e.g., 14)",
 		"id": "ActiveIssueNumber",
 		"type": "promptString"
+		},
+		{
+		"default": "full",
+		"description": "Work mode for active folder creation",
+		"id": "ActiveWorkMode",
+		"options": [
+			"full",
+			"minor-audit"
+		],
+		"type": "pickString"
 		},
 		{
 		"default": "",

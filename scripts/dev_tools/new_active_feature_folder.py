@@ -276,6 +276,7 @@ def upsert_work_mode_marker(content: str, mode: str) -> str:
     for idx, line in enumerate(lines):
         # Place marker immediately above first top-level section heading.
         if line.lstrip().startswith("## "):
+            lines.insert(idx, "")
             lines.insert(idx, marker_line)
             return "\n".join(lines)
 
@@ -617,6 +618,43 @@ def copy_template(
                     break
     else:
         fs.copy_tree(template_dir, target_dir)
+
+
+def copy_feature_template_for_minor_audit(
+    template_dir: Path, target_dir: Path, fs: FileSystem
+) -> None:
+    """Copy only the plan template for minor-audit feature flows.
+
+    Purpose:
+        Ensure minimal-audit feature folders do not include spec/user-story
+        templates while still materializing a plan when available.
+
+    Args:
+        template_dir (Path): Source feature template directory.
+        target_dir (Path): Destination active feature folder.
+        fs (FileSystem): File abstraction for copy operations.
+
+    Returns:
+        None
+
+    Raises:
+        FileNotFoundError: If expected template files are missing when accessed
+            by the FileSystem implementation.
+
+    Side Effects:
+        Copies the plan template into the active folder when present.
+    """
+
+    # Prefer the timestamped plan template to preserve the repo convention.
+    timestamped_plan = template_dir / PLAN_TIMESTAMP_TEMPLATE_NAME
+    if fs.exists(timestamped_plan):
+        fs.copy_file(timestamped_plan, target_dir / PLAN_TIMESTAMP_TEMPLATE_NAME)
+        return
+
+    # Fall back to legacy plan.md if timestamped template is not present.
+    legacy_plan = template_dir / "plan.md"
+    if fs.exists(legacy_plan):
+        fs.copy_file(legacy_plan, target_dir / "plan.md")
 
 
 def materialize_plan_file(
@@ -1125,7 +1163,11 @@ def create_active_folder(
         )
 
     filesystem.ensure_dir(target_dir)
-    copy_template(feature_type, template_dir, target_dir, filesystem)
+    # Branch copy behavior to avoid spec/user-story templates in minor-audit.
+    if feature_type == "feature" and use_minor_audit:
+        copy_feature_template_for_minor_audit(template_dir, target_dir, filesystem)
+    else:
+        copy_template(feature_type, template_dir, target_dir, filesystem)
 
     issue_meta = None
     if normalized_issue_number:
@@ -1179,36 +1221,49 @@ def create_active_folder(
     }
 
     files_to_open: list[Path]
+    potential_issue_path: Path | None = None
     if use_minor_audit:
-        issue_doc = target_dir / "issue.md"
-        # Build issue.md content for minor-audit mode in a fixed section order.
-        issue_body = "\n".join(
-            [
-                f"# {feature_name}",
-                "- Work Mode: minor-audit",
-                "## Problem / Why",
-                sections["problem"] or "(not provided in potential file)",
-                "",
-                "## Implementation Intent",
-                sections["behavior"] or "(not provided in potential file)",
-                "",
-                "## Acceptance Criteria",
-                sections["criteria"] or "(not provided in potential file)",
-                "",
-                "## Dependencies / Risks",
-                sections["constraints"] or "(not provided in potential file)",
-                "",
-                "## Verification Steps",
-                sections["tests"] or "(not provided in potential file)",
-                "",
-                "## Evidence Checklist",
-                "- [ ] baseline",
-                "- [ ] targeted verification",
-                "- [ ] end-state",
-            ]
-        )
-        filesystem.write_text(issue_doc, issue_body)
-        files_to_open = [issue_doc]
+        if potential_file:
+            # Preserve promoted frontmatter/content and only inject marker line.
+            potential_issue_path = target_dir / "issue.md"
+            filesystem.move(potential_file, potential_issue_path)
+            moved_content = filesystem.read_text(potential_issue_path)
+            filesystem.write_text(
+                potential_issue_path,
+                upsert_work_mode_marker(moved_content, "minor-audit"),
+            )
+            files_to_open = [potential_issue_path]
+        else:
+            issue_doc = target_dir / "issue.md"
+            # Build fallback issue.md content for minor-audit mode.
+            issue_body = "\n".join(
+                [
+                    f"# {feature_name}",
+                    "",
+                    "- Work Mode: minor-audit",
+                    "## Problem / Why",
+                    sections["problem"] or "(not provided in potential file)",
+                    "",
+                    "## Implementation Intent",
+                    sections["behavior"] or "(not provided in potential file)",
+                    "",
+                    "## Acceptance Criteria",
+                    sections["criteria"] or "(not provided in potential file)",
+                    "",
+                    "## Dependencies / Risks",
+                    sections["constraints"] or "(not provided in potential file)",
+                    "",
+                    "## Verification Steps",
+                    sections["tests"] or "(not provided in potential file)",
+                    "",
+                    "## Evidence Checklist",
+                    "- [ ] baseline",
+                    "- [ ] targeted verification",
+                    "- [ ] end-state",
+                ]
+            )
+            filesystem.write_text(issue_doc, issue_body)
+            files_to_open = [issue_doc]
     else:
         files_to_open = update_feature_docs(
             feature_type,
@@ -1226,14 +1281,12 @@ def create_active_folder(
             plan_path=plan_path,
         )
 
-    potential_issue_path = None
     if potential_file:
-        potential_issue_path = target_dir / "issue.md"
         if use_minor_audit:
-            print(
-                f"Kept generated issue.md for minor-audit mode: {potential_issue_path}"
-            )
+            if potential_issue_path is not None:
+                print(f"Moved potential file to {potential_issue_path}")
         else:
+            potential_issue_path = target_dir / "issue.md"
             filesystem.move(potential_file, potential_issue_path)
             if work_mode == "minor-audit" and fallback_reason:
                 moved_content = filesystem.read_text(potential_issue_path)

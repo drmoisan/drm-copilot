@@ -1033,7 +1033,11 @@ def test_create_active_folder_minor_audit_materializes_issue_md_and_skips_full_d
         work_mode="minor-audit",
     )
     assert fs.exists(result.target / "issue.md")
-    assert "Implementation Intent" in fs.read_text(result.target / "issue.md")
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: minor-audit" in issue_md
+    assert "## Proposed Behavior" in issue_md
+    assert not fs.exists(result.target / "spec.md")
+    assert not fs.exists(result.target / "user-story.md")
 
 
 def test_work_mode_marker_minor_issue_md() -> None:
@@ -1069,7 +1073,62 @@ def test_work_mode_marker_minor_issue_md() -> None:
     lines = issue_md.splitlines()
     first_section_index = lines.index("## Problem / Why")
     assert first_section_index > 0
-    assert lines[first_section_index - 1] == "- Work Mode: minor-audit"
+    assert lines[first_section_index - 2] == "- Work Mode: minor-audit"
+    assert lines[first_section_index - 1] == ""
+
+
+def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
+    """Verify minor-audit preserves promoted issue frontmatter and spacing."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = workspace / "docs" / "features" / "potential" / "frontmatter.md"
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "# bootstrap-typescript (Issue #33)",
+                "",
+                "- Date captured: 2026-02-20",
+                "- Author: Dan Moisan",
+                "- Status: Promoted -> "
+                "docs/features/active/bootstrap-typescript/ (Issue #33)",
+                "- Risk: low",
+                "",
+                "- Issue: #33",
+                "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33",
+                "- Last Updated: 2026-02-21",
+                "",
+                "## Problem / Why",
+                "problem",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="frontmatter",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    assert lines[0] == "# bootstrap-typescript (Issue #33)"
+    assert lines[1] == ""
+    assert "- Date captured: 2026-02-20" in lines
+    assert "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33" in lines
+    assert "- Work Mode: minor-audit" in lines
+
+    issue_url_index = lines.index(
+        "- Issue URL: https://github.com/drmoisan/drm-copilot/issues/33"
+    )
+    marker_index = lines.index("- Work Mode: minor-audit")
+    problem_index = lines.index("## Problem / Why")
+    assert issue_url_index < marker_index < problem_index
+    assert lines[marker_index + 1] == ""
+    assert lines[marker_index + 2] == "## Problem / Why"
 
 
 def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
@@ -1144,7 +1203,8 @@ def test_work_mode_marker_fallback_issue_md_full() -> None:
     lines = issue_md.splitlines()
     first_section_index = lines.index("## Problem / Why")
     assert first_section_index > 0
-    assert lines[first_section_index - 1] == "- Work Mode: full"
+    assert lines[first_section_index - 2] == "- Work Mode: full"
+    assert lines[first_section_index - 1] == ""
 
 
 def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
