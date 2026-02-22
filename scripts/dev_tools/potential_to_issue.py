@@ -3,21 +3,32 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
-import re
 import shutil
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
+
+from scripts.dev_tools.potential_to_issue_content import (
+    BUG_SECTION_HEADINGS,
+    PLACEHOLDER,
+    build_body,
+    build_bug_body,
+    build_minor_audit_body,
+    evaluate_minor_audit_eligibility,
+    extract_last_updated,
+    get_feature_name,
+    get_feature_path,
+    get_section,
+    normalize_smart_punctuation,
+    parse_issue_reference,
+    update_metadata_lines,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
-PLACEHOLDER = "(not provided in potential file)"
-ISSUE_URL_PATTERN = re.compile(r"https?://\S+/issues/(\d+)")
 PROMOTION_TYPES = ("epic", "feature", "refactor", "bug")
 WORK_MODES = ("minor-audit", "full")
 TITLE_PREFIXES = {
@@ -25,24 +36,6 @@ TITLE_PREFIXES = {
     "feature": "Feature",
     "refactor": "Refactor",
     "bug": "Bug",
-}
-BUG_SECTION_HEADINGS = [
-    "Summary",
-    "Environment",
-    "Steps to Reproduce",
-    "Expected Behavior",
-    "Actual Behavior",
-    "Logs / Screenshots",
-    "Impact / Severity",
-]
-SMART_PUNCTUATION_MAP = {
-    "\u201c": '"',
-    "\u201d": '"',
-    "\u2018": "'",
-    "\u2019": "'",
-    "\u2013": "-",
-    "\u2014": "-",
-    "\u00a0": " ",
 }
 
 
@@ -314,407 +307,6 @@ def _resolve_workspace() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def _strip_potential_marker(value: str) -> str:
-    """Remove `(Potential...)` suffix markers from heading values.
-
-    Purpose:
-        Normalize feature names derived from potential-file headings.
-
-    Args:
-        value (str): Raw heading text.
-
-    Returns:
-        str: Cleaned heading text without potential marker noise.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    cleaned = re.sub(r"\s*\(Potential[^)]*\)", "", value, flags=re.IGNORECASE).strip()
-    return cleaned or value.strip()
-
-
-def get_feature_name(content: str, file_path: Path) -> str:
-    """Derive feature name from markdown heading or filename fallback.
-
-    Purpose:
-        Produce a deterministic feature name for issue title/path generation.
-
-    Args:
-        content (str): Potential markdown content.
-        file_path (Path): Source potential file path.
-
-    Returns:
-        str: Best-available feature name.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    heading_match = re.search(r"^\s*#\s+(.+)$", content, flags=re.MULTILINE)
-    if heading_match:
-        feature_name = _strip_potential_marker(heading_match.group(1))
-        if feature_name:
-            return feature_name
-
-    name = file_path.name
-    return name[:-3] if name.lower().endswith(".md") else name
-
-
-def get_feature_path(feature_name: str) -> str:
-    """Convert feature name into safe path token.
-
-    Purpose:
-        Generate deterministic folder slug segments from feature names.
-
-    Args:
-        feature_name (str): Human-readable feature name.
-
-    Returns:
-        str: Sanitized token suitable for folder naming.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    replaced = re.sub(r"\s+", "_", feature_name)
-    return re.sub(r"[^A-Za-z0-9_-]", "", replaced)
-
-
-def get_section(content: str, heading: str) -> str:
-    """Extract markdown section body for a top-level `##` heading.
-
-    Purpose:
-        Reuse structured section extraction across issue body builders.
-
-    Args:
-        content (str): Full markdown content.
-        heading (str): Section heading name without `##`.
-
-    Returns:
-        str: Trimmed section body or empty string when missing.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    escaped = re.escape(heading)
-    pattern = rf"^##\s+{escaped}\s*\r?\n(.*?)(?=^##\s+|\Z)"
-    match = re.search(pattern, content, flags=re.MULTILINE | re.DOTALL)
-    if not match:
-        return ""
-    return match.group(1).strip()
-
-
-def build_body(
-    work_mode: str,
-    problem: str,
-    behavior: str,
-    criteria: str,
-    constraints: str,
-    tests: str,
-    relative_path: str,
-) -> str:
-    """Construct the standard full-mode issue body.
-
-    Purpose:
-        Assemble deterministic full workflow issue content from extracted sections.
-
-    Args:
-        problem (str): Problem/why section text.
-        behavior (str): Proposed behavior section text.
-        criteria (str): Acceptance criteria section text.
-        constraints (str): Constraints and risks section text.
-        tests (str): Test conditions section text.
-        relative_path (str): Source potential file path relative to workspace.
-
-    Returns:
-        str: Fully rendered issue body markdown.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    return (
-        f"- Work Mode: {work_mode}\n"
-        f"## Problem / Why\n{problem}\n\n"
-        f"## Proposed Behavior\n{behavior}\n\n"
-        f"## Acceptance Criteria\n{criteria}\n\n"
-        f"## Constraints & Risks\n{constraints}\n\n"
-        f"## Test Conditions\n{tests}\n\n"
-        f"## Source\nFrom: {relative_path}\n"
-    )
-
-
-def build_bug_body(sections: dict[str, str], relative_path: str) -> str:
-    """Construct the bug issue body from canonical bug section headings.
-
-    Purpose:
-        Render bug issue content in a predictable section order.
-
-    Args:
-        sections (dict[str, str]): Heading-to-content mapping.
-        relative_path (str): Source potential file path relative to workspace.
-
-    Returns:
-        str: Rendered bug issue body markdown.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    # Build bug issue sections in template order to preserve heading sequence.
-    parts = [f"## {heading}\n{sections[heading]}" for heading in BUG_SECTION_HEADINGS]
-    parts.append(f"## Source\nFrom: {relative_path}")
-    return "\n\n".join(parts) + "\n"
-
-
-def evaluate_minor_audit_eligibility(content: str) -> tuple[bool, str]:
-    """Evaluate deterministic eligibility for minor-audit mode."""
-
-    lower = content.lower()
-    if "bootstrapped" in lower or "pre-cooked" in lower:
-        return True, "eligible: bootstrapped/pre-cooked"
-
-    production_files = len(
-        re.findall(r"^\s*-\s*(?:production\s+)?file\s*:", content, flags=re.MULTILINE)
-    )
-    has_low_risk = "low integration risk" in lower or "risk: low" in lower
-    if production_files <= 3 and has_low_risk:
-        return True, "eligible: <=3 production files and low integration risk"
-    if production_files > 3:
-        return False, "fallback: production file count exceeds 3"
-    return False, "fallback: missing low integration risk signal"
-
-
-def build_minor_audit_body(
-    work_mode: str,
-    problem: str,
-    implementation_intent: str,
-    acceptance_criteria: str,
-    dependencies_risks: str,
-    verification_steps: str,
-    evidence_checklist: str,
-    relative_path: str,
-) -> str:
-    """Build required issue sections for the minor-audit mode."""
-
-    return (
-        f"- Work Mode: {work_mode}\n"
-        f"## Problem / Why\n{problem}\n\n"
-        f"## Implementation Intent\n{implementation_intent}\n\n"
-        f"## Acceptance Criteria\n{acceptance_criteria}\n\n"
-        f"## Dependencies / Risks\n{dependencies_risks}\n\n"
-        f"## Verification Steps\n{verification_steps}\n\n"
-        f"## Evidence Checklist\n{evidence_checklist}\n\n"
-        f"## Source\nFrom: {relative_path}\n"
-    )
-
-
-def parse_issue_reference(output: Iterable[str]) -> tuple[str | None, str | None]:
-    """Parse created issue URL/number from gh output lines.
-
-    Purpose:
-        Extract issue metadata required for post-create file updates.
-
-    Args:
-        output (Iterable[str]): gh command output lines.
-
-    Returns:
-        tuple[str | None, str | None]: (issue_url, issue_number) when found.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    text = "\n".join(output)
-    match = ISSUE_URL_PATTERN.search(text)
-    if not match:
-        return None, None
-    return match.group(0), match.group(1)
-
-
-def _extract_last_updated(issue_json: str) -> str | None:
-    """Extract issue updated date from gh JSON payload.
-
-    Purpose:
-        Convert gh issue-view JSON into an ISO date for metadata stamping.
-
-    Args:
-        issue_json (str): JSON string from `gh issue view --json ...`.
-
-    Returns:
-        str | None: ISO date (`YYYY-MM-DD`) when parse succeeds.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    try:
-        data = json.loads(issue_json)
-    except json.JSONDecodeError:
-        return None
-
-    updated_raw = data.get("updatedAt")
-    if not isinstance(updated_raw, str):
-        return None
-
-    try:
-        dt = datetime.fromisoformat(updated_raw.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    return dt.date().isoformat()
-
-
-def _find_meta_end(lines: list[str]) -> int:
-    """Locate insertion point where header metadata block ends.
-
-    Purpose:
-        Keep metadata updates above markdown content sections.
-
-    Args:
-        lines (list[str]): Markdown document lines.
-
-    Returns:
-        int: Index where metadata entries should stop being inserted.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    # Scan for the first section header to determine where metadata ends.
-    for idx, line in enumerate(lines):
-        if line.lstrip().startswith("## "):
-            return idx
-    return len(lines)
-
-
-def normalize_smart_punctuation(text: str) -> str:
-    """
-    Replace common smart quotes/dashes/non-breaking spaces with ASCII equivalents.
-
-    Purpose:
-        GitHub issue bodies/titles can mis-render smart punctuation copied from
-        source files; normalize to plain ASCII before submission.
-
-    Args:
-        text (str): Arbitrary text to normalize.
-
-    Returns:
-        str: Text with smart punctuation replaced by ASCII characters.
-
-    Side Effects:
-        None.
-    """
-
-    return text.translate(str.maketrans(SMART_PUNCTUATION_MAP))
-
-
-def _set_line_value(lines: list[str], label: str, value: str, meta_end: int) -> int:
-    """Set or insert a metadata list line and return updated boundary index.
-
-    Purpose:
-        Apply deterministic metadata updates without duplicating labels.
-
-    Args:
-        lines (list[str]): Markdown document lines.
-        label (str): Metadata label (for `- Label: value`).
-        value (str): Value to assign.
-        meta_end (int): Current metadata insertion boundary.
-
-    Returns:
-        int: Updated metadata insertion boundary index.
-
-    Raises:
-        None.
-
-    Side Effects:
-        Mutates `lines` in place.
-    """
-
-    pattern = re.compile(rf"^- {re.escape(label)}:")
-    for idx, line in enumerate(lines):
-        # Update existing metadata entry before inserting a new line.
-        if pattern.match(line):
-            lines[idx] = f"- {label}: {value}"
-            return meta_end
-    lines.insert(meta_end, f"- {label}: {value}")
-    return meta_end + 1
-
-
-def update_metadata_lines(
-    lines: list[str],
-    feature_name: str,
-    issue_number: str,
-    issue_url: str,
-    last_updated: str | None,
-    feature_path: str,
-) -> list[str]:
-    """Apply issue metadata updates to potential markdown lines.
-
-    Purpose:
-        Keep promoted potential files synchronized with created issue metadata.
-
-    Args:
-        lines (list[str]): Original markdown lines.
-        feature_name (str): Feature heading text.
-        issue_number (str): Created issue number.
-        issue_url (str): Created issue URL.
-        last_updated (str | None): Optional issue updated date.
-        feature_path (str): Active feature path token used in status line.
-
-    Returns:
-        list[str]: Updated markdown lines with metadata edits applied.
-
-    Raises:
-        None.
-
-    Side Effects:
-        Mutates list content used for file write-back.
-    """
-
-    if lines:
-        lines[0] = f"# {feature_name} (Issue #{issue_number})"
-
-    meta_end = _find_meta_end(lines)
-    meta_end = _set_line_value(lines, "Issue", f"#{issue_number}", meta_end)
-    meta_end = _set_line_value(lines, "Issue URL", issue_url, meta_end)
-    if last_updated:
-        meta_end = _set_line_value(lines, "Last Updated", last_updated, meta_end)
-    status_value = (
-        f"Promoted -> docs/features/active/{feature_path}/ (Issue #{issue_number})"
-    )
-    _set_line_value(lines, "Status", status_value, meta_end)
-    return lines
-
-
 def _default(message: str) -> None:
     """Default emitter that prints messages to stdout.
 
@@ -898,7 +490,7 @@ def promote_potential(
     if issue_number:
         view_result = gh_client.issue_view(issue_number)
         if view_result.exit_code == 0 and view_result.output:
-            last_updated = _extract_last_updated("\n".join(view_result.output))
+            last_updated = extract_last_updated("\n".join(view_result.output))
 
     if issue_number and issue_url:
         lines = content.splitlines()

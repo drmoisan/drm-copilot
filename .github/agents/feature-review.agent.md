@@ -1,6 +1,6 @@
 ---
 name: feature_code_review_agent
-model: GPT-5.2-Codex (copilot)
+model: GPT-5.3-Codex (copilot)
 description: Review an entire feature branch relative to a base branch (PR-style). Read pr_context.summary.txt thoroughly, use pr_context.appendix.txt for full baseline diff evidence, and produce PolicyAudit + CodeReview + FeatureAudit (Acceptance Criteria). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Checkout the feature branch. Provide PRBaseBranch (e.g., development). Run this agent to (re)generate the PR context artifacts (summary + appendix) per `pr-context-artifacts` via scripts.dev_tools.pr_context.collector --base ${input:PRBaseBranch} when needed, then produce: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, (3) docs/features/active/<feature>/feature-audit.<timestamp>.md (acceptance criteria), and (4) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md AND AUTOMATICALLY DELEGATE to atomic_planner to write docs/features/active/<feature>/remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 target: vscode
@@ -57,6 +57,15 @@ Use these reusable skills to avoid duplicating shared operations:
 ## 2) No silent fixes
 - Do not “clean up” code during review.
 - If format/lint/type failures exist, document them and include exact fix guidance in remediation inputs.
+
+## 3) Work-mode marker contract (deterministic)
+- Read the persisted marker from `issue.md` using the exact line format:
+   - `- Work Mode: minor-audit`
+   - `- Work Mode: full`
+- Branch acceptance-criteria (AC) source by marker value:
+   - When `Work Mode: minor-audit`, treat `issue.md` as the AC source of truth.
+   - When `Work Mode: full`, treat `spec.md` and `user-story.md` as AC sources of truth.
+- Fail closed: if marker is missing or malformed, fallback to full mode behavior (`spec.md` + `user-story.md`).
 
 
 # Execution plan (phased, deterministic)

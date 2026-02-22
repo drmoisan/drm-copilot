@@ -20,6 +20,7 @@ import pytest
 
 from scripts.dev_tools.atomic_executor import cli
 from scripts.dev_tools.atomic_executor.cli import main
+from scripts.dev_tools.atomic_executor.cli_workspace import EXECUTOR_LOCK_BYPASS_ENV
 from scripts.dev_tools.atomic_executor.copilot_runner import CopilotRunResult
 from scripts.dev_tools.atomic_executor.plan_parser import PlanModel, PlanTask
 
@@ -458,7 +459,7 @@ def test_single_run_lock_acquired_on_start(monkeypatch: pytest.MonkeyPatch) -> N
 
     lock_path = cli.acquire_executor_lock(Path("/workspace"))
 
-    if os.getenv(cli.EXECUTOR_LOCK_BYPASS_ENV) == "1":
+    if os.getenv(EXECUTOR_LOCK_BYPASS_ENV) == "1":
         assert lock_exists is False
     else:
         assert lock_exists is True
@@ -502,7 +503,7 @@ def test_single_run_lock_blocks_concurrent_run(
     monkeypatch.setattr(cli.Path, "exists", _fake_exists)
     monkeypatch.setattr(cli.Path, "mkdir", _fake_mkdir)
 
-    if os.getenv(cli.EXECUTOR_LOCK_BYPASS_ENV) == "1":
+    if os.getenv(EXECUTOR_LOCK_BYPASS_ENV) == "1":
         lock_path = cli.acquire_executor_lock(Path("/workspace"))
         assert lock_path.as_posix().endswith(lock_file_name)
         return
@@ -546,7 +547,7 @@ def test_single_run_lock_allows_bypass_env(
 
     monkeypatch.setattr(cli.Path, "exists", _fake_exists)
     monkeypatch.setattr(cli.Path, "mkdir", _fake_mkdir)
-    monkeypatch.setenv(cli.EXECUTOR_LOCK_BYPASS_ENV, "1")
+    monkeypatch.setenv(EXECUTOR_LOCK_BYPASS_ENV, "1")
 
     lock_path = cli.acquire_executor_lock(Path("/workspace"))
 

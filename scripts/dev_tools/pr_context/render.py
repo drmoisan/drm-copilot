@@ -4,24 +4,67 @@ from __future__ import annotations
 
 import re
 import subprocess
-from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
+
+from .models import PRContextResult, normalize_reference, section
+from .render_feature_excerpts import (
+    build_excerpt_text,
+    completed_plan_tasks,
+    directory_exists,
+    extract_features_from_paths,
+    extract_plan_sections,
+    extract_spec_parts,
+    extract_story_parts,
+    gather_feature_excerpts,
+    parse_section,
+    read_text_file,
+)
+from .render_pr_helpers import (
+    build_close_candidates_section,
+    convert_numstat,
+    extension_summary,
+    extract_changed_paths,
+    extract_issue_references,
+    extract_merge_pr_numbers,
+    format_diff_path,
+    format_issue_details,
+    format_pr_details,
+    select_default_base,
+    summarize_conventional_commits,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from pathlib import Path
 
     from .git import GitClient
-from .models import (
-    CONVENTIONAL_TYPES,
-    FeatureDocExcerpt,
-    IssueDetails,
-    PRContextResult,
-    PullRequestDetails,
-    format_list,
-    normalize_reference,
-    section,
-    truncate,
-)
+    from .models import PullRequestDetails
+
+__all__ = [
+    "build_close_candidates_section",
+    "build_excerpt_text",
+    "build_pr_context",
+    "completed_plan_tasks",
+    "convert_numstat",
+    "directory_exists",
+    "extension_summary",
+    "extract_changed_paths",
+    "extract_features_from_paths",
+    "extract_issue_references",
+    "extract_merge_pr_numbers",
+    "extract_plan_sections",
+    "extract_spec_parts",
+    "extract_story_parts",
+    "format_diff_path",
+    "format_issue_details",
+    "format_pr_details",
+    "gather_feature_excerpts",
+    "parse_section",
+    "read_text_file",
+    "resolve_feature_dir",
+    "select_default_base",
+    "summarize_conventional_commits",
+]
 
 
 class GhLike(Protocol):
@@ -33,148 +76,8 @@ class GhLike(Protocol):
     def available(self) -> bool: ...
 
 
-def select_default_base(git: GitClient) -> str | None:
-    candidates = [
-        "origin/main",
-        "origin/master",
-        "main",
-        "master",
-        "origin/develop",
-        "develop",
-    ]
-    for ref in candidates:
-        result = git.run(["rev-parse", "--verify", "--quiet", ref], allow_error=True)
-        if result.code == 0 and result.stdout.strip():
-            return ref
-    return None
-
-
-def format_diff_path(path_text: str | None) -> str:
-    if path_text is None:
-        return ""
-    if path_text.strip() == "":
-        return path_text
-
-    trimmed = path_text.strip().strip('"')
-    trimmed = re.sub(r"\{[^{}]*\s=>\s([^{}]*)\}", r"\1", trimmed)
-
-    arrow_match = re.match(r"^\s*(.+?)\s=>\s(.+?)\s*$", trimmed)
-    if arrow_match:
-        return arrow_match.group(2)
-    return trimmed
-
-
-def convert_numstat(numstat_text: str) -> tuple[int, int, list[str]]:
-    adds = 0
-    dels = 0
-    files: list[str] = []
-
-    for raw_line in numstat_text.splitlines():
-        if not raw_line.strip():
-            continue
-
-        parts = raw_line.split("\t")
-        if len(parts) < 3:
-            continue
-
-        add_part, del_part, file_part = parts[0], parts[1], parts[2]
-        if add_part.isdigit():
-            adds += int(add_part)
-        if del_part.isdigit():
-            dels += int(del_part)
-        files.append(file_part)
-
-    return adds, dels, files
-
-
-def extension_summary(files: Iterable[str]) -> str:
-    counts: dict[str, int] = {}
-    for raw in files:
-        name = format_diff_path(raw)
-        ext = "(unknown)"
-        try:
-            suffix = Path(name).suffix
-            ext = suffix if suffix else "(noext)"
-        except ValueError:
-            fallback = re.search(r"\.([A-Za-z0-9_]+)$", name)
-            ext = f".{fallback.group(1)}" if fallback else "(unknown)"
-
-        counts[ext] = counts.get(ext, 0) + 1
-
-    lines = [f"{counts[k]:8d}  {k}" for k in sorted(counts)]
-    return "\n".join(lines)
-
-
-def extract_issue_references(text: str) -> list[str]:
-    if not text:
-        return []
-    matches = re.findall(r"(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b", text)
-    seen: set[str] = set()
-    ordered: list[str] = []
-    for item in matches:
-        if item not in seen:
-            seen.add(item)
-            ordered.append(item)
-    return ordered
-
-
-def extract_merge_pr_numbers(subjects: Iterable[str]) -> list[str]:
-    numbers: set[str] = set()
-    pattern = re.compile(r"Merge pull request #(\d+)", re.IGNORECASE)
-    for subj in subjects:
-        match = pattern.search(subj)
-        if match:
-            numbers.add(f"#{match.group(1)}")
-    return sorted(numbers)
-
-
-def summarize_conventional_commits(subjects: str) -> str:
-    counts = {key: 0 for key in CONVENTIONAL_TYPES}
-    counts["other"] = 0
-
-    for line in subjects.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        match = re.match(
-            r"(feat|fix|refactor|perf|docs|test|chore|build|ci|style)(\(|!|:)",
-            line,
-        )
-        label = match.group(1) if match else "other"
-        counts[label] += 1
-
-    non_zero = [(k, v) for k, v in counts.items() if v > 0]
-    if not non_zero:
-        return "(no recognizable conventional commit types)"
-    return "\n".join(f"{name:<9} : {value}" for name, value in non_zero)
-
-
-def parse_section(markdown: str, heading: str) -> str:
-    escaped = re.escape(heading)
-    pattern = rf"^##\s+{escaped}\s*\r?\n(.*?)(?=^##\s+|\Z)"
-    match = re.search(pattern, markdown, flags=re.MULTILINE | re.DOTALL)
-    if not match:
-        return ""
-    return match.group(1).strip()
-
-
-def completed_plan_tasks(markdown: str, *, limit: int = 10) -> list[str]:
-    tasks: list[str] = []
-    for line in markdown.splitlines():
-        if re.search(r"\[x\]", line, flags=re.IGNORECASE):
-            cleaned = re.sub(r"^[-*]\s*\[[xX]\]\s*", "", line).strip()
-            tasks.append(cleaned)
-        if len(tasks) >= limit:
-            break
-    return tasks
-
-
-def directory_exists(path: Path) -> bool:
-    return path.exists()
-
-
 def resolve_feature_dir(base_dir: Path, feature: str) -> Path | None:
-    """Resolve feature directory by exact match or fuzzy match."""
+    """Resolve feature directory by exact, strong-pattern, then weak match."""
     direct = base_dir / feature
     if directory_exists(direct):
         return direct
@@ -202,258 +105,6 @@ def resolve_feature_dir(base_dir: Path, feature: str) -> Path | None:
     return None
 
 
-def read_text_file(path: Path) -> str:
-    """Read text from path if it exists, otherwise return empty string."""
-    return path.read_text(encoding="utf-8") if path.exists() else ""
-
-
-def extract_features_from_paths(changed_files: Iterable[str]) -> set[str]:
-    """Extract feature names from docs/features/active/** paths."""
-    features: set[str] = set()
-    for raw in changed_files:
-        parts = Path(raw).parts
-        if (
-            len(parts) >= 4
-            and parts[0] == "docs"
-            and parts[1] == "features"
-            and parts[2] == "active"
-        ):
-            features.add(parts[3])
-    return features
-
-
-def extract_spec_parts(spec_text: str) -> list[str]:
-    """Extract relevant sections from spec document."""
-    spec_parts: list[str] = []
-    for heading in (
-        "Context",
-        "Root Cause",
-        "Root Cause/Problem",
-        "Problem",
-        "Proposed Fix",
-        "Acceptance Criteria",
-        "Constraints & Risks",
-        "Behavior",
-        "Overview",
-    ):
-        section_text = parse_section(spec_text, heading)
-        if section_text:
-            spec_parts.append(f"{heading}: {truncate(section_text)}")
-    return spec_parts
-
-
-def extract_plan_sections(plan_text: str) -> tuple[str, str]:
-    """Extract completed tasks and verification block from plan."""
-    plan_tasks = completed_plan_tasks(plan_text)
-    plan_section = "\n".join(f"- {task}" for task in plan_tasks) if plan_tasks else ""
-    test_plan_section = parse_section(plan_text, "Test Plan")
-    verification_block = (
-        "Plan verification notes:\n" + truncate(test_plan_section)
-        if test_plan_section
-        else ""
-    )
-    return plan_section, verification_block
-
-
-def extract_story_parts(user_story_text: str, promoted_story_text: str) -> list[str]:
-    """Extract story statement and problem sections from user story."""
-    story_parts: list[str] = []
-    story_statements = parse_section(user_story_text, "Story Statement")
-    if story_statements:
-        story_lines = [
-            line.strip("- ") for line in story_statements.splitlines() if line.strip()
-        ]
-        if story_lines:
-            story_parts.append(
-                "Story Statement:\n" + "\n".join(f"- {line}" for line in story_lines)
-            )
-    problem_section = parse_section(user_story_text, "Problem / Why")
-    if problem_section:
-        story_parts.append("Problem / Why:\n" + truncate(problem_section))
-    if not story_parts and promoted_story_text:
-        promoted_problem = parse_section(promoted_story_text, "Problem / Why")
-        if not promoted_problem:
-            promoted_problem = parse_section(promoted_story_text, "Summary")
-        if promoted_problem:
-            story_parts.append("Problem / Why:\n" + truncate(promoted_problem))
-    return story_parts
-
-
-def build_excerpt_text(
-    feature: str,
-    story_parts: list[str],
-    spec_parts: list[str],
-    plan_section: str,
-    verification_block: str,
-) -> str:
-    """Build the formatted excerpt text from collected parts."""
-    lines: list[str] = [section(f"Feature doc: {feature}")]
-    if story_parts:
-        lines.append("User story excerpts:\n" + "\n\n".join(story_parts))
-    if spec_parts:
-        lines.append("Spec excerpts:\n" + "\n\n".join(spec_parts))
-    if plan_section:
-        lines.append("Plan completed tasks:\n" + plan_section)
-    if verification_block:
-        lines.append(verification_block)
-    if len(lines) == 1:
-        lines.append("(no spec/plan/user-story excerpts found)")
-    return "\n".join(lines)
-
-
-def gather_feature_excerpts(
-    root: Path, changed_files: Iterable[str]
-) -> list[FeatureDocExcerpt]:
-    """Extract feature documentation excerpts from changed files."""
-    features = extract_features_from_paths(changed_files)
-    excerpts: list[FeatureDocExcerpt] = []
-    base_dir = root / "docs" / "features" / "active"
-    promoted_dir = root / "docs" / "features" / "potential" / "promoted"
-
-    for feature in sorted(features):
-        feature_dir = resolve_feature_dir(base_dir, feature)
-        promoted_feature_dir = resolve_feature_dir(promoted_dir, feature)
-        if feature_dir is None and promoted_feature_dir is None:
-            continue
-
-        active_dir = feature_dir or promoted_feature_dir
-        if active_dir is None:
-            continue
-
-        spec_path = active_dir / "spec.md"
-        plan_path = active_dir / "plan.md"
-        user_story_path: Path = active_dir / "user-story.md"
-        promoted_story_path = (
-            promoted_feature_dir / "user-story.md"
-            if promoted_feature_dir is not None
-            else None
-        )
-        promoted_story_text = (
-            read_text_file(promoted_story_path) if promoted_story_path else ""
-        )
-        if promoted_story_path is not None and not user_story_path.exists():
-            user_story_path = promoted_story_path
-
-        user_story_text = read_text_file(user_story_path)
-        if (
-            not user_story_text
-            and promoted_story_text
-            and promoted_story_path is not None
-        ):
-            user_story_text = promoted_story_text
-            user_story_path = promoted_story_path
-
-        spec_text = read_text_file(spec_path)
-        plan_text = read_text_file(plan_path)
-
-        spec_parts = extract_spec_parts(spec_text)
-        plan_section, verification_block = extract_plan_sections(plan_text)
-        story_parts = extract_story_parts(user_story_text, promoted_story_text)
-        excerpt_text = build_excerpt_text(
-            feature, story_parts, spec_parts, plan_section, verification_block
-        )
-
-        context_files = [
-            str(path.relative_to(root))
-            for path in (spec_path, plan_path, user_story_path)
-            if path and path.exists()
-        ]
-        issue_refs = extract_issue_references(
-            "\n".join([spec_text, plan_text, user_story_text])
-        )
-        excerpts.append(
-            FeatureDocExcerpt(
-                feature=feature,
-                excerpt=excerpt_text,
-                issue_refs=issue_refs,
-                context_files=context_files,
-            )
-        )
-
-    return excerpts
-
-
-def format_issue_details(issue: IssueDetails) -> str:
-    comments_text = format_list(issue.comments, "(no comments)")
-    lines = [
-        section(f"Issue {issue.number}: {issue.title}"),
-        f"State: {issue.state}",
-        f"Author: {issue.author}",
-        f"Labels: {', '.join(issue.labels) if issue.labels else '(none)'}",
-        f"Assignees: {', '.join(issue.assignees) if issue.assignees else '(none)'}",
-        f"Created: {issue.created_at}",
-        f"Updated: {issue.updated_at}",
-        "",
-        truncate(issue.body, 1200),
-        "",
-        "Comments:",
-        comments_text,
-    ]
-    if issue.user_story_content:
-        lines.extend(
-            [
-                "",
-                f"User story ({issue.user_story_path or 'user-story.md'}):",
-                truncate(issue.user_story_content, 1200),
-            ]
-        )
-    return "\n".join(lines)
-
-
-def format_pr_details(pr: PullRequestDetails) -> str:
-    return "\n".join(
-        [
-            section(f"Pull Request {pr.number}: {pr.title}"),
-            f"State: {pr.state}",
-            f"Author: {pr.author}",
-            f"Base: {pr.base_ref}",
-            f"Head: {pr.head_ref}",
-            f"Created: {pr.created_at}",
-            f"Updated: {pr.updated_at}",
-            f"Merged: {pr.merged_at or '(not merged)'}",
-            f"Labels: {', '.join(pr.labels) if pr.labels else '(none)'}",
-            f"Assignees: {', '.join(pr.assignees) if pr.assignees else '(none)'}",
-            truncate(pr.body, 1200),
-            "",
-            "Auto-close issues (from this PR):",
-            format_list(pr.closing_issues, "(none)"),
-            "",
-            "Files (first 15):",
-            format_list(pr.files_changed[:15], "(none)"),
-        ]
-    )
-
-
-def build_close_candidates_section(
-    *,
-    verified: list[str],
-    author_asserted: list[str],
-    referenced: list[str],
-    verified_reason: str,
-    author_reason: str,
-) -> str:
-    # Combine all auto-close issues (verified + author asserted)
-    all_auto_close = set(verified + author_asserted + referenced)
-    author_auto_close = sorted(all_auto_close)
-
-    # Referenced issues are only those NOT in auto-close categories
-    referenced_only = sorted(set(referenced) - all_auto_close)
-
-    return "\n".join(
-        [
-            section("Close candidates"),
-            "Auto-close issues (verified from GitHub PR metadata):",
-            format_list(verified, verified_reason),
-            "",
-            "Auto-close issues (author asserted):",
-            format_list(author_auto_close, author_reason),
-            "",
-            "Referenced issues (detected):",
-            format_list(referenced_only, "(none)"),
-        ]
-    )
-
-
 def build_pr_context(
     *,
     git: GitClient,
@@ -465,6 +116,7 @@ def build_pr_context(
     current_pr: PullRequestDetails | None = None,
     gh_available: bool | None = None,
 ) -> PRContextResult:
+    """Build the full PR context payload from git/gh state and references."""
     gh_available = (
         gh.available
         if gh_available is None and hasattr(gh, "available")
@@ -622,7 +274,6 @@ def build_pr_context(
         )
         pr_block = "\n".join(block_lines)
     except (subprocess.CalledProcessError, RuntimeError, ValueError, OSError) as exc:
-        # Graceful degradation for git/GitHub operation failures
         pr_block = section("PR Comparison") + f"(FAILED to compute PR context: {exc})\n"
         referenced_issues = []
         referenced_prs = []
@@ -689,21 +340,3 @@ def build_pr_context(
         rev_range=rev_range,
         gh_available=gh_available,
     )
-
-
-def extract_changed_paths(context_text: str) -> list[str]:
-    paths: list[str] = []
-    capture = False
-    for line in context_text.splitlines():
-        if line.startswith("===== Changed files"):
-            capture = True
-            continue
-        if capture:
-            if line.startswith("====="):
-                break
-            if line.strip() and "\t" in line:
-                path_part = line.split("\t")[-1]
-                paths.append(format_diff_path(path_part.strip()))
-            elif line.strip():
-                paths.append(format_diff_path(line.strip()))
-    return paths

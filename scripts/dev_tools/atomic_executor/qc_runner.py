@@ -9,28 +9,40 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.atomic_executor.pytest_expectations import (
-    JestFailureSummary,
-    ResolvedTestExpectations,
-    parse_jest_failure_output,
-    parse_pytest_failure_output,
-    split_jest_expected_ref,
+from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    run_jest_with_expectations,
+    run_pytest_with_expectations,
 )
+from scripts.dev_tools.atomic_executor.qc_runner_loop import (
+    QCLoopResult,
+    QCToolResult,
+    diff_signature,
+    git_has_changes,
+    normalize_excluded_paths,
+    run_and_record,
+    run_full_loop_with_artifacts,
+)
+from scripts.dev_tools.atomic_executor.qc_runner_process import QCRunnerProcessMixin
 from scripts.dev_tools.atomic_executor.qc_toolchain import (
     TOOLCHAIN_COMMANDS,
     QCToolchain,
 )
 
+# Compatibility anchor for tests that monkeypatch qc_runner.shutil.which.
+COMPAT_SHUTIL = shutil
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
+    from scripts.dev_tools.atomic_executor.pytest_expectations import (
+        ResolvedTestExpectations,
+    )
 
-class QCRunner:
+
+class QCRunner(QCRunnerProcessMixin):
     """
     Execute scoped and full QC toolchains.
 
@@ -200,54 +212,13 @@ class QCRunner:
         Raises:
             CalledProcessError: If pytest fails unexpectedly.
         """
-        env = self._merge_env(self._lock_bypass_env())
-        if expectations is None:
-            self._run(self.FULL_TEST, env=env)
-            return
-
-        if expectations.missing_test_refs:
-            missing_refs = ", ".join(expectations.missing_test_refs)
-            raise RuntimeError(
-                "Missing test reference for expectation-tagged tasks: "
-                f"{missing_refs}"
-            )
-
-        result = subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            self.FULL_TEST,
-            cwd=self.workspace,
-            check=False,
-            capture_output=True,
-            text=True,
-            errors="replace",
-            env=env,
+        run_pytest_with_expectations(
+            cmd=self.FULL_TEST,
+            workspace=self.workspace,
+            resolve_executable=self.resolve_executable,
+            expectations=expectations,
+            env=self._merge_env(self._lock_bypass_env()),
         )
-        combined = (result.stdout or "") + (result.stderr or "")
-        if result.returncode == 0:
-            return
-
-        summary = parse_pytest_failure_output(combined)
-        if summary.has_collection_error:
-            raise subprocess.CalledProcessError(
-                result.returncode, self.FULL_TEST, output=combined
-            )
-
-        unexpected_failures: list[str] = []
-        expected_pass_hits: list[str] = []
-
-        # Compare failing nodeids against expected refs with prefix matching.
-        for nodeid in summary.failed_nodeids:
-            if _matches_expected_ref(nodeid, expectations.expected_pass_refs):
-                expected_pass_hits.append(nodeid)
-                unexpected_failures.append(nodeid)
-            elif _matches_expected_ref(nodeid, expectations.expected_fail_refs):
-                continue
-            else:
-                unexpected_failures.append(nodeid)
-
-        if unexpected_failures or expected_pass_hits:
-            raise subprocess.CalledProcessError(
-                result.returncode, self.FULL_TEST, output=combined
-            )
 
     def _run_pytest_scoped_with_expectations(
         self,
@@ -270,52 +241,13 @@ class QCRunner:
         Raises:
             CalledProcessError: If pytest fails unexpectedly.
         """
-        env = self._merge_env(self._lock_bypass_env())
-        cmd = ["poetry", "run", "pytest", *test_files]
-
-        if expectations is None:
-            self._run(cmd, env=env)
-            return
-
-        if expectations.missing_test_refs:
-            missing_refs = ", ".join(expectations.missing_test_refs)
-            raise RuntimeError(
-                "Missing test reference for expectation-tagged tasks: "
-                f"{missing_refs}"
-            )
-
-        result = subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            cmd,
-            cwd=self.workspace,
-            check=False,
-            capture_output=True,
-            text=True,
-            errors="replace",
-            env=env,
+        run_pytest_with_expectations(
+            cmd=["poetry", "run", "pytest", *test_files],
+            workspace=self.workspace,
+            resolve_executable=self.resolve_executable,
+            expectations=expectations,
+            env=self._merge_env(self._lock_bypass_env()),
         )
-        combined = (result.stdout or "") + (result.stderr or "")
-        if result.returncode == 0:
-            return
-
-        summary = parse_pytest_failure_output(combined)
-        if summary.has_collection_error:
-            raise subprocess.CalledProcessError(result.returncode, cmd, output=combined)
-
-        unexpected_failures: list[str] = []
-        expected_pass_hits: list[str] = []
-
-        # Compare failing nodeids against expected refs with prefix matching.
-        for nodeid in summary.failed_nodeids:
-            if _matches_expected_ref(nodeid, expectations.expected_pass_refs):
-                expected_pass_hits.append(nodeid)
-                unexpected_failures.append(nodeid)
-            elif _matches_expected_ref(nodeid, expectations.expected_fail_refs):
-                continue
-            else:
-                unexpected_failures.append(nodeid)
-
-        if unexpected_failures or expected_pass_hits:
-            raise subprocess.CalledProcessError(result.returncode, cmd, output=combined)
 
     def _run_jest_with_expectations(
         self,
@@ -338,66 +270,12 @@ class QCRunner:
         Raises:
             CalledProcessError: If Jest fails unexpectedly.
         """
-        if expectations is None:
-            self._run(cmd)
-            return
-
-        if expectations.missing_test_refs:
-            missing_refs = ", ".join(expectations.missing_test_refs)
-            raise RuntimeError(
-                "Missing test reference for expectation-tagged tasks: "
-                f"{missing_refs}"
-            )
-
-        try:
-            self._run(cmd, capture_output=True)
-            return
-        except subprocess.CalledProcessError as exc:
-            combined = (exc.stdout or "") + (exc.stderr or "")
-            summary = parse_jest_failure_output(combined)
-            if summary.has_runtime_error:
-                raise subprocess.CalledProcessError(
-                    exc.returncode, cmd, output=combined
-                ) from exc
-            if not summary.failed_tests and not summary.failed_files:
-                raise subprocess.CalledProcessError(
-                    exc.returncode, cmd, output=combined
-                ) from exc
-
-            unexpected_failures: list[str] = []
-            expected_pass_hits: list[str] = []
-
-            if summary.failed_tests:
-                for test_name in summary.failed_tests:
-                    if _jest_test_matches_expected(
-                        test_name, expectations.expected_pass_jest_refs
-                    ):
-                        expected_pass_hits.append(test_name)
-                        unexpected_failures.append(test_name)
-                    elif _jest_test_matches_expected(
-                        test_name, expectations.expected_fail_jest_refs
-                    ):
-                        continue
-                    else:
-                        unexpected_failures.append(test_name)
-            else:
-                for file_path in summary.failed_files:
-                    if _jest_file_matches_expected(
-                        file_path, expectations.expected_pass_jest_refs
-                    ):
-                        expected_pass_hits.append(file_path)
-                        unexpected_failures.append(file_path)
-                    elif _jest_file_matches_expected(
-                        file_path, expectations.expected_fail_jest_refs
-                    ):
-                        continue
-                    else:
-                        unexpected_failures.append(file_path)
-
-            if unexpected_failures or expected_pass_hits:
-                raise subprocess.CalledProcessError(
-                    exc.returncode, cmd, output=combined
-                ) from exc
+        run_jest_with_expectations(
+            cmd=cmd,
+            workspace=self.workspace,
+            resolve_executable=self.resolve_executable,
+            expectations=expectations,
+        )
 
     def _run_jest_scoped_with_expectations(
         self,
@@ -421,50 +299,6 @@ class QCRunner:
         """
         cmd = ["npm", "run", "test:unit", "--", *test_files]
         self._run_jest_with_expectations(cmd=cmd, expectations=expectations)
-
-    def check_jest_skipped_tests(
-        self, *, test_files: list[str] | None = None
-    ) -> JestFailureSummary:
-        """
-        Run Jest and return a summary including skipped test count.
-
-        Purpose:
-            Check whether Jest tests were skipped (e.g., describe.skip()),
-            which is relevant for TDD Red tasks where tests should fail but
-            may be skipped if the implementation doesn't exist.
-
-        Args:
-            test_files (list[str] | None): Optional list of test files to run.
-                If None, runs the full Jest test suite.
-
-        Returns:
-            JestFailureSummary: Summary including skipped_count and output.
-
-        Side Effects:
-            Runs Jest via subprocess. Does NOT raise on test failures.
-        """
-        if test_files:
-            cmd = ["npm", "run", "test:unit", "--", *test_files]
-        else:
-            cmd = self.FULL_TS_TEST
-
-        # Resolve executable for Windows compatibility
-        exe = shutil.which(cmd[0])
-        if exe is None:
-            raise FileNotFoundError(f"Required executable not found on PATH: {cmd[0]}")
-        resolved_cmd = [exe, *cmd[1:]]
-
-        # Run Jest, capturing output regardless of exit code
-        result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-            resolved_cmd,
-            cwd=self.workspace,
-            check=False,
-            capture_output=True,
-            text=True,
-            errors="replace",
-        )
-        combined = (result.stdout or "") + (result.stderr or "")
-        return parse_jest_failure_output(combined)
 
     def run_full_loop_with_artifacts(
         self,
@@ -495,123 +329,60 @@ class QCRunner:
         Side Effects:
             Runs subprocess commands and writes output files under artifacts/.
         """
-        loop_count = 0
 
-        if toolchain is QCToolchain.PYTHON:
-            format_step = "black"
-            lint_step = "ruff"
-            type_step = "pyright"
-            test_step = "pytest"
-            format_cmd = ["poetry", "run", "black", "."]
-            lint_cmd = ["poetry", "run", "ruff", "check"]
-            type_cmd = ["poetry", "run", "pyright"]
-            test_cmd = [
+        def _diff_signature_callback(
+            *,
+            workspace: Path,
+            run_checked: object,
+            exclude_paths: Iterable[Path] | None = None,
+        ) -> tuple[tuple[str, str, str], ...]:
+            del workspace
+            del run_checked
+            return self._diff_signature(exclude_paths=exclude_paths)
+
+        def _run_and_record_callback(
+            *,
+            workspace: Path,
+            resolve_executable: object,
+            argv: list[str],
+            output_path: Path,
+            env: dict[str, str] | None = None,
+        ) -> QCToolResult:
+            del workspace
+            del resolve_executable
+            return self._run_and_record(
+                argv=argv,
+                output_path=output_path,
+                env=env,
+            )
+
+        return run_full_loop_with_artifacts(
+            workspace=self.workspace,
+            resolve_executable=self.resolve_executable,
+            run_checked=self._run,
+            artifact_paths=artifact_paths,
+            lock_bypass_env=self._lock_bypass_env,
+            merge_env=self._merge_env,
+            full_fmt=["poetry", "run", "black", "."],
+            full_lint=["poetry", "run", "ruff", "check"],
+            full_type=["poetry", "run", "pyright"],
+            full_test=[
                 "poetry",
                 "run",
                 "pytest",
                 "--cov=src/lexile_corpus_tuner",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
-            ]
-            test_env = self._merge_env(self._lock_bypass_env())
-        elif toolchain is QCToolchain.TYPESCRIPT:
-            format_step = "format"
-            lint_step = "lint"
-            type_step = "typecheck"
-            test_step = "test-unit"
-            format_cmd = self.FULL_TS_FMT
-            lint_cmd = self.FULL_TS_LINT
-            type_cmd = self.FULL_TS_TYPE
-            test_cmd = self.FULL_TS_TEST
-            test_env = None
-        else:
-            raise RuntimeError(f"Unsupported QC toolchain: {toolchain}")
-
-        # Repeat the toolchain until it completes without formatting changes.
-        while True:
-            loop_count += 1
-            if max_loops is not None and loop_count > max_loops:
-                raise RuntimeError(
-                    "QC loop exceeded maximum iterations " f"({max_loops})."
-                )
-
-            # Capture the current diff signature so we can detect Black changes
-            # even when the working tree already has edits.
-            before_black = self._diff_signature(exclude_paths=artifact_paths.values())
-
-            # Run Black in write mode and restart the loop if files changed.
-            format_result = self._run_and_record(
-                argv=format_cmd,
-                output_path=artifact_paths[format_step],
-            )
-            # Formatting failure must be fixed before continuing to other steps.
-            if format_result.returncode != 0:
-                return QCLoopResult(
-                    success=False,
-                    failure=QCLoopFailure(
-                        step=format_step,
-                        returncode=format_result.returncode,
-                        output=format_result.output,
-                    ),
-                    loop_count=loop_count,
-                )
-
-            # Detect formatting changes by comparing diffs before/after Black.
-            after_black = self._diff_signature(exclude_paths=artifact_paths.values())
-            if after_black != before_black:
-                continue
-
-            # Run Ruff, Pyright, and Pytest in order.
-            lint_result = self._run_and_record(
-                argv=lint_cmd,
-                output_path=artifact_paths[lint_step],
-            )
-            # Fail fast if linting fails.
-            if lint_result.returncode != 0:
-                return QCLoopResult(
-                    success=False,
-                    failure=QCLoopFailure(
-                        step=lint_step,
-                        returncode=lint_result.returncode,
-                        output=lint_result.output,
-                    ),
-                    loop_count=loop_count,
-                )
-
-            type_result = self._run_and_record(
-                argv=type_cmd,
-                output_path=artifact_paths[type_step],
-            )
-            # Type-checking failures should be fixed before testing.
-            if type_result.returncode != 0:
-                return QCLoopResult(
-                    success=False,
-                    failure=QCLoopFailure(
-                        step=type_step,
-                        returncode=type_result.returncode,
-                        output=type_result.output,
-                    ),
-                    loop_count=loop_count,
-                )
-
-            test_result = self._run_and_record(
-                argv=test_cmd,
-                output_path=artifact_paths[test_step],
-                env=test_env,
-            )
-            # Test failures must be fixed before the loop can complete.
-            if test_result.returncode != 0:
-                return QCLoopResult(
-                    success=False,
-                    failure=QCLoopFailure(
-                        step=test_step,
-                        returncode=test_result.returncode,
-                        output=test_result.output,
-                    ),
-                    loop_count=loop_count,
-                )
-
-            return QCLoopResult(success=True, failure=None, loop_count=loop_count)
+            ],
+            full_ts_fmt=self.FULL_TS_FMT,
+            full_ts_lint=self.FULL_TS_LINT,
+            full_ts_type=self.FULL_TS_TYPE,
+            full_ts_test=self.FULL_TS_TEST,
+            diff_signature_fn=_diff_signature_callback,
+            run_and_record_fn=_run_and_record_callback,
+            max_loops=max_loops,
+            toolchain=toolchain,
+        )
 
     def changed_files(self) -> list[str]:
         """
@@ -658,26 +429,11 @@ class QCRunner:
             bool: True if there are uncommitted changes beyond exclusions,
                 False otherwise.
         """
-        result = self._run(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            errors="replace",
+        return git_has_changes(
+            workspace=self.workspace,
+            run_checked=self._run,
+            exclude_paths=exclude_paths,
         )
-
-        excluded = self._normalize_excluded_paths(exclude_paths)
-
-        # Scan git status output and ignore excluded paths when requested.
-        for line in result.stdout.splitlines():
-            parts = line.strip().split(maxsplit=1)
-            if len(parts) != 2:
-                continue
-            changed_path = parts[1]
-            if changed_path in excluded:
-                continue
-            return True
-
-        return False
 
     def _diff_signature(
         self, *, exclude_paths: Iterable[Path] | None = None
@@ -698,28 +454,11 @@ class QCRunner:
             tuple[tuple[str, str, str], ...]: Sorted tuples of
                 (path, additions, deletions) for each changed file.
         """
-        result = self._run(
-            ["git", "diff", "--numstat"],
-            capture_output=True,
-            text=True,
-            errors="replace",
+        return diff_signature(
+            workspace=self.workspace,
+            run_checked=self._run,
+            exclude_paths=exclude_paths,
         )
-        excluded = self._normalize_excluded_paths(exclude_paths)
-
-        signature: list[tuple[str, str, str]] = []
-        # Capture line-level change counts per file for a stable diff fingerprint.
-        for line in result.stdout.splitlines():
-            parts = line.split("\t")
-            if len(parts) < 3:
-                continue
-            additions, deletions, path = parts[0], parts[1], parts[2]
-            if " => " in path:
-                path = path.split(" => ")[-1].strip()
-            if path in excluded:
-                continue
-            signature.append((path, additions, deletions))
-
-        return tuple(sorted(signature))
 
     def _normalize_excluded_paths(
         self, exclude_paths: Iterable[Path] | None
@@ -736,19 +475,7 @@ class QCRunner:
         Returns:
             set[str]: Normalized paths in POSIX form.
         """
-        excluded: set[str] = set()
-        if exclude_paths is None:
-            return excluded
-
-        # Normalize paths to repo-relative strings for comparison.
-        for path in exclude_paths:
-            try:
-                rel_path = path.relative_to(self.workspace)
-            except ValueError:
-                rel_path = path
-            excluded.add(rel_path.as_posix())
-
-        return excluded
+        return normalize_excluded_paths(self.workspace, exclude_paths)
 
     def _lock_bypass_env(self) -> dict[str, str]:
         """
@@ -811,117 +538,6 @@ class QCRunner:
             and (p.endswith(".test.ts") or p.endswith(".spec.ts"))
         ]
 
-    def resolve_executable(self, argv: list[str]) -> list[str]:
-        """
-        Resolve a command argv to a full executable path.
-
-        Purpose:
-            Ensure PATH and PATHEXT resolution works on Windows
-            (e.g., npm.cmd, poetry.exe) to avoid WinError 2.
-
-        Args:
-            argv (list[str]): Command argv where argv[0] is the executable.
-
-        Returns:
-            list[str]: Resolved argv with full executable path.
-
-        Raises:
-            FileNotFoundError: If the executable is not found on PATH.
-            ValueError: If argv is empty.
-        """
-        if not argv:
-            raise ValueError("Command argv must not be empty.")
-
-        exe = shutil.which(argv[0])
-        if exe is None:
-            raise FileNotFoundError(f"Required executable not found on PATH: {argv[0]}")
-
-        return [exe, *argv[1:]]
-
-    def run_command(
-        self,
-        argv: list[str],
-        *,
-        capture_output: bool = False,
-        text: bool = True,
-        errors: str | None = "replace",
-        env: dict[str, str] | None = None,
-    ) -> subprocess.CompletedProcess[str]:
-        """
-        Run a subprocess command using the QC runner execution defaults.
-
-        Purpose:
-            Provide a public wrapper around the internal subprocess handling
-            to support integration tests and external callers.
-
-        Args:
-            argv (list[str]): Command and arguments to execute.
-            capture_output (bool): Whether to capture stdout/stderr.
-            text (bool): Whether to decode output as text.
-            errors (str | None): Text decoding error handler
-                ('replace', 'ignore', etc.). Defaults to "replace" when
-                text output is enabled.
-            env (dict[str, str] | None): Environment overrides for the command.
-
-        Returns:
-            CompletedProcess: Result of subprocess execution.
-
-        Raises:
-            FileNotFoundError: If executable is not found on PATH.
-            CalledProcessError: If command exits with non-zero status.
-        """
-        return self._run(
-            argv,
-            capture_output=capture_output,
-            text=text,
-            errors=errors,
-            env=env,
-        )
-
-    def _run(
-        self,
-        argv: list[str],
-        *,
-        capture_output: bool = False,
-        text: bool = True,
-        errors: str | None = "replace",
-        env: dict[str, str] | None = None,
-    ) -> subprocess.CompletedProcess[str]:
-        """
-        Execute a subprocess command with consistent settings.
-
-        Purpose:
-            Cross-platform subprocess execution with PATH-based executable
-            resolution for Windows compatibility (e.g., npm.cmd, poetry.exe).
-
-        Args:
-            argv (list[str]): Command and arguments to execute.
-            capture_output (bool): Whether to capture stdout/stderr.
-            text (bool): Whether to decode output as text.
-            errors (str | None): Text decoding error handler
-                ('replace', 'ignore', etc.). Defaults to "replace" when
-                text output is enabled.
-            env (dict[str, str] | None): Environment overrides for the command.
-
-        Returns:
-            CompletedProcess: Result of subprocess execution.
-
-        Raises:
-            FileNotFoundError: If executable is not found on PATH.
-            CalledProcessError: If command exits with non-zero status.
-        """
-        # Resolve executable via PATH/PATHEXT for cross-platform compatibility.
-        resolved_argv = self.resolve_executable(argv)
-        return subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-            resolved_argv,
-            cwd=self.workspace,
-            check=True,
-            capture_output=capture_output,
-            text=text,
-            errors=errors if text else None,
-            env=env,
-        )
-
     def _run_and_record(
         self,
         *,
@@ -946,125 +562,10 @@ class QCRunner:
         Side Effects:
             Creates parent directories and writes output to disk.
         """
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        resolved_argv = self.resolve_executable(argv)
-        result = subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            resolved_argv,
-            cwd=self.workspace,
-            check=False,
-            capture_output=True,
-            text=True,
-            errors="replace",
+        return run_and_record(
+            workspace=self.workspace,
+            resolve_executable=self.resolve_executable,
+            argv=argv,
+            output_path=output_path,
             env=env,
         )
-
-        output = (result.stdout or "") + (result.stderr or "")
-        header = " ".join(argv)
-        output_path.write_text(
-            f"$ {header}\n(exit {result.returncode})\n\n{output}",
-            encoding="utf-8",
-        )
-
-        return QCToolResult(
-            step=argv[2] if len(argv) > 2 else "command",
-            returncode=result.returncode,
-            output=output,
-        )
-
-
-@dataclass(frozen=True)
-class QCToolResult:
-    """
-    Captured output and exit status for a QC step.
-
-    Attributes:
-        step (str): Step name or command identifier.
-        returncode (int): Process exit code.
-        output (str): Combined stdout/stderr text.
-    """
-
-    step: str
-    returncode: int
-    output: str
-
-
-@dataclass(frozen=True)
-class QCLoopFailure:
-    """
-    Failure details for a QC loop.
-
-    Attributes:
-        step (str): Step that failed.
-        returncode (int): Process exit code.
-        output (str): Captured output from the failed step.
-    """
-
-    step: str
-    returncode: int
-    output: str
-
-
-@dataclass(frozen=True)
-class QCLoopResult:
-    """
-    Result for a QC loop execution.
-
-    Attributes:
-        success (bool): True if all steps passed.
-        failure (QCLoopFailure | None): Failure details when success is False.
-        loop_count (int): Number of iterations executed.
-    """
-
-    success: bool
-    failure: QCLoopFailure | None
-    loop_count: int
-
-
-def _matches_expected_ref(nodeid: str, expected_refs: set[str]) -> bool:
-    """
-    Check whether a failing nodeid matches any expected ref prefix.
-
-    Purpose:
-        Support prefix matching to handle parameterized pytest nodeids.
-
-    Args:
-        nodeid (str): Failing pytest nodeid.
-        expected_refs (set[str]): Expected nodeid prefixes to match against.
-
-    Returns:
-        bool: True when a prefix match is found.
-    """
-    # Scan the expected refs to allow prefix matching for parametrized tests.
-    for expected_ref in expected_refs:
-        if nodeid.startswith(expected_ref):
-            return True
-    return False
-
-
-def _jest_test_matches_expected(test_name: str, expected_refs: set[str]) -> bool:
-    """
-    Check whether a Jest test name matches any expected ref pattern.
-
-    Purpose:
-        Support substring matching for Jest test names.
-    """
-    for expected_ref in expected_refs:
-        _, test_pattern = split_jest_expected_ref(expected_ref)
-        if test_pattern and test_pattern in test_name:
-            return True
-    return False
-
-
-def _jest_file_matches_expected(file_path: str, expected_refs: set[str]) -> bool:
-    """
-    Check whether a Jest file path matches any expected ref file path.
-
-    Purpose:
-        Support file-level matching when Jest output lacks test names.
-    """
-    for expected_ref in expected_refs:
-        expected_file, _ = split_jest_expected_ref(expected_ref)
-        if expected_file and expected_file == file_path:
-            return True
-    return False

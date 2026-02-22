@@ -218,6 +218,26 @@ def run_test(root: Path | None = None) -> int:
     return run_test_with_options(root=root)
 
 
+def run_pyright() -> int:
+    """Run pyright using the repository project configuration."""
+
+    poetry_exe = shutil.which("poetry")
+    if poetry_exe is None:
+        _print_missing_tool("poetry")
+        return 127
+
+    completed = subprocess.run(  # noqa: S603
+        [poetry_exe, "run", "pyright", "--project", "pyproject.toml"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    output = (completed.stdout or "") + (completed.stderr or "")
+    if output:
+        print(output, end="" if output.endswith("\n") else "\n")
+    return int(completed.returncode)
+
+
 def _prepare_kcov_output_dirs(repo_root: Path, out_dir: Path) -> tuple[Path, Path]:
     """Prepare the output directories used by kcov.
 
@@ -424,6 +444,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("check", help="Run shfmt -d and shellcheck.")
     subparsers.add_parser("format", help="Format shell scripts with shfmt.")
+    subparsers.add_parser("pyright", help="Run pyright with --project pyproject.toml.")
     test_parser = subparsers.add_parser("test", help="Run bats tests when available.")
     test_parser.add_argument(
         "--coverage",
@@ -444,6 +465,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_check()
     if args.command == "format":
         return run_format()
+    if args.command == "pyright":
+        return run_pyright()
     if args.command == "test":
         return run_test_with_options(coverage=bool(getattr(args, "coverage", False)))
 

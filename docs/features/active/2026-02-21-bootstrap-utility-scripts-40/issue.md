@@ -7,6 +7,9 @@
 - Issue: #40
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/40
 - Last Updated: 2026-02-22
+
+- Work Mode: minor-audit
+
 ## Problem / Why
 
 Contributors currently rely on tribal knowledge to manually bootstrap utility scripts from two roots (`scripts\dev_tools` and `scripts\dev-tools`). For audit work, we need explicit documentation of what scripts exist, which toolchain each script depends on, and what manual bootstrap expectations apply. The language toolchains (Python, PowerShell, TypeScript) already exist in the environment; this effort is about auditable documentation, not automation.
