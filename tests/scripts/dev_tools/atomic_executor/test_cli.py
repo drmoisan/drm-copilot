@@ -28,6 +28,12 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 class TestParseArgs:
     """Tests for parse_args() function."""
 
@@ -107,10 +113,10 @@ class TestParseArgs:
 class TestResolveWorkspace:
     """Tests for resolve_workspace() function."""
 
-    def test_resolve_uses_explicit_workspace(self, tmp_path: Path) -> None:
+    def test_resolve_uses_explicit_workspace(self, mem_path: Path) -> None:
         """resolve_workspace() uses explicit workspace argument."""
-        result = resolve_workspace(str(tmp_path))
-        assert result == tmp_path.resolve()
+        result = resolve_workspace(str(mem_path))
+        assert result == mem_path.resolve()
 
     def test_resolve_infers_from_file_location(
         self, monkeypatch: "MonkeyPatch"
@@ -132,7 +138,7 @@ class TestEnsureCleanTree:
     """Tests for ensure_clean_tree() function."""
 
     def test_ensure_clean_tree_passes_for_clean_tree(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """ensure_clean_tree() passes when tree is clean."""
 
@@ -146,10 +152,10 @@ class TestEnsureCleanTree:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         # Should not raise
-        ensure_clean_tree(tmp_path)
+        ensure_clean_tree(mem_path)
 
     def test_ensure_clean_tree_raises_for_dirty_tree(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """ensure_clean_tree() raises RuntimeError when tree has changes."""
 
@@ -163,14 +169,14 @@ class TestEnsureCleanTree:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="Working tree is not clean"):
-            ensure_clean_tree(tmp_path)
+            ensure_clean_tree(mem_path)
 
 
 class TestRefuseProtectedBranch:
     """Tests for refuse_protected_branch() function."""
 
     def test_refuse_raises_for_main_branch(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'main' branch."""
 
@@ -184,10 +190,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(tmp_path)
+            refuse_protected_branch(mem_path)
 
     def test_refuse_raises_for_master_branch(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'master' branch."""
 
@@ -201,10 +207,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(tmp_path)
+            refuse_protected_branch(mem_path)
 
     def test_refuse_raises_for_development_branch(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'development' branch."""
 
@@ -218,10 +224,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(tmp_path)
+            refuse_protected_branch(mem_path)
 
     def test_refuse_passes_for_feature_branch(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() passes for non-protected branch."""
 
@@ -235,10 +241,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         # Should not raise
-        refuse_protected_branch(tmp_path)
+        refuse_protected_branch(mem_path)
 
     def test_refuse_handles_git_error(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() handles git errors gracefully."""
 
@@ -249,7 +255,7 @@ class TestRefuseProtectedBranch:
 
         # Should not raise when git fails (returns None, not in
         # PROTECTED_BRANCHES)
-        refuse_protected_branch(tmp_path)
+        refuse_protected_branch(mem_path)
 
 
 class TestCopyToClipboard:
@@ -401,7 +407,7 @@ class TestMainEdgeCases:
 
     def test_main_exits_early_with_print_prompt(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -409,7 +415,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -422,7 +428,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -445,7 +451,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
                 "--print-prompt",
                 "--skip-preflight-qc",
             ]
@@ -458,7 +464,7 @@ class TestMainEdgeCases:
 
     def test_main_exits_early_with_copy_prompt(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -466,7 +472,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -479,7 +485,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -504,7 +510,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
                 "--copy-prompt",
                 "--skip-preflight-qc",
             ]
@@ -516,7 +522,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_error_for_missing_plan(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -524,7 +530,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder without plan.md
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
@@ -542,7 +548,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
             ]
         )
 
@@ -552,7 +558,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_zero_when_plan_already_complete(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -560,7 +566,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with all tasks checked
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [x] [P0-T1] Task 1\n\n"
@@ -573,7 +579,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -593,7 +599,7 @@ class TestMainEdgeCases:
                 "resume",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
             ]
         )
 
@@ -603,7 +609,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_error_for_missing_template(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -611,7 +617,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with plan.md
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -640,7 +646,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
             ]
         )
 
@@ -650,7 +656,7 @@ class TestMainEdgeCases:
 
     def test_main_with_copy_prompt_fallback_when_clipboard_fails(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -658,7 +664,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -671,7 +677,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -697,7 +703,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
                 "--copy-prompt",
                 "--skip-preflight-qc",
             ]
@@ -710,7 +716,7 @@ class TestMainEdgeCases:
 
     def test_main_execute_with_start_flag(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -718,7 +724,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with multiple tasks
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n"
@@ -733,7 +739,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -753,7 +759,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
                 "--start",
                 "P0-T2",
                 "--print-prompt",
@@ -768,7 +774,7 @@ class TestMainEdgeCases:
 
     def test_main_execute_when_all_tasks_complete(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -776,7 +782,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with all tasks checked
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [x] [P0-T1] Task 1\n\n"
@@ -789,7 +795,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -809,7 +815,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
             ]
         )
 
@@ -819,17 +825,17 @@ class TestMainEdgeCases:
 
     def test_main_successful_execution_with_scoped_qc(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         """main() successfully executes task with scoped QC."""
         from scripts.dev_tools.atomic_executor.cli import main
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
 
         # Setup feature folder
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         plan_file = feature_dir / "plan.md"
         plan_file.write_text(
@@ -843,14 +849,14 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = tmp_path / ".github" / "prompts"
+        template_dir = mem_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "Task: {{task_id}}\n", encoding="utf-8"
         )
 
         # Setup fake copilot on PATH for run_copilot
-        bin_dir = tmp_path / "bin"
+        bin_dir = mem_path / "bin"
         bin_dir.mkdir()
         copilot_exe = bin_dir / "copilot"
         copilot_exe.touch()
@@ -906,7 +912,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(tmp_path),
+                str(mem_path),
                 "--skip-preflight-qc",
             ]
         )
@@ -946,21 +952,21 @@ class TestPreflightQC:
 
     def test_build_preflight_qc_fix_prompt_includes_workspace(
         self,
-        tmp_path: Path,
+        mem_path: Path,
     ) -> None:
         """_build_preflight_qc_fix_prompt includes workspace in prompt."""
         from scripts.dev_tools.atomic_executor.cli import _build_preflight_qc_fix_prompt
         from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
 
         prompt = _build_preflight_qc_fix_prompt(
-            workspace=tmp_path,
+            workspace=mem_path,
             qc_output="Black failed: file.py",
             toolchain=QCToolchain.PYTHON,
         )
 
         # Check key elements are present
         assert "Pre-flight QC Fix Required" in prompt
-        assert str(tmp_path.as_posix()) in prompt
+        assert str(mem_path.as_posix()) in prompt
         assert "Black failed: file.py" in prompt
         assert "poetry run black" in prompt
         assert "poetry run ruff" in prompt
@@ -986,7 +992,7 @@ class TestPreflightQC:
 
     def test_run_preflight_qc_with_capture_returns_success(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """_run_preflight_qc_with_capture returns success when all steps pass."""
@@ -1007,7 +1013,7 @@ class TestPreflightQC:
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
-        result = _run_preflight_qc_with_capture(tmp_path)
+        result = _run_preflight_qc_with_capture(mem_path)
 
         assert result.success is True
         assert result.failed_step is None
@@ -1018,7 +1024,7 @@ class TestPreflightQC:
 
     def test_run_preflight_qc_with_capture_returns_failure(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """_run_preflight_qc_with_capture returns failure when a step fails."""
@@ -1045,7 +1051,7 @@ class TestPreflightQC:
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
-        result = _run_preflight_qc_with_capture(tmp_path)
+        result = _run_preflight_qc_with_capture(mem_path)
 
         assert result.success is False
         assert result.failed_step == "ruff"
@@ -1365,23 +1371,23 @@ class TestRunCopilot:
     """Tests for run_copilot() function."""
 
     def test_run_copilot_raises_when_executable_not_found(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() raises FileNotFoundError when copilot not found."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Set PATH to empty so no copilot executable can be found
         monkeypatch.setenv("PATH", "")
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         with pytest.raises(
             FileNotFoundError,
             match=r"Required executable not found on PATH: copilot\b",
         ):
             run_copilot(
-                workspace=tmp_path,
+                workspace=mem_path,
                 prompt_text="test prompt",
                 log_file=log_file,
                 task_id="P1-T1",
@@ -1390,17 +1396,17 @@ class TestRunCopilot:
             )
 
     def test_run_copilot_rejects_vscode_shim(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() skips VS Code shim and finds no other copilot."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Create shim directory structure that matches the detection pattern
         # Pattern: .../Code/User/globalStorage/github.copilot-chat/copilotCli/
         # Use nested dirs to ensure we hit the pattern matching logic
         shim_dir = (
-            tmp_path
+            mem_path
             / "Code"
             / "User"
             / "globalStorage"
@@ -1418,14 +1424,14 @@ class TestRunCopilot:
         # Update PATH to point to this directory
         monkeypatch.setenv("PATH", str(shim_dir))
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         with pytest.raises(
             FileNotFoundError,
             match=r"Required executable not found on PATH: copilot\b",
         ):
             run_copilot(
-                workspace=tmp_path,
+                workspace=mem_path,
                 prompt_text="test prompt",
                 log_file=log_file,
                 task_id="P1-T1",
@@ -1434,18 +1440,18 @@ class TestRunCopilot:
             )
 
     def test_run_copilot_rejects_vscode_shim_remote_paths(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() rejects the VS Code Remote/Devcontainer shim path."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # VS Code Remote (including devcontainers) stores its shim under a Linux
         # path, e.g. ~/.vscode-server/data/User/globalStorage/github.copilot-chat/
         # copilotCli/. If we accidentally execute this shim, it can block waiting
         # for interactive install/auth and appear as a hang.
         shim_dir = (
-            tmp_path
+            mem_path
             / ".vscode-server"
             / "data"
             / "User"
@@ -1468,14 +1474,14 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", _should_not_invoke_popen)
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         with pytest.raises(
             FileNotFoundError,
             match=r"Required executable not found on PATH: copilot\b",
         ):
             run_copilot(
-                workspace=tmp_path,
+                workspace=mem_path,
                 prompt_text="test prompt",
                 log_file=log_file,
                 task_id="P1-T1",
@@ -1484,14 +1490,14 @@ class TestRunCopilot:
             )
 
     def test_run_copilot_creates_log_directory(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() creates log directory if missing."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Setup fake copilot on PATH
-        bin_dir = tmp_path / "bin"
+        bin_dir = mem_path / "bin"
         bin_dir.mkdir()
         copilot_exe = bin_dir / "copilot"
         copilot_exe.touch()
@@ -1524,11 +1530,11 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
-        log_dir = tmp_path / "nested" / "log" / "dir"
+        log_dir = mem_path / "nested" / "log" / "dir"
         log_file = log_dir / "test.log"
 
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="test prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1540,18 +1546,18 @@ class TestRunCopilot:
         assert log_file.exists()
 
     def test_run_copilot_prefers_cmd_wrapper_over_bare_executable_name(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() prefers copilot.cmd over a bare 'copilot' file on Windows."""
 
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
 
         # Arrange a PATH entry with both:
         # - copilot (often a POSIX shim from npm, not executable by CreateProcess)
         # - copilot.cmd (Windows-friendly wrapper)
-        fake_bin = tmp_path / "bin"
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         (fake_bin / "copilot").write_text("#!/usr/bin/env node\n", encoding="utf-8")
         (fake_bin / "copilot.cmd").write_text("@echo fake copilot\n", encoding="utf-8")
@@ -1579,10 +1585,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="test prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1594,14 +1600,14 @@ class TestRunCopilot:
         assert Path(captured_argv[0]).name == "copilot.cmd"
 
     def test_run_copilot_invokes_with_correct_arguments(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() invokes copilot with correct arguments."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Create a fake copilot executable on PATH
-        fake_bin = tmp_path / "bin"
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot.exe"
         fake_copilot.write_text("@echo fake copilot")
@@ -1646,10 +1652,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="test prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1695,15 +1701,15 @@ class TestRunCopilot:
         assert "shell(git)" in captured_argv
 
     def test_run_copilot_normalizes_gpt_5_2_codex_display_name(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() normalizes GPT-5.2 Codex display names for Copilot CLI."""
 
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Create a fake copilot executable on PATH.
-        fake_bin = tmp_path / "bin"
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot.exe"
         fake_copilot.write_text("@echo fake copilot")
@@ -1731,12 +1737,12 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         # VS Code tasks sometimes pass this exact display-style model string.
         # The executor should normalize it to the Copilot CLI model key.
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="test prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1749,15 +1755,15 @@ class TestRunCopilot:
         assert captured_argv[model_idx + 1] == "gpt-5.2-codex"
 
     def test_run_copilot_permission_denied_fails_fast_with_actionable_error(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() raises promptly when Copilot reports a permission denial."""
 
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
         # Create a fake copilot executable on PATH.
-        fake_bin = tmp_path / "bin"
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot.exe"
         fake_copilot.write_text("@echo fake copilot")
@@ -1795,11 +1801,11 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "test.log"
+        log_file = mem_path / "test.log"
 
         with pytest.raises(RuntimeError) as exc_info:
             run_copilot(
-                workspace=tmp_path,
+                workspace=mem_path,
                 prompt_text="test prompt",
                 log_file=log_file,
                 task_id="P1-T1",
@@ -1822,13 +1828,13 @@ class TestRunCopilot:
         assert captured_argv[0] == str(fake_copilot)
 
     def test_run_copilot_reuses_session_when_requested(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() adds --continue when resume_session=True."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
-        fake_bin = tmp_path / "bin"
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot"
         fake_copilot.write_text("#!/bin/sh\necho copilot")
@@ -1856,10 +1862,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "log" / "test.log"
+        log_file = mem_path / "log" / "test.log"
 
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="retry prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1872,16 +1878,16 @@ class TestRunCopilot:
         assert "--continue" in captured_argv
 
     def test_run_copilot_trusts_workspace_in_config(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() writes workspace to trusted_folders when enabled."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
         # Route Copilot config to a temp directory for isolation.
-        config_root = tmp_path / "config-root"
+        config_root = mem_path / "config-root"
         monkeypatch.setenv("XDG_CONFIG_HOME", str(config_root))
 
-        fake_bin = tmp_path / "bin"
+        fake_bin = mem_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot"
         fake_copilot.write_text("#!/bin/sh\necho copilot")
@@ -1906,10 +1912,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = tmp_path / "log" / "test.log"
+        log_file = mem_path / "log" / "test.log"
 
         run_copilot(
-            workspace=tmp_path,
+            workspace=mem_path,
             prompt_text="trust prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -1928,16 +1934,16 @@ class TestRunCopilot:
 
         config_data = json.loads(config_text)
         trusted_folders = config_data.get("trusted_folders", [])
-        assert str(tmp_path.resolve()) in trusted_folders
+        assert str(mem_path.resolve()) in trusted_folders
 
     def test_run_copilot_times_out_when_cli_is_idle(
-        self, tmp_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() terminates when Copilot CLI produces no output."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config-root"))
-        bin_dir = tmp_path / "bin"
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
+        bin_dir = mem_path / "bin"
         bin_dir.mkdir()
         copilot_exe = bin_dir / "copilot"
         copilot_exe.write_text("#!/bin/sh\nexit 0")
@@ -1977,11 +1983,11 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", fake_popen)
 
-        log_file = tmp_path / "log" / "test.log"
+        log_file = mem_path / "log" / "test.log"
 
         with pytest.raises(TimeoutError):
             run_copilot(
-                workspace=tmp_path,
+                workspace=mem_path,
                 prompt_text="idle prompt",
                 log_file=log_file,
                 task_id="P1-T1",

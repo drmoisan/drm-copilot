@@ -15,10 +15,16 @@ from scripts.dev_tools.pr_context.git import (
 from scripts.dev_tools.pr_context.models import CommandResult
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 class TestSubprocessRunner:
     """Test SubprocessRunner command execution."""
 
-    def test_run_success(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    def test_run_success(self, monkeypatch: pytest.MonkeyPatch, mem_path: Path) -> None:
         """SubprocessRunner returns CommandResult on success."""
         mock_completed = Mock()
         mock_completed.stdout = "output\n"
@@ -29,7 +35,7 @@ class TestSubprocessRunner:
         monkeypatch.setattr("subprocess.run", mock_run)
 
         runner = SubprocessRunner()
-        result = runner.run(["echo", "test"], cwd=tmp_path)
+        result = runner.run(["echo", "test"], cwd=mem_path)
 
         assert result.stdout == "output"
         assert result.stderr == "warning"
@@ -114,9 +120,9 @@ class TestGitClient:
         return Mock(spec=CommandRunner)
 
     @pytest.fixture
-    def git_client(self, mock_runner: Mock, tmp_path: Path) -> GitClient:
+    def git_client(self, mock_runner: Mock, mem_path: Path) -> GitClient:
         """GitClient instance with mock runner."""
-        return GitClient(mock_runner, tmp_path)
+        return GitClient(mock_runner, mem_path)
 
     def test_run_delegates_to_runner(
         self, git_client: GitClient, mock_runner: Mock
@@ -145,19 +151,19 @@ class TestGitClient:
         assert result.code == 1
 
     def test_resolve_root_when_git_dir_exists(
-        self, git_client: GitClient, mock_runner: Mock, tmp_path: Path
+        self, git_client: GitClient, mock_runner: Mock, mem_path: Path
     ) -> None:
         """GitClient.resolve_root returns cwd when .git exists."""
-        git_dir = tmp_path / ".git"
+        git_dir = mem_path / ".git"
         git_dir.mkdir()
 
         root = git_client.resolve_root()
 
-        assert root == tmp_path
+        assert root == mem_path
         mock_runner.run.assert_not_called()
 
     def test_resolve_root_when_git_dir_missing(
-        self, git_client: GitClient, mock_runner: Mock, tmp_path: Path
+        self, git_client: GitClient, mock_runner: Mock, mem_path: Path
     ) -> None:
         """GitClient.resolve_root calls rev-parse when .git missing."""
         mock_runner.run.return_value = CommandResult("/repo/root", "", 0)

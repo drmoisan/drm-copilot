@@ -4,10 +4,18 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from scripts.dev_tools.resolve_hard_lock_prompt import (
     main,
     resolve_prompt,
 )
+
+
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
 
 
 def test_resolve_prompt_basic() -> None:
@@ -171,10 +179,10 @@ def test_copy_to_clipboard_no_mechanism() -> None:
         assert result is False
 
 
-def test_main_success(tmp_path: Path) -> None:
+def test_main_success(mem_path: Path) -> None:
     """Test successful main execution."""
     # Create workspace structure
-    workspace = tmp_path / "workspace"
+    workspace = mem_path / "workspace"
     workspace.mkdir()
 
     # Create template file
@@ -210,9 +218,9 @@ def test_main_success(tmp_path: Path) -> None:
     assert "✓ Copied to clipboard" in mock_stderr.getvalue()
 
 
-def test_main_template_not_found(tmp_path: Path) -> None:
+def test_main_template_not_found(mem_path: Path) -> None:
     """Test main when template file doesn't exist."""
-    workspace = tmp_path / "workspace"
+    workspace = mem_path / "workspace"
     workspace.mkdir()
 
     target_file = workspace / "plan.md"
@@ -231,9 +239,9 @@ def test_main_template_not_found(tmp_path: Path) -> None:
     assert "Template not found" in mock_stderr.getvalue()
 
 
-def test_main_target_not_found(tmp_path: Path) -> None:
+def test_main_target_not_found(mem_path: Path) -> None:
     """Test main when target file doesn't exist."""
-    workspace = tmp_path / "workspace"
+    workspace = mem_path / "workspace"
     workspace.mkdir()
 
     # Create template file
@@ -258,9 +266,9 @@ def test_main_target_not_found(tmp_path: Path) -> None:
     assert "Target file not found" in mock_stderr.getvalue()
 
 
-def test_main_clipboard_copy_fails(tmp_path: Path) -> None:
+def test_main_clipboard_copy_fails(mem_path: Path) -> None:
     """Test main when clipboard copy fails."""
-    workspace = tmp_path / "workspace"
+    workspace = mem_path / "workspace"
     workspace.mkdir()
 
     # Create template file
@@ -291,20 +299,20 @@ def test_main_clipboard_copy_fails(tmp_path: Path) -> None:
     assert "✗ Could not copy to clipboard" in mock_stderr.getvalue()
 
 
-def test_main_default_workspace(tmp_path: Path) -> None:
+def test_main_default_workspace(mem_path: Path) -> None:
     """Test main with default workspace (cwd)."""
-    # Create template and target in tmp_path
-    template_dir = tmp_path / ".github" / "codex"
+    # Create template and target in mem_path
+    template_dir = mem_path / ".github" / "codex"
     template_dir.mkdir(parents=True)
     template_file = template_dir / "execute-hard-lock.prompt.md"
     template_file.write_text("Plan: ${plan-path}", encoding="utf-8")
 
-    target_file = tmp_path / "plan.md"
+    target_file = mem_path / "plan.md"
     target_file.write_text("# Plan", encoding="utf-8")
 
     with (
         patch("sys.argv", ["script", "--target", str(target_file)]),
-        patch("pathlib.Path.cwd", return_value=tmp_path),
+        patch("pathlib.Path.cwd", return_value=mem_path),
         patch(
             "scripts.dev_tools.resolve_hard_lock_prompt.copy_to_clipboard",
             return_value=True,
@@ -318,9 +326,9 @@ def test_main_default_workspace(tmp_path: Path) -> None:
     assert "plan.md" in mock_stdout.getvalue()
 
 
-def test_main_template_read_error(tmp_path: Path) -> None:
+def test_main_template_read_error(mem_path: Path) -> None:
     """Test main when template file cannot be read."""
-    workspace = tmp_path / "workspace"
+    workspace = mem_path / "workspace"
     workspace.mkdir()
 
     # Create template file

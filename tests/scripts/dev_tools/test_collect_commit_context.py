@@ -15,6 +15,12 @@ from scripts.dev_tools.collect_commit_context import (
 )
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 class TestRunGit:
     """Tests for run_git function."""
 
@@ -175,7 +181,7 @@ class TestCollectCommitContext:
     """Tests for collect_commit_context function."""
 
     def test_creates_output_file(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that the function creates the output file."""
 
@@ -186,13 +192,13 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "test_output.txt"
+        output_file = mem_path / "test_output.txt"
         collect_commit_context(output_file)
 
         assert output_file.exists()
 
     def test_creates_parent_directories(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that the function creates parent directories if they don't exist."""
 
@@ -203,14 +209,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "nested" / "dir" / "output.txt"
+        output_file = mem_path / "nested" / "dir" / "output.txt"
         collect_commit_context(output_file)
 
         assert output_file.exists()
         assert output_file.parent.exists()
 
     def test_output_contains_expected_sections(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that output file contains all expected section headers."""
 
@@ -247,7 +253,7 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
@@ -268,7 +274,7 @@ class TestCollectCommitContext:
         assert "===== Change intent (edit below) =====" in content
 
     def test_handles_no_upstream(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that missing upstream is handled gracefully."""
 
@@ -281,14 +287,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no upstream)" in content
 
     def test_handles_no_staged_changes(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no staged changes is indicated correctly."""
 
@@ -301,14 +307,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no staged changes)" in content
 
     def test_handles_no_unstaged_changes(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no unstaged changes is indicated correctly."""
 
@@ -323,14 +329,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no unstaged changes)" in content
 
     def test_handles_no_untracked_files(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no untracked files is indicated correctly."""
 
@@ -343,14 +349,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no untracked files)" in content
 
     def test_handles_no_changes_in_diff_stat(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no changes in diff stat is indicated correctly."""
 
@@ -363,14 +369,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no changes)" in content
 
     def test_filters_python_files(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that Python files are filtered correctly from changed files."""
 
@@ -383,7 +389,7 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
@@ -393,7 +399,7 @@ class TestCollectCommitContext:
         assert "README.md" not in content
 
     def test_handles_no_python_files_changed(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no Python files changed is indicated correctly."""
 
@@ -406,14 +412,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no Python files changed)" in content
 
     def test_handles_no_previous_commits(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that no previous commits is indicated correctly."""
 
@@ -426,14 +432,14 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
         assert "(no previous commits)" in content
 
     def test_formats_last_commit_correctly(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that last commit is formatted with all fields correctly."""
 
@@ -456,7 +462,7 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         content = output_file.read_text(encoding="utf-8")
@@ -471,7 +477,7 @@ class TestCollectCommitContext:
 
     def test_prints_output_path(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -484,7 +490,7 @@ class TestCollectCommitContext:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         collect_commit_context(output_file)
 
         captured = capsys.readouterr()
@@ -495,7 +501,7 @@ class TestMain:
     """Tests for main function."""
 
     def test_successful_execution_returns_zero(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that successful execution returns exit code 0."""
 
@@ -506,14 +512,14 @@ class TestMain:
             "scripts.dev_tools.collect_commit_context.run_git", mock_run_git
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         exit_code = main(["--output", str(output_file)])
 
         assert exit_code == 0
         assert output_file.exists()
 
     def test_uses_default_output_path(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+        self, monkeypatch: pytest.MonkeyPatch, mem_path: Path
     ) -> None:
         """Test that default output path is used when not specified."""
         calls: list[Path] = []
@@ -526,8 +532,8 @@ class TestMain:
             mock_collect,
         )
 
-        # Change cwd to tmp_path to avoid writing to real artifacts directory
-        monkeypatch.chdir(tmp_path)
+        # Change cwd to mem_path to avoid writing to real artifacts directory
+        monkeypatch.chdir(mem_path)
 
         main([])
 
@@ -535,7 +541,7 @@ class TestMain:
         assert calls[0] == Path("artifacts/commit_context.txt")
 
     def test_accepts_custom_output_path(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that custom output path is used when specified."""
         calls: list[Path] = []
@@ -548,14 +554,14 @@ class TestMain:
             mock_collect,
         )
 
-        custom_path = tmp_path / "custom_output.txt"
+        custom_path = mem_path / "custom_output.txt"
         main(["--output", str(custom_path)])
 
         assert len(calls) == 1
         assert calls[0] == custom_path
 
     def test_accepts_short_flag(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Test that -o short flag is accepted."""
         calls: list[Path] = []
@@ -568,7 +574,7 @@ class TestMain:
             mock_collect,
         )
 
-        custom_path = tmp_path / "custom_output.txt"
+        custom_path = mem_path / "custom_output.txt"
         main(["-o", str(custom_path)])
 
         assert len(calls) == 1
@@ -576,7 +582,7 @@ class TestMain:
 
     def test_returns_one_on_subprocess_error(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -590,7 +596,7 @@ class TestMain:
             mock_collect,
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         exit_code = main(["--output", str(output_file)])
 
         assert exit_code == 1
@@ -599,7 +605,7 @@ class TestMain:
 
     def test_returns_one_on_general_exception(
         self,
-        tmp_path: Path,
+        mem_path: Path,
         monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -613,7 +619,7 @@ class TestMain:
             mock_collect,
         )
 
-        output_file = tmp_path / "output.txt"
+        output_file = mem_path / "output.txt"
         exit_code = main(["--output", str(output_file)])
 
         assert exit_code == 1

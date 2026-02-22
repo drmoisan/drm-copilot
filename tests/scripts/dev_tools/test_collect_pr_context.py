@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pytest
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import pytest
 
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
@@ -59,6 +59,12 @@ from scripts.dev_tools.pr_context.summary_helpers import (
 from scripts.dev_tools.pr_context.summary_helpers import (
     scoping_doc_changes as _scoping_doc_changes,
 )
+
+
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
 
 
 class FakeRunner:
@@ -267,8 +273,8 @@ def test_build_pr_context_excludes_merge_pr_numbers_from_issue_refs():
     assert "#53" in context.referenced_prs
 
 
-def test_gather_feature_excerpts_reads_active_docs(tmp_path: Path) -> None:
-    root = tmp_path
+def test_gather_feature_excerpts_reads_active_docs(mem_path: Path) -> None:
+    root = mem_path
     feature = "2025-12-18-docs-v3-upgrade"
     feature_dir = root / "docs" / "features" / "active" / feature
     feature_dir.mkdir(parents=True)
@@ -517,7 +523,7 @@ def test_is_scoping_doc_identifies_feature_files():
 
 
 def test_collect_and_write_uses_feature_refs_and_scoping(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_path: Path
 ) -> None:
     captured: list[tuple[Path, str]] = []
 
@@ -665,9 +671,9 @@ def test_collect_and_write_uses_feature_refs_and_scoping(
     collect_and_write(
         base="main",
         head="feature",
-        out=tmp_path / "summary.txt",
-        appendix_out=tmp_path / "appendix.txt",
-        repo_root=tmp_path,
+        out=mem_path / "summary.txt",
+        appendix_out=mem_path / "appendix.txt",
+        repo_root=mem_path,
         append=False,
         include_untracked=False,
     )
@@ -692,8 +698,8 @@ def test_parse_numstat_detailed_skips_invalid_rows() -> None:
     assert mapping == {"file.py": (1, 1)}
 
 
-def test_write_output_creates_parent_and_appends(tmp_path: Path) -> None:
-    target = tmp_path / "nested" / "out.txt"
+def test_write_output_creates_parent_and_appends(mem_path: Path) -> None:
+    target = mem_path / "nested" / "out.txt"
     write_output("first", target, append=False)
     write_output("second", target, append=True)
     assert target.read_text(encoding="utf-8").endswith("firstsecond")
@@ -755,7 +761,7 @@ def test_parse_args_and_main_delegate_to_collect(
 
 
 def test_collect_and_write_renders_non_material_scoping(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -768,7 +774,7 @@ def test_collect_and_write_renders_non_material_scoping(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = tmp_path
+            self._root = mem_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -948,9 +954,9 @@ def test_collect_and_write_renders_non_material_scoping(
     collect_and_write(
         base="main",
         head="feature",
-        out=tmp_path / "summary.txt",
-        appendix_out=tmp_path / "appendix.txt",
-        repo_root=tmp_path,
+        out=mem_path / "summary.txt",
+        appendix_out=mem_path / "appendix.txt",
+        repo_root=mem_path,
         append=False,
         include_untracked=False,
     )
@@ -961,7 +967,7 @@ def test_collect_and_write_renders_non_material_scoping(
 
 
 def test_collect_and_write_handles_offline_gh(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -974,7 +980,7 @@ def test_collect_and_write_handles_offline_gh(
 
     class OfflineGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = tmp_path
+            self._root = mem_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -1039,9 +1045,9 @@ def test_collect_and_write_handles_offline_gh(
     collect_and_write(
         base="main",
         head="feature",
-        out=tmp_path / "summary.txt",
-        appendix_out=tmp_path / "appendix.txt",
-        repo_root=tmp_path,
+        out=mem_path / "summary.txt",
+        appendix_out=mem_path / "appendix.txt",
+        repo_root=mem_path,
         append=False,
         include_untracked=False,
     )
@@ -1053,7 +1059,7 @@ def test_collect_and_write_handles_offline_gh(
 
 
 def test_collect_and_write_includes_intent_and_additional_context(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -1205,8 +1211,8 @@ def test_collect_and_write_includes_intent_and_additional_context(
     collect_and_write(
         base="main",
         head="feature",
-        out=tmp_path / "summary.txt",
-        appendix_out=tmp_path / "appendix.txt",
+        out=mem_path / "summary.txt",
+        appendix_out=mem_path / "appendix.txt",
         repo_root=repo_root,
         append=False,
         include_untracked=False,

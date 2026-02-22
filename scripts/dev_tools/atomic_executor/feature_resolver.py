@@ -181,7 +181,7 @@ class FeatureResolver:
             )
             branch = result.stdout.strip()
             return branch or None
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, FileNotFoundError, NotADirectoryError):
             return None
 
     def _normalize_branch_suffix(self, branch: str) -> str:

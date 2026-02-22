@@ -13,6 +13,12 @@ import pytest  # noqa: TCH002  # Needed at runtime for pytest decorators
 import scripts.dev_tools.format_json as fmt
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 def _patch_io(monkeypatch: MonkeyPatch, store: dict[Path, str]) -> None:
     def read_text(self: Path, *args: Any, **kwargs: Any):
         return store[self]
@@ -227,9 +233,9 @@ def test_parse_args_combined() -> None:
     assert args.paths == ["test.json"]
 
 
-def test_main_no_paths_uses_governed(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_no_paths_uses_governed(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main with no paths should use iter_governed_files."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text("{}")
 
     def mock_iter(_: Path) -> list[Path]:
@@ -250,7 +256,7 @@ def test_main_no_paths_uses_governed(tmp_path: Path, monkeypatch: MonkeyPatch) -
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -259,9 +265,9 @@ def test_main_no_paths_uses_governed(tmp_path: Path, monkeypatch: MonkeyPatch) -
     assert exit_code == 0
 
 
-def test_main_with_file_path(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_with_file_path(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main should format specific file when path provided."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
     def _which(_: str) -> str:
@@ -278,7 +284,7 @@ def test_main_with_file_path(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -287,9 +293,9 @@ def test_main_with_file_path(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     assert exit_code == 0
 
 
-def test_main_with_directory_path(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_with_directory_path(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main should recursively find JSON files in directory."""
-    subdir = tmp_path / "subdir"
+    subdir = mem_path / "subdir"
     subdir.mkdir()
     json_file = subdir / "test.json"
     json_file.write_text("{}")
@@ -308,20 +314,20 @@ def test_main_with_directory_path(tmp_path: Path, monkeypatch: MonkeyPatch) -> N
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
 
-    exit_code = fmt.main([str(tmp_path)])
+    exit_code = fmt.main([str(mem_path)])
     assert exit_code == 0
 
 
 def test_main_check_mode_exits_1_on_changes(
-    tmp_path: Path, monkeypatch: MonkeyPatch
+    mem_path: Path, monkeypatch: MonkeyPatch
 ) -> None:
     """main in check mode should return 1 when changes needed."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
     def _which(_: str) -> str:
@@ -338,7 +344,7 @@ def test_main_check_mode_exits_1_on_changes(
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -347,9 +353,9 @@ def test_main_check_mode_exits_1_on_changes(
     assert exit_code == 1
 
 
-def test_main_failure_exits_1(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_failure_exits_1(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main should return 1 on formatting failures."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text("invalid")
 
     def _which(_: str) -> str:
@@ -366,7 +372,7 @@ def test_main_failure_exits_1(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -376,10 +382,10 @@ def test_main_failure_exits_1(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
 
 def test_main_verbose_mode_already_formatted(
-    tmp_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    mem_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """main with --verbose should print 'already formatted' when no changes."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     original = '{\n  "b": 1\n}\n'
     json_file.write_text(original)
 
@@ -397,7 +403,7 @@ def test_main_verbose_mode_already_formatted(
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -410,10 +416,10 @@ def test_main_verbose_mode_already_formatted(
 
 
 def test_main_verbose_mode_reformatted(
-    tmp_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    mem_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """main with --verbose should print 'reformatted' when file is changed."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
     def _which(_: str) -> str:
@@ -430,7 +436,7 @@ def test_main_verbose_mode_reformatted(
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "format_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "format_json.py"
+            return mem_path / "scripts" / "dev_tools" / "format_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)

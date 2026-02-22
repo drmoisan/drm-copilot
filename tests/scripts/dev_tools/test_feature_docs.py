@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools.pr_context.feature_docs import (
     _resolve_feature_dir,  # pyright: ignore[reportPrivateUsage]
     completed_plan_tasks,
@@ -9,6 +11,12 @@ from scripts.dev_tools.pr_context.feature_docs import (
     gather_feature_excerpts,
     parse_section,
 )
+
+
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
 
 
 class TestParseSection:
@@ -97,10 +105,10 @@ class TestExtractIssueReferences:
 
 
 class TestGatherFeatureExcerpts:
-    def test_gather_feature_excerpts_direct_match(self, tmp_path: Path) -> None:
-        feature_dir = tmp_path / "docs" / "features" / "active" / "test-feature"
+    def test_gather_feature_excerpts_direct_match(self, mem_path: Path) -> None:
+        feature_dir = mem_path / "docs" / "features" / "active" / "test-feature"
         feature_dir.mkdir(parents=True)
-        (tmp_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+        (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
 
         user_story = feature_dir / "user-story.md"
         user_story.write_text(
@@ -116,7 +124,7 @@ class TestGatherFeatureExcerpts:
         plan.write_text("## Tasks\n- [x] Task 1\n- [ ] Task 2", encoding="utf-8")
 
         changed_files = ["docs/features/active/test-feature/user-story.md"]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
 
         assert len(excerpts) == 1
         assert excerpts[0].feature == "test-feature"
@@ -124,32 +132,32 @@ class TestGatherFeatureExcerpts:
         assert "Feature spec." in excerpts[0].excerpt
         assert "Task 1" in excerpts[0].excerpt
 
-    def test_gather_feature_excerpts_fuzzy_match(self, tmp_path: Path) -> None:
-        feature_dir = tmp_path / "docs" / "features" / "active" / "my-test-feature-impl"
+    def test_gather_feature_excerpts_fuzzy_match(self, mem_path: Path) -> None:
+        feature_dir = mem_path / "docs" / "features" / "active" / "my-test-feature-impl"
         feature_dir.mkdir(parents=True)
-        (tmp_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+        (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
 
         spec = feature_dir / "spec.md"
         spec.write_text("## Spec\nData", encoding="utf-8")
 
         changed_files = ["docs/features/active/my-test-feature-impl/spec.md"]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
 
         assert len(excerpts) == 1
 
-    def test_gather_feature_excerpts_not_found(self, tmp_path: Path) -> None:
-        (tmp_path / "docs" / "features" / "active").mkdir(parents=True)
-        (tmp_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+    def test_gather_feature_excerpts_not_found(self, mem_path: Path) -> None:
+        (mem_path / "docs" / "features" / "active").mkdir(parents=True)
+        (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
 
         changed_files = ["docs/features/active/nonexistent/user-story.md"]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
 
         assert len(excerpts) == 0
 
-    def test_gather_feature_excerpts_promoted(self, tmp_path: Path) -> None:
-        (tmp_path / "docs" / "features" / "active").mkdir(parents=True)
+    def test_gather_feature_excerpts_promoted(self, mem_path: Path) -> None:
+        (mem_path / "docs" / "features" / "active").mkdir(parents=True)
 
-        promoted_dir = tmp_path / "docs" / "features" / "potential" / "promoted"
+        promoted_dir = mem_path / "docs" / "features" / "potential" / "promoted"
         feature_dir = promoted_dir / "test-feature"
         feature_dir.mkdir(parents=True)
 
@@ -159,40 +167,40 @@ class TestGatherFeatureExcerpts:
         )
 
         changed_files = ["docs/features/active/test-feature/plan.md"]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
         assert len(excerpts) == 1
         assert excerpts[0].feature == "test-feature"
         assert "Promoted story content" in excerpts[0].excerpt
 
-    def test_gather_feature_excerpts_extracts_issue_refs(self, tmp_path: Path) -> None:
-        feature_dir = tmp_path / "docs" / "features" / "active" / "test"
+    def test_gather_feature_excerpts_extracts_issue_refs(self, mem_path: Path) -> None:
+        feature_dir = mem_path / "docs" / "features" / "active" / "test"
         feature_dir.mkdir(parents=True)
-        (tmp_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+        (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
 
         user_story = feature_dir / "user-story.md"
         user_story.write_text("Relates to #123 and ABC-456", encoding="utf-8")
 
         changed_files = ["docs/features/active/test/user-story.md"]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
 
         assert len(excerpts) == 1
         assert "#123" in excerpts[0].issue_refs
         assert "ABC-456" in excerpts[0].issue_refs
 
-    def test_gather_feature_excerpts_multiple_features(self, tmp_path: Path) -> None:
+    def test_gather_feature_excerpts_multiple_features(self, mem_path: Path) -> None:
         for name in ["feature-a", "feature-b"]:
-            feature_dir = tmp_path / "docs" / "features" / "active" / name
+            feature_dir = mem_path / "docs" / "features" / "active" / name
             feature_dir.mkdir(parents=True)
             (feature_dir / "user-story.md").write_text(
                 f"Story for {name}", encoding="utf-8"
             )
-        (tmp_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+        (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
 
         changed_files = [
             "docs/features/active/feature-a/user-story.md",
             "docs/features/active/feature-b/spec.md",
         ]
-        excerpts = gather_feature_excerpts(tmp_path, changed_files)
+        excerpts = gather_feature_excerpts(mem_path, changed_files)
 
         assert len(excerpts) == 2
         features = {e.feature for e in excerpts}
@@ -202,18 +210,18 @@ class TestGatherFeatureExcerpts:
 class TestResolveFeatureDir:
     """Tests for _resolve_feature_dir focusing on directory matching loop."""
 
-    def test_resolve_feature_dir_direct_match(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_direct_match(self, mem_path: Path) -> None:
         """Test direct match when feature folder exists exactly."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         feature_dir = base_dir / "my-feature"
         feature_dir.mkdir(parents=True)
 
         result = _resolve_feature_dir(base_dir, "my-feature")
         assert result == feature_dir
 
-    def test_resolve_feature_dir_pattern_match_prefix(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_pattern_match_prefix(self, mem_path: Path) -> None:
         """Test pattern matching with feature at start of directory name."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "2025-12-01-my-feature-impl").mkdir(parents=True)
         (base_dir / "other-folder").mkdir(parents=True)
 
@@ -221,36 +229,36 @@ class TestResolveFeatureDir:
         assert result is not None
         assert result.name == "2025-12-01-my-feature-impl"
 
-    def test_resolve_feature_dir_pattern_match_suffix(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_pattern_match_suffix(self, mem_path: Path) -> None:
         """Test pattern matching with feature at end of directory name."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "impl-my-feature").mkdir(parents=True)
 
         result = _resolve_feature_dir(base_dir, "my-feature")
         assert result is not None
         assert result.name == "impl-my-feature"
 
-    def test_resolve_feature_dir_pattern_match_middle(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_pattern_match_middle(self, mem_path: Path) -> None:
         """Test pattern matching with feature in middle of directory name."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "prefix-my-feature-suffix").mkdir(parents=True)
 
         result = _resolve_feature_dir(base_dir, "my-feature")
         assert result is not None
         assert result.name == "prefix-my-feature-suffix"
 
-    def test_resolve_feature_dir_weak_match(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_weak_match(self, mem_path: Path) -> None:
         """Test weak substring match when no pattern match found."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "somemyfeaturedir").mkdir(parents=True)
 
         result = _resolve_feature_dir(base_dir, "myfeature")
         assert result is not None
         assert result.name == "somemyfeaturedir"
 
-    def test_resolve_feature_dir_strong_over_weak(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_strong_over_weak(self, mem_path: Path) -> None:
         """Test that strong pattern match is preferred over weak substring match."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "weak-myfeature-match").mkdir(parents=True)
         (base_dir / "strong-my-feature-match").mkdir(parents=True)
 
@@ -259,9 +267,9 @@ class TestResolveFeatureDir:
         # Strong match (with delimiters) should win
         assert result.name == "strong-my-feature-match"
 
-    def test_resolve_feature_dir_skips_files(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_skips_files(self, mem_path: Path) -> None:
         """Test that files are skipped during directory iteration."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         base_dir.mkdir(parents=True)
         # Create a file (not directory) with matching name
         (base_dir / "my-feature.txt").write_text("not a dir", encoding="utf-8")
@@ -272,9 +280,9 @@ class TestResolveFeatureDir:
         assert result is not None
         assert result.name == "my-feature-dir"
 
-    def test_resolve_feature_dir_sorted_order(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_sorted_order(self, mem_path: Path) -> None:
         """Test first sorted match returned when multiple strong matches exist."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "z-my-feature").mkdir(parents=True)
         (base_dir / "a-my-feature").mkdir(parents=True)
         (base_dir / "m-my-feature").mkdir(parents=True)
@@ -284,18 +292,18 @@ class TestResolveFeatureDir:
         # Should return first in sorted order
         assert result.name == "a-my-feature"
 
-    def test_resolve_feature_dir_no_match(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_no_match(self, mem_path: Path) -> None:
         """Test returns None when no match found."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         (base_dir / "other-feature").mkdir(parents=True)
         (base_dir / "different-thing").mkdir(parents=True)
 
         result = _resolve_feature_dir(base_dir, "nonexistent")
         assert result is None
 
-    def test_resolve_feature_dir_empty_directory(self, tmp_path: Path) -> None:
+    def test_resolve_feature_dir_empty_directory(self, mem_path: Path) -> None:
         """Test returns None when base directory is empty."""
-        base_dir = tmp_path / "active"
+        base_dir = mem_path / "active"
         base_dir.mkdir()
 
         result = _resolve_feature_dir(base_dir, "any-feature")

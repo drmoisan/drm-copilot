@@ -14,6 +14,12 @@ import pytest
 import scripts.dev_tools.validate_json as val
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 def _patch_read(monkeypatch: MonkeyPatch, store: dict[Path, str]) -> None:
     def read_text(self: Path, *args: Any, **kwargs: Any):
         return store[self]
@@ -39,9 +45,9 @@ def test_cache_path_generates_deterministic_hash() -> None:
     assert path1.suffix == ".json"
 
 
-def test_load_schema_from_cache(tmp_path: Path) -> None:
+def test_load_schema_from_cache(mem_path: Path) -> None:
     """_load_schema should load from cache if present."""
-    cache_dir = tmp_path / "cache"
+    cache_dir = mem_path / "cache"
     cache_dir.mkdir()
     uri = "https://example.com/schema.json"
     cache_file = val._cache_path(cache_dir, uri)  # type: ignore[reportPrivateUsage]
@@ -51,36 +57,36 @@ def test_load_schema_from_cache(tmp_path: Path) -> None:
     assert schema == {"type": "object"}
 
 
-def test_load_schema_unsupported_scheme(tmp_path: Path) -> None:
+def test_load_schema_unsupported_scheme(mem_path: Path) -> None:
     """_load_schema should reject unsupported URI schemes."""
     with pytest.raises(ValueError, match="Unsupported schema URI scheme"):
-        val._load_schema("ftp://example.com/schema.json", tmp_path / "cache")  # type: ignore[reportPrivateUsage]
+        val._load_schema("ftp://example.com/schema.json", mem_path / "cache")  # type: ignore[reportPrivateUsage]
 
 
-def test_load_schema_missing_scheme(tmp_path: Path) -> None:
+def test_load_schema_missing_scheme(mem_path: Path) -> None:
     """_load_schema should reject URIs with missing scheme."""
     with pytest.raises(ValueError, match="Unsupported schema URI scheme"):
-        val._load_schema("no-scheme-here", tmp_path / "cache")  # type: ignore[reportPrivateUsage]
+        val._load_schema("no-scheme-here", mem_path / "cache")  # type: ignore[reportPrivateUsage]
 
 
-def test_load_schema_relative_path(tmp_path: Path) -> None:
+def test_load_schema_relative_path(mem_path: Path) -> None:
     """_load_schema should resolve relative file paths against the source file."""
-    cache_dir = tmp_path / "cache"
+    cache_dir = mem_path / "cache"
     cache_dir.mkdir()
-    schema_path = tmp_path / "schema.json"
+    schema_path = mem_path / "schema.json"
     schema_path.write_text(
         '{"type": "object", "properties": {"key": {"type": "number"}}}'
     )
-    source_path = tmp_path / "data.json"
+    source_path = mem_path / "data.json"
 
     schema = val._load_schema("./schema.json", cache_dir, source_path)  # type: ignore[reportPrivateUsage]
 
     assert schema == {"type": "object", "properties": {"key": {"type": "number"}}}
 
 
-def test_load_schema_fetch_and_cache(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_load_schema_fetch_and_cache(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """_load_schema should fetch remote schema and cache it."""
-    cache_dir = tmp_path / "cache"
+    cache_dir = mem_path / "cache"
     uri = "https://example.com/schema.json"
     schema_content = '{"type": "object", "properties": {}}'
 
@@ -123,9 +129,9 @@ def test_validate_ok(monkeypatch: MonkeyPatch) -> None:
     assert "ok" in msg
 
 
-def test_validate_relative_schema(tmp_path: Path) -> None:
+def test_validate_relative_schema(mem_path: Path) -> None:
     """validate_file should resolve relative $schema paths."""
-    schema_path = tmp_path / "schema.json"
+    schema_path = mem_path / "schema.json"
     schema_path.write_text(
         json.dumps(
             {
@@ -136,10 +142,10 @@ def test_validate_relative_schema(tmp_path: Path) -> None:
         )
     )
 
-    data_path = tmp_path / "data.json"
+    data_path = mem_path / "data.json"
     data_path.write_text('{"$schema": "./schema.json", "key": 1}')
 
-    ok, msg = val.validate_file(data_path, tmp_path / "cache")
+    ok, msg = val.validate_file(data_path, mem_path / "cache")
 
     assert ok is True
     assert "ok" in msg
@@ -253,34 +259,34 @@ def test_parse_args_custom_cache_dir() -> None:
     assert args.cache_dir == "/custom/cache"
 
 
-def test_collect_targets_with_file_paths(tmp_path: Path) -> None:
+def test_collect_targets_with_file_paths(mem_path: Path) -> None:
     """collect_targets should collect specific file paths."""
-    file1 = tmp_path / "test1.json"
+    file1 = mem_path / "test1.json"
     file1.write_text("{}")
-    file2 = tmp_path / "test2.json"
+    file2 = mem_path / "test2.json"
     file2.write_text("{}")
 
-    targets = val.collect_targets(tmp_path, [str(file1), str(file2)])
+    targets = val.collect_targets(mem_path, [str(file1), str(file2)])
     assert file1 in targets
     assert file2 in targets
 
 
-def test_collect_targets_with_directory(tmp_path: Path) -> None:
+def test_collect_targets_with_directory(mem_path: Path) -> None:
     """collect_targets should recursively find JSON files in directories."""
-    subdir = tmp_path / "subdir"
+    subdir = mem_path / "subdir"
     subdir.mkdir()
     json_file = subdir / "test.json"
     json_file.write_text("{}")
 
-    targets = val.collect_targets(tmp_path, [str(tmp_path)])
+    targets = val.collect_targets(mem_path, [str(mem_path)])
     assert json_file in targets
 
 
 def test_collect_targets_defaults_to_governed(
-    tmp_path: Path, monkeypatch: MonkeyPatch
+    mem_path: Path, monkeypatch: MonkeyPatch
 ) -> None:
     """collect_targets with no paths should use iter_governed_files."""
-    vscode_dir = tmp_path / ".vscode"
+    vscode_dir = mem_path / ".vscode"
     vscode_dir.mkdir()
     tasks_json = vscode_dir / "tasks.json"
     tasks_json.write_text("{}")
@@ -290,11 +296,11 @@ def test_collect_targets_defaults_to_governed(
 
     monkeypatch.setattr(val, "iter_governed_files", mock_iter)
 
-    targets = val.collect_targets(tmp_path, [])
+    targets = val.collect_targets(mem_path, [])
     assert tasks_json in targets
 
 
-def test_main_no_files(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_no_files(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main with no matching files should return 0."""
 
     def mock_iter(_: Path) -> list[Path]:
@@ -307,7 +313,7 @@ def test_main_no_files(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "validate_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "validate_json.py"
+            return mem_path / "scripts" / "dev_tools" / "validate_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -316,9 +322,9 @@ def test_main_no_files(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     assert exit_code == 0
 
 
-def test_main_all_valid(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_all_valid(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main with all valid files should return 0."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"$schema":"https://example.com/schema.json"}')
 
     def mock_iter(_: Path) -> list[Path]:
@@ -335,7 +341,7 @@ def test_main_all_valid(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "validate_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "validate_json.py"
+            return mem_path / "scripts" / "dev_tools" / "validate_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -344,9 +350,9 @@ def test_main_all_valid(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     assert exit_code == 0
 
 
-def test_main_validation_failure(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_validation_failure(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main with validation failures should return 1."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"key":1}')
 
     def mock_iter(_: Path) -> list[Path]:
@@ -359,7 +365,7 @@ def test_main_validation_failure(tmp_path: Path, monkeypatch: MonkeyPatch) -> No
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "validate_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "validate_json.py"
+            return mem_path / "scripts" / "dev_tools" / "validate_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -369,10 +375,10 @@ def test_main_validation_failure(tmp_path: Path, monkeypatch: MonkeyPatch) -> No
 
 
 def test_main_verbose_mode(
-    tmp_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    mem_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """main with --verbose should print status for all files."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"$schema":"https://example.com/schema.json"}')
 
     def mock_iter(_: Path) -> list[Path]:
@@ -389,7 +395,7 @@ def test_main_verbose_mode(
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "validate_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "validate_json.py"
+            return mem_path / "scripts" / "dev_tools" / "validate_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)
@@ -401,12 +407,12 @@ def test_main_verbose_mode(
     assert "ok" in captured.out
 
 
-def test_main_custom_cache_dir(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+def test_main_custom_cache_dir(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
     """main should respect --cache-dir argument."""
-    json_file = tmp_path / "test.json"
+    json_file = mem_path / "test.json"
     json_file.write_text('{"$schema":"https://example.com/schema.json"}')
 
-    custom_cache = tmp_path / "custom_cache"
+    custom_cache = mem_path / "custom_cache"
 
     def mock_iter(_: Path) -> list[Path]:
         return [json_file]
@@ -426,7 +432,7 @@ def test_main_custom_cache_dir(tmp_path: Path, monkeypatch: MonkeyPatch) -> None
 
     def mock_resolve(self: Path, *args: Any, **kwargs: Any) -> Path:
         if "validate_json.py" in str(self):
-            return tmp_path / "scripts" / "dev_tools" / "validate_json.py"
+            return mem_path / "scripts" / "dev_tools" / "validate_json.py"
         return original_resolve(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "resolve", mock_resolve)

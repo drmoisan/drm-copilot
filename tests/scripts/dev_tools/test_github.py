@@ -19,34 +19,40 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 class TestGhClientAvailability:
     """Test GhClient availability checks."""
 
     def test_gh_not_installed(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """GhClient marks unavailable when gh binary not found."""
         monkeypatch.setattr("shutil.which", lambda x: None)  # type: ignore[arg-type]
         runner = Mock(spec=CommandRunner)
 
-        client = GhClient(runner, tmp_path, gh_path=None)
+        client = GhClient(runner, mem_path, gh_path=None)
 
         assert not client.available
         # When unavailable, status_message is None
         assert client.status_message is None
 
-    def test_gh_not_authenticated(self, tmp_path: Path) -> None:
+    def test_gh_not_authenticated(self, mem_path: Path) -> None:
         """GhClient marks unavailable when auth fails."""
         runner = Mock(spec=CommandRunner)
         runner.run.return_value = CommandResult("", "not logged in", 1)
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         assert not client.available
         # When unavailable, status_message is None
         assert client.status_message is None
 
-    def test_gh_available_success(self, tmp_path: Path) -> None:
+    def test_gh_available_success(self, mem_path: Path) -> None:
         """GhClient marks available when fully configured."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -54,24 +60,24 @@ class TestGhClientAvailability:
             CommandResult('{"nameWithOwner": "owner/repo"}', "", 0),  # repo view
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         assert client.available
         assert client.status_message == "GitHub CLI authenticated for owner/repo"
 
     def test_ensure_available_raises(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """ensure_available raises when not available."""
         monkeypatch.setattr("shutil.which", lambda x: None)  # type: ignore[arg-type]
         runner = Mock(spec=CommandRunner)
 
-        client = GhClient(runner, tmp_path, gh_path=None)
+        client = GhClient(runner, mem_path, gh_path=None)
 
         with pytest.raises(RuntimeError):
             client.ensure_available()
 
-    def test_repo_name_caching(self, tmp_path: Path) -> None:
+    def test_repo_name_caching(self, mem_path: Path) -> None:
         """status_message caches repo name."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -79,13 +85,13 @@ class TestGhClientAvailability:
             CommandResult('{"nameWithOwner": "owner/repo"}', "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         # Status message includes repo name
         msg = client.status_message
         assert msg and "owner/repo" in msg
 
-    def test_repo_name_returns_none_on_invalid_json(self, tmp_path: Path) -> None:
+    def test_repo_name_returns_none_on_invalid_json(self, mem_path: Path) -> None:
         """GhClient handles invalid JSON from repo view."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -93,7 +99,7 @@ class TestGhClientAvailability:
             CommandResult("invalid", "", 0),  # Invalid JSON from repo view (init)
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         # Client should mark unavailable when repo resolution fails
         assert not client.available
@@ -102,7 +108,7 @@ class TestGhClientAvailability:
 class TestGhClientClassifyEntity:
     """Test entity classification."""
 
-    def test_classify_as_issue(self, tmp_path: Path) -> None:
+    def test_classify_as_issue(self, mem_path: Path) -> None:
         """classify_entity returns 'issue' for issues."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -111,12 +117,12 @@ class TestGhClientClassifyEntity:
             CommandResult('{"number": 1}', "", 0),  # classify call
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         result = client.classify_entity("1")
 
         assert result == "issue"
 
-    def test_classify_as_pull(self, tmp_path: Path) -> None:
+    def test_classify_as_pull(self, mem_path: Path) -> None:
         """classify_entity returns 'pull' when pull_request key present."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -125,12 +131,12 @@ class TestGhClientClassifyEntity:
             CommandResult('{"number": 1, "pull_request": {}}', "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         result = client.classify_entity("1")
 
         assert result == "pull"
 
-    def test_classify_not_found(self, tmp_path: Path) -> None:
+    def test_classify_not_found(self, mem_path: Path) -> None:
         """classify_entity returns None when entity not found."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -139,7 +145,7 @@ class TestGhClientClassifyEntity:
             CommandResult("", "404 Not Found", 1),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         result = client.classify_entity("999")
 
         assert result is None
@@ -148,7 +154,7 @@ class TestGhClientClassifyEntity:
 class TestGhClientClosingIssues:
     """Test closing_issues method."""
 
-    def test_closing_issues_returns_list(self, tmp_path: Path) -> None:
+    def test_closing_issues_returns_list(self, mem_path: Path) -> None:
         """closing_issues extracts issue numbers."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -159,12 +165,12 @@ class TestGhClientClosingIssues:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         issues = client.closing_issues()
 
         assert issues == ["#5"]
 
-    def test_closing_issues_empty(self, tmp_path: Path) -> None:
+    def test_closing_issues_empty(self, mem_path: Path) -> None:
         """closing_issues returns empty list when no issues."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -173,7 +179,7 @@ class TestGhClientClosingIssues:
             CommandResult(json.dumps({"closingIssuesReferences": []}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         issues = client.closing_issues()
 
         assert issues == []
@@ -182,7 +188,7 @@ class TestGhClientClosingIssues:
 class TestGhClientIssueDetails:
     """Test issue_details method."""
 
-    def test_issue_details_minimal(self, tmp_path: Path) -> None:
+    def test_issue_details_minimal(self, mem_path: Path) -> None:
         """issue_details handles minimal payload."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -191,13 +197,13 @@ class TestGhClientIssueDetails:
             CommandResult(json.dumps({"number": 1}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.number == "#1"
         assert details.title == "(no title)"
 
-    def test_issue_details_with_labels(self, tmp_path: Path) -> None:
+    def test_issue_details_with_labels(self, mem_path: Path) -> None:
         """issue_details extracts labels."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -208,7 +214,7 @@ class TestGhClientIssueDetails:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.labels == ["bug"]
@@ -217,7 +223,7 @@ class TestGhClientIssueDetails:
 class TestGhClientPrDetails:
     """Test pr_details method."""
 
-    def test_pr_details_basic(self, tmp_path: Path) -> None:
+    def test_pr_details_basic(self, mem_path: Path) -> None:
         """pr_details returns PullRequestDetails."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -226,7 +232,7 @@ class TestGhClientPrDetails:
             CommandResult(json.dumps({"number": 1, "title": "Test"}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.number == "#1"
@@ -237,18 +243,18 @@ class TestGhClientCurrentPr:
     """Test current_pr method."""
 
     def test_current_pr_not_available(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, mem_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """current_pr returns None when gh not available."""
         monkeypatch.setattr("shutil.which", lambda x: None)  # type: ignore[arg-type]
         runner = Mock(spec=CommandRunner)
 
-        client = GhClient(runner, tmp_path, gh_path=None)
+        client = GhClient(runner, mem_path, gh_path=None)
         pr = client.current_pr()
 
         assert pr is None
 
-    def test_current_pr_no_pr(self, tmp_path: Path) -> None:
+    def test_current_pr_no_pr(self, mem_path: Path) -> None:
         """current_pr returns None when no PR active."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -257,7 +263,7 @@ class TestGhClientCurrentPr:
             CommandResult("", "no pull request", 1),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is None
@@ -266,7 +272,7 @@ class TestGhClientCurrentPr:
 class TestGhClientFetchRepoFile:
     """Test fetch_repo_file method."""
 
-    def test_fetch_repo_file_success(self, tmp_path: Path) -> None:
+    def test_fetch_repo_file_success(self, mem_path: Path) -> None:
         """fetch_repo_file decodes content."""
         import base64
 
@@ -280,12 +286,12 @@ class TestGhClientFetchRepoFile:
             CommandResult(json.dumps({"content": encoded}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         result = client.fetch_repo_file("test.txt")
 
         assert result == content
 
-    def test_fetch_repo_file_not_found(self, tmp_path: Path) -> None:
+    def test_fetch_repo_file_not_found(self, mem_path: Path) -> None:
         """fetch_repo_file returns None when file not found."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -294,7 +300,7 @@ class TestGhClientFetchRepoFile:
             CommandResult("", "404", 1),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         result = client.fetch_repo_file("missing.txt")
 
         assert result is None
@@ -303,7 +309,7 @@ class TestGhClientFetchRepoFile:
 class TestGhClientCiStatus:
     """Test ci_status method."""
 
-    def test_ci_status_returns_status(self, tmp_path: Path) -> None:
+    def test_ci_status_returns_status(self, mem_path: Path) -> None:
         """ci_status extracts status from runs."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -312,12 +318,12 @@ class TestGhClientCiStatus:
             CommandResult(json.dumps([{"status": "success"}]), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         status, _ = client.ci_status("abc123")
 
         assert status == "success"
 
-    def test_ci_status_empty_runs(self, tmp_path: Path) -> None:
+    def test_ci_status_empty_runs(self, mem_path: Path) -> None:
         """ci_status returns None when no runs."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -326,7 +332,7 @@ class TestGhClientCiStatus:
             CommandResult(json.dumps([]), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         status, _ = client.ci_status("abc123")
 
         assert status is None
@@ -335,7 +341,7 @@ class TestGhClientCiStatus:
 class TestGhClientIssueDetailsExtended:
     """Extended tests for issue_details covering comments and edge cases."""
 
-    def test_issue_details_with_comments(self, tmp_path: Path) -> None:
+    def test_issue_details_with_comments(self, mem_path: Path) -> None:
         """issue_details extracts comments."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -367,14 +373,14 @@ class TestGhClientIssueDetailsExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert len(details.comments) == 1
         assert "testuser" in details.comments[0]
         assert "Test comment" in details.comments[0]
 
-    def test_issue_details_with_body(self, tmp_path: Path) -> None:
+    def test_issue_details_with_body(self, mem_path: Path) -> None:
         """issue_details extracts body text."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -383,12 +389,12 @@ class TestGhClientIssueDetailsExtended:
             CommandResult(json.dumps({"number": 1, "body": "Issue body text"}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.body == "Issue body text"
 
-    def test_issue_details_with_assignees(self, tmp_path: Path) -> None:
+    def test_issue_details_with_assignees(self, mem_path: Path) -> None:
         """issue_details extracts assignees."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -399,7 +405,7 @@ class TestGhClientIssueDetailsExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.assignees == ["user1"]
@@ -408,7 +414,7 @@ class TestGhClientIssueDetailsExtended:
 class TestGhClientPrDetailsExtended:
     """Extended tests for pr_details."""
 
-    def test_pr_details_with_all_fields(self, tmp_path: Path) -> None:
+    def test_pr_details_with_all_fields(self, mem_path: Path) -> None:
         """pr_details extracts all available fields."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -432,7 +438,7 @@ class TestGhClientPrDetailsExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.number == "#1"
@@ -448,7 +454,7 @@ class TestGhClientPrDetailsExtended:
 class TestGhClientCurrentPrExtended:
     """Extended tests for current_pr."""
 
-    def test_current_pr_success(self, tmp_path: Path) -> None:
+    def test_current_pr_success(self, mem_path: Path) -> None:
         """current_pr returns PR number when active."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -457,13 +463,13 @@ class TestGhClientCurrentPrExtended:
             CommandResult(json.dumps({"number": 42}), "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is not None
         assert pr.number == "#42"
 
-    def test_current_pr_invalid_json(self, tmp_path: Path) -> None:
+    def test_current_pr_invalid_json(self, mem_path: Path) -> None:
         """current_pr returns None on invalid JSON."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -472,12 +478,12 @@ class TestGhClientCurrentPrExtended:
             CommandResult("invalid", "", 0),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is None
 
-    def test_current_pr_with_labels_and_assignees(self, tmp_path: Path) -> None:
+    def test_current_pr_with_labels_and_assignees(self, mem_path: Path) -> None:
         """current_pr extracts labels and assignees."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -497,14 +503,14 @@ class TestGhClientCurrentPrExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is not None
         assert pr.labels == ["feature"]
         assert pr.assignees == ["dev1"]
 
-    def test_current_pr_with_closing_issues(self, tmp_path: Path) -> None:
+    def test_current_pr_with_closing_issues(self, mem_path: Path) -> None:
         """current_pr extracts closing issues."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -522,13 +528,13 @@ class TestGhClientCurrentPrExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is not None
         assert pr.closing_issues == ["#10"]
 
-    def test_current_pr_with_author(self, tmp_path: Path) -> None:
+    def test_current_pr_with_author(self, mem_path: Path) -> None:
         """current_pr extracts author."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -546,13 +552,13 @@ class TestGhClientCurrentPrExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is not None
         assert pr.author == "contributor1"
 
-    def test_current_pr_malformed_data(self, tmp_path: Path) -> None:
+    def test_current_pr_malformed_data(self, mem_path: Path) -> None:
         """current_pr handles malformed lists gracefully."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -572,7 +578,7 @@ class TestGhClientCurrentPrExtended:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         pr = client.current_pr()
 
         assert pr is not None
@@ -584,11 +590,11 @@ class TestGhClientCurrentPrExtended:
 class TestGhClientUserStory:
     """Test user story fetching in issue_details."""
 
-    def test_issue_details_with_user_story_link(self, tmp_path: Path) -> None:
+    def test_issue_details_with_user_story_link(self, mem_path: Path) -> None:
         """issue_details extracts user story link from body."""
         # Create a local user story file
         story_path = (
-            tmp_path / "docs" / "features" / "active" / "test" / "user-story.md"
+            mem_path / "docs" / "features" / "active" / "test" / "user-story.md"
         )
         story_path.parent.mkdir(parents=True)
         story_path.write_text("# User Story Content", encoding="utf-8")
@@ -613,13 +619,13 @@ class TestGhClientUserStory:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.user_story_path == "docs/features/active/test/user-story.md"
         assert details.user_story_content == "# User Story Content"
 
-    def test_issue_details_user_story_remote_fetch(self, tmp_path: Path) -> None:
+    def test_issue_details_user_story_remote_fetch(self, mem_path: Path) -> None:
         """issue_details fetches user story from remote when not local."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -647,7 +653,7 @@ class TestGhClientUserStory:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.user_story_path == "docs/features/active/test/user-story.md"
@@ -657,7 +663,7 @@ class TestGhClientUserStory:
 class TestGhClientPrDetailsError:
     """Test error handling in pr_details."""
 
-    def test_pr_details_raises_on_no_repo(self, tmp_path: Path) -> None:
+    def test_pr_details_raises_on_no_repo(self, mem_path: Path) -> None:
         """pr_details raises when repo unavailable."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -665,12 +671,12 @@ class TestGhClientPrDetailsError:
             CommandResult("invalid", "", 0),  # Bad JSON
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         with pytest.raises(RuntimeError, match="failed to resolve repository"):
             client.pr_details("1")
 
-    def test_pr_details_raises_on_bad_payload(self, tmp_path: Path) -> None:
+    def test_pr_details_raises_on_bad_payload(self, mem_path: Path) -> None:
         """pr_details raises on non-dict payload."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -679,7 +685,7 @@ class TestGhClientPrDetailsError:
             CommandResult("[]", "", 0),  # Array instead of object
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
 
         with pytest.raises(RuntimeError, match="Unexpected pull request payload"):
             client.pr_details("1")
@@ -688,7 +694,7 @@ class TestGhClientPrDetailsError:
 class TestGhClientFilesChanged:
     """Test files_changed extraction in pr_details."""
 
-    def test_pr_details_extracts_files(self, tmp_path: Path) -> None:
+    def test_pr_details_extracts_files(self, mem_path: Path) -> None:
         """pr_details extracts files changed list."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -709,7 +715,7 @@ class TestGhClientFilesChanged:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.files_changed == ["src/main.py", "tests/test_main.py"]
@@ -718,7 +724,7 @@ class TestGhClientFilesChanged:
 class TestGhClientCommentEdgeCases:
     """Test edge cases in comment extraction."""
 
-    def test_issue_details_comment_without_user(self, tmp_path: Path) -> None:
+    def test_issue_details_comment_without_user(self, mem_path: Path) -> None:
         """issue_details handles comments without user field."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -748,13 +754,13 @@ class TestGhClientCommentEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert len(details.comments) == 1
         assert "(unknown)" in details.comments[0]
 
-    def test_issue_details_comment_malformed_entries(self, tmp_path: Path) -> None:
+    def test_issue_details_comment_malformed_entries(self, mem_path: Path) -> None:
         """issue_details skips malformed comment entries."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -782,7 +788,7 @@ class TestGhClientCommentEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert len(details.comments) == 1
@@ -792,7 +798,7 @@ class TestGhClientCommentEdgeCases:
 class TestGhClientLabelAssigneeEdgeCases:
     """Test edge cases in label/assignee extraction."""
 
-    def test_pr_details_malformed_labels(self, tmp_path: Path) -> None:
+    def test_pr_details_malformed_labels(self, mem_path: Path) -> None:
         """pr_details handles malformed label entries."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -814,12 +820,12 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.labels == ["bug"]
 
-    def test_pr_details_malformed_assignees(self, tmp_path: Path) -> None:
+    def test_pr_details_malformed_assignees(self, mem_path: Path) -> None:
         """pr_details handles malformed assignee entries."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -841,12 +847,12 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.assignees == ["dev1"]
 
-    def test_pr_details_closing_issues_malformed(self, tmp_path: Path) -> None:
+    def test_pr_details_closing_issues_malformed(self, mem_path: Path) -> None:
         """pr_details handles malformed closing issues."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -868,12 +874,12 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.closing_issues == ["#5"]
 
-    def test_pr_details_author_extraction(self, tmp_path: Path) -> None:
+    def test_pr_details_author_extraction(self, mem_path: Path) -> None:
         """pr_details extracts author login."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -891,12 +897,12 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.pr_details("1")
 
         assert details.author == "contributor1"
 
-    def test_issue_details_malformed_labels(self, tmp_path: Path) -> None:
+    def test_issue_details_malformed_labels(self, mem_path: Path) -> None:
         """issue_details handles malformed label entries."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -917,12 +923,12 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.labels == ["bug"]
 
-    def test_issue_details_malformed_assignees(self, tmp_path: Path) -> None:
+    def test_issue_details_malformed_assignees(self, mem_path: Path) -> None:
         """issue_details handles malformed assignee entries."""
         runner = Mock(spec=CommandRunner)
         runner.run.side_effect = [
@@ -943,7 +949,7 @@ class TestGhClientLabelAssigneeEdgeCases:
             ),
         ]
 
-        client = GhClient(runner, tmp_path, gh_path="/usr/bin/gh")
+        client = GhClient(runner, mem_path, gh_path="/usr/bin/gh")
         details = client.issue_details("1")
 
         assert details.assignees == ["assignee1"]

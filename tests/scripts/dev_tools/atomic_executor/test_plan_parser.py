@@ -16,6 +16,12 @@ from scripts.dev_tools.atomic_executor.plan_parser import (
 )
 
 
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
 class TestPlanTask:
     """Tests for PlanTask dataclass."""
 
@@ -70,17 +76,17 @@ class TestPlanModel:
 class TestPlanParserInit:
     """Tests for PlanParser initialization."""
 
-    def test_init_with_valid_file(self, tmp_path: Path) -> None:
+    def test_init_with_valid_file(self, mem_path: Path) -> None:
         """PlanParser initializes successfully with valid file path."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_file.write_text("# Plan\n", encoding="utf-8")
 
         parser = PlanParser(plan_file)
         assert parser.plan_path == plan_file
 
-    def test_init_with_nonexistent_file_raises(self, tmp_path: Path) -> None:
+    def test_init_with_nonexistent_file_raises(self, mem_path: Path) -> None:
         """PlanParser raises FileNotFoundError for nonexistent file."""
-        nonexistent = tmp_path / "missing.md"
+        nonexistent = mem_path / "missing.md"
         with pytest.raises(FileNotFoundError, match="Plan file not found"):
             PlanParser(nonexistent)
 
@@ -88,9 +94,9 @@ class TestPlanParserInit:
 class TestPlanParserParse:
     """Tests for PlanParser.parse() method."""
 
-    def test_parse_empty_file_returns_empty_model(self, tmp_path: Path) -> None:
+    def test_parse_empty_file_returns_empty_model(self, mem_path: Path) -> None:
         """Parsing an empty file returns PlanModel with no tasks or phases."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_file.write_text("", encoding="utf-8")
 
         parser = PlanParser(plan_file)
@@ -98,9 +104,9 @@ class TestPlanParserParse:
         assert model.tasks == []
         assert model.phases == []
 
-    def test_parse_single_unchecked_task(self, tmp_path: Path) -> None:
+    def test_parse_single_unchecked_task(self, mem_path: Path) -> None:
         """Parsing a single unchecked task returns correct PlanTask."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = "## Phase 1\n- [ ] [P1-T1] First task\n"
         plan_file.write_text(plan_content, encoding="utf-8")
 
@@ -240,7 +246,7 @@ class TestPlanParserParse:
         )
 
     def test_parse_defaults_expect_fail_false_when_tag_missing(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """
         PlanParser.parse defaults expect_fail to False when tag is absent.
@@ -248,7 +254,7 @@ class TestPlanParserParse:
         Purpose:
             Ensure normal tasks without [expect-fail] prefix get expect_fail=False.
         """
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_file.write_text(
             "## Phase 1\n- [ ] [P1-T1] Normal task without tag\n", encoding="utf-8"
         )
@@ -258,9 +264,9 @@ class TestPlanParserParse:
         assert model.tasks[0].expect_fail is False
         assert model.tasks[0].title == "Normal task without tag"
 
-    def test_parse_single_checked_task(self, tmp_path: Path) -> None:
+    def test_parse_single_checked_task(self, mem_path: Path) -> None:
         """Parsing a single checked task returns correct PlanTask."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = "## Phase 1\n- [x] [P1-T1] First task\n"
         plan_file.write_text(plan_content, encoding="utf-8")
 
@@ -271,9 +277,9 @@ class TestPlanParserParse:
         task = model.tasks[0]
         assert task.checked is True
 
-    def test_parse_multiple_tasks_multiple_phases(self, tmp_path: Path) -> None:
+    def test_parse_multiple_tasks_multiple_phases(self, mem_path: Path) -> None:
         """Parsing multiple tasks across phases returns all correctly."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 0: Setup
 - [ ] [P0-T1] Setup task
 
@@ -311,9 +317,9 @@ class TestPlanParserParse:
         assert model.tasks[3].phase == 2
         assert model.tasks[3].checked is False
 
-    def test_parse_ignores_non_task_lines(self, tmp_path: Path) -> None:
+    def test_parse_ignores_non_task_lines(self, mem_path: Path) -> None:
         """Parser ignores lines that don't match task pattern."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """# Plan Document
 
 Some intro text.
@@ -341,9 +347,9 @@ Random text without checkbox.
 class TestPlanParserNextUncheckedTask:
     """Tests for PlanParser.next_unchecked_task() method."""
 
-    def test_next_unchecked_task_returns_first_unchecked(self, tmp_path: Path) -> None:
+    def test_next_unchecked_task_returns_first_unchecked(self, mem_path: Path) -> None:
         """next_unchecked_task returns the first unchecked task."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Done
 - [ ] [P1-T2] Not done
@@ -357,10 +363,10 @@ class TestPlanParserNextUncheckedTask:
         assert task.task_id == "P1-T2"
 
     def test_next_unchecked_task_returns_none_when_all_checked(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """next_unchecked_task returns None when all tasks are checked."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Done
 - [x] [P1-T2] Also done
@@ -372,10 +378,10 @@ class TestPlanParserNextUncheckedTask:
         assert task is None
 
     def test_next_unchecked_task_returns_none_for_empty_model(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """next_unchecked_task returns None for empty task list."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_file.write_text("", encoding="utf-8")
 
         parser = PlanParser(plan_file)
@@ -386,9 +392,9 @@ class TestPlanParserNextUncheckedTask:
 class TestPlanParserFindTaskById:
     """Tests for PlanParser.find_task_by_id() method."""
 
-    def test_find_task_by_id_returns_matching_task(self, tmp_path: Path) -> None:
+    def test_find_task_by_id_returns_matching_task(self, mem_path: Path) -> None:
         """find_task_by_id returns the task with matching ID."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [ ] [P1-T1] First
 - [ ] [P1-T2] Second
@@ -401,9 +407,9 @@ class TestPlanParserFindTaskById:
         assert task.task_id == "P1-T2"
         assert task.title == "Second"
 
-    def test_find_task_by_id_raises_for_missing_id(self, tmp_path: Path) -> None:
+    def test_find_task_by_id_raises_for_missing_id(self, mem_path: Path) -> None:
         """find_task_by_id raises RuntimeError when ID not found."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [ ] [P1-T1] First
 """
@@ -417,9 +423,9 @@ class TestPlanParserFindTaskById:
 class TestPlanParserPhaseComplete:
     """Tests for PlanParser.phase_complete() method."""
 
-    def test_phase_complete_returns_true_when_all_checked(self, tmp_path: Path) -> None:
+    def test_phase_complete_returns_true_when_all_checked(self, mem_path: Path) -> None:
         """phase_complete returns True when all tasks in phase are checked."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Done
 - [x] [P1-T2] Also done
@@ -430,10 +436,10 @@ class TestPlanParserPhaseComplete:
         assert parser.phase_complete(1) is True
 
     def test_phase_complete_returns_false_when_any_unchecked(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """phase_complete returns False when any task in phase is unchecked."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Done
 - [ ] [P1-T2] Not done
@@ -444,10 +450,10 @@ class TestPlanParserPhaseComplete:
         assert parser.phase_complete(1) is False
 
     def test_phase_complete_returns_false_for_nonexistent_phase(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """phase_complete returns False for phase with no tasks."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Done
 """
@@ -461,9 +467,9 @@ class TestPlanParserPhaseComplete:
 class TestPlanParserFlipCheckbox:
     """Tests for PlanParser.flip_checkbox() method."""
 
-    def test_flip_checkbox_checks_unchecked_task(self, tmp_path: Path) -> None:
+    def test_flip_checkbox_checks_unchecked_task(self, mem_path: Path) -> None:
         """flip_checkbox changes [ ] to [x] for the specified task."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [ ] [P1-T1] First task
 """
@@ -478,9 +484,9 @@ class TestPlanParserFlipCheckbox:
         updated_content = plan_file.read_text(encoding="utf-8")
         assert "- [x] [P1-T1] First task" in updated_content
 
-    def test_flip_checkbox_is_idempotent_for_checked_task(self, tmp_path: Path) -> None:
+    def test_flip_checkbox_is_idempotent_for_checked_task(self, mem_path: Path) -> None:
         """flip_checkbox is idempotent for already-checked tasks."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] First task
 """
@@ -495,9 +501,9 @@ class TestPlanParserFlipCheckbox:
         updated_content = plan_file.read_text(encoding="utf-8")
         assert "- [x] [P1-T1] First task" in updated_content
 
-    def test_flip_checkbox_preserves_other_lines(self, tmp_path: Path) -> None:
+    def test_flip_checkbox_preserves_other_lines(self, mem_path: Path) -> None:
         """flip_checkbox only modifies the target line, leaving others intact."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """# Plan Document
 
 ## Phase 1
@@ -527,10 +533,10 @@ class TestPlanParserPreflightValidate:
     """Tests for PlanParser.preflight_validate() method."""
 
     def test_preflight_validate_passes_with_phase_0_and_qa(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """preflight_validate succeeds when Phase 0 and QA/toolchain present."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 0: Setup
 - [ ] [P0-T1] Setup
 
@@ -563,10 +569,10 @@ class TestPlanParserPreflightValidate:
         assert parser.auto_qc_phase_by_number(5) is not None
 
     def test_preflight_validate_raises_when_phase_0_missing(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """preflight_validate raises ValueError when Phase 0 is missing."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1: Implementation
 - [ ] [P1-T1] Impl
 
@@ -580,10 +586,10 @@ class TestPlanParserPreflightValidate:
             parser.preflight_validate()
 
     def test_preflight_validate_raises_when_qa_phase_missing(
-        self, tmp_path: Path
+        self, mem_path: Path
     ) -> None:
         """preflight_validate raises ValueError when QA phase is missing."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 0: Setup
 - [ ] [P0-T1] Setup
 
@@ -596,9 +602,9 @@ class TestPlanParserPreflightValidate:
         with pytest.raises(RuntimeError, match="QA/toolchain"):
             parser.preflight_validate()
 
-    def test_preflight_validate_raises_when_both_missing(self, tmp_path: Path) -> None:
+    def test_preflight_validate_raises_when_both_missing(self, mem_path: Path) -> None:
         """preflight_validate raises RuntimeError when both Phase 0 and QA missing."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1: Implementation
 - [ ] [P1-T1] Impl
 """
@@ -613,9 +619,9 @@ class TestPlanParserPreflightValidate:
 class TestPlanParserEdgeCases:
     """Edge case tests for PlanParser."""
 
-    def test_parse_handles_mixed_checkbox_formats(self, tmp_path: Path) -> None:
+    def test_parse_handles_mixed_checkbox_formats(self, mem_path: Path) -> None:
         """Parser correctly handles [x], [X], [ ] variants."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [x] [P1-T1] Lowercase x
 - [X] [P1-T2] Uppercase X
@@ -630,9 +636,9 @@ class TestPlanParserEdgeCases:
         assert model.tasks[1].checked is True
         assert model.tasks[2].checked is False
 
-    def test_parse_handles_whitespace_variations(self, tmp_path: Path) -> None:
+    def test_parse_handles_whitespace_variations(self, mem_path: Path) -> None:
         """Parser handles variations in whitespace around task elements."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 -  [x]  [P1-T1]  Task with extra spaces
 - [ ] [P1-T2]No space after ID
@@ -644,9 +650,9 @@ class TestPlanParserEdgeCases:
         # Should still parse both tasks
         assert len(model.tasks) == 2
 
-    def test_flip_checkbox_is_idempotent(self, tmp_path: Path) -> None:
+    def test_flip_checkbox_is_idempotent(self, mem_path: Path) -> None:
         """Flipping checkbox multiple times is idempotent - stays checked."""
-        plan_file = tmp_path / "plan.md"
+        plan_file = mem_path / "plan.md"
         plan_content = """## Phase 1
 - [ ] [P1-T1] Task
 """
