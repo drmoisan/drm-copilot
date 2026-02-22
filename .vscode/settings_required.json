@@ -23,6 +23,8 @@
         "artifacts/pester",
         "artifacts/pester/kcov/kcov-merged"
     ],
+    "jest.jestCommandLine": "npm run test:unit --",
+    "jest.rootPath": ".",
     "powershell.cwd": "${workspaceFolder}",
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
