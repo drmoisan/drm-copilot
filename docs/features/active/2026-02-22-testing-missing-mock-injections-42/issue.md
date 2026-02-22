@@ -3,12 +3,11 @@
 - Date captured: 2026-02-22
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/testing-missing-mock-injections/ (Issue #42)
-
-> Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
-
 - Issue: #42
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/42
 - Last Updated: 2026-02-22
+- Work Mode: full
+
 ## Summary
 
 Unit tests in `tests/scripts/dev_tools/test_new_active_feature_folder.py` invoke `create_active_folder(...)` without injecting `code_launcher`, allowing the default launcher to execute real `code` subprocess calls. This causes external side effects (opening/creating files under `/workspace/...` mapped as `C:\workspace\...` on Windows), violating unit-test isolation.
@@ -101,3 +100,15 @@ Known affected callsite functions include:
 
 - [x] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Resolution Summary
+
+- Added deterministic regression test `test_guard_blocks_unmocked_code_launcher_invocation` and captured fail-before evidence.
+- Injected `code_launcher=FakeCodeLauncher()` into the planned missing `create_active_folder(...)` callsites and aligned additional scoped callsites impacted by the new guard.
+- Added scoped fixture `guard_unmocked_code_launcher_subprocess` in `tests/conftest.py` with explicit launcher-test allowlist containing `default_code_launcher`.
+- Verified targeted module, guard/launcher subset, dev-tools folder tests, and full Python QA loop.
+
+## Resolution Evidence
+
+- `docs/features/active/2026-02-22-testing-missing-mock-injections-42/evidence/regression-testing/`
+- `docs/features/active/2026-02-22-testing-missing-mock-injections-42/evidence/qa-gates/`
