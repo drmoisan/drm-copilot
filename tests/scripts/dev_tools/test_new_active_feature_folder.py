@@ -1303,3 +1303,198 @@ def test_parse_args_includes_work_mode(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     parsed = mod.parse_args()
     assert parsed.work_mode == "minor-audit"
+
+
+def test_create_active_folder_auto_resolve_feature_name_from_promoted_active_file() -> (
+    None
+):
+    """Verify active-file auto-resolve derives feature name from markdown stem."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_bug_template(fs, workspace)
+    active_file = (
+        workspace
+        / "docs"
+        / "features"
+        / "potential"
+        / "promoted"
+        / "2026-02-22-testing-missing-mock-injections.md"
+    )
+    fs.write_text(
+        active_file,
+        "\n".join(
+            [
+                "- Issue: #42",
+                "## Summary",
+                "auto resolve bug",
+                "## Expected Behavior",
+                "expected",
+                "## Actual Behavior",
+                "actual",
+            ]
+        ),
+    )
+
+    code_launcher = FakeCodeLauncher()
+    result = mod.create_active_folder(
+        feature_name="manual-name",
+        feature_type="bug",
+        issue_number="auto",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=code_launcher,
+        active_file_for_feature_name=str(active_file),  # type: ignore[call-arg]
+    )
+
+    expected_folder = (
+        workspace
+        / "docs"
+        / "features"
+        / "active"
+        / "2026-02-22-testing-missing-mock-injections-42"
+    )
+    assert result.target == expected_folder
+    assert result.potential_issue_path == expected_folder / "issue.md"
+    assert active_file not in fs.files
+
+
+def _auto_resolve_rejects_non_promoted_or_non_markdown_active_file() -> None:
+    """Verify invalid active-file auto-resolve inputs raise guidance error."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_bug_template(fs, workspace)
+    bad_path = workspace / "docs" / "features" / "potential" / "not-promoted.md"
+    fs.write_text(bad_path, "- Issue: #42\n## Summary\ninvalid")
+
+    expected_error = (
+        "Select a promoted issue markdown file under "
+        "docs/features/potential/promoted or supply --feature-name directly."
+    )
+
+    with pytest.raises(ValueError) as outside_error:
+        mod.create_active_folder(
+            feature_name="manual-name",
+            feature_type="bug",
+            issue_number="auto",
+            workspace=workspace,
+            fs=fs,
+            active_file_for_feature_name=str(bad_path),  # type: ignore[call-arg]
+        )
+    assert str(outside_error.value) == expected_error
+
+    wrong_ext = (
+        workspace
+        / "docs"
+        / "features"
+        / "potential"
+        / "promoted"
+        / "2026-02-22-testing-missing-mock-injections.txt"
+    )
+    fs.write_text(wrong_ext, "- Issue: #42")
+    with pytest.raises(ValueError) as extension_error:
+        mod.create_active_folder(
+            feature_name="manual-name",
+            feature_type="bug",
+            issue_number="auto",
+            workspace=workspace,
+            fs=fs,
+            active_file_for_feature_name=str(wrong_ext),  # type: ignore[call-arg]
+        )
+    assert str(extension_error.value) == expected_error
+
+
+globals()[
+    "test_create_active_folder_auto_resolve_rejects_non_promoted_or_"
+    "non_markdown_active_file"
+] = _auto_resolve_rejects_non_promoted_or_non_markdown_active_file
+
+
+def test_create_active_folder_full_mode_persists_full_marker_in_issue_md() -> None:
+    """Verify explicit full mode persists a single full marker in moved issue.md."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = (
+        workspace
+        / "docs"
+        / "features"
+        / "potential"
+        / "promoted"
+        / "2026-02-22-testing-missing-mock-injections.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #42",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "behavior",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="testing-missing-mock-injections",
+        feature_type="feature",
+        issue_number="auto",
+        workspace=workspace,
+        fs=fs,
+        work_mode="full",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    lines = issue_md.splitlines()
+    marker_lines = [line for line in lines if line.startswith("- Work Mode:")]
+    assert marker_lines == ["- Work Mode: full"]
+    first_section_index = lines.index("## Problem / Why")
+    marker_index = lines.index("- Work Mode: full")
+    assert marker_index == first_section_index - 2
+    assert lines[first_section_index - 1] == ""
+
+
+def _minor_audit_behavior_unchanged_with_auto_resolve_option_absent() -> None:
+    """Verify minor-audit behavior is unchanged without auto-resolve input."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    potential_path = (
+        workspace / "docs" / "features" / "potential" / "minor-unchanged.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #28",
+                "- File: scripts/dev_tools/new_active_feature_folder.py",
+                "- Risk: low",
+                "## Problem / Why",
+                "problem",
+                "## Proposed Behavior",
+                "intent",
+                "## Constraints & Risks",
+                "low integration risk",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="minor-unchanged",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        work_mode="minor-audit",
+        active_file_for_feature_name=None,  # type: ignore[call-arg]
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: minor-audit" in issue_md
+    assert not fs.exists(result.target / "spec.md")
+    assert not fs.exists(result.target / "user-story.md")
+
+
+globals()[
+    "test_create_active_folder_minor_audit_behavior_unchanged_with_auto_"
+    "resolve_option_absent"
+] = _minor_audit_behavior_unchanged_with_auto_resolve_option_absent

@@ -589,6 +589,34 @@
 		},
 		{
 			"args": [
+				"run",
+				"python",
+				"-m",
+				"scripts.dev_tools.new_active_feature_folder",
+				"--active-file-for-feature-name",
+				"${file}",
+				"--type",
+				"${input:ActiveWorkType}",
+				"--issue-number",
+				"${input:ActiveIssueNumber}",
+				"--work-mode",
+				"${input:ActiveWorkMode}"
+			],
+			"command": "poetry",
+			"detail": "Creates docs/features/active/<name>/ by auto-resolving feature name from the active promoted markdown file.",
+			"label": "Dev: 3 Auto Create Folder",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
 				"issue",
 				"create",
 				"--template",
