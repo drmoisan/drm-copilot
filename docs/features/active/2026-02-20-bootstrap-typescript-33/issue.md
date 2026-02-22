@@ -35,7 +35,7 @@ And ensure these are wired consistently across:
 
 The outcome should be that a contributor can run the TypeScript gates in a clean checkout without global installs beyond Node.js, and get the same results locally and in CI.
 
-## Acceptance Criteria (early draft)
+## Acceptance Criteria
 
 - [ ] The repo defines a stable “TypeScript toolchain pass” consisting of:
 	- `npm run format:check`
@@ -43,13 +43,7 @@ The outcome should be that a contributor can run the TypeScript gates in a clean
 	- `npm run typecheck`
 	- `npm run test:unit`
 - [ ] The TypeScript toolchain pass runs successfully on Windows using only repo-managed devDependencies (no global Prettier/ESLint/Jest installs).
-- [ ] VS Code commands exposed by the extension for TS quality checks execute the corresponding `npm run ...` scripts (or an explicitly documented equivalent) in a way that is:
-	- workspace-rooted (correct cwd)
-	- cross-platform (Windows/macOS/Linux)
-	- consistent with the repo’s “toolchain loop” philosophy
-- [ ] TypeScript unit tests exist for at least one non-trivial utility module (to verify the harness works, not just that it compiles).
-- [ ] `docs/developer-tooling.md` documents the TypeScript commands alongside the existing Python/PowerShell quality gates.
-- [ ] Any CI workflow that runs repository quality gates includes the TypeScript toolchain pass (or clearly documents why it is excluded).
+- [ ] TypeScript unit tests exist for at least one utility module
 
 ## Constraints & Risks
 
@@ -74,8 +68,7 @@ The outcome should be that a contributor can run the TypeScript gates in a clean
 	- `npm run typecheck` fails on an intentional strictness violation and passes when corrected.
 - [ ] Unit tests:
 	- `npm run test:unit` runs at least one `.test.ts` under `tests/unit/`.
-- [ ] VS Code command wiring:
-	- Running “DRM Copilot: TS 1 - Prettier Format” (and TS 2/3/4 equivalents) executes the same underlying behavior as the `npm run ...` scripts.
+
 
 ## Next Step
 
