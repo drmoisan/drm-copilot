@@ -713,6 +713,26 @@ def test_create_epic_folder_seeds_epic_docs() -> None:
     assert "#99" in initiative_content
 
 
+def test_guard_blocks_unmocked_code_launcher_invocation() -> None:
+    """Verify guard fixture blocks unmocked launcher subprocess invocation."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+
+    # Force launcher path resolution so the guard intercepts launcher execution.
+    with mock.patch("shutil.which", return_value="code"):
+        with pytest.raises(
+            AssertionError,
+            match="Blocked unmocked code launcher subprocess",
+        ):
+            mod.create_active_folder(
+                feature_name="guard-check",
+                feature_type="feature",
+                workspace=workspace,
+                fs=fs,
+            )
+
+
 def test_create_active_folder_raises_on_invalid_feature_type() -> None:
     """Verify invalid feature type inputs raise ValueError."""
     fs = FakeFileSystem()
@@ -723,6 +743,7 @@ def test_create_active_folder_raises_on_invalid_feature_type() -> None:
             feature_type="invalid",  # type: ignore[arg-type]
             workspace=workspace,
             fs=fs,
+            code_launcher=FakeCodeLauncher(),
         )
 
 
@@ -736,6 +757,7 @@ def test_create_active_folder_raises_on_missing_template() -> None:
             feature_type="feature",
             workspace=workspace,
             fs=fs,
+            code_launcher=FakeCodeLauncher(),
         )
 
 
@@ -868,6 +890,7 @@ def test_create_active_folder_raises_when_exists_without_force() -> None:
             feature_type="feature",
             workspace=workspace,
             fs=fs,
+            code_launcher=FakeCodeLauncher(),
         )
 
 
@@ -1030,6 +1053,7 @@ def test_create_active_folder_minor_audit_materializes_issue_md_and_skips_full_d
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
     assert fs.exists(result.target / "issue.md")
@@ -1066,6 +1090,7 @@ def test_work_mode_marker_minor_issue_md() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
 
@@ -1103,6 +1128,7 @@ def scenario_single_work_mode_marker_before_first_heading() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
 
@@ -1155,6 +1181,7 @@ def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
 
@@ -1203,6 +1230,7 @@ def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
     out = capsys.readouterr().out
@@ -1241,6 +1269,7 @@ def test_work_mode_marker_fallback_issue_md_full() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
 
@@ -1262,6 +1291,7 @@ def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="full",
     )
     assert fs.exists(result.target / "user-story.md")
@@ -1279,6 +1309,7 @@ def test_create_active_folder_fallback_reason_output(
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
     )
     assert result.target
@@ -1441,6 +1472,7 @@ def test_create_active_folder_full_mode_persists_full_marker_in_issue_md() -> No
         issue_number="auto",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="full",
     )
 
@@ -1484,6 +1516,7 @@ def _minor_audit_behavior_unchanged_with_auto_resolve_option_absent() -> None:
         feature_type="feature",
         workspace=workspace,
         fs=fs,
+        code_launcher=FakeCodeLauncher(),
         work_mode="minor-audit",
         active_file_for_feature_name=None,  # type: ignore[call-arg]
     )

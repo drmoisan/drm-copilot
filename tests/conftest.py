@@ -24,10 +24,11 @@ from __future__ import annotations
 
 import io
 import os
+import subprocess
 import sys
 from itertools import count
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -61,6 +62,81 @@ def _ensure_repo_root_on_sys_path() -> None:
 
 
 _ensure_repo_root_on_sys_path()
+
+
+@pytest.fixture(autouse=True)
+def guard_unmocked_code_launcher_subprocess(
+    request: pytest.FixtureRequest,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Block unmocked VS Code launcher subprocess calls in scoped unit tests.
+
+    Purpose:
+        Enforce hermetic behavior for target dev-tools unit tests by preventing
+        accidental real editor-launch subprocess calls.
+
+    Args:
+        request (pytest.FixtureRequest): Current test request metadata.
+        monkeypatch (pytest.MonkeyPatch): Fixture used to patch subprocess calls.
+
+    Returns:
+        None: Applies monkeypatch behavior for the active test when in scope.
+
+    Raises:
+        AssertionError: When a scoped test attempts an unmocked launcher
+            subprocess invocation for executable tokens ``code``, ``code.cmd``,
+            or ``code.exe``.
+
+    Side Effects:
+        Patches ``subprocess.run`` during scoped tests and leaves all other
+        tests unchanged.
+    """
+    raw_node_id = str(getattr(getattr(request, "node", None), "nodeid", ""))
+    normalized_node_id = raw_node_id.replace("\\", "/")
+    scoped_module = "tests/scripts/dev_tools/test_new_active_feature_folder.py"
+    allowlist = ("default_code_launcher",)
+
+    # Guard only the targeted module to avoid unrelated fixture side effects.
+    if scoped_module not in normalized_node_id:
+        return
+
+    # Explicitly allow launcher-specific tests that already mock subprocess.
+    if any(allowed in normalized_node_id for allowed in allowlist):
+        return
+
+    def _extract_executable_token(command: object) -> str | None:
+        """Extract a normalized executable token from subprocess command input."""
+        if command is None:
+            return None
+
+        if isinstance(command, list | tuple):
+            if not command:
+                return None
+            token_text = str(cast(object, command[0]))
+        else:
+            token_text = str(command)
+        return token_text.replace("\\", "/").rsplit("/", maxsplit=1)[-1].lower()
+
+    def _guarded_subprocess_run(
+        *args: object, **kwargs: object
+    ) -> subprocess.CompletedProcess[str]:
+        """Intercept subprocess calls and block unmocked VS Code launchers."""
+        command = args[0] if args else kwargs.get("args")
+        executable_token = _extract_executable_token(command)
+        blocked_tokens = {"code", "code.cmd", "code.exe"}
+
+        # Fail fast only for known VS Code launcher executable names.
+        if executable_token in blocked_tokens:
+            raise AssertionError(
+                "Blocked unmocked code launcher subprocess: "
+                f"executable={executable_token}, nodeid={raw_node_id}"
+            )
+
+        # Keep non-launcher subprocess behavior deterministic and side-effect free
+        # within this scoped test module.
+        return subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", _guarded_subprocess_run)
 
 
 _MEM_TEST_ROOT_COUNTER = count(start=1)
