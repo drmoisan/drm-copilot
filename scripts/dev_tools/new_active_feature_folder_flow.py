@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.new_active_feature_folder_docs import (
@@ -36,15 +37,15 @@ from scripts.dev_tools.new_active_feature_folder_models import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import datetime
-    from pathlib import Path
 
 
 def create_active_folder(
-    feature_name: str,
+    feature_name: str | None,
     feature_type: str = "feature",
     issue_number: str | None = None,
     force: bool = False,
     *,
+    active_file_for_feature_name: str | None = None,
     workspace: Path | None = None,
     fs: FileSystem | None = None,
     issue_fetcher: Callable[[str], IssueMeta | None] = default_issue_fetcher,
@@ -56,15 +57,53 @@ def create_active_folder(
     if feature_type not in {"feature", "refactor", "epic", "bug"}:
         raise ValueError("Type must be one of: feature, refactor, epic, bug")
 
-    validate_feature_name(feature_name)
     workspace_path = workspace or resolve_workspace()
     filesystem = fs or RealFileSystem()
+
+    resolved_feature_name = feature_name
+    feature_name_source = "manual"
+    if active_file_for_feature_name is not None:
+        auto_resolve_error = (
+            "Select a promoted issue markdown file under "
+            "docs/features/potential/promoted or supply --feature-name directly."
+        )
+        active_file_path = Path(active_file_for_feature_name)
+        if not active_file_path.is_absolute():
+            active_file_path = workspace_path / active_file_path
+
+        promoted_root = workspace_path / "docs" / "features" / "potential" / "promoted"
+        try:
+            active_file_path.relative_to(promoted_root)
+            is_in_promoted = True
+        except ValueError:
+            is_in_promoted = False
+
+        if (
+            active_file_path.suffix.lower() != ".md"
+            or not is_in_promoted
+            or not filesystem.exists(active_file_path)
+        ):
+            raise ValueError(auto_resolve_error)
+
+        resolved_feature_name = active_file_path.stem
+        feature_name_source = "active-file"
+
+    if not resolved_feature_name:
+        raise ValueError(
+            "feature_name must be provided when "
+            "--active-file-for-feature-name is not used"
+        )
+
+    validate_feature_name(resolved_feature_name)
+    print(f"Feature name source: {feature_name_source}")
 
     template_dir = workspace_path / "docs" / "features" / "templates" / feature_type
     if not filesystem.exists(template_dir):
         raise FileNotFoundError(f"Template folder not found: {template_dir}")
 
-    potential_file = find_potential_file(feature_name, workspace_path, filesystem)
+    potential_file = find_potential_file(
+        resolved_feature_name, workspace_path, filesystem
+    )
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
     use_minor_audit, fallback_reason = should_use_minor_audit_mode(
         work_mode=work_mode,
@@ -79,7 +118,7 @@ def create_active_folder(
         normalized_issue_number = parse_issue_number(potential_content)
 
     folder_slug = build_folder_slug(
-        feature_name,
+        resolved_feature_name,
         potential_file,
         normalized_issue_number,
     )
@@ -112,7 +151,7 @@ def create_active_folder(
     plan_path = materialize_plan_file(
         feature_type=feature_type,
         target_dir=target_dir,
-        feature_name=feature_name,
+        feature_name=resolved_feature_name,
         issue_field=issue_field,
         owner_field=owner_field,
         parent_field=parent_field,
@@ -160,7 +199,7 @@ def create_active_folder(
             issue_doc = target_dir / "issue.md"
             issue_body = "\n".join(
                 [
-                    f"# {feature_name}",
+                    f"# {resolved_feature_name}",
                     "",
                     "- Work Mode: minor-audit",
                     "## Problem / Why",
@@ -189,7 +228,7 @@ def create_active_folder(
     else:
         files_to_open = update_feature_docs(
             feature_type,
-            feature_name,
+            resolved_feature_name,
             target_dir,
             issue_field,
             owner_field,
@@ -210,12 +249,11 @@ def create_active_folder(
         else:
             potential_issue_path = target_dir / "issue.md"
             filesystem.move(potential_file, potential_issue_path)
-            if work_mode == "minor-audit" and fallback_reason:
-                moved_content = filesystem.read_text(potential_issue_path)
-                filesystem.write_text(
-                    potential_issue_path,
-                    upsert_work_mode_marker(moved_content, "full"),
-                )
+            moved_content = filesystem.read_text(potential_issue_path)
+            filesystem.write_text(
+                potential_issue_path,
+                upsert_work_mode_marker(moved_content, "full"),
+            )
             print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:
@@ -250,8 +288,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--feature-name",
-        required=True,
+        default=None,
         help="Feature folder name (kebab/underscore)",
+    )
+    parser.add_argument(
+        "--active-file-for-feature-name",
+        dest="active_file_for_feature_name",
+        default=None,
+        help=(
+            "Resolve feature name from active promoted markdown file path. "
+            "Must be under docs/features/potential/promoted and end with .md"
+        ),
     )
     parser.add_argument(
         "--type",
@@ -289,6 +336,7 @@ def main() -> None:
             feature_type=args.feature_type,
             issue_number=args.issue_number,
             force=args.force,
+            active_file_for_feature_name=args.active_file_for_feature_name,
             work_mode=args.work_mode,
         )
     except (ValueError, FileExistsError) as exc:

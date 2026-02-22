@@ -3,15 +3,17 @@
 - Date captured: 2026-02-22
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/create-active-folder-bug/ (Issue #43)
-
-> Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
-
 - Issue: #43
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/43
 - Last Updated: 2026-02-22
+- Work Mode: full
+
 ## Summary
 
-One or two sentences on what is broken.
+Delivered fix summary:
+- Added `Dev: 3 Auto Create Folder` so active-folder creation can derive feature name from the active promoted markdown file (`${file}`) instead of relying only on manual input.
+- Explicit full-mode runs now persist exactly one `- Work Mode: full` marker in moved `issue.md` content above the first `##` heading.
+- Invalid auto-resolve inputs now emit deterministic guidance: `Select a promoted issue markdown file under docs/features/potential/promoted or supply --feature-name directly.`
 
 ## Environment
 
