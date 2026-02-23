@@ -91,8 +91,8 @@ def _seed_bug_template(fs: mod.FileSystem, workspace: Path) -> None:
     )
 
 
-def test_work_mode_marker_fallback_issue_md_full() -> None:
-    """Verify minor-audit fallback issue.md persists full marker above first section."""
+def test_work_mode_marker_minor_audit_issue_md_even_when_heuristics_fail() -> None:
+    """Verify explicit minor-audit keeps the minor marker above the first section."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -129,7 +129,7 @@ def test_work_mode_marker_fallback_issue_md_full() -> None:
     lines = issue_md.splitlines()
     first_section_index = lines.index("## Problem / Why")
     assert first_section_index > 0
-    assert lines[first_section_index - 2] == "- Work Mode: full"
+    assert lines[first_section_index - 2] == "- Work Mode: minor-audit"
     assert lines[first_section_index - 1] == ""
 
 
@@ -149,10 +149,10 @@ def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
     assert fs.exists(result.target / "user-story.md")
 
 
-def test_create_active_folder_fallback_reason_output(
+def test_create_active_folder_minor_audit_has_no_fallback_reason(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Verify fallback reason output appears when minor-audit cannot be used."""
+    """Verify explicit minor-audit does not emit fallback output."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -166,7 +166,8 @@ def test_create_active_folder_fallback_reason_output(
     )
     assert result.target
     out = capsys.readouterr().out
-    assert "Fallback reason:" in out
+    assert "Fallback reason:" not in out
+    assert "Selected mode: minor-audit" in out
 
 
 def test_parse_args_includes_work_mode(monkeypatch: pytest.MonkeyPatch) -> None:
