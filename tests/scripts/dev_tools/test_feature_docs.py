@@ -328,3 +328,45 @@ def test_feature_doc_and_render_helpers_share_verification_then_test_plan_fallba
     assert feature_docs_verification
     assert render_verification_notes
     assert "Verification-first notes should win." in render_verification_notes
+
+
+def test_primary_issue_and_pass_readiness(mem_path: Path) -> None:
+    """Assert Issue metadata is primary and latest feature-audit PASS is surfaced."""
+    feature_dir = (
+        mem_path
+        / "docs"
+        / "features"
+        / "active"
+        / "2026-02-22-pr-context-verification-contract-gap-46"
+    )
+    feature_dir.mkdir(parents=True)
+    (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+
+    (feature_dir / "spec.md").write_text(
+        "- Issue: #46\n"
+        "## Context\n"
+        "Narrative mentions #40 #42 #43 should not become primary metadata issue.\n",
+        encoding="utf-8",
+    )
+    (feature_dir / "user-story.md").write_text(
+        "## Story Statement\n" "- Keep deterministic issue metadata.\n",
+        encoding="utf-8",
+    )
+    (feature_dir / "plan.md").write_text("## Tasks\n- [x] done\n", encoding="utf-8")
+
+    (feature_dir / "feature-audit.2026-02-22T20-00.md").write_text(
+        "Readiness: NEEDS REVISION\n", encoding="utf-8"
+    )
+    (feature_dir / "feature-audit.2026-02-22T21-00.md").write_text(
+        "Readiness: PASS\n", encoding="utf-8"
+    )
+
+    excerpts = gather_feature_excerpts(
+        mem_path,
+        [
+            "docs/features/active/2026-02-22-pr-context-verification-contract-gap-46/spec.md"
+        ],
+    )
+    assert len(excerpts) == 1
+    assert excerpts[0].primary_issue_ref == "#46"
+    assert excerpts[0].readiness_signal == "PASS"

@@ -225,6 +225,53 @@ def build_close_candidates_section(
     )
 
 
+def build_issues_to_autoclose_section(
+    *,
+    verified: list[str],
+    pending_primary: list[str],
+    readiness_signals: list[str],
+) -> str:
+    """Render approved autoclose section from verified and deterministic pending refs.
+
+    Purpose:
+        Build the summary section consumed by PR-generation prompts for allowed
+        autoclose declarations.
+
+    Args:
+        verified: Issues verified from GitHub PR metadata (`closingIssuesReferences`).
+        pending_primary: Deterministic primary issue refs eligible when
+            readiness is PASS.
+        readiness_signals: Normalized readiness states observed in feature docs.
+
+    Returns:
+        A formatted section with header
+        `===== Issues to autoclose (verified or pending) =====` and either a
+        deterministic list or conservative fallback text.
+
+    Side Effects:
+        None.
+    """
+    # Preserve stable, deterministic ordering: verified issues first, then
+    # pending deterministic issues not already verified.
+    ordered: list[str] = []
+    for issue in verified + pending_primary:
+        if issue and issue not in ordered:
+            ordered.append(issue)
+
+    if ordered:
+        body = format_list(ordered, "(none)")
+    else:
+        # Use explicit conservative wording when readiness is missing/non-PASS.
+        if any(signal == "PASS" for signal in readiness_signals):
+            body = (
+                "None (no verified closing issues and no deterministic pending issue)"
+            )
+        else:
+            body = "None (no verified closing issues and readiness not PASS)"
+
+    return "\n".join([section("Issues to autoclose (verified or pending)"), body])
+
+
 def extract_changed_paths(context_text: str) -> list[str]:
     """Extract changed file paths from the 'Changed files' section text."""
     paths: list[str] = []

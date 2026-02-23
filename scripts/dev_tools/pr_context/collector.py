@@ -36,6 +36,7 @@ from .render import (
     format_pr_details,
     select_default_base,
 )
+from .render_pr_helpers import build_issues_to_autoclose_section
 from .summary_helpers import (
     append_generation_timestamp,
     bucket_text,
@@ -289,6 +290,29 @@ def collect_and_write(
         author_asserted = sorted(set(author_asserted + referenced_issues))
         author_reason = "Detected issue references (classified)"
 
+    # Derive deterministic pending autoclose targets from explicit metadata only
+    # when feature readiness is PASS.
+    pending_primary: list[str] = []
+    for feature_doc in feature_docs:
+        if feature_doc.readiness_signal != "PASS":
+            continue
+        if not feature_doc.primary_issue_ref:
+            continue
+        if feature_doc.primary_issue_ref not in pending_primary:
+            pending_primary.append(feature_doc.primary_issue_ref)
+    readiness_signals = sorted(
+        {
+            feature_doc.readiness_signal
+            for feature_doc in feature_docs
+            if feature_doc.readiness_signal
+        }
+    )
+    issues_to_autoclose_section = build_issues_to_autoclose_section(
+        verified=verified,
+        pending_primary=pending_primary,
+        readiness_signals=readiness_signals,
+    )
+
     issues_to_fetch = sorted(set(verified + author_asserted + referenced_issues))
     issue_details: list[IssueDetails] = []
     if gh_available:
@@ -449,6 +473,8 @@ def collect_and_write(
         )
     summary_sections.extend(
         [
+            "",
+            issues_to_autoclose_section,
             "",
             close_candidates,
             "",

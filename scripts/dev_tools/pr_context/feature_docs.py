@@ -81,6 +81,78 @@ def _verification_text(plan_text: str) -> str:
     return ""
 
 
+def _parse_primary_issue_from_metadata(
+    *, spec_text: str, story_text: str
+) -> str | None:
+    """Parse deterministic primary issue from metadata lines only.
+
+    Args:
+        spec_text: Full `spec.md` text for the feature.
+        story_text: Full `user-story.md` text for the feature.
+
+    Returns:
+        A normalized issue reference (for example `#46`) when an explicit
+        metadata line `Issue: #NN` is found; otherwise `None`.
+
+    Side Effects:
+        None.
+    """
+    # Search metadata-style lines only so narrative mentions never become the
+    # deterministic primary issue source.
+    pattern = re.compile(r"^\s*[-*]?\s*Issue:\s*(#\d+)\s*$", re.IGNORECASE)
+
+    # Prefer spec metadata first, then story metadata as fallback.
+    for source_text in (spec_text, story_text):
+        for line in source_text.splitlines():
+            match = pattern.match(line)
+            if match:
+                return match.group(1)
+    return None
+
+
+def _parse_readiness_value(text: str) -> str | None:
+    """Normalize readiness value from a feature-audit markdown payload.
+
+    Args:
+        text: Raw markdown content from a `feature-audit.*.md` file.
+
+    Returns:
+        One of `PASS`, `NEEDS REVISION`, `BLOCKED`, or `None`.
+
+    Side Effects:
+        None.
+    """
+    match = re.search(r"^\s*Readiness:\s*(.+?)\s*$", text, flags=re.MULTILINE)
+    if not match:
+        return None
+    value = match.group(1).strip().upper()
+    if value in {"PASS", "NEEDS REVISION", "BLOCKED"}:
+        return value
+    return None
+
+
+def _resolve_readiness_signal(feature_dir: Path) -> str | None:
+    """Resolve readiness signal from the latest `feature-audit.*.md` file.
+
+    Args:
+        feature_dir: Active feature directory containing audit artifacts.
+
+    Returns:
+        `PASS`, `NEEDS REVISION`, `BLOCKED`, or `None` when no parseable
+        readiness metadata exists.
+
+    Side Effects:
+        Reads local feature audit files from disk.
+    """
+    audit_files = sorted(feature_dir.glob("feature-audit.*.md"))
+    # Evaluate newest-first based on lexicographic timestamp suffix.
+    for audit_path in reversed(audit_files):
+        readiness = _parse_readiness_value(_read_text(audit_path))
+        if readiness:
+            return readiness
+    return None
+
+
 def gather_feature_excerpts(
     root: Path, changed_files: Iterable[str]
 ) -> list[FeatureDocExcerpt]:
@@ -134,6 +206,11 @@ def gather_feature_excerpts(
 
         spec_text = _read_text(spec_path)
         plan_text = _read_text(plan_path)
+        primary_issue_ref = _parse_primary_issue_from_metadata(
+            spec_text=spec_text,
+            story_text=user_story_text,
+        )
+        readiness_signal = _resolve_readiness_signal(active_dir)
 
         spec_parts: list[str] = []
         for heading in (
@@ -216,6 +293,8 @@ def gather_feature_excerpts(
                 excerpt="\n".join(lines),
                 issue_refs=issue_refs,
                 context_files=sorted(set(context_files + evidence_context_files)),
+                primary_issue_ref=primary_issue_ref,
+                readiness_signal=readiness_signal,
             )
         )
 
