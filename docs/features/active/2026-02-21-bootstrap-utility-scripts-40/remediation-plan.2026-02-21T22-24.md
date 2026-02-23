@@ -76,41 +76,41 @@
 	- Acceptance: `scripts/dev_tools/pr_context/render.py` line count is `<=500` and existing tests targeting this functionality pass.
 
 ### Phase 3 — Decompose Oversized Test Files to <=500 Lines
-- [ ] [P3-T1] Split `tests/scripts/dev_tools/atomic_executor/test_cli.py` into smaller focused test modules while preserving current assertions
+- [x] [P3-T1] Split `tests/scripts/dev_tools/atomic_executor/test_cli.py` into smaller focused test modules while preserving current assertions
 	- Acceptance: no resulting test file exceeds `500` lines and all moved tests are collected by `pytest`.
-- [ ] [P3-T2] Split `tests/scripts/dev_tools/test_new_active_feature_folder.py` into smaller focused test modules while preserving current assertions
+- [x] [P3-T2] Split `tests/scripts/dev_tools/test_new_active_feature_folder.py` into smaller focused test modules while preserving current assertions
 	- Acceptance: no resulting test file exceeds `500` lines and all moved tests are collected by `pytest`.
-- [ ] [P3-T3] Split `tests/scripts/dev_tools/test_collect_pr_context.py` into smaller focused test modules while preserving current assertions
+- [x] [P3-T3] Split `tests/scripts/dev_tools/test_collect_pr_context.py` into smaller focused test modules while preserving current assertions
 	- Acceptance: no resulting test file exceeds `500` lines and all moved tests are collected by `pytest`.
-- [ ] [P3-T4] Split `tests/scripts/dev_tools/test_github.py` into smaller focused test modules while preserving current assertions
+- [x] [P3-T4] Split `tests/scripts/dev_tools/test_github.py` into smaller focused test modules while preserving current assertions
 	- Acceptance: no resulting test file exceeds `500` lines and all moved tests are collected by `pytest`.
-- [ ] [P3-T5] Split `tests/scripts/dev_tools/test_resolve_execute_plan_prompt.py` into smaller focused test modules while preserving current assertions
+- [x] [P3-T5] Split `tests/scripts/dev_tools/test_resolve_execute_plan_prompt.py` into smaller focused test modules while preserving current assertions
 	- Acceptance: no resulting test file exceeds `500` lines and all moved tests are collected by `pytest`.
-- [ ] [P3-T6] Run scripted line-count verification over all changed production/test/reusable-script files and record results in `evidence/qa-gates/line-counts.2026-02-21T22-24.md`
+- [x] [P3-T6] Run scripted line-count verification over all changed production/test/reusable-script files and record results in `evidence/qa-gates/line-counts.2026-02-21T22-24.md`
 	- Acceptance: artifact contains `EXIT_CODE: 0` and no listed tracked file has a line count greater than `500`.
 
 ### Phase 4 — Targeted Verification and QA-Gate Evidence Stabilization
-- [ ] [P4-T1] Run Python targeted verification command `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` and append results to `evidence/qa-gates/python.2026-02-21T22-24.md`
+- [x] [P4-T1] Run Python targeted verification command `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` and append results to `evidence/qa-gates/python.2026-02-21T22-24.md`
 	- Acceptance: artifact includes a second run block with `Command: poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` and `EXIT_CODE: 0`.
-- [ ] [P4-T2] Run PowerShell targeted verification command `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."` and append results to `evidence/qa-gates/powershell.2026-02-21T22-24.md`
+- [x] [P4-T2] Run PowerShell targeted verification command `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."` and append results to `evidence/qa-gates/powershell.2026-02-21T22-24.md`
 	- Acceptance: artifact contains `Timestamp:`, exact command, and `EXIT_CODE: 0`.
-- [ ] [P4-T3] Run TypeScript targeted verification commands and write results to `evidence/qa-gates/typescript.2026-02-21T22-24.md`
+- [x] [P4-T3] Run TypeScript targeted verification commands and write results to `evidence/qa-gates/typescript.2026-02-21T22-24.md`
 	- Acceptance: artifact contains command/result blocks for `npm run format:check`, `npm run lint`, `npm run typecheck`, and `npm run test:unit` with `EXIT_CODE: 0` for each command.
-- [ ] [P4-T4] Enforce blocked-gate documentation schema in every `evidence/qa-gates/*.2026-02-21T22-24.md` artifact
+- [x] [P4-T4] Enforce blocked-gate documentation schema in every `evidence/qa-gates/*.2026-02-21T22-24.md` artifact
 	- Acceptance: each artifact includes either `GateStatus: PASS` or, when non-zero exit exists, includes exact fields `GateStatus: BLOCKED`, `BlockedReason:`, `RemediationOwner:`, and `NextAction:`.
 
 ### Phase 5 — Final Full Toolchain QA Loop
-- [ ] [P5-T1] Run Python full QA loop until one clean pass completes in order: `poetry run black .` -> `poetry run ruff check` -> `poetry run pyright` -> `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`
+- [x] [P5-T1] Run Python full QA loop until one clean pass completes in order: `poetry run black .` -> `poetry run ruff check` -> `poetry run pyright` -> `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`
 	- Acceptance: a final Python loop run is recorded in `evidence/qa-gates/python.2026-02-21T22-24.md` with `EXIT_CODE: 0` for all four commands in one uninterrupted pass.
-- [ ] [P5-T2] Run PowerShell full QA loop until one clean pass completes in order: `Invoke-PoshQCFormat -Root .` -> `Invoke-PoshQCAnalyze -Root .` -> `Invoke-PoshQCTest -Root .`
+- [x] [P5-T2] Run PowerShell full QA loop until one clean pass completes in order: `Invoke-PoshQCFormat -Root .` -> `Invoke-PoshQCAnalyze -Root .` -> `Invoke-PoshQCTest -Root .`
 	- Acceptance: a final PowerShell loop run is recorded in `evidence/qa-gates/powershell.2026-02-21T22-24.md` with `EXIT_CODE: 0` for all three commands in one uninterrupted pass.
-- [ ] [P5-T3] Run TypeScript full QA loop until one clean pass completes in order: `npm run format` -> `npm run lint` -> `npm run typecheck` -> `npm run test:unit`
+- [x] [P5-T3] Run TypeScript full QA loop until one clean pass completes in order: `npm run format` -> `npm run lint` -> `npm run typecheck` -> `npm run test:unit`
 	- Acceptance: a final TypeScript loop run is recorded in `evidence/qa-gates/typescript.2026-02-21T22-24.md` with `EXIT_CODE: 0` for all four commands in one uninterrupted pass.
 
 ### Phase 6 — Plan Status and Delivery Closure
-- [ ] [P6-T1] Execute final plan-status sync at remediation completion by reconciling all completed tasks to concrete evidence artifacts
+- [x] [P6-T1] Execute final plan-status sync at remediation completion by reconciling all completed tasks to concrete evidence artifacts
 	- Acceptance: each checked task in this plan has a referenced evidence artifact path committed in the same change set.
-- [ ] [P6-T2] Publish remediation completion summary in `evidence/other/remediation-closeout.2026-02-21T22-24.md`
+- [x] [P6-T2] Publish remediation completion summary in `evidence/other/remediation-closeout.2026-02-21T22-24.md`
 	- Acceptance: closeout artifact contains exact fields `Timestamp:`, `AC1Status:`, `AC4Status:`, `AC5Status:`, and `PreflightSignal: PREFLIGHT: ALL CLEAR`.
 
 ## Mandatory Preflight Validation Contract

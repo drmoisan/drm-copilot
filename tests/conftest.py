@@ -93,11 +93,11 @@ def guard_unmocked_code_launcher_subprocess(
     """
     raw_node_id = str(getattr(getattr(request, "node", None), "nodeid", ""))
     normalized_node_id = raw_node_id.replace("\\", "/")
-    scoped_module = "tests/scripts/dev_tools/test_new_active_feature_folder.py"
+    scoped_module_prefix = "tests/scripts/dev_tools/test_new_active_feature_folder"
     allowlist = ("default_code_launcher",)
 
     # Guard only the targeted module to avoid unrelated fixture side effects.
-    if scoped_module not in normalized_node_id:
+    if scoped_module_prefix not in normalized_node_id:
         return
 
     # Explicitly allow launcher-specific tests that already mock subprocess.
