@@ -122,7 +122,7 @@ exclude_lines = [
 
 [tool.pyright]
 typeCheckingMode = "strict"
-reportMissingTypeArgument = "none"
+reportMissingTypeArgument = "error"
 pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"
@@ -136,6 +136,7 @@ exclude = [
   ".idea",
   ".ruff_cache",
   ".venv",
+    "drm-copilot",
   "build",
     "dist",
     "node_modules"
