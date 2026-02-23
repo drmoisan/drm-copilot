@@ -319,3 +319,24 @@ def test_generate_pr_prompt_alignment() -> None:
         in content
     )
     assert "Related issues / PRs" in content
+
+
+def test_prompt_contract_allows_evidence_backed_verification_only_when_enumerated() -> (
+    None
+):
+    """Assert prompt keeps anti-hallucination constraints and evidence gating."""
+    prompt_path = (
+        Path(__file__).resolve().parents[3]
+        / ".github"
+        / "prompts"
+        / "generate-pr.prompt.md"
+    )
+    content = prompt_path.read_text(encoding="utf-8")
+
+    expected_constraint = (
+        "DO NOT cite or summarize files that are not listed under “Additional "
+        "context files”"
+    )
+    assert expected_constraint in content
+    assert "evidence-backed" in content
+    assert "CI unavailable must not be treated as evidence failure" in content

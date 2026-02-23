@@ -61,6 +61,10 @@ from .summary_helpers import (
 from .summary_helpers import (
     scoping_doc_changes as _scoping_doc_changes,
 )
+from .verification_evidence import (
+    VerificationEvidenceRecord,
+    parse_verification_evidence_file,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -105,6 +109,60 @@ COMMENT_SUMMARY_LIMIT = 3
 COMMENT_APPENDIX_LIMIT = 10
 PR_BODY_SUMMARY_LINES = 25
 PR_BODY_APPENDIX_LINES = 120
+
+
+def _render_verification_evidence_section(
+    *, resolved_root: Path, feature_docs: list[FeatureDocExcerpt]
+) -> str:
+    """Render canonical verification evidence rows for summary output.
+
+    Args:
+        resolved_root: Repository root used to read discovered evidence files.
+        feature_docs: Feature excerpts whose context files may include evidence paths.
+
+    Returns:
+        A formatted section body containing parsed evidence rows or fallback text.
+
+    Side Effects:
+        Reads evidence files from disk and tolerates unreadable artifacts.
+    """
+    records: list[VerificationEvidenceRecord] = []
+    # Parse only canonical evidence files already enumerated in context files.
+    for doc in feature_docs:
+        for raw_path in doc.context_files:
+            normalized = raw_path.replace("\\", "/")
+            if "/evidence/" not in normalized:
+                continue
+            try:
+                record: VerificationEvidenceRecord = parse_verification_evidence_file(
+                    root=resolved_root,
+                    feature=doc.feature,
+                    relative_path=Path(normalized),
+                )
+            except OSError:
+                continue
+            records.append(record)
+
+    parseable_records = [
+        item for item in records if item.normalized_result in {"pass", "fail"}
+    ]
+    if not parseable_records:
+        return "No canonical verification evidence parsed"
+
+    lines: list[str] = []
+    # Render deterministic rows sorted by source path for stable artifacts.
+    for record in sorted(parseable_records, key=lambda item: item.source_file):
+        lines.extend(
+            [
+                f"- Feature: {record.feature}",
+                f"  - Source: {record.source_file}",
+                f"  - Timestamp: {record.timestamp}",
+                f"  - Command: {record.command}",
+                f"  - EXIT_CODE: {record.exit_code}",
+                f"  - Normalized result: {record.normalized_result}",
+            ]
+        )
+    return "\n".join(lines)
 
 
 # helper functions moved to summary_helpers
@@ -335,6 +393,10 @@ def collect_and_write(
     feature_summary = (
         "\n".join(feature_summary_lines).rstrip() if feature_summary_lines else "(none)"
     )
+    verification_evidence_section = _render_verification_evidence_section(
+        resolved_root=resolved_root,
+        feature_docs=feature_docs,
+    )
 
     close_candidates = build_close_candidates_section(
         verified=verified,
@@ -421,6 +483,9 @@ def collect_and_write(
             "",
             section("PR digests"),
             pr_digests or "(none)",
+            "",
+            section("Verification evidence (feature docs + canonical artifacts)"),
+            verification_evidence_section,
             "",
             section("CI status (HEAD)"),
             (

@@ -27,6 +27,7 @@ You MUST follow these rules.
 - DO NOT use “Related:” inside the auto-close section (it will not autoclose).
 - DO NOT claim verification (tests/lint/typecheck) unless the context explicitly proves it.
 - DO NOT cite or summarize files that are not listed under “Additional context files” (pr_context plus that enumerated list are the only allowed sources).
+- CI unavailable must not be treated as evidence failure.
 
 If the context is missing information, say so explicitly and provide recommended verification commands.
 
@@ -121,6 +122,7 @@ Group bullets by theme:
 ### Verification
 - “Completed” must contain ONLY what is explicitly supported in context.  
    If not proven, write: “Not verified in this PR (no tool outputs recorded in pr_context.summary.txt).”
+- evidence-backed verification wording is allowed only when `pr_context` explicitly contains canonical verification evidence rows and/or enumerated additional context files that provide `Timestamp`, `Command`, and `EXIT_CODE` fields.
 - “Recommended” must include concrete commands appropriate to the repo (poetry/pwsh/etc.), derived from context.
 
 ### GitHub Auto-close (strict)
