@@ -11,6 +11,7 @@ from scripts.dev_tools.pr_context.feature_docs import (
     gather_feature_excerpts,
     parse_section,
 )
+from scripts.dev_tools.pr_context.render_feature_excerpts import extract_plan_sections
 
 
 @pytest.fixture
@@ -308,3 +309,22 @@ class TestResolveFeatureDir:
 
         result = _resolve_feature_dir(base_dir, "any-feature")
         assert result is None
+
+
+def test_feature_doc_and_render_helpers_share_verification_then_test_plan_fallback():
+    """Assert both helper paths honor the same heading fallback ordering contract."""
+    plan_markdown = (
+        "## Tasks\n"
+        "- [x] done\n\n"
+        "## Verification\n"
+        "Verification-first notes should win.\n\n"
+        "## Test Plan\n"
+        "Secondary fallback notes.\n"
+    )
+
+    feature_docs_verification = parse_section(plan_markdown, "Verification")
+    _plan_section, render_verification_notes = extract_plan_sections(plan_markdown)
+
+    assert feature_docs_verification
+    assert render_verification_notes
+    assert "Verification-first notes should win." in render_verification_notes

@@ -319,6 +319,44 @@ def test_gather_feature_excerpts_reads_active_docs(mem_path: Path) -> None:
     }
 
 
+def test_collector_includes_canonical_evidence_paths_in_additional_context_files(
+    mem_path: Path,
+) -> None:
+    """Assert canonical feature evidence paths are enumerated as additional context."""
+    root = mem_path
+    feature = "2026-02-22-pr-context-verification-contract-gap-46"
+    feature_dir = root / "docs" / "features" / "active" / feature
+    feature_dir.mkdir(parents=True)
+    (root / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+
+    # Build a minimal active-feature doc set so excerpt discovery can run.
+    (feature_dir / "spec.md").write_text("## Context\nContext", encoding="utf-8")
+    (feature_dir / "plan.md").write_text("## Tasks\n- [x] done", encoding="utf-8")
+    (feature_dir / "user-story.md").write_text(
+        "## Story Statement\n- Story", encoding="utf-8"
+    )
+
+    # Add canonical evidence artifact that should be included in context files.
+    evidence_file = (
+        feature_dir / "evidence" / "qa-gates" / "black-final.2026-02-22T21-00.md"
+    )
+    evidence_file.parent.mkdir(parents=True)
+    evidence_file.write_text(
+        "Timestamp: 2026-02-22T21-00\n"
+        "Command: poetry run black .\n"
+        "EXIT_CODE: 0\n",
+        encoding="utf-8",
+    )
+
+    changed_paths = [f"docs/features/active/{feature}/spec.md"]
+    excerpts = gather_feature_excerpts(root, changed_paths)
+
+    assert len(excerpts) == 1
+    assert any(
+        "/evidence/" in path.replace("\\", "/") for path in excerpts[0].context_files
+    )
+
+
 def test_find_user_story_link_extracts_blob_path():
     link = find_user_story_link(
         "See [story](https://github.com/org/repo/blob/main/docs/story/user-story.md)"

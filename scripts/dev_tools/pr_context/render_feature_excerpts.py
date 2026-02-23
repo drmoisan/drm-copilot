@@ -126,7 +126,10 @@ def extract_plan_sections(plan_text: str) -> tuple[str, str]:
     """Extract completed tasks and verification notes from a plan document."""
     plan_tasks = completed_plan_tasks(plan_text)
     plan_section = "\n".join(f"- {task}" for task in plan_tasks) if plan_tasks else ""
-    test_plan_section = parse_section(plan_text, "Test Plan")
+    # Keep fallback order aligned with feature_docs for consistent semantics.
+    test_plan_section = parse_section(plan_text, "Verification")
+    if not test_plan_section:
+        test_plan_section = parse_section(plan_text, "Test Plan")
     verification_block = (
         "Plan verification notes:\n" + truncate(test_plan_section)
         if test_plan_section

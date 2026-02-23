@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .models import FeatureDocExcerpt, section, truncate
+from .verification_evidence import discover_canonical_evidence_files
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -201,6 +202,11 @@ def gather_feature_excerpts(
             for path in (spec_path, plan_path, user_story_path)
             if path.exists()
         ]
+        # Include canonical evidence files so downstream PR authoring can cite
+        # only enumerated sources while preserving deterministic ordering.
+        evidence_context_files = [
+            path.as_posix() for path in discover_canonical_evidence_files(root, feature)
+        ]
         issue_refs = extract_issue_references(
             "\n".join([spec_text, plan_text, user_story_text])
         )
@@ -209,7 +215,7 @@ def gather_feature_excerpts(
                 feature=feature,
                 excerpt="\n".join(lines),
                 issue_refs=issue_refs,
-                context_files=sorted(set(context_files)),
+                context_files=sorted(set(context_files + evidence_context_files)),
             )
         )
 
