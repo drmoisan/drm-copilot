@@ -399,20 +399,11 @@ def promote_potential(
 
     relative_path = Path(_relative_path()).as_posix()
 
-    selected_mode = "full"
+    selected_mode = work_mode
     fallback_reason = ""
-    if work_mode == "minor-audit" and promotion_type != "bug":
-        # Honor explicit user selection for non-bug promotions.
-        selected_mode = "minor-audit"
 
     # Route issue-body generation based on promotion type and eligible work mode.
-    if promotion_type == "bug":
-        bug_sections = {
-            heading: get_section(content, heading) or PLACEHOLDER
-            for heading in BUG_SECTION_HEADINGS
-        }
-        body = build_bug_body(bug_sections, relative_path)
-    elif selected_mode == "minor-audit":
+    if selected_mode == "minor-audit":
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         implementation_intent = get_section(content, "Proposed Behavior") or PLACEHOLDER
         acceptance_criteria = (
@@ -437,6 +428,12 @@ def promote_potential(
             evidence_checklist,
             relative_path,
         )
+    elif promotion_type == "bug":
+        bug_sections = {
+            heading: get_section(content, heading) or PLACEHOLDER
+            for heading in BUG_SECTION_HEADINGS
+        }
+        body = build_bug_body(bug_sections, relative_path)
     else:
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         behavior = get_section(content, "Proposed Behavior") or PLACEHOLDER

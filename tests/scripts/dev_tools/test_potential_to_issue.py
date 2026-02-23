@@ -652,6 +652,46 @@ def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
     assert "## Evidence Checklist" in body
 
 
+def test_promote_potential_bug_honors_explicit_minor_audit() -> None:
+    """Verify bug promotions honor explicit minor-audit selection."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/bug-minor.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Bug Minor Audit",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+            "## Acceptance Criteria (early draft)",
+            "criteria",
+            "## Constraints & Risks",
+            "constraints",
+            "## Test Conditions to Consider",
+            "tests",
+        ]
+    )
+    messages: list[str] = []
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/58"], 0), mod.GhResult([], 0)
+    )
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="bug",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+        emit=messages.append,
+    )
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    assert "## Implementation Intent" in body
+    assert any("Selected mode: minor-audit" in m for m in messages)
+    assert not any("Fallback reason:" in m for m in messages)
+
+
 def test_work_mode_marker_minor_audit() -> None:
     """Verify minor-audit issue bodies persist marker above first section heading."""
     workspace = Path("/workspace")

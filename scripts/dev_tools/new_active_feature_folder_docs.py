@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.new_active_feature_folder_markdown import (
@@ -263,23 +262,4 @@ def should_use_minor_audit_mode(
         raise ValueError("work_mode must be one of: minor-audit, full")
     if work_mode == "full":
         return False, ""
-    if feature_type != "feature":
-        return False, "fallback: minor-audit only applies to feature type"
-
-    lower = potential_content.lower()
-    if "bootstrapped" in lower or "pre-cooked" in lower:
-        return True, ""
-
-    production_files = len(
-        re.findall(
-            r"^\s*-\s*(?:production\s+)?file\s*:",
-            potential_content,
-            flags=re.MULTILINE,
-        )
-    )
-    has_low_risk = "low integration risk" in lower or "risk: low" in lower
-    if production_files <= 3 and has_low_risk:
-        return True, ""
-    if production_files > 3:
-        return False, "fallback: production file count exceeds 3"
-    return False, "fallback: missing low integration risk signal"
+    return True, ""
