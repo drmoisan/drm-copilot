@@ -16,7 +16,6 @@ from scripts.dev_tools.potential_to_issue_content import (
     build_body,
     build_bug_body,
     build_minor_audit_body,
-    evaluate_minor_audit_eligibility,
     extract_last_updated,
     get_feature_name,
     get_feature_path,
@@ -403,11 +402,8 @@ def promote_potential(
     selected_mode = "full"
     fallback_reason = ""
     if work_mode == "minor-audit" and promotion_type != "bug":
-        eligible, eligibility_reason = evaluate_minor_audit_eligibility(content)
-        if eligible:
-            selected_mode = "minor-audit"
-        else:
-            fallback_reason = eligibility_reason
+        # Honor explicit user selection for non-bug promotions.
+        selected_mode = "minor-audit"
 
     # Route issue-body generation based on promotion type and eligible work mode.
     if promotion_type == "bug":
