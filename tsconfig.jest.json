@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.tests.json",
   "compilerOptions": {
+    "isolatedModules": true,
     "types": ["node", "jest"]
   }
 }

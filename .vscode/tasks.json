@@ -35,6 +35,16 @@
 		"type": "pickString"
 		},
 		{
+		"default": "full",
+		"description": "Work mode for promoting potential docs",
+		"id": "PotentialWorkMode",
+		"options": [
+			"full",
+			"minor-audit"
+		],
+		"type": "pickString"
+		},
+		{
 		"default": "new_feature",
 		"description": "Feature folder name (kebab/underscore-case, e.g., notes_feature)",
 		"id": "ActiveFeatureName",
@@ -63,6 +73,16 @@
 		"description": "Issue number (optional, e.g., 14)",
 		"id": "ActiveIssueNumber",
 		"type": "promptString"
+		},
+		{
+		"default": "full",
+		"description": "Work mode for active folder creation",
+		"id": "ActiveWorkMode",
+		"options": [
+			"full",
+			"minor-audit"
+		],
+		"type": "pickString"
 		},
 		{
 		"default": "",
@@ -389,7 +409,32 @@
 			},
 			"problemMatcher": [],
 			"type": "shell"
-		},		
+		},
+		{
+			"dependsOn": [
+				"JSON: format",
+				"JSON: validate",
+				"QC: Black: format",
+				"QC: Ruff: lint",
+				"QC: Pyright: type-check",
+				"QC: Pytest: run tests with coverage",
+				"PoshQC: 1 format",
+				"PoshQC: 2 analyze",
+				"PoshQC: 4 test (Pester)"
+			],
+			"dependsOrder": "sequence",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"label": "QC: 5 Run All Checks",
+			"presentation": {
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": []
+		},
 		{
 			"args": [
 				"run",
@@ -547,11 +592,62 @@
 				"run",
 				"python",
 				"-m",
+				"scripts.dev_tools.new_active_feature_folder",
+				"--active-file-for-feature-name",
+				"${file}",
+				"--type",
+				"${input:ActiveWorkType}",
+				"--issue-number",
+				"${input:ActiveIssueNumber}",
+				"--work-mode",
+				"${input:ActiveWorkMode}"
+			],
+			"command": "poetry",
+			"detail": "Creates docs/features/active/<name>/ by auto-resolving feature name from the active promoted markdown file.",
+			"label": "Dev: 3 Auto Create Folder",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"issue",
+				"create",
+				"--template",
+				"feature-request.md",
+				"--web"
+			],
+			"command": "gh",
+			"detail": "Opens browser with .github/ISSUE_TEMPLATE/feature-request.md via gh (requires gh CLI auth).",
+			"label": "Dev: New GitHub Feature Issue (manual)",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"python",
+				"-m",
 				"scripts.dev_tools.potential_to_issue",
 				"--potential-path",
 				"${relativeFile}",
 				"--promotion-type",
-				"${input:PotentialPromotionType}"
+				"${input:PotentialPromotionType}",
+				"--work-mode",
+				"${input:PotentialWorkMode}"
 			],
 			"command": "poetry",
 			"detail": "Creates a feature issue from the active editor file (workspace-relative) using gh issue create (non-interactive) via Python.",
@@ -629,11 +725,34 @@
 				"--type",
 				"${input:ActiveWorkType}",
 				"--issue-number",
-				"${input:ActiveIssueNumber}"
+				"${input:ActiveIssueNumber}",
+				"--work-mode",
+				"${input:ActiveWorkMode}"
 			],
 			"command": "poetry",
 			"detail": "Creates docs/features/active/<name>/ from the selected template (feature/refactor/epic/bug) and opens the relevant files.",
 			"label": "Dev: 3 Create Active Folder",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"issue",
+				"create",
+				"--template",
+				"bug-report.md",
+				"--web"
+			],
+			"command": "gh",
+			"detail": "Opens browser with .github/ISSUE_TEMPLATE/bug-report.md via gh (requires gh CLI auth).",
+			"label": "Dev: New GitHub Bug Issue",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
@@ -673,11 +792,11 @@
 				"-ExecutionPolicy",
 				"Bypass",
 				"-File",
-				"${workspaceFolder}/scripts/powershell/BootstrapPC/bootstrap-host.ps1",
+				"${workspaceFolder}/scripts/dev-tools/bootstrap-host.ps1",
 				"-Apply"
 			],
 			"command": "pwsh",
-			"detail": "Installs host prerequisites from scripts/powershell/BootstrapPC/host-tools.manifest.json.",
+			"detail": "Installs host prerequisites from the devcontainer-derived host tooling manifest.",
 			"label": "Dev: Host Bootstrap (PowerShell)",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -696,10 +815,10 @@
 				"-ExecutionPolicy",
 				"Bypass",
 				"-File",
-				"${workspaceFolder}/scripts/powershell/BootstrapPC/verify-host.ps1"
+				"${workspaceFolder}/scripts/dev-tools/verify-host.ps1"
 			],
 			"command": "pwsh",
-			"detail": "Verifies host prerequisites against scripts/powershell/BootstrapPC/host-tools.manifest.json.",
+			"detail": "Verifies host prerequisites against scripts/host-tools.manifest.json.",
 			"label": "Dev: Host Verify (PowerShell)",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -710,7 +829,42 @@
 			},
 			"problemMatcher": [],
 			"type": "shell"
-		},		
+		},
+		{
+			"args": [
+				"${workspaceFolder}/scripts/bash/bootstrap-host.sh",
+				"--apply"
+			],
+			"command": "bash",
+			"detail": "Installs host prerequisites on Linux/macOS from the devcontainer-derived host tooling manifest.",
+			"label": "Dev: Host Bootstrap (Bash)",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"${workspaceFolder}/scripts/bash/verify-host.sh"
+			],
+			"command": "bash",
+			"detail": "Verifies host prerequisites on Linux/macOS against scripts/host-tools.manifest.json.",
+			"label": "Dev: Host Verify (Bash)",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
 		{
 			"args": [
 				"run",

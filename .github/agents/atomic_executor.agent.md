@@ -70,6 +70,23 @@ You MUST NOT:
 
 ## 2. Plan Ingestion Protocol (Mandatory)
 
+### 2.0.1 Mode-aware preflight gate (Mandatory)
+
+During preflight (before [P0-T1]), resolve work mode from feature `issue.md` marker first:
+
+- `- Work Mode: minor-audit`
+- `- Work Mode: full`
+
+If the marker is missing or malformed, fail closed to `full`.
+
+When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
+
+`PREFLIGHT: REVISIONS REQUIRED`
+
+When all format and mode-gate requirements are satisfied, return:
+
+`PREFLIGHT: ALL CLEAR`
+
 ### 2.0 Preflight validation-only mode (directive-driven)
 
 If you receive a plan along with the following directive line (exact text):
