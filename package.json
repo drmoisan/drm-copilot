@@ -1,0 +1,35 @@
+{
+  "name": "drm-copilot",
+  "publisher": "drm-copilot",
+  "displayName": "drm-copilot",
+  "description": "VS Code extension to facilitate standardized development tools to repos.",
+  "version": "0.0.1",  
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node -e \"const fs=require('node:fs');const path=require('node:path');const hasTs=(dir)=>{if(!fs.existsSync(dir)) return false;const stack=[dir];while(stack.length){const cur=stack.pop();for(const ent of fs.readdirSync(cur,{withFileTypes:true})){if(ent.name==='node_modules'||ent.name==='out') continue;const full=path.join(cur,ent.name);if(ent.isDirectory()) stack.push(full);else if(/\\.ts$/i.test(ent.name)) return true;}}return false;};if(!hasTs('src')&&!hasTs('tests')){console.log('Skipping compile: no TypeScript sources found under src/ or tests/.');process.exit(0);}const cp=require('node:child_process');const tsc=require.resolve('typescript/bin/tsc');const result=cp.spawnSync(process.execPath,[tsc,'-p','./'],{stdio:'inherit'});process.exit(result.status??1);\"",
+    "compile:integration-tests": "node -e \"const fs=require('node:fs');const path=require('node:path');const hasTs=(dir)=>{if(!fs.existsSync(dir)) return false;const stack=[dir];while(stack.length){const cur=stack.pop();for(const ent of fs.readdirSync(cur,{withFileTypes:true})){if(ent.name==='node_modules'||ent.name==='out') continue;const full=path.join(cur,ent.name);if(ent.isDirectory()) stack.push(full);else if(/\\.ts$/i.test(ent.name)) return true;}}return false;};if(!hasTs('src')&&!hasTs('tests')){console.log('Skipping compile:integration-tests: no TypeScript sources found under src/ or tests/.');process.exit(0);}const config='tsconfig.vscode-test.json';if(!fs.existsSync(config)){console.log('Skipping compile:integration-tests: '+config+' not found.');process.exit(0);}const cp=require('node:child_process');const tsc=require.resolve('typescript/bin/tsc');const result=cp.spawnSync(process.execPath,[tsc,'-p','./'+config],{stdio:'inherit'});process.exit(result.status??1);\"",
+    "typecheck": "node -e \"const fs=require('node:fs');const path=require('node:path');const hasTs=(dir)=>{if(!fs.existsSync(dir)) return false;const stack=[dir];while(stack.length){const cur=stack.pop();for(const ent of fs.readdirSync(cur,{withFileTypes:true})){if(ent.name==='node_modules'||ent.name==='out') continue;const full=path.join(cur,ent.name);if(ent.isDirectory()) stack.push(full);else if(/\\.ts$/i.test(ent.name)) return true;}}return false;};if(!hasTs('src')&&!hasTs('tests')){console.log('Skipping typecheck: no TypeScript sources found under src/ or tests/.');process.exit(0);}const cp=require('node:child_process');const tsc=require.resolve('typescript/bin/tsc');const result=cp.spawnSync(process.execPath,[tsc,'-p','./','--noEmit'],{stdio:'inherit'});process.exit(result.status??1);\"",
+    "watch": "tsc -watch -p ./",
+    "format": "prettier --no-error-on-unmatched-pattern --write \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
+    "format:check": "prettier --no-error-on-unmatched-pattern --check \"src/**/*.{ts,tsx,js,mjs,cjs,json}\" \"tests/**/*.{ts,tsx,js,mjs,cjs,json}\" \"eslint.config.mjs\" \"jest.config.cjs\" \".vscode-test.mjs\" \"tsconfig*.json\"",
+    "pretest": "npm run compile && npm run compile:integration-tests && npm run lint",
+    "lint": "eslint --no-error-on-unmatched-pattern src tests",
+    "test:unit": "jest --config jest.config.cjs",
+    "test:integration": "vscode-test",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.108.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@jest/globals": "^30.0.0",
+    "typescript-eslint": "^8.52.0",
+    "eslint": "^9.39.2",
+    "jest": "^30.0.0",
+    "prettier": "^3.6.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

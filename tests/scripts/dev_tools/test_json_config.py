@@ -1,0 +1,177 @@
+from __future__ import annotations
+
+from pathlib import Path  # noqa: TCH003 - required for pytest fixtures
+
+import pytest
+
+from scripts.dev_tools.json_config import (
+    EXCLUDE_GLOBS,
+    GOVERNED_GLOBS,
+    iter_governed_files,
+)
+
+
+@pytest.fixture
+def mem_path(tmp_path: Path) -> Path:
+    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
+    return tmp_path
+
+
+def test_governed_globs_constant() -> None:
+    """Verify GOVERNED_GLOBS constant is defined."""
+    assert isinstance(GOVERNED_GLOBS, tuple)
+    assert len(GOVERNED_GLOBS) > 0
+    # .vscode and .devcontainer contain JSONC (not pure JSON) and are excluded
+    assert "scripts/**/*.json" in GOVERNED_GLOBS
+
+
+def test_exclude_globs_constant() -> None:
+    """Verify EXCLUDE_GLOBS constant is defined."""
+    assert isinstance(EXCLUDE_GLOBS, tuple)
+    assert len(EXCLUDE_GLOBS) > 0
+    assert "data/**" in EXCLUDE_GLOBS
+
+
+def test_iter_governed_files_empty(mem_path: Path) -> None:
+    """No JSON files should yield nothing."""
+    result = list(iter_governed_files(mem_path))
+    assert result == []
+
+
+def test_iter_governed_files_excludes_vscode_json(mem_path: Path) -> None:
+    """Files in .vscode/*.json should NOT be found (JSONC, not pure JSON)."""
+    vscode_dir = mem_path / ".vscode"
+    vscode_dir.mkdir()
+    tasks_json = vscode_dir / "tasks.json"
+    tasks_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert tasks_json not in result
+
+
+def test_iter_governed_files_excludes_nested_vscode_json(mem_path: Path) -> None:
+    """Files matching .vscode/**/*.json should NOT be found (JSONC)."""
+    nested_dir = mem_path / ".vscode" / "subdir"
+    nested_dir.mkdir(parents=True)
+    nested_json = nested_dir / "config.json"
+    nested_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert nested_json not in result
+
+
+def test_iter_governed_files_excludes_data_dir(mem_path: Path) -> None:
+    """Files under data/** should be excluded."""
+    data_dir = mem_path / "data"
+    data_dir.mkdir()
+    data_json = data_dir / "metadata.json"
+    data_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert data_json not in result
+
+
+def test_iter_governed_files_excludes_artifacts_dir(mem_path: Path) -> None:
+    """Files under artifacts/** should be excluded."""
+    artifacts_dir = mem_path / "artifacts"
+    artifacts_dir.mkdir()
+    artifact_json = artifacts_dir / "output.json"
+    artifact_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert artifact_json not in result
+
+
+def test_iter_governed_files_excludes_parent_in_excluded(mem_path: Path) -> None:
+    """Files with any parent in exclusion set should be excluded."""
+    htmlcov_dir = mem_path / "htmlcov" / "subdir"
+    htmlcov_dir.mkdir(parents=True)
+    report_json = htmlcov_dir / "report.json"
+    report_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert report_json not in result
+
+
+def test_iter_governed_files_excludes_devcontainer_json(mem_path: Path) -> None:
+    """Files in .devcontainer/*.json should NOT be found (JSONC)."""
+    devcontainer_dir = mem_path / ".devcontainer"
+    devcontainer_dir.mkdir()
+    devcontainer_json = devcontainer_dir / "devcontainer.json"
+    devcontainer_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert devcontainer_json not in result
+
+
+def test_iter_governed_files_finds_scripts_json(mem_path: Path) -> None:
+    """Files matching scripts/**/*.json should be found."""
+    scripts_dir = mem_path / "scripts" / "subdir"
+    scripts_dir.mkdir(parents=True)
+    script_json = scripts_dir / "config.json"
+    script_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert script_json in result
+
+
+def test_iter_governed_files_finds_docs_json(mem_path: Path) -> None:
+    """Files matching docs/**/*.json should be found."""
+    docs_dir = mem_path / "docs" / "features"
+    docs_dir.mkdir(parents=True)
+    doc_json = docs_dir / "manifest.json"
+    doc_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert doc_json in result
+
+
+def test_iter_governed_files_finds_examples_json(mem_path: Path) -> None:
+    """Files matching examples/**/*.json should be found."""
+    examples_dir = mem_path / "examples" / "meta"
+    examples_dir.mkdir(parents=True)
+    example_json = examples_dir / "sample.json"
+    example_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert example_json in result
+
+
+def test_iter_governed_files_accepts_str_path(mem_path: Path) -> None:
+    """iter_governed_files should accept str paths."""
+    scripts_dir = mem_path / "scripts"
+    scripts_dir.mkdir()
+    script_json = scripts_dir / "config.json"
+    script_json.write_text("{}")
+
+    result = list(iter_governed_files(str(mem_path)))
+    assert script_json in result
+
+
+def test_iter_governed_files_mixed_included_excluded(mem_path: Path) -> None:
+    """Mix of included and excluded files should only yield included ones."""
+    scripts_dir = mem_path / "scripts"
+    scripts_dir.mkdir()
+    included_json = scripts_dir / "config.json"
+    included_json.write_text("{}")
+
+    data_dir = mem_path / "data"
+    data_dir.mkdir()
+    excluded_json = data_dir / "corpus.json"
+    excluded_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_path))
+    assert included_json in result
+    assert excluded_json not in result
+
+
+def test_iter_governed_files_handles_non_file_matches(mem_path: Path) -> None:
+    """glob matches that are directories should be skipped."""
+    scripts_dir = mem_path / "scripts"
+    scripts_dir.mkdir()
+    # Create a directory with .json suffix (unusual but possible)
+    json_dir = scripts_dir / "weird.json"
+    json_dir.mkdir()
+
+    result = list(iter_governed_files(mem_path))
+    assert json_dir not in result
