@@ -245,6 +245,33 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
 
             $result | Should -Be $true
         }
+
+        It "prefers code-insiders when running in an Insiders session and both commands are available" {
+            $files = @("file1.md", "file2.md")
+            $originalTermProgramVersion = $env:TERM_PROGRAM_VERSION
+
+            try {
+                $env:TERM_PROGRAM_VERSION = "1.110.0-insider"
+                $result = Invoke-VSCodeOpen -Files $files `
+                    -GetCommand {
+                        param($Name)
+                        if ($Name -in @("code-insiders", "code")) {
+                            return [pscustomobject]@{ Name = $Name }
+                        }
+                        return $null
+                    } `
+                    -StartProcess {
+                        param($FilePath, $ArgumentList)
+                        $FilePath | Should -Be 'code-insiders'
+                        $ArgumentList | Should -Be $files
+                    }
+
+                $result | Should -Be $true
+            }
+            finally {
+                $env:TERM_PROGRAM_VERSION = $originalTermProgramVersion
+            }
+        }
     }
 }
 

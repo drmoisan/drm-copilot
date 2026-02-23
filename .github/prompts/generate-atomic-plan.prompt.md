@@ -12,6 +12,12 @@ You are an AI agent tasked with updating the implementation plan file `${file}` 
 
 This prompt is designed for AI-to-AI communication and automated processing. All instructions must be interpreted literally and executed systematically without human interpretation or clarification.
 
+## Mode Context (Deterministic)
+
+- Selected work mode: `${work-mode}`
+- Fallback reason: `${fallback-reason}`
+- Source of truth: resolve mode from issue.md marker first; fail closed to full when marker is missing or malformed.
+
 ## Core Requirements
 
 - Generate implementation plans that are fully executable by AI agents

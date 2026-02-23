@@ -116,6 +116,90 @@ def test_resolve_prompt_nested_path() -> None:
     assert "${plan-path}" not in result
 
 
+def test_resolve_prompt_injects_work_mode_from_issue_marker() -> None:
+    """Inject ${work-mode} from issue.md marker when available."""
+    template = "Plan=${plan-path};Mode=${work-mode};Reason=${fallback-reason}"
+    workspace_root = Path.cwd()
+    target = workspace_root / "docs" / "features" / "active" / "feature-1" / "plan.md"
+    issue_path = (
+        workspace_root / "docs" / "features" / "active" / "feature-1" / "issue.md"
+    )
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: minor-audit\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, workspace_root)
+
+    assert "Mode=minor-audit" in result
+    assert "Reason=none" in result
+
+
+def test_resolve_prompt_uses_parent_issue_for_versioned_plan_path() -> None:
+    """Use parent folder issue.md when target is inside a versioned folder."""
+    template = "Mode=${work-mode};Reason=${fallback-reason}"
+    workspace_root = Path.cwd()
+    target = (
+        workspace_root / "docs" / "features" / "active" / "feature-1" / "v2" / "plan.md"
+    )
+    parent_issue = (
+        workspace_root / "docs" / "features" / "active" / "feature-1" / "issue.md"
+    )
+
+    def _exists(self: Path) -> bool:
+        return self == parent_issue
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == parent_issue:
+            return "- Work Mode: full\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, workspace_root)
+
+    assert "Mode=full" in result
+    assert "Reason=none" in result
+
+
+def test_resolve_prompt_mode_fallback_when_issue_unreadable() -> None:
+    """Emit unreadable fallback reason when issue.md cannot be read."""
+    template = "Mode=${work-mode};Reason=${fallback-reason}"
+    workspace_root = Path.cwd()
+    target = workspace_root / "docs" / "features" / "active" / "feature-1" / "plan.md"
+    issue_path = (
+        workspace_root / "docs" / "features" / "active" / "feature-1" / "issue.md"
+    )
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        raise OSError("boom")
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, workspace_root)
+
+    assert "Mode=full" in result
+    assert "issue.md unreadable; fail closed to full" in result
+
+
 def test_copy_to_clipboard_with_pyperclip_success() -> None:
     """Test successful clipboard copy with pyperclip."""
     mock_pyperclip = MagicMock()
@@ -353,3 +437,52 @@ def test_main_template_read_error(mem_path: Path) -> None:
 
     assert exit_code == 1
     assert "Error reading template" in mock_stderr.getvalue()
+
+
+def test_main_resume_template_kind(mem_path: Path) -> None:
+    """Resolve resume template when --template-kind resume is provided."""
+    workspace = mem_path / "workspace"
+    workspace.mkdir()
+
+    template_dir = workspace / ".github" / "codex"
+    template_dir.mkdir(parents=True)
+    execute_template = template_dir / "execute-hard-lock.prompt.md"
+    execute_template.write_text("Execute ${plan-path}", encoding="utf-8")
+    resume_template = template_dir / "resume-hard-lock.prompt.md"
+    resume_template.write_text(
+        "Resume ${plan-path} mode=${work-mode}",
+        encoding="utf-8",
+    )
+
+    issue_file = workspace / "docs" / "issue.md"
+    issue_file.parent.mkdir(parents=True)
+    issue_file.write_text("- Work Mode: full\n", encoding="utf-8")
+
+    target_file = workspace / "docs" / "plan.md"
+    target_file.write_text("# Plan", encoding="utf-8")
+
+    with (
+        patch(
+            "sys.argv",
+            [
+                "script",
+                "--target",
+                str(target_file),
+                "--workspace",
+                str(workspace),
+                "--template-kind",
+                "resume",
+            ],
+        ),
+        patch(
+            "scripts.dev_tools.resolve_hard_lock_prompt.copy_to_clipboard",
+            return_value=True,
+        ),
+        patch("sys.stdout", new_callable=StringIO) as mock_stdout,
+        patch("sys.stderr", new_callable=StringIO),
+    ):
+        exit_code = main()
+
+    assert exit_code == 0
+    assert "Resume docs/plan.md" in mock_stdout.getvalue()
+    assert "mode=full" in mock_stdout.getvalue()

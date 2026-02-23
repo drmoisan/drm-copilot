@@ -31,6 +31,7 @@ Before any execution, validate plan structure and policy compatibility:
 	- `- Work Mode: minor-audit`
 	- `- Work Mode: full`
 - If marker is missing or malformed, fail closed to `full`.
+- Enforce minor-audit evidence-task gate before execution when selected mode is `minor-audit`.
 - When selected mode is `minor-audit`, reject plans that do not include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
 
 - Canonical headings: `### Phase N — <Title>`
