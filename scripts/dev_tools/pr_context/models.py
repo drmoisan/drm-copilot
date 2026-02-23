@@ -79,6 +79,8 @@ class FeatureDocExcerpt:
     excerpt: str
     issue_refs: list[str]
     context_files: list[str]
+    primary_issue_ref: str | None = None
+    readiness_signal: str | None = None
 
 
 @dataclass
