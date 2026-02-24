@@ -102,9 +102,48 @@ Phase completion criteria:
 Phase completion criteria:
 - Manual bootstrap of qualifying code is completed without presuming any specific script path or command shape.
 - Bootstrap execution evidence records only commands that were actually run in this environment.
+- Codex web setup/maintenance scripts use `drm-copilot` naming consistently.
+- `codex-web-setup.sh` has explicit coverage for all required tool families implied by the Codespaces devcontainer and Dockerfile.
+- `shell-qc test` discovers `tests/shell` tests and passes.
 
-- [ ] [P2-T1] Manual bootstrap of qualifying code
+- [x] [P2-T1] Manual bootstrap of qualifying code
   - Acceptance: Evidence file `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/manual-bootstrap.*.md` exists and contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, a non-empty `Command:` line matching regex `^Command: .+\S.+$`, integer `EXIT_CODE`, and `Output Summary:` beginning with `PASS` or `FAIL`.
+
+- [ ] [P2-T2] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "transcript-etl-pipeline" .github/codex/codex-web-setup.sh` exits non-zero and `grep -n "drm-copilot" .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T3] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-maintenance.sh`
+  - Acceptance: `grep -n "transcript-etl-pipeline" .github/codex/codex-web-maintenance.sh` exits non-zero and `grep -n "drm-copilot" .github/codex/codex-web-maintenance.sh` exits 0.
+
+- [ ] [P2-T4] Record required tool parity matrix from `.devcontainer/codespaces/devcontainer.json` and `.devcontainer/codespaces/Dockerfile` into `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/codex-setup-tool-parity.*.md`
+  - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, exact line `Command: derive tool parity matrix from codespaces devcontainer + Dockerfile`, exact line `EXIT_CODE: 0`, and a `Required Tools:` section listing at minimum `jq`, `shfmt`, `shellcheck`, `bats`, `kcov`, `node`, `npm`, `pwsh`, `poetry`, and `actionlint`.
+
+- [ ] [P2-T5] Add tool setup/check coverage for `jq` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "jq" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T6] Add tool setup/check coverage for `shfmt`, `shellcheck`, and `bats` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "shfmt\\|shellcheck\\|bats" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T7] Add tool setup/check coverage for `kcov` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "kcov" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T8] Add tool setup/check coverage for `node` and `npm` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "node\\|npm" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T9] Add tool setup/check coverage for `actionlint` in `.github/codex/codex-web-setup.sh`
+  - Acceptance: `grep -n "actionlint" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
+
+- [ ] [P2-T10] Add shell test scenario for `.github/codex/codex-web-setup.sh` naming banner update in `tests/shell/test_codex_web_setup_source_safety.bats`
+  - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_source_safety.bats`.
+
+- [ ] [P2-T11] Add shell test scenario for `.github/codex/codex-web-setup.sh` tool parity assertions in `tests/shell/test_codex_web_setup_apt_helpers.bats`
+  - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_apt_helpers.bats`.
+
+- [ ] [P2-T12] Add shell test scenario for `.github/codex/codex-web-maintenance.sh` naming banner update in `tests/shell/test_codex_web_setup_pypi_connectivity.bats`
+  - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_pypi_connectivity.bats`.
+
+- [ ] [P2-T13] Verify `shell-qc test` discovers tests under `tests/shell` and all shell tests pass; record results in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/shell-qc-tests.*.md`
+  - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, exact line `Command: poetry run shell-qc test`, exact line `EXIT_CODE: 0`, exact line `Output Summary: PASS shell tests discovered and passed`, and a `Discovered Test Files:` section including `tests/shell/test_codex_web_setup_apt_helpers.bats`, `tests/shell/test_codex_web_setup_pypi_connectivity.bats`, `tests/shell/test_codex_web_setup_source_safety.bats`, and `tests/shell/test_coverage_demo.bats`.
 
 ### Phase 3 — Final QA Loop and End-State No-Harm Evidence
 
@@ -140,6 +179,11 @@ Phase completion criteria:
 | REQ-006 | Preserve non-Bash toolchain health (Python and PowerShell non-regression) | P3-T1, P3-T2 |
 | REQ-007 | Complete minor-audit mandatory gates (baseline, targeted verification, end-state evidence) | P0-T1, P0-T2, P1-T1, P1-T2, P1-T3, P1-T4, P1-T5, P2-T1, P3-T4, P3-T5 |
 | REQ-008 | Record mandatory policy-read precedence evidence | P0-T3, P0-T4, P0-T5, P0-T6 |
+| REQ-009 | Codex web setup script uses repository name `drm-copilot` instead of legacy naming | P2-T2 |
+| REQ-010 | Codex web maintenance script uses repository name `drm-copilot` instead of legacy naming | P2-T3 |
+| REQ-011 | Codex web setup script covers required tools implied by Codespaces devcontainer and Dockerfile | P2-T4, P2-T5, P2-T6, P2-T7, P2-T8, P2-T9 |
+| REQ-012 | Shell tests explicitly exercise codex web setup and maintenance script updates | P2-T10, P2-T11, P2-T12 |
+| REQ-013 | shell-qc discovers tests/shell and executes them successfully | P2-T13 |
 
 ## Test Plan
 
@@ -153,7 +197,7 @@ Phase completion criteria:
   - `poetry run shell-qc check`
   - `poetry run shell-qc test`
 - Manual/CLI:
-  - Run VS Code tasks `Dev: Host Bootstrap (Bash)` and `Dev: Host Verify (Bash)` from `.vscode/tasks.json`, then capture repo-state diff to verify no unintended file changes.
+  - Execute only branch-relevant JSON/Bash QC and devcontainer verification commands recorded in evidence artifacts.
 
 ## Open Questions / Notes
 
