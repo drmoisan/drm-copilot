@@ -17,7 +17,7 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Literal, Protocol, TypedDict
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,6 +30,32 @@ ROOT_FOLDERS: tuple[Path, ...] = (
 
 DecisionType = Literal["equivalent-mtime", "equivalent-content", "synced"]
 ForceDirection = Literal["left-to-right", "right-to-left"]
+
+
+class SyncActionPayload(TypedDict):
+    """JSON payload schema for a serialized ``SyncAction`` entry."""
+
+    root: str
+    relative_path: str
+    left_path: str
+    right_path: str
+    left_mtime: float
+    right_mtime: float
+    decision: DecisionType
+    source: str | None
+    sync_mtime: float | None
+    forced: bool
+
+
+class SyncSummaryPayload(TypedDict):
+    """JSON payload schema for a serialized ``SyncSummary`` artifact."""
+
+    repo_left: str
+    repo_right: str
+    started_at: str
+    finished_at: str
+    force_direction: ForceDirection | None
+    actions: list[SyncActionPayload]
 
 
 class SyncFileSystem(Protocol):
@@ -650,7 +676,7 @@ def render_sync_summary(summary: SyncSummary) -> str:
     """
 
     # Serialize dataclasses into JSON-friendly structures.
-    actions_payload: list[dict[str, object]] = []
+    actions_payload: list[SyncActionPayload] = []
     # Serialize actions in order to preserve traceability.
     for action in summary.actions:
         actions_payload.append(
@@ -668,7 +694,7 @@ def render_sync_summary(summary: SyncSummary) -> str:
             }
         )
 
-    payload = {
+    payload: SyncSummaryPayload = {
         "repo_left": summary.repo_left,
         "repo_right": summary.repo_right,
         "started_at": summary.started_at.isoformat(),

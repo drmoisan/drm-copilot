@@ -215,10 +215,13 @@ Describe "new-potential-entry.ps1 - Convert-TemplateContent" {
 Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
     BeforeAll {
         $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/new-potential-entry.ps1"
+        $script:vscodeHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/vscode-cli.helpers.ps1"
     }
 
     Context "VS Code command detection and execution" {
         BeforeEach {
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Test-IsVSCodeInsidersSession")
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Resolve-VSCodeCliCommand")
             . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-VSCodeOpen")
         }
 

@@ -27,8 +27,8 @@ param(
     [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
 
     [Parameter()]
-    [ValidateNotNullOrEmpty()]
-    [string]$CodeCommand = "code",
+    [AllowEmptyString()]
+    [string]$CodeCommand = "",
 
     [Parameter()]
     [switch]$UseInsiders,
@@ -52,6 +52,8 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+. (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
 
 function Invoke-ExternalCommand {
     [CmdletBinding()]
@@ -186,10 +188,6 @@ if (-not (Test-Path -LiteralPath $packageJsonPath)) {
     throw "package.json not found at RepoRoot: $packageJsonPath"
 }
 
-if ($UseInsiders) {
-    $CodeCommand = "code-insiders"
-}
-
 if (-not (Test-Path -LiteralPath $VsixOutputDir)) {
     if ($PSCmdlet.ShouldProcess($VsixOutputDir, 'Create output directory')) {
         New-Item -ItemType Directory -Path $VsixOutputDir -Force | Out-Null
@@ -220,6 +218,15 @@ if (-not (Test-Path -LiteralPath $vsixPath)) {
 }
 
 if (-not $SkipInstall) {
+    $hasExplicitCodeCommand = $PSBoundParameters.ContainsKey('CodeCommand')
+    $preferredCodeCommand = if ($hasExplicitCodeCommand) { $CodeCommand } else { $null }
+    $resolvedCodeCommand = Resolve-VSCodeCliCommand -PreferredCommand $preferredCodeCommand -PreferInsiders:$UseInsiders
+    if (-not $resolvedCodeCommand) {
+        throw "Could not find a VS Code CLI command on PATH (expected 'code' or 'code-insiders')."
+    }
+
+    $CodeCommand = $resolvedCodeCommand
+
     $installArgs = @("--install-extension", $vsixPath)
     if ($Force) {
         $installArgs += "--force"

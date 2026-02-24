@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from scripts.dev_tools.fix_all import BranchResult, CommandRunner, StepLogger
+    from .fix_all import BranchResult, CommandRunner, StepLogger
 
 
 def run_fix_all(
@@ -22,7 +22,7 @@ def run_fix_all(
     complete_all: bool = False,
 ) -> int:
     """Run the fix-all pipeline in parallel branches."""
-    from scripts.dev_tools import fix_all as api
+    from . import fix_all as api
 
     step_logger = logger or api.StepLogger()
     cancel_event = threading.Event()

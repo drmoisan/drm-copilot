@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol, TextIO, cast
 
-from scripts.dev_tools.fix_all_runtime import run_fix_all as run_fix_all_runtime
+from .fix_all_runtime import run_fix_all as run_fix_all_runtime
 
 if TYPE_CHECKING:
     import threading
@@ -278,7 +278,7 @@ def is_vt_enabled_for_stream(stream: TextIO) -> bool:
     if windll is None:
         return False
 
-    kernel32 = cast(Kernel32Api, windll.kernel32)
+    kernel32 = cast("Kernel32Api", windll.kernel32)
     handle = kernel32.GetStdHandle(std_output_handle)
     if handle in (0, -1):
         return False
