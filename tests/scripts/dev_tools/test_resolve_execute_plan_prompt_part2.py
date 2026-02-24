@@ -16,9 +16,11 @@ This module tests:
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 import pytest  # noqa: TCH002 - pytest required at runtime for fixtures
 
@@ -333,7 +335,9 @@ def test_main_clipboard_unavailable(
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast("Callable[[str], str | None]", _which)
+        module.shutil,
+        "which",
+        cast("Callable[[str], str | None]", _which),
     )
 
     workspace = FIXTURE_ROOT

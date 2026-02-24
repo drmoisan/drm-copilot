@@ -254,17 +254,19 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
                 $env:TERM_PROGRAM_VERSION = "1.110.0-insider"
                 $result = Invoke-VSCodeOpen -Files $files `
                     -GetCommand {
-                        param($Name)
-                        if ($Name -in @("code-insiders", "code")) {
-                            return [pscustomobject]@{ Name = $Name }
-                        }
-                        return $null
-                    } `
-                    -StartProcess {
-                        param($FilePath, $ArgumentList)
-                        $FilePath | Should -Be 'code-insiders'
-                        $ArgumentList | Should -Be $files
+                    param($Name)
+                    if ($Name -in @("code-insiders", "code")) {
+                        return [pscustomobject]@{ Name = $Name }
                     }
+
+                    return $null
+                } `
+                    -StartProcess {
+                    param($FilePath, $ArgumentList)
+
+                    $FilePath | Should -Be 'code-insiders'
+                    $ArgumentList | Should -Be $files
+                }
 
                 $result | Should -Be $true
             }
@@ -295,3 +297,4 @@ Describe "new-potential-entry.ps1 - Integration validation" {
         }
     }
 }
+
