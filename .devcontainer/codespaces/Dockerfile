@@ -31,6 +31,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     # Clipboard utilities for pyperclip fallback
     wl-clipboard \
     xclip \
+    # Node tooling (required for Graphite CLI, ESLint, Jest, bash-language-server)
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Build and install bashdb (not packaged for all Debian/Ubuntu bases)
@@ -49,6 +52,11 @@ RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-p
     && apt-get update \
     && apt-get install -y powershell \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Graphite CLI for the Graphite VS Code extension.
+# Pinned for repeatable devcontainer builds.
+ARG GRAPHITE_CLI_VERSION=1.7.14
+RUN npm install -g "@withgraphite/graphite-cli@${GRAPHITE_CLI_VERSION}"
 
 # Install Poetry
 RUN pip install --no-cache-dir poetry==2.2.1
