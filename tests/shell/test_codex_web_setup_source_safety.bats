@@ -27,3 +27,10 @@ SCRIPT_UNDER_TEST=".github/codex/codex-web-setup.sh"
     # Assert: output should contain a line number match
     [[ "$output" =~ ^[0-9]+: ]]
 }
+
+@test "codex-web-setup.sh naming banner uses drm-copilot" {
+    run grep -n 'drm-copilot setup:' "$SCRIPT_UNDER_TEST"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ ^[0-9]+: ]]
+}

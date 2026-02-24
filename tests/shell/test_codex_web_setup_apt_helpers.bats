@@ -104,3 +104,10 @@ setup() {
     [[ "$output" == *"package1"* ]]
     [[ "$output" == *"package2"* ]]
 }
+
+@test "codex-web-setup.sh includes required tool parity assertions" {
+    run grep -nE 'jq|shfmt|shellcheck|bats|kcov|node|npm|actionlint' "${BATS_TEST_DIRNAME}/../../.github/codex/codex-web-setup.sh"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ ^[0-9]+: ]]
+}

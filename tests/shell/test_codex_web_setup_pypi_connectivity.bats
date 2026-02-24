@@ -61,3 +61,10 @@ setup() {
 
     [ "$status" -eq 0 ]
 }
+
+@test "codex-web-maintenance.sh naming banner uses drm-copilot" {
+    run grep -n 'drm-copilot \[maintenance\]' "${BATS_TEST_DIRNAME}/../../.github/codex/codex-web-maintenance.sh"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ ^[0-9]+: ]]
+}

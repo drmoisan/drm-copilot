@@ -109,40 +109,40 @@ Phase completion criteria:
 - [x] [P2-T1] Manual bootstrap of qualifying code
   - Acceptance: Evidence file `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/manual-bootstrap.*.md` exists and contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, a non-empty `Command:` line matching regex `^Command: .+\S.+$`, integer `EXIT_CODE`, and `Output Summary:` beginning with `PASS` or `FAIL`.
 
-- [ ] [P2-T2] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T2] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "transcript-etl-pipeline" .github/codex/codex-web-setup.sh` exits non-zero and `grep -n "drm-copilot" .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T3] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-maintenance.sh`
+- [x] [P2-T3] Replace all `transcript-etl-pipeline` references with `drm-copilot` in `.github/codex/codex-web-maintenance.sh`
   - Acceptance: `grep -n "transcript-etl-pipeline" .github/codex/codex-web-maintenance.sh` exits non-zero and `grep -n "drm-copilot" .github/codex/codex-web-maintenance.sh` exits 0.
 
-- [ ] [P2-T4] Record required tool parity matrix from `.devcontainer/codespaces/devcontainer.json` and `.devcontainer/codespaces/Dockerfile` into `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/codex-setup-tool-parity.*.md`
+- [x] [P2-T4] Record required tool parity matrix from `.devcontainer/codespaces/devcontainer.json` and `.devcontainer/codespaces/Dockerfile` into `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/codex-setup-tool-parity.*.md`
   - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, exact line `Command: derive tool parity matrix from codespaces devcontainer + Dockerfile`, exact line `EXIT_CODE: 0`, and a `Required Tools:` section listing at minimum `jq`, `shfmt`, `shellcheck`, `bats`, `kcov`, `node`, `npm`, `pwsh`, `poetry`, and `actionlint`.
 
-- [ ] [P2-T5] Add tool setup/check coverage for `jq` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T5] Add tool setup/check coverage for `jq` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "jq" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T6] Add tool setup/check coverage for `shfmt`, `shellcheck`, and `bats` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T6] Add tool setup/check coverage for `shfmt`, `shellcheck`, and `bats` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "shfmt\\|shellcheck\\|bats" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T7] Add tool setup/check coverage for `kcov` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T7] Add tool setup/check coverage for `kcov` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "kcov" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T8] Add tool setup/check coverage for `node` and `npm` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T8] Add tool setup/check coverage for `node` and `npm` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "node\\|npm" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T9] Add tool setup/check coverage for `actionlint` in `.github/codex/codex-web-setup.sh`
+- [x] [P2-T9] Add tool setup/check coverage for `actionlint` in `.github/codex/codex-web-setup.sh`
   - Acceptance: `grep -n "actionlint" .github/codex/codex-web-setup.sh` exits 0 and `bash -n .github/codex/codex-web-setup.sh` exits 0.
 
-- [ ] [P2-T10] Add shell test scenario for `.github/codex/codex-web-setup.sh` naming banner update in `tests/shell/test_codex_web_setup_source_safety.bats`
+- [x] [P2-T10] Add shell test scenario for `.github/codex/codex-web-setup.sh` naming banner update in `tests/shell/test_codex_web_setup_source_safety.bats`
   - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_source_safety.bats`.
 
-- [ ] [P2-T11] Add shell test scenario for `.github/codex/codex-web-setup.sh` tool parity assertions in `tests/shell/test_codex_web_setup_apt_helpers.bats`
+- [x] [P2-T11] Add shell test scenario for `.github/codex/codex-web-setup.sh` tool parity assertions in `tests/shell/test_codex_web_setup_apt_helpers.bats`
   - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_apt_helpers.bats`.
 
-- [ ] [P2-T12] Add shell test scenario for `.github/codex/codex-web-maintenance.sh` naming banner update in `tests/shell/test_codex_web_setup_pypi_connectivity.bats`
+- [x] [P2-T12] Add shell test scenario for `.github/codex/codex-web-maintenance.sh` naming banner update in `tests/shell/test_codex_web_setup_pypi_connectivity.bats`
   - Acceptance: `poetry run shell-qc test` exits 0 and test output includes `test_codex_web_setup_pypi_connectivity.bats`.
 
-- [ ] [P2-T13] Verify `shell-qc test` discovers tests under `tests/shell` and all shell tests pass; record results in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/shell-qc-tests.*.md`
+- [x] [P2-T13] Verify `shell-qc test` discovers tests under `tests/shell` and all shell tests pass; record results in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/shell-qc-tests.*.md`
   - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, exact line `Command: poetry run shell-qc test`, exact line `EXIT_CODE: 0`, exact line `Output Summary: PASS shell tests discovered and passed`, and a `Discovered Test Files:` section including `tests/shell/test_codex_web_setup_apt_helpers.bats`, `tests/shell/test_codex_web_setup_pypi_connectivity.bats`, `tests/shell/test_codex_web_setup_source_safety.bats`, and `tests/shell/test_coverage_demo.bats`.
 
 ### Phase 3 — Final QA Loop and End-State No-Harm Evidence
@@ -151,19 +151,19 @@ Phase completion criteria:
 - Final toolchain pass is clean after bootstrap execution.
 - End-state evidence proves no unintended repository harm.
 
-- [ ] [P3-T1] Run final Python toolchain pass in order using `poetry run black .`, `poetry run ruff check`, `poetry run pyright`, and `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`
+- [x] [P3-T1] Run final Python toolchain pass in order using `poetry run black .`, `poetry run ruff check`, `poetry run pyright`, and `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`
   - Acceptance: All four commands exit `0` in one uninterrupted pass; if any command fails or changes files, rerun from Black.
 
-- [ ] [P3-T2] Run final PowerShell toolchain pass in order using `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`, `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`, and `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
+- [x] [P3-T2] Run final PowerShell toolchain pass in order using `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`, `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`, and `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
   - Acceptance: All commands exit `0` in one uninterrupted pass; if formatting/analyze/test changes files or fails, rerun from format.
 
-- [ ] [P3-T3] Run final JSON/Bash toolchain pass in order using `poetry run python -m scripts.dev_tools.format_json`, `poetry run python -m scripts.dev_tools.validate_json`, `poetry run shell-qc format`, `poetry run shell-qc check`, and `poetry run shell-qc test`
+- [x] [P3-T3] Run final JSON/Bash toolchain pass in order using `poetry run python -m scripts.dev_tools.format_json`, `poetry run python -m scripts.dev_tools.validate_json`, `poetry run shell-qc format`, `poetry run shell-qc check`, and `poetry run shell-qc test`
   - Acceptance: All commands exit `0` in one uninterrupted pass; if any command fails or changes files, rerun from JSON format.
 
-- [ ] [P3-T4] Record final QA gate evidence in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/final-toolchain-pass.*.md`
+- [x] [P3-T4] Record final QA gate evidence in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/qa-gates/final-toolchain-pass.*.md`
   - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, one `Command:` line per command executed in P3-T1 through P3-T3, one integer `EXIT_CODE:` line per `Command:` line, and exact line `Output Summary: PASS final QA loop clean`.
 
-- [ ] [P3-T5] Record end-state no-harm evidence in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/other/end-state-no-harm.*.md` by comparing baseline repository state artifact to post-bootstrap repository state artifact
+- [x] [P3-T5] Record end-state no-harm evidence in `docs/features/active/2026-02-23-bootstrap-json-bash-toolchains-devcontainer-55/evidence/other/end-state-no-harm.*.md` by comparing baseline repository state artifact to post-bootstrap repository state artifact
   - Acceptance: Evidence file contains `Timestamp:` matching regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}$`, exact line `Command: compare baseline repo-state vs post-repo-state`, exact line `EXIT_CODE: 0`, and exact line `Output Summary: PASS no unintended repo changes outside evidence artifacts`.
 
 
