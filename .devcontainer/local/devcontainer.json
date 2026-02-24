@@ -14,6 +14,7 @@
         "github.copilot",
         "github.copilot-chat",
         "ms-python.python",
+        "ms-python.debugpy",
         "ms-python.vscode-pylance",
         "ms-python.black-formatter",
         "charliermarsh.ruff",
@@ -26,6 +27,7 @@
         "graphite.gti-vscode",
         "github.vscode-pull-request-github",
         "editorconfig.editorconfig",
+        "dbaeumer.vscode-eslint",
         "humao.rest-client",
         "ryanluker.vscode-coverage-gutters",
         "tenninebt.vscode-koverage",
@@ -41,7 +43,9 @@
         "ms-toolsai.datawrangler",
         "ms-vscode.extension-test-runner",
         "Orta.vscode-jest",
-        "ZainChen.json"
+        "ZainChen.json",
+        "jq-syntax-highlighting.jq-syntax-highlighting",
+        "ms-vscode-remote.remote-containers"
       ],
       "settings": {
         "[python]": {

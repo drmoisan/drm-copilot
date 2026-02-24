@@ -23,6 +23,7 @@
     "vscode": {
       "extensions": [
         "ms-python.python",
+        "ms-python.debugpy",
         "ms-python.vscode-pylance",
         "ms-python.black-formatter",
         "charliermarsh.ruff",
@@ -35,6 +36,7 @@
         "graphite.gti-vscode",
         "github.vscode-pull-request-github",
         "editorconfig.editorconfig",
+        "dbaeumer.vscode-eslint",
         "humao.rest-client",
         "ryanluker.vscode-coverage-gutters",
         "tenninebt.vscode-koverage",
@@ -45,7 +47,13 @@
         "mechatroner.rainbow-csv",
         "openai.chatgpt",
         "github.vscode-github-actions",
-        "bierner.markdown-checkbox"
+        "bierner.markdown-checkbox",
+        "mads-hartmann.bash-ide-vscode",
+        "ms-vscode.extension-test-runner",
+        "Orta.vscode-jest",
+        "ZainChen.json",
+        "jq-syntax-highlighting.jq-syntax-highlighting",
+        "ms-vscode-remote.remote-containers"
       ],
       "settings": {
         "[python]": {
