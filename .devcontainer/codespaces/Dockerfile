@@ -45,6 +45,11 @@ RUN git clone --depth 1 https://github.com/Trepan-Debuggers/bashdb /tmp/bashdb \
     && make install \
     && rm -rf /tmp/bashdb
 
+# Add clip.exe compatibility shim for Linux containers.
+# This supports scripts/tools that expect the Windows clip.exe command.
+RUN printf '%s\n' '#!/usr/bin/env bash' 'exec xclip -selection clipboard "$@"' > /usr/local/bin/clip.exe \
+    && chmod +x /usr/local/bin/clip.exe
+
 # Install PowerShell 7.5+ from Microsoft repository
 RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
