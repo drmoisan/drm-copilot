@@ -16,9 +16,11 @@ This module tests:
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 import pytest  # noqa: TCH002 - pytest required at runtime for fixtures
 
@@ -333,7 +335,9 @@ def test_main_clipboard_unavailable(
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil,
+        "which",
+        cast("Callable[[str], str | None]", _which),
     )
 
     workspace = FIXTURE_ROOT
@@ -452,3 +456,95 @@ def test_prompt_excludes_instructions_md_content() -> None:
     prompt = builder.build(feature_dir, task)
 
     assert "---- BEGIN repo instructions ----" not in prompt
+
+
+def test_resolve_mode_context_mode_minor_audit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Resolve mode context from issue.md marker when minor-audit is present."""
+    workspace = Path("/workspace")
+    folderpath = "docs/features/active/feature-x"
+    issue_path = workspace / folderpath / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: minor-audit\n"
+        raise FileNotFoundError(str(self))
+
+    monkeypatch.setattr(Path, "exists", _exists)
+    monkeypatch.setattr(Path, "read_text", _read_text)
+
+    mode, reason = module.resolve_mode_context(folderpath, workspace)
+
+    assert mode == "minor-audit"
+    assert reason == "none"
+
+
+def test_resolve_mode_context_mode_fails_closed_when_marker_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Fail closed to full mode when issue marker is missing."""
+    workspace = Path("/workspace")
+    folderpath = "docs/features/active/feature-x"
+    issue_path = workspace / folderpath / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "# no marker\n"
+        raise FileNotFoundError(str(self))
+
+    monkeypatch.setattr(Path, "exists", _exists)
+    monkeypatch.setattr(Path, "read_text", _read_text)
+
+    mode, reason = module.resolve_mode_context(folderpath, workspace)
+
+    assert mode == "full"
+    assert "marker missing" in reason
+
+
+def test_resolve_mode_context_mode_fails_closed_when_issue_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Fail closed to full when issue.md file does not exist."""
+    workspace = Path("/workspace")
+    folderpath = "docs/features/active/feature-x"
+
+    def _exists(_self: Path) -> bool:
+        return False
+
+    monkeypatch.setattr(Path, "exists", _exists)
+
+    mode, reason = module.resolve_mode_context(folderpath, workspace)
+
+    assert mode == "full"
+    assert reason == "issue.md missing; fail closed to full"
+
+
+def test_resolve_mode_context_mode_fails_closed_when_issue_unreadable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Fail closed to full with unreadable reason when issue.md read fails."""
+    workspace = Path("/workspace")
+    folderpath = "docs/features/active/feature-x"
+    issue_path = workspace / folderpath / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(_self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        raise OSError("cannot read")
+
+    monkeypatch.setattr(Path, "exists", _exists)
+    monkeypatch.setattr(Path, "read_text", _read_text)
+
+    mode, reason = module.resolve_mode_context(folderpath, workspace)
+
+    assert mode == "full"
+    assert reason == "issue.md unreadable; fail closed to full"

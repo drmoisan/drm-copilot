@@ -460,6 +460,28 @@
 			"args": [
 				"run",
 				"python",
+				"scripts/dev_tools/resolve_hard_lock_prompt.py",
+				"--target",
+				"${file}",
+				"--workspace",
+				"${workspaceFolder}",
+				"--template-kind",
+				"resume"
+			],
+			"command": "poetry",
+			"detail": "Resolves ${file} in the resume-hard-lock prompt with the active plan file path and copies to clipboard.",
+			"label": "Dev: Resolve Resume Hard-Lock Prompt",
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"python",
 				"-m",
 				"scripts.dev_tools.format_json"
 			],

@@ -85,6 +85,9 @@ OUTPUT DISCIPLINE
 
 --- END OF ATOMIC EXECUTION HARD-LOCK ---
 
+MODE CONTEXT
+- Selected work mode: `${work-mode}`
+
 PLAN OF RECORD
 `${plan-path}`
 

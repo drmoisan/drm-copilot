@@ -3,7 +3,6 @@ name: python-orchestrator
 model: GPT-5.3-Codex (copilot)
 description: Orchestrate end-to-end Python feature/bug delivery by estimating change budget, routing small changes directly to python-typed-engineer, and routing larger efforts through scope → promotion → research/spec → atomic planning/execution → feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
-target: vscode
 tools: ['execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
 handoffs:
   - label: Small-scope implementation path

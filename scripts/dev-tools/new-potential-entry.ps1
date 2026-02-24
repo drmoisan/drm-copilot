@@ -99,11 +99,31 @@ function Invoke-VSCodeOpen {
         [scriptblock] $StartProcess = { param([string]$FilePath, $ArgumentList) Start-Process $FilePath -ArgumentList $ArgumentList }
     )
 
-    $codeCommand = Resolve-VSCodeCliCommand -GetCommand $GetCommand
-    if ($codeCommand) {
-        & $StartProcess $codeCommand $Files
+    $isInsidersSession = $env:TERM_PROGRAM_VERSION -match 'insider'
+
+    $hasMatchingCommand = {
+        param(
+            $CommandInfo,
+            [string] $ExpectedName
+        )
+
+        return $CommandInfo -and $CommandInfo.Name -eq $ExpectedName
+    }
+
+    if ($isInsidersSession) {
+        $codeInsidersCmd = & $GetCommand 'code-insiders'
+        if (& $hasMatchingCommand $codeInsidersCmd 'code-insiders') {
+            & $StartProcess 'code-insiders' $Files
+            return $true
+        }
+    }
+
+    $codeCmd = & $GetCommand 'code'
+    if (& $hasMatchingCommand $codeCmd 'code') {
+        & $StartProcess 'code' $Files
         return $true
     }
+
 
     return $false
 }

@@ -27,7 +27,10 @@ PLAN AUTHORITY
 
 PLAN OF RECORD (AUTHORITATIVE)
 - Load the plan from this repository file path (not from memory, not inferred):
-  docs/features/active/2026-01-06-populate-open-stax-ck-12-manifest-73/v4/plan.2026-01-29T05-45.md
+   ${plan-path}
+
+MODE CONTEXT
+- Selected work mode: `${work-mode}`
 
 MANDATORY LOAD + READ-PROOF (DO THIS BEFORE PREFLIGHT; DO NOT EXECUTE)
 1) Open/read the plan file from the repo/branch you are operating on.

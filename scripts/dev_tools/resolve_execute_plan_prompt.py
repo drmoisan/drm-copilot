@@ -25,6 +25,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.prompt_mode_contract import (
+    build_fallback_reason,
+    resolve_selected_work_mode,
+)
+
 
 def read_text(path: Path) -> str:
     """Return the UTF-8 contents of a file.
@@ -290,6 +295,37 @@ def _resolve_user_story_value(folderpath: str, workspace_root: Path) -> str:
     return f"{rel_story} (missing)"
 
 
+def resolve_mode_context(folderpath: str, workspace_root: Path) -> tuple[str, str]:
+    """Resolve ${work-mode} and ${fallback-reason} from issue.md.
+
+    Purpose:
+        Populate optional mode placeholders in prompt templates using the same
+        fail-closed issue marker contract as other prompt resolvers.
+
+    Args:
+        folderpath: Workspace-relative feature folder path.
+        workspace_root: Workspace root used for file resolution.
+
+    Returns:
+        tuple[str, str]: Selected mode and fallback reason text.
+    """
+    issue_path = workspace_root / Path(folderpath) / "issue.md"
+    if not issue_path.exists():
+        return resolve_selected_work_mode(None), build_fallback_reason(None)
+
+    try:
+        issue_content = issue_path.read_text(encoding="utf-8")
+    except OSError:
+        return (
+            resolve_selected_work_mode(None),
+            "issue.md unreadable; fail closed to full",
+        )
+
+    selected_mode = resolve_selected_work_mode(issue_content)
+    fallback_reason = build_fallback_reason(issue_content)
+    return selected_mode, fallback_reason
+
+
 def _remove_user_story_section_when_missing(template: str) -> str:
     """Remove the user-story authoritative document section from the template.
 
@@ -417,12 +453,15 @@ def build_prompt_text(
         content = _remove_user_story_clause_when_missing(content)
 
     # Build variable mapping
+    selected_mode, fallback_reason = resolve_mode_context(folderpath, workspace)
     variables: dict[str, str] = {
         "file": file_str,
         "folderpath": folderpath,
         "name": name,
         "spec": _resolve_spec_path(folderpath),
         "research": _resolve_research_value(folderpath, workspace),
+        "work-mode": selected_mode,
+        "fallback-reason": fallback_reason,
     }
 
     # Only include user-story in variables if not missing
