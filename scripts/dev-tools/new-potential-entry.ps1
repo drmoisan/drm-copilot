@@ -3,6 +3,8 @@ param(
     [string] $ShortName
 )
 
+. (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
+
 function Test-ValidShortName {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -97,11 +99,32 @@ function Invoke-VSCodeOpen {
         [scriptblock] $StartProcess = { param([string]$FilePath, $ArgumentList) Start-Process $FilePath -ArgumentList $ArgumentList }
     )
 
+    $isInsidersSession = $env:TERM_PROGRAM_VERSION -match 'insider'
+
+    $hasMatchingCommand = {
+        param(
+            $CommandInfo,
+            [string] $ExpectedName
+        )
+
+        return $CommandInfo -and $CommandInfo.Name -eq $ExpectedName
+    }
+
+    if ($isInsidersSession) {
+        $codeInsidersCmd = & $GetCommand 'code-insiders'
+        if (& $hasMatchingCommand $codeInsidersCmd 'code-insiders') {
+            & $StartProcess 'code-insiders' $Files
+            return $true
+        }
+    }
+
     $codeCmd = & $GetCommand 'code'
-    if ($codeCmd) {
+    if (& $hasMatchingCommand $codeCmd 'code') {
         & $StartProcess 'code' $Files
         return $true
     }
+
+
     return $false
 }
 
@@ -139,7 +162,7 @@ Set-Content -Path $target -Value $content -Encoding UTF8
 
 $opened = Invoke-VSCodeOpen -Files @($target, $backlog)
 if (-not $opened) {
-    Write-Warning "VS Code 'code' command not found. Open files manually:"
+    Write-Warning "VS Code CLI command not found (expected 'code' or 'code-insiders'). Open files manually:"
     Write-Output "  $target"
     Write-Output "  $backlog"
 }

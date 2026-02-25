@@ -431,10 +431,10 @@ def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
     assert lines[marker_index + 2] == "## Problem / Why"
 
 
-def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
+def test_create_active_folder_minor_audit_honors_explicit_selection(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Verify ineligible minor-audit requests fall back to full mode with reason."""
+    """Verify explicit minor-audit stays selected even when heuristics are unmet."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -462,6 +462,7 @@ def test_create_active_folder_minor_audit_falls_back_to_full_when_not_eligible(
         work_mode="minor-audit",
     )
     out = capsys.readouterr().out
-    assert fs.exists(result.target / "user-story.md")
-    assert "Selected mode: full" in out
-    assert "Fallback reason:" in out
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: minor-audit" in issue_md
+    assert "Selected mode: minor-audit" in out
+    assert "Fallback reason:" not in out

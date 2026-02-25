@@ -16,7 +16,6 @@ from scripts.dev_tools.potential_to_issue_content import (
     build_body,
     build_bug_body,
     build_minor_audit_body,
-    evaluate_minor_audit_eligibility,
     extract_last_updated,
     get_feature_name,
     get_feature_path,
@@ -400,23 +399,11 @@ def promote_potential(
 
     relative_path = Path(_relative_path()).as_posix()
 
-    selected_mode = "full"
+    selected_mode = work_mode
     fallback_reason = ""
-    if work_mode == "minor-audit" and promotion_type != "bug":
-        eligible, eligibility_reason = evaluate_minor_audit_eligibility(content)
-        if eligible:
-            selected_mode = "minor-audit"
-        else:
-            fallback_reason = eligibility_reason
 
     # Route issue-body generation based on promotion type and eligible work mode.
-    if promotion_type == "bug":
-        bug_sections = {
-            heading: get_section(content, heading) or PLACEHOLDER
-            for heading in BUG_SECTION_HEADINGS
-        }
-        body = build_bug_body(bug_sections, relative_path)
-    elif selected_mode == "minor-audit":
+    if selected_mode == "minor-audit":
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         implementation_intent = get_section(content, "Proposed Behavior") or PLACEHOLDER
         acceptance_criteria = (
@@ -441,6 +428,12 @@ def promote_potential(
             evidence_checklist,
             relative_path,
         )
+    elif promotion_type == "bug":
+        bug_sections = {
+            heading: get_section(content, heading) or PLACEHOLDER
+            for heading in BUG_SECTION_HEADINGS
+        }
+        body = build_bug_body(bug_sections, relative_path)
     else:
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         behavior = get_section(content, "Proposed Behavior") or PLACEHOLDER

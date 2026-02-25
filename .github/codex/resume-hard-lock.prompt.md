@@ -27,9 +27,12 @@ PLAN AUTHORITY
 
 PLAN OF RECORD (AUTHORITATIVE)
 - Load the plan from this repository file path (not from memory, not inferred):
-  docs/features/active/2026-01-06-populate-open-stax-ck-12-manifest-73/v4/plan.2026-01-29T05-45.md
+   ${plan-path}
 
-MANDATORY LOAD + READ-PROOF (DO THIS BEFORE PREFLIGHT; DO NOT EXECUTE)
+MODE CONTEXT
+- Selected work mode: `${work-mode}`
+
+MANDATORY LOAD + READ-PROOF (DO THIS BEFORE PREFLIGHT)
 1) Open/read the plan file from the repo/branch you are operating on.
 2) Provide proof you actually read it by outputting:
    a) A unique fingerprint of the plan file contents (sha256 preferred; if not available, provide file byte length AND the first and last 2 lines verbatim)
@@ -40,7 +43,7 @@ MANDATORY LOAD + READ-PROOF (DO THIS BEFORE PREFLIGHT; DO NOT EXECUTE)
    - 2 lines above and 2 lines below
 4) Then output exactly:
    READY TO RESUME FROM [P#-T#]
-   and STOP (wait for me to say "Proceed").
+5) Immediately continue into PREFLIGHT (RESUME VARIANT), then begin execution from that resume point if preflight passes.
 
 If you cannot open/read the plan file, respond ONLY:
 NO FILE ACCESS — CANNOT EXECUTE
@@ -51,12 +54,12 @@ You must:
 2) Identify the first unchecked task ([ ]).
 3) Announce ONLY:
    “Resuming execution from [P#-T#]: <task text>”
-4) Do NOT begin execution yet.
+4) Begin execution immediately after the announcement.
 
 If any task before the proposed resume point is unchecked, STOP and report invalid execution state.
 
-EXECUTION LOOP (AFTER RESUME CONFIRMATION)
-Once the user confirms to proceed:
+EXECUTION LOOP (AUTOMATIC AFTER PREFLIGHT PASSES)
+After preflight passes:
 - Execute tasks strictly one-by-one from the resume point.
 - Do NOT stop mid-plan.
 - Do NOT replan.
@@ -85,5 +88,5 @@ OUTPUT DISCIPLINE
 INSTRUCTIONS:
 - Load the plan of record from the file path above.
 - Perform the MANDATORY LOAD + READ-PROOF.
-- Then perform PREFLIGHT (RESUME VARIANT).
-- Do NOT execute yet.
+- Perform PREFLIGHT (RESUME VARIANT).
+- If preflight passes, continue execution immediately from the first unchecked task.

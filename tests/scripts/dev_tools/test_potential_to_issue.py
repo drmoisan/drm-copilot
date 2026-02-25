@@ -652,6 +652,46 @@ def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
     assert "## Evidence Checklist" in body
 
 
+def test_promote_potential_bug_honors_explicit_minor_audit() -> None:
+    """Verify bug promotions honor explicit minor-audit selection."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/bug-minor.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Bug Minor Audit",
+            "## Problem / Why",
+            "problem",
+            "## Proposed Behavior",
+            "behavior",
+            "## Acceptance Criteria (early draft)",
+            "criteria",
+            "## Constraints & Risks",
+            "constraints",
+            "## Test Conditions to Consider",
+            "tests",
+        ]
+    )
+    messages: list[str] = []
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/58"], 0), mod.GhResult([], 0)
+    )
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="bug",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+        emit=messages.append,
+    )
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    assert "## Implementation Intent" in body
+    assert any("Selected mode: minor-audit" in m for m in messages)
+    assert not any("Fallback reason:" in m for m in messages)
+
+
 def test_work_mode_marker_minor_audit() -> None:
     """Verify minor-audit issue bodies persist marker above first section heading."""
     workspace = Path("/workspace")
@@ -689,8 +729,8 @@ def test_work_mode_marker_minor_audit() -> None:
     assert lines[first_section_index - 1] == "- Work Mode: minor-audit"
 
 
-def test_work_mode_marker_fallback_full() -> None:
-    """Verify fallback-to-full issue bodies persist full marker above first section."""
+def test_work_mode_marker_honors_explicit_minor_audit() -> None:
+    """Verify explicit minor-audit requests persist a minor-audit marker."""
     workspace = Path("/workspace")
     potential = workspace / "docs/features/potential/fallback-marker.md"
     fs = FakeFileSystem()
@@ -725,16 +765,16 @@ def test_work_mode_marker_fallback_full() -> None:
     lines = body.splitlines()
     first_section_index = lines.index("## Problem / Why")
     assert first_section_index > 0
-    assert lines[first_section_index - 1] == "- Work Mode: full"
+    assert lines[first_section_index - 1] == "- Work Mode: minor-audit"
 
 
-def test_promote_potential_persists_selected_work_mode_after_fallback() -> None:
-    """Verify fallback selection persists as a full marker when minor is ineligible."""
-    test_work_mode_marker_fallback_full()
+def test_promote_potential_persists_explicit_selected_work_mode() -> None:
+    """Verify explicit selection persists as minor-audit."""
+    test_work_mode_marker_honors_explicit_minor_audit()
 
 
-def test_promote_potential_minor_audit_rejects_missing_eligibility_inputs() -> None:
-    """Verify ineligible minor-audit requests fall back and emit reason messages."""
+def test_promote_potential_minor_audit_honors_explicit_user_selection() -> None:
+    """Verify explicit minor-audit selection is honored."""
     workspace = Path("/workspace")
     potential = workspace / "docs/features/potential/not-eligible.md"
     fs = FakeFileSystem()
@@ -765,8 +805,8 @@ def test_promote_potential_minor_audit_rejects_missing_eligibility_inputs() -> N
         emit=messages.append,
     )
     assert outcome.exit_code == 0
-    assert any("Selected mode: full" in m for m in messages)
-    assert any("Fallback reason:" in m for m in messages)
+    assert any("Selected mode: minor-audit" in m for m in messages)
+    assert not any("Fallback reason:" in m for m in messages)
 
 
 def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:

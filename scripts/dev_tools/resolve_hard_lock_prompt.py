@@ -22,6 +22,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.prompt_mode_contract import (
+    build_fallback_reason,
+    resolve_selected_work_mode,
+)
+
 
 def copy_to_clipboard(text: str) -> bool:
     """Attempt to copy text to the clipboard using common tools.
@@ -101,8 +106,76 @@ def _try_relative_to_workspace(path: Path, workspace_root: Path) -> Path:
         return path
 
 
+def _resolve_issue_file_for_target(target_path: Path, workspace_root: Path) -> Path:
+    """Resolve the most likely issue.md path for a target plan file.
+
+    Purpose:
+        Hard-lock prompts are usually generated from a plan file located in a
+        feature folder (or a version subfolder like `v2`). This helper selects
+        the nearest deterministic `issue.md` candidate.
+
+    Args:
+        target_path: Path to the target plan file.
+        workspace_root: Workspace root for normalization.
+
+    Returns:
+        Path: Candidate issue.md path to parse for work-mode marker.
+    """
+    relative_target = _try_relative_to_workspace(target_path, workspace_root)
+    plan_dir = relative_target.parent
+    direct_issue = workspace_root / plan_dir / "issue.md"
+    if direct_issue.exists():
+        return direct_issue
+
+    if plan_dir.name.startswith("v") and len(plan_dir.parts) >= 2:
+        parent_issue = workspace_root / plan_dir.parent / "issue.md"
+        if parent_issue.exists():
+            return parent_issue
+
+    return direct_issue
+
+
+def _resolve_work_mode_from_issue(
+    target_path: Path, workspace_root: Path
+) -> tuple[str, str]:
+    """Resolve selected work mode from issue.md with fail-closed behavior.
+
+    Purpose:
+        Enforce deterministic mode selection for prompt templates by reading the
+        persisted issue marker first and failing closed to `full` on missing or
+        malformed data.
+
+    Args:
+        target_path: Target plan file path.
+        workspace_root: Workspace root for path resolution.
+
+    Returns:
+        tuple[str, str]: Selected mode and fallback reason text.
+    """
+    issue_path = _resolve_issue_file_for_target(target_path, workspace_root)
+    if not issue_path.exists():
+        return resolve_selected_work_mode(None), build_fallback_reason(None)
+
+    try:
+        issue_content = issue_path.read_text(encoding="utf-8")
+    except OSError:
+        return (
+            resolve_selected_work_mode(None),
+            "issue.md unreadable; fail closed to full",
+        )
+
+    return resolve_selected_work_mode(issue_content), build_fallback_reason(
+        issue_content
+    )
+
+
 def resolve_prompt(
-    template_content: str, target_path: Path, workspace_root: Path
+    template_content: str,
+    target_path: Path,
+    workspace_root: Path,
+    *,
+    work_mode: str | None = None,
+    fallback_reason: str | None = None,
 ) -> str:
     """Resolve ${plan-path} in the template with the target file path.
 
@@ -127,8 +200,19 @@ def resolve_prompt(
     # Convert to forward slashes for cross-platform consistency
     plan_path_value = relative_target.as_posix()
 
-    # Substitute the variable
+    selected_mode, resolved_fallback_reason = _resolve_work_mode_from_issue(
+        target_path,
+        workspace_root,
+    )
+    mode_value = work_mode if work_mode is not None else selected_mode
+    fallback_value = (
+        fallback_reason if fallback_reason is not None else resolved_fallback_reason
+    )
+
+    # Substitute variables.
     resolved = template_content.replace("${plan-path}", plan_path_value)
+    resolved = resolved.replace("${work-mode}", mode_value)
+    resolved = resolved.replace("${fallback-reason}", fallback_value)
 
     return resolved
 
@@ -157,14 +241,25 @@ def main() -> int:
         default=None,
         help="Workspace root directory (default: current working directory)",
     )
+    parser.add_argument(
+        "--template-kind",
+        choices=("execute", "resume"),
+        default="execute",
+        help="Hard-lock template kind to resolve.",
+    )
 
     args = parser.parse_args()
 
     # Determine workspace root
     workspace_root = args.workspace if args.workspace else Path.cwd()
 
-    # Locate the template file
-    template_path = workspace_root / ".github" / "codex" / "execute-hard-lock.prompt.md"
+    # Locate the template file selected by --template-kind.
+    template_name = (
+        "execute-hard-lock.prompt.md"
+        if args.template_kind == "execute"
+        else "resume-hard-lock.prompt.md"
+    )
+    template_path = workspace_root / ".github" / "codex" / template_name
 
     if not template_path.exists():
         print(f"Error: Template not found at {template_path}", file=sys.stderr)

@@ -26,6 +26,11 @@ import sys
 import types
 from pathlib import Path
 
+from scripts.dev_tools.prompt_mode_contract import (
+    build_fallback_reason,
+    resolve_selected_work_mode,
+)
+
 
 def _missing_pyperclip_copy(text: str) -> None:
     """
@@ -373,6 +378,40 @@ def _extract_template_variables(template: str) -> set[str]:
     return {m.group(1) for m in re.finditer(r"\$\{([^}]+)\}", template)}
 
 
+def _resolve_work_mode_from_issue(
+    folderpath: str, workspace_root: Path
+) -> tuple[str, str]:
+    """Resolve work mode and fallback reason from issue.md.
+
+    Purpose:
+        Read the feature `issue.md` marker and enforce deterministic fail-closed
+        behavior when the marker is missing, malformed, or the file is absent.
+
+    Args:
+        folderpath (str): Workspace-relative feature folder path.
+        workspace_root (Path): Workspace root used for file resolution.
+
+    Returns:
+        tuple[str, str]: Selected work mode (`minor-audit` or `full`) and a
+        human-readable fallback reason.
+    """
+    issue_path = workspace_root / Path(folderpath) / "issue.md"
+    if not issue_path.exists():
+        return resolve_selected_work_mode(None), build_fallback_reason(None)
+
+    try:
+        issue_content = issue_path.read_text(encoding="utf-8")
+    except OSError:
+        return (
+            resolve_selected_work_mode(None),
+            "issue.md unreadable; fail closed to full",
+        )
+
+    selected_mode = resolve_selected_work_mode(issue_content)
+    fallback_reason = build_fallback_reason(issue_content)
+    return selected_mode, fallback_reason
+
+
 def _replace_all_variables(template: str, variables: dict[str, str]) -> str:
     """Replace all ${var} placeholders in template using the provided mapping.
 
@@ -430,6 +469,10 @@ def resolve_prompt(template_content: str, target_path: Path, cwd: Path) -> str:
         "spec": _resolve_spec_path(folderpath),
         "user-story": _resolve_user_story_value(folderpath, cwd),
     }
+
+    selected_work_mode, fallback_reason = _resolve_work_mode_from_issue(folderpath, cwd)
+    variables["work-mode"] = selected_work_mode
+    variables["fallback-reason"] = fallback_reason
 
     # Resolve optional research path. If missing, delete any instruction line
     # that references it (per prompt requirements).

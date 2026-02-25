@@ -38,7 +38,7 @@ Your primary responsibility is to:
 - Produce a **phased implementation plan**
 - Decompose the work into **atomic tasks** with explicit checkboxes and clear acceptance criteria
 
-You may reference tools, code, files, and docs for context (for example, via `#tool:web/githubRepo`, `#tool:search`), but you do not perform edits yourself unless explicitly asked to write or update a plan document in the repo.
+You may reference tools, code, files, and docs for context (for example, via `#tool:search`), but you do not perform edits yourself unless explicitly asked to write or update a plan document in the repo.
 
 ### 1.1 Hard constraint: do not execute the plan
 
@@ -89,10 +89,11 @@ Use the `atomic-plan-contract` skill as the system-of-record for plan format, Ph
 
 ### 2.5.0 Mode source precedence and fail-closed routing (Mandatory)
 
-When planning from a feature folder, resolve mode from `issue.md` marker first:
+When planning from a feature folder, resolve mode using this ordered precedence:
 
-- `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- Persisted marker in `issue.md` (`- Work Mode: minor-audit` or `- Work Mode: full`)
+- Explicit workflow override only if repo policy allows and only if reconciled against issue.md
+- fail closed to full when marker is missing or malformed
 
 If marker is missing or malformed, fail closed to `full`.
 

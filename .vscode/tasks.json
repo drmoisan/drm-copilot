@@ -312,6 +312,93 @@
 		},
 		{
 			"args": [
+				"run",
+				"shell-qc",
+				"format"
+			],
+			"command": "poetry",
+			"detail": "Formats repository shell scripts with shfmt (write mode).",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"label": "Shell QC: 1 shfmt: format",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"shell-qc",
+				"check"
+			],
+			"command": "poetry",
+			"detail": "Runs shell QC checks: shfmt -d + shellcheck over discovered scripts.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "Shell QC: 2 shellcheck: lint",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-lc",
+				"set -euo pipefail; shopt -s globstar nullglob; set -- tools/**/*.sh scripts/**/*.sh; if [ \"$#\" -eq 0 ]; then echo 'No .sh files found under tools/ or scripts/; skipping.'; exit 0; fi; echo \"Running bash -n on $# file(s)...\"; for f in \"$@\"; do bash -n \"$f\"; done"
+			],
+			"command": "bash",
+			"detail": "Runs bash -n (syntax check) on .sh files under tools/ and scripts/.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "Shell QC: 3 bash: type-check",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"shell-qc",
+				"test"
+			],
+			"command": "poetry",
+			"detail": "Runs bats tests under tests/shell or tests/bash when present.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "Shell QC: 4 bats: run tests",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
 				"-NoLogo",
 				"-NoProfile",
 				"-ExecutionPolicy",
@@ -452,6 +539,28 @@
 				"panel": "new",
 				"reveal": "always",
 				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"python",
+				"scripts/dev_tools/resolve_hard_lock_prompt.py",
+				"--target",
+				"${file}",
+				"--workspace",
+				"${workspaceFolder}",
+				"--template-kind",
+				"resume"
+			],
+			"command": "poetry",
+			"detail": "Resolves ${file} in the resume-hard-lock prompt with the active plan file path and copies to clipboard.",
+			"label": "Dev: Resolve Resume Hard-Lock Prompt",
+			"presentation": {
+				"panel": "new",
+				"reveal": "always"
 			},
 			"problemMatcher": [],
 			"type": "shell"
@@ -646,8 +755,7 @@
 				"${relativeFile}",
 				"--promotion-type",
 				"${input:PotentialPromotionType}",
-				"--work-mode",
-				"${input:PotentialWorkMode}"
+				"--work-mode=${input:PotentialWorkMode}"
 			],
 			"command": "poetry",
 			"detail": "Creates a feature issue from the active editor file (workspace-relative) using gh issue create (non-interactive) via Python.",
@@ -784,87 +892,7 @@
 			},
 			"problemMatcher": [],
 			"type": "shell"
-		},
-		{
-			"args": [
-				"-NoLogo",
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"${workspaceFolder}/scripts/dev-tools/bootstrap-host.ps1",
-				"-Apply"
-			],
-			"command": "pwsh",
-			"detail": "Installs host prerequisites from the devcontainer-derived host tooling manifest.",
-			"label": "Dev: Host Bootstrap (PowerShell)",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"presentation": {
-				"panel": "new",
-				"reveal": "always"
-			},
-			"problemMatcher": [],
-			"type": "shell"
-		},
-		{
-			"args": [
-				"-NoLogo",
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"${workspaceFolder}/scripts/dev-tools/verify-host.ps1"
-			],
-			"command": "pwsh",
-			"detail": "Verifies host prerequisites against scripts/host-tools.manifest.json.",
-			"label": "Dev: Host Verify (PowerShell)",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"presentation": {
-				"panel": "new",
-				"reveal": "always"
-			},
-			"problemMatcher": [],
-			"type": "shell"
-		},
-		{
-			"args": [
-				"${workspaceFolder}/scripts/bash/bootstrap-host.sh",
-				"--apply"
-			],
-			"command": "bash",
-			"detail": "Installs host prerequisites on Linux/macOS from the devcontainer-derived host tooling manifest.",
-			"label": "Dev: Host Bootstrap (Bash)",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"presentation": {
-				"panel": "new",
-				"reveal": "always"
-			},
-			"problemMatcher": [],
-			"type": "shell"
-		},
-		{
-			"args": [
-				"${workspaceFolder}/scripts/bash/verify-host.sh"
-			],
-			"command": "bash",
-			"detail": "Verifies host prerequisites on Linux/macOS against scripts/host-tools.manifest.json.",
-			"label": "Dev: Host Verify (Bash)",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"presentation": {
-				"panel": "new",
-				"reveal": "always"
-			},
-			"problemMatcher": [],
-			"type": "shell"
-		},
+		},		
 		{
 			"args": [
 				"run",
