@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -20,10 +19,22 @@ def mem_path(tmp_path: Path) -> Path:
 
 
 def _patch_io(monkeypatch: MonkeyPatch, store: dict[Path, str]) -> None:
-    def read_text(self: Path, *args: Any, **kwargs: Any):
+    """Patch Path.read_text, Path.write_text, and Path.is_file to use an in-memory
+    store.
+
+    Purpose:
+        Isolate format_file and format_files from the real filesystem in unit tests.
+        All reads return from ``store``; all writes update ``store`` in place.
+
+    Args:
+        monkeypatch (MonkeyPatch): Pytest monkeypatch fixture.
+        store (dict[Path, str]): In-memory store keyed by Path.
+    """
+
+    def read_text(self: Path, *args: Any, **kwargs: Any) -> str:
         return store[self]
 
-    def write_text(self: Path, data: str, *args: Any, **kwargs: Any):
+    def write_text(self: Path, data: str, *args: Any, **kwargs: Any) -> int:
         store[self] = data
         return len(data)
 
@@ -35,22 +46,11 @@ def _patch_io(monkeypatch: MonkeyPatch, store: dict[Path, str]) -> None:
     monkeypatch.setattr(Path, "is_file", _is_file, raising=False)
 
 
-def _fake_run(stdout: str = "{}\n", returncode: int = 0) -> SimpleNamespace:
-    return SimpleNamespace(stdout=stdout, stderr="", returncode=returncode)
-
-
 def test_format_no_change(monkeypatch: MonkeyPatch) -> None:
+    """format_files should report 'already formatted' for already-formatted content."""
+    # "{}\n" is the exact output Python json.dumps produces for an empty object.
     store: dict[Path, str] = {Path("/f.json"): "{}\n"}
     _patch_io(monkeypatch, store)
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("{}\n", 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
 
     result = fmt.format_files([Path("/f.json")], check=False, verbose=True)
 
@@ -60,17 +60,10 @@ def test_format_no_change(monkeypatch: MonkeyPatch) -> None:
 
 
 def test_format_rewrites(monkeypatch: MonkeyPatch) -> None:
+    """format_files should rewrite a file whose content differs from the canonical
+    form."""
     store: dict[Path, str] = {Path("/f.json"): '{"b":1}\n'}
     _patch_io(monkeypatch, store)
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run('{\n  "b": 1\n}\n', 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
 
     result = fmt.format_files([Path("/f.json")], check=False, verbose=True)
 
@@ -80,17 +73,9 @@ def test_format_rewrites(monkeypatch: MonkeyPatch) -> None:
 
 
 def test_format_check_mode(monkeypatch: MonkeyPatch) -> None:
+    """format_files in check mode should report a change without writing the file."""
     store: dict[Path, str] = {Path("/f.json"): '{"b":1}\n'}
     _patch_io(monkeypatch, store)
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run('{\n  "b": 1\n}\n', 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
 
     result = fmt.format_files([Path("/f.json")], check=True, verbose=True)
 
@@ -99,24 +84,16 @@ def test_format_check_mode(monkeypatch: MonkeyPatch) -> None:
     assert store[Path("/f.json")] == '{"b":1}\n'  # unchanged in check mode
 
 
-def test_format_jq_failure(monkeypatch: MonkeyPatch) -> None:
-    store: dict[Path, str] = {Path("/f.json"): '{"b":1}\n'}
+def test_format_parse_error(monkeypatch: MonkeyPatch) -> None:
+    """format_files should report failure for content that is not valid JSON."""
+    store: dict[Path, str] = {Path("/f.json"): "not valid json"}
     _patch_io(monkeypatch, store)
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("", returncode=1)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
 
     result = fmt.format_files([Path("/f.json")], check=False, verbose=True)
 
     assert result.failed is True
     assert result.changed is False
-    assert any("jq failed" in m for m in result.messages)
+    assert any("Failed to parse" in m for m in result.messages)
 
 
 def test_format_result_init() -> None:
@@ -127,31 +104,12 @@ def test_format_result_init() -> None:
     assert result.messages == ["message1", "message2"]
 
 
-def test_format_files_jq_not_found(monkeypatch: MonkeyPatch) -> None:
-    """format_files should handle missing jq executable."""
-
-    def _which(_: str) -> None:
-        return None
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-
-    result = fmt.format_files([Path("/f.json")], check=False, verbose=False)
-
-    assert result.failed is True
-    assert result.changed is False
-    assert "jq executable not found on PATH" in result.messages[0]
-
-
 def test_format_files_skips_non_files(monkeypatch: MonkeyPatch) -> None:
     """format_files should skip paths that are not files."""
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
 
     def _is_file(self: Path) -> bool:
         return False
 
-    monkeypatch.setattr(fmt.shutil, "which", _which)
     monkeypatch.setattr(Path, "is_file", _is_file)
 
     result = fmt.format_files([Path("/dir")], check=False, verbose=True)
@@ -162,18 +120,9 @@ def test_format_files_skips_non_files(monkeypatch: MonkeyPatch) -> None:
 
 
 def test_format_files_non_verbose_hides_unchanged(monkeypatch: MonkeyPatch) -> None:
-    """format_files should not report unchanged files when not verbose."""
+    """format_files should not emit a message for unchanged files when not verbose."""
     store: dict[Path, str] = {Path("/f.json"): "{}\n"}
     _patch_io(monkeypatch, store)
-
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("{}\n", 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
 
     result = fmt.format_files([Path("/f.json")], check=False, verbose=False)
 
@@ -182,21 +131,17 @@ def test_format_files_non_verbose_hides_unchanged(monkeypatch: MonkeyPatch) -> N
     assert result.messages == []
 
 
-def test_run_jq_format_with_error_message(monkeypatch: MonkeyPatch) -> None:
-    """run_jq_format should capture stderr on failure."""
+def test_format_file_parse_error(monkeypatch: MonkeyPatch) -> None:
+    """format_file should set failed=True with a descriptive message for invalid
+    JSON."""
     store: dict[Path, str] = {Path("/f.json"): "invalid"}
     _patch_io(monkeypatch, store)
 
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return SimpleNamespace(stdout="", stderr="parse error", returncode=1)
-
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
-
-    changed, failed, msg = fmt.run_jq_format(Path("/f.json"), False, "/usr/bin/jq")
+    changed, failed, msg = fmt.format_file(Path("/f.json"), False)
 
     assert changed is False
     assert failed is True
-    assert "parse error" in msg
+    assert "Failed to parse" in msg
 
 
 def test_parse_args_defaults() -> None:
@@ -234,22 +179,14 @@ def test_parse_args_combined() -> None:
 
 
 def test_main_no_paths_uses_governed(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
-    """main with no paths should use iter_governed_files."""
+    """main with no paths should delegate file discovery to iter_governed_files."""
     json_file = mem_path / "test.json"
     json_file.write_text("{}")
 
     def mock_iter(_: Path) -> list[Path]:
         return [json_file]
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("{}\n", 0)
-
     monkeypatch.setattr(fmt, "iter_governed_files", mock_iter)
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -266,18 +203,10 @@ def test_main_no_paths_uses_governed(mem_path: Path, monkeypatch: MonkeyPatch) -
 
 
 def test_main_with_file_path(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
-    """main should format specific file when path provided."""
+    """main should format a specific file when its path is supplied."""
     json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run('{\n  "b": 1\n}\n', 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -294,20 +223,12 @@ def test_main_with_file_path(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
 
 
 def test_main_with_directory_path(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
-    """main should recursively find JSON files in directory."""
+    """main should recursively find and format JSON files when given a directory."""
     subdir = mem_path / "subdir"
     subdir.mkdir()
     json_file = subdir / "test.json"
-    json_file.write_text("{}")
+    json_file.write_text("{}\n")
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("{}\n", 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -326,18 +247,10 @@ def test_main_with_directory_path(mem_path: Path, monkeypatch: MonkeyPatch) -> N
 def test_main_check_mode_exits_1_on_changes(
     mem_path: Path, monkeypatch: MonkeyPatch
 ) -> None:
-    """main in check mode should return 1 when changes needed."""
+    """main in check mode should return 1 when the file needs reformatting."""
     json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run('{\n  "b": 1\n}\n', 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -354,18 +267,10 @@ def test_main_check_mode_exits_1_on_changes(
 
 
 def test_main_failure_exits_1(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
-    """main should return 1 on formatting failures."""
+    """main should return 1 when a file cannot be parsed as JSON."""
     json_file = mem_path / "test.json"
     json_file.write_text("invalid")
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run("", returncode=1)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -384,19 +289,13 @@ def test_main_failure_exits_1(mem_path: Path, monkeypatch: MonkeyPatch) -> None:
 def test_main_verbose_mode_already_formatted(
     mem_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """main with --verbose should print 'already formatted' when no changes."""
+    """main with --verbose should print 'already formatted' when no changes needed."""
     json_file = mem_path / "test.json"
+    # Write content in canonical Python json form (sorted keys, 2-space indent,
+    # trailing newline), so formatter reports it as already formatted.
     original = '{\n  "b": 1\n}\n'
     json_file.write_text(original)
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run(original, 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve
@@ -418,18 +317,10 @@ def test_main_verbose_mode_already_formatted(
 def test_main_verbose_mode_reformatted(
     mem_path: Path, monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """main with --verbose should print 'reformatted' when file is changed."""
+    """main with --verbose should print 'reformatted' after rewriting a file."""
     json_file = mem_path / "test.json"
     json_file.write_text('{"b":1}')
 
-    def _which(_: str) -> str:
-        return "/usr/bin/jq"
-
-    def _run(*args: Any, **kwargs: Any) -> SimpleNamespace:
-        return _fake_run('{\n  "b": 1\n}\n', 0)
-
-    monkeypatch.setattr(fmt.shutil, "which", _which)
-    monkeypatch.setattr(fmt.subprocess, "run", _run)
     monkeypatch.setattr(sys, "argv", ["format_json.py"])
 
     original_resolve = Path.resolve

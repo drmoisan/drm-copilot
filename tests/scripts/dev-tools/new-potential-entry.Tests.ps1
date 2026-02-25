@@ -261,12 +261,10 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
                     if ($Name -in @("code-insiders", "code")) {
                         return [pscustomobject]@{ Name = $Name }
                     }
-
                     return $null
                 } `
                     -StartProcess {
                     param($FilePath, $ArgumentList)
-
                     $FilePath | Should -Be 'code-insiders'
                     $ArgumentList | Should -Be $files
                 }
@@ -276,6 +274,94 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
             finally {
                 $env:TERM_PROGRAM_VERSION = $originalTermProgramVersion
             }
+        }
+    }
+}
+
+Describe "vscode-cli.helpers.ps1 - Resolve-VSCodeCliCommand" {
+    BeforeAll {
+        $script:vscodeHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/vscode-cli.helpers.ps1"
+    }
+
+    Context "Explicit command preference" {
+        BeforeEach {
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Test-IsVSCodeInsidersSession")
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Resolve-VSCodeCliCommand")
+        }
+
+        It "returns the explicitly requested command when available" {
+            $result = Resolve-VSCodeCliCommand -PreferredCommand "code" -GetCommand {
+                param($Name)
+                if ($Name -eq "code") {
+                    return [pscustomobject]@{ Name = $Name }
+                }
+
+                return $null
+            }
+
+            $result | Should -Be "code"
+        }
+
+        It "throws when the explicitly requested command is unavailable" {
+            {
+                Resolve-VSCodeCliCommand -PreferredCommand "code" -GetCommand { param($Name) $null = $Name; $null }
+            } | Should -Throw "*explicitly requested*"
+        }
+    }
+
+    Context "Automatic command selection" {
+        BeforeEach {
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Test-IsVSCodeInsidersSession")
+            . (Import-ScriptFunction -Path $script:vscodeHelperPath -Name "Resolve-VSCodeCliCommand")
+        }
+
+        It "prefers code-insiders when TERM_PROGRAM_VERSION indicates insiders" {
+            $result = Resolve-VSCodeCliCommand `
+                -GetCommand {
+                param($Name)
+                if ($Name -in @("code-insiders", "code")) {
+                    return [pscustomobject]@{ Name = $Name }
+                }
+
+                return $null
+            } `
+                -GetEnvironmentVariable {
+                param($Name)
+                if ($Name -eq "TERM_PROGRAM_VERSION") {
+                    return "1.110.0-insider"
+                }
+
+                return $null
+            }
+
+            $result | Should -Be "code-insiders"
+        }
+
+        It "falls back to code when insiders is preferred but unavailable" {
+            $result = Resolve-VSCodeCliCommand `
+                -GetCommand {
+                param($Name)
+                if ($Name -eq "code") {
+                    return [pscustomobject]@{ Name = $Name }
+                }
+
+                return $null
+            } `
+                -GetEnvironmentVariable {
+                param($Name)
+                if ($Name -eq "TERM_PROGRAM_VERSION") {
+                    return "1.110.0-insider"
+                }
+
+                return $null
+            }
+
+            $result | Should -Be "code"
+        }
+
+        It "returns null when no VS Code command is available" {
+            $result = Resolve-VSCodeCliCommand -GetCommand { param($Name) $null = $Name; $null }
+            $result | Should -Be $null
         }
     }
 }
