@@ -1,278 +1,267 @@
 <!-- markdownlint-disable-file -->
 
-# Task Research Notes: scaffold-extension implementation approach
+# Task Research Notes: scaffold-extension extension-side execution implementation
 
 ## Research Executed
 
 ### File Analysis
 
-- d:\repos\drm-copilot.worktrees\wt-master-rebuild\docs\features\active\2026-01-28-scaffold-extension-16\issue.md
-  - Defines problem, acceptance criteria, constraints, and test conditions for the scaffold extension.
-- d:\repos\drm-copilot.worktrees\wt-master-rebuild\docs\features\active\2026-01-28-scaffold-extension-16\spec.md
-  - Draft spec with behavior summary, constraints, and definition of done.
-- d:\repos\drm-copilot.worktrees\wt-master-rebuild\docs\features\active\2026-01-28-scaffold-extension-16\user-story.md
-  - Draft user story; acceptance criteria mirror issue.md.
-- d:\repos\drm-copilot.worktrees\wt-master-rebuild\docs\features\active\2026-01-28-scaffold-extension-16\plan.2026-02-11T20-01.md
-  - Plan template referencing required policy docs; no implementation plan yet.
-- d:\repos\drm-copilot.worktrees\wt-master-rebuild\.vscode\settings.json
-  - Workspace tooling hints (e.g., tasks/tsc auto-detect off), no extension scaffold present.
+- c:\Users\DanMoisan\repos\drm-copilot\docs\features\active\2026-01-28-scaffold-extension-16\spec.md
+  - Confirms the required target architecture: scripts execute from extension resources, artifacts are written to destination workspace, and hello scripts must never be copied to workspace root.
+- c:\Users\DanMoisan\repos\drm-copilot\docs\features\active\2026-01-28-scaffold-extension-16\user-story.md
+  - Defines the user-facing contract and acceptance criteria for self-contained extension behavior and no-copy invariants.
+- c:\Users\DanMoisan\repos\drm-copilot\docs\features\active\2026-01-28-scaffold-extension-16\research.md
+  - Contains earlier strategy notes that still describe template-copy behavior; this is superseded by current spec/user-story requirements.
+- c:\Users\DanMoisan\repos\drm-copilot\package.json
+  - Shows the repository already has TypeScript/Jest/ESLint/Prettier tooling and `@types/vscode`, providing a baseline to host extension code and tests.
+- c:\Users\DanMoisan\repos\drm-copilot\src\hello-typescript.ts
+  - Indicates no existing extension entrypoint or runtime orchestration code; extension scaffold must be added.
 
 ### Code Search Results
 
-- package.json
-  - No package.json files exist in this repo snapshot.
-- **/*.{ps1,psm1,py,sh,ts,js}
-  - Only docs and policy files; no implementation sources found.
+- extension scaffold / extension entry search (`src/extension.ts`, `contributes.commands`, `extensionUri`)
+  - No existing in-repo extension implementation found; behavior must be introduced from scratch.
+- bundled-resource execution patterns (`resolveBundledScriptPath`, `executeBundledScriptInWorkspace`)
+  - No existing helper implementations found.
+- repo command/test tooling (`package.json` scripts, TypeScript/Jest config)
+  - Confirmed development/test toolchain exists and can support extension implementation and verification.
 
 ### External Research
 
-- #githubRepo:"microsoft/vscode-extension-samples task-provider-sample"
-  - Not available in this environment; used #fetch GitHub page instead for sample structure.
-- #fetch:https://github.com/drmoisan/drm-copilot/issues/16
-  - Issue URL returned 404 (likely private); no additional details accessible.
+- #githubRepo:"microsoft/vscode-extension-samples helloworld-sample command registration"
+  - Baseline sample confirms extension structure (`package.json` manifest + `src/extension.ts`) and command registration flow.
 - #fetch:https://code.visualstudio.com/api/get-started/extension-anatomy
-  - Extension structure, activation/command registration, entry point conventions.
+  - Confirms required extension structure, activation model, and command contribution/registration baseline.
 - #fetch:https://code.visualstudio.com/api/references/extension-manifest
-  - package.json extension manifest fields (name, publisher, main, contributes, activationEvents, engines.vscode).
-- #fetch:https://code.visualstudio.com/api/references/activation-events
-  - onCommand activation and implicit activation for commands declared in contributes.commands.
-- #fetch:https://code.visualstudio.com/api/references/contribution-points
-  - contributes.commands and contributes.taskDefinitions usage and structure.
+  - Confirms manifest requirements: `engines.vscode`, `main`, `contributes.commands`, optional `activationEvents` depending on minimum supported VS Code.
 - #fetch:https://code.visualstudio.com/api/extension-guides/command
-  - registerCommand and user-facing command contributions (commands + activation guidance).
-- #fetch:https://code.visualstudio.com/api/extension-guides/task-provider
-  - TaskProvider, task definitions, and ShellExecution vs ProcessExecution guidance.
-- #fetch:https://code.visualstudio.com/docs/editor/tasks
-  - tasks.json usage, platform-specific properties, and variable substitution.
-- #fetch:https://code.visualstudio.com/docs/reference/tasks-appendix
-  - tasks.json schema details for task definitions and properties.
-- #fetch:https://code.visualstudio.com/docs/reference/variables-reference
-  - ${workspaceFolder}, ${pathSeparator}, and variable substitution constraints.
+  - Confirms `commands.registerCommand` and user-facing command contribution patterns.
 - #fetch:https://code.visualstudio.com/api/references/vscode-api
-  - vscode.commands.registerCommand, tasks API, workspace.fs for file copying.
-- #fetch:https://code.visualstudio.com/api/references/when-clause-contexts
-  - when-clause contexts for conditional command visibility if needed.
-- #fetch:https://code.visualstudio.com/api/references/commands
-  - Built-in command list and examples for executeCommand.
-- #fetch:https://github.com/microsoft/vscode-extension-samples/tree/main/task-provider-sample
-  - Sample layout and task-provider sample references.
-- #fetch:https://docs.npmjs.com/cli/v7/configuring-npm/package-json
-  - Base package.json fields and constraints for naming/versioning.
+  - Confirms APIs needed for this design: `ExtensionContext.extensionUri`, `Uri.joinPath`, `window.createOutputChannel`, `workspace.workspaceFolders`, and task/process abstractions.
+- #fetch:https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-sample
+  - Confirms practical scaffold layout and build/test loops for a TypeScript extension.
 
 ### Project Conventions
 
-- Standards referenced: general code change policy; general unit test policy.
-- Instructions followed: .github/instructions/general-code-change.instructions.md; .github/instructions/general-unit-test.instructions.md.
+- Standards referenced: `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`.
+- Instructions followed: self-contained extension behavior from current `spec.md` and `user-story.md` takes precedence over older research notes.
 
 ## Key Discoveries
 
 ### Project Structure
 
-The repo snapshot contains only documentation and policy files. There is no existing VS Code extension scaffold or runtime code. Any implementation will require creating a new extension folder and baseline project files.
+The workspace has TypeScript and test tooling but no existing extension runtime implementation. This is a greenfield extension implementation inside the existing monorepo layout.
 
 ### Implementation Patterns
 
-No internal patterns exist for extensions or runtime detection. External documentation establishes expected VS Code extension structure (package.json manifest + extension entry point) and the task provider contract.
+The required pattern is now explicit and stable:
+
+- Resolve workspace context from `vscode.workspace.workspaceFolders`.
+- Resolve script file paths from extension resources via `context.extensionUri` + `vscode.Uri.joinPath`.
+- Execute bundled scripts via subprocess with destination workspace as execution context (`cwd`).
+- Write artifacts to destination workspace only (for example: `<workspace>/artifacts/hello_python.txt`).
+- Never copy `hello_python.py` / `hello_pwsh.ps1` into destination workspace root.
 
 ### Complete Examples
 
 ```ts
-// From VS Code extension anatomy docs: command registration pattern.
+import * as cp from 'node:child_process';
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
-  const disposable = vscode.commands.registerCommand('helloworld.helloWorld', () => {
-    vscode.window.showInformationMessage('Hello World!');
-  });
+type RuntimeKind = 'python' | 'powershell';
 
-  context.subscriptions.push(disposable);
+interface RuntimeResolution {
+  executable: string;
+  argsPrefix: string[];
 }
 
-export function deactivate() {}
-```
+export function activate(context: vscode.ExtensionContext): void {
+  const output = vscode.window.createOutputChannel('Scaffold Utils');
 
-```ts
-// From Task Provider guide: registerTaskProvider with resolveTask/provideTasks.
-import * as vscode from 'vscode';
-
-const taskProvider = vscode.tasks.registerTaskProvider('rake', {
-  provideTasks: () => getRakeTasks(),
-  resolveTask(_task: vscode.Task): vscode.Task | undefined {
-    const taskName = _task.definition.task;
-    if (!taskName) {
-      return undefined;
+  const helloPython = vscode.commands.registerCommand(
+    'scaffoldExtension.helloPython',
+    async () => {
+      await runBundledScriptCommand({
+        context,
+        output,
+        runtimeKind: 'python',
+        bundledRelativePath: 'resources/templates/hello_python.py',
+      });
     }
+  );
 
-    const definition = _task.definition as { type: string; task: string };
-    return new vscode.Task(
-      definition,
-      _task.scope ?? vscode.TaskScope.Workspace,
-      definition.task,
-      'rake',
-      new vscode.ShellExecution(`rake ${definition.task}`)
-    );
+  const helloPowerShell = vscode.commands.registerCommand(
+    'scaffoldExtension.helloPowerShell',
+    async () => {
+      await runBundledScriptCommand({
+        context,
+        output,
+        runtimeKind: 'powershell',
+        bundledRelativePath: 'resources/templates/hello_pwsh.ps1',
+      });
+    }
+  );
+
+  context.subscriptions.push(output, helloPython, helloPowerShell);
+}
+
+async function runBundledScriptCommand(input: {
+  context: vscode.ExtensionContext;
+  output: vscode.OutputChannel;
+  runtimeKind: RuntimeKind;
+  bundledRelativePath: string;
+}): Promise<void> {
+  const workspaceRoot = requireWorkspaceRoot();
+  const runtime = await resolveRuntime(input.runtimeKind);
+
+  const scriptUri = vscode.Uri.joinPath(
+    input.context.extensionUri,
+    input.bundledRelativePath
+  );
+
+  input.output.appendLine(`Running ${scriptUri.fsPath} in ${workspaceRoot.fsPath}`);
+
+  await execProcess(runtime.executable, [...runtime.argsPrefix, scriptUri.fsPath], {
+    cwd: workspaceRoot.fsPath,
+  });
+}
+
+function requireWorkspaceRoot(): vscode.Uri {
+  const folder = vscode.workspace.workspaceFolders?.[0];
+  if (!folder) {
+    throw new Error('No workspace is open. Open a folder and rerun the command.');
   }
-});
+  return folder.uri;
+}
+
+async function resolveRuntime(kind: RuntimeKind): Promise<RuntimeResolution> {
+  if (kind === 'python') {
+    return { executable: 'python', argsPrefix: [] };
+  }
+
+  // Prefer pwsh first; fallback to powershell if needed.
+  return { executable: 'pwsh', argsPrefix: ['-NoProfile', '-File'] };
+}
+
+function execProcess(
+  executable: string,
+  args: string[],
+  options: cp.SpawnOptions
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = cp.spawn(executable, args, {
+      ...options,
+      stdio: 'pipe',
+    });
+
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Process exited with code ${code ?? -1}`));
+      }
+    });
+  });
+}
 ```
 
 ### API and Schema Documentation
 
-- Extension manifest fields: name, publisher, engines.vscode, main, contributes.commands, contributes.taskDefinitions, activationEvents. (VS Code extension manifest docs)
-- Task provider API: vscode.tasks.registerTaskProvider, TaskDefinition, Task, ShellExecution/ProcessExecution. (Task Provider guide)
-- tasks.json schema for custom tasks and platform-specific overrides. (tasks-appendix)
-- Variable substitution for ${workspaceFolder} and OS-specific path handling. (variables-reference)
+- `commands.registerCommand` + `contributes.commands` are the canonical user-facing command path.
+- `ExtensionContext.extensionUri` and `Uri.joinPath` are the canonical way to locate packaged resources.
+- `window.createOutputChannel` is the canonical pattern for traceable command diagnostics.
+- `workspace.workspaceFolders` provides destination workspace resolution.
+- `child_process.spawn` with explicit args is the safest cross-platform process invocation pattern for file paths with spaces.
 
 ### Configuration Examples
 
 ```json
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Run tests",
-      "type": "shell",
-      "command": "./scripts/test.sh",
-      "windows": {
-        "command": ".\\scripts\\test.cmd"
+  "name": "scaffold-extension",
+  "displayName": "Scaffold Extension",
+  "version": "0.0.1",
+  "publisher": "drm-copilot",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "scaffoldExtension.helloPython",
+        "title": "Hello Python"
       },
-      "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
+      {
+        "command": "scaffoldExtension.helloPowerShell",
+        "title": "Hello PowerShell"
       }
-    }
-  ]
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "jest"
+  }
 }
 ```
 
 ### Technical Requirements
 
-- Scaffolding must create `hello_python.py` in the destination repo.
-- Extension must expose command **Hello Python** that runs the `hello_python.py` script and creates `artifacts/hello_python.txt` in the destination repo.
-- Scaffolding must create `hello_pwsh.ps1` in the destination repo.
-- Extension must expose command **Hello PowerShell** that runs the `hello_pwsh.ps1` script and creates `artifacts/hello_pwsh.txt` in the destination repo.
-- Commands must run without manual path edits in consuming workspaces.
-- Errors for missing Python/PowerShell runtimes must be explicit.
-- Cross-platform support for Windows/macOS/Linux with documented caveats.
+- Extension must be self-contained for script assets (`hello_python.py`, `hello_pwsh.ps1`).
+- Commands must execute bundled scripts directly from extension resources.
+- Artifacts must be created in destination workspace (`artifacts/hello_python.txt`, `artifacts/hello_pwsh.txt`).
+- No bundled hello script files may be copied into workspace root.
+- Missing workspace and missing runtime errors must be explicit, actionable, and logged.
+- Behavior must run on Windows/macOS/Linux with runtime probing (`python`, `pwsh` then `powershell`).
+- Test strategy must verify both positive behavior and no-copy invariant.
 
 **Mandatory unachievable objective callout**:
-- **None identified.** The requirements are achievable with a standard VS Code extension scaffold and task provider approach.
+- **None identified.** The self-contained execution model is achievable with standard VS Code extension APIs and Node subprocess primitives.
 
 ## Recommended Approach
 
-Create a minimal TypeScript-based VS Code extension scaffold in-repo (e.g., `extensions/scaffold-extension/`) with two user-facing commands and a lightweight scaffolding step.
+Implement a command-only, extension-side execution architecture (no workspace script materialization) with three concrete layers:
 
-1) **Scaffold templates**
-  - Bundle `hello_python.py` and `hello_pwsh.ps1` under `resources/templates/`.
-  - On first command invocation (or via a dedicated “Scaffold Hello Scripts” helper), copy these templates into the destination repo root using `vscode.workspace.fs`.
-2) **Commands**
-  - Register commands:
-    - `scaffoldExtension.helloPython` → **Hello Python**
-    - `scaffoldExtension.helloPowerShell` → **Hello PowerShell**
-  - Each command:
-    - Validates runtime availability (python/pwsh/powershell).
-    - Ensures templates exist in the workspace (copy if missing).
-    - Executes the workspace script (so the scaffolded file is the one that runs).
-    - Creates `artifacts/hello_python.txt` or `artifacts/hello_pwsh.txt` in the workspace.
-3) **Execution model**
-  - Use `ProcessExecution` or `ShellExecution` with args to avoid quoting issues and ensure paths with spaces work reliably across platforms.
-4) **README**
-  - Document “Hello Python” and “Hello PowerShell” commands, and the expected artifacts output.
+1. **Command/UX Layer**
+   - Register `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
+   - Validate workspace presence before any runtime or script execution.
+   - Emit start/success/failure telemetry to a dedicated OutputChannel.
 
-### Rationale
+2. **Execution Orchestration Layer**
+   - Resolve runtime executable (`python`; `pwsh` with fallback to `powershell`).
+   - Resolve script paths from extension resources with `context.extensionUri` + `Uri.joinPath`.
+   - Execute scripts through subprocess with `cwd` set to destination workspace root.
+   - Ensure process errors and non-zero exits are surfaced as actionable user errors.
 
-- Directly matches the new minimum viable requirements (scaffolded scripts + command execution + artifacts output).
-- Running the copied workspace scripts ensures the scaffolded files are actually used.
-- Uses only built-in Node.js + VS Code APIs; no new dependencies.
+3. **Script Contract Layer**
+   - Bundled scripts are responsible for creating `artifacts/*` under current working directory.
+   - Scripts must avoid assumptions about local source tree layout in destination workspace.
+   - Scripts should produce deterministic, testable output markers.
 
-### Rejected alternatives (brief)
+Why this is optimal:
+- Fully matches current `spec.md`/`user-story.md` no-copy requirement.
+- Keeps destination workspaces clean and independent from extension internals.
+- Provides the reusable production pattern the feature is intended to teach.
 
-- **Running only extension-bundled scripts**: conflicts with the requirement that scaffolding creates scripts in the destination repo and implies those scripts should be used.
-- **Templates-only with no commands**: fails explicit command requirements.
+Rejected alternatives (brief, non-exhaustive):
+- **Copying scripts into workspace root before execution**: rejected because it directly violates current acceptance criteria and no-copy invariants.
+- **Task-provider-first execution model for MVP**: rejected because it adds complexity without improving the core self-contained command flow.
 
 ## Implementation Guidance
 
-- **Objectives**: Build a minimal extension scaffold with commands, task provider, template copy, runtime detection, and README.
+- **Objectives**: Deliver a minimal VS Code extension that runs bundled hello scripts extension-side and writes only artifacts into destination workspace.
 - **Key Tasks**:
-  - Add `extensions/scaffold-extension/package.json` manifest with `contributes.commands`, `contributes.taskDefinitions`, and `activationEvents` (or rely on implicit command activation for modern VS Code).
-  - Add `src/extension.ts` implementing command registration, runtime detection, task provider, and template copy handler.
-  - Bundle template assets under `resources/templates/` and use `context.extensionUri` + `vscode.Uri.joinPath` for copy.
-  - Provide sample utilities under `resources/scripts/` (Python/PowerShell/Bash) invoked by commands/tasks.
-  - Add README with installation + first-run steps.
-- **Dependencies**: Built-in `child_process`, `path`, `os` only; no new external npm deps unless future testing requires `@vscode/test-electron`.
-- **Success Criteria**: Commands and tasks run for all three runtimes, template copy succeeds, and missing runtimes yield actionable errors; README covers first run.
-
-### Proposed State Model (runtime + execution)
-
-States: `Idle` → `CheckingRuntime` → (`RuntimeMissing` | `RuntimeAvailable`) → `RunningTask` → (`Succeeded` | `Failed`) → `Idle`
-
-Transitions:
-- `Idle` → `CheckingRuntime` on command invocation.
-- `CheckingRuntime` → `RuntimeMissing` on detection failure (surface error, stop).
-- `CheckingRuntime` → `RuntimeAvailable` on detection success.
-- `RuntimeAvailable` → `RunningTask` when task execution begins.
-- `RunningTask` → `Succeeded` or `Failed` on completion.
-
-### Update/Reporting Strategy
-
-- Use a dedicated `OutputChannel` to report status per command invocation.
-- Surface user-facing errors with `vscode.window.showErrorMessage` and detailed logs in the OutputChannel.
-
-### Pseudocode (command + execution flow)
-
-```ts
-const output = vscode.window.createOutputChannel('Scaffold Utils');
-
-async function runHello(kind: 'python' | 'powershell') {
-  output.appendLine(`[${kind}] Checking runtime...`);
-  const runtime = await detectRuntime(kind);
-  if (!runtime.found) {
-    output.appendLine(`[${kind}] Missing runtime: ${runtime.message}`);
-    vscode.window.showErrorMessage(runtime.message);
-    return;
-  }
-
-  const workspaceRoot = getWorkspaceRootOrThrow();
-  await ensureScaffoldedScripts(workspaceRoot); // copies hello_python.py + hello_pwsh.ps1
-
-  const scriptPath = kind === 'python'
-    ? path.join(workspaceRoot, 'hello_python.py')
-    : path.join(workspaceRoot, 'hello_pwsh.ps1');
-
-  output.appendLine(`[${kind}] Running ${path.basename(scriptPath)}...`);
-  const task = buildTaskForScript(kind, runtime.path, scriptPath, workspaceRoot);
-  const execution = await vscode.tasks.executeTask(task);
-
-  const onEnd = vscode.tasks.onDidEndTaskProcess((e) => {
-    if (e.execution === execution) {
-      if (e.exitCode === 0) {
-        output.appendLine(`[${kind}] Success.`);
-      } else {
-        output.appendLine(`[${kind}] Failed with exit code ${e.exitCode}.`);
-      }
-      onEnd.dispose();
-    }
-  });
-}
-```
-
-### Implementation Hooks (target files/locations)
-
-- Create new extension scaffold at `extensions/scaffold-extension/`:
-  - `package.json`: manifest, `contributes.commands` for **Hello Python** and **Hello PowerShell**, `activationEvents`, `main`.
-  - `src/extension.ts`: activate/deactivate, command registration, runtime detection, scaffold copy, task execution.
-  - `resources/templates/hello_python.py` and `resources/templates/hello_pwsh.ps1`: scaffolded scripts.
-  - `README.md`: install + first run (commands + artifacts output).
-
-### Risks and Mitigations
-
-- **Windows runtime naming**: PowerShell may be `pwsh` or `powershell`. Mitigate by probing both and reporting detected path.
-- **Shell quoting differences**: Prefer `ProcessExecution` with args or `ShellExecution` with args array. Avoid single-line shell strings for paths with spaces.
-- **Workspace missing**: Commands must guard against no workspace and surface actionable errors.
-
-### Testing Implications (design-level)
-
-- Unit tests for runtime detection helper (pure function, no external calls; inject a command-runner abstraction for stubbing).
-- Unit tests for scaffold copy helper (uses mocked `workspace.fs` to avoid temp files).
-- Unit tests for task creation (ensures correct command/args and cwd).
-- Integration test concept: run Hello commands in extension host test, verify artifacts files appear in workspace without using temp files.
+  - Scaffold extension under `extensions/scaffold-extension/` with manifest and TypeScript entrypoint.
+  - Add bundled scripts under `resources/templates/hello_python.py` and `resources/templates/hello_pwsh.ps1`.
+  - Implement runtime probe helpers and bundled script path resolver.
+  - Implement subprocess execution helper with explicit args and workspace `cwd`.
+  - Add error handling + OutputChannel logging paths.
+  - Add tests for command registration, runtime detection, script path resolution, subprocess success/failure, and no-copy invariant.
+  - Update README with architecture explanation and first-run validation.
+- **Dependencies**: Use existing repo TypeScript/Jest toolchain and Node built-ins (`child_process`, `path`, `fs`) plus VS Code API; no new runtime dependency is required.
+- **Success Criteria**:
+  - Both commands run bundled scripts and generate artifacts in workspace.
+  - Missing workspace/runtime produces clear actionable error.
+  - Tests confirm no `hello_python.py`/`hello_pwsh.ps1` is copied into workspace root.
+  - Final implementation behavior matches `spec.md` and `user-story.md` exactly.

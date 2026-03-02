@@ -7,14 +7,14 @@
 
 ## Story Statement
 
-- As a repo maintainer, I want a minimal VS Code extension scaffold that creates `hello_python.py` and `hello_pwsh.ps1` with runnable commands, so that downstream teams can adopt a consistent starter without wiring scripts by hand.
-- As a developer consuming the scaffold, I want to run “Hello Python” and “Hello PowerShell” from the Command Palette and get workspace artifacts, so that I can quickly verify runtime availability and end-to-end wiring.
+- As a framework architect, I want a minimal, working VS Code extension that demonstrates how extension code can discover workspace roots, validate runtimes, and execute bundled scripts from inside the extension package to produce deterministic artifacts in the destination workspace, so that the pattern can be replicated for production-ready extensions.
+- As an extension developer, I want to study the hello-world example (Hello Python and Hello PowerShell) to understand the scripting pattern: TypeScript command handler → runtime validation → extension-resource script resolution → subprocess execution against workspace context → artifact generation.
 
 ## Problem / Why
 
-Teams want to reuse proven Python, PowerShell, and Bash utilities from this repo, but there is no single, consistent extension scaffold that packages those tools with templates and tasks.
-This leads to copy-paste adoption, inconsistent setup, and higher onboarding costs across projects.
-A focused scaffold would standardize installation, usage, and upgrades for these utilities.
+The repo contains Python, PowerShell, JSON, and Bash QC tooling, but there is no extension framework that demonstrates how to invoke these tools from within a destination workspace.
+Without a proven pattern, teams cannot build production-ready extensions that leverage the repo's utilities or establish consistent extension-to-workspace scripting conventions.
+A minimal, well-tested scaffold establishes the foundational contract: how extension code discovers, validates, and invokes workspace tools programmatically.
 
 
 ## Personas & Scenarios
@@ -32,19 +32,26 @@ A focused scaffold would standardize installation, usage, and upgrades for these
     1) Open the repo in VS Code.
     2) Run “Hello Python” from the Command Palette.
     3) Run “Hello PowerShell” from the Command Palette.
-  - what obstacles or decisions occur? If Python or PowerShell is missing, they must install the runtime.
-  - what outcome do they expect? `hello_python.py` and `hello_pwsh.ps1` exist in the repo and `artifacts/hello_python.txt` + `artifacts/hello_pwsh.txt` are created with a success marker.
+  - what obstacles or decisions occur? If Python or PowerShell is missing, they must install the runtime shown in the error (`python`, `pwsh`, or `powershell`) and rerun.
+  - what outcome do they expect? The bundled extension scripts run successfully from extension resources, `artifacts/hello_python.txt` + `artifacts/hello_pwsh.txt` are created with a success marker, command lifecycle is visible in the `Scaffold Utils` OutputChannel, and no `hello_*.py`/`hello_*.ps1` files are copied into the destination workspace root.
 
 
 ## Acceptance Criteria
 
-- [ ] Scaffold includes a working VS Code extension manifest and entry point that registers **Hello Python** and **Hello PowerShell** commands.
-- [ ] Running **Hello Python** creates `hello_python.py` (if missing) and produces `artifacts/hello_python.txt` in the workspace.
-- [ ] Running **Hello PowerShell** creates `hello_pwsh.ps1` (if missing) and produces `artifacts/hello_pwsh.txt` in the workspace.
-- [ ] Commands run without manual path edits in the consumer workspace.
-- [ ] README documents installation, required runtimes (Python + PowerShell), and a minimal “first run” workflow using the two commands.
-- [ ] Missing runtimes surface clear, actionable errors naming the missing runtime.
-- [ ] Works on Windows, macOS, and Linux with documented platform caveats.
+- [ ] Extension manifest (`package.json`) and TypeScript entry point (`src/extension.ts`) are present and functional.
+- [ ] **Hello Python** command: discovers workspace root → validates Python runtime → resolves bundled extension script path → executes bundled `hello_python.py` → produces `artifacts/hello_python.txt`.
+- [ ] **Hello PowerShell** command: discovers workspace root → validates PowerShell runtime → resolves bundled extension script path → executes bundled `hello_pwsh.ps1` → produces `artifacts/hello_pwsh.txt`.
+- [ ] Runtime probe order is deterministic and testable: Python probes `python`; PowerShell probes `pwsh` then `powershell`.
+- [ ] Commands use workspace context without requiring local script files in the destination workspace.
+- [ ] Command execution does not copy `hello_python.py` or `hello_pwsh.ps1` into workspace root.
+- [ ] Runtime validation is explicit and surfaces clear, actionable errors (e.g., "Python not found on PATH").
+- [ ] Output is logged to the `Scaffold Utils` VS Code OutputChannel and includes runtime detection, script resolution, command start/end, and failure details.
+- [ ] Unit tests cover: command registration, runtime detection (present/missing), bundled script resolution/execution logic.
+- [ ] Integration tests cover: end-to-end execution of both commands on Windows and POSIX platforms.
+- [ ] Error cases are tested: no open workspace, missing Python, missing PowerShell, non-zero script exit.
+- [ ] Platform notes document runtime naming differences and expected runtime availability on Windows/macOS/Linux.
+- [ ] README documents the scripting pattern, required runtimes, and first-run workflow.
+- [ ] README includes a section on how the extension demonstrates the foundation for production extensions.
 
 
 ## Non-Goals
@@ -52,3 +59,6 @@ A focused scaffold would standardize installation, usage, and upgrades for these
 - Task provider integration and `tasks.json` auto-detection beyond the two hello commands.
 - A Bash “Hello” command in the MVP.
 - Publishing the scaffolded extension to the VS Code Marketplace.
+- Pre-installation of Python, PowerShell, or other runtimes; the extension detects and reports missing runtimes.
+- Environment scaffolding (pyproject.toml, poetry.toml, PoshQC setup); this tooling already exists in the repo.
+- Copying bundled hello scripts into destination workspace root as part of command execution.

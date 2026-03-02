@@ -1,0 +1,40 @@
+{
+  "name": "scaffold-extension",
+  "displayName": "scaffold-extension",
+  "description": "Extension-side bundled script execution utilities.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.108.0"
+  },
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "scaffoldExtension.helloPython",
+        "title": "Scaffold: Hello Python"
+      },
+      {
+        "command": "scaffoldExtension.helloPowerShell",
+        "title": "Scaffold: Hello PowerShell"
+      }
+    ]
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
+    "lint": "eslint --no-error-on-unmatched-pattern src test",
+    "typecheck": "tsc -p ./ --noEmit",
+    "test": "node run-jest.cjs"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.108.1",
+    "@jest/globals": "^30.0.0",
+    "eslint": "^9.39.2",
+    "jest": "^30.0.0",
+    "prettier": "^3.6.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0"
+  }
+}

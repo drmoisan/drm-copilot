@@ -9,52 +9,50 @@
 
 ## Overview
 
-Teams want to reuse proven Python and PowerShell utilities from this repo, but there is no single, consistent extension scaffold that packages a minimal runnable starter.
-This leads to copy-paste adoption, inconsistent setup, and higher onboarding costs across projects.
-The MVP scaffold provides a pair of “hello” scripts plus commands that run them and generate deterministic workspace artifacts, giving teams a reliable smoke test and a clear starting point for customization.
+The repo contains Python, PowerShell, JSON, and Bash QC tooling, but there is no extension framework that demonstrates how to invoke these tools from within a destination workspace.
+This MVP provides a minimal VS Code Extension scaffold that establishes the foundational pattern for extension-based workspace scripting:
+TypeScript command handler → runtime validation → extension-resource script resolution → subprocess execution against destination workspace context → artifact generation.
+Two "hello" commands serve as the proof-of-concept and test harness for future production extensions.
+The extension executes packaged scripts in place from extension resources and writes only output artifacts to the destination workspace; it does not materialize hello scripts into workspace root.
 
 
 ## Behavior
 
-Provide a minimal VS Code Extension scaffold that exposes two commands and ensures the corresponding scripts exist in the destination repo:
+Provide a minimal VS Code Extension that demonstrates the extension-to-workspace scripting pattern:
 
 - **Hello Python**
-	- Ensures `hello_python.py` exists in the workspace (copy from bundled template if missing).
-	- Verifies a Python runtime is available; if missing, shows a clear error.
-	- Executes `hello_python.py` from the workspace root.
-	- Ensures `artifacts/hello_python.txt` is created in the workspace.
+	- Discover active workspace root; fail with clear error if no workspace is open.
+	- Validate Python runtime availability (`python` on PATH); fail with clear error if missing.
+	- Resolve bundled `hello_python.py` path from inside the extension package.
+	- Execute bundled `hello_python.py` using subprocess, targeting the active destination workspace context.
+	- Ensure `artifacts/hello_python.txt` is created by the script.
+	- Log command lifecycle details to OutputChannel (runtime probe result, script path, start, completion, failure).
 - **Hello PowerShell**
-	- Ensures `hello_pwsh.ps1` exists in the workspace (copy from bundled template if missing).
-	- Verifies a PowerShell runtime is available (`pwsh` preferred, fallback to `powershell`); if missing, shows a clear error.
-	- Executes `hello_pwsh.ps1` from the workspace root.
-	- Ensures `artifacts/hello_pwsh.txt` is created in the workspace.
+	- Discover active workspace root; fail with clear error if no workspace is open.
+	- Validate PowerShell runtime availability (`pwsh` preferred, fallback to `powershell`); fail with clear error if missing.
+	- Resolve bundled `hello_pwsh.ps1` path from inside the extension package.
+	- Execute bundled `hello_pwsh.ps1` using subprocess, targeting the active destination workspace context.
+	- Ensure `artifacts/hello_pwsh.txt` is created by the script.
+	- Log command lifecycle details to OutputChannel (runtime probe result, script path, start, completion, failure).
 
 General behavior:
-- Commands run without manual path edits by resolving paths relative to the active workspace root.
-- If no workspace is open, commands fail with an actionable error.
-- Output is logged to a dedicated OutputChannel for traceability.
-- README provides a minimal “first run” walkthrough using both commands.
-- Scaffolded environments include:
-	- Python tooling with Poetry, Black, Ruff, Pyright, and Pytest.
-	- PowerShell tooling with the PoshQC package.
-- Python scaffolding must be expressed in `pyproject.toml` and `poetry.toml` using the exact content specified in this spec.
+- Commands run from TypeScript extension code via VS Code extension API after command registration in extension manifest and activation entrypoint.
+- Bundled script paths are resolved from extension installation resources; hello scripts are never copied into destination workspace root.
+- Runtimes are detected in extension code using deterministic probe order: `python` for Python; `pwsh` then `powershell` for PowerShell.
+- Output is logged to a dedicated OutputChannel ("Scaffold Utils") for traceability and debugging.
+- Error messages are clear and actionable (missing workspace, missing runtime, script non-zero exit), and failures include runtime/command context.
 
 
 ## Inputs / Outputs
 
 - Inputs
-	- Workspace root folder (required).
-	- Runtime availability: `python` on PATH; `pwsh` or `powershell` on PATH.
-	- Bundled templates: `resources/templates/hello_python.py`, `resources/templates/hello_pwsh.ps1`.
-	- Python environment scaffold assets/config for Poetry, Black, Ruff, Pyright, and Pytest (`pyproject.toml`, `poetry.toml`).
-	- PowerShell environment scaffold assets/config for PoshQC.
+	- Workspace root folder (required; extension fails if no workspace is open).
+	- Runtime availability: `python` on PATH; `pwsh` or `powershell` on PATH (probe order: `pwsh` then `powershell`).
+	- Bundled extension scripts: `resources/templates/hello_python.py`, `resources/templates/hello_pwsh.ps1`.
 - Outputs
-	- Workspace files created (if missing): `hello_python.py`, `hello_pwsh.ps1`.
 	- Artifacts written by scripts: `artifacts/hello_python.txt`, `artifacts/hello_pwsh.txt`.
-	- Logs: OutputChannel entries for runtime detection, execution start/end, and error details.
-	- Environment scaffold files for Python and PowerShell (see Implementation Strategy).
-	  - `pyproject.toml`
-	  - `poetry.toml`
+	- Logs: OutputChannel ("Scaffold Utils") entries for runtime detection attempts/results, script resolution path, execution start/end, and error details.
+	- No `hello_python.py` or `hello_pwsh.ps1` files are created in workspace root during command execution.
 - Config keys and defaults: None for the MVP.
 - Versioning or backward-compatibility constraints: None; MVP is additive and does not change existing runtime behavior.
 
@@ -69,23 +67,22 @@ Commands (Command Palette):
 	- Example: run “Hello PowerShell” → `artifacts/hello_pwsh.txt` created
 
 Contracts and validation rules:
-- If no workspace root is open, commands must fail with a user-facing error.
+- If no workspace root is open, commands must fail with a clear user-facing error.
 - If the required runtime is missing, commands must fail with an error that names the runtime (`python`, `pwsh`, `powershell`).
-- Commands must execute the workspace scripts (not only bundled templates) and must not require manual path edits.
-- Environment scaffolded files must be created in the workspace without requiring manual edits to run the hello commands.
-- The generated `pyproject.toml` must match the exact content specified below.
+- Commands must execute bundled extension scripts against destination workspace context and must not require manual path edits.
+- Commands must not copy bundled hello scripts into workspace root.
+- Command registration and invocation behavior must be testable via command IDs `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
 
 ## Data & State
 
 Data flow and state:
-- On command invocation, resolve workspace root → ensure template scripts are copied → execute script → write artifact file.
+- On command invocation, resolve workspace root → detect runtime → resolve bundled script path → execute script.
 - Runtime detection is ephemeral per invocation (no caching).
-- State transitions follow: `Idle` → `CheckingRuntime` → (`RuntimeMissing` | `RuntimeAvailable`) → `RunningTask` → (`Succeeded` | `Failed`) → `Idle`.
 
 Data transformations and invariants:
 - `artifacts/hello_python.txt` and `artifacts/hello_pwsh.txt` are always written under the active workspace root.
-- Script execution must use absolute paths derived from the workspace root to avoid manual edits.
-- Python and PowerShell environment scaffolds are additive and must not overwrite existing user configuration without explicit intent.
+- Script execution uses extension-bundled script paths with workspace root passed as execution context.
+- `hello_python.py` and `hello_pwsh.ps1` are never materialized in destination workspace root by command execution.
 
 Caching or persistence details:
 - None; no persistent extension state beyond created workspace files.
@@ -95,206 +92,62 @@ Migration or backfill requirements (if any):
 
 ## Constraints & Risks
 
-- Must not assume global installs beyond typical runtimes; must detect and report missing Python/PowerShell runtimes.
-- Extension packaging size should stay small; avoid bundling large binaries.
-- Cross-platform shell invocation differences may require platform-specific handling (especially on Windows paths with spaces).
-- Commands require a workspace root; running without a workspace is an explicit error path.
-- Scope risk: avoid turning into a full toolbox; keep the scaffold minimal and extensible.
-- Environment scaffolds should avoid pinning tool versions too tightly to reduce maintenance overhead.
+- Must not assume global installs beyond typical runtimes; detect and clearly report missing Python/PowerShell runtimes.
+- Extension packaging size must stay small; use only bundled `hello_*.py` and `hello_*.ps1` scripts.
+- Cross-platform shell invocation differences require robust platform-specific handling (path separators, shell paths).
+- Cross-platform invocation must handle Windows and POSIX differences without shell-string concatenation (explicit executable + args).
+- Commands require an active workspace root; running without a workspace is an explicit error path.
+- Scope risk: keep this MVP minimal and focused on the scripting pattern; future production extensions will extend this foundation.
+- No feature flags or staged rollout; extension loads in all environments but commands gracefully fail with clear errors.
 
 
 ## Implementation Strategy
 
 - Implementation scope (what changes, not sequencing):
-	- Add a minimal VS Code extension scaffold under `extensions/scaffold-extension/` with a manifest, entry point, and bundled templates.
-	- Provide two commands that copy templates (if missing), detect runtimes, and execute the workspace scripts to produce artifacts.
-	- Add Python environment scaffold assets/config for Poetry, Black, Ruff, Pyright, and Pytest via `pyproject.toml` and `poetry.toml`.
-	- Add PowerShell environment scaffold assets/config for PoshQC.
+	- Create a minimal VS Code extension under `extensions/scaffold-extension/` with manifest (`package.json`) and TypeScript entry point (`src/extension.ts`).
+	- Implement two commands (`scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`) that demonstrate the scripting pattern.
+	- Include bundled scripts (`resources/templates/hello_python.py` and `resources/templates/hello_pwsh.ps1`) executed directly from extension resources.
+	- Provide unit and integration tests with clear documentation of the extension-to-workspace scripting model.
 - New classes/functions/commands to add or update:
-	- `activate` and command registrations in `src/extension.ts`.
-	- `detectRuntime(kind)` helper (checks `python`, `pwsh`, `powershell`).
-	- `ensureScaffoldedScripts(workspaceRoot)` helper (copies templates to repo root if missing).
+	- `activate` function and command registrations in `src/extension.ts`.
+	- `detectRuntime(kind: string): Promise<string | null>` helper (checks `python`, and `pwsh` then `powershell` on PATH).
+	- `resolveBundledScriptPath(scriptName: string): string` helper (locates packaged script files in extension resources).
 	- Command handlers for `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
-	- `ensureScaffoldedEnvironments(workspaceRoot)` helper (copies Python/PowerShell environment scaffold files if missing).
+	- `executeBundledScriptInWorkspace(workspaceRoot: string, scriptPath: string, timeout?: number): Promise<void>` helper (runs packaged script via subprocess, captures output).
 - Dependency changes (new/removed packages) and rationale:
-	- None; use built-in Node.js and VS Code APIs only.
+	- None; use built-in Node.js and VS Code APIs only (no external npm packages beyond dev dependencies).
 - Logging/telemetry additions and locations:
-	- OutputChannel (e.g., “Scaffold Utils”) for runtime detection, execution, and errors.
+	- OutputChannel ("Scaffold Utils") for runtime detection, execution start/end, and error details.
 	- No telemetry in MVP.
 - Rollout plan (feature flags, staged deploys, fallback path):
-	- No feature flags; local scaffold only. Fail fast with clear errors on missing workspace or runtimes.
+	- No feature flags; extension loads in all environments. Commands fail gracefully with clear errors on missing workspace or runtimes.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos (Evidence: linked test plan and demo steps for both commands)
-- [ ] Behavior matches acceptance criteria in all documented environments (Evidence: command runs on Windows/macOS/Linux)
-- [ ] Tests updated/added (unit/integration as applicable) (Evidence: unit tests for runtime detection + scaffold copy)
-- [ ] Edge cases and error handling covered by tests (Evidence: missing workspace and missing runtime cases)
-- [ ] Docs updated (README, docs/features/active/... links) (Evidence: README includes first-run section)
-- [ ] Telemetry/logging added or updated (if applicable) (Evidence: OutputChannel logging verified)
-- [ ] Toolchain pass completed (format → lint → type-check → test) (Evidence: CI or local pass log)
-- [ ] Environment scaffolds documented and validated (Evidence: Python tooling + PoshQC setup present in scaffold output)
-- [ ] `pyproject.toml` and `poetry.toml` content matches the spec (Evidence: file comparison to spec template)
+- [ ] Extension manifest and entry point are present and register both hello commands.
+- [ ] Both commands execute successfully on Windows and POSIX platforms without manual edits.
+- [ ] Unit tests cover: command registration, runtime detection (present/missing cases), bundled script path resolution logic.
+- [ ] Integration tests verify end-to-end execution of both commands with artifact creation.
+- [ ] Error cases are tested: no open workspace, missing Python, missing PowerShell, non-zero script exit.
+- [ ] Output is logged to the "Scaffold Utils" OutputChannel with appropriate detail.
+- [ ] Tests verify no `hello_*.py`/`hello_*.ps1` files are copied into workspace root during command execution.
+- [ ] Runtime detection behavior is verified: Python probes `python`; PowerShell probes `pwsh` then `powershell` with actionable failure messaging.
+- [ ] README documents the scripting pattern, required runtimes, and first-run workflow.
+- [ ] README includes a section on how the extension demonstrates the foundation for production extensions.
+- [ ] Toolchain pass completed (format → lint → type-check → test).
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit tests for command registration and runtime detection logic.
-- [ ] Integration tests for running Hello Python and Hello PowerShell end-to-end.
-- [ ] Template copy logic verifies `hello_python.py` and `hello_pwsh.ps1` land in workspace root.
-- [ ] Errors when runtimes are missing or scripts exit non-zero.
-- [ ] Environment scaffold copy logic verifies Python tooling config and PoshQC assets land in workspace.
-- [ ] `pyproject.toml` content matches the specified template.
 
-## Python Scaffold Template (pyproject.toml)
-
-```toml
-[build-system]
-requires = ["poetry-core>=1.9.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-name = "drm-copilot"
-version = "0.1.1"
-description = "Tool for optimizing use of copilot and streamlining documentation."
-authors = ["Dan Moisan"]
-license = "MIT"
-readme = "README.md"
-packages = [
-	{ include = "scripts" },
-]
-
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-typer = ">=0.9.0"
-PyYAML = ">=6.0"
-numpy = ">=1.23"
-click = ">=8.1"
-pandas = ">=2.0"
-scikit-learn = ">=1.3"
-scipy = ">=1.10"
-requests = ">=2.31"
-beautifulsoup4 = ">=4.12"
-lxml = ">=5.3.0"
-pyarrow = ">=15.0"
-pdfplumber = ">=0.10.0"
-tensorflow = { version = ">=2.10.0", optional = true }
-joblib = { version = ">=1.1.0", optional = true }
-nltk = { version = ">=3.8", optional = true }
-keras-preprocessing = { version = ">=1.1", optional = true }
-openai = { version = ">=1.40.0", optional = true }
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.0"
-pytest-cov = ">=7.0"
-black = ">=23.0"
-ruff = "^0.5.3"
-pyright = "^1.1.407"
-pyperclip = "^1.11.0"
-jsonschema = "^4.25.1"
-types-beautifulsoup4 = ">=4.12.0.0"
-types-requests = ">=2.31.0.6"
-
-[tool.poetry.scripts]
-atomic-executor = "scripts.dev_tools.atomic_executor.cli:main"
-shell-qc = "scripts.dev_tools.shell_qc:main"
-shell-qc-check = "scripts.dev_tools.shell_qc:main_check"
-shell-qc-format = "scripts.dev_tools.shell_qc:main_format"
-shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
-
-# Dev Tools Aliases
-"dev.atomic-executor" = "scripts.dev_tools.atomic_executor.cli:main"
-"dev.clean-devcontainer" = "scripts.dev_tools.clean_devcontainer:main"
-"dev.collect-commit-context" = "scripts.dev_tools.collect_commit_context:main"
-"dev.fix-all" = "scripts.dev_tools.fix_all:main"
-"dev.format-json" = "scripts.dev_tools.format_json:main"
-"dev.format-markdown" = "scripts.dev_tools.markdown_label_formatter:main"
-"dev.new-active-feature" = "scripts.dev_tools.new_active_feature_folder:main"
-"dev.new-potential-bug" = "scripts.dev_tools.new_potential_bug_entry:main"
-"dev.potential-to-issue" = "scripts.dev_tools.potential_to_issue:main"
-"dev.pr-context" = "scripts.dev_tools.pr_context.collector:main"
-"dev.resolve-execute-plan" = "scripts.dev_tools.resolve_execute_plan_prompt:main"
-"dev.resolve-file-prompt" = "scripts.dev_tools.resolve_file_prompt:main"
-"dev.shell-qc" = "scripts.dev_tools.shell_qc:main"
-"dev.validate-json" = "scripts.dev_tools.validate_json:main"
-
-[tool.black]
-line-length = 88
-target-version = ["py310"]
-
-[tool.ruff]
-line-length = 88
-target-version = "py310"
-fix = true
-show-fixes = true
-
-[tool.ruff.lint]
-select = [
-	"E",    # pycodestyle errors
-	"F",    # pyflakes
-	"I",    # isort
-	"B",    # flake8-bugbear
-	"UP",   # pyupgrade
-	"S",    # flake8-bandit (security)
-	"TID",  # flake8-tidy-imports
-	"TCH",  # flake8-type-checking
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["S101"]
-"src/lexile_corpus_tuner/cli.py" = ["B008"]
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra"
-testpaths = ["tests"]
-
-[tool.coverage.run]
-source = ["src", "scripts/dev_tools"]
-data_file = "artifacts/.coverage"
-omit = [
-	"tests/*",
-	"*/tests/*",
-	"*/__pycache__/*",
-	"*/site-packages/*",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-	"pragma: no cover",
-	"def __repr__",
-	"raise AssertionError",
-	"raise NotImplementedError",
-	"if __name__ == .__main__.:",
-	"if TYPE_CHECKING:",
-	"@abstractmethod",
-	"@abc.abstractmethod",
-]
-
-[tool.pyright]
-include = ["src", "tests", "scripts"]
-extraPaths = ["src", "scripts"]
-typeCheckingMode = "strict"
-diagnosticMode = "workspace"
-reportMissingTypeArgument = "none"
-venvPath = "."
-venv = ".venv"
-exclude = [
-  "**/__pycache__",
-  ".idea",
-  ".ruff_cache",
-  ".venv",
-  "build",
-	"dist",
-	"artifacts"
-]
-reportUnknownParameterType = "error"
-reportUnknownArgumentType = "error"
-reportUnknownVariableType = "error"
-reportUnknownMemberType = "error"
-reportMissingImports = "error"
-reportGeneralTypeIssues = "error"
-reportOptionalMemberAccess = "error"
-reportOptionalSubscript = "error"
-reportPrivateUsage = "error"
-reportUntypedFunctionDecorator = "error"
-reportUntypedClassDecorator = "error"
-```
+- [ ] Unit test: command registration (both commands are registered correctly).
+- [ ] Unit test: runtime detection logic (happy path and missing runtime cases).
+- [ ] Unit test: bundled script path resolution logic (extension resource path discovery and validation).
+- [ ] Integration test: end-to-end execution of Hello Python on available platform.
+- [ ] Integration test: end-to-end execution of Hello PowerShell on available platform.
+- [ ] Test error case: no open workspace when running command.
+- [ ] Test error case: Python not available on PATH.
+- [ ] Test error case: PowerShell not available on PATH.
+- [ ] Test error case: script exits with non-zero status.
+- [ ] Artifact verification: `artifacts/hello_python.txt` created with expected content.
+- [ ] Artifact verification: `artifacts/hello_pwsh.txt` created with expected content.
+- [ ] OutputChannel logging verified for normal and error paths.
+- [ ] Invariant test: command execution does not create `hello_python.py` or `hello_pwsh.ps1` in workspace root.
