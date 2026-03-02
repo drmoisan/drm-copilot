@@ -113,7 +113,7 @@ describe("scaffold-extension integration behavior", () => {
     expect(options.cwd).toBe("C:/workspace");
   });
 
-  it("execution leaves no hello_python.py or hello_pwsh.ps1 in workspace root", async () => {
+  it("execution enforces no copy of hello_python.py or hello_pwsh.ps1 into workspace root", async () => {
     await handlerFor("scaffoldExtension.helloPython")();
     await handlerFor("scaffoldExtension.helloPowerShell")();
 

@@ -155,11 +155,19 @@ describe("scaffold-extension command behavior", () => {
     await expect(handler()).rejects.toThrow("No workspace");
   });
 
-  it("detectRuntime prefers pwsh then powershell", () => {
+  it("detectRuntime probes pwsh then powershell", () => {
     setExecutablePresence({ pwsh: true, powershell: true });
 
     const runtime = detectRuntime("powershell");
     expect(runtime.executable).toBe("pwsh");
+  });
+
+  it("missing PowerShell returns actionable runtime error when pwsh and powershell are unavailable", () => {
+    setExecutablePresence({ pwsh: false, powershell: false });
+
+    expect(() => detectRuntime("powershell")).toThrow(
+      "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
+    );
   });
 
   it("detectRuntime returns named Python error when python missing", () => {

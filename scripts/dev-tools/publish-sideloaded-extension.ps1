@@ -55,6 +55,78 @@ $ErrorActionPreference = "Stop"
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
 
+function Get-PackageManifest {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$PackageJsonPath
+    )
+
+    if (-not (Test-Path -LiteralPath $PackageJsonPath)) {
+        throw "package.json not found: $PackageJsonPath"
+    }
+
+    try {
+        $manifestJson = Get-Content -LiteralPath $PackageJsonPath -Raw
+        return ($manifestJson | ConvertFrom-Json)
+    } catch {
+        throw "Failed to parse package.json at '$PackageJsonPath': $($_.Exception.Message)"
+    }
+}
+
+function Test-IsVsCodeExtensionManifest {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [pscustomobject]$Manifest
+    )
+
+    if ($Manifest.PSObject.Properties.Match("engines").Count -eq 0) {
+        return $false
+    }
+
+    $engines = $Manifest.engines
+    if ($null -eq $engines -or $engines.PSObject.Properties.Match("vscode").Count -eq 0) {
+        return $false
+    }
+
+    $vscodeEngineVersion = $engines.vscode
+    return -not [string]::IsNullOrWhiteSpace([string]$vscodeEngineVersion)
+}
+
+function Resolve-ExtensionProjectRoot {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$RepoRoot,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$RelativeExtensionPath = "extensions\scaffold-extension"
+    )
+
+    $repoPackageJsonPath = Join-Path $RepoRoot "package.json"
+    $repoManifest = Get-PackageManifest -PackageJsonPath $repoPackageJsonPath
+    if (Test-IsVsCodeExtensionManifest -Manifest $repoManifest) {
+        return $RepoRoot
+    }
+
+    $extensionProjectRoot = Join-Path $RepoRoot $RelativeExtensionPath
+    $extensionPackageJsonPath = Join-Path $extensionProjectRoot "package.json"
+
+    if (Test-Path -LiteralPath $extensionPackageJsonPath) {
+        $extensionManifest = Get-PackageManifest -PackageJsonPath $extensionPackageJsonPath
+        if (Test-IsVsCodeExtensionManifest -Manifest $extensionManifest) {
+            return $extensionProjectRoot
+        }
+    }
+
+    throw "Could not find a VS Code extension manifest with 'engines.vscode'. Checked: $repoPackageJsonPath, $extensionPackageJsonPath"
+}
+
 function Invoke-ExternalCommand {
     [CmdletBinding()]
     param(
@@ -179,11 +251,46 @@ function Invoke-NpmCiWithRetry {
     }
 }
 
+function Invoke-ProjectCompile {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ProjectRoot
+    )
+
+    $manifestPath = Join-Path $ProjectRoot "package.json"
+    $manifest = Get-PackageManifest -PackageJsonPath $manifestPath
+
+    $hasCompileScript = $false
+    if ($manifest.PSObject.Properties.Match("scripts").Count -gt 0 -and $null -ne $manifest.scripts) {
+        $scripts = $manifest.scripts
+        if ($scripts.PSObject.Properties.Match("compile").Count -gt 0) {
+            $hasCompileScript = -not [string]::IsNullOrWhiteSpace([string]$scripts.compile)
+        }
+    }
+
+    if ($hasCompileScript) {
+        Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("run", "compile") -WorkingDirectory $ProjectRoot
+        return
+    }
+
+    $tsConfigPath = Join-Path $ProjectRoot "tsconfig.json"
+    if (Test-Path -LiteralPath $tsConfigPath) {
+        Invoke-ExternalCommand -FilePath "npx" -ArgumentList @("--yes", "tsc", "-p", "./") -WorkingDirectory $ProjectRoot
+        return
+    }
+
+    Write-Verbose ("Skipping compile for '{0}' because no npm compile script or tsconfig.json was found." -f $ProjectRoot)
+}
+
 if (-not (Test-Path -LiteralPath $RepoRoot)) {
     throw "RepoRoot does not exist: $RepoRoot"
 }
 
-$packageJsonPath = Join-Path $RepoRoot "package.json"
+$extensionProjectRoot = Resolve-ExtensionProjectRoot -RepoRoot $RepoRoot
+
+$packageJsonPath = Join-Path $extensionProjectRoot "package.json"
 if (-not (Test-Path -LiteralPath $packageJsonPath)) {
     throw "package.json not found at RepoRoot: $packageJsonPath"
 }
@@ -198,19 +305,19 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $vsixPath = Join-Path $VsixOutputDir ("drm-copilot-{0}.vsix" -f $timestamp)
 
 if (-not $SkipNpmCi) {
-    if ($PSCmdlet.ShouldProcess($RepoRoot, "npm ci")) {
-        Invoke-NpmCiWithRetry -WorkingDirectory $RepoRoot -ForceCleanup:$Force
+    if ($PSCmdlet.ShouldProcess($extensionProjectRoot, "npm ci")) {
+        Invoke-NpmCiWithRetry -WorkingDirectory $extensionProjectRoot -ForceCleanup:$Force
     }
 }
 
 if (-not $SkipCompile) {
-    if ($PSCmdlet.ShouldProcess($RepoRoot, "npm run compile")) {
-        Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("run", "compile") -WorkingDirectory $RepoRoot
+    if ($PSCmdlet.ShouldProcess($extensionProjectRoot, "compile extension project")) {
+        Invoke-ProjectCompile -ProjectRoot $extensionProjectRoot
     }
 }
 
-if ($PSCmdlet.ShouldProcess($RepoRoot, "npx vsce package")) {
-    Invoke-ExternalCommand -FilePath "npx" -ArgumentList @("--yes", "@vscode/vsce", "package", "--allow-missing-repository", "--skip-license", "--out", $vsixPath) -WorkingDirectory $RepoRoot
+if ($PSCmdlet.ShouldProcess($extensionProjectRoot, "npx vsce package")) {
+    Invoke-ExternalCommand -FilePath "npx" -ArgumentList @("--yes", "@vscode/vsce", "package", "--allow-missing-repository", "--skip-license", "--out", $vsixPath) -WorkingDirectory $extensionProjectRoot
 }
 
 if (-not (Test-Path -LiteralPath $vsixPath)) {

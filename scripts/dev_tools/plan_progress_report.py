@@ -342,6 +342,15 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         )
     )
     parser.add_argument(
+        "--feature",
+        type=Path,
+        default=None,
+        help=(
+            "Optional feature folder to scan directly (compatibility alias used "
+            "by older remediation plans)."
+        ),
+    )
+    parser.add_argument(
         "--active-root",
         type=Path,
         default=Path("docs/features/active"),
@@ -373,8 +382,9 @@ def main(argv: list[str] | None = None) -> int:
     """
 
     args = _parse_args(argv)
+    selected_root: Path = args.feature if args.feature is not None else args.active_root
     report = generate_plan_progress_report(
-        active_root=args.active_root, report_path=args.out
+        active_root=selected_root, report_path=args.out
     )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
