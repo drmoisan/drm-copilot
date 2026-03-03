@@ -292,6 +292,30 @@ jobs:
           path: artifacts/pester/kcov/**
           if-no-files-found: error
 
+  scaffold-extension-tests:
+    name: Scaffold Extension Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: extensions/scaffold-extension/package-lock.json
+
+      - name: Install extension dependencies
+        run: npm --prefix extensions/scaffold-extension ci
+
+      - name: Run extension unit/integration tests
+        run: npm --prefix extensions/scaffold-extension run test
+
 
 
 
