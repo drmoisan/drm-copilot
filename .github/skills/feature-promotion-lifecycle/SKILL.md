@@ -54,11 +54,19 @@ When orchestrator routing selects short path, promotion/folder initialization st
 3) Create active feature folder with short-path flag:
 - `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
 
-4) Create minimal short-path plan in `${feature-folder}` containing:
-- baseline capture,
-- delegation task for the small-path implementation engineer,
-- final QC block,
-- reduced small-audit handoff after implementation.
+4) Delegate minimal-audit plan creation to `atomic_planner` with directive:
+- `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
+
+5) Require preflight validation via `atomic_executor` until:
+- `PREFLIGHT: ALL CLEAR`
+
+6) Execute plan Phase 0 only via executor and checkpoint evidence.
+
+7) Branch:
+- manual bootstrap: save state and stop,
+- non-bootstrap: continue with constrained small-path development.
+
+8) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 
 ## Required Outputs for Downstream Handoffs
 

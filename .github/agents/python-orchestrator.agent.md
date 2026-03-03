@@ -5,9 +5,21 @@ description: Orchestrate end-to-end Python feature/bug delivery by estimating ch
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
 tools: ['execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
 handoffs:
+  - label: Build minimal-audit atomic plan (preflight all clear)
+    agent: atomic_planner
+    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR`. Return `plan-path` and final preflight signal."
+    send: true
+  - label: Execute Phase 0 only
+    agent: atomic_executor
+    prompt: "Execute the approved plan in `${feature-folder}` with strict phase scoping: run Phase 0 only and stop. Return execution summary and updated checklist state. Do not execute Phase 1 or Phase 2."
+    send: true
   - label: Small-scope implementation path
     agent: python-typed-engineer
     prompt: "Estimate and confirm scope (1-3 production Python files + corresponding tests). If confirmed, execute the short-path development phase against the provided `${feature-folder}` and minimal plan context: baseline capture, implementation, and full QA gates with final Ruff/Pyright/test/coverage deltas."
+    send: true
+  - label: Validate small-path delivery and post-QC docs
+    agent: atomic_executor
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
@@ -138,12 +150,35 @@ S2.6 Capture created folder path as `${feature-folder}`.
 
 ### Step S3 — Create minimal short-path plan
 
-Create a minimal plan artifact in `${feature-folder}` that includes:
-- baseline capture tasks,
-- explicit delegation task for handoff **Small-scope implementation path**,
-- final QC task block (Black → Ruff → Pyright → Pytest as applicable).
+S3.1 Delegate handoff **Build minimal-audit atomic plan (preflight all clear)**.
 
-### Step S4 — Delegate short-path development
+Hard enforcement for S3:
+- Handoff MUST include directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`.
+- Generated plan MUST include exactly 3 phases:
+  - Phase 0 baseline capture,
+  - Phase 1 placeholder for constrained small-path implementation work,
+  - Phase 2 final QC loop.
+- Plan MUST treat `${feature-folder}/issue.md` as sole requirements source (no `spec.md`).
+- Do not mark S3 complete until delegate returns `plan-path` and `PREFLIGHT: ALL CLEAR`.
+
+### Step S4 — Execute baseline phase only
+
+S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
+
+Hard enforcement for S4:
+- Execute only Phase 0.
+- Persist checkpoint with Phase 0 completion evidence.
+
+### Step S5 — Branch by bootstrap mode
+
+S5.1 If request is `manual bootstrap`:
+- Save checkpoint with `next_step` at Phase 1 resume point.
+- Stop execution and return resume instructions.
+
+S5.2 If request is small development (not manual bootstrap):
+- Continue to Step S6.
+
+### Step S6 — Delegate constrained small-path development
 
 Delegate to `python-typed-engineer` using handoff **Small-scope implementation path**.
 
@@ -153,14 +188,26 @@ Required delegation expectations:
 - final Ruff/Pyright/test/coverage deltas,
 - completion report referencing `${feature-folder}` and the minimal plan.
 
-### Step S5 — Validate QC and run reduced audit
+### Step S7 — Validate delivery and post-QC documentation
 
-S5.1 Confirm short-path QC completion from delegate output.
+S7.1 Delegate handoff **Validate small-path delivery and post-QC docs**.
 
-S5.2 Delegate handoff **Post-implementation small-path audit**.
+Hard enforcement for S7:
+- Validation MUST be against `${feature-folder}/issue.md`.
+- Plan checklist updates MUST be persisted before audit.
 
-Hard enforcement for S5:
-- Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}`.
+### Step S8 — Run reduced audit and remediation loop
+
+S8.1 Delegate handoff **Post-implementation small-path audit**.
+
+S8.2 If audit triggers remediation:
+- generate remediation inputs + remediation plan,
+- execute remediation,
+- re-run reduced audit,
+- repeat until ready-to-merge gate passes.
+
+Hard enforcement for S8:
+- Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
 
 ---
 
@@ -263,6 +310,7 @@ Checkpoint writes are mandatory after each completed sub-step in the large and s
 Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
+- If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
 
 Artifact verification gate before mission completion (large path):
 - At least one `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
