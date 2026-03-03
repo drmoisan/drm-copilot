@@ -38,6 +38,9 @@ Use this skill when:
 For short-path runs, also persist:
 - `small_path_qc_summary`
 - `small_path_audit_artifacts`
+- `bootstrap_mode` (`manual-bootstrap` or `auto-small-dev`)
+- `phase0_execution_summary`
+- `resume_after_manual_bootstrap` (next step token)
 
 ## Update Protocol
 

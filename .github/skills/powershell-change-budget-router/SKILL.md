@@ -26,7 +26,9 @@ Use this skill when:
 When routed through `powershell-orchestrator`, small path still requires lifecycle scaffolding before implementation:
 - promote potential item to GitHub issue with `--work-mode minor-audit`,
 - create active feature folder with `--work-mode minor-audit`,
-- create a minimal short-path plan (baseline, delegated implementation, QC, reduced audit),
+- delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,
+- require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`,
+- execute Phase 0 only via `atomic_executor` before branching,
 - run reduced small-audit after implementation and QC.
 
 Direct invocation of `powershell-typed-engineer` remains implementation-focused and does not replace orchestrator lifecycle steps.

@@ -27,6 +27,10 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 1) Baseline capture block
 - policy reads in required order,
 - baseline toolchain/test state capture for touched language(s).
+- required artifacts:
+	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
+	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
+	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
 
 2) Delegated implementation block
 - explicit handoff task to the small-path implementation engineer,
@@ -35,16 +39,48 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 3) Final QC block
 - full language-appropriate QA loop (format → lint → type-check when applicable → test),
 - rerun behavior when any step changes files or fails.
+- one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
+- each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
 
 4) Reduced audit block
 - explicit post-implementation small-audit handoff,
 - reduced artifact checks required by short-path policy.
+
+## Minimal-Audit Directive Contract (Small Path)
+
+For short-path planning handoffs, orchestrators MUST include:
+- `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
+
+Required planner outputs for this directive:
+- plan MUST use `${feature-folder}/issue.md` as sole requirements source,
+- plan MUST NOT require `spec.md`/`user-story.md`/`research.md`,
+- plan MUST include exactly 3 phases:
+	- Phase 0 baseline capture,
+	- Phase 1 placeholder for constrained small-path implementation,
+	- Phase 2 final QC loop,
+- planner MUST return `plan-path` and final preflight signal.
+
+## Phase-0-Only Execution Contract (Small Path)
+
+After preflight all-clear on the minimal-audit plan:
+- orchestrator MUST delegate to executor to run Phase 0 only,
+- orchestrator MUST checkpoint Phase 0 evidence before branching.
+
+Branching after Phase 0:
+- `manual bootstrap` → save state and stop for manual resume,
+- otherwise continue with constrained small-path development, then executor validation, then reduced audit/remediation loop.
 
 ## Phase 0 Requirements
 
 Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
 
 Phase 0 must also capture baseline toolchain results for the languages touched. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
+- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
+- baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
+
+`Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
 ## Final QA Loop (Required for Code/Test Changes)
 
