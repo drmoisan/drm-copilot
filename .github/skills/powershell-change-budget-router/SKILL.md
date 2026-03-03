@@ -21,6 +21,16 @@ Use this skill when:
 - `1-2` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
 - `>2` production files → **large path** (`powershell-orchestrator`).
 
+## Orchestrated Small-Path Requirements
+
+When routed through `powershell-orchestrator`, small path still requires lifecycle scaffolding before implementation:
+- promote potential item to GitHub issue with `--work-mode minor-audit`,
+- create active feature folder with `--work-mode minor-audit`,
+- create a minimal short-path plan (baseline, delegated implementation, QC, reduced audit),
+- run reduced small-audit after implementation and QC.
+
+Direct invocation of `powershell-typed-engineer` remains implementation-focused and does not replace orchestrator lifecycle steps.
+
 ## Direct-Mode Rejection Rule
 
 If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:
