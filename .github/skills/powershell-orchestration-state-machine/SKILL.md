@@ -29,9 +29,15 @@ Use this skill when:
 - `long-name`
 - `issue-num`
 - `feature-folder`
+- `work-mode` (`full` or `minor-audit`)
+- `plan-path` (minimal or full plan path)
 - `completed_steps`
 - `next_step`
 - `last_updated`
+
+For short-path runs, also persist:
+- `small_path_qc_summary`
+- `small_path_audit_artifacts`
 
 ## Update Protocol
 

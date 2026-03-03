@@ -1,13 +1,17 @@
 ---
 name: orchestrator
 model: GPT-5.3-Codex (copilot)
-description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes directly to a typed engineer, and routing larger efforts through scope → promotion → research/spec → atomic planning/execution → feature review until complete.
+description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
 tools: [execute, read, edit, search, agent, web, todo]
 handoffs:
   - label: Small-scope implementation path
     agent: python-typed-engineer
-    prompt: "Estimate and confirm scope (1-3 production Python files + corresponding tests). If confirmed, complete end-to-end workflow: baseline, planning (including atomic plan creation and preflight readiness), implementation, QA gates, and final report with Ruff/Pyright/test/coverage deltas."
+    prompt: "Estimate and confirm scope (1-3 production Python files + corresponding tests). If confirmed, execute the short-path development phase against the provided `${feature-folder}` and minimal plan context: baseline capture, implementation, and full QA gates with final Ruff/Pyright/test/coverage deltas."
+    send: true
+  - label: Post-implementation small-path audit
+    agent: feature_code_review_agent
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for `${feature-folder}` in short-path/minor-audit mode. Generate reduced audit artifacts required for short path (policy + feature acceptance focus) and trigger remediation planning only if required by that reduced gate."
     send: true
   - label: Fill potential entry details
     agent: prd_feature
@@ -97,17 +101,66 @@ Use these reusable skills to avoid duplicating shared operations:
 
 ## Small path (budget 1-3 production files and 1-3 test files)
 
-Delegate directly to `python-typed-engineer` using handoff **Small-scope implementation path**.
+Follow this exact sequence.
+
+### Step S1 — Scope potential feature/bug
+
+S1.1 Determine type and set `${promotion-type}`:
+- `feature` or `bug`
+
+S1.2 Generate `${short-name}`:
+- lowercase slug, hyphen-separated
+
+S1.3 Ensure potential entry exists using exact command by type when missing:
+- If `${promotion-type}` is `feature`:
+  - `${workspaceFolder}/scripts/dev-tools/new-potential-entry.ps1 -ShortName ${short-name}`
+- If `${promotion-type}` is `bug`:
+  - `${workspaceFolder}/scripts/dev_tools/new_potential_bug_entry.py --short-name ${short-name}`
+
+S1.4 Detect created/existing potential markdown file path and save as `${relativeFile}`.
+
+### Step S2 — Promote with short-path flag
+
+S2.1 Promote to issue using existing tooling with short-path flag set:
+- `poetry run python -m scripts.dev_tools.potential_to_issue --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+
+S2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
+
+S2.3 Parse promoted document to capture `${issue-num}`.
+
+S2.4 Create branch with exact name:
+- `${promotion-type}/${short-name}-${issue-num}`
+
+S2.5 Create active feature folder with short-path flag set:
+- `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+
+S2.6 Capture created folder path as `${feature-folder}`.
+
+### Step S3 — Create minimal short-path plan
+
+Create a minimal plan artifact in `${feature-folder}` that includes:
+- baseline capture tasks,
+- explicit delegation task for handoff **Small-scope implementation path**,
+- final QC task block (format/lint/type/test as applicable).
+
+### Step S4 — Delegate short-path development
+
+Delegate to `python-typed-engineer` using handoff **Small-scope implementation path**.
 
 Required delegation expectations:
-- plan + execute end-to-end,
+- baseline + implementation + QA closure,
 - strict QA gates,
 - final Ruff/Pyright/test/coverage deltas,
-- completion report.
+- completion report referencing `${feature-folder}` and the minimal plan.
 
-After handoff completion:
-- record completion in checkpoint,
-- provide concise final outcome to user.
+### Step S5 — Validate QC and run reduced audit
+
+S5.1 Confirm short-path QC completion from delegate output.
+
+S5.2 Delegate handoff **Post-implementation small-path audit**.
+
+Hard enforcement for S5:
+- Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}`.
 
 ---
 
@@ -205,7 +258,11 @@ On each invocation:
 4. If user explicitly asks to restart:
    - reset checkpoint and start at Phase 0.
 
-Checkpoint writes are mandatory after each completed sub-step in the large path sequence and after final completion in the small path.
+Checkpoint writes are mandatory after each completed sub-step in the large and small path sequences and after final completion.
+
+Artifact verification gate before mission completion (small path):
+- At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
+- At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
 
 Artifact verification gate before mission completion (large path):
 - At least one `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
@@ -218,7 +275,7 @@ Artifact verification gate before mission completion (large path):
 You are complete only when:
 - selected path has run end-to-end,
 - all required delegations completed,
-- feature review completed (large path),
+- feature review completed (large path) or reduced small-path audit completed (small path),
 - checkpoint indicates completed mission,
 - user receives concise summary with produced paths/artifacts and branch info.
 

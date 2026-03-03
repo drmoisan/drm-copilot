@@ -20,6 +20,26 @@ Use this skill when:
 - Tasks must start with: `- [ ] [P#-T#]` (or `[x]` for completed)
 - Task IDs must match their phase and be sequential per phase.
 
+## Short-Path Minimal Plan Contract
+
+When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
+
+1) Baseline capture block
+- policy reads in required order,
+- baseline toolchain/test state capture for touched language(s).
+
+2) Delegated implementation block
+- explicit handoff task to the small-path implementation engineer,
+- acceptance criteria for implementation completion.
+
+3) Final QC block
+- full language-appropriate QA loop (format → lint → type-check when applicable → test),
+- rerun behavior when any step changes files or fails.
+
+4) Reduced audit block
+- explicit post-implementation small-audit handoff,
+- reduced artifact checks required by short-path policy.
+
 ## Phase 0 Requirements
 
 Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
