@@ -1,6 +1,6 @@
 {
-  "name": "scaffold-extension",
-  "displayName": "scaffold-extension",
+  "name": "drm-copilot",
+  "displayName": "drm-copilot",
   "description": "Extension-side bundled script execution utilities.",
   "version": "0.0.1",
   "engines": {

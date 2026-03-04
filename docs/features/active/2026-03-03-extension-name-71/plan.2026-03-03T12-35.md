@@ -41,48 +41,48 @@
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline) when command runs.
 
 ### Phase 1 — Constrained Small-Path Implementation Placeholder
-- [ ] [P1-T1] Apply the constrained small-path fix so scaffolded extension identity resolves to `drm-copilot` instead of feature slug values.
+- [x] [P1-T1] Apply the constrained small-path fix so scaffolded extension identity resolves to `drm-copilot` instead of feature slug values.
   - Acceptance: Changed files are limited to the minimum naming-resolution implementation surface required by Issue #71 and directly related tests.
-- [ ] [P1-T2] Create targeted verification evidence artifact at `docs/features/active/2026-03-03-extension-name-71/evidence/other/targeted-verification-name.md`.
+- [x] [P1-T2] Create targeted verification evidence artifact at `docs/features/active/2026-03-03-extension-name-71/evidence/other/targeted-verification-name.md`.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline), and includes a headline confirming generated extension name is `drm-copilot`.
 
 ### Phase 2 — Final QC Loop
-- [ ] [P2-T1] Run final Python formatting step with `poetry run black .` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-format.md`.
+- [x] [P2-T1] Run final Python formatting step with `poetry run black .` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-format.md`.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: poetry run black .`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline).
-- [ ] [P2-T2] Run final Python lint step with `poetry run ruff check` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-lint.md`.
+- [x] [P2-T2] Run final Python lint step with `poetry run ruff check` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-lint.md`.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: poetry run ruff check`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: This task depends on [P2-T1] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline).
-- [ ] [P2-T3] Run final Python typecheck step with `poetry run pyright` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-typecheck.md`.
+- [x] [P2-T3] Run final Python typecheck step with `poetry run pyright` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-typecheck.md`.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: poetry run pyright`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: This task depends on [P2-T2] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline).
-- [ ] [P2-T4] Run final Python test step with `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-test.md`.
+- [x] [P2-T4] Run final Python test step with `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-python-test.md`.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: This task depends on [P2-T3] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline).
-- [ ] [P2-T5] If TypeScript scope is `IN_SCOPE`, run final TypeScript formatting step with `npm run format` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-format.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
+- [x] [P2-T5] Run final TypeScript formatting step with `npm run format` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-format.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: npm run format`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: If `OUT_OF_SCOPE`, `EXIT_CODE: SKIPPED` and `Output Summary: SKIPPED - TypeScript final QC format not required (no TS files touched)`.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline) when command runs.
-- [ ] [P2-T6] If TypeScript scope is `IN_SCOPE`, run final TypeScript lint step with `npm run lint` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-lint.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
+- [x] [P2-T6] Run final TypeScript lint step with `npm run lint` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-lint.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: npm run lint`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: If `OUT_OF_SCOPE`, `EXIT_CODE: SKIPPED` and `Output Summary: SKIPPED - TypeScript final QC lint not required (no TS files touched)`.
   - Acceptance: If `IN_SCOPE`, this task depends on [P2-T5] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline) when command runs.
-- [ ] [P2-T7] If TypeScript scope is `IN_SCOPE`, run final TypeScript typecheck step with `npm run typecheck` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-typecheck.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
+- [x] [P2-T7] Run final TypeScript typecheck step with `npm run typecheck` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-typecheck.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: npm run typecheck`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: If `OUT_OF_SCOPE`, `EXIT_CODE: SKIPPED` and `Output Summary: SKIPPED - TypeScript final QC typecheck not required (no TS files touched)`.
   - Acceptance: If `IN_SCOPE`, this task depends on [P2-T6] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline) when command runs.
-- [ ] [P2-T8] If TypeScript scope is `IN_SCOPE`, run final TypeScript test step with `npm run test` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-test.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
+- [x] [P2-T8] Run final TypeScript test step with `npm run test` in `extensions/scaffold-extension` and write artifact `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/final-qc-ts-test.md`; if `OUT_OF_SCOPE`, create the same artifact with explicit skip status.
   - Acceptance: The artifact exists and includes `Timestamp:`, `Command: npm run test`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: If `OUT_OF_SCOPE`, `EXIT_CODE: SKIPPED` and `Output Summary: SKIPPED - TypeScript final QC tests not required (no TS files touched)`.
   - Acceptance: If `IN_SCOPE`, this task depends on [P2-T7] success from the same QC attempt.
   - Acceptance: `Output Summary:` is a concise summary of command result signal (pass/fail, key counts, coverage/diagnostic headline) when command runs.
-- [ ] [P2-T9] Enforce final QC loop restart semantics by repeating Phase 2 command sequence from [P2-T1] (and [P2-T5] when `IN_SCOPE`) whenever any `EXIT_CODE` is non-zero or a formatting step changes files.
+- [x] [P2-T9] Enforce final QC loop restart semantics by repeating Phase 2 command sequence from [P2-T1] (and [P2-T5] when `IN_SCOPE`) whenever any `EXIT_CODE` is non-zero or a formatting step changes files.
   - Acceptance: The final set of Phase 2 evidence corresponds to one clean pass where all required non-skipped steps have `EXIT_CODE: 0`.
-- [ ] [P2-T10] Create reduced minor-audit end-state evidence artifact at `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/end-state-minor-audit.md`.
+- [x] [P2-T10] Create reduced minor-audit end-state evidence artifact at `docs/features/active/2026-03-03-extension-name-71/evidence/qa-gates/end-state-minor-audit.md`.
   - Acceptance: The artifact exists and includes `Issue: #71`, `Work Mode: minor-audit`, changed file list, `targeted-verification-name.md` path, and references to all generated `final-qc-*.md` evidence.

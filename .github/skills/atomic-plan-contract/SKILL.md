@@ -26,7 +26,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 
 1) Baseline capture block
 - policy reads in required order,
-- baseline toolchain/test state capture for touched language(s).
+- baseline toolchain/test state capture for each language that has explicit baseline command tasks in the plan.
 - required artifacts:
 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
@@ -41,6 +41,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 - rerun behavior when any step changes files or fails.
 - one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
 - each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
+- final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
 
 4) Reduced audit block
 - explicit post-implementation small-audit handoff,
@@ -91,6 +92,13 @@ Run the full toolchain loop for each applicable language in order:
 4) Testing
 
 If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
+
+## No-SKIPPED Rule for Planned Command Tasks
+
+For command-bearing tasks in approved plans (especially Phase 2 final-QC tasks):
+- if the task exists in the plan, the command must be executed and recorded,
+- `EXIT_CODE: SKIPPED` MUST NOT be used as a passing outcome,
+- exceptions are allowed only when the task text itself explicitly contains a skip branch and that branch is intentionally approved in requirements.
 
 ## Expect-Fail Test Tasks
 

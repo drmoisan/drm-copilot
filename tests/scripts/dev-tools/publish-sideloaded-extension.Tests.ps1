@@ -69,3 +69,14 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
         $result | Should -Be $repoRoot
     }
 }
+
+Describe "scaffold extension package identity" {
+    It "uses canonical drm-copilot name metadata" {
+        $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../../..")
+        $packageJsonPath = Join-Path $repoRoot "extensions/scaffold-extension/package.json"
+        $manifest = Get-Content -LiteralPath $packageJsonPath -Raw | ConvertFrom-Json
+
+        $manifest.name | Should -Be "drm-copilot"
+        $manifest.displayName | Should -Be "drm-copilot"
+    }
+}

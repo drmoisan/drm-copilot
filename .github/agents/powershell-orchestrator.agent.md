@@ -48,7 +48,7 @@ handoffs:
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
-    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Pass `PRBaseBranch` from orchestration context (default to `main` if missing). If remediation is required, trigger atomic planner remediation flow automatically."
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Resolve `PRBaseBranch` via `pr-base-branch-merge-base` and pass that resolved branch from orchestration context (do not default to `main` unless merge-base resolution fails for all candidates). If remediation is required, trigger atomic planner remediation flow automatically."
     send: true
 ---
 
@@ -63,6 +63,7 @@ You do not perform deep implementation yourself when a delegated specialist exis
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `pr-context-artifacts`
+- `pr-base-branch-merge-base`
 - `powershell-change-budget-router`
 - `powershell-orchestration-state-machine`
 - `feature-promotion-lifecycle`

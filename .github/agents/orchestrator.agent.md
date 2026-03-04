@@ -7,7 +7,7 @@ tools: [execute, read, edit, search, agent, web, todo]
 handoffs:
   - label: Build minimal-audit atomic plan (preflight all clear)
     agent: atomic_planner
-    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR`. Return `plan-path` and final preflight signal."
+    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Final-QC command tasks MUST be unconditional when present in the plan: do not add IN_SCOPE/OUT_OF_SCOPE branching and do not allow SKIPPED as a valid completion state for those tasks. Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR`. Return `plan-path` and final preflight signal."
     send: true
   - label: Execute Phase 0 only
     agent: atomic_executor
@@ -43,11 +43,11 @@ handoffs:
     send: true
   - label: Execute approved atomic plan
     agent: atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for touched languages and report lint/type/test/coverage deltas as applicable.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
-    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Pass `PRBaseBranch` from orchestration context (default to `main` if missing). If remediation is required, trigger atomic planner remediation flow automatically."
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Resolve `PRBaseBranch` via `pr-base-branch-merge-base` and pass that resolved branch from orchestration context (do not default to `main` unless merge-base resolution fails for all candidates). If remediation is required, trigger atomic planner remediation flow automatically."
     send: true
 ---
 
@@ -62,6 +62,7 @@ You do not perform deep implementation yourself when a delegated specialist exis
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `pr-context-artifacts`
+- `pr-base-branch-merge-base`
 - `feature-promotion-lifecycle`
 - `atomic-plan-contract`
 
@@ -159,6 +160,7 @@ Hard enforcement for S3:
   - Phase 1 placeholder for constrained small-path implementation work,
   - Phase 2 final QC loop.
 - Plan MUST treat `${feature-folder}/issue.md` as sole requirements source (no `spec.md`).
+- Final-QC command tasks in the generated plan MUST be unconditional when present; no IN_SCOPE/OUT_OF_SCOPE branches and no SKIPPED completion path unless explicitly required by the user.
 - Do not mark S3 complete until delegate returns `plan-path` and `PREFLIGHT: ALL CLEAR`.
 
 ### Step S4 — Execute baseline phase only
