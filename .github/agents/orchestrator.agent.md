@@ -39,11 +39,11 @@ handoffs:
     send: true
   - label: Build atomic plan (preflight all clear)
     agent: atomic_planner
-    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
+    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Plan MUST include explicit coverage-bearing baseline and final-QC testing tasks for each language in scope where policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
     send: true
   - label: Execute approved atomic plan
     agent: atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results; if those metrics are missing, mark execution as remediation-required rather than PASS.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
@@ -282,6 +282,7 @@ Delegate to `atomic_planner` via handoff **Build atomic plan (preflight all clea
 Hard enforcement for Step 4:
 - The planning route MUST be `atomic_planner -> atomic_executor` for preflight validation.
 - The planner MUST update `${plan-path}` in place and MUST NOT create additional `plan.*.md` files for revisions.
+- The approved plan MUST include explicit coverage capture tasks (baseline and final QC) for each language in scope where policy requires coverage.
 - Do not mark Step 4 complete until delegate output includes both a concrete `plan-path` and final `PREFLIGHT: ALL CLEAR`.
 
 ### Step 5 — Execute approved atomic plan
@@ -289,7 +290,7 @@ Hard enforcement for Step 4:
 Delegate to `atomic_executor` via handoff **Execute approved atomic plan** using the Step 4 approved `plan-path`.
 
 Hard enforcement for Step 5:
-- Do not mark Step 5 complete until execution output includes execution summary, QA summary, and lint/type/test/coverage deltas.
+- Do not mark Step 5 complete until execution output includes execution summary, QA summary, lint/type/test/coverage deltas, and numeric baseline/post/new-code coverage metrics where policy requires them.
 
 ### Step 6 — Post-implementation review
 
@@ -297,6 +298,7 @@ Delegate to `feature_code_review_agent` via handoff **Post-implementation featur
 
 Hard enforcement for Step 6:
 - Do not mark Step 6 complete until expected review artifacts are present on disk in `${feature-folder}`.
+- Do not accept PASS policy-audit outcomes that leave required coverage fields as `UNVERIFIED` for languages in scope.
 
 ---
 
