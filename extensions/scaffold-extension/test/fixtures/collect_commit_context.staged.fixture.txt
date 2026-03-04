@@ -1,0 +1,70 @@
+Please generate a commit message based on the following content:
+
+
+===== Repository remotes =====
+
+origin	https://example.test/repo.git (fetch)
+origin	https://example.test/repo.git (push)
+
+===== Current branch =====
+
+feature/expose-commit-script-74
+
+===== Upstream =====
+
+origin/feature/expose-commit-script-74
+
+===== Status (short) =====
+
+## feature/expose-commit-script-74...origin/feature/expose-commit-script-74
+M  scripts/dev_tools/collect_commit_context.py
+ M README.md
+?? docs/features/active/2026-03-03-expose-commit-script-74/
+
+===== Staged files (name-status) =====
+
+M	scripts/dev_tools/collect_commit_context.py
+
+===== Staged diff =====
+
+diff --git a/scripts/dev_tools/collect_commit_context.py b/scripts/dev_tools/collect_commit_context.py
+index 1111111..2222222 100644
+--- a/scripts/dev_tools/collect_commit_context.py
++++ b/scripts/dev_tools/collect_commit_context.py
+@@ -1,3 +1,4 @@
++fixture-staged-sentinel
+
+===== Unstaged files (name-status) =====
+
+M	README.md
+
+===== Unstaged diff =====
+
+diff --git a/README.md b/README.md
+index 3333333..4444444 100644
+--- a/README.md
++++ b/README.md
+@@ -10,3 +10,4 @@
++docs update
+
+===== Untracked files =====
+
+docs/features/active/2026-03-03-expose-commit-script-74/notes.md
+
+===== Diff stat (staged + unstaged) =====
+
+ 2 files changed, 2 insertions(+)
+
+===== Changed Python files =====
+
+scripts/dev_tools/collect_commit_context.py
+
+===== Last commit (header only) =====
+
+commit abcdef1234567890abcdef1234567890abcdef12
+Author:     Dan Moisan <dan@example.test>
+AuthorDate: Tue, 3 Mar 2026 20:11:00 +0000
+Commit:     Dan Moisan <dan@example.test>
+CommitDate: Tue, 3 Mar 2026 20:11:00 +0000
+
+    Add collect commit context scaffold wiring

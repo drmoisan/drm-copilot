@@ -104,6 +104,20 @@ function createMockProcess(exitCode: number): MockChildProcess {
   return processMock;
 }
 
+function createMockProcessWithStderr(
+  exitCode: number,
+  stderrLine: string,
+): MockChildProcess {
+  const processMock = new EventEmitter() as MockChildProcess;
+  processMock.stdout = new EventEmitter();
+  processMock.stderr = new EventEmitter();
+  process.nextTick(() => {
+    processMock.stderr.emit("data", Buffer.from(stderrLine, "utf-8"));
+    processMock.emit("close", exitCode);
+  });
+  return processMock;
+}
+
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {
     extensionUri: { fsPath: "C:/extension" },
@@ -146,6 +160,14 @@ describe("scaffold-extension command behavior", () => {
     expect(commandHandlers.has("scaffoldExtension.helloPowerShell")).toBe(true);
   });
 
+  it("registers collectCommitContext", () => {
+    activateAndGetHandler("scaffoldExtension.collectCommitContext");
+
+    expect(commandHandlers.has("scaffoldExtension.collectCommitContext")).toBe(
+      true,
+    );
+  });
+
   it("no workspace throws clear no-workspace error", async () => {
     workspaceFoldersState = undefined;
     setExecutablePresence({ python: true });
@@ -178,6 +200,28 @@ describe("scaffold-extension command behavior", () => {
     );
   });
 
+  it("collectCommitContext fails when no workspace folder is open", async () => {
+    workspaceFoldersState = undefined;
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await expect(handler()).rejects.toThrow("No workspace folder is open.");
+  });
+
+  it("collectCommitContext fails when python runtime is unavailable", async () => {
+    setExecutablePresence({ python: false });
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await expect(handler()).rejects.toThrow(
+      "Python runtime 'python' not found on PATH.",
+    );
+  });
+
   it("helloPython uses bundled extension script path", async () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
@@ -200,6 +244,77 @@ describe("scaffold-extension command behavior", () => {
     expect(args[args.length - 1]).toBe(
       "C:/extension/resources/templates/hello_pwsh.ps1",
     );
+  });
+
+  it("collectCommitContext passes explicit output args to bundled script", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/collect_commit_context.py",
+    );
+    expect(args[1]).toBe("--output");
+    expect(args[2]).toBe("artifacts/commit_context.txt");
+  });
+
+  it("collectCommitContext runs with workspace cwd", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await handler();
+
+    const [, , options] = childProcessMock.spawn.mock.calls[0] as [
+      string,
+      string[],
+      { cwd: string; shell: boolean },
+    ];
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
+  });
+
+  it("collectCommitContext logs and throws on non-zero exit", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await expect(handler()).rejects.toThrow("Command exited with code 2");
+
+    const logs = appendLineMock.mock.calls.map(([line]) => line);
+    expect(
+      logs.some((line) =>
+        line.includes(
+          "[scaffoldExtension.collectCommitContext] command failure",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it("collectCommitContext reports git failure details from collector stderr", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(
+      createMockProcessWithStderr(1, "git executable not found on PATH"),
+    );
+
+    const handler = activateAndGetHandler(
+      "scaffoldExtension.collectCommitContext",
+    );
+    await expect(handler()).rejects.toThrow("Command exited with code 1");
+
+    const logs = appendLineMock.mock.calls.map(([line]) => line);
+    expect(
+      logs.some((line) => line.includes("git executable not found on PATH")),
+    ).toBe(true);
   });
 
   it("helloPython uses explicit executable and argv arrays", async () => {

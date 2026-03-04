@@ -528,6 +528,18 @@ Once a path is confirmed:
 
 When updating an existing file, preserve non-plan content (for example, problem statements, context, or design notes); only replace or append the plan section.
 
+### 9.2.1 Caller-provided target path is authoritative (MANDATORY)
+
+When the calling system or handoff provides an explicit target plan file path (for example `${file}` or `${plan-path}`), you MUST:
+
+- Update that exact file in place.
+- Reuse that same file for every preflight revision iteration.
+- Return the same path in `plan-path` outputs unless the caller explicitly changes it.
+
+You MUST NOT create additional timestamped sibling files (for example `plan.<timestamp>.md`) when an authoritative target path has been supplied.
+
+If the provided path does not exist, create it once, then continue all revisions in that same file.
+
 CRITICAL (template normalization): When updating an existing plan template, you MUST normalize it to satisfy §2.5 and §2.6 even if the template uses different formatting (e.g., `### Phase 0:`). If the template conflicts with §2.5 (executor preflight), rewrite the template’s plan structure to match the canonical executor-compatible form.
 
 ### 9.3 Plan document format

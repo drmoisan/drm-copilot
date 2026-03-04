@@ -16,6 +16,10 @@
       {
         "command": "scaffoldExtension.helloPowerShell",
         "title": "Scaffold: Hello PowerShell"
+      },
+      {
+        "command": "scaffoldExtension.collectCommitContext",
+        "title": "Scaffold: Collect Commit Context"
       }
     ]
   },

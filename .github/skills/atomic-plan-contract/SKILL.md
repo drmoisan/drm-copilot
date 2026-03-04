@@ -113,6 +113,16 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
 
+## Plan-Path Continuity Contract (Mandatory)
+
+When a caller provides an explicit target plan file path (for example `${plan-path}` or `${file}`):
+
+- Planner MUST update that exact file in place.
+- Planner MUST reuse the same file for all preflight revision iterations.
+- Planner MUST NOT create additional timestamped sibling files (for example `plan.<timestamp>.md`) during the same planning cycle.
+
+If the provided path does not exist, it may be created once, then reused for all subsequent revisions in that cycle.
+
 ## Mode source precedence (Mandatory)
 
 When a plan is generated or validated from a feature folder, resolve selected mode in this order:

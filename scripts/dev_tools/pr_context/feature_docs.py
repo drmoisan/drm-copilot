@@ -73,6 +73,28 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
+def _latest_glob_path(directory: Path, pattern: str) -> Path | None:
+    """Return the lexicographically latest matching file path.
+
+    Purpose:
+        Feature folders commonly use timestamped filenames (for example
+        `plan.<timestamp>.md`). Lexicographic ordering over the timestamp suffix
+        yields deterministic "latest" selection.
+
+    Args:
+        directory (Path): Directory to search.
+        pattern (str): Glob pattern to match.
+
+    Returns:
+        Path | None: Latest matching path, or None if no matches.
+
+    Side Effects:
+        Reads directory entries.
+    """
+    matches = sorted(directory.glob(pattern))
+    return matches[-1] if matches else None
+
+
 def _verification_text(plan_text: str) -> str:
     for heading in ("Verification", "Test Plan"):
         section_text = parse_section(plan_text, heading)
@@ -82,13 +104,14 @@ def _verification_text(plan_text: str) -> str:
 
 
 def _parse_primary_issue_from_metadata(
-    *, spec_text: str, story_text: str
+    *, spec_text: str, story_text: str, issue_text: str
 ) -> str | None:
     """Parse deterministic primary issue from metadata lines only.
 
     Args:
         spec_text: Full `spec.md` text for the feature.
         story_text: Full `user-story.md` text for the feature.
+        issue_text: Full `issue.md` text for the feature (minor-audit source).
 
     Returns:
         A normalized issue reference (for example `#46`) when an explicit
@@ -101,8 +124,8 @@ def _parse_primary_issue_from_metadata(
     # deterministic primary issue source.
     pattern = re.compile(r"^\s*[-*]?\s*Issue:\s*(#\d+)\s*$", re.IGNORECASE)
 
-    # Prefer spec metadata first, then story metadata as fallback.
-    for source_text in (spec_text, story_text):
+    # Prefer spec metadata first, then story, then issue.md.
+    for source_text in (spec_text, story_text, issue_text):
         for line in source_text.splitlines():
             match = pattern.match(line)
             if match:
@@ -122,7 +145,15 @@ def _parse_readiness_value(text: str) -> str | None:
     Side Effects:
         None.
     """
-    match = re.search(r"^\s*Readiness:\s*(.+?)\s*$", text, flags=re.MULTILINE)
+    # Normalize away Markdown emphasis so template-driven lines like
+    # `**Overall feature readiness:** **PASS**` are parseable using a single
+    # canonical regex.
+    normalized = text.replace("**", "")
+    match = re.search(
+        r"^\s*(?:Readiness|Overall feature readiness):\s*(.+?)\s*$",
+        normalized,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )
     if not match:
         return None
     value = match.group(1).strip().upper()
@@ -131,26 +162,30 @@ def _parse_readiness_value(text: str) -> str | None:
     return None
 
 
-def _resolve_readiness_signal(feature_dir: Path) -> str | None:
-    """Resolve readiness signal from the latest `feature-audit.*.md` file.
+def _resolve_readiness_signal(feature_dir: Path) -> tuple[str | None, Path | None]:
+    """Resolve readiness signal from the newest readable `feature-audit.*.md`.
 
     Args:
         feature_dir: Active feature directory containing audit artifacts.
 
     Returns:
-        `PASS`, `NEEDS REVISION`, `BLOCKED`, or `None` when no parseable
-        readiness metadata exists.
+        tuple[str | None, Path | None]:
+            - Readiness (`PASS`, `NEEDS REVISION`, `BLOCKED`) or `None`.
+            - The audit file path that produced the readiness value, or `None`.
 
     Side Effects:
         Reads local feature audit files from disk.
     """
     audit_files = sorted(feature_dir.glob("feature-audit.*.md"))
     # Evaluate newest-first based on lexicographic timestamp suffix.
+    # Intent: We prefer the newest audit that contains a parseable readiness
+    # marker, which allows older audits to coexist without overriding newer
+    # PASS/REVISION/BLOCKED states.
     for audit_path in reversed(audit_files):
         readiness = _parse_readiness_value(_read_text(audit_path))
         if readiness:
-            return readiness
-    return None
+            return readiness, audit_path
+    return None, None
 
 
 def gather_feature_excerpts(
@@ -181,7 +216,16 @@ def gather_feature_excerpts(
             continue
 
         spec_path = active_dir / "spec.md"
+        issue_path = active_dir / "issue.md"
+
+        # Resolve plan path:
+        # - Prefer `plan.md` for legacy features.
+        # - Fall back to newest `plan.<timestamp>.md` for minor-audit flows.
         plan_path = active_dir / "plan.md"
+        if not plan_path.exists():
+            latest_plan = _latest_glob_path(active_dir, "plan.*.md")
+            if latest_plan is not None:
+                plan_path = latest_plan
         user_story_path: Path = active_dir / "user-story.md"
         promoted_story_path = (
             promoted_feature_dir / "user-story.md"
@@ -205,12 +249,14 @@ def gather_feature_excerpts(
             user_story_path = promoted_story_path
 
         spec_text = _read_text(spec_path)
+        issue_text = _read_text(issue_path)
         plan_text = _read_text(plan_path)
         primary_issue_ref = _parse_primary_issue_from_metadata(
             spec_text=spec_text,
             story_text=user_story_text,
+            issue_text=issue_text,
         )
-        readiness_signal = _resolve_readiness_signal(active_dir)
+        readiness_signal, readiness_source = _resolve_readiness_signal(active_dir)
 
         spec_parts: list[str] = []
         for heading in (
@@ -275,17 +321,19 @@ def gather_feature_excerpts(
             lines.append("(no spec/plan/user-story excerpts found)")
 
         context_files = [
-            str(path.relative_to(root))
-            for path in (spec_path, plan_path, user_story_path)
+            path.relative_to(root).as_posix()
+            for path in (spec_path, issue_path, plan_path, user_story_path)
             if path.exists()
         ]
+        if readiness_source is not None:
+            context_files.append(readiness_source.relative_to(root).as_posix())
         # Include canonical evidence files so downstream PR authoring can cite
         # only enumerated sources while preserving deterministic ordering.
         evidence_context_files = [
             path.as_posix() for path in discover_canonical_evidence_files(root, feature)
         ]
         issue_refs = extract_issue_references(
-            "\n".join([spec_text, plan_text, user_story_text])
+            "\n".join([spec_text, issue_text, plan_text, user_story_text])
         )
         excerpts.append(
             FeatureDocExcerpt(
