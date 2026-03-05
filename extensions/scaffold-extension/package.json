@@ -11,15 +11,15 @@
     "commands": [
       {
         "command": "scaffoldExtension.helloPython",
-        "title": "Scaffold: Hello Python"
+        "title": "drm-copilot: Hello Python"
       },
       {
         "command": "scaffoldExtension.helloPowerShell",
-        "title": "Scaffold: Hello PowerShell"
+        "title": "drm-copilot: Hello PowerShell"
       },
       {
         "command": "scaffoldExtension.collectCommitContext",
-        "title": "Scaffold: Collect Commit Context"
+        "title": "drm-copilot: Collect Commit Context"
       }
     ]
   },
