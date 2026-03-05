@@ -165,7 +165,7 @@ function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
   }
 
   return meaningfulLines.every(
-    (line) => line === heading || line.startsWith("Base branch:"),
+    (line) => line === heading || line.startsWith("Base ref"),
   );
 }
 
@@ -321,7 +321,7 @@ describe("scaffold-extension integration behavior", () => {
     expect(artifactText).toContain("(no staged changes)");
   });
 
-  it("collectPrContext executes bundled resource without workspace script copy", async () => {
+  it("collectPrContext executes canonical package module in destination workspace", async () => {
     await handlerFor("scaffoldExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
@@ -329,10 +329,8 @@ describe("scaffold-extension integration behavior", () => {
       string[],
       { cwd: string },
     ];
-    const scriptPath = normalizePath(args[0]);
-
-    expect(scriptPath.startsWith("C:/extension/")).toBe(true);
-    expect(scriptPath.includes("C:/workspace/")).toBe(false);
+    expect(args).toContain("-m");
+    expect(args).toContain("scripts.dev_tools.pr_context.collector");
     expect(args).toContain("--base");
     expect(options.cwd).toBe("C:/workspace");
   });
@@ -377,23 +375,25 @@ describe("scaffold-extension integration behavior", () => {
         generatedArtifacts.set(
           `${options.cwd}/${summaryRelativePath}`,
           [
-            "# PR Context Summary",
+            "===== PR Intent =====",
+            "Primary outcome:",
+            "User/dev impact:",
             "",
-            "## Base/Head",
-            "- Base SHA: abc123",
-            "- Head SHA: def456",
+            "===== Base/Head =====",
+            "Base ref (requested): origin/main",
             "",
-            "## Changed files",
-            "- extensions/scaffold-extension/resources/templates/collect_pr_context.py",
+            "===== Changed files (name-status) =====",
+            "M\textensions/scaffold-extension/resources/templates/collect_pr_context.py",
             "",
           ].join("\n"),
         );
         generatedArtifacts.set(
           `${options.cwd}/${appendixRelativePath}`,
           [
-            "# PR Context Appendix",
+            "===== Comparison metadata =====",
+            "Base ref: origin/main",
             "",
-            "## Numstat",
+            "===== Numstat =====",
             "12\t3\textensions/scaffold-extension/resources/templates/collect_pr_context.py",
             "",
           ].join("\n"),
@@ -419,14 +419,19 @@ describe("scaffold-extension integration behavior", () => {
       generatedArtifacts.get(
         "C:/workspace/artifacts/pr_context.appendix.txt",
       ) ?? "";
-    expect(summaryText).toContain("## Base/Head");
-    expect(summaryText).toContain("## Changed files");
-    expect(appendixText).toContain("## Numstat");
-    expect(isPlaceholderOnlyArtifact(summaryText, "# PR Context Summary")).toBe(
-      false,
-    );
+    expect(summaryText).toContain("===== PR Intent =====");
+    expect(summaryText).toContain("===== Base/Head =====");
+    expect(summaryText).toContain("===== Changed files (name-status) =====");
+    expect(appendixText).toContain("===== Comparison metadata =====");
+    expect(appendixText).toContain("===== Numstat =====");
     expect(
-      isPlaceholderOnlyArtifact(appendixText, "# PR Context Appendix"),
+      isPlaceholderOnlyArtifact(summaryText, "===== PR Intent ====="),
+    ).toBe(false);
+    expect(
+      isPlaceholderOnlyArtifact(
+        appendixText,
+        "===== Comparison metadata =====",
+      ),
     ).toBe(false);
   });
 });

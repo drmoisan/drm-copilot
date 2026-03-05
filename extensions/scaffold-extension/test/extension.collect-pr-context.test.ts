@@ -181,46 +181,6 @@ function createMockProcessWithStderr(
   return processMock;
 }
 
-function createMockProcessWithStdout(
-  exitCode: number,
-  stdoutLine: string,
-): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.stdout.emit("data", Buffer.from(stdoutLine, "utf-8"));
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
-}
-
-function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
-  const meaningfulLines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-  if (meaningfulLines.length === 0) {
-    return true;
-  }
-
-  return meaningfulLines.every(
-    (line) => line === heading || line.startsWith("Base branch:"),
-  );
-}
-
-function extractPrContextArtifactFromLogs(
-  logs: ReadonlyArray<string>,
-  heading: string,
-): string {
-  const emittedArtifact = logs.find((line) => line.includes(heading));
-  if (!emittedArtifact) {
-    return "";
-  }
-
-  return emittedArtifact;
-}
-
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {
     extensionUri: { fsPath: "C:/extension" },
@@ -317,6 +277,8 @@ describe("scaffold-extension collectPrContext command behavior", () => {
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("-m");
+    expect(args).toContain("scripts.dev_tools.pr_context.collector");
     expect(args).toContain("--base");
     expect(args).toContain("--out");
     expect(args).toContain("artifacts/pr_context.summary.txt");
@@ -382,40 +344,16 @@ describe("scaffold-extension collectPrContext command behavior", () => {
     ).toBe(true);
   });
 
-  it("fails_when_summary_is_placeholder_only", async () => {
+  it("collectPrContext executes canonical package module", async () => {
     setExecutablePresence({ python: true });
-    const substantiveSummary =
-      "# PR Context Summary\n\n## Base/Head\n- Base SHA: abc123\n- Head SHA: def456\n";
-    const substantiveAppendix =
-      "# PR Context Appendix\n\n## Numstat\n12\t3\tsrc/file.py\n";
-    childProcessMock.spawn.mockReturnValue(
-      createMockProcessWithStdout(
-        0,
-        `${substantiveSummary}\n${substantiveAppendix}`,
-      ),
-    );
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
 
     await handler();
 
-    const logs = appendLineMock.mock.calls.map(([line]) => line);
-    const capturedSummary = extractPrContextArtifactFromLogs(
-      logs,
-      "# PR Context Summary",
-    );
-    const capturedAppendix = extractPrContextArtifactFromLogs(
-      logs,
-      "# PR Context Appendix",
-    );
-
-    expect(capturedSummary).toContain("## Base/Head");
-    expect(capturedAppendix).toContain("## Numstat");
-    expect(
-      isPlaceholderOnlyArtifact(capturedSummary, "# PR Context Summary"),
-    ).toBe(false);
-    expect(
-      isPlaceholderOnlyArtifact(capturedAppendix, "# PR Context Appendix"),
-    ).toBe(false);
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[0]).toBe("-m");
+    expect(args[1]).toBe("scripts.dev_tools.pr_context.collector");
   });
 });
