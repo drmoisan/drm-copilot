@@ -20,6 +20,10 @@
       {
         "command": "scaffoldExtension.collectCommitContext",
         "title": "drm-copilot: Collect Commit Context"
+      },
+      {
+        "command": "scaffoldExtension.collectPrContext",
+        "title": "drm-copilot: Collect PR Context"
       }
     ]
   },
