@@ -155,6 +155,20 @@ function loadFixtureArtifact(fixtureFileName: string): string {
   return realFs.readFileSync(fixturePath, "utf-8");
 }
 
+function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
+  const meaningfulLines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (meaningfulLines.length === 0) {
+    return true;
+  }
+
+  return meaningfulLines.every(
+    (line) => line === heading || line.startsWith("Base branch:"),
+  );
+}
+
 describe("scaffold-extension integration behavior", () => {
   beforeEach(() => {
     handlers.clear();
@@ -362,11 +376,27 @@ describe("scaffold-extension integration behavior", () => {
 
         generatedArtifacts.set(
           `${options.cwd}/${summaryRelativePath}`,
-          "# PR Context Summary\n\nBase branch: origin/main\n",
+          [
+            "# PR Context Summary",
+            "",
+            "## Base/Head",
+            "- Base SHA: abc123",
+            "- Head SHA: def456",
+            "",
+            "## Changed files",
+            "- extensions/scaffold-extension/resources/templates/collect_pr_context.py",
+            "",
+          ].join("\n"),
         );
         generatedArtifacts.set(
           `${options.cwd}/${appendixRelativePath}`,
-          "# PR Context Appendix\n\nBase branch: origin/main\n",
+          [
+            "# PR Context Appendix",
+            "",
+            "## Numstat",
+            "12\t3\textensions/scaffold-extension/resources/templates/collect_pr_context.py",
+            "",
+          ].join("\n"),
         );
 
         return mockProcessSuccess();
@@ -381,5 +411,22 @@ describe("scaffold-extension integration behavior", () => {
     expect(
       generatedArtifacts.has("C:/workspace/artifacts/pr_context.appendix.txt"),
     ).toBe(true);
+
+    const summaryText =
+      generatedArtifacts.get("C:/workspace/artifacts/pr_context.summary.txt") ??
+      "";
+    const appendixText =
+      generatedArtifacts.get(
+        "C:/workspace/artifacts/pr_context.appendix.txt",
+      ) ?? "";
+    expect(summaryText).toContain("## Base/Head");
+    expect(summaryText).toContain("## Changed files");
+    expect(appendixText).toContain("## Numstat");
+    expect(isPlaceholderOnlyArtifact(summaryText, "# PR Context Summary")).toBe(
+      false,
+    );
+    expect(
+      isPlaceholderOnlyArtifact(appendixText, "# PR Context Appendix"),
+    ).toBe(false);
   });
 });
