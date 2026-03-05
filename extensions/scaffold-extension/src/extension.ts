@@ -17,6 +17,11 @@ interface CommandSpec {
   readonly args?: ReadonlyArray<string>;
 }
 
+interface BranchDiscoveryResult {
+  readonly candidates: ReadonlyArray<string>;
+  readonly defaultBranch: string;
+}
+
 function createOutputChannel(): vscode.OutputChannel {
   return vscode.window.createOutputChannel("Scaffold Utils");
 }
@@ -136,6 +141,172 @@ function runCommandWithOutput(
   });
 }
 
+function runGitForTextOutput(
+  output: vscode.OutputChannel,
+  commandId: string,
+  cwd: string,
+  args: ReadonlyArray<string>,
+  allowNonZeroExit: boolean,
+): string {
+  const result = cp.spawnSync("git", args, {
+    cwd,
+    encoding: "utf-8",
+    shell: false,
+  });
+
+  const status = result.status;
+  if (!allowNonZeroExit && status !== 0) {
+    const stderr = (result.stderr ?? "").trim();
+    output.appendLine(
+      `[${commandId}] git command failure: git ${args.join(" ")}`,
+    );
+    throw new Error(
+      `Git command failed (${status ?? "unknown"}): ${stderr || "no stderr output"}`,
+    );
+  }
+
+  return (result.stdout ?? "").trim();
+}
+
+function scoreBranchForPriority(branchName: string): number {
+  if (branchName === "main") {
+    return 0;
+  }
+
+  if (branchName === "master") {
+    return 1;
+  }
+
+  if (branchName === "develop") {
+    return 2;
+  }
+
+  if (branchName === "trunk") {
+    return 3;
+  }
+
+  if (/^release([/.-]|$)/.test(branchName)) {
+    return 4;
+  }
+
+  return 5;
+}
+
+function sortRemoteBranchCandidates(
+  candidates: ReadonlyArray<string>,
+): string[] {
+  return [...candidates].sort((left, right) => {
+    const leftName = left.replace(/^origin\//, "");
+    const rightName = right.replace(/^origin\//, "");
+    const scoreDelta =
+      scoreBranchForPriority(leftName) - scoreBranchForPriority(rightName);
+    if (scoreDelta !== 0) {
+      return scoreDelta;
+    }
+
+    return left.localeCompare(right);
+  });
+}
+
+function discoverPrBaseBranches(
+  output: vscode.OutputChannel,
+  commandId: string,
+  workspaceRoot: string,
+): BranchDiscoveryResult {
+  const originHead = runGitForTextOutput(
+    output,
+    commandId,
+    workspaceRoot,
+    ["symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD"],
+    true,
+  );
+
+  const remoteRefLines = runGitForTextOutput(
+    output,
+    commandId,
+    workspaceRoot,
+    ["for-each-ref", "--format=%(refname:short)", "refs/remotes/origin"],
+    false,
+  )
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .filter((line) => line !== "origin/HEAD");
+
+  const uniqueRemoteRefs = Array.from(new Set(remoteRefLines));
+  const sortedRemoteRefs = sortRemoteBranchCandidates(uniqueRemoteRefs);
+
+  if (sortedRemoteRefs.length > 0) {
+    if (originHead.length > 0 && sortedRemoteRefs.includes(originHead)) {
+      const candidates = [
+        originHead,
+        ...sortedRemoteRefs.filter((item) => item !== originHead),
+      ];
+      return {
+        candidates,
+        defaultBranch: originHead,
+      };
+    }
+
+    return {
+      candidates: sortedRemoteRefs,
+      defaultBranch: sortedRemoteRefs[0]!,
+    };
+  }
+
+  const localRefLines = runGitForTextOutput(
+    output,
+    commandId,
+    workspaceRoot,
+    ["for-each-ref", "--format=%(refname:short)", "refs/heads"],
+    false,
+  )
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const uniqueLocalRefs = Array.from(new Set(localRefLines)).sort(
+    (left, right) => left.localeCompare(right),
+  );
+
+  if (uniqueLocalRefs.length === 0) {
+    throw new Error("No branch candidates found in destination repository.");
+  }
+
+  return {
+    candidates: uniqueLocalRefs,
+    defaultBranch: uniqueLocalRefs[0]!,
+  };
+}
+
+async function pickPrBaseBranch(
+  output: vscode.OutputChannel,
+  commandId: string,
+  candidates: ReadonlyArray<string>,
+  defaultBranch: string,
+): Promise<string | undefined> {
+  const quickPickItems = candidates.map((branch) => ({
+    label: branch,
+    description: branch === defaultBranch ? "default" : "",
+  }));
+
+  const selectedItem = await vscode.window.showQuickPick(quickPickItems, {
+    title: "Select PR base branch",
+    placeHolder: "Choose the base branch used for PR context collection",
+    ignoreFocusOut: true,
+  });
+
+  if (!selectedItem) {
+    output.appendLine(`[${commandId}] branch selection canceled by user`);
+    return undefined;
+  }
+
+  output.appendLine(
+    `[${commandId}] selected base branch: ${selectedItem.label}`,
+  );
+  return selectedItem.label;
+}
+
 async function executeBundledScript(
   context: vscode.ExtensionContext,
   output: vscode.OutputChannel,
@@ -213,10 +384,60 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const collectPrContextDisposable = vscode.commands.registerCommand(
+    "scaffoldExtension.collectPrContext",
+    async () => {
+      const commandId = "scaffoldExtension.collectPrContext";
+      const workspaceRoot = getWorkspaceRoot();
+      output.appendLine(`[${commandId}] branch discovery start`);
+
+      let discoveryResult: BranchDiscoveryResult;
+      try {
+        discoveryResult = discoverPrBaseBranches(
+          output,
+          commandId,
+          workspaceRoot,
+        );
+      } catch (error: unknown) {
+        output.appendLine(`[${commandId}] branch discovery failure`);
+        throw error;
+      }
+
+      output.appendLine(
+        `[${commandId}] branch discovery success: ${discoveryResult.candidates.join(", ")}`,
+      );
+
+      const selectedBase = await pickPrBaseBranch(
+        output,
+        commandId,
+        discoveryResult.candidates,
+        discoveryResult.defaultBranch,
+      );
+      if (!selectedBase) {
+        return;
+      }
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/collect_pr_context.py",
+        commandId,
+        args: [
+          "--base",
+          selectedBase,
+          "--out",
+          "artifacts/pr_context.summary.txt",
+          "--appendix-out",
+          "artifacts/pr_context.appendix.txt",
+        ],
+      });
+    },
+  );
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
     collectCommitContextDisposable,
+    collectPrContextDisposable,
     output,
   );
 }

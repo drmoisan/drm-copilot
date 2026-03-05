@@ -16,12 +16,15 @@ type MockChildProcess = EventEmitter & {
 
 const commandHandlers = new Map<string, CommandHandler>();
 const appendLineMock = jest.fn<(line: string) => void>();
+const showQuickPickMock = jest.fn();
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
     commandHandlers.set(command, handler);
     return { dispose: jest.fn() };
   },
 );
+
+let quickPickResultLabel: string | undefined = "origin/main";
 
 let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
@@ -38,6 +41,7 @@ jest.mock(
         appendLine: appendLineMock,
         dispose: jest.fn(),
       })),
+      showQuickPick: showQuickPickMock,
     },
     workspace: {
       get workspaceFolders() {
@@ -59,6 +63,7 @@ jest.mock("node:fs", () => ({
 
 jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
+  spawnSync: jest.fn(),
 }));
 
 import { activate, detectRuntime } from "../src/extension";
@@ -69,7 +74,67 @@ const fsMock = jest.requireMock("node:fs") as {
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
+  spawnSync: jest.Mock;
 };
+
+function setGitBranchDiscoveryState(input: {
+  readonly originHead?: string;
+  readonly remoteRefs?: ReadonlyArray<string>;
+  readonly localRefs?: ReadonlyArray<string>;
+}): void {
+  const originHead = input.originHead ?? "origin/main";
+  const remoteRefs = input.remoteRefs ?? ["origin/HEAD", "origin/main"];
+  const localRefs = input.localRefs ?? ["main"];
+
+  childProcessMock.spawnSync.mockImplementation(
+    (_executable: string, args: ReadonlyArray<string>) => {
+      const joined = args.join(" ");
+      if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
+        return {
+          status: originHead.length > 0 ? 0 : 1,
+          stdout: originHead,
+          stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
+        };
+      }
+
+      if (
+        joined.includes("for-each-ref") &&
+        joined.includes("refs/remotes/origin")
+      ) {
+        return {
+          status: 0,
+          stdout: remoteRefs.join("\n"),
+          stderr: "",
+        };
+      }
+
+      if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
+        return {
+          status: 0,
+          stdout: localRefs.join("\n"),
+          stderr: "",
+        };
+      }
+
+      return {
+        status: 0,
+        stdout: "",
+        stderr: "",
+      };
+    },
+  );
+
+  showQuickPickMock.mockImplementation(
+    async (items: ReadonlyArray<{ label: string }>) => {
+      if (!quickPickResultLabel) {
+        return undefined;
+      }
+
+      const matched = items.find((item) => item.label === quickPickResultLabel);
+      return matched ?? items[0];
+    },
+  );
+}
 
 function setExecutablePresence(presence: {
   readonly python?: boolean;
@@ -141,7 +206,15 @@ describe("scaffold-extension command behavior", () => {
     appendLineMock.mockReset();
     registerCommandMock.mockClear();
     childProcessMock.spawn.mockReset();
+    childProcessMock.spawnSync.mockReset();
+    showQuickPickMock.mockReset();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
+    quickPickResultLabel = "origin/main";
+    setGitBranchDiscoveryState({
+      originHead: "origin/main",
+      remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
+      localRefs: ["main"],
+    });
   });
 
   afterEach(() => {
@@ -164,6 +237,14 @@ describe("scaffold-extension command behavior", () => {
     activateAndGetHandler("scaffoldExtension.collectCommitContext");
 
     expect(commandHandlers.has("scaffoldExtension.collectCommitContext")).toBe(
+      true,
+    );
+  });
+
+  it("registers collectPrContext", () => {
+    activateAndGetHandler("scaffoldExtension.collectPrContext");
+
+    expect(commandHandlers.has("scaffoldExtension.collectPrContext")).toBe(
       true,
     );
   });

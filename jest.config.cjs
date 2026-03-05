@@ -1,7 +1,10 @@
 /** @type {import('jest').Config} */
 module.exports = {
   testEnvironment: "node",
-  testMatch: ["<rootDir>/tests/unit/**/*.test.ts"],
+  testMatch: [
+    "<rootDir>/tests/unit/**/*.test.ts",
+    "<rootDir>/extensions/scaffold-extension/test/**/*.test.ts",
+  ],
   testPathIgnorePatterns: ["/node_modules/", "/out/"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   transform: {

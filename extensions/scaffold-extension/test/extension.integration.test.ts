@@ -11,9 +11,11 @@ type MockChildProcess = EventEmitter & {
 
 const handlers = new Map<string, CommandHandler>();
 const generatedArtifacts = new Map<string, string>();
+const showQuickPickMock = jest.fn();
 let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
+let quickPickResultLabel: string | undefined = "origin/main";
 
 jest.mock(
   "vscode",
@@ -29,6 +31,7 @@ jest.mock(
         appendLine: jest.fn(),
         dispose: jest.fn(),
       }),
+      showQuickPick: showQuickPickMock,
     },
     workspace: {
       get workspaceFolders() {
@@ -54,13 +57,75 @@ jest.mock("node:fs", () => ({
 
 jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
+  spawnSync: jest.fn(),
 }));
 
 import { activate } from "../src/extension";
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
+  spawnSync: jest.Mock;
 };
+
+function setGitBranchDiscoveryState(input: {
+  readonly originHead?: string;
+  readonly remoteRefs?: ReadonlyArray<string>;
+  readonly localRefs?: ReadonlyArray<string>;
+}): void {
+  const originHead = input.originHead ?? "origin/main";
+  const remoteRefs = input.remoteRefs ?? ["origin/HEAD", "origin/main"];
+  const localRefs = input.localRefs ?? ["main"];
+
+  childProcessMock.spawnSync.mockImplementation(
+    (_executable: string, args: ReadonlyArray<string>) => {
+      const joined = args.join(" ");
+      if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
+        return {
+          status: originHead.length > 0 ? 0 : 1,
+          stdout: originHead,
+          stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
+        };
+      }
+
+      if (
+        joined.includes("for-each-ref") &&
+        joined.includes("refs/remotes/origin")
+      ) {
+        return {
+          status: 0,
+          stdout: remoteRefs.join("\n"),
+          stderr: "",
+        };
+      }
+
+      if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
+        return {
+          status: 0,
+          stdout: localRefs.join("\n"),
+          stderr: "",
+        };
+      }
+
+      return {
+        status: 0,
+        stdout: "",
+        stderr: "",
+      };
+    },
+  );
+
+  showQuickPickMock.mockImplementation(
+    async (items: ReadonlyArray<{ label: string }>) => {
+      if (!quickPickResultLabel) {
+        return undefined;
+      }
+
+      return (
+        items.find((item) => item.label === quickPickResultLabel) ?? items[0]
+      );
+    },
+  );
+}
 
 function mockProcessSuccess(): MockChildProcess {
   const processMock = new EventEmitter() as MockChildProcess;
@@ -95,7 +160,15 @@ describe("scaffold-extension integration behavior", () => {
     handlers.clear();
     generatedArtifacts.clear();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
+    quickPickResultLabel = "origin/main";
     childProcessMock.spawn.mockReset();
+    childProcessMock.spawnSync.mockReset();
+    showQuickPickMock.mockReset();
+    setGitBranchDiscoveryState({
+      originHead: "origin/main",
+      remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
+      localRefs: ["main"],
+    });
     childProcessMock.spawn.mockImplementation(() => mockProcessSuccess());
 
     const context = {
@@ -232,5 +305,81 @@ describe("scaffold-extension integration behavior", () => {
     const artifactText = generatedArtifacts.get(artifactPath) ?? "";
     expect(artifactText).toContain("===== Staged files (name-status) =====");
     expect(artifactText).toContain("(no staged changes)");
+  });
+
+  it("collectPrContext executes bundled resource without workspace script copy", async () => {
+    await handlerFor("scaffoldExtension.collectPrContext")();
+
+    const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
+      string,
+      string[],
+      { cwd: string },
+    ];
+    const scriptPath = normalizePath(args[0]);
+
+    expect(scriptPath.startsWith("C:/extension/")).toBe(true);
+    expect(scriptPath.includes("C:/workspace/")).toBe(false);
+    expect(args).toContain("--base");
+    expect(options.cwd).toBe("C:/workspace");
+  });
+
+  it("collectPrContext handles workspace paths with spaces or unicode", async () => {
+    workspaceFoldersState = [
+      {
+        uri: {
+          fsPath: "C:/workspace/Repo Δ with spaces",
+        },
+      },
+    ];
+
+    await handlerFor("scaffoldExtension.collectPrContext")();
+
+    const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
+      string,
+      string[],
+      { cwd: string },
+    ];
+    expect(options.cwd).toBe("C:/workspace/Repo Δ with spaces");
+    expect(args).toContain("--out");
+    expect(args).toContain("artifacts/pr_context.summary.txt");
+    expect(args).toContain("--appendix-out");
+    expect(args).toContain("artifacts/pr_context.appendix.txt");
+  });
+
+  it("collectPrContext writes summary and appendix artifacts", async () => {
+    childProcessMock.spawn.mockImplementation(
+      (_executable: string, args: string[], options: { cwd: string }) => {
+        const summaryIndex = args.indexOf("--out");
+        const appendixIndex = args.indexOf("--appendix-out");
+        const summaryRelativePath =
+          summaryIndex >= 0
+            ? (args[summaryIndex + 1] ?? "artifacts/pr_context.summary.txt")
+            : "artifacts/pr_context.summary.txt";
+        const appendixRelativePath =
+          appendixIndex >= 0
+            ? (args[appendixIndex + 1] ?? "artifacts/pr_context.appendix.txt")
+            : "artifacts/pr_context.appendix.txt";
+
+        generatedArtifacts.set(
+          `${options.cwd}/${summaryRelativePath}`,
+          "# PR Context Summary\n\nBase branch: origin/main\n",
+        );
+        generatedArtifacts.set(
+          `${options.cwd}/${appendixRelativePath}`,
+          "# PR Context Appendix\n\nBase branch: origin/main\n",
+        );
+
+        return mockProcessSuccess();
+      },
+    );
+
+    await handlerFor("scaffoldExtension.collectPrContext")();
+
+    expect(
+      generatedArtifacts.has("C:/workspace/artifacts/pr_context.summary.txt"),
+    ).toBe(true);
+    expect(
+      generatedArtifacts.has("C:/workspace/artifacts/pr_context.appendix.txt"),
+    ).toBe(true);
   });
 });

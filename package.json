@@ -3,7 +3,7 @@
   "publisher": "drm-copilot",
   "displayName": "drm-copilot",
   "description": "VS Code extension to facilitate standardized development tools to repos.",
-  "version": "0.0.1",  
+  "version": "0.0.1",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "node -e \"const fs=require('node:fs');const path=require('node:path');const hasTs=(dir)=>{if(!fs.existsSync(dir)) return false;const stack=[dir];while(stack.length){const cur=stack.pop();for(const ent of fs.readdirSync(cur,{withFileTypes:true})){if(ent.name==='node_modules'||ent.name==='out') continue;const full=path.join(cur,ent.name);if(ent.isDirectory()) stack.push(full);else if(/\\.ts$/i.test(ent.name)) return true;}}return false;};if(!hasTs('src')&&!hasTs('tests')){console.log('Skipping compile: no TypeScript sources found under src/ or tests/.');process.exit(0);}const cp=require('node:child_process');const tsc=require.resolve('typescript/bin/tsc');const result=cp.spawnSync(process.execPath,[tsc,'-p','./'],{stdio:'inherit'});process.exit(result.status??1);\"",
