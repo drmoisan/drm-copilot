@@ -31,6 +31,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
+	- baseline test-step artifacts for languages with mandatory coverage policy MUST include numeric coverage headline values in `Output Summary:` (baseline percent and, when applicable, targeted module/new-code percent).
 
 2) Delegated implementation block
 - explicit handoff task to the small-path implementation engineer,
@@ -41,6 +42,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 - rerun behavior when any step changes files or fails.
 - one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
 - each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
+- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values in `Output Summary:`.
 - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
 
 4) Reduced audit block
@@ -83,6 +85,18 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+## Coverage Evidence Contract (Mandatory when policy requires coverage)
+
+For any language in scope where repository policy requires coverage validation:
+
+- The approved plan MUST include explicit baseline and final-QC coverage capture tasks.
+- Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
+- Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports:
+	- baseline coverage,
+	- post-change coverage,
+	- new/changed-code coverage.
+- If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
+
 ## Final QA Loop (Required for Code/Test Changes)
 
 Run the full toolchain loop for each applicable language in order:
@@ -90,6 +104,8 @@ Run the full toolchain loop for each applicable language in order:
 2) Linting
 3) Type checking (if applicable)
 4) Testing
+
+For languages with mandatory coverage policy, step 4 must use coverage-enabled test commands and persist numeric coverage evidence.
 
 If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
 
@@ -112,6 +128,16 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: ALL CLEAR`
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
+
+## Plan-Path Continuity Contract (Mandatory)
+
+When a caller provides an explicit target plan file path (for example `${plan-path}` or `${file}`):
+
+- Planner MUST update that exact file in place.
+- Planner MUST reuse the same file for all preflight revision iterations.
+- Planner MUST NOT create additional timestamped sibling files (for example `plan.<timestamp>.md`) during the same planning cycle.
+
+If the provided path does not exist, it may be created once, then reused for all subsequent revisions in that cycle.
 
 ## Mode source precedence (Mandatory)
 

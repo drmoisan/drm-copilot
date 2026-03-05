@@ -14,6 +14,7 @@ interface CommandSpec {
   readonly runtimeKind: RuntimeKind;
   readonly bundledRelativePath: string;
   readonly commandId: string;
+  readonly args?: ReadonlyArray<string>;
 }
 
 function createOutputChannel(): vscode.OutputChannel {
@@ -140,8 +141,8 @@ async function executeBundledScript(
   output: vscode.OutputChannel,
   spec: CommandSpec,
 ): Promise<void> {
-  output.appendLine(`[${spec.commandId}] runtime probe start`);
   const workspaceRoot = getWorkspaceRoot();
+  output.appendLine(`[${spec.commandId}] runtime probe start`);
   let runtime: RuntimeResolution;
   try {
     runtime = detectRuntime(spec.runtimeKind);
@@ -160,7 +161,8 @@ async function executeBundledScript(
   ).fsPath;
   output.appendLine(`[${spec.commandId}] resolved script path: ${scriptPath}`);
 
-  const args = [...runtime.argsPrefix, scriptPath];
+  const specScriptArgs = spec.args ?? [];
+  const args = [...runtime.argsPrefix, scriptPath, ...specScriptArgs];
   output.appendLine(
     `[${spec.commandId}] command start: ${runtime.executable} ${args.join(" ")}`,
   );
@@ -199,9 +201,22 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const collectCommitContextDisposable = vscode.commands.registerCommand(
+    "scaffoldExtension.collectCommitContext",
+    async () => {
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/collect_commit_context.py",
+        commandId: "scaffoldExtension.collectCommitContext",
+        args: ["--output", "artifacts/commit_context.txt"],
+      });
+    },
+  );
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
+    collectCommitContextDisposable,
     output,
   );
 }

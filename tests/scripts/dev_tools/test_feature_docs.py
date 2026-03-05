@@ -370,3 +370,57 @@ def test_primary_issue_and_pass_readiness(mem_path: Path) -> None:
     assert len(excerpts) == 1
     assert excerpts[0].primary_issue_ref == "#46"
     assert excerpts[0].readiness_signal == "PASS"
+
+
+def test_primary_issue_and_pass_readiness_from_issue_md_and_overall_marker(
+    mem_path: Path,
+) -> None:
+    """Assert minor-audit issue.md + bold readiness marker are recognized.
+
+    This regression guards PR auto-close derivation for minor-audit feature folders
+    that do not carry `spec.md` / `user-story.md` but do carry:
+
+    - `issue.md` containing a metadata line `- Issue: #NN`
+    - timestamped plan files `plan.<timestamp>.md`
+    - `feature-audit.*.md` using the template marker `Overall feature readiness:`
+      (often with Markdown bold).
+    """
+    feature = "2026-03-03-extension-name-71"
+    feature_dir = mem_path / "docs" / "features" / "active" / feature
+    feature_dir.mkdir(parents=True)
+    (mem_path / "docs" / "features" / "potential" / "promoted").mkdir(parents=True)
+
+    (feature_dir / "issue.md").write_text(
+        "# extension-name (Issue #71)\n\n- Issue: #71\n- Work Mode: minor-audit\n",
+        encoding="utf-8",
+    )
+    # Use a timestamped plan file (minor-audit commonly uses plan.<timestamp>.md).
+    (feature_dir / "plan.2026-03-03T12-35.md").write_text(
+        "## Tasks\n- [x] Completed work\n",
+        encoding="utf-8",
+    )
+    # Match the current audit template wording used in active feature folders.
+    (feature_dir / "feature-audit.2026-03-03T19-24.md").write_text(
+        "## Summary\n\n**Overall feature readiness:** **PASS**\n",
+        encoding="utf-8",
+    )
+
+    excerpts = gather_feature_excerpts(
+        mem_path,
+        [f"docs/features/active/{feature}/issue.md"],
+    )
+
+    assert len(excerpts) == 1
+    assert excerpts[0].primary_issue_ref == "#71"
+    assert excerpts[0].readiness_signal == "PASS"
+
+    # Ensure the enumerated context includes the deterministic sources.
+    assert f"docs/features/active/{feature}/issue.md" in excerpts[0].context_files
+    assert (
+        f"docs/features/active/{feature}/plan.2026-03-03T12-35.md"
+        in excerpts[0].context_files
+    )
+    assert (
+        f"docs/features/active/{feature}/feature-audit.2026-03-03T19-24.md"
+        in excerpts[0].context_files
+    )

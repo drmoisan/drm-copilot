@@ -6,6 +6,14 @@ This extension executes bundled hello scripts directly from extension resources 
 
 - `scaffoldExtension.helloPython`
 - `scaffoldExtension.helloPowerShell`
+- `scaffoldExtension.collectCommitContext`
+
+### Commit Context Command Contract
+
+- Command Palette title: `Scaffold: Collect Commit Context`
+- Requires an open workspace folder.
+- Executes bundled collector resource: `resources/templates/collect_commit_context.py`
+- Writes output artifact to: `artifacts/commit_context.txt` under the active workspace.
 
 ## Runtime Requirements
 
