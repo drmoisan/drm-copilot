@@ -17,8 +17,8 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
     It "selects the extension folder when root package.json is not a VS Code extension manifest" {
         $repoRoot = "C:\repo"
         $repoPackagePath = "C:\repo\package.json"
-        $extensionRoot = "C:\repo\extensions\scaffold-extension"
-        $extensionPackagePath = "C:\repo\extensions\scaffold-extension\package.json"
+        $extensionRoot = "C:\repo\extensions\drm-copilot"
+        $extensionPackagePath = "C:\repo\extensions\drm-copilot\package.json"
 
         Mock -CommandName Test-Path -MockWith {
             param([string]$LiteralPath)
@@ -36,7 +36,7 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
 
             switch ($LiteralPath) {
                 $repoPackagePath { return '{"name":"repo-package"}' }
-                $extensionPackagePath { return '{"name":"scaffold-extension","engines":{"vscode":"^1.108.0"}}' }
+                $extensionPackagePath { return '{"name":"drm-copilot","engines":{"vscode":"^1.108.0"}}' }
                 default { throw "Unexpected path: $LiteralPath" }
             }
         }
@@ -73,7 +73,7 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
 Describe "scaffold extension package identity" {
     It "uses canonical drm-copilot name metadata" {
         $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../../..")
-        $packageJsonPath = Join-Path $repoRoot "extensions/scaffold-extension/package.json"
+        $packageJsonPath = Join-Path $repoRoot "extensions/drm-copilot/package.json"
         $manifest = Get-Content -LiteralPath $packageJsonPath -Raw | ConvertFrom-Json
 
         $manifest.name | Should -Be "drm-copilot"

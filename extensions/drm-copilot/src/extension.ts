@@ -29,7 +29,7 @@ interface BranchDiscoveryResult {
 }
 
 function createOutputChannel(): vscode.OutputChannel {
-  return vscode.window.createOutputChannel("Scaffold Utils");
+  return vscode.window.createOutputChannel("drm-copilot");
 }
 
 function getWorkspaceRoot(): string {

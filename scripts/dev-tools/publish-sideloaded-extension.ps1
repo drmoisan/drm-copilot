@@ -105,7 +105,7 @@ function Resolve-ExtensionProjectRoot {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [string]$RelativeExtensionPath = "extensions\scaffold-extension"
+        [string]$RelativeExtensionPath = "extensions\drm-copilot"
     )
 
     $repoPackageJsonPath = Join-Path $RepoRoot "package.json"

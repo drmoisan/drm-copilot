@@ -198,7 +198,7 @@ function activateAndGetHandler(commandId: string): CommandHandler {
   return handler;
 }
 
-describe("scaffold-extension command behavior", () => {
+describe("drm-copilot command behavior", () => {
   beforeEach(() => {
     process.env.PATH = "C:/bin";
     process.env.PATHEXT = ".EXE;.CMD";

@@ -169,7 +169,7 @@ function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
   );
 }
 
-describe("scaffold-extension integration behavior", () => {
+describe("drm-copilot integration behavior", () => {
   beforeEach(() => {
     handlers.clear();
     generatedArtifacts.clear();
@@ -383,7 +383,7 @@ describe("scaffold-extension integration behavior", () => {
             "Base ref (requested): origin/main",
             "",
             "===== Changed files (name-status) =====",
-            "M\textensions/scaffold-extension/resources/templates/collect_pr_context.py",
+            "M\textensions/drm-copilot/resources/templates/collect_pr_context.py",
             "",
           ].join("\n"),
         );
@@ -394,7 +394,7 @@ describe("scaffold-extension integration behavior", () => {
             "Base ref: origin/main",
             "",
             "===== Numstat =====",
-            "12\t3\textensions/scaffold-extension/resources/templates/collect_pr_context.py",
+            "12\t3\textensions/drm-copilot/resources/templates/collect_pr_context.py",
             "",
           ].join("\n"),
         );

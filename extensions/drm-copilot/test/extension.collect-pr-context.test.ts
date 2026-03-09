@@ -196,7 +196,7 @@ function activateAndGetHandler(commandId: string): CommandHandler {
   return handler;
 }
 
-describe("scaffold-extension collectPrContext command behavior", () => {
+describe("drm-copilot collectPrContext command behavior", () => {
   beforeEach(() => {
     process.env.PATH = "C:/bin";
     process.env.PATHEXT = ".EXE;.CMD";
