@@ -31,7 +31,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",
     "typecheck": "tsc -p ./ --noEmit",
-    "test": "node run-jest.cjs"
+    "test": "node run-jest.cjs",
+    "test:unit": "node run-jest.cjs"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

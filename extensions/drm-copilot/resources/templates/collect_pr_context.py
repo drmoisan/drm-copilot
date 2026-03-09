@@ -2,88 +2,70 @@
 
 Purpose:
     Preserve the historical bundled-script entry point while delegating all
-    collection/rendering behavior to the canonical package implementation.
+    collection/rendering behavior to the bundled package implementation.
 
 Usage:
-    python collect_pr_context.py --base <ref> --out <path> --appendix-out <path>
+    python collect_pr_context.py --base <ref> --repo-root <path> \
+    --out <path> --appendix-out <path>
 
 Flow:
-    1. Parse stable CLI args consumed by the extension command.
-    2. Execute `scripts.dev_tools.pr_context.collector` with forwarded args.
+    1. Ensure `resources/scripts/` is importable at runtime.
+    2. Import `dev_tools.pr_context.collector.main` from bundled sources.
+    3. Invoke collector entrypoint in-process with unmodified CLI args.
 
 Invariants / Constraints:
     - No PR context rendering logic is implemented in this wrapper.
-    - Output parity with repo-native collection is guaranteed by delegation.
+    - Argument contract is owned by the collector module and forwarded unchanged.
 
 Side Effects:
-    Runs the canonical collector module in a subprocess and propagates exit code.
+    Imports bundled collector code and executes it in the current Python process.
 """
 
 from __future__ import annotations
 
-import argparse
-import shutil
-import subprocess
+import importlib
 import sys
+from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Forward CLI invocation to canonical PR-context collector module.
+def _ensure_bundled_scripts_import_path() -> None:
+    """Prepend bundled `resources/scripts` directory to ``sys.path``.
+
+    Purpose:
+        Make extension-bundled Python packages importable regardless of the
+        destination workspace layout.
+
+    Side Effects:
+        Mutates ``sys.path`` by inserting the bundled scripts directory at
+        index 0 when not already present.
+    """
+    scripts_dir = Path(__file__).resolve().parent.parent / "scripts"
+    scripts_dir_str = str(scripts_dir)
+
+    if scripts_dir_str not in sys.path:
+        sys.path.insert(0, scripts_dir_str)
+
+
+def main() -> int:
+    """Execute bundled PR-context collector entrypoint in-process.
 
     Purpose:
         Keep the bundled extension script as a thin adapter and avoid duplicated
-        PR-context business logic.
-
-    Args:
-        argv: Optional argument list for testability.
+        PR-context business logic while preserving collector-owned CLI parsing.
 
     Returns:
-        Process exit code from delegated collector run.
+        Exit code from bundled collector main function.
 
     Side Effects:
-        Executes a Python subprocess and streams stdout/stderr to caller.
+        Imports the bundled collector module and executes its CLI flow.
     """
-    parser = argparse.ArgumentParser(description="Collect PR context artifacts")
-    parser.add_argument("--base", required=True, help="Base branch")
-    parser.add_argument(
-        "--out",
-        type=Path,
-        default=Path("artifacts/pr_context.summary.txt"),
-        help="Summary output artifact path",
-    )
-    parser.add_argument(
-        "--appendix-out",
-        type=Path,
-        default=Path("artifacts/pr_context.appendix.txt"),
-        help="Appendix output artifact path",
-    )
-    args = parser.parse_args(argv)
+    _ensure_bundled_scripts_import_path()
+    collector_module = importlib.import_module("dev_tools.pr_context.collector")
+    collector_main = cast(Callable[[], int], collector_module.main)
 
-    python_exe = shutil.which("python")
-    if not python_exe:
-        print("Error: python executable not found on PATH", file=sys.stderr)
-        return 1
-
-    command = [
-        python_exe,
-        "-m",
-        "scripts.dev_tools.pr_context.collector",
-        "--base",
-        args.base,
-        "--out",
-        str(args.out),
-        "--appendix-out",
-        str(args.appendix_out),
-    ]
-
-    result = (
-        subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-            command,
-            check=False,
-        )
-    )
-    return result.returncode
+    return collector_main()
 
 
 if __name__ == "__main__":

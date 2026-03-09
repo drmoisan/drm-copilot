@@ -321,7 +321,7 @@ describe("drm-copilot integration behavior", () => {
     expect(artifactText).toContain("(no staged changes)");
   });
 
-  it("collectPrContext executes canonical package module in destination workspace", async () => {
+  it("collectPrContext executes bundled wrapper script in destination workspace", async () => {
     await handlerFor("scaffoldExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
@@ -329,9 +329,12 @@ describe("drm-copilot integration behavior", () => {
       string[],
       { cwd: string },
     ];
-    expect(args).toContain("-m");
-    expect(args).toContain("scripts.dev_tools.pr_context.collector");
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/collect_pr_context.py",
+    );
     expect(args).toContain("--base");
+    expect(args).toContain("--repo-root");
+    expect(args).toContain("C:/workspace");
     expect(options.cwd).toBe("C:/workspace");
   });
 
@@ -352,6 +355,9 @@ describe("drm-copilot integration behavior", () => {
       { cwd: string },
     ];
     expect(options.cwd).toBe("C:/workspace/Repo Δ with spaces");
+    const repoRootIndex = args.indexOf("--repo-root");
+    expect(repoRootIndex).toBeGreaterThan(-1);
+    expect(args[repoRootIndex + 1]).toBe("C:/workspace/Repo Δ with spaces");
     expect(args).toContain("--out");
     expect(args).toContain("artifacts/pr_context.summary.txt");
     expect(args).toContain("--appendix-out");

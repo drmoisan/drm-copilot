@@ -277,9 +277,12 @@ describe("drm-copilot collectPrContext command behavior", () => {
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("-m");
-    expect(args).toContain("scripts.dev_tools.pr_context.collector");
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/collect_pr_context.py",
+    );
     expect(args).toContain("--base");
+    expect(args).toContain("--repo-root");
+    expect(args).toContain("C:/workspace");
     expect(args).toContain("--out");
     expect(args).toContain("artifacts/pr_context.summary.txt");
     expect(args).toContain("--appendix-out");
@@ -344,7 +347,7 @@ describe("drm-copilot collectPrContext command behavior", () => {
     ).toBe(true);
   });
 
-  it("collectPrContext executes canonical package module", async () => {
+  it("collectPrContext executes bundled wrapper script", async () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
@@ -353,7 +356,21 @@ describe("drm-copilot collectPrContext command behavior", () => {
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe("-m");
-    expect(args[1]).toBe("scripts.dev_tools.pr_context.collector");
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/collect_pr_context.py",
+    );
+  });
+
+  it("collectPrContext always propagates --repo-root with workspace path", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const repoRootIndex = args.indexOf("--repo-root");
+    expect(repoRootIndex).toBeGreaterThan(-1);
+    expect(args[repoRootIndex + 1]).toBe("C:/workspace");
   });
 });

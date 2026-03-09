@@ -17,12 +17,6 @@ interface CommandSpec {
   readonly args?: ReadonlyArray<string>;
 }
 
-interface PythonModuleCommandSpec {
-  readonly commandId: string;
-  readonly moduleName: string;
-  readonly args?: ReadonlyArray<string>;
-}
-
 interface BranchDiscoveryResult {
   readonly candidates: ReadonlyArray<string>;
   readonly defaultBranch: string;
@@ -353,44 +347,6 @@ async function executeBundledScript(
   }
 }
 
-async function executePythonModule(
-  output: vscode.OutputChannel,
-  spec: PythonModuleCommandSpec,
-): Promise<void> {
-  const workspaceRoot = getWorkspaceRoot();
-  output.appendLine(`[${spec.commandId}] runtime probe start`);
-
-  let runtime: RuntimeResolution;
-  try {
-    runtime = detectRuntime("python");
-  } catch (error: unknown) {
-    output.appendLine(`[${spec.commandId}] runtime probe failure`);
-    throw error;
-  }
-
-  output.appendLine(
-    `[${spec.commandId}] runtime probe success: ${runtime.executable}`,
-  );
-
-  const moduleArgs = ["-m", spec.moduleName, ...(spec.args ?? [])];
-  output.appendLine(
-    `[${spec.commandId}] command start: ${runtime.executable} ${moduleArgs.join(" ")}`,
-  );
-
-  try {
-    await runCommandWithOutput(
-      output,
-      runtime.executable,
-      moduleArgs,
-      workspaceRoot,
-    );
-    output.appendLine(`[${spec.commandId}] command success`);
-  } catch (error: unknown) {
-    output.appendLine(`[${spec.commandId}] command failure`);
-    throw error;
-  }
-}
-
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
 
@@ -461,12 +417,15 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      await executePythonModule(output, {
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/collect_pr_context.py",
         commandId,
-        moduleName: "scripts.dev_tools.pr_context.collector",
         args: [
           "--base",
           selectedBase,
+          "--repo-root",
+          workspaceRoot,
           "--out",
           "artifacts/pr_context.summary.txt",
           "--appendix-out",
