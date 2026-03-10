@@ -390,7 +390,7 @@ def test_rewrite_known_pr_context_reference_to_collect_pr_context_command() -> N
     )
     assert summary.rewritten_reference_count == 1
     assert "VS Code command: `drm-copilot: Collect PR Context`" in rewritten_text
-    assert "command ID: `scaffoldExtension.collectPrContext`" in rewritten_text
+    assert "command ID: `drmCopilotExtension.collectPrContext`" in rewritten_text
     assert "scripts.dev_tools.pr_context.collector" not in rewritten_text
 
 
@@ -430,7 +430,7 @@ def test_rewrite_new_active_feature_folder_reference_to_placeholder_command() ->
         in rewritten_text
     )
     assert (
-        "command ID: `scaffoldExtension.newActiveFeatureFolderPlaceholder`"
+        "command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`"
         in rewritten_text
     )
     assert "scripts.dev_tools.new_active_feature_folder" not in rewritten_text
@@ -467,11 +467,11 @@ def test_rewrite_normalizes_dev_tools_slash_variants() -> None:
     )
     assert summary.placeholder_rewrite_count == 2
     assert (
-        "command ID: `scaffoldExtension.newPotentialBugEntryPyPlaceholder`"
+        "command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`"
         in rewritten_text
     )
     assert (
-        "command ID: `scaffoldExtension.newPotentialEntryPsPlaceholder`"
+        "command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`"
         in rewritten_text
     )
     assert "scripts/dev_tools/new_potential_bug_entry.py" not in rewritten_text

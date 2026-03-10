@@ -22,15 +22,15 @@ VS Code extension scaffolding to apply agentic programming customizations to pro
 ## Commands
 
 - `drm-copilot.applyCustomizations`: Placeholder command to validate activation wiring.
-- `scaffoldExtension.collectPrContext`: Packaged PR-context command used by rewritten customization references.
-- `scaffoldExtension.newActiveFeatureFolderPlaceholder`: Placeholder command used when copied customization files reference uncovered feature-folder tooling.
+- `drmCopilotExtension.collectPrContext`: Packaged PR-context command used by rewritten customization references.
+- `drmCopilotExtension.newActiveFeatureFolderPlaceholder`: Placeholder command used when copied customization files reference uncovered feature-folder tooling.
 
 ## Push-down publisher
 
 - Publish the scoped `.github` customization trees into another workspace with:
 	`poetry run python -m scripts.dev_tools.push_down_copilot_customizations --destination <workspace-root>`
 - The publisher rewrites supported script references to stable textual VS Code command references.
-- Known-but-unimplemented references are rewritten to placeholder command IDs such as `scaffoldExtension.newActiveFeatureFolderPlaceholder`, which fail deterministically with a `Not implemented:` error when invoked.
+- Known-but-unimplemented references are rewritten to placeholder command IDs such as `drmCopilotExtension.newActiveFeatureFolderPlaceholder`, which fail deterministically with a `Not implemented:` error when invoked.
 
 ## Skills
 

@@ -86,54 +86,53 @@ function setGitBranchDiscoveryState(input: {
   const remoteRefs = input.remoteRefs ?? ["origin/HEAD", "origin/main"];
   const localRefs = input.localRefs ?? ["main"];
 
-  childProcessMock.spawnSync.mockImplementation(
-    (_executable: string, args: ReadonlyArray<string>) => {
-      const joined = args.join(" ");
-      if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
-        return {
-          status: originHead.length > 0 ? 0 : 1,
-          stdout: originHead,
-          stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
-        };
-      }
+  childProcessMock.spawnSync.mockImplementation((...rawArgs: unknown[]) => {
+    const args = (rawArgs[1] as ReadonlyArray<string> | undefined) ?? [];
+    const joined = args.join(" ");
+    if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
+      return {
+        status: originHead.length > 0 ? 0 : 1,
+        stdout: originHead,
+        stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
+      };
+    }
 
-      if (
-        joined.includes("for-each-ref") &&
-        joined.includes("refs/remotes/origin")
-      ) {
-        return {
-          status: 0,
-          stdout: remoteRefs.join("\n"),
-          stderr: "",
-        };
-      }
-
-      if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
-        return {
-          status: 0,
-          stdout: localRefs.join("\n"),
-          stderr: "",
-        };
-      }
-
+    if (
+      joined.includes("for-each-ref") &&
+      joined.includes("refs/remotes/origin")
+    ) {
       return {
         status: 0,
-        stdout: "",
+        stdout: remoteRefs.join("\n"),
         stderr: "",
       };
-    },
-  );
+    }
 
-  showQuickPickMock.mockImplementation(
-    async (items: ReadonlyArray<{ label: string }>) => {
-      if (!quickPickResultLabel) {
-        return undefined;
-      }
+    if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
+      return {
+        status: 0,
+        stdout: localRefs.join("\n"),
+        stderr: "",
+      };
+    }
 
-      const matched = items.find((item) => item.label === quickPickResultLabel);
-      return matched ?? items[0];
-    },
-  );
+    return {
+      status: 0,
+      stdout: "",
+      stderr: "",
+    };
+  });
+
+  showQuickPickMock.mockImplementation(async (...rawArgs: unknown[]) => {
+    const items =
+      (rawArgs[0] as ReadonlyArray<{ label: string }> | undefined) ?? [];
+    if (!quickPickResultLabel) {
+      return undefined;
+    }
+
+    const matched = items.find((item) => item.label === quickPickResultLabel);
+    return matched ?? items[0];
+  });
 }
 
 function setExecutablePresence(presence: {
@@ -221,30 +220,32 @@ describe("drm-copilot command behavior", () => {
     jest.clearAllMocks();
   });
 
-  it("activate registers scaffoldExtension.helloPython", () => {
-    activateAndGetHandler("scaffoldExtension.helloPython");
+  it("activate registers drmCopilotExtension.helloPython", () => {
+    activateAndGetHandler("drmCopilotExtension.helloPython");
 
-    expect(commandHandlers.has("scaffoldExtension.helloPython")).toBe(true);
+    expect(commandHandlers.has("drmCopilotExtension.helloPython")).toBe(true);
   });
 
-  it("activate registers scaffoldExtension.helloPowerShell", () => {
-    activateAndGetHandler("scaffoldExtension.helloPowerShell");
+  it("activate registers drmCopilotExtension.helloPowerShell", () => {
+    activateAndGetHandler("drmCopilotExtension.helloPowerShell");
 
-    expect(commandHandlers.has("scaffoldExtension.helloPowerShell")).toBe(true);
-  });
-
-  it("registers collectCommitContext", () => {
-    activateAndGetHandler("scaffoldExtension.collectCommitContext");
-
-    expect(commandHandlers.has("scaffoldExtension.collectCommitContext")).toBe(
+    expect(commandHandlers.has("drmCopilotExtension.helloPowerShell")).toBe(
       true,
     );
   });
 
-  it("registers collectPrContext", () => {
-    activateAndGetHandler("scaffoldExtension.collectPrContext");
+  it("registers collectCommitContext", () => {
+    activateAndGetHandler("drmCopilotExtension.collectCommitContext");
 
-    expect(commandHandlers.has("scaffoldExtension.collectPrContext")).toBe(
+    expect(
+      commandHandlers.has("drmCopilotExtension.collectCommitContext"),
+    ).toBe(true);
+  });
+
+  it("registers collectPrContext", () => {
+    activateAndGetHandler("drmCopilotExtension.collectPrContext");
+
+    expect(commandHandlers.has("drmCopilotExtension.collectPrContext")).toBe(
       true,
     );
   });
@@ -254,7 +255,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPython");
+    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await expect(handler()).rejects.toThrow("No workspace");
   });
 
@@ -287,7 +288,7 @@ describe("drm-copilot command behavior", () => {
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await expect(handler()).rejects.toThrow("No workspace folder is open.");
   });
@@ -296,7 +297,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: false });
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await expect(handler()).rejects.toThrow(
       "Python runtime 'python' not found on PATH.",
@@ -307,7 +308,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPython");
+    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
@@ -318,7 +319,9 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPowerShell");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.helloPowerShell",
+    );
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
@@ -332,7 +335,7 @@ describe("drm-copilot command behavior", () => {
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await handler();
 
@@ -349,7 +352,7 @@ describe("drm-copilot command behavior", () => {
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await handler();
 
@@ -367,7 +370,7 @@ describe("drm-copilot command behavior", () => {
     childProcessMock.spawn.mockReturnValue(createMockProcess(2));
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await expect(handler()).rejects.toThrow("Command exited with code 2");
 
@@ -375,7 +378,7 @@ describe("drm-copilot command behavior", () => {
     expect(
       logs.some((line) =>
         line.includes(
-          "[scaffoldExtension.collectCommitContext] command failure",
+          "[drmCopilotExtension.collectCommitContext] command failure",
         ),
       ),
     ).toBe(true);
@@ -388,7 +391,7 @@ describe("drm-copilot command behavior", () => {
     );
 
     const handler = activateAndGetHandler(
-      "scaffoldExtension.collectCommitContext",
+      "drmCopilotExtension.collectCommitContext",
     );
     await expect(handler()).rejects.toThrow("Command exited with code 1");
 
@@ -402,7 +405,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPython");
+    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
     const [executable, args, options] = childProcessMock.spawn.mock
@@ -416,7 +419,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPython");
+    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
@@ -429,7 +432,7 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(1));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPython");
+    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await expect(handler()).rejects.toThrow("Command exited with code 1");
 
     const logs = appendLineMock.mock.calls.map(([line]) => line);
@@ -446,7 +449,9 @@ describe("drm-copilot command behavior", () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.helloPowerShell");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.helloPowerShell",
+    );
     await handler();
 
     const [executable, args, options] = childProcessMock.spawn.mock

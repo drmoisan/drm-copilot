@@ -79,19 +79,19 @@ describe("drm-copilot placeholder command registration", () => {
 
     expect(
       commandHandlers.has(
-        "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+        "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
       ),
     ).toBe(true);
     expect(
-      commandHandlers.has("scaffoldExtension.potentialToIssuePlaceholder"),
+      commandHandlers.has("drmCopilotExtension.potentialToIssuePlaceholder"),
     ).toBe(true);
     expect(
       commandHandlers.has(
-        "scaffoldExtension.newPotentialBugEntryPyPlaceholder",
+        "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
       ),
     ).toBe(true);
     expect(
-      commandHandlers.has("scaffoldExtension.newPotentialEntryPsPlaceholder"),
+      commandHandlers.has("drmCopilotExtension.newPotentialEntryPsPlaceholder"),
     ).toBe(true);
   });
 
@@ -99,17 +99,17 @@ describe("drm-copilot placeholder command registration", () => {
     activateExtension();
 
     const handler = commandHandlers.get(
-      "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+      "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
     );
 
     if (!handler) {
       throw new Error(
-        "Missing handler scaffoldExtension.newActiveFeatureFolderPlaceholder",
+        "Missing handler drmCopilotExtension.newActiveFeatureFolderPlaceholder",
       );
     }
 
     await expect(handler()).rejects.toThrow(
-      "Not implemented: scaffoldExtension.newActiveFeatureFolderPlaceholder is a placeholder for scripts.dev_tools.new_active_feature_folder.",
+      "Not implemented: drmCopilotExtension.newActiveFeatureFolderPlaceholder is a placeholder for scripts.dev_tools.new_active_feature_folder.",
     );
   });
 });

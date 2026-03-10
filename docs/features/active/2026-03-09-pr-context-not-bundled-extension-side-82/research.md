@@ -95,7 +95,7 @@ Key behavior:
 
 ```typescript
 const collectPrContextDisposable = vscode.commands.registerCommand(
-  "scaffoldExtension.collectPrContext",
+  "drmCopilotExtension.collectPrContext",
   async () => {
     // ... branch discovery with Git spawnSync ...
     // ... QuickPick for base branch selection ...

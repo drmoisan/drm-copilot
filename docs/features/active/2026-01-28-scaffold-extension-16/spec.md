@@ -60,10 +60,10 @@ General behavior:
 
 Commands (Command Palette):
 - **Hello Python**
-	- Command ID: `scaffoldExtension.helloPython`
+	- Command ID: `drmCopilotExtension.helloPython`
 	- Example: run “Hello Python” → `artifacts/hello_python.txt` created
 - **Hello PowerShell**
-	- Command ID: `scaffoldExtension.helloPowerShell`
+	- Command ID: `drmCopilotExtension.helloPowerShell`
 	- Example: run “Hello PowerShell” → `artifacts/hello_pwsh.txt` created
 
 Contracts and validation rules:
@@ -71,7 +71,7 @@ Contracts and validation rules:
 - If the required runtime is missing, commands must fail with an error that names the runtime (`python`, `pwsh`, `powershell`).
 - Commands must execute bundled extension scripts against destination workspace context and must not require manual path edits.
 - Commands must not copy bundled hello scripts into workspace root.
-- Command registration and invocation behavior must be testable via command IDs `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
+- Command registration and invocation behavior must be testable via command IDs `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`.
 
 ## Data & State
 
@@ -105,14 +105,14 @@ Migration or backfill requirements (if any):
 
 - Implementation scope (what changes, not sequencing):
 	- Create a minimal VS Code extension under `extensions/scaffold-extension/` with manifest (`package.json`) and TypeScript entry point (`src/extension.ts`).
-	- Implement two commands (`scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`) that demonstrate the scripting pattern.
+	- Implement two commands (`drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`) that demonstrate the scripting pattern.
 	- Include bundled scripts (`resources/templates/hello_python.py` and `resources/templates/hello_pwsh.ps1`) executed directly from extension resources.
 	- Provide unit and integration tests with clear documentation of the extension-to-workspace scripting model.
 - New classes/functions/commands to add or update:
 	- `activate` function and command registrations in `src/extension.ts`.
 	- `detectRuntime(kind: string): Promise<string | null>` helper (checks `python`, and `pwsh` then `powershell` on PATH).
 	- `resolveBundledScriptPath(scriptName: string): string` helper (locates packaged script files in extension resources).
-	- Command handlers for `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
+	- Command handlers for `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`.
 	- `executeBundledScriptInWorkspace(workspaceRoot: string, scriptPath: string, timeout?: number): Promise<void>` helper (runs packaged script via subprocess, captures output).
 - Dependency changes (new/removed packages) and rationale:
 	- None; use built-in Node.js and VS Code APIs only (no external npm packages beyond dev dependencies).

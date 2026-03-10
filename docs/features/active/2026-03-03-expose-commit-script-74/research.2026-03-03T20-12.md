@@ -15,7 +15,7 @@
 - extensions/scaffold-extension/src/extension.ts
   - Current command framework already provides reusable seams: command registration, runtime probing (`python`/`pwsh` fallback), bundled resource path resolution, subprocess spawn with explicit argv arrays, and workspace `cwd` binding.
 - extensions/scaffold-extension/package.json
-  - Existing command contribution model can be extended with a new `scaffoldExtension.collectCommitContext` command without architectural change.
+  - Existing command contribution model can be extended with a new `drmCopilotExtension.collectCommitContext` command without architectural change.
 - extensions/scaffold-extension/test/extension.test.ts
   - Existing deterministic unit strategy already validates registration, runtime probing, bundled script path usage, no-copy invariant, and spawn options (`shell: false`, `cwd`).
 - extensions/scaffold-extension/test/extension.integration.test.ts
@@ -27,7 +27,7 @@
 
 ### Code Search Results
 
-- scaffoldExtension.helloPython|scaffoldExtension.helloPowerShell
+- drmCopilotExtension.helloPython|drmCopilotExtension.helloPowerShell
   - Found in extension manifest + registration path, demonstrating established command contribution and activation flow.
 - detectRuntime|getWorkspaceRoot|executeBundledScript
   - Found in `extensions/scaffold-extension/src/extension.ts` and directly reusable for new command orchestration.
@@ -109,7 +109,7 @@ await runCommandWithOutput(output, runtime.executable, args, workspaceRoot);
   "contributes": {
     "commands": [
       {
-        "command": "scaffoldExtension.collectCommitContext",
+        "command": "drmCopilotExtension.collectCommitContext",
         "title": "Scaffold: Collect Commit Context"
       }
     ]
@@ -139,7 +139,7 @@ await runCommandWithOutput(output, runtime.executable, args, workspaceRoot);
 Use a **bundle-and-invoke adapter approach**:
 
 1. Keep `collect_commit_context.py` as the canonical collector logic source and add an extension-bundled copy under `extensions/scaffold-extension/resources/templates/` (or `resources/scripts/`) generated/synced from the canonical script.
-2. Add `scaffoldExtension.collectCommitContext` command in `extensions/scaffold-extension` that reuses current execution pipeline (`getWorkspaceRoot` -> `detectRuntime("python")` -> resolve bundled script path -> spawn with workspace `cwd`).
+2. Add `drmCopilotExtension.collectCommitContext` command in `extensions/scaffold-extension` that reuses current execution pipeline (`getWorkspaceRoot` -> `detectRuntime("python")` -> resolve bundled script path -> spawn with workspace `cwd`).
 3. Invoke collector with explicit `--output artifacts/commit_context.txt` so destination artifact path is deterministic regardless of script defaults.
 4. Preserve output-channel lifecycle logging with command-scoped prefixes for probe start/success/failure, script path, command start/success/failure, and surfaced stderr/stdout chunks.
 5. Keep deterministic root-selection policy explicit:

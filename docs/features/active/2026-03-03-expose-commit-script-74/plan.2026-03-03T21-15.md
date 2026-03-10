@@ -27,9 +27,9 @@ This plan delivers extension-side commit-context collection for the destination 
   - Acceptance: artifact `evidence/baseline/baseline.test.2026-03-03T21-15.md` exists with exact fields `Timestamp:`, `Command: npm --prefix extensions/scaffold-extension run test`, `EXIT_CODE: <int>`, and `Output Summary:`.
 
 ### Phase 1 — Extension Command Surface & Bundled Collector Wiring
-- [x] [P1-T1] Add `scaffoldExtension.collectCommitContext` to extension command contributions in `extensions/scaffold-extension/package.json`.
+- [x] [P1-T1] Add `drmCopilotExtension.collectCommitContext` to extension command contributions in `extensions/scaffold-extension/package.json`.
   - Preconditions: `contributes.commands` currently includes hello commands.
-  - Acceptance: `extensions/scaffold-extension/package.json` contains a command object with exact `"command": "scaffoldExtension.collectCommitContext"` and title `"Scaffold: Collect Commit Context"`.
+  - Acceptance: `extensions/scaffold-extension/package.json` contains a command object with exact `"command": "drmCopilotExtension.collectCommitContext"` and title `"Scaffold: Collect Commit Context"`.
 - [x] [P1-T2] Add bundled collector script resource for extension-side execution at `extensions/scaffold-extension/resources/templates/collect_commit_context.py`.
   - Preconditions: canonical source exists at `scripts/dev_tools/collect_commit_context.py`.
   - Acceptance: target resource file exists and includes the CLI argument contract line containing `--output` and default `artifacts/commit_context.txt`.
@@ -41,7 +41,7 @@ This plan delivers extension-side commit-context collection for the destination 
   - Acceptance: the runtime args construction in `extension.ts` builds `[...runtime.argsPrefix, scriptPath, ...specScriptArgs]` semantics and existing hello command handlers still compile.
 - [x] [P1-T5] Register the new command handler in `activate` using Python runtime, bundled collector path, and explicit output argument `--output artifacts/commit_context.txt`.
   - Preconditions: [P1-T1], [P1-T2], [P1-T4] complete.
-  - Acceptance: `activate` registers `scaffoldExtension.collectCommitContext` and passes `runtimeKind: "python"`, `bundledRelativePath: "resources/templates/collect_commit_context.py"`, and script args containing exactly `"--output"` and `"artifacts/commit_context.txt"`.
+  - Acceptance: `activate` registers `drmCopilotExtension.collectCommitContext` and passes `runtimeKind: "python"`, `bundledRelativePath: "resources/templates/collect_commit_context.py"`, and script args containing exactly `"--output"` and `"artifacts/commit_context.txt"`.
 
 ### Phase 2 — Destination Workspace Execution Semantics & Diagnostics
 - [x] [P2-T1] Ensure command execution enforces destination-workspace root discovery before runtime probe and returns actionable no-workspace errors.
@@ -49,15 +49,15 @@ This plan delivers extension-side commit-context collection for the destination 
   - Acceptance: invoking handler with `vscode.workspace.workspaceFolders` undefined/empty rejects with exact message `No workspace folder is open.` and test assertions can match this string.
 - [x] [P2-T2] Ensure subprocess spawn options for commit-context command preserve destination workspace `cwd` and `shell: false`.
   - Preconditions: [P1-T5] complete.
-  - Acceptance: spawn call for `scaffoldExtension.collectCommitContext` includes options where `cwd` equals the selected workspace root path and `shell` is exactly `false`.
+  - Acceptance: spawn call for `drmCopilotExtension.collectCommitContext` includes options where `cwd` equals the selected workspace root path and `shell` is exactly `false`.
 - [x] [P2-T3] Add command-scoped output-channel lifecycle lines for start/success/failure diagnostics for the new command path.
   - Preconditions: [P1-T5] complete.
-  - Acceptance: output logging includes command-scoped lines with exact prefix `[scaffoldExtension.collectCommitContext]` for runtime probe start/success/failure and command start/success/failure.
+  - Acceptance: output logging includes command-scoped lines with exact prefix `[drmCopilotExtension.collectCommitContext]` for runtime probe start/success/failure and command start/success/failure.
 
 ### Phase 3 — Deterministic Test Additions (Scenario-by-Scenario)
-- [x] [P3-T1] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` for `activate` registering `scaffoldExtension.collectCommitContext`.
+- [x] [P3-T1] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` for `activate` registering `drmCopilotExtension.collectCommitContext`.
   - Preconditions: [P1-T1], [P1-T5] complete.
-  - Acceptance: test file contains a test case whose assertion checks the command handler map includes key `scaffoldExtension.collectCommitContext` and `npm --prefix extensions/scaffold-extension run test -- --runInBand extension.test.ts -t "registers collectCommitContext"` exits 0.
+  - Acceptance: test file contains a test case whose assertion checks the command handler map includes key `drmCopilotExtension.collectCommitContext` and `npm --prefix extensions/scaffold-extension run test -- --runInBand extension.test.ts -t "registers collectCommitContext"` exits 0.
 - [x] [P3-T2] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` for no-workspace scenario of `collectCommitContext` handler.
   - Preconditions: [P2-T1] complete.
   - Acceptance: targeted test command `npm --prefix extensions/scaffold-extension run test -- --runInBand extension.test.ts -t "collectCommitContext fails when no workspace folder is open"` exits 0 and asserts rejection message `No workspace folder is open.`.
@@ -89,7 +89,7 @@ This plan delivers extension-side commit-context collection for the destination 
 ### Phase 4 — Documentation & Feature Evidence Updates
 - [x] [P4-T1] Update `extensions/scaffold-extension/README.md` with the new Command Palette action, destination output artifact contract, and workspace requirement.
   - Preconditions: [P1-T5], [P2-T1] complete.
-  - Acceptance: README contains command ID `scaffoldExtension.collectCommitContext`, path `artifacts/commit_context.txt`, and explicit statement that command requires an open workspace.
+  - Acceptance: README contains command ID `drmCopilotExtension.collectCommitContext`, path `artifacts/commit_context.txt`, and explicit statement that command requires an open workspace.
 - [x] [P4-T2] Update feature docs checklists (`issue.md` and/or `spec.md`) to reflect implemented command/test coverage evidence links.
   - Preconditions: implementation and test tasks complete.
   - Acceptance: updated feature markdown includes links to at least one baseline artifact and one QA artifact under `evidence/` and marks corresponding acceptance/DoD items complete.

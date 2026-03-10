@@ -11,7 +11,7 @@
 - `scripts/dev_tools/pr_context/collector.py`
   - Canonical collector generates rich summary/appendix using git/gh context via `collect_and_write(...)` and `build_pr_context(...)`.
 - `extensions/scaffold-extension/src/extension.ts`
-  - `scaffoldExtension.collectPrContext` performs branch discovery + Quick Pick, then executes bundled `resources/templates/collect_pr_context.py`.
+  - `drmCopilotExtension.collectPrContext` performs branch discovery + Quick Pick, then executes bundled `resources/templates/collect_pr_context.py`.
 - `extensions/scaffold-extension/resources/templates/collect_pr_context.py`
   - Current bundled script writes only placeholder markdown (title + base branch), not real PR context.
 - `extensions/scaffold-extension/resources/templates/collect_commit_context.py`
@@ -21,7 +21,7 @@
 - `extensions/scaffold-extension/test/extension.integration.test.ts`
   - Validates artifact presence and invocation boundary; currently allows minimal PR-context content.
 - `extensions/scaffold-extension/package.json`
-  - Confirms command contribution `scaffoldExtension.collectPrContext` is already exposed.
+  - Confirms command contribution `drmCopilotExtension.collectPrContext` is already exposed.
 
 ### Code Search Results
 
@@ -85,7 +85,7 @@ write_text(
 ### API and Schema Documentation
 
 - Canonical rich collector entrypoint: `scripts/dev_tools/pr_context/collector.py::collect_and_write(...)`
-- Extension PR command: `extensions/scaffold-extension/src/extension.ts::scaffoldExtension.collectPrContext`
+- Extension PR command: `extensions/scaffold-extension/src/extension.ts::drmCopilotExtension.collectPrContext`
 - Current bundled collector: `extensions/scaffold-extension/resources/templates/collect_pr_context.py::main(...)`
 - Canonical output contract:
   - `artifacts/pr_context.summary.txt`
@@ -98,7 +98,7 @@ write_text(
   "contributes": {
     "commands": [
       {
-        "command": "scaffoldExtension.collectPrContext",
+        "command": "drmCopilotExtension.collectPrContext",
         "title": "drm-copilot: Collect PR Context"
       }
     ]
@@ -120,7 +120,7 @@ write_text(
 
 Use a **minimal-scope parity fix**:
 
-1. Keep `scaffoldExtension.collectPrContext` branch discovery + `showQuickPick` flow unchanged.
+1. Keep `drmCopilotExtension.collectPrContext` branch discovery + `showQuickPick` flow unchanged.
 2. Replace the bundled placeholder `extensions/scaffold-extension/resources/templates/collect_pr_context.py` implementation with a bundled implementation that calls canonical PR-context collection logic (or a faithful subset that produces meaningful summary/appendix content).
 3. Preserve existing output paths and args (`--base`, `--out`, `--appendix-out`).
 4. Add regression assertions in extension tests that fail when summary/appendix contain only placeholder headings/base line.

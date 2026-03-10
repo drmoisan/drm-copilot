@@ -4,9 +4,9 @@ This extension executes bundled hello scripts directly from extension resources 
 
 ## Commands
 
-- `scaffoldExtension.helloPython`
-- `scaffoldExtension.helloPowerShell`
-- `scaffoldExtension.collectCommitContext`
+- `drmCopilotExtension.helloPython`
+- `drmCopilotExtension.helloPowerShell`
+- `drmCopilotExtension.collectCommitContext`
 
 ### Commit Context Command Contract
 
@@ -56,9 +56,9 @@ Artifacts are generated under workspace `artifacts/` by the script runtime. The 
 ## First-run workflow
 
 1. Open a workspace folder in VS Code.
-2. Open the Command Palette and run `scaffoldExtension.helloPython`.
+2. Open the Command Palette and run `drmCopilotExtension.helloPython`.
 3. Confirm Python runtime probe and command logs in the `Scaffold Utils` output channel.
-4. Open the Command Palette and run `scaffoldExtension.helloPowerShell`.
+4. Open the Command Palette and run `drmCopilotExtension.helloPowerShell`.
 5. Confirm PowerShell runtime probe and command logs in the `Scaffold Utils` output channel.
 6. Verify output artifacts under workspace `artifacts/`.
 

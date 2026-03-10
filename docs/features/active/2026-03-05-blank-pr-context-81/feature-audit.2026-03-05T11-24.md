@@ -16,7 +16,7 @@
 ## Acceptance criteria inventory (authoritative)
 
 From `user-story.md` and `spec.md`:
-1. `scaffoldExtension.collectPrContext` produces substantive summary/appendix artifacts (not placeholder-only).
+1. `drmCopilotExtension.collectPrContext` produces substantive summary/appendix artifacts (not placeholder-only).
 2. Existing command UX and boundary behavior are preserved.
 3. Failure paths surface actionable errors and avoid false-success blank artifacts.
 4. Regression tests fail on placeholder-only output and pass on meaningful content.

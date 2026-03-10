@@ -45,7 +45,7 @@ Notes:
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| Command contribution + activation wiring | ✅ PASS | `extensions/scaffold-extension/package.json` contributes `scaffoldExtension.collectCommitContext`; `src/extension.ts` registers/disposes command. |
+| Command contribution + activation wiring | ✅ PASS | `extensions/scaffold-extension/package.json` contributes `drmCopilotExtension.collectCommitContext`; `src/extension.ts` registers/disposes command. |
 | Runtime + argv/cwd contract | ✅ PASS | `src/extension.ts` keeps explicit argv arrays, `shell: false`, and workspace `cwd`. |
 | Tests cover command contract + error paths | ✅ PASS | `test/extension.test.ts` and `test/extension.integration.test.ts` pass (`25/25`). |
 | Formatting gate | ✅ PASS | `Push-Location extensions/scaffold-extension; npm exec -- prettier --check ...` => all matched files use Prettier style. |

@@ -193,7 +193,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("helloPython produces artifacts/hello_python.txt using bundled script execution", async () => {
-    await handlerFor("scaffoldExtension.helloPython")();
+    await handlerFor("drmCopilotExtension.helloPython")();
 
     const [executable, args, options] = childProcessMock.spawn.mock
       .calls[0] as [string, string[], { cwd: string }];
@@ -203,7 +203,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("helloPowerShell produces artifacts/hello_pwsh.txt using bundled script execution", async () => {
-    await handlerFor("scaffoldExtension.helloPowerShell")();
+    await handlerFor("drmCopilotExtension.helloPowerShell")();
 
     const [executable, args, options] = childProcessMock.spawn.mock
       .calls[0] as [string, string[], { cwd: string }];
@@ -215,8 +215,8 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("execution enforces no copy of hello_python.py or hello_pwsh.ps1 into workspace root", async () => {
-    await handlerFor("scaffoldExtension.helloPython")();
-    await handlerFor("scaffoldExtension.helloPowerShell")();
+    await handlerFor("drmCopilotExtension.helloPython")();
+    await handlerFor("drmCopilotExtension.helloPowerShell")();
 
     const scriptPaths = childProcessMock.spawn.mock.calls.map(
       (call: unknown[]) => {
@@ -238,7 +238,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("collectCommitContext executes bundled resource without workspace script copy", async () => {
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
     const scriptPath = normalizePath(args[0]);
@@ -268,7 +268,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const artifactPath = "C:/workspace/artifacts/commit_context.txt";
     const artifactText = generatedArtifacts.get(artifactPath);
@@ -313,7 +313,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const artifactPath = "C:/workspace/artifacts/commit_context.txt";
     const artifactText = generatedArtifacts.get(artifactPath) ?? "";
@@ -322,7 +322,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("collectPrContext executes bundled wrapper script in destination workspace", async () => {
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
       string,
@@ -347,7 +347,7 @@ describe("drm-copilot integration behavior", () => {
       },
     ];
 
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
       string,
@@ -409,7 +409,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     expect(
       generatedArtifacts.has("C:/workspace/artifacts/pr_context.summary.txt"),

@@ -31,7 +31,7 @@ At runtime, the command should:
 
 ## Acceptance Criteria (early draft)
 
-- [x] Extension contributes a Command Palette action for commit-context collection (for example, `scaffoldExtension.collectCommitContext`).
+- [x] Extension contributes a Command Palette action for commit-context collection (for example, `drmCopilotExtension.collectCommitContext`).
 - [x] Command returns a clear actionable error when no workspace is open.
 - [x] Command executes a script resolved from extension bundled resources and does not create collector script files in the destination workspace root.
 - [x] Collector process is launched with destination workspace root as working directory, and Git introspection targets that repository.

@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This feature adds a new extension command, `scaffoldExtension.collectPrContext`, plus branch discovery/defaulting, quick-pick branch selection, and test coverage around command behavior. The implementation is coherent and test-backed for primary UX flow.
+This feature adds a new extension command, `drmCopilotExtension.collectPrContext`, plus branch discovery/defaulting, quick-pick branch selection, and test coverage around command behavior. The implementation is coherent and test-backed for primary UX flow.
 
 Top risks:
 1. **Policy gate risk:** formatting currently fails in both TS and Python paths.

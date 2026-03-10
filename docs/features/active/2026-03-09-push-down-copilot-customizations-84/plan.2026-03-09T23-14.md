@@ -99,7 +99,7 @@ Implement a new one-way Python push-down tool that copies the scoped `.github` c
 - [x] [P2-T2] Implement destination validation in `scripts/dev_tools/push_down_copilot_customizations.py` so missing paths, the source repository root, and non-directory destinations fail before any copy action begins.
   - Acceptance: The file contains a dedicated validation helper that raises `ValueError` before invoking the copy engine when the destination is unusable.
 
-- [x] [P2-T3] Implement the rewrite catalog and canonical textual reference renderer in `scripts/dev_tools/push_down_copilot_customizations.py` for `scaffoldExtension.collectPrContext`, `scaffoldExtension.newActiveFeatureFolderPlaceholder`, `scaffoldExtension.potentialToIssuePlaceholder`, `scaffoldExtension.newPotentialBugEntryPyPlaceholder`, and `scaffoldExtension.newPotentialEntryPsPlaceholder`.
+- [x] [P2-T3] Implement the rewrite catalog and canonical textual reference renderer in `scripts/dev_tools/push_down_copilot_customizations.py` for `drmCopilotExtension.collectPrContext`, `drmCopilotExtension.newActiveFeatureFolderPlaceholder`, `drmCopilotExtension.potentialToIssuePlaceholder`, `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`, and `drmCopilotExtension.newPotentialEntryPsPlaceholder`.
   - Acceptance: The file contains all five exact command IDs plus the exact text fragments `VS Code command:` and `command ID:`.
 
 - [x] [P2-T4] Implement anchored text-reference normalization and rewrite helpers in `scripts/dev_tools/push_down_copilot_customizations.py` so `scripts.dev_tools.*`, `scripts/dev_tools/*`, and `scripts/dev-tools/*` patterns normalize before catalog lookup.
@@ -119,14 +119,14 @@ Implement a new one-way Python push-down tool that copies the scoped `.github` c
 
 ### Phase 3 — Extension Placeholder Command Exposure
 
-- [x] [P3-T1] Add placeholder command contributions to `extensions/drm-copilot/package.json` for `scaffoldExtension.newActiveFeatureFolderPlaceholder`, `scaffoldExtension.potentialToIssuePlaceholder`, `scaffoldExtension.newPotentialBugEntryPyPlaceholder`, and `scaffoldExtension.newPotentialEntryPsPlaceholder`.
+- [x] [P3-T1] Add placeholder command contributions to `extensions/drm-copilot/package.json` for `drmCopilotExtension.newActiveFeatureFolderPlaceholder`, `drmCopilotExtension.potentialToIssuePlaceholder`, `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`, and `drmCopilotExtension.newPotentialEntryPsPlaceholder`.
   - Acceptance: `extensions/drm-copilot/package.json` contains all four exact command IDs under `contributes.commands`.
 
 - [x] [P3-T2] Add a placeholder command catalog in `extensions/drm-copilot/src/extension.ts` that maps each placeholder command ID to its original script reference and display title.
   - Acceptance: `extensions/drm-copilot/src/extension.ts` contains the exact script references `scripts.dev_tools.new_active_feature_folder`, `scripts.dev_tools.potential_to_issue`, `scripts/dev_tools/new_potential_bug_entry.py`, and `scripts/dev-tools/new-potential-entry.ps1`.
 
-- [x] [P3-T3] Add a placeholder command registration helper to `extensions/drm-copilot/src/extension.ts` and register all placeholder commands inside `activate()` without changing the existing `scaffoldExtension.collectPrContext` command ID.
-  - Acceptance: `extensions/drm-copilot/src/extension.ts` still contains `scaffoldExtension.collectPrContext` and also contains all four placeholder command IDs in `activate()` registration flow.
+- [x] [P3-T3] Add a placeholder command registration helper to `extensions/drm-copilot/src/extension.ts` and register all placeholder commands inside `activate()` without changing the existing `drmCopilotExtension.collectPrContext` command ID.
+  - Acceptance: `extensions/drm-copilot/src/extension.ts` still contains `drmCopilotExtension.collectPrContext` and also contains all four placeholder command IDs in `activate()` registration flow.
 
 - [x] [P3-T4] Implement the deterministic placeholder failure message in `extensions/drm-copilot/src/extension.ts` as `Not implemented: <commandId> is a placeholder for <script reference>.`.
   - Acceptance: `extensions/drm-copilot/src/extension.ts` contains the exact text fragment `Not implemented:` and the exact text fragment `is a placeholder for` in the placeholder handler.
@@ -164,7 +164,7 @@ Implement a new one-way Python push-down tool that copies the scoped `.github` c
   - Acceptance: Command `npm --prefix extensions/drm-copilot exec -- jest test/extension.placeholder-commands.test.ts -t "placeholder command throws deterministic not implemented error"` exits `0`.
 
 - [x] [P4-T11] Update `README.md` with the new push-down CLI invocation and the placeholder command contract.
-  - Acceptance: `README.md` contains the exact command `poetry run python -m scripts.dev_tools.push_down_copilot_customizations --destination` and the exact command ID `scaffoldExtension.newActiveFeatureFolderPlaceholder`.
+  - Acceptance: `README.md` contains the exact command `poetry run python -m scripts.dev_tools.push_down_copilot_customizations --destination` and the exact command ID `drmCopilotExtension.newActiveFeatureFolderPlaceholder`.
 
 ### Phase 5 — Final QA Loop & Coverage Gates
 

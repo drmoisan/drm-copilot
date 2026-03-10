@@ -21,7 +21,7 @@ Source set used (Work Mode: `full` from `issue.md`):
 
 | Criterion | Status | Evidence | Verification command(s) | Notes |
 |---|---|---|---|---|
-| Command Palette action contributed (`scaffoldExtension.collectCommitContext`) | PASS | `extensions/scaffold-extension/package.json:21-22` | static inspection | Command and title present. |
+| Command Palette action contributed (`drmCopilotExtension.collectCommitContext`) | PASS | `extensions/scaffold-extension/package.json:21-22` | static inspection | Command and title present. |
 | Clear error when no workspace open | PASS | `extensions/scaffold-extension/test/extension.test.ts:203-211` | `npm --prefix extensions/scaffold-extension run test -- --runInBand` | Test asserts `No workspace folder is open.` |
 | Uses bundled extension script, no workspace script copy | PASS | `extensions/scaffold-extension/src/extension.ts:205-214`; `extension.integration.test.ts:179-192` | same Jest command | Path assertions verify extension resource location, not workspace root. |
 | Collector launched with destination workspace `cwd` and targets destination repo | PASS | `extension.test.ts:267-283` checks `cwd` and `shell:false` | same Jest command | CWD semantics are explicitly asserted. |

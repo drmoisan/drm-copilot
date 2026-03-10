@@ -24,7 +24,7 @@ Therefore AC source of truth for this audit run:
 
 | Criterion | Status | Evidence | Verification command(s) | Notes |
 |---|---|---|---|---|
-| Command Palette action contributed (`scaffoldExtension.collectCommitContext`) | PASS | `extensions/scaffold-extension/package.json` contributes command/title. | static inspection | Present and aligned with feature docs. |
+| Command Palette action contributed (`drmCopilotExtension.collectCommitContext`) | PASS | `extensions/scaffold-extension/package.json` contributes command/title. | static inspection | Present and aligned with feature docs. |
 | Clear error when no workspace open | PASS | `extensions/scaffold-extension/test/extension.test.ts` asserts `No workspace folder is open.` | `npm --prefix extensions/scaffold-extension run test -- --runInBand` | Covered and passing. |
 | Uses bundled extension script, no workspace script copy | PASS | `src/extension.ts` resolves bundled path; integration tests assert no workspace-root materialization. | same Jest command | Covered and passing. |
 | Collector launched with destination workspace `cwd` and git targets destination repo | PASS | Unit tests assert spawn `cwd` equals workspace root and `shell:false`. | same Jest command | Contract verified. |

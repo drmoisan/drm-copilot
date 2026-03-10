@@ -30,22 +30,22 @@ interface BranchDiscoveryResult {
 
 const PLACEHOLDER_COMMAND_SPECS: ReadonlyArray<PlaceholderCommandSpec> = [
   {
-    commandId: "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+    commandId: "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
     title: "drm-copilot: New Active Feature Folder (Placeholder)",
     scriptReference: "scripts.dev_tools.new_active_feature_folder",
   },
   {
-    commandId: "scaffoldExtension.potentialToIssuePlaceholder",
+    commandId: "drmCopilotExtension.potentialToIssuePlaceholder",
     title: "drm-copilot: Potential To Issue (Placeholder)",
     scriptReference: "scripts.dev_tools.potential_to_issue",
   },
   {
-    commandId: "scaffoldExtension.newPotentialBugEntryPyPlaceholder",
+    commandId: "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
     title: "drm-copilot: New Potential Bug Entry (Python Placeholder)",
     scriptReference: "scripts/dev_tools/new_potential_bug_entry.py",
   },
   {
-    commandId: "scaffoldExtension.newPotentialEntryPsPlaceholder",
+    commandId: "drmCopilotExtension.newPotentialEntryPsPlaceholder",
     title: "drm-copilot: New Potential Entry (PowerShell Placeholder)",
     scriptReference: "scripts/dev-tools/new-potential-entry.ps1",
   },
@@ -392,43 +392,43 @@ export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
 
   const helloPythonDisposable = vscode.commands.registerCommand(
-    "scaffoldExtension.helloPython",
+    "drmCopilotExtension.helloPython",
     async () => {
       await executeBundledScript(context, output, {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/hello_python.py",
-        commandId: "scaffoldExtension.helloPython",
+        commandId: "drmCopilotExtension.helloPython",
       });
     },
   );
 
   const helloPowerShellDisposable = vscode.commands.registerCommand(
-    "scaffoldExtension.helloPowerShell",
+    "drmCopilotExtension.helloPowerShell",
     async () => {
       await executeBundledScript(context, output, {
         runtimeKind: "powershell",
         bundledRelativePath: "resources/templates/hello_pwsh.ps1",
-        commandId: "scaffoldExtension.helloPowerShell",
+        commandId: "drmCopilotExtension.helloPowerShell",
       });
     },
   );
 
   const collectCommitContextDisposable = vscode.commands.registerCommand(
-    "scaffoldExtension.collectCommitContext",
+    "drmCopilotExtension.collectCommitContext",
     async () => {
       await executeBundledScript(context, output, {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/collect_commit_context.py",
-        commandId: "scaffoldExtension.collectCommitContext",
+        commandId: "drmCopilotExtension.collectCommitContext",
         args: ["--output", "artifacts/commit_context.txt"],
       });
     },
   );
 
   const collectPrContextDisposable = vscode.commands.registerCommand(
-    "scaffoldExtension.collectPrContext",
+    "drmCopilotExtension.collectPrContext",
     async () => {
-      const commandId = "scaffoldExtension.collectPrContext";
+      const commandId = "drmCopilotExtension.collectPrContext";
       const workspaceRoot = getWorkspaceRoot();
       output.appendLine(`[${commandId}] branch discovery start`);
 

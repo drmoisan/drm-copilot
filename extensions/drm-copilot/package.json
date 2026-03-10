@@ -10,35 +10,35 @@
   "contributes": {
     "commands": [
       {
-        "command": "scaffoldExtension.helloPython",
+        "command": "drmCopilotExtension.helloPython",
         "title": "drm-copilot: Hello Python"
       },
       {
-        "command": "scaffoldExtension.helloPowerShell",
+        "command": "drmCopilotExtension.helloPowerShell",
         "title": "drm-copilot: Hello PowerShell"
       },
       {
-        "command": "scaffoldExtension.collectCommitContext",
+        "command": "drmCopilotExtension.collectCommitContext",
         "title": "drm-copilot: Collect Commit Context"
       },
       {
-        "command": "scaffoldExtension.collectPrContext",
+        "command": "drmCopilotExtension.collectPrContext",
         "title": "drm-copilot: Collect PR Context"
       },
       {
-        "command": "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+        "command": "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
         "title": "drm-copilot: New Active Feature Folder (Placeholder)"
       },
       {
-        "command": "scaffoldExtension.potentialToIssuePlaceholder",
+        "command": "drmCopilotExtension.potentialToIssuePlaceholder",
         "title": "drm-copilot: Potential To Issue (Placeholder)"
       },
       {
-        "command": "scaffoldExtension.newPotentialBugEntryPyPlaceholder",
+        "command": "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
         "title": "drm-copilot: New Potential Bug Entry (Python Placeholder)"
       },
       {
-        "command": "scaffoldExtension.newPotentialEntryPsPlaceholder",
+        "command": "drmCopilotExtension.newPotentialEntryPsPlaceholder",
         "title": "drm-copilot: New Potential Entry (PowerShell Placeholder)"
       }
     ]
