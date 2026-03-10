@@ -292,8 +292,8 @@ jobs:
           path: artifacts/pester/kcov/**
           if-no-files-found: error
 
-  scaffold-extension-tests:
-    name: Scaffold Extension Tests (${{ matrix.os }})
+  drm-copilot-extension-tests:
+    name: drm-copilot Extension Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -308,13 +308,13 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: extensions/scaffold-extension/package-lock.json
+          cache-dependency-path: extensions/drm-copilot/package-lock.json
 
       - name: Install extension dependencies
-        run: npm --prefix extensions/scaffold-extension ci
+        run: npm --prefix extensions/drm-copilot ci
 
       - name: Run extension unit/integration tests
-        run: npm --prefix extensions/scaffold-extension run test
+        run: npm --prefix extensions/drm-copilot run test
 
 
 

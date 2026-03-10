@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: "node",
   testMatch: [
     "<rootDir>/tests/unit/**/*.test.ts",
-    "<rootDir>/extensions/scaffold-extension/test/**/*.test.ts",
+    "<rootDir>/extensions/drm-copilot/test/**/*.test.ts",
   ],
   testPathIgnorePatterns: ["/node_modules/", "/out/"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],

@@ -1,6 +1,6 @@
 ---
 name: csharp-orchestrator
-model: GPT-5.3-Codex (copilot)
+model: GPT-5.4 (copilot)
 description: Orchestrate end-to-end C# feature/bug delivery by estimating change budget and routing through atomic planning/execution and feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose workflow path, delegate to specialist agents, and persist until completion."
 target: vscode

@@ -1,0 +1,67 @@
+# blank-pr-context (Potential Bug)
+
+- Date captured: 2026-03-05
+- Author: Dan Moisan
+- Status: Draft
+
+> Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
+
+## Summary
+
+When the extension exposes internal tooling to a destination workspace, PR-context collection from `scripts\dev_tools\pr_context` creates the output artifact but leaves it empty (or effectively empty), while `collect_commit_context.py` succeeds under the same workflow.
+
+## Environment
+
+- OS/version: Windows (workspace host)
+- Python version: `>=3.10,<4.0` (repo constraint in `pyproject.toml`)
+- Command/flags used: Extension-side execution flow that exposes and runs tooling in a destination workspace
+- Data source or fixture: Destination workspace Git repository context (branch, base comparison, changed files/diffs)
+
+## Steps to Reproduce
+
+1. Use the `drm-copilot` extension to expose internal tooling to a destination workspace.
+2. Run `collect_commit_context.py` (control) and then run PR-context collection from `scripts\dev_tools\pr_context` in the same destination workspace flow.
+3. Inspect generated artifacts in the destination workspace.
+
+## Expected Behavior
+
+PR-context artifacts should be populated with expected branch/base comparison and diff context when generated in destination workspaces, just like commit-context artifacts are populated.
+
+## Actual Behavior
+
+The destination artifact path is created correctly, but PR-context content is empty (or effectively empty for downstream use). This indicates collection/rendering references are not resolving correctly under extension-side execution.
+
+## Logs / Screenshots
+
+- [x] Attached minimal logs or screenshot
+- Snippet:
+	- Commit context artifact is populated using `collect_commit_context.py` in destination workspace.
+	- PR-context artifact from `scripts\dev_tools\pr_context` is created but lacks expected context payload.
+
+## Impact / Severity
+
+- [ ] Blocker
+- [x] High
+- [ ] Medium
+- [ ] Low
+
+## Suspected Cause / Notes
+
+Likely path/reference resolution mismatch when PR-context package runs from extension-exposed location in destination workspace. Candidate areas to inspect:
+- `scripts/dev_tools/pr_context/collector.py`
+- `scripts/dev_tools/pr_context/render.py`
+- `scripts/dev_tools/pr_context/render_pr_helpers.py`
+
+## Proposed Fix / Validation Ideas
+
+- [x] Unit coverage areas
+	- Add regression tests for destination-workspace execution path to ensure PR-context artifacts are non-empty when git context exists.
+- [x] Integration scenario to retest
+	- End-to-end extension exposure workflow: compare commit-context vs PR-context artifact generation in destination workspace.
+- [x] Manual verification notes
+	- Re-run destination-workspace PR-context generation and confirm output includes expected context body.
+
+## Next Step
+
+- [x] Promote to GitHub issue (bug-report template)
+- [ ] Move to active fix folder / branch
