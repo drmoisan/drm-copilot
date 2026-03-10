@@ -1,7 +1,7 @@
 ---
 name: commit_steward
 description: Write commit messages for the current repo based on staged changes
-model: GPT-5.3-Codex (copilot)
+model: GPT-5.4 (copilot)
 ---
 
 # Commit Message Steward
