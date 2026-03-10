@@ -340,8 +340,8 @@ def test_main_prints_summary_artifact_path_on_success(
 ) -> None:
     """Print the artifact path when the CLI completes successfully."""
     module = _load_main_module()
-    repo_root = Path("/source-repo")
-    destination_root = Path("/destination-repo")
+    repo_root = Path("/source-repo").expanduser().resolve()
+    destination_root = Path("/destination-repo").expanduser().resolve()
     fs = RecordingPushDownFileSystem()
     fs.ensure_dir(repo_root)
     fs.ensure_dir(destination_root)
@@ -365,7 +365,11 @@ def test_real_filesystem_list_files_returns_empty_when_root_is_missing(
     filesystem_module = _load_filesystem_module()
     root = Path("/missing-root")
 
-    monkeypatch.setattr(Path, "is_dir", lambda self: False)
+    def fake_is_dir(_: Path) -> bool:
+        """Report the requested root as absent for this enumeration scenario."""
+        return False
+
+    monkeypatch.setattr(Path, "is_dir", fake_is_dir)
 
     assert filesystem_module.RealPushDownFileSystem().list_files(root) == []
 
@@ -380,7 +384,9 @@ def test_real_filesystem_list_files_filters_and_sorts_paths(
     earlier_file = root / "a-first.md"
     non_file = root / "nested"
 
-    monkeypatch.setattr(Path, "is_dir", lambda self: self == root)
+    def fake_root_is_dir(candidate: Path) -> bool:
+        """Mark only the requested root as a directory for the test run."""
+        return candidate == root
 
     def fake_rglob(self: Path, pattern: str):
         """Return an intentionally unsorted mixed directory listing."""
@@ -388,12 +394,13 @@ def test_real_filesystem_list_files_filters_and_sorts_paths(
         assert pattern == "*"
         return [later_file, non_file, earlier_file]
 
+    def fake_is_file(candidate: Path) -> bool:
+        """Treat only the seeded markdown paths as files for sorting coverage."""
+        return candidate in {later_file, earlier_file}
+
+    monkeypatch.setattr(Path, "is_dir", fake_root_is_dir)
     monkeypatch.setattr(Path, "rglob", fake_rglob)
-    monkeypatch.setattr(
-        Path,
-        "is_file",
-        lambda self: self in {later_file, earlier_file},
-    )
+    monkeypatch.setattr(Path, "is_file", fake_is_file)
 
     files = filesystem_module.RealPushDownFileSystem().list_files(root)
 
@@ -409,9 +416,18 @@ def test_real_filesystem_delegates_path_operations(
     directory_path = Path("/repo/output")
     file_path = directory_path / "example.md"
     calls: dict[str, object] = {}
+    mkdir_calls: list[tuple[Path, bool, bool]] = []
 
-    monkeypatch.setattr(Path, "is_dir", lambda self: self == directory_path)
-    monkeypatch.setattr(Path, "is_file", lambda self: self == file_path)
+    def fake_is_dir(candidate: Path) -> bool:
+        """Mark only the seeded output directory as an existing directory."""
+        return candidate == directory_path
+
+    def fake_is_file(candidate: Path) -> bool:
+        """Mark only the seeded markdown file as an existing file."""
+        return candidate == file_path
+
+    monkeypatch.setattr(Path, "is_dir", fake_is_dir)
+    monkeypatch.setattr(Path, "is_file", fake_is_file)
 
     def fake_read_text(self: Path, *, encoding: str) -> str:
         """Record read delegation and return deterministic content."""
@@ -425,8 +441,6 @@ def test_real_filesystem_delegates_path_operations(
 
     def fake_mkdir(self: Path, *, parents: bool, exist_ok: bool) -> None:
         """Record directory-creation requests."""
-        mkdir_calls = calls.setdefault("mkdir", [])
-        assert isinstance(mkdir_calls, list)
         mkdir_calls.append((self, parents, exist_ok))
 
     monkeypatch.setattr(Path, "read_text", fake_read_text)
@@ -441,7 +455,7 @@ def test_real_filesystem_delegates_path_operations(
 
     assert calls["read"] == (file_path, "utf-8")
     assert calls["write"] == (file_path, "updated content", "utf-8")
-    assert calls["mkdir"] == [
+    assert mkdir_calls == [
         (directory_path, True, True),
         (directory_path, True, True),
     ]
@@ -469,7 +483,8 @@ def test_normalize_reference_for_lookup_removes_prefixes_and_normalizes_slashes(
     rewrite_module = _load_rewrite_module()
 
     normalized = rewrite_module.normalize_reference_for_lookup(
-        "poetry run python -m ${workspaceFolder}\\scripts\\dev-tools\\new-potential-entry.ps1"
+        "poetry run python -m "
+        "${workspaceFolder}\\scripts\\dev-tools\\new-potential-entry.ps1"
     )
 
     assert normalized == "scripts/dev_tools/new-potential-entry.ps1"
@@ -490,7 +505,8 @@ def test_rewrite_matched_reference_preserves_trailing_punctuation() -> None:
     assert rewritten_count == 0
     assert placeholder_count == 1
     assert unmatched == []
-    assert replacement.endswith("`.")
+    assert replacement.endswith(").")
+    assert "`scaffoldExtension.newActiveFeatureFolderPlaceholder`" in replacement
 
 
 def test_rewrite_text_references_reports_unique_unmatched_references() -> None:

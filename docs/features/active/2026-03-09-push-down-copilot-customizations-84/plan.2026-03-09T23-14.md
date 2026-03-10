@@ -87,8 +87,9 @@ Implement a new one-way Python push-down tool that copies the scoped `.github` c
 - [x] [P1-T9] [expect-fail] Add `registers push-down placeholder commands` to `extensions/drm-copilot/test/extension.placeholder-commands.test.ts`.
   - Acceptance: Command `npm --prefix extensions/drm-copilot exec -- jest test/extension.placeholder-commands.test.ts -t "registers push-down placeholder commands"` exits non-zero and evidence is saved at `docs/features/active/2026-03-09-push-down-copilot-customizations-84/evidence/regression-testing/p1-t9-placeholder-registration.2026-03-09T23-14.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and a failure excerpt attributable to the missing-command-registration scenario.
 
-- [ ] [P1-T10] [expect-fail] Add `placeholder command throws deterministic not implemented error` to `extensions/drm-copilot/test/extension.placeholder-commands.test.ts`.
+- [x] [P1-T10] [expect-fail] Add `placeholder command throws deterministic not implemented error` to `extensions/drm-copilot/test/extension.placeholder-commands.test.ts`.
   - Acceptance: Command `npm --prefix extensions/drm-copilot exec -- jest test/extension.placeholder-commands.test.ts -t "placeholder command throws deterministic not implemented error"` exits non-zero and evidence is saved at `docs/features/active/2026-03-09-push-down-copilot-customizations-84/evidence/regression-testing/p1-t10-placeholder-error.2026-03-09T23-14.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and a failure excerpt attributable to the placeholder-error scenario.
+  - Reconciliation Note: Historical fail-before evidence was not captured during the original implementation; see `docs/features/active/2026-03-09-push-down-copilot-customizations-84/evidence/regression-testing/p1-t10-placeholder-error-replacement-note.2026-03-09T23-14.md` for the audited replacement note recorded during remediation.
 
 ### Phase 2 — Python Push-Down Tool Implementation
 
