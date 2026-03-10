@@ -24,6 +24,22 @@
       {
         "command": "scaffoldExtension.collectPrContext",
         "title": "drm-copilot: Collect PR Context"
+      },
+      {
+        "command": "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+        "title": "drm-copilot: New Active Feature Folder (Placeholder)"
+      },
+      {
+        "command": "scaffoldExtension.potentialToIssuePlaceholder",
+        "title": "drm-copilot: Potential To Issue (Placeholder)"
+      },
+      {
+        "command": "scaffoldExtension.newPotentialBugEntryPyPlaceholder",
+        "title": "drm-copilot: New Potential Bug Entry (Python Placeholder)"
+      },
+      {
+        "command": "scaffoldExtension.newPotentialEntryPsPlaceholder",
+        "title": "drm-copilot: New Potential Entry (PowerShell Placeholder)"
       }
     ]
   },

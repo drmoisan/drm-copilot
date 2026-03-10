@@ -396,6 +396,23 @@ def test_force_left_to_right_overrides_newer_right() -> None:
     assert fs.get_mtime(repo_right / root / "skill.md") == 100.0
 
 
+def test_sync_repos_ignores_files_missing_on_one_side() -> None:
+    """Ignore files that exist in only one repo so two-way sync stays unchanged."""
+    fs = InMemorySyncFileSystem()
+    repo_left, repo_right = _make_repo_paths()
+    root = Path(".github/prompts")
+
+    left_only_path = repo_left / root / "left-only.prompt.md"
+    fs.write_text(left_only_path, "left only")
+    fs.set_mtime(left_only_path, 100.0)
+
+    summary = agentic_sync.AgenticSyncer(fs).sync_repos(repo_left, repo_right)
+
+    assert summary.actions == []
+    assert fs.read_text(left_only_path) == "left only"
+    assert fs.get_file(repo_right / root / "left-only.prompt.md") is None
+
+
 def test_build_artifact_path_uses_timestamp() -> None:
     """Artifact path should include timestamp and folder path."""
     started = agentic_sync.datetime(

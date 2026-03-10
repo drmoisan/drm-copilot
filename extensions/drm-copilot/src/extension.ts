@@ -17,10 +17,39 @@ interface CommandSpec {
   readonly args?: ReadonlyArray<string>;
 }
 
+interface PlaceholderCommandSpec {
+  readonly commandId: string;
+  readonly title: string;
+  readonly scriptReference: string;
+}
+
 interface BranchDiscoveryResult {
   readonly candidates: ReadonlyArray<string>;
   readonly defaultBranch: string;
 }
+
+const PLACEHOLDER_COMMAND_SPECS: ReadonlyArray<PlaceholderCommandSpec> = [
+  {
+    commandId: "scaffoldExtension.newActiveFeatureFolderPlaceholder",
+    title: "drm-copilot: New Active Feature Folder (Placeholder)",
+    scriptReference: "scripts.dev_tools.new_active_feature_folder",
+  },
+  {
+    commandId: "scaffoldExtension.potentialToIssuePlaceholder",
+    title: "drm-copilot: Potential To Issue (Placeholder)",
+    scriptReference: "scripts.dev_tools.potential_to_issue",
+  },
+  {
+    commandId: "scaffoldExtension.newPotentialBugEntryPyPlaceholder",
+    title: "drm-copilot: New Potential Bug Entry (Python Placeholder)",
+    scriptReference: "scripts/dev_tools/new_potential_bug_entry.py",
+  },
+  {
+    commandId: "scaffoldExtension.newPotentialEntryPsPlaceholder",
+    title: "drm-copilot: New Potential Entry (PowerShell Placeholder)",
+    scriptReference: "scripts/dev-tools/new-potential-entry.ps1",
+  },
+];
 
 function createOutputChannel(): vscode.OutputChannel {
   return vscode.window.createOutputChannel("drm-copilot");
@@ -347,6 +376,18 @@ async function executeBundledScript(
   }
 }
 
+function registerPlaceholderCommands(
+  output: vscode.OutputChannel,
+): vscode.Disposable[] {
+  return PLACEHOLDER_COMMAND_SPECS.map((spec) =>
+    vscode.commands.registerCommand(spec.commandId, async () => {
+      const message = `Not implemented: ${spec.commandId} is a placeholder for ${spec.scriptReference}.`;
+      output.appendLine(`[${spec.commandId}] ${message}`);
+      throw new Error(message);
+    }),
+  );
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
 
@@ -435,11 +476,14 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const placeholderDisposables = registerPlaceholderCommands(output);
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
     collectCommitContextDisposable,
     collectPrContextDisposable,
+    ...placeholderDisposables,
     output,
   );
 }
