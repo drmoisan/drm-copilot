@@ -23,7 +23,7 @@ Use this skill when:
 - `${long-name}`: `${relativeFile}` filename without `.md`
 - `${issue-num}`: promoted GitHub issue number
 - `${feature-folder}`: active feature folder path
-- `${work-mode}`: `full` or `minor-audit`
+- `${work-mode}`: `minor-audit`, `full-feature`, or `full-bug` (legacy `full` is accepted only as an alias for `full-feature`)
 - `${short-path-flag}`: `--work-mode minor-audit` (mandatory for short-path promotion/folder creation)
 
 ## Canonical Command Sequence
@@ -79,11 +79,14 @@ Before delegating research/spec/planning, provide:
 
 Mode-aware expectations:
 - For `minor-audit`, `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
-- For `full`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
+- For `full-feature`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
+- For `full-bug`, `spec.md` is expected alongside `issue.md`; `user-story.md` should be absent unless the requirements explicitly justify it.
 
 Selected-mode persistence requirements:
 - Producer outputs MUST persist exactly one marker in `issue.md` metadata above the first `##` heading:
 	- `- Work Mode: minor-audit`
-	- `- Work Mode: full`
+	- `- Work Mode: full-feature`
+	- `- Work Mode: full-bug`
 - Persisted marker MUST represent selected mode after eligibility checks, not requested mode.
-- If a requested `minor-audit` path is rejected by eligibility checks, tooling MUST fail closed to `full`, emit fallback reason, and persist `- Work Mode: full`.
+- If a legacy requested `full` path is accepted, tooling MUST normalize it to `full-feature` before persistence.
+- If a requested `minor-audit` path is rejected by eligibility checks, tooling MUST fail closed to `full-feature`, emit fallback reason, and persist `- Work Mode: full-feature`.

@@ -485,7 +485,7 @@ def test_resolve_mode_context_mode_minor_audit(monkeypatch: pytest.MonkeyPatch) 
 def test_resolve_mode_context_mode_fails_closed_when_marker_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Fail closed to full mode when issue marker is missing."""
+    """Fail closed to full-feature mode when issue marker is missing."""
     workspace = Path("/workspace")
     folderpath = "docs/features/active/feature-x"
     issue_path = workspace / folderpath / "issue.md"
@@ -504,14 +504,14 @@ def test_resolve_mode_context_mode_fails_closed_when_marker_missing(
 
     mode, reason = module.resolve_mode_context(folderpath, workspace)
 
-    assert mode == "full"
+    assert mode == "full-feature"
     assert "marker missing" in reason
 
 
 def test_resolve_mode_context_mode_fails_closed_when_issue_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Fail closed to full when issue.md file does not exist."""
+    """Fail closed to full-feature when issue.md file does not exist."""
     workspace = Path("/workspace")
     folderpath = "docs/features/active/feature-x"
 
@@ -522,14 +522,14 @@ def test_resolve_mode_context_mode_fails_closed_when_issue_missing(
 
     mode, reason = module.resolve_mode_context(folderpath, workspace)
 
-    assert mode == "full"
-    assert reason == "issue.md missing; fail closed to full"
+    assert mode == "full-feature"
+    assert reason == "issue.md missing; fail closed to full-feature"
 
 
 def test_resolve_mode_context_mode_fails_closed_when_issue_unreadable(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Fail closed to full with unreadable reason when issue.md read fails."""
+    """Fail closed to full-feature with unreadable reason when issue.md read fails."""
     workspace = Path("/workspace")
     folderpath = "docs/features/active/feature-x"
     issue_path = workspace / folderpath / "issue.md"
@@ -546,5 +546,5 @@ def test_resolve_mode_context_mode_fails_closed_when_issue_unreadable(
 
     mode, reason = module.resolve_mode_context(folderpath, workspace)
 
-    assert mode == "full"
-    assert reason == "issue.md unreadable; fail closed to full"
+    assert mode == "full-feature"
+    assert reason == "issue.md unreadable; fail closed to full-feature"

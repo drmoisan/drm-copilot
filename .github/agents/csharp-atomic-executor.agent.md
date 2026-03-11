@@ -17,6 +17,13 @@ You are an **execution-only agent**. Execute an `atomic_planner` plan exactly as
 
 If the plan is incomplete or non-executable, stop only during preflight and request a plan delta.
 
+# Shared skills (apply before proceeding)
+
+Use these reusable skills to avoid duplicating shared operations:
+- `policy-compliance-order`
+- `atomic-plan-contract`
+- `acceptance-criteria-tracking`
+
 # Core behavior
 
 ## 1) Plan is authoritative
@@ -29,8 +36,10 @@ Before any execution, validate plan structure and policy compatibility:
 
 - Resolve mode from `issue.md` marker first:
   - `- Work Mode: minor-audit`
-  - `- Work Mode: full`
-- If marker is missing or malformed, fail closed to `full`.
+  - `- Work Mode: full-feature`
+  - `- Work Mode: full-bug`
+  - legacy `- Work Mode: full` => interpret as `full-feature`
+- If marker is missing or malformed, fail closed to `full-feature`.
 - When selected mode is `minor-audit`, reject plans that do not include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
 
 - Canonical headings: `### Phase N — <Title>`
@@ -99,6 +108,7 @@ At completion, report:
 - type-check delta
 - failing test delta
 - per-file coverage delta (and overall if applicable)
+- AC Status Summary per `acceptance-criteria-tracking`
 - final updated checklist status
 
 # Blocking protocol

@@ -33,6 +33,7 @@ from scripts.dev_tools.new_active_feature_folder_models import (
     resolve_workspace,
     validate_feature_name,
 )
+from scripts.dev_tools.prompt_mode_contract import normalize_requested_work_mode
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -105,8 +106,9 @@ def create_active_folder(
         resolved_feature_name, workspace_path, filesystem
     )
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
+    selected_work_mode = normalize_requested_work_mode(work_mode, feature_type)
     use_minor_audit, fallback_reason = should_use_minor_audit_mode(
-        work_mode=work_mode,
+        work_mode=selected_work_mode,
         feature_type=feature_type,
         potential_content=potential_content,
     )
@@ -252,14 +254,14 @@ def create_active_folder(
             moved_content = filesystem.read_text(potential_issue_path)
             filesystem.write_text(
                 potential_issue_path,
-                upsert_work_mode_marker(moved_content, "full"),
+                upsert_work_mode_marker(moved_content, selected_work_mode),
             )
             print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:
         print(f"Seeded docs from potential: {potential_file.name}")
 
-    print(f"Selected mode: {'minor-audit' if use_minor_audit else 'full'}")
+    print(f"Selected mode: {'minor-audit' if use_minor_audit else selected_work_mode}")
     if fallback_reason:
         print(f"Fallback reason: {fallback_reason}")
 
@@ -320,9 +322,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--work-mode",
-        choices=["minor-audit", "full"],
+        choices=["minor-audit", "full-feature", "full-bug", "full"],
         default="full",
-        help="Work mode routing for minor-audit vs full feature flow.",
+        help=(
+            "Work mode routing. Canonical values are minor-audit, full-feature, "
+            "and full-bug; full is accepted as a backward-compatible alias."
+        ),
     )
     return parser.parse_args()
 

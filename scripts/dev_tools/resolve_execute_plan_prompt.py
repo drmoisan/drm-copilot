@@ -12,8 +12,8 @@ Supported variables:
     - ${name}: Feature name derived from folder naming convention.
     - ${spec}: Path to spec.md under ${folderpath}.
     - ${research}: Path to research.md under ${folderpath}, annotated when missing.
-    - ${user-story}: Path to user-story.md under ${folderpath}, section removed
-      when missing.
+        - ${user-story}: Path to user-story.md under ${folderpath}, section removed
+            when missing.
 """
 
 from __future__ import annotations
@@ -318,7 +318,7 @@ def resolve_mode_context(folderpath: str, workspace_root: Path) -> tuple[str, st
     except OSError:
         return (
             resolve_selected_work_mode(None),
-            "issue.md unreadable; fail closed to full",
+            "issue.md unreadable; fail closed to full-feature",
         )
 
     selected_mode = resolve_selected_work_mode(issue_content)

@@ -42,7 +42,9 @@ def get_section(content: str, name: str) -> str:
 def upsert_work_mode_marker(content: str, mode: str) -> str:
     """Insert or update work-mode marker directly above first `##` heading."""
     marker_line = f"- Work Mode: {mode}"
-    marker_pattern = re.compile(r"^- Work Mode:\s*(minor-audit|full)\s*$")
+    marker_pattern = re.compile(
+        r"^- Work Mode:\s*(minor-audit|full-feature|full-bug|full)\s*$"
+    )
     lines = [line for line in content.splitlines() if not marker_pattern.match(line)]
 
     for idx, line in enumerate(lines):

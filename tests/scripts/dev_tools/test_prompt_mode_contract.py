@@ -14,24 +14,29 @@ def test_parse_issue_work_mode_valid_minor_marker() -> None:
     assert malformed is False
 
 
-def test_parse_issue_work_mode_valid_full_marker() -> None:
-    """Parse valid full marker from issue content."""
-    mode, malformed = parse_issue_work_mode("- Work Mode: full\n")
-    assert mode == "full"
+def test_parse_issue_work_mode_valid_full_feature_marker() -> None:
+    """Parse valid full-feature marker from issue content."""
+    mode, malformed = parse_issue_work_mode("- Work Mode: full-feature\n")
+    assert mode == "full-feature"
     assert malformed is False
 
 
+def test_resolve_selected_work_mode_normalizes_legacy_full_marker() -> None:
+    """Normalize legacy full markers to the canonical full-feature variant."""
+    assert resolve_selected_work_mode("- Work Mode: full\n") == "full-feature"
+
+
 def test_resolve_selected_work_mode_fails_closed_when_marker_missing() -> None:
-    """Resolve to full when marker is absent."""
-    assert resolve_selected_work_mode("# no marker here\n") == "full"
+    """Resolve to full-feature when marker is absent."""
+    assert resolve_selected_work_mode("# no marker here\n") == "full-feature"
 
 
 def test_resolve_selected_work_mode_fails_closed_when_marker_malformed() -> None:
-    """Resolve to full when marker has unsupported value."""
-    assert resolve_selected_work_mode("- Work Mode: maybe\n") == "full"
+    """Resolve to full-feature when marker has unsupported value."""
+    assert resolve_selected_work_mode("- Work Mode: maybe\n") == "full-feature"
 
 
 def test_build_fallback_reason_is_explicit_for_missing_marker() -> None:
     """Return explicit fallback reason text for missing marker scenario."""
     reason = build_fallback_reason("# no marker\n")
-    assert reason == "issue.md Work Mode marker missing; fail closed to full"
+    assert reason == "issue.md Work Mode marker missing; fail closed to full-feature"

@@ -464,7 +464,8 @@ def _resolve_work_mode_from_issue(
         workspace_root (Path): Workspace root used for file resolution.
 
     Returns:
-        tuple[str, str]: Selected work mode (`minor-audit` or `full`) and a
+        tuple[str, str]: Selected work mode (`minor-audit`, `full-feature`, or
+        `full-bug`) and a
         human-readable fallback reason.
     """
     issue_path = workspace_root / Path(folderpath) / "issue.md"
@@ -476,7 +477,7 @@ def _resolve_work_mode_from_issue(
     except OSError:
         return (
             resolve_selected_work_mode(None),
-            "issue.md unreadable; fail closed to full",
+            "issue.md unreadable; fail closed to full-feature",
         )
 
     selected_mode = resolve_selected_work_mode(issue_content)
