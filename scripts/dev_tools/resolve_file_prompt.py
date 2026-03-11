@@ -373,6 +373,78 @@ def _remove_lines_referencing_variable(template: str, variable_name: str) -> str
     return "".join(kept_lines)
 
 
+def _insert_after_heading(template: str, heading: str, block: str) -> str:
+    """Insert a text block immediately after a markdown heading.
+
+    Purpose:
+        Some prompt adjustments are mode-specific and should be added near the
+        most relevant section header. This helper performs a stable insertion
+        after the first exact heading match.
+
+    Args:
+        template (str): Prompt template content.
+        heading (str): Exact heading line to match.
+        block (str): Text block to insert after the heading.
+
+    Returns:
+        str: Template with block inserted after the matched heading. If the
+        heading does not exist, the original template is returned.
+    """
+    lines = template.splitlines(keepends=True)
+
+    # Insert after the first exact heading match to keep behavior deterministic.
+    for index, line in enumerate(lines):
+        if line.strip() != heading:
+            continue
+
+        insertion = block
+        if not insertion.endswith("\n"):
+            insertion = f"{insertion}\n"
+
+        lines.insert(index + 1, insertion)
+        return "".join(lines)
+
+    return template
+
+
+def _apply_minor_audit_overrides(template: str) -> str:
+    """Apply deterministic minor-audit prompt overrides.
+
+    Purpose:
+        Minor-audit plans intentionally use `issue.md` as the sole requirement
+        source. In this mode, spec/user-story/research references should be
+        removed from the resolved prompt and phase guidance constrained to three
+        phases for small-path execution.
+
+    Args:
+        template (str): Prompt template content without front matter.
+
+    Returns:
+        str: Updated template content with minor-audit-specific instructions.
+    """
+    updated = template
+
+    # Remove optional document references that are invalid for minor-audit.
+    for variable_name in ("spec", "user-story", "research"):
+        updated = _remove_lines_referencing_variable(updated, variable_name)
+
+    mode_block = (
+        "\n"
+        "### Minor-Audit Mode Overrides (Mandatory)\n"
+        "\n"
+        "- Use `${folderpath}/issue.md` as the sole requirements source.\n"
+        "- Do not require or reference `${spec}`, `${user-story}`, or "
+        "`${research}`.\n"
+        "- Output exactly 3 phases in this order:\n"
+        "  - Phase 0 — Baseline Capture\n"
+        "  - Phase 1 — Handoff to small-path planning/development agent\n"
+        "  - Phase 2 — Final QC loop\n"
+    )
+    updated = _insert_after_heading(updated, "## Core Requirements", mode_block)
+
+    return updated
+
+
 def _extract_template_variables(template: str) -> set[str]:
     """Extract variable names from ${var} placeholders in a template."""
     return {m.group(1) for m in re.finditer(r"\$\{([^}]+)\}", template)}
@@ -392,7 +464,8 @@ def _resolve_work_mode_from_issue(
         workspace_root (Path): Workspace root used for file resolution.
 
     Returns:
-        tuple[str, str]: Selected work mode (`minor-audit` or `full`) and a
+        tuple[str, str]: Selected work mode (`minor-audit`, `full-feature`, or
+        `full-bug`) and a
         human-readable fallback reason.
     """
     issue_path = workspace_root / Path(folderpath) / "issue.md"
@@ -404,7 +477,7 @@ def _resolve_work_mode_from_issue(
     except OSError:
         return (
             resolve_selected_work_mode(None),
-            "issue.md unreadable; fail closed to full",
+            "issue.md unreadable; fail closed to full-feature",
         )
 
     selected_mode = resolve_selected_work_mode(issue_content)
@@ -473,6 +546,11 @@ def resolve_prompt(template_content: str, target_path: Path, cwd: Path) -> str:
     selected_work_mode, fallback_reason = _resolve_work_mode_from_issue(folderpath, cwd)
     variables["work-mode"] = selected_work_mode
     variables["fallback-reason"] = fallback_reason
+
+    # In minor-audit mode, prompt requirements come from issue.md only and the
+    # plan structure is constrained to three phases.
+    if selected_work_mode == "minor-audit":
+        content = _apply_minor_audit_overrides(content)
 
     # Resolve optional research path. If missing, delete any instruction line
     # that references it (per prompt requirements).

@@ -1,7 +1,7 @@
 ---
 name: python-atomic-executor
 description: Execute atomic_planner plans verbatim with atomic_executor rigor and Python-specialized quality gates (Black, Ruff, Pyright, Pytest, and zero-regression deltas).
-model: GPT-5.3-Codex (copilot)
+model: GPT-5.4 (copilot)
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and Python-specific QA gates."
 target: vscode
 tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, todo]
@@ -17,6 +17,13 @@ You are an **execution-only agent**. Execute an `atomic_planner` plan exactly as
 
 If the plan is incomplete or non-executable, stop only during preflight and request a plan delta.
 
+# Shared skills (apply before proceeding)
+
+Use these reusable skills to avoid duplicating shared operations:
+- `policy-compliance-order`
+- `atomic-plan-contract`
+- `acceptance-criteria-tracking`
+
 # Core behavior
 
 ## 1) Plan is authoritative
@@ -29,8 +36,10 @@ Before any execution, validate plan structure and policy compatibility:
 
 - Resolve mode from `issue.md` marker first:
   - `- Work Mode: minor-audit`
-  - `- Work Mode: full`
-- If marker is missing or malformed, fail closed to `full`.
+  - `- Work Mode: full-feature`
+  - `- Work Mode: full-bug`
+  - legacy `- Work Mode: full` => interpret as `full-feature`
+- If marker is missing or malformed, fail closed to `full-feature`.
 - Enforce minor-audit evidence-task gate before execution when selected mode is `minor-audit`.
 - When selected mode is `minor-audit`, reject plans that do not include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
 
@@ -101,6 +110,7 @@ At completion, report:
 - Pyright delta
 - failing test delta
 - per-file coverage delta (and overall if applicable)
+- AC Status Summary per `acceptance-criteria-tracking`
 - final updated checklist status
 
 # Blocking protocol

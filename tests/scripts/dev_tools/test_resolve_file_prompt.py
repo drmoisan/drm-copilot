@@ -220,8 +220,87 @@ def test_resolve_prompt_work_mode_marker_minor_audit() -> None:
     assert "Reason=none" in result
 
 
+def test_resolve_prompt_minor_audit_removes_spec_story_research_lines() -> None:
+    """In minor-audit mode, remove spec/user-story/research requirement lines."""
+    template = (
+        "## Core Requirements\n"
+        "- Plan should deliver all of the requirements detailed in the `${spec}` "
+        "and the `${user-story}`\n"
+        "- Plan should leverage the extensive research that has been done on "
+        "how to implement and can be found at `${research}`\n"
+        "Mode=${work-mode};Reason=${fallback-reason}\n"
+    )
+    cwd = Path.cwd()
+    feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
+    target = feature_dir / "plan.md"
+
+    issue_path = feature_dir / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: minor-audit\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, cwd)
+
+    assert "Mode=minor-audit" in result
+    assert "`${spec}`" not in result
+    assert "`${user-story}`" not in result
+    assert "`${research}`" not in result
+    assert "Plan should deliver all of the requirements" not in result
+    assert "Plan should leverage the extensive research" not in result
+
+
+def test_resolve_prompt_minor_audit_injects_three_phase_override() -> None:
+    """In minor-audit mode, inject deterministic three-phase guidance."""
+    template = (
+        "## Core Requirements\n"
+        "- Generate implementation plans that are fully executable by AI agents\n"
+        "Mode=${work-mode};Reason=${fallback-reason}\n"
+    )
+    cwd = Path.cwd()
+    feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
+    target = feature_dir / "plan.md"
+
+    issue_path = feature_dir / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: minor-audit\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, cwd)
+
+    assert "Minor-Audit Mode Overrides (Mandatory)" in result
+    normalized_result = result.replace("\\", "/")
+    expected_issue_source_line = (
+        "Use `docs/features/active/2026-02-23-minor-audit-58/issue.md` "
+        "as the sole requirements source."
+    )
+    assert expected_issue_source_line in normalized_result
+    assert "Phase 0 — Baseline Capture" in result
+    assert "Phase 1 — Handoff to small-path planning/development agent" in result
+    assert "Phase 2 — Final QC loop" in result
+
+
 def test_resolve_prompt_work_mode_fails_closed_when_marker_missing() -> None:
-    """Resolve ${work-mode} to full when issue.md marker is missing."""
+    """Resolve ${work-mode} to full-feature when issue.md marker is missing."""
     template = "Mode=${work-mode};Reason=${fallback-reason}"
     cwd = Path.cwd()
     feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
@@ -244,12 +323,12 @@ def test_resolve_prompt_work_mode_fails_closed_when_marker_missing() -> None:
     ):
         result = resolve_prompt(template, target, cwd)
 
-    assert "Mode=full" in result
+    assert "Mode=full-feature" in result
     assert "marker missing" in result
 
 
 def test_resolve_prompt_work_mode_fails_closed_when_marker_malformed() -> None:
-    """Resolve ${work-mode} to full when issue.md marker value is malformed."""
+    """Resolve ${work-mode} to full-feature when issue.md marker value is malformed."""
     template = "Mode=${work-mode};Reason=${fallback-reason}"
     cwd = Path.cwd()
     feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
@@ -272,8 +351,36 @@ def test_resolve_prompt_work_mode_fails_closed_when_marker_malformed() -> None:
     ):
         result = resolve_prompt(template, target, cwd)
 
-    assert "Mode=full" in result
+    assert "Mode=full-feature" in result
     assert "marker malformed" in result
+
+
+def test_resolve_prompt_work_mode_normalizes_legacy_full_marker() -> None:
+    """Resolve legacy full markers to the canonical full-feature variant."""
+    template = "Mode=${work-mode};Reason=${fallback-reason}"
+    cwd = Path.cwd()
+    feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
+    target = feature_dir / "plan.md"
+
+    issue_path = feature_dir / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: full\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, cwd)
+
+    assert "Mode=full-feature" in result
+    assert "legacy full; normalized to full-feature" in result
 
 
 def test_resolve_prompt_removes_user_story_clause_when_missing() -> None:

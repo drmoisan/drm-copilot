@@ -1,14 +1,30 @@
 ---
 name: powershell-orchestrator
-model: GPT-5.3-Codex (copilot)
-description: Orchestrate end-to-end PowerShell feature/bug delivery by estimating change budget, routing small changes directly to powershell-typed-engineer, and routing larger efforts through scope → promotion → research/spec → atomic planning/execution → feature review until complete.
+model: GPT-5.4 (copilot)
+description: Orchestrate end-to-end PowerShell feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
 target: vscode
 tools: ['execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
 handoffs:
+  - label: Build minimal-audit atomic plan (preflight all clear)
+    agent: atomic_planner
+    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR`. Return `plan-path` and final preflight signal."
+    send: true
+  - label: Execute Phase 0 only
+    agent: atomic_executor
+    prompt: "Execute the approved plan in `${feature-folder}` with strict phase scoping: run Phase 0 only and stop. Return execution summary and updated checklist state. Do not execute Phase 1 or Phase 2."
+    send: true
   - label: Small-scope implementation path
     agent: powershell-typed-engineer
-    prompt: "Estimate and confirm scope (1-2 production PowerShell files + corresponding tests). If confirmed, complete end-to-end workflow: baseline, planning (including atomic plan creation and preflight readiness), implementation, QA gates, and final report with analyzer/test/coverage deltas."
+    prompt: "Estimate and confirm scope (1-2 production PowerShell files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer/test/coverage deltas."
+    send: true
+  - label: Validate small-path delivery and post-QC docs
+    agent: atomic_executor
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
+    send: true
+  - label: Post-implementation small-path audit
+    agent: feature_code_review_agent
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for `${feature-folder}` in short-path/minor-audit mode. Generate reduced audit artifacts required for short path (policy + feature acceptance focus) and trigger remediation planning only if required by that reduced gate."
     send: true
   - label: Fill potential entry details
     agent: prd_feature
@@ -28,11 +44,11 @@ handoffs:
     send: true
   - label: Execute approved PowerShell atomic plan
     agent: powershell_atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer/test/coverage deltas.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/test/coverage deltas\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer/test/coverage deltas.\n5) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
-    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Pass `PRBaseBranch` from orchestration context (default to `main` if missing). If remediation is required, trigger atomic planner remediation flow automatically."
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Resolve `PRBaseBranch` via `pr-base-branch-merge-base` and pass that resolved branch from orchestration context (do not default to `main` unless merge-base resolution fails for all candidates). If remediation is required, trigger atomic planner remediation flow automatically."
     send: true
 ---
 
@@ -47,9 +63,11 @@ You do not perform deep implementation yourself when a delegated specialist exis
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `pr-context-artifacts`
+- `pr-base-branch-merge-base`
 - `powershell-change-budget-router`
 - `powershell-orchestration-state-machine`
 - `feature-promotion-lifecycle`
+- `acceptance-criteria-tracking`
 
 # Non-negotiable mission behavior
 
@@ -99,17 +117,101 @@ Use these reusable skills to avoid duplicating shared operations:
 
 ## Small path (budget 1-2 production PowerShell files)
 
-Delegate directly to `powershell-typed-engineer` using handoff **Small-scope implementation path**.
+Follow this exact sequence.
+
+### Step S1 — Scope potential feature/bug
+
+S1.1 Determine type and set `${promotion-type}`:
+- `feature` or `bug`
+
+S1.2 Generate `${short-name}`:
+- lowercase slug, hyphen-separated
+
+S1.3 Ensure potential entry exists using exact command by type when missing:
+- If `${promotion-type}` is `feature`:
+  - `${workspaceFolder}/scripts/dev-tools/new-potential-entry.ps1 -ShortName ${short-name}`
+- If `${promotion-type}` is `bug`:
+  - `${workspaceFolder}/scripts/dev_tools/new_potential_bug_entry.py --short-name ${short-name}`
+
+S1.4 Detect created/existing potential markdown file path and save as `${relativeFile}`.
+
+### Step S2 — Promote with short-path flag
+
+S2.1 Promote to issue using existing tooling with short-path flag set:
+- `poetry run python -m scripts.dev_tools.potential_to_issue --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+
+S2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
+
+S2.3 Parse promoted document to capture `${issue-num}`.
+
+S2.4 Create branch with exact name:
+- `${promotion-type}/${short-name}-${issue-num}`
+
+S2.5 Create active feature folder with short-path flag set:
+- `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+
+S2.6 Capture created folder path as `${feature-folder}`.
+
+### Step S3 — Build minimal-audit atomic plan with preflight
+
+S3.1 Delegate handoff **Build minimal-audit atomic plan (preflight all clear)**.
+
+Hard enforcement for S3:
+- Handoff MUST include directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`.
+- Generated plan MUST include exactly 3 phases:
+  - Phase 0 baseline capture,
+  - Phase 1 placeholder for constrained small-path implementation work,
+  - Phase 2 final QC loop.
+- Plan MUST treat `${feature-folder}/issue.md` as sole requirements source (no `spec.md`).
+- Do not mark S3 complete until delegate returns `plan-path` and `PREFLIGHT: ALL CLEAR`.
+
+### Step S4 — Execute baseline phase only
+
+S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
+
+Hard enforcement for S4:
+- Execute only Phase 0.
+- Persist checkpoint with Phase 0 completion evidence.
+
+### Step S5 — Branch by bootstrap mode
+
+S5.1 If request is `manual bootstrap`:
+- Save checkpoint with `next_step` at Phase 1 resume point.
+- Stop execution and return resume instructions.
+
+S5.2 If request is small development (not manual bootstrap):
+- Continue to Step S6.
+
+### Step S6 — Delegate constrained small-path development
+
+Delegate to `powershell-typed-engineer` using handoff **Small-scope implementation path**.
 
 Required delegation expectations:
-- plan + execute end-to-end,
+- implement only Phase 1 placeholder scope,
 - strict QA gates,
 - final analyzer/test/coverage deltas,
-- completion report.
+- completion report referencing `${feature-folder}` and approved `plan-path`.
 
-After handoff completion:
-- record completion in checkpoint,
-- provide concise final outcome to user.
+### Step S7 — Validate delivery and post-QC documentation
+
+S7.1 Delegate handoff **Validate small-path delivery and post-QC docs**.
+
+Hard enforcement for S7:
+- Validation MUST be against `${feature-folder}/issue.md`.
+- Plan checklist updates MUST be persisted before audit.
+
+### Step S8 — Run reduced audit and remediation loop
+
+S8.1 Delegate handoff **Post-implementation small-path audit**.
+
+S8.2 If audit triggers remediation:
+- generate remediation inputs + remediation plan,
+- execute remediation,
+- re-run reduced audit,
+- repeat until ready-to-merge gate passes.
+
+Hard enforcement for S8:
+- Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
 
 ---
 
@@ -207,7 +309,12 @@ On each invocation:
 4. If user explicitly asks to restart:
    - reset checkpoint and start at Phase 0.
 
-Checkpoint writes are mandatory after each completed sub-step in the large path sequence and after final completion in the small path.
+Checkpoint writes are mandatory after each completed sub-step in the large and small path sequences and after final completion.
+
+Artifact verification gate before mission completion (small path):
+- At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
+- At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
+- If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
 
 Artifact verification gate before mission completion (large path):
 - At least one `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
@@ -220,7 +327,7 @@ Artifact verification gate before mission completion (large path):
 You are complete only when:
 - selected path has run end-to-end,
 - all required delegations completed,
-- feature review completed (large path),
+- feature review completed (large path) or reduced small-path audit completed (small path),
 - checkpoint indicates completed mission,
 - user receives concise summary with produced paths/artifacts and branch info.
 

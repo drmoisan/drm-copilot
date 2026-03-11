@@ -1,0 +1,69 @@
+{
+  "name": "drm-copilot",
+  "displayName": "drm-copilot",
+  "description": "Extension-side bundled script execution utilities.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.108.0"
+  },
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "drmCopilotExtension.helloPython",
+        "title": "drm-copilot: Hello Python"
+      },
+      {
+        "command": "drmCopilotExtension.helloPowerShell",
+        "title": "drm-copilot: Hello PowerShell"
+      },
+      {
+        "command": "drmCopilotExtension.collectCommitContext",
+        "title": "drm-copilot: Collect Commit Context"
+      },
+      {
+        "command": "drmCopilotExtension.collectPrContext",
+        "title": "drm-copilot: Collect PR Context"
+      },
+      {
+        "command": "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
+        "title": "drm-copilot: New Active Feature Folder (Placeholder)"
+      },
+      {
+        "command": "drmCopilotExtension.potentialToIssuePlaceholder",
+        "title": "drm-copilot: Potential To Issue (Placeholder)"
+      },
+      {
+        "command": "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
+        "title": "drm-copilot: New Potential Bug Entry (Python Placeholder)"
+      },
+      {
+        "command": "drmCopilotExtension.newPotentialEntryPsPlaceholder",
+        "title": "drm-copilot: New Potential Entry (PowerShell Placeholder)"
+      },
+      {
+        "command": "drmCopilotExtension.pushDownCopilotCustomizations",
+        "title": "drm-copilot: Push Down Copilot Customizations"
+      }
+    ]
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
+    "lint": "eslint --no-error-on-unmatched-pattern src test",
+    "typecheck": "tsc -p ./ --noEmit",
+    "test": "node run-jest.cjs",
+    "test:unit": "node run-jest.cjs"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.108.1",
+    "@jest/globals": "^30.0.0",
+    "eslint": "^9.39.2",
+    "jest": "^30.0.0",
+    "prettier": "^3.6.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0"
+  }
+}

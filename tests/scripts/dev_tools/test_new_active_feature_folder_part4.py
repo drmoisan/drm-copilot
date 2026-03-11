@@ -133,8 +133,8 @@ def test_work_mode_marker_minor_audit_issue_md_even_when_heuristics_fail() -> No
     assert lines[first_section_index - 1] == ""
 
 
-def test_create_active_folder_full_mode_remains_backward_compatible() -> None:
-    """Verify explicit full mode keeps backward-compatible document outputs."""
+def test_create_active_folder_full_mode_alias_remains_backward_compatible() -> None:
+    """Verify legacy full alias still creates full-feature document outputs."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -294,7 +294,7 @@ globals()[
 
 
 def test_create_active_folder_full_mode_persists_full_marker_in_issue_md() -> None:
-    """Verify explicit full mode persists a single full marker in moved issue.md."""
+    """Verify legacy full alias persists canonical full-feature marker in issue.md."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
@@ -332,11 +332,55 @@ def test_create_active_folder_full_mode_persists_full_marker_in_issue_md() -> No
     issue_md = fs.read_text(result.target / "issue.md")
     lines = issue_md.splitlines()
     marker_lines = [line for line in lines if line.startswith("- Work Mode:")]
-    assert marker_lines == ["- Work Mode: full"]
+    assert marker_lines == ["- Work Mode: full-feature"]
     first_section_index = lines.index("## Problem / Why")
-    marker_index = lines.index("- Work Mode: full")
+    marker_index = lines.index("- Work Mode: full-feature")
     assert marker_index == first_section_index - 2
     assert lines[first_section_index - 1] == ""
+
+
+def test_create_active_folder_bug_full_alias_persists_full_bug_marker() -> None:
+    """Verify legacy full alias normalizes to full-bug for bug folder creation."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_bug_template(fs, workspace)
+    potential_path = (
+        workspace
+        / "docs"
+        / "features"
+        / "potential"
+        / "promoted"
+        / "2026-02-22-bug-mode-test.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #52",
+                "## Summary",
+                "summary",
+                "## Expected Behavior",
+                "expected",
+                "## Actual Behavior",
+                "actual",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="bug-mode-test",
+        feature_type="bug",
+        issue_number="auto",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=FakeCodeLauncher(),
+        work_mode="full",
+    )
+
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: full-bug" in issue_md
+    assert fs.exists(result.target / "spec.md")
+    assert not fs.exists(result.target / "user-story.md")
 
 
 def _minor_audit_behavior_unchanged_with_auto_resolve_option_absent() -> None:

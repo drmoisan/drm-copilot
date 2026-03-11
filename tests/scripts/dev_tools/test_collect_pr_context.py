@@ -315,9 +315,9 @@ def test_gather_feature_excerpts_reads_active_docs(mem_path: Path) -> None:
 
     assert excerpt.issue_refs == ["#77", "ABC-123"]
     assert set(excerpt.context_files) == {
-        str(spec_path.relative_to(root)),
-        str(plan_path.relative_to(root)),
-        str(story_path.relative_to(root)),
+        spec_path.relative_to(root).as_posix(),
+        plan_path.relative_to(root).as_posix(),
+        story_path.relative_to(root).as_posix(),
     }
 
 

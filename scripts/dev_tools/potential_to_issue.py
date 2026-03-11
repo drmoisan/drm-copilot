@@ -24,12 +24,16 @@ from scripts.dev_tools.potential_to_issue_content import (
     parse_issue_reference,
     update_metadata_lines,
 )
+from scripts.dev_tools.prompt_mode_contract import (
+    ACCEPTED_WORK_MODES,
+    normalize_requested_work_mode,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
 PROMOTION_TYPES = ("epic", "feature", "refactor", "bug")
-WORK_MODES = ("minor-audit", "full")
+WORK_MODES = ACCEPTED_WORK_MODES
 TITLE_PREFIXES = {
     "epic": "Epic",
     "feature": "Feature",
@@ -350,7 +354,8 @@ def promote_potential(
         fs (FileSystem | None): Optional filesystem adapter override.
         gh (GhClient | None): Optional gh client adapter override.
         workspace (Path | None): Optional workspace root override.
-        work_mode (str): Work-mode routing (`minor-audit` or `full`).
+        work_mode (str): Work-mode routing (`minor-audit`, `full-feature`,
+            `full-bug`, or legacy `full`).
         emit (Callable[[str], None]): Status message emitter callback.
 
     Returns:
@@ -399,7 +404,10 @@ def promote_potential(
 
     relative_path = Path(_relative_path()).as_posix()
 
-    selected_mode = work_mode
+    try:
+        selected_mode = normalize_requested_work_mode(work_mode, promotion_type)
+    except ValueError as exc:
+        raise PromotionError(str(exc)) from exc
     fallback_reason = ""
 
     # Route issue-body generation based on promotion type and eligible work mode.
@@ -433,7 +441,7 @@ def promote_potential(
             heading: get_section(content, heading) or PLACEHOLDER
             for heading in BUG_SECTION_HEADINGS
         }
-        body = build_bug_body(bug_sections, relative_path)
+        body = build_bug_body(selected_mode, bug_sections, relative_path)
     else:
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         behavior = get_section(content, "Proposed Behavior") or PLACEHOLDER
@@ -544,7 +552,10 @@ def parse_args() -> argparse.Namespace:
         "--work-mode",
         choices=WORK_MODES,
         default="full",
-        help="Work mode routing for full vs minor-audit issue body generation.",
+        help=(
+            "Work mode routing. Canonical values are minor-audit, full-feature, "
+            "and full-bug; full is accepted as a backward-compatible alias."
+        ),
     )
     return parser.parse_args()
 

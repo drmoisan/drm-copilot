@@ -75,7 +75,7 @@ def build_body(
     tests: str,
     relative_path: str,
 ) -> str:
-    """Construct the standard full-mode issue body."""
+    """Construct the standard full-feature issue body."""
     return (
         f"- Work Mode: {work_mode}\n"
         f"## Problem / Why\n{problem}\n\n"
@@ -87,9 +87,12 @@ def build_body(
     )
 
 
-def build_bug_body(sections: dict[str, str], relative_path: str) -> str:
+def build_bug_body(work_mode: str, sections: dict[str, str], relative_path: str) -> str:
     """Construct the bug issue body from canonical bug section headings."""
-    parts = [f"## {heading}\n{sections[heading]}" for heading in BUG_SECTION_HEADINGS]
+    parts = [f"- Work Mode: {work_mode}"]
+    parts.extend(
+        f"## {heading}\n{sections[heading]}" for heading in BUG_SECTION_HEADINGS
+    )
     parts.append(f"## Source\nFrom: {relative_path}")
     return "\n\n".join(parts) + "\n"
 

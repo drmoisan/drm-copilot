@@ -1,0 +1,21 @@
+Timestamp: 2026-03-10T12:52:00Z
+Policy Order:
+1. .github/copilot-instructions.md
+2. .github/instructions/general-code-change.instructions.md
+3. .github/instructions/general-unit-test.instructions.md
+4. .github/instructions/python-code-change.instructions.md
+5. .github/instructions/python-unit-test.instructions.md
+6. .github/instructions/python-suppressions.instructions.md
+7. .github/instructions/self-explanatory-code-commenting.instructions.md
+8. .github/instructions/typescript-code-change.instructions.md
+9. .github/instructions/typescript-unit-test.instructions.md
+10. .github/instructions/typescript-suppressions.instructions.md
+11. AGENTS.md
+Work Mode Source: issue.md
+Resolved Work Mode: full
+Authoritative Inputs Reviewed:
+- spec.md
+- user-story.md
+- remediation-inputs.2026-03-10T12-52.md
+- policy-audit.2026-03-10T12-52.md
+- code-review.2026-03-10T12-52.md

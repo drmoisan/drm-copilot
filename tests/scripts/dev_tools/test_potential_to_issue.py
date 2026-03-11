@@ -577,7 +577,7 @@ def test_parse_args_and_main_paths(monkeypatch: pytest.MonkeyPatch) -> None:
         potential_path: str, promotion_type: str, work_mode: str
     ) -> mod.PromotionOutcome:
         """Return a successful promotion outcome for main-path testing."""
-        assert work_mode in {"full", "minor-audit"}
+        assert work_mode in {"full", "minor-audit", "full-feature", "full-bug"}
         return mod.PromotionOutcome(0, [], None)
 
     monkeypatch.setattr(mod, "parse_args", fake_parse_args)
@@ -810,7 +810,7 @@ def test_promote_potential_minor_audit_honors_explicit_user_selection() -> None:
 
 
 def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:
-    """Verify explicit full mode preserves legacy full-body section contract."""
+    """Verify legacy full alias preserves the full-feature body contract."""
     workspace = Path("/workspace")
     potential = workspace / "docs/features/potential/full-mode.md"
     fs = FakeFileSystem()
@@ -841,8 +841,45 @@ def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:
         work_mode="full",
     )
     body = gh.calls[0][1][1]
+    assert "- Work Mode: full-feature" in body
     assert "## Proposed Behavior" in body
     assert "## Implementation Intent" not in body
+
+
+def test_promote_potential_full_alias_normalizes_bug_to_full_bug() -> None:
+    """Verify legacy full alias normalizes to full-bug for bug promotions."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/full-bug-mode.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Full Bug Mode",
+            "## Summary",
+            "summary",
+            "## Expected Behavior",
+            "expected",
+            "## Actual Behavior",
+            "actual",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/100"], 0),
+        mod.GhResult([], 0),
+    )
+
+    mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="bug",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="full",
+    )
+
+    body = gh.calls[0][1][1]
+    assert "- Work Mode: full-bug" in body
+    assert "## Summary" in body
+    assert "## Proposed Behavior" not in body
 
 
 def test_promote_potential_body_omits_token_like_secret_strings() -> None:

@@ -142,8 +142,8 @@ def _resolve_work_mode_from_issue(
 
     Purpose:
         Enforce deterministic mode selection for prompt templates by reading the
-        persisted issue marker first and failing closed to `full` on missing or
-        malformed data.
+        persisted issue marker first and failing closed to `full-feature` on
+        missing or malformed data.
 
     Args:
         target_path: Target plan file path.
@@ -161,7 +161,7 @@ def _resolve_work_mode_from_issue(
     except OSError:
         return (
             resolve_selected_work_mode(None),
-            "issue.md unreadable; fail closed to full",
+            "issue.md unreadable; fail closed to full-feature",
         )
 
     return resolve_selected_work_mode(issue_content), build_fallback_reason(
