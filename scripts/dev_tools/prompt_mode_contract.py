@@ -70,8 +70,8 @@ def parse_issue_work_mode(issue_content: str) -> tuple[str | None, bool]:
 
     Returns:
         tuple[str | None, bool]:
-                        - Parsed mode (`minor-audit`, `full-feature`, `full-bug`, or legacy
-                            `full`) when valid; otherwise None.
+            - Parsed mode (`minor-audit`, `full-feature`, `full-bug`, or legacy
+              `full`) when valid; otherwise None.
             - Boolean indicating whether a malformed marker line was detected.
 
     Side Effects:
