@@ -161,7 +161,7 @@ def test_resolve_prompt_uses_parent_issue_for_versioned_plan_path() -> None:
     def _read_text(self: Path, encoding: str = "utf-8") -> str:
         del encoding
         if self == parent_issue:
-            return "- Work Mode: full\n"
+            return "- Work Mode: full-feature\n"
         raise FileNotFoundError(str(self))
 
     with (
@@ -170,7 +170,7 @@ def test_resolve_prompt_uses_parent_issue_for_versioned_plan_path() -> None:
     ):
         result = resolve_prompt(template, target, workspace_root)
 
-    assert "Mode=full" in result
+    assert "Mode=full-feature" in result
     assert "Reason=none" in result
 
 
@@ -196,8 +196,8 @@ def test_resolve_prompt_mode_fallback_when_issue_unreadable() -> None:
     ):
         result = resolve_prompt(template, target, workspace_root)
 
-    assert "Mode=full" in result
-    assert "issue.md unreadable; fail closed to full" in result
+    assert "Mode=full-feature" in result
+    assert "issue.md unreadable; fail closed to full-feature" in result
 
 
 def test_copy_to_clipboard_with_pyperclip_success() -> None:
@@ -456,7 +456,7 @@ def test_main_resume_template_kind(mem_path: Path) -> None:
 
     issue_file = workspace / "docs" / "issue.md"
     issue_file.parent.mkdir(parents=True)
-    issue_file.write_text("- Work Mode: full\n", encoding="utf-8")
+    issue_file.write_text("- Work Mode: full-feature\n", encoding="utf-8")
 
     target_file = workspace / "docs" / "plan.md"
     target_file.write_text("# Plan", encoding="utf-8")
@@ -485,4 +485,4 @@ def test_main_resume_template_kind(mem_path: Path) -> None:
 
     assert exit_code == 0
     assert "Resume docs/plan.md" in mock_stdout.getvalue()
-    assert "mode=full" in mock_stdout.getvalue()
+    assert "mode=full-feature" in mock_stdout.getvalue()

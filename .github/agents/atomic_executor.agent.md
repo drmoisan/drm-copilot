@@ -17,6 +17,7 @@ If you believe the plan is incomplete or non-executable, you must **stop before 
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `atomic-plan-contract`
+- `acceptance-criteria-tracking`
 
 ---
 
@@ -77,9 +78,11 @@ Use `atomic-plan-contract` as the system-of-record for mode gate behavior, inclu
 During preflight (before [P0-T1]), resolve work mode from feature `issue.md` marker first:
 
 - `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- `- Work Mode: full-feature`
+- `- Work Mode: full-bug`
+- legacy `- Work Mode: full` => interpret as `full-feature`
 
-If the marker is missing or malformed, fail closed to `full`.
+If the marker is missing or malformed, fail closed to `full-feature`.
 
 When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
 
@@ -192,6 +195,9 @@ Start with:
 ### 3.5 Check-off rules (binary)
 - Only mark the task `[x]` when verification passes.
 - If partial progress exists but acceptance criteria do not pass, leave it unchecked.
+
+### 3.5.1 Acceptance criteria check-off (requirement source files)
+After verifying a plan task, determine whether the completed work satisfies any acceptance criteria in the resolved AC source file(s) per `acceptance-criteria-tracking`. If so, check off the corresponding `- [ ]` items in those source files immediately and report the check-off. At plan completion, include the AC Status Summary defined in `acceptance-criteria-tracking`.
 
 ### 3.6 Progress reporting
 At the end of each message, include an updated copy of the plan’s checklist (or at least the current phase + next 5 upcoming tasks), with completed tasks checked off.

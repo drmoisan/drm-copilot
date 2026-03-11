@@ -20,7 +20,7 @@ handoffs:
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
-    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
@@ -44,7 +44,7 @@ handoffs:
     send: true
   - label: Execute approved PowerShell atomic plan
     agent: powershell_atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer/test/coverage deltas.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/test/coverage deltas\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce PowerShell quality gates and DI/mocking constraints from agent policy.\n4) Complete final QA loop (format → analyze → test, plus coverage when enforced) and report analyzer/test/coverage deltas.\n5) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- analyzer/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
@@ -67,6 +67,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `powershell-change-budget-router`
 - `powershell-orchestration-state-machine`
 - `feature-promotion-lifecycle`
+- `acceptance-criteria-tracking`
 
 # Non-negotiable mission behavior
 

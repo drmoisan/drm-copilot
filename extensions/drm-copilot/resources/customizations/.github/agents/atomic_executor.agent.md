@@ -77,9 +77,11 @@ Use `atomic-plan-contract` as the system-of-record for mode gate behavior, inclu
 During preflight (before [P0-T1]), resolve work mode from feature `issue.md` marker first:
 
 - `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- `- Work Mode: full-feature`
+- `- Work Mode: full-bug`
+- legacy `- Work Mode: full` => interpret as `full-feature`
 
-If the marker is missing or malformed, fail closed to `full`.
+If the marker is missing or malformed, fail closed to `full-feature`.
 
 When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
 

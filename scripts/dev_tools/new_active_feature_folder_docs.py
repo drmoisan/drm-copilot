@@ -258,8 +258,11 @@ def should_use_minor_audit_mode(
     potential_content: str,
 ) -> tuple[bool, str]:
     """Return whether minor-audit path should be used and fallback reason."""
-    if work_mode not in ("minor-audit", "full"):
-        raise ValueError("work_mode must be one of: minor-audit, full")
-    if work_mode == "full":
+    del feature_type, potential_content
+    if work_mode not in ("minor-audit", "full-feature", "full-bug", "full"):
+        raise ValueError(
+            "work_mode must be one of: minor-audit, full-feature, full-bug, full"
+        )
+    if work_mode != "minor-audit":
         return False, ""
     return True, ""

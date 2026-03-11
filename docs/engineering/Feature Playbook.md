@@ -31,9 +31,11 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 -## 2. Create the active feature folder
 - Run `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name <name> --type feature --issue-number <issue|auto>` (or VS Code task “Feature: Create Active Folder”).
 - Creates `docs/features/active/<name>-<issue>/` with:
-  - `user-story.md`
-  - `spec.md`
+  - `issue.md`
   - `plan.md`
+  - `spec.md` and `user-story.md` for `full-feature`
+  - `spec.md` only for `full-bug`
+  - `minor-audit` may intentionally omit `spec.md` and `user-story.md`
 - Seeds Problem/Behavior/AC/Test Conditions from the promoted doc, fills headers (Issue/Owner/Last Updated), and moves the promoted potential file into the active folder as `issue.md`.
 
 ## 3. Branch
@@ -43,7 +45,10 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 
 ## 4. Docs and tests first
 - Update/add tests before or alongside code.
-- Update `user-story.md`, `spec.md`, `plan.md` in the active folder.
+- Update the active-folder requirement docs for the selected work mode:
+  - `full-feature`: `user-story.md`, `spec.md`, `plan.md`
+  - `full-bug`: `spec.md`, `plan.md`
+  - `minor-audit`: `issue.md`, `plan.md` (with `spec.md`/`user-story.md` optional by design)
 - Test locations: `tests/transform/`, `tests/document/`, `tests/integration/`, `tests/features/<feature-name>/` (as needed).
 
 ## 5. Incremental development
@@ -115,7 +120,7 @@ VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: Ne
 | **3**                                      | **Requirements & Constraint Discovery**                 | **Task Researcher**                     | Functional + non-functional constraints emerge here but are not yet finalized or committed. Still exploratory.                                                                   |
 | **4**                                      | **Domain & Impact Analysis**                            | **Task Researcher**                     | Identifies affected subsystems, data, APIs, compatibility risks. Output is research evidence, not decisions.                                                                     |
 | **5**                                      | **Solution Exploration (Option Space)**                 | **Task Researcher**                     | Multiple approaches evaluated; tradeoffs documented; one approach recommended; alternatives deleted.                                                                             |
-| **6**                                      | **Feature Specification Authoring (Design Commitment)** | **PRD / Feature Docs Completion Agent** | Completes `user-story.md` and `spec.md`. This is where intent becomes a **commitment**: behavior, APIs, data, constraints, risks.                                                |
+| **6**                                      | **Feature Specification Authoring (Design Commitment)** | **PRD / Feature Docs Completion Agent** | For `full-feature`, completes `user-story.md` and `spec.md`; for `full-bug`, completes `spec.md` (and only adds `user-story.md` when explicitly required). This is where intent becomes a **commitment**: behavior, APIs, data, constraints, risks. |
 | **7**                                      | **Acceptance Criteria & DoD Finalization**              | **PRD / Feature Docs Completion Agent** | Acceptance criteria become stable, testable, and exhaustive. Feature is now “commit-ready.”                                                                                      |
 | **8**                                      | **Atomic Development Plan Authoring (Plan-of-Record)**  | **Atomic Planning Agent**               | **Critical distinction**: this is the *true* atomic plan. It cannot exist until the spec is complete. Tasks are binary, ordered, verifiable.                                     |
 | **9**                                      | **Deterministic Plan Execution**                        | **Atomic Execution Agent**              | Executes the atomic plan verbatim. No replanning, no scope change, strict policy and acceptance-criteria verification.                                                           |

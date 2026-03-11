@@ -300,7 +300,7 @@ def test_resolve_prompt_minor_audit_injects_three_phase_override() -> None:
 
 
 def test_resolve_prompt_work_mode_fails_closed_when_marker_missing() -> None:
-    """Resolve ${work-mode} to full when issue.md marker is missing."""
+    """Resolve ${work-mode} to full-feature when issue.md marker is missing."""
     template = "Mode=${work-mode};Reason=${fallback-reason}"
     cwd = Path.cwd()
     feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
@@ -323,12 +323,12 @@ def test_resolve_prompt_work_mode_fails_closed_when_marker_missing() -> None:
     ):
         result = resolve_prompt(template, target, cwd)
 
-    assert "Mode=full" in result
+    assert "Mode=full-feature" in result
     assert "marker missing" in result
 
 
 def test_resolve_prompt_work_mode_fails_closed_when_marker_malformed() -> None:
-    """Resolve ${work-mode} to full when issue.md marker value is malformed."""
+    """Resolve ${work-mode} to full-feature when issue.md marker value is malformed."""
     template = "Mode=${work-mode};Reason=${fallback-reason}"
     cwd = Path.cwd()
     feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
@@ -351,8 +351,36 @@ def test_resolve_prompt_work_mode_fails_closed_when_marker_malformed() -> None:
     ):
         result = resolve_prompt(template, target, cwd)
 
-    assert "Mode=full" in result
+    assert "Mode=full-feature" in result
     assert "marker malformed" in result
+
+
+def test_resolve_prompt_work_mode_normalizes_legacy_full_marker() -> None:
+    """Resolve legacy full markers to the canonical full-feature variant."""
+    template = "Mode=${work-mode};Reason=${fallback-reason}"
+    cwd = Path.cwd()
+    feature_dir = cwd / "docs" / "features" / "active" / "2026-02-23-minor-audit-58"
+    target = feature_dir / "plan.md"
+
+    issue_path = feature_dir / "issue.md"
+
+    def _exists(self: Path) -> bool:
+        return self == issue_path
+
+    def _read_text(self: Path, encoding: str = "utf-8") -> str:
+        del encoding
+        if self == issue_path:
+            return "- Work Mode: full\n"
+        raise FileNotFoundError(str(self))
+
+    with (
+        patch.object(Path, "exists", _exists),
+        patch.object(Path, "read_text", _read_text),
+    ):
+        result = resolve_prompt(template, target, cwd)
+
+    assert "Mode=full-feature" in result
+    assert "legacy full; normalized to full-feature" in result
 
 
 def test_resolve_prompt_removes_user_story_clause_when_missing() -> None:
