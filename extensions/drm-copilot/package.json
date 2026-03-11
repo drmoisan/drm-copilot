@@ -40,6 +40,10 @@
       {
         "command": "drmCopilotExtension.newPotentialEntryPsPlaceholder",
         "title": "drm-copilot: New Potential Entry (PowerShell Placeholder)"
+      },
+      {
+        "command": "drmCopilotExtension.pushDownCopilotCustomizations",
+        "title": "drm-copilot: Push Down Copilot Customizations"
       }
     ]
   },

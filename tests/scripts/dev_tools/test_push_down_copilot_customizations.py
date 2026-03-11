@@ -507,3 +507,45 @@ def test_push_down_reports_unmatched_script_references_without_rewrite() -> None
     assert summary.unmatched_references == [
         "scripts.dev_tools.unknown_future_tool",
     ]
+
+
+def test_rewrite_known_push_down_reference_to_real_command() -> None:
+    """Rewrite the push-down publisher reference to the real extension command."""
+    module = importlib.import_module(
+        "scripts.dev_tools.push_down_copilot_customizations"
+    )
+    source_repo = Path("/source-repo")
+    destination_repo = Path("/destination-repo")
+    fs = InMemoryPushDownFileSystem()
+    fs.ensure_dir(source_repo)
+    fs.ensure_dir(destination_repo)
+    prompt_path = source_repo / ".github/prompts/push-down.prompt.md"
+    fs.ensure_dir(prompt_path.parent)
+    fs.write_text(
+        prompt_path,
+        (
+            "Run poetry run python -m "
+            "scripts.dev_tools.push_down_copilot_customizations "
+            "--destination <workspace-root> to push customizations."
+        ),
+    )
+
+    summary = module.push_down_customizations(
+        repo_root=source_repo,
+        destination_root=destination_repo,
+        fs=fs,
+    )
+
+    rewritten_text = fs.read_text(
+        destination_repo / ".github/prompts/push-down.prompt.md"
+    )
+    assert summary.rewritten_reference_count >= 1
+    assert (
+        "VS Code command: `drm-copilot: Push Down Copilot Customizations`"
+        in rewritten_text
+    )
+    assert (
+        "command ID: `drmCopilotExtension.pushDownCopilotCustomizations`"
+        in rewritten_text
+    )
+    assert "scripts.dev_tools.push_down_copilot_customizations" not in rewritten_text

@@ -124,6 +124,8 @@ class PushDownSummary:
 def enumerate_source_files(
     repo_root: Path,
     fs: PushDownFileSystem,
+    *,
+    source_root: Path | None = None,
 ) -> list[Path]:
     """
     Enumerate scoped source files in deterministic root and path order.
@@ -131,11 +133,27 @@ def enumerate_source_files(
     Purpose:
         Preserve the `ROOT_FOLDERS` ordering contract while keeping file-order
         stable within each scoped root.
+
+    Args:
+        repo_root (Path): Source repository root (used as default source root).
+        fs (PushDownFileSystem): Filesystem adapter.
+        source_root (Path | None): Explicit source root for packaged content.
+            Defaults to ``repo_root`` when ``None``.
+
+    Returns:
+        list[Path]: Ordered source file paths.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads directory metadata through ``fs``.
     """
+    effective_source = source_root if source_root is not None else repo_root
     ordered_files: list[Path] = []
     # Enumerate by scoped root first so summaries match the feature contract.
     for root in ROOT_FOLDERS:
-        root_path = repo_root / root
+        root_path = effective_source / root
         root_files = fs.list_files(root_path)
         ordered_files.extend(
             sorted(root_files, key=lambda path: path.relative_to(root_path).as_posix())
@@ -167,7 +185,12 @@ def validate_destination(
         )
 
 
-def build_artifact_path(repo_root: Path, started_at: datetime) -> Path:
+def build_artifact_path(
+    repo_root: Path,
+    started_at: datetime,
+    *,
+    artifact_root: Path | None = None,
+) -> Path:
     """
     Build the deterministic JSON summary artifact path for a push-down run.
 
@@ -175,8 +198,10 @@ def build_artifact_path(repo_root: Path, started_at: datetime) -> Path:
         Keep artifact naming stable and predictable for audits and automation.
 
     Args:
-        repo_root (Path): Source repository root.
+        repo_root (Path): Source repository root (used as default artifact root).
         started_at (datetime): UTC timestamp captured at run start.
+        artifact_root (Path | None): Explicit artifact root for bundled execution.
+            Defaults to ``repo_root`` when ``None``.
 
     Returns:
         Path: Artifact path beneath `artifacts/copilot-customizations`.
@@ -187,8 +212,9 @@ def build_artifact_path(repo_root: Path, started_at: datetime) -> Path:
     Side Effects:
         None.
     """
+    effective_root = artifact_root if artifact_root is not None else repo_root
     timestamp = started_at.strftime("%Y%m%dT%H%M%SZ")
-    return repo_root / ARTIFACT_DIRECTORY / f"push-down-{timestamp}.json"
+    return effective_root / ARTIFACT_DIRECTORY / f"push-down-{timestamp}.json"
 
 
 def render_push_down_summary(summary: PushDownSummary) -> str:
@@ -230,17 +256,21 @@ def write_summary_artifact(
     fs: PushDownFileSystem,
     repo_root: Path,
     summary: PushDownSummary,
+    *,
+    artifact_root: Path | None = None,
 ) -> Path:
     """
     Write the JSON summary artifact under `artifacts/copilot-customizations`.
 
     Purpose:
-        Persist the run summary in the canonical repo-local artifact location.
+        Persist the run summary in the canonical artifact location.
 
     Args:
         fs (PushDownFileSystem): Filesystem adapter used for writes.
         repo_root (Path): Source repository root.
         summary (PushDownSummary): Summary to serialize.
+        artifact_root (Path | None): Explicit artifact root for bundled
+            execution. Defaults to ``repo_root`` when ``None``.
 
     Returns:
         Path: Written artifact path.
@@ -251,7 +281,9 @@ def write_summary_artifact(
     Side Effects:
         Creates the artifact directory and writes JSON to disk.
     """
-    artifact_path = build_artifact_path(repo_root, summary.started_at)
+    artifact_path = build_artifact_path(
+        repo_root, summary.started_at, artifact_root=artifact_root
+    )
     fs.ensure_dir(artifact_path.parent)
     fs.write_text(artifact_path, render_push_down_summary(summary))
     return artifact_path
@@ -262,6 +294,8 @@ def push_down_customizations(
     repo_root: Path,
     destination_root: Path,
     fs: PushDownFileSystem,
+    source_root: Path | None = None,
+    artifact_root: Path | None = None,
 ) -> PushDownSummary:
     """
     Copy scoped `.github` customizations into the destination workspace.
@@ -271,6 +305,8 @@ def push_down_customizations(
         overwrite-aware writes, and summary artifact emission for the one-way
         customization publisher.
     """
+    effective_source = source_root if source_root is not None else repo_root
+    effective_artifact = artifact_root if artifact_root is not None else repo_root
     validate_destination(destination_root, repo_root, fs)
     started_at = datetime.now(timezone.utc)
     created_count = 0
@@ -281,8 +317,10 @@ def push_down_customizations(
     file_results: list[PushDownFileResult] = []
 
     # Process files in stable order so artifacts and test expectations are reproducible.
-    for source_path in enumerate_source_files(repo_root, fs):
-        relative_path = source_path.relative_to(repo_root)
+    for source_path in enumerate_source_files(
+        repo_root, fs, source_root=effective_source
+    ):
+        relative_path = source_path.relative_to(effective_source)
         destination_path = destination_root / relative_path
         destination_status = (
             "overwritten" if fs.is_file(destination_path) else "created"
@@ -330,7 +368,9 @@ def push_down_customizations(
         files=file_results,
         artifact_path="",
     )
-    artifact_path = write_summary_artifact(fs, repo_root, provisional_summary)
+    artifact_path = write_summary_artifact(
+        fs, repo_root, provisional_summary, artifact_root=effective_artifact
+    )
     return PushDownSummary(
         repo_root=provisional_summary.repo_root,
         destination_root=provisional_summary.destination_root,
@@ -400,6 +440,8 @@ def main(
         repo_root=resolved_repo_root,
         destination_root=resolved_destination,
         fs=resolved_fs,
+        source_root=resolved_repo_root,
+        artifact_root=resolved_repo_root,
     )
     print(f"Wrote push-down summary artifact to: {summary.artifact_path}")
     return 0

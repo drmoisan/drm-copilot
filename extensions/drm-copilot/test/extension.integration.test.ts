@@ -440,4 +440,27 @@ describe("drm-copilot integration behavior", () => {
       ),
     ).toBe(false);
   });
+
+  it("pushDownCopilotCustomizations executes bundled wrapper script in workspace", async () => {
+    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    expect(executable).toBe("python");
+    expect(
+      normalizePath(args[0]).endsWith(
+        "resources/templates/push_down_copilot_customizations.py",
+      ),
+    ).toBe(true);
+    expect(options.cwd).toBe("C:/workspace");
+  });
+
+  it("pushDownCopilotCustomizations passes workspace root as --destination", async () => {
+    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const destinationIndex = args.indexOf("--destination");
+    expect(destinationIndex).toBeGreaterThan(-1);
+    expect(args[destinationIndex + 1]).toBe("C:/workspace");
+  });
 });

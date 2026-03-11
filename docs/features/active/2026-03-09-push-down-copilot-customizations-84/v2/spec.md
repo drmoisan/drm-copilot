@@ -71,6 +71,9 @@ List commands, flags, request/response shapes, and examples.
 	- Placeholder commands should use the same textual format, but the underlying command implementation must throw a deterministic not-implemented error when invoked.
 - Extension command surface
 	- Real bundled commands in scope: PR-context collection and a dedicated push-down publisher command backed by the bundled `scripts.dev_tools.push_down_copilot_customizations` resource.
+	- Push-down extension command: `drmCopilotExtension.pushDownCopilotCustomizations` (title: `drm-copilot: Push Down Copilot Customizations`).
+	- Bundled wrapper path: `resources/templates/push_down_copilot_customizations.py`.
+	- The wrapper resolves `source_root` to the bundled `resources/customizations` payload, resolves `artifact_root` to the destination workspace, and passes `--destination` with the open workspace root.
 	- Initial placeholder coverage should be limited to the currently verified uncovered scripts referenced in copied docs: `scripts.dev_tools.new_active_feature_folder`, `scripts.dev_tools.potential_to_issue`, `scripts/dev_tools/new_potential_bug_entry.py`, and `scripts/dev-tools/new-potential-entry.ps1`.
 - Contracts and validation rules:
 	- Destination path must resolve to a workspace root distinct from the source repo.

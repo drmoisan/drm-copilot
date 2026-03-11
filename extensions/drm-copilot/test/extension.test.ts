@@ -250,6 +250,14 @@ describe("drm-copilot command behavior", () => {
     );
   });
 
+  it("registers pushDownCopilotCustomizations", () => {
+    activateAndGetHandler("drmCopilotExtension.pushDownCopilotCustomizations");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.pushDownCopilotCustomizations"),
+    ).toBe(true);
+  });
+
   it("no workspace throws clear no-workspace error", async () => {
     workspaceFoldersState = undefined;
     setExecutablePresence({ python: true });

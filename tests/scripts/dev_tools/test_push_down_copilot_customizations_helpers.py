@@ -528,6 +528,62 @@ def test_rewrite_text_references_reports_unique_unmatched_references() -> None:
     assert "drm-copilot: Collect PR Context" in rewritten_text
 
 
+def test_push_down_customizations_reads_from_explicit_source_root() -> None:
+    """Enumerate source files from a packaged source root.
+
+    Verifies behaviour when source root is distinct from the destination.
+    """
+    module = _load_main_module()
+    source_root = Path("/packaged-source")
+    destination_root = Path("/destination-workspace")
+    fs = RecordingPushDownFileSystem()
+    fs.ensure_dir(source_root)
+    fs.ensure_dir(destination_root)
+
+    source_file = source_root / ".github/prompts/example.prompt.md"
+    fs.ensure_dir(source_file.parent)
+    fs.write_text(source_file, "packaged prompt content")
+
+    summary = module.push_down_customizations(
+        repo_root=source_root,
+        destination_root=destination_root,
+        source_root=source_root,
+        fs=fs,
+    )
+
+    assert summary.created_count == 1
+    copied_text = fs.read_text(destination_root / ".github/prompts/example.prompt.md")
+    assert copied_text == "packaged prompt content"
+
+
+def test_push_down_writes_artifact_under_explicit_artifact_root() -> None:
+    """Write summary artifact under an explicit artifact root.
+
+    Verifies the artifact lands outside the source root.
+    """
+    module = _load_main_module()
+    source_root = Path("/packaged-source")
+    destination_root = Path("/destination-workspace")
+    artifact_root = Path("/destination-workspace")
+    fs = RecordingPushDownFileSystem()
+    fs.ensure_dir(source_root)
+    fs.ensure_dir(destination_root)
+
+    source_file = source_root / ".github/prompts/example.prompt.md"
+    fs.ensure_dir(source_file.parent)
+    fs.write_text(source_file, "prompt content")
+
+    summary = module.push_down_customizations(
+        repo_root=source_root,
+        destination_root=destination_root,
+        artifact_root=artifact_root,
+        fs=fs,
+    )
+
+    assert "destination-workspace" in summary.artifact_path
+    assert "packaged-source" not in summary.artifact_path
+
+
 def test_split_trailing_punctuation_returns_core_and_suffix() -> None:
     """Split trailing prose punctuation away from the matched reference core."""
     rewrite_module = _load_rewrite_module()
