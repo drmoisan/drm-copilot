@@ -3,13 +3,22 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
 
+/**
+ * Identifies which interpreter family is required to launch a bundled script.
+ */
 type RuntimeKind = "python" | "powershell";
 
+/**
+ * Describes the executable and fixed argument prefix needed to launch a script.
+ */
 interface RuntimeResolution {
   readonly executable: string;
   readonly argsPrefix: ReadonlyArray<string>;
 }
 
+/**
+ * Defines the information needed to execute a bundled resource as a VS Code command.
+ */
 interface CommandSpec {
   readonly runtimeKind: RuntimeKind;
   readonly bundledRelativePath: string;
@@ -17,12 +26,18 @@ interface CommandSpec {
   readonly args?: ReadonlyArray<string>;
 }
 
+/**
+ * Defines a command that is intentionally registered as a placeholder.
+ */
 interface PlaceholderCommandSpec {
   readonly commandId: string;
   readonly title: string;
   readonly scriptReference: string;
 }
 
+/**
+ * Captures the candidate base branches that a PR-context collection can use.
+ */
 interface BranchDiscoveryResult {
   readonly candidates: ReadonlyArray<string>;
   readonly defaultBranch: string;
@@ -51,10 +66,21 @@ const PLACEHOLDER_COMMAND_SPECS: ReadonlyArray<PlaceholderCommandSpec> = [
   },
 ];
 
+/**
+ * Creates the shared output channel used by the extension's command handlers.
+ *
+ * @returns A VS Code output channel that records command progress and failures.
+ */
 function createOutputChannel(): vscode.OutputChannel {
   return vscode.window.createOutputChannel("drm-copilot");
 }
 
+/**
+ * Resolves the first open workspace folder as the working directory for commands.
+ *
+ * @returns The filesystem path for the primary workspace folder.
+ * @throws Error when the extension is invoked without an open workspace.
+ */
 function getWorkspaceRoot(): string {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
@@ -64,6 +90,13 @@ function getWorkspaceRoot(): string {
   return folder.uri.fsPath;
 }
 
+/**
+ * Determines whether an executable can be resolved from the current process PATH.
+ *
+ * @param executable The executable name to probe, without a file extension.
+ * @returns True when a matching file exists in one of the PATH directories.
+ * @remarks On Windows the lookup also tries each PATHEXT suffix to mirror shell resolution.
+ */
 function executableExists(executable: string): boolean {
   const pathValue = process.env["PATH"] ?? "";
   const pathParts = pathValue
@@ -76,6 +109,8 @@ function executableExists(executable: string): boolean {
           .filter((part) => part.length > 0)
       : [""];
 
+  // Probe each PATH directory against each allowed extension so runtime detection
+  // behaves consistently across Windows and non-Windows environments.
   for (const directory of pathParts) {
     for (const extension of pathExtensions) {
       const candidate = path.join(
@@ -91,7 +126,16 @@ function executableExists(executable: string): boolean {
   return false;
 }
 
+/**
+ * Resolves the interpreter required to execute a bundled script.
+ *
+ * @param runtimeKind The runtime family requested by the command.
+ * @returns The executable name and fixed argument prefix needed to launch the script.
+ * @throws Error when the required runtime cannot be found on PATH.
+ */
 export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
+  // Python commands have a single acceptable runtime, so fail fast with a
+  // targeted error message instead of falling through the PowerShell probes.
   if (runtimeKind === "python") {
     if (!executableExists("python")) {
       throw new Error("Python runtime 'python' not found on PATH.");
@@ -103,6 +147,8 @@ export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
     };
   }
 
+  // Prefer PowerShell Core when available, then fall back to Windows PowerShell
+  // so the extension works across newer and older developer environments.
   if (executableExists("pwsh")) {
     return {
       executable: "pwsh",
@@ -134,6 +180,16 @@ export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
   );
 }
 
+/**
+ * Executes a subprocess and streams its stdout/stderr into the output channel.
+ *
+ * @param output The output channel that should receive process diagnostics.
+ * @param executable The executable to launch.
+ * @param args The argv array passed to the executable.
+ * @param cwd The working directory used for process execution.
+ * @returns A promise that resolves on exit code 0 and rejects otherwise.
+ * @throws Error when process spawning fails or the command exits non-zero.
+ */
 function runCommandWithOutput(
   output: vscode.OutputChannel,
   executable: string,
@@ -160,6 +216,8 @@ function runCommandWithOutput(
     });
 
     child.on("close", (code: number | null) => {
+      // Treat any non-zero exit as a command failure so the command surface keeps
+      // the original process status visible to users and tests.
       if (code === 0) {
         resolve();
         return;
@@ -170,6 +228,17 @@ function runCommandWithOutput(
   });
 }
 
+/**
+ * Runs a git command synchronously and returns trimmed stdout for follow-up parsing.
+ *
+ * @param output The output channel used for failure diagnostics.
+ * @param commandId The logical command name associated with the git invocation.
+ * @param cwd The repository root where git should run.
+ * @param args The git argv array.
+ * @param allowNonZeroExit Whether a non-zero exit should be tolerated.
+ * @returns The trimmed stdout emitted by git.
+ * @throws Error when git exits non-zero and the call does not allow that failure.
+ */
 function runGitForTextOutput(
   output: vscode.OutputChannel,
   commandId: string,
@@ -197,7 +266,15 @@ function runGitForTextOutput(
   return (result.stdout ?? "").trim();
 }
 
+/**
+ * Scores a branch name so well-known long-lived branches sort ahead of others.
+ *
+ * @param branchName The branch name without the `origin/` prefix.
+ * @returns A lower number for higher-priority default branch candidates.
+ */
 function scoreBranchForPriority(branchName: string): number {
+  // Keep the priority list explicit so default-branch heuristics stay predictable
+  // even when repositories expose many remote refs.
   if (branchName === "main") {
     return 0;
   }
@@ -221,6 +298,12 @@ function scoreBranchForPriority(branchName: string): number {
   return 5;
 }
 
+/**
+ * Orders remote branch candidates by branch priority and then alphabetically.
+ *
+ * @param candidates The remote refs returned from git.
+ * @returns A new array sorted for quick-pick display and default selection.
+ */
 function sortRemoteBranchCandidates(
   candidates: ReadonlyArray<string>,
 ): string[] {
@@ -237,6 +320,15 @@ function sortRemoteBranchCandidates(
   });
 }
 
+/**
+ * Discovers the most suitable branch candidates for PR-context collection.
+ *
+ * @param output The output channel used for git failure diagnostics.
+ * @param commandId The logical command name associated with discovery.
+ * @param workspaceRoot The repository root where git commands should run.
+ * @returns Candidate base branches and the branch that should be selected by default.
+ * @throws Error when the repository exposes no usable local or remote branches.
+ */
 function discoverPrBaseBranches(
   output: vscode.OutputChannel,
   commandId: string,
@@ -250,6 +342,8 @@ function discoverPrBaseBranches(
     true,
   );
 
+  // Prefer remote branches when available because PR context is typically based on
+  // the branch layout tracked in `origin`, not on a contributor's local branches.
   const remoteRefLines = runGitForTextOutput(
     output,
     commandId,
@@ -266,6 +360,8 @@ function discoverPrBaseBranches(
   const sortedRemoteRefs = sortRemoteBranchCandidates(uniqueRemoteRefs);
 
   if (sortedRemoteRefs.length > 0) {
+    // Keep `origin/HEAD` first when it resolves to a listed ref so the quick pick
+    // mirrors the repository's advertised default branch.
     if (originHead.length > 0 && sortedRemoteRefs.includes(originHead)) {
       const candidates = [
         originHead,
@@ -283,6 +379,8 @@ function discoverPrBaseBranches(
     };
   }
 
+  // Fall back to local branches only when no remote refs exist, which keeps the
+  // command usable in offline or minimally configured repositories.
   const localRefLines = runGitForTextOutput(
     output,
     commandId,
@@ -308,12 +406,23 @@ function discoverPrBaseBranches(
   };
 }
 
+/**
+ * Prompts the user to choose which branch should be treated as the PR base.
+ *
+ * @param output The output channel used for cancellation and selection logging.
+ * @param commandId The logical command requesting the selection.
+ * @param candidates The ordered candidate branches displayed to the user.
+ * @param defaultBranch The branch labeled as the default suggestion.
+ * @returns The chosen branch label, or `undefined` when the user cancels.
+ */
 async function pickPrBaseBranch(
   output: vscode.OutputChannel,
   commandId: string,
   candidates: ReadonlyArray<string>,
   defaultBranch: string,
 ): Promise<string | undefined> {
+  // Mirror the sorted candidate list in the picker so the user sees the same
+  // priority order the extension would otherwise use automatically.
   const quickPickItems = candidates.map((branch) => ({
     label: branch,
     description: branch === defaultBranch ? "default" : "",
@@ -336,6 +445,15 @@ async function pickPrBaseBranch(
   return selectedItem.label;
 }
 
+/**
+ * Resolves a bundled script, selects its runtime, and executes it in the workspace.
+ *
+ * @param context The extension context that provides the extension installation URI.
+ * @param output The output channel used for command progress and diagnostics.
+ * @param spec The command configuration describing the bundled script to execute.
+ * @returns A promise that resolves when the bundled script exits successfully.
+ * @throws Error when runtime detection fails or the spawned command exits non-zero.
+ */
 async function executeBundledScript(
   context: vscode.ExtensionContext,
   output: vscode.OutputChannel,
@@ -355,6 +473,8 @@ async function executeBundledScript(
     `[${spec.commandId}] runtime probe success: ${runtime.executable}`,
   );
 
+  // Resolve scripts relative to the installed extension so commands always use the
+  // bundled resources rather than depending on workspace copies.
   const scriptPath = vscode.Uri.joinPath(
     context.extensionUri,
     spec.bundledRelativePath,
@@ -376,6 +496,12 @@ async function executeBundledScript(
   }
 }
 
+/**
+ * Registers placeholder commands that intentionally fail with actionable errors.
+ *
+ * @param output The output channel used to record placeholder usage.
+ * @returns Disposables for each registered placeholder command.
+ */
 function registerPlaceholderCommands(
   output: vscode.OutputChannel,
 ): vscode.Disposable[] {
@@ -388,6 +514,14 @@ function registerPlaceholderCommands(
   );
 }
 
+/**
+ * Activates the extension by registering all command handlers and shared resources.
+ *
+ * @param context The extension lifecycle context supplied by VS Code.
+ * @returns Nothing.
+ * @remarks Each command delegates to a small runtime/script launcher to keep the
+ * activation path thin and predictable.
+ */
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
 
@@ -448,6 +582,8 @@ export function activate(context: vscode.ExtensionContext): void {
         `[${commandId}] branch discovery success: ${discoveryResult.candidates.join(", ")}`,
       );
 
+      // Require an explicit branch confirmation so PR-context collection reflects
+      // the user's intended comparison target instead of silently guessing.
       const selectedBase = await pickPrBaseBranch(
         output,
         commandId,
@@ -488,6 +624,11 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 }
 
+/**
+ * Deactivates the extension.
+ *
+ * @returns Nothing.
+ */
 export function deactivate(): void {
   // No-op.
 }
