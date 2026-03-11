@@ -1,5 +1,5 @@
 {	
-    "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
+    "coverage-gutters.coverageBaseDir": "**",
     "coverage-gutters.coverageFileNames": [
         "lcov.info",
         "cov.xml",
@@ -20,8 +20,10 @@
         "powershell-coverage.koverage.xml"
     ],
     "koverage.coverageFilePaths": [
+        "coverage",
         "artifacts/pester",
-        "artifacts/pester/kcov/kcov-merged"
+        "artifacts/pester/kcov/kcov-merged",
+        "artifacts/python"
     ],
     "jest.jestCommandLine": "npm run test:unit --",
     "jest.rootPath": ".",

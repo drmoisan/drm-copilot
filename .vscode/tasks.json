@@ -293,7 +293,8 @@
 				"pytest",
 				"--cov=src/lexile_corpus_tuner",
 				"--cov=scripts/dev_tools",
-				"--cov-report=term-missing"
+				"--cov-report=term-missing",
+				"--cov-report=lcov:artifacts/python/lcov.info"
 			],
 			"command": "poetry",
 			"group": {
@@ -496,6 +497,26 @@
 			},
 			"problemMatcher": [],
 			"type": "shell"
+		},
+		{
+			"dependsOn": [
+				"TS: 4 Jest: unit tests with coverage",
+				"QC: 4 Pytest: run tests with coverage",
+				"PoshQC: 4 test (Pester)"
+			],
+			"dependsOrder": "sequence",
+			"detail": "Runs Jest, Python, and PowerShell tests with coverage to refresh all Koverage sources.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: Coverage: All Providers",
+			"presentation": {
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": []
 		},
 		{
 			"dependsOn": [
@@ -1124,6 +1145,27 @@
 				"kind": "test"
 			},
 			"label": "TS: 4 Jest: unit tests",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"test:unit:coverage"
+			],
+			"command": "npm",
+			"detail": "Runs Jest unit tests with coverage and writes coverage/lcov.info.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "TS: 4 Jest: unit tests with coverage",
 			"presentation": {
 				"close": false,
 				"panel": "new",
