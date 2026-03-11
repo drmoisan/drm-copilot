@@ -1,16 +1,28 @@
-# Scaffold Extension
+# drm-copilot
 
-This extension executes bundled hello scripts directly from extension resources while targeting the active workspace as runtime `cwd`.
+This extension executes bundled scripts directly from extension resources while targeting the active workspace as runtime `cwd`.
 
 ## Commands
 
-- `scaffoldExtension.helloPython`
-- `scaffoldExtension.helloPowerShell`
-- `scaffoldExtension.collectCommitContext`
+- `drmCopilotExtension.helloPython`
+- `drmCopilotExtension.helloPowerShell`
+- `drmCopilotExtension.collectCommitContext`
+- `drmCopilotExtension.collectPrContext`
+- `drmCopilotExtension.pushDownCopilotCustomizations`
+
+### Push Down Copilot Customizations
+
+- Command Palette title: `drm-copilot: Push Down Copilot Customizations`
+- Requires an open workspace folder.
+- Executes bundled wrapper: `resources/templates/push_down_copilot_customizations.py`
+- Passes `--destination` with the open workspace root.
+- Source customizations are read from the bundled `resources/customizations/.github/` payload.
+- The summary artifact is written under the destination workspace.
+- Script references in copied files are rewritten to VS Code command: references for both real and placeholder commands.
 
 ### Commit Context Command Contract
 
-- Command Palette title: `Scaffold: Collect Commit Context`
+- Command Palette title: `drm-copilot: Collect Commit Context`
 - Requires an open workspace folder.
 - Executes bundled collector resource: `resources/templates/collect_commit_context.py`
 - Writes output artifact to: `artifacts/commit_context.txt` under the active workspace.
@@ -38,7 +50,7 @@ Runtime probing emits clear output-channel messages so users can identify missin
 
 ## Output Channel
 
-The extension logs command lifecycle events to the `Scaffold Utils` output channel:
+The extension logs command lifecycle events to the `drm-copilot` output channel:
 
 - Runtime probe start/success/failure
 - Resolved bundled script path
@@ -56,10 +68,10 @@ Artifacts are generated under workspace `artifacts/` by the script runtime. The 
 ## First-run workflow
 
 1. Open a workspace folder in VS Code.
-2. Open the Command Palette and run `scaffoldExtension.helloPython`.
-3. Confirm Python runtime probe and command logs in the `Scaffold Utils` output channel.
-4. Open the Command Palette and run `scaffoldExtension.helloPowerShell`.
-5. Confirm PowerShell runtime probe and command logs in the `Scaffold Utils` output channel.
+2. Open the Command Palette and run `drmCopilotExtension.helloPython`.
+3. Confirm Python runtime probe and command logs in the `drm-copilot` output channel.
+4. Open the Command Palette and run `drmCopilotExtension.helloPowerShell`.
+5. Confirm PowerShell runtime probe and command logs in the `drm-copilot` output channel.
 6. Verify output artifacts under workspace `artifacts/`.
 
 ## Production foundation

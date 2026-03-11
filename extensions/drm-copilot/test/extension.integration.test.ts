@@ -193,7 +193,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("helloPython produces artifacts/hello_python.txt using bundled script execution", async () => {
-    await handlerFor("scaffoldExtension.helloPython")();
+    await handlerFor("drmCopilotExtension.helloPython")();
 
     const [executable, args, options] = childProcessMock.spawn.mock
       .calls[0] as [string, string[], { cwd: string }];
@@ -203,7 +203,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("helloPowerShell produces artifacts/hello_pwsh.txt using bundled script execution", async () => {
-    await handlerFor("scaffoldExtension.helloPowerShell")();
+    await handlerFor("drmCopilotExtension.helloPowerShell")();
 
     const [executable, args, options] = childProcessMock.spawn.mock
       .calls[0] as [string, string[], { cwd: string }];
@@ -215,8 +215,8 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("execution enforces no copy of hello_python.py or hello_pwsh.ps1 into workspace root", async () => {
-    await handlerFor("scaffoldExtension.helloPython")();
-    await handlerFor("scaffoldExtension.helloPowerShell")();
+    await handlerFor("drmCopilotExtension.helloPython")();
+    await handlerFor("drmCopilotExtension.helloPowerShell")();
 
     const scriptPaths = childProcessMock.spawn.mock.calls.map(
       (call: unknown[]) => {
@@ -238,7 +238,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("collectCommitContext executes bundled resource without workspace script copy", async () => {
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
     const scriptPath = normalizePath(args[0]);
@@ -268,7 +268,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const artifactPath = "C:/workspace/artifacts/commit_context.txt";
     const artifactText = generatedArtifacts.get(artifactPath);
@@ -313,7 +313,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectCommitContext")();
+    await handlerFor("drmCopilotExtension.collectCommitContext")();
 
     const artifactPath = "C:/workspace/artifacts/commit_context.txt";
     const artifactText = generatedArtifacts.get(artifactPath) ?? "";
@@ -322,7 +322,7 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("collectPrContext executes bundled wrapper script in destination workspace", async () => {
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
       string,
@@ -347,7 +347,7 @@ describe("drm-copilot integration behavior", () => {
       },
     ];
 
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     const [, args, options] = childProcessMock.spawn.mock.calls[0] as [
       string,
@@ -409,7 +409,7 @@ describe("drm-copilot integration behavior", () => {
       },
     );
 
-    await handlerFor("scaffoldExtension.collectPrContext")();
+    await handlerFor("drmCopilotExtension.collectPrContext")();
 
     expect(
       generatedArtifacts.has("C:/workspace/artifacts/pr_context.summary.txt"),
@@ -439,5 +439,28 @@ describe("drm-copilot integration behavior", () => {
         "===== Comparison metadata =====",
       ),
     ).toBe(false);
+  });
+
+  it("pushDownCopilotCustomizations executes bundled wrapper script in workspace", async () => {
+    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    expect(executable).toBe("python");
+    expect(
+      normalizePath(args[0]).endsWith(
+        "resources/templates/push_down_copilot_customizations.py",
+      ),
+    ).toBe(true);
+    expect(options.cwd).toBe("C:/workspace");
+  });
+
+  it("pushDownCopilotCustomizations passes workspace root as --destination", async () => {
+    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const destinationIndex = args.indexOf("--destination");
+    expect(destinationIndex).toBeGreaterThan(-1);
+    expect(args[destinationIndex + 1]).toBe("C:/workspace");
   });
 });

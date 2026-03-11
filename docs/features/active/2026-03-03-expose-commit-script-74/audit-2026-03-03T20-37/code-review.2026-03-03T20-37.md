@@ -2,7 +2,7 @@
 
 ## Executive summary
 
-Change set adds extension command `scaffoldExtension.collectCommitContext`, wires argumentized bundled-script execution, adds bundled collector resource, and expands TypeScript + Python regression tests.
+Change set adds extension command `drmCopilotExtension.collectCommitContext`, wires argumentized bundled-script execution, adds bundled collector resource, and expands TypeScript + Python regression tests.
 
 Top 3 risks:
 1. **Blocker:** extension formatting is not currently clean in check-only validation (`package.json`).

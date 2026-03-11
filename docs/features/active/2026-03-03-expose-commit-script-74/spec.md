@@ -32,7 +32,7 @@ At runtime, the command should:
 ## Inputs / Outputs
 
 - Inputs (CLI flags, files, env vars)
-	- VS Code command invocation: `scaffoldExtension.collectCommitContext` from Command Palette.
+	- VS Code command invocation: `drmCopilotExtension.collectCommitContext` from Command Palette.
 	- Destination workspace root from `vscode.workspace.workspaceFolders` (deterministic root selection policy).
 	- Bundled collector script file shipped inside extension resources (based on `scripts/dev_tools/collect_commit_context.py`).
 	- Runtime input: Python executable resolved by existing extension runtime probing logic.
@@ -44,7 +44,7 @@ At runtime, the command should:
 	- Output channel logging in `Scaffold Utils` for command start, runtime resolution, script path resolution, subprocess execution, completion, and failure diagnostics.
 	- User-facing error messages for missing workspace, missing runtime, git resolution failure, or collector non-zero exit.
 - Config keys and defaults:
-	- Command ID: `scaffoldExtension.collectCommitContext`.
+	- Command ID: `drmCopilotExtension.collectCommitContext`.
 	- Default output path: `artifacts/commit_context.txt` under destination workspace.
 	- Runtime preference follows existing extension order for Python resolution.
 	- Process execution uses destination workspace as `cwd` and `shell: false` in subprocess spawn.
@@ -62,7 +62,7 @@ List commands, flags, request/response shapes, and examples.
 	- Command Palette -> `Scaffold: Collect Commit Context` when Python or Git is unavailable -> actionable failure log + surfaced error, no partial success state.
 - Contracts and validation rules:
 	- Command registration contract:
-		- `package.json` contributes `scaffoldExtension.collectCommitContext`.
+		- `package.json` contributes `drmCopilotExtension.collectCommitContext`.
 		- extension activation registers/disposes handler correctly.
 	- Execution contract:
 		- Collector script path resolves from extension bundled resources, never destination workspace root.
@@ -110,7 +110,7 @@ Data flow, storage, or state changes introduced by this feature.
 	- Update feature docs and extension-facing documentation to reflect command behavior and artifact contract.
 - New classes/functions/commands to add or update:
 	- `extensions/scaffold-extension/package.json`
-		- Add command contribution entry for `scaffoldExtension.collectCommitContext`.
+		- Add command contribution entry for `drmCopilotExtension.collectCommitContext`.
 	- `extensions/scaffold-extension/src/extension.ts`
 		- Register command handler for commit-context collection.
 		- Reuse/extend existing helpers for workspace root selection, runtime detection, bundled script resolution, and process execution.

@@ -19,7 +19,7 @@ The extension's `collectPrContext` command uses `executePythonModule()` which ru
 
 - OS/version: Windows 11
 - Python version: 3.12+
-- Command/flags used: VS Code command `scaffoldExtension.collectPrContext`
+- Command/flags used: VS Code command `drmCopilotExtension.collectPrContext`
 - Data source or fixture: Any destination workspace without the `scripts/dev_tools/pr_context` package
 
 ## Steps to Reproduce

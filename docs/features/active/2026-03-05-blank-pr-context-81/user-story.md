@@ -34,7 +34,7 @@ Fixing this closes a high-severity workflow gap: destination users keep the exte
 
 ## Acceptance Criteria
 
-- [ ] Running `scaffoldExtension.collectPrContext` in a valid destination git repository produces `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` with substantive, multi-line PR context content (not heading/base-line placeholder-only output).
+- [ ] Running `drmCopilotExtension.collectPrContext` in a valid destination git repository produces `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` with substantive, multi-line PR context content (not heading/base-line placeholder-only output).
 - [ ] Extension-side PR-context generation preserves existing command UX and boundary behavior (workspace validation, branch selection/cancel semantics, destination `cwd`, no script materialization in destination repo root).
 - [ ] If collection fails (runtime/git/data failure), command surfaces actionable errors and does not report success with effectively blank artifacts.
 - [ ] Regression tests fail on placeholder-only artifact content and pass when artifacts include meaningful PR context sections.

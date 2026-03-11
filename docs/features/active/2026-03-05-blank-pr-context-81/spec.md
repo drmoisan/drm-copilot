@@ -67,7 +67,7 @@ Likely path/reference resolution mismatch when PR-context package runs from exte
 - `scripts/dev_tools/pr_context/render_pr_helpers.py`
 
 Confirmed root cause from research:
-- Extension command `scaffoldExtension.collectPrContext` currently executes bundled script `extensions/scaffold-extension/resources/templates/collect_pr_context.py`.
+- Extension command `drmCopilotExtension.collectPrContext` currently executes bundled script `extensions/scaffold-extension/resources/templates/collect_pr_context.py`.
 - That bundled script writes a placeholder summary body (heading + base branch line) instead of invoking canonical PR-context collection logic.
 - Because output files are created at the correct destination path but payload generation is minimal, artifacts appear "blank" for downstream use even though file creation succeeds.
 
@@ -119,7 +119,7 @@ Signals/evidence supporting root cause:
 
 #### Functions/classes/CLI commands impacted:
 - `extensions/scaffold-extension/src/extension.ts`
-	- Command: `scaffoldExtension.collectPrContext` (behavior contract preserved; payload quality improved through collector output).
+	- Command: `drmCopilotExtension.collectPrContext` (behavior contract preserved; payload quality improved through collector output).
 - `extensions/scaffold-extension/resources/templates/collect_pr_context.py`
 	- `main(...)` and internal collection/render helpers (exact function names to be finalized in implementation PR).
 - Canonical reference contract:
@@ -174,7 +174,7 @@ Signals/evidence supporting root cause:
 	- Base branch selected in command flow and passed explicitly via `--base`.
 
 #### Backward-compatibility expectations:
-- No command ID changes (`scaffoldExtension.collectPrContext` unchanged).
+- No command ID changes (`drmCopilotExtension.collectPrContext` unchanged).
 - No CLI flag removals/renames for bundled collector invocation.
 - Existing downstream consumers of `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` continue to read same paths.
 - Behavior change is additive in quality (artifact richness), not a breaking path contract.

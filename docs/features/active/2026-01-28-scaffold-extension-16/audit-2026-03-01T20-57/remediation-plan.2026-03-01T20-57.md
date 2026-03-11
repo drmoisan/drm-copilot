@@ -64,8 +64,8 @@ Close all FAIL/PARTIAL findings in `feature-audit.2026-03-01T20-57.md` by restor
 
 - [x] [P4-T1] Add explicit per-platform runtime section (Windows/macOS/Linux) to `extensions/scaffold-extension/README.md`.
 	- Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'Windows' in t and 'macOS' in t and 'Linux' in t"` exits with `EXIT_CODE: 0`.
-- [x] [P4-T2] Add explicit first-run workflow steps to `extensions/scaffold-extension/README.md` for both `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
-	- Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'First-run workflow' in t; assert 'scaffoldExtension.helloPython' in t; assert 'scaffoldExtension.helloPowerShell' in t"` exits with `EXIT_CODE: 0`.
+- [x] [P4-T2] Add explicit first-run workflow steps to `extensions/scaffold-extension/README.md` for both `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`.
+	- Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'First-run workflow' in t; assert 'drmCopilotExtension.helloPython' in t; assert 'drmCopilotExtension.helloPowerShell' in t"` exits with `EXIT_CODE: 0`.
 - [x] [P4-T3] Add dedicated production-foundation section to `extensions/scaffold-extension/README.md` describing extension-to-workspace execution value.
 	- Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'Production foundation' in t"` exits with `EXIT_CODE: 0`.
 

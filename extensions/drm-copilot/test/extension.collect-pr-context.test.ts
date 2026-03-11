@@ -221,7 +221,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
 
   it("collectPrContext cancels before spawn", async () => {
     quickPickResultLabel = undefined;
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
 
     await handler();
 
@@ -230,7 +232,7 @@ describe("drm-copilot collectPrContext command behavior", () => {
     expect(
       logs.some((line) =>
         line.includes(
-          "[scaffoldExtension.collectPrContext] branch selection canceled by user",
+          "[drmCopilotExtension.collectPrContext] branch selection canceled by user",
         ),
       ),
     ).toBe(true);
@@ -239,7 +241,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
   it("collectPrContext fails when no workspace folder is open", async () => {
     workspaceFoldersState = undefined;
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await expect(handler()).rejects.toThrow("No workspace folder is open.");
   });
 
@@ -251,7 +255,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
       remoteRefs: ["origin/HEAD", "origin/develop", "origin/main"],
     });
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await handler();
 
     const firstQuickPickCall = showQuickPickMock.mock.calls[0] as [
@@ -273,7 +279,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
       remoteRefs: ["origin/HEAD", "origin/main", "origin/release/1.0"],
     });
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
@@ -311,14 +319,16 @@ describe("drm-copilot collectPrContext command behavior", () => {
       };
     });
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await expect(handler()).rejects.toThrow("Git command failed (2)");
 
     const logs = appendLineMock.mock.calls.map(([line]) => line);
     expect(
       logs.some((line) =>
         line.includes(
-          "[scaffoldExtension.collectPrContext] branch discovery failure",
+          "[drmCopilotExtension.collectPrContext] branch discovery failure",
         ),
       ),
     ).toBe(true);
@@ -333,7 +343,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
       createMockProcessWithStderr(7, "collector crashed: simulated stderr"),
     );
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await expect(handler()).rejects.toThrow("Command exited with code 7");
 
     const logs = appendLineMock.mock.calls.map(([line]) => line);
@@ -342,7 +354,7 @@ describe("drm-copilot collectPrContext command behavior", () => {
     ).toBe(true);
     expect(
       logs.some((line) =>
-        line.includes("[scaffoldExtension.collectPrContext] command failure"),
+        line.includes("[drmCopilotExtension.collectPrContext] command failure"),
       ),
     ).toBe(true);
   });
@@ -351,7 +363,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
 
     await handler();
 
@@ -365,7 +379,9 @@ describe("drm-copilot collectPrContext command behavior", () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
-    const handler = activateAndGetHandler("scaffoldExtension.collectPrContext");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
     await handler();
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];

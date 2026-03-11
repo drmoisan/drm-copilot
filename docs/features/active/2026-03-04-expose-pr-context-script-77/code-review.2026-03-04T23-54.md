@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This post-remediation review confirms the PR-context command implementation is complete and now quality-gate clean. The feature adds `scaffoldExtension.collectPrContext`, deterministic branch discovery/defaulting, cancel-safe Quick Pick behavior, destination `cwd` execution, and explicit destination artifact args.
+This post-remediation review confirms the PR-context command implementation is complete and now quality-gate clean. The feature adds `drmCopilotExtension.collectPrContext`, deterministic branch discovery/defaulting, cancel-safe Quick Pick behavior, destination `cwd` execution, and explicit destination artifact args.
 
 Top 3 residual risks:
 1. **Measurement risk (minor):** changed-lines-only coverage metric is not emitted by current Jest summary format.

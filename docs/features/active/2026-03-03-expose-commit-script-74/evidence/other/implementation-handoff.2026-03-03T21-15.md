@@ -1,7 +1,7 @@
 Timestamp: 2026-03-03T21:21:20Z
 
 Completed Tasks:
-- Implemented scaffoldExtension.collectCommitContext manifest contribution and activation handler wiring.
+- Implemented drmCopilotExtension.collectCommitContext manifest contribution and activation handler wiring.
 - Added bundled collector resource at extensions/scaffold-extension/resources/templates/collect_commit_context.py.
 - Extended command execution contract in extension.ts with per-command args support and workspace-first validation.
 - Added unit and integration-style scenario tests for registration, workspace/runtime failures, argv/cwd semantics, diagnostics, bundled path resolution, and artifact-section markers.

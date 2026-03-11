@@ -20,7 +20,7 @@ Authoritative AC sources for this run:
 
 | Criterion | Status | Evidence | Verification command(s) | Notes |
 |---|---|---|---|---|
-| Command contribution exists for PR context | PASS | `extensions/scaffold-extension/package.json` includes `scaffoldExtension.collectPrContext` | `npm run test:unit -- --coverage --coverageReporters=text-summary` | Registration behavior also covered by unit tests. |
+| Command contribution exists for PR context | PASS | `extensions/scaffold-extension/package.json` includes `drmCopilotExtension.collectPrContext` | `npm run test:unit -- --coverage --coverageReporters=text-summary` | Registration behavior also covered by unit tests. |
 | No-workspace fails fast and prevents spawn | PASS | Unit scenario `collectPrContext fails when no workspace folder is open` | `npm run test:unit -- --coverage --coverageReporters=text-summary` | Command throws actionable workspace error path. |
 | Bundled-resource execution only; no workspace script materialization | PASS | Integration scenario `collectPrContext executes bundled resource without workspace script copy` | `npm run test:unit -- --coverage --coverageReporters=text-summary` | Extension path starts with extension root, not destination workspace. |
 | Branch picker with deterministic candidates/default | PASS | Branch discovery + default selection logic; unit default-selection assertion | `npm run test:unit -- --coverage --coverageReporters=text-summary` | Deterministic ordering and default marker verified. |

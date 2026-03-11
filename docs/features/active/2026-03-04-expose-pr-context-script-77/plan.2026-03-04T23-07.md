@@ -45,10 +45,10 @@ Expose `scripts/dev_tools/pr_context` through extension-side execution in `exten
 
 ### Phase 1 — TDD Red Regression Tasks
 
-- [ ] [P1-T1] [expect-fail] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` asserting `activate()` registers `scaffoldExtension.collectPrContext`
+- [ ] [P1-T1] [expect-fail] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` asserting `activate()` registers `drmCopilotExtension.collectPrContext`
   - Acceptance: Command `npm --prefix extensions/scaffold-extension exec -- jest test/extension.test.ts -t "registers collectPrContext"` exits non-zero and evidence is saved at `docs/features/active/2026-03-04-expose-pr-context-script-77/evidence/regression-testing/p1-t1-register-command-fail.yyyy-MM-ddTHH-mm.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and a failing assertion excerpt.
 
-- [ ] [P1-T2] [expect-fail] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` asserting branch selection cancel aborts `scaffoldExtension.collectPrContext` before subprocess spawn
+- [ ] [P1-T2] [expect-fail] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` asserting branch selection cancel aborts `drmCopilotExtension.collectPrContext` before subprocess spawn
   - Acceptance: Command `npm --prefix extensions/scaffold-extension exec -- jest test/extension.test.ts -t "collectPrContext cancels before spawn"` exits non-zero and evidence is saved at `docs/features/active/2026-03-04-expose-pr-context-script-77/evidence/regression-testing/p1-t2-cancel-before-spawn-fail.yyyy-MM-ddTHH-mm.md` with `Timestamp:`, `Command:`, and `EXIT_CODE:`.
 
 - [ ] [P1-T3] [expect-fail] Add unit test in `extensions/scaffold-extension/test/extension.test.ts` asserting selected base branch is passed through `--base` and PR artifact flags
@@ -56,18 +56,18 @@ Expose `scripts/dev_tools/pr_context` through extension-side execution in `exten
 
 ### Phase 2 — Extension Command Implementation
 
-- [ ] [P2-T1] Add command contribution `scaffoldExtension.collectPrContext` to `extensions/scaffold-extension/package.json`
-  - Acceptance: `extensions/scaffold-extension/package.json` contains the exact JSON entry with command id `scaffoldExtension.collectPrContext` and title `drm-copilot: Collect PR Context`.
+- [ ] [P2-T1] Add command contribution `drmCopilotExtension.collectPrContext` to `extensions/scaffold-extension/package.json`
+  - Acceptance: `extensions/scaffold-extension/package.json` contains the exact JSON entry with command id `drmCopilotExtension.collectPrContext` and title `drm-copilot: Collect PR Context`.
 
 - [ ] [P2-T2] Add a branch-discovery helper in `extensions/scaffold-extension/src/extension.ts` that returns deterministic candidates from destination repository refs and deterministic default selection
   - Acceptance: `extensions/scaffold-extension/src/extension.ts` contains a dedicated helper used by PR context command flow and includes deterministic ordering logic with `origin/HEAD` priority.
 
 - [ ] [P2-T3] Add a branch-picker helper in `extensions/scaffold-extension/src/extension.ts` that uses VS Code Quick Pick and returns cancel state as command abort
-  - Acceptance: `extensions/scaffold-extension/src/extension.ts` contains a helper that handles `undefined` Quick Pick result and emits a cancellation log line with command id `scaffoldExtension.collectPrContext`.
+  - Acceptance: `extensions/scaffold-extension/src/extension.ts` contains a helper that handles `undefined` Quick Pick result and emits a cancellation log line with command id `drmCopilotExtension.collectPrContext`.
 
-- [ ] [P2-T4] Register `scaffoldExtension.collectPrContext` in `activate()` and invoke bundled collector with destination workspace `cwd`
+- [ ] [P2-T4] Register `drmCopilotExtension.collectPrContext` in `activate()` and invoke bundled collector with destination workspace `cwd`
   - Preconditions: [P2-T1], [P2-T2], and [P2-T3] completed.
-  - Acceptance: `extensions/scaffold-extension/src/extension.ts` registers command id `scaffoldExtension.collectPrContext` and calls bundled script execution with args `--base`, `--out artifacts/pr_context.summary.txt`, and `--appendix-out artifacts/pr_context.appendix.txt`.
+  - Acceptance: `extensions/scaffold-extension/src/extension.ts` registers command id `drmCopilotExtension.collectPrContext` and calls bundled script execution with args `--base`, `--out artifacts/pr_context.summary.txt`, and `--appendix-out artifacts/pr_context.appendix.txt`.
 
 - [ ] [P2-T5] Extend PR-context command logging in `extensions/scaffold-extension/src/extension.ts` for branch discovery, selection, cancellation, runtime probe failures, and non-zero collector exits
   - Acceptance: The file contains command-id-scoped log lines for each failure class and success completion path.

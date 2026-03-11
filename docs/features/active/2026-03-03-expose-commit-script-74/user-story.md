@@ -37,7 +37,7 @@ This feature closes that gap by making commit-context collection an extension co
 
 ## Acceptance Criteria
 
-- [ ] Extension contributes a Command Palette action for commit-context collection (for example, `scaffoldExtension.collectCommitContext`).
+- [ ] Extension contributes a Command Palette action for commit-context collection (for example, `drmCopilotExtension.collectCommitContext`).
 - [ ] Command returns a clear actionable error when no workspace is open.
 - [ ] Command executes a script resolved from extension bundled resources and does not create collector script files in the destination workspace root.
 - [ ] Collector process is launched with destination workspace root as working directory, and staged/unstaged Git introspection targets that destination repository.

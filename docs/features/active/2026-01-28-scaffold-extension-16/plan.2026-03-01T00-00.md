@@ -22,7 +22,7 @@ work_mode: full
 
 This plan implements the extension-side bundled-script execution pattern defined in `spec.md` and `user-story.md`:
 
-- Keep command IDs exactly `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
+- Keep command IDs exactly `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`.
 - Execute bundled scripts from extension resources.
 - Preserve invariant: no copying `hello_python.py` or `hello_pwsh.ps1` into workspace root.
 - Preserve explicit runtime detection with clear runtime-named errors.
@@ -51,12 +51,12 @@ This plan implements the extension-side bundled-script execution pattern defined
 
 - [x] [P1-T1] Create folder structure `extensions/scaffold-extension/src`, `extensions/scaffold-extension/resources/templates`, and `extensions/scaffold-extension/test`.
   - Acceptance: `pwsh -NoLogo -NoProfile -Command "@('extensions/scaffold-extension/src','extensions/scaffold-extension/resources/templates','extensions/scaffold-extension/test') | ForEach-Object { if (!(Test-Path $_)) { throw \"missing: $_\" } }"` exits with `EXIT_CODE: 0`.
-- [x] [P1-T2] Create `extensions/scaffold-extension/package.json` with command contributions for `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell` and `main` value `./out/extension.js`.
-  - Acceptance: `poetry run python -c "import json, pathlib; d=json.loads(pathlib.Path('extensions/scaffold-extension/package.json').read_text(encoding='utf-8')); ids={c['command'] for c in d['contributes']['commands']}; assert 'scaffoldExtension.helloPython' in ids; assert 'scaffoldExtension.helloPowerShell' in ids; assert d['main']=='./out/extension.js'"` exits with `EXIT_CODE: 0`.
+- [x] [P1-T2] Create `extensions/scaffold-extension/package.json` with command contributions for `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell` and `main` value `./out/extension.js`.
+  - Acceptance: `poetry run python -c "import json, pathlib; d=json.loads(pathlib.Path('extensions/scaffold-extension/package.json').read_text(encoding='utf-8')); ids={c['command'] for c in d['contributes']['commands']}; assert 'drmCopilotExtension.helloPython' in ids; assert 'drmCopilotExtension.helloPowerShell' in ids; assert d['main']=='./out/extension.js'"` exits with `EXIT_CODE: 0`.
 - [x] [P1-T3] Create `extensions/scaffold-extension/tsconfig.json` with strict TypeScript settings and output to `out/` from `src/`.
   - Acceptance: `poetry run python -c "import json, pathlib; d=json.loads(pathlib.Path('extensions/scaffold-extension/tsconfig.json').read_text(encoding='utf-8')); c=d['compilerOptions']; assert c['strict'] is True; assert c['outDir']=='out'; assert c['rootDir']=='src'"` exits with `EXIT_CODE: 0`.
 - [x] [P1-T4] Create `extensions/scaffold-extension/src/extension.ts` exporting command handlers that resolve workspace root, detect runtime (`python`; `pwsh` then `powershell`), resolve bundled script path via extension URI, execute with explicit executable+args, and log lifecycle to output channel `Scaffold Utils`.
-  - Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/src/extension.ts').read_text(encoding='utf-8'); assert 'scaffoldExtension.helloPython' in t; assert 'scaffoldExtension.helloPowerShell' in t; assert 'Scaffold Utils' in t; assert 'pwsh' in t and 'powershell' in t"` exits with `EXIT_CODE: 0`.
+  - Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/src/extension.ts').read_text(encoding='utf-8'); assert 'drmCopilotExtension.helloPython' in t; assert 'drmCopilotExtension.helloPowerShell' in t; assert 'Scaffold Utils' in t; assert 'pwsh' in t and 'powershell' in t"` exits with `EXIT_CODE: 0`.
 - [x] [P1-T5] Create bundled Python script `extensions/scaffold-extension/resources/templates/hello_python.py` that writes deterministic marker `hello_python:ok` to `artifacts/hello_python.txt`.
   - Acceptance: `poetry run python -c "from pathlib import Path; py=Path('extensions/scaffold-extension/resources/templates/hello_python.py').read_text(encoding='utf-8'); assert 'artifacts/hello_python.txt' in py; assert 'hello_python:ok' in py"` exits with `EXIT_CODE: 0`.
 - [x] [P1-T6] Create bundled PowerShell script `extensions/scaffold-extension/resources/templates/hello_pwsh.ps1` that writes deterministic marker `hello_pwsh:ok` to `artifacts/hello_pwsh.txt`.
@@ -66,10 +66,10 @@ This plan implements the extension-side bundled-script execution pattern defined
 
 **Phase Completion Criteria:** Each required scenario has an explicit failing regression test task with auditable expect-fail evidence under canonical `evidence/regression-testing/`.
 
-- [x] [P2-T1] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `activate registers scaffoldExtension.helloPython`.
-  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers scaffoldExtension.helloPython"` fails and evidence file `docs/features/active/2026-01-28-scaffold-extension-16/evidence/regression-testing/p2-t1.2026-03-01T00-00.md` contains `Timestamp: 2026-03-01T00-00`, exact `Command:`, and non-zero `EXIT_CODE:`.
-- [x] [P2-T2] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `activate registers scaffoldExtension.helloPowerShell`.
-  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers scaffoldExtension.helloPowerShell"` fails and evidence file `docs/features/active/2026-01-28-scaffold-extension-16/evidence/regression-testing/p2-t2.2026-03-01T00-00.md` contains `Timestamp: 2026-03-01T00-00`, exact `Command:`, and non-zero `EXIT_CODE:`.
+- [x] [P2-T1] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `activate registers drmCopilotExtension.helloPython`.
+  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers drmCopilotExtension.helloPython"` fails and evidence file `docs/features/active/2026-01-28-scaffold-extension-16/evidence/regression-testing/p2-t1.2026-03-01T00-00.md` contains `Timestamp: 2026-03-01T00-00`, exact `Command:`, and non-zero `EXIT_CODE:`.
+- [x] [P2-T2] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `activate registers drmCopilotExtension.helloPowerShell`.
+  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers drmCopilotExtension.helloPowerShell"` fails and evidence file `docs/features/active/2026-01-28-scaffold-extension-16/evidence/regression-testing/p2-t2.2026-03-01T00-00.md` contains `Timestamp: 2026-03-01T00-00`, exact `Command:`, and non-zero `EXIT_CODE:`.
 - [x] [P2-T3] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `detectRuntime prefers pwsh then powershell`.
   - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "detectRuntime prefers pwsh then powershell"` fails and evidence file `docs/features/active/2026-01-28-scaffold-extension-16/evidence/regression-testing/p2-t3.2026-03-01T00-00.md` contains `Timestamp: 2026-03-01T00-00`, exact `Command:`, and non-zero `EXIT_CODE:`.
 - [x] [P2-T4] [expect-fail] Add Jest test in `extensions/scaffold-extension/test/extension.test.ts` for `detectRuntime returns named Python error when python missing`.
@@ -88,7 +88,7 @@ This plan implements the extension-side bundled-script execution pattern defined
 **Phase Completion Criteria:** All regression scenarios from Phase 2 pass; command behavior matches spec/user-story objective and invariants.
 
 - [x] [P3-T1] Implement command registration in `extensions/scaffold-extension/src/extension.ts` so both command IDs are registered and disposed through `context.subscriptions`.
-  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers scaffoldExtension.hello"` exits with `EXIT_CODE: 0`.
+  - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "activate registers drmCopilotExtension.hello"` exits with `EXIT_CODE: 0`.
 - [x] [P3-T2] Implement workspace guard in `extensions/scaffold-extension/src/extension.ts` that throws clear no-workspace error before runtime probing.
   - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "no workspace"` exits with `EXIT_CODE: 0` and output contains `No workspace`.
 - [x] [P3-T3] Implement Python runtime probe in `extensions/scaffold-extension/src/extension.ts` that checks `python` explicitly and emits runtime-named failure.
@@ -117,7 +117,7 @@ This plan implements the extension-side bundled-script execution pattern defined
 - [x] [P4-T4] Add security-focused unit test in `extensions/scaffold-extension/test/extension.test.ts` for `subprocess calls use argv arrays and never shell-concatenated command strings`.
   - Acceptance: `npm --prefix extensions/scaffold-extension run test -- --testNamePattern "argv arrays and never shell-concatenated"` exits with `EXIT_CODE: 0`.
 - [x] [P4-T5] Update `extensions/scaffold-extension/README.md` with required runtime names, command IDs, output channel behavior, and explicit no-copy invariant statement.
-  - Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'scaffoldExtension.helloPython' in t; assert 'scaffoldExtension.helloPowerShell' in t; assert 'Scaffold Utils' in t; assert 'no workspace-root script copying' in t"` exits with `EXIT_CODE: 0`.
+  - Acceptance: `poetry run python -c "from pathlib import Path; t=Path('extensions/scaffold-extension/README.md').read_text(encoding='utf-8'); assert 'drmCopilotExtension.helloPython' in t; assert 'drmCopilotExtension.helloPowerShell' in t; assert 'Scaffold Utils' in t; assert 'no workspace-root script copying' in t"` exits with `EXIT_CODE: 0`.
 
 ### Phase 5 — Final QA Toolchain Loop
 

@@ -35,7 +35,7 @@ We need a first-class extension command that runs bundled `pr_context` resources
 
 ## Acceptance Criteria
 
-- [ ] Extension contributes a discoverable Command Palette command for PR context collection (for example `scaffoldExtension.collectPrContext`) with clear title/description aligned to existing scaffold commands.
+- [ ] Extension contributes a discoverable Command Palette command for PR context collection (for example `drmCopilotExtension.collectPrContext`) with clear title/description aligned to existing scaffold commands.
 - [ ] Command validates destination workspace root before runtime probing; if no workspace is open, the command fails fast with actionable error text and does not spawn a process.
 - [ ] Command resolves and executes only extension-bundled `pr_context` script resources; no collector script files are created in the destination workspace root.
 - [ ] Command presents a secondary branch-selection UX that lists branch candidates from the destination repository and preselects a deterministic default base branch.

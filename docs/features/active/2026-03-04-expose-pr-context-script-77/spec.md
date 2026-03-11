@@ -35,7 +35,7 @@ Scope is limited to exposing `pr_context` execution and the branch-selection flo
 ## Inputs / Outputs
 
 - Inputs (CLI flags, files, env vars)
-	- Extension command ID: `scaffoldExtension.collectPrContext`.
+	- Extension command ID: `drmCopilotExtension.collectPrContext`.
 	- Workspace input: exactly one destination workspace folder from VS Code workspace context.
 	- Branch input: single branch selected from a secondary Quick Pick list.
 	- Bundled collector entrypoint: extension resource path (`resources/scripts/dev_tools/pr_context/collector.py`) resolved from extension installation directory.
@@ -75,7 +75,7 @@ Scope is limited to exposing `pr_context` execution and the branch-selection flo
 
 List commands, flags, request/response shapes, and examples.
 - Extension command contribution:
-	- Command ID: `scaffoldExtension.collectPrContext`
+	- Command ID: `drmCopilotExtension.collectPrContext`
 	- Command title: `Scaffold Utils: Collect PR Context`
 	- Invocation path: Command Palette -> `Scaffold Utils: Collect PR Context` -> base-branch Quick Pick.
 - Branch-selection contract:
@@ -130,7 +130,7 @@ Data flow, storage, or state changes introduced by this feature.
 	- Add/extend tests for registration, branch UX behavior, spawn contracts, and deterministic failures.
 - New classes/functions/commands to add or update:
 	- `extensions/scaffold-extension/package.json`
-		- Add command contribution for `scaffoldExtension.collectPrContext`.
+		- Add command contribution for `drmCopilotExtension.collectPrContext`.
 	- `extensions/scaffold-extension/src/extension.ts`
 		- Register new command.
 		- Add helper to discover deterministic branch candidates.
@@ -168,7 +168,7 @@ Data flow, storage, or state changes introduced by this feature.
 
 ## Seeded Test Conditions (from potential)
 - [ ] Unit coverage areas
-	- [ ] Command contribution/registration and disposal behavior (`scaffoldExtension.collectPrContext` contributed and disposable tracked)
+	- [ ] Command contribution/registration and disposal behavior (`drmCopilotExtension.collectPrContext` contributed and disposable tracked)
 	- [ ] Workspace root validation and no-workspace failure path (assert no subprocess spawn)
 	- [ ] Bundled `pr_context` script path resolution (extension install path, not workspace path)
 	- [ ] Branch list retrieval, deterministic default selection, and cancel behavior (`showQuickPick` returns selection or `undefined`)

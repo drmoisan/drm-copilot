@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel('Scaffold Utils');
 
   const helloPython = vscode.commands.registerCommand(
-    'scaffoldExtension.helloPython',
+    'drmCopilotExtension.helloPython',
     async () => {
       await runBundledScriptCommand({
         context,
@@ -91,7 +91,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   const helloPowerShell = vscode.commands.registerCommand(
-    'scaffoldExtension.helloPowerShell',
+    'drmCopilotExtension.helloPowerShell',
     async () => {
       await runBundledScriptCommand({
         context,
@@ -189,11 +189,11 @@ function execProcess(
   "contributes": {
     "commands": [
       {
-        "command": "scaffoldExtension.helloPython",
+        "command": "drmCopilotExtension.helloPython",
         "title": "Hello Python"
       },
       {
-        "command": "scaffoldExtension.helloPowerShell",
+        "command": "drmCopilotExtension.helloPowerShell",
         "title": "Hello PowerShell"
       }
     ]
@@ -224,7 +224,7 @@ function execProcess(
 Implement a command-only, extension-side execution architecture (no workspace script materialization) with three concrete layers:
 
 1. **Command/UX Layer**
-   - Register `scaffoldExtension.helloPython` and `scaffoldExtension.helloPowerShell`.
+   - Register `drmCopilotExtension.helloPython` and `drmCopilotExtension.helloPowerShell`.
    - Validate workspace presence before any runtime or script execution.
    - Emit start/success/failure telemetry to a dedicated OutputChannel.
 
