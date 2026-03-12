@@ -44,7 +44,7 @@ Describe 'Invoke-PoshQCFormat' {
 
 Describe 'Invoke-PoshQCAnalyze' {
     It 'validates settings path exists' {
-        { Invoke-PoshQCAnalyze -Root $PSScriptRoot -SettingsPath 'C:\nonexistent\settings.psd1' } | Should -Throw '*Settings not found*'
+        { Invoke-PoshQCAnalyze -Root $PSScriptRoot -SettingsPath '/missing/settings.psd1' } | Should -Throw '*Settings not found*'
     }
 }
 
