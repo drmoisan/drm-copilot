@@ -17,7 +17,7 @@ type MockChildProcess = EventEmitter & {
 
 const commandHandlers = new Map<string, CommandHandler>();
 const showOpenDialogMock =
-  jest.fn<() => Promise<ReadonlyArray<MockUri> | undefined>>();
+  jest.fn<(options?: unknown) => Promise<ReadonlyArray<MockUri> | undefined>>();
 const showQuickPickMock = jest.fn<() => Promise<string | undefined>>();
 const showInputBoxMock = jest.fn<() => Promise<string | undefined>>();
 const appendLineMock = jest.fn<(line: string) => void>();
