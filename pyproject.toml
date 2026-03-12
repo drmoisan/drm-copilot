@@ -95,7 +95,7 @@ select = [
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra"
+addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info"
 testpaths = ["tests"]
 
 [tool.coverage.run]
