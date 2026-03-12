@@ -470,9 +470,11 @@ def test_build_rewrite_catalog_contains_expected_command_targets() -> None:
     assert catalog["scripts.dev_tools.pr_context.collector"].command_id == (
         "drmCopilotExtension.collectPrContext"
     )
-    assert catalog["scripts.dev_tools.new_active_feature_folder"].is_placeholder is True
+    assert (
+        catalog["scripts.dev_tools.new_active_feature_folder"].is_placeholder is False
+    )
     assert catalog["scripts/dev_tools/new-potential-entry.ps1"].command_id == (
-        "drmCopilotExtension.newPotentialEntryPsPlaceholder"
+        "drmCopilotExtension.newPotentialEntry"
     )
 
 
@@ -502,11 +504,11 @@ def test_rewrite_matched_reference_preserves_trailing_punctuation() -> None:
         )
     )
 
-    assert rewritten_count == 0
-    assert placeholder_count == 1
+    assert rewritten_count == 1
+    assert placeholder_count == 0
     assert unmatched == []
     assert replacement.endswith(").")
-    assert "`drmCopilotExtension.newActiveFeatureFolderPlaceholder`" in replacement
+    assert "`drmCopilotExtension.newActiveFeatureFolder`" in replacement
 
 
 def test_rewrite_text_references_reports_unique_unmatched_references() -> None:

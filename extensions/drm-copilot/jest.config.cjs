@@ -6,4 +6,6 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.jest.json" }],
-  },  coverageProvider: "v8",};
+  },
+  coverageProvider: "v8",
+};

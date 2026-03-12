@@ -395,7 +395,7 @@ def test_rewrite_known_pr_context_reference_to_collect_pr_context_command() -> N
 
 
 def test_rewrite_new_active_feature_folder_reference_to_placeholder_command() -> None:
-    """Rewrite uncovered feature-folder script references to a placeholder command."""
+    """Rewrite uncovered feature-folder script references to the live command."""
     module = importlib.import_module(
         "scripts.dev_tools.push_down_copilot_customizations"
     )
@@ -424,20 +424,15 @@ def test_rewrite_new_active_feature_folder_reference_to_placeholder_command() ->
     rewritten_text = fs.read_text(
         destination_repo / ".github/instructions/example.instructions.md"
     )
-    assert summary.placeholder_rewrite_count == 1
-    assert (
-        "VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)`"
-        in rewritten_text
-    )
-    assert (
-        "command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`"
-        in rewritten_text
-    )
+    assert summary.rewritten_reference_count == 1
+    assert summary.placeholder_rewrite_count == 0
+    assert "VS Code command: `drm-copilot: New Active Feature Folder`" in rewritten_text
+    assert "command ID: `drmCopilotExtension.newActiveFeatureFolder`" in rewritten_text
     assert "scripts.dev_tools.new_active_feature_folder" not in rewritten_text
 
 
 def test_rewrite_normalizes_dev_tools_slash_variants() -> None:
-    """Normalize slash variants before rewriting to the placeholder command catalog."""
+    """Normalize slash variants before rewriting to the live command catalog."""
     module = importlib.import_module(
         "scripts.dev_tools.push_down_copilot_customizations"
     )
@@ -465,15 +460,10 @@ def test_rewrite_normalizes_dev_tools_slash_variants() -> None:
     rewritten_text = fs.read_text(
         destination_repo / ".github/prompts/normalize.prompt.md"
     )
-    assert summary.placeholder_rewrite_count == 2
-    assert (
-        "command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`"
-        in rewritten_text
-    )
-    assert (
-        "command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`"
-        in rewritten_text
-    )
+    assert summary.rewritten_reference_count == 2
+    assert summary.placeholder_rewrite_count == 0
+    assert "command ID: `drmCopilotExtension.newPotentialBugEntry`" in rewritten_text
+    assert "command ID: `drmCopilotExtension.newPotentialEntry`" in rewritten_text
     assert "scripts/dev_tools/new_potential_bug_entry.py" not in rewritten_text
     assert "scripts/dev-tools/new-potential-entry.ps1" not in rewritten_text
 
