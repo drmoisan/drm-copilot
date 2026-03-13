@@ -617,4 +617,57 @@ describe("drm-copilot command behavior", () => {
     expect(options.shell).toBe(false);
     expect(executable.includes(" ")).toBe(false);
   });
+
+  it("newPotentialBugEntry passes --template-root pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ python: true });
+    showInputBoxMock.mockResolvedValue("test-bug");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("--template-root");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+
+  it("newPotentialEntry passes -TemplateRoot pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock.mockResolvedValue("test-entry");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("-TemplateRoot");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+
+  it("newActiveFeatureFolder passes --template-root pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ python: true });
+    showQuickPickMock
+      .mockResolvedValueOnce("feature")
+      .mockResolvedValueOnce("minor-audit");
+    showInputBoxMock
+      .mockResolvedValueOnce("test-feature")
+      .mockResolvedValueOnce("");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("--template-root");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
 });

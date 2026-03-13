@@ -53,6 +53,7 @@ def create_active_folder(
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     now_provider: Callable[[], datetime] | None = None,
     work_mode: str = "full",
+    template_root: Path | None = None,
 ) -> ActiveFolderResult:
     """Create and seed an active feature folder from templates and potential docs."""
     if feature_type not in {"feature", "refactor", "epic", "bug"}:
@@ -98,7 +99,12 @@ def create_active_folder(
     validate_feature_name(resolved_feature_name)
     print(f"Feature name source: {feature_name_source}")
 
-    template_dir = workspace_path / "docs" / "features" / "templates" / feature_type
+    # Resolve template directory from the bundled template root when provided,
+    # otherwise fall back to the workspace's docs/features/templates/ tree.
+    if template_root is not None:
+        template_dir = template_root / feature_type
+    else:
+        template_dir = workspace_path / "docs" / "features" / "templates" / feature_type
     if not filesystem.exists(template_dir):
         raise FileNotFoundError(f"Template folder not found: {template_dir}")
 
@@ -132,7 +138,7 @@ def create_active_folder(
         )
 
     filesystem.ensure_dir(target_dir)
-    if feature_type == "feature" and use_minor_audit:
+    if use_minor_audit:
         copy_feature_template_for_minor_audit(template_dir, target_dir, filesystem)
     else:
         copy_template(feature_type, template_dir, target_dir, filesystem)
@@ -329,12 +335,19 @@ def parse_args() -> argparse.Namespace:
             "and full-bug; full is accepted as a backward-compatible alias."
         ),
     )
+    parser.add_argument(
+        "--template-root",
+        dest="template_root",
+        default=None,
+        help="Bundled feature-templates dir (overrides workspace).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     """CLI entry point for active-folder creation script."""
     args = parse_args()
+    resolved_root = Path(args.template_root) if args.template_root else None
     try:
         create_active_folder(
             feature_name=args.feature_name,
@@ -343,6 +356,7 @@ def main() -> None:
             force=args.force,
             active_file_for_feature_name=args.active_file_for_feature_name,
             work_mode=args.work_mode,
+            template_root=resolved_root,
         )
     except (ValueError, FileExistsError) as exc:
         print(str(exc))

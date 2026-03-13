@@ -108,6 +108,7 @@ def create_bug_entry(
     author_provider: Callable[[], str] = get_author,
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     entry_date: str | None = None,
+    template_root: Path | None = None,
 ) -> Path:
     validate_short_name(short_name)
 
@@ -117,9 +118,17 @@ def create_bug_entry(
 
     target_dir = workspace_path / "docs" / "features" / "potential"
     target = target_dir / f"{date_str}-{short_name}.md"
-    template = (
-        workspace_path / "docs" / "features" / "templates" / "bug" / "potential_bug.md"
-    )
+    if template_root is not None:
+        template = template_root / "bug" / "potential_bug.md"
+    else:
+        template = (
+            workspace_path
+            / "docs"
+            / "features"
+            / "templates"
+            / "bug"
+            / "potential_bug.md"
+        )
 
     filesystem.ensure_dir(target_dir)
     filesystem.copy_file(template, target)
@@ -143,13 +152,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--short-name", required=True, help="Bug name in kebab-case (e.g., api-timeout)"
     )
+    parser.add_argument(
+        "--template-root",
+        default=None,
+        help="Bundled feature-templates dir (overrides workspace).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    resolved_root = Path(args.template_root) if args.template_root else None
     try:
-        create_bug_entry(short_name=args.short_name)
+        create_bug_entry(short_name=args.short_name, template_root=resolved_root)
     except ValueError as exc:
         print(str(exc))
         raise SystemExit(1) from exc

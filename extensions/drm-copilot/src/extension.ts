@@ -108,6 +108,10 @@ async function promptForFeatureName(
  */
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
+  const templateRoot = vscode.Uri.joinPath(
+    context.extensionUri,
+    "resources/feature-templates",
+  ).fsPath;
 
   const helloPythonDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.helloPython",
@@ -229,7 +233,7 @@ export function activate(context: vscode.ExtensionContext): void {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
         commandId: "drmCopilotExtension.newPotentialBugEntry",
-        args: ["--short-name", shortName],
+        args: ["--short-name", shortName, "--template-root", templateRoot],
       });
     },
   );
@@ -250,7 +254,7 @@ export function activate(context: vscode.ExtensionContext): void {
         runtimeKind: "powershell",
         bundledRelativePath: "resources/templates/new-potential-entry.ps1",
         commandId: "drmCopilotExtension.newPotentialEntry",
-        args: ["-ShortName", shortName],
+        args: ["-ShortName", shortName, "-TemplateRoot", templateRoot],
       });
     },
   );
@@ -360,6 +364,7 @@ export function activate(context: vscode.ExtensionContext): void {
         args.push("--issue-number", trimmedIssueNumber);
       }
       args.push("--work-mode", workMode);
+      args.push("--template-root", templateRoot);
 
       await executeBundledScript(context, output, {
         runtimeKind: "python",
