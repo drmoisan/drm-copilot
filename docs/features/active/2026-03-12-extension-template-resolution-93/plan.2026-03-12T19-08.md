@@ -20,13 +20,14 @@ The bug in `issue.md` is that extension commands resolve template markdown files
 | Language | Format | Lint | Type-check | Test |
 |---|---|---|---|---|
 | Python | `poetry run black .` | `poetry run ruff check` | `poetry run pyright` | `poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` |
+| PowerShell | `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."` | `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."` | `N/A` | `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."` |
 | TypeScript | `npm --prefix extensions/drm-copilot run format` | `npm --prefix extensions/drm-copilot run lint` | `npm --prefix extensions/drm-copilot run typecheck` | `npm --prefix extensions/drm-copilot run test:unit -- --coverage` |
 
 ### Phase 0 — Baseline Capture
 
 - [ ] [P0-T1] Record policy reads in repository compliance order in `evidence/baseline/phase0-instructions-read.md`
   - Preconditions: feature folder exists and `issue.md` contains `- Work Mode: minor-audit`
-  - Acceptance: `evidence/baseline/phase0-instructions-read.md` exists and contains `Timestamp:`, `Policy Order:`, and the exact ordered list `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`
+  - Acceptance: `evidence/baseline/phase0-instructions-read.md` exists and contains `Timestamp:`, `Policy Order:`, and the exact ordered list `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, `.github/instructions/self-explanatory-code-commenting.instructions.md`, `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`, `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`, `.github/instructions/typescript-suppressions.instructions.md`
 
 - [ ] [P0-T2] Record branch and commit baseline in `evidence/baseline/branch-commit-baseline.md`
   - Acceptance: `evidence/baseline/branch-commit-baseline.md` exists and contains `Timestamp:`, `Command: git branch --show-current && git rev-parse HEAD`, `EXIT_CODE: 0`, `Output Summary:`, `Branch: bug/extension-template-resolution-93`, and a non-empty `Commit:` line
@@ -58,15 +59,24 @@ The bug in `issue.md` is that extension commands resolve template markdown files
 - [ ] [P0-T11] Capture TypeScript coverage baseline in `evidence/baseline/ts-test-baseline.md`
   - Acceptance: artifact exists and contains `Timestamp:`, `Command: npm --prefix extensions/drm-copilot run test:unit -- --coverage`, `EXIT_CODE:`, and `Output Summary:` with numeric coverage headline values
 
+- [ ] [P0-T12] Capture PowerShell formatting baseline in `evidence/baseline/ps-format-baseline.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`, `EXIT_CODE:`, and `Output Summary:`
+
+- [ ] [P0-T13] Capture PowerShell analyzer baseline in `evidence/baseline/ps-analyze-baseline.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`, `EXIT_CODE:`, and `Output Summary:`
+
+- [ ] [P0-T14] Capture PowerShell test baseline in `evidence/baseline/ps-test-baseline.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`, `EXIT_CODE:`, and `Output Summary:` with numeric coverage headline values
+
 ### Phase 1 — Constrained Small-Path Implementation Placeholder
 
-- [ ] [P1-T1] Delegate constrained implementation against `issue.md` acceptance items to the small-path engineer
+- [ ] [P1-T1] Persist constrained implementation handoff in `evidence/other/delegated-implementation-handoff.md`
   - Preconditions: all Phase 0 artifacts exist and `evidence/baseline/minor-audit-requirements-gate.md` records `Result: PASS`
-  - Acceptance: delegate summary identifies only the in-scope changes from `issue.md` (`resources/feature-templates/` bundling, bundled-resource template resolution with fallback, and unit-test coverage of bundled vs workspace paths) and references only these production/test files: `extensions/drm-copilot/src/extension.ts`, `extensions/drm-copilot/resources/templates/new-potential-entry.ps1`, `extensions/drm-copilot/resources/templates/new_potential_bug_entry.py`, `extensions/drm-copilot/resources/templates/new_active_feature_folder.py`, `extensions/drm-copilot/resources/scripts/dev_tools/new_active_feature_folder_flow.py`, `scripts/dev_tools/new_potential_bug_entry.py`, `scripts/dev_tools/new_active_feature_folder_flow.py`, `extensions/drm-copilot/test/extension.test.ts`, `tests/scripts/dev_tools/test_new_potential_bug_entry.py`, and `tests/scripts/dev_tools/test_new_active_feature_folder_part2.py`
+  - Acceptance: `evidence/other/delegated-implementation-handoff.md` exists and contains `Timestamp:`, `Requirements Source: docs/features/active/2026-03-12-extension-template-resolution-93/issue.md`, `In-Scope Changes: resources/feature-templates bundling; bundled-resource template resolution with fallback; unit-test coverage of bundled vs workspace paths`, `Allowed Files: extensions/drm-copilot/src/extension.ts; extensions/drm-copilot/resources/templates/new-potential-entry.ps1; extensions/drm-copilot/resources/templates/new_potential_bug_entry.py; extensions/drm-copilot/resources/templates/new_active_feature_folder.py; extensions/drm-copilot/resources/scripts/dev_tools/new_active_feature_folder_flow.py; scripts/dev_tools/new_potential_bug_entry.py; scripts/dev_tools/new_active_feature_folder_flow.py; extensions/drm-copilot/test/extension.test.ts; tests/scripts/dev_tools/test_new_potential_bug_entry.py; tests/scripts/dev_tools/test_new_active_feature_folder_part2.py; extensions/drm-copilot/resources/feature-templates/**`, and `Result: DELEGATED`
 
 - [ ] [P1-T2] Persist targeted `issue.md` delivery validation in `evidence/other/issue-validation.md` before final QC handoff
   - Depends on: [P1-T1]
-  - Acceptance: `evidence/other/issue-validation.md` exists and contains `Timestamp:`, `Requirements Source: docs/features/active/2026-03-12-extension-template-resolution-93/issue.md`, `Delivered Acceptance Items:`, `SearchScope:`, `SearchPatterns: spec.md, user-story.md`, `SearchResult:`, `Checklist Evidence Status:`, and `Result: PASS` only when the three checked acceptance items in `issue.md` are evidenced and no unexpected `spec.md` or `user-story.md` exists; otherwise `Result: remediation-required`
+  - Acceptance: `evidence/other/issue-validation.md` exists and contains `Timestamp:`, `Requirements Source: docs/features/active/2026-03-12-extension-template-resolution-93/issue.md`, `Delivered Acceptance Items:`, `SearchScope:`, `SearchPatterns: spec.md, user-story.md`, `SearchResult:`, `Checklist Evidence Status:`, and `Result: PASS` only when the three checked items under `## Proposed Fix / Validation Ideas` in `issue.md` lines 63-65 are evidenced and no unexpected `spec.md` or `user-story.md` exists; otherwise `Result: remediation-required`
 
 - [ ] [P1-T3] Persist reduced small-path audit handoff in `evidence/other/reduced-audit-handoff.md`
   - Depends on: [P1-T2]
@@ -98,5 +108,14 @@ The bug in `issue.md` is that extension commands resolve template markdown files
 - [ ] [P2-T8] Run TypeScript unit tests and persist `evidence/qa-gates/ts-test-final.md`
   - Acceptance: artifact exists and contains `Timestamp:`, `Command: npm --prefix extensions/drm-copilot run test:unit -- --coverage`, `EXIT_CODE: 0`, and `Output Summary:` with numeric post-change coverage headline values
 
-- [ ] [P2-T9] Restart the QC loop from [P2-T1] when any Phase 2 command changes files or fails
-  - Acceptance: the final successful pass records `EXIT_CODE: 0` in every artifact from `python-format-final.md` through `ts-test-final.md` without any `SKIPPED` outcome
+- [ ] [P2-T9] Run PowerShell formatter and persist `evidence/qa-gates/ps-format-final.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`, `EXIT_CODE: 0`, and `Output Summary:`
+
+- [ ] [P2-T10] Run PowerShell analyzer and persist `evidence/qa-gates/ps-analyze-final.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`, `EXIT_CODE: 0`, and `Output Summary:`
+
+- [ ] [P2-T11] Run PowerShell tests and persist `evidence/qa-gates/ps-test-final.md`
+  - Acceptance: artifact exists and contains `Timestamp:`, `Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`, `EXIT_CODE: 0`, and `Output Summary:` with numeric post-change coverage headline values
+
+- [ ] [P2-T12] Verify coverage deltas and QC loop closure in `evidence/qa-gates/coverage-delta-verification.md`
+  - Acceptance: `evidence/qa-gates/coverage-delta-verification.md` exists and contains `Timestamp:`, `Python Baseline Coverage:`, `Python Post-Change Coverage:`, `Python New/Changed-Code Coverage:`, `TypeScript Baseline Coverage:`, `TypeScript Post-Change Coverage:`, `TypeScript New/Changed-Code Coverage:`, `PowerShell Baseline Coverage:`, `PowerShell Post-Change Coverage:`, `PowerShell New/Changed-Code Coverage:`, `Restart Required: NO`, and `Result: PASS`; if any Phase 2 command changes files or fails before the final clean pass, the QC loop restarts from [P2-T1], and the final successful pass records `EXIT_CODE: 0` in every artifact from `python-format-final.md` through `ps-test-final.md` without any `SKIPPED` outcome
