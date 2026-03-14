@@ -227,7 +227,11 @@ function Invoke-NpmCiWithRetry {
     $attempt = 1
     while ($true) {
         try {
-            Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci") -WorkingDirectory $WorkingDirectory
+            # The side-load workflow needs deterministic installs, but the default npm output
+            # is noisy because upstream tooling emits audit/funding/deprecation warnings that do
+            # not change the packaged VSIX. Keep the install strict while limiting publish-task
+            # output to actionable failures.
+            Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci", "--no-audit", "--no-fund", "--loglevel=error") -WorkingDirectory $WorkingDirectory
             return
         } catch {
             $exitCode = $null
