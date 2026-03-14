@@ -42,8 +42,19 @@ def _ensure_bundled_scripts_import_path() -> None:
 
 
 def main() -> int:
-    """Execute bundled active-feature-folder entrypoint in-process."""
+    """Execute bundled active-feature-folder entrypoint in-process.
+
+    Injects ``--template-root`` pointing to the extension's bundled
+    ``feature-templates`` directory so the downstream module resolves
+    templates from the extension rather than the workspace.
+    """
     _ensure_bundled_scripts_import_path()
+
+    # Compute the bundled template root relative to this wrapper script.
+    template_root = str(Path(__file__).resolve().parent.parent / "feature-templates")
+    if "--template-root" not in sys.argv:
+        sys.argv.extend(["--template-root", template_root])
+
     module = importlib.import_module("dev_tools.new_active_feature_folder")
     module_main = cast(Callable[[], None], module.main)
     module_main()

@@ -192,7 +192,9 @@ def test_real_filesystem_methods_are_invoked(monkeypatch: pytest.MonkeyPatch) ->
 
 def test_main_exits_on_invalid_short_name(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        mod, "parse_args", lambda: argparse.Namespace(short_name="Invalid Name")
+        mod,
+        "parse_args",
+        lambda: argparse.Namespace(short_name="Invalid Name", template_root=None),
     )
     with pytest.raises(SystemExit) as excinfo:
         mod.main()
@@ -204,10 +206,57 @@ def test_main_exits_on_missing_template(monkeypatch: pytest.MonkeyPatch) -> None
         raise FileNotFoundError("missing template")
 
     monkeypatch.setattr(
-        mod, "parse_args", lambda: argparse.Namespace(short_name="api-timeout")
+        mod,
+        "parse_args",
+        lambda: argparse.Namespace(short_name="api-timeout", template_root=None),
     )
     monkeypatch.setattr(mod, "create_bug_entry", fake_create_bug_entry)
 
     with pytest.raises(SystemExit) as excinfo:
         mod.main()
     assert excinfo.value.code == 1
+
+
+def test_create_bug_entry_uses_template_root_when_provided() -> None:
+    """When template_root is given, template resolves from template_root/bug/."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    template_root = Path("/ext/feature-templates")
+    template_path = template_root / "bug" / "potential_bug.md"
+    fs.files[template_path] = "<bug-name> on YYYY-MM-DD by - Author: name"
+
+    created = mod.create_bug_entry(
+        short_name="api-timeout",
+        workspace=workspace,
+        fs=fs,
+        author_provider=lambda: "Jane Doe",
+        code_launcher=lambda files: True,
+        entry_date="2025-12-15",
+        template_root=template_root,
+    )
+
+    expected = workspace / "docs/features/potential/2025-12-15-api-timeout.md"
+    assert created == expected
+    assert fs.files[expected] == "api-timeout on 2025-12-15 by - Author: Jane Doe"
+
+
+def test_create_bug_entry_falls_back_to_workspace_when_no_template_root() -> None:
+    """When template_root is None, template resolves from workspace (default)."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    workspace_template = (
+        workspace / "docs" / "features" / "templates" / "bug" / "potential_bug.md"
+    )
+    fs.files[workspace_template] = "<bug-name> on YYYY-MM-DD"
+
+    created = mod.create_bug_entry(
+        short_name="api-timeout",
+        workspace=workspace,
+        fs=fs,
+        author_provider=lambda: "Jane",
+        code_launcher=lambda files: True,
+        entry_date="2025-12-15",
+        template_root=None,
+    )
+
+    assert created == workspace / "docs/features/potential/2025-12-15-api-timeout.md"

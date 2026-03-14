@@ -23,6 +23,26 @@ def _resolve_workspace() -> Path:
 
 
 def validate_short_name(short_name: str) -> None:
+    """Validate that a short name matches the repository kebab-case contract.
+
+    Purpose:
+        Reject invalid bug-entry short names before filesystem or template work begins.
+
+    Args:
+        short_name (str): Candidate short name that must use lowercase
+            kebab-case tokens.
+
+    Returns:
+        None: This validator returns no value when the short name satisfies
+            the contract.
+
+    Raises:
+        ValueError: Raised when the supplied short name is blank or
+            violates the kebab-case pattern.
+
+    Side Effects:
+        None.
+    """
     if not short_name or not SHORT_NAME_PATTERN.fullmatch(short_name):
         raise ValueError(
             f"Aborted: '{short_name}' is invalid. Use kebab-case letters/numbers only "
@@ -31,6 +51,25 @@ def validate_short_name(short_name: str) -> None:
 
 
 def default_git_config_lookup(key: str) -> str | None:
+    """Resolve a Git configuration value without failing when Git is unavailable.
+
+    Purpose:
+        Query Git configuration opportunistically so author discovery can
+            prefer repository settings.
+
+    Args:
+        key (str): Git configuration key to read, such as `user.name`.
+
+    Returns:
+        str | None: The trimmed configuration value when Git is available
+            and returns a non-blank value; otherwise `None`.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Invokes the `git config` subprocess when Git is available on PATH.
+    """
     git_cmd = shutil.which("git")
     if not git_cmd:
         return None
@@ -45,6 +84,25 @@ def default_git_config_lookup(key: str) -> str | None:
 
 
 def default_env_lookup(name: str) -> str | None:
+    """Return a non-blank environment variable value when one is defined.
+
+    Purpose:
+        Provide a lightweight fallback lookup for author resolution
+            without accepting blank environment values.
+
+    Args:
+        name (str): Environment variable name to read from the current process.
+
+    Returns:
+        str | None: The environment variable value when present and
+            non-blank; otherwise `None`.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads process environment state.
+    """
     value = os.getenv(name)
     return value if value and value.strip() else None
 
@@ -53,6 +111,28 @@ def get_author(
     git_lookup: Callable[[str], str | None] = default_git_config_lookup,
     env_lookup: Callable[[str], str | None] = default_env_lookup,
 ) -> str:
+    """Resolve the author name from Git configuration before falling back to USERNAME.
+
+    Purpose:
+        Produce the best available author label for the generated
+            bug-entry markdown metadata.
+
+    Args:
+        git_lookup (Callable[[str], str | None]): Git-backed lookup
+            function for configuration values.
+        env_lookup (Callable[[str], str | None]): Environment-backed
+            lookup function for fallback variables.
+
+    Returns:
+        str: The resolved author name, or `Unknown` when neither lookup yields a value.
+
+    Raises:
+        None.
+
+    Side Effects:
+        May read Git configuration and process environment state through
+            the injected lookup callables.
+    """
     author = git_lookup("user.name")
     if not author:
         author = env_lookup("USERNAME")
@@ -62,6 +142,29 @@ def get_author(
 
 
 def render_content(template: str, short_name: str, entry_date: str, author: str) -> str:
+    """Apply bug-entry placeholder substitutions to the copied markdown template.
+
+    Purpose:
+        Replace the template placeholders with the concrete bug name,
+            entry date, and author metadata.
+
+    Args:
+        template (str): Raw markdown template content copied from the
+            selected source template.
+        short_name (str): Validated short name used to replace the
+            bug-name placeholder.
+        entry_date (str): ISO date string inserted into the generated markdown.
+        author (str): Author name inserted into the metadata block.
+
+    Returns:
+        str: Markdown content with all supported bug-entry placeholders replaced.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
     updated = template.replace("<bug-name>", short_name)
     updated = updated.replace("YYYY-MM-DD", entry_date)
     updated = updated.replace("- Author: name", f"- Author: {author}")
@@ -108,7 +211,44 @@ def create_bug_entry(
     author_provider: Callable[[], str] = get_author,
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     entry_date: str | None = None,
+    template_root: Path | None = None,
 ) -> Path:
+    """Create a potential bug markdown file from the selected template root.
+
+    Purpose:
+        Materialize a new potential bug entry by copying a template,
+            filling in metadata, and optionally opening the result in
+            VS Code.
+
+    Args:
+        short_name (str): Validated kebab-case suffix for the generated
+            bug-entry filename and content.
+        workspace (Path | None): Workspace root that receives the
+            generated file; defaults to the resolved repository or
+            bundle workspace.
+        fs (FileSystem | None): Filesystem adapter used for directory
+            creation, file copy, and text I/O.
+        author_provider (Callable[[], str]): Callable that resolves the
+            author name inserted into the template.
+        code_launcher (Callable[[Iterable[Path]], bool]): Callable that
+            attempts to open the generated file in VS Code.
+        entry_date (str | None): Optional ISO date override for
+            deterministic generation.
+        template_root (Path | None): Optional bundled feature-template
+            root that overrides workspace-local templates.
+
+    Returns:
+        Path: Absolute path to the generated potential bug markdown file.
+
+    Raises:
+        ValueError: Raised when `short_name` violates the kebab-case contract.
+        FileNotFoundError: Raised when the selected template cannot be
+            copied from the resolved template path.
+
+    Side Effects:
+        Creates directories, copies and rewrites markdown files, and may
+            invoke the VS Code launcher or print a warning.
+    """
     validate_short_name(short_name)
 
     workspace_path = workspace or _resolve_workspace()
@@ -117,9 +257,17 @@ def create_bug_entry(
 
     target_dir = workspace_path / "docs" / "features" / "potential"
     target = target_dir / f"{date_str}-{short_name}.md"
-    template = (
-        workspace_path / "docs" / "features" / "templates" / "bug" / "potential_bug.md"
-    )
+    if template_root is not None:
+        template = template_root / "bug" / "potential_bug.md"
+    else:
+        template = (
+            workspace_path
+            / "docs"
+            / "features"
+            / "templates"
+            / "bug"
+            / "potential_bug.md"
+        )
 
     filesystem.ensure_dir(target_dir)
     filesystem.copy_file(template, target)
@@ -137,19 +285,65 @@ def create_bug_entry(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for the potential bug entry workflow.
+
+    Purpose:
+        Define and read the command-line interface for creating a
+            potential bug entry from a bundled or workspace template.
+
+    Args:
+        None.
+
+    Returns:
+        argparse.Namespace: Parsed CLI arguments containing the required
+            short name and optional template root.
+
+    Raises:
+        SystemExit: Raised by `argparse` when required arguments are missing or invalid.
+
+    Side Effects:
+        Reads process command-line arguments and may emit argparse help or error text.
+    """
     parser = argparse.ArgumentParser(
         description="Create a potential bug entry from the template."
     )
     parser.add_argument(
         "--short-name", required=True, help="Bug name in kebab-case (e.g., api-timeout)"
     )
+    parser.add_argument(
+        "--template-root",
+        default=None,
+        help="Bundled feature-templates dir (overrides workspace).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
+    """Execute the CLI boundary for potential bug entry creation.
+
+    Purpose:
+        Bridge parsed CLI arguments into the bug-entry creation workflow
+            and convert user-facing failures into exit codes.
+
+    Args:
+        None.
+
+    Returns:
+        None: The CLI exits by returning normally on success or raising
+            `SystemExit` on handled failures.
+
+    Raises:
+        SystemExit: Raised with exit code 1 when validation or file lookup fails.
+
+    Side Effects:
+        Reads CLI arguments, may create bug-entry files, may launch VS
+            Code, and prints user-facing error messages on handled
+            failures.
+    """
     args = parse_args()
+    resolved_root = Path(args.template_root) if args.template_root else None
     try:
-        create_bug_entry(short_name=args.short_name)
+        create_bug_entry(short_name=args.short_name, template_root=resolved_root)
     except ValueError as exc:
         print(str(exc))
         raise SystemExit(1) from exc

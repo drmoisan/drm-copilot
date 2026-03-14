@@ -108,14 +108,30 @@ function Resolve-ExtensionProjectRoot {
         [string]$RelativeExtensionPath = "extensions\drm-copilot"
     )
 
-    $repoPackageJsonPath = Join-Path $RepoRoot "package.json"
+    $joinProjectPath = {
+        param(
+            [string]$BasePath,
+            [string]$ChildPath
+        )
+
+        $usesPosixSeparators = $BasePath.Contains('/') -and -not $BasePath.Contains('\\')
+        if (-not $usesPosixSeparators) {
+            return Join-Path $BasePath $ChildPath
+        }
+
+        $normalizedBasePath = $BasePath.TrimEnd([char[]]@('/', '\'))
+        $normalizedChildPath = $ChildPath -replace '\\', '/'
+        return '{0}/{1}' -f $normalizedBasePath, $normalizedChildPath.TrimStart('/')
+    }
+
+    $repoPackageJsonPath = & $joinProjectPath $RepoRoot "package.json"
     $repoManifest = Get-PackageManifest -PackageJsonPath $repoPackageJsonPath
     if (Test-IsVsCodeExtensionManifest -Manifest $repoManifest) {
         return $RepoRoot
     }
 
-    $extensionProjectRoot = Join-Path $RepoRoot $RelativeExtensionPath
-    $extensionPackageJsonPath = Join-Path $extensionProjectRoot "package.json"
+    $extensionProjectRoot = & $joinProjectPath $RepoRoot $RelativeExtensionPath
+    $extensionPackageJsonPath = & $joinProjectPath $extensionProjectRoot "package.json"
 
     if (Test-Path -LiteralPath $extensionPackageJsonPath) {
         $extensionManifest = Get-PackageManifest -PackageJsonPath $extensionPackageJsonPath
