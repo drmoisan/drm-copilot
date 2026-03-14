@@ -149,6 +149,48 @@ def test_create_active_folder_full_mode_alias_remains_backward_compatible() -> N
     assert fs.exists(result.target / "user-story.md")
 
 
+def test_create_active_folder_bug_minor_audit_omits_full_bug_docs() -> None:
+    """Verify bug minor-audit creates only issue-driven docs and no spec."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_bug_template(fs, workspace)
+    potential_path = (
+        workspace / "docs" / "features" / "potential" / "bug-minor-audit.md"
+    )
+    fs.write_text(
+        potential_path,
+        "\n".join(
+            [
+                "- Issue: #88",
+                "## Summary",
+                "broken behavior",
+                "## Expected Behavior",
+                "expected",
+                "## Actual Behavior",
+                "actual",
+                "## Proposed Fix / Validation Ideas",
+                "validate it",
+            ]
+        ),
+    )
+
+    result = mod.create_active_folder(
+        feature_name="bug-minor-audit",
+        feature_type="bug",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=FakeCodeLauncher(),
+        work_mode="minor-audit",
+    )
+
+    assert result.potential_issue_path == result.target / "issue.md"
+    assert fs.exists(result.target / "issue.md")
+    assert not fs.exists(result.target / "spec.md")
+    assert not fs.exists(result.target / "user-story.md")
+    issue_md = fs.read_text(result.target / "issue.md")
+    assert "- Work Mode: minor-audit" in issue_md
+
+
 def test_create_active_folder_minor_audit_has_no_fallback_reason(
     capsys: pytest.CaptureFixture[str],
 ) -> None:

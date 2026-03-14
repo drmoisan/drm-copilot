@@ -3,7 +3,6 @@ name: csharp-orchestrator
 model: GPT-5.4 (copilot)
 description: Orchestrate end-to-end C# feature/bug delivery by estimating change budget and routing through atomic planning/execution and feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose workflow path, delegate to specialist agents, and persist until completion."
-target: vscode
 tools: ['execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
 handoffs:
   - label: Fill potential entry details
@@ -102,7 +101,8 @@ Use this exact sequence:
 2. Require return of concrete `plan-path` and `PREFLIGHT: ALL CLEAR`.
 3. Delegate to `csharp-atomic-executor` via handoff **Execute approved C# atomic plan** using the approved `plan-path`.
 4. Require execution summary, QA summary, and analyzer/type/test/coverage deltas.
-5. Record completion in checkpoint and provide concise final outcome to user.
+5. Delegate to `feature_code_review_agent` via handoff **Post-implementation feature review**; use the delegated artifacts as authoritative and do NOT create `policy-audit.*.md`, `feature-audit.*.md`, or `code-review.*.md` directly from orchestration.
+6. Do not record completion in checkpoint or respond as done until the delegated review artifacts exist on disk under `${feature-folder}`.
 
 ---
 
@@ -213,7 +213,7 @@ Artifact verification gate before mission completion (large path):
 You are complete only when:
 - selected path has run end-to-end,
 - all required delegations completed,
-- feature review completed (large path),
+- feature review completed for the selected path,
 - checkpoint indicates completed mission,
 - user receives concise summary with produced paths/artifacts and branch info.
 

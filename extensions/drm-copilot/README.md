@@ -9,6 +9,10 @@ This extension executes bundled scripts directly from extension resources while 
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
+- `drmCopilotExtension.newPotentialBugEntry`
+- `drmCopilotExtension.newPotentialEntry`
+- `drmCopilotExtension.potentialToIssue`
+- `drmCopilotExtension.newActiveFeatureFolder`
 
 ### Push Down Copilot Customizations
 
@@ -18,7 +22,7 @@ This extension executes bundled scripts directly from extension resources while 
 - Passes `--destination` with the open workspace root.
 - Source customizations are read from the bundled `resources/customizations/.github/` payload.
 - The summary artifact is written under the destination workspace.
-- Script references in copied files are rewritten to VS Code command: references for both real and placeholder commands.
+- Script references in copied files are rewritten to the live VS Code command IDs contributed by the extension.
 
 ### Commit Context Command Contract
 

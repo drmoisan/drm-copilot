@@ -46,13 +46,10 @@ The active extension package lives in `extensions/drm-copilot` and currently con
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
-
-It also registers intentional placeholder commands that fail with a deterministic `Not implemented:` message when invoked:
-
-- `drmCopilotExtension.newActiveFeatureFolderPlaceholder`
-- `drmCopilotExtension.potentialToIssuePlaceholder`
-- `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`
-- `drmCopilotExtension.newPotentialEntryPsPlaceholder`
+- `drmCopilotExtension.newPotentialBugEntry`
+- `drmCopilotExtension.newPotentialEntry`
+- `drmCopilotExtension.potentialToIssue`
+- `drmCopilotExtension.newActiveFeatureFolder`
 
 ## Requirements
 
@@ -118,9 +115,7 @@ Use `drmCopilotExtension.pushDownCopilotCustomizations` from the Command Palette
 
 ### Rewrite behavior
 
-During publication, supported script references are rewritten to stable VS Code command references.
-
-When a referenced workflow is known but not yet implemented in the extension, it is rewritten to a placeholder command ID that fails explicitly instead of silently drifting into chaos. Polite chaos, perhaps, but still chaos.
+During publication, supported script references are rewritten to stable live VS Code command references contributed by the extension.
 
 ## CI coverage
 

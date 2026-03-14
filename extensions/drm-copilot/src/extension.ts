@@ -13,54 +13,116 @@ import {
 // Re-export detectRuntime so existing test imports from this module keep working.
 export { detectRuntime } from "./command-runtime";
 
-/**
- * Defines a command that is intentionally registered as a placeholder.
- */
-interface PlaceholderCommandSpec {
-  readonly commandId: string;
-  readonly title: string;
-  readonly scriptReference: string;
+const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
+const POTENTIAL_PROMOTION_TYPES = ["epic", "feature", "refactor", "bug"];
+const WORK_MODE_OPTIONS = ["minor-audit", "full-feature", "full-bug", "full"];
+const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
+
+function normalizePath(filePath: string): string {
+  return filePath.replace(/\\/g, "/");
 }
 
-const PLACEHOLDER_COMMAND_SPECS: ReadonlyArray<PlaceholderCommandSpec> = [
-  {
-    commandId: "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
-    title: "drm-copilot: New Active Feature Folder (Placeholder)",
-    scriptReference: "scripts.dev_tools.new_active_feature_folder",
-  },
-  {
-    commandId: "drmCopilotExtension.potentialToIssuePlaceholder",
-    title: "drm-copilot: Potential To Issue (Placeholder)",
-    scriptReference: "scripts.dev_tools.potential_to_issue",
-  },
-  {
-    commandId: "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
-    title: "drm-copilot: New Potential Bug Entry (Python Placeholder)",
-    scriptReference: "scripts/dev_tools/new_potential_bug_entry.py",
-  },
-  {
-    commandId: "drmCopilotExtension.newPotentialEntryPsPlaceholder",
-    title: "drm-copilot: New Potential Entry (PowerShell Placeholder)",
-    scriptReference: "scripts/dev-tools/new-potential-entry.ps1",
-  },
-];
+function getActivePotentialPath(workspaceRoot: string): string | undefined {
+  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+  if (!activeEditorPath) {
+    return undefined;
+  }
 
-/**
- * Registers placeholder commands that intentionally fail with actionable errors.
- *
- * @param output The output channel used to record placeholder usage.
- * @returns Disposables for each registered placeholder command.
- */
-function registerPlaceholderCommands(
-  output: vscode.OutputChannel,
-): vscode.Disposable[] {
-  return PLACEHOLDER_COMMAND_SPECS.map((spec) =>
-    vscode.commands.registerCommand(spec.commandId, async () => {
-      const message = `Not implemented: ${spec.commandId} is a placeholder for ${spec.scriptReference}.`;
-      output.appendLine(`[${spec.commandId}] ${message}`);
-      throw new Error(message);
-    }),
-  );
+  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
+  const normalizedActiveEditorPath =
+    normalizePath(activeEditorPath).toLowerCase();
+  const normalizedPotentialRoot = `${normalizedWorkspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`;
+
+  if (!normalizedActiveEditorPath.endsWith(".md")) {
+    return undefined;
+  }
+
+  if (!normalizedActiveEditorPath.startsWith(`${normalizedPotentialRoot}/`)) {
+    return undefined;
+  }
+
+  return activeEditorPath;
+}
+
+async function promptForShortName(
+  title: string,
+  prompt: string,
+): Promise<string | undefined> {
+  const shortName = await vscode.window.showInputBox({
+    title,
+    prompt,
+    ignoreFocusOut: true,
+    validateInput: (value) => {
+      const trimmed = value.trim();
+      if (trimmed.length === 0) {
+        return "Short name is required.";
+      }
+
+      return SHORT_NAME_PATTERN.test(trimmed)
+        ? undefined
+        : "Use kebab-case letters and numbers only (e.g., api-timeout).";
+    },
+  });
+
+  if (shortName === undefined) {
+    return undefined;
+  }
+
+  const trimmed = shortName.trim();
+  if (!SHORT_NAME_PATTERN.test(trimmed)) {
+    throw new Error(
+      "Short name must use kebab-case letters and numbers only (e.g., api-timeout).",
+    );
+  }
+
+  return trimmed;
+}
+
+async function promptForChoice(
+  title: string,
+  prompt: string,
+  items: ReadonlyArray<string>,
+): Promise<string | undefined> {
+  return vscode.window.showQuickPick([...items], {
+    title,
+    prompt,
+    ignoreFocusOut: true,
+  });
+}
+
+async function promptForFeatureName(
+  title: string,
+  prompt: string,
+): Promise<string | undefined> {
+  const featureName = await vscode.window.showInputBox({
+    title,
+    prompt,
+    ignoreFocusOut: true,
+    validateInput: (value) => {
+      const trimmed = value.trim();
+      if (trimmed.length === 0) {
+        return "Feature name is required.";
+      }
+
+      return FEATURE_NAME_PATTERN.test(trimmed)
+        ? undefined
+        : "Use kebab-case or underscore-case letters and numbers only.";
+    },
+  });
+
+  if (featureName === undefined) {
+    return undefined;
+  }
+
+  const trimmed = featureName.trim();
+  if (!FEATURE_NAME_PATTERN.test(trimmed)) {
+    throw new Error(
+      "Feature name must use kebab-case or underscore-case letters and numbers only.",
+    );
+  }
+
+  return trimmed;
 }
 
 /**
@@ -73,6 +135,10 @@ function registerPlaceholderCommands(
  */
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
+  const templateRoot = vscode.Uri.joinPath(
+    context.extensionUri,
+    "resources/feature-templates",
+  ).fsPath;
 
   const helloPythonDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.helloPython",
@@ -178,15 +244,179 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
-  const placeholderDisposables = registerPlaceholderCommands(output);
+  const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.newPotentialBugEntry",
+    async () => {
+      const shortName = await promptForShortName(
+        "drm-copilot: New Potential Bug Entry",
+        "Enter a kebab-case short name for the potential bug entry.",
+      );
+
+      if (!shortName) {
+        return;
+      }
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
+        commandId: "drmCopilotExtension.newPotentialBugEntry",
+        args: ["--short-name", shortName, "--template-root", templateRoot],
+      });
+    },
+  );
+
+  const newPotentialEntryDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.newPotentialEntry",
+    async () => {
+      const shortName = await promptForShortName(
+        "drm-copilot: New Potential Entry",
+        "Enter a kebab-case short name for the potential entry.",
+      );
+
+      if (!shortName) {
+        return;
+      }
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "powershell",
+        bundledRelativePath: "resources/templates/new-potential-entry.ps1",
+        commandId: "drmCopilotExtension.newPotentialEntry",
+        args: ["-ShortName", shortName, "-TemplateRoot", templateRoot],
+      });
+    },
+  );
+
+  const potentialToIssueDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.potentialToIssue",
+    async () => {
+      const workspaceRoot = getWorkspaceRoot();
+      const activePotentialPath = getActivePotentialPath(workspaceRoot);
+      const selectedFile = activePotentialPath
+        ? undefined
+        : await vscode.window.showOpenDialog({
+            canSelectMany: false,
+            openLabel: "Select potential file",
+            defaultUri: vscode.Uri.file(
+              `${workspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`,
+            ),
+            filters: {
+              Markdown: ["md"],
+            },
+          });
+      const potentialPath = activePotentialPath ?? selectedFile?.[0]?.fsPath;
+      if (!potentialPath) {
+        return;
+      }
+
+      const promotionType = await promptForChoice(
+        "drm-copilot: Potential To Issue",
+        "Choose a promotion type.",
+        POTENTIAL_PROMOTION_TYPES,
+      );
+      if (!promotionType) {
+        return;
+      }
+
+      const workMode = await promptForChoice(
+        "drm-copilot: Potential To Issue",
+        "Choose a work mode.",
+        WORK_MODE_OPTIONS,
+      );
+      if (!workMode) {
+        return;
+      }
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/potential_to_issue.py",
+        commandId: "drmCopilotExtension.potentialToIssue",
+        args: [
+          "--potential-path",
+          potentialPath,
+          "--promotion-type",
+          promotionType,
+          "--work-mode",
+          workMode,
+        ],
+      });
+    },
+  );
+
+  const newActiveFeatureFolderDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.newActiveFeatureFolder",
+    async () => {
+      const featureType = await promptForChoice(
+        "drm-copilot: New Active Feature Folder",
+        "Choose the feature folder type.",
+        POTENTIAL_PROMOTION_TYPES,
+      );
+      if (!featureType) {
+        return;
+      }
+
+      const featureName = await promptForFeatureName(
+        "drm-copilot: New Active Feature Folder",
+        "Enter the feature name (kebab-case or underscore-case).",
+      );
+      if (!featureName) {
+        return;
+      }
+
+      const issueNumber = await vscode.window.showInputBox({
+        title: "drm-copilot: New Active Feature Folder",
+        prompt: "Enter the issue number, or leave blank to omit it.",
+        ignoreFocusOut: true,
+        validateInput: (value) => {
+          const trimmed = value.trim();
+          if (trimmed.length === 0) {
+            return undefined;
+          }
+
+          return /^\d+$/.test(trimmed)
+            ? undefined
+            : "Issue number must be digits only when provided.";
+        },
+      });
+      if (issueNumber === undefined) {
+        return;
+      }
+
+      const workMode = await promptForChoice(
+        "drm-copilot: New Active Feature Folder",
+        "Choose a work mode.",
+        WORK_MODE_OPTIONS,
+      );
+      if (!workMode) {
+        return;
+      }
+
+      const args = ["--feature-name", featureName, "--type", featureType];
+      const trimmedIssueNumber = issueNumber.trim();
+      if (trimmedIssueNumber.length > 0) {
+        args.push("--issue-number", trimmedIssueNumber);
+      }
+      args.push("--work-mode", workMode);
+      args.push("--template-root", templateRoot);
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "python",
+        bundledRelativePath: "resources/templates/new_active_feature_folder.py",
+        commandId: "drmCopilotExtension.newActiveFeatureFolder",
+        args,
+      });
+    },
+  );
 
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
     collectCommitContextDisposable,
     collectPrContextDisposable,
+    newActiveFeatureFolderDisposable,
+    potentialToIssueDisposable,
     pushDownCopilotCustomizationsDisposable,
-    ...placeholderDisposables,
+    newPotentialBugEntryDisposable,
+    newPotentialEntryDisposable,
     output,
   );
 }
