@@ -17,6 +17,33 @@ const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const POTENTIAL_PROMOTION_TYPES = ["epic", "feature", "refactor", "bug"];
 const WORK_MODE_OPTIONS = ["minor-audit", "full-feature", "full-bug", "full"];
+const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
+
+function normalizePath(filePath: string): string {
+  return filePath.replace(/\\/g, "/");
+}
+
+function getActivePotentialPath(workspaceRoot: string): string | undefined {
+  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+  if (!activeEditorPath) {
+    return undefined;
+  }
+
+  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
+  const normalizedActiveEditorPath =
+    normalizePath(activeEditorPath).toLowerCase();
+  const normalizedPotentialRoot = `${normalizedWorkspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`;
+
+  if (!normalizedActiveEditorPath.endsWith(".md")) {
+    return undefined;
+  }
+
+  if (!normalizedActiveEditorPath.startsWith(`${normalizedPotentialRoot}/`)) {
+    return undefined;
+  }
+
+  return activeEditorPath;
+}
 
 async function promptForShortName(
   title: string,
@@ -263,15 +290,20 @@ export function activate(context: vscode.ExtensionContext): void {
     "drmCopilotExtension.potentialToIssue",
     async () => {
       const workspaceRoot = getWorkspaceRoot();
-      const selectedFile = await vscode.window.showOpenDialog({
-        canSelectMany: false,
-        openLabel: "Select potential file",
-        defaultUri: vscode.Uri.file(`${workspaceRoot}/docs/features/potential`),
-        filters: {
-          Markdown: ["md"],
-        },
-      });
-      const potentialPath = selectedFile?.[0]?.fsPath;
+      const activePotentialPath = getActivePotentialPath(workspaceRoot);
+      const selectedFile = activePotentialPath
+        ? undefined
+        : await vscode.window.showOpenDialog({
+            canSelectMany: false,
+            openLabel: "Select potential file",
+            defaultUri: vscode.Uri.file(
+              `${workspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`,
+            ),
+            filters: {
+              Markdown: ["md"],
+            },
+          });
+      const potentialPath = activePotentialPath ?? selectedFile?.[0]?.fsPath;
       if (!potentialPath) {
         return;
       }
