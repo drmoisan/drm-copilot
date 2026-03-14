@@ -63,7 +63,7 @@ These paths only exist in the development repo. The extension bundles the script
 - [x] Bundle template markdown files in extension resources/feature-templates/
 - [x] Each script resolves templates from bundled resources (via --template-root or relative to __file__ / $PSScriptRoot), with fallback to workspace for backward compat
 - [x] Unit tests verify template resolution from both bundled and workspace paths
-- [ ] Integration test: run new-potential-entry in workspace without docs/features/templates/ → should succeed using bundled templates
+- [x] Integration test: run new-potential-entry in workspace without docs/features/templates/ → should succeed using bundled templates
 
 ## Next Step
 
@@ -71,6 +71,21 @@ These paths only exist in the development repo. The extension bundles the script
 - [x] Move to active fix folder / branch
 
 ---
+
+## Sync Summary (as of 2026-03-13T19-35)
+
+- Status: Remediation verified — 4 of 4 issue acceptance items are evidenced
+- Branch: `bug/extension-template-resolution-93`
+- Plan: `plan.2026-03-12T19-08.md`
+- Remediation plan: `remediation-plan.2026-03-13T19-35.md`
+- Work Mode: `minor-audit` — AC source is this file only
+- Fresh remediation evidence: new-potential-entry-template-less-workspace.2026-03-13T19-35.md
+- Fresh TypeScript QA evidence: remediation-ts-test-final.2026-03-13T19-35.md
+
+### Changes in this sync run
+
+- Checked off the final `## Proposed Fix / Validation Ideas` criterion after the targeted integration regression and full TypeScript QA both recorded `EXIT_CODE: 0`
+- Synced the remediation-specific Python docstring evidence and QA-loop closure artifacts into the active feature folder
 
 ## Sync Summary (as of 2026-03-13T18-10)
 
@@ -94,7 +109,7 @@ These paths only exist in the development repo. The extension bundles the script
 | 1 | Bundle template markdown files in `resources/feature-templates/` | ✅ Evidenced | `extensions/drm-copilot/resources/feature-templates/{bug,epic,feature,potential,refactor}` now exists with template markdown files |
 | 2 | Each script resolves templates from bundled resources (via `--template-root` or relative to bundled files) with workspace fallback | ✅ Evidenced | `extensions/drm-copilot/src/extension.ts`, `extensions/drm-copilot/resources/templates/new-potential-entry.ps1`, `extensions/drm-copilot/resources/templates/new_potential_bug_entry.py`, `extensions/drm-copilot/resources/templates/new_active_feature_folder.py`, and `scripts/dev_tools/new_active_feature_folder_flow.py` now route through bundled template roots with fallback |
 | 3 | Unit tests verify template resolution from both bundled and workspace paths | ✅ Evidenced | `extensions/drm-copilot/test/extension.test.ts`, `tests/scripts/dev_tools/test_new_potential_bug_entry.py`, and `tests/scripts/dev_tools/test_new_active_feature_folder_part2.py` cover bundled-template and fallback behavior |
-| 4 | Integration test: run new-potential-entry in workspace without `docs/features/templates/` → should succeed using bundled templates | ⏳ Open | No integration-test artifact or execution record found |
+| 4 | Integration test: run new-potential-entry in workspace without `docs/features/templates/` → should succeed using bundled templates | ✅ Evidenced | `evidence/regression-testing/new-potential-entry-template-less-workspace.2026-03-13T19-35.md`; `evidence/qa-gates/remediation-ts-test-final.2026-03-13T19-35.md` |
 
 ### History / Prior Notes
 
@@ -118,4 +133,4 @@ These paths only exist in the development repo. The extension bundles the script
 
 ### Open criteria
 
-- `Integration test: run new-potential-entry in workspace without docs/features/templates/ → should succeed using bundled templates`
+- None; all issue acceptance criteria are now evidenced.

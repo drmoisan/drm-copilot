@@ -11,6 +11,13 @@
 
 DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED
 
+## Status Notes
+
+- Remediation follow-up: `remediation-plan.2026-03-13T19-35.md`
+- Remediation verification complete: remediation-plan.2026-03-13T19-35.md
+- Fresh remediation evidence: `evidence/regression-testing/new-potential-entry-template-less-workspace.2026-03-13T19-35.md`
+- Legacy checklist state retained; remediation verification is tracked by the remediation plan and its evidence artifacts.
+
 ## Overview
 
 The bug in `issue.md` is that extension commands resolve template markdown files from the destination workspace instead of the extension's bundled resources. This minimal-audit plan uses `issue.md` as the only requirements source, captures baseline evidence for the Python and TypeScript toolchains touched by the fix, delegates constrained small-path implementation against the `issue.md` acceptance items, and ends with an unconditional final QC loop that records on-disk evidence for each command step.

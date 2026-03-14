@@ -12,6 +12,7 @@ type MockChildProcess = EventEmitter & {
 const handlers = new Map<string, CommandHandler>();
 const generatedArtifacts = new Map<string, string>();
 const showQuickPickMock = jest.fn();
+const showInputBoxMock = jest.fn();
 let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
@@ -31,6 +32,7 @@ jest.mock(
         appendLine: jest.fn(),
         dispose: jest.fn(),
       }),
+      showInputBox: showInputBoxMock,
       showQuickPick: showQuickPickMock,
     },
     workspace: {
@@ -175,6 +177,7 @@ describe("drm-copilot integration behavior", () => {
     generatedArtifacts.clear();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
     quickPickResultLabel = "origin/main";
+    showInputBoxMock.mockReset();
     childProcessMock.spawn.mockReset();
     childProcessMock.spawnSync.mockReset();
     showQuickPickMock.mockReset();
@@ -462,5 +465,41 @@ describe("drm-copilot integration behavior", () => {
     const destinationIndex = args.indexOf("--destination");
     expect(destinationIndex).toBeGreaterThan(-1);
     expect(args[destinationIndex + 1]).toBe("C:/workspace");
+  });
+
+  it("newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates", async () => {
+    const templateLessWorkspacePath = "C:/workspace/template-less";
+    workspaceFoldersState = [
+      {
+        uri: {
+          fsPath: templateLessWorkspacePath,
+        },
+      },
+    ];
+    showInputBoxMock.mockResolvedValue("template-less-entry");
+
+    await handlerFor("drmCopilotExtension.newPotentialEntry")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    const templateRootIndex = args.indexOf("-TemplateRoot");
+    const scriptPath = args[args.indexOf("-File") + 1] ?? "";
+
+    expect(executable).toBe("pwsh");
+    expect(templateRootIndex).toBeGreaterThan(-1);
+    expect(args[templateRootIndex + 1]).toBe(
+      "C:/extension/resources/feature-templates",
+    );
+    expect(
+      normalizePath(scriptPath).endsWith(
+        "resources/templates/new-potential-entry.ps1",
+      ),
+    ).toBe(true);
+    expect(options.cwd).toBe(templateLessWorkspacePath);
+    expect(
+      args.some((arg) =>
+        normalizePath(arg).includes("/docs/features/templates/"),
+      ),
+    ).toBe(false);
   });
 });
