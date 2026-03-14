@@ -31,6 +31,15 @@ const registerCommandMock = jest.fn(
 let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
+let activeTextEditorState:
+  | {
+      document: {
+        uri: {
+          fsPath: string;
+        };
+      };
+    }
+  | undefined;
 
 jest.mock(
   "vscode",
@@ -43,6 +52,9 @@ jest.mock(
         appendLine: appendLineMock,
         dispose: jest.fn(),
       })),
+      get activeTextEditor() {
+        return activeTextEditorState;
+      },
       showInputBox: showInputBoxMock,
       showOpenDialog: showOpenDialogMock,
       showQuickPick: showQuickPickMock,
@@ -118,6 +130,18 @@ function activateAndGetHandler(commandId: string): CommandHandler {
   return handler;
 }
 
+function setActiveEditorPath(filePath: string | undefined): void {
+  activeTextEditorState = filePath
+    ? {
+        document: {
+          uri: {
+            fsPath: filePath,
+          },
+        },
+      }
+    : undefined;
+}
+
 describe("drm-copilot potentialToIssue command", () => {
   beforeEach(() => {
     process.env.PATH = "C:/bin";
@@ -131,6 +155,7 @@ describe("drm-copilot potentialToIssue command", () => {
     showOpenDialogMock.mockReset();
     showQuickPickMock.mockReset();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
+    activeTextEditorState = undefined;
   });
 
   afterEach(() => {
@@ -170,6 +195,80 @@ describe("drm-copilot potentialToIssue command", () => {
     expect(args[4]).toBe("feature");
     expect(args[5]).toBe("--work-mode");
     expect(args[6]).toBe("full");
+  });
+
+  it("reuses the active potential editor path before falling back to the file picker", async () => {
+    setExecutablePresence({ python: true });
+    setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
+    showQuickPickMock
+      .mockResolvedValueOnce("feature")
+      .mockResolvedValueOnce("minor-audit");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+    await handler();
+
+    expect(showOpenDialogMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--potential-path");
+    expect(args).toContain("C:/workspace/docs/features/potential/active.md");
+  });
+
+  it("keeps the promotion-type quick pick after active-editor auto-resolution", async () => {
+    setExecutablePresence({ python: true });
+    setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
+    showQuickPickMock
+      .mockResolvedValueOnce("bug")
+      .mockResolvedValueOnce("full-bug");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+    await handler();
+
+    expect(showQuickPickMock).toHaveBeenNthCalledWith(
+      1,
+      expect.arrayContaining(["epic", "feature", "refactor", "bug"]),
+      expect.objectContaining({
+        prompt: "Choose a promotion type.",
+      }),
+    );
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--promotion-type");
+    expect(args).toContain("bug");
+  });
+
+  it("keeps the work-mode quick pick after active-editor auto-resolution", async () => {
+    setExecutablePresence({ python: true });
+    setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
+    showQuickPickMock
+      .mockResolvedValueOnce("feature")
+      .mockResolvedValueOnce("minor-audit");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+    await handler();
+
+    expect(showQuickPickMock).toHaveBeenNthCalledWith(
+      2,
+      expect.arrayContaining([
+        "minor-audit",
+        "full-feature",
+        "full-bug",
+        "full",
+      ]),
+      expect.objectContaining({
+        prompt: "Choose a work mode.",
+      }),
+    );
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--work-mode");
+    expect(args).toContain("minor-audit");
   });
 
   it("returns early when the file picker is cancelled", async () => {
