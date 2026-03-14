@@ -7,21 +7,21 @@
 
 ## Executive summary
 
-The reviewed working-tree change is small, focused, and aligned with the issue: `extensions/drm-copilot/src/extension.ts` now prefers the active `docs/features/potential/*.md` editor path, and `extensions/drm-copilot/test/extension.potential-to-issue.test.ts` adds three regression scenarios that prove auto-resolution and prompt retention. Automated evidence is strong: fail-before evidence exists, final feature-folder QA gates are all green, and an in-session extension-local quality pass also passed.
+The reviewed branch change is small, focused, and aligned with the issue: `extensions/drm-copilot/src/extension.ts` now prefers the active `docs/features/potential/*.md` editor path, and `extensions/drm-copilot/test/extension.potential-to-issue.test.ts` adds three regression scenarios that prove auto-resolution and prompt retention. Automated evidence is strong: fail-before evidence exists, final feature-folder QA gates are all green, the in-session extension-local quality pass also passed, and the refreshed `pr_context` now captures the committed branch range headed by `257dbb6`.
 
 Top 3 risks:
-1. The reviewed diff is still uncommitted, so the canonical PR summary has no commit-range diff and cannot serve as a merge snapshot yet.
-2. `getActivePotentialPath()` lowercases paths for comparison; that matches Windows behavior, but it is worth keeping in mind for any future platform-specific path rules.
-3. The feature folder has strong automated coverage but no separate end-to-end destination-workspace manual verification artifact.
+1. `getActivePotentialPath()` lowercases paths for comparison; that matches Windows behavior, but it is worth keeping in mind for any future platform-specific path rules.
+2. The feature folder has strong automated coverage but no separate end-to-end destination-workspace manual verification artifact.
+3. HEAD CI status is not surfaced in the refreshed `pr_context` summary, so current confidence rests on local QA evidence rather than remote pipeline results.
 
-**PR readiness recommendation:** **No-Go for immediate merge as a branch snapshot.** The implementation quality looks good, but the branch needs the reviewed diff committed/pushed before it can be treated as merge-ready.
+**PR readiness recommendation:** **Go for PR readiness.** The implementation quality is good, the committed branch delta is now present, and the available verification evidence supports opening or merging a PR pending normal CI.
 
 ## Findings
 
 | Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
 |---|---|---|---|---|---|---|
-| Major | `artifacts/pr_context.summary.txt` / branch state | Base/Head section | The refreshed canonical PR summary reports `HEAD` equal to `origin/feature/expose-placeholder-commands-92`, so the reviewed implementation exists only as working-tree state. | Commit and push the audited extension/test changes, then refresh `pr_context` again. | Review artifacts should describe a mergeable branch delta, not only local unstaged edits. | `artifacts/pr_context.summary.txt` shows identical base/head SHA; `artifacts/pr_context.appendix.txt` shows the real diff under `Working tree diff (unstaged)`. |
 | Minor | `docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98` | evidence inventory | There is no separate destination-workspace manual verification note beyond automated Jest evidence. | Optionally add a short manual verification note after exercising the command in a destination workspace. | Automated evidence is solid, but a tiny manual note would fully mirror the issue’s validation ideas. | `issue.md` Proposed Fix / Validation Ideas mentions the destination-workspace retest; feature evidence currently contains baseline/regression/QA artifacts only. |
+| Nit | `extensions/drm-copilot/src/extension.ts` | `getActivePotentialPath()` | Path comparisons are normalized to lowercase, which is acceptable for current Windows-focused usage but should stay visible if Linux/macOS destination workspaces become a supported primary scenario. | Keep this helper behavior under review if cross-platform path semantics expand; add a case-sensitivity regression test if platform scope changes. | The current implementation is correct for the reported environment, but future portability work could benefit from an explicit test seam here. | `extensions/drm-copilot/src/extension.ts`; user-reported environment is Windows. |
 
 ## TypeScript implementation audit
 
@@ -61,4 +61,4 @@ No external research was required; repository policies, the feature-folder evide
 
 ## Verdict
 
-The implementation itself is in good shape: focused, typed, and well-covered. The blocking issue is procedural rather than behavioral—the branch snapshot does not yet contain the reviewed diff. Once the current working-tree changes are committed and `pr_context` is refreshed, this review would otherwise be a calm sea rather than stormy weather.
+The implementation is in good shape: focused, typed, and well-covered, and the earlier procedural blocker is resolved because the branch snapshot now includes the reviewed diff and refreshed PR-context evidence. This is ready for normal PR flow, with only optional evidence polish remaining.

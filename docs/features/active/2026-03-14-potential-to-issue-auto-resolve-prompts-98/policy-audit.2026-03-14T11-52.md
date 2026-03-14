@@ -15,7 +15,7 @@
 
 This minor-audit feature folder satisfies the hard scoping requirements: `issue.md` is the sole requirements source, `spec.md`/`user-story.md` are absent, required Phase 0 artifacts exist, the plan checklist is supported by on-disk evidence, and baseline evidence exists for the approved minimal plan. The implementation under review adds active-editor auto-resolution for `drmCopilotExtension.potentialToIssue` while preserving the promotion-type and work-mode prompts and the file-picker fallback. Baseline evidence shows 71 passing Jest tests before the change, regression evidence shows the new scenarios failed before the fix, and post-change evidence plus an in-session rerun show 74/74 passing.
 
-The only material compliance gap is branch-state fidelity: the refreshed canonical `pr_context` summary shows `HEAD` equal to `origin/feature/expose-placeholder-commands-92`, while the audited change exists only in the working tree (`artifacts/pr_context.appendix.txt` unstaged diff section). That means the implementation looks sound, but the branch is not yet a mergeable git snapshot.
+The earlier branch-state gap is now resolved. The refreshed canonical `pr_context` summary shows `Base ref (resolved): origin/feature/expose-placeholder-commands-92 @ 20dff96333cff413b60c410100428cb420e56026`, `Head ref (resolved): bug/potential-to-issue-auto-resolve-prompts-98 @ 257dbb6e3b706c382fdb6afdad81038eb98811cb`, and range `20dff96333cff413b60c410100428cb420e56026..257dbb6e3b706c382fdb6afdad81038eb98811cb`. The appendix likewise records the committed branch delta, including the two reviewed TypeScript files and the supporting feature-folder evidence.
 
 **Policy documents evaluated:**
 - [✅] `.github/instructions/general-code-change.instructions.md`
@@ -131,7 +131,7 @@ The only material compliance gap is branch-state fidelity: the refreshed canonic
 | Summarize changes | [✅] PASS | The plan, evidence, and this audit all describe the two-file constrained change. |
 | Design choices explained | [✅] PASS | `p0-t6-constrained-targets...md` ties the chosen targets back to `issue.md` suspected cause and validation ideas. |
 | Update supporting documents | [✅] PASS | The active feature folder contains issue, plan, baseline, regression, and QA evidence. |
-| Provide next steps | [⚠️] PARTIAL | The implementation is validated, but the reviewed diff is only in the working tree; a commit/push and PR-context refresh are still required for a mergeable branch snapshot. |
+| Provide next steps | [✅] PASS | The branch now contains committed reviewable changes (`257dbb6`), and `artifacts/pr_context.summary.txt` / `artifacts/pr_context.appendix.txt` have been refreshed against `feature/expose-placeholder-commands-92`. |
 
 ## 3. TypeScript-Specific Code Change Policy Compliance
 
@@ -147,7 +147,7 @@ The only material compliance gap is branch-state fidelity: the refreshed canonic
 
 ### Identified Gaps
 
-1. **Branch snapshot gap** — refreshed canonical `artifacts/pr_context.summary.txt` shows `HEAD` equal to `origin/feature/expose-placeholder-commands-92` with zero commits in range, while the actual reviewed implementation exists only in the working tree and `artifacts/pr_context.appendix.txt` unstaged diff section.
+**None.** No material policy gaps remain after the branch snapshot and canonical `pr_context` artifacts were refreshed.
 
 ### Approved Exceptions
 
@@ -161,7 +161,7 @@ The only material compliance gap is branch-state fidelity: the refreshed canonic
 
 ### Commits in This PR/Branch
 
-- None in range after PR-context refresh; the reviewed implementation is currently uncommitted working-tree state.
+- `257dbb6` 2026-03-14 Dan Moisan `fix: auto-resolve potential-to-issue active file (#98)`
 
 ### Files Modified
 
@@ -170,20 +170,20 @@ The only material compliance gap is branch-state fidelity: the refreshed canonic
    - Reuses an active `docs/features/potential/*.md` editor file before falling back to `showOpenDialog()`.
 2. **`extensions/drm-copilot/test/extension.potential-to-issue.test.ts`** (MODIFIED)
    - Adds regression coverage for active-editor auto-resolution and prompt retention.
-3. **`docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98/**`** (NEW, untracked feature evidence)
-   - Records Phase 0 baseline, fail-before/pass-after regression evidence, and final QA-gate artifacts.
+3. **`docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98/**`** (ADDED IN BRANCH RANGE)
+   - Records Phase 0 baseline, fail-before/pass-after regression evidence, and final QA-gate artifacts as part of the committed review snapshot.
 
 ## 6. Compliance Verdict
 
-### Overall Status: ⚠️ PARTIALLY COMPLIANT
+### Overall Status: ✅ COMPLIANT
 
-The scoped TypeScript implementation and tests are policy-compliant and validated by evidence, but the branch is not yet reviewable as a mergeable git snapshot because the refreshed PR context has no commit-range diff. The content is good; the branch state still needs one small process follow-up.
+The scoped TypeScript implementation and tests are policy-compliant and validated by baseline, regression, QA-gate, and refreshed PR-context evidence. The branch now presents the reviewed work as an actual git delta relative to `feature/expose-placeholder-commands-92`, so the audit no longer depends on working-tree-only state.
 
 ### Recommendation
 
-**Needs revision**
+**Ready for merge**
 
-Commit/push the reviewed working-tree diff on `bug/potential-to-issue-auto-resolve-prompts-98`, then refresh `artifacts/pr_context.summary.txt` / `artifacts/pr_context.appendix.txt` against `feature/expose-placeholder-commands-92` so the audited changes exist as an actual branch delta.
+Safe to open or merge a PR into `feature/expose-placeholder-commands-92` once the normal PR/CI path runs, with the existing local QA evidence already green.
 
 ## Appendix A: Hard-Requirement Checks
 

@@ -12,7 +12,7 @@
   - Feature evidence: `docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98/evidence/**`
 - **Requirements source:** `docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98/issue.md`
 - **Work mode:** `minor-audit` (resolved from `issue.md`)
-- **Note:** The refreshed PR summary shows no commit-range diff because the reviewed implementation is currently local working-tree state; the appendix’s unstaged diff is the authoritative baseline for the code under review.
+- **Note:** The refreshed PR summary now shows a committed comparison range `20dff96333cff413b60c410100428cb420e56026..257dbb6e3b706c382fdb6afdad81038eb98811cb`, and the appendix records commit `257dbb6` plus the scoped file delta for issue `#98`.
 
 ## Acceptance criteria inventory (authoritative for this run)
 
@@ -36,11 +36,10 @@
 
 **Overall feature readiness:** PASS
 
-The reviewed implementation satisfies the behavior defined in `issue.md` and is supported by baseline, fail-before, pass-after, and final QA evidence. The remaining merge-readiness gap is branch-state/process related rather than a missed requirement.
+The reviewed implementation satisfies the behavior defined in `issue.md` and is supported by baseline, fail-before, pass-after, final QA, and refreshed PR-context evidence. The previously noted branch-state/process gap is now resolved because the implementation is committed and present in the comparison range against `feature/expose-placeholder-commands-92`.
 
 **Recommended follow-up verification steps:**
 - Optional but nice: capture one short destination-workspace manual verification note if maintainers want parity with the issue’s validation ideas.
-- Required for mergeable branch state: commit/push the current working-tree diff and refresh `pr_context` artifacts.
 
 ## Acceptance Criteria Status
 - Source: `docs/features/active/2026-03-14-potential-to-issue-auto-resolve-prompts-98/issue.md`
