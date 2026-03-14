@@ -177,11 +177,8 @@ def default_issue_fetcher(issue_number: str) -> IssueMeta | None:
     author = parsed.get("author", {}).get("login") or "name"
     updated_at = parsed.get("updatedAt")
     updated_date = "YYYY-MM-DD"
-    if updated_at:
-        try:
-            updated_date = str(updated_at).split("T")[0]
-        except Exception:
-            updated_date = "YYYY-MM-DD"
+    if isinstance(updated_at, str) and updated_at.strip():
+        updated_date = updated_at.split("T")[0]
     return IssueMeta(number=number, author=author, updated_date=updated_date)
 
 

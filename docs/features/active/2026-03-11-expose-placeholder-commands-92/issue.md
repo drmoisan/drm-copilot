@@ -31,7 +31,7 @@ Each command should use VS Code input boxes or quick picks to gather user input 
 
 - [x] All four placeholder commands are replaced with real command handlers that invoke the bundled scripts
 - [x] Each command's Python/PowerShell modules and dependencies are bundled under `resources/scripts/dev_tools/` or `resources/templates/` as appropriate
-- [x] Wrapper templates follow the same thin-adapter pattern as `collect_pr_context.py` and `push_down_copilot_customizations.py`
+- [ ] Wrapper templates follow the same thin-adapter pattern as `collect_pr_context.py` and `push_down_copilot_customizations.py`
 - [x] Each command gathers required user input (file paths, names, types) via VS Code input boxes or quick picks before execution
 - [x] Command IDs are renamed (drop "Placeholder" suffix) and `package.json` contributions are updated
 - [x] The `PLACEHOLDER_COMMAND_SPECS` array and `registerPlaceholderCommands` function are removed

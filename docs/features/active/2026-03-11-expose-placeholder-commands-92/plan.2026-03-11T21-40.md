@@ -9,6 +9,11 @@
 
 Replace the four placeholder VS Code extension commands with real command handlers that bundle the referenced Python and PowerShell scripts, prompt for required user input, and execute through `executeBundledScript()` using the established extension-side pattern. The implementation order stays intentionally incremental: `newPotentialBugEntry` → `newPotentialEntry` → `potentialToIssue` → `newActiveFeatureFolder`, followed by placeholder removal and full multi-language QA.
 
+## Status Notes
+
+- Remediation follow-up: `remediation-plan.2026-03-14T15-48.md`
+- Remediation verification complete: remediation-plan.2026-03-14T15-48.md
+
 ## Requirements Inputs
 
 - Primary acceptance source: `docs/features/active/2026-03-11-expose-placeholder-commands-92/issue.md`
