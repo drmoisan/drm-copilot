@@ -68,9 +68,12 @@ def set_section(content: str, name: str, body: str) -> str:
         rf"(^##\s+{re.escape(name)}\s*\r?\n)(.*?)(?=^\s*##\s+|\Z)",
         re.DOTALL | re.MULTILINE,
     )
-    replacement = f"\\1{body}\n\n"
     if pattern.search(content):
-        return pattern.sub(replacement, content)
+        return pattern.sub(
+            lambda match: f"{match.group(1)}{body}\n\n",
+            content,
+            count=1,
+        )
 
     trimmed = content.rstrip()
     if trimmed:
@@ -110,8 +113,14 @@ def update_section_body(
     if updated_body == body:
         return content, False
 
-    replacement = f"{header}{updated_body}\n"
-    return pattern.sub(replacement, content, count=1), True
+    return (
+        pattern.sub(
+            lambda _match: f"{header}{updated_body}\n",
+            content,
+            count=1,
+        ),
+        True,
+    )
 
 
 def set_header_placeholder(
