@@ -228,7 +228,7 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
         It "returns true when code command is available" {
             $result = Invoke-VSCodeOpen -Files @("file1.md", "file2.md") `
                 -GetCommand { param($Name) $null = $Name; [pscustomobject]@{ Name = "code" } } `
-                -StartProcess { param($FilePath, $ArgumentList) $null = $FilePath; $null = $ArgumentList }
+                -InvokeCommand { param($Exe, $CmdArgs) $null = $Exe; $null = $CmdArgs }
 
             $result | Should -Be $true
         }
@@ -240,11 +240,11 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
             $result | Should -Be $false
         }
 
-        It "calls Start-Process with correct parameters" {
+        It "invokes command with --reuse-window and correct executable" {
             $files = @("file1.md", "file2.md")
             $result = Invoke-VSCodeOpen -Files $files `
                 -GetCommand { param($Name) $null = $Name; [pscustomobject]@{ Name = "code" } } `
-                -StartProcess { param($FilePath, $ArgumentList) $FilePath | Should -Be 'code'; $ArgumentList | Should -Be $files }
+                -InvokeCommand { param($Exe, $CmdArgs) $Exe | Should -Be 'code'; $CmdArgs | Should -Be (@('--reuse-window') + $files) }
 
             $result | Should -Be $true
         }
@@ -263,10 +263,10 @@ Describe "new-potential-entry.ps1 - Invoke-VSCodeOpen" {
                     }
                     return $null
                 } `
-                    -StartProcess {
-                    param($FilePath, $ArgumentList)
-                    $FilePath | Should -Be 'code-insiders'
-                    $ArgumentList | Should -Be $files
+                    -InvokeCommand {
+                    param($Exe, $CmdArgs)
+                    $Exe | Should -Be 'code-insiders'
+                    $CmdArgs | Should -Be (@('--reuse-window') + $files)
                 }
 
                 $result | Should -Be $true
@@ -384,6 +384,58 @@ Describe "new-potential-entry.ps1 - Integration validation" {
 
             $scriptContent | Should -Match "param\(\s*\[string\]\s*\`$ShortName\s*\)"
         }
+
+        It "contains the parent-directory guard block before copying the template in both production scripts" {
+            $scriptPaths = @(
+                (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/new-potential-entry.ps1"),
+                (Join-Path -Path $PSScriptRoot -ChildPath "../../../extensions/drm-copilot/resources/templates/new-potential-entry.ps1")
+            )
+
+            # (?s) enables dot-all mode so .*? matches across newlines.
+            $guardPattern = '(?s)' +
+            [regex]::Escape('$targetDir = Split-Path -Parent $target') +
+            '[\s\S]*?' +
+            [regex]::Escape('if (-not (Test-Path $targetDir)) {') +
+            '[\s\S]*?' +
+            [regex]::Escape('New-Item -ItemType Directory -Path $targetDir -Force | Out-Null') +
+            '[\s\S]*?' +
+            [regex]::Escape('}') +
+            '[\s\S]*?' +
+            [regex]::Escape('Copy-Item $template $target -Force')
+
+            foreach ($scriptPath in $scriptPaths) {
+                $scriptContent = Get-Content -Path $scriptPath -Raw
+
+                $scriptContent | Should -Match 'Split-Path -Parent \$target'
+                $scriptContent | Should -Match 'Test-Path \$targetDir'
+                $scriptContent | Should -Match 'New-Item -ItemType Directory -Path \$targetDir -Force \| Out-Null'
+                $scriptContent | Should -Match $guardPattern
+            }
+        }
+
+        It "uses reuse-window CLI invocation without Start-Process inside Invoke-VSCodeOpen in both production scripts" {
+            $scriptPaths = @(
+                (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/new-potential-entry.ps1"),
+                (Join-Path -Path $PSScriptRoot -ChildPath "../../../extensions/drm-copilot/resources/templates/new-potential-entry.ps1")
+            )
+
+            foreach ($scriptPath in $scriptPaths) {
+                $scriptContent = Get-Content -Path $scriptPath -Raw
+                $invokeVsCodeOpenMatch = [regex]::Match(
+                    $scriptContent,
+                    'function Invoke-VSCodeOpen \{(?<body>.*?)\n\}',
+                    [System.Text.RegularExpressions.RegexOptions]::Singleline
+                )
+
+                $invokeVsCodeOpenMatch.Success | Should -BeTrue
+                $invokeVsCodeOpenBody = $invokeVsCodeOpenMatch.Groups['body'].Value
+
+                $invokeVsCodeOpenBody | Should -Match '--reuse-window'
+                $invokeVsCodeOpenBody | Should -Match 'VSCODE_IPC_HOOK_CLI|Get-Process.+insider'
+                $invokeVsCodeOpenBody | Should -Not -Match 'Start-Process'
+            }
+        }
     }
 }
+
 
