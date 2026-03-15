@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = () => Promise<void> | void;
+type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
   stderr: EventEmitter;
@@ -467,6 +467,35 @@ describe("drm-copilot command behavior", () => {
     expect(args[2]).toBe("blank-pr-context");
   });
 
+  it("newPotentialBugEntry direct --short-name invocation skips prompts", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler(["--short-name", "blank-pr-context"]);
+
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[1]).toBe("--short-name");
+    expect(args[2]).toBe("blank-pr-context");
+  });
+
+  it("newPotentialBugEntry direct mode rejects invalid short-name pattern", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+
+    await expect(handler(["--short-name", "Invalid Name"])).rejects.toThrow(
+      /short-name/i,
+    );
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
   it("newPotentialBugEntry returns early when the input box is cancelled", async () => {
     showInputBoxMock.mockResolvedValue(undefined);
 
@@ -519,6 +548,47 @@ describe("drm-copilot command behavior", () => {
     );
     expect(args).toContain("-ShortName");
     expect(args).toContain("stale-cache");
+  });
+
+  it("newPotentialEntry direct -ShortName invocation skips prompts", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler(["-ShortName", "stale-cache"]);
+
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("-ShortName");
+    expect(args).toContain("stale-cache");
+  });
+
+  it("newPotentialEntry direct mode rejects missing -ShortName value", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(handler(["-ShortName"])).rejects.toThrow(/-ShortName.*value/i);
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialEntry direct mode rejects duplicate -ShortName flag", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(
+      handler(["-ShortName", "first-entry", "-ShortName", "second-entry"]),
+    ).rejects.toThrow(/duplicate.*-ShortName/i);
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("newPotentialEntry returns early when the input box is cancelled", async () => {

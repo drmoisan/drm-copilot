@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = () => Promise<void> | void;
+type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockUri = { fsPath: string };
 type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
@@ -195,6 +195,79 @@ describe("drm-copilot potentialToIssue command", () => {
     expect(args[4]).toBe("feature");
     expect(args[5]).toBe("--work-mode");
     expect(args[6]).toBe("full");
+  });
+
+  it("potentialToIssue direct invocation skips active-editor and prompt UI", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+    await handler([
+      "--potential-path",
+      "C:/workspace/docs/features/potential/direct.md",
+      "--promotion-type",
+      "feature",
+      "--work-mode",
+      "full-feature",
+    ]);
+
+    expect(showOpenDialogMock).not.toHaveBeenCalled();
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--potential-path");
+    expect(args).toContain("C:/workspace/docs/features/potential/direct.md");
+    expect(args).toContain("--promotion-type");
+    expect(args).toContain("feature");
+    expect(args).toContain("--work-mode");
+    expect(args).toContain("full-feature");
+  });
+
+  it("potentialToIssue direct mode rejects unknown flag", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+
+    await expect(
+      handler([
+        "--potential-path",
+        "C:/workspace/docs/features/potential/direct.md",
+        "--promotion-type",
+        "feature",
+        "--work-mode",
+        "full-feature",
+        "--mystery-flag",
+        "boom",
+      ]),
+    ).rejects.toThrow(/unknown flag/i);
+    expect(showOpenDialogMock).not.toHaveBeenCalled();
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("potentialToIssue direct mode rejects invalid work mode", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.potentialToIssue",
+    );
+
+    await expect(
+      handler([
+        "--potential-path",
+        "C:/workspace/docs/features/potential/direct.md",
+        "--promotion-type",
+        "feature",
+        "--work-mode",
+        "freeform-mode",
+      ]),
+    ).rejects.toThrow(/work mode/i);
+    expect(showOpenDialogMock).not.toHaveBeenCalled();
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("reuses the active potential editor path before falling back to the file picker", async () => {

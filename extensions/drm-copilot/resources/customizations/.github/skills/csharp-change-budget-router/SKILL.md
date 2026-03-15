@@ -1,6 +1,6 @@
 ---
 name: csharp-change-budget-router
-description: Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, and enforce orchestration-first routing for larger changes.
+description: Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, enforce orchestration-first routing for larger changes, and use the VS Code extension command surface for promotion lifecycle steps when available.
 ---
 
 # C# Change Budget Router
@@ -24,6 +24,7 @@ Use this skill when:
 ## Orchestrated Small-Path Requirements
 
 When routed through `csharp-orchestrator`, small path still requires lifecycle scaffolding before implementation:
+- invoke promotion/folder lifecycle steps through `vscode/runCommand` + extension access per `feature-promotion-lifecycle` when available; use script/CLI fallback only when direct extension command execution is unavailable,
 - promote potential item to GitHub issue with `--work-mode minor-audit`,
 - create active feature folder with `--work-mode minor-audit`,
 - delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,

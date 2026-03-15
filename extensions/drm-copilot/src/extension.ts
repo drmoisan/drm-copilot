@@ -9,6 +9,12 @@ import {
   discoverPrBaseBranches,
   pickPrBaseBranch,
 } from "./pr-context-branches";
+import {
+  resolveNewActiveFeatureFolderInvocation,
+  resolveNewPotentialBugEntryInvocation,
+  resolveNewPotentialEntryInvocation,
+  resolvePotentialToIssueInvocation,
+} from "./workflow-command-arguments";
 
 // Re-export detectRuntime so existing test imports from this module keep working.
 export { detectRuntime } from "./command-runtime";
@@ -167,6 +173,22 @@ async function promptForFeatureName(
   return trimmed;
 }
 
+function resolveWorkflowInvocation(
+  output: vscode.OutputChannel,
+  commandId: string,
+  resolver: () => ReturnType<typeof resolveNewPotentialEntryInvocation>,
+): ReturnType<typeof resolveNewPotentialEntryInvocation> {
+  try {
+    const invocation = resolver();
+    output.appendLine(`[${commandId}] ${invocation.mode} mode`);
+    return invocation;
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error);
+    output.appendLine(`[${commandId}] validation failure: ${detail}`);
+    throw error;
+  }
+}
+
 /**
  * Activates the extension by registering all command handlers and shared resources.
  *
@@ -288,7 +310,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newPotentialBugEntry",
-    async () => {
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newPotentialBugEntry";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveNewPotentialBugEntryInvocation(rawArgs, templateRoot),
+      );
+      if (invocation.mode === "direct") {
+        await executeBundledScript(context, output, {
+          runtimeKind: "python",
+          bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
+          commandId,
+          args: invocation.forwardedArgs,
+        });
+        return;
+      }
+
       const shortName = await promptForShortName(
         "drm-copilot: New Potential Bug Entry",
         "Enter a kebab-case short name for the potential bug entry.",
@@ -301,7 +337,7 @@ export function activate(context: vscode.ExtensionContext): void {
       await executeBundledScript(context, output, {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
-        commandId: "drmCopilotExtension.newPotentialBugEntry",
+        commandId,
         args: ["--short-name", shortName, "--template-root", templateRoot],
       });
     },
@@ -309,7 +345,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const newPotentialEntryDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newPotentialEntry",
-    async () => {
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newPotentialEntry";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveNewPotentialEntryInvocation(rawArgs, templateRoot),
+      );
+      if (invocation.mode === "direct") {
+        await executeBundledScript(context, output, {
+          runtimeKind: "powershell",
+          bundledRelativePath: "resources/templates/new-potential-entry.ps1",
+          commandId,
+          args: invocation.forwardedArgs,
+        });
+        return;
+      }
+
       const shortName = await promptForShortName(
         "drm-copilot: New Potential Entry",
         "Enter a kebab-case short name for the potential entry.",
@@ -322,7 +372,7 @@ export function activate(context: vscode.ExtensionContext): void {
       await executeBundledScript(context, output, {
         runtimeKind: "powershell",
         bundledRelativePath: "resources/templates/new-potential-entry.ps1",
-        commandId: "drmCopilotExtension.newPotentialEntry",
+        commandId,
         args: ["-ShortName", shortName, "-TemplateRoot", templateRoot],
       });
     },
@@ -330,7 +380,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const potentialToIssueDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.potentialToIssue",
-    async () => {
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.potentialToIssue";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolvePotentialToIssueInvocation(rawArgs),
+      );
+      if (invocation.mode === "direct") {
+        await executeBundledScript(context, output, {
+          runtimeKind: "python",
+          bundledRelativePath: "resources/templates/potential_to_issue.py",
+          commandId,
+          args: invocation.forwardedArgs,
+        });
+        return;
+      }
+
       const workspaceRoot = getWorkspaceRoot();
       const activePotentialPath = getActivePotentialPath(workspaceRoot);
       const selectedFile = activePotentialPath
@@ -371,7 +435,7 @@ export function activate(context: vscode.ExtensionContext): void {
       await executeBundledScript(context, output, {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/potential_to_issue.py",
-        commandId: "drmCopilotExtension.potentialToIssue",
+        commandId,
         args: [
           "--potential-path",
           potentialPath,
@@ -386,7 +450,22 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const newActiveFeatureFolderDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newActiveFeatureFolder",
-    async () => {
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newActiveFeatureFolder";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveNewActiveFeatureFolderInvocation(rawArgs, templateRoot),
+      );
+      if (invocation.mode === "direct") {
+        await executeBundledScript(context, output, {
+          runtimeKind: "python",
+          bundledRelativePath:
+            "resources/templates/new_active_feature_folder.py",
+          commandId,
+          args: invocation.forwardedArgs,
+        });
+        return;
+      }
+
       const featureType = await promptForChoice(
         "drm-copilot: New Active Feature Folder",
         "Choose the feature folder type.",
@@ -443,7 +522,7 @@ export function activate(context: vscode.ExtensionContext): void {
       await executeBundledScript(context, output, {
         runtimeKind: "python",
         bundledRelativePath: "resources/templates/new_active_feature_folder.py",
-        commandId: "drmCopilotExtension.newActiveFeatureFolder",
+        commandId,
         args,
       });
     },

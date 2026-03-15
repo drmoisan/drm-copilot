@@ -382,7 +382,12 @@ Describe "new-potential-entry.ps1 - Integration validation" {
             $scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/new-potential-entry.ps1"
             $scriptContent = Get-Content -Path $scriptPath -Raw
 
-            $scriptContent | Should -Match "param\(\s*\[string\]\s*\`$ShortName\s*\)"
+            $scriptContent | Should -Match (
+                "param\(" +
+                "[\s\S]*?\[string\]\s*\`$ShortName," +
+                "[\s\S]*?\[string\]\s*\`$TemplateRoot" +
+                "[\s\S]*?\)"
+            )
         }
 
         It "contains the parent-directory guard block before copying the template in both production scripts" {
