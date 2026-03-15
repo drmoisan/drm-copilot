@@ -17,6 +17,7 @@ const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const POTENTIAL_PROMOTION_TYPES = ["epic", "feature", "refactor", "bug"];
 const WORK_MODE_OPTIONS = ["minor-audit", "full-feature", "full-bug", "full"];
+const ACTIVE_FEATURE_DOCS_DIRECTORY = "docs/features/active";
 const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
 
 function normalizePath(filePath: string): string {
@@ -43,6 +44,47 @@ function getActivePotentialPath(workspaceRoot: string): string | undefined {
   }
 
   return activeEditorPath;
+}
+
+function getActiveFeaturePlanPath(workspaceRoot: string): string | undefined {
+  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+  if (!activeEditorPath) {
+    return undefined;
+  }
+
+  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
+  const normalizedActiveEditorPath =
+    normalizePath(activeEditorPath).toLowerCase();
+  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
+
+  if (!normalizedActiveEditorPath.endsWith(".md")) {
+    return undefined;
+  }
+
+  if (
+    !normalizedActiveEditorPath.startsWith(`${normalizedActiveFeatureRoot}/`)
+  ) {
+    return undefined;
+  }
+
+  return activeEditorPath;
+}
+
+async function promptForActiveFeaturePlan(
+  workspaceRoot: string,
+): Promise<string | undefined> {
+  const selectedFile = await vscode.window.showOpenDialog({
+    canSelectMany: false,
+    openLabel: "Select feature plan",
+    defaultUri: vscode.Uri.file(
+      `${workspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`,
+    ),
+    filters: {
+      Markdown: ["md"],
+    },
+  });
+
+  return selectedFile?.[0]?.fsPath;
 }
 
 async function promptForShortName(
@@ -407,6 +449,29 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const resolveExecuteHardLockPromptDisposable =
+    vscode.commands.registerCommand(
+      "drmCopilotExtension.resolveExecuteHardLockPrompt",
+      async () => {
+        const commandId = "drmCopilotExtension.resolveExecuteHardLockPrompt";
+        const workspaceRoot = getWorkspaceRoot();
+        const activePlanPath = getActiveFeaturePlanPath(workspaceRoot);
+        const planPath =
+          activePlanPath ?? (await promptForActiveFeaturePlan(workspaceRoot));
+        if (!planPath) {
+          return;
+        }
+
+        await executeBundledScript(context, output, {
+          runtimeKind: "python",
+          bundledRelativePath:
+            "resources/templates/resolve_hard_lock_prompt.py",
+          commandId,
+          args: ["--target", planPath, "--workspace", workspaceRoot],
+        });
+      },
+    );
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
@@ -417,6 +482,7 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCopilotCustomizationsDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
+    resolveExecuteHardLockPromptDisposable,
     output,
   );
 }
