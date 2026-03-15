@@ -22,7 +22,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from scripts.dev_tools.prompt_mode_contract import (
+from dev_tools.prompt_mode_contract import (
     build_fallback_reason,
     resolve_selected_work_mode,
 )
@@ -121,12 +121,12 @@ def copy_to_clipboard(text: str) -> bool:
 
     # Fallback chain: try common clipboard commands across platforms
     commands: tuple[list[str], ...] = (
-        ["pbcopy"],  # macOS
-        ["wl-copy"],  # Wayland
-        ["xclip", "-selection", "clipboard"],  # X11
-        ["xsel", "--clipboard", "--input"],  # X11 alternative
-        ["clip"],  # Windows
-        ["clip.exe"],  # WSL
+        ["pbcopy"],
+        ["wl-copy"],
+        ["xclip", "-selection", "clipboard"],
+        ["xsel", "--clipboard", "--input"],
+        ["clip"],
+        ["clip.exe"],
     )
 
     for command in commands:
@@ -134,7 +134,6 @@ def copy_to_clipboard(text: str) -> bool:
         if executable is None:
             continue
         try:
-            # S603: validated above via shutil.which
             subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
                 [executable, *command[1:]],
                 input=text,
@@ -255,10 +254,7 @@ def resolve_prompt(
     Side Effects:
         None. Pure function.
     """
-    # Resolve target path relative to workspace
     relative_target = _try_relative_to_workspace(target_path, workspace_root)
-
-    # Convert to forward slashes for cross-platform consistency
     plan_path_value = relative_target.as_posix()
 
     selected_mode, resolved_fallback_reason = _resolve_work_mode_from_issue(
@@ -270,7 +266,6 @@ def resolve_prompt(
         fallback_reason if fallback_reason is not None else resolved_fallback_reason
     )
 
-    # Substitute variables.
     resolved = template_content.replace("${plan-path}", plan_path_value)
     resolved = resolved.replace("${work-mode}", mode_value)
     resolved = resolved.replace("${fallback-reason}", fallback_value)
@@ -316,11 +311,7 @@ def main() -> int:
     )
 
     args = parser.parse_args()
-
-    # Determine workspace root
     workspace_root = args.workspace if args.workspace else Path.cwd()
-
-    # Locate the template file selected by --template-kind.
     template_name = _resolve_template_name(args.template_kind)
     template_path, checked_paths = _resolve_template_path(
         template_name,
@@ -341,20 +332,15 @@ def main() -> int:
         print(f"Error: Target file not found at {args.target}", file=sys.stderr)
         return 1
 
-    # Read template
     try:
         template_content = template_path.read_text(encoding="utf-8")
     except OSError as error:
         print(f"Error reading template: {error}", file=sys.stderr)
         return 1
 
-    # Resolve the prompt
     resolved_prompt = resolve_prompt(template_content, args.target, workspace_root)
-
-    # Print the resolved prompt
     print(resolved_prompt)
 
-    # Attempt to copy to clipboard
     if copy_to_clipboard(resolved_prompt):
         print("\n✓ Copied to clipboard", file=sys.stderr)
     else:

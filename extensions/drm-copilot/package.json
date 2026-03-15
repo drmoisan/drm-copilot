@@ -44,6 +44,10 @@
       {
         "command": "drmCopilotExtension.pushDownCopilotCustomizations",
         "title": "drm-copilot: Push Down Copilot Customizations"
+      },
+      {
+        "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
+        "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }
     ]
   },
