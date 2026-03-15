@@ -18,14 +18,26 @@ Use this skill when:
 
 1) Estimate rough change budget first based on likely **production C# files** touched.
 2) Route:
-- `1-3` production files (+ corresponding tests) → **small path** (atomic plan + execution route).
+- `1-3` production files (+ corresponding tests) → **small path** (`csharp-typed-engineer` direct mode).
 - `>3` production files or `>3` test files → **large path** (orchestration workflow with promotion/research/spec/planning/execution/review).
+
+## Orchestrated Small-Path Requirements
+
+When routed through `csharp-orchestrator`, small path still requires lifecycle scaffolding before implementation:
+- promote potential item to GitHub issue with `--work-mode minor-audit`,
+- create active feature folder with `--work-mode minor-audit`,
+- delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,
+- require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`,
+- execute Phase 0 only via atomic_executor before branching,
+- run reduced small-audit after implementation and QC.
+
+Direct invocation of `csharp-typed-engineer` remains implementation-focused and does not replace orchestrator lifecycle steps.
 
 ## Direct-Mode Rejection Rule
 
 If direct implementation is requested but estimated scope is `>3` production files:
 - Stop before implementation.
-- Return explicit routing instruction to invoke `csharp-orchestrator`.
+- Return explicit routing instruction to invoke `csharp-orchestrator` (or `.github/prompts/orchestrate-csharp-work.prompt.md`).
 
 ## Documentation Expectations
 
