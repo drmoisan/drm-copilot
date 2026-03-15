@@ -1,6 +1,7 @@
 # Creates a dated potential feature file from the template and opens it plus backlog.md.
 param(
-    [string] $ShortName
+    [string] $ShortName,
+    [string] $TemplateRoot
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
@@ -148,7 +149,15 @@ $workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $today = Get-Date -Format 'yyyy-MM-dd'
 $lastUpdated = Get-Date -Format 'yyyy-MM-ddTHH-mm'
 $target = Join-Path $workspace "docs/features/potential/$today-$ShortName.md"
-$template = Join-Path $workspace 'docs/features/potential/template.md'
+if ($TemplateRoot -and (Test-Path (Join-Path $TemplateRoot 'potential/template.md'))) {
+    $template = Join-Path $TemplateRoot 'potential/template.md'
+} else {
+    $template = Join-Path $workspace 'docs/features/potential/template.md'
+}
+if (-not (Test-Path $template)) {
+    Write-Error "Template not found: $template"
+    exit 1
+}
 $backlog = Join-Path $workspace 'docs/features/backlog.md'
 
 $targetDir = Split-Path -Parent $target

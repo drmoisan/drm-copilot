@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = () => Promise<void> | void;
+type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
   stderr: EventEmitter;
@@ -165,6 +165,111 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     expect(args[5]).toBe("--work-mode");
     expect(args[6]).toBe("full");
     expect(args).not.toContain("--issue-number");
+  });
+
+  it("newActiveFeatureFolder direct invocation forwards issue number without prompts", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+    await handler([
+      "--feature-name",
+      "blank-pr-context",
+      "--type",
+      "feature",
+      "--issue-number",
+      "104",
+      "--work-mode",
+      "full-feature",
+    ]);
+
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--feature-name");
+    expect(args).toContain("blank-pr-context");
+    expect(args).toContain("--type");
+    expect(args).toContain("feature");
+    expect(args).toContain("--issue-number");
+    expect(args).toContain("104");
+    expect(args).toContain("--work-mode");
+    expect(args).toContain("full-feature");
+  });
+
+  it("newActiveFeatureFolder direct invocation omits issue number without prompts", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+    await handler([
+      "--feature-name",
+      "blank-pr-context",
+      "--type",
+      "feature",
+      "--work-mode",
+      "minor-audit",
+    ]);
+
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--feature-name");
+    expect(args).toContain("blank-pr-context");
+    expect(args).toContain("--type");
+    expect(args).toContain("feature");
+    expect(args).toContain("--work-mode");
+    expect(args).toContain("minor-audit");
+    expect(args).not.toContain("--issue-number");
+  });
+
+  it("newActiveFeatureFolder direct mode rejects non-digit issue number", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+
+    await expect(
+      handler([
+        "--feature-name",
+        "blank-pr-context",
+        "--type",
+        "feature",
+        "--issue-number",
+        "issue-104",
+        "--work-mode",
+        "full-feature",
+      ]),
+    ).rejects.toThrow(/issue number/i);
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newActiveFeatureFolder direct mode rejects invalid type", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+
+    await expect(
+      handler([
+        "--feature-name",
+        "blank-pr-context",
+        "--type",
+        "maintenance",
+        "--work-mode",
+        "full-feature",
+      ]),
+    ).rejects.toThrow(/type/i);
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("returns early when the type quick pick is cancelled", async () => {
