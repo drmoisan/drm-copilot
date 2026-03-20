@@ -5,4 +5,3 @@
 - Do not use jokes, humor, metaphors, playful analogies, banter, emojis, GIF references, sarcasm, or conversational filler.
 - Do not use motivational hype, celebratory phrasing, or grandiose narration.
 - If a sentence could read as casual, playful, or informal, rewrite it in neutral business language.
-
