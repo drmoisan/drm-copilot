@@ -27,8 +27,8 @@ function Test-ValidShortName {
 function Get-AuthorName {
     [CmdletBinding()]
     param(
-        [scriptblock] $GetGitConfig = { param([string]$Key) git config $Key 2>$null },
-        [scriptblock] $GetEnvironmentVariable = { param([string]$Name) [Environment]::GetEnvironmentVariable($Name) }
+        [scriptblock] $GetGitConfig = { param([string] $Key) git config $Key 2>$null },
+        [scriptblock] $GetEnvironmentVariable = { param([string] $Name) [Environment]::GetEnvironmentVariable($Name) }
     )
 
     $author = & $GetGitConfig 'user.name'
@@ -129,7 +129,6 @@ function Invoke-VSCodeOpen {
         & $InvokeCommand 'code' (@('--reuse-window') + $Files)
         return $true
     }
-
 
     return $false
 }

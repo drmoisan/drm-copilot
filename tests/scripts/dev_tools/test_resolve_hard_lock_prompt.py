@@ -1,7 +1,7 @@
 """Tests for scripts.dev_tools.resolve_hard_lock_prompt."""
 
 from io import StringIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -175,12 +175,16 @@ def test_resolve_prompt_uses_parent_issue_for_versioned_plan_path() -> None:
 
 
 def _test_resolve_prompt_windows_v2_path_uses_forward_slashes() -> None:
-    """Normalize Windows-style versioned plan paths to forward slashes."""
+    """Normalize backslash-bearing relative plan paths to forward slashes."""
     template = "Plan=${plan-path}"
     workspace_root = Path(r"C:\workspace")
     target = Path(r"C:\workspace\docs\features\active\feature-1\v2\plan.md")
 
-    result = resolve_prompt(template, target, workspace_root)
+    with patch(
+        "scripts.dev_tools.resolve_hard_lock_prompt._try_relative_to_workspace",
+        return_value=PurePosixPath(r"docs\features\active\feature-1\v2\plan.md"),
+    ):
+        result = resolve_prompt(template, target, workspace_root)
 
     assert "docs/features/active/feature-1/v2/plan.md" in result
     assert "\\" not in result
