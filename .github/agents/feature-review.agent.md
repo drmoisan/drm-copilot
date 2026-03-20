@@ -1,6 +1,5 @@
 ---
 name: feature_code_review_agent
-model: GPT-5.4 (copilot)
 description: Review an entire feature branch relative to a base branch (PR-style). Read pr_context.summary.txt thoroughly, use pr_context.appendix.txt for full baseline diff evidence, and produce PolicyAudit + CodeReview + FeatureAudit (Acceptance Criteria). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Checkout the feature branch. Provide PRBaseBranch (e.g., development). Run this agent to (re)generate the PR context artifacts (summary + appendix) per `pr-context-artifacts` via scripts.dev_tools.pr_context.collector --base ${input:PRBaseBranch} when needed, then produce: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, (3) docs/features/active/<feature>/feature-audit.<timestamp>.md (acceptance criteria), and (4) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md AND AUTOMATICALLY DELEGATE to atomic_planner to write docs/features/active/<feature>/remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
