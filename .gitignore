@@ -54,3 +54,6 @@ htmlcov/
 .mypy_cache/
 .pytype/
 .pyre/
+
+coverage/
+extensions/drm-copilot/coverage

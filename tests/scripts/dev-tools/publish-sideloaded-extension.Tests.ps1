@@ -15,10 +15,10 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
     }
 
     It "selects the extension folder when root package.json is not a VS Code extension manifest" {
-        $repoRoot = "C:\repo"
-        $repoPackagePath = "C:\repo\package.json"
-        $extensionRoot = "C:\repo\extensions\drm-copilot"
-        $extensionPackagePath = "C:\repo\extensions\drm-copilot\package.json"
+        $repoRoot = "/repo"
+        $repoPackagePath = "/repo/package.json"
+        $extensionRoot = "/repo/extensions/drm-copilot"
+        $extensionPackagePath = "/repo/extensions/drm-copilot/package.json"
 
         Mock -CommandName Test-Path -MockWith {
             param([string]$LiteralPath)
@@ -46,8 +46,8 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
     }
 
     It "keeps repo root when package.json already has engines.vscode" {
-        $repoRoot = "C:\repo"
-        $repoPackagePath = "C:\repo\package.json"
+        $repoRoot = "/repo"
+        $repoPackagePath = "/repo/package.json"
 
         Mock -CommandName Test-Path -MockWith {
             param([string]$LiteralPath)
@@ -67,6 +67,17 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
 
         $result = Resolve-ExtensionProjectRoot -RepoRoot $repoRoot
         $result | Should -Be $repoRoot
+    }
+
+    It "treats a manifest without engines.vscode as non-extension metadata" {
+        $manifest = [pscustomobject]@{
+            name    = 'repo-package'
+            engines = [pscustomobject]@{}
+        }
+
+        $result = Test-IsVsCodeExtensionManifest -Manifest $manifest
+
+        $result | Should -BeFalse
     }
 }
 

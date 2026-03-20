@@ -288,20 +288,20 @@ Describe 'Convert-PoshQCCoverageToRelative' {
             $mockXmlContent = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <report name="Pester">
-  <package name="/tmp/repos/lexile-corpus-tuner/scripts/dev-tools">
-  <class name="/tmp/repos/lexile-corpus-tuner/scripts/dev-tools/collect-commit-context" sourcefilename="collect-commit-context.ps1">
+    <package name="/repo-root/scripts/dev-tools">
+    <class name="/repo-root/scripts/dev-tools/collect-commit-context" sourcefilename="collect-commit-context.ps1">
   </class>
   </package>
-  <package name="/tmp/repos/lexile-corpus-tuner/scripts/powershell/PoshQC">
+    <package name="/repo-root/scripts/powershell/PoshQC">
   <sourcefile name="PoshQC.psm1">
   </sourcefile>
   </package>
 </report>
 '@
 
-            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/tmp/repos/lexile-corpus-tuner' -PassThru
+            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/repo-root' -PassThru
 
-            $result | Should -Not -Match '/tmp/repos/lexile-corpus-tuner/'
+            $result | Should -Not -Match '/repo-root/'
             $result | Should -Match '<package name="scripts/dev-tools">'
             $result | Should -Match '<class name="scripts/dev-tools/collect-commit-context"'
             $result | Should -Match '<package name="scripts/powershell/PoshQC">'
@@ -311,17 +311,17 @@ Describe 'Convert-PoshQCCoverageToRelative' {
             $mockXmlContent = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <report name="Pester">
-  <package name="C:\repos\lexile-corpus-tuner\scripts\dev-tools">
-  <class name="C:\repos\lexile-corpus-tuner\scripts\dev-tools\collect-commit-context" sourcefilename="collect-commit-context.ps1">
+    <package name="\repo-root\scripts\dev-tools">
+    <class name="\repo-root\scripts\dev-tools\collect-commit-context" sourcefilename="collect-commit-context.ps1">
   </class>
   </package>
 </report>
 '@
 
-            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot 'C:\repos\lexile-corpus-tuner' -PassThru
+            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '\repo-root' -PassThru
 
-            $result | Should -Not -Match 'C:/repos/lexile-corpus-tuner/'
-            $result | Should -Not -Match 'C:\\repos\\lexile-corpus-tuner\\'
+            $result | Should -Not -Match '/repo-root/'
+            $result | Should -Not -Match '\\repo-root\\'
             $result | Should -Match 'scripts'
         }
 
@@ -329,17 +329,17 @@ Describe 'Convert-PoshQCCoverageToRelative' {
             $mockXmlContent = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <report name="Pester">
-  <package name="C:/repos/lexile-corpus-tuner/scripts/dev-tools">
-  <class name="C:\repos\lexile-corpus-tuner\scripts\powershell\PoshQC" sourcefilename="PoshQC.psm1">
+    <package name="/repo-root/scripts/dev-tools">
+    <class name="\repo-root\scripts\powershell\PoshQC" sourcefilename="PoshQC.psm1">
   </class>
   </package>
 </report>
 '@
 
-            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot 'C:\repos\lexile-corpus-tuner' -PassThru
+            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/repo-root' -PassThru
 
-            $result | Should -Not -Match 'C:/repos/lexile-corpus-tuner/'
-            $result | Should -Not -Match 'C:\\repos\\lexile-corpus-tuner\\'
+            $result | Should -Not -Match '/repo-root/'
+            $result | Should -Not -Match '\\repo-root\\'
             $result | Should -Match 'scripts'
         }
     }
@@ -349,14 +349,14 @@ Describe 'Convert-PoshQCCoverageToRelative' {
             $mockXmlContent = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <report name="Pester">
-  <package name="/tmp/repos/lexile-corpus-tuner/scripts/dev-tools">
+    <package name="/repo-root/scripts/dev-tools">
   </package>
 </report>
 '@
 
-            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/tmp/repos/lexile-corpus-tuner/' -PassThru
+            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/repo-root/' -PassThru
 
-            $result | Should -Not -Match '/tmp/repos/lexile-corpus-tuner/'
+            $result | Should -Not -Match '/repo-root/'
             $result | Should -Match '<package name="scripts/dev-tools">'
         }
     }
@@ -394,14 +394,14 @@ Describe 'Convert-PoshQCCoverageToRelative' {
             $mockXmlContent = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <report name="Pester">
-  <package name="/tmp/repos/lexile-corpus-tuner/scripts/dev-tools">
+    <package name="/repo-root/scripts/dev-tools">
   </package>
 </report>
 '@
 
-            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/tmp/repos/lexile-corpus-tuner/' -PassThru
+            $result = Convert-PoshQCCoverageToRelative -InputContent $mockXmlContent -RepoRoot '/repo-root/' -PassThru
 
-            $result | Should -Not -Match '/tmp/repos/lexile-corpus-tuner/'
+            $result | Should -Not -Match '/repo-root/'
             $result | Should -Match 'scripts/dev-tools'
         }
     }
@@ -485,7 +485,7 @@ Describe 'Invoke-PoshQCTest' {
 
     It 'invokes coverage copy when coverage is enabled and not disabled' {
         $copyArgs = $null
-        $repoRoot = Join-Path ([IO.Path]::GetTempPath()) 'repo'
+        $repoRoot = $PSScriptRoot
         $coveragePath = Join-Path $repoRoot 'coverage.xml'
         $coverageSrcPath = Join-Path $repoRoot 'src'
         $expectedCoveragePath = $coveragePath
@@ -499,7 +499,7 @@ Describe 'Invoke-PoshQCTest' {
             [pscustomobject]@{
                 Run          = @{ Path = @{ Value = $Table.Run.Path }; ExcludePath = @{ Value = @() } }
                 TestResult   = @{ Enabled = @{ Value = $false }; OutputPath = @{ Value = $null } }
-                CodeCoverage = @{ Enabled = $true; Path = @{ Value = $Table.CodeCoverage.Path }; OutputPath = @{ Value = $Table.CodeCoverage.OutputPath } }
+                CodeCoverage = @{ Enabled = @{ Value = $true }; Path = @{ Value = $Table.CodeCoverage.Path }; OutputPath = @{ Value = $Table.CodeCoverage.OutputPath } }
                 Output       = @{ Verbosity = 'Normal' }
             }
         } -EnsureResultPath { param($cfg, [string] $RootPath) [void] $RootPath; $cfg } -ExpandCoveragePaths { param($cfg, [string] $RootPath) [void] $RootPath; $cfg } `

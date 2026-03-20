@@ -15,6 +15,7 @@
     "pretest": "npm run compile && npm run compile:integration-tests && npm run lint",
     "lint": "eslint --no-error-on-unmatched-pattern src tests",
     "test:unit": "jest --config jest.config.cjs",
+    "test:unit:coverage": "jest --config jest.config.cjs --coverage",
     "test:integration": "vscode-test",
     "test": "vscode-test"
   },

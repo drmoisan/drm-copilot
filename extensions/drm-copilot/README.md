@@ -9,6 +9,20 @@ This extension executes bundled scripts directly from extension resources while 
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
+- `drmCopilotExtension.newPotentialBugEntry`
+- `drmCopilotExtension.newPotentialEntry`
+- `drmCopilotExtension.potentialToIssue`
+- `drmCopilotExtension.newActiveFeatureFolder`
+- `drmCopilotExtension.resolveExecuteHardLockPrompt`
+
+### Resolve Execute Hard-Lock Prompt
+
+- Command Palette title: `drm-copilot: Resolve Execute Hard-Lock Prompt`
+- Requires an open workspace folder.
+- Reuses the active Markdown feature plan under `docs/features/active/` when possible; otherwise prompts for a Markdown plan file under that folder.
+- Executes bundled Python wrapper: `resources/templates/resolve_hard_lock_prompt.py`
+- The wrapper injects bundled hard-lock prompt templates from `resources/customizations/.github/codex/` so the command works even when the active workspace does not contain repo-local `.github/codex` assets.
+- Passes only `--target <selected-plan-path>` and `--workspace <workspace-root>` to the bundled resolver entrypoint.
 
 ### Push Down Copilot Customizations
 
@@ -18,7 +32,7 @@ This extension executes bundled scripts directly from extension resources while 
 - Passes `--destination` with the open workspace root.
 - Source customizations are read from the bundled `resources/customizations/.github/` payload.
 - The summary artifact is written under the destination workspace.
-- Script references in copied files are rewritten to VS Code command: references for both real and placeholder commands.
+- Script references in copied files are rewritten to the live VS Code command IDs contributed by the extension.
 
 ### Commit Context Command Contract
 
@@ -31,6 +45,8 @@ This extension executes bundled scripts directly from extension resources while 
 
 - Python command: `python`
 - PowerShell commands: `pwsh` (preferred), then `powershell`
+
+`Resolve Execute Hard-Lock Prompt` depends on a Python runtime being available on `PATH` because the command delegates to bundled Python resources at execution time.
 
 If runtime detection fails, handlers throw actionable runtime-named errors.
 

@@ -475,3 +475,60 @@ def test_code_launcher_returns_false_when_code_missing() -> None:
 
     assert result is False
     mock_run.assert_not_called()
+
+
+def test_create_active_folder_resolves_template_from_template_root() -> None:
+    """Verify template_root overrides workspace template path when provided."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    template_root = Path("/ext/resources/feature-templates")
+
+    # Seed templates under template_root (not workspace)
+    template_dir = template_root / "feature"
+    fs.write_text(
+        template_dir / "user-story.md", "- **Issue:** <issue>\n<feature-name>"
+    )
+    fs.write_text(template_dir / "spec.md", "- **Issue:** <issue>\n<feature-name>")
+    fs.write_text(
+        template_dir / "plan.yyyy-MM-ddTHH-mm.md",
+        "- **Issue:** <issue>\n<feature-name>",
+    )
+
+    code_launcher = FakeCodeLauncher()
+    result = mod.create_active_folder(
+        feature_name="tr-feature",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=code_launcher,
+        template_root=template_root,
+    )
+
+    expected_folder = workspace / "docs" / "features" / "active" / "tr-feature"
+    assert result.target == expected_folder
+    assert fs.exists(expected_folder / "user-story.md")
+
+
+def test_create_active_folder_falls_back_to_workspace_when_template_root_is_none() -> (
+    None
+):
+    """Verify workspace-relative template path is used when template_root is None."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+
+    # Seed templates under workspace (default location)
+    _seed_feature_template(fs, workspace)
+
+    code_launcher = FakeCodeLauncher()
+    result = mod.create_active_folder(
+        feature_name="fb-feature",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=code_launcher,
+        template_root=None,
+    )
+
+    expected_folder = workspace / "docs" / "features" / "active" / "fb-feature"
+    assert result.target == expected_folder
+    assert fs.exists(expected_folder / "user-story.md")

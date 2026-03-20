@@ -1,0 +1,11 @@
+src/**
+test/**
+artifacts/**
+coverage/**
+node_modules/**
+*.ts
+tsconfig*.json
+jest.config.cjs
+eslint.config.mjs
+run-jest.cjs
+package-lock.json

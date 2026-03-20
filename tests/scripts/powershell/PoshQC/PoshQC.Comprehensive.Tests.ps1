@@ -88,7 +88,7 @@ Describe 'Get-PoshQCFileList' {
             InModuleScope PoshQC {
                 Mock -CommandName Resolve-Path -MockWith { throw 'Path not found' }
 
-                { Get-PoshQCFileList -Root 'C:\nonexistent' } | Should -Throw
+                { Get-PoshQCFileList -Root '/missing' } | Should -Throw
             }
         }
     }
@@ -150,7 +150,7 @@ Describe 'Invoke-PoshQCFormat' {
                 Mock -CommandName Import-Module -MockWith { }
                 Mock -CommandName Test-Path -MockWith { $false }
 
-                { Invoke-PoshQCFormat -Root $PSScriptRoot -SettingsPath 'C:\nonexistent.psd1' } | Should -Throw '*Settings not found*'
+                { Invoke-PoshQCFormat -Root $PSScriptRoot -SettingsPath '/missing.psd1' } | Should -Throw '*Settings not found*'
             }
         }
     }
@@ -238,7 +238,7 @@ Describe 'Invoke-PoshQCAnalyze' {
                 Mock -CommandName Import-Module -MockWith { }
                 Mock -CommandName Test-Path -MockWith { $false }
 
-                { Invoke-PoshQCAnalyze -Root $PSScriptRoot -SettingsPath 'C:\nonexistent.psd1' } | Should -Throw '*Settings not found*'
+                { Invoke-PoshQCAnalyze -Root $PSScriptRoot -SettingsPath '/missing.psd1' } | Should -Throw '*Settings not found*'
             }
         }
     }
@@ -339,7 +339,7 @@ Describe 'Invoke-PoshQCTest' {
                 Mock -CommandName Import-Module -MockWith { }
                 Mock -CommandName Test-Path -MockWith { $false }
 
-                { Invoke-PoshQCTest -Root $PSScriptRoot -SettingsPath 'C:\nonexistent.psd1' } | Should -Throw '*Settings not found*'
+                { Invoke-PoshQCTest -Root $PSScriptRoot -SettingsPath '/missing.psd1' } | Should -Throw '*Settings not found*'
             }
         }
     }

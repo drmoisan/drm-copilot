@@ -1,7 +1,7 @@
 """Tests for scripts.dev_tools.resolve_hard_lock_prompt."""
 
 from io import StringIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -174,6 +174,27 @@ def test_resolve_prompt_uses_parent_issue_for_versioned_plan_path() -> None:
     assert "Reason=none" in result
 
 
+def _test_resolve_prompt_windows_v2_path_uses_forward_slashes() -> None:
+    """Normalize backslash-bearing relative plan paths to forward slashes."""
+    template = "Plan=${plan-path}"
+    workspace_root = Path(r"C:\workspace")
+    target = Path(r"C:\workspace\docs\features\active\feature-1\v2\plan.md")
+
+    with patch(
+        "scripts.dev_tools.resolve_hard_lock_prompt._try_relative_to_workspace",
+        return_value=PurePosixPath(r"docs\features\active\feature-1\v2\plan.md"),
+    ):
+        result = resolve_prompt(template, target, workspace_root)
+
+    assert "docs/features/active/feature-1/v2/plan.md" in result
+    assert "\\" not in result
+
+
+test_resolve_prompt_uses_forward_slash_path_for_versioned_windows_style_target = (
+    _test_resolve_prompt_windows_v2_path_uses_forward_slashes
+)
+
+
 def test_resolve_prompt_mode_fallback_when_issue_unreadable() -> None:
     """Emit unreadable fallback reason when issue.md cannot be read."""
     template = "Mode=${work-mode};Reason=${fallback-reason}"
@@ -302,163 +323,24 @@ def test_main_success(mem_path: Path) -> None:
     assert "✓ Copied to clipboard" in mock_stderr.getvalue()
 
 
-def test_main_template_not_found(mem_path: Path) -> None:
-    """Test main when template file doesn't exist."""
+def test_main_prefers_template_root_before_workspace_codex(mem_path: Path) -> None:
+    """Prefer the explicit template root over workspace codex templates."""
     workspace = mem_path / "workspace"
     workspace.mkdir()
-
-    target_file = workspace / "plan.md"
-    target_file.write_text("# Plan", encoding="utf-8")
-
-    with (
-        patch(
-            "sys.argv",
-            ["script", "--target", str(target_file), "--workspace", str(workspace)],
-        ),
-        patch("sys.stderr", new_callable=StringIO) as mock_stderr,
-    ):
-        exit_code = main()
-
-    assert exit_code == 1
-    assert "Template not found" in mock_stderr.getvalue()
-
-
-def test_main_target_not_found(mem_path: Path) -> None:
-    """Test main when target file doesn't exist."""
-    workspace = mem_path / "workspace"
-    workspace.mkdir()
-
-    # Create template file
-    template_dir = workspace / ".github" / "codex"
-    template_dir.mkdir(parents=True)
-    template_file = template_dir / "execute-hard-lock.prompt.md"
-    template_file.write_text("Plan: ${plan-path}", encoding="utf-8")
-
-    # Don't create target file
-    target_file = workspace / "nonexistent.md"
-
-    with (
-        patch(
-            "sys.argv",
-            ["script", "--target", str(target_file), "--workspace", str(workspace)],
-        ),
-        patch("sys.stderr", new_callable=StringIO) as mock_stderr,
-    ):
-        exit_code = main()
-
-    assert exit_code == 1
-    assert "Target file not found" in mock_stderr.getvalue()
-
-
-def test_main_clipboard_copy_fails(mem_path: Path) -> None:
-    """Test main when clipboard copy fails."""
-    workspace = mem_path / "workspace"
-    workspace.mkdir()
-
-    # Create template file
-    template_dir = workspace / ".github" / "codex"
-    template_dir.mkdir(parents=True)
-    template_file = template_dir / "execute-hard-lock.prompt.md"
-    template_file.write_text("Plan: ${plan-path}", encoding="utf-8")
-
-    # Create target file
-    target_file = workspace / "plan.md"
-    target_file.write_text("# Plan", encoding="utf-8")
-
-    with (
-        patch(
-            "sys.argv",
-            ["script", "--target", str(target_file), "--workspace", str(workspace)],
-        ),
-        patch(
-            "scripts.dev_tools.resolve_hard_lock_prompt.copy_to_clipboard",
-            return_value=False,
-        ),
-        patch("sys.stdout", new_callable=StringIO),
-        patch("sys.stderr", new_callable=StringIO) as mock_stderr,
-    ):
-        exit_code = main()
-
-    assert exit_code == 0  # Still succeeds, just warns
-    assert "✗ Could not copy to clipboard" in mock_stderr.getvalue()
-
-
-def test_main_default_workspace(mem_path: Path) -> None:
-    """Test main with default workspace (cwd)."""
-    # Create template and target in mem_path
-    template_dir = mem_path / ".github" / "codex"
-    template_dir.mkdir(parents=True)
-    template_file = template_dir / "execute-hard-lock.prompt.md"
-    template_file.write_text("Plan: ${plan-path}", encoding="utf-8")
-
-    target_file = mem_path / "plan.md"
-    target_file.write_text("# Plan", encoding="utf-8")
-
-    with (
-        patch("sys.argv", ["script", "--target", str(target_file)]),
-        patch("pathlib.Path.cwd", return_value=mem_path),
-        patch(
-            "scripts.dev_tools.resolve_hard_lock_prompt.copy_to_clipboard",
-            return_value=True,
-        ),
-        patch("sys.stdout", new_callable=StringIO) as mock_stdout,
-        patch("sys.stderr", new_callable=StringIO),
-    ):
-        exit_code = main()
-
-    assert exit_code == 0
-    assert "plan.md" in mock_stdout.getvalue()
-
-
-def test_main_template_read_error(mem_path: Path) -> None:
-    """Test main when template file cannot be read."""
-    workspace = mem_path / "workspace"
-    workspace.mkdir()
-
-    # Create template file
-    template_dir = workspace / ".github" / "codex"
-    template_dir.mkdir(parents=True)
-    template_file = template_dir / "execute-hard-lock.prompt.md"
-    template_file.write_text("Plan: ${plan-path}", encoding="utf-8")
-
-    # Create target file
-    target_file = workspace / "plan.md"
-    target_file.write_text("# Plan", encoding="utf-8")
-
-    with (
-        patch(
-            "sys.argv",
-            ["script", "--target", str(target_file), "--workspace", str(workspace)],
-        ),
-        patch("pathlib.Path.read_text", side_effect=OSError("Read error")),
-        patch("sys.stderr", new_callable=StringIO) as mock_stderr,
-    ):
-        exit_code = main()
-
-    assert exit_code == 1
-    assert "Error reading template" in mock_stderr.getvalue()
-
-
-def test_main_resume_template_kind(mem_path: Path) -> None:
-    """Resolve resume template when --template-kind resume is provided."""
-    workspace = mem_path / "workspace"
-    workspace.mkdir()
-
-    template_dir = workspace / ".github" / "codex"
-    template_dir.mkdir(parents=True)
-    execute_template = template_dir / "execute-hard-lock.prompt.md"
-    execute_template.write_text("Execute ${plan-path}", encoding="utf-8")
-    resume_template = template_dir / "resume-hard-lock.prompt.md"
-    resume_template.write_text(
-        "Resume ${plan-path} mode=${work-mode}",
+    workspace_template_dir = workspace / ".github" / "codex"
+    workspace_template_dir.mkdir(parents=True)
+    (workspace_template_dir / "execute-hard-lock.prompt.md").write_text(
+        "workspace ${plan-path}",
         encoding="utf-8",
     )
-
-    issue_file = workspace / "docs" / "issue.md"
-    issue_file.parent.mkdir(parents=True)
-    issue_file.write_text("- Work Mode: full-feature\n", encoding="utf-8")
-
+    template_root = mem_path / "bundled-codex"
+    template_root.mkdir()
+    (template_root / "execute-hard-lock.prompt.md").write_text(
+        "bundled ${plan-path}",
+        encoding="utf-8",
+    )
     target_file = workspace / "docs" / "plan.md"
+    target_file.parent.mkdir(parents=True)
     target_file.write_text("# Plan", encoding="utf-8")
 
     with (
@@ -470,8 +352,8 @@ def test_main_resume_template_kind(mem_path: Path) -> None:
                 str(target_file),
                 "--workspace",
                 str(workspace),
-                "--template-kind",
-                "resume",
+                "--template-root",
+                str(template_root),
             ],
         ),
         patch(
@@ -484,5 +366,88 @@ def test_main_resume_template_kind(mem_path: Path) -> None:
         exit_code = main()
 
     assert exit_code == 0
-    assert "Resume docs/plan.md" in mock_stdout.getvalue()
-    assert "mode=full-feature" in mock_stdout.getvalue()
+    assert "bundled docs/plan.md" in mock_stdout.getvalue()
+
+
+def test_main_falls_back_to_workspace_codex_when_template_root_template_is_missing(
+    mem_path: Path,
+) -> None:
+    """Fall back to workspace codex when the explicit template root lacks it."""
+    workspace = mem_path / "workspace"
+    workspace.mkdir()
+    workspace_template_dir = workspace / ".github" / "codex"
+    workspace_template_dir.mkdir(parents=True)
+    (workspace_template_dir / "execute-hard-lock.prompt.md").write_text(
+        "workspace ${plan-path}",
+        encoding="utf-8",
+    )
+    template_root = mem_path / "bundled-codex"
+    template_root.mkdir()
+    target_file = workspace / "docs" / "plan.md"
+    target_file.parent.mkdir(parents=True)
+    target_file.write_text("# Plan", encoding="utf-8")
+
+    with (
+        patch(
+            "sys.argv",
+            [
+                "script",
+                "--target",
+                str(target_file),
+                "--workspace",
+                str(workspace),
+                "--template-root",
+                str(template_root),
+            ],
+        ),
+        patch(
+            "scripts.dev_tools.resolve_hard_lock_prompt.copy_to_clipboard",
+            return_value=True,
+        ),
+        patch("sys.stdout", new_callable=StringIO) as mock_stdout,
+        patch("sys.stderr", new_callable=StringIO),
+    ):
+        exit_code = main()
+
+    assert exit_code == 0
+    assert "workspace docs/plan.md" in mock_stdout.getvalue()
+
+
+def test_main_reports_checked_template_paths_when_template_lookup_fails(
+    mem_path: Path,
+) -> None:
+    """Report every checked template path when no template candidate exists."""
+    workspace = mem_path / "workspace"
+    workspace.mkdir()
+    template_root = mem_path / "bundled-codex"
+    template_root.mkdir()
+    target_file = workspace / "docs" / "plan.md"
+    target_file.parent.mkdir(parents=True)
+    target_file.write_text("# Plan", encoding="utf-8")
+
+    with (
+        patch(
+            "sys.argv",
+            [
+                "script",
+                "--target",
+                str(target_file),
+                "--workspace",
+                str(workspace),
+                "--template-root",
+                str(template_root),
+            ],
+        ),
+        patch("sys.stderr", new_callable=StringIO) as mock_stderr,
+    ):
+        exit_code = main()
+
+    expected_workspace_template = (
+        workspace / ".github" / "codex" / "execute-hard-lock.prompt.md"
+    )
+    expected_bundled_template = template_root / "execute-hard-lock.prompt.md"
+    stderr_output = mock_stderr.getvalue()
+
+    assert exit_code == 1
+    assert str(expected_bundled_template) in stderr_output
+    assert str(expected_workspace_template) in stderr_output

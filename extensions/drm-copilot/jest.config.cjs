@@ -7,4 +7,5 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.jest.json" }],
   },
+  coverageProvider: "v8",
 };

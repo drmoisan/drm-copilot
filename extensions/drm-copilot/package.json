@@ -26,24 +26,28 @@
         "title": "drm-copilot: Collect PR Context"
       },
       {
-        "command": "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
-        "title": "drm-copilot: New Active Feature Folder (Placeholder)"
+        "command": "drmCopilotExtension.newActiveFeatureFolder",
+        "title": "drm-copilot: New Active Feature Folder"
       },
       {
-        "command": "drmCopilotExtension.potentialToIssuePlaceholder",
-        "title": "drm-copilot: Potential To Issue (Placeholder)"
+        "command": "drmCopilotExtension.potentialToIssue",
+        "title": "drm-copilot: Potential To Issue"
       },
       {
-        "command": "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
-        "title": "drm-copilot: New Potential Bug Entry (Python Placeholder)"
+        "command": "drmCopilotExtension.newPotentialBugEntry",
+        "title": "drm-copilot: New Potential Bug Entry"
       },
       {
-        "command": "drmCopilotExtension.newPotentialEntryPsPlaceholder",
-        "title": "drm-copilot: New Potential Entry (PowerShell Placeholder)"
+        "command": "drmCopilotExtension.newPotentialEntry",
+        "title": "drm-copilot: New Potential Entry"
       },
       {
         "command": "drmCopilotExtension.pushDownCopilotCustomizations",
         "title": "drm-copilot: Push Down Copilot Customizations"
+      },
+      {
+        "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
+        "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }
     ]
   },

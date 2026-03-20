@@ -108,14 +108,30 @@ function Resolve-ExtensionProjectRoot {
         [string]$RelativeExtensionPath = "extensions\drm-copilot"
     )
 
-    $repoPackageJsonPath = Join-Path $RepoRoot "package.json"
+    $joinProjectPath = {
+        param(
+            [string]$BasePath,
+            [string]$ChildPath
+        )
+
+        $usesPosixSeparators = $BasePath.Contains('/') -and -not $BasePath.Contains('\\')
+        if (-not $usesPosixSeparators) {
+            return Join-Path $BasePath $ChildPath
+        }
+
+        $normalizedBasePath = $BasePath.TrimEnd([char[]]@('/', '\'))
+        $normalizedChildPath = $ChildPath -replace '\\', '/'
+        return '{0}/{1}' -f $normalizedBasePath, $normalizedChildPath.TrimStart('/')
+    }
+
+    $repoPackageJsonPath = & $joinProjectPath $RepoRoot "package.json"
     $repoManifest = Get-PackageManifest -PackageJsonPath $repoPackageJsonPath
     if (Test-IsVsCodeExtensionManifest -Manifest $repoManifest) {
         return $RepoRoot
     }
 
-    $extensionProjectRoot = Join-Path $RepoRoot $RelativeExtensionPath
-    $extensionPackageJsonPath = Join-Path $extensionProjectRoot "package.json"
+    $extensionProjectRoot = & $joinProjectPath $RepoRoot $RelativeExtensionPath
+    $extensionPackageJsonPath = & $joinProjectPath $extensionProjectRoot "package.json"
 
     if (Test-Path -LiteralPath $extensionPackageJsonPath) {
         $extensionManifest = Get-PackageManifest -PackageJsonPath $extensionPackageJsonPath
@@ -211,7 +227,11 @@ function Invoke-NpmCiWithRetry {
     $attempt = 1
     while ($true) {
         try {
-            Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci") -WorkingDirectory $WorkingDirectory
+            # The side-load workflow needs deterministic installs, but the default npm output
+            # is noisy because upstream tooling emits audit/funding/deprecation warnings that do
+            # not change the packaged VSIX. Keep the install strict while limiting publish-task
+            # output to actionable failures.
+            Invoke-ExternalCommand -FilePath "npm" -ArgumentList @("ci", "--no-audit", "--no-fund", "--loglevel=error") -WorkingDirectory $WorkingDirectory
             return
         } catch {
             $exitCode = $null

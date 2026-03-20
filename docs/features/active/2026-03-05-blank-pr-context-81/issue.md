@@ -2,14 +2,14 @@
 
 - Date captured: 2026-03-05
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/blank-pr-context/ (Issue #81)
+- Status: Active (re-opened from archive)
+- Work Mode: minor-audit
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
 - Issue: #81
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/81
 - Last Updated: 2026-03-05
-- Work Mode: full
 
 ## Summary
 
@@ -69,25 +69,11 @@ Likely path/reference resolution mismatch when PR-context package runs from exte
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
 
-## 2026-03-05 Implementation Outcome
+## 2026-03-05 Implementation Outcome (Prior Attempt — Archived)
 
 - Replaced placeholder-only bundled PR collector output with substantive git-backed summary/appendix rendering in `extensions/scaffold-extension/resources/templates/collect_pr_context.py`.
 - Preserved extension invocation CLI flags: `--base`, `--out`, and `--appendix-out`.
 - Added deterministic error-path handling so unrecoverable git/data failures return non-zero exit with stderr context.
 - Locked regression behavior with extension tests so placeholder-only summary/appendix content is explicitly rejected by test expectations.
-
-Evidence links:
-- Red regression evidence: `evidence/regression-testing/ts-regression-red.2026-03-05T10-42.md`
-- Green regression evidence: `evidence/regression-testing/ts-regression-green.2026-03-05T10-42.md`
-- Final TypeScript QA: `evidence/qa-gates/ts-format.2026-03-05T10-42.md`, `evidence/qa-gates/ts-lint.2026-03-05T10-42.md`, `evidence/qa-gates/ts-typecheck.2026-03-05T10-42.md`, `evidence/qa-gates/ts-test.2026-03-05T10-42.md`
-- Final Python QA: `evidence/qa-gates/py-format.2026-03-05T10-42.md`, `evidence/qa-gates/py-lint.2026-03-05T10-42.md`, `evidence/qa-gates/py-typecheck.2026-03-05T10-42.md`, `evidence/qa-gates/py-test-cov.2026-03-05T10-42.md`
-- Coverage delta: `evidence/qa-gates/coverage-delta.2026-03-05T10-42.md`
-
-## 2026-03-05 Agentic Error Correction
-
-- Agentic error: the first implementation replaced empty placeholder output by adding rich rendering logic directly inside `extensions/scaffold-extension/resources/templates/collect_pr_context.py`.
-- Why this was wrong: it duplicated logic already owned by `scripts/dev_tools/pr_context`, creating drift risk and violating the requirement that extension-side and repo-side artifacts be identical.
-- Correction implemented: `drm-copilot: Collect PR Context` now executes the canonical package module `scripts.dev_tools.pr_context.collector` directly from the destination workspace context.
-- Compatibility note: the bundled `collect_pr_context.py` template is now only a thin wrapper delegating to the canonical module and contains no PR-context rendering logic.

@@ -1,5 +1,5 @@
 {	
-    "coverage-gutters.coverageBaseDir": "artifacts/pester/**",
+    "coverage-gutters.coverageBaseDir": "**",
     "coverage-gutters.coverageFileNames": [
         "lcov.info",
         "cov.xml",
@@ -20,14 +20,18 @@
         "powershell-coverage.koverage.xml"
     ],
     "koverage.coverageFilePaths": [
+        "coverage",
         "artifacts/pester",
-        "artifacts/pester/kcov/kcov-merged"
+        "artifacts/pester/kcov/kcov-merged",
+        "artifacts/python"
     ],
     "jest.jestCommandLine": "npm run test:unit --",
     "jest.rootPath": ".",
+    "jest.runMode": "on-demand",
+    "jest.useJest30": true,
     "powershell.cwd": "${workspaceFolder}",
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": ["tests"],
-    "python.testing.autoTestDiscoverOnSaveEnabled": true
+    "python.testing.autoTestDiscoverOnSaveEnabled": false
 }

@@ -19,21 +19,21 @@ Describe "run-actionlint.ps1" {
     Context "Resolve-ActionlintPath" {
         It "resolves paths correctly from script location" {
             # Arrange
-            $testScriptPath = 'C:\repo\scripts\dev-tools\run-actionlint.ps1'
+            $testScriptPath = '/repo/scripts/dev-tools/run-actionlint.ps1'
 
-            Mock -CommandName Split-Path -MockWith { 'C:\repo\scripts\dev-tools' }
+            Mock -CommandName Split-Path -MockWith { '/repo/scripts/dev-tools' }
             Mock -CommandName Resolve-Path -MockWith {
-                [PSCustomObject]@{ Path = 'C:\repo' }
+                [PSCustomObject]@{ Path = '/repo' }
             }
             Mock -CommandName Join-Path -MockWith {
                 param($Path, $ChildPath)
                 $null = $Path
                 if ($ChildPath -eq '..\..') {
-                    return 'C:\repo'
+                    return '/repo'
                 } elseif ($ChildPath -eq 'tools\actionlint\bin') {
-                    return 'C:\repo\tools\actionlint\bin'
+                    return '/repo/tools/actionlint/bin'
                 } else {
-                    return 'C:\repo\tools\actionlint\bin\actionlint.exe'
+                    return '/repo/tools/actionlint/bin/actionlint.exe'
                 }
             }
 
@@ -41,25 +41,25 @@ Describe "run-actionlint.ps1" {
             $result = Resolve-ActionlintPath -ScriptPath $testScriptPath
 
             # Assert
-            $result.RepoRoot | Should -Be 'C:\repo'
-            $result.BinDir | Should -Be 'C:\repo\tools\actionlint\bin'
-            $result.ExePath | Should -Be 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $result.RepoRoot | Should -Be '/repo'
+            $result.BinDir | Should -Be '/repo/tools/actionlint/bin'
+            $result.ExePath | Should -Be '/repo/tools/actionlint/bin/actionlint.exe'
         }
 
         It "returns PSCustomObject with expected properties" {
             # Arrange
-            Mock -CommandName Split-Path -MockWith { 'C:\test\scripts\dev-tools' }
-            Mock -CommandName Resolve-Path -MockWith { [PSCustomObject]@{ Path = 'C:\test' } }
+            Mock -CommandName Split-Path -MockWith { '/test/scripts/dev-tools' }
+            Mock -CommandName Resolve-Path -MockWith { [PSCustomObject]@{ Path = '/test' } }
             Mock -CommandName Join-Path -MockWith {
                 param($Path, $ChildPath)
                 $null = $Path
-                if ($ChildPath -eq '..\..') { return 'C:\test' }
-                elseif ($ChildPath -eq 'tools\actionlint\bin') { return 'C:\test\tools\actionlint\bin' }
-                else { return 'C:\test\tools\actionlint\bin\actionlint.exe' }
+                if ($ChildPath -eq '..\..') { return '/test' }
+                elseif ($ChildPath -eq 'tools\actionlint\bin') { return '/test/tools/actionlint/bin' }
+                else { return '/test/tools/actionlint/bin/actionlint.exe' }
             }
 
             # Act
-            $result = Resolve-ActionlintPath -ScriptPath 'C:\test\scripts\dev-tools\run-actionlint.ps1'
+            $result = Resolve-ActionlintPath -ScriptPath '/test/scripts/dev-tools/run-actionlint.ps1'
 
             # Assert
             $result | Should -BeOfType [PSCustomObject]
@@ -73,14 +73,14 @@ Describe "run-actionlint.ps1" {
         It "returns command source when actionlint is found on PATH" {
             # Arrange
             Mock -CommandName Get-Command -MockWith {
-                [PSCustomObject]@{ Source = 'C:\tools\actionlint.exe' }
+                [PSCustomObject]@{ Source = '/tools/actionlint.exe' }
             }
 
             # Act
             $result = Find-ActionlintOnPath
 
             # Assert
-            $result | Should -Be 'C:\tools\actionlint.exe'
+            $result | Should -Be '/tools/actionlint.exe'
             Should -Invoke Get-Command -Times 1 -Exactly
         }
 
@@ -123,7 +123,7 @@ Describe "run-actionlint.ps1" {
                 param($MessageData)
                 $script:infoMessages += $MessageData
             }
-            Mock -CommandName New-Item -MockWith { [PSCustomObject]@{ FullName = 'C:\repo\tools\actionlint\bin' } }
+            Mock -CommandName New-Item -MockWith { [PSCustomObject]@{ FullName = '/repo/tools/actionlint/bin' } }
             Mock -CommandName Invoke-WebRequest -MockWith { }
             Mock -CommandName Expand-Archive -MockWith { }
             Mock -CommandName Remove-Item -MockWith { }
@@ -136,17 +136,17 @@ Describe "run-actionlint.ps1" {
 
         It "creates bin directory if it does not exist" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert
             Should -Invoke New-Item -Times 1 -Exactly -ParameterFilter {
-                $ItemType -eq 'Directory' -and $Path -eq 'C:\repo\tools\actionlint\bin'
+                $ItemType -eq 'Directory' -and $Path -eq '/repo/tools/actionlint/bin'
             }
         }
 
         It "downloads actionlint from GitHub releases" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe' -Version '1.7.7'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe' -Version '1.7.7'
 
             # Assert
             Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
@@ -156,17 +156,17 @@ Describe "run-actionlint.ps1" {
 
         It "extracts downloaded archive to bin directory" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert
             Should -Invoke Expand-Archive -Times 1 -Exactly -ParameterFilter {
-                $DestinationPath -eq 'C:\repo\tools\actionlint\bin'
+                $DestinationPath -eq '/repo/tools/actionlint/bin'
             }
         }
 
         It "removes zip file after extraction" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert
             Should -Invoke Remove-Item -Times 1 -Exactly -ParameterFilter {
@@ -176,10 +176,10 @@ Describe "run-actionlint.ps1" {
 
         It "returns exe path on successful installation" {
             # Act
-            $result = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $result = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert
-            $result | Should -Be 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $result | Should -Be '/repo/tools/actionlint/bin/actionlint.exe'
         }
 
         It "throws error when exe not found after extraction" {
@@ -187,13 +187,13 @@ Describe "run-actionlint.ps1" {
             Mock -CommandName Test-Path -MockWith { $false }
 
             # Act & Assert
-            { Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe' } |
+            { Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe' } |
                 Should -Throw -ExpectedMessage '*actionlint.exe was not found*'
         }
 
         It "writes information messages during installation" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert - verify at least the first info message is written
             $script:infoMessages | Should -Not -BeNullOrEmpty
@@ -202,7 +202,7 @@ Describe "run-actionlint.ps1" {
 
         It "uses custom version when provided" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe' -Version '1.6.0'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe' -Version '1.6.0'
 
             # Assert
             Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
@@ -212,7 +212,7 @@ Describe "run-actionlint.ps1" {
 
         It "defaults to version 1.7.7 when not specified" {
             # Act
-            $null = Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe'
+            $null = Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe'
 
             # Assert
             Should -Invoke Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
@@ -332,19 +332,19 @@ Describe "run-actionlint.ps1" {
 
         It "invokes provided process delegate and returns exit code" {
             $script:lastInvocation = $null
-            $exit = Invoke-ActionlintCommand -CommandPath 'C:\bin\actionlint.exe' -Arguments @('-verbose') -InvokeProcess {
+            $exit = Invoke-ActionlintCommand -CommandPath '/bin/actionlint.exe' -Arguments @('-verbose') -InvokeProcess {
                 param([string]$ActionlintCommand, [string[]]$ActionlintArgs)
                 $script:lastInvocation = @{ Command = $ActionlintCommand; Args = $ActionlintArgs }
                 $global:LASTEXITCODE = 0
             }
 
             $exit | Should -Be 0
-            $script:lastInvocation.Command | Should -Be 'C:\bin\actionlint.exe'
+            $script:lastInvocation.Command | Should -Be '/bin/actionlint.exe'
             $script:lastInvocation.Args | Should -Be @('-verbose')
         }
 
         It "returns exit code and writes error on failure" {
-            $exit = Invoke-ActionlintCommand -CommandPath 'C:\bin\actionlint.exe' -Arguments @('-check') -InvokeProcess {
+            $exit = Invoke-ActionlintCommand -CommandPath '/bin/actionlint.exe' -Arguments @('-check') -InvokeProcess {
                 param([string]$ActionlintCommand, [string[]]$ActionlintArgs)
                 [void] $ActionlintCommand
                 [void] $ActionlintArgs
@@ -363,15 +363,15 @@ Describe "run-actionlint.ps1" {
                 $global:LASTEXITCODE = 0
             }
 
-            $null = Invoke-ActionlintCommand -CommandPath 'C:\bin\actionlint.exe' -Arguments @('--color')
+            $null = Invoke-ActionlintCommand -CommandPath '/bin/actionlint.exe' -Arguments @('--color')
 
-            $script:captured.Command | Should -Be 'C:\bin\actionlint.exe'
+            $script:captured.Command | Should -Be '/bin/actionlint.exe'
             $script:captured.Args | Should -Be @('--color')
         }
 
         It "handles zero arguments correctly" {
             $script:lastInvocation = $null
-            $exit = Invoke-ActionlintCommand -CommandPath 'C:\bin\actionlint.exe' -InvokeProcess {
+            $exit = Invoke-ActionlintCommand -CommandPath '/bin/actionlint.exe' -InvokeProcess {
                 param([string]$ActionlintCommand, [string[]]$ActionlintArgs)
                 $script:lastInvocation = @{ Command = $ActionlintCommand; Args = $ActionlintArgs }
                 $global:LASTEXITCODE = 0
@@ -443,7 +443,7 @@ Describe "run-actionlint.ps1" {
             }
 
             # Act & Assert
-            { Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe' } |
+            { Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe' } |
                 Should -Throw
         }
 
@@ -458,7 +458,7 @@ Describe "run-actionlint.ps1" {
             }
 
             # Act & Assert
-            { Install-Actionlint -BinDir 'C:\repo\tools\actionlint\bin' -ExePath 'C:\repo\tools\actionlint\bin\actionlint.exe' } |
+            { Install-Actionlint -BinDir '/repo/tools/actionlint/bin' -ExePath '/repo/tools/actionlint/bin/actionlint.exe' } |
                 Should -Throw
         }
 
@@ -486,16 +486,16 @@ Describe "run-actionlint.ps1" {
             Mock -CommandName Test-Path -MockWith { $true }
 
             # Act
-            $result = Install-Actionlint -BinDir 'C:\repo with spaces\tools' -ExePath 'C:\repo with spaces\tools\actionlint.exe'
+            $result = Install-Actionlint -BinDir '/repo with spaces/tools' -ExePath '/repo with spaces/tools/actionlint.exe'
 
             # Assert
-            $result | Should -Be 'C:\repo with spaces\tools\actionlint.exe'
+            $result | Should -Be '/repo with spaces/tools/actionlint.exe'
         }
 
         It "Add-DirectoryToPath handles paths with trailing separator" {
             # Arrange
-            $env:PATH = 'C:\existing'
-            $newDir = 'C:\new\'
+            $env:PATH = '/existing'
+            $newDir = '/new/'
 
             # Act
             Add-DirectoryToPath -Directory $newDir

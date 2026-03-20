@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = () => Promise<void> | void;
+type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
   stderr: EventEmitter;
@@ -16,6 +16,7 @@ type MockChildProcess = EventEmitter & {
 
 const commandHandlers = new Map<string, CommandHandler>();
 const appendLineMock = jest.fn<(line: string) => void>();
+const showInputBoxMock = jest.fn();
 const showQuickPickMock = jest.fn();
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
@@ -41,6 +42,7 @@ jest.mock(
         appendLine: appendLineMock,
         dispose: jest.fn(),
       })),
+      showInputBox: showInputBoxMock,
       showQuickPick: showQuickPickMock,
     },
     workspace: {
@@ -206,6 +208,7 @@ describe("drm-copilot command behavior", () => {
     registerCommandMock.mockClear();
     childProcessMock.spawn.mockReset();
     childProcessMock.spawnSync.mockReset();
+    showInputBoxMock.mockReset();
     showQuickPickMock.mockReset();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
     quickPickResultLabel = "origin/main";
@@ -256,6 +259,43 @@ describe("drm-copilot command behavior", () => {
     expect(
       commandHandlers.has("drmCopilotExtension.pushDownCopilotCustomizations"),
     ).toBe(true);
+  });
+
+  it("registers newPotentialBugEntry", () => {
+    activateAndGetHandler("drmCopilotExtension.newPotentialBugEntry");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.newPotentialBugEntry"),
+    ).toBe(true);
+  });
+
+  it("registers newPotentialEntry", () => {
+    activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
+
+    expect(commandHandlers.has("drmCopilotExtension.newPotentialEntry")).toBe(
+      true,
+    );
+  });
+
+  it("does not register the retired placeholder commands", () => {
+    activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
+
+    expect(
+      commandHandlers.has(
+        "drmCopilotExtension.newActiveFeatureFolderPlaceholder",
+      ),
+    ).toBe(false);
+    expect(
+      commandHandlers.has("drmCopilotExtension.potentialToIssuePlaceholder"),
+    ).toBe(false);
+    expect(
+      commandHandlers.has(
+        "drmCopilotExtension.newPotentialBugEntryPyPlaceholder",
+      ),
+    ).toBe(false);
+    expect(
+      commandHandlers.has("drmCopilotExtension.newPotentialEntryPsPlaceholder"),
+    ).toBe(false);
   });
 
   it("no workspace throws clear no-workspace error", async () => {
@@ -409,6 +449,184 @@ describe("drm-copilot command behavior", () => {
     ).toBe(true);
   });
 
+  it("newPotentialBugEntry passes the bundled script path and short-name args", async () => {
+    setExecutablePresence({ python: true });
+    showInputBoxMock.mockResolvedValue("blank-pr-context");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/new_potential_bug_entry.py",
+    );
+    expect(args[1]).toBe("--short-name");
+    expect(args[2]).toBe("blank-pr-context");
+  });
+
+  it("newPotentialBugEntry direct --short-name invocation skips prompts", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler(["--short-name", "blank-pr-context"]);
+
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[1]).toBe("--short-name");
+    expect(args[2]).toBe("blank-pr-context");
+  });
+
+  it("newPotentialBugEntry direct mode rejects invalid short-name pattern", async () => {
+    setExecutablePresence({ python: true });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+
+    await expect(handler(["--short-name", "Invalid Name"])).rejects.toThrow(
+      /short-name/i,
+    );
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialBugEntry returns early when the input box is cancelled", async () => {
+    showInputBoxMock.mockResolvedValue(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialBugEntry surfaces a missing python runtime error", async () => {
+    setExecutablePresence({ python: false });
+    showInputBoxMock.mockResolvedValue("blank-pr-context");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+
+    await expect(handler()).rejects.toThrow(
+      "Python runtime 'python' not found on PATH.",
+    );
+  });
+
+  it("newPotentialBugEntry surfaces non-zero exit failures", async () => {
+    setExecutablePresence({ python: true });
+    showInputBoxMock.mockResolvedValue("blank-pr-context");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+
+    await expect(handler()).rejects.toThrow("Command exited with code 2");
+  });
+
+  it("newPotentialEntry passes the bundled script path and short-name args", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock.mockResolvedValue("stale-cache");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/new-potential-entry.ps1",
+    );
+    expect(args).toContain("-ShortName");
+    expect(args).toContain("stale-cache");
+  });
+
+  it("newPotentialEntry direct -ShortName invocation skips prompts", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler(["-ShortName", "stale-cache"]);
+
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("-ShortName");
+    expect(args).toContain("stale-cache");
+  });
+
+  it("newPotentialEntry direct mode rejects missing -ShortName value", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(handler(["-ShortName"])).rejects.toThrow(/-ShortName.*value/i);
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialEntry direct mode rejects duplicate -ShortName flag", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(
+      handler(["-ShortName", "first-entry", "-ShortName", "second-entry"]),
+    ).rejects.toThrow(/duplicate.*-ShortName/i);
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialEntry returns early when the input box is cancelled", async () => {
+    showInputBoxMock.mockResolvedValue(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newPotentialEntry surfaces a missing powershell runtime error", async () => {
+    setExecutablePresence({ pwsh: false, powershell: false });
+    showInputBoxMock.mockResolvedValue("stale-cache");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(handler()).rejects.toThrow(
+      "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
+    );
+  });
+
+  it("newPotentialEntry surfaces non-zero exit failures", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock.mockResolvedValue("stale-cache");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+
+    await expect(handler()).rejects.toThrow("Command exited with code 2");
+  });
+
   it("helloPython uses explicit executable and argv arrays", async () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
@@ -468,5 +686,58 @@ describe("drm-copilot command behavior", () => {
     expect(Array.isArray(args)).toBe(true);
     expect(options.shell).toBe(false);
     expect(executable.includes(" ")).toBe(false);
+  });
+
+  it("newPotentialBugEntry passes --template-root pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ python: true });
+    showInputBoxMock.mockResolvedValue("test-bug");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialBugEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("--template-root");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+
+  it("newPotentialEntry passes -TemplateRoot pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock.mockResolvedValue("test-entry");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newPotentialEntry",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("-TemplateRoot");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+
+  it("newActiveFeatureFolder passes --template-root pointing to bundled feature-templates", async () => {
+    setExecutablePresence({ python: true });
+    showQuickPickMock
+      .mockResolvedValueOnce("feature")
+      .mockResolvedValueOnce("minor-audit");
+    showInputBoxMock
+      .mockResolvedValueOnce("test-feature")
+      .mockResolvedValueOnce("");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newActiveFeatureFolder",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const templateRootIdx = args.indexOf("--template-root");
+    expect(templateRootIdx).toBeGreaterThan(-1);
+    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
   });
 });

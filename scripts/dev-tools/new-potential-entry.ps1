@@ -1,6 +1,7 @@
 # Creates a dated potential feature file from the template and opens it plus backlog.md.
 param(
-    [string] $ShortName
+    [string] $ShortName,
+    [string] $TemplateRoot
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
@@ -26,8 +27,8 @@ function Test-ValidShortName {
 function Get-AuthorName {
     [CmdletBinding()]
     param(
-        [scriptblock] $GetGitConfig = { param([string]$Key) git config $Key 2>$null },
-        [scriptblock] $GetEnvironmentVariable = { param([string]$Name) [Environment]::GetEnvironmentVariable($Name) }
+        [scriptblock] $GetGitConfig = { param([string] $Key) git config $Key 2>$null },
+        [scriptblock] $GetEnvironmentVariable = { param([string] $Name) [Environment]::GetEnvironmentVariable($Name) }
     )
 
     $author = & $GetGitConfig 'user.name'
@@ -96,10 +97,15 @@ function Invoke-VSCodeOpen {
         [Parameter(Mandatory = $true)]
         [string[]] $Files,
         [scriptblock] $GetCommand = { param([string]$Name) Get-Command $Name -ErrorAction SilentlyContinue },
-        [scriptblock] $StartProcess = { param([string]$FilePath, $ArgumentList) Start-Process $FilePath -ArgumentList $ArgumentList }
+        # DI seam: receives ($Exe, $CmdArgs); default invokes directly to support --reuse-window.
+        [scriptblock] $InvokeCommand = { param([string]$Exe, [string[]]$CmdArgs) & $Exe @CmdArgs }
     )
 
-    $isInsidersSession = $env:TERM_PROGRAM_VERSION -match 'insider'
+    # Detect Insiders using multiple signals; TERM_PROGRAM_VERSION alone is
+    # unreliable when VS Code spawns external processes (e.g., extension host or task runners).
+    $isInsidersSession = $env:TERM_PROGRAM_VERSION -match 'insider' -or
+    (-not [string]::IsNullOrEmpty($env:VSCODE_IPC_HOOK_CLI) -and $env:VSCODE_IPC_HOOK_CLI -match 'insider') -or
+    ($null -ne (Get-Process -Name '*insiders*' -ErrorAction SilentlyContinue | Select-Object -First 1))
 
     $hasMatchingCommand = {
         param(
@@ -113,17 +119,16 @@ function Invoke-VSCodeOpen {
     if ($isInsidersSession) {
         $codeInsidersCmd = & $GetCommand 'code-insiders'
         if (& $hasMatchingCommand $codeInsidersCmd 'code-insiders') {
-            & $StartProcess 'code-insiders' $Files
+            & $InvokeCommand 'code-insiders' (@('--reuse-window') + $Files)
             return $true
         }
     }
 
     $codeCmd = & $GetCommand 'code'
     if (& $hasMatchingCommand $codeCmd 'code') {
-        & $StartProcess 'code' $Files
+        & $InvokeCommand 'code' (@('--reuse-window') + $Files)
         return $true
     }
-
 
     return $false
 }
@@ -143,9 +148,22 @@ $workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $today = Get-Date -Format 'yyyy-MM-dd'
 $lastUpdated = Get-Date -Format 'yyyy-MM-ddTHH-mm'
 $target = Join-Path $workspace "docs/features/potential/$today-$ShortName.md"
-$template = Join-Path $workspace 'docs/features/potential/template.md'
+if ($TemplateRoot -and (Test-Path (Join-Path $TemplateRoot 'potential/template.md'))) {
+    $template = Join-Path $TemplateRoot 'potential/template.md'
+}
+else {
+    $template = Join-Path $workspace 'docs/features/potential/template.md'
+}
+if (-not (Test-Path $template)) {
+    Write-Error "Template not found: $template"
+    exit 1
+}
 $backlog = Join-Path $workspace 'docs/features/backlog.md'
 
+$targetDir = Split-Path -Parent $target
+if (-not (Test-Path $targetDir)) {
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+}
 Copy-Item $template $target -Force
 Write-Output "Created: $target"
 
@@ -166,4 +184,5 @@ if (-not $opened) {
     Write-Output "  $target"
     Write-Output "  $backlog"
 }
+
 

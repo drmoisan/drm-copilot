@@ -99,7 +99,7 @@ Once your Codespace is created, you should have:
 - **OS:** Debian Bookworm (not Ubuntu)
 - **Python:** 3.13.x (not 3.12.x)
 - **Poetry:** 2.2.1
-- **PowerShell:** 7.5+
+- **PowerShell:** 7.6+
 - **Shell tools:** shellcheck, shfmt, bashdb, actionlint
 
 ### Verification Command

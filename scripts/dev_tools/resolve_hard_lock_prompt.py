@@ -28,6 +28,67 @@ from scripts.dev_tools.prompt_mode_contract import (
 )
 
 
+def _resolve_template_name(template_kind: str) -> str:
+    """Map the CLI template-kind flag to a concrete template filename.
+
+    Purpose:
+        Keeps filename selection centralized so both root and bundled callers
+        resolve the same prompt asset names for `execute` and `resume` flows.
+
+    Args:
+        template_kind: CLI selector constrained to `execute` or `resume`.
+
+    Returns:
+        str: The prompt filename associated with the requested template kind.
+
+    Side Effects:
+        None.
+    """
+    return (
+        "execute-hard-lock.prompt.md"
+        if template_kind == "execute"
+        else "resume-hard-lock.prompt.md"
+    )
+
+
+def _resolve_template_path(
+    template_name: str,
+    workspace_root: Path,
+    template_root: Path | None,
+) -> tuple[Path | None, tuple[Path, ...]]:
+    """Resolve the first available prompt template path in deterministic order.
+
+    Purpose:
+        Supports bundled extension resources by checking an explicit template
+        root first while preserving the existing workspace `.github/codex`
+        fallback for repo-root usage.
+
+    Args:
+        template_name: Prompt filename to resolve.
+        workspace_root: Workspace root used for repo-local fallback lookup.
+        template_root: Optional explicit template directory to probe first.
+
+    Returns:
+        tuple[Path | None, tuple[Path, ...]]: The selected template path when
+        found, plus the ordered list of checked candidate paths.
+
+    Side Effects:
+        None.
+    """
+    candidates: list[Path] = []
+    if template_root is not None:
+        candidates.append(template_root / template_name)
+    candidates.append(workspace_root / ".github" / "codex" / template_name)
+
+    # Probe the explicit template root before the workspace fallback so bundled
+    # extension resources stay authoritative when they are intentionally passed.
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate, tuple(candidates)
+
+    return None, tuple(candidates)
+
+
 def copy_to_clipboard(text: str) -> bool:
     """Attempt to copy text to the clipboard using common tools.
 
@@ -104,6 +165,28 @@ def _try_relative_to_workspace(path: Path, workspace_root: Path) -> Path:
         return path.resolve().relative_to(workspace_root.resolve())
     except ValueError:
         return path
+
+
+def _normalize_prompt_path_value(path: Path) -> str:
+    """Convert a resolved prompt path into forward-slash form.
+
+    Purpose:
+        `Path.as_posix()` only normalizes native separators for the active
+        platform. When a Windows-style path string is parsed on POSIX, the
+        embedded backslashes remain literal characters and leak into prompt
+        templates. This helper normalizes any remaining backslashes so the
+        emitted `${plan-path}` value is stable across CI platforms.
+
+    Args:
+        path: Relative or absolute prompt path value to normalize.
+
+    Returns:
+        str: Forward-slash-only path text suitable for prompt substitution.
+
+    Side Effects:
+        None.
+    """
+    return str(path).replace("\\", "/")
 
 
 def _resolve_issue_file_for_target(target_path: Path, workspace_root: Path) -> Path:
@@ -197,8 +280,9 @@ def resolve_prompt(
     # Resolve target path relative to workspace
     relative_target = _try_relative_to_workspace(target_path, workspace_root)
 
-    # Convert to forward slashes for cross-platform consistency
-    plan_path_value = relative_target.as_posix()
+    # Convert to forward slashes for cross-platform consistency, including
+    # Windows-style paths that may be parsed on non-Windows runners.
+    plan_path_value = _normalize_prompt_path_value(relative_target)
 
     selected_mode, resolved_fallback_reason = _resolve_work_mode_from_issue(
         target_path,
@@ -247,6 +331,12 @@ def main() -> int:
         default="execute",
         help="Hard-lock template kind to resolve.",
     )
+    parser.add_argument(
+        "--template-root",
+        type=Path,
+        default=None,
+        help="Optional directory containing hard-lock prompt templates.",
+    )
 
     args = parser.parse_args()
 
@@ -254,15 +344,20 @@ def main() -> int:
     workspace_root = args.workspace if args.workspace else Path.cwd()
 
     # Locate the template file selected by --template-kind.
-    template_name = (
-        "execute-hard-lock.prompt.md"
-        if args.template_kind == "execute"
-        else "resume-hard-lock.prompt.md"
+    template_name = _resolve_template_name(args.template_kind)
+    template_path, checked_paths = _resolve_template_path(
+        template_name,
+        workspace_root,
+        args.template_root,
     )
-    template_path = workspace_root / ".github" / "codex" / template_name
 
-    if not template_path.exists():
-        print(f"Error: Template not found at {template_path}", file=sys.stderr)
+    if template_path is None:
+        checked_paths_text = "\n".join(f"- {candidate}" for candidate in checked_paths)
+        print(
+            "Error: Template "
+            f"'{template_name}' not found. Checked locations:\n{checked_paths_text}",
+            file=sys.stderr,
+        )
         return 1
 
     if not args.target.exists():

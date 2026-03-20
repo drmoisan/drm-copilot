@@ -1,6 +1,6 @@
 # PoshQC
 
-PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSScriptAnalyzer, and Pester with repo-safe defaults. It targets both Windows PowerShell 5.1 and PowerShell 7.5+.
+PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSScriptAnalyzer, and Pester with repo-safe defaults. It targets both Windows PowerShell 5.1 and PowerShell 7.6+.
 
 ## What it does
 
@@ -11,7 +11,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 
 ## Requirements
 
-- PowerShell 5.1 or 7.5+
+- PowerShell 5.1 or 7.6+
 - Modules: PSScriptAnalyzer 1.22.0, Pester 5.6.1 (installed automatically via the helper if missing)
 
 ## Getting started
@@ -54,7 +54,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 ## Configuration
 
 - PSScriptAnalyzer settings: `./settings/pssa.settings.psd1`
-  - Enforces compatible syntax for 5.1 and 7.5, 4-space indentation, ShouldProcess for state-changing functions, and safety guards (no Invoke-Expression, no global vars, etc.).
+   - Enforces compatible syntax for 5.1 and 7.6, 4-space indentation, ShouldProcess for state-changing functions, and safety guards (no Invoke-Expression, no global vars, etc.).
 - Pester settings: `./settings/pester.runsettings.psd1`
   - Runs tests under `scripts` and `tests/powershell`, outputs JUnit XML and CoverageGutters coverage, and enables coverage over `scripts/dev-tools/*.ps1`, `scripts/powershell/**/*.psm1`, and `src/**/*.ps1`.
 
