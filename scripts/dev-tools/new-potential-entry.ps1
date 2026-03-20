@@ -104,8 +104,8 @@ function Invoke-VSCodeOpen {
     # Detect Insiders using multiple signals; TERM_PROGRAM_VERSION alone is
     # unreliable when VS Code spawns external processes (e.g., extension host or task runners).
     $isInsidersSession = $env:TERM_PROGRAM_VERSION -match 'insider' -or
-        (-not [string]::IsNullOrEmpty($env:VSCODE_IPC_HOOK_CLI) -and $env:VSCODE_IPC_HOOK_CLI -match 'insider') -or
-        ($null -ne (Get-Process -Name '*insiders*' -ErrorAction SilentlyContinue | Select-Object -First 1))
+    (-not [string]::IsNullOrEmpty($env:VSCODE_IPC_HOOK_CLI) -and $env:VSCODE_IPC_HOOK_CLI -match 'insider') -or
+    ($null -ne (Get-Process -Name '*insiders*' -ErrorAction SilentlyContinue | Select-Object -First 1))
 
     $hasMatchingCommand = {
         param(
@@ -150,7 +150,8 @@ $lastUpdated = Get-Date -Format 'yyyy-MM-ddTHH-mm'
 $target = Join-Path $workspace "docs/features/potential/$today-$ShortName.md"
 if ($TemplateRoot -and (Test-Path (Join-Path $TemplateRoot 'potential/template.md'))) {
     $template = Join-Path $TemplateRoot 'potential/template.md'
-} else {
+}
+else {
     $template = Join-Path $workspace 'docs/features/potential/template.md'
 }
 if (-not (Test-Path $template)) {
@@ -183,4 +184,5 @@ if (-not $opened) {
     Write-Output "  $target"
     Write-Output "  $backlog"
 }
+
 
