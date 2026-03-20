@@ -167,6 +167,28 @@ def _try_relative_to_workspace(path: Path, workspace_root: Path) -> Path:
         return path
 
 
+def _normalize_prompt_path_value(path: Path) -> str:
+    """Convert a resolved prompt path into forward-slash form.
+
+    Purpose:
+        `Path.as_posix()` only normalizes native separators for the active
+        platform. When a Windows-style path string is parsed on POSIX, the
+        embedded backslashes remain literal characters and leak into prompt
+        templates. This helper normalizes any remaining backslashes so the
+        emitted `${plan-path}` value is stable across CI platforms.
+
+    Args:
+        path: Relative or absolute prompt path value to normalize.
+
+    Returns:
+        str: Forward-slash-only path text suitable for prompt substitution.
+
+    Side Effects:
+        None.
+    """
+    return str(path).replace("\\", "/")
+
+
 def _resolve_issue_file_for_target(target_path: Path, workspace_root: Path) -> Path:
     """Resolve the most likely issue.md path for a target plan file.
 
@@ -258,8 +280,9 @@ def resolve_prompt(
     # Resolve target path relative to workspace
     relative_target = _try_relative_to_workspace(target_path, workspace_root)
 
-    # Convert to forward slashes for cross-platform consistency
-    plan_path_value = relative_target.as_posix()
+    # Convert to forward slashes for cross-platform consistency, including
+    # Windows-style paths that may be parsed on non-Windows runners.
+    plan_path_value = _normalize_prompt_path_value(relative_target)
 
     selected_mode, resolved_fallback_reason = _resolve_work_mode_from_issue(
         target_path,

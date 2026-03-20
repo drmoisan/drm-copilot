@@ -67,7 +67,7 @@ check_pypi_connectivity() {
 }
 
 ensure_pwsh() {
-  local required="7.4.0"
+  local required="7.6.0"
 
   if command -v pwsh >/dev/null 2>&1; then
     local current
@@ -81,7 +81,7 @@ ensure_pwsh() {
     echo "pwsh not found; installing PowerShell..."
   fi
 
-  local os_id="" os_version="" repo_url="" fallback_version="7.4.13"
+  local os_id="" os_version="" repo_url="" fallback_version="7.6.0"
   if [ -r /etc/os-release ]; then
     # shellcheck disable=SC1091
     . /etc/os-release
@@ -201,6 +201,7 @@ main() {
   if command -v pwsh >/dev/null 2>&1; then
     echo "PowerShell installed. Checking modules from PSGallery..."
 
+    # shellcheck disable=SC2016  # PowerShell variables must remain literal inside the single-quoted command string.
     pwsh -NoLogo -NoProfile -Command '
       $ErrorActionPreference = "Stop"
 
@@ -268,6 +269,7 @@ main() {
 
     if [ -f "$POSHQC_PATH" ]; then
       echo "Importing PoshQC module (required for parity)..."
+      # shellcheck disable=SC2016  # PowerShell variables must remain literal inside the single-quoted command string.
       pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass \
         -Command '& { Import-Module "$env:REPO_ROOT/scripts/powershell/PoshQC/PoshQC.psd1" -Force; Get-Command -Module PoshQC | Out-Host }'
     else

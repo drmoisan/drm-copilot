@@ -69,7 +69,7 @@ bash .devcontainer/verify-container.sh
 # 2. Check Python tools
 python --version         # Should be 3.13.x
 poetry --version         # Should be 2.2.x
-pwsh --version          # Should be PowerShell 7.x
+pwsh --version          # Should be PowerShell 7.6.x
 
 # 3. Verify project setup
 poetry install          # Install dependencies
@@ -97,7 +97,7 @@ Using: .devcontainer/devcontainer.json (Codespaces)
 And you should have:
 - Debian Bookworm OS
 - Python 3.13.x
-- PowerShell 7.5+
+- PowerShell 7.6+
 - Poetry 2.2.1
 - All shell tools (shellcheck, shfmt, bashdb, actionlint)
 

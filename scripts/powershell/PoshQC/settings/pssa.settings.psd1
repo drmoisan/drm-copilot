@@ -4,10 +4,10 @@
     Severity            = @('Error', 'Warning', 'Information')
 
     Rules               = @{
-        # Enforce compatibility with both Windows PowerShell 5.1 and PowerShell 7.4+
+        # Enforce compatibility with both Windows PowerShell 5.1 and PowerShell 7.6+
         PSUseCompatibleSyntax                          = @{
             Enable         = $true
-            TargetVersions = @('5.1', '7.5')
+            TargetVersions = @('5.1', '7.6')
             IgnoreUntested = $false
         }
 

@@ -83,11 +83,11 @@ if command -v pwsh &> /dev/null; then
     PWSH_VERSION=$(pwsh --version 2>&1 | head -n1)
     echo "   $PWSH_VERSION"
     
-    if [[ "$PWSH_VERSION" == *"7."* ]]; then
-        echo "   ✅ PowerShell 7+ detected (expected)"
+    if [[ "$PWSH_VERSION" == *"7.6."* ]]; then
+        echo "   ✅ PowerShell 7.6.x detected (expected)"
         PWSH_OK=true
     else
-        echo "   ⚠️  Unexpected version (expected 7.5+)"
+        echo "   ⚠️  Unexpected version (expected 7.6+)"
         PWSH_OK=false
     fi
 else
