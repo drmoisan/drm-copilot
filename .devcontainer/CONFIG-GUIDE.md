@@ -11,7 +11,7 @@ This repository uses **separate dev container configurations** for Codespaces an
 1. **Codespaces** (`.devcontainer/codespaces/devcontainer.json`) - Manual selection required
 2. **Local Docker** (`.devcontainer/local/devcontainer.json`) - Manual selection required
 
-Both provide identical tooling (Debian Bookworm, Python 3.13, PowerShell 7.5+, etc.)
+Both provide identical tooling (Debian Bookworm, Python 3.13, PowerShell 7.6+, etc.)
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ Both configurations provide:
 ### Base Environment
 - Debian Bookworm (latest stable)
 - Python 3.13 with Poetry 2.2.1
-- PowerShell 7.5+ with PSScriptAnalyzer and Pester
+- PowerShell 7.6+ with PSScriptAnalyzer and Pester
 - Git, GitHub CLI, actionlint, bashdb
 
 ### Python Tooling
@@ -60,7 +60,7 @@ After container starts, check which config was used:
 # Check environment
 cat /etc/os-release  # Should show Debian Bookworm
 python --version     # Should show 3.13.x
-pwsh --version       # Should show PowerShell 7.5+
+pwsh --version       # Should show PowerShell 7.6+
 poetry --version     # Should show 2.2.1
 
 # Check if running in Codespaces

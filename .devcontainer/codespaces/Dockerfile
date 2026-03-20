@@ -50,7 +50,7 @@ RUN git clone --depth 1 https://github.com/Trepan-Debuggers/bashdb /tmp/bashdb \
 RUN printf '%s\n' '#!/usr/bin/env bash' 'exec xclip -selection clipboard "$@"' > /usr/local/bin/clip.exe \
     && chmod +x /usr/local/bin/clip.exe
 
-# Install PowerShell 7.5+ from Microsoft repository
+# Install PowerShell 7.6+ from Microsoft repository
 RUN wget -q https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && rm packages-microsoft-prod.deb \

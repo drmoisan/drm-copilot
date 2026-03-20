@@ -218,7 +218,7 @@
 | **Formatting with Invoke-Formatter** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCFormat -Root .`<br>**Result:** [Describe result] |
 | **Linting with PSScriptAnalyzer** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCAnalyze -Root .`<br>**Result:** [Describe result] |
 | **Fix all findings** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe any findings and how they were resolved.] |
-| **PowerShell 5.1 & 7.5+ compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
+| **PowerShell 5.1 & 7.6+ compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
 
 #### 3B.2 PowerShell Design & Safety
 
@@ -335,7 +335,7 @@
 |------------|--------|----------|
 | **Use Pester v5.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v5 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
 | **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
-| **PowerShell 5.1 & 7.5+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
+| **PowerShell 5.1 & 7.6+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
 
 #### 4B.2 Test Style and Structure
 
