@@ -586,6 +586,22 @@ def test_push_down_writes_artifact_under_explicit_artifact_root() -> None:
     assert "packaged-source" not in summary.artifact_path
 
 
+def test_thinking_beast_mode_bundle_mirror_matches_root_agent() -> None:
+    """Keep the bundled Thinking Beast Mode agent identical to the root source."""
+    repo_root = Path(__file__).resolve().parents[3]
+    root_agent_path = (
+        repo_root / ".github/agents/5.1-Thinking-Beast-Mode-adjusted.agent.md"
+    )
+    mirror_agent_path = repo_root / (
+        "extensions/drm-copilot/resources/customizations/.github/agents/"
+        "5.1-Thinking-Beast-Mode-adjusted.agent.md"
+    )
+
+    assert mirror_agent_path.read_text(encoding="utf-8") == root_agent_path.read_text(
+        encoding="utf-8"
+    )
+
+
 def test_split_trailing_punctuation_returns_core_and_suffix() -> None:
     """Split trailing prose punctuation away from the matched reference core."""
     rewrite_module = _load_rewrite_module()
