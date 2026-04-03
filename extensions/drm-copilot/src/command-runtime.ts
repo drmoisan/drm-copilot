@@ -17,7 +17,14 @@ export interface RuntimeResolution {
 }
 
 /**
- * Defines the information needed to execute a bundled resource as a VS Code command.
+ * Minimal output sink used by command adapters and the MCP bridge.
+ */
+export interface CommandOutput {
+  appendLine(line: string): void;
+}
+
+/**
+ * Defines the information needed to execute a bundled resource.
  */
 export interface CommandSpec {
   readonly runtimeKind: RuntimeKind;
@@ -27,12 +34,89 @@ export interface CommandSpec {
 }
 
 /**
+ * Defines the filesystem context required to execute a bundled resource.
+ */
+export interface BundledScriptExecutionSpec extends CommandSpec {
+  readonly extensionRoot: string;
+  readonly workspaceRoot: string;
+}
+
+/**
+ * Describes the captured process output from a completed subprocess execution.
+ */
+export interface ProcessExecutionResult {
+  readonly exitCode: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+/**
+ * Describes the completed execution of a bundled script.
+ */
+export interface BundledScriptExecutionResult extends ProcessExecutionResult {
+  readonly executable: string;
+  readonly args: ReadonlyArray<string>;
+  readonly scriptPath: string;
+  readonly workspaceRoot: string;
+}
+
+/**
+ * Rich error raised when a spawned command exits non-zero.
+ */
+export class CommandExecutionError extends Error {
+  readonly executable: string;
+  readonly args: ReadonlyArray<string>;
+  readonly cwd: string;
+  readonly exitCode: number | null;
+  readonly stdout: string;
+  readonly stderr: string;
+
+  constructor(input: {
+    readonly executable: string;
+    readonly args: ReadonlyArray<string>;
+    readonly cwd: string;
+    readonly exitCode: number | null;
+    readonly stdout: string;
+    readonly stderr: string;
+  }) {
+    super(`Command exited with code ${input.exitCode ?? "unknown"}.`);
+    this.name = "CommandExecutionError";
+    this.executable = input.executable;
+    this.args = input.args;
+    this.cwd = input.cwd;
+    this.exitCode = input.exitCode;
+    this.stdout = input.stdout;
+    this.stderr = input.stderr;
+  }
+}
+
+/**
  * Creates the shared output channel used by the extension's command handlers.
  *
  * @returns A VS Code output channel that records command progress and failures.
  */
 export function createOutputChannel(): vscode.OutputChannel {
   return vscode.window.createOutputChannel("drm-copilot");
+}
+
+/**
+ * Creates an in-memory output sink for MCP and unit-test scenarios.
+ *
+ * @returns A writable sink plus the collected log lines.
+ */
+export function createBufferedOutput(): {
+  readonly output: CommandOutput;
+  readonly lines: string[];
+} {
+  const lines: string[] = [];
+  return {
+    output: {
+      appendLine(line: string): void {
+        lines.push(line);
+      },
+    },
+    lines,
+  };
 }
 
 /**
@@ -141,22 +225,38 @@ export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
 }
 
 /**
- * Executes a subprocess and streams its stdout/stderr into the output channel.
+ * Builds the absolute path to a bundled script inside the installed extension package.
  *
- * @param output The output channel that should receive process diagnostics.
+ * @param extensionRoot The extension installation root.
+ * @param bundledRelativePath The bundled resource path relative to the extension root.
+ * @returns The resolved absolute path to the bundled resource.
+ */
+export function resolveBundledScriptPath(
+  extensionRoot: string,
+  bundledRelativePath: string,
+): string {
+  return path.resolve(extensionRoot, bundledRelativePath).replace(/\\/g, "/");
+}
+
+/**
+ * Executes a subprocess and streams its stdout/stderr into the output sink.
+ *
+ * @param output The output sink that should receive process diagnostics.
  * @param executable The executable to launch.
  * @param args The argv array passed to the executable.
  * @param cwd The working directory used for process execution.
- * @returns A promise that resolves on exit code 0 and rejects otherwise.
+ * @returns The aggregated stdout/stderr emitted by the child process.
  * @throws Error when process spawning fails or the command exits non-zero.
  */
 export function runCommandWithOutput(
-  output: vscode.OutputChannel,
+  output: CommandOutput,
   executable: string,
   args: ReadonlyArray<string>,
   cwd: string,
-): Promise<void> {
+): Promise<ProcessExecutionResult> {
   return new Promise((resolve, reject) => {
+    const stdoutChunks: string[] = [];
+    const stderrChunks: string[] = [];
     const child = cp.spawn(executable, args, {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
@@ -164,11 +264,21 @@ export function runCommandWithOutput(
     });
 
     child.stdout.on("data", (chunk: Buffer) => {
-      output.appendLine(chunk.toString("utf-8").trimEnd());
+      const text = chunk.toString("utf-8");
+      stdoutChunks.push(text);
+      const trimmed = text.trimEnd();
+      if (trimmed.length > 0) {
+        output.appendLine(trimmed);
+      }
     });
 
     child.stderr.on("data", (chunk: Buffer) => {
-      output.appendLine(chunk.toString("utf-8").trimEnd());
+      const text = chunk.toString("utf-8");
+      stderrChunks.push(text);
+      const trimmed = text.trimEnd();
+      if (trimmed.length > 0) {
+        output.appendLine(trimmed);
+      }
     });
 
     child.on("error", (error: Error) => {
@@ -176,14 +286,27 @@ export function runCommandWithOutput(
     });
 
     child.on("close", (code: number | null) => {
-      // Treat any non-zero exit as a command failure so the command surface keeps
-      // the original process status visible to users and tests.
+      const stdout = stdoutChunks.join("");
+      const stderr = stderrChunks.join("");
       if (code === 0) {
-        resolve();
+        resolve({
+          exitCode: 0,
+          stdout,
+          stderr,
+        });
         return;
       }
 
-      reject(new Error(`Command exited with code ${code ?? "unknown"}.`));
+      reject(
+        new CommandExecutionError({
+          executable,
+          args,
+          cwd,
+          exitCode: code,
+          stdout,
+          stderr,
+        }),
+      );
     });
   });
 }
@@ -191,18 +314,15 @@ export function runCommandWithOutput(
 /**
  * Resolves a bundled script, selects its runtime, and executes it in the workspace.
  *
- * @param context The extension context that provides the extension installation URI.
- * @param output The output channel used for command progress and diagnostics.
+ * @param output The output sink used for command progress and diagnostics.
  * @param spec The command configuration describing the bundled script to execute.
  * @returns A promise that resolves when the bundled script exits successfully.
  * @throws Error when runtime detection fails or the spawned command exits non-zero.
  */
-export async function executeBundledScript(
-  context: vscode.ExtensionContext,
-  output: vscode.OutputChannel,
-  spec: CommandSpec,
-): Promise<void> {
-  const workspaceRoot = getWorkspaceRoot();
+export async function executeBundledScriptFromExtensionRoot(
+  output: CommandOutput,
+  spec: BundledScriptExecutionSpec,
+): Promise<BundledScriptExecutionResult> {
   output.appendLine(`[${spec.commandId}] runtime probe start`);
   let runtime: RuntimeResolution;
   try {
@@ -218,10 +338,10 @@ export async function executeBundledScript(
 
   // Resolve scripts relative to the installed extension so commands always use the
   // bundled resources rather than depending on workspace copies.
-  const scriptPath = vscode.Uri.joinPath(
-    context.extensionUri,
+  const scriptPath = resolveBundledScriptPath(
+    spec.extensionRoot,
     spec.bundledRelativePath,
-  ).fsPath;
+  );
   output.appendLine(`[${spec.commandId}] resolved script path: ${scriptPath}`);
 
   const specScriptArgs = spec.args ?? [];
@@ -231,10 +351,63 @@ export async function executeBundledScript(
   );
 
   try {
-    await runCommandWithOutput(output, runtime.executable, args, workspaceRoot);
+    const processResult = await runCommandWithOutput(
+      output,
+      runtime.executable,
+      args,
+      spec.workspaceRoot,
+    );
     output.appendLine(`[${spec.commandId}] command success`);
+    return {
+      ...processResult,
+      executable: runtime.executable,
+      args,
+      scriptPath,
+      workspaceRoot: spec.workspaceRoot,
+    };
   } catch (error: unknown) {
     output.appendLine(`[${spec.commandId}] command failure`);
     throw error;
   }
+}
+
+/**
+ * Resolves a bundled script and executes it against the active VS Code workspace.
+ *
+ * @param context The extension context that provides the extension installation URI.
+ * @param output The output sink used for command progress and diagnostics.
+ * @param spec The command configuration describing the bundled script to execute.
+ * @returns A promise that resolves when the bundled script exits successfully.
+ */
+export function executeBundledScript(
+  context: vscode.ExtensionContext,
+  output: CommandOutput,
+  spec: CommandSpec,
+): Promise<BundledScriptExecutionResult> {
+  return executeBundledScriptFromExtensionRoot(output, {
+    ...spec,
+    extensionRoot: context.extensionUri.fsPath,
+    workspaceRoot: getWorkspaceRoot(),
+  });
+}
+
+/**
+ * Extracts a short stderr diagnostic snippet from a command-execution failure.
+ *
+ * @param error The thrown error to inspect.
+ * @returns A trimmed stderr excerpt when available.
+ */
+export function getStderrExcerpt(error: unknown): string | undefined {
+  if (!(error instanceof CommandExecutionError)) {
+    return undefined;
+  }
+
+  const trimmed = error.stderr
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .slice(0, 8)
+    .join("\n");
+
+  return trimmed.length > 0 ? trimmed : undefined;
 }
