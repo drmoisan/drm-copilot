@@ -1,8 +1,15 @@
 # drm-copilot
 
-This extension executes bundled scripts directly from extension resources while targeting the active workspace as runtime `cwd`.
+`extensions/drm-copilot` provides two workspace-facing adapter surfaces over the same bundled repo-automation workflows:
 
-## Commands
+- VS Code commands for interactive editor use.
+- A stdio MCP server for Codex and other MCP clients.
+
+The bundled workflows continue to execute from extension package resources. They do not copy repo-local scripts into the destination workspace before execution.
+
+## VS Code Commands
+
+The extension continues to contribute these stable command IDs:
 
 - `drmCopilotExtension.helloPython`
 - `drmCopilotExtension.helloPowerShell`
@@ -15,81 +22,98 @@ This extension executes bundled scripts directly from extension resources while 
 - `drmCopilotExtension.newActiveFeatureFolder`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
 
-### Resolve Execute Hard-Lock Prompt
+The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
 
-- Command Palette title: `drm-copilot: Resolve Execute Hard-Lock Prompt`
-- Requires an open workspace folder.
-- Reuses the active Markdown feature plan under `docs/features/active/` when possible; otherwise prompts for a Markdown plan file under that folder.
-- Executes bundled Python wrapper: `resources/templates/resolve_hard_lock_prompt.py`
-- The wrapper injects bundled hard-lock prompt templates from `resources/customizations/.github/codex/` so the command works even when the active workspace does not contain repo-local `.github/codex` assets.
-- Passes only `--target <selected-plan-path>` and `--workspace <workspace-root>` to the bundled resolver entrypoint.
+## MCP Server
 
-### Push Down Copilot Customizations
+The extension package also builds a stdio MCP server named `drmCopilotExtension`.
 
-- Command Palette title: `drm-copilot: Push Down Copilot Customizations`
-- Requires an open workspace folder.
-- Executes bundled wrapper: `resources/templates/push_down_copilot_customizations.py`
-- Passes `--destination` with the open workspace root.
-- Source customizations are read from the bundled `resources/customizations/.github/` payload.
-- The summary artifact is written under the destination workspace.
-- Script references in copied files are rewritten to the live VS Code command IDs contributed by the extension.
+Downstream Codex skills should depend on the MCP server name `drmCopilotExtension`, not on raw VS Code command IDs such as `drmCopilotExtension.collectPrContext`.
 
-### Commit Context Command Contract
+### Exposed MCP Tools
 
-- Command Palette title: `drm-copilot: Collect Commit Context`
-- Requires an open workspace folder.
-- Executes bundled collector resource: `resources/templates/collect_commit_context.py`
-- Writes output artifact to: `artifacts/commit_context.txt` under the active workspace.
+- `collect_commit_context`
+- `collect_pr_context`
+- `push_down_copilot_customizations`
+- `new_potential_bug_entry`
+- `new_potential_entry`
+- `potential_to_issue`
+- `new_active_feature_folder`
+- `resolve_execute_hard_lock_prompt`
+
+### MCP Runtime Expectations
+
+- MCP tools are fully non-interactive.
+- `workspace_root` is accepted by all workspace-targeted tools and defaults to `process.cwd()` when omitted.
+- `collect_pr_context` requires an explicit `base` branch/ref in MCP mode.
+- Bundled scripts are resolved from `extensions/drm-copilot/resources/...` at runtime.
+- Subprocesses are launched with explicit argv arrays and `shell: false`.
+
+### Codex Configuration Example
+
+Build the extension package first:
+
+```powershell
+npm --prefix extensions/drm-copilot run build
+```
+
+Then configure the repo checkout as an MCP server:
+
+```json
+{
+  "mcpServers": {
+    "drmCopilotExtension": {
+      "command": "node",
+      "args": ["extensions/drm-copilot/out/mcp-server.js"]
+    }
+  }
+}
+```
+
+If the server is launched from a different working directory, pass `workspace_root` explicitly in tool calls so the destination workspace stays deterministic.
+
+### MCP Input Summary
+
+- `collect_commit_context`: optional `workspace_root`
+- `collect_pr_context`: optional `workspace_root`, required `base`
+- `push_down_copilot_customizations`: optional `workspace_root`
+- `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
+- `new_potential_entry`: optional `workspace_root`, required `short_name`
+- `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
+- `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
+- `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
+
+### MCP Result Shape
+
+MCP tool calls return structured JSON with:
+
+- `ok`
+- `tool`
+- `workspace_root`
+- `artifacts` when the workflow has deterministic or discovered output paths
+- `summary`
+- `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
 
 ## Runtime Requirements
 
-- Python command: `python`
-- PowerShell commands: `pwsh` (preferred), then `powershell`
+- Python commands expect `python` on `PATH`.
+- PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available.
+- An open workspace folder is required for workspace-targeted VS Code commands.
+- MCP clients must build the package so `out/mcp-server.js` exists before launching the server.
 
-`Resolve Execute Hard-Lock Prompt` depends on a Python runtime being available on `PATH` because the command delegates to bundled Python resources at execution time.
-
-If runtime detection fails, handlers throw actionable runtime-named errors.
-
-## Platform Runtime Notes
-
-- **Windows**
-	- Python runtime lookup expects `python` on `PATH`.
-	- PowerShell runtime prefers `pwsh`; falls back to `powershell` when `pwsh` is unavailable.
-- **macOS**
-	- Python runtime lookup expects `python` on `PATH`.
-	- PowerShell runtime lookup expects `pwsh` (PowerShell 7) when installed.
-- **Linux**
-	- Python runtime lookup expects `python` on `PATH`.
-	- PowerShell runtime lookup expects `pwsh` when installed.
-
-Runtime probing emits clear output-channel messages so users can identify missing runtime dependencies quickly.
-
-## Output Channel
-
-The extension logs command lifecycle events to the `drm-copilot` output channel:
-
-- Runtime probe start/success/failure
-- Resolved bundled script path
-- Command start/success/failure
+`Resolve Execute Hard-Lock Prompt` depends on Python because it delegates to bundled Python resources at execution time.
 
 ## Execution Model
 
-Bundled scripts are resolved from extension resources:
+The shared repo-automation service executes these bundled wrapper resources:
 
-- `resources/templates/hello_python.py`
-- `resources/templates/hello_pwsh.ps1`
+- `resources/templates/collect_commit_context.py`
+- `resources/templates/collect_pr_context.py`
+- `resources/templates/push_down_copilot_customizations.py`
+- `resources/templates/new_potential_bug_entry.py`
+- `resources/templates/new-potential-entry.ps1`
+- `resources/templates/potential_to_issue.py`
+- `resources/templates/new_active_feature_folder.py`
+- `resources/templates/resolve_hard_lock_prompt.py`
 
-Artifacts are generated under workspace `artifacts/` by the script runtime. The implementation enforces **no workspace-root script copying**.
-
-## First-run workflow
-
-1. Open a workspace folder in VS Code.
-2. Open the Command Palette and run `drmCopilotExtension.helloPython`.
-3. Confirm Python runtime probe and command logs in the `drm-copilot` output channel.
-4. Open the Command Palette and run `drmCopilotExtension.helloPowerShell`.
-5. Confirm PowerShell runtime probe and command logs in the `drm-copilot` output channel.
-6. Verify output artifacts under workspace `artifacts/`.
-
-## Production foundation
-
-This scaffold is a **Production foundation** for extension-to-workspace execution. It demonstrates a deterministic pattern for resolving bundled extension resources, validating runtimes, and invoking subprocesses with explicit argv arrays against the active workspace context.
+The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.

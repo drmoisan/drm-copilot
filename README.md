@@ -5,7 +5,7 @@
 Today the repository contains two main deliverables:
 
 - a **Python/Poetry toolchain** at the repo root for documentation, context collection, customization publishing, shell quality checks, and developer workflows;
-- a **VS Code extension** in `extensions/drm-copilot` that runs bundled scripts against the active workspace.
+- a **VS Code extension and stdio MCP bridge** in `extensions/drm-copilot` that runs bundled scripts against the active workspace.
 
 ## Current repository layout
 
@@ -39,7 +39,9 @@ Selected CLI entrypoints exposed by Poetry include:
 
 ### VS Code extension
 
-The active extension package lives in `extensions/drm-copilot` and currently contributes these implemented commands:
+The active extension package lives in `extensions/drm-copilot`. It now exposes both the existing VS Code command surface and a Codex-facing stdio MCP server named `drmCopilotExtension`.
+
+The VS Code side continues to contribute these implemented commands:
 
 - `drmCopilotExtension.helloPython`
 - `drmCopilotExtension.helloPowerShell`
@@ -50,6 +52,20 @@ The active extension package lives in `extensions/drm-copilot` and currently con
 - `drmCopilotExtension.newPotentialEntry`
 - `drmCopilotExtension.potentialToIssue`
 - `drmCopilotExtension.newActiveFeatureFolder`
+- `drmCopilotExtension.resolveExecuteHardLockPrompt`
+
+The MCP side exposes semantic repo-automation tools such as:
+
+- `collect_commit_context`
+- `collect_pr_context`
+- `push_down_copilot_customizations`
+- `new_potential_bug_entry`
+- `new_potential_entry`
+- `potential_to_issue`
+- `new_active_feature_folder`
+- `resolve_execute_hard_lock_prompt`
+
+Downstream Codex skills should depend on the MCP server name `drmCopilotExtension`, not on raw VS Code command IDs.
 
 ## Requirements
 
@@ -69,6 +85,8 @@ The active extension package lives in `extensions/drm-copilot` and currently con
 - Python commands expect `python` on `PATH`.
 - PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available.
 - An open workspace folder is required for workspace-targeted extension commands.
+- The MCP bridge must be built before launch: `npm --prefix extensions/drm-copilot run build`.
+- The checked-in workspace settings pin the VS Code PowerShell extension to `C:\Program Files\PowerShell\7\pwsh.exe` on Windows so the Pester Test Explorer runs under PowerShell 7 instead of Windows PowerShell 5.1. If your local `pwsh.exe` lives elsewhere, override `powershell.powerShellAdditionalExePaths` and `powershell.powerShellDefaultVersion` in local VS Code settings.
 
 ## Development workflows
 
@@ -94,6 +112,7 @@ Common local commands:
 
 Run extension-specific checks from the extension folder (or by using `npm --prefix extensions/drm-copilot ...`):
 
+- build: `npm --prefix extensions/drm-copilot run build`
 - format: `npm --prefix extensions/drm-copilot run format`
 - lint: `npm --prefix extensions/drm-copilot run lint`
 - type-check: `npm --prefix extensions/drm-copilot run typecheck`

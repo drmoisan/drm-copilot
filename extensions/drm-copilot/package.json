@@ -1,7 +1,7 @@
 {
   "name": "drm-copilot",
   "displayName": "drm-copilot",
-  "description": "Extension-side bundled script execution utilities.",
+  "description": "Extension-side bundled workflow execution utilities and MCP bridge.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.108.0"
@@ -52,6 +52,7 @@
     ]
   },
   "scripts": {
+    "build": "tsc -p ./",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",
     "typecheck": "tsc -p ./ --noEmit",
@@ -59,15 +60,18 @@
     "test:unit": "node run-jest.cjs"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "22.x",
     "@types/vscode": "^1.108.1",
-    "@jest/globals": "^30.0.0",
     "eslint": "^9.39.2",
     "jest": "^30.0.0",
     "prettier": "^3.6.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.52.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
   }
 }

@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = () => Promise<void> | void;
+type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockChildProcess = EventEmitter & {
   stdout: EventEmitter;
   stderr: EventEmitter;
@@ -295,6 +295,21 @@ describe("drm-copilot collectPrContext command behavior", () => {
     expect(args).toContain("artifacts/pr_context.summary.txt");
     expect(args).toContain("--appendix-out");
     expect(args).toContain("artifacts/pr_context.appendix.txt");
+  });
+
+  it("collectPrContext direct invocation uses explicit base without prompting", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
+    await handler("--base", "origin/release/1.0");
+
+    expect(showQuickPickMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--base");
+    expect(args).toContain("origin/release/1.0");
   });
 
   it("collectPrContext git branch discovery failure", async () => {
