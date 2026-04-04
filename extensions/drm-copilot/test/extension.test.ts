@@ -152,6 +152,7 @@ function setGitBranchDiscoveryState(input: {
 
 function setExecutablePresence(presence: {
   readonly python?: boolean;
+  readonly py?: boolean;
   readonly pwsh?: boolean;
   readonly powershell?: boolean;
 }): void {
@@ -159,6 +160,10 @@ function setExecutablePresence(presence: {
     const lowerPath = filePath.toLowerCase();
     if (lowerPath.includes("python")) {
       return presence.python ?? false;
+    }
+
+    if (lowerPath.includes(`${"\\"}py.`) || lowerPath.endsWith("/py")) {
+      return presence.py ?? false;
     }
 
     if (lowerPath.includes("pwsh")) {
@@ -362,6 +367,16 @@ describe("drm-copilot command behavior", () => {
     expect(() => detectRuntime("python")).toThrow(
       "Python runtime 'python' not found on PATH.",
     );
+  });
+
+  it("detectRuntime falls back to py -3 when python is unavailable", () => {
+    setExecutablePresence({ python: false, py: true });
+
+    const runtime = detectRuntime("python");
+    expect(runtime).toEqual({
+      executable: "py",
+      argsPrefix: ["-3"],
+    });
   });
 
   it("collectCommitContext fails when no workspace folder is open", async () => {

@@ -181,14 +181,26 @@ export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
   // Python commands have a single acceptable runtime, so fail fast with a
   // targeted error message instead of falling through the PowerShell probes.
   if (runtimeKind === "python") {
-    if (!executableExists("python")) {
-      throw new Error("Python runtime 'python' not found on PATH.");
+    // Keep `python` as the primary probe everywhere, then fall back to the
+    // Windows launcher so common Windows installations still work when only
+    // `py` is exposed on PATH.
+    if (executableExists("python")) {
+      return {
+        executable: "python",
+        argsPrefix: [],
+      };
     }
 
-    return {
-      executable: "python",
-      argsPrefix: [],
-    };
+    if (executableExists("py")) {
+      return {
+        executable: "py",
+        argsPrefix: ["-3"],
+      };
+    }
+
+    throw new Error(
+      "Python runtime 'python' not found on PATH. On Windows, 'py -3' is also accepted.",
+    );
   }
 
   // Prefer PowerShell Core when available, then fall back to Windows PowerShell

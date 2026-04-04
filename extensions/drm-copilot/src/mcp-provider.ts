@@ -30,7 +30,7 @@ export function registerMcpProvider(
         // point in the extension's output directory.
         const serverDef = new vscode.McpStdioServerDefinition(
           "drmCopilotExtension",
-          "node",
+          process.execPath,
           [
             vscode.Uri.joinPath(context.extensionUri, "out", "mcp-server.js")
               .fsPath,
