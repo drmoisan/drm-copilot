@@ -53,6 +53,7 @@ The VS Code side continues to contribute these implemented commands:
 - `drmCopilotExtension.potentialToIssue`
 - `drmCopilotExtension.newActiveFeatureFolder`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
+- `drmCopilotExtension.syncAgentsFromInstructions`
 
 The MCP side exposes semantic repo-automation tools such as:
 
@@ -117,6 +118,14 @@ Run extension-specific checks from the extension folder (or by using `npm --pref
 - lint: `npm --prefix extensions/drm-copilot run lint`
 - type-check: `npm --prefix extensions/drm-copilot run typecheck`
 - unit tests: `npm --prefix extensions/drm-copilot run test:unit`
+
+## Sync AGENTS.md from instructions
+
+The `drmCopilotExtension.syncAgentsFromInstructions` command regenerates `AGENTS.md` in the destination workspace by discovering all `.github/instructions/*.instructions.md` files under the active workspace root, aggregating their content deterministically, and writing the consolidated result to `AGENTS.md`. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the workspace's canonical `.github` instruction files.
+
+### Extension command
+
+Use `drmCopilotExtension.syncAgentsFromInstructions` from the Command Palette to trigger the bundled PowerShell generator against the currently open workspace root.
 
 ## Push-down customizations
 

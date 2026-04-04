@@ -31,6 +31,10 @@ let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
 
+const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
+  dispose: jest.fn(),
+}));
+
 jest.mock(
   "vscode",
   () => ({
@@ -51,10 +55,19 @@ jest.mock(
       },
     },
     Uri: {
-      joinPath: jest.fn((base: { fsPath: string }, relative: string) => ({
-        fsPath: `${base.fsPath}/${relative}`,
+      joinPath: jest.fn((base: { fsPath: string }, ...segments: string[]) => ({
+        fsPath: `${base.fsPath}/${segments.join("/")}`,
       })),
     },
+    lm: {
+      registerMcpServerDefinitionProvider:
+        registerMcpServerDefinitionProviderMock,
+    },
+    EventEmitter: jest.fn(() => ({
+      event: jest.fn(),
+      dispose: jest.fn(),
+    })),
+    McpStdioServerDefinition: jest.fn(),
   }),
   { virtual: true },
 );
@@ -68,7 +81,7 @@ jest.mock("node:child_process", () => ({
   spawnSync: jest.fn(),
 }));
 
-import { activate, detectRuntime } from "../src/extension";
+import { activate, deactivate, detectRuntime } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
@@ -261,6 +274,14 @@ describe("drm-copilot command behavior", () => {
     ).toBe(true);
   });
 
+  it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
+    activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.syncAgentsFromInstructions"),
+    ).toBe(true);
+  });
+
   it("registers newPotentialBugEntry", () => {
     activateAndGetHandler("drmCopilotExtension.newPotentialBugEntry");
 
@@ -296,6 +317,19 @@ describe("drm-copilot command behavior", () => {
     expect(
       commandHandlers.has("drmCopilotExtension.newPotentialEntryPsPlaceholder"),
     ).toBe(false);
+  });
+
+  it("activate registers the MCP server definition provider", () => {
+    activateAndGetHandler("drmCopilotExtension.helloPython");
+
+    expect(registerMcpServerDefinitionProviderMock).toHaveBeenCalledWith(
+      "drmCopilotMcpProvider",
+      expect.objectContaining({
+        onDidChangeMcpServerDefinitions: expect.any(Function),
+        provideMcpServerDefinitions: expect.any(Function),
+        resolveMcpServerDefinition: expect.any(Function),
+      }),
+    );
   });
 
   it("no workspace throws clear no-workspace error", async () => {
@@ -739,5 +773,11 @@ describe("drm-copilot command behavior", () => {
     const templateRootIdx = args.indexOf("--template-root");
     expect(templateRootIdx).toBeGreaterThan(-1);
     expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+});
+
+describe("deactivate", () => {
+  it("completes without throwing (no-op implementation)", () => {
+    expect(() => deactivate()).not.toThrow();
   });
 });

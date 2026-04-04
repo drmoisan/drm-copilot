@@ -41,10 +41,20 @@ jest.mock(
       },
     },
     Uri: {
-      joinPath: (base: { fsPath: string }, relative: string) => ({
-        fsPath: `${base.fsPath}/${relative}`,
+      joinPath: (base: { fsPath: string }, ...segments: string[]) => ({
+        fsPath: `${base.fsPath}/${segments.join("/")}`,
       }),
     },
+    lm: {
+      registerMcpServerDefinitionProvider: jest.fn(() => ({
+        dispose: jest.fn(),
+      })),
+    },
+    EventEmitter: jest.fn(() => ({
+      event: jest.fn(),
+      dispose: jest.fn(),
+    })),
+    McpStdioServerDefinition: jest.fn(),
   }),
   { virtual: true },
 );
@@ -465,6 +475,24 @@ describe("drm-copilot integration behavior", () => {
     const destinationIndex = args.indexOf("--destination");
     expect(destinationIndex).toBeGreaterThan(-1);
     expect(args[destinationIndex + 1]).toBe("C:/workspace");
+  });
+
+  it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {
+    await handlerFor("drmCopilotExtension.syncAgentsFromInstructions")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    const repoRootIndex = args.indexOf("-RepoRoot");
+    const fileIndex = args.indexOf("-File");
+
+    expect(executable).toBe("pwsh");
+    expect(fileIndex).toBeGreaterThan(-1);
+    expect(args[fileIndex + 1]).toBe(
+      "C:/extension/resources/templates/sync-agents-from-instructions.ps1",
+    );
+    expect(repoRootIndex).toBeGreaterThan(-1);
+    expect(args[repoRootIndex + 1]).toBe("C:/workspace");
+    expect(options.cwd).toBe("C:/workspace");
   });
 
   it("newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates", async () => {

@@ -1,0 +1,34 @@
+Timestamp: 2026-04-03T16-08
+Policy Order:
+1. `.github/copilot-instructions.md`
+2. `.github/instructions/general-code-change.instructions.md`
+3. `.github/instructions/general-unit-test.instructions.md`
+4. `.github/instructions/typescript-code-change.instructions.md`
+5. `.github/instructions/typescript-unit-test.instructions.md`
+6. `.github/instructions/powershell-code-change.instructions.md`
+7. `.github/instructions/powershell-unit-test.instructions.md`
+8. `.github/instructions/python-code-change.instructions.md`
+9. `.github/instructions/python-unit-test.instructions.md`
+10. `.github/instructions/python-suppressions.instructions.md`
+11. `.github/instructions/self-explanatory-code-commenting.instructions.md`
+12. `.github/instructions/codexer.instructions.md`
+Files Read:
+- `.github/copilot-instructions.md`
+- `.github/instructions/general-code-change.instructions.md`
+- `.github/instructions/general-unit-test.instructions.md`
+- `.github/instructions/typescript-code-change.instructions.md`
+- `.github/instructions/typescript-unit-test.instructions.md`
+- `.github/instructions/powershell-code-change.instructions.md`
+- `.github/instructions/powershell-unit-test.instructions.md`
+- `.github/instructions/python-code-change.instructions.md`
+- `.github/instructions/python-unit-test.instructions.md`
+- `.github/instructions/python-suppressions.instructions.md`
+- `.github/instructions/self-explanatory-code-commenting.instructions.md`
+- `.github/instructions/codexer.instructions.md`
+Work Mode: full-feature
+Requirements Sources:
+- `docs/features/active/2026-03-21-bundle-sync-agents-113/issue.md`
+- `docs/features/active/2026-03-21-bundle-sync-agents-113/spec.md`
+- `docs/features/active/2026-03-21-bundle-sync-agents-113/user-story.md`
+- `docs/features/active/2026-03-21-bundle-sync-agents-113/research.md`
+Target Plan Path: c:\Users\DanMoisan\repos\drm-copilot\docs\features\active\2026-03-21-bundle-sync-agents-113\plan.2026-03-21T20-41.md

@@ -8,6 +8,12 @@
   },
   "main": "./out/extension.js",
   "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "drmCopilotMcpProvider",
+        "label": "drm-copilot Repo Automation"
+      }
+    ],
     "commands": [
       {
         "command": "drmCopilotExtension.helloPython",
@@ -46,13 +52,19 @@
         "title": "drm-copilot: Push Down Copilot Customizations"
       },
       {
+        "command": "drmCopilotExtension.syncAgentsFromInstructions",
+        "title": "drm-copilot: Sync AGENTS.md from Instructions"
+      },
+      {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }
     ]
   },
   "scripts": {
-    "build": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run bundle:mcp-server",
+    "build": "tsc -p ./ && npm run bundle:mcp-server",
+    "bundle:mcp-server": "node esbuild-mcp-server.cjs",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",
     "typecheck": "tsc -p ./ --noEmit",
@@ -64,6 +76,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "22.x",
     "@types/vscode": "^1.108.1",
+    "esbuild": "^0.28.0",
     "eslint": "^9.39.2",
     "jest": "^30.0.0",
     "prettier": "^3.6.0",

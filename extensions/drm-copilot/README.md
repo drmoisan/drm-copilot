@@ -21,8 +21,13 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.potentialToIssue`
 - `drmCopilotExtension.newActiveFeatureFolder`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
+- `drmCopilotExtension.syncAgentsFromInstructions`
 
 The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
+
+## Sync AGENTS.md from Instructions
+
+Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `drmCopilotExtension.syncAgentsFromInstructions`) from the Command Palette to regenerate `AGENTS.md` in the active workspace. The bundled PowerShell script discovers all `.github/instructions/*.instructions.md` files under the active workspace root, aggregates their content in a deterministic order, and writes the consolidated result to `AGENTS.md` at the workspace root. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the workspace's canonical `.github` instruction files.
 
 ## MCP Server
 
