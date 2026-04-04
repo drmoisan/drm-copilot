@@ -74,6 +74,10 @@ jest.mock("node:child_process", () => ({
 
 import { activate } from "../src/extension";
 
+const fsMock = jest.requireMock("node:fs") as {
+  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
+};
+
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
   spawnSync: jest.Mock;
@@ -181,6 +185,29 @@ function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
   );
 }
 
+function setExecutablePresence(presence: {
+  readonly python?: boolean;
+  readonly py?: boolean;
+  readonly pwsh?: boolean;
+}): void {
+  fsMock.existsSync.mockImplementation((filePath: string) => {
+    const lowerPath = filePath.toLowerCase();
+    if (lowerPath.includes("python")) {
+      return presence.python ?? false;
+    }
+
+    if (lowerPath.includes(`${"\\"}py.`) || lowerPath.endsWith("/py")) {
+      return presence.py ?? false;
+    }
+
+    if (lowerPath.includes("pwsh")) {
+      return presence.pwsh ?? false;
+    }
+
+    return false;
+  });
+}
+
 describe("drm-copilot integration behavior", () => {
   beforeEach(() => {
     handlers.clear();
@@ -196,6 +223,7 @@ describe("drm-copilot integration behavior", () => {
       remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
       localRefs: ["main"],
     });
+    setExecutablePresence({ python: true, py: false, pwsh: true });
     childProcessMock.spawn.mockImplementation(() => mockProcessSuccess());
 
     const context = {
@@ -475,6 +503,26 @@ describe("drm-copilot integration behavior", () => {
     const destinationIndex = args.indexOf("--destination");
     expect(destinationIndex).toBeGreaterThan(-1);
     expect(args[destinationIndex + 1]).toBe("C:/workspace");
+  });
+
+  it("pushDownCopilotCustomizations falls back to py -3 when python is unavailable", async () => {
+    setExecutablePresence({ python: false, py: true, pwsh: true });
+
+    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    expect(executable).toBe("py");
+    expect(args[0]).toBe("-3");
+    expect(
+      normalizePath(args[1]).endsWith(
+        "resources/templates/push_down_copilot_customizations.py",
+      ),
+    ).toBe(true);
+    const destinationIndex = args.indexOf("--destination");
+    expect(destinationIndex).toBeGreaterThan(-1);
+    expect(args[destinationIndex + 1]).toBe("C:/workspace");
+    expect(options.cwd).toBe("C:/workspace");
   });
 
   it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {

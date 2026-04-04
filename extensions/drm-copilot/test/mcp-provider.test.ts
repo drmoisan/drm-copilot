@@ -155,7 +155,7 @@ describe("registerMcpProvider", () => {
     const [name, runtime, args] = McpStdioServerDefinitionMock.mock
       .calls[0] as [string, string, string[]];
     expect(name).toBe("drmCopilotExtension");
-    expect(runtime).toBe("node");
+    expect(runtime).toBe(process.execPath);
     expect(args[0]).toContain("mcp-server.js");
     // Callback must return the constructed definition.
     expect(results).toHaveLength(1);

@@ -54,6 +54,7 @@ function createMockProcess(
 
 function setExecutablePresence(presence: {
   readonly python?: boolean;
+  readonly py?: boolean;
   readonly pwsh?: boolean;
   readonly powershell?: boolean;
 }): void {
@@ -61,6 +62,10 @@ function setExecutablePresence(presence: {
     const lowerPath = filePath.toLowerCase();
     if (lowerPath.includes("python")) {
       return presence.python ?? false;
+    }
+
+    if (lowerPath.includes(`${"\\"}py.`) || lowerPath.endsWith("/py")) {
+      return presence.py ?? false;
     }
 
     if (lowerPath.includes("pwsh")) {
@@ -125,6 +130,31 @@ describe("repo automation service", () => {
       "C:/workspace/artifacts/pr_context.summary.txt",
       "C:/workspace/artifacts/pr_context.appendix.txt",
     ]);
+  });
+
+  it("collectPrContext falls back to py -3 when python is unavailable", async () => {
+    setExecutablePresence({ python: false, py: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.collectPrContext({
+      workspaceRoot: "C:/workspace",
+      invocationId: "collect_pr_context",
+      base: "origin/main",
+    });
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
+    expect(executable).toBe("py");
+    expect(args[0]).toBe("-3");
+    expect(args[1]).toBe(
+      "C:/extension/resources/templates/collect_pr_context.py",
+    );
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
   });
 
   it("newPotentialEntry keeps subprocess execution argv-based with shell disabled", async () => {
