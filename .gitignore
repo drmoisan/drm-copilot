@@ -57,3 +57,7 @@ htmlcov/
 
 coverage/
 extensions/drm-copilot/coverage
+
+# Local Tooling
+.agents/
+.codex/

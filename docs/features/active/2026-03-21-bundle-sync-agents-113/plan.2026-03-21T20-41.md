@@ -130,13 +130,13 @@ DIRECTIVE: PREFLIGHT VALIDATION ONLY
 
 ### Phase 4 — Bundled Parity and Extension Command Implementation
 
-- [ ] [P4-T1] Create `extensions/drm-copilot/resources/templates/sync-agents-from-instructions.ps1`
+- [x] [P4-T1] Create `extensions/drm-copilot/resources/templates/sync-agents-from-instructions.ps1`
   - Acceptance: `extensions/drm-copilot/resources/templates/sync-agents-from-instructions.ps1` exists and matches `scripts/dev-tools/sync-agents-from-instructions.ps1` exactly.
-- [ ] [P4-T2] Contribute `drmCopilotExtension.syncAgentsFromInstructions` in `extensions/drm-copilot/package.json`
+- [x] [P4-T2] Contribute `drmCopilotExtension.syncAgentsFromInstructions` in `extensions/drm-copilot/package.json`
   - Acceptance: `extensions/drm-copilot/package.json` contains command ID `drmCopilotExtension.syncAgentsFromInstructions` with title `drm-copilot: Sync AGENTS.md from Instructions` under `contributes.commands`.
-- [ ] [P4-T3] Register `drmCopilotExtension.syncAgentsFromInstructions` in `extensions/drm-copilot/src/extension.ts`
+- [x] [P4-T3] Register `drmCopilotExtension.syncAgentsFromInstructions` in `extensions/drm-copilot/src/extension.ts`
   - Acceptance: `extensions/drm-copilot/src/extension.ts` registers `drmCopilotExtension.syncAgentsFromInstructions` with `vscode.commands.registerCommand` and adds the resulting disposable to `context.subscriptions`.
-- [ ] [P4-T4] Route the new command through the bundled PowerShell execution model in `extensions/drm-copilot/src/extension.ts`
+- [x] [P4-T4] Route the new command through the bundled PowerShell execution model in `extensions/drm-copilot/src/extension.ts`
   - Acceptance: `extensions/drm-copilot/src/extension.ts` resolves `workspaceRoot` with `getWorkspaceRoot()`, invokes `executeBundledScript` with `runtimeKind: "powershell"`, uses bundled path `resources/templates/sync-agents-from-instructions.ps1`, and forwards `args: ["-RepoRoot", workspaceRoot]`.
 - [ ] [P4-T5] Run the focused extension sync suite with `npm --prefix extensions/drm-copilot run test:unit -- --runTestsByPath test/extension.test.ts test/extension.integration.test.ts --testNamePattern="syncAgentsFromInstructions|activate registers drmCopilotExtension.syncAgentsFromInstructions"`
   - Acceptance: a file matching `evidence/other/extension-sync-agents-green.*.md` exists and contains `Timestamp:`, `Command: npm --prefix extensions/drm-copilot run test:unit -- --runTestsByPath test/extension.test.ts test/extension.integration.test.ts --testNamePattern="syncAgentsFromInstructions|activate registers drmCopilotExtension.syncAgentsFromInstructions"`, `EXIT_CODE: 0`, and `Output Summary:` naming the registration and bundled-execution scenarios.
