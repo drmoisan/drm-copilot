@@ -330,6 +330,22 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
+  const syncAgentsFromInstructionsDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.syncAgentsFromInstructions",
+    async () => {
+      const commandId = "drmCopilotExtension.syncAgentsFromInstructions";
+      const workspaceRoot = getWorkspaceRoot();
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "powershell",
+        bundledRelativePath:
+          "resources/templates/sync-agents-from-instructions.ps1",
+        commandId,
+        args: ["-RepoRoot", workspaceRoot],
+      });
+    },
+  );
+
   const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newPotentialBugEntry",
     async (...rawArgs: unknown[]) => {
@@ -524,6 +540,31 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
+  const mcpDidChangeEmitter = new vscode.EventEmitter<void>();
+  const mcpProviderDisposable =
+    vscode.lm.registerMcpServerDefinitionProvider("drmCopilotMcpProvider", {
+      onDidChangeMcpServerDefinitions: mcpDidChangeEmitter.event,
+      provideMcpServerDefinitions: async () => {
+        const serverDef = new vscode.McpStdioServerDefinition(
+          "drmCopilotExtension",
+          "node",
+          [
+            vscode.Uri.joinPath(
+              context.extensionUri,
+              "out",
+              "mcp-server.js",
+            ).fsPath,
+          ],
+        );
+        const workspaceCwd = vscode.workspace.workspaceFolders?.[0]?.uri;
+        if (workspaceCwd) {
+          serverDef.cwd = workspaceCwd;
+        }
+        return [serverDef];
+      },
+      resolveMcpServerDefinition: async (server) => server,
+    });
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
@@ -532,9 +573,12 @@ export function activate(context: vscode.ExtensionContext): void {
     newActiveFeatureFolderDisposable,
     potentialToIssueDisposable,
     pushDownCopilotCustomizationsDisposable,
+    syncAgentsFromInstructionsDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
     resolveExecuteHardLockPromptDisposable,
+    mcpDidChangeEmitter,
+    mcpProviderDisposable,
     output,
   );
 }

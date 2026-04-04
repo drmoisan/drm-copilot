@@ -48,10 +48,20 @@ jest.mock(
       },
     },
     Uri: {
-      joinPath: jest.fn((base: { fsPath: string }, relative: string) => ({
-        fsPath: `${base.fsPath}/${relative}`,
+      joinPath: jest.fn((base: { fsPath: string }, ...segments: string[]) => ({
+        fsPath: `${base.fsPath}/${segments.join("/")}`,
       })),
     },
+    lm: {
+      registerMcpServerDefinitionProvider: jest.fn(() => ({
+        dispose: jest.fn(),
+      })),
+    },
+    EventEmitter: jest.fn(() => ({
+      event: jest.fn(),
+      dispose: jest.fn(),
+    })),
+    McpStdioServerDefinition: jest.fn(),
   }),
   { virtual: true },
 );

@@ -7,8 +7,8 @@
 
 ## Story Statement
 
-- As a ..., I want ..., so that ...
-- As a ..., I want ..., so that ...
+- As a maintainer pushing bundled copilot tooling into another workspace, I want to run `AGENTS.md` sync from the VS Code extension command surface, so that I can regenerate the destination workspace's agent instructions without leaving the extension workflow.
+- As a repository maintainer evolving `.github` instruction files, I want `AGENTS.md` generation to discover supported instruction sources automatically, so that new or reorganized instruction files are included on the next sync run without script maintenance drift.
 
 ## Problem / Why
 
@@ -19,19 +19,18 @@ The current script also hard-codes a fixed section list and rewrites section tit
 
 ## Personas & Scenarios
 
-- Persona: ...
-  - who the user is
-  - what they care about
-  - their constraints
-  - their goals and frustrations
-  - their context and motivations
-- Scenario: ...
-  - A concrete, step-by-step narrative that describes how a user accomplishes a goal in a real-world context using the system.
-  - who is acting?
-  - what triggered the action?
-  - what steps do they take?
-  - what obstacles or decisions occur?
-  - what outcome do they expect?
+- Persona: Repository maintainer using the bundled extension workflow
+  - Works on this repository and pushes bundled customization and tooling into other workspaces.
+  - Cares that extension commands operate on the active destination workspace rather than the extension installation directory.
+  - Needs deterministic generated output because `AGENTS.md` is derived content that should not drift across repeated runs or across machines.
+  - Is constrained by the current extension command surface: related workspace-targeted workflows are available there today, but `AGENTS.md` sync is not.
+  - Wants newly added instruction files under the supported `.github` discovery scope to appear automatically without having to update a hard-coded section list.
+- Scenario: Syncing agent instructions after pushing bundled customization content into a workspace
+  - A repository maintainer opens a destination workspace that already contains the expected `.github` instruction sources.
+  - After using the extension-driven workflow that pushes bundled customization content, the maintainer needs the workspace's generated `AGENTS.md` to reflect the current instruction set.
+  - The maintainer runs the new `drm-copilot: Sync AGENTS.md from Instructions` command from the Command Palette.
+  - The extension resolves the open workspace root, executes the bundled PowerShell sync workflow against that workspace, and the script discovers `.github/copilot-instructions.md` plus supported `*.instructions.md` files under `.github/`.
+  - If the required sources are present, the maintainer expects a regenerated, deterministic `AGENTS.md`; if the sources are missing, the maintainer expects an actionable failure instead of partial output.
 
 
 ## Acceptance Criteria
@@ -45,4 +44,8 @@ The current script also hard-codes a fixed section list and rewrites section tit
 
 ## Non-Goals
 
-Call out what is explicitly excluded from this feature.
+- Changing the semantics or authoring format of the underlying instruction files themselves.
+- Expanding the discovery scope beyond the documented `.github/copilot-instructions.md` preamble and supported `*.instructions.md` files under `.github/`.
+- Aggregating `.prompt.md`, `.agent.md`, generated outputs, or other non-instruction assets into `AGENTS.md`.
+- Replacing the existing repository-local PowerShell entrypoint; direct script invocation remains supported.
+- Introducing new runtime dependencies, feature flags, or unrelated extension command behavior beyond the `AGENTS.md` sync workflow.
