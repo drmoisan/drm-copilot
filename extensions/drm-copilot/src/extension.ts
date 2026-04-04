@@ -541,19 +541,17 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
   const mcpDidChangeEmitter = new vscode.EventEmitter<void>();
-  const mcpProviderDisposable =
-    vscode.lm.registerMcpServerDefinitionProvider("drmCopilotMcpProvider", {
+  const mcpProviderDisposable = vscode.lm.registerMcpServerDefinitionProvider(
+    "drmCopilotMcpProvider",
+    {
       onDidChangeMcpServerDefinitions: mcpDidChangeEmitter.event,
       provideMcpServerDefinitions: async () => {
         const serverDef = new vscode.McpStdioServerDefinition(
           "drmCopilotExtension",
           "node",
           [
-            vscode.Uri.joinPath(
-              context.extensionUri,
-              "out",
-              "mcp-server.js",
-            ).fsPath,
+            vscode.Uri.joinPath(context.extensionUri, "out", "mcp-server.js")
+              .fsPath,
           ],
         );
         const workspaceCwd = vscode.workspace.workspaceFolders?.[0]?.uri;
@@ -563,7 +561,8 @@ export function activate(context: vscode.ExtensionContext): void {
         return [serverDef];
       },
       resolveMcpServerDefinition: async (server) => server,
-    });
+    },
+  );
 
   context.subscriptions.push(
     helloPythonDisposable,

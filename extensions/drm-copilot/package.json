@@ -62,6 +62,7 @@
     ]
   },
   "scripts": {
+    "compile": "tsc -p ./ && npm run bundle:mcp-server",
     "build": "tsc -p ./ && npm run bundle:mcp-server",
     "bundle:mcp-server": "node esbuild-mcp-server.cjs",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
