@@ -5,219 +5,32 @@ import {
   getWorkspaceRoot,
 } from "./command-runtime";
 import {
+  promptForActiveFeaturePlan,
+  promptForChoice,
+  promptForFeatureName,
+  promptForIssueNumber,
+  promptForPotentialPath,
+  promptForShortName,
+  resolveWorkflowInvocation,
+} from "./extension-command-helpers";
+import { registerMcpProvider } from "./mcp-provider";
+import {
   discoverPrBaseBranches,
   pickPrBaseBranch,
 } from "./pr-context-branches";
 import { createRepoAutomationService } from "./repo-automation-service";
 import {
-  getFeatureNameValidationMessage,
-  getShortNameValidationMessage,
   POTENTIAL_PROMOTION_TYPES,
   resolveCollectPrContextInvocation,
   resolveNewActiveFeatureFolderInvocation,
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
   resolvePotentialToIssueInvocation,
-  validateFeatureName,
-  validateIssueNumber,
-  validateShortName,
   WORK_MODE_OPTIONS,
-  type WorkflowCommandInvocation,
 } from "./workflow-command-arguments";
 
 // Re-export detectRuntime so existing test imports from this module keep working.
 export { detectRuntime } from "./command-runtime";
-
-const ACTIVE_FEATURE_DOCS_DIRECTORY = "docs/features/active";
-const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
-
-function normalizePath(filePath: string): string {
-  return filePath.replace(/\\/g, "/");
-}
-
-function getActivePotentialPath(workspaceRoot: string): string | undefined {
-  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-  if (!activeEditorPath) {
-    return undefined;
-  }
-
-  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
-  const normalizedActiveEditorPath =
-    normalizePath(activeEditorPath).toLowerCase();
-  const normalizedPotentialRoot = `${normalizedWorkspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`;
-
-  if (!normalizedActiveEditorPath.endsWith(".md")) {
-    return undefined;
-  }
-
-  if (!normalizedActiveEditorPath.startsWith(`${normalizedPotentialRoot}/`)) {
-    return undefined;
-  }
-
-  return activeEditorPath;
-}
-
-function getActiveFeaturePlanPath(workspaceRoot: string): string | undefined {
-  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-  if (!activeEditorPath) {
-    return undefined;
-  }
-
-  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
-  const normalizedActiveEditorPath =
-    normalizePath(activeEditorPath).toLowerCase();
-  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
-
-  if (!normalizedActiveEditorPath.endsWith(".md")) {
-    return undefined;
-  }
-
-  if (
-    !normalizedActiveEditorPath.startsWith(`${normalizedActiveFeatureRoot}/`)
-  ) {
-    return undefined;
-  }
-
-  return activeEditorPath;
-}
-
-async function promptForShortName(
-  title: string,
-  prompt: string,
-): Promise<string | undefined> {
-  const shortName = await vscode.window.showInputBox({
-    title,
-    prompt,
-    ignoreFocusOut: true,
-    validateInput: (value) =>
-      getShortNameValidationMessage(value, "Short name"),
-  });
-
-  if (shortName === undefined) {
-    return undefined;
-  }
-
-  return validateShortName(shortName.trim(), "Short name");
-}
-
-async function promptForChoice<TItem extends string>(
-  title: string,
-  prompt: string,
-  items: ReadonlyArray<TItem>,
-): Promise<TItem | undefined> {
-  const selected = await vscode.window.showQuickPick([...items], {
-    title,
-    prompt,
-    ignoreFocusOut: true,
-  });
-
-  return selected as TItem | undefined;
-}
-
-async function promptForFeatureName(
-  title: string,
-  prompt: string,
-): Promise<string | undefined> {
-  const featureName = await vscode.window.showInputBox({
-    title,
-    prompt,
-    ignoreFocusOut: true,
-    validateInput: getFeatureNameValidationMessage,
-  });
-
-  if (featureName === undefined) {
-    return undefined;
-  }
-
-  return validateFeatureName(featureName.trim(), "Feature name");
-}
-
-async function promptForIssueNumber(): Promise<string | null | undefined> {
-  const issueNumber = await vscode.window.showInputBox({
-    title: "drm-copilot: New Active Feature Folder",
-    prompt: "Enter the issue number, or leave blank to omit it.",
-    ignoreFocusOut: true,
-    validateInput: (value) => {
-      const trimmed = value.trim();
-      if (trimmed.length === 0) {
-        return undefined;
-      }
-
-      return /^\d+$/.test(trimmed)
-        ? undefined
-        : "Issue number must be digits only when provided.";
-    },
-  });
-
-  if (issueNumber === undefined) {
-    return undefined;
-  }
-
-  const trimmed = issueNumber.trim();
-  if (trimmed.length === 0) {
-    return null;
-  }
-
-  return validateIssueNumber(trimmed);
-}
-
-async function promptForPotentialPath(
-  workspaceRoot: string,
-): Promise<string | undefined> {
-  const activePotentialPath = getActivePotentialPath(workspaceRoot);
-  if (activePotentialPath) {
-    return activePotentialPath;
-  }
-
-  const selectedFile = await vscode.window.showOpenDialog({
-    canSelectMany: false,
-    openLabel: "Select potential file",
-    defaultUri: vscode.Uri.file(`${workspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`),
-    filters: {
-      Markdown: ["md"],
-    },
-  });
-
-  return selectedFile?.[0]?.fsPath;
-}
-
-async function promptForActiveFeaturePlan(
-  workspaceRoot: string,
-): Promise<string | undefined> {
-  const activePlanPath = getActiveFeaturePlanPath(workspaceRoot);
-  if (activePlanPath) {
-    return activePlanPath;
-  }
-
-  const selectedFile = await vscode.window.showOpenDialog({
-    canSelectMany: false,
-    openLabel: "Select feature plan",
-    defaultUri: vscode.Uri.file(
-      `${workspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`,
-    ),
-    filters: {
-      Markdown: ["md"],
-    },
-  });
-
-  return selectedFile?.[0]?.fsPath;
-}
-
-function resolveWorkflowInvocation<TInput>(
-  output: vscode.OutputChannel,
-  commandId: string,
-  resolver: () => WorkflowCommandInvocation<TInput>,
-): WorkflowCommandInvocation<TInput> {
-  try {
-    const invocation = resolver();
-    output.appendLine(`[${commandId}] ${invocation.mode} mode`);
-    return invocation;
-  } catch (error: unknown) {
-    const detail = error instanceof Error ? error.message : String(error);
-    output.appendLine(`[${commandId}] validation failure: ${detail}`);
-    throw error;
-  }
-}
 
 /**
  * Activates the extension by registering all command handlers and shared resources.
@@ -540,29 +353,7 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
-  const mcpDidChangeEmitter = new vscode.EventEmitter<void>();
-  const mcpProviderDisposable = vscode.lm.registerMcpServerDefinitionProvider(
-    "drmCopilotMcpProvider",
-    {
-      onDidChangeMcpServerDefinitions: mcpDidChangeEmitter.event,
-      provideMcpServerDefinitions: async () => {
-        const serverDef = new vscode.McpStdioServerDefinition(
-          "drmCopilotExtension",
-          "node",
-          [
-            vscode.Uri.joinPath(context.extensionUri, "out", "mcp-server.js")
-              .fsPath,
-          ],
-        );
-        const workspaceCwd = vscode.workspace.workspaceFolders?.[0]?.uri;
-        if (workspaceCwd) {
-          serverDef.cwd = workspaceCwd;
-        }
-        return [serverDef];
-      },
-      resolveMcpServerDefinition: async (server) => server,
-    },
-  );
+  const mcpDisposables = registerMcpProvider(context);
 
   context.subscriptions.push(
     helloPythonDisposable,
@@ -576,8 +367,7 @@ export function activate(context: vscode.ExtensionContext): void {
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
     resolveExecuteHardLockPromptDisposable,
-    mcpDidChangeEmitter,
-    mcpProviderDisposable,
+    ...mcpDisposables,
     output,
   );
 }

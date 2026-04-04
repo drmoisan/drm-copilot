@@ -81,7 +81,7 @@ jest.mock("node:child_process", () => ({
   spawnSync: jest.fn(),
 }));
 
-import { activate, detectRuntime } from "../src/extension";
+import { activate, deactivate, detectRuntime } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
@@ -773,5 +773,11 @@ describe("drm-copilot command behavior", () => {
     const templateRootIdx = args.indexOf("--template-root");
     expect(templateRootIdx).toBeGreaterThan(-1);
     expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+  });
+});
+
+describe("deactivate", () => {
+  it("completes without throwing (no-op implementation)", () => {
+    expect(() => deactivate()).not.toThrow();
   });
 });

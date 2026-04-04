@@ -125,23 +125,23 @@ Data flow, storage, or state changes introduced by this feature.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria are mapped to concrete verification in the PowerShell, Jest, and any rewrite-catalog test surfaces identified in research.
-- [ ] Behavior matches the documented extension-command path and the existing direct PowerShell script path for the same workspace contents.
-- [ ] Tests are added or updated in `tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1`, `extensions/drm-copilot/test/extension.test.ts`, and `extensions/drm-copilot/test/extension.integration.test.ts`, with rewrite-catalog tests updated if command references change.
-- [ ] Edge cases for missing `.github/copilot-instructions.md`, zero discovered instruction files, deterministic ordering, frontmatter stripping, and automatic inclusion of new instruction files are covered by tests.
-- [ ] Documentation is updated where the command surface is described, including this feature folder and any README content chosen by implementation.
-- [ ] Existing extension output or script error reporting clearly surfaces success and actionable failure details; no separate telemetry addition is required unless implementation introduces one.
-- [ ] The relevant toolchain passes for all touched languages and surfaces after implementation work is complete.
+- [x] Acceptance criteria are mapped to concrete verification in the PowerShell, Jest, and any rewrite-catalog test surfaces identified in research.
+- [x] Behavior matches the documented extension-command path and the existing direct PowerShell script path for the same workspace contents.
+- [x] Tests are added or updated in `tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1`, `extensions/drm-copilot/test/extension.test.ts`, and `extensions/drm-copilot/test/extension.integration.test.ts`, with rewrite-catalog tests updated if command references change.
+- [x] Edge cases for missing `.github/copilot-instructions.md`, zero discovered instruction files, deterministic ordering, frontmatter stripping, and automatic inclusion of new instruction files are covered by tests.
+- [x] Documentation is updated where the command surface is described, including this feature folder and any README content chosen by implementation.
+- [x] Existing extension output or script error reporting clearly surfaces success and actionable failure details; no separate telemetry addition is required unless implementation introduces one.
+- [x] The relevant toolchain passes for all touched languages and surfaces after implementation work is complete.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage areas
+- [x] Unit coverage areas
 - Discovery of `.github/copilot-instructions.md` plus `*.instructions.md` files from the destination workspace
 - Frontmatter stripping, empty-file handling, deterministic ordering, and section-label derivation
 - Exclusion of generated outputs or unsupported files from the aggregation set
-- [ ] Integration scenarios
+- [x] Integration scenarios
 - Extension command execution updates `AGENTS.md` successfully in a workspace that contains the expected `.github/` instruction sources
 - Workspace with an added instruction file is resynced without any code changes and includes the new content
 - Workspace missing required inputs fails fast with a clear error surfaced through the extension output/logging path
-- [ ] CLI/API examples
+- [x] CLI/API examples
 - Manual invocation of `scripts/dev-tools/sync-agents-from-instructions.ps1` against an explicit repo root still works for repository-local use
 - Extension command invocation produces the same `AGENTS.md` result as the direct script run for the same workspace contents

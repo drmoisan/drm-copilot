@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$RepoRoot = (Resolve-Path "$PSScriptRoot/../..")
 )
@@ -53,11 +53,11 @@ function Get-InstructionFileData {
     $rawContent = Get-Content -Raw -LiteralPath $Path
     if ([string]::IsNullOrEmpty($rawContent)) {
         return [pscustomobject]@{
-            Path = $Path
-            RelativePath = Convert-ToNormalizedRelativePath -RepoRootParam $RepoRootParam -Path $Path
-            Body = ""
+            Path            = $Path
+            RelativePath    = Convert-ToNormalizedRelativePath -RepoRootParam $RepoRootParam -Path $Path
+            Body            = ""
             FrontMatterName = $null
-            FirstHeading = $null
+            FirstHeading    = $null
         }
     }
 
@@ -82,11 +82,11 @@ function Get-InstructionFileData {
     }
 
     return [pscustomobject]@{
-        Path = $Path
-        RelativePath = Convert-ToNormalizedRelativePath -RepoRootParam $RepoRootParam -Path $Path
-        Body = $trimmedBody
+        Path            = $Path
+        RelativePath    = Convert-ToNormalizedRelativePath -RepoRootParam $RepoRootParam -Path $Path
+        Body            = $trimmedBody
         FrontMatterName = $frontMatterName
-        FirstHeading = $firstHeading
+        FirstHeading    = $firstHeading
     }
 }
 
@@ -154,9 +154,9 @@ function Get-SectionTitle {
             }) -join ' ')
 }
 
-function Get-DiscoveredInstructionFiles {
+function Get-DiscoveredInstructionFile {
     [CmdletBinding()]
-    [OutputType([pscustomobject[]])]
+    [OutputType([object[]])]
     param(
         [Parameter(Mandatory = $true)]
         [string]$RepoRootParam
@@ -205,7 +205,7 @@ function Get-AgentContent {
 
     $copilotPath = Join-Path $RepoRootParam ".github/copilot-instructions.md"
     $agentsTarget = Join-Path $RepoRootParam "AGENTS.md"
-    $instructionFiles = Get-DiscoveredInstructionFiles -RepoRootParam $RepoRootParam
+    $instructionFiles = Get-DiscoveredInstructionFile -RepoRootParam $RepoRootParam
 
     $copilotBody = Get-InstructionsBody -Path $copilotPath
 
@@ -257,7 +257,7 @@ $generatedSources
 ## Repository Setup (High-Level)
 
 - For coding and testing policies, always follow the sections below in the order:
-  Copilot instructions → general policies → language-specific policies → CI policies.
+  Copilot instructions -> general policies -> language-specific policies -> CI policies.
 - Use the language- and domain-specific sections for Python, PowerShell, and CI behavior.
 "@
 
@@ -291,6 +291,7 @@ if ($env:POSHQC_SKIP_SCRIPT_EXECUTION) {
 }
 
 Invoke-SyncAgentInstruction -RepoRootParam $RepoRoot
+
 
 
 

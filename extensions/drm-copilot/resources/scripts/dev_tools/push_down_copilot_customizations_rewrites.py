@@ -118,6 +118,13 @@ def build_rewrite_catalog() -> dict[str, RewriteTarget]:
             script_reference="scripts.dev_tools.push_down_copilot_customizations",
             is_placeholder=False,
         ),
+        RewriteTarget(
+            normalized_key="scripts/dev_tools/sync-agents-from-instructions.ps1",
+            command_id="drmCopilotExtension.syncAgentsFromInstructions",
+            title="drm-copilot: Sync AGENTS.md from Instructions",
+            script_reference="scripts/dev-tools/sync-agents-from-instructions.ps1",
+            is_placeholder=False,
+        ),
     )
     return {target.normalized_key: target for target in targets}
 

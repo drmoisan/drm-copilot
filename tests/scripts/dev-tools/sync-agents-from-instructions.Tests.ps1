@@ -69,15 +69,15 @@ applyTo: "**"
         }
     }
 
-    Context "Get-DiscoveredInstructionFiles" {
-        It "Get-DiscoveredInstructionFiles throws when no supported instruction files are discovered" {
+    Context "Get-DiscoveredInstructionFile" {
+        It "Get-DiscoveredInstructionFile throws when no supported instruction files are discovered" {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @() }
 
-            { Get-DiscoveredInstructionFiles -RepoRootParam "/repo" } | Should -Throw -ExpectedMessage "No supported instruction files were discovered under /repo/.github"
+            { Get-DiscoveredInstructionFile -RepoRootParam "/repo" } | Should -Throw -ExpectedMessage "No supported instruction files were discovered under /repo/.github"
         }
 
-        It "Get-DiscoveredInstructionFiles sorts normalized relative paths ordinally" {
+        It "Get-DiscoveredInstructionFile sorts normalized relative paths ordinally" {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith {
                 @(
@@ -92,15 +92,15 @@ applyTo: "**"
                 [void]$RepoRootParam
                 $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
                 [pscustomobject]@{
-                    Path = $Path
-                    RelativePath = $relativePath
-                    Body = ''
+                    Path            = $Path
+                    RelativePath    = $relativePath
+                    Body            = ''
                     FrontMatterName = $null
-                    FirstHeading = $null
+                    FirstHeading    = $null
                 }
             }
 
-            $result = Get-DiscoveredInstructionFiles -RepoRootParam 'C:\repo'
+            $result = Get-DiscoveredInstructionFile -RepoRootParam 'C:\repo'
             $result.RelativePath | Should -Be @(
                 '.github/B.instructions.md'
                 '.github/a.instructions.md'
@@ -126,7 +126,7 @@ applyTo: "**"
                 [pscustomobject]@{ Path = (Join-Path -Path $script:instructionsDir -ChildPath "self-explanatory-code-commenting.instructions.md"); RelativePath = ".github/instructions/self-explanatory-code-commenting.instructions.md"; Body = "self-explanatory-code-commenting unit"; FrontMatterName = "Code Commenting and Docstring Policy"; FirstHeading = $null }
             )
             Mock -CommandName Test-Path -MockWith { $true }
-            Mock -CommandName Get-DiscoveredInstructionFiles -MockWith { $script:discoveredInstructionFiles }
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $script:discoveredInstructionFiles }
             Mock -CommandName Get-InstructionsBody -MockWith {
                 param($Path)
                 switch ($Path) {
@@ -171,7 +171,7 @@ applyTo: "**"
             $writes = [System.Collections.Generic.List[string]]::new()
 
             Mock -CommandName Test-Path -MockWith { $true }
-            Mock -CommandName Get-DiscoveredInstructionFiles -MockWith {
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith {
                 @(
                     [pscustomobject]@{ Path = (Join-Path -Path $instructionsDir -ChildPath "general-code-change.instructions.md"); RelativePath = ".github/instructions/general-code-change.instructions.md"; Body = "general code"; FrontMatterName = $null; FirstHeading = $null }
                     [pscustomobject]@{ Path = $newInstructionPath; RelativePath = ".github/instructions/new-surface.instructions.md"; Body = "new surface body"; FrontMatterName = $null; FirstHeading = $null }
@@ -224,3 +224,4 @@ applyTo: "**"
         }
     }
 }
+
