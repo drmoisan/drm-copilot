@@ -1,0 +1,4 @@
+Timestamp: 2026-04-05T13-23
+Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."
+EXIT_CODE: 1
+Output Summary: Pester discovery found 246 tests. Test execution completed with 238 passed, 1 failed, 7 skipped, and 0 inconclusive. The intentional regression failure was `sync-agents-from-instructions.ps1.Get-AgentContent ordering.emits general instruction files before language-specific instruction files in generated AGENTS.md output`, which failed because `general-code-change.instructions.md` appeared after `csharp-code-change.instructions.md` in generated output (`Expected the actual value to be less than 92, but got 152.`).

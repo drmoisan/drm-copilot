@@ -1,0 +1,4 @@
+Timestamp: 2026-04-05T13-27
+Command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/dev-tools/sync-agents-from-instructions.ps1
+EXIT_CODE: 0
+Output Summary: The sync script regenerated `AGENTS.md` successfully. The generated source list now places `.github/instructions/general-code-change.instructions.md` and `.github/instructions/general-unit-test.instructions.md` immediately after `.github/copilot-instructions.md` and before language-specific instruction files such as C#, PowerShell, Python, and TypeScript. The corresponding sections follow the same grouped order: `## Agent Code Change Policy` and `## General Unit Test Policy` appear before `## Codexer Instructions (Placeholder)` and the language-specific sections.

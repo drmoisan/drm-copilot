@@ -119,6 +119,43 @@ applyTo: "**"
                 '.github/sub/c.instructions.md'
             )
         }
+
+        It "Get-DiscoveredInstructionFile preserves deterministic ordering within the general and language-specific groups" {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-ChildItem -MockWith {
+                @(
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\python-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-unit-test.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\typescript-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\csharp-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\powershell-code-change.instructions.md' }
+                )
+            }
+            Mock -CommandName Get-InstructionFileData -MockWith {
+                param($Path, $RepoRootParam)
+
+                [void]$RepoRootParam
+                $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
+                [pscustomobject]@{
+                    Path            = $Path
+                    RelativePath    = $relativePath
+                    Body            = ''
+                    FrontMatterName = $null
+                    FirstHeading    = $null
+                }
+            }
+
+            $result = Get-DiscoveredInstructionFile -RepoRootParam 'C:\repo'
+            $result.RelativePath | Should -Be @(
+                '.github/instructions/general-code-change.instructions.md'
+                '.github/instructions/general-unit-test.instructions.md'
+                '.github/instructions/csharp-code-change.instructions.md'
+                '.github/instructions/powershell-code-change.instructions.md'
+                '.github/instructions/python-code-change.instructions.md'
+                '.github/instructions/typescript-code-change.instructions.md'
+            )
+        }
     }
 
     Context "Get-AgentContent" {
@@ -172,6 +209,57 @@ applyTo: "**"
             $result.Content | Should -Match "ps unit"
             $result.Content | Should -Match "codexer unit"
             $result.Content | Should -Match "self-explanatory-code-commenting unit"
+        }
+    }
+
+    Context "Get-AgentContent ordering" {
+        BeforeEach {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-InstructionsBody -MockWith {
+                param($Path)
+
+                if ($Path -eq (Join-Path -Path 'C:\repo' -ChildPath '.github/copilot-instructions.md')) {
+                    return 'copilot body'
+                }
+
+                throw "Unexpected path $Path"
+            }
+            Mock -CommandName Get-ChildItem -MockWith {
+                @(
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\python-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-unit-test.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\csharp-code-change.instructions.md' }
+                    [pscustomobject]@{ FullName = 'C:\repo\.github\instructions\general-code-change.instructions.md' }
+                )
+            }
+            Mock -CommandName Get-InstructionFileData -MockWith {
+                param($Path, $RepoRootParam)
+
+                [void]$RepoRootParam
+                $relativePath = $Path.Substring('C:\repo\'.Length) -replace '\\', '/'
+
+                return [pscustomobject]@{
+                    Path            = $Path
+                    RelativePath    = $relativePath
+                    Body            = "body for $relativePath"
+                    FrontMatterName = $null
+                    FirstHeading    = $null
+                }
+            }
+        }
+
+        It "emits general instruction files before language-specific instruction files in generated AGENTS.md output" {
+            $result = Get-AgentContent -RepoRootParam 'C:\repo'
+
+            $generalCodeIndex = $result.Content.IndexOf('> - .github/instructions/general-code-change.instructions.md', [System.StringComparison]::Ordinal)
+            $generalUnitIndex = $result.Content.IndexOf('> - .github/instructions/general-unit-test.instructions.md', [System.StringComparison]::Ordinal)
+            $csharpIndex = $result.Content.IndexOf('> - .github/instructions/csharp-code-change.instructions.md', [System.StringComparison]::Ordinal)
+            $pythonIndex = $result.Content.IndexOf('> - .github/instructions/python-code-change.instructions.md', [System.StringComparison]::Ordinal)
+
+            $generalCodeIndex | Should -BeLessThan $csharpIndex
+            $generalCodeIndex | Should -BeLessThan $pythonIndex
+            $generalUnitIndex | Should -BeLessThan $csharpIndex
+            $generalUnitIndex | Should -BeLessThan $pythonIndex
         }
     }
 
