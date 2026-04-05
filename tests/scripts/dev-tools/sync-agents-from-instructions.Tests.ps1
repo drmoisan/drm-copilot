@@ -54,7 +54,7 @@ applyTo: "**"
     }
 
     Context "Get-AgentContent failure paths" {
-        It "Get-AgentContent throws when .github/copilot-instructions.md is missing" {
+        It "Get-AgentContent succeeds when .github/copilot-instructions.md is missing" {
             Mock -CommandName Test-Path -MockWith {
                 param($LiteralPath)
 
@@ -65,7 +65,19 @@ applyTo: "**"
                 return $true
             }
 
-            { Get-AgentContent -RepoRootParam "/repo" } | Should -Throw -ExpectedMessage "Required AGENTS preamble file not found: /repo/.github/copilot-instructions.md"
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/general-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/general-code-change.instructions.md"
+                    Body            = "general code body"
+                    FrontMatterName = $null
+                    FirstHeading    = "General Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match 'copilot-instructions'
         }
     }
 
@@ -212,6 +224,191 @@ applyTo: "**"
             Should -Invoke -CommandName Get-AgentContent -Times 1 -ParameterFilter { $RepoRootParam -eq "/work" }
             Should -Invoke -CommandName Set-Content -Times 1 -ParameterFilter { $LiteralPath -eq "/work/AGENTS.md" -and $Value -eq "content" -and $NoNewline }
             Should -Invoke -CommandName Write-Output -Times 1
+        }
+    }
+
+    Context "Get-AgentContent optional preamble" {
+        It "Get-AgentContent succeeds when copilot-instructions.md is absent" {
+            Mock -CommandName Test-Path -MockWith {
+                param($LiteralPath)
+
+                if ($LiteralPath -eq (Join-Path -Path "/repo" -ChildPath ".github/copilot-instructions.md")) {
+                    return $false
+                }
+
+                return $true
+            }
+
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/general-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/general-code-change.instructions.md"
+                    Body            = "general code body"
+                    FrontMatterName = $null
+                    FirstHeading    = "General Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match '<!-- BEGIN: copilot-instructions -->'
+        }
+
+        It "header omits copilot-instructions.md from source list when preamble is absent" {
+            Mock -CommandName Test-Path -MockWith {
+                param($LiteralPath)
+
+                if ($LiteralPath -eq (Join-Path -Path "/repo" -ChildPath ".github/copilot-instructions.md")) {
+                    return $false
+                }
+
+                return $true
+            }
+
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/general-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/general-code-change.instructions.md"
+                    Body            = "general code body"
+                    FrontMatterName = $null
+                    FirstHeading    = "General Code Change Policy"
+                }
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/python-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/python-code-change.instructions.md"
+                    Body            = "python code body"
+                    FrontMatterName = $null
+                    FirstHeading    = "Python Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match '> - .github/copilot-instructions.md'
+            $result.Content | Should -Match '.github/instructions/general-code-change.instructions.md'
+            $result.Content | Should -Match '.github/instructions/python-code-change.instructions.md'
+        }
+    }
+
+    Context "Get-AgentContent compaction" {
+        BeforeEach {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-InstructionsBody -MockWith {
+                param($Path)
+
+                [void]$Path
+                return "copilot body"
+            }
+        }
+
+        It "compacted output strips cross-reference boilerplate" {
+            $bodyWithBoilerplate = @"
+# Python Code Change Policy
+
+This policy **extends** general-code-change.instructions.md and applies to all Python code.
+
+Some unique content here.
+
+halt and notify the user.
+"@
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/python-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/python-code-change.instructions.md"
+                    Body            = $bodyWithBoilerplate
+                    FrontMatterName = $null
+                    FirstHeading    = "Python Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match 'This policy \*\*extends\*\*'
+            $result.Content | Should -Not -Match 'halt and notify the user'
+            $result.Content | Should -Match 'Some unique content here'
+        }
+
+        It "compacted output removes repeated reading-order statements" {
+            $bodyWithReadingOrder = @"
+# General Code Change Policy
+
+Apply this general policy first, then any language-specific code-change instructions.
+
+Some actual policy content.
+"@
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/general-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/general-code-change.instructions.md"
+                    Body            = $bodyWithReadingOrder
+                    FrontMatterName = $null
+                    FirstHeading    = "General Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match 'Apply this general policy first'
+            $result.Content | Should -Match 'Some actual policy content'
+        }
+
+        It "compacted output condenses suppression examples" {
+            $bodyWithCodeBlock = @"
+# Suppression Policy
+
+### S603: subprocess call
+
+**Required pattern:**
+
+$('```')python
+def example():
+    pass
+$('```')
+
+**Justification:** This is the rationale.
+"@
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/python-suppressions.instructions.md"
+                    RelativePath    = ".github/instructions/python-suppressions.instructions.md"
+                    Body            = $bodyWithCodeBlock
+                    FrontMatterName = $null
+                    FirstHeading    = "Suppression Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match 'def example\(\):'
+            $result.Content | Should -Match 'This is the rationale'
+        }
+
+        It "compacted output strips approved-command lines" {
+            $bodyWithApproved = @"
+# Python Code Change Policy
+
+1. **Formatting**
+   - Approved command: poetry run black .
+
+2. **Linting**
+   - Approved command: poetry run ruff check
+
+Some unique policy text.
+"@
+            $minimalFiles = @(
+                [pscustomobject]@{
+                    Path            = "/repo/.github/instructions/python-code-change.instructions.md"
+                    RelativePath    = ".github/instructions/python-code-change.instructions.md"
+                    Body            = $bodyWithApproved
+                    FrontMatterName = $null
+                    FirstHeading    = "Python Code Change Policy"
+                }
+            )
+            Mock -CommandName Get-DiscoveredInstructionFile -MockWith { $minimalFiles }
+
+            $result = Get-AgentContent -RepoRootParam "/repo"
+            $result.Content | Should -Not -Match 'Approved command:'
+            $result.Content | Should -Match 'Some unique policy text'
         }
     }
 
