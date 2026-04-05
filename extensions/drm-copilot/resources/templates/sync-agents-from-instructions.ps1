@@ -154,6 +154,20 @@ function Get-SectionTitle {
             }) -join ' ')
 }
 
+function Get-InstructionSortKey {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RelativePath
+    )
+
+    $fileName = [System.IO.Path]::GetFileName($RelativePath)
+    $groupPrefix = if ($fileName.StartsWith('general', [System.StringComparison]::OrdinalIgnoreCase)) { '0' } else { '1' }
+
+    return "$groupPrefix|$RelativePath"
+}
+
 function Get-DiscoveredInstructionFile {
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -171,20 +185,24 @@ function Get-DiscoveredInstructionFile {
     }
 
     $instructionFilesByRelativePath = @{}
-    $relativePaths = [System.Collections.Generic.List[string]]::new()
+    $sortKeysByRelativePath = @{}
+    $sortKeys = [System.Collections.Generic.List[string]]::new()
 
     # Normalize discovered paths relative to the repo root before sorting so output is deterministic across platforms.
     foreach ($candidateFile in $candidateFiles) {
         $instructionFile = Get-InstructionFileData -Path $candidateFile.FullName -RepoRootParam $RepoRootParam
         $instructionFilesByRelativePath[$instructionFile.RelativePath] = $instructionFile
-        $relativePaths.Add($instructionFile.RelativePath)
+        $sortKey = Get-InstructionSortKey -RelativePath $instructionFile.RelativePath
+        $sortKeysByRelativePath[$sortKey] = $instructionFile.RelativePath
+        $sortKeys.Add($sortKey)
     }
 
-    $sortedRelativePaths = $relativePaths.ToArray()
-    [System.Array]::Sort($sortedRelativePaths, [System.StringComparer]::Ordinal)
+    $sortedSortKeys = $sortKeys.ToArray()
+    [System.Array]::Sort($sortedSortKeys, [System.StringComparer]::Ordinal)
 
     return @(
-        foreach ($relativePath in $sortedRelativePaths) {
+        foreach ($sortKey in $sortedSortKeys) {
+            $relativePath = $sortKeysByRelativePath[$sortKey]
             $instructionFilesByRelativePath[$relativePath]
         }
     )
