@@ -28,9 +28,12 @@ export function registerMcpProvider(
       provideMcpServerDefinitions: async () => {
         // Build the server definition pointing at the compiled MCP server entry
         // point in the extension's output directory.
+        // Use "node" from PATH as the runtime command. In VS Code's extension
+        // host, process.execPath resolves to the Electron binary (e.g.,
+        // Code - Insiders.exe), which cannot run standalone .js scripts.
         const serverDef = new vscode.McpStdioServerDefinition(
           "drmCopilotExtension",
-          process.execPath,
+          "node",
           [
             vscode.Uri.joinPath(context.extensionUri, "out", "mcp-server.js")
               .fsPath,

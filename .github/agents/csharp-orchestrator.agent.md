@@ -18,7 +18,7 @@ handoffs:
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
-    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence). If validation fails, return precise remediation deltas."
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, the explicit `## Acceptance Criteria` section is missing from `issue.md`, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence). If validation fails, return precise remediation deltas."
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
@@ -154,6 +154,7 @@ S2.6 Capture created folder path as `${feature-folder}`.
 
 S2.7 Verify short-path folder integrity before proceeding:
 - `${feature-folder}/issue.md` MUST exist and contain `- Work Mode: minor-audit`.
+- `${feature-folder}/issue.md` MUST contain an explicit `## Acceptance Criteria` section.
 - `${feature-folder}/spec.md` MUST NOT exist.
 - `${feature-folder}/user-story.md` MUST NOT exist.
 - If any integrity check fails, stop and remediate before planning.
@@ -212,7 +213,7 @@ S7.1 Delegate handoff **Validate small-path delivery and post-QC docs**.
 Hard enforcement for S7:
 - Validation MUST be against `${feature-folder}/issue.md`.
 - Plan checklist updates MUST be persisted before audit.
-- Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence).
+- Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, the explicit `## Acceptance Criteria` section is missing from `issue.md`, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence).
 
 ### Step S8 — Run reduced audit and remediation loop
 
@@ -227,7 +228,7 @@ S8.2 If audit triggers remediation:
 Hard enforcement for S8:
 - Orchestrator MUST delegate the short-path audit to `feature_code_review_agent` as defined in `.github/agents/feature-review.agent.md`; direct creation or replacement of `policy-audit.*.md`, `feature-audit.*.md`, or `code-review.*.md` by the orchestrator is prohibited.
 - Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
-- Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, or when minor-audit folders contain `spec.md`/`user-story.md`.
+- Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, or when minor-audit folders contain `spec.md`/`user-story.md`.
 
 ---
 

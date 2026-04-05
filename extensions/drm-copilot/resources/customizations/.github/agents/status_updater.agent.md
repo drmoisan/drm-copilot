@@ -100,7 +100,7 @@ Within the selected current version scope:
    - `- Work Mode: full-bug`
 - Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch `Delivered` computation and evidence targets by marker value:
-   - For `Work Mode: minor-audit`, evaluate acceptance completion from `issue.md` criteria and write acceptance evidence to `issue.md`.
+   - For `Work Mode: minor-audit`, evaluate acceptance completion only from the explicit `## Acceptance Criteria` section in `issue.md` and write acceptance evidence to `issue.md`.
    - For `Work Mode: full-feature`, evaluate acceptance completion from `spec.md` and `user-story.md` and write acceptance evidence to `spec.md` and `user-story.md`.
    - For `Work Mode: full-bug`, evaluate acceptance completion from `spec.md` and write acceptance evidence to `spec.md`.
 - Fail closed: if marker is missing or malformed, fallback to `full-feature` behavior (`spec.md` + `user-story.md`) for Delivered computation and evidence writing.
@@ -195,7 +195,8 @@ Goal: if ALL acceptance criteria in the authoritative AC source file(s) have bee
 Process per feature:
 1) Resolve authoritative AC source file(s) per the work-mode marker contract and `acceptance-criteria-tracking`.
 2) Extract acceptance criteria from those source file(s):
-   - Prefer sections titled: “Acceptance Criteria”, “AC”, “Done when”
+   - For `minor-audit`, require the exact section title `## Acceptance Criteria` in `issue.md`
+   - For other modes, prefer sections titled: “Acceptance Criteria”, “AC”, “Done when”
    - Parse checklists and bullet lists as criteria items
 3) For each criterion:
    - Find best evidence:

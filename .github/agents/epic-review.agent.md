@@ -132,9 +132,10 @@ If the epic deviates from this shape, continue anyway and document deviations.
   - `- Work Mode: full-bug`
 - Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch doc completeness and AC extraction by marker:
-  - For `Work Mode: minor-audit`, `spec.md` and `user-story.md` may be absent by design; use `issue.md` as the AC source.
+  - For `Work Mode: minor-audit`, `spec.md` and `user-story.md` may be absent by design; use only the explicit `## Acceptance Criteria` section in `issue.md` as the AC source.
   - For `Work Mode: full-feature`, require and evaluate `spec.md` and `user-story.md` as AC sources.
   - For `Work Mode: full-bug`, require and evaluate `spec.md` as the AC source; do not require `user-story.md` unless the docs explicitly justify it.
+- For `Work Mode: minor-audit`, a missing explicit `## Acceptance Criteria` section in `issue.md` is a blocking documentation gap.
 - Fail closed: if the marker is missing or malformed, fallback to `full-feature` behavior for doc completeness and AC extraction.
 
 ## 3) Version selection rule (deterministic)

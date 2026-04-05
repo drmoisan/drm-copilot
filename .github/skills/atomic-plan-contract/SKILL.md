@@ -56,6 +56,7 @@ For short-path planning handoffs, orchestrators MUST include:
 
 Required planner outputs for this directive:
 - plan MUST use `${feature-folder}/issue.md` as sole requirements source,
+- plan MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section and MUST treat only that section as the minor-audit AC source,
 - plan MUST NOT require `spec.md`/`user-story.md`/`research.md`,
 - plan MUST include exactly 3 phases:
 	- Phase 0 baseline capture,
@@ -156,7 +157,8 @@ When a plan is generated or validated from a feature folder, resolve selected mo
 ## Mode-Specific Mandatory Plan Gates
 
 - `minor-audit` plans MUST include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `minor-audit` plans MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section; do not infer acceptance criteria from other `issue.md` sections.
 - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
-- `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
+- `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 - `full-feature` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
 - `full-bug` plans MUST enforce spec-driven expectations (`spec.md` required, `user-story.md` optional/absent by default) and full QA loop obligations.

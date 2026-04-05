@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from scripts.dev_tools import new_active_feature_folder as mod
+from scripts.dev_tools import new_active_feature_folder_io as io_mod
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -455,3 +456,78 @@ def test_build_folder_slug_raises_on_invalid_slug() -> None:
     """Verify invalid derived slugs raise ValueError."""
     with pytest.raises(ValueError, match="invalid"):
         mod.build_folder_slug("name", Path("/some/INVALID-FILE.md"), None)
+
+
+def test_default_code_launcher_uses_code_with_reuse_window(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Use the standard VS Code CLI and reuse the current window when available."""
+    launched: list[list[str]] = []
+
+    def fake_run(cmd: list[str], check: bool) -> None:  # noqa: ARG001
+        launched.append(cmd)
+
+    def fake_which(name: str) -> str | None:
+        if name == "code":
+            return "/usr/bin/code"
+        return None
+
+    monkeypatch.setattr(io_mod.shutil, "which", fake_which)
+    monkeypatch.setattr(io_mod.subprocess, "run", fake_run)
+    monkeypatch.delenv("TERM_PROGRAM_VERSION", raising=False)
+    monkeypatch.delenv("VSCODE_GIT_ASKPASS_MAIN", raising=False)
+    monkeypatch.delenv("TERM_PROGRAM", raising=False)
+    monkeypatch.delenv("VSCODE_IPC_HOOK_CLI", raising=False)
+
+    assert mod.default_code_launcher([Path("file.md")]) is True
+    assert launched == [["/usr/bin/code", "--reuse-window", "file.md"]]
+
+
+def test_default_code_launcher_prefers_code_insiders_for_insiders_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prefer the Insiders CLI and reuse the current window when session signals it."""
+    launched: list[list[str]] = []
+    looked_up: list[str] = []
+
+    def fake_run(cmd: list[str], check: bool) -> None:  # noqa: ARG001
+        launched.append(cmd)
+
+    def fake_which(name: str) -> str | None:
+        looked_up.append(name)
+        if name == "code-insiders":
+            return "/usr/bin/code-insiders"
+        if name == "code":
+            return "/usr/bin/code"
+        return None
+
+    monkeypatch.setattr(io_mod.shutil, "which", fake_which)
+    monkeypatch.setattr(io_mod.subprocess, "run", fake_run)
+    monkeypatch.setenv("TERM_PROGRAM_VERSION", "1.110.0-insider")
+    monkeypatch.delenv("VSCODE_GIT_ASKPASS_MAIN", raising=False)
+    monkeypatch.delenv("TERM_PROGRAM", raising=False)
+    monkeypatch.delenv("VSCODE_IPC_HOOK_CLI", raising=False)
+
+    assert mod.default_code_launcher([Path("file.md")]) is True
+    assert looked_up[0] == "code-insiders"
+    assert launched == [["/usr/bin/code-insiders", "--reuse-window", "file.md"]]
+
+
+def test_default_code_launcher_returns_false_when_no_cli_is_available(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Return False after checking both standard CLI names when none are installed."""
+    looked_up: list[str] = []
+
+    def fake_which(name: str) -> None:
+        looked_up.append(name)
+        return None
+
+    monkeypatch.setattr(io_mod.shutil, "which", fake_which)
+    monkeypatch.delenv("TERM_PROGRAM_VERSION", raising=False)
+    monkeypatch.delenv("VSCODE_GIT_ASKPASS_MAIN", raising=False)
+    monkeypatch.delenv("TERM_PROGRAM", raising=False)
+    monkeypatch.delenv("VSCODE_IPC_HOOK_CLI", raising=False)
+
+    assert mod.default_code_launcher([Path("file.md")]) is False
+    assert looked_up == ["code", "code-insiders"]

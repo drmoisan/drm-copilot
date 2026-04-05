@@ -64,10 +64,11 @@ Use these reusable skills to avoid duplicating shared operations:
    - `- Work Mode: full-bug`
 - Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch acceptance-criteria (AC) source by marker value:
-   - When `Work Mode: minor-audit`, treat `issue.md` as the AC source of truth.
+   - When `Work Mode: minor-audit`, treat only the explicit `## Acceptance Criteria` section in `issue.md` as the AC source of truth.
    - When `Work Mode: full-feature`, treat `spec.md` and `user-story.md` as AC sources of truth.
    - When `Work Mode: full-bug`, treat `spec.md` as the AC source of truth.
 - Fail closed: if marker is missing or malformed, fallback to `full-feature` behavior (`spec.md` + `user-story.md`).
+- For `minor-audit`, fail closed to remediation-required if the explicit `## Acceptance Criteria` section is missing from `issue.md`.
 
 
 # Execution plan (phased, deterministic)
@@ -183,6 +184,7 @@ Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
    - Extract acceptance criteria from:
      - pr_context summary acceptance-criteria blocks
      - active feature scoping docs (plan/spec/user-story) if they contain criteria
+   - When `Work Mode: minor-audit`, extract criteria only from the explicit `## Acceptance Criteria` section in `issue.md`; do not infer criteria from other `issue.md` sections.
    - Treat extracted criteria as the authoritative checklist for this audit run.
 
 3) Acceptance criteria evaluation table
