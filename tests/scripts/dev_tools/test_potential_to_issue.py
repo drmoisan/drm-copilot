@@ -63,15 +63,20 @@ class FakeGhClient(mod.GhClient):
 
     def __init__(
         self,
-        create_result: mod.GhResult,
+        create_result: mod.GhResult | list[mod.GhResult],
         view_result: mod.GhResult | None = None,
+        label_result: mod.GhResult | None = None,
         authenticated: bool = True,
     ) -> None:
         """Initialize fake gh responses and call tracking state."""
-        self.create_result = create_result
+        self.create_results = (
+            create_result if isinstance(create_result, list) else [create_result]
+        )
         self.view_result = view_result
+        self.label_result = label_result or mod.GhResult([], 0)
         self.authenticated = authenticated
         self.calls: list[tuple[str, tuple[str, ...]]] = []
+        self.ensure_label_calls: list[str] = []
 
     def is_authenticated(self) -> bool:
         """Return preconfigured authentication status."""
@@ -80,12 +85,39 @@ class FakeGhClient(mod.GhClient):
     def issue_create(self, title: str, body: str, promotion_type: str) -> mod.GhResult:
         """Record issue-create invocations and return configured result."""
         self.calls.append(("create", (title, body, promotion_type)))
-        return self.create_result
+        if len(self.create_results) > 1:
+            return self.create_results.pop(0)
+        return self.create_results[0]
+
+    def ensure_label(self, label: str) -> mod.GhResult:
+        """Record label-ensure requests and return configured result."""
+        self.ensure_label_calls.append(label)
+        self.calls.append(("ensure_label", (label,)))
+        return self.label_result
 
     def issue_view(self, issue_number: str) -> mod.GhResult:
         """Record issue-view invocation and return configured view result."""
         self.calls.append(("view", (issue_number,)))
         return self.view_result or mod.GhResult([], 0)
+
+
+def _build_feature_potential_content(feature_name: str) -> str:
+    """Return minimal feature content for potential-to-issue promotion tests."""
+    return "\n".join(
+        [
+            f"# {feature_name}",
+            "## Problem / Why",
+            "why",
+            "## Proposed Behavior",
+            "behave",
+            "## Acceptance Criteria (early draft)",
+            "criteria",
+            "## Constraints & Risks",
+            "risk",
+            "## Test Conditions to Consider",
+            "tests",
+        ]
+    )
 
 
 def test_get_feature_name_variants() -> None:
@@ -247,6 +279,78 @@ def test_promote_potential_failure_does_not_move_file() -> None:
     assert "## Test Conditions\n(not provided in potential file)" in body
     assert potential.relative_to(workspace).as_posix() in body
     assert "line1" in messages and "line2" in messages
+
+
+def test_promote_potential_feature_missing_label_recovers_and_moves_file() -> None:
+    """Verify feature promotion recovers from a missing-label create failure."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/missing-feature-label.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = _build_feature_potential_content("Missing Feature Label")
+
+    create_results = [
+        mod.GhResult(["could not add label: 'feature' not found"], 1),
+        mod.GhResult(["Created: https://example.com/issues/321"], 0),
+    ]
+    view_result = mod.GhResult(
+        [
+            '{"number":321,"title":"t","url":"https://example.com/issues/321","author":{"login":"me"},"updatedAt":"2024-04-05T00:00:00Z"}',
+        ],
+        0,
+    )
+    gh = FakeGhClient(create_results, view_result=view_result)
+
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+    )
+
+    assert outcome.exit_code == 0
+    assert outcome.destination == (
+        workspace / "docs/features/potential/promoted/missing-feature-label.md"
+    )
+    create_calls = [call for call in gh.calls if call[0] == "create"]
+    assert len(create_calls) == 2
+    assert gh.ensure_label_calls == ["feature"]
+    assert all(call[1][2] == "feature" for call in create_calls)
+    assert (potential, outcome.destination) in fs.moves
+
+
+# fmt: off
+def test_promote_potential_feature_existing_label_uses_single_issue_create_attempt(
+) -> None:
+# fmt: on
+    """Verify existing feature labels stay on the single create path."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/existing-feature-label.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = _build_feature_potential_content("Existing Feature Label")
+
+    create_result = mod.GhResult(["Created: https://example.com/issues/322"], 0)
+    view_result = mod.GhResult(
+        [
+            '{"number":322,"title":"t","url":"https://example.com/issues/322","author":{"login":"me"},"updatedAt":"2024-04-05T00:00:00Z"}',
+        ],
+        0,
+    )
+    gh = FakeGhClient(create_result, view_result=view_result)
+
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="feature",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+    )
+
+    assert outcome.exit_code == 0
+    create_calls = [call for call in gh.calls if call[0] == "create"]
+    assert len(create_calls) == 1
+    assert create_calls[0][1][2] == "feature"
+    assert gh.ensure_label_calls == []
 
 
 def test_promote_potential_bug_builds_issue_body_from_bug_sections() -> None:
@@ -518,9 +622,11 @@ def test_real_gh_client_invokes_subprocess(monkeypatch: pytest.MonkeyPatch) -> N
     client = mod.RealGhClient()
     assert client.is_authenticated() is True
     create = client.issue_create("Title", "Body", "feature")
+    ensure_label = client.ensure_label("feature")
     view = client.issue_view("5")
-    assert create.exit_code == 0 and view.exit_code == 0
+    assert create.exit_code == 0 and ensure_label.exit_code == 0 and view.exit_code == 0
     assert any("issue" in call for call in calls)
+    assert any(call[:3] == ["/usr/bin/gh", "label", "create"] for call in calls)
 
 
 def test_real_gh_client_raises_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:

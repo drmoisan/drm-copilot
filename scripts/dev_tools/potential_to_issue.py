@@ -40,6 +40,8 @@ TITLE_PREFIXES = {
     "refactor": "Refactor",
     "bug": "Bug",
 }
+FEATURE_LABEL_COLOR = "0e8a16"
+FEATURE_LABEL_DESCRIPTION = "Feature work"
 
 
 class PromotionError(Exception):
@@ -79,6 +81,8 @@ class GhClient(Protocol):
     def is_authenticated(self) -> bool: ...
 
     def issue_create(self, title: str, body: str, promotion_type: str) -> GhResult: ...
+
+    def ensure_label(self, label: str) -> GhResult: ...
 
     def issue_view(self, issue_number: str) -> GhResult: ...
 
@@ -162,6 +166,19 @@ class RealGhClient(GhClient):
             promotion_type,
         ]
         return self._run(args, body)
+
+    def ensure_label(self, label: str) -> GhResult:
+        """Ensure a GitHub label exists before retrying issue creation."""
+        args = [
+            "label",
+            "create",
+            label,
+            "--color",
+            FEATURE_LABEL_COLOR,
+            "--description",
+            FEATURE_LABEL_DESCRIPTION,
+        ]
+        return self._run(args)
 
     def issue_view(self, issue_number: str) -> GhResult:
         args = [
@@ -332,6 +349,12 @@ def _default(message: str) -> None:
     print(message)
 
 
+def _is_missing_label_failure(output: list[str], label: str) -> bool:
+    """Return whether gh output reports a missing-label create failure."""
+    expected_fragment = f"could not add label: '{label}' not found"
+    return any(expected_fragment in line.lower() for line in output)
+
+
 def promote_potential(
     potential_path: str,
     promotion_type: str = "feature",
@@ -472,6 +495,18 @@ def promote_potential(
         _emit(f"Fallback reason: {fallback_reason}")
     _emit(f"Creating issue: {issue_title} (label: {promotion_type})")
     create_result = gh_client.issue_create(issue_title, body, promotion_type)
+
+    # Recover only from the known feature-label failure so other gh errors still
+    # fail fast with their original output.
+    if promotion_type == "feature" and _is_missing_label_failure(
+        create_result.output, promotion_type
+    ):
+        _emit("Missing feature label detected; ensuring label exists and retrying.")
+        ensure_label_result = gh_client.ensure_label(promotion_type)
+        for line in ensure_label_result.output:
+            _emit(line)
+        if ensure_label_result.exit_code == 0:
+            create_result = gh_client.issue_create(issue_title, body, promotion_type)
 
     if create_result.exit_code != 0:
         output_lines = create_result.output or [
