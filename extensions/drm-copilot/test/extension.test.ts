@@ -279,6 +279,18 @@ describe("drm-copilot command behavior", () => {
     ).toBe(true);
   });
 
+  it("registers pushDownCodexAndAgentsCustomizations", () => {
+    activateAndGetHandler(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+
+    expect(
+      commandHandlers.has(
+        "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+      ),
+    ).toBe(true);
+  });
+
   it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
     activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
 

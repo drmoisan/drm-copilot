@@ -52,6 +52,10 @@
         "title": "drm-copilot: Push Down Copilot Customizations"
       },
       {
+        "command": "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+        "title": "drm-copilot: Push Down Codex and Agents Customizations"
+      },
+      {
         "command": "drmCopilotExtension.syncAgentsFromInstructions",
         "title": "drm-copilot: Sync AGENTS.md from Instructions"
       },

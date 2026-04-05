@@ -48,6 +48,7 @@ The VS Code side continues to contribute these implemented commands:
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
+- `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.newPotentialBugEntry`
 - `drmCopilotExtension.newPotentialEntry`
 - `drmCopilotExtension.potentialToIssue`
@@ -60,6 +61,7 @@ The MCP side exposes semantic repo-automation tools such as:
 - `collect_commit_context`
 - `collect_pr_context`
 - `push_down_copilot_customizations`
+- `push_down_codex_and_agents_customizations`
 - `new_potential_bug_entry`
 - `new_potential_entry`
 - `potential_to_issue`
@@ -144,6 +146,24 @@ Use `drmCopilotExtension.pushDownCopilotCustomizations` from the Command Palette
 ### Rewrite behavior
 
 During publication, supported script references are rewritten to stable live VS Code command references contributed by the extension.
+
+## Push-down Codex and agents customizations
+
+You can also publish the scoped `.codex` and `.agents` trees into another workspace from either side of the repo.
+
+### Python entrypoint
+
+Use the root Python publisher to copy Codex/agents files into a target workspace:
+
+`poetry run python -m scripts.dev_tools.push_down_codex_and_agents_customizations --destination <workspace-root>`
+
+### Extension command
+
+Use `drmCopilotExtension.pushDownCodexAndAgentsCustomizations` from the Command Palette to apply the bundled `.codex` / `.agents` payload to the currently open workspace.
+
+### MCP tool
+
+Use `push_down_codex_and_agents_customizations` from the `drmCopilotExtension` MCP server to invoke the same bundled publisher non-interactively.
 
 ## CI coverage
 

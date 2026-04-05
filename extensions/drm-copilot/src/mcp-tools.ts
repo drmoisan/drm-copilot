@@ -8,6 +8,7 @@ import {
 import {
   resolveCollectCommitContextToolInput,
   resolveCollectPrContextToolInput,
+  resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
@@ -77,6 +78,18 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     name: "push_down_copilot_customizations",
     description:
       "Copy the bundled Copilot customization payload into the target workspace.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "push_down_codex_and_agents_customizations",
+    description:
+      "Copy the bundled Codex and agents customization payload into the target workspace.",
     inputSchema: {
       type: "object",
       properties: {
@@ -282,6 +295,14 @@ export async function dispatchRepoAutomationTool(
         const input = resolvePushDownCopilotCustomizationsToolInput(rawInput);
         return toMcpToolResult(
           await service.pushDownCopilotCustomizations(input),
+        );
+      }
+
+      case "push_down_codex_and_agents_customizations": {
+        const input =
+          resolvePushDownCodexAndAgentsCustomizationsToolInput(rawInput);
+        return toMcpToolResult(
+          await service.pushDownCodexAndAgentsCustomizations(input),
         );
       }
 

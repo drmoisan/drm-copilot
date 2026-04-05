@@ -143,6 +143,19 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
+  const pushDownCodexAndAgentsCustomizationsDisposable =
+    vscode.commands.registerCommand(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+      async () => {
+        const commandId =
+          "drmCopilotExtension.pushDownCodexAndAgentsCustomizations";
+        await service.pushDownCodexAndAgentsCustomizations({
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
+        });
+      },
+    );
+
   const syncAgentsFromInstructionsDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.syncAgentsFromInstructions",
     async () => {
@@ -363,6 +376,7 @@ export function activate(context: vscode.ExtensionContext): void {
     newActiveFeatureFolderDisposable,
     potentialToIssueDisposable,
     pushDownCopilotCustomizationsDisposable,
+    pushDownCodexAndAgentsCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,

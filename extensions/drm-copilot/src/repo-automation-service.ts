@@ -17,6 +17,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "collect_commit_context",
   "collect_pr_context",
   "push_down_copilot_customizations",
+  "push_down_codex_and_agents_customizations",
   "new_potential_bug_entry",
   "new_potential_entry",
   "potential_to_issue",
@@ -50,6 +51,9 @@ export interface RepoAutomationService {
     input: WorkspaceExecutionInput & { readonly base: string },
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCopilotCustomizations(
+    input: WorkspaceExecutionInput,
+  ): Promise<RepoAutomationExecutionResult>;
+  pushDownCodexAndAgentsCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   newPotentialBugEntry(
@@ -197,6 +201,24 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       args: ["--destination", input.workspaceRoot],
       summary:
         "Pushed bundled Copilot customizations into the destination workspace.",
+      stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
+    });
+  }
+
+  async pushDownCodexAndAgentsCustomizations(
+    input: WorkspaceExecutionInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "push_down_codex_and_agents_customizations",
+      runtimeKind: "python",
+      bundledRelativePath:
+        "resources/templates/push_down_codex_and_agents_customizations.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId:
+        input.invocationId ?? "push_down_codex_and_agents_customizations",
+      args: ["--destination", input.workspaceRoot],
+      summary:
+        "Pushed bundled Codex and agents customizations into the destination workspace.",
       stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
     });
   }
