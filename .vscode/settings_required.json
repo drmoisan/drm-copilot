@@ -30,6 +30,10 @@
     "jest.runMode": "on-demand",
     "jest.useJest30": true,
     "powershell.cwd": "${workspaceFolder}",
+    "powershell.powerShellAdditionalExePaths": {
+        "PowerShell 7 (Workspace)": "C:/Program Files/PowerShell/7/pwsh.exe"
+    },
+    "powershell.powerShellDefaultVersion": "PowerShell 7 (Workspace)",
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": ["tests"],

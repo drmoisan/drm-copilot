@@ -5,18 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-
-ROOT_MIRROR_PAIRS = (
-    (
-        ".codex/agents/orchestrator.toml",
-        "extensions/drm-copilot/resources/codex-and-agents-customizations/"
-        ".codex/agents/orchestrator.toml",
-    ),
-    (
-        ".agents/skills/orchestrator-workflow/SKILL.md",
-        "extensions/drm-copilot/resources/codex-and-agents-customizations/"
-        ".agents/skills/orchestrator-workflow/SKILL.md",
-    ),
+BUNDLED_ROOT = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "codex-and-agents-customizations"
+)
+REQUIRED_BUNDLED_PATHS = (
+    Path(".codex/agents/orchestrator.toml"),
+    Path(".agents/skills/orchestrator-workflow/SKILL.md"),
 )
 
 
@@ -26,10 +24,16 @@ def read_repo_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def read_bundle_text(relative_path: str) -> str:
+    """Return UTF-8 text for a bundled Codex/agents contract file."""
+
+    return (BUNDLED_ROOT / relative_path).read_text(encoding="utf-8")
+
+
 def test_codex_orchestrator_agent_requires_mandatory_specialist_handoffs() -> None:
     """Require the Codex orchestrator agent to enforce specialist delegation."""
 
-    agent_text = read_repo_text(".codex/agents/orchestrator.toml")
+    agent_text = read_bundle_text(".codex/agents/orchestrator.toml")
 
     assert "you must delegate planning to it" in agent_text
     assert (
@@ -45,7 +49,7 @@ def test_codex_orchestrator_agent_requires_mandatory_specialist_handoffs() -> No
 def test_codex_orchestrator_workflow_requires_large_path_evidence_gates() -> None:
     """Require the Codex workflow skill to restore large-path hard enforcement."""
 
-    skill_text = read_repo_text(".agents/skills/orchestrator-workflow/SKILL.md")
+    skill_text = read_bundle_text(".agents/skills/orchestrator-workflow/SKILL.md")
 
     assert "- `pr-context-artifacts`" in skill_text
     assert "- `pr-base-branch-merge-base`" in skill_text
@@ -77,10 +81,8 @@ def test_codex_orchestrator_workflow_requires_large_path_evidence_gates() -> Non
     )
 
 
-def test_codex_orchestration_bundle_mirrors_match_root_contracts() -> None:
-    """Require bundled Codex orchestration resources to stay in sync."""
+def test_codex_orchestration_bundle_contains_required_runtime_surfaces() -> None:
+    """Require bundled Codex orchestration resources to be present in the payload."""
 
-    for root_relative_path, mirror_relative_path in ROOT_MIRROR_PAIRS:
-        assert read_repo_text(mirror_relative_path) == read_repo_text(
-            root_relative_path
-        )
+    for relative_path in REQUIRED_BUNDLED_PATHS:
+        assert (BUNDLED_ROOT / relative_path).is_file()

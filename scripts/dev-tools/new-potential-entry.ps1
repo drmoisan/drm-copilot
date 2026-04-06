@@ -27,11 +27,19 @@ function Test-ValidShortName {
 function Get-AuthorName {
     [CmdletBinding()]
     param(
+        [scriptblock] $GetCommand = { param([string] $Name) Get-Command $Name -ErrorAction SilentlyContinue },
         [scriptblock] $GetGitConfig = { param([string] $Key) git config $Key 2>$null },
         [scriptblock] $GetEnvironmentVariable = { param([string] $Name) [Environment]::GetEnvironmentVariable($Name) }
     )
 
-    $author = & $GetGitConfig 'user.name'
+    # Test Explorer can run under a host where git is not on PATH, so guard the
+    # git lookup before invoking the external command and fall back cleanly.
+    $author = $null
+    $gitCommand = & $GetCommand 'git'
+    if ($gitCommand) {
+        $author = & $GetGitConfig 'user.name'
+    }
+
     if (-not $author -or [string]::IsNullOrWhiteSpace($author)) {
         $author = & $GetEnvironmentVariable 'USERNAME'
     }

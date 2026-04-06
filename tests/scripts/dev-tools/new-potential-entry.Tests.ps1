@@ -101,6 +101,14 @@ Describe "new-potential-entry.ps1 - Get-AuthorName" {
             $result | Should -Be "WindowsUser"
         }
 
+        It "falls back to USERNAME environment variable when git is unavailable" {
+            $result = Get-AuthorName `
+                -GetCommand { param($Name) $null = $Name; $null } `
+                -GetGitConfig { throw 'git should not be called when unavailable' } `
+                -GetEnvironmentVariable { param($Name) $null = $Name; "WindowsUser" }
+            $result | Should -Be "WindowsUser"
+        }
+
         It "returns 'Unknown' when git returns empty and no USERNAME" {
             $result = Get-AuthorName `
                 -GetGitConfig { param($Key) $null = $Key; "" } `

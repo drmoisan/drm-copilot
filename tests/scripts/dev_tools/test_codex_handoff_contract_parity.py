@@ -5,6 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+BUNDLED_ROOT = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "codex-and-agents-customizations"
+)
 
 SHARED_SKILL_NAMES = (
     "acceptance-criteria-tracking",
@@ -31,20 +38,26 @@ def read_repo_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def read_bundle_text(relative_path: str) -> str:
+    """Return UTF-8 content for a bundled Codex/agents contract file."""
+
+    return (BUNDLED_ROOT / relative_path).read_text(encoding="utf-8")
+
+
 def test_shared_codex_skills_match_github_contract_sources() -> None:
     """Require migrated shared skills to stay identical to GitHub source contracts."""
 
     for skill_name in SHARED_SKILL_NAMES:
         github_path = f".github/skills/{skill_name}/SKILL.md"
         codex_path = f".agents/skills/{skill_name}/SKILL.md"
-        assert read_repo_text(codex_path) == read_repo_text(github_path)
+        assert read_bundle_text(codex_path) == read_repo_text(github_path)
 
 
 def test_atomic_planner_handoff_contract_is_strict_in_skill_and_agent() -> None:
     """Require planner preflight handoff strictness in both Codex surfaces."""
 
-    skill_text = read_repo_text(".agents/skills/atomic-planner/SKILL.md")
-    agent_text = read_repo_text(".codex/agents/atomic-planner.toml")
+    skill_text = read_bundle_text(".agents/skills/atomic-planner/SKILL.md")
+    agent_text = read_bundle_text(".codex/agents/atomic-planner.toml")
 
     required_fragments = (
         "DIRECTIVE: PREFLIGHT VALIDATION ONLY",
@@ -67,8 +80,8 @@ def test_atomic_planner_handoff_contract_is_strict_in_skill_and_agent() -> None:
 def test_atomic_executor_handoff_contract_is_strict_in_skill_and_agent() -> None:
     """Require executor validation-only preflight behavior in both Codex surfaces."""
 
-    skill_text = read_repo_text(".agents/skills/atomic-executor/SKILL.md")
-    agent_text = read_repo_text(".codex/agents/atomic-executor.toml")
+    skill_text = read_bundle_text(".agents/skills/atomic-executor/SKILL.md")
+    agent_text = read_bundle_text(".codex/agents/atomic-executor.toml")
 
     for fragment in (
         "DIRECTIVE: PREFLIGHT VALIDATION ONLY",
@@ -88,8 +101,8 @@ def test_atomic_executor_handoff_contract_is_strict_in_skill_and_agent() -> None
 def test_feature_review_remediation_handoff_is_strict_in_skill_and_agent() -> None:
     """Require automatic remediation handoff strictness in both Codex surfaces."""
 
-    skill_text = read_repo_text(".agents/skills/feature-review/SKILL.md")
-    agent_text = read_repo_text(".codex/agents/feature-reviewer.toml")
+    skill_text = read_bundle_text(".agents/skills/feature-review/SKILL.md")
+    agent_text = read_bundle_text(".codex/agents/feature-reviewer.toml")
 
     for fragment in (
         (

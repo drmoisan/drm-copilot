@@ -358,6 +358,36 @@ def test_main_prints_summary_artifact_path_on_success(
     assert "artifacts/copilot-customizations/push-down-" in captured.out
 
 
+def test_main_preserves_windows_style_absolute_paths_on_linux_hosts(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Keep Windows absolute test paths stable when the host runner is Linux."""
+    module = _load_main_module()
+    repo_root = Path("C:/source-repo")
+    destination_root = Path("C:/destination-repo")
+    source_file = repo_root / ".github" / "prompts" / "example.prompt.md"
+    fs = RecordingPushDownFileSystem(
+        files={source_file: MemoryFile(content="No rewrites needed here.")}
+    )
+    fs.ensure_dir(repo_root)
+    fs.ensure_dir(source_file.parent)
+    fs.ensure_dir(destination_root)
+
+    exit_code = module.main(
+        ["--destination", str(destination_root)],
+        repo_root=repo_root,
+        fs=fs,
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Wrote push-down summary artifact to:" in captured.out
+    assert (
+        fs.read_text(destination_root / ".github" / "prompts" / "example.prompt.md")
+        == "No rewrites needed here."
+    )
+
+
 def test_real_filesystem_list_files_returns_empty_when_root_is_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
