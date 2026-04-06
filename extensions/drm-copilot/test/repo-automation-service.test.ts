@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
   afterEach,
   beforeEach,
@@ -8,10 +7,13 @@ import {
   jest,
 } from "@jest/globals";
 
-type MockChildProcess = EventEmitter & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
-};
+import {
+  createMockProcess,
+  getFreshChildProcessMock,
+  getFreshFsMock,
+  prepareFreshModulesWithPosixPathResolve,
+  setExecutablePresenceOnFsMock,
+} from "./runtime-test-helpers";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
@@ -35,21 +37,19 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
-function createMockProcess(
-  exitCode: number,
-  stdoutText: string = "",
-): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    if (stdoutText.length > 0) {
-      processMock.stdout.emit("data", Buffer.from(stdoutText, "utf-8"));
-    }
+function setFreshExecutablePresence(presence: {
+  readonly python?: boolean;
+  readonly py?: boolean;
+  readonly pwsh?: boolean;
+  readonly powershell?: boolean;
+}): void {
+  setExecutablePresenceOnFsMock(getFreshFsMock(), presence);
+}
 
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
+function createFreshRepoAutomationService(): typeof import("../src/repo-automation-service") {
+  return jest.requireActual<typeof import("../src/repo-automation-service")>(
+    "../src/repo-automation-service",
+  );
 }
 
 function setExecutablePresence(presence: {
@@ -58,26 +58,7 @@ function setExecutablePresence(presence: {
   readonly pwsh?: boolean;
   readonly powershell?: boolean;
 }): void {
-  fsMock.existsSync.mockImplementation((filePath: string) => {
-    const lowerPath = filePath.toLowerCase();
-    if (lowerPath.includes("python")) {
-      return presence.python ?? false;
-    }
-
-    if (lowerPath.includes(`${"\\"}py.`) || lowerPath.endsWith("/py")) {
-      return presence.py ?? false;
-    }
-
-    if (lowerPath.includes("pwsh")) {
-      return presence.pwsh ?? false;
-    }
-
-    if (lowerPath.includes("powershell")) {
-      return presence.powershell ?? false;
-    }
-
-    return false;
-  });
+  setExecutablePresenceOnFsMock(fsMock, presence);
 }
 
 describe("repo automation service", () => {
@@ -157,6 +138,36 @@ describe("repo automation service", () => {
     expect(options.shell).toBe(false);
   });
 
+  it("collectCommitContext preserves C:/extension on POSIX hosts", async () => {
+    prepareFreshModulesWithPosixPathResolve();
+    setFreshExecutablePresence({ python: true });
+    const freshChildProcessMock = getFreshChildProcessMock();
+    freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const freshModule = createFreshRepoAutomationService();
+    const service = freshModule.createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    try {
+      await service.collectCommitContext({
+        workspaceRoot: "C:/workspace",
+        invocationId: "collect_commit_context",
+      });
+
+      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+        string,
+        string[],
+      ];
+      expect(args[0].startsWith("C:/extension/resources/templates/")).toBe(
+        true,
+      );
+    } finally {
+      jest.dontMock("node:path");
+      jest.resetModules();
+    }
+  });
+
   it("newPotentialEntry keeps subprocess execution argv-based with shell disabled", async () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
@@ -188,5 +199,36 @@ describe("repo automation service", () => {
     ]);
     expect(options.cwd).toBe("C:/workspace");
     expect(options.shell).toBe(false);
+  });
+
+  it("newPotentialEntry preserves C:/extension on POSIX hosts", async () => {
+    prepareFreshModulesWithPosixPathResolve();
+    setFreshExecutablePresence({ pwsh: true });
+    const freshChildProcessMock = getFreshChildProcessMock();
+    freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const freshModule = createFreshRepoAutomationService();
+    const service = freshModule.createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    try {
+      await service.newPotentialEntry({
+        workspaceRoot: "C:/workspace",
+        invocationId: "new_potential_entry",
+        shortName: "mcp-entry",
+      });
+
+      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+        string,
+        string[],
+      ];
+      expect(args[5].startsWith("C:/extension/resources/templates/")).toBe(
+        true,
+      );
+    } finally {
+      jest.dontMock("node:path");
+      jest.resetModules();
+    }
   });
 });

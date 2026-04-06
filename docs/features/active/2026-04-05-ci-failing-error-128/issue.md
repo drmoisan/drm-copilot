@@ -43,9 +43,9 @@ The run ends with `Test Suites: 7 failed, 3 passed, 10 total`, `Tests: 18 failed
 
 ## Acceptance Criteria
 
-- [ ] Windows-style absolute extension roots such as `C:/extension` remain absolute when bundled script paths are resolved on POSIX hosts.
-- [ ] Bundled command and repo-automation script invocations continue to target extension resources rather than workspace-relative copies.
-- [ ] Regression coverage verifies the Windows-style mocked `fsPath` scenario and the extension Jest suite no longer fails with checkout-prefixed hybrid paths.
+- [x] Windows-style absolute extension roots such as `C:/extension` remain absolute when bundled script paths are resolved on POSIX hosts.
+- [x] Bundled command and repo-automation script invocations continue to target extension resources rather than workspace-relative copies.
+- [x] Regression coverage verifies the Windows-style mocked `fsPath` scenario and the extension Jest suite no longer fails with checkout-prefixed hybrid paths.
 
 ## Logs / Screenshots
 
