@@ -103,7 +103,7 @@ def _load_module():
 def test_bundled_module_imports_without_repo_root_scripts_package(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Verify bundled import works with only the packaged `dev_tools` path."""
+    """Verify bundled import and CLI execution work with only packaged sources."""
 
     repo_root = Path(__file__).resolve().parents[3]
     bundled_scripts_root = _bundled_scripts_root()
@@ -141,6 +141,26 @@ def test_bundled_module_imports_without_repo_root_scripts_package(
         assert callable(module.push_down_customizations)
         assert module.MODULE_ENTRY_POINT.endswith(
             "push_down_codex_and_agents_customizations"
+        )
+        source_root = Path("C:/repo")
+        destination_root = Path("C:/dest")
+        fs = RecordingFileSystem(
+            files={
+                source_root / ".codex" / "config.toml": MemoryFile("trusted = true\n"),
+            }
+        )
+        fs.directories.update({source_root, source_root / ".codex", destination_root})
+
+        exit_code = module.main(
+            ["--destination", str(destination_root)],
+            repo_root=source_root,
+            fs=fs,
+        )
+
+        assert exit_code == 0
+        assert (
+            fs.read_text(destination_root / ".codex" / "config.toml")
+            == "trusted = true\n"
         )
     finally:
         for module_name in import_state:

@@ -5,12 +5,25 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+BUNDLED_ROOT = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "codex-and-agents-customizations"
+)
 
 
 def read_repo_text(relative_path: str) -> str:
     """Return UTF-8 content for a repository contract file."""
 
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def read_bundle_text(relative_path: str) -> str:
+    """Return UTF-8 content for a bundled Codex contract file."""
+
+    return (BUNDLED_ROOT / relative_path).read_text(encoding="utf-8")
 
 
 def assert_contains_all(text: str, fragments: tuple[str, ...]) -> None:
@@ -24,7 +37,7 @@ def test_atomic_planner_wrapper_preserves_github_preflight_handoff_contract() ->
     """Require Codex planner wrapper to preserve GitHub preflight semantics."""
 
     github_text = read_repo_text(".github/agents/atomic_planning.agent.md")
-    codex_text = read_repo_text(".codex/agents/atomic-planner.toml")
+    codex_text = read_bundle_text(".codex/agents/atomic-planner.toml")
 
     assert_contains_all(
         github_text,
@@ -55,7 +68,7 @@ def test_atomic_executor_wrapper_preserves_github_preflight_return_handoff() -> 
     """Require Codex executor wrapper to preserve planner-return handoff rules."""
 
     github_text = read_repo_text(".github/agents/atomic_executor.agent.md")
-    codex_text = read_repo_text(".codex/agents/atomic-executor.toml")
+    codex_text = read_bundle_text(".codex/agents/atomic-executor.toml")
 
     assert_contains_all(
         github_text,
@@ -87,7 +100,7 @@ def test_feature_reviewer_wrapper_preserves_github_remediation_handoff() -> None
     """Require Codex reviewer wrapper to preserve automatic remediation handoff."""
 
     github_text = read_repo_text(".github/agents/feature-review.agent.md")
-    codex_text = read_repo_text(".codex/agents/feature-reviewer.toml")
+    codex_text = read_bundle_text(".codex/agents/feature-reviewer.toml")
 
     assert_contains_all(
         github_text,
@@ -123,7 +136,7 @@ def test_orchestrator_wrapper_preserves_github_mandatory_delegation_contract() -
     """Require Codex orchestrator wrapper to preserve GitHub delegation gates."""
 
     github_text = read_repo_text(".github/agents/orchestrator.agent.md")
-    codex_text = read_repo_text(".codex/agents/orchestrator.toml")
+    codex_text = read_bundle_text(".codex/agents/orchestrator.toml")
 
     assert_contains_all(
         github_text,

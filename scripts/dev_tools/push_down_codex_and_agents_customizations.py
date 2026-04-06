@@ -16,6 +16,7 @@ try:
         PushDownFileSystem,
         PushDownSummary,
         RealPushDownFileSystem,
+        resolve_cli_path,
     )
     from scripts.dev_tools.push_down_copilot_customizations import (
         push_down_customizations as push_down_scoped_customizations,
@@ -27,6 +28,7 @@ except ModuleNotFoundError as error:
         PushDownFileSystem,
         PushDownSummary,
         RealPushDownFileSystem,
+        resolve_cli_path,
     )
     from dev_tools.push_down_copilot_customizations import (
         push_down_customizations as push_down_scoped_customizations,
@@ -98,8 +100,8 @@ def main(
     """Run the Codex/agents push-down publisher CLI."""
 
     args = parse_args(argv)
-    resolved_repo_root = (repo_root or Path.cwd()).expanduser().resolve()
-    resolved_destination = Path(args.destination).expanduser().resolve()
+    resolved_repo_root = resolve_cli_path(repo_root or Path.cwd())
+    resolved_destination = resolve_cli_path(args.destination)
     resolved_fs = fs or RealPushDownFileSystem()
     summary = push_down_customizations(
         repo_root=resolved_repo_root,

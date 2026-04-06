@@ -52,6 +52,12 @@ def read_repo_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def read_bundle_text(relative_path: str) -> str:
+    """Return UTF-8 text for a bundled Codex/agents file."""
+
+    return (BUNDLE_ROOT / relative_path).read_text(encoding="utf-8")
+
+
 def normalize_agent_target(file_name: str) -> str:
     """Map a GitHub agent filename to its default Codex wrapper target."""
 
@@ -89,15 +95,10 @@ def test_all_github_skills_are_migrated_and_identical_in_agents_tree() -> None:
 
     for skill_name in github_skill_dirs:
         github_relative = f".github/skills/{skill_name}/SKILL.md"
-        codex_relative = f".agents/skills/{skill_name}/SKILL.md"
-        bundled_relative = (
-            f"extensions/drm-copilot/resources/codex-and-agents-customizations/"
-            f".agents/skills/{skill_name}/SKILL.md"
-        )
+        bundled_relative = f".agents/skills/{skill_name}/SKILL.md"
 
-        assert (REPO_ROOT / codex_relative).exists()
-        assert read_repo_text(codex_relative) == read_repo_text(github_relative)
-        assert read_repo_text(bundled_relative) == read_repo_text(codex_relative)
+        assert (BUNDLE_ROOT / bundled_relative).exists()
+        assert read_bundle_text(bundled_relative) == read_repo_text(github_relative)
 
 
 def test_every_github_agent_has_a_codex_wrapper_file() -> None:
@@ -111,13 +112,8 @@ def test_every_github_agent_has_a_codex_wrapper_file() -> None:
 
     for github_file in github_agents:
         wrapper_relative = f".codex/agents/{normalize_agent_target(github_file)}.toml"
-        bundled_relative = (
-            "extensions/drm-copilot/resources/codex-and-agents-customizations/"
-            f".codex/agents/{normalize_agent_target(github_file)}.toml"
-        )
 
-        assert (REPO_ROOT / wrapper_relative).exists()
-        assert read_repo_text(bundled_relative) == read_repo_text(wrapper_relative)
+        assert (BUNDLE_ROOT / wrapper_relative).exists()
 
 
 def test_generated_agent_wrappers_reference_source_and_preserve_handoffs() -> None:
@@ -137,7 +133,7 @@ def test_generated_agent_wrappers_reference_source_and_preserve_handoffs() -> No
         github_relative = f".github/agents/{github_file}"
         wrapper_relative = f".codex/agents/{target_name}.toml"
         github_text = read_repo_text(github_relative)
-        wrapper_text = read_repo_text(wrapper_relative)
+        wrapper_text = read_bundle_text(wrapper_relative)
 
         for fragment in WRAPPER_REQUIRED_FRAGMENTS:
             assert fragment in wrapper_text

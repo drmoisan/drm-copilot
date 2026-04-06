@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import TypedDict
 
 try:
@@ -310,6 +311,27 @@ def write_summary_artifact(
     return artifact_path
 
 
+def resolve_cli_path(path_value: str | Path) -> Path:
+    """
+    Resolve CLI paths without breaking Windows absolute paths on Linux hosts.
+
+    Purpose:
+        Keep test-injected Windows paths stable when a Linux runner validates
+        the push-down CLIs against the in-memory filesystem doubles.
+
+    Args:
+        path_value (str | Path): CLI or test path value to normalize.
+
+    Returns:
+        Path: Expanded path that is resolved only when the host semantics match.
+    """
+    raw_value = str(path_value)
+    candidate = Path(raw_value).expanduser()
+    if os.name != "nt" and PureWindowsPath(raw_value).is_absolute():
+        return candidate
+    return candidate.resolve()
+
+
 def push_down_customizations(
     *,
     repo_root: Path,
@@ -464,8 +486,8 @@ def main(
         JSON summary artifact path on success.
     """
     args = parse_args(argv)
-    resolved_repo_root = (repo_root or Path.cwd()).expanduser().resolve()
-    resolved_destination = Path(args.destination).expanduser().resolve()
+    resolved_repo_root = resolve_cli_path(repo_root or Path.cwd())
+    resolved_destination = resolve_cli_path(args.destination)
     resolved_fs = fs or RealPushDownFileSystem()
     summary = push_down_customizations(
         repo_root=resolved_repo_root,
