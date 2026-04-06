@@ -320,12 +320,11 @@ def promote_potential(
     _emit(f"Creating issue: {issue_title} (label: {promotion_type})")
     create_result = gh_client.issue_create(issue_title, body, promotion_type)
 
-    # Recover only from the known feature-label failure so other gh errors still
-    # fail fast with their original output.
-    if promotion_type == "feature" and _is_missing_label_failure(
-        create_result.output, promotion_type
-    ):
-        _emit("Missing feature label detected; ensuring label exists and retrying.")
+    # Recover only from the known missing-label failure for the selected
+    # promotion label so other gh errors still fail fast with their original
+    # output.
+    if _is_missing_label_failure(create_result.output, promotion_type):
+        _emit("Missing promotion label detected; ensuring label exists and retrying.")
         ensure_label_result = gh_client.ensure_label(promotion_type)
         for line in ensure_label_result.output:
             _emit(line)
