@@ -16,14 +16,26 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypedDict
 
-from scripts.dev_tools.agentic_sync import ROOT_FOLDERS
-from scripts.dev_tools.push_down_copilot_customizations_filesystem import (
-    PushDownFileSystem,
-    RealPushDownFileSystem,
-)
-from scripts.dev_tools.push_down_copilot_customizations_rewrites import (
-    rewrite_text_references,
-)
+try:
+    from scripts.dev_tools.agentic_sync import ROOT_FOLDERS
+    from scripts.dev_tools.push_down_copilot_customizations_filesystem import (
+        PushDownFileSystem,
+        RealPushDownFileSystem,
+    )
+    from scripts.dev_tools.push_down_copilot_customizations_rewrites import (
+        rewrite_text_references,
+    )
+except ModuleNotFoundError as error:
+    if error.name is None or not error.name.startswith("scripts"):
+        raise
+    from dev_tools.agentic_sync import ROOT_FOLDERS
+    from dev_tools.push_down_copilot_customizations_filesystem import (
+        PushDownFileSystem,
+        RealPushDownFileSystem,
+    )
+    from dev_tools.push_down_copilot_customizations_rewrites import (
+        rewrite_text_references,
+    )
 
 ARTIFACT_DIRECTORY = "artifacts/copilot-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_copilot_customizations"

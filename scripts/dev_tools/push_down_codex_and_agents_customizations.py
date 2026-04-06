@@ -11,14 +11,26 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from scripts.dev_tools.push_down_copilot_customizations import (
-    PushDownFileSystem,
-    PushDownSummary,
-    RealPushDownFileSystem,
-)
-from scripts.dev_tools.push_down_copilot_customizations import (
-    push_down_customizations as push_down_scoped_customizations,
-)
+try:
+    from scripts.dev_tools.push_down_copilot_customizations import (
+        PushDownFileSystem,
+        PushDownSummary,
+        RealPushDownFileSystem,
+    )
+    from scripts.dev_tools.push_down_copilot_customizations import (
+        push_down_customizations as push_down_scoped_customizations,
+    )
+except ModuleNotFoundError as error:
+    if error.name is None or not error.name.startswith("scripts"):
+        raise
+    from dev_tools.push_down_copilot_customizations import (
+        PushDownFileSystem,
+        PushDownSummary,
+        RealPushDownFileSystem,
+    )
+    from dev_tools.push_down_copilot_customizations import (
+        push_down_customizations as push_down_scoped_customizations,
+    )
 
 ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customizations"
