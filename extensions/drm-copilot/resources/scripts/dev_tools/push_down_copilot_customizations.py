@@ -10,22 +10,24 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypedDict
 
-from dev_tools.agentic_sync import ROOT_FOLDERS
-from dev_tools.push_down_copilot_customizations_filesystem import (
+from scripts.dev_tools.agentic_sync import ROOT_FOLDERS
+from scripts.dev_tools.push_down_copilot_customizations_filesystem import (
     PushDownFileSystem,
     RealPushDownFileSystem,
 )
-from dev_tools.push_down_copilot_customizations_rewrites import (
+from scripts.dev_tools.push_down_copilot_customizations_rewrites import (
     rewrite_text_references,
 )
 
 ARTIFACT_DIRECTORY = "artifacts/copilot-customizations"
-MODULE_ENTRY_POINT = "dev_tools.push_down_copilot_customizations"
+MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_copilot_customizations"
+RewriteFunction = Callable[[str], tuple[str, int, int, list[str]]]
 
 __all__ = ["PushDownSummary", "main", "parse_args", "push_down_customizations"]
 
@@ -126,6 +128,7 @@ def enumerate_source_files(
     fs: PushDownFileSystem,
     *,
     source_root: Path | None = None,
+    root_folders: tuple[Path, ...] | None = None,
 ) -> list[Path]:
     """
     Enumerate scoped source files in deterministic root and path order.
@@ -150,9 +153,10 @@ def enumerate_source_files(
         Reads directory metadata through ``fs``.
     """
     effective_source = source_root if source_root is not None else repo_root
+    effective_roots = root_folders if root_folders is not None else ROOT_FOLDERS
     ordered_files: list[Path] = []
     # Enumerate by scoped root first so summaries match the feature contract.
-    for root in ROOT_FOLDERS:
+    for root in effective_roots:
         root_path = effective_source / root
         root_files = fs.list_files(root_path)
         ordered_files.extend(
@@ -190,6 +194,7 @@ def build_artifact_path(
     started_at: datetime,
     *,
     artifact_root: Path | None = None,
+    artifact_directory: str = ARTIFACT_DIRECTORY,
 ) -> Path:
     """
     Build the deterministic JSON summary artifact path for a push-down run.
@@ -204,7 +209,7 @@ def build_artifact_path(
             Defaults to ``repo_root`` when ``None``.
 
     Returns:
-        Path: Artifact path beneath `artifacts/copilot-customizations`.
+        Path: Artifact path beneath the configured artifact directory.
 
     Raises:
         None.
@@ -214,7 +219,7 @@ def build_artifact_path(
     """
     effective_root = artifact_root if artifact_root is not None else repo_root
     timestamp = started_at.strftime("%Y%m%dT%H%M%SZ")
-    return effective_root / ARTIFACT_DIRECTORY / f"push-down-{timestamp}.json"
+    return effective_root / artifact_directory / f"push-down-{timestamp}.json"
 
 
 def render_push_down_summary(summary: PushDownSummary) -> str:
@@ -258,6 +263,7 @@ def write_summary_artifact(
     summary: PushDownSummary,
     *,
     artifact_root: Path | None = None,
+    artifact_directory: str = ARTIFACT_DIRECTORY,
 ) -> Path:
     """
     Write the JSON summary artifact under `artifacts/copilot-customizations`.
@@ -282,7 +288,10 @@ def write_summary_artifact(
         Creates the artifact directory and writes JSON to disk.
     """
     artifact_path = build_artifact_path(
-        repo_root, summary.started_at, artifact_root=artifact_root
+        repo_root,
+        summary.started_at,
+        artifact_root=artifact_root,
+        artifact_directory=artifact_directory,
     )
     fs.ensure_dir(artifact_path.parent)
     fs.write_text(artifact_path, render_push_down_summary(summary))
@@ -296,9 +305,12 @@ def push_down_customizations(
     fs: PushDownFileSystem,
     source_root: Path | None = None,
     artifact_root: Path | None = None,
+    root_folders: tuple[Path, ...] | None = None,
+    artifact_directory: str = ARTIFACT_DIRECTORY,
+    rewrite_references: RewriteFunction = rewrite_text_references,
 ) -> PushDownSummary:
     """
-    Copy scoped `.github` customizations into the destination workspace.
+    Copy scoped customizations into the destination workspace.
 
     Purpose:
         Execute validation, deterministic enumeration, text rewriting,
@@ -318,7 +330,10 @@ def push_down_customizations(
 
     # Process files in stable order so artifacts and test expectations are reproducible.
     for source_path in enumerate_source_files(
-        repo_root, fs, source_root=effective_source
+        repo_root,
+        fs,
+        source_root=effective_source,
+        root_folders=root_folders,
     ):
         relative_path = source_path.relative_to(effective_source)
         destination_path = destination_root / relative_path
@@ -332,7 +347,7 @@ def push_down_customizations(
 
         source_text = fs.read_text(source_path)
         rewritten_text, rewritten_delta, placeholder_delta, unmatched = (
-            rewrite_text_references(source_text)
+            rewrite_references(source_text)
         )
         rewritten_reference_count += rewritten_delta
         placeholder_rewrite_count += placeholder_delta
@@ -369,7 +384,11 @@ def push_down_customizations(
         artifact_path="",
     )
     artifact_path = write_summary_artifact(
-        fs, repo_root, provisional_summary, artifact_root=effective_artifact
+        fs,
+        repo_root,
+        provisional_summary,
+        artifact_root=effective_artifact,
+        artifact_directory=artifact_directory,
     )
     return PushDownSummary(
         repo_root=provisional_summary.repo_root,

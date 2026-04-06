@@ -47,6 +47,14 @@ describe("drm-copilot core command behavior", () => {
     );
   });
 
+  it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
+    activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.syncAgentsFromInstructions"),
+    ).toBe(true);
+  });
+
   it("does not register the retired placeholder commands", () => {
     activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
 

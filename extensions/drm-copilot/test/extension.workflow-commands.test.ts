@@ -42,6 +42,12 @@ describe("drm-copilot workflow command behavior", () => {
     activateAndGetHandler("drmCopilotExtension.pushDownCopilotCustomizations");
   });
 
+  it("registers pushDownCodexAndAgentsCustomizations", () => {
+    activateAndGetHandler(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+  });
+
   it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
     activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
   });

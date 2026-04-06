@@ -61,3 +61,7 @@ extensions/drm-copilot/coverage
 # Local Tooling
 .agents/
 .codex/
+!extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/
+!extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/**
+!extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/
+!extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/**

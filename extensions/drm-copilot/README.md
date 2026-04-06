@@ -16,6 +16,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
+- `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.newPotentialBugEntry`
 - `drmCopilotExtension.newPotentialEntry`
 - `drmCopilotExtension.potentialToIssue`
@@ -40,6 +41,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `collect_commit_context`
 - `collect_pr_context`
 - `push_down_copilot_customizations`
+- `push_down_codex_and_agents_customizations`
 - `new_potential_bug_entry`
 - `new_potential_entry`
 - `potential_to_issue`
@@ -82,6 +84,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `collect_commit_context`: optional `workspace_root`
 - `collect_pr_context`: optional `workspace_root`, required `base`
 - `push_down_copilot_customizations`: optional `workspace_root`
+- `push_down_codex_and_agents_customizations`: optional `workspace_root`
 - `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
 - `new_potential_entry`: optional `workspace_root`, required `short_name`
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
@@ -115,6 +118,7 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/collect_commit_context.py`
 - `resources/templates/collect_pr_context.py`
 - `resources/templates/push_down_copilot_customizations.py`
+- `resources/templates/push_down_codex_and_agents_customizations.py`
 - `resources/templates/new_potential_bug_entry.py`
 - `resources/templates/new-potential-entry.ps1`
 - `resources/templates/potential_to_issue.py`
@@ -122,3 +126,7 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/resolve_hard_lock_prompt.py`
 
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
+
+## Push Down Codex and Agents Customizations
+
+Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The bundled Python wrapper executes the packaged publisher from `resources/templates/push_down_codex_and_agents_customizations.py`, uses the extension-packaged payload root at `resources/codex-and-agents-customizations/`, and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
