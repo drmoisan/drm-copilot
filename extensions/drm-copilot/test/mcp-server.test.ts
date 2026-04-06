@@ -19,6 +19,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     collectCommitContext: jest.fn(),
     collectPrContext: jest.fn(),
     pushDownCopilotCustomizations: jest.fn(),
+    pushDownCodexAndAgentsCustomizations: jest.fn(),
     newPotentialBugEntry: jest.fn(),
     newPotentialEntry: jest.fn(),
     potentialToIssue: jest.fn(),
@@ -65,6 +66,7 @@ describe("repo automation MCP server", () => {
       "collect_commit_context",
       "collect_pr_context",
       "push_down_copilot_customizations",
+      "push_down_codex_and_agents_customizations",
       "new_potential_bug_entry",
       "new_potential_entry",
       "potential_to_issue",
@@ -147,6 +149,38 @@ describe("repo automation MCP server", () => {
       ok: true,
       tool: "collect_commit_context",
       workspace_root: process.cwd(),
+    });
+  });
+
+  it("dispatches push_down_codex_and_agents_customizations through the shared service", async () => {
+    service.pushDownCodexAndAgentsCustomizations.mockResolvedValue({
+      tool: "push_down_codex_and_agents_customizations",
+      workspaceRoot: "C:/workspace",
+      artifacts: [
+        "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
+      ],
+      summary:
+        "Pushed bundled Codex and agents customizations into the destination workspace.",
+    });
+
+    const result = await client.callTool({
+      name: "push_down_codex_and_agents_customizations",
+      arguments: {
+        workspace_root: "C:/workspace",
+      },
+    });
+
+    expect(service.pushDownCodexAndAgentsCustomizations).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "push_down_codex_and_agents_customizations",
+      workspace_root: "C:/workspace",
+      artifacts: [
+        "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
+      ],
     });
   });
 });

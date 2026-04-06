@@ -525,6 +525,55 @@ describe("drm-copilot integration behavior", () => {
     expect(options.cwd).toBe("C:/workspace");
   });
 
+  it("pushDownCodexAndAgentsCustomizations executes bundled wrapper script in workspace", async () => {
+    await handlerFor(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    )();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    expect(executable).toBe("python");
+    expect(
+      normalizePath(args[0]).endsWith(
+        "resources/templates/push_down_codex_and_agents_customizations.py",
+      ),
+    ).toBe(true);
+    expect(options.cwd).toBe("C:/workspace");
+  });
+
+  it("pushDownCodexAndAgentsCustomizations passes workspace root as --destination", async () => {
+    await handlerFor(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    )();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    const destinationIndex = args.indexOf("--destination");
+    expect(destinationIndex).toBeGreaterThan(-1);
+    expect(args[destinationIndex + 1]).toBe("C:/workspace");
+  });
+
+  it("pushDownCodexAndAgentsCustomizations falls back to py -3 when python is unavailable", async () => {
+    setExecutablePresence({ python: false, py: true, pwsh: true });
+
+    await handlerFor(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    )();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    expect(executable).toBe("py");
+    expect(args[0]).toBe("-3");
+    expect(
+      normalizePath(args[1]).endsWith(
+        "resources/templates/push_down_codex_and_agents_customizations.py",
+      ),
+    ).toBe(true);
+    const destinationIndex = args.indexOf("--destination");
+    expect(destinationIndex).toBeGreaterThan(-1);
+    expect(args[destinationIndex + 1]).toBe("C:/workspace");
+    expect(options.cwd).toBe("C:/workspace");
+  });
+
   it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {
     await handlerFor("drmCopilotExtension.syncAgentsFromInstructions")();
 
