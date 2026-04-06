@@ -247,6 +247,18 @@ export function resolveBundledScriptPath(
   extensionRoot: string,
   bundledRelativePath: string,
 ): string {
+  const normalizedExtensionRoot = extensionRoot.replace(/\\/g, "/");
+  const normalizedBundledRelativePath = bundledRelativePath
+    .replace(/\\/g, "/")
+    .replace(/^\/+/, "");
+
+  // Preserve Windows drive-prefixed roots as absolute paths even when the host
+  // process uses POSIX path semantics, where `path.resolve` would otherwise
+  // treat `C:/...` as a relative segment and prefix the checkout directory.
+  if (/^[A-Za-z]:\//.test(normalizedExtensionRoot)) {
+    return `${normalizedExtensionRoot.replace(/\/+$/, "")}/${normalizedBundledRelativePath}`;
+  }
+
   return path.resolve(extensionRoot, bundledRelativePath).replace(/\\/g, "/");
 }
 
