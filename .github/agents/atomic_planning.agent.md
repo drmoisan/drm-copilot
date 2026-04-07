@@ -106,6 +106,8 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence,
 
 Follow the preflight validation loop rules in the `atomic-plan-contract` skill.
 
+If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
+
 ---
 
 ## 2.6 Determinism Gates (Mandatory)

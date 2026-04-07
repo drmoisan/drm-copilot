@@ -118,6 +118,7 @@ If revisions are required:
   - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals).
   - Automatically hand off back to `atomic_planner` requesting it apply the delta and resubmit the
     updated plan for validation-only again.
+  - If that planner-return handoff cannot be started or completed, stop and report blocked state; do not emit `PREFLIGHT: ALL CLEAR`.
 
 Loop requirement:
   Continue this validate → delta → planner-revise → validate loop until you can return
@@ -142,6 +143,7 @@ Confirm all of the following; otherwise stop and request a corrected plan:
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a “bucket task” (e.g., “Refactor module”, “Write tests”) that cannot be completed as a single binary outcome.
+- The plan passes `python -m scripts.dev_tools.validate_orchestration_artifacts plan <plan-path>` when a plan file path is available.
 
 Preflight rule: all blocking due to plan incompleteness must be raised **before** executing any task (before [P0-T1]). After execution begins, do not halt for replanning; continue to completion.
 
