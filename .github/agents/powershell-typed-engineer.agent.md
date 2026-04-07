@@ -175,9 +175,9 @@ If any gate fails, revert/fix immediately before proceeding.
 
 Run the repo-standard PowerShell toolchain in this order:
 
-1) **Format** (`Invoke-PoshQCFormat -Root .` or repo task equivalent)
-2) **Analyze** (`Invoke-PoshQCAnalyze -Root .` or repo task equivalent)
-3) **Test** (`Invoke-PoshQCTest -Root .` or repo task equivalent)
+1) **Format** (`mcp__drmCopilotExtension__run_poshqc_format`)
+2) **Analyze** (`mcp__drmCopilotExtension__run_poshqc_analyze`)
+3) **Test** (`mcp__drmCopilotExtension__run_poshqc_test`)
 4) **Coverage** (when enforced by task/repo flow)
 
 If tools cannot run in the environment, STOP implementation and provide plan + proposed diffs marked **unverified**.
