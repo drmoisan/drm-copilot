@@ -22,6 +22,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "new_potential_entry",
   "potential_to_issue",
   "new_active_feature_folder",
+  "run_poshqc_suite",
   "resolve_execute_hard_lock_prompt",
 ] as const;
 
@@ -75,6 +76,11 @@ export interface RepoAutomationService {
       readonly type: PotentialPromotionType;
       readonly issueNumber?: string;
       readonly workMode: WorkModeOption;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCSuite(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
@@ -309,6 +315,32 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "new_active_feature_folder",
       args,
       summary: `Created a new active ${input.type} feature folder for '${input.featureName}'.`,
+    });
+  }
+
+  async runPoshQCSuite(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    const args = ["-WorkspaceRoot", input.workspaceRoot];
+    if (input.scanFolders && input.scanFolders.length > 0) {
+      for (const scanFolder of input.scanFolders) {
+        args.push("-ScanFolders", scanFolder);
+      }
+    }
+
+    return this.executeScript({
+      tool: "run_poshqc_suite",
+      runtimeKind: "powershell",
+      bundledRelativePath: "resources/templates/run-poshqc-suite.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_suite",
+      args,
+      summary:
+        input.scanFolders && input.scanFolders.length > 0
+          ? `Ran the bundled PoshQC suite against '${input.workspaceRoot}' with ${input.scanFolders.length} selected scan folder(s).`
+          : `Ran the bundled PoshQC suite against '${input.workspaceRoot}'.`,
     });
   }
 

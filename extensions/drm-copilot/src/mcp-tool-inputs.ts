@@ -35,6 +35,10 @@ export interface ResolveExecuteHardLockPromptToolInput extends WorkspaceToolInpu
   readonly target: string;
 }
 
+export interface RunPoshQCSuiteToolInput extends WorkspaceToolInput {
+  readonly scanFolders?: ReadonlyArray<string>;
+}
+
 function asToolArgumentObject(
   rawInput: unknown,
 ): Readonly<Record<string, unknown>> {
@@ -216,5 +220,35 @@ export function resolveResolveExecuteHardLockPromptToolInput(
       fallbackWorkspaceRoot,
     ),
     target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolveRunPoshQCSuiteToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): RunPoshQCSuiteToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const scanFolders = args["scan_folders"];
+  if (scanFolders === undefined) {
+    return {
+      workspaceRoot: normalizeWorkspaceRoot(
+        args["workspace_root"],
+        fallbackWorkspaceRoot,
+      ),
+    };
+  }
+
+  if (!Array.isArray(scanFolders)) {
+    throw new Error("Field 'scan_folders' must be an array when provided.");
+  }
+
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    scanFolders: scanFolders.map((folder, index) =>
+      normalizeRequiredText(folder, `scan_folders[${index}]`),
+    ),
   };
 }

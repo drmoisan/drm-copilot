@@ -124,9 +124,15 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/potential_to_issue.py`
 - `resources/templates/new_active_feature_folder.py`
 - `resources/templates/resolve_hard_lock_prompt.py`
+- `resources/templates/run-poshqc-suite.ps1`
+- `resources/powershell/PoshQC/`
 
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
 
 ## Push Down Codex and Agents Customizations
 
 Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The bundled Python wrapper executes the packaged publisher from `resources/templates/push_down_codex_and_agents_customizations.py`, uses the extension-packaged payload root at `resources/codex-and-agents-customizations/`, and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
+
+## Run PoshQC Suite
+
+Use the `drm-copilot: Run PoshQC Suite` command (command ID: `drmCopilotExtension.runPoshQCSuite`) from the Command Palette to run the bundled PowerShell quality gate from extension resources against the destination workspace. The bundled PowerShell wrapper executes `resources/templates/run-poshqc-suite.ps1`, imports the colocated `resources/powershell/PoshQC/` module copy, and can limit scanning to one or more selected destination-workspace folders.

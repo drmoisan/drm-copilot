@@ -11,6 +11,7 @@ import {
   promptForIssueNumber,
   promptForPotentialPath,
   promptForShortName,
+  promptForWorkspaceScanFolders,
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
 import { registerMcpProvider } from "./mcp-provider";
@@ -26,6 +27,7 @@ import {
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
   resolvePotentialToIssueInvocation,
+  resolveRunPoshQCSuiteInvocation,
   WORK_MODE_OPTIONS,
 } from "./workflow-command-arguments";
 
@@ -168,6 +170,54 @@ export function activate(context: vscode.ExtensionContext): void {
           "resources/templates/sync-agents-from-instructions.ps1",
         commandId,
         args: ["-RepoRoot", workspaceRoot],
+      });
+    },
+  );
+
+  const runPoshQCSuiteDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.runPoshQCSuite",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.runPoshQCSuite";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveRunPoshQCSuiteInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await service.runPoshQCSuite({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const scopeChoice = await promptForChoice(
+        "drm-copilot: Run PoshQC Suite",
+        "Choose the scan scope.",
+        ["Scan entire workspace", "Select folders to scan"],
+      );
+      if (!scopeChoice) {
+        return;
+      }
+
+      if (scopeChoice === "Select folders to scan") {
+        const selectedFolders =
+          await promptForWorkspaceScanFolders(workspaceRoot);
+        if (!selectedFolders) {
+          return;
+        }
+
+        await service.runPoshQCSuite({
+          workspaceRoot,
+          invocationId: commandId,
+          scanFolders: selectedFolders,
+        });
+        return;
+      }
+
+      await service.runPoshQCSuite({
+        workspaceRoot,
+        invocationId: commandId,
       });
     },
   );
@@ -378,6 +428,7 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCopilotCustomizationsDisposable,
     pushDownCodexAndAgentsCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
+    runPoshQCSuiteDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
     resolveExecuteHardLockPromptDisposable,

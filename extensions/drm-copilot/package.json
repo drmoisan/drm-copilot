@@ -60,6 +60,10 @@
         "title": "drm-copilot: Sync AGENTS.md from Instructions"
       },
       {
+        "command": "drmCopilotExtension.runPoshQCSuite",
+        "title": "drm-copilot: Run PoshQC Suite"
+      },
+      {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }

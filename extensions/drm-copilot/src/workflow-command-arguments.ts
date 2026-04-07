@@ -54,6 +54,10 @@ export interface NewActiveFeatureFolderInput {
   readonly workMode: WorkModeOption;
 }
 
+export interface RunPoshQCSuiteInput {
+  readonly scanFolders?: ReadonlyArray<string>;
+}
+
 function formatAllowedFlags(allowedFlags: ReadonlySet<string>): string {
   return [...allowedFlags].join(", ");
 }
@@ -453,6 +457,48 @@ export function resolveNewActiveFeatureFolderInvocation(
         WORK_MODE_OPTIONS,
       ),
       ...(issueNumber === undefined ? {} : { issueNumber }),
+    },
+  };
+}
+
+/**
+ * Resolves invocation mode for `drmCopilotExtension.runPoshQCSuite`.
+ *
+ * @param rawArgs The raw command arguments supplied by VS Code.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
+ */
+export function resolveRunPoshQCSuiteInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCSuiteInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
+  }
+
+  const stringArgs = normalizeStringArguments(rawArgs);
+  const scanFolders: string[] = [];
+
+  for (let index = 0; index < stringArgs.length; index += 2) {
+    const flag = stringArgs[index];
+    if (flag === undefined) {
+      break;
+    }
+
+    if (flag !== "--scan-folder") {
+      throw new Error(`Unknown flag '${flag}'. Accepted flags: --scan-folder.`);
+    }
+
+    const value = stringArgs[index + 1];
+    if (value === undefined || value.startsWith("-")) {
+      throw new Error("Flag '--scan-folder' requires a value.");
+    }
+
+    scanFolders.push(normalizeRequiredText(value, "--scan-folder"));
+  }
+
+  return {
+    mode: "direct",
+    input: {
+      ...(scanFolders.length === 0 ? {} : { scanFolders }),
     },
   };
 }

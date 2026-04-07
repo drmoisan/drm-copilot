@@ -24,6 +24,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     newPotentialEntry: jest.fn(),
     potentialToIssue: jest.fn(),
     newActiveFeatureFolder: jest.fn(),
+    runPoshQCSuite: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
   };
 }
@@ -71,6 +72,7 @@ describe("repo automation MCP server", () => {
       "new_potential_entry",
       "potential_to_issue",
       "new_active_feature_folder",
+      "run_poshqc_suite",
       "resolve_execute_hard_lock_prompt",
     ]);
   });
@@ -181,6 +183,34 @@ describe("repo automation MCP server", () => {
       artifacts: [
         "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
       ],
+    });
+  });
+
+  it("dispatches run_poshqc_suite through the shared service with scan folders", async () => {
+    service.runPoshQCSuite.mockResolvedValue({
+      tool: "run_poshqc_suite",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran the bundled PoshQC suite against 'C:/workspace' with 2 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_suite",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+      },
+    });
+
+    expect(service.runPoshQCSuite).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_suite",
+      workspace_root: "C:/workspace",
     });
   });
 });

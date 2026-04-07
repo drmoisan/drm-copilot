@@ -231,4 +231,40 @@ describe("repo automation service", () => {
       jest.resetModules();
     }
   });
+
+  it("runPoshQCSuite uses the bundled extension wrapper and forwards selected scan folders", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCSuite({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_suite",
+      scanFolders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+    });
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
+    expect(executable).toBe("pwsh");
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/extension/resources/templates/run-poshqc-suite.ps1",
+      "-WorkspaceRoot",
+      "C:/workspace",
+      "-ScanFolders",
+      "C:/workspace/src",
+      "-ScanFolders",
+      "C:/workspace/tests/powershell",
+    ]);
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
+    expect(result.summary).toContain("selected scan folder(s)");
+  });
 });

@@ -14,6 +14,7 @@ import {
   resolveNewPotentialEntryToolInput,
   resolvePotentialToIssueToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
+  resolveRunPoshQCSuiteToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
 } from "./mcp-tool-inputs";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
@@ -195,6 +196,26 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "run_poshqc_suite",
+    description:
+      "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: "resolve_execute_hard_lock_prompt",
     description:
       "Resolve the execute hard-lock prompt for a target plan path using bundled extension resources.",
@@ -324,6 +345,11 @@ export async function dispatchRepoAutomationTool(
       case "new_active_feature_folder": {
         const input = resolveNewActiveFeatureFolderToolInput(rawInput);
         return toMcpToolResult(await service.newActiveFeatureFolder(input));
+      }
+
+      case "run_poshqc_suite": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCSuite(input));
       }
 
       case "resolve_execute_hard_lock_prompt": {
