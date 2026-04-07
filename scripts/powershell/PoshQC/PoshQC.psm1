@@ -405,6 +405,74 @@ function Invoke-PoshQCAnalyze {
 
 <#
 .SYNOPSIS
+Applies PSScriptAnalyzer autofixes, then reruns analysis.
+.DESCRIPTION
+Uses the repo PSScriptAnalyzer settings to apply `-Fix` to each discovered PowerShell file, then invokes
+the standard analysis pass and fails if findings remain.
+.PARAMETER Root
+Root directory to search for PowerShell files. Defaults to current location.
+.PARAMETER ScanFolders
+Optional workspace-relative or workspace-contained folders to scan instead of the entire root.
+.PARAMETER SettingsPath
+Path to PSScriptAnalyzer settings file.
+.PARAMETER ExcludeDirs
+Directory names to exclude from analysis.
+#>
+function Invoke-PoshQCAnalyzeAutofix {
+    [CmdletBinding()]
+    param(
+        [string] $Root,
+        [string[]] $ScanFolders,
+        [string] $SettingsPath = $script:PssaSettings,
+        [string[]] $ExcludeDirs = $script:DefaultExcludedDirs,
+        [scriptblock] $EnsureModule = {
+            param([string] $Name, [string] $ErrorMessage)
+            if (-not (Get-Module -ListAvailable -Name $Name)) { throw $ErrorMessage }
+            Import-Module $Name -ErrorAction Stop
+        },
+        [scriptblock] $TestPathExists = { param([string] $Path) Test-Path $Path },
+        [scriptblock] $GetFileList = { param([string] $RootPath, [string[]] $ScanFoldersPath, [string[]] $Excluded) Get-PoshQCFileList -Root $RootPath -ScanFolders $ScanFoldersPath -ExcludeDirs $Excluded },
+        [scriptblock] $FixFile = {
+            param([string] $Path, [string] $Settings)
+            Invoke-ScriptAnalyzer -Path $Path -Settings $Settings -Severity Error, Warning, Information -Fix -ErrorAction Stop | Out-Null
+        },
+        [scriptblock] $InvokeAnalyze = {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string] $AnalyzeSettingsPath, [string[]] $Excluded)
+            Invoke-PoshQCAnalyze -Root $RootPath -ScanFolders $ScanFoldersPath -SettingsPath $AnalyzeSettingsPath -ExcludeDirs $Excluded
+        },
+        [scriptblock] $Logger = {
+            param([string] $Message)
+            Write-Information $Message -InformationAction Continue
+        }
+    )
+
+    $ErrorActionPreference = 'Stop'
+
+    if (-not $Root) {
+        $Root = $PWD.ProviderPath
+    }
+
+    & $EnsureModule 'PSScriptAnalyzer' "PSScriptAnalyzer is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first."
+
+    if (-not (& $TestPathExists $SettingsPath)) {
+        throw "Settings not found: $SettingsPath"
+    }
+
+    $files = @(& $GetFileList $Root $ScanFolders $ExcludeDirs | Where-Object { $_.Extension -in '.ps1', '.psm1' })
+    if (-not $files) {
+        & $Logger "No PowerShell files found under $Root"
+    } else {
+        foreach ($file in $files) {
+            & $FixFile $file.FullName $SettingsPath
+            & $Logger "Autofixed: $($file.FullName)"
+        }
+    }
+
+    & $InvokeAnalyze $Root $ScanFolders $SettingsPath $ExcludeDirs
+}
+
+<#
+.SYNOPSIS
 Runs the bundled PoshQC suite in one pass.
 .DESCRIPTION
 Executes formatting, analysis, and Pester checks against the selected workspace root and scan folders.
@@ -823,6 +891,7 @@ Export-ModuleMember -Function @(
     'Install-PoshQCTool',
     'Invoke-PoshQCFormat',
     'Invoke-PoshQCAnalyze',
+    'Invoke-PoshQCAnalyzeAutofix',
     'Invoke-PoshQCSuite',
     'Invoke-PoshQCTest',
     'Convert-PoshQCCoverageToRelative'

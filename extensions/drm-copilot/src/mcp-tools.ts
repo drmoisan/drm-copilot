@@ -196,6 +196,86 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "run_poshqc_format",
+    description:
+      "Run bundled PoshQC formatting against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_analyze",
+    description:
+      "Run bundled PoshQC analysis against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_test",
+    description:
+      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_analyze_autofix",
+    description:
+      "Apply bundled PoshQC analyzer autofixes, then rerun analysis against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: "run_poshqc_suite",
     description:
       "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
@@ -345,6 +425,26 @@ export async function dispatchRepoAutomationTool(
       case "new_active_feature_folder": {
         const input = resolveNewActiveFeatureFolderToolInput(rawInput);
         return toMcpToolResult(await service.newActiveFeatureFolder(input));
+      }
+
+      case "run_poshqc_format": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCFormat(input));
+      }
+
+      case "run_poshqc_analyze": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCAnalyze(input));
+      }
+
+      case "run_poshqc_test": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCTest(input));
+      }
+
+      case "run_poshqc_analyze_autofix": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCAnalyzeAutofix(input));
       }
 
       case "run_poshqc_suite": {

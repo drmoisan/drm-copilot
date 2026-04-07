@@ -24,6 +24,10 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     newPotentialEntry: jest.fn(),
     potentialToIssue: jest.fn(),
     newActiveFeatureFolder: jest.fn(),
+    runPoshQCFormat: jest.fn(),
+    runPoshQCAnalyze: jest.fn(),
+    runPoshQCTest: jest.fn(),
+    runPoshQCAnalyzeAutofix: jest.fn(),
     runPoshQCSuite: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
   };
@@ -72,6 +76,10 @@ describe("repo automation MCP server", () => {
       "new_potential_entry",
       "potential_to_issue",
       "new_active_feature_folder",
+      "run_poshqc_format",
+      "run_poshqc_analyze",
+      "run_poshqc_test",
+      "run_poshqc_analyze_autofix",
       "run_poshqc_suite",
       "resolve_execute_hard_lock_prompt",
     ]);
@@ -210,6 +218,118 @@ describe("repo automation MCP server", () => {
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_suite",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_format through the shared service with scan folders", async () => {
+    service.runPoshQCFormat.mockResolvedValue({
+      tool: "run_poshqc_format",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC format against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_format",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCFormat).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_format",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_analyze through the shared service with scan folders", async () => {
+    service.runPoshQCAnalyze.mockResolvedValue({
+      tool: "run_poshqc_analyze",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC analyze against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_analyze",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCAnalyze).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_analyze",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_test through the shared service with scan folders", async () => {
+    service.runPoshQCTest.mockResolvedValue({
+      tool: "run_poshqc_test",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC test against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_test",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/tests/powershell"],
+      },
+    });
+
+    expect(service.runPoshQCTest).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/tests/powershell"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_test",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_analyze_autofix through the shared service with scan folders", async () => {
+    service.runPoshQCAnalyzeAutofix.mockResolvedValue({
+      tool: "run_poshqc_analyze_autofix",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC analyze autofix against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_analyze_autofix",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCAnalyzeAutofix).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_analyze_autofix",
       workspace_root: "C:/workspace",
     });
   });

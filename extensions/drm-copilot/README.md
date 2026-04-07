@@ -124,6 +124,10 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/potential_to_issue.py`
 - `resources/templates/new_active_feature_folder.py`
 - `resources/templates/resolve_hard_lock_prompt.py`
+- `resources/templates/run-poshqc-format.ps1`
+- `resources/templates/run-poshqc-analyze.ps1`
+- `resources/templates/run-poshqc-test.ps1`
+- `resources/templates/run-poshqc-analyze-autofix.ps1`
 - `resources/templates/run-poshqc-suite.ps1`
 - `resources/powershell/PoshQC/`
 
@@ -136,3 +140,12 @@ Use the `drm-copilot: Push Down Codex and Agents Customizations` command (comman
 ## Run PoshQC Suite
 
 Use the `drm-copilot: Run PoshQC Suite` command (command ID: `drmCopilotExtension.runPoshQCSuite`) from the Command Palette to run the bundled PowerShell quality gate from extension resources against the destination workspace. The bundled PowerShell wrapper executes `resources/templates/run-poshqc-suite.ps1`, imports the colocated `resources/powershell/PoshQC/` module copy, and can limit scanning to one or more selected destination-workspace folders.
+
+Additional granular bundled PoshQC surfaces are also available through both VS Code commands and semantic MCP tools:
+
+- `drmCopilotExtension.runPoshQCFormat` / `run_poshqc_format`
+- `drmCopilotExtension.runPoshQCAnalyze` / `run_poshqc_analyze`
+- `drmCopilotExtension.runPoshQCTest` / `run_poshqc_test`
+- `drmCopilotExtension.runPoshQCAnalyzeAutofix` / `run_poshqc_analyze_autofix`
+
+Each command/tool uses the same `workspace_root` plus optional `scan_folders` contract as the bundled suite. The autofix operation is intentionally mutating: it applies `PSScriptAnalyzer -Fix` to the selected PowerShell files, then reruns bundled analysis and fails if findings remain.

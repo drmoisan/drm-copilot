@@ -267,4 +267,93 @@ describe("repo automation service", () => {
     expect(options.shell).toBe(false);
     expect(result.summary).toContain("selected scan folder(s)");
   });
+
+  it("runPoshQCFormat uses the bundled format wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCFormat({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_format",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-format.ps1",
+    );
+    expect(args).toContain("C:/workspace/src");
+    expect(result.summary).toContain("format");
+  });
+
+  it("runPoshQCAnalyze uses the bundled analyze wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCAnalyze({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_analyze",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-analyze.ps1",
+    );
+    expect(result.summary).toContain("analyze");
+  });
+
+  it("runPoshQCTest uses the bundled test wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCTest({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_test",
+      scanFolders: ["C:/workspace/tests/powershell"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-test.ps1",
+    );
+    expect(args).toContain("C:/workspace/tests/powershell");
+    expect(result.summary).toContain("test");
+  });
+
+  it("runPoshQCAnalyzeAutofix uses the dedicated autofix wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCAnalyzeAutofix({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_analyze_autofix",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-analyze-autofix.ps1",
+    );
+    expect(args).not.toContain(
+      "C:/extension/resources/templates/run-poshqc-suite.ps1",
+    );
+    expect(result.summary).toContain("autofix");
+  });
 });

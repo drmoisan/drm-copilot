@@ -58,6 +58,8 @@ export interface RunPoshQCSuiteInput {
   readonly scanFolders?: ReadonlyArray<string>;
 }
 
+export type RunPoshQCCommandInput = RunPoshQCSuiteInput;
+
 function formatAllowedFlags(allowedFlags: ReadonlySet<string>): string {
   return [...allowedFlags].join(", ");
 }
@@ -501,4 +503,28 @@ export function resolveRunPoshQCSuiteInvocation(
       ...(scanFolders.length === 0 ? {} : { scanFolders }),
     },
   };
+}
+
+export function resolveRunPoshQCFormatInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCAnalyzeInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCTestInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCAnalyzeAutofixInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
 }

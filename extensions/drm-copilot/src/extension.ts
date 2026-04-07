@@ -27,7 +27,11 @@ import {
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
   resolvePotentialToIssueInvocation,
+  resolveRunPoshQCAnalyzeAutofixInvocation,
+  resolveRunPoshQCAnalyzeInvocation,
+  resolveRunPoshQCFormatInvocation,
   resolveRunPoshQCSuiteInvocation,
+  resolveRunPoshQCTestInvocation,
   WORK_MODE_OPTIONS,
 } from "./workflow-command-arguments";
 
@@ -68,6 +72,65 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     },
   );
+
+  const registerPoshQcCommand = (
+    commandId: string,
+    title: string,
+    resolveInvocation: (
+      rawArgs: readonly unknown[],
+    ) => ReturnType<typeof resolveRunPoshQCSuiteInvocation>,
+    runOperation: (input: {
+      readonly workspaceRoot: string;
+      readonly invocationId: string;
+      readonly scanFolders?: ReadonlyArray<string>;
+    }) => Promise<unknown>,
+  ) =>
+    vscode.commands.registerCommand(
+      commandId,
+      async (...rawArgs: unknown[]) => {
+        const invocation = resolveWorkflowInvocation(output, commandId, () =>
+          resolveInvocation(rawArgs),
+        );
+        const workspaceRoot = getWorkspaceRoot();
+        if (invocation.mode === "direct") {
+          await runOperation({
+            workspaceRoot,
+            invocationId: commandId,
+            ...invocation.input,
+          });
+          return;
+        }
+
+        const scopeChoice = await promptForChoice(
+          title,
+          "Choose the scan scope.",
+          ["Scan entire workspace", "Select folders to scan"],
+        );
+        if (!scopeChoice) {
+          return;
+        }
+
+        if (scopeChoice === "Select folders to scan") {
+          const selectedFolders =
+            await promptForWorkspaceScanFolders(workspaceRoot);
+          if (!selectedFolders) {
+            return;
+          }
+
+          await runOperation({
+            workspaceRoot,
+            invocationId: commandId,
+            scanFolders: selectedFolders,
+          });
+          return;
+        }
+
+        await runOperation({
+          workspaceRoot,
+          invocationId: commandId,
+        });
+      },
+    );
 
   const collectCommitContextDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.collectCommitContext",
@@ -220,6 +283,30 @@ export function activate(context: vscode.ExtensionContext): void {
         invocationId: commandId,
       });
     },
+  );
+  const runPoshQCFormatDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCFormat",
+    "drm-copilot: Run PoshQC Format",
+    resolveRunPoshQCFormatInvocation,
+    (input) => service.runPoshQCFormat(input),
+  );
+  const runPoshQCAnalyzeDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCAnalyze",
+    "drm-copilot: Run PoshQC Analyze",
+    resolveRunPoshQCAnalyzeInvocation,
+    (input) => service.runPoshQCAnalyze(input),
+  );
+  const runPoshQCTestDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCTest",
+    "drm-copilot: Run PoshQC Test",
+    resolveRunPoshQCTestInvocation,
+    (input) => service.runPoshQCTest(input),
+  );
+  const runPoshQCAnalyzeAutofixDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCAnalyzeAutofix",
+    "drm-copilot: Run PoshQC Analyze Autofix",
+    resolveRunPoshQCAnalyzeAutofixInvocation,
+    (input) => service.runPoshQCAnalyzeAutofix(input),
   );
 
   const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
@@ -429,6 +516,10 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCodexAndAgentsCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
     runPoshQCSuiteDisposable,
+    runPoshQCFormatDisposable,
+    runPoshQCAnalyzeDisposable,
+    runPoshQCTestDisposable,
+    runPoshQCAnalyzeAutofixDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
     resolveExecuteHardLockPromptDisposable,

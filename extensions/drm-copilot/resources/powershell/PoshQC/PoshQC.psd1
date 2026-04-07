@@ -16,6 +16,7 @@
         'Install-PoshQCTool',
         'Invoke-PoshQCFormat',
         'Invoke-PoshQCAnalyze',
+        'Invoke-PoshQCAnalyzeAutofix',
         'Invoke-PoshQCSuite',
         'Invoke-PoshQCTest'
     )
@@ -24,6 +25,5 @@
     AliasesToExport      = @('Install-PoshQCTools')
     PrivateData          = @{}
 }
-
 
 

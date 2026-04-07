@@ -64,6 +64,22 @@
         "title": "drm-copilot: Run PoshQC Suite"
       },
       {
+        "command": "drmCopilotExtension.runPoshQCFormat",
+        "title": "drm-copilot: Run PoshQC Format"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCAnalyze",
+        "title": "drm-copilot: Run PoshQC Analyze"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCTest",
+        "title": "drm-copilot: Run PoshQC Test"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCAnalyzeAutofix",
+        "title": "drm-copilot: Run PoshQC Analyze Autofix"
+      },
+      {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }

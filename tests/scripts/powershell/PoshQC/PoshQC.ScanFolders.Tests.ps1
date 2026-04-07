@@ -103,6 +103,56 @@ Describe 'Invoke-PoshQCSuite' {
     }
 }
 
+Describe 'Invoke-PoshQCAnalyzeAutofix' {
+    It 'applies fixes to selected scan folders, then reruns analysis' {
+        $script:fixedFiles = @()
+        $script:analysisInvocations = @()
+
+        Invoke-PoshQCAnalyzeAutofix -Root '/repo' -ScanFolders @('/repo/src') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } `
+            -GetFileList {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string[]] $Excluded)
+            [void] $RootPath
+            [void] $ScanFoldersPath
+            [void] $Excluded
+            @(
+                [pscustomobject]@{ FullName = '/repo/src/format.ps1'; Extension = '.ps1' },
+                [pscustomobject]@{ FullName = '/repo/src/module.psm1'; Extension = '.psm1' }
+            )
+        } -FixFile {
+            param([string] $Path, [string] $Settings)
+            $script:fixedFiles += @($Path, $Settings)
+        } -InvokeAnalyze {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string] $AnalyzeSettingsPath, [string[]] $Excluded)
+            $script:analysisInvocations += , @($RootPath, $ScanFoldersPath[0], $AnalyzeSettingsPath, $Excluded.Count)
+        } -Logger { param([string] $Message) [void] $Message }
+
+        $script:fixedFiles | Should -Be @(
+            '/repo/src/format.ps1', '/settings.psd1',
+            '/repo/src/module.psm1', '/settings.psd1'
+        )
+        $script:analysisInvocations | Should -HaveCount 1
+        $script:analysisInvocations[0][0] | Should -Be '/repo'
+        $script:analysisInvocations[0][1] | Should -Be '/repo/src'
+        $script:analysisInvocations[0][2] | Should -Be '/settings.psd1'
+    }
+
+    It 'still reruns analysis when no files are discovered' {
+        $script:analysisRan = $false
+
+        Invoke-PoshQCAnalyzeAutofix -Root '/repo' -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } `
+            -GetFileList { @() } -FixFile { throw 'should not fix' } -InvokeAnalyze {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string] $AnalyzeSettingsPath, [string[]] $Excluded)
+            [void] $RootPath
+            [void] $ScanFoldersPath
+            [void] $AnalyzeSettingsPath
+            [void] $Excluded
+            $script:analysisRan = $true
+        } -Logger { param([string] $Message) [void] $Message }
+
+        $script:analysisRan | Should -BeTrue
+    }
+}
+
 Describe 'Invoke-PoshQCTest scan-folder support' {
     It 'overrides run and coverage paths when scan folders are supplied' {
         $script:capturedRunPaths = $null
@@ -172,4 +222,5 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
         $script:capturedCoveragePaths[1] | Should -Be '/repo'
     }
 }
+
 
