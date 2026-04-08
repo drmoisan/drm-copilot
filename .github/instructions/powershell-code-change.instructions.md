@@ -21,7 +21,7 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 **Agent execution requirement (explicit):**
 
-- Agents must use the MCP server functions: `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp__drmCopilotExtension__run_poshqc_test`, and `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`.
+- Agents must use the MCP server functions: `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, and `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`.
 - Agents must **not** use VS Code task wrappers as a substitute.
 
 1) **Formatting - Invoke-Formatter**
@@ -72,7 +72,7 @@ When PowerShell code changes, your toolchain loop must include:
 1. Format: `mcp__drmCopilotExtension__run_poshqc_format`
 2. Analyze: `mcp__drmCopilotExtension__run_poshqc_analyze`
 3. (Type checking is not applicable for PowerShell; skip to testing.)
-4. Test: `mcp__drmCopilotExtension__run_poshqc_test`
+4. Test: `mcp_drmcopilotext_run_poshqc_test`
 
 The MCP server functions above are the approved toolchain contract for agents.
 

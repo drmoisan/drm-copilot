@@ -368,7 +368,7 @@ When the work involves tests:
 
    * [ ] [P3-T1] Add regression test for `mcp__drmCopilotExtension__run_poshqc_format` forwarding selected `scan_folders`
    * [ ] [P3-T2] Add regression test for `mcp__drmCopilotExtension__run_poshqc_analyze` rejecting invalid scan-folder input
-   * [ ] [P3-T3] Add regression test for `mcp__drmCopilotExtension__run_poshqc_test` preserving the selected workspace scope
+   * [ ] [P3-T3] Add regression test for `mcp_drmcopilotext_run_poshqc_test` preserving the selected workspace scope
 
 ### 5.4.1 TDD Red regression tests must be tagged (MANDATORY)
 

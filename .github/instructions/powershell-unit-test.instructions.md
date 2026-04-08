@@ -20,7 +20,7 @@ If there is any conflict between these documents, halt and notify the user.
 
 - **Testing framework:** All PowerShell tests must use **Pester** (v5.x).
 - Use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
-- **Agent execution requirement:** use the MCP server function `mcp__drmCopilotExtension__run_poshqc_test`. Do **not** use VS Code task wrappers as a substitute.
+- **Agent execution requirement:** use the MCP server function `mcp_drmcopilotext_run_poshqc_test`. Do **not** use VS Code task wrappers as a substitute.
 - Keep tests compatible with PowerShell 7+.
 
 ---
@@ -62,7 +62,7 @@ If there is any conflict between these documents, halt and notify the user.
 ## 4. Running the Toolchain (PowerShell Tests)
 
 - When running the "After Making Changes" toolchain, the **testing step** for PowerShell must use:
-  - MCP server function: `mcp__drmCopilotExtension__run_poshqc_test`
+  - MCP server function: `mcp_drmcopilotext_run_poshqc_test`
 - Agents must use the MCP server function. VS Code task wrappers are not an approved substitute.
 - Do **not** substitute other test runners for PowerShell work without explicit approval.
 

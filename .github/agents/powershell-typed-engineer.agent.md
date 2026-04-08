@@ -2,7 +2,7 @@
 name: powershell-typed-engineer
 description: Design and implement small, highly testable, idiomatic PowerShell scripts/modules with deterministic Pester coverage, strict PSScriptAnalyzer hygiene, minimal DI seams, and zero-regression quality gates.
 argument-hint: "Provide: (1) objective, (2) exact script/module and test entrypoints, (3) constraints/APIs to preserve, (4) repo tasks/commands to run. I will baseline → design → plan → implement in small batches with gates."
-tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, todo]
+tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/memory, vscode/newWorkspace, vscode/resolveMemoryFileUri, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, vscode/askQuestions, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, drmcopilotextension/collect_commit_context, drmcopilotextension/collect_pr_context, drmcopilotextension/new_active_feature_folder, drmcopilotextension/new_potential_bug_entry, drmcopilotextension/new_potential_entry, drmcopilotextension/potential_to_issue, drmcopilotextension/push_down_copilot_customizations, drmcopilotextension/resolve_execute_hard_lock_prompt, todo]
 handoffs:
   - label: Architecture + testability plan only (no edits)
     agent: atomic_planner
@@ -177,7 +177,7 @@ Run the repo-standard PowerShell toolchain in this order:
 
 1) **Format** (`mcp__drmCopilotExtension__run_poshqc_format`)
 2) **Analyze** (`mcp__drmCopilotExtension__run_poshqc_analyze`)
-3) **Test** (`mcp__drmCopilotExtension__run_poshqc_test`)
+3) **Test** (`mcp_drmcopilotext_run_poshqc_test`)
 4) **Coverage** (when enforced by task/repo flow)
 
 If tools cannot run in the environment, STOP implementation and provide plan + proposed diffs marked **unverified**.
