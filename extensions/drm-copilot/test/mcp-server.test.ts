@@ -30,6 +30,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runPoshQCAnalyzeAutofix: jest.fn(),
     runPoshQCSuite: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
+    validateOrchestrationArtifacts: jest.fn(),
   };
 }
 
@@ -82,6 +83,7 @@ describe("repo automation MCP server", () => {
       "run_poshqc_analyze_autofix",
       "run_poshqc_suite",
       "resolve_execute_hard_lock_prompt",
+      "validate_orchestration_artifacts",
     ]);
   });
 
@@ -331,6 +333,53 @@ describe("repo automation MCP server", () => {
       ok: true,
       tool: "run_poshqc_analyze_autofix",
       workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches validate_orchestration_artifacts through the shared service", async () => {
+    service.validateOrchestrationArtifacts.mockResolvedValue({
+      tool: "validate_orchestration_artifacts",
+      workspaceRoot: "C:/workspace",
+      summary: "Validated plan artifact at docs/plan.md.",
+    });
+
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "plan",
+        artifact_path: "docs/plan.md",
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      artifactType: "plan",
+      artifactPath: "docs/plan.md",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "validate_orchestration_artifacts",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("returns validation error for invalid artifact_type", async () => {
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "invalid-type",
+        artifact_path: "docs/plan.md",
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).not.toHaveBeenCalled();
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({
+      ok: false,
+      tool: "validate_orchestration_artifacts",
     });
   });
 });

@@ -116,7 +116,7 @@ Follow the `policy-audit-template-usage` skill to create and populate the policy
    - Set a clear verdict: Ready for merge / Needs revision / Blocked.
    - For feature review, interpret “merge” as “safe to open/merge a PR into base after CI”.
 6) Validator gate:
-   - Run `python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit <FEATURE_FOLDER>/policy-audit.<timestamp>.md`.
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <FEATURE_FOLDER>/policy-audit.<timestamp>.md`.
    - If validation fails, treat review as blocked/remediation-required; do not continue as PASS.
 
 ## Phase D — Run required checks (check-only preferred)
@@ -177,7 +177,7 @@ Create `<FEATURE_FOLDER>/code-review.<timestamp>.md` (use the same timestamp fro
    - The file MUST contain `## Executive Summary`.
    - The file MUST contain `## Findings Table`.
    - The findings section MUST include a Markdown table header with: `Severity | File | Location | Finding | Recommendation | Rationale | Evidence`.
-   - Run `python -m scripts.dev_tools.validate_orchestration_artifacts code-review <FEATURE_FOLDER>/code-review.<timestamp>.md`.
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "code-review"` and `artifact_path: <FEATURE_FOLDER>/code-review.<timestamp>.md`.
 
 ## Phase F — Produce `feature-audit.<timestamp>.md` (acceptance criteria vs baseline)
 Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
@@ -214,7 +214,7 @@ Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
    - Include the AC Status Summary defined in `acceptance-criteria-tracking`.
 6) Validator gate
    - The file MUST contain `## Scope and Baseline`, `## Acceptance Criteria Inventory`, `## Acceptance Criteria Evaluation`, `## Summary`, and `## Acceptance Criteria Check-off`.
-   - Run `python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit <FEATURE_FOLDER>/feature-audit.<timestamp>.md`.
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "feature-audit"` and `artifact_path: <FEATURE_FOLDER>/feature-audit.<timestamp>.md`.
 
 ## Phase G — Remediation (only if necessary)
 Trigger remediation if ANY of the following:

@@ -66,7 +66,7 @@ def test_atomic_planner_handoff_contract_is_strict_in_skill_and_agent() -> None:
         "PREFLIGHT: REVISIONS REQUIRED",
         "precise plan delta",
         "do not create additional sibling `plan.*.md` files",
-        "validate_orchestration_artifacts plan",
+        "validate_orchestration_artifacts` MCP tool",
     )
 
     for fragment in required_fragments:
@@ -90,7 +90,7 @@ def test_atomic_executor_handoff_contract_is_strict_in_skill_and_agent() -> None
         "PREFLIGHT: REVISIONS REQUIRED",
         "precise plan delta",
         "only authoritative checklist",
-        "validate_orchestration_artifacts plan",
+        "validate_orchestration_artifacts` MCP tool",
     ):
         assert fragment in skill_text
 

@@ -359,7 +359,7 @@ Artifact verification gate before mission completion (large path):
 - At least one `code-review.<timestamp>.md` exists under `${feature-folder}`.
 - At least one `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
 - If remediation was triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` exist under `${feature-folder}`.
-- The approved plan and each required review artifact pass `python -m scripts.dev_tools.validate_orchestration_artifacts ...`.
+- The approved plan and each required review artifact pass the `validate_orchestration_artifacts` MCP tool.
 - The checkpoint contains delegation receipts for every required delegated step and no required step is left in `pending` or `blocked`.
 
 # Completion criteria

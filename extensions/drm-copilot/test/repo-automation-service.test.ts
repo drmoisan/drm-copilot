@@ -356,4 +356,56 @@ describe("repo automation service", () => {
     );
     expect(result.summary).toContain("autofix");
   });
+
+  it("validateOrchestrationArtifacts spawns the bundled validator with correct args", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.validateOrchestrationArtifacts({
+      workspaceRoot: "C:/workspace",
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "plan",
+      artifactPath: "docs/plan.md",
+      requireComplete: false,
+    });
+
+    const [executable, args] = childProcessMock.spawn.mock.calls[0] as [
+      string,
+      string[],
+    ];
+    expect(executable).toBe("python");
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/validate_orchestration_artifacts.py",
+    );
+    expect(args).toContain("plan");
+    expect(args).toContain("docs/plan.md");
+    expect(args).not.toContain("--require-complete");
+    expect(result.tool).toBe("validate_orchestration_artifacts");
+  });
+
+  it("validateOrchestrationArtifacts passes --require-complete when requested", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.validateOrchestrationArtifacts({
+      workspaceRoot: "C:/workspace",
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "policy-audit",
+      artifactPath: "docs/policy-audit.md",
+      requireComplete: true,
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--require-complete");
+    expect(args).toContain("policy-audit");
+    expect(args).toContain("docs/policy-audit.md");
+  });
 });

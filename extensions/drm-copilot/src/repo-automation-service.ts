@@ -28,6 +28,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "run_poshqc_analyze_autofix",
   "run_poshqc_suite",
   "resolve_execute_hard_lock_prompt",
+  "validate_orchestration_artifacts",
 ] as const;
 
 /**
@@ -109,6 +110,13 @@ export interface RepoAutomationService {
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  validateOrchestrationArtifacts(
+    input: WorkspaceExecutionInput & {
+      readonly artifactType: string;
+      readonly artifactPath: string;
+      readonly requireComplete?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult>;
 }
 
@@ -473,6 +481,30 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
       args: ["--target", input.target, "--workspace", input.workspaceRoot],
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+    });
+  }
+
+  async validateOrchestrationArtifacts(
+    input: WorkspaceExecutionInput & {
+      readonly artifactType: string;
+      readonly artifactPath: string;
+      readonly requireComplete?: boolean;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    const args = [input.artifactType, input.artifactPath];
+    if (input.requireComplete) {
+      args.push("--require-complete");
+    }
+
+    return this.executeScript({
+      tool: "validate_orchestration_artifacts",
+      runtimeKind: "python",
+      bundledRelativePath:
+        "resources/templates/validate_orchestration_artifacts.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "validate_orchestration_artifacts",
+      args,
+      summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
     });
   }
 

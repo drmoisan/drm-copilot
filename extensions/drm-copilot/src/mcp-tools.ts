@@ -16,6 +16,7 @@ import {
   resolvePushDownCopilotCustomizationsToolInput,
   resolveRunPoshQCSuiteToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
+  resolveValidateOrchestrationArtifactsToolInput,
 } from "./mcp-tool-inputs";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 
@@ -312,6 +313,40 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
+  {
+    name: "validate_orchestration_artifacts",
+    description:
+      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        artifact_type: {
+          type: "string",
+          enum: [
+            "plan",
+            "policy-audit",
+            "code-review",
+            "feature-audit",
+            "orchestrator-state",
+          ],
+          description: "The type of orchestration artifact to validate.",
+        },
+        artifact_path: {
+          type: "string",
+          description:
+            "Workspace-relative or absolute path to the artifact file.",
+        },
+        require_complete: {
+          type: "boolean",
+          description:
+            "When true and artifact_type is 'orchestrator-state', require all phases to be complete.",
+        },
+      },
+      required: ["artifact_type", "artifact_path"],
+      additionalProperties: false,
+    },
+  },
 ];
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -456,6 +491,13 @@ export async function dispatchRepoAutomationTool(
         const input = resolveResolveExecuteHardLockPromptToolInput(rawInput);
         return toMcpToolResult(
           await service.resolveExecuteHardLockPrompt(input),
+        );
+      }
+
+      case "validate_orchestration_artifacts": {
+        const input = resolveValidateOrchestrationArtifactsToolInput(rawInput);
+        return toMcpToolResult(
+          await service.validateOrchestrationArtifacts(input),
         );
       }
     }

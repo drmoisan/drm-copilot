@@ -143,7 +143,7 @@ Confirm all of the following; otherwise stop and request a corrected plan:
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a “bucket task” (e.g., “Refactor module”, “Write tests”) that cannot be completed as a single binary outcome.
-- The plan passes `python -m scripts.dev_tools.validate_orchestration_artifacts plan <plan-path>` when a plan file path is available.
+- The plan passes the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` when a plan file path is available.
 
 Preflight rule: all blocking due to plan incompleteness must be raised **before** executing any task (before [P0-T1]). After execution begins, do not halt for replanning; continue to completion.
 

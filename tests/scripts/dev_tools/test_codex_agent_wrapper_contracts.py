@@ -61,7 +61,7 @@ def test_atomic_planner_wrapper_preserves_github_preflight_handoff_contract() ->
             "Reuse the same target plan file for every preflight revision "
             "iteration in the same planning cycle.",
             "stop and report blocked state",
-            "validate_orchestration_artifacts plan",
+            "validate_orchestration_artifacts` MCP tool",
         ),
     )
 
@@ -95,7 +95,7 @@ def test_atomic_executor_wrapper_preserves_github_preflight_return_handoff() -> 
             "Continue the validate -> delta -> planner-revise -> validate "
             "loop until preflight can return `PREFLIGHT: ALL CLEAR`.",
             "stop and report blocked state",
-            "validate_orchestration_artifacts plan",
+            "validate_orchestration_artifacts` MCP tool",
         ),
     )
 
