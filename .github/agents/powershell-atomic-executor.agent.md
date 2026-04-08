@@ -2,7 +2,7 @@
 name: powershell_atomic_executor
 description: Execute atomic_planner plans verbatim with atomic_executor rigor and PowerShell-specialized MCP quality gates (`mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`), Pester, DI/mocking rules, and zero-regression deltas.
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and PowerShell-specific QA gates."
-tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, todo]
+tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 ---
 
 # PowerShell Atomic Execution Agent (Plan-Following + Domain-Specialized)
