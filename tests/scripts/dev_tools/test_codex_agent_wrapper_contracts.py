@@ -60,6 +60,8 @@ def test_atomic_planner_wrapper_preserves_github_preflight_handoff_contract() ->
             "Treat executor preflight findings as binding plan defects",
             "Reuse the same target plan file for every preflight revision "
             "iteration in the same planning cycle.",
+            "stop and report blocked state",
+            "validate_orchestration_artifacts` MCP tool",
         ),
     )
 
@@ -92,6 +94,8 @@ def test_atomic_executor_wrapper_preserves_github_preflight_return_handoff() -> 
             "that it apply the delta to the same plan file",
             "Continue the validate -> delta -> planner-revise -> validate "
             "loop until preflight can return `PREFLIGHT: ALL CLEAR`.",
+            "stop and report blocked state",
+            "validate_orchestration_artifacts` MCP tool",
         ),
     )
 
@@ -128,6 +132,8 @@ def test_feature_reviewer_wrapper_preserves_github_remediation_handoff() -> None
             "artifacts, and the original feature plan file(s).",
             "Do not claim completion when remediation is triggered unless "
             "the remediation plan file exists on disk.",
+            "pass their validators",
+            "stop and report blocked state",
         ),
     )
 
@@ -154,17 +160,17 @@ def test_orchestrator_wrapper_preserves_github_mandatory_delegation_contract() -
     assert_contains_all(
         codex_text,
         (
-            "If `atomic-planner` is available, you must delegate planning " "to it;",
-            "If `atomic-executor` is available, you must delegate plan "
-            "preflight validation, execution, and post-delivery validation "
-            "to it;",
-            "If `feature-reviewer` is available, you must delegate "
-            "post-implementation review to it;",
+            "Treat `spawn_agent` availability as the mechanical availability " "signal",
+            "you must delegate or stop execution",
+            "do not perform planning locally",
+            "do not perform preflight validation, execution, or post-delivery "
+            "validation locally",
+            "do not perform post-implementation review locally",
             "Do not treat a delegated step as complete until the delegate "
             "returns the required output contract for that step and the "
             "required on-disk artifacts exist.",
             "Do not claim mission completion unless all required "
-            "delegations completed",
+            "delegations completed with receipts",
             "Do not accept PASS outcomes that rely on stale PR-context " "artifacts",
         ),
     )

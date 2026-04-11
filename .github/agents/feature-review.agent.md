@@ -3,7 +3,7 @@ name: feature_code_review_agent
 description: Review an entire feature branch relative to a base branch (PR-style). Read pr_context.summary.txt thoroughly, use pr_context.appendix.txt for full baseline diff evidence, and produce PolicyAudit + CodeReview + FeatureAudit (Acceptance Criteria). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Checkout the feature branch. Provide PRBaseBranch (e.g., development). Run this agent to (re)generate the PR context artifacts (summary + appendix) per `pr-context-artifacts` via scripts.dev_tools.pr_context.collector --base ${input:PRBaseBranch} when needed, then produce: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, (3) docs/features/active/<feature>/feature-audit.<timestamp>.md (acceptance criteria), and (4) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md AND AUTOMATICALLY DELEGATE to atomic_planner to write docs/features/active/<feature>/remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
-  ['execute/getTerminalOutput', 'execute/runTask', 'execute/runTests', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
+  [execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 handoffs:
   - label: Create remediation plan (atomic_planner)
     agent: atomic_planner
@@ -42,6 +42,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - Prefer check-only / no-mutation commands for review.
 - Do NOT ask the user questions. If information is missing, proceed with best-effort assumptions and clearly document them.
 - Continue until all required review artifacts exist, even if some sections must be marked UNVERIFIED with a concrete reason.
+- Do not claim completion unless required review artifacts pass their validators.
 
 # Operating rules (non-negotiable)
 
@@ -114,6 +115,9 @@ Follow the `policy-audit-template-usage` skill to create and populate the policy
 5) Recommendation:
    - Set a clear verdict: Ready for merge / Needs revision / Blocked.
    - For feature review, interpret “merge” as “safe to open/merge a PR into base after CI”.
+6) Validator gate:
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <FEATURE_FOLDER>/policy-audit.<timestamp>.md`.
+   - If validation fails, treat review as blocked/remediation-required; do not continue as PASS.
 
 ## Phase D — Run required checks (check-only preferred)
 Read repo policy docs first and use the repo-preferred tasks/commands.
@@ -169,6 +173,11 @@ Create `<FEATURE_FOLDER>/code-review.<timestamp>.md` (use the same timestamp fro
    - What you looked up
    - Source (official doc) and date
    - How it affects recommendations
+7) Validator gate
+   - The file MUST contain `## Executive Summary`.
+   - The file MUST contain `## Findings Table`.
+   - The findings section MUST include a Markdown table header with: `Severity | File | Location | Finding | Recommendation | Rationale | Evidence`.
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "code-review"` and `artifact_path: <FEATURE_FOLDER>/code-review.<timestamp>.md`.
 
 ## Phase F — Produce `feature-audit.<timestamp>.md` (acceptance criteria vs baseline)
 Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
@@ -203,6 +212,9 @@ Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
    - For each criterion evaluated as **PASS**, check it off in the AC source file(s) per `acceptance-criteria-tracking` (change `- [ ]` to `- [x]`).
    - For criteria evaluated as PARTIAL, FAIL, or UNVERIFIED, leave them unchecked.
    - Include the AC Status Summary defined in `acceptance-criteria-tracking`.
+6) Validator gate
+   - The file MUST contain `## Scope and Baseline`, `## Acceptance Criteria Inventory`, `## Acceptance Criteria Evaluation`, `## Summary`, and `## Acceptance Criteria Check-off`.
+   - Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "feature-audit"` and `artifact_path: <FEATURE_FOLDER>/feature-audit.<timestamp>.md`.
 
 ## Phase G — Remediation (only if necessary)
 Trigger remediation if ANY of the following:
@@ -236,6 +248,7 @@ If remediation is triggered:
    - Append a “Context package” that inlines the FULL TEXT of the required context files listed in the handoff instructions.
 
 Do NOT rely on a copy/paste prompt as the primary mechanism; the delegation must occur automatically when remediation is triggered.
+If the `atomic_planner` remediation handoff cannot be started or completed, stop and report blocked state; do not claim review completion.
 
 ## Phase H — Final deliverable (no questions)
 When finished, respond with:

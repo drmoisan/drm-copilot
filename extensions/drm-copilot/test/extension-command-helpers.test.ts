@@ -54,6 +54,7 @@ import {
   promptForIssueNumber,
   promptForPotentialPath,
   promptForShortName,
+  promptForWorkspaceScanFolders,
   resolveWorkflowInvocation,
 } from "../src/extension-command-helpers";
 import type * as vscode from "vscode";
@@ -297,6 +298,42 @@ describe("promptForActiveFeaturePlan", () => {
       "C:/workspace/docs/features/active/2026-01-01-feat/plan.md",
     );
     expect(showOpenDialogMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("promptForWorkspaceScanFolders", () => {
+  beforeEach(() => {
+    showOpenDialogMock.mockReset();
+  });
+
+  it("returns undefined when the user cancels", async () => {
+    showOpenDialogMock.mockResolvedValueOnce(undefined);
+    const result = await promptForWorkspaceScanFolders("C:/workspace");
+    expect(result).toBeUndefined();
+  });
+
+  it("returns the selected folder paths when the user picks folders", async () => {
+    showOpenDialogMock.mockResolvedValueOnce([
+      { fsPath: "C:/workspace/src" },
+      { fsPath: "C:/workspace/tests/powershell" },
+    ]);
+
+    const result = await promptForWorkspaceScanFolders("C:/workspace");
+
+    expect(result).toEqual([
+      "C:/workspace/src",
+      "C:/workspace/tests/powershell",
+    ]);
+    expect(showOpenDialogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        canSelectMany: true,
+        canSelectFiles: false,
+        canSelectFolders: true,
+        defaultUri: expect.objectContaining({
+          fsPath: "C:/workspace",
+        }),
+      }),
+    );
   });
 });
 

@@ -231,4 +231,181 @@ describe("repo automation service", () => {
       jest.resetModules();
     }
   });
+
+  it("runPoshQCSuite uses the bundled extension wrapper and forwards selected scan folders", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCSuite({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_suite",
+      scanFolders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+    });
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
+    expect(executable).toBe("pwsh");
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/extension/resources/templates/run-poshqc-suite.ps1",
+      "-WorkspaceRoot",
+      "C:/workspace",
+      "-ScanFolders",
+      "C:/workspace/src",
+      "-ScanFolders",
+      "C:/workspace/tests/powershell",
+    ]);
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
+    expect(result.summary).toContain("selected scan folder(s)");
+  });
+
+  it("runPoshQCFormat uses the bundled format wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCFormat({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_format",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-format.ps1",
+    );
+    expect(args).toContain("C:/workspace/src");
+    expect(result.summary).toContain("format");
+  });
+
+  it("runPoshQCAnalyze uses the bundled analyze wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCAnalyze({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_analyze",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-analyze.ps1",
+    );
+    expect(result.summary).toContain("analyze");
+  });
+
+  it("runPoshQCTest uses the bundled test wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCTest({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_test",
+      scanFolders: ["C:/workspace/tests/powershell"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-test.ps1",
+    );
+    expect(args).toContain("C:/workspace/tests/powershell");
+    expect(result.summary).toContain("test");
+  });
+
+  it("runPoshQCAnalyzeAutofix uses the dedicated autofix wrapper", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.runPoshQCAnalyzeAutofix({
+      workspaceRoot: "C:/workspace",
+      invocationId: "run_poshqc_analyze_autofix",
+      scanFolders: ["C:/workspace/src"],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/run-poshqc-analyze-autofix.ps1",
+    );
+    expect(args).not.toContain(
+      "C:/extension/resources/templates/run-poshqc-suite.ps1",
+    );
+    expect(result.summary).toContain("autofix");
+  });
+
+  it("validateOrchestrationArtifacts spawns the bundled validator with correct args", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.validateOrchestrationArtifacts({
+      workspaceRoot: "C:/workspace",
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "plan",
+      artifactPath: "docs/plan.md",
+      requireComplete: false,
+    });
+
+    const [executable, args] = childProcessMock.spawn.mock.calls[0] as [
+      string,
+      string[],
+    ];
+    expect(executable).toBe("python");
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/validate_orchestration_artifacts.py",
+    );
+    expect(args).toContain("plan");
+    expect(args).toContain("docs/plan.md");
+    expect(args).not.toContain("--require-complete");
+    expect(result.tool).toBe("validate_orchestration_artifacts");
+  });
+
+  it("validateOrchestrationArtifacts passes --require-complete when requested", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.validateOrchestrationArtifacts({
+      workspaceRoot: "C:/workspace",
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "policy-audit",
+      artifactPath: "docs/policy-audit.md",
+      requireComplete: true,
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("--require-complete");
+    expect(args).toContain("policy-audit");
+    expect(args).toContain("docs/policy-audit.md");
+  });
 });

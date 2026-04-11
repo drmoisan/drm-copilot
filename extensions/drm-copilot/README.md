@@ -47,6 +47,12 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `potential_to_issue`
 - `new_active_feature_folder`
 - `resolve_execute_hard_lock_prompt`
+- `run_poshqc_format`
+- `run_poshqc_analyze`
+- `run_poshqc_test`
+- `run_poshqc_analyze_autofix`
+- `run_poshqc_suite`
+- `validate_orchestration_artifacts`
 
 ### MCP Runtime Expectations
 
@@ -90,6 +96,12 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
 - `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
 - `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
+- run_poshqc_format: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_test: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze_autofix: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_suite: optional `workspace_root`, optional `scan_folders`
+- validate_orchestration_artifacts: optional `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
 
 ### MCP Result Shape
 
@@ -124,9 +136,28 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/potential_to_issue.py`
 - `resources/templates/new_active_feature_folder.py`
 - `resources/templates/resolve_hard_lock_prompt.py`
+- `resources/templates/run-poshqc-format.ps1`
+- `resources/templates/run-poshqc-analyze.ps1`
+- `resources/templates/run-poshqc-test.ps1`
+- `resources/templates/run-poshqc-analyze-autofix.ps1`
+- `resources/templates/run-poshqc-suite.ps1`
+- `resources/powershell/PoshQC/`
 
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
 
 ## Push Down Codex and Agents Customizations
 
 Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The bundled Python wrapper executes the packaged publisher from `resources/templates/push_down_codex_and_agents_customizations.py`, uses the extension-packaged payload root at `resources/codex-and-agents-customizations/`, and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
+
+## Run PoshQC Suite
+
+Use the `drm-copilot: Run PoshQC Suite` command (command ID: `drmCopilotExtension.runPoshQCSuite`) from the Command Palette to run the bundled PowerShell quality gate from extension resources against the destination workspace. The bundled PowerShell wrapper executes `resources/templates/run-poshqc-suite.ps1`, imports the colocated `resources/powershell/PoshQC/` module copy, and can limit scanning to one or more selected destination-workspace folders.
+
+Additional granular bundled PoshQC surfaces are also available through both VS Code commands and semantic MCP tools:
+
+- `drmCopilotExtension.runPoshQCFormat` / `run_poshqc_format`
+- `drmCopilotExtension.runPoshQCAnalyze` / `run_poshqc_analyze`
+- `drmCopilotExtension.runPoshQCTest` / `run_poshqc_test`
+- `drmCopilotExtension.runPoshQCAnalyzeAutofix` / `run_poshqc_analyze_autofix`
+
+Each command/tool uses the same `workspace_root` plus optional `scan_folders` contract as the bundled suite. The autofix operation is intentionally mutating: it applies `PSScriptAnalyzer -Fix` to the selected PowerShell files, then reruns bundled analysis and fails if findings remain.

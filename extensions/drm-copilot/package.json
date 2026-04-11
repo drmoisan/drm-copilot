@@ -7,6 +7,9 @@
     "vscode": "^1.108.0"
   },
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "contributes": {
     "mcpServerDefinitionProviders": [
       {
@@ -58,6 +61,26 @@
       {
         "command": "drmCopilotExtension.syncAgentsFromInstructions",
         "title": "drm-copilot: Sync AGENTS.md from Instructions"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCSuite",
+        "title": "drm-copilot: Run PoshQC Suite"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCFormat",
+        "title": "drm-copilot: Run PoshQC Format"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCAnalyze",
+        "title": "drm-copilot: Run PoshQC Analyze"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCTest",
+        "title": "drm-copilot: Run PoshQC Test"
+      },
+      {
+        "command": "drmCopilotExtension.runPoshQCAnalyzeAutofix",
+        "title": "drm-copilot: Run PoshQC Analyze Autofix"
       },
       {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",

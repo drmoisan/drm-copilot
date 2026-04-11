@@ -35,6 +35,16 @@ export interface ResolveExecuteHardLockPromptToolInput extends WorkspaceToolInpu
   readonly target: string;
 }
 
+export interface RunPoshQCSuiteToolInput extends WorkspaceToolInput {
+  readonly scanFolders?: ReadonlyArray<string>;
+}
+
+export interface ValidateOrchestrationArtifactsToolInput extends WorkspaceToolInput {
+  readonly artifactType: string;
+  readonly artifactPath: string;
+  readonly requireComplete?: boolean;
+}
+
 function asToolArgumentObject(
   rawInput: unknown,
 ): Readonly<Record<string, unknown>> {
@@ -216,5 +226,72 @@ export function resolveResolveExecuteHardLockPromptToolInput(
       fallbackWorkspaceRoot,
     ),
     target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolveRunPoshQCSuiteToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): RunPoshQCSuiteToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const scanFolders = args["scan_folders"];
+  if (scanFolders === undefined) {
+    return {
+      workspaceRoot: normalizeWorkspaceRoot(
+        args["workspace_root"],
+        fallbackWorkspaceRoot,
+      ),
+    };
+  }
+
+  if (!Array.isArray(scanFolders)) {
+    throw new Error("Field 'scan_folders' must be an array when provided.");
+  }
+
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    scanFolders: scanFolders.map((folder, index) =>
+      normalizeRequiredText(folder, `scan_folders[${index}]`),
+    ),
+  };
+}
+
+const VALID_ARTIFACT_TYPES = new Set([
+  "plan",
+  "policy-audit",
+  "code-review",
+  "feature-audit",
+  "orchestrator-state",
+]);
+
+export function resolveValidateOrchestrationArtifactsToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): ValidateOrchestrationArtifactsToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const artifactType = normalizeRequiredText(
+    args["artifact_type"],
+    "artifact_type",
+  );
+
+  if (!VALID_ARTIFACT_TYPES.has(artifactType)) {
+    throw new Error(
+      `Field 'artifact_type' must be one of: ${[...VALID_ARTIFACT_TYPES].join(", ")}. Got '${artifactType}'.`,
+    );
+  }
+
+  const requireComplete = args["require_complete"];
+
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    artifactType,
+    artifactPath: normalizeRequiredText(args["artifact_path"], "artifact_path"),
+    ...(requireComplete === true ? { requireComplete: true } : {}),
   };
 }

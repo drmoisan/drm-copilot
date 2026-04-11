@@ -24,7 +24,13 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     newPotentialEntry: jest.fn(),
     potentialToIssue: jest.fn(),
     newActiveFeatureFolder: jest.fn(),
+    runPoshQCFormat: jest.fn(),
+    runPoshQCAnalyze: jest.fn(),
+    runPoshQCTest: jest.fn(),
+    runPoshQCAnalyzeAutofix: jest.fn(),
+    runPoshQCSuite: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
+    validateOrchestrationArtifacts: jest.fn(),
   };
 }
 
@@ -71,7 +77,13 @@ describe("repo automation MCP server", () => {
       "new_potential_entry",
       "potential_to_issue",
       "new_active_feature_folder",
+      "run_poshqc_format",
+      "run_poshqc_analyze",
+      "run_poshqc_test",
+      "run_poshqc_analyze_autofix",
+      "run_poshqc_suite",
       "resolve_execute_hard_lock_prompt",
+      "validate_orchestration_artifacts",
     ]);
   });
 
@@ -181,6 +193,195 @@ describe("repo automation MCP server", () => {
       artifacts: [
         "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
       ],
+    });
+  });
+
+  it("dispatches run_poshqc_suite through resolveRunPoshQCSuiteToolInput and forwards repeated scan_folders values to the repo-automation service", async () => {
+    service.runPoshQCSuite.mockResolvedValue({
+      tool: "run_poshqc_suite",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran the bundled PoshQC suite against 'C:/workspace' with 2 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_suite",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+      },
+    });
+
+    expect(service.runPoshQCSuite).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_suite",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_format through the shared service with scan folders", async () => {
+    service.runPoshQCFormat.mockResolvedValue({
+      tool: "run_poshqc_format",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC format against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_format",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCFormat).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_format",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_analyze through the shared service with scan folders", async () => {
+    service.runPoshQCAnalyze.mockResolvedValue({
+      tool: "run_poshqc_analyze",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC analyze against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_analyze",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCAnalyze).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_analyze",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_test through the shared service with scan folders", async () => {
+    service.runPoshQCTest.mockResolvedValue({
+      tool: "run_poshqc_test",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC test against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_test",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/tests/powershell"],
+      },
+    });
+
+    expect(service.runPoshQCTest).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/tests/powershell"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_test",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches run_poshqc_analyze_autofix through the shared service with scan folders", async () => {
+    service.runPoshQCAnalyzeAutofix.mockResolvedValue({
+      tool: "run_poshqc_analyze_autofix",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Ran bundled PoshQC analyze autofix against 'C:/workspace' with 1 selected scan folder(s).",
+    });
+
+    const result = await client.callTool({
+      name: "run_poshqc_analyze_autofix",
+      arguments: {
+        workspace_root: "C:/workspace",
+        scan_folders: ["C:/workspace/src"],
+      },
+    });
+
+    expect(service.runPoshQCAnalyzeAutofix).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      scanFolders: ["C:/workspace/src"],
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "run_poshqc_analyze_autofix",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches validate_orchestration_artifacts through resolveValidateOrchestrationArtifactsToolInput and forwards artifact_type, artifact_path, and require_complete to the repo-automation service", async () => {
+    service.validateOrchestrationArtifacts.mockResolvedValue({
+      tool: "validate_orchestration_artifacts",
+      workspaceRoot: "C:/workspace",
+      summary: "Validated plan artifact at docs/plan.md.",
+    });
+
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "plan",
+        artifact_path: "docs/plan.md",
+        require_complete: true,
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      artifactType: "plan",
+      artifactPath: "docs/plan.md",
+      requireComplete: true,
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "validate_orchestration_artifacts",
+      workspace_root: "C:/workspace",
+    });
+  });
+
+  it("returns validation error for invalid artifact_type", async () => {
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "invalid-type",
+        artifact_path: "docs/plan.md",
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).not.toHaveBeenCalled();
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({
+      ok: false,
+      tool: "validate_orchestration_artifacts",
     });
   });
 });

@@ -14,7 +14,9 @@ import {
   resolveNewPotentialEntryToolInput,
   resolvePotentialToIssueToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
+  resolveRunPoshQCSuiteToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
+  resolveValidateOrchestrationArtifactsToolInput,
 } from "./mcp-tool-inputs";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 
@@ -195,6 +197,106 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "run_poshqc_format",
+    description:
+      "Run bundled PoshQC formatting against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_analyze",
+    description:
+      "Run bundled PoshQC analysis against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_test",
+    description:
+      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_analyze_autofix",
+    description:
+      "Apply bundled PoshQC analyzer autofixes, then rerun analysis against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "run_poshqc_suite",
+    description:
+      "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        scan_folders: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or workspace-contained folders to scan.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: "resolve_execute_hard_lock_prompt",
     description:
       "Resolve the execute hard-lock prompt for a target plan path using bundled extension resources.",
@@ -208,6 +310,40 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
         },
       },
       required: ["target"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "validate_orchestration_artifacts",
+    description:
+      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        artifact_type: {
+          type: "string",
+          enum: [
+            "plan",
+            "policy-audit",
+            "code-review",
+            "feature-audit",
+            "orchestrator-state",
+          ],
+          description: "The type of orchestration artifact to validate.",
+        },
+        artifact_path: {
+          type: "string",
+          description:
+            "Workspace-relative or absolute path to the artifact file.",
+        },
+        require_complete: {
+          type: "boolean",
+          description:
+            "When true and artifact_type is 'orchestrator-state', require all phases to be complete.",
+        },
+      },
+      required: ["artifact_type", "artifact_path"],
       additionalProperties: false,
     },
   },
@@ -326,10 +462,42 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(await service.newActiveFeatureFolder(input));
       }
 
+      case "run_poshqc_format": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCFormat(input));
+      }
+
+      case "run_poshqc_analyze": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCAnalyze(input));
+      }
+
+      case "run_poshqc_test": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCTest(input));
+      }
+
+      case "run_poshqc_analyze_autofix": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCAnalyzeAutofix(input));
+      }
+
+      case "run_poshqc_suite": {
+        const input = resolveRunPoshQCSuiteToolInput(rawInput);
+        return toMcpToolResult(await service.runPoshQCSuite(input));
+      }
+
       case "resolve_execute_hard_lock_prompt": {
         const input = resolveResolveExecuteHardLockPromptToolInput(rawInput);
         return toMcpToolResult(
           await service.resolveExecuteHardLockPrompt(input),
+        );
+      }
+
+      case "validate_orchestration_artifacts": {
+        const input = resolveValidateOrchestrationArtifactsToolInput(rawInput);
+        return toMcpToolResult(
+          await service.validateOrchestrationArtifacts(input),
         );
       }
     }

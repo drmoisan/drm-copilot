@@ -22,7 +22,13 @@ export const REPO_AUTOMATION_TOOLS = [
   "new_potential_entry",
   "potential_to_issue",
   "new_active_feature_folder",
+  "run_poshqc_format",
+  "run_poshqc_analyze",
+  "run_poshqc_test",
+  "run_poshqc_analyze_autofix",
+  "run_poshqc_suite",
   "resolve_execute_hard_lock_prompt",
+  "validate_orchestration_artifacts",
 ] as const;
 
 /**
@@ -77,8 +83,40 @@ export interface RepoAutomationService {
       readonly workMode: WorkModeOption;
     },
   ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCFormat(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCAnalyze(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCTest(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCAnalyzeAutofix(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
+  runPoshQCSuite(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  validateOrchestrationArtifacts(
+    input: WorkspaceExecutionInput & {
+      readonly artifactType: string;
+      readonly artifactPath: string;
+      readonly requireComplete?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult>;
 }
 
@@ -312,6 +350,126 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     });
   }
 
+  async runPoshQCFormat(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executePoshQcScript({
+      tool: "run_poshqc_format",
+      bundledRelativePath: "resources/templates/run-poshqc-format.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_format",
+      summaryWithoutFolders: `Ran bundled PoshQC format against '${input.workspaceRoot}'.`,
+      summaryWithFolders: `Ran bundled PoshQC format against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
+      ...(input.scanFolders === undefined
+        ? {}
+        : { scanFolders: input.scanFolders }),
+    });
+  }
+
+  async runPoshQCAnalyze(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executePoshQcScript({
+      tool: "run_poshqc_analyze",
+      bundledRelativePath: "resources/templates/run-poshqc-analyze.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_analyze",
+      summaryWithoutFolders: `Ran bundled PoshQC analyze against '${input.workspaceRoot}'.`,
+      summaryWithFolders: `Ran bundled PoshQC analyze against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
+      ...(input.scanFolders === undefined
+        ? {}
+        : { scanFolders: input.scanFolders }),
+    });
+  }
+
+  async runPoshQCTest(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executePoshQcScript({
+      tool: "run_poshqc_test",
+      bundledRelativePath: "resources/templates/run-poshqc-test.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_test",
+      summaryWithoutFolders: `Ran bundled PoshQC test against '${input.workspaceRoot}'.`,
+      summaryWithFolders: `Ran bundled PoshQC test against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
+      ...(input.scanFolders === undefined
+        ? {}
+        : { scanFolders: input.scanFolders }),
+    });
+  }
+
+  async runPoshQCAnalyzeAutofix(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executePoshQcScript({
+      tool: "run_poshqc_analyze_autofix",
+      bundledRelativePath: "resources/templates/run-poshqc-analyze-autofix.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_analyze_autofix",
+      summaryWithoutFolders: `Ran bundled PoshQC analyze autofix against '${input.workspaceRoot}'.`,
+      summaryWithFolders: `Ran bundled PoshQC analyze autofix against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
+      ...(input.scanFolders === undefined
+        ? {}
+        : { scanFolders: input.scanFolders }),
+    });
+  }
+
+  async runPoshQCSuite(
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executePoshQcScript({
+      tool: "run_poshqc_suite",
+      bundledRelativePath: "resources/templates/run-poshqc-suite.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_poshqc_suite",
+      summaryWithoutFolders: `Ran the bundled PoshQC suite against '${input.workspaceRoot}'.`,
+      summaryWithFolders: `Ran the bundled PoshQC suite against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
+      ...(input.scanFolders === undefined
+        ? {}
+        : { scanFolders: input.scanFolders }),
+    });
+  }
+
+  private async executePoshQcScript(options: {
+    readonly tool: RepoAutomationToolName;
+    readonly bundledRelativePath: string;
+    readonly workspaceRoot: string;
+    readonly invocationId: string;
+    readonly scanFolders?: ReadonlyArray<string>;
+    readonly summaryWithoutFolders: string;
+    readonly summaryWithFolders: string;
+  }): Promise<RepoAutomationExecutionResult> {
+    const args = ["-WorkspaceRoot", options.workspaceRoot];
+    if (options.scanFolders && options.scanFolders.length > 0) {
+      for (const scanFolder of options.scanFolders) {
+        args.push("-ScanFolders", scanFolder);
+      }
+    }
+
+    return this.executeScript({
+      tool: options.tool,
+      runtimeKind: "powershell",
+      bundledRelativePath: options.bundledRelativePath,
+      workspaceRoot: options.workspaceRoot,
+      invocationId: options.invocationId,
+      args,
+      summary:
+        options.scanFolders && options.scanFolders.length > 0
+          ? options.summaryWithFolders
+          : options.summaryWithoutFolders,
+    });
+  }
+
   async resolveExecuteHardLockPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
   ): Promise<RepoAutomationExecutionResult> {
@@ -323,6 +481,30 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
       args: ["--target", input.target, "--workspace", input.workspaceRoot],
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+    });
+  }
+
+  async validateOrchestrationArtifacts(
+    input: WorkspaceExecutionInput & {
+      readonly artifactType: string;
+      readonly artifactPath: string;
+      readonly requireComplete?: boolean;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    const args = [input.artifactType, input.artifactPath];
+    if (input.requireComplete) {
+      args.push("--require-complete");
+    }
+
+    return this.executeScript({
+      tool: "validate_orchestration_artifacts",
+      runtimeKind: "python",
+      bundledRelativePath:
+        "resources/templates/validate_orchestration_artifacts.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "validate_orchestration_artifacts",
+      args,
+      summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
     });
   }
 

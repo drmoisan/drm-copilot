@@ -35,13 +35,16 @@ def test_codex_orchestrator_agent_requires_mandatory_specialist_handoffs() -> No
 
     agent_text = read_bundle_text(".codex/agents/orchestrator.toml")
 
-    assert "you must delegate planning to it" in agent_text
+    assert "mechanical availability signal" in agent_text
+    assert "you must delegate or stop execution" in agent_text
+    assert "stop and report blocked state" in agent_text
+    assert "do not perform planning locally" in agent_text
     assert (
-        "you must delegate plan preflight validation, execution, and "
-        "post-delivery validation to it" in agent_text
+        "do not perform preflight validation, execution, or "
+        "post-delivery validation locally" in agent_text
     )
-    assert "you must delegate post-implementation review to it" in agent_text
-    assert "explicit fallback reason" in agent_text
+    assert "do not perform post-implementation review locally" in agent_text
+    assert "all required delegations completed with receipts" in agent_text
     assert "required evidence-backed QA artifacts" in agent_text
     assert "stale PR-context artifacts" in agent_text
 
@@ -71,13 +74,17 @@ def test_codex_orchestrator_workflow_requires_large_path_evidence_gates() -> Non
         "PR-context artifacts are missing or stale relative to the current "
         "branch state" in skill_text
     )
-    assert (
-        "all required delegations completed or an explicit fallback reason "
-        "was recorded" in skill_text
-    )
+    assert "all required delegations completed with receipts" in skill_text
     assert (
         "required baseline and final-QA evidence artifacts referenced by the "
         "approved plan exist on disk" in skill_text
+    )
+    assert (
+        "Do not execute required delegated steps locally as a fallback." in skill_text
+    )
+    assert (
+        "validator-backed checks for the approved plan, policy audit, code "
+        "review, feature audit, and checkpoint state pass" in skill_text
     )
 
 

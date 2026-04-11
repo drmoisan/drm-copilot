@@ -260,6 +260,31 @@ export async function promptForActiveFeaturePlan(
 }
 
 /**
+ * Prompt the user to choose one or more workspace folders to scan.
+ *
+ * @param workspaceRoot The root of the current workspace.
+ * @returns The selected folder paths, or `undefined` if the user cancelled.
+ */
+export async function promptForWorkspaceScanFolders(
+  workspaceRoot: string,
+): Promise<string[] | undefined> {
+  const selectedFolders = await vscode.window.showOpenDialog({
+    canSelectMany: true,
+    canSelectFiles: false,
+    canSelectFolders: true,
+    defaultUri: vscode.Uri.file(workspaceRoot),
+    openLabel: "Select folders to scan",
+    title: "drm-copilot: Run PoshQC Suite",
+  });
+
+  if (!selectedFolders) {
+    return undefined;
+  }
+
+  return selectedFolders.map((folder) => folder.fsPath);
+}
+
+/**
  * Resolve a workflow command invocation, logging its mode to the output channel.
  *
  * @param output The extension output channel for logging.
