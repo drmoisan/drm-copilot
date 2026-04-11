@@ -47,6 +47,12 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `potential_to_issue`
 - `new_active_feature_folder`
 - `resolve_execute_hard_lock_prompt`
+- `run_poshqc_format`
+- `run_poshqc_analyze`
+- `run_poshqc_test`
+- `run_poshqc_analyze_autofix`
+- `run_poshqc_suite`
+- `validate_orchestration_artifacts`
 
 ### MCP Runtime Expectations
 
@@ -90,6 +96,12 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
 - `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
 - `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
+- run_poshqc_format: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_test: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze_autofix: optional `workspace_root`, optional `scan_folders`
+- run_poshqc_suite: optional `workspace_root`, optional `scan_folders`
+- validate_orchestration_artifacts: optional `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
 
 ### MCP Result Shape
 

@@ -196,7 +196,7 @@ describe("repo automation MCP server", () => {
     });
   });
 
-  it("dispatches run_poshqc_suite through the shared service with scan folders", async () => {
+  it("dispatches run_poshqc_suite through resolveRunPoshQCSuiteToolInput and forwards repeated scan_folders values to the repo-automation service", async () => {
     service.runPoshQCSuite.mockResolvedValue({
       tool: "run_poshqc_suite",
       workspaceRoot: "C:/workspace",
@@ -336,7 +336,7 @@ describe("repo automation MCP server", () => {
     });
   });
 
-  it("dispatches validate_orchestration_artifacts through the shared service", async () => {
+  it("dispatches validate_orchestration_artifacts through resolveValidateOrchestrationArtifactsToolInput and forwards artifact_type, artifact_path, and require_complete to the repo-automation service", async () => {
     service.validateOrchestrationArtifacts.mockResolvedValue({
       tool: "validate_orchestration_artifacts",
       workspaceRoot: "C:/workspace",
@@ -349,6 +349,7 @@ describe("repo automation MCP server", () => {
         workspace_root: "C:/workspace",
         artifact_type: "plan",
         artifact_path: "docs/plan.md",
+        require_complete: true,
       },
     });
 
@@ -356,6 +357,7 @@ describe("repo automation MCP server", () => {
       workspaceRoot: "C:/workspace",
       artifactType: "plan",
       artifactPath: "docs/plan.md",
+      requireComplete: true,
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({

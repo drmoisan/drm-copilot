@@ -13,6 +13,8 @@
         @{ ModuleName = 'Pester'; ModuleVersion = '5.6.1' }
     )
     FunctionsToExport    = @(
+        'Convert-PoshQCCoverageToRelative',
+        'Get-PoshQCFileList',
         'Install-PoshQCTool',
         'Invoke-PoshQCFormat',
         'Invoke-PoshQCAnalyze',

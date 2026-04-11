@@ -42,6 +42,34 @@ Describe 'Get-PoshQCFileList scan-folder support' {
                 } } | Should -Throw "Scan folder '../outside' must resolve inside root '/repo'."
         }
     }
+
+    It 'rejects blank scan-folder values' {
+        InModuleScope PoshQC {
+            {
+                Resolve-PoshQCScanFolder -Root '/repo' -ScanFolders @('') -ResolvePath {
+                    param([string] $Path)
+                    [pscustomobject]@{ Path = $Path }
+                }
+            } | Should -Throw 'Scan folder values must not be blank.'
+        }
+    }
+
+    It 'returns an empty array when selected scan roots contain no PowerShell files' {
+        $result = Get-PoshQCFileList -Root '/repo' -ScanFolders @('src', 'tests') -ResolvePath {
+            param([string] $Path)
+            [pscustomobject]@{ Path = $Path }
+        } -ResolveScanFolders {
+            param([string] $ResolvedRoot, [string[]] $Folders, [scriptblock] $ResolvePathFn)
+            [void] $ResolvedRoot
+            [void] $ResolvePathFn
+            $Folders | ForEach-Object { "/repo/$_" }
+        } -EnumerateFiles {
+            param([string] $Path)
+            @([pscustomobject]@{ FullName = "$Path/readme.txt"; Extension = '.txt' })
+        }
+
+        $result | Should -BeNullOrEmpty
+    }
 }
 
 Describe 'Invoke-PoshQCSuite' {
@@ -136,6 +164,27 @@ Describe 'Invoke-PoshQCAnalyzeAutofix' {
         $script:analysisInvocations[0][2] | Should -Be '/settings.psd1'
     }
 
+    It 'preserves selected scan folders when it reruns analysis after autofix' {
+        $script:rerunScanFolders = $null
+
+        Invoke-PoshQCAnalyzeAutofix -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } `
+            -GetFileList {
+            @([pscustomobject]@{ FullName = '/repo/src/file.ps1'; Extension = '.ps1' })
+        } -FixFile {
+            param([string] $Path, [string] $Settings)
+            [void] $Path
+            [void] $Settings
+        } -InvokeAnalyze {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string] $AnalyzeSettingsPath, [string[]] $Excluded)
+            [void] $RootPath
+            [void] $AnalyzeSettingsPath
+            [void] $Excluded
+            $script:rerunScanFolders = $ScanFoldersPath
+        } -Logger { param([string] $Message) [void] $Message }
+
+        $script:rerunScanFolders | Should -Be @('/repo/src', '/repo/tests/powershell')
+    }
+
     It 'still reruns analysis when no files are discovered' {
         $script:analysisRan = $false
 
@@ -220,6 +269,30 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
 
         $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
         $script:capturedCoveragePaths[1] | Should -Be '/repo'
+    }
+}
+
+Describe 'Invoke-PoshQCAnalyze scan-folder support' {
+    It 'honors ScanFolders when requesting the file list' {
+        $script:capturedAnalyzeRoot = $null
+        $script:capturedAnalyzeScanFolders = $null
+
+        Invoke-PoshQCAnalyze -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -EnsureModule { } -TestPathExists { $true } `
+            -GetFileList {
+            param([string] $RootPath, [string[]] $ScanFoldersPath, [string[]] $Excluded)
+            [void] $Excluded
+            $script:capturedAnalyzeRoot = $RootPath
+            $script:capturedAnalyzeScanFolders = $ScanFoldersPath
+            @([pscustomobject]@{ FullName = '/repo/src/file.ps1'; Extension = '.ps1' })
+        } -AnalyzeFile {
+            param([string] $Path, [string] $Settings)
+            [void] $Path
+            [void] $Settings
+            @()
+        } -Logger { param([string] $Message) [void] $Message }
+
+        $script:capturedAnalyzeRoot | Should -Be '/repo'
+        $script:capturedAnalyzeScanFolders | Should -Be @('/repo/src', '/repo/tests/powershell')
     }
 }
 
