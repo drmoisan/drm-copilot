@@ -83,6 +83,10 @@
         "title": "drm-copilot: Run PoshQC Analyze Autofix"
       },
       {
+        "command": "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
+        "title": "drm-copilot: Resolve Policy Audit Template Asset"
+      },
+      {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
       }

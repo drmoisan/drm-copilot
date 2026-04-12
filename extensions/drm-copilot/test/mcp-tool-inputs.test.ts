@@ -6,6 +6,7 @@ import {
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
+  resolvePolicyAuditTemplateAssetToolInput,
   resolvePotentialToIssueToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
@@ -136,6 +137,78 @@ describe("resolveValidateOrchestrationArtifactsToolInput", () => {
       );
       expect(result.artifactType).toBe(validType);
     }
+  });
+});
+
+describe("resolvePolicyAuditTemplateAssetToolInput", () => {
+  it("uses the fallback workspace root and omits targetPath when target_path is absent", () => {
+    const result = resolvePolicyAuditTemplateAssetToolInput(
+      {
+        asset: "agents",
+      },
+      "C:/fallback-workspace",
+    );
+
+    expect(result).toEqual({
+      workspaceRoot: "C:/fallback-workspace",
+      asset: "agents",
+    });
+    expect("targetPath" in result).toBe(false);
+  });
+
+  it("returns the normalized asset and workspace-relative target path", () => {
+    expect(
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "template",
+        target_path: "docs/policy-audit.md",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/workspace",
+      asset: "template",
+      targetPath: "C:/workspace/docs/policy-audit.md",
+    });
+  });
+
+  it("preserves an absolute target path", () => {
+    expect(
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "agents",
+        target_path: "D:/exports/policy-audit-agents.md",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/workspace",
+      asset: "agents",
+      targetPath: "D:/exports/policy-audit-agents.md",
+    });
+  });
+
+  it("rejects unsupported selectors", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "invalid",
+      }),
+    ).toThrow("asset must be one of: template, agents.");
+  });
+
+  it("rejects a missing asset", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+      }),
+    ).toThrow("Field 'asset' must be a string.");
+  });
+
+  it("rejects a non-string target_path", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "template",
+        target_path: 42,
+      }),
+    ).toThrow("Field 'target_path' must be a string.");
   });
 });
 

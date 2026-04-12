@@ -8,11 +8,12 @@ import {
 import {
   resolveCollectCommitContextToolInput,
   resolveCollectPrContextToolInput,
-  resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
+  resolvePolicyAuditTemplateAssetToolInput,
   resolvePotentialToIssueToolInput,
+  resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
   resolveRunPoshQCSuiteToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
@@ -36,6 +37,9 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly tool: RepoAutomationToolName;
   readonly workspace_root: string;
   readonly artifacts?: ReadonlyArray<string>;
+  readonly asset_id?: string;
+  readonly bundled_source_path?: string;
+  readonly destination_path?: string;
   readonly summary: string;
   readonly stderr_excerpt?: string;
 }
@@ -297,6 +301,30 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "resolve_policy_audit_template_asset",
+    description:
+      "Resolve a bundled policy-audit template asset from the published extension package, optionally copying it into the target workspace.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        asset: {
+          type: "string",
+          enum: ["template", "agents"],
+          description:
+            "Bundled policy-audit asset selector: 'template' for policy-audit.yyyy-MM-ddTHH-mm.md or 'agents' for AGENTS.md.",
+        },
+        target_path: {
+          type: "string",
+          description:
+            "Optional workspace-relative or absolute destination path for a copied asset.",
+        },
+      },
+      required: ["asset"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "resolve_execute_hard_lock_prompt",
     description:
       "Resolve the execute hard-lock prompt for a target plan path using bundled extension resources.",
@@ -373,6 +401,13 @@ function toMcpToolResult(
     workspace_root: result.workspaceRoot,
     summary: result.summary,
     ...(result.artifacts === undefined ? {} : { artifacts: result.artifacts }),
+    ...(result.assetId === undefined ? {} : { asset_id: result.assetId }),
+    ...(result.bundledSourcePath === undefined
+      ? {}
+      : { bundled_source_path: result.bundledSourcePath }),
+    ...(result.destinationPath === undefined
+      ? {}
+      : { destination_path: result.destinationPath }),
   };
 }
 
@@ -485,6 +520,13 @@ export async function dispatchRepoAutomationTool(
       case "run_poshqc_suite": {
         const input = resolveRunPoshQCSuiteToolInput(rawInput);
         return toMcpToolResult(await service.runPoshQCSuite(input));
+      }
+
+      case "resolve_policy_audit_template_asset": {
+        const input = resolvePolicyAuditTemplateAssetToolInput(rawInput);
+        return toMcpToolResult(
+          await service.resolvePolicyAuditTemplateAsset(input),
+        );
       }
 
       case "resolve_execute_hard_lock_prompt": {

@@ -21,6 +21,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.newPotentialEntry`
 - `drmCopilotExtension.potentialToIssue`
 - `drmCopilotExtension.newActiveFeatureFolder`
+- `drmCopilotExtension.resolvePolicyAuditTemplateAsset`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
 - `drmCopilotExtension.syncAgentsFromInstructions`
 
@@ -52,6 +53,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `run_poshqc_test`
 - `run_poshqc_analyze_autofix`
 - `run_poshqc_suite`
+- `resolve_policy_audit_template_asset`
 - `validate_orchestration_artifacts`
 
 ### MCP Runtime Expectations
@@ -59,6 +61,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - MCP tools are fully non-interactive.
 - `workspace_root` is accepted by all workspace-targeted tools and defaults to `process.cwd()` when omitted.
 - `collect_pr_context` requires an explicit `base` branch/ref in MCP mode.
+- `resolve_policy_audit_template_asset` requires `asset` and optionally accepts `target_path`; when `target_path` is omitted, callers receive the bundled source path for the requested asset.
 - Bundled scripts are resolved from `extensions/drm-copilot/resources/...` at runtime.
 - Subprocesses are launched with explicit argv arrays and `shell: false`.
 
@@ -95,6 +98,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `new_potential_entry`: optional `workspace_root`, required `short_name`
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
 - `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
+- `resolve_policy_audit_template_asset`: optional `workspace_root`, required `asset`, optional `target_path`
 - `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
 - run_poshqc_format: optional `workspace_root`, optional `scan_folders`
 - run_poshqc_analyze: optional `workspace_root`, optional `scan_folders`
@@ -135,6 +139,8 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/new-potential-entry.ps1`
 - `resources/templates/potential_to_issue.py`
 - `resources/templates/new_active_feature_folder.py`
+- `resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
+- `resources/templates/policy_audit/AGENTS.md`
 - `resources/templates/resolve_hard_lock_prompt.py`
 - `resources/templates/run-poshqc-format.ps1`
 - `resources/templates/run-poshqc-analyze.ps1`
@@ -144,6 +150,8 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/powershell/PoshQC/`
 
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
+
+`resolve_policy_audit_template_asset` and `drmCopilotExtension.resolvePolicyAuditTemplateAsset` are additive surface adapters over the same bundled policy-audit assets. They support the selectors `template` and `agents`. In MCP mode, callers receive the canonical asset id plus the bundled source path and, when requested, the copied destination path. In VS Code, interactive use opens the bundled asset when no target is supplied and copies it into the workspace when `-target <path>` is supplied.
 
 ## Push Down Codex and Agents Customizations
 
