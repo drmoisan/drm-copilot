@@ -1,4 +1,4 @@
-"""Regression tests for migrated Codex handoff-contract parity."""
+"""Regression tests for Codex handoff-contract parity."""
 
 from __future__ import annotations
 
@@ -44,13 +44,34 @@ def read_bundle_text(relative_path: str) -> str:
     return (BUNDLED_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_shared_codex_skills_match_github_contract_sources() -> None:
-    """Require migrated shared skills to stay identical to GitHub source contracts."""
+def test_shared_codex_skills_match_repo_agent_skill_sources() -> None:
+    """Require bundled shared Codex skills to match repo `.agents` sources."""
 
     for skill_name in SHARED_SKILL_NAMES:
-        github_path = f".github/skills/{skill_name}/SKILL.md"
-        codex_path = f".agents/skills/{skill_name}/SKILL.md"
-        assert read_bundle_text(codex_path) == read_repo_text(github_path)
+        skill_path = f".agents/skills/{skill_name}/SKILL.md"
+        assert read_bundle_text(skill_path) == read_repo_text(skill_path)
+
+
+def test_codex_orchestration_chain_agents_match_repo_sources() -> None:
+    """Require bundled orchestration-chain agents to match repo `.codex` sources."""
+
+    agent_names = (
+        "orchestrator",
+        "python-orchestrator",
+        "powershell-orchestrator",
+        "csharp-orchestrator",
+        "atomic-planning",
+        "python-atomic-planning",
+        "powershell-atomic-planning",
+        "csharp-atomic-planning",
+        "python-atomic-executor",
+        "powershell-atomic-executor",
+        "csharp-atomic-executor",
+    )
+
+    for agent_name in agent_names:
+        agent_path = f".codex/agents/{agent_name}.toml"
+        assert read_bundle_text(agent_path) == read_repo_text(agent_path)
 
 
 def test_atomic_planner_handoff_contract_is_strict_in_skill_and_agent() -> None:
