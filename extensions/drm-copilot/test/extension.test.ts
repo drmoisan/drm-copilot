@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
   afterEach,
   beforeEach,
@@ -8,215 +7,26 @@ import {
   jest,
 } from "@jest/globals";
 
-type CommandHandler = (...args: unknown[]) => Promise<void> | void;
-type MockChildProcess = EventEmitter & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
-};
+import {
+  activateAndGetHandler,
+  activateFreshHandlerWithPosixPathResolve,
+  appendLineMock,
+  childProcessMock,
+  commandHandlers,
+  createMockProcess,
+  deactivate,
+  detectRuntime,
+  getFreshChildProcessMock,
+  prepareFreshModulesWithPosixPathResolve,
+  resetExtensionHarnessState,
+  setExecutablePresence,
+  setFreshExecutablePresence,
+  setWorkspaceFolders,
+} from "./extension-test-harness";
 
-const commandHandlers = new Map<string, CommandHandler>();
-const appendLineMock = jest.fn<(line: string) => void>();
-const showInputBoxMock = jest.fn();
-const showQuickPickMock = jest.fn();
-const registerCommandMock = jest.fn(
-  (command: string, handler: CommandHandler) => {
-    commandHandlers.set(command, handler);
-    return { dispose: jest.fn() };
-  },
-);
-
-let quickPickResultLabel: string | undefined = "origin/main";
-
-let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
-  { uri: { fsPath: "C:/workspace" } },
-];
-
-jest.mock(
-  "vscode",
-  () => ({
-    commands: {
-      registerCommand: registerCommandMock,
-    },
-    window: {
-      createOutputChannel: jest.fn(() => ({
-        appendLine: appendLineMock,
-        dispose: jest.fn(),
-      })),
-      showInputBox: showInputBoxMock,
-      showQuickPick: showQuickPickMock,
-    },
-    workspace: {
-      get workspaceFolders() {
-        return workspaceFoldersState;
-      },
-    },
-    Uri: {
-      joinPath: jest.fn((base: { fsPath: string }, relative: string) => ({
-        fsPath: `${base.fsPath}/${relative}`,
-      })),
-    },
-  }),
-  { virtual: true },
-);
-
-jest.mock("node:fs", () => ({
-  existsSync: jest.fn(),
-}));
-
-jest.mock("node:child_process", () => ({
-  spawn: jest.fn(),
-  spawnSync: jest.fn(),
-}));
-
-import { activate, detectRuntime } from "../src/extension";
-
-const fsMock = jest.requireMock("node:fs") as {
-  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-};
-
-const childProcessMock = jest.requireMock("node:child_process") as {
-  spawn: jest.Mock;
-  spawnSync: jest.Mock;
-};
-
-function setGitBranchDiscoveryState(input: {
-  readonly originHead?: string;
-  readonly remoteRefs?: ReadonlyArray<string>;
-  readonly localRefs?: ReadonlyArray<string>;
-}): void {
-  const originHead = input.originHead ?? "origin/main";
-  const remoteRefs = input.remoteRefs ?? ["origin/HEAD", "origin/main"];
-  const localRefs = input.localRefs ?? ["main"];
-
-  childProcessMock.spawnSync.mockImplementation((...rawArgs: unknown[]) => {
-    const args = (rawArgs[1] as ReadonlyArray<string> | undefined) ?? [];
-    const joined = args.join(" ");
-    if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
-      return {
-        status: originHead.length > 0 ? 0 : 1,
-        stdout: originHead,
-        stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
-      };
-    }
-
-    if (
-      joined.includes("for-each-ref") &&
-      joined.includes("refs/remotes/origin")
-    ) {
-      return {
-        status: 0,
-        stdout: remoteRefs.join("\n"),
-        stderr: "",
-      };
-    }
-
-    if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
-      return {
-        status: 0,
-        stdout: localRefs.join("\n"),
-        stderr: "",
-      };
-    }
-
-    return {
-      status: 0,
-      stdout: "",
-      stderr: "",
-    };
-  });
-
-  showQuickPickMock.mockImplementation(async (...rawArgs: unknown[]) => {
-    const items =
-      (rawArgs[0] as ReadonlyArray<{ label: string }> | undefined) ?? [];
-    if (!quickPickResultLabel) {
-      return undefined;
-    }
-
-    const matched = items.find((item) => item.label === quickPickResultLabel);
-    return matched ?? items[0];
-  });
-}
-
-function setExecutablePresence(presence: {
-  readonly python?: boolean;
-  readonly pwsh?: boolean;
-  readonly powershell?: boolean;
-}): void {
-  fsMock.existsSync.mockImplementation((filePath: string) => {
-    const lowerPath = filePath.toLowerCase();
-    if (lowerPath.includes("python")) {
-      return presence.python ?? false;
-    }
-
-    if (lowerPath.includes("pwsh")) {
-      return presence.pwsh ?? false;
-    }
-
-    if (lowerPath.includes("powershell")) {
-      return presence.powershell ?? false;
-    }
-
-    return false;
-  });
-}
-
-function createMockProcess(exitCode: number): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
-}
-
-function createMockProcessWithStderr(
-  exitCode: number,
-  stderrLine: string,
-): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.stderr.emit("data", Buffer.from(stderrLine, "utf-8"));
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
-}
-
-function activateAndGetHandler(commandId: string): CommandHandler {
-  const context = {
-    extensionUri: { fsPath: "C:/extension" },
-    subscriptions: [] as Array<{ dispose(): void }>,
-  };
-
-  activate(context as never);
-  const handler = commandHandlers.get(commandId);
-  if (!handler) {
-    throw new Error(`Missing command handler: ${commandId}`);
-  }
-
-  return handler;
-}
-
-describe("drm-copilot command behavior", () => {
+describe("drm-copilot core command behavior", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
-    commandHandlers.clear();
-    appendLineMock.mockReset();
-    registerCommandMock.mockClear();
-    childProcessMock.spawn.mockReset();
-    childProcessMock.spawnSync.mockReset();
-    showInputBoxMock.mockReset();
-    showQuickPickMock.mockReset();
-    workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
-    quickPickResultLabel = "origin/main";
-    setGitBranchDiscoveryState({
-      originHead: "origin/main",
-      remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
-      localRefs: ["main"],
-    });
+    resetExtensionHarnessState();
   });
 
   afterEach(() => {
@@ -237,44 +47,12 @@ describe("drm-copilot command behavior", () => {
     );
   });
 
-  it("registers collectCommitContext", () => {
-    activateAndGetHandler("drmCopilotExtension.collectCommitContext");
+  it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
+    activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
 
     expect(
-      commandHandlers.has("drmCopilotExtension.collectCommitContext"),
+      commandHandlers.has("drmCopilotExtension.syncAgentsFromInstructions"),
     ).toBe(true);
-  });
-
-  it("registers collectPrContext", () => {
-    activateAndGetHandler("drmCopilotExtension.collectPrContext");
-
-    expect(commandHandlers.has("drmCopilotExtension.collectPrContext")).toBe(
-      true,
-    );
-  });
-
-  it("registers pushDownCopilotCustomizations", () => {
-    activateAndGetHandler("drmCopilotExtension.pushDownCopilotCustomizations");
-
-    expect(
-      commandHandlers.has("drmCopilotExtension.pushDownCopilotCustomizations"),
-    ).toBe(true);
-  });
-
-  it("registers newPotentialBugEntry", () => {
-    activateAndGetHandler("drmCopilotExtension.newPotentialBugEntry");
-
-    expect(
-      commandHandlers.has("drmCopilotExtension.newPotentialBugEntry"),
-    ).toBe(true);
-  });
-
-  it("registers newPotentialEntry", () => {
-    activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
-
-    expect(commandHandlers.has("drmCopilotExtension.newPotentialEntry")).toBe(
-      true,
-    );
   });
 
   it("does not register the retired placeholder commands", () => {
@@ -299,7 +77,7 @@ describe("drm-copilot command behavior", () => {
   });
 
   it("no workspace throws clear no-workspace error", async () => {
-    workspaceFoldersState = undefined;
+    setWorkspaceFolders(undefined);
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
@@ -330,26 +108,14 @@ describe("drm-copilot command behavior", () => {
     );
   });
 
-  it("collectCommitContext fails when no workspace folder is open", async () => {
-    workspaceFoldersState = undefined;
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("detectRuntime falls back to py -3 when python is unavailable", () => {
+    setExecutablePresence({ python: false, py: true });
 
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow("No workspace folder is open.");
-  });
-
-  it("collectCommitContext fails when python runtime is unavailable", async () => {
-    setExecutablePresence({ python: false });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
+    const runtime = detectRuntime("python");
+    expect(runtime).toEqual({
+      executable: "py",
+      argsPrefix: ["-3"],
+    });
   });
 
   it("helloPython uses bundled extension script path", async () => {
@@ -376,255 +142,6 @@ describe("drm-copilot command behavior", () => {
     expect(args[args.length - 1]).toBe(
       "C:/extension/resources/templates/hello_pwsh.ps1",
     );
-  });
-
-  it("collectCommitContext passes explicit output args to bundled script", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/collect_commit_context.py",
-    );
-    expect(args[1]).toBe("--output");
-    expect(args[2]).toBe("artifacts/commit_context.txt");
-  });
-
-  it("collectCommitContext runs with workspace cwd", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await handler();
-
-    const [, , options] = childProcessMock.spawn.mock.calls[0] as [
-      string,
-      string[],
-      { cwd: string; shell: boolean },
-    ];
-    expect(options.cwd).toBe("C:/workspace");
-    expect(options.shell).toBe(false);
-  });
-
-  it("collectCommitContext logs and throws on non-zero exit", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
-
-    const logs = appendLineMock.mock.calls.map(([line]) => line);
-    expect(
-      logs.some((line) =>
-        line.includes(
-          "[drmCopilotExtension.collectCommitContext] command failure",
-        ),
-      ),
-    ).toBe(true);
-  });
-
-  it("collectCommitContext reports git failure details from collector stderr", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(
-      createMockProcessWithStderr(1, "git executable not found on PATH"),
-    );
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow("Command exited with code 1");
-
-    const logs = appendLineMock.mock.calls.map(([line]) => line);
-    expect(
-      logs.some((line) => line.includes("git executable not found on PATH")),
-    ).toBe(true);
-  });
-
-  it("newPotentialBugEntry passes the bundled script path and short-name args", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/new_potential_bug_entry.py",
-    );
-    expect(args[1]).toBe("--short-name");
-    expect(args[2]).toBe("blank-pr-context");
-  });
-
-  it("newPotentialBugEntry direct --short-name invocation skips prompts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler(["--short-name", "blank-pr-context"]);
-
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[1]).toBe("--short-name");
-    expect(args[2]).toBe("blank-pr-context");
-  });
-
-  it("newPotentialBugEntry direct mode rejects invalid short-name pattern", async () => {
-    setExecutablePresence({ python: true });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler(["--short-name", "Invalid Name"])).rejects.toThrow(
-      /short-name/i,
-    );
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialBugEntry returns early when the input box is cancelled", async () => {
-    showInputBoxMock.mockResolvedValue(undefined);
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialBugEntry surfaces a missing python runtime error", async () => {
-    setExecutablePresence({ python: false });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
-  });
-
-  it("newPotentialBugEntry surfaces non-zero exit failures", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
-  });
-
-  it("newPotentialEntry passes the bundled script path and short-name args", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    showInputBoxMock.mockResolvedValue("stale-cache");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
-      "C:/extension/resources/templates/new-potential-entry.ps1",
-    );
-    expect(args).toContain("-ShortName");
-    expect(args).toContain("stale-cache");
-  });
-
-  it("newPotentialEntry direct -ShortName invocation skips prompts", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-    await handler(["-ShortName", "stale-cache"]);
-
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("-ShortName");
-    expect(args).toContain("stale-cache");
-  });
-
-  it("newPotentialEntry direct mode rejects missing -ShortName value", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-
-    await expect(handler(["-ShortName"])).rejects.toThrow(/-ShortName.*value/i);
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialEntry direct mode rejects duplicate -ShortName flag", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-
-    await expect(
-      handler(["-ShortName", "first-entry", "-ShortName", "second-entry"]),
-    ).rejects.toThrow(/duplicate.*-ShortName/i);
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialEntry returns early when the input box is cancelled", async () => {
-    showInputBoxMock.mockResolvedValue(undefined);
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-    await handler();
-
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialEntry surfaces a missing powershell runtime error", async () => {
-    setExecutablePresence({ pwsh: false, powershell: false });
-    showInputBoxMock.mockResolvedValue("stale-cache");
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-
-    await expect(handler()).rejects.toThrow(
-      "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
-    );
-  });
-
-  it("newPotentialEntry surfaces non-zero exit failures", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    showInputBoxMock.mockResolvedValue("stale-cache");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
   });
 
   it("helloPython uses explicit executable and argv arrays", async () => {
@@ -688,56 +205,55 @@ describe("drm-copilot command behavior", () => {
     expect(executable.includes(" ")).toBe(false);
   });
 
-  it("newPotentialBugEntry passes --template-root pointing to bundled feature-templates", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("test-bug");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("helloPython preserves C:/extension on POSIX hosts", async () => {
+    try {
+      prepareFreshModulesWithPosixPathResolve();
+      setFreshExecutablePresence({ python: true });
+      const freshChildProcessMock = getFreshChildProcessMock();
+      freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+      const handler = await activateFreshHandlerWithPosixPathResolve(
+        "drmCopilotExtension.helloPython",
+      );
+      await handler();
 
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const templateRootIdx = args.indexOf("--template-root");
-    expect(templateRootIdx).toBeGreaterThan(-1);
-    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+        string,
+        string[],
+      ];
+      expect(args[0]).toBe("C:/extension/resources/templates/hello_python.py");
+    } finally {
+      jest.dontMock("node:path");
+      jest.resetModules();
+    }
   });
 
-  it("newPotentialEntry passes -TemplateRoot pointing to bundled feature-templates", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    showInputBoxMock.mockResolvedValue("test-entry");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("helloPowerShell preserves C:/extension on POSIX hosts", async () => {
+    try {
+      prepareFreshModulesWithPosixPathResolve();
+      setFreshExecutablePresence({ pwsh: true });
+      const freshChildProcessMock = getFreshChildProcessMock();
+      freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+      const handler = await activateFreshHandlerWithPosixPathResolve(
+        "drmCopilotExtension.helloPowerShell",
+      );
+      await handler();
 
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const templateRootIdx = args.indexOf("-TemplateRoot");
-    expect(templateRootIdx).toBeGreaterThan(-1);
-    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+        string,
+        string[],
+      ];
+      expect(
+        args[args.length - 1].startsWith("C:/extension/resources/templates/"),
+      ).toBe(true);
+    } finally {
+      jest.dontMock("node:path");
+      jest.resetModules();
+    }
   });
+});
 
-  it("newActiveFeatureFolder passes --template-root pointing to bundled feature-templates", async () => {
-    setExecutablePresence({ python: true });
-    showQuickPickMock
-      .mockResolvedValueOnce("feature")
-      .mockResolvedValueOnce("minor-audit");
-    showInputBoxMock
-      .mockResolvedValueOnce("test-feature")
-      .mockResolvedValueOnce("");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newActiveFeatureFolder",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const templateRootIdx = args.indexOf("--template-root");
-    expect(templateRootIdx).toBeGreaterThan(-1);
-    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
+describe("deactivate", () => {
+  it("completes without throwing (no-op implementation)", () => {
+    expect(() => deactivate()).not.toThrow();
   });
 });

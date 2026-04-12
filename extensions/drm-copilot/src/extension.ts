@@ -5,204 +5,51 @@ import {
   getWorkspaceRoot,
 } from "./command-runtime";
 import {
-  type BranchDiscoveryResult,
+  promptForActiveFeaturePlan,
+  promptForChoice,
+  promptForFeatureName,
+  promptForIssueNumber,
+  promptForPotentialPath,
+  promptForShortName,
+  promptForWorkspaceScanFolders,
+  resolveWorkflowInvocation,
+} from "./extension-command-helpers";
+import { registerMcpProvider } from "./mcp-provider";
+import {
   discoverPrBaseBranches,
   pickPrBaseBranch,
 } from "./pr-context-branches";
+import { createRepoAutomationService } from "./repo-automation-service";
 import {
+  POTENTIAL_PROMOTION_TYPES,
+  resolveCollectPrContextInvocation,
   resolveNewActiveFeatureFolderInvocation,
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
   resolvePotentialToIssueInvocation,
+  resolveRunPoshQCAnalyzeAutofixInvocation,
+  resolveRunPoshQCAnalyzeInvocation,
+  resolveRunPoshQCFormatInvocation,
+  resolveRunPoshQCSuiteInvocation,
+  resolveRunPoshQCTestInvocation,
+  WORK_MODE_OPTIONS,
 } from "./workflow-command-arguments";
 
 // Re-export detectRuntime so existing test imports from this module keep working.
 export { detectRuntime } from "./command-runtime";
-
-const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
-const POTENTIAL_PROMOTION_TYPES = ["epic", "feature", "refactor", "bug"];
-const WORK_MODE_OPTIONS = ["minor-audit", "full-feature", "full-bug", "full"];
-const ACTIVE_FEATURE_DOCS_DIRECTORY = "docs/features/active";
-const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
-
-function normalizePath(filePath: string): string {
-  return filePath.replace(/\\/g, "/");
-}
-
-function getActivePotentialPath(workspaceRoot: string): string | undefined {
-  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-  if (!activeEditorPath) {
-    return undefined;
-  }
-
-  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
-  const normalizedActiveEditorPath =
-    normalizePath(activeEditorPath).toLowerCase();
-  const normalizedPotentialRoot = `${normalizedWorkspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`;
-
-  if (!normalizedActiveEditorPath.endsWith(".md")) {
-    return undefined;
-  }
-
-  if (!normalizedActiveEditorPath.startsWith(`${normalizedPotentialRoot}/`)) {
-    return undefined;
-  }
-
-  return activeEditorPath;
-}
-
-function getActiveFeaturePlanPath(workspaceRoot: string): string | undefined {
-  const activeEditorPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-  if (!activeEditorPath) {
-    return undefined;
-  }
-
-  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
-  const normalizedActiveEditorPath =
-    normalizePath(activeEditorPath).toLowerCase();
-  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
-
-  if (!normalizedActiveEditorPath.endsWith(".md")) {
-    return undefined;
-  }
-
-  if (
-    !normalizedActiveEditorPath.startsWith(`${normalizedActiveFeatureRoot}/`)
-  ) {
-    return undefined;
-  }
-
-  return activeEditorPath;
-}
-
-async function promptForActiveFeaturePlan(
-  workspaceRoot: string,
-): Promise<string | undefined> {
-  const selectedFile = await vscode.window.showOpenDialog({
-    canSelectMany: false,
-    openLabel: "Select feature plan",
-    defaultUri: vscode.Uri.file(
-      `${workspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`,
-    ),
-    filters: {
-      Markdown: ["md"],
-    },
-  });
-
-  return selectedFile?.[0]?.fsPath;
-}
-
-async function promptForShortName(
-  title: string,
-  prompt: string,
-): Promise<string | undefined> {
-  const shortName = await vscode.window.showInputBox({
-    title,
-    prompt,
-    ignoreFocusOut: true,
-    validateInput: (value) => {
-      const trimmed = value.trim();
-      if (trimmed.length === 0) {
-        return "Short name is required.";
-      }
-
-      return SHORT_NAME_PATTERN.test(trimmed)
-        ? undefined
-        : "Use kebab-case letters and numbers only (e.g., api-timeout).";
-    },
-  });
-
-  if (shortName === undefined) {
-    return undefined;
-  }
-
-  const trimmed = shortName.trim();
-  if (!SHORT_NAME_PATTERN.test(trimmed)) {
-    throw new Error(
-      "Short name must use kebab-case letters and numbers only (e.g., api-timeout).",
-    );
-  }
-
-  return trimmed;
-}
-
-async function promptForChoice(
-  title: string,
-  prompt: string,
-  items: ReadonlyArray<string>,
-): Promise<string | undefined> {
-  return vscode.window.showQuickPick([...items], {
-    title,
-    prompt,
-    ignoreFocusOut: true,
-  });
-}
-
-async function promptForFeatureName(
-  title: string,
-  prompt: string,
-): Promise<string | undefined> {
-  const featureName = await vscode.window.showInputBox({
-    title,
-    prompt,
-    ignoreFocusOut: true,
-    validateInput: (value) => {
-      const trimmed = value.trim();
-      if (trimmed.length === 0) {
-        return "Feature name is required.";
-      }
-
-      return FEATURE_NAME_PATTERN.test(trimmed)
-        ? undefined
-        : "Use kebab-case or underscore-case letters and numbers only.";
-    },
-  });
-
-  if (featureName === undefined) {
-    return undefined;
-  }
-
-  const trimmed = featureName.trim();
-  if (!FEATURE_NAME_PATTERN.test(trimmed)) {
-    throw new Error(
-      "Feature name must use kebab-case or underscore-case letters and numbers only.",
-    );
-  }
-
-  return trimmed;
-}
-
-function resolveWorkflowInvocation(
-  output: vscode.OutputChannel,
-  commandId: string,
-  resolver: () => ReturnType<typeof resolveNewPotentialEntryInvocation>,
-): ReturnType<typeof resolveNewPotentialEntryInvocation> {
-  try {
-    const invocation = resolver();
-    output.appendLine(`[${commandId}] ${invocation.mode} mode`);
-    return invocation;
-  } catch (error: unknown) {
-    const detail = error instanceof Error ? error.message : String(error);
-    output.appendLine(`[${commandId}] validation failure: ${detail}`);
-    throw error;
-  }
-}
 
 /**
  * Activates the extension by registering all command handlers and shared resources.
  *
  * @param context The extension lifecycle context supplied by VS Code.
  * @returns Nothing.
- * @remarks Each command delegates to a small runtime/script launcher to keep the
- * activation path thin and predictable.
  */
 export function activate(context: vscode.ExtensionContext): void {
   const output = createOutputChannel();
-  const templateRoot = vscode.Uri.joinPath(
-    context.extensionUri,
-    "resources/feature-templates",
-  ).fsPath;
+  const service = createRepoAutomationService({
+    extensionRoot: context.extensionUri.fsPath,
+    output,
+  });
 
   const helloPythonDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.helloPython",
@@ -226,26 +73,95 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const registerPoshQcCommand = (
+    commandId: string,
+    title: string,
+    resolveInvocation: (
+      rawArgs: readonly unknown[],
+    ) => ReturnType<typeof resolveRunPoshQCSuiteInvocation>,
+    runOperation: (input: {
+      readonly workspaceRoot: string;
+      readonly invocationId: string;
+      readonly scanFolders?: ReadonlyArray<string>;
+    }) => Promise<unknown>,
+  ) =>
+    vscode.commands.registerCommand(
+      commandId,
+      async (...rawArgs: unknown[]) => {
+        const invocation = resolveWorkflowInvocation(output, commandId, () =>
+          resolveInvocation(rawArgs),
+        );
+        const workspaceRoot = getWorkspaceRoot();
+        if (invocation.mode === "direct") {
+          await runOperation({
+            workspaceRoot,
+            invocationId: commandId,
+            ...invocation.input,
+          });
+          return;
+        }
+
+        const scopeChoice = await promptForChoice(
+          title,
+          "Choose the scan scope.",
+          ["Scan entire workspace", "Select folders to scan"],
+        );
+        if (!scopeChoice) {
+          return;
+        }
+
+        if (scopeChoice === "Select folders to scan") {
+          const selectedFolders =
+            await promptForWorkspaceScanFolders(workspaceRoot);
+          if (!selectedFolders) {
+            return;
+          }
+
+          await runOperation({
+            workspaceRoot,
+            invocationId: commandId,
+            scanFolders: selectedFolders,
+          });
+          return;
+        }
+
+        await runOperation({
+          workspaceRoot,
+          invocationId: commandId,
+        });
+      },
+    );
+
   const collectCommitContextDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.collectCommitContext",
     async () => {
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/collect_commit_context.py",
-        commandId: "drmCopilotExtension.collectCommitContext",
-        args: ["--output", "artifacts/commit_context.txt"],
+      const commandId = "drmCopilotExtension.collectCommitContext";
+      await service.collectCommitContext({
+        workspaceRoot: getWorkspaceRoot(),
+        invocationId: commandId,
       });
     },
   );
 
   const collectPrContextDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.collectPrContext",
-    async () => {
+    async (...rawArgs: unknown[]) => {
       const commandId = "drmCopilotExtension.collectPrContext";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveCollectPrContextInvocation(rawArgs),
+      );
       const workspaceRoot = getWorkspaceRoot();
-      output.appendLine(`[${commandId}] branch discovery start`);
+      if (invocation.mode === "direct") {
+        await service.collectPrContext({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
 
-      let discoveryResult: BranchDiscoveryResult;
+      output.appendLine(`[${commandId}] branch discovery start`);
+      let discoveryResult: ReturnType<typeof discoverPrBaseBranches>;
       try {
         discoveryResult = discoverPrBaseBranches(
           output,
@@ -256,7 +172,6 @@ export function activate(context: vscode.ExtensionContext): void {
         output.appendLine(`[${commandId}] branch discovery failure`);
         throw error;
       }
-
       output.appendLine(
         `[${commandId}] branch discovery success: ${discoveryResult.candidates.join(", ")}`,
       );
@@ -273,20 +188,10 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/collect_pr_context.py",
-        commandId,
-        args: [
-          "--base",
-          selectedBase,
-          "--repo-root",
-          workspaceRoot,
-          "--out",
-          "artifacts/pr_context.summary.txt",
-          "--appendix-out",
-          "artifacts/pr_context.appendix.txt",
-        ],
+      await service.collectPrContext({
+        workspaceRoot,
+        invocationId: commandId,
+        base: selectedBase,
       });
     },
   );
@@ -296,31 +201,127 @@ export function activate(context: vscode.ExtensionContext): void {
       "drmCopilotExtension.pushDownCopilotCustomizations",
       async () => {
         const commandId = "drmCopilotExtension.pushDownCopilotCustomizations";
-        const workspaceRoot = getWorkspaceRoot();
-
-        await executeBundledScript(context, output, {
-          runtimeKind: "python",
-          bundledRelativePath:
-            "resources/templates/push_down_copilot_customizations.py",
-          commandId,
-          args: ["--destination", workspaceRoot],
+        await service.pushDownCopilotCustomizations({
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
         });
       },
     );
+
+  const pushDownCodexAndAgentsCustomizationsDisposable =
+    vscode.commands.registerCommand(
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+      async () => {
+        const commandId =
+          "drmCopilotExtension.pushDownCodexAndAgentsCustomizations";
+        await service.pushDownCodexAndAgentsCustomizations({
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
+        });
+      },
+    );
+
+  const syncAgentsFromInstructionsDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.syncAgentsFromInstructions",
+    async () => {
+      const commandId = "drmCopilotExtension.syncAgentsFromInstructions";
+      const workspaceRoot = getWorkspaceRoot();
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "powershell",
+        bundledRelativePath:
+          "resources/templates/sync-agents-from-instructions.ps1",
+        commandId,
+        args: ["-RepoRoot", workspaceRoot],
+      });
+    },
+  );
+
+  const runPoshQCSuiteDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.runPoshQCSuite",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.runPoshQCSuite";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveRunPoshQCSuiteInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await service.runPoshQCSuite({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const scopeChoice = await promptForChoice(
+        "drm-copilot: Run PoshQC Suite",
+        "Choose the scan scope.",
+        ["Scan entire workspace", "Select folders to scan"],
+      );
+      if (!scopeChoice) {
+        return;
+      }
+
+      if (scopeChoice === "Select folders to scan") {
+        const selectedFolders =
+          await promptForWorkspaceScanFolders(workspaceRoot);
+        if (!selectedFolders) {
+          return;
+        }
+
+        await service.runPoshQCSuite({
+          workspaceRoot,
+          invocationId: commandId,
+          scanFolders: selectedFolders,
+        });
+        return;
+      }
+
+      await service.runPoshQCSuite({
+        workspaceRoot,
+        invocationId: commandId,
+      });
+    },
+  );
+  const runPoshQCFormatDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCFormat",
+    "drm-copilot: Run PoshQC Format",
+    resolveRunPoshQCFormatInvocation,
+    (input) => service.runPoshQCFormat(input),
+  );
+  const runPoshQCAnalyzeDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCAnalyze",
+    "drm-copilot: Run PoshQC Analyze",
+    resolveRunPoshQCAnalyzeInvocation,
+    (input) => service.runPoshQCAnalyze(input),
+  );
+  const runPoshQCTestDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCTest",
+    "drm-copilot: Run PoshQC Test",
+    resolveRunPoshQCTestInvocation,
+    (input) => service.runPoshQCTest(input),
+  );
+  const runPoshQCAnalyzeAutofixDisposable = registerPoshQcCommand(
+    "drmCopilotExtension.runPoshQCAnalyzeAutofix",
+    "drm-copilot: Run PoshQC Analyze Autofix",
+    resolveRunPoshQCAnalyzeAutofixInvocation,
+    (input) => service.runPoshQCAnalyzeAutofix(input),
+  );
 
   const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newPotentialBugEntry",
     async (...rawArgs: unknown[]) => {
       const commandId = "drmCopilotExtension.newPotentialBugEntry";
       const invocation = resolveWorkflowInvocation(output, commandId, () =>
-        resolveNewPotentialBugEntryInvocation(rawArgs, templateRoot),
+        resolveNewPotentialBugEntryInvocation(rawArgs),
       );
+      const workspaceRoot = getWorkspaceRoot();
       if (invocation.mode === "direct") {
-        await executeBundledScript(context, output, {
-          runtimeKind: "python",
-          bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
-          commandId,
-          args: invocation.forwardedArgs,
+        await service.newPotentialBugEntry({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
         });
         return;
       }
@@ -329,16 +330,14 @@ export function activate(context: vscode.ExtensionContext): void {
         "drm-copilot: New Potential Bug Entry",
         "Enter a kebab-case short name for the potential bug entry.",
       );
-
       if (!shortName) {
         return;
       }
 
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
-        commandId,
-        args: ["--short-name", shortName, "--template-root", templateRoot],
+      await service.newPotentialBugEntry({
+        workspaceRoot,
+        invocationId: commandId,
+        shortName,
       });
     },
   );
@@ -348,14 +347,14 @@ export function activate(context: vscode.ExtensionContext): void {
     async (...rawArgs: unknown[]) => {
       const commandId = "drmCopilotExtension.newPotentialEntry";
       const invocation = resolveWorkflowInvocation(output, commandId, () =>
-        resolveNewPotentialEntryInvocation(rawArgs, templateRoot),
+        resolveNewPotentialEntryInvocation(rawArgs),
       );
+      const workspaceRoot = getWorkspaceRoot();
       if (invocation.mode === "direct") {
-        await executeBundledScript(context, output, {
-          runtimeKind: "powershell",
-          bundledRelativePath: "resources/templates/new-potential-entry.ps1",
-          commandId,
-          args: invocation.forwardedArgs,
+        await service.newPotentialEntry({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
         });
         return;
       }
@@ -364,16 +363,14 @@ export function activate(context: vscode.ExtensionContext): void {
         "drm-copilot: New Potential Entry",
         "Enter a kebab-case short name for the potential entry.",
       );
-
       if (!shortName) {
         return;
       }
 
-      await executeBundledScript(context, output, {
-        runtimeKind: "powershell",
-        bundledRelativePath: "resources/templates/new-potential-entry.ps1",
-        commandId,
-        args: ["-ShortName", shortName, "-TemplateRoot", templateRoot],
+      await service.newPotentialEntry({
+        workspaceRoot,
+        invocationId: commandId,
+        shortName,
       });
     },
   );
@@ -385,31 +382,17 @@ export function activate(context: vscode.ExtensionContext): void {
       const invocation = resolveWorkflowInvocation(output, commandId, () =>
         resolvePotentialToIssueInvocation(rawArgs),
       );
+      const workspaceRoot = getWorkspaceRoot();
       if (invocation.mode === "direct") {
-        await executeBundledScript(context, output, {
-          runtimeKind: "python",
-          bundledRelativePath: "resources/templates/potential_to_issue.py",
-          commandId,
-          args: invocation.forwardedArgs,
+        await service.potentialToIssue({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
         });
         return;
       }
 
-      const workspaceRoot = getWorkspaceRoot();
-      const activePotentialPath = getActivePotentialPath(workspaceRoot);
-      const selectedFile = activePotentialPath
-        ? undefined
-        : await vscode.window.showOpenDialog({
-            canSelectMany: false,
-            openLabel: "Select potential file",
-            defaultUri: vscode.Uri.file(
-              `${workspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`,
-            ),
-            filters: {
-              Markdown: ["md"],
-            },
-          });
-      const potentialPath = activePotentialPath ?? selectedFile?.[0]?.fsPath;
+      const potentialPath = await promptForPotentialPath(workspaceRoot);
       if (!potentialPath) {
         return;
       }
@@ -432,18 +415,12 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/potential_to_issue.py",
-        commandId,
-        args: [
-          "--potential-path",
-          potentialPath,
-          "--promotion-type",
-          promotionType,
-          "--work-mode",
-          workMode,
-        ],
+      await service.potentialToIssue({
+        workspaceRoot,
+        invocationId: commandId,
+        potentialPath,
+        promotionType,
+        workMode,
       });
     },
   );
@@ -453,15 +430,14 @@ export function activate(context: vscode.ExtensionContext): void {
     async (...rawArgs: unknown[]) => {
       const commandId = "drmCopilotExtension.newActiveFeatureFolder";
       const invocation = resolveWorkflowInvocation(output, commandId, () =>
-        resolveNewActiveFeatureFolderInvocation(rawArgs, templateRoot),
+        resolveNewActiveFeatureFolderInvocation(rawArgs),
       );
+      const workspaceRoot = getWorkspaceRoot();
       if (invocation.mode === "direct") {
-        await executeBundledScript(context, output, {
-          runtimeKind: "python",
-          bundledRelativePath:
-            "resources/templates/new_active_feature_folder.py",
-          commandId,
-          args: invocation.forwardedArgs,
+        await service.newActiveFeatureFolder({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
         });
         return;
       }
@@ -483,21 +459,7 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      const issueNumber = await vscode.window.showInputBox({
-        title: "drm-copilot: New Active Feature Folder",
-        prompt: "Enter the issue number, or leave blank to omit it.",
-        ignoreFocusOut: true,
-        validateInput: (value) => {
-          const trimmed = value.trim();
-          if (trimmed.length === 0) {
-            return undefined;
-          }
-
-          return /^\d+$/.test(trimmed)
-            ? undefined
-            : "Issue number must be digits only when provided.";
-        },
-      });
+      const issueNumber = await promptForIssueNumber();
       if (issueNumber === undefined) {
         return;
       }
@@ -511,19 +473,13 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      const args = ["--feature-name", featureName, "--type", featureType];
-      const trimmedIssueNumber = issueNumber.trim();
-      if (trimmedIssueNumber.length > 0) {
-        args.push("--issue-number", trimmedIssueNumber);
-      }
-      args.push("--work-mode", workMode);
-      args.push("--template-root", templateRoot);
-
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/new_active_feature_folder.py",
-        commandId,
-        args,
+      await service.newActiveFeatureFolder({
+        workspaceRoot,
+        invocationId: commandId,
+        featureName,
+        type: featureType,
+        workMode,
+        ...(issueNumber === null ? {} : { issueNumber }),
       });
     },
   );
@@ -534,22 +490,20 @@ export function activate(context: vscode.ExtensionContext): void {
       async () => {
         const commandId = "drmCopilotExtension.resolveExecuteHardLockPrompt";
         const workspaceRoot = getWorkspaceRoot();
-        const activePlanPath = getActiveFeaturePlanPath(workspaceRoot);
-        const planPath =
-          activePlanPath ?? (await promptForActiveFeaturePlan(workspaceRoot));
+        const planPath = await promptForActiveFeaturePlan(workspaceRoot);
         if (!planPath) {
           return;
         }
 
-        await executeBundledScript(context, output, {
-          runtimeKind: "python",
-          bundledRelativePath:
-            "resources/templates/resolve_hard_lock_prompt.py",
-          commandId,
-          args: ["--target", planPath, "--workspace", workspaceRoot],
+        await service.resolveExecuteHardLockPrompt({
+          workspaceRoot,
+          invocationId: commandId,
+          target: planPath,
         });
       },
     );
+
+  const mcpDisposables = registerMcpProvider(context);
 
   context.subscriptions.push(
     helloPythonDisposable,
@@ -559,9 +513,17 @@ export function activate(context: vscode.ExtensionContext): void {
     newActiveFeatureFolderDisposable,
     potentialToIssueDisposable,
     pushDownCopilotCustomizationsDisposable,
+    pushDownCodexAndAgentsCustomizationsDisposable,
+    syncAgentsFromInstructionsDisposable,
+    runPoshQCSuiteDisposable,
+    runPoshQCFormatDisposable,
+    runPoshQCAnalyzeDisposable,
+    runPoshQCTestDisposable,
+    runPoshQCAnalyzeAutofixDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
     resolveExecuteHardLockPromptDisposable,
+    ...mcpDisposables,
     output,
   );
 }

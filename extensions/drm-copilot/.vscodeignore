@@ -8,4 +8,5 @@ tsconfig*.json
 jest.config.cjs
 eslint.config.mjs
 run-jest.cjs
+esbuild-mcp-server.cjs
 package-lock.json

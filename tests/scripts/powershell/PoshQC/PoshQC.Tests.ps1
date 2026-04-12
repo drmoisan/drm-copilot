@@ -522,6 +522,54 @@ Describe 'Invoke-PoshQCTest' {
         ($copyArgs[1] -replace '\\', '/') | Should -Be ($expectedRepoRoot -replace '\\', '/')
         ($copyArgs[2] -replace '\\', '/') | Should -Be ($expectedKoveragePath -replace '\\', '/')
     }
+
+    It 'preserves a custom KoverageOutputPath when ScanFolders override Run.Path and CodeCoverage.Path' {
+        $script:capturedRunPaths = $null
+        $script:capturedCoveragePaths = $null
+        $copyArgs = $null
+        $customKoveragePath = '/repo/artifacts/custom.koverage.xml'
+
+        Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/src', '/repo/tests/powershell') -SettingsPath '/settings.psd1' -KoverageOutputPath $customKoveragePath -EnsureModule { } -TestPathExists { $true } -LoadSettings {
+            @{ Run = @{ Path = @('tests') }; Should = @{ ErrorAction = 'Stop' }; Output = @{ Verbosity = 'Detailed' }; TestResult = @{ Enabled = $false }; CodeCoverage = @{ Enabled = $true; Path = @('src/**/*.ps1'); OutputPath = 'artifacts/coverage.xml' } }
+        } -BuildConfiguration {
+            param($Table)
+            [pscustomobject]@{
+                Run          = @{ Path = @{ Value = $Table.Run.Path }; ExcludePath = @{ Value = @() }; PassThru = $false }
+                TestResult   = @{ Enabled = @{ Value = $false }; OutputPath = @{ Value = $null } }
+                CodeCoverage = @{ Enabled = @{ Value = $true }; Path = @{ Value = $Table.CodeCoverage.Path }; OutputPath = @{ Value = 'artifacts/coverage.xml' } }
+                Output       = @{ Verbosity = 'Normal' }
+            }
+        } -EnsureResultPath { param($cfg, [string] $RootPath) [void] $RootPath; $cfg } -ExpandRunPaths { param($cfg, [string] $RootPath, [string[]] $Excluded) [void] $RootPath; [void] $Excluded; $cfg } -ExpandCoveragePaths { param($cfg, [string] $RootPath) [void] $RootPath; $cfg } -ResolveScanFolders {
+            param([string] $RootPath, [string[]] $Folders)
+            [void] $RootPath
+            $Folders
+        } -EnumerateTests {
+            param([string[]] $Paths, [string[]] $Excluded, [scriptblock] $TestPathFn)
+            [void] $Excluded
+            [void] $TestPathFn
+            $script:capturedRunPaths = $Paths
+            @([pscustomobject]@{ FullName = '/repo/tests/sample.Tests.ps1' })
+        } -InvokePester {
+            param($Config)
+            $script:capturedCoveragePaths = $Config.CodeCoverage.Path
+            [pscustomobject]@{
+                Duration          = [timespan]::Zero
+                PassedCount       = 1
+                FailedCount       = 0
+                SkippedCount      = 0
+                InconclusiveCount = 0
+                NotRunCount       = 0
+                CodeCoverage      = [pscustomobject]@{ CoverageReport = 'Coverage: 100%' }
+            }
+        } -CopyCoverage {
+            param([string] $CoveragePath, [string] $RepoRoot, [string] $KoveragePath)
+            $script:copyArgs = @($CoveragePath, $RepoRoot, $KoveragePath)
+        } -Logger { param([string] $Message) [void] $Message } | Out-Null
+
+        $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
+        $script:capturedCoveragePaths | Should -Be @('/repo/src', '/repo/tests/powershell')
+        $script:copyArgs[2] | Should -Be $customKoveragePath
+    }
 }
 
 

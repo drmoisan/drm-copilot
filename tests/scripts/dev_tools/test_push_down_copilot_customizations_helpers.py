@@ -358,6 +358,36 @@ def test_main_prints_summary_artifact_path_on_success(
     assert "artifacts/copilot-customizations/push-down-" in captured.out
 
 
+def test_main_preserves_windows_style_absolute_paths_on_linux_hosts(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Keep Windows absolute test paths stable when the host runner is Linux."""
+    module = _load_main_module()
+    repo_root = Path("C:/source-repo")
+    destination_root = Path("C:/destination-repo")
+    source_file = repo_root / ".github" / "prompts" / "example.prompt.md"
+    fs = RecordingPushDownFileSystem(
+        files={source_file: MemoryFile(content="No rewrites needed here.")}
+    )
+    fs.ensure_dir(repo_root)
+    fs.ensure_dir(source_file.parent)
+    fs.ensure_dir(destination_root)
+
+    exit_code = module.main(
+        ["--destination", str(destination_root)],
+        repo_root=repo_root,
+        fs=fs,
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Wrote push-down summary artifact to:" in captured.out
+    assert (
+        fs.read_text(destination_root / ".github" / "prompts" / "example.prompt.md")
+        == "No rewrites needed here."
+    )
+
+
 def test_real_filesystem_list_files_returns_empty_when_root_is_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -584,6 +614,22 @@ def test_push_down_writes_artifact_under_explicit_artifact_root() -> None:
 
     assert "destination-workspace" in summary.artifact_path
     assert "packaged-source" not in summary.artifact_path
+
+
+def test_thinking_beast_mode_bundle_mirror_matches_root_agent() -> None:
+    """Keep the bundled Thinking Beast Mode agent identical to the root source."""
+    repo_root = Path(__file__).resolve().parents[3]
+    root_agent_path = (
+        repo_root / ".github/agents/5.1-Thinking-Beast-Mode-adjusted.agent.md"
+    )
+    mirror_agent_path = repo_root / (
+        "extensions/drm-copilot/resources/customizations/.github/agents/"
+        "5.1-Thinking-Beast-Mode-adjusted.agent.md"
+    )
+
+    assert mirror_agent_path.read_text(encoding="utf-8") == root_agent_path.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_split_trailing_punctuation_returns_core_and_suffix() -> None:

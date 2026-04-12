@@ -2,9 +2,8 @@
 name: python-atomic-planning
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria for Python workflows.
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
-model: GPT-5.4 (copilot)
 tools:
-  ['read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'agent', 'todo']
+  [read/readFile, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 handoffs:
   - label: Preflight validate plan (python-atomic-executor)
     agent: python-atomic-executor

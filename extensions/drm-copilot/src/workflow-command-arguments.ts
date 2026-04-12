@@ -6,19 +6,59 @@ export interface InteractiveInvocation {
   readonly mode: "interactive";
 }
 
-export interface DirectInvocation {
+export interface DirectInvocation<TInput> {
   readonly mode: "direct";
-  readonly forwardedArgs: ReadonlyArray<string>;
+  readonly input: TInput;
 }
 
-export type WorkflowCommandInvocation =
+export type WorkflowCommandInvocation<TInput> =
   | InteractiveInvocation
-  | DirectInvocation;
+  | DirectInvocation<TInput>;
 
-const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
-const POTENTIAL_PROMOTION_TYPES = ["epic", "feature", "refactor", "bug"];
-const WORK_MODE_OPTIONS = ["minor-audit", "full-feature", "full-bug", "full"];
+export const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
+export const POTENTIAL_PROMOTION_TYPES = [
+  "epic",
+  "feature",
+  "refactor",
+  "bug",
+] as const;
+export const WORK_MODE_OPTIONS = [
+  "minor-audit",
+  "full-feature",
+  "full-bug",
+  "full",
+] as const;
+
+export type PotentialPromotionType = (typeof POTENTIAL_PROMOTION_TYPES)[number];
+export type WorkModeOption = (typeof WORK_MODE_OPTIONS)[number];
+
+export interface CollectPrContextInput {
+  readonly base: string;
+}
+
+export interface NewPotentialEntryInput {
+  readonly shortName: string;
+}
+
+export interface PotentialToIssueInput {
+  readonly potentialPath: string;
+  readonly promotionType: PotentialPromotionType;
+  readonly workMode: WorkModeOption;
+}
+
+export interface NewActiveFeatureFolderInput {
+  readonly featureName: string;
+  readonly type: PotentialPromotionType;
+  readonly issueNumber?: string;
+  readonly workMode: WorkModeOption;
+}
+
+export interface RunPoshQCSuiteInput {
+  readonly scanFolders?: ReadonlyArray<string>;
+}
+
+export type RunPoshQCCommandInput = RunPoshQCSuiteInput;
 
 function formatAllowedFlags(allowedFlags: ReadonlySet<string>): string {
   return [...allowedFlags].join(", ");
@@ -39,6 +79,152 @@ function normalizeStringArguments(
 
     return arg;
   });
+}
+
+export function normalizeRequiredText(
+  value: unknown,
+  fieldName: string,
+): string {
+  if (typeof value !== "string") {
+    throw new Error(`Field '${fieldName}' must be a string.`);
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new Error(`Field '${fieldName}' is required.`);
+  }
+
+  return trimmed;
+}
+
+export function normalizeOptionalText(
+  value: unknown,
+  fieldName: string,
+): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  return normalizeRequiredText(value, fieldName);
+}
+
+function validateChoice<TChoice extends string>(
+  value: string,
+  fieldName: string,
+  allowedValues: readonly TChoice[],
+): TChoice {
+  const matchedChoice = allowedValues.find(
+    (allowedValue) => allowedValue === value,
+  );
+  if (matchedChoice === undefined) {
+    const readableFieldName = fieldName
+      .replace(/^-+/, "")
+      .replace(/_/g, " ")
+      .replace(/-/g, " ");
+    throw new Error(
+      `${readableFieldName} must be one of: ${allowedValues.join(", ")}.`,
+    );
+  }
+
+  return matchedChoice;
+}
+
+export function validatePromotionType(
+  value: string,
+  fieldName: string,
+): PotentialPromotionType {
+  return validateChoice(value, fieldName, POTENTIAL_PROMOTION_TYPES);
+}
+
+export function validateWorkMode(
+  value: string,
+  fieldName: string,
+): WorkModeOption {
+  return validateChoice(value, fieldName, WORK_MODE_OPTIONS);
+}
+
+export function validateShortName(
+  shortName: string,
+  fieldName: string,
+): string {
+  if (!SHORT_NAME_PATTERN.test(shortName)) {
+    throw new Error(
+      `${fieldName} must use kebab-case letters and numbers only (e.g., api-timeout).`,
+    );
+  }
+
+  return shortName;
+}
+
+export function validateFeatureName(
+  featureName: string,
+  fieldName: string = "--feature-name",
+): string {
+  if (!FEATURE_NAME_PATTERN.test(featureName)) {
+    throw new Error(
+      `${fieldName} must use kebab-case or underscore-case letters and numbers only.`,
+    );
+  }
+
+  return featureName;
+}
+
+export function validateIssueNumber(
+  issueNumber: string | undefined,
+): string | undefined {
+  if (issueNumber === undefined) {
+    return undefined;
+  }
+
+  if (!/^\d+$/.test(issueNumber)) {
+    throw new Error("Issue number must be digits only when provided.");
+  }
+
+  return issueNumber;
+}
+
+export function getShortNameValidationMessage(
+  value: string,
+  fieldName: string,
+): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return "Short name is required.";
+  }
+
+  try {
+    validateShortName(trimmed, fieldName);
+    return undefined;
+  } catch (error: unknown) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
+export function getFeatureNameValidationMessage(
+  value: string,
+): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return "Feature name is required.";
+  }
+
+  try {
+    validateFeatureName(trimmed, "Feature name");
+    return undefined;
+  } catch (error: unknown) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
+export function normalizeWorkspaceRoot(
+  value: unknown,
+  fallbackWorkspaceRoot: string = process.cwd(),
+): string {
+  if (value === undefined) {
+    return fallbackWorkspaceRoot;
+  }
+
+  return normalizeRequiredText(value, "workspace_root");
 }
 
 /**
@@ -125,118 +311,84 @@ export function getRequiredFlagValue(
   return value;
 }
 
-function validateShortName(shortName: string, flagName: string): string {
-  if (!SHORT_NAME_PATTERN.test(shortName)) {
-    throw new Error(
-      `${flagName} must use kebab-case letters and numbers only (e.g., api-timeout).`,
-    );
+export function resolveCollectPrContextInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<CollectPrContextInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
   }
 
-  return shortName;
-}
-
-function validateChoice(
-  value: string,
-  flagName: string,
-  allowedValues: readonly string[],
-): string {
-  if (!allowedValues.includes(value)) {
-    const readableFlagName = flagName.replace(/^-+/, "").replace(/-/g, " ");
-    throw new Error(
-      `${readableFlagName} must be one of: ${allowedValues.join(", ")}.`,
-    );
-  }
-
-  return value;
-}
-
-function validateFeatureName(featureName: string): string {
-  if (!FEATURE_NAME_PATTERN.test(featureName)) {
-    throw new Error(
-      "--feature-name must use kebab-case or underscore-case letters and numbers only.",
-    );
-  }
-
-  return featureName;
-}
-
-function validateIssueNumber(
-  issueNumber: string | undefined,
-): string | undefined {
-  if (issueNumber === undefined) {
-    return undefined;
-  }
-
-  if (!/^\d+$/.test(issueNumber)) {
-    throw new Error("Issue number must be digits only when provided.");
-  }
-
-  return issueNumber;
+  const parsedArgs = parseWorkflowCommandArguments(rawArgs, ["--base"]);
+  return {
+    mode: "direct",
+    input: {
+      base: normalizeRequiredText(
+        getRequiredFlagValue(parsedArgs, "--base"),
+        "--base",
+      ),
+    },
+  };
 }
 
 /**
- * Resolves invocation mode and forwarded argv for `drmCopilotExtension.newPotentialEntry`.
+ * Resolves invocation mode for `drmCopilotExtension.newPotentialEntry`.
  *
  * @param rawArgs The raw command arguments supplied by VS Code.
- * @param templateRoot The bundled template root appended only in direct mode.
- * @returns Interactive mode when no args are supplied, otherwise validated direct-mode argv.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
  */
 export function resolveNewPotentialEntryInvocation(
   rawArgs: readonly unknown[],
-  templateRoot: string,
-): WorkflowCommandInvocation {
+): WorkflowCommandInvocation<NewPotentialEntryInput> {
   if (rawArgs.length === 0) {
     return { mode: "interactive" };
   }
 
   const parsedArgs = parseWorkflowCommandArguments(rawArgs, ["-ShortName"]);
-  const shortName = validateShortName(
-    getRequiredFlagValue(parsedArgs, "-ShortName"),
-    "-ShortName",
-  );
-
   return {
     mode: "direct",
-    forwardedArgs: ["-ShortName", shortName, "-TemplateRoot", templateRoot],
+    input: {
+      shortName: validateShortName(
+        getRequiredFlagValue(parsedArgs, "-ShortName"),
+        "-ShortName",
+      ),
+    },
   };
 }
 
 /**
- * Resolves invocation mode and forwarded argv for `drmCopilotExtension.newPotentialBugEntry`.
+ * Resolves invocation mode for `drmCopilotExtension.newPotentialBugEntry`.
  *
  * @param rawArgs The raw command arguments supplied by VS Code.
- * @param templateRoot The bundled template root appended only in direct mode.
- * @returns Interactive mode when no args are supplied, otherwise validated direct-mode argv.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
  */
 export function resolveNewPotentialBugEntryInvocation(
   rawArgs: readonly unknown[],
-  templateRoot: string,
-): WorkflowCommandInvocation {
+): WorkflowCommandInvocation<NewPotentialEntryInput> {
   if (rawArgs.length === 0) {
     return { mode: "interactive" };
   }
 
   const parsedArgs = parseWorkflowCommandArguments(rawArgs, ["--short-name"]);
-  const shortName = validateShortName(
-    getRequiredFlagValue(parsedArgs, "--short-name"),
-    "--short-name",
-  );
-
   return {
     mode: "direct",
-    forwardedArgs: ["--short-name", shortName, "--template-root", templateRoot],
+    input: {
+      shortName: validateShortName(
+        getRequiredFlagValue(parsedArgs, "--short-name"),
+        "--short-name",
+      ),
+    },
   };
 }
 
 /**
- * Resolves invocation mode and forwarded argv for `drmCopilotExtension.potentialToIssue`.
+ * Resolves invocation mode for `drmCopilotExtension.potentialToIssue`.
  *
  * @param rawArgs The raw command arguments supplied by VS Code.
- * @returns Interactive mode when no args are supplied, otherwise validated direct-mode argv.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
  */
 export function resolvePotentialToIssueInvocation(
   rawArgs: readonly unknown[],
-): WorkflowCommandInvocation {
+): WorkflowCommandInvocation<PotentialToIssueInput> {
   if (rawArgs.length === 0) {
     return { mode: "interactive" };
   }
@@ -246,42 +398,36 @@ export function resolvePotentialToIssueInvocation(
     "--promotion-type",
     "--work-mode",
   ]);
-  const potentialPath = getRequiredFlagValue(parsedArgs, "--potential-path");
-  const promotionType = validateChoice(
-    getRequiredFlagValue(parsedArgs, "--promotion-type"),
-    "--promotion-type",
-    POTENTIAL_PROMOTION_TYPES,
-  );
-  const workMode = validateChoice(
-    getRequiredFlagValue(parsedArgs, "--work-mode"),
-    "--work-mode",
-    WORK_MODE_OPTIONS,
-  );
-
   return {
     mode: "direct",
-    forwardedArgs: [
-      "--potential-path",
-      potentialPath,
-      "--promotion-type",
-      promotionType,
-      "--work-mode",
-      workMode,
-    ],
+    input: {
+      potentialPath: normalizeRequiredText(
+        getRequiredFlagValue(parsedArgs, "--potential-path"),
+        "--potential-path",
+      ),
+      promotionType: validateChoice(
+        getRequiredFlagValue(parsedArgs, "--promotion-type"),
+        "--promotion-type",
+        POTENTIAL_PROMOTION_TYPES,
+      ),
+      workMode: validateChoice(
+        getRequiredFlagValue(parsedArgs, "--work-mode"),
+        "--work-mode",
+        WORK_MODE_OPTIONS,
+      ),
+    },
   };
 }
 
 /**
- * Resolves invocation mode and forwarded argv for `drmCopilotExtension.newActiveFeatureFolder`.
+ * Resolves invocation mode for `drmCopilotExtension.newActiveFeatureFolder`.
  *
  * @param rawArgs The raw command arguments supplied by VS Code.
- * @param templateRoot The bundled template root appended only in direct mode.
- * @returns Interactive mode when no args are supplied, otherwise validated direct-mode argv.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
  */
 export function resolveNewActiveFeatureFolderInvocation(
   rawArgs: readonly unknown[],
-  templateRoot: string,
-): WorkflowCommandInvocation {
+): WorkflowCommandInvocation<NewActiveFeatureFolderInput> {
   if (rawArgs.length === 0) {
     return { mode: "interactive" };
   }
@@ -292,32 +438,93 @@ export function resolveNewActiveFeatureFolderInvocation(
     "--issue-number",
     "--work-mode",
   ]);
-  const featureName = validateFeatureName(
-    getRequiredFlagValue(parsedArgs, "--feature-name"),
-  );
-  const featureType = validateChoice(
-    getRequiredFlagValue(parsedArgs, "--type"),
-    "--type",
-    POTENTIAL_PROMOTION_TYPES,
-  );
   const issueNumber = validateIssueNumber(
     getOptionalFlagValue(parsedArgs, "--issue-number"),
   );
-  const workMode = validateChoice(
-    getRequiredFlagValue(parsedArgs, "--work-mode"),
-    "--work-mode",
-    WORK_MODE_OPTIONS,
-  );
+  return {
+    mode: "direct",
+    input: {
+      featureName: validateFeatureName(
+        getRequiredFlagValue(parsedArgs, "--feature-name"),
+        "--feature-name",
+      ),
+      type: validateChoice(
+        getRequiredFlagValue(parsedArgs, "--type"),
+        "--type",
+        POTENTIAL_PROMOTION_TYPES,
+      ),
+      workMode: validateChoice(
+        getRequiredFlagValue(parsedArgs, "--work-mode"),
+        "--work-mode",
+        WORK_MODE_OPTIONS,
+      ),
+      ...(issueNumber === undefined ? {} : { issueNumber }),
+    },
+  };
+}
 
-  const forwardedArgs = ["--feature-name", featureName, "--type", featureType];
-  if (issueNumber !== undefined) {
-    forwardedArgs.push("--issue-number", issueNumber);
+/**
+ * Resolves invocation mode for `drmCopilotExtension.runPoshQCSuite`.
+ *
+ * @param rawArgs The raw command arguments supplied by VS Code.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
+ */
+export function resolveRunPoshQCSuiteInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCSuiteInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
   }
 
-  forwardedArgs.push("--work-mode", workMode, "--template-root", templateRoot);
+  const stringArgs = normalizeStringArguments(rawArgs);
+  const scanFolders: string[] = [];
+
+  for (let index = 0; index < stringArgs.length; index += 2) {
+    const flag = stringArgs[index];
+    if (flag === undefined) {
+      break;
+    }
+
+    if (flag !== "--scan-folder") {
+      throw new Error(`Unknown flag '${flag}'. Accepted flags: --scan-folder.`);
+    }
+
+    const value = stringArgs[index + 1];
+    if (value === undefined || value.startsWith("-")) {
+      throw new Error("Flag '--scan-folder' requires a value.");
+    }
+
+    scanFolders.push(normalizeRequiredText(value, "--scan-folder"));
+  }
 
   return {
     mode: "direct",
-    forwardedArgs,
+    input: {
+      ...(scanFolders.length === 0 ? {} : { scanFolders }),
+    },
   };
+}
+
+export function resolveRunPoshQCFormatInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCAnalyzeInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCTestInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolveRunPoshQCAnalyzeAutofixInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<RunPoshQCCommandInput> {
+  return resolveRunPoshQCSuiteInvocation(rawArgs);
 }

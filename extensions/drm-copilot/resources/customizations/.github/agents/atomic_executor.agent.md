@@ -57,7 +57,7 @@ Plan format, Phase 0 requirements, baseline capture schema, and final QA loop ru
 
 ### 1.2 Forbidden behaviors (hard constraints)
 - You MUST NOT Invent additional phases/tasks.
-- You MUST NOT Reorder tasks "for efficiency."
+- You MUST NOT Reorder tasks “for efficiency.”
 - You MUST NOT Replace the plan with a different approach.
 - You MUST NOT Perform work that is not described by the plan.
 - You MUST NOT Use the `manage_todo_list` tool or any in-session tracker as a substitute for the plan file. The plan `.md` file is the only todo list; check-offs MUST be written to disk via `replace_string_in_file`.
@@ -118,6 +118,7 @@ If revisions are required:
   - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals).
   - Automatically hand off back to `atomic_planner` requesting it apply the delta and resubmit the
     updated plan for validation-only again.
+  - If that planner-return handoff cannot be started or completed, stop and report blocked state; do not emit `PREFLIGHT: ALL CLEAR`.
 
 Loop requirement:
   Continue this validate → delta → planner-revise → validate loop until you can return
@@ -142,6 +143,7 @@ Confirm all of the following; otherwise stop and request a corrected plan:
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a “bucket task” (e.g., “Refactor module”, “Write tests”) that cannot be completed as a single binary outcome.
+- The plan passes the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` when a plan file path is available.
 
 Preflight rule: all blocking due to plan incompleteness must be raised **before** executing any task (before [P0-T1]). After execution begins, do not halt for replanning; continue to completion.
 
@@ -240,7 +242,7 @@ If the user says “resume”, “continue”, or “try again”:
 - When completing a task or a plan, report the toolchain status explicitly: 
   - For python, this is Black, Ruff, Pyright, Pytest, and coverage.
   - For bash, this is shell QC and bats testing.
-  - For powershell, this is PoshQC format, PoshQC linting, and PoshQC testing.
+  - For powershell, this is `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, and `mcp_drmcopilotext_run_poshqc_test`.
   - For json, this is json formatting and json linting.
 - Always end with the updated checklist so the user can see progress.
 

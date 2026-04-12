@@ -1,0 +1,4 @@
+Timestamp: 2026-04-11T11-13
+Command: original plan reconciliation
+EXIT_CODE: 0
+Output Summary: Reconciled original plan evidence state. `[P0-T1]` -> `evidence/baseline/original-plan-branch-inventory.2026-04-11T11-13.md` and checklist `[x]`; `[P0-T3]` -> recreated TypeScript baseline artifacts under `evidence/baseline/` and checklist `[x]`; `[P0-T4]` -> recreated PowerShell baseline artifacts under `evidence/baseline/` and checklist `[x]`; `[P2-T1]` -> `evidence/qa-gates/final-typescript-prettier.2026-04-11T11-13.md` and checklist `[ ]`; `[P2-T2]` -> `evidence/qa-gates/final-typescript-eslint.2026-04-11T11-13.md` and checklist `[ ]`; `[P2-T3]` -> `evidence/qa-gates/final-typescript-typecheck.2026-04-11T11-13.md` and checklist `[ ]`; `[P2-T4]` -> `evidence/qa-gates/final-typescript-jest-coverage.2026-04-11T11-13.md` and checklist `[ ]`; `[P2-T5]` -> PowerShell final QA artifacts under `evidence/qa-gates/` and checklist `[ ]` pending remediation Phase 6.
