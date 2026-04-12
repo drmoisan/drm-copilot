@@ -9,6 +9,7 @@ import {
   promptForChoice,
   promptForFeatureName,
   promptForIssueNumber,
+  promptForRequiredIssueNumber,
   promptForPotentialPath,
   promptForShortName,
   promptForWorkspaceScanFolders,
@@ -24,6 +25,7 @@ import { createRepoAutomationService } from "./repo-automation-service";
 import {
   POTENTIAL_PROMOTION_TYPES,
   resolveCollectPrContextInvocation,
+  resolveLinkParentChildInvocation,
   resolveNewActiveFeatureFolderInvocation,
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
@@ -298,6 +300,50 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const linkParentChildDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.linkParentChild",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.linkParentChild";
+      const invocation = resolveWorkflowInvocation(output, commandId, () =>
+        resolveLinkParentChildInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await service.linkParentChild({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const childIssueNumber = await promptForRequiredIssueNumber(
+        "drm-copilot: Link Parent/Child Issues",
+        "Enter the child issue number.",
+        "Child issue number",
+      );
+      if (!childIssueNumber) {
+        return;
+      }
+
+      const parentIssueNumber = await promptForRequiredIssueNumber(
+        "drm-copilot: Link Parent/Child Issues",
+        "Enter the parent tracking issue number.",
+        "Parent issue number",
+      );
+      if (!parentIssueNumber) {
+        return;
+      }
+
+      await service.linkParentChild({
+        workspaceRoot,
+        invocationId: commandId,
+        childIssueNumber,
+        parentIssueNumber,
+      });
+    },
+  );
+
   const potentialToIssueDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.potentialToIssue",
     async (...rawArgs: unknown[]) => {
@@ -434,6 +480,7 @@ export function activate(context: vscode.ExtensionContext): void {
     runPoshQCAnalyzeAutofixDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
+    linkParentChildDisposable,
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
     ...mcpDisposables,

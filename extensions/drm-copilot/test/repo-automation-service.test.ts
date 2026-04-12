@@ -242,6 +242,42 @@ describe("repo automation service", () => {
     }
   });
 
+  it("linkParentChild keeps subprocess execution argv-based with shell disabled", async () => {
+    setExecutablePresence({ pwsh: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.linkParentChild({
+      workspaceRoot: "C:/workspace",
+      invocationId: "link_parent_child",
+      childIssueNumber: "12",
+      parentIssueNumber: "34",
+    });
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
+    expect(executable).toBe("pwsh");
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/extension/resources/templates/link-parent-child.ps1",
+      "-ChildIssueNumber",
+      "12",
+      "-ParentIssueNumber",
+      "34",
+    ]);
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
+    expect(result.summary).toContain("child issue #12");
+    expect(result.summary).toContain("parent issue #34");
+  });
+
   it("runPoshQCSuite uses the bundled extension wrapper and forwards selected scan folders", async () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));

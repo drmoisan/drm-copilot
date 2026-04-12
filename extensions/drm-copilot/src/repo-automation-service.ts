@@ -26,6 +26,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "push_down_codex_and_agents_customizations",
   "new_potential_bug_entry",
   "new_potential_entry",
+  "link_parent_child",
   "potential_to_issue",
   "new_active_feature_folder",
   "run_poshqc_format",
@@ -68,6 +69,12 @@ export interface RepoAutomationService {
   ): Promise<RepoAutomationExecutionResult>;
   newPotentialEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  linkParentChild(
+    input: WorkspaceExecutionInput & {
+      readonly childIssueNumber: string;
+      readonly parentIssueNumber: string;
+    },
   ): Promise<RepoAutomationExecutionResult>;
   potentialToIssue(
     input: WorkspaceExecutionInput & {
@@ -260,6 +267,27 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       args: ["-ShortName", input.shortName, "-TemplateRoot", this.templateRoot],
       summary: `Created a new potential entry for '${input.shortName}'.`,
       stdoutArtifactPattern: /^Created:\s*(.+)$/im,
+    });
+  }
+  async linkParentChild(
+    input: WorkspaceExecutionInput & {
+      readonly childIssueNumber: string;
+      readonly parentIssueNumber: string;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "link_parent_child",
+      runtimeKind: "powershell",
+      bundledRelativePath: "resources/templates/link-parent-child.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "link_parent_child",
+      args: [
+        "-ChildIssueNumber",
+        input.childIssueNumber,
+        "-ParentIssueNumber",
+        input.parentIssueNumber,
+      ],
+      summary: `Linked child issue #${input.childIssueNumber} to parent issue #${input.parentIssueNumber} using the bundled workflow.`,
     });
   }
   async potentialToIssue(

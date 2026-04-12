@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
 import {
   getFeatureNameValidationMessage,
+  getRequiredIssueNumberValidationMessage,
   getShortNameValidationMessage,
+  validateRequiredIssueNumber,
   validateFeatureName,
   validateIssueNumber,
   validateShortName,
@@ -197,6 +199,34 @@ export async function promptForIssueNumber(): Promise<
   }
 
   return validateIssueNumber(trimmed);
+}
+
+/**
+ * Prompt the user to enter a required numeric issue number.
+ *
+ * @param title The input box title string.
+ * @param prompt The input box prompt string.
+ * @param fieldName The user-facing field label used in validation messaging.
+ * @returns The validated issue number, or `undefined` if the user cancelled.
+ */
+export async function promptForRequiredIssueNumber(
+  title: string,
+  prompt: string,
+  fieldName: string,
+): Promise<string | undefined> {
+  const issueNumber = await vscode.window.showInputBox({
+    title,
+    prompt,
+    ignoreFocusOut: true,
+    validateInput: (value) =>
+      getRequiredIssueNumberValidationMessage(value, fieldName),
+  });
+
+  if (issueNumber === undefined) {
+    return undefined;
+  }
+
+  return validateRequiredIssueNumber(issueNumber.trim(), fieldName);
 }
 
 /**

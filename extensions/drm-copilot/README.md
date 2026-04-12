@@ -19,6 +19,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.newPotentialBugEntry`
 - `drmCopilotExtension.newPotentialEntry`
+- `drmCopilotExtension.linkParentChild`
 - `drmCopilotExtension.potentialToIssue`
 - `drmCopilotExtension.newActiveFeatureFolder`
 - `drmCopilotExtension.resolvePolicyAuditTemplateAsset`
@@ -45,6 +46,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `push_down_codex_and_agents_customizations`
 - `new_potential_bug_entry`
 - `new_potential_entry`
+- `link_parent_child`
 - `potential_to_issue`
 - `new_active_feature_folder`
 - `resolve_execute_hard_lock_prompt`
@@ -96,6 +98,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `push_down_codex_and_agents_customizations`: optional `workspace_root`
 - `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
 - `new_potential_entry`: optional `workspace_root`, required `short_name`
+- `link_parent_child`: optional `workspace_root`, required `child_issue_number`, required `parent_issue_number`
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
 - `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
 - `resolve_policy_audit_template_asset`: optional `workspace_root`, required `asset`, optional `target_path`
@@ -137,6 +140,7 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/push_down_codex_and_agents_customizations.py`
 - `resources/templates/new_potential_bug_entry.py`
 - `resources/templates/new-potential-entry.ps1`
+- `resources/templates/link-parent-child.ps1`
 - `resources/templates/potential_to_issue.py`
 - `resources/templates/new_active_feature_folder.py`
 - `resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`

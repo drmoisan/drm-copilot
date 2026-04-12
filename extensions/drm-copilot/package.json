@@ -51,6 +51,10 @@
         "title": "drm-copilot: New Potential Entry"
       },
       {
+        "command": "drmCopilotExtension.linkParentChild",
+        "title": "drm-copilot: Link Parent/Child Issues"
+      },
+      {
         "command": "drmCopilotExtension.pushDownCopilotCustomizations",
         "title": "drm-copilot: Push Down Copilot Customizations"
       },

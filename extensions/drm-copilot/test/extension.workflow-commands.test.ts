@@ -60,6 +60,10 @@ describe("drm-copilot workflow command behavior", () => {
     activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
   });
 
+  it("registers linkParentChild", () => {
+    activateAndGetHandler("drmCopilotExtension.linkParentChild");
+  });
+
   it("activate registers the MCP server definition provider", () => {
     activateAndGetHandler("drmCopilotExtension.helloPython");
 
@@ -342,6 +346,82 @@ describe("drm-copilot workflow command behavior", () => {
     );
 
     await expect(handler()).rejects.toThrow("Command exited with code 2");
+  });
+
+  it("linkParentChild prompts for both issue numbers and runs the bundled script", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock.mockResolvedValueOnce("12").mockResolvedValueOnce("34");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+    await handler();
+
+    expect(showInputBoxMock).toHaveBeenCalledTimes(2);
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/link-parent-child.ps1",
+    );
+    expect(args).toContain("-ChildIssueNumber");
+    expect(args).toContain("12");
+    expect(args).toContain("-ParentIssueNumber");
+    expect(args).toContain("34");
+  });
+
+  it("linkParentChild direct invocation skips prompts", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+    await handler(["-ChildIssueNumber", "12", "-ParentIssueNumber", "34"]);
+
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("-ChildIssueNumber");
+    expect(args).toContain("12");
+    expect(args).toContain("-ParentIssueNumber");
+    expect(args).toContain("34");
+  });
+
+  it("linkParentChild direct mode rejects non-digit issue numbers", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+
+    await expect(
+      handler(["-ChildIssueNumber", "child-12", "-ParentIssueNumber", "34"]),
+    ).rejects.toThrow(/ChildIssueNumber.*digits only/i);
+    expect(showInputBoxMock).not.toHaveBeenCalled();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("linkParentChild returns early when the child issue prompt is cancelled", async () => {
+    showInputBoxMock.mockResolvedValue(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("linkParentChild surfaces a missing powershell runtime error", async () => {
+    setExecutablePresence({ pwsh: false, powershell: false });
+    showInputBoxMock.mockResolvedValueOnce("12").mockResolvedValueOnce("34");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+
+    await expect(handler()).rejects.toThrow(
+      "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
+    );
   });
 
   it("newPotentialBugEntry passes --template-root pointing to bundled feature-templates", async () => {

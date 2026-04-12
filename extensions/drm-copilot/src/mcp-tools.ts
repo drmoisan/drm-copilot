@@ -8,6 +8,7 @@ import {
 import {
   resolveCollectCommitContextToolInput,
   resolveCollectPrContextToolInput,
+  resolveLinkParentChildToolInput,
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
@@ -135,6 +136,27 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
         },
       },
       required: ["short_name"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "link_parent_child",
+    description:
+      "Link a child GitHub issue to a parent tracking issue using the bundled PowerShell workflow.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        child_issue_number: {
+          type: "string",
+          description: "Child issue number to link.",
+        },
+        parent_issue_number: {
+          type: "string",
+          description: "Parent tracking issue number.",
+        },
+      },
+      required: ["child_issue_number", "parent_issue_number"],
       additionalProperties: false,
     },
   },
@@ -485,6 +507,11 @@ export async function dispatchRepoAutomationTool(
       case "new_potential_entry": {
         const input = resolveNewPotentialEntryToolInput(rawInput);
         return toMcpToolResult(await service.newPotentialEntry(input));
+      }
+
+      case "link_parent_child": {
+        const input = resolveLinkParentChildToolInput(rawInput);
+        return toMcpToolResult(await service.linkParentChild(input));
       }
 
       case "potential_to_issue": {

@@ -3,6 +3,7 @@ import {
   normalizeOptionalText,
   normalizeRequiredText,
   normalizeWorkspaceRoot,
+  type LinkParentChildInput,
   type NewActiveFeatureFolderInput,
   type NewPotentialEntryInput,
   type PolicyAuditTemplateAssetSelector,
@@ -13,6 +14,7 @@ import {
   validateFeatureName,
   validateIssueNumber,
   validatePromotionType,
+  validateRequiredIssueNumber,
   validateShortName,
   validateWorkMode,
 } from "./workflow-command-arguments";
@@ -27,6 +29,9 @@ export interface CollectPrContextToolInput extends WorkspaceToolInput {
 
 export interface NewPotentialEntryToolInput
   extends WorkspaceToolInput, NewPotentialEntryInput {}
+
+export interface LinkParentChildToolInput
+  extends WorkspaceToolInput, LinkParentChildInput {}
 
 export interface PotentialToIssueToolInput
   extends WorkspaceToolInput, PotentialToIssueInput {}
@@ -174,6 +179,27 @@ export function resolveNewPotentialEntryToolInput(
     shortName: validateShortName(
       normalizeRequiredText(args["short_name"], "short_name"),
       "short_name",
+    ),
+  };
+}
+
+export function resolveLinkParentChildToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): LinkParentChildToolInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    childIssueNumber: validateRequiredIssueNumber(
+      normalizeRequiredText(args["child_issue_number"], "child_issue_number"),
+      "child_issue_number",
+    ),
+    parentIssueNumber: validateRequiredIssueNumber(
+      normalizeRequiredText(args["parent_issue_number"], "parent_issue_number"),
+      "parent_issue_number",
     ),
   };
 }
