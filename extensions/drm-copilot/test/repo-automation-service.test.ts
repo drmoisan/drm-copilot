@@ -20,7 +20,9 @@ const appendLineMock = jest.fn<(line: string) => void>();
 jest.mock("vscode", () => ({}), { virtual: true });
 
 jest.mock("node:fs", () => ({
+  copyFileSync: jest.fn(),
   existsSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -30,7 +32,13 @@ jest.mock("node:child_process", () => ({
 import { createRepoAutomationService } from "../src/repo-automation-service";
 
 const fsMock = jest.requireMock("node:fs") as {
+  copyFileSync: jest.MockedFunction<
+    (source: string, destination: string) => void
+  >;
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
+  mkdirSync: jest.MockedFunction<
+    (filePath: string, options?: { recursive?: boolean }) => void
+  >;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
@@ -67,6 +75,8 @@ describe("repo automation service", () => {
     process.env.PATHEXT = ".EXE;.CMD";
     appendLineMock.mockReset();
     childProcessMock.spawn.mockReset();
+    fsMock.copyFileSync.mockReset();
+    fsMock.mkdirSync.mockReset();
   });
 
   afterEach(() => {
@@ -407,5 +417,79 @@ describe("repo automation service", () => {
     expect(args).toContain("--require-complete");
     expect(args).toContain("policy-audit");
     expect(args).toContain("docs/policy-audit.md");
+  });
+
+  it("resolvePolicyAuditTemplateAsset returns the bundled source path without spawning a subprocess", async () => {
+    setExecutablePresence({
+      python: false,
+      py: false,
+      pwsh: false,
+      powershell: false,
+    });
+    fsMock.existsSync.mockImplementation((filePath: string) => {
+      const normalizedPath = filePath.replace(/\\/g, "/");
+      return normalizedPath.endsWith(
+        "/resources/templates/policy_audit/AGENTS.md",
+      );
+    });
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.resolvePolicyAuditTemplateAsset({
+      workspaceRoot: "C:/workspace",
+      invocationId: "resolve_policy_audit_template_asset",
+      asset: "agents",
+    });
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      tool: "resolve_policy_audit_template_asset",
+      workspaceRoot: "C:/workspace",
+      assetId: "policy_audit.agents",
+      bundledSourcePath:
+        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+      artifacts: ["C:/extension/resources/templates/policy_audit/AGENTS.md"],
+    });
+    expect(result.destinationPath).toBeUndefined();
+  });
+
+  it("resolvePolicyAuditTemplateAsset copies the bundled asset to a requested target path", async () => {
+    fsMock.existsSync.mockImplementation((filePath: string) => {
+      const normalizedPath = filePath.replace(/\\/g, "/");
+      return normalizedPath.endsWith(
+        "/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+      );
+    });
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.resolvePolicyAuditTemplateAsset({
+      workspaceRoot: "C:/workspace",
+      invocationId: "resolve_policy_audit_template_asset",
+      asset: "template",
+      targetPath: "C:/workspace/docs/policy-audit.md",
+    });
+
+    expect(fsMock.mkdirSync).toHaveBeenCalledWith("C:/workspace/docs", {
+      recursive: true,
+    });
+    expect(fsMock.copyFileSync).toHaveBeenCalledWith(
+      "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+      "C:/workspace/docs/policy-audit.md",
+    );
+    expect(result).toMatchObject({
+      assetId: "policy_audit.template",
+      bundledSourcePath:
+        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+      destinationPath: "C:/workspace/docs/policy-audit.md",
+      artifacts: [
+        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+        "C:/workspace/docs/policy-audit.md",
+      ],
+    });
   });
 });

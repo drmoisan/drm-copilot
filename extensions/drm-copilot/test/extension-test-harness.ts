@@ -18,6 +18,8 @@ const appendLineMock = jest.fn<(line: string) => void>();
 const showInputBoxMock = jest.fn();
 const showQuickPickMock = jest.fn();
 const showOpenDialogMock = jest.fn();
+const openTextDocumentMock = jest.fn();
+const showTextDocumentMock = jest.fn();
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
     commandHandlers.set(command, handler);
@@ -45,6 +47,7 @@ jest.mock(
         appendLine: appendLineMock,
         dispose: jest.fn(),
       })),
+      showTextDocument: showTextDocumentMock,
       showOpenDialog: showOpenDialogMock,
       showInputBox: showInputBoxMock,
       showQuickPick: showQuickPickMock,
@@ -53,6 +56,7 @@ jest.mock(
       get workspaceFolders() {
         return workspaceFoldersState;
       },
+      openTextDocument: openTextDocumentMock,
     },
     Uri: {
       joinPath: jest.fn((base: { fsPath: string }, ...segments: string[]) => ({
@@ -74,7 +78,9 @@ jest.mock(
 );
 
 jest.mock("node:fs", () => ({
+  copyFileSync: jest.fn(),
   existsSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -180,6 +186,12 @@ export function resetExtensionHarnessState(): void {
   showInputBoxMock.mockReset();
   showQuickPickMock.mockReset();
   showOpenDialogMock.mockReset();
+  openTextDocumentMock.mockReset();
+  showTextDocumentMock.mockReset();
+  openTextDocumentMock.mockImplementation(async (uri: { fsPath: string }) => ({
+    uri,
+  }));
+  showTextDocumentMock.mockResolvedValue(undefined);
   workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
   quickPickResultLabel = "origin/main";
   setGitBranchDiscoveryState({
@@ -241,9 +253,11 @@ export {
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
   registerMcpServerDefinitionProviderMock,
+  openTextDocumentMock,
   showInputBoxMock,
   showOpenDialogMock,
   showQuickPickMock,
+  showTextDocumentMock,
 };
 
 export type { CommandHandler, MockChildProcess };

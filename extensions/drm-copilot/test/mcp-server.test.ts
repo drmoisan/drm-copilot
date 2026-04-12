@@ -29,6 +29,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runPoshQCTest: jest.fn(),
     runPoshQCAnalyzeAutofix: jest.fn(),
     runPoshQCSuite: jest.fn(),
+    resolvePolicyAuditTemplateAsset: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
   };
@@ -82,6 +83,7 @@ describe("repo automation MCP server", () => {
       "run_poshqc_test",
       "run_poshqc_analyze_autofix",
       "run_poshqc_suite",
+      "resolve_policy_audit_template_asset",
       "resolve_execute_hard_lock_prompt",
       "validate_orchestration_artifacts",
     ]);
@@ -364,6 +366,42 @@ describe("repo automation MCP server", () => {
       ok: true,
       tool: "validate_orchestration_artifacts",
       workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches resolve_policy_audit_template_asset through the shared service with normalized inputs", async () => {
+    service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
+      tool: "resolve_policy_audit_template_asset",
+      workspaceRoot: "C:/workspace",
+      summary: "Resolved bundled policy-audit asset 'agents'.",
+      artifacts: ["C:/extension/resources/templates/policy_audit/AGENTS.md"],
+      assetId: "policy_audit.agents",
+      bundledSourcePath:
+        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+    });
+
+    const result = await client.callTool({
+      name: "resolve_policy_audit_template_asset",
+      arguments: {
+        workspace_root: "C:/workspace",
+        asset: "agents",
+        target_path: "docs/policy-audit/AGENTS.md",
+      },
+    });
+
+    expect(service.resolvePolicyAuditTemplateAsset).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      asset: "agents",
+      targetPath: "C:/workspace/docs/policy-audit/AGENTS.md",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "resolve_policy_audit_template_asset",
+      workspace_root: "C:/workspace",
+      asset_id: "policy_audit.agents",
+      bundled_source_path:
+        "C:/extension/resources/templates/policy_audit/AGENTS.md",
     });
   });
 

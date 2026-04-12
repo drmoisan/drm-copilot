@@ -1,11 +1,14 @@
 import {
+  normalizeWorkspaceDestinationPath,
   normalizeOptionalText,
   normalizeRequiredText,
   normalizeWorkspaceRoot,
   type NewActiveFeatureFolderInput,
   type NewPotentialEntryInput,
+  type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
   type PotentialToIssueInput,
+  validatePolicyAuditTemplateAssetSelector,
   type WorkModeOption,
   validateFeatureName,
   validateIssueNumber,
@@ -33,6 +36,11 @@ export interface NewActiveFeatureFolderToolInput
 
 export interface ResolveExecuteHardLockPromptToolInput extends WorkspaceToolInput {
   readonly target: string;
+}
+
+export interface ResolvePolicyAuditTemplateAssetToolInput extends WorkspaceToolInput {
+  readonly asset: PolicyAuditTemplateAssetSelector;
+  readonly targetPath?: string;
 }
 
 export interface RunPoshQCSuiteToolInput extends WorkspaceToolInput {
@@ -226,6 +234,35 @@ export function resolveResolveExecuteHardLockPromptToolInput(
       fallbackWorkspaceRoot,
     ),
     target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolvePolicyAuditTemplateAssetToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): ResolvePolicyAuditTemplateAssetToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const workspaceRoot = normalizeWorkspaceRoot(
+    args["workspace_root"],
+    fallbackWorkspaceRoot,
+  );
+  const targetPath = normalizeOptionalText(args["target_path"], "target_path");
+
+  return {
+    workspaceRoot,
+    asset: validatePolicyAuditTemplateAssetSelector(
+      normalizeRequiredText(args["asset"], "asset"),
+      "asset",
+    ),
+    ...(targetPath === undefined
+      ? {}
+      : {
+          targetPath: normalizeWorkspaceDestinationPath(
+            targetPath,
+            workspaceRoot,
+            "target_path",
+          ),
+        }),
   };
 }
 

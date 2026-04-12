@@ -1,18 +1,24 @@
 import * as path from "node:path";
 import {
-  type BundledScriptExecutionResult,
   type CommandOutput,
   executeBundledScriptFromExtensionRoot,
-  type RuntimeKind,
 } from "./command-runtime";
 import {
+  copyBundledPolicyAuditTemplateAsset,
+  resolveBundledPolicyAuditTemplateAsset,
+} from "./policy-audit-template-assets";
+import {
+  normalizeGeneratedPath,
+  parseFirstArtifactPath,
+  POSH_QC_TOOL_CONFIG,
+  type ScriptExecutionOptions,
+} from "./repo-automation-service-support";
+import {
+  type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
   type WorkModeOption,
 } from "./workflow-command-arguments";
 
-/**
- * Stable semantic workflow names shared by the VS Code and MCP adapters.
- */
 export const REPO_AUTOMATION_TOOLS = [
   "collect_commit_context",
   "collect_pr_context",
@@ -27,28 +33,23 @@ export const REPO_AUTOMATION_TOOLS = [
   "run_poshqc_test",
   "run_poshqc_analyze_autofix",
   "run_poshqc_suite",
+  "resolve_policy_audit_template_asset",
   "resolve_execute_hard_lock_prompt",
   "validate_orchestration_artifacts",
 ] as const;
 
-/**
- * Stable semantic workflow name.
- */
 export type RepoAutomationToolName = (typeof REPO_AUTOMATION_TOOLS)[number];
 
-/**
- * Shared execution result returned by the repo-automation service.
- */
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
   readonly workspaceRoot: string;
   readonly summary: string;
   readonly artifacts?: ReadonlyArray<string>;
+  readonly assetId?: string;
+  readonly bundledSourcePath?: string;
+  readonly destinationPath?: string;
 }
 
-/**
- * Shared service contract consumed by the VS Code and MCP adapters.
- */
 export interface RepoAutomationService {
   collectCommitContext(
     input: WorkspaceExecutionInput,
@@ -108,6 +109,12 @@ export interface RepoAutomationService {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult>;
+  resolvePolicyAuditTemplateAsset(
+    input: WorkspaceExecutionInput & {
+      readonly asset: PolicyAuditTemplateAssetSelector;
+      readonly targetPath?: string;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
   ): Promise<RepoAutomationExecutionResult>;
@@ -120,47 +127,14 @@ export interface RepoAutomationService {
   ): Promise<RepoAutomationExecutionResult>;
 }
 
-/**
- * Shared input used by all workspace-targeted workflows.
- */
 export interface WorkspaceExecutionInput {
   readonly workspaceRoot: string;
   readonly invocationId?: string;
 }
 
-/**
- * Factory options for the repo-automation service.
- */
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
   readonly output: CommandOutput;
-}
-
-interface ScriptExecutionOptions {
-  readonly tool: RepoAutomationToolName;
-  readonly runtimeKind: RuntimeKind;
-  readonly bundledRelativePath: string;
-  readonly workspaceRoot: string;
-  readonly invocationId: string;
-  readonly args: ReadonlyArray<string>;
-  readonly summary: string;
-  readonly artifactPaths?: ReadonlyArray<string>;
-  readonly stdoutArtifactPattern?: RegExp;
-}
-
-function normalizeGeneratedPath(filePath: string): string {
-  return filePath.replace(/\\/g, "/");
-}
-
-function parseFirstArtifactPath(
-  execution: BundledScriptExecutionResult,
-  pattern: RegExp,
-): string | undefined {
-  const match = execution.stdout.match(pattern);
-  const capturedPath = match?.[1]?.trim();
-  return capturedPath && capturedPath.length > 0
-    ? normalizeGeneratedPath(capturedPath)
-    : undefined;
 }
 
 class DefaultRepoAutomationService implements RepoAutomationService {
@@ -175,7 +149,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       path.join(this.extensionRoot, "resources", "feature-templates"),
     );
   }
-
   async collectCommitContext(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
@@ -194,7 +167,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       ],
     });
   }
-
   async collectPrContext(
     input: WorkspaceExecutionInput & { readonly base: string },
   ): Promise<RepoAutomationExecutionResult> {
@@ -225,7 +197,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       ],
     });
   }
-
   async pushDownCopilotCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
@@ -242,7 +213,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
     });
   }
-
   async pushDownCodexAndAgentsCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
@@ -260,7 +230,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
     });
   }
-
   async newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult> {
@@ -279,7 +248,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       summary: `Created a new potential bug entry for '${input.shortName}'.`,
     });
   }
-
   async newPotentialEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult> {
@@ -294,7 +262,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       stdoutArtifactPattern: /^Created:\s*(.+)$/im,
     });
   }
-
   async potentialToIssue(
     input: WorkspaceExecutionInput & {
       readonly potentialPath: string;
@@ -319,7 +286,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       summary: `Promoted '${input.potentialPath}' as a ${input.promotionType} workflow in ${input.workMode} mode.`,
     });
   }
-
   async newActiveFeatureFolder(
     input: WorkspaceExecutionInput & {
       readonly featureName: string;
@@ -349,125 +315,75 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       summary: `Created a new active ${input.type} feature folder for '${input.featureName}'.`,
     });
   }
-
   async runPoshQCFormat(
     input: WorkspaceExecutionInput & {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executePoshQcScript({
-      tool: "run_poshqc_format",
-      bundledRelativePath: "resources/templates/run-poshqc-format.ps1",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "run_poshqc_format",
-      summaryWithoutFolders: `Ran bundled PoshQC format against '${input.workspaceRoot}'.`,
-      summaryWithFolders: `Ran bundled PoshQC format against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
-      ...(input.scanFolders === undefined
-        ? {}
-        : { scanFolders: input.scanFolders }),
-    });
+    return this.runPoshQcWorkflow("run_poshqc_format", input);
   }
-
   async runPoshQCAnalyze(
     input: WorkspaceExecutionInput & {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executePoshQcScript({
-      tool: "run_poshqc_analyze",
-      bundledRelativePath: "resources/templates/run-poshqc-analyze.ps1",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "run_poshqc_analyze",
-      summaryWithoutFolders: `Ran bundled PoshQC analyze against '${input.workspaceRoot}'.`,
-      summaryWithFolders: `Ran bundled PoshQC analyze against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
-      ...(input.scanFolders === undefined
-        ? {}
-        : { scanFolders: input.scanFolders }),
-    });
+    return this.runPoshQcWorkflow("run_poshqc_analyze", input);
   }
-
   async runPoshQCTest(
     input: WorkspaceExecutionInput & {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executePoshQcScript({
-      tool: "run_poshqc_test",
-      bundledRelativePath: "resources/templates/run-poshqc-test.ps1",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "run_poshqc_test",
-      summaryWithoutFolders: `Ran bundled PoshQC test against '${input.workspaceRoot}'.`,
-      summaryWithFolders: `Ran bundled PoshQC test against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
-      ...(input.scanFolders === undefined
-        ? {}
-        : { scanFolders: input.scanFolders }),
-    });
+    return this.runPoshQcWorkflow("run_poshqc_test", input);
   }
-
   async runPoshQCAnalyzeAutofix(
     input: WorkspaceExecutionInput & {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executePoshQcScript({
-      tool: "run_poshqc_analyze_autofix",
-      bundledRelativePath: "resources/templates/run-poshqc-analyze-autofix.ps1",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "run_poshqc_analyze_autofix",
-      summaryWithoutFolders: `Ran bundled PoshQC analyze autofix against '${input.workspaceRoot}'.`,
-      summaryWithFolders: `Ran bundled PoshQC analyze autofix against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
-      ...(input.scanFolders === undefined
-        ? {}
-        : { scanFolders: input.scanFolders }),
-    });
+    return this.runPoshQcWorkflow("run_poshqc_analyze_autofix", input);
   }
-
   async runPoshQCSuite(
     input: WorkspaceExecutionInput & {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executePoshQcScript({
-      tool: "run_poshqc_suite",
-      bundledRelativePath: "resources/templates/run-poshqc-suite.ps1",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "run_poshqc_suite",
-      summaryWithoutFolders: `Ran the bundled PoshQC suite against '${input.workspaceRoot}'.`,
-      summaryWithFolders: `Ran the bundled PoshQC suite against '${input.workspaceRoot}' with ${input.scanFolders?.length ?? 0} selected scan folder(s).`,
-      ...(input.scanFolders === undefined
-        ? {}
-        : { scanFolders: input.scanFolders }),
-    });
+    return this.runPoshQcWorkflow("run_poshqc_suite", input);
   }
 
-  private async executePoshQcScript(options: {
-    readonly tool: RepoAutomationToolName;
-    readonly bundledRelativePath: string;
-    readonly workspaceRoot: string;
-    readonly invocationId: string;
-    readonly scanFolders?: ReadonlyArray<string>;
-    readonly summaryWithoutFolders: string;
-    readonly summaryWithFolders: string;
-  }): Promise<RepoAutomationExecutionResult> {
-    const args = ["-WorkspaceRoot", options.workspaceRoot];
-    if (options.scanFolders && options.scanFolders.length > 0) {
-      for (const scanFolder of options.scanFolders) {
-        args.push("-ScanFolders", scanFolder);
-      }
-    }
+  async resolvePolicyAuditTemplateAsset(
+    input: WorkspaceExecutionInput & {
+      readonly asset: PolicyAuditTemplateAssetSelector;
+      readonly targetPath?: string;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    const resolvedAsset = resolveBundledPolicyAuditTemplateAsset(
+      this.extensionRoot,
+      input.asset,
+    );
+    const destinationPath =
+      input.targetPath === undefined
+        ? undefined
+        : copyBundledPolicyAuditTemplateAsset(
+            resolvedAsset.bundledSourcePath,
+            input.targetPath,
+          );
 
-    return this.executeScript({
-      tool: options.tool,
-      runtimeKind: "powershell",
-      bundledRelativePath: options.bundledRelativePath,
-      workspaceRoot: options.workspaceRoot,
-      invocationId: options.invocationId,
-      args,
+    return {
+      tool: "resolve_policy_audit_template_asset",
+      workspaceRoot: input.workspaceRoot,
       summary:
-        options.scanFolders && options.scanFolders.length > 0
-          ? options.summaryWithFolders
-          : options.summaryWithoutFolders,
-    });
+        destinationPath === undefined
+          ? `Resolved bundled policy-audit asset '${input.asset}'.`
+          : `Copied bundled policy-audit asset '${input.asset}' to '${destinationPath}'.`,
+      artifacts:
+        destinationPath === undefined
+          ? [resolvedAsset.bundledSourcePath]
+          : [resolvedAsset.bundledSourcePath, destinationPath],
+      assetId: resolvedAsset.assetId,
+      bundledSourcePath: resolvedAsset.bundledSourcePath,
+      ...(destinationPath === undefined ? {} : { destinationPath }),
+    };
   }
 
   async resolveExecuteHardLockPrompt(
@@ -481,6 +397,44 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
       args: ["--target", input.target, "--workspace", input.workspaceRoot],
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+    });
+  }
+
+  private async runPoshQcWorkflow(
+    tool:
+      | "run_poshqc_format"
+      | "run_poshqc_analyze"
+      | "run_poshqc_test"
+      | "run_poshqc_analyze_autofix"
+      | "run_poshqc_suite",
+    input: WorkspaceExecutionInput & {
+      readonly scanFolders?: ReadonlyArray<string>;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    const toolConfig = POSH_QC_TOOL_CONFIG[tool];
+    const args = ["-WorkspaceRoot", input.workspaceRoot];
+    if (input.scanFolders && input.scanFolders.length > 0) {
+      for (const scanFolder of input.scanFolders) {
+        args.push("-ScanFolders", scanFolder);
+      }
+    }
+
+    const summaryTemplate =
+      input.scanFolders && input.scanFolders.length > 0
+        ? toolConfig.summaryWithFolders
+        : toolConfig.summaryWithoutFolders;
+    const summary = summaryTemplate
+      .replace("{workspaceRoot}", input.workspaceRoot)
+      .replace("{scanFolderCount}", String(input.scanFolders?.length ?? 0));
+
+    return this.executeScript({
+      tool: tool as RepoAutomationToolName,
+      runtimeKind: "powershell",
+      bundledRelativePath: toolConfig.bundledRelativePath,
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? tool,
+      args,
+      summary,
     });
   }
 
@@ -509,7 +463,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   }
 
   private async executeScript(
-    options: ScriptExecutionOptions,
+    options: ScriptExecutionOptions & { readonly tool: RepoAutomationToolName },
   ): Promise<RepoAutomationExecutionResult> {
     const execution = await executeBundledScriptFromExtensionRoot(this.output, {
       runtimeKind: options.runtimeKind,
@@ -537,12 +491,6 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   }
 }
 
-/**
- * Creates the shared repo-automation service.
- *
- * @param options Construction options describing the extension resource root and output sink.
- * @returns A service that executes bundled repo-automation workflows.
- */
 export function createRepoAutomationService(
   options: RepoAutomationServiceOptions,
 ): RepoAutomationService {

@@ -22,6 +22,18 @@ Create a policy audit document:
 
 ## How to Use
 
+### Source Artifacts vs Published Automation Surface
+
+This folder remains the source-artifact location for the policy-audit template set. It is the correct place to review or edit the source markdown files that are bundled into the published extension package.
+
+Automation consumers should not depend on this folder layout for the guidance asset. Use the published MCP surface instead:
+
+- MCP server: `drmCopilotExtension`
+- Tool: `resolve_policy_audit_template_asset`
+- Guidance selector: `asset: agents`
+
+For manual interactive use in VS Code, the matching command is `drmCopilotExtension.resolvePolicyAuditTemplateAsset`. Prefer that command only for editor-driven access; automation should continue to use the MCP tool.
+
 ### Step 1: Copy the Template
 
 ```powershell
@@ -106,8 +118,8 @@ When working in Codex with this repo attached, you can kick off a full audit wit
 > - Scope: `[short description – e.g., “new PoshQC entrypoint tests for fix-all.ps1 on branch feature/PoshQc-#21”]`  
 > - Branch: `[branch name]`  
 >  
-> Use the **local audit instructions** in:  
-> - `docs/features/templates/policy_audit/AGENTS.md`  
+> Use the published policy-audit guidance surface and source template docs:  
+> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
 > - `docs/features/templates/policy_audit/README.md`  
 > - `docs/features/templates/policy_audit/PolicyAudit.template.md`  
 >  
@@ -135,7 +147,7 @@ Sometimes you will ask Codex to both **write unit tests** for a file and then **
    > In addition to generating the unit tests described above, perform a **formal Policy Audit** for `fix-all.ps1` and the new tests you create.  
    >  
    > Use:  
-   > - `docs/features/templates/policy_audit/AGENTS.md`  
+   > - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
    > - `docs/features/templates/policy_audit/README.md`  
    > - `docs/features/templates/policy_audit/PolicyAudit.template.md`  
    >  
@@ -158,7 +170,7 @@ When you have a working copy of `PolicyAudit.template.md` open in VS Code (for e
 >  
 > Use the **policy audit process** defined in:  
 > - `docs/features/templates/policy_audit/README.md`  
-> - `docs/features/templates/policy_audit/AGENTS.md`  
+> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
 >  
 > And evaluate compliance against the canonical policies in:  
 > - `.github/instructions/general-code-change.instructions.md`  

@@ -1,3 +1,5 @@
+import * as path from "node:path";
+
 export interface ParsedFlagArguments {
   readonly values: ReadonlyMap<string, string>;
 }
@@ -29,9 +31,15 @@ export const WORK_MODE_OPTIONS = [
   "full-bug",
   "full",
 ] as const;
+export const POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS = [
+  "template",
+  "agents",
+] as const;
 
 export type PotentialPromotionType = (typeof POTENTIAL_PROMOTION_TYPES)[number];
 export type WorkModeOption = (typeof WORK_MODE_OPTIONS)[number];
+export type PolicyAuditTemplateAssetSelector =
+  (typeof POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS)[number];
 
 export interface CollectPrContextInput {
   readonly base: string;
@@ -59,6 +67,11 @@ export interface RunPoshQCSuiteInput {
 }
 
 export type RunPoshQCCommandInput = RunPoshQCSuiteInput;
+
+export interface ResolvePolicyAuditTemplateAssetInput {
+  readonly asset: PolicyAuditTemplateAssetSelector;
+  readonly targetPath?: string;
+}
 
 function formatAllowedFlags(allowedFlags: ReadonlySet<string>): string {
   return [...allowedFlags].join(", ");
@@ -143,6 +156,17 @@ export function validateWorkMode(
   return validateChoice(value, fieldName, WORK_MODE_OPTIONS);
 }
 
+export function validatePolicyAuditTemplateAssetSelector(
+  value: string,
+  fieldName: string,
+): PolicyAuditTemplateAssetSelector {
+  return validateChoice(
+    value,
+    fieldName,
+    POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS,
+  );
+}
+
 export function validateShortName(
   shortName: string,
   fieldName: string,
@@ -225,6 +249,22 @@ export function normalizeWorkspaceRoot(
   }
 
   return normalizeRequiredText(value, "workspace_root");
+}
+
+function isAbsolutePathLike(filePath: string): boolean {
+  return /^(?:[a-zA-Z]:[\\/]|\\\\|\/)/.test(filePath);
+}
+
+export function normalizeWorkspaceDestinationPath(
+  value: string,
+  workspaceRoot: string,
+  fieldName: string,
+): string {
+  const targetPath = normalizeRequiredText(value, fieldName);
+  const resolvedPath = isAbsolutePathLike(targetPath)
+    ? targetPath
+    : path.join(workspaceRoot, targetPath);
+  return resolvedPath.replace(/\\/g, "/");
 }
 
 /**
@@ -527,4 +567,32 @@ export function resolveRunPoshQCAnalyzeAutofixInvocation(
   rawArgs: readonly unknown[],
 ): WorkflowCommandInvocation<RunPoshQCCommandInput> {
   return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolvePolicyAuditTemplateAssetInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<ResolvePolicyAuditTemplateAssetInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
+  }
+
+  const parsedArgs = parseWorkflowCommandArguments(rawArgs, [
+    "-asset",
+    "-target",
+  ]);
+  const asset = validatePolicyAuditTemplateAssetSelector(
+    getRequiredFlagValue(parsedArgs, "-asset"),
+    "-asset",
+  );
+  const targetPath = getOptionalFlagValue(parsedArgs, "-target");
+
+  return {
+    mode: "direct",
+    input: {
+      asset,
+      ...(targetPath === undefined
+        ? {}
+        : { targetPath: normalizeRequiredText(targetPath, "-target") }),
+    },
+  };
 }

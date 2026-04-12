@@ -4,8 +4,8 @@ import {
   executeBundledScript,
   getWorkspaceRoot,
 } from "./command-runtime";
+import { registerDocumentWorkflowCommands } from "./document-workflow-commands";
 import {
-  promptForActiveFeaturePlan,
   promptForChoice,
   promptForFeatureName,
   promptForIssueNumber,
@@ -15,6 +15,7 @@ import {
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
 import { registerMcpProvider } from "./mcp-provider";
+import { registerPoshQcCommands } from "./poshqc-command-registration";
 import {
   discoverPrBaseBranches,
   pickPrBaseBranch,
@@ -27,11 +28,7 @@ import {
   resolveNewPotentialBugEntryInvocation,
   resolveNewPotentialEntryInvocation,
   resolvePotentialToIssueInvocation,
-  resolveRunPoshQCAnalyzeAutofixInvocation,
-  resolveRunPoshQCAnalyzeInvocation,
-  resolveRunPoshQCFormatInvocation,
   resolveRunPoshQCSuiteInvocation,
-  resolveRunPoshQCTestInvocation,
   WORK_MODE_OPTIONS,
 } from "./workflow-command-arguments";
 
@@ -72,65 +69,6 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     },
   );
-
-  const registerPoshQcCommand = (
-    commandId: string,
-    title: string,
-    resolveInvocation: (
-      rawArgs: readonly unknown[],
-    ) => ReturnType<typeof resolveRunPoshQCSuiteInvocation>,
-    runOperation: (input: {
-      readonly workspaceRoot: string;
-      readonly invocationId: string;
-      readonly scanFolders?: ReadonlyArray<string>;
-    }) => Promise<unknown>,
-  ) =>
-    vscode.commands.registerCommand(
-      commandId,
-      async (...rawArgs: unknown[]) => {
-        const invocation = resolveWorkflowInvocation(output, commandId, () =>
-          resolveInvocation(rawArgs),
-        );
-        const workspaceRoot = getWorkspaceRoot();
-        if (invocation.mode === "direct") {
-          await runOperation({
-            workspaceRoot,
-            invocationId: commandId,
-            ...invocation.input,
-          });
-          return;
-        }
-
-        const scopeChoice = await promptForChoice(
-          title,
-          "Choose the scan scope.",
-          ["Scan entire workspace", "Select folders to scan"],
-        );
-        if (!scopeChoice) {
-          return;
-        }
-
-        if (scopeChoice === "Select folders to scan") {
-          const selectedFolders =
-            await promptForWorkspaceScanFolders(workspaceRoot);
-          if (!selectedFolders) {
-            return;
-          }
-
-          await runOperation({
-            workspaceRoot,
-            invocationId: commandId,
-            scanFolders: selectedFolders,
-          });
-          return;
-        }
-
-        await runOperation({
-          workspaceRoot,
-          invocationId: commandId,
-        });
-      },
-    );
 
   const collectCommitContextDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.collectCommitContext",
@@ -284,30 +222,15 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     },
   );
-  const runPoshQCFormatDisposable = registerPoshQcCommand(
-    "drmCopilotExtension.runPoshQCFormat",
-    "drm-copilot: Run PoshQC Format",
-    resolveRunPoshQCFormatInvocation,
-    (input) => service.runPoshQCFormat(input),
-  );
-  const runPoshQCAnalyzeDisposable = registerPoshQcCommand(
-    "drmCopilotExtension.runPoshQCAnalyze",
-    "drm-copilot: Run PoshQC Analyze",
-    resolveRunPoshQCAnalyzeInvocation,
-    (input) => service.runPoshQCAnalyze(input),
-  );
-  const runPoshQCTestDisposable = registerPoshQcCommand(
-    "drmCopilotExtension.runPoshQCTest",
-    "drm-copilot: Run PoshQC Test",
-    resolveRunPoshQCTestInvocation,
-    (input) => service.runPoshQCTest(input),
-  );
-  const runPoshQCAnalyzeAutofixDisposable = registerPoshQcCommand(
-    "drmCopilotExtension.runPoshQCAnalyzeAutofix",
-    "drm-copilot: Run PoshQC Analyze Autofix",
-    resolveRunPoshQCAnalyzeAutofixInvocation,
-    (input) => service.runPoshQCAnalyzeAutofix(input),
-  );
+  const [
+    runPoshQCFormatDisposable,
+    runPoshQCAnalyzeDisposable,
+    runPoshQCTestDisposable,
+    runPoshQCAnalyzeAutofixDisposable,
+  ] = registerPoshQcCommands({
+    output,
+    service,
+  });
 
   const newPotentialBugEntryDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.newPotentialBugEntry",
@@ -484,24 +407,13 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
-  const resolveExecuteHardLockPromptDisposable =
-    vscode.commands.registerCommand(
-      "drmCopilotExtension.resolveExecuteHardLockPrompt",
-      async () => {
-        const commandId = "drmCopilotExtension.resolveExecuteHardLockPrompt";
-        const workspaceRoot = getWorkspaceRoot();
-        const planPath = await promptForActiveFeaturePlan(workspaceRoot);
-        if (!planPath) {
-          return;
-        }
-
-        await service.resolveExecuteHardLockPrompt({
-          workspaceRoot,
-          invocationId: commandId,
-          target: planPath,
-        });
-      },
-    );
+  const [
+    resolvePolicyAuditTemplateAssetDisposable,
+    resolveExecuteHardLockPromptDisposable,
+  ] = registerDocumentWorkflowCommands({
+    output,
+    service,
+  });
 
   const mcpDisposables = registerMcpProvider(context);
 
@@ -522,6 +434,7 @@ export function activate(context: vscode.ExtensionContext): void {
     runPoshQCAnalyzeAutofixDisposable,
     newPotentialBugEntryDisposable,
     newPotentialEntryDisposable,
+    resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
     ...mcpDisposables,
     output,
