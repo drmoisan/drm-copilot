@@ -459,7 +459,7 @@ describe("repo automation service", () => {
     fsMock.existsSync.mockImplementation((filePath: string) => {
       const normalizedPath = filePath.replace(/\\/g, "/");
       return normalizedPath.endsWith(
-        "/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+        "/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
       );
     });
     const service = createRepoAutomationService({
@@ -470,25 +470,25 @@ describe("repo automation service", () => {
     const result = await service.resolvePolicyAuditTemplateAsset({
       workspaceRoot: "C:/workspace",
       invocationId: "resolve_policy_audit_template_asset",
-      asset: "template",
-      targetPath: "C:/workspace/docs/policy-audit.md",
+      asset: "feature-audit-template",
+      targetPath: "C:/workspace/docs/feature-audit.md",
     });
 
     expect(fsMock.mkdirSync).toHaveBeenCalledWith("C:/workspace/docs", {
       recursive: true,
     });
     expect(fsMock.copyFileSync).toHaveBeenCalledWith(
-      "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-      "C:/workspace/docs/policy-audit.md",
+      "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      "C:/workspace/docs/feature-audit.md",
     );
     expect(result).toMatchObject({
-      assetId: "policy_audit.template",
+      assetId: "policy_audit.feature_audit_template",
       bundledSourcePath:
-        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-      destinationPath: "C:/workspace/docs/policy-audit.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      destinationPath: "C:/workspace/docs/feature-audit.md",
       artifacts: [
-        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-        "C:/workspace/docs/policy-audit.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+        "C:/workspace/docs/feature-audit.md",
       ],
     });
   });

@@ -373,35 +373,37 @@ describe("repo automation MCP server", () => {
     service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
       tool: "resolve_policy_audit_template_asset",
       workspaceRoot: "C:/workspace",
-      summary: "Resolved bundled policy-audit asset 'agents'.",
-      artifacts: ["C:/extension/resources/templates/policy_audit/AGENTS.md"],
-      assetId: "policy_audit.agents",
+      summary: "Resolved bundled policy-audit asset 'feature-audit-template'.",
+      artifacts: [
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      ],
+      assetId: "policy_audit.feature_audit_template",
       bundledSourcePath:
-        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
     });
 
     const result = await client.callTool({
       name: "resolve_policy_audit_template_asset",
       arguments: {
         workspace_root: "C:/workspace",
-        asset: "agents",
-        target_path: "docs/policy-audit/AGENTS.md",
+        asset: "feature-audit-template",
+        target_path: "docs/policy-audit/feature-audit.md",
       },
     });
 
     expect(service.resolvePolicyAuditTemplateAsset).toHaveBeenCalledWith({
       workspaceRoot: "C:/workspace",
-      asset: "agents",
-      targetPath: "C:/workspace/docs/policy-audit/AGENTS.md",
+      asset: "feature-audit-template",
+      targetPath: "C:/workspace/docs/policy-audit/feature-audit.md",
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "resolve_policy_audit_template_asset",
       workspace_root: "C:/workspace",
-      asset_id: "policy_audit.agents",
+      asset_id: "policy_audit.feature_audit_template",
       bundled_source_path:
-        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
     });
   });
 

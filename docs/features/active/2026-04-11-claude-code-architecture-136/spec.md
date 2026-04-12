@@ -44,23 +44,85 @@ At a high level, the implementation should:
 
 ## Inputs / Outputs
 
-- Inputs (CLI flags, files, env vars)
-- Outputs (artifacts, logs, telemetry)
-- Config keys and defaults:
-- Versioning or backward-compatibility constraints:
+**Inputs:**
+- The canonical `.github/instructions/*.instructions.md` files (standing policy sources).
+- The canonical `.github/agents/*.agent.md` files (specialist persona definitions).
+- The canonical `.github/skills/*/SKILL.md` files (reusable workflow contracts).
+- The canonical `.github/prompts/*.prompt.md` files (direct-use entry points).
+- The existing `artifacts/orchestration/orchestrator-state.json` checkpoint schema.
+
+**Outputs:**
+- `CLAUDE.md` (repo root) — repository tone policy, compliance reading order, and architectural context.
+- `.claude/rules/python.md`, `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, `.claude/rules/csharp.md` — path-scoped language policy files.
+- `.claude/skills/orchestrate/SKILL.md` — orchestration entry point skill.
+- `.claude/skills/commit-message/SKILL.md` — commit message generation skill.
+- `.claude/skills/pr-author/SKILL.md` — PR authoring skill.
+- `.claude/skills/research-issue/SKILL.md` — research task skill.
+- `.claude/agents/orchestrator.md` — orchestrator subagent.
+- `.claude/agents/atomic-planner.md` — atomic planner subagent.
+- `.claude/agents/atomic-executor.md` — atomic executor subagent.
+- `.claude/agents/feature-review.md` — feature review subagent.
+- `.claude/agents/task-researcher.md` — task researcher subagent.
+- `.claude/settings.json` — shared permissions and hook configuration.
+- `.claude/hooks/validate-bash.ps1` — PreToolUse bash validation hook script.
+- `docs/engineering/claude-code-architecture.md` — sync strategy and Copilot/Claude equivalences documentation.
+
+**Config keys and defaults:**
+- No environment variables or feature flags are introduced. All configuration lives in `.claude/settings.json` and the supporting files.
+
+**Versioning / backward-compatibility constraints:**
+- Existing `.github/` files are the canonical source and must not be modified. `.claude/` files mirror or reference content from `.github/` as specified by the sync strategy.
+- The `.claude/commands/` directory must not be used for new user-invocable workflows. If it exists, it is documented as a backward-compatibility surface only.
 
 ## API / CLI Surface
 
-List commands, flags, request/response shapes, and examples.
-- Example invocations with expected outputs (concise):
-- Contracts and validation rules:
+**Skill invocations (primary user-invocable surface in Claude Code):**
+
+```
+/orchestrate <objective>
+  → forks the `orchestrator` subagent via `context: fork`; the subagent reads the checkpoint
+    and executes the full orchestration lifecycle (promotion → research → planning → execution → review).
+
+/commit-message
+  → reads staged git changes and the commit-message conventions skill;
+    writes a conventional commit message following the repository's canonical format.
+
+/pr-author
+  → reads pr_context.summary.txt and pr_context.appendix.txt;
+    writes a GitHub-ready PR body with strict verification and auto-close rules.
+
+/research-issue <feature-folder>
+  → reads the issue.md in the specified feature folder;
+    writes structured research output to artifacts/research/<timestamp>-<short-name>-research.md.
+```
+
+**Subagent delegation (internal, not user-facing):**
+- `orchestrator` delegates to: `atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, language engineers.
+- All delegation uses named `Agent(...)` patterns declared in each subagent's `tools` frontmatter.
+
+**Contracts and validation rules:**
+- Skills must declare `description`, `context`, `agent` (when forking), and `allowed-tools` in frontmatter.
+- Subagents must declare `tools`, `model`, `skills`, `memory`, and `hooks` in frontmatter.
+- Settings must declare a `permissions` block with explicit `allow` and `deny` arrays.
+- Hook scripts must exit with a non-zero code to block an operation and zero to allow it.
 
 ## Data & State
 
-Data flow, storage, or state changes introduced by this feature.
-- Data transformations and invariants:
-- Caching or persistence details:
-- Migration or backfill requirements (if any):
+**Data flow:**
+- User invokes a skill → skill body instructs the subagent → subagent reads policy from CLAUDE.md and `.claude/rules/` → subagent reads `artifacts/orchestration/orchestrator-state.json` → subagent delegates specialist work → subagent writes updated checkpoint after each phase.
+
+**Storage and persistence:**
+- `artifacts/orchestration/orchestrator-state.json` is the persistent checkpoint for orchestration state. Its schema is unchanged from the existing Copilot orchestrator contract.
+- All other outputs (plans, review artifacts, research files) follow the existing `docs/features/active/<feature>/` and `artifacts/` directory conventions.
+- `.claude/settings.json` is the shared project configuration file, checked into the repository.
+
+**Invariants:**
+- The orchestrator subagent must read the checkpoint before doing new work.
+- The orchestrator subagent must write an updated checkpoint after each phase transition.
+- No `.claude/` file may replace a `.github/` file; both directories coexist.
+
+**Migration / backfill:**
+- No migration of existing data is required. The `.claude/` directory is new and additive.
 
 ## Constraints & Risks
 
@@ -71,24 +133,48 @@ Data flow, storage, or state changes introduced by this feature.
 - Scope is limited to the four-layer architecture, skill and subagent definitions, settings and hooks, resumability, sync strategy, and validation guidance. It does not include rewriting every existing `.github/agents/` file, restructuring unrelated repository automation, or implementing agent teams (which are experimental, higher-cost, and not suited to this repository's sequential workflow model).
 - Agent teams are explicitly out of scope. They are designed for collaborative parallel exploration, not for the repository's deterministic sequential pipeline (promotion → research → planning → execution → review).
 
-
 ## Implementation Strategy
 
-- Implementation scope (what changes, not sequencing):
-- New classes/functions/commands to add or update:
-- Dependency changes (new/removed packages) and rationale:
-- Logging/telemetry additions and locations:
-- Rollout plan (feature flags, staged deploys, fallback path):
+**Implementation scope:**
+All changes are additive new files in `.claude/` and `docs/engineering/`. No existing source, test, or configuration files are deleted or structurally modified. The `.github/` directory remains the canonical source of truth.
+
+**New files to create:**
+
+| File | Purpose |
+|---|---|
+| `CLAUDE.md` | Repo-root standing instructions: tone policy, compliance reading order, arch context |
+| `.claude/rules/python.md` | Python policy rules, scoped via `paths: ["**/*.py"]` |
+| `.claude/rules/powershell.md` | PowerShell policy rules, scoped via `paths: ["**/*.ps1", "**/*.psm1", "**/*.psd1"]` |
+| `.claude/rules/typescript.md` | TypeScript policy rules, scoped via `paths: ["**/*.ts"]` |
+| `.claude/rules/csharp.md` | C# policy rules, scoped via `paths: ["**/*.cs", "**/*.csproj"]` |
+| `.claude/skills/orchestrate/SKILL.md` | Orchestration entry point; `context: fork`, `agent: orchestrator` |
+| `.claude/skills/commit-message/SKILL.md` | Commit message generation; `allowed-tools: [Read, Bash(git log *), Bash(git diff *)]` |
+| `.claude/skills/pr-author/SKILL.md` | PR body authoring; `allowed-tools: [Read, Bash(git log *)]` |
+| `.claude/skills/research-issue/SKILL.md` | Issue research; `allowed-tools: [Read, Grep, Glob, WebFetch]` |
+| `.claude/agents/orchestrator.md` | Orchestrator subagent with full delegation allowlist, `model: sonnet`, `memory: project` |
+| `.claude/agents/atomic-planner.md` | Planning subagent restricted to `docs/` and `artifacts/` write paths |
+| `.claude/agents/atomic-executor.md` | Execution subagent with explicit language toolchain `Bash(...)` patterns |
+| `.claude/agents/feature-review.md` | Review subagent restricted to read + `Write(/docs/features/active/**)` |
+| `.claude/agents/task-researcher.md` | Research subagent restricted to read + `Write(/artifacts/research/**)` |
+| `.claude/settings.json` | Shared permissions and hook entries (allow/deny arrays + SubagentStop + PreToolUse) |
+| `.claude/hooks/validate-bash.ps1` | PowerShell hook script invoked by `PreToolUse` for dangerous-command detection |
+| `docs/engineering/claude-code-architecture.md` | Sync strategy and Copilot/Claude equivalences documentation |
+
+**Dependency changes:** None. No new packages are required.
+
+**Logging/telemetry:** None introduced by this feature.
+
+**Rollout plan:** No staged deploy or feature flags needed. All files are checked into the repository on the feature branch and become available to Claude Code sessions opened in that repo immediately after merge.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
 - [ ] Validation that each `.claude/skills/` file can be invoked by name in a Claude Code session and produces the expected entry-point behavior (context fork, agent delegation, or direct workflow execution as applicable)
@@ -96,4 +182,4 @@ Data flow, storage, or state changes introduced by this feature.
 - [ ] Validation that the `SubagentStop` hooks in `settings.json` block premature termination when the required artifact path is absent from the subagent's output, and allow termination when the artifact path is present
 - [ ] Validation that the `orchestrator` subagent reads `artifacts/orchestration/orchestrator-state.json` at the start of a session and correctly resumes from a partially populated checkpoint rather than restarting the workflow from scratch
 - [ ] Validation that the `PreToolUse` bash-validation hook in `settings.json` invokes the hook script and blocks at least one representative dangerous-command pattern
-- [ ] Documentation review confirming that every non-equivalence between Copilot and Claude is identified and that no section of the migration documentation claims runtime enforcement for behaviors that are enforced only by prompt conventions
+- [x] Documentation review confirming that every non-equivalence between Copilot and Claude is identified and that no section of the migration documentation claims runtime enforcement for behaviors that are enforced only by prompt conventions
