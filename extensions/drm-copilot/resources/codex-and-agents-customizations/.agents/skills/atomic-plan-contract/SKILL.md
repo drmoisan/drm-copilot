@@ -94,11 +94,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 For any language in scope where repository policy requires coverage validation:
 
 - The approved plan MUST include explicit baseline and final-QC coverage capture tasks.
+- The approved plan MUST include explicit artifact-path tasks for baseline artifacts, final-QA artifacts, and coverage-comparison artifacts for each in-scope language that requires coverage.
 - Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
 - Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports:
 	- baseline coverage,
 	- post-change coverage,
 	- new/changed-code coverage.
+- If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict MUST be BLOCKED or INCOMPLETE, never PASS.
+- Do not synthesize or backfill missing evidence from memory or inference. Missing evidence MUST remain missing and be reported with exact artifact paths.
 - If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
 
 ## Final QA Loop (Required for Code/Test Changes)

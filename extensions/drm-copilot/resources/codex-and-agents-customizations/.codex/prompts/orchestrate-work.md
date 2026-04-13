@@ -17,6 +17,8 @@ Required behavior:
 - maintain and resume from the canonical orchestration checkpoint
 - use migrated Codex subagents when available
 - route host-specific lifecycle automation through the shared adapter rules
+- do not synthesize or backfill missing audit evidence from memory or inference
+- if required baseline artifacts, QA artifacts, or coverage-comparison artifacts are missing, report incomplete with the exact missing artifact names and do not mark readiness as pass
 - continue until planning, execution, validation, and review are complete for the selected path, unless the request explicitly requires a manual-bootstrap pause
 
 On completion, report the selected route, branch, key variables, `plan-path` when applicable, checkpoint path, created or updated artifact paths, and final readiness summary.

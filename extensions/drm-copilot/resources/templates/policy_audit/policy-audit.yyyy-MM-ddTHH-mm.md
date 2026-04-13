@@ -37,6 +37,20 @@
 
 **Note:** Delete rows for languages not involved in this change. Add rows if additional languages are used.
 
+### Coverage Evidence Checklist
+
+- TypeScript baseline coverage artifact: [path or `N/A - out of scope`]
+- TypeScript post-change coverage artifact: [path or `N/A - out of scope`]
+- PowerShell baseline coverage artifact: [path or `N/A - out of scope`]
+- PowerShell post-change coverage artifact: [path or `N/A - out of scope`]
+- Per-language comparison summary: [section reference or artifact path]
+
+**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+
+**Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
+
 ---
 
 ## Executive Summary
@@ -90,6 +104,12 @@
 | **Error Handling** - Error paths | [✅/❌/N/A] [PASS/FAIL/N/A] | **All error scenarios tested:**<br>- `test_function_handles_network_timeout`: Mock network timeout → raises `TimeoutError` after retry<br>- `test_function_handles_file_not_found`: Missing file → raises `FileNotFoundError` with filepath<br>- `test_function_handles_json_parse_error`: Invalid JSON → raises `JSONDecodeError` with line number<br>**Total error handling tests:** [N] |
 | **Concurrency** - If applicable | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe concurrency testing or explain why it's not applicable. If applicable, describe how race conditions and thread safety are tested.] |
 | **State Transitions** - If applicable | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe state transition testing or explain why it's not applicable. If applicable, show that all state transitions are tested.] |
+
+### 1.2.1 Per-Language Coverage Comparison
+
+Repeat one bullet per in-scope language that has coverage requirements. Keep the checklist above even when a language is out of scope, but use `N/A - out of scope` for the artifact path.
+
+- [Language]: Baseline: [N]% [unit] -> Post-change: [N]% [unit]. Change: [+/-N]% [unit delta]. New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
 
 ### 1.3 Test Structure and Diagnostics
 
@@ -494,6 +514,8 @@
 ### Overall Status: [✅ FULLY COMPLIANT / ⚠️ PARTIALLY COMPLIANT / ❌ NON-COMPLIANT]
 
 [Provide a brief summary of overall compliance status and any major findings.]
+
+**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is missing.
 
 ---
 

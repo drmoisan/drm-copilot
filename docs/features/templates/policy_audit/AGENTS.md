@@ -50,11 +50,15 @@ When asked to perform a Policy Audit for a component, branch, or PR:
    - Generate a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.g., "2026-01-08T14-30" for Jan 8, 2026 at 2:30 PM).
    - Copy [policy-audit.yyyy-MM-ddTHH-mm.md](./policy-audit.yyyy-MM-ddTHH-mm.md) to the requested location with timestamped filename: `policy-audit.<timestamp>.md` (e.g., feature folder or PR docs).
    - Replace placeholders (`[Component Name]`, dates, paths, counts) as described in [README.md](./README.md).
+   - Preserve the explicit coverage evidence checklist in the template.
+     - Keep the TypeScript and PowerShell artifact lines even when those languages are out of scope; mark them `N/A - out of scope` rather than deleting them.
+     - Fill the per-language comparison summary reference with either an in-document section reference or an exact artifact path.
    - **For multi-language changes:**
      - Fill in the Coverage Metrics by Language table with one row per language.
      - Complete all applicable language sections (3A, 3B, 3C, 3D for code; 4A, 4B for tests).
      - Delete sections for languages NOT involved in this change.
    - **Fill in baseline coverage metrics** from pre-development measurement (per language that has coverage).
+   - Add one per-language comparison bullet for every in-scope language that has coverage requirements.
 
 3. **Evaluate policy compliance**
    - For each section of the template:
@@ -73,6 +77,11 @@ When asked to perform a Policy Audit for a component, branch, or PR:
      - Compare post-change coverage to baseline to verify no regression (per language).
      - Isolate and measure coverage of new/modified code only (must be ≥90% per language).
      - Use concrete examples showing calculations: "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅"
+   - **Fail-closed evidence handling:**
+     - No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+     - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+     - Do not synthesize or backfill missing audit evidence from memory or inference.
+     - If evidence is missing, stop and report the exact missing artifact paths.
    - **For scenario testing:**
      - Use deterministic, input→output→assertion format for all examples.
      - **Positive flows:** Show concrete valid inputs and expected outputs.
@@ -104,4 +113,5 @@ When asked to perform a Policy Audit for a component, branch, or PR:
 
 - Do **not** modify the canonical `.instructions.md` policy documents as part of an audit.
 - Do **not** treat this AGENTS file as a reason to change how normal code or tests are written; it is for **evaluation and documentation** only.
+- Do **not** report readiness as PASS when required audit evidence is absent; report incomplete with the missing artifact names or paths.
 - If you detect any conflict between this file and the canonical policy documents, halt and ask the user for clarification instead of guessing.
