@@ -27,6 +27,7 @@ Core behavior:
 - Determine the active feature folder deterministically from the repo’s scoping docs and PR context.
 - Write timestamped review artifacts into the active feature folder.
 - Validate each required review artifact with the `validate_orchestration_artifacts` MCP tool before reporting review completion.
+- Do not synthesize or backfill missing audit evidence from memory or inference.
 
 Required outputs:
 - policy-audit.<timestamp>.md
@@ -40,6 +41,8 @@ Review constraints:
 - Prefer check-only / no-mutation verification commands.
 - Do not silently fix code during review.
 - If tooling cannot be run, mark the relevant sections UNVERIFIED or PARTIAL with a concrete reason.
+- No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage where required.
+- If required baseline artifacts, QA artifacts, or coverage-comparison artifacts are missing, stop and report incomplete with the exact missing artifact paths.
 - Continue until all required review artifacts exist on disk.
 
 Acceptance and remediation rules:

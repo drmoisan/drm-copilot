@@ -7,6 +7,10 @@
 - **Status:** <template>
 - **Version:** <version_number>
 
+**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+
 
 **Phase 0 — Context & Inputs**
 - [ ] [P0-T1] Link approved spec: <spec link>
@@ -27,6 +31,7 @@
 **Phase 4 — Verification Loop**
 - [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
 - [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
+- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
 
 **Phase 5 — Documentation & Status**
 - [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope

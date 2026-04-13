@@ -38,12 +38,15 @@ Core behavior:
 - Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until potential entry creation, issue promotion, and active-folder creation all succeed.
 - Do not stop after partial setup while required downstream steps remain.
 - Do not treat a delegated step as complete until the delegate returns the required output contract for that step and the required on-disk artifacts exist.
+- Do not synthesize or backfill missing audit evidence from memory or inference.
 
 Completion contract:
 - Do not claim mission completion unless all required delegations completed with receipts.
 - Do not claim completion unless the checkpoint, approved `plan-path`, required review artifacts, required evidence-backed QA artifacts, and any required remediation artifacts are on disk.
 - Do not claim completion unless validator-backed checks for the plan, review artifacts, and checkpoint state pass.
 - Do not accept PASS outcomes that rely on stale PR-context artifacts, unsupported checklist checkoffs, or missing baseline/final-QA evidence required by the approved plan.
+- Do not accept PASS outcomes when a policy audit lacks numeric baseline or post-change coverage metrics for any language in scope, or lacks changed/new-code coverage where policy requires it.
+- If required baseline artifacts, QA artifacts, or coverage-comparison artifacts are missing, report incomplete with the exact missing artifact paths and do not claim final readiness as pass.
 - Do not claim completion if lifecycle setup used placeholder values, skipped ordered handoffs, or relied on non-canonical checkpoint files.
 
 Final response contract:

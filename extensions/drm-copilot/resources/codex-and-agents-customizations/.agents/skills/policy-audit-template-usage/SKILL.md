@@ -24,8 +24,17 @@ Use this skill when:
 1) Resolve the policy-audit template through the MCP server tool `resolve_policy_audit_template_asset` with asset `template`, then copy the resolved asset to the target location using an ISO-8601 timestamp.
 2) Replace placeholders with actual values (component, date, files under test, commits).
 3) Remove any template usage instructions per template guidance.
-4) Mark each section PASS/FAIL/N/A using the template’s expected conventions.
-5) Preserve the canonical major sections from the template:
+4) Preserve the coverage evidence checklist in the audit and fill each required line with either an exact artifact path/reference or `N/A - out of scope`.
+   - Required checklist lines:
+     - `TypeScript baseline coverage artifact:`
+     - `TypeScript post-change coverage artifact:`
+     - `PowerShell baseline coverage artifact:`
+     - `PowerShell post-change coverage artifact:`
+     - `Per-language comparison summary:`
+5) Add one per-language comparison line for every language in scope that has coverage requirements.
+   - Each comparison line MUST include numeric baseline coverage, numeric post-change coverage, explicit delta/comparison text, a language-by-language disposition, and changed/new-code coverage when policy requires it.
+6) Mark each section PASS/FAIL/N/A using the template’s expected conventions.
+7) Preserve the canonical major sections from the template:
    - `## Executive Summary`
    - `## 1. General Unit Test Policy Compliance`
    - `## 2. General Code Change Policy Compliance`
@@ -39,10 +48,16 @@ Use this skill when:
    - `## 10. Compliance Verdict`
    - `## Appendix A: Test Inventory`
    - `## Appendix B: Toolchain Commands Reference`
-6) Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <path>` and fail closed on any non-zero result.
+8) Apply the non-negotiable verdict gate:
+   - no policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required,
+   - if any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict MUST be BLOCKED or INCOMPLETE, never PASS.
+9) Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and report the exact missing artifact paths.
+10) Run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <path>` and fail closed on any non-zero result.
 
 ## Invalid Outputs
 
 - A freeform summary note is invalid.
 - A policy audit that retains the template instruction block is invalid.
 - A policy audit that omits the canonical major headings is invalid.
+- A policy audit that omits the coverage evidence checklist or the per-language comparison summary is invalid.
+- A policy audit that reports PASS while any required coverage metric or evidence path is missing is invalid.
