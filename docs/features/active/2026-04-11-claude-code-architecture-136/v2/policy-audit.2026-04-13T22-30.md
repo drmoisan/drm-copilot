@@ -1,66 +1,39 @@
-# Policy Compliance Audit: [Component Name]
-
-> **Template Usage Instructions:**
-> 
-> This template is for documenting policy compliance during agent-driven development. Use it to audit any code changes (features, bugfixes, refactors) or test additions.
-> 
-> **How to use:**
-> 1. Copy this template to your working directory (feature folder, PR docs, etc.)
-> 2. Replace all `[placeholders]` with actual values
-> 3. Use `[✅/❌/N/A]` and `[PASS/FAIL/N/A]` to mark status
-> 4. Delete inapplicable sections (e.g., delete Python sections for PowerShell work)
-> 5. Fill in evidence based on actual test runs and code inspection
-> 6. Complete before submitting PR or marking work as done
-> 
-> **When to use:**
-> - After completing any code changes (required by policy)
-> - Before submitting PRs
-> - When adding or updating tests
-> - During bugfix implementation (see Bugfix Playbook)
-> - For feature development (see Feature Playbook)
-> 
-> **Delete this instruction block before finalizing the audit.**
+# Policy Compliance Audit: Claude Code architecture v2 fifth re-review (#136)
 
 ---
 
-**Audit Date:** [YYYY-MM-DD]  
-**Code Under Test:** [List all files modified across all languages]
+**Audit Date:** 2026-04-13
+**Code Under Test:** `extensions/drm-copilot/src/repo-automation-service.ts`; `extensions/drm-copilot/resources/templates/run-poshqc-format.ps1`; `extensions/drm-copilot/resources/templates/run-poshqc-analyze.ps1`; `extensions/drm-copilot/resources/templates/run-poshqc-test.ps1`; `extensions/drm-copilot/test/repo-automation-service.test.ts`; `scripts/powershell/PoshQC/PoshQC.Testing.psm1`; `tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1`; `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1`; `.claude/settings.json`; `docs/engineering/claude-code-architecture.md`
 
 **Coverage Metrics by Language:**
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
 |----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
-| Python | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% lines, [N]% funcs | [N]% lines, [N]% funcs | [N]% |
-| PowerShell | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% cmds, [N]% funcs | [N]% cmds, [N]% funcs | [N]% |
-| Bash | [N] files | [N/A] tests | [✅/❌/N/A] | N/A (no coverage) | N/A (no coverage) | N/A |
-| JSON | [N] files | N/A | [✅/❌] validation | N/A (config files) | N/A (config files) | N/A |
-
-**Note:** Delete rows for languages not involved in this change. Add rows if additional languages are used.
+| TypeScript | 2 scoped files | 14 Jest tests | [PASS] 14 pass, 0 fail | N/A | N/A | OPEN BY AUDITED EXCEPTION |
+| PowerShell | 6 scoped wrapper/runtime/test files | 46 targeted Pester tests + 3 live wrapper probes | [PASS] 46 pass, 0 fail; wrapper probes green | Baseline numeric coverage unavailable | Not mapped to the changed wrapper/runtime scope | OPEN BY AUDITED EXCEPTION |
+| JSON | 1 supporting file | N/A | [PASS] validation previously green | N/A | N/A | N/A |
 
 ---
 
 ## Executive Summary
 
-[Summarize overall compliance status and key findings. List which policy documents were evaluated. Provide a brief overview of what was tested and the outcome of toolchain execution.]
+This fifth re-review confirms that the repo-controlled multi-folder `scan_folders` wrapper defect remains closed in the current working tree. The TypeScript service still marshals multi-folder requests through one `-ScanFoldersJson` payload, the bundled PowerShell wrappers still decode that payload, and the previously recorded targeted Jest, Pester, and live wrapper checks remain green. PR context was refreshed again against `origin/development` during this review.
+
+Overall policy compliance is still incomplete for three reasons. First, the new loop-5 evidence proves that the current shell execution environment still cannot start a live Claude Code session, so the seven live-runtime acceptance criteria remain `UNVERIFIED` for environment reasons rather than because of a repo-controlled runtime defect. Second, changed-scope coverage accounting remains open by audited exception. Third, the current working tree now contains three touched files that exceed the repository's 500-line file limit, which is a repo-controlled policy defect that must be fixed before the branch can pass review.
 
 **Policy documents evaluated:**
-- [✅/❌] `general-code-change.instructions.md` (if applicable)
-- [✅/❌] `general-unit-test.instructions.md` (if testing)
+- [PASS] `.github/copilot-instructions.md`
+- [PASS] `.github/instructions/general-code-change.instructions.md`
+- [PASS] `.github/instructions/general-unit-test.instructions.md`
 
 **Language-specific policies evaluated:**
-- [✅/❌/N/A] `python-code-change.instructions.md` + `python-unit-test.instructions.md`
-- [✅/❌/N/A] `powershell-code-change.instructions.md` + `powershell-unit-test.instructions.md`
-- [✅/❌/N/A] Bash: shfmt + shellcheck + bats (if applicable)
-- [✅/❌/N/A] JSON: format_json + validate_json (if applicable)
-
-**Note:** Check all languages involved in this change. N/A for unused languages.
-
-[Brief summary of test coverage, toolchain results, and compliance status.]
+- [PASS] `.github/instructions/typescript-code-change.instructions.md` + `.github/instructions/typescript-unit-test.instructions.md`
+- [PARTIAL] `.github/instructions/powershell-code-change.instructions.md` + `.github/instructions/powershell-unit-test.instructions.md`
+- [PASS] JSON: `format_json` + `validate_json`
 
 **Temporary artifacts cleanup:**
-- [✅/❌] All temporary/one-time scripts created during development have been deleted
-- [✅/❌] Any ongoing tooling scripts are fully tested and compliant with repo policies
-- [List any scripts created during development and their disposition: deleted or kept with tests]
+- [PASS] No temporary one-off scripts were introduced by the wrapper repair or the validation-only remediation loop.
+- [FAIL] The branch is not yet policy-clean because the live-runtime evidence remains environment-blocked, changed-scope coverage remains open by audited exception, and three touched files now exceed the 500-line file limit.
 
 ---
 
@@ -70,48 +43,48 @@
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Independence** - Tests run in any order | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how tests demonstrate independence. Do they share state? Can they run in parallel? Do they use proper setup/teardown?] |
-| **Isolation** - Each test targets single behavior | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how each test targets a single unit. List test organization structure. Explain how tests are grouped.] |
-| **Fast Execution** - Tests complete quickly | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report total execution time, average per test, discovery time. Identify any slow tests.] |
-| **Determinism** - Consistent results | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how tests avoid randomness, time dependencies, and external I/O. List mocking strategy.] |
-| **Readability & Maintainability** - Clear structure | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test naming conventions, organization patterns, and documentation approach.] |
+| **Independence** - Tests run in any order | [PASS] | The scoped Jest and Pester suites rely on mocks and repository-local files only. |
+| **Isolation** - Each test targets single behavior | [PASS] | The updated Jest cases isolate argv marshalling, and the updated Pester cases isolate wrapper JSON decoding, scan-folder behavior, and coverage-path preservation. |
+| **Fast Execution** - Tests complete quickly | [PASS] | `p2-t4.wrapper-regression-tests.2026-04-13T11-49.md` records 14 Jest tests and 46 Pester tests in one targeted run. |
+| **Determinism** - Consistent results | [PASS] | No network or runtime-created temporary files are used by the scoped regression suites. |
+| **Readability & Maintainability** - Clear structure | [PARTIAL] | The individual tests are clear, but two touched test files now exceed the repository's maintainability limit of 500 lines. |
 
 ### 1.2 Coverage and Scenarios
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Baseline Coverage Documented** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Baseline (pre-development):** [N]% lines, [N]% functions<br>**Command:** `[coverage command]`<br>**Timestamp:** [YYYY-MM-DD HH:MM]<br>**Note:** Document baseline BEFORE making changes to avoid re-computation during audit. |
-| **No Coverage Regression** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions<br>**Change:** [+/-N]% lines, [+/-N]% functions<br>**Status:** [No regression / Regression detected: justification]<br>**Example:** "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅ PASS" |
-| **New Code Coverage ≥90%** | [✅/❌/N/A] [PASS/FAIL/N/A] | **New/modified files:** [list files]<br>**New code coverage:** [N]% (must be ≥90%)<br>**Calculation method:** [describe how new code was isolated for measurement]<br>**Example:** "New module `foo.py`: 127/135 lines covered = 94.1% ✅ PASS" |
-| **Comprehensive Coverage** | [✅/❌/N/A] [PASS/FAIL/N/A] | **All functions/classes tested:**<br>- `function_name()` (lines X-Y): [N] tests<br>- `ClassName` (lines A-B): [N] tests<br>**Untested code:** [list with justification]<br>**Example:**<br>- `parse_config()` (lines 45-67): 3 tests<br>- `ConfigLoader` (lines 100-150): 5 tests<br>- Untested: `__repr__()` (trivial representation, no business logic) |
-| **Positive Flows** - Valid inputs | [✅/❌/N/A] [PASS/FAIL/N/A] | **All positive scenarios tested:**<br>- `test_function_with_valid_string`: Tests normal string input → returns expected output<br>- `test_function_with_valid_number`: Tests numeric input in valid range → performs calculation<br>- `test_function_with_default_params`: Tests function with default parameters → uses correct defaults<br>**Total positive tests:** [N] |
-| **Negative Flows** - Invalid inputs | [✅/❌/N/A] [PASS/FAIL/N/A] | **All negative scenarios tested:**<br>- `test_function_rejects_none`: Input `None` → raises `ValueError` with message "Input cannot be None"<br>- `test_function_rejects_empty_string`: Input `""` → raises `ValueError` with message "Input cannot be empty"<br>- `test_function_rejects_negative_number`: Input `-5` → raises `ValueError` with message "Value must be positive"<br>- `test_function_rejects_wrong_type`: Input `123` (expected str) → raises `TypeError` with message "Expected string, got int"<br>**Total negative tests:** [N] |
-| **Edge Cases** - Boundary conditions | [✅/❌/N/A] [PASS/FAIL/N/A] | **All edge cases tested:**<br>- `test_function_with_empty_list`: Input `[]` → returns empty result<br>- `test_function_with_max_length_string`: Input 255-char string (boundary) → processes correctly<br>- `test_function_with_unicode_chars`: Input `"café ☕"` → handles Unicode correctly<br>- `test_function_with_whitespace`: Input `"  spaces  "` → strips/preserves as designed<br>**Total edge case tests:** [N] |
-| **Error Handling** - Error paths | [✅/❌/N/A] [PASS/FAIL/N/A] | **All error scenarios tested:**<br>- `test_function_handles_network_timeout`: Mock network timeout → raises `TimeoutError` after retry<br>- `test_function_handles_file_not_found`: Missing file → raises `FileNotFoundError` with filepath<br>- `test_function_handles_json_parse_error`: Invalid JSON → raises `JSONDecodeError` with line number<br>**Total error handling tests:** [N] |
-| **Concurrency** - If applicable | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe concurrency testing or explain why it's not applicable. If applicable, describe how race conditions and thread safety are tested.] |
-| **State Transitions** - If applicable | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe state transition testing or explain why it's not applicable. If applicable, show that all state transitions are tested.] |
+| **Baseline Coverage Documented** | [PARTIAL] | `p3-t4.powershell-coverage-green.2026-04-13T11-06.md` provides numeric PowerShell coverage output, but not a changed-scope baseline for the repaired files. |
+| **No Coverage Regression** | [UNVERIFIED] | `p1-t5.coverage-accounting.2026-04-13T22-07.md` records that current artifacts do not calculate before/after coverage for the changed TypeScript and PowerShell scope. |
+| **New Code Coverage ≥90%** | [UNVERIFIED] | The current evidence set does not isolate new-code coverage for the repaired TypeScript and PowerShell paths. |
+| **Comprehensive Coverage** | [PASS] | The available suites cover TypeScript marshalling, PowerShell wrapper decoding, coverage-path preservation, and successful end-to-end wrapper execution. |
+| **Positive Flows** - Valid inputs | [PASS] | `p2-t4`, `p2-t5`, `p2-t6`, and `p2-t7` show green valid-path coverage for the repaired transport. |
+| **Negative Flows** - Invalid inputs | [PASS] | The prior failing wrapper modes were reproduced during earlier remediation loops and the current regression tests are designed to fail on contract drift. |
+| **Edge Cases** - Boundary conditions | [PASS] | Multi-folder wrapper transport remains the protected edge case. |
+| **Error Handling** - Error paths | [PASS] | The wrappers still fail explicitly under strict mode, and the tests verify contract-sensitive behavior instead of masking errors. |
+| **Concurrency** - If applicable | [N/A] | Not applicable to the reviewed service and wrapper transport paths. |
+| **State Transitions** - If applicable | [N/A] | Not applicable to the reviewed service and wrapper transport paths. |
 
 ### 1.3 Test Structure and Diagnostics
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Clear Failure Messages** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe assertion strategy and failure message quality. Show examples of diagnostic output from failing tests.] |
-| **Arrange-Act-Assert Pattern** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how tests follow AAA pattern. Explain setup, execution, and assertion phases.] |
-| **Document Intent** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Show test naming conventions and documentation approach. Provide examples of test names and describe how tests are grouped.] |
+| **Clear Failure Messages** | [PASS] | The Jest and Pester cases assert exact transport payloads and path-preservation behavior, so failures identify contract drift clearly. |
+| **Arrange-Act-Assert Pattern** | [PASS] | The touched tests follow clear setup, invocation, and assertion phases. |
+| **Document Intent** | [PASS] | Test names such as `runPoshQCTest marshals multi-folder scan roots through one ScanFoldersJson argument` remain descriptive. |
 
 ### 1.4 External Dependencies and Environment
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Avoid External Dependencies** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List any external dependencies (databases, networks, APIs, processes, filesystem). If none, explicitly state this.] |
-| **Use Mocks/Stubs** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List all mocked/stubbed components and why they were mocked. Explain mocking strategy.] |
-| **Environment Stability** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how tests avoid environment dependencies. Note any global state, config files, or temporary files. Confirm no prohibited temporary file creation.] |
+| **Avoid External Dependencies** | [PASS] | The scoped suites use repository files and mocked subprocess boundaries only. |
+| **Use Mocks/Stubs** | [PASS] | Jest mocks `spawn`; Pester injects wrapper and coverage collaborators. |
+| **Environment Stability** | [PASS] | No prohibited temporary-file creation was introduced in the touched tests. |
 
 ### 1.5 Policy Audit Requirement
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Pre-submission Review** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm that this audit document serves as the required policy review. Note any outstanding review items.] |
+| **Pre-submission Review** | [PASS] | This artifact is the required policy audit for the current branch state. |
 
 ---
 
@@ -121,275 +94,165 @@
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Clarify the objective** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe what objective was being pursued. Reference issue numbers or feature specs if applicable.] |
-| **Read existing change plans** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Note whether existing change plans were reviewed. List any relevant planning documents.] |
-| **Document the plan** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Reference where the plan was documented (commit messages, planning docs, etc.).] |
+| **Clarify the objective** | [PASS] | The current re-review evaluates loop-5 evidence and current working-tree state for Feature `#136`. |
+| **Read existing change plans** | [PASS] | `remediation-plan.2026-04-13T22-07.md`, refreshed PR context, the latest evidence artifacts, and the prior audit set were reviewed. |
+| **Document the plan** | [PASS] | New review artifacts were created in the active feature folder, and a new remediation plan is required by this review outcome. |
 
 ### 2.2 Design Principles
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Simplicity first** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how the code demonstrates simplicity. Note any complexity and its justification.] |
-| **Reusability** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe what was reused and how. Note any shared patterns or helpers used.] |
-| **Extensibility** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how the design supports future extension. Note any extension points.] |
-| **Separation of concerns** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how different concerns are separated. Note the layering strategy.] |
+| **Simplicity first** | [PASS] | The wrapper repair continues to use one JSON transport format instead of tool-specific behavior. |
+| **Reusability** | [PASS] | One JSON transport rule is reused across all three PoshQC wrappers. |
+| **Extensibility** | [PARTIAL] | The repaired transport is extensible, but the current working tree still needs file-structure cleanup and live-runtime validation evidence. |
+| **Separation of concerns** | [PASS] | TypeScript marshalling, PowerShell wrapper execution, tests, and review artifacts remain separated by layer. |
 
 ### 2.3 Module & File Structure
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Cohesive modules** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the purpose and cohesion of each module/file. Note organization strategy.] |
-| **Under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report line counts for all files. Note any exceptions and justifications.] |
-| **Public vs internal** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the public API surface. Note how internals are hidden.] |
-| **No circular dependencies** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe the dependency graph. Confirm no circular dependencies exist.] |
+| **Cohesive modules** | [PASS] | The touched files remain scoped to marshalling, wrapper execution, tests, or review artifacts. |
+| **Under 500 lines** | [FAIL] | The current working tree counts are `extensions/drm-copilot/src/repo-automation-service.ts = 506`, `extensions/drm-copilot/test/repo-automation-service.test.ts = 542`, and `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1 = 574`. HEAD and base were below the limit for these files, so the current working-tree changes introduced the violation. |
+| **Public vs internal** | [PASS] | No new public API surface was introduced by the wrapper repair. |
+| **No circular dependencies** | [PASS] | No new dependency cycle is evident in the reviewed scope. |
 
 ### 2.4 Naming, Docs, and Comments
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Descriptive names** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe naming conventions used. Provide examples of well-named elements.] |
-| **Docs/docstrings** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe documentation approach. Note coverage of public APIs.] |
-| **Comment why, not what** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe commenting approach. Provide examples of good comments explaining rationale.] |
+| **Descriptive names** | [PASS] | `ScanFoldersJson` and the related test names describe the transport contract clearly. |
+| **Docs/docstrings** | [PASS] | The feature docs, evidence artifacts, and review artifacts document the repaired contract and remaining gaps. |
+| **Comment why, not what** | [PASS] | The touched code remains largely self-explanatory without redundant comments. |
 
 ### 2.5 After Making Changes - Toolchain Execution
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **1. Formatting** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `[formatting command]`<br>**Result:** [Describe result - no changes needed, or changes applied] |
-| **2. Linting** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `[linting command]`<br>**Result:** [Describe result - no findings, or findings fixed] |
-| **3. Type checking** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `[type checking command]`<br>**Result:** [Describe result - no errors, or errors fixed, or N/A for PowerShell] |
-| **4. Testing** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `[test command]`<br>**Result:** [Describe result - all tests passing] |
-| **Full toolchain loop** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm all steps completed in single pass, or describe how many iterations were needed.] |
-| **Explicit reporting** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm commands and results are documented in this audit and/or commit messages.] |
+| **1. Formatting** | [PASS] | `p2-t1.typescript-format-check.2026-04-13T11-49.md`; `p2-t5.poshqc-format-wrapper-green.2026-04-13T11-49.md` |
+| **2. Linting** | [PASS] | `p2-t2.typescript-lint.2026-04-13T11-49.md`; `p2-t6.poshqc-analyze-wrapper-green.2026-04-13T11-49.md` |
+| **3. Type checking** | [PASS] | `p2-t3.typescript-typecheck.2026-04-13T11-49.md`; prior JSON validation remains green. |
+| **4. Testing** | [PASS] | `p2-t4.wrapper-regression-tests.2026-04-13T11-49.md`; `p2-t7.poshqc-test-wrapper-green.2026-04-13T11-49.md` |
+| **Full toolchain loop** | [PASS] | `p2-t8.remediation-summary.2026-04-13T11-49.md` records the restarted clean final pass. |
+| **Explicit reporting** | [PASS] | Commands and outputs are recorded in the QA-gate artifacts and cited by this audit. |
 
 ### 2.6 Summarize and Document
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Summarize changes** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Summarize what was changed. Reference PR description and commit messages.] |
-| **Design choices explained** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Explain key design decisions. Note any alternatives considered.] |
-| **Update supporting documents** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List any documentation updated (README, specs, runbooks, etc.).] |
-| **Provide next steps** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe what should happen next. Note completion status and readiness for merge/deployment.] |
+| **Summarize changes** | [PASS] | The current review artifacts summarize the closed wrapper fix and the remaining blocker categories. |
+| **Design choices explained** | [PASS] | The repair remains explicitly documented as one JSON transport contract shared across the TypeScript service and PowerShell wrappers. |
+| **Update supporting documents** | [PASS] | New review artifacts and a new remediation handoff package were written into the feature folder. |
+| **Provide next steps** | [FAIL] | The branch is still blocked on a repo-controlled file-size defect plus remaining live-runtime and coverage evidence gaps. |
 
 ---
 
 ## 3. Language-Specific Code Change Policy Compliance
 
-**Instructions:** Complete one section per language involved in this change. Delete sections for languages not used.
-
----
-
-### Section 3A: Python Code Change Policy Compliance (if applicable)
+### Section 3A: TypeScript Code Change Policy Compliance
 
 #### 3A.1 Tooling & Baseline
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Formatting with Black** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run black .`<br>**Result:** [Describe result] |
-| **Linting with Ruff** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run ruff check`<br>**Result:** [Describe result] |
-| **Type checking with Pyright** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pyright`<br>**Result:** [Describe result] |
-| **Testing with Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest`<br>**Result:** [Describe result] |
+| **Formatting with Prettier** | [PASS] | `p2-t1.typescript-format-check.2026-04-13T11-49.md` |
+| **Linting with ESLint** | [PASS] | `p2-t2.typescript-lint.2026-04-13T11-49.md` |
+| **Type checking with TSC** | [PASS] | `p2-t3.typescript-typecheck.2026-04-13T11-49.md` |
+| **Testing with Jest** | [PASS] | `p2-t4.wrapper-regression-tests.2026-04-13T11-49.md` |
 
-#### 3A.2 Python Design & Typing
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Strong typing** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe type annotation coverage. Note any use of `Any` and justification.] |
-| **Dataclasses for value objects** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of dataclasses. Note any value objects.] |
-| **Protocols/ABCs for interfaces** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of protocols or abstract base classes. Note any interfaces.] |
-| **Avoid utility classes** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm no static-method-only utility classes. Note use of modules with functions instead.] |
-
-#### 3A.3 Python Error Handling
+#### 3A.2 TypeScript Design & Typing
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Specific exceptions** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe exception handling approach. Confirm no broad catches.] |
-| **Logging over print** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm use of logging module. Note any print statements and justification.] |
-| **Invariants at construction** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how invariants are enforced in `__init__` or `__post_init__`.] |
+| **Strong typing** | [PASS] | The service continues to use typed `scanFolders` input and explicit JSON serialization at the boundary. |
+| **Prefer explicit domain types** | [PASS] | The repair does not introduce an untyped transport bag. |
+| **Avoid cleverness** | [PASS] | The implementation uses one explicit JSON payload instead of multiple implicit argument shapes. |
+| **Separation of concerns** | [PASS] | The service remains responsible only for process marshalling. |
 
----
-
-### Section 3B: PowerShell Code Change Policy Compliance (if applicable)
+### Section 3B: PowerShell Code Change Policy Compliance
 
 #### 3B.1 Tooling & Baseline
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Formatting with Invoke-Formatter** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCFormat -Root .`<br>**Result:** [Describe result] |
-| **Linting with PSScriptAnalyzer** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCAnalyze -Root .`<br>**Result:** [Describe result] |
-| **Fix all findings** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe any findings and how they were resolved.] |
-| **PowerShell 5.1 & 7.6+ compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
+| **Formatting with Invoke-Formatter** | [PASS] | `p2-t5.poshqc-format-wrapper-green.2026-04-13T11-49.md` |
+| **Linting with PSScriptAnalyzer** | [PASS] | `p2-t6.poshqc-analyze-wrapper-green.2026-04-13T11-49.md` |
+| **Fix all findings** | [PASS] | `p2-t6` reports analyzer success for the selected folders. |
+| **PowerShell 5.1 & 7.6+ compatible** | [UNVERIFIED] | No new cross-version runtime evidence was added in loop 5. |
 
 #### 3B.2 PowerShell Design & Safety
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Advanced functions** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of CmdletBinding and parameter attributes. N/A for test files.] |
-| **Parameter validation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe parameter validation attributes used. N/A for test files.] |
-| **Avoid global state** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how global state is avoided. Note any legitimate global usage.] |
-| **Error handling** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe error handling approach. Note use of try/catch, -ErrorAction, etc.] |
+| **Advanced functions** | [PASS] | The bundled scripts keep `CmdletBinding()` and typed parameters. |
+| **Parameter validation** | [PASS] | The wrappers accept one explicit JSON payload and convert it into `string[]` input. |
+| **Avoid global state** | [PASS] | No new mutable global state was introduced in the wrappers. |
+| **Error handling** | [PASS] | The wrappers retain strict mode and stop-on-error behavior. |
 
 #### 3B.3 Structure, Naming, and Comments
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Cohesive and under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report file line counts. Confirm all under limit.] |
-| **Approved verbs** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List all function names and confirm verbs are approved.] |
-| **Comment why** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe commenting approach. Confirm focus on rationale.] |
+| **Cohesive and under 500 lines** | [FAIL] | `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1` is 574 lines in the current working tree, exceeding the repository limit. |
+| **Approved verbs** | [PASS] | Existing approved wrapper and PoshQC function names remain in place. |
+| **Comment why** | [PASS] | The scripts remain concise without redundant comments. |
 
 #### 3B.4 Running the Toolchain
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Step 1: Format** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe execution and result.] |
-| **Step 2: Analyze** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe execution and result.] |
+| **Step 1: Format** | [PASS] | `p2-t5.poshqc-format-wrapper-green.2026-04-13T11-49.md` |
+| **Step 2: Analyze** | [PASS] | `p2-t6.poshqc-analyze-wrapper-green.2026-04-13T11-49.md` |
 | **Step 3: Type check** | N/A | Not applicable for PowerShell. |
-| **Step 4: Test** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe execution and result.] |
-| **Rerun loop if needed** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how many iterations were needed.] |
+| **Step 4: Test** | [PASS] | `p2-t7.poshqc-test-wrapper-green.2026-04-13T11-49.md` |
+| **Rerun loop if needed** | [PASS] | `p2-t8.remediation-summary.2026-04-13T11-49.md` records the restart loop and clean final pass. |
 
----
-
-### Section 3C: Bash Script Policy Compliance (if applicable)
-
-#### 3C.1 Tooling & Baseline
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Formatting with shfmt** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc format`<br>**Result:** [Describe result] |
-| **Linting with shellcheck** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc check`<br>**Result:** [Describe result] |
-| **Testing with bats** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc test`<br>**Result:** [Describe result or N/A if no tests] |
-
-#### 3C.2 Bash Script Design
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Portable shebang** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm `#!/usr/bin/env bash` or `#!/bin/bash` used.] |
-| **Error handling** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of `set -e`, `set -u`, `set -o pipefail`, error traps.] |
-| **Under 500 lines** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report file line counts.] |
-
----
-
-### Section 3D: JSON Configuration Policy Compliance (if applicable)
+### Section 3D: JSON Configuration Policy Compliance
 
 #### 3D.1 JSON Tooling
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Formatting with jq** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run python -m scripts.dev_tools.format_json`<br>**Result:** [Describe result - files formatted or already formatted] |
-| **Schema validation** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run python -m scripts.dev_tools.validate_json`<br>**Result:** [Describe result - all schemas valid] |
-| **Required $schema** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm all governed JSON files have `$schema` property.] |
+| **Formatting with jq** | [PASS] | `p3-t1.settings-json-format.2026-04-13T11-06.md` remains green. |
+| **Schema validation** | [PASS] | `p3-t2.settings-json-validation.2026-04-13T11-06.md` remains green. |
+| **Required $schema** | [PASS] | `.claude/settings.json` retains the Claude settings schema declaration. |
 
 #### 3D.2 JSON Structure
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Strict JSON only** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm no comments, trailing commas, or other JSON5 features.] |
-| **Deterministic key order** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm keys are sorted via `jq --sort-keys`.] |
+| **Strict JSON only** | [PASS] | `.claude/settings.json` remains strict JSON. |
+| **Deterministic key order** | [PASS] | The last recorded JSON formatting pass succeeded. |
 
 ---
 
 ## 4. Language-Specific Unit Test Policy Compliance
 
-**Instructions:** Complete one section per language with tests. Delete sections for languages not used or not tested.
-
----
-
-### Section 4A: Python Unit Test Policy Compliance (if applicable)
-
-#### 4A.1 Framework and Scope
+### Section 4A: TypeScript Unit Test Policy Compliance
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%.] |
+| **Use Jest** | [PASS] | The scoped TypeScript regression suite is Jest-only. |
+| **Coverage expectation** | [UNVERIFIED] | `p1-t5.coverage-accounting.2026-04-13T22-07.md` carries the changed-scope TypeScript coverage fields forward by audited exception. |
+| **Focused unit tests** | [PASS] | Each touched Jest case targets one wrapper invocation path. |
+| **Naming and readability** | [PARTIAL] | The test names are clear, but `repo-automation-service.test.ts` now exceeds 500 lines in the working tree. |
 
-#### 4A.2 Test Style and Structure
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Focused unit tests** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test focus. Confirm each test exercises single behavior.] |
-| **Mocking sparingly** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe mocking strategy. List what is mocked and why.] |
-| **Organization** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test organization. Confirm tests mirror code structure.] |
-
-#### 4A.3 Naming and Readability
+### Section 4B: PowerShell Unit Test Policy Compliance
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Naming conventions** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test naming. Provide examples of descriptive test names.] |
-| **Docstrings/comments** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe documentation approach for tests.] |
-
-#### 4A.4 Running the Toolchain
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest`<br>**Result:** [Describe test results] |
-| **No Alternative Test Runners** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm only Pytest is used.] |
-
----
-
-### Section 4B: PowerShell Unit Test Policy Compliance (if applicable)
-
-#### 4B.1 Framework and Scope
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Use Pester v5.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v5 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
-| **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
-| **PowerShell 5.1 & 7.6+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
-
-#### 4B.2 Test Style and Structure
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Focused Unit Tests** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test focus. Report test distribution across functions.] |
-| **Test Behavior Over Implementation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe what behaviors are tested vs. implementation details.] |
-| **Mocking Used Sparingly** | [✅/❌/N/A] [PASS/FAIL/N/A] | [List all mocked components and justification for each.] |
-| **Organization** | [✅/❌/N/A] [PASS/FAIL/N/A] | **CRITICAL:** Test file location must mirror code file location.<br>**Test file:** `[path]`<br>**Code file:** `[path]`<br>[Confirm structure mirrors code location.] |
-
-#### 4B.3 Naming and Readability
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **File Naming** - *.Tests.ps1 | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm file named correctly: `[name].Tests.ps1`] |
-| **Describe/Context/It Structure** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe test structure: # Describe blocks, # Context blocks, # It blocks.] |
-| **Logical Grouping** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe how tests are grouped. Show grouping strategy.] |
-| **Docstrings/Comments** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe documentation approach. Note that test names should be self-documenting.] |
-
-#### 4B.4 Running the Toolchain
-
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| **Use PoshQCTest Command** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCTest -Root .`<br>**Result:** [Describe test results] |
-| **No Alternative Test Runners** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm only Pester is used through PoshQC.] |
+| **Use Pester v5.x** | [PASS] | `p2-t4.wrapper-regression-tests.2026-04-13T11-49.md` records a passing targeted Pester run. |
+| **Use PoshQC Configuration** | [PASS] | The end-to-end wrapper probes use the same bundled PoshQC wrapper path under review. |
+| **PowerShell 7+ Compatible** | [PASS] | The targeted run executed successfully under PowerShell 7 in the recorded evidence. |
+| **Toolchain coverage expectation** | [UNVERIFIED] | `p1-t5.coverage-accounting.2026-04-13T22-07.md` records that changed-scope PowerShell coverage remains open by audited exception. |
 
 ---
 
 ## 5. Test Coverage Detail
 
-**Instructions:** Create one subsection for each function/class/module under test. Use tables to show test names, scenario types, lines covered, and status.
-
-### [Function/Class/Module Name] ([N] tests)
-
-| Test Name | Scenario Type | Lines Covered | Status |
-|-----------|--------------|---------------|--------|
-| [test name] | [Positive/Negative/Edge Case/Error Handling] | [line ranges] | [✅/❌] |
-| [test name] | [Positive/Negative/Edge Case/Error Handling] | [line ranges] | [✅/❌] |
-| [test name] | [Positive/Negative/Edge Case/Error Handling] | [line ranges] | [✅/❌] |
-
-**Coverage:** [X]% of [function/class] (lines [start]-[end])
-
-**Detailed line-by-line coverage (optional):**
-- Line [N]: [✅/❌] Covered ([describe what's tested])
-- Lines [N-M]: [✅/❌] Covered ([describe what's tested])
-- Line [N]: ❌ Not covered ([explain why or plan to cover])
-
-**Not covered:** [List any untested code and justification, or state "None"]
-
----
-
-### [Additional Function/Class/Module] ([N] tests)
-
-[Repeat structure above for each component tested]
+- `extensions/drm-copilot/test/repo-automation-service.test.ts` verifies that format, analyze, and test wrappers each receive one `-ScanFoldersJson` argument with the full folder array.
+- `tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1` verifies bundled-wrapper JSON decoding and coverage-path preservation when scan folders narrow run paths.
+- `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1` preserves the custom `KoverageOutputPath` behavior when scan folders narrow run paths.
+- `p1-t5.coverage-accounting.2026-04-13T22-07.md` is the current audited exception dossier for changed-scope coverage. It does not close the no-regression or new-code coverage requirements.
 
 ---
 
@@ -397,64 +260,40 @@
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Total Tests | [N] | [✅/❌] |
-| Tests Passed | [N] ([X]%) | [✅/❌] |
-| Tests Failed | [N] | [✅/❌] |
-| Execution Time | [X]s total | [✅/❌] Fast/Slow |
-| Average Time per Test | [X]ms | [✅/❌] Fast/Slow |
-| Discovery Time | [X]ms | [✅/❌] |
-| Functions/Classes Tested | [N]/[M] ([X]%) | [✅/❌] |
-| Test File Size | [N] lines | [✅/❌] Maintainable |
-| Code Coverage (if applicable) | [X]% lines, [Y]% branches | [✅/❌] |
+| Total Tests | 60 targeted checks | [PASS] |
+| Tests Passed | 60 | [PASS] |
+| Tests Failed | 0 | [PASS] |
+| Wrapper Probes | 3 green live wrapper probes | [PASS] |
+| Live Claude Runtime Proofs | 0 captured in this shell environment | [FAIL] |
+| Coverage Accounting Completeness | Incomplete for changed scope | [PARTIAL] |
 
 ---
 
 ## 7. Code Quality Checks
 
-**For Python:**
-
 | Check | Command | Result | Status |
 |-------|---------|--------|--------|
-| Black Formatting | `poetry run black .` | [result] | [✅/❌] |
-| Ruff Linting | `poetry run ruff check` | [result] | [✅/❌] |
-| Pyright Type Checking | `poetry run pyright` | [result] | [✅/❌] |
-| Pytest Tests | `poetry run pytest` | [result] | [✅/❌] |
-
-**For PowerShell:**
-
-| Check | Command | Result | Status |
-|-------|---------|--------|--------|
-| Invoke-Formatter | `Invoke-PoshQCFormat -Root .` | [result] | [✅/❌] |
-| PSScriptAnalyzer | `Invoke-PoshQCAnalyze -Root .` | [result] | [✅/❌] |
-| Pester Tests | `Invoke-PoshQCTest -Root .` | [result] | [✅/❌] |
-
-**Notes:**
-[Document any pre-existing failures unrelated to this work. Explain any deviations from clean runs.]
+| PR context refresh | `mcp__drmCopilotExtension__collect_pr_context(base='origin/development', workspace_root='c:\\Users\\DanMoisan\\repos\\drm-copilot')` | Exit 0 | [PASS] |
+| TypeScript formatting | `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` | Exit 0 | [PASS] |
+| TypeScript linting | `npm run lint` | Exit 0 | [PASS] |
+| TypeScript type checking | `npm run typecheck` | Exit 0 | [PASS] |
+| Wrapper regression tests | `npx jest ...`; `pwsh ... Invoke-Pester ...` | Exit 0 | [PASS] |
+| Live wrapper format probe | `mcp__drmCopilotExtension__run_poshqc_format(...)` | Exit 0 | [PASS] |
+| Live wrapper analyze probe | `mcp__drmCopilotExtension__run_poshqc_analyze(...)` | Exit 0 | [PASS] |
+| Live wrapper test probe | `mcp__drmCopilotExtension__run_poshqc_test(...)` | Exit 0 | [PASS] |
+| Live Claude runtime probe | `Get-Command claude -ErrorAction SilentlyContinue` | `claude` absent | [FAIL] |
 
 ---
 
 ## 8. Gaps and Exceptions
 
-### Identified Gaps
-[List any policy requirements that are not fully met. If none, state "**None.** All policy requirements are met."]
+- Environment-only blocker: `p1-t1`, `p1-t2`, `p1-t3`, and `p1-t4` prove that the current execution environment cannot launch a live Claude Code session, so seven runtime criteria remain `UNVERIFIED`.
+- Policy/evidence-only blocker: `p1-t5.coverage-accounting.2026-04-13T22-07.md` carries the changed-scope coverage fields forward by audited exception because current coverage artifacts do not map strongly enough to the repaired TypeScript and PowerShell scope.
+- Repo-controlled policy defect: the current working tree raises three touched files above the repository's 500-line file limit.
 
-**Example:**
-- [Requirement name]: [Description of gap and plan to address]
+Approved exceptions: none.
 
-### Approved Exceptions
-[List any approved exceptions to policy requirements with justification. If none, state "**None.** No exceptions needed."]
-
-**Example:**
-- [Requirement name]: [Justification for exception and approval source]
-
-### Removed/Skipped Tests
-[List any tests that were planned but removed or skipped, with justification. If none, state "**None.** All planned tests implemented."]
-
-**Example:**
-1. **"[test name]"** - Removed in commit [hash]
-   - **Reason:** [Why was it removed?]
-   - **Impact:** [What coverage is lost?]
-   - **Justification:** [Why is this acceptable?]
+Removed/skipped tests: none.
 
 ---
 
@@ -462,166 +301,123 @@
 
 ### Commits in This PR/Branch
 
-[List all commits with hashes and brief descriptions]
-
-**Example:**
-1. **[hash]** - [commit message]
-2. **[hash]** - [commit message]
-3. **[hash]** - [commit message]
+- The reviewed branch remains `feature/claude-code-architecture-136` against `origin/development`; this audit did not create a commit.
 
 ### Files Modified
 
-[List all files that were created, modified, or deleted]
+1. **`extensions/drm-copilot/src/repo-automation-service.ts`** (MODIFIED)
+   - Preserves the repaired `-ScanFoldersJson` wrapper transport.
+   - Currently exceeds the repository file-size limit in the working tree.
 
-**Example:**
+2. **`extensions/drm-copilot/test/repo-automation-service.test.ts`** (MODIFIED)
+   - Preserves the TypeScript regression cases for the wrapper transport.
+   - Currently exceeds the repository file-size limit in the working tree.
 
-1. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
+3. **`tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1`** (MODIFIED)
+   - Preserves PowerShell regression coverage for scan-folder and coverage-path behavior.
+   - Currently exceeds the repository file-size limit in the working tree.
 
-2. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
-
-3. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
+4. **Review and evidence artifacts under `docs/features/active/2026-04-11-claude-code-architecture-136/v2/`** (MODIFIED/NEW)
+   - Supersede stale blocker evidence with current environment findings.
+   - Carry forward the remaining review blockers with explicit classification.
 
 ---
 
 ## 10. Compliance Verdict
 
-### Overall Status: [✅ FULLY COMPLIANT / ⚠️ PARTIALLY COMPLIANT / ❌ NON-COMPLIANT]
+### Overall Status: NON-COMPLIANT
 
-[Provide a brief summary of overall compliance status and any major findings.]
-
----
+The repaired wrapper implementation remains stable and the latest loop-5 evidence correctly supersedes the stale checkpoint blocker. The review still cannot pass because live Claude runtime proof remains unavailable in the current environment, changed-scope coverage remains open by audited exception, and the current working tree now contains a repo-controlled file-size policy defect.
 
 ### Policy-by-Policy Summary
 
 #### General Code Change Policy (Section 2)
-- [✅/⚠️/❌] Before Making Changes: [Brief status]
-- [✅/⚠️/❌] Design Principles: [Brief status]
-- [✅/⚠️/❌] Module & File Structure: [Brief status]
-- [✅/⚠️/❌] Naming, Docs, Comments: [Brief status]
-- [✅/⚠️/❌] Toolchain Execution: [Brief status]
-- [✅/⚠️/❌] Summarize & Document: [Brief status]
+- [PASS] Before Making Changes: current review inputs were gathered and refreshed correctly.
+- [PASS] Design Principles: the wrapper repair remains simple and coherent.
+- [FAIL] Module & File Structure: three touched files exceed 500 lines in the current working tree.
+- [PASS] Naming, Docs, Comments: naming and documentation remain clear.
+- [PASS] Toolchain Execution: the last recorded targeted toolchain pass completed cleanly.
+- [FAIL] Summarize & Document: the branch is not yet ready for closure because additional remediation is required.
 
 #### Language-Specific Code Change Policy (Section 3)
 
-**For Python:**
-- [✅/⚠️/❌] Tooling & Baseline: [Brief status]
-- [✅/⚠️/❌] Python Design & Typing: [Brief status]
-- [✅/⚠️/❌] Error Handling: [Brief status]
+**For TypeScript:**
+- [PASS] Tooling & Baseline: formatter, linter, type checker, and Jest evidence remain green.
+- [PASS] TypeScript Design & Typing: the repaired transport remains explicit and typed.
+- [FAIL] File Structure: `repo-automation-service.ts` exceeds 500 lines in the current working tree.
 
 **For PowerShell:**
-- [✅/⚠️/❌] Tooling & Baseline: [Brief status]
-- [✅/⚠️/❌] PowerShell Design & Safety: [Brief status]
-- [✅/⚠️/❌] Structure & Naming: [Brief status]
-- [✅/⚠️/❌] Toolchain: [Brief status]
+- [PASS] Tooling & Baseline: wrapper format, analyze, and test evidence remain green.
+- [PASS] PowerShell Design & Safety: the wrappers retain strict, explicit behavior.
+- [FAIL] Structure & Naming: `PoshQC.Tests.ps1` exceeds 500 lines in the current working tree.
+- [PASS] Toolchain: the last targeted PowerShell QA loop completed cleanly.
 
 #### General Unit Test Policy (Section 1)
-- [✅/⚠️/❌] Core Principles: [Brief status]
-- [✅/⚠️/❌] Coverage & Scenarios: [Brief status]
-- [✅/⚠️/❌] Test Structure: [Brief status]
-- [✅/⚠️/❌] External Dependencies: [Brief status]
-- [✅/⚠️/❌] Policy Audit: [Brief status]
+- [PASS] Core Principles: the targeted tests remain independent, isolated, and deterministic.
+- [PARTIAL] Coverage & Scenarios: coverage accounting remains open by audited exception.
+- [PASS] Test Structure: the individual tests remain clear.
+- [PASS] External Dependencies: no prohibited external dependencies were added.
+- [PASS] Policy Audit: this review fulfills the audit requirement.
 
 #### Language-Specific Unit Test Policy (Section 4)
 
-**For Python:**
-- [✅/⚠️/❌] Framework & Scope: [Brief status]
-- [✅/⚠️/❌] Test Style & Structure: [Brief status]
-- [✅/⚠️/❌] Naming & Readability: [Brief status]
-- [✅/⚠️/❌] Toolchain: [Brief status]
+**For TypeScript:**
+- [PARTIAL] Framework & Scope: Jest is correct, but changed-scope coverage remains unverified.
+- [FAIL] Test Style & Structure: `repo-automation-service.test.ts` exceeds 500 lines in the current working tree.
+- [PASS] Naming & Readability: the test names remain descriptive.
+- [PASS] Toolchain: the recorded targeted Jest run passed.
 
 **For PowerShell:**
-- [✅/⚠️/❌] Framework & Scope: [Brief status]
-- [✅/⚠️/❌] Test Style & Structure: [Brief status]
-- [✅/⚠️/❌] Naming & Readability: [Brief status]
-- [✅/⚠️/❌] Toolchain: [Brief status]
-
----
+- [PASS] Framework & Scope: Pester and the PoshQC wrapper path remain correct.
+- [PARTIAL] Test Style & Structure: behavior coverage is good, but `PoshQC.Tests.ps1` exceeds 500 lines in the current working tree.
+- [PASS] Naming & Readability: test naming and grouping remain clear.
+- [PASS] Toolchain: the recorded targeted Pester run passed.
 
 ### Metrics Summary
 
-[Provide a bulleted summary of key metrics from Section 6]
-
-**Example:**
-- [✅/❌] [N]/[M] tests passing ([X]%)
-- [✅/❌] [N]/[M] functions/classes tested ([X]%)
-- [✅/❌] [X]% line coverage
-- [✅/❌] Proper file organization: [describe]
-- [✅/❌] All code quality checks passing
-- [✅/❌] Test execution time: [X] seconds ([fast/slow])
-
----
+- [PASS] 60/60 targeted automated checks passed in the last recorded restart loop.
+- [PASS] 3/3 live wrapper probes succeeded after the wrapper transport repair.
+- [FAIL] 7 live Claude-session criteria remain `UNVERIFIED` in the current shell environment.
+- [FAIL] 3 touched files exceed the repository 500-line limit in the current working tree.
+- [PARTIAL] Changed-scope coverage accounting remains open by audited exception.
 
 ### Recommendation
 
-**[Ready for merge / Needs revision / Blocked]**
+**Needs revision**
 
-[Provide clear recommendation and any next steps. If not ready for merge, list specific items that must be addressed.]
+Do not reopen the wrapper transport fix. Split the three oversized touched files to restore policy compliance, generate changed-scope coverage evidence or obtain an explicit policy decision on the current exception, and capture the remaining live Claude-session proofs in a real Claude Code environment before the next PASS review attempt.
 
 ---
 
 ## Appendix A: Test Inventory
 
-### Complete Test List
-
-[List all tests in a hierarchical structure that matches the test organization (Describe/Context/It or test class hierarchy)]
-
-**Example format:**
-
-1. [Describe/Class] › [Context/Method] › [test name]
-2. [Describe/Class] › [Context/Method] › [test name]
-3. [Describe/Class] › [Context/Method] › [test name]
-...
-
-**Alternative flat format:**
-
-- [test_module.py::TestClassName::test_method_name]
-- [test_module.py::TestClassName::test_method_name]
-- [test_module.py::test_function_name]
-...
+- `extensions/drm-copilot/test/repo-automation-service.test.ts`
+- `tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1`
+- `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1`
+- `docs/features/active/2026-04-11-claude-code-architecture-136/v2/evidence/qa-gates/p2-t4.wrapper-regression-tests.2026-04-13T11-49.md`
+- `docs/features/active/2026-04-11-claude-code-architecture-136/v2/evidence/qa-gates/p2-t5.poshqc-format-wrapper-green.2026-04-13T11-49.md`
+- `docs/features/active/2026-04-11-claude-code-architecture-136/v2/evidence/qa-gates/p2-t6.poshqc-analyze-wrapper-green.2026-04-13T11-49.md`
+- `docs/features/active/2026-04-11-claude-code-architecture-136/v2/evidence/qa-gates/p2-t7.poshqc-test-wrapper-green.2026-04-13T11-49.md`
 
 ---
 
 ## Appendix B: Toolchain Commands Reference
 
-[Provide quick reference of all commands used in this audit]
-
-**For Python:**
-```bash
-# Formatting
-poetry run black .
-
-# Linting
-poetry run ruff check
-poetry run ruff check --fix  # auto-fix
-
-# Type checking
-poetry run pyright
-
-# Testing
-poetry run pytest
-poetry run pytest --cov=src/[package] --cov-report=term-missing
-```
-
-**For PowerShell:**
-```powershell
-# Formatting
-Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root .
-
-# Linting
-Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root .
-
-# Testing
-Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root .
+```text
+mcp__drmCopilotExtension__collect_pr_context(base='origin/development', workspace_root='c:\Users\DanMoisan\repos\drm-copilot')
+npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"
+npm run lint
+npm run typecheck
+npx jest extensions/drm-copilot/test/repo-automation-service.test.ts --runInBand
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Invoke-Pester -Path 'tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1','tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1' -Output Detailed"
+mcp__drmCopilotExtension__run_poshqc_format(workspace_root='c:\Users\DanMoisan\repos\drm-copilot', scan_folders=['scripts/powershell/PoshQC','tests/scripts/powershell/PoshQC','tests/scripts/claude-runtime'])
+mcp__drmCopilotExtension__run_poshqc_analyze(workspace_root='c:\Users\DanMoisan\repos\drm-copilot', scan_folders=['scripts/powershell/PoshQC','tests/scripts/powershell/PoshQC','tests/scripts/claude-runtime'])
+mcp__drmCopilotExtension__run_poshqc_test(workspace_root='c:\Users\DanMoisan\repos\drm-copilot', scan_folders=['tests/scripts/claude-runtime','tests/scripts/claude-hooks'])
+Get-Command claude -ErrorAction SilentlyContinue
 ```
 
 ---
 
-**Audit Completed By:** [Agent Name / Human Name]  
-**Audit Date:** [YYYY-MM-DD]  
+**Audit Completed By:** Codex
+**Audit Date:** 2026-04-13
 **Policy Version:** Current (as of audit date)
