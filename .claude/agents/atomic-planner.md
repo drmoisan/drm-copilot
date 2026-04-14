@@ -11,7 +11,9 @@ tools:
   - "Write(docs/**)"
   - "Write(artifacts/**)"
 skills:
+  - policy-compliance-order
   - atomic-plan-contract
+  - evidence-and-timestamp-conventions
 memory: project
 hooks:
   Stop:
@@ -53,7 +55,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 
 ## Preflight Validation
 
-Submit the plan for validation-only preflight through `atomic-executor` and iterate until the final signal is `PREFLIGHT: ALL CLEAR`. Preserve the same target file path across revision loops.
+Return the finalized plan for validation-only preflight through `atomic-executor` and preserve the same target file path across revision loops. Do not claim nested worker delegation from within planner execution.
 
 ## Output
 

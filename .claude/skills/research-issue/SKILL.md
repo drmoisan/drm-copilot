@@ -12,6 +12,8 @@ allowed-tools:
 
 Research the best implementation approach for a feature or bug described in the provided issue and spec documents. Output is a structured research file, not implementation code.
 
+Canonical authored source: `.github/prompts/research-issue.prompt.md`
+
 ## Inputs
 
 Accept one or more feature documents as context:
@@ -24,7 +26,7 @@ Accept one or more feature documents as context:
 
 Create or update a single research file:
 
-- Path: `artifacts/research/YYYYMMDD-<short-feature-name>-implementation-research.md`
+- Path: `artifacts/research/<timestamp>-<short-name>-research.md`
 - Use the Task Researcher template from the repository exactly.
 - Place rejected-alternatives summaries inside `## Recommended Approach`, not as a separate top-level header.
 
@@ -64,3 +66,4 @@ Create or update a single research file:
 - Research only. Do not implement changes.
 - Ground all findings in verified evidence from the codebase and authoritative external sources.
 - Keep discussion of non-selected approaches brief.
+- Do not claim or perform nested worker delegation.

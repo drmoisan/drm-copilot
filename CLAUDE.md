@@ -44,9 +44,9 @@ Each rule file uses YAML frontmatter with a `paths:` field to scope activation t
 
 ## Architecture
 
-This repository uses a four-layer Claude Code architecture that maps the existing Copilot orchestration model onto Claude-native primitives:
+This repository uses a four-layer Claude Code runtime architecture that maps the existing Copilot orchestration model onto Claude-native primitives:
 
-1. **Standing Instructions** — `CLAUDE.md` (this file) and `.claude/rules/*.md` provide persistent policy context. `CLAUDE.md` carries repository-wide tone, compliance order, and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path.
+1. **Standing Instructions** — `CLAUDE.md` (this file) and `.claude/rules/*.md` provide persistent policy context. `CLAUDE.md` carries repository-wide tone, policy-compliance order, and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path.
 
 2. **Skills** — `.claude/skills/<name>/SKILL.md` files define reusable, user-invocable workflows. Skills are the primary entry point for direct-use operations such as orchestration, commit message generation, PR authoring, and research. Each skill declares its own `allowed-tools`, `context`, and `agent` routing in YAML frontmatter.
 
@@ -54,4 +54,8 @@ This repository uses a four-layer Claude Code architecture that maps the existin
 
 4. **Enforcement** — `.claude/settings.json` defines project-level `permissions` (allow/deny lists for tools, paths, and patterns). `.claude/hooks/` contains scripts invoked by `PreToolUse` and `SubagentStop` hooks to enforce dangerous-command blocking and completion-gate validation.
 
-The canonical workflow definitions live in `.github/agents/`, `.github/skills/`, and `.github/instructions/`. The `.claude/` files derive from those sources. The sync strategy is documented in `docs/engineering/claude-code-architecture.md`.
+The canonical authored source remains `.github/*`, including `.github/agents/`, `.github/skills/`, and `.github/instructions/`. The `.claude/` runtime files derive from those sources.
+
+The orchestration checkpoint path for this runtime is `artifacts/orchestration/orchestrator-state.json`. The main session reads `artifacts/orchestration/orchestrator-state.json` before worker delegation and updates the same file across phase transitions.
+
+The sync strategy is documented in `docs/engineering/claude-code-architecture.md`.

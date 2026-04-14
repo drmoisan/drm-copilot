@@ -19,6 +19,7 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 
 ## Coding Standards
 
+- New user-invocable workflows belong under `.claude/skills/` rather than `.claude/commands/`.
 - **Strong typing**: Public functions, methods, and exported APIs must have clear, intentional types. Avoid type assertions (`as X`) unless justified.
 - **ES modules**: Use ES module syntax. Do not introduce CommonJS patterns (`require`, `module.exports`).
 - **Domain types**: Model domain concepts with interfaces/types that encode invariants. Prefer discriminated unions for state machines.

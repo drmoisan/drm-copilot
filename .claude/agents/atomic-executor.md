@@ -18,10 +18,15 @@ tools:
   - "Bash(npx jest *)"
   - "Bash(pwsh *)"
   - "Bash(git *)"
-  - "mcp__drmCopilotExtension__.*"
+  - "mcp__drmCopilotExtension__run_poshqc_format"
+  - "mcp__drmCopilotExtension__run_poshqc_analyze"
+  - "mcp__drmCopilotExtension__run_poshqc_test"
+  - "mcp__drmCopilotExtension__run_poshqc_analyze_autofix"
 skills:
+  - policy-compliance-order
   - atomic-plan-contract
   - evidence-and-timestamp-conventions
+  - acceptance-criteria-tracking
 memory: project
 hooks:
   SubagentStop:
@@ -56,7 +61,7 @@ Use the scoped tool patterns for quality gates:
 
 - **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
-- **PowerShell**: MCP server functions (`mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`)
+- **PowerShell**: MCP server functions (`mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp__drmCopilotExtension__run_poshqc_test`, `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`)
 - **Git**: `git diff`, `git status`, `git log`
 
 Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.

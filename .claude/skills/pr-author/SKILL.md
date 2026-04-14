@@ -10,6 +10,8 @@ allowed-tools:
 
 Produce a GitHub-ready Pull Request description from the standard PR context files.
 
+Canonical authored source: `.github/prompts/generate-pr.prompt.md`
+
 ## Inputs
 
 - `artifacts/pr_context.summary.txt` — PR context summary (primary)
@@ -24,6 +26,7 @@ Only reference files that are listed under "Additional context files" in the con
 2. Use clear headings, consistent structure, and concise bullets.
 3. Do not invent tests or results; if not in context, state "Not verified in this PR."
 4. If scope is large, include a Review Guide with suggested review order.
+5. The output is a PR body artifact or PR-ready body text only.
 
 ## PR Body Structure
 

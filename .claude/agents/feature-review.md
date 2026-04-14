@@ -25,10 +25,12 @@ You are a feature-branch reviewer. Your output is audit artifacts, not code chan
 
 ## Required Outputs
 
-1. `docs/features/active/<feature>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
-2. `docs/features/active/<feature>/code-review.<timestamp>.md` — code quality review covering best practices
-3. `docs/features/active/<feature>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
-4. If remediation is needed: `docs/features/active/<feature>/remediation-inputs.<timestamp>.md` with delegation to `atomic-planner`
+When the active review scope is a selected version folder such as `docs/features/active/<feature>/v2/`, write review artifacts into that selected version folder rather than the parent feature root.
+
+1. `docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
+2. `docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md` — code quality review covering best practices
+3. `docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
+4. If remediation is needed: `docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths
 
 Timestamp format: `yyyy-MM-ddTHH-mm` (ISO-8601).
 

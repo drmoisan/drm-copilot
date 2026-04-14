@@ -5,12 +5,13 @@ allowed-tools:
   - Read
   - "Bash(git log *)"
   - "Bash(git diff *)"
-  - "Bash(git status *)"
 ---
 
 # Commit Message Skill
 
 Generate a single conventional commit message from staged Git changes or a provided commit-context artifact.
+
+Canonical authored source: `.github/skills/commit-message-conventions/SKILL.md`
 
 ## Inputs
 
@@ -22,11 +23,11 @@ Generate a single conventional commit message from staged Git changes or a provi
 ## Context Gathering
 
 1. Use the supplied commit-context artifact first when present.
-2. Otherwise inspect the local staged state:
-   - `git status --short`
+2. Otherwise inspect the staged diff and commit history only:
    - `git diff --cached --stat`
    - `git diff --cached`
    - `git diff --cached --name-only`
+   - `git log --oneline -n 20`
 3. Do not infer intent from unstaged files or unrelated commit history.
 
 ## Classification

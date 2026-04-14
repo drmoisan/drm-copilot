@@ -1,14 +1,12 @@
 ---
 name: orchestrate
 description: Route a repository request through the deterministic orchestration workflow for feature, bug, research, planning, execution, and review handoffs.
-context: fork
-agent: orchestrator
 argument-hint: "[objective]"
 ---
 
 # Orchestrate Skill
 
-This skill invokes the `orchestrator` subagent to coordinate end-to-end feature or bug delivery.
+This skill frames work for the already-active main session, which serves as the orchestrator runtime for end-to-end feature or bug delivery.
 
 ## Prerequisites
 
@@ -20,7 +18,7 @@ Before proceeding, the orchestrator must:
 
 ## Checkpoint Handling
 
-On every invocation, the orchestrator must:
+On every invocation, the main session must:
 
 1. Read `artifacts/orchestration/orchestrator-state.json` to check for existing state.
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
@@ -28,7 +26,7 @@ On every invocation, the orchestrator must:
 
 ## Delegation Model
 
-The orchestrator delegates work exclusively through configured subagents:
+After reading `artifacts/orchestration/orchestrator-state.json`, the main session delegates work exclusively through configured workers:
 
 - `atomic-planner` — generates phased implementation plans
 - `atomic-executor` — executes approved plans task-by-task

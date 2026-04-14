@@ -22,6 +22,23 @@ Describe "validate-bash.ps1" {
     }
 
     Context "Blocked patterns" {
+        It "keeps blocking all repository-dangerous command patterns used by the Claude runtime" {
+            $blockedCommands = @(
+                'git push --force',
+                'git push origin --force',
+                'git push -f',
+                'git reset --hard',
+                'rm -rf /some/path',
+                'Remove-Item -Recurse -Force C:\temp'
+            )
+
+            foreach ($command in $blockedCommands) {
+                $ErrorActionPreference = 'Continue'
+                & $script:ScriptPath $command 2>$null
+                $LASTEXITCODE | Should -Be 1
+            }
+        }
+
         It "blocks 'rm -rf' commands with exit code 1" {
             # Override ErrorActionPreference so Write-Error in the production
             # script does not become a terminating error under PoshQC's Stop preference.
