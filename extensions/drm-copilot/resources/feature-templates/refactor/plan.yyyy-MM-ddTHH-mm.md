@@ -16,6 +16,10 @@
 
 Brief approach to reach the target structure while keeping behavior stable.
 
+Fail-closed evidence rule: include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+Evidence accounting rule: record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+
 ## Work Breakdown
 
 ### Phase 1: Inventory & Plan [0%]
@@ -37,6 +41,7 @@ Brief approach to reach the target structure while keeping behavior stable.
 - Unit/Integration: impacted modules and any regression tests for invariants
 - CLI/Workflow: end-to-end commands/tasks expected to remain stable
 - Tooling: lint/type checks after path updates
+- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
 
 ## Rollback / Contingency
 
