@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+_requires_codex_runtime = pytest.mark.skipif(
+    not (REPO_ROOT / ".codex" / "agents").exists()
+    or not (REPO_ROOT / ".agents" / "skills").exists(),
+    reason=".codex and .agents directories are gitignored and unavailable in CI",
+)
 BUNDLED_ROOT = (
     REPO_ROOT
     / "extensions"
@@ -44,6 +52,7 @@ def read_bundle_text(relative_path: str) -> str:
     return (BUNDLED_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+@_requires_codex_runtime
 def test_shared_codex_skills_match_repo_agent_skill_sources() -> None:
     """Require bundled shared Codex skills to match repo `.agents` sources."""
 
@@ -52,6 +61,7 @@ def test_shared_codex_skills_match_repo_agent_skill_sources() -> None:
         assert read_bundle_text(skill_path) == read_repo_text(skill_path)
 
 
+@_requires_codex_runtime
 def test_codex_orchestration_chain_agents_match_repo_sources() -> None:
     """Require bundled orchestration-chain agents to match repo `.codex` sources."""
 

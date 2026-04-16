@@ -316,6 +316,8 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
     It 'run-poshqc-format decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
 
+        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
+
         function global:Import-Module {
             param()
         }
@@ -335,6 +337,8 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
     It 'run-poshqc-analyze decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
 
+        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
+
         function global:Import-Module {
             param()
         }
@@ -353,6 +357,8 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
 
     It 'run-poshqc-test decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
+
+        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
 
         function global:Import-Module {
             param()

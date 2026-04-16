@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+pytestmark = pytest.mark.skipif(
+    not (REPO_ROOT / ".codex" / "agents").exists()
+    or not (REPO_ROOT / ".agents" / "skills").exists(),
+    reason=".codex and .agents directories are gitignored and unavailable in CI",
+)
 BUNDLE_ROOT = (
     REPO_ROOT
     / "extensions"
