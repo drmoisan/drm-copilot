@@ -278,7 +278,7 @@ describe("repo automation service", () => {
     expect(result.summary).toContain("selected scan folder(s)");
   });
 
-  it("runPoshQCFormat uses the bundled format wrapper", async () => {
+  it("runPoshQCFormat marshals multi-folder scan roots through one ScanFoldersJson argument", async () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
     const service = createRepoAutomationService({
@@ -289,18 +289,34 @@ describe("repo automation service", () => {
     const result = await service.runPoshQCFormat({
       workspaceRoot: "C:/workspace",
       invocationId: "run_poshqc_format",
-      scanFolders: ["C:/workspace/src"],
+      scanFolders: [
+        "C:/workspace/src",
+        "C:/workspace/tests/powershell",
+        "C:/workspace/tests/claude-runtime",
+      ],
     });
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
       "C:/extension/resources/templates/run-poshqc-format.ps1",
-    );
-    expect(args).toContain("C:/workspace/src");
+      "-WorkspaceRoot",
+      "C:/workspace",
+      "-ScanFoldersJson",
+      JSON.stringify([
+        "C:/workspace/src",
+        "C:/workspace/tests/powershell",
+        "C:/workspace/tests/claude-runtime",
+      ]),
+    ]);
     expect(result.summary).toContain("format");
   });
 
-  it("runPoshQCAnalyze uses the bundled analyze wrapper", async () => {
+  it("runPoshQCAnalyze marshals multi-folder scan roots through one ScanFoldersJson argument", async () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
     const service = createRepoAutomationService({
@@ -311,17 +327,34 @@ describe("repo automation service", () => {
     const result = await service.runPoshQCAnalyze({
       workspaceRoot: "C:/workspace",
       invocationId: "run_poshqc_analyze",
-      scanFolders: ["C:/workspace/src"],
+      scanFolders: [
+        "C:/workspace/src",
+        "C:/workspace/tests/powershell",
+        "C:/workspace/tests/claude-runtime",
+      ],
     });
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
       "C:/extension/resources/templates/run-poshqc-analyze.ps1",
-    );
+      "-WorkspaceRoot",
+      "C:/workspace",
+      "-ScanFoldersJson",
+      JSON.stringify([
+        "C:/workspace/src",
+        "C:/workspace/tests/powershell",
+        "C:/workspace/tests/claude-runtime",
+      ]),
+    ]);
     expect(result.summary).toContain("analyze");
   });
 
-  it("runPoshQCTest uses the bundled test wrapper", async () => {
+  it("runPoshQCTest marshals multi-folder scan roots through one ScanFoldersJson argument", async () => {
     setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));
     const service = createRepoAutomationService({
@@ -332,14 +365,28 @@ describe("repo automation service", () => {
     const result = await service.runPoshQCTest({
       workspaceRoot: "C:/workspace",
       invocationId: "run_poshqc_test",
-      scanFolders: ["C:/workspace/tests/powershell"],
+      scanFolders: [
+        "C:/workspace/tests/claude-runtime",
+        "C:/workspace/tests/claude-hooks",
+      ],
     });
 
     const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
+    expect(args).toEqual([
+      "-NoLogo",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
       "C:/extension/resources/templates/run-poshqc-test.ps1",
-    );
-    expect(args).toContain("C:/workspace/tests/powershell");
+      "-WorkspaceRoot",
+      "C:/workspace",
+      "-ScanFoldersJson",
+      JSON.stringify([
+        "C:/workspace/tests/claude-runtime",
+        "C:/workspace/tests/claude-hooks",
+      ]),
+    ]);
     expect(result.summary).toContain("test");
   });
 
@@ -459,7 +506,7 @@ describe("repo automation service", () => {
     fsMock.existsSync.mockImplementation((filePath: string) => {
       const normalizedPath = filePath.replace(/\\/g, "/");
       return normalizedPath.endsWith(
-        "/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+        "/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
       );
     });
     const service = createRepoAutomationService({
@@ -470,25 +517,25 @@ describe("repo automation service", () => {
     const result = await service.resolvePolicyAuditTemplateAsset({
       workspaceRoot: "C:/workspace",
       invocationId: "resolve_policy_audit_template_asset",
-      asset: "template",
-      targetPath: "C:/workspace/docs/policy-audit.md",
+      asset: "feature-audit-template",
+      targetPath: "C:/workspace/docs/feature-audit.md",
     });
 
     expect(fsMock.mkdirSync).toHaveBeenCalledWith("C:/workspace/docs", {
       recursive: true,
     });
     expect(fsMock.copyFileSync).toHaveBeenCalledWith(
-      "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-      "C:/workspace/docs/policy-audit.md",
+      "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      "C:/workspace/docs/feature-audit.md",
     );
     expect(result).toMatchObject({
-      assetId: "policy_audit.template",
+      assetId: "policy_audit.feature_audit_template",
       bundledSourcePath:
-        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-      destinationPath: "C:/workspace/docs/policy-audit.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      destinationPath: "C:/workspace/docs/feature-audit.md",
       artifacts: [
-        "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
-        "C:/workspace/docs/policy-audit.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+        "C:/workspace/docs/feature-audit.md",
       ],
     });
   });

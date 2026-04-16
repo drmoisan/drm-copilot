@@ -160,13 +160,13 @@ describe("resolvePolicyAuditTemplateAssetToolInput", () => {
     expect(
       resolvePolicyAuditTemplateAssetToolInput({
         workspace_root: "C:/workspace",
-        asset: "template",
-        target_path: "docs/policy-audit.md",
+        asset: "code-review-template",
+        target_path: "docs/code-review.md",
       }),
     ).toEqual({
       workspaceRoot: "C:/workspace",
-      asset: "template",
-      targetPath: "C:/workspace/docs/policy-audit.md",
+      asset: "code-review-template",
+      targetPath: "C:/workspace/docs/code-review.md",
     });
   });
 
@@ -190,7 +190,9 @@ describe("resolvePolicyAuditTemplateAssetToolInput", () => {
         workspace_root: "C:/workspace",
         asset: "invalid",
       }),
-    ).toThrow("asset must be one of: template, agents.");
+    ).toThrow(
+      "asset must be one of: template, agents, code-review-template, feature-audit-template.",
+    );
   });
 
   it("rejects a missing asset", () => {

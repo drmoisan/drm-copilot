@@ -2,7 +2,15 @@
 
 ## Purpose
 
-This template provides a structured format for documenting compliance with repository policies during agent-driven development. It ensures that all code changes, whether features, bugfixes, or refactors, meet the standards defined in:
+This template folder provides structured formats for policy-compliance and review artifacts used during agent-driven development. It ensures that code changes, whether features, bugfixes, or refactors, can be reviewed with a consistent document shape.
+
+Current templates in this folder:
+
+- `policy-audit.yyyy-MM-ddTHH-mm.md` — policy compliance audit
+- `code-review.yyyy-MM-ddTHH-mm.md` — feature or staged-diff code review
+- `feature-audit.yyyy-MM-ddTHH-mm.md` — acceptance-criteria and feature-readiness audit
+
+The policy-audit template specifically evaluates the standards defined in:
 
 - `general-code-change.instructions.md`
 - `python-code-change.instructions.md` OR `powershell-code-change.instructions.md`
@@ -20,6 +28,20 @@ Create a policy audit document:
 - ✅ **During refactoring work** - To confirm no regressions
 - ✅ **When requested by reviewers** - As part of PR review process
 
+Create a code review document:
+
+- ✅ **When a workflow requires `code-review.<timestamp>.md`**
+- ✅ **When reviewing a feature branch relative to a base branch**
+- ✅ **When performing a staged-diff review before commit**
+- ✅ **When re-reviewing a feature after remediation**
+
+Create a feature audit document:
+
+- ✅ **When a workflow requires `feature-audit.<timestamp>.md`**
+- ✅ **When validating delivered behavior against authoritative acceptance criteria**
+- ✅ **When performing a post-remediation acceptance re-review**
+- ✅ **When reviewing minor-audit, full-bug, or full-feature readiness**
+
 ## How to Use
 
 ### Source Artifacts vs Published Automation Surface
@@ -30,7 +52,11 @@ Automation consumers should not depend on this folder layout for the guidance as
 
 - MCP server: `drmCopilotExtension`
 - Tool: `resolve_policy_audit_template_asset`
-- Guidance selector: `asset: agents`
+- Supported selectors:
+  - `asset: template` → `policy-audit.yyyy-MM-ddTHH-mm.md`
+  - `asset: code-review-template` → `code-review.yyyy-MM-ddTHH-mm.md`
+  - `asset: feature-audit-template` → `feature-audit.yyyy-MM-ddTHH-mm.md`
+  - `asset: agents` → `AGENTS.md`
 
 For manual interactive use in VS Code, the matching command is `drmCopilotExtension.resolvePolicyAuditTemplateAsset`. Prefer that command only for editor-driven access; automation should continue to use the MCP tool.
 
@@ -119,7 +145,7 @@ When working in Codex with this repo attached, you can kick off a full audit wit
 > - Branch: `[branch name]`  
 >  
 > Use the published policy-audit guidance surface and source template docs:  
-> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
+> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with the selector matching the artifact you need (`template`, `code-review-template`, `feature-audit-template`, or `agents`)  
 > - `docs/features/templates/policy_audit/README.md`  
 > - `docs/features/templates/policy_audit/PolicyAudit.template.md`  
 >  
@@ -147,7 +173,7 @@ Sometimes you will ask Codex to both **write unit tests** for a file and then **
    > In addition to generating the unit tests described above, perform a **formal Policy Audit** for `fix-all.ps1` and the new tests you create.  
    >  
    > Use:  
-   > - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
+  > - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with the selector matching the artifact you need (`template`, `code-review-template`, `feature-audit-template`, or `agents`)  
    > - `docs/features/templates/policy_audit/README.md`  
    > - `docs/features/templates/policy_audit/PolicyAudit.template.md`  
    >  
@@ -170,7 +196,7 @@ When you have a working copy of `PolicyAudit.template.md` open in VS Code (for e
 >  
 > Use the **policy audit process** defined in:  
 > - `docs/features/templates/policy_audit/README.md`  
-> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`  
+> - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with the selector matching the artifact you need (`template`, `code-review-template`, `feature-audit-template`, or `agents`)  
 >  
 > And evaluate compliance against the canonical policies in:  
 > - `.github/instructions/general-code-change.instructions.md`  

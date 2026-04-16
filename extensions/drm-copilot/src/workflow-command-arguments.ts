@@ -34,6 +34,8 @@ export const WORK_MODE_OPTIONS = [
 export const POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS = [
   "template",
   "agents",
+  "code-review-template",
+  "feature-audit-template",
 ] as const;
 
 export type PotentialPromotionType = (typeof POTENTIAL_PROMOTION_TYPES)[number];

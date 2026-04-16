@@ -414,8 +414,16 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     const toolConfig = POSH_QC_TOOL_CONFIG[tool];
     const args = ["-WorkspaceRoot", input.workspaceRoot];
     if (input.scanFolders && input.scanFolders.length > 0) {
-      for (const scanFolder of input.scanFolders) {
-        args.push("-ScanFolders", scanFolder);
+      if (
+        tool === "run_poshqc_format" ||
+        tool === "run_poshqc_analyze" ||
+        tool === "run_poshqc_test"
+      ) {
+        args.push("-ScanFoldersJson", JSON.stringify(input.scanFolders));
+      } else {
+        for (const scanFolder of input.scanFolders) {
+          args.push("-ScanFolders", scanFolder);
+        }
       }
     }
 

@@ -280,9 +280,6 @@ function Invoke-PoshQCTest {
         $resolvedScanFolders = @(& $ResolveScanFolders $Root $ScanFolders)
         if ($resolvedScanFolders.Count -gt 0) {
             $config.Run.Path = $resolvedScanFolders
-            if ($config.CodeCoverage) {
-                $config.CodeCoverage.Path = $resolvedScanFolders
-            }
         }
     }
 

@@ -19,7 +19,10 @@ import {
   resolveResolveExecuteHardLockPromptToolInput,
   resolveValidateOrchestrationArtifactsToolInput,
 } from "./mcp-tool-inputs";
-import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
+import {
+  normalizeWorkspaceRoot,
+  POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS,
+} from "./workflow-command-arguments";
 
 interface ToolDefinition {
   readonly name: RepoAutomationToolName;
@@ -310,9 +313,9 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
         workspace_root: workspaceRootProperty,
         asset: {
           type: "string",
-          enum: ["template", "agents"],
+          enum: [...POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS],
           description:
-            "Bundled policy-audit asset selector: 'template' for policy-audit.yyyy-MM-ddTHH-mm.md or 'agents' for AGENTS.md.",
+            "Bundled policy-audit asset selector: 'template' for policy-audit.yyyy-MM-ddTHH-mm.md, 'code-review-template' for code-review.yyyy-MM-ddTHH-mm.md, 'feature-audit-template' for feature-audit.yyyy-MM-ddTHH-mm.md, or 'agents' for AGENTS.md.",
         },
         target_path: {
           type: "string",

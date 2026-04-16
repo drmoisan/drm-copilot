@@ -21,6 +21,7 @@
         OutputFormat          = 'CoverageGutters'
         OutputPath            = 'artifacts/pester/powershell-coverage.xml'
         Path                  = @(
+            '.claude/hooks/*.ps1'
             'scripts/dev-tools/*.ps1'
             'scripts/powershell/**/*.psm1'
             'src/**/*.ps1'
