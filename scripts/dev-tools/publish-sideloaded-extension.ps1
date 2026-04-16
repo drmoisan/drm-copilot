@@ -189,6 +189,33 @@ function Invoke-ExternalCommand {
     }
 }
 
+function Assert-RequiredCommandAvailable {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$CommandName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$InstallHint
+    )
+
+    $resolvedCommand = Get-Command -Name $CommandName -ErrorAction SilentlyContinue
+    if ($resolvedCommand) {
+        return
+    }
+
+    $message = @(
+        "Required command '$CommandName' was not found on PATH.",
+        $InstallHint,
+        "If the command is already installed, open a new terminal so PATH updates are applied.",
+        "This script runs with -NoProfile, so profile-only PATH changes are not loaded."
+    ) -join ' '
+
+    throw $message
+}
+
 function Invoke-NpmCiWithRetry {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
@@ -307,6 +334,9 @@ function Invoke-ProjectCompile {
 if (-not (Test-Path -LiteralPath $RepoRoot)) {
     throw "RepoRoot does not exist: $RepoRoot"
 }
+
+Assert-RequiredCommandAvailable -CommandName "npm" -InstallHint "Install Node.js from https://nodejs.org and ensure npm is on PATH."
+Assert-RequiredCommandAvailable -CommandName "npx" -InstallHint "Install Node.js from https://nodejs.org and ensure npx is on PATH."
 
 $extensionProjectRoot = Resolve-ExtensionProjectRoot -RepoRoot $RepoRoot
 
