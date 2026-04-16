@@ -19,6 +19,14 @@ BeforeAll {
 # problematic and leads to brittle tests.
 
 Describe 'Install-PoshQCTool' {
+    It 'keeps manifest dependency requirements empty to allow bootstrap installs' {
+        $manifestPath = Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psd1'
+        $manifest = Import-PowerShellDataFile -Path $manifestPath
+
+        # RequiredModules prevents module import when tools are missing, which blocks the installer entry point.
+        $manifest.RequiredModules | Should -BeNullOrEmpty
+    }
+
     It 'reports already-installed modules without error' {
         # This test verifies the function runs successfully when dependencies are present
         # It won't reinstall if PSScriptAnalyzer and Pester are already available
