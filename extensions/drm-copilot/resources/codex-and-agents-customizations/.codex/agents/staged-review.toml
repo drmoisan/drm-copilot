@@ -14,9 +14,6 @@ Migration contract:
 - Prefer migrated Codex subagents, skills, and prompts when an equivalent Codex runtime surface exists; otherwise follow the source contract directly and record any fallback.
 - Treat .agents/skills, .codex/agents, and .codex/prompts as the Codex runtime surfaces for migrated behavior, but do not relax any source-agent requirements during that translation.
 - Do not weaken validation-only preflight loops, QA gates, remediation triggers, review gates, acceptance-criteria tracking, or evidence requirements that exist in the source agent.
-- Do not synthesize or backfill missing audit evidence from memory or inference.
-- No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage where required.
-- If required baseline artifacts, QA artifacts, or coverage-comparison artifacts are missing, report incomplete with the exact missing artifact paths and do not mark readiness as pass.
 
 Mandatory source handoffs to preserve:
 - atomic_planner

@@ -213,7 +213,6 @@ Required behavior:
     Hard enforcement for Step 8:
     - Do not mark Step 8 complete until execution output includes execution summary, QA summary, lint/type/test/coverage deltas, and numeric baseline/post/new-code coverage metrics where policy requires them.
     - Do not accept PASS execution outcomes when required baseline or final-QA artifacts are missing, when checklist state is not backed by artifacts, or when coverage-bearing plan tasks remain unverified.
-    - Do not synthesize or backfill missing audit evidence from memory or inference.
     - Do not perform execution locally when this delegation cannot be started; set `step8_status` to `blocked`, set `blocked_reason`, and stop.
     - Record a delegation receipt and set `step8_status` to `verified` only after delegate output and validator checks pass.
 10. Spawn `feature-reviewer` for post-implementation review.
@@ -222,9 +221,6 @@ Required behavior:
     - Load canonical PR-context artifacts and refresh them through `repo-automation-adapter` when they are missing or stale relative to the current branch state.
     - Do not mark Step 9 complete until expected review artifacts are present on disk in `${feature-folder}`.
     - Do not accept PASS review outcomes when required coverage fields are left unverified, when PR-context artifacts are missing or stale relative to the current branch state, or when required remediation artifacts are missing.
-    - No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
-    - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, treat the review outcome as incomplete or blocked and report the exact missing artifact paths.
-    - Do not synthesize or backfill missing audit evidence from memory or inference.
     - Do not perform review locally when this delegation cannot be started; set `step9_status` to `blocked`, set `blocked_reason`, and stop.
     - Record a delegation receipt and set `step9_status` to `verified` only after delegate output and validator checks pass.
 11. If review triggers remediation, loop through remediation planning, remediation execution, and re-review until the gate is clean.
@@ -262,5 +258,4 @@ Do not claim mission completion until all of the following are true:
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
 - Do not accept stale PR-context artifacts, unsupported checklist checkoffs, or missing required evidence as PASS outcomes.
-- Do not synthesize or backfill missing audit evidence from memory or inference.
 - Do not claim completion without reporting the checkpoint path and the created or updated artifact paths.
