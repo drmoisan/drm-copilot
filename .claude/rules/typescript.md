@@ -1,12 +1,12 @@
 ---
 paths:
   - "**/*.ts"
-description: TypeScript-specific toolchain and coding standards derived from .github/instructions/typescript-code-change.instructions.md and .github/instructions/typescript-unit-test.instructions.md.
+description: TypeScript-specific toolchain and coding standards.
 ---
 
 # TypeScript Code Standards
 
-This rule file summarizes the TypeScript-specific policies for this repository. The authoritative sources are `.github/instructions/typescript-code-change.instructions.md` and `.github/instructions/typescript-unit-test.instructions.md`.
+This rule file summarizes the TypeScript-specific policies for this repository.
 
 ## Toolchain
 
@@ -39,3 +39,7 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - Use `jest.spyOn` or `jest.mock` for targeted mocking; reset mocks with `afterEach(() => { jest.resetAllMocks(); })`.
 - No external dependencies (network, filesystem temp files, external processes) in unit tests.
 - Avoid snapshot tests unless stable and intentional.
+- Repository-wide line coverage must remain >= 80%.
+- Any new module, class, or method must reach >= 90% coverage.
+- Coverage command: `npm run test:unit:coverage`
+- Coverage regression on changed lines is a blocking finding.

@@ -54,8 +54,6 @@ This repository uses a four-layer Claude Code runtime architecture that maps the
 
 4. **Enforcement** — `.claude/settings.json` defines project-level `permissions` (allow/deny lists for tools, paths, and patterns). `.claude/hooks/` contains scripts invoked by `PreToolUse` and `SubagentStop` hooks to enforce dangerous-command blocking and completion-gate validation.
 
-The canonical authored source remains `.github/*`, including `.github/agents/`, `.github/skills/`, and `.github/instructions/`. The `.claude/` runtime files derive from those sources.
+The `.claude/` directory is the standalone runtime surface for Claude Code. Skills, agents, and rules under `.claude/` are self-contained and do not require reading from `.github/` at runtime. The `.github/` directory contains the parallel Copilot-native customization surface.
 
 The orchestration checkpoint path for this runtime is `artifacts/orchestration/orchestrator-state.json`. The main session reads `artifacts/orchestration/orchestrator-state.json` before worker delegation and updates the same file across phase transitions.
-
-The sync strategy is documented in `docs/engineering/claude-code-architecture.md`.

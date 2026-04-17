@@ -92,6 +92,11 @@ Always apply:
      2. lint check
      3. type check
      4. tests
+     5. coverage
+        - TypeScript: `npm run test:unit:coverage`
+        - Python: `poetry run pytest --cov`
+        - Record the coverage percentage. Flag as FAIL if repo-wide coverage is below 80% or any new module/class/method is below 90%.
+        - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
    - Run the smallest relevant subset first when the repo policy permits it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 
@@ -123,6 +128,7 @@ Always apply:
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
+     - coverage regression below policy threshold (< 80% repo-wide or < 90% for new code)
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.

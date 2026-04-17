@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/evidence-and-timestamp-conventions/SKILL.md`
->
-> This `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: evidence-and-timestamp-conventions
 description: 'Evidence storage and timestamp naming conventions for audits and remediation. Use when storing baseline/regression/QA evidence or naming audit artifacts with ISO-8601 timestamps.'

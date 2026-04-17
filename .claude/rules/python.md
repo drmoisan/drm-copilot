@@ -1,12 +1,12 @@
 ---
 paths:
   - "**/*.py"
-description: Python-specific toolchain and coding standards derived from .github/instructions/python-code-change.instructions.md and .github/instructions/python-unit-test.instructions.md.
+description: Python-specific toolchain and coding standards.
 ---
 
 # Python Code Standards
 
-This rule file summarizes the Python-specific policies for this repository. The authoritative sources are `.github/instructions/python-code-change.instructions.md` and `.github/instructions/python-unit-test.instructions.md`.
+This rule file summarizes the Python-specific policies for this repository.
 
 ## Toolchain
 
@@ -36,3 +36,5 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - Mock sparingly; prefer real code paths and pure functions.
 - No external dependencies (network, filesystem temp files, external processes) in unit tests.
 - Organize tests to mirror code structure (e.g., `tests/test_module_name.py` for `module_name.py`).
+- Repository-wide line coverage must remain >= 80%.
+- Coverage regression on changed lines is a blocking finding.

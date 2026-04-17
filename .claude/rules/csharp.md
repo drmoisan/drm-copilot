@@ -2,12 +2,12 @@
 paths:
   - "**/*.cs"
   - "**/*.csproj"
-description: C#-specific toolchain and coding standards derived from .github/instructions/csharp-code-change.instructions.md and .github/instructions/csharp-unit-test.instructions.md.
+description: C#-specific toolchain and coding standards.
 ---
 
 # C# Code Standards
 
-This rule file summarizes the C#-specific policies for this repository. The authoritative sources are `.github/instructions/csharp-code-change.instructions.md` and `.github/instructions/csharp-unit-test.instructions.md`.
+This rule file summarizes the C#-specific policies for this repository.
 
 ## Toolchain
 
@@ -36,3 +36,6 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - Use `[TestClass]` and `[TestMethod]` attributes.
 - Follow Arrange–Act–Assert structure.
 - No external dependencies in unit tests.
+- Repository-wide line coverage must remain >= 80%.
+- Any new module, class, or method must reach >= 90% coverage.
+- Coverage regression on changed lines is a blocking finding.

@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/powershell-orchestration-state-machine/SKILL.md`
->
-> This `.claude/skills/powershell-orchestration-state-machine/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: powershell-orchestration-state-machine
 description: Checkpoint schema and resume protocol for long-running PowerShell orchestration workflows.

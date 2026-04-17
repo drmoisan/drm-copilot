@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/pr-base-branch-merge-base/SKILL.md`
->
-> This `.claude/skills/pr-base-branch-merge-base/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: pr-base-branch-merge-base
 description: 'Resolve PRBaseBranch for scripts.dev_tools.pr_context.collector using merge-base ancestry. Use when orchestrators or review workflows need the correct comparison base branch and must select the branch with the most recent common ancestor commit with HEAD.'

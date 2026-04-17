@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/pr-context-artifacts/SKILL.md`
->
-> This `.claude/skills/pr-context-artifacts/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: pr-context-artifacts
 description: 'PR context artifact locations and refresh rules. Use when generating, reading, or inlining pr_context summary/appendix artifacts.'

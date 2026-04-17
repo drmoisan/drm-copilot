@@ -3,12 +3,12 @@ paths:
   - "**/*.ps1"
   - "**/*.psm1"
   - "**/*.psd1"
-description: PowerShell-specific toolchain and coding standards derived from .github/instructions/powershell-code-change.instructions.md and .github/instructions/powershell-unit-test.instructions.md.
+description: PowerShell-specific toolchain and coding standards.
 ---
 
 # PowerShell Code Standards
 
-This rule file summarizes the PowerShell-specific policies for this repository. The authoritative sources are `.github/instructions/powershell-code-change.instructions.md` and `.github/instructions/powershell-unit-test.instructions.md`.
+This rule file summarizes the PowerShell-specific policies for this repository.
 
 ## Toolchain
 
@@ -43,3 +43,6 @@ Run the toolchain in order: format → analyze → test. Restart from step 1 if 
 - Write focused tests exercising a single function or behavior.
 - Mock sparingly; prefer real code paths.
 - No external dependencies in unit tests.
+- Repository-wide line coverage must remain >= 80%.
+- Any new module, class, or method must reach >= 90% coverage.
+- Coverage regression on changed lines is a blocking finding.

@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/csharp-change-budget-router/SKILL.md`
->
-> This `.claude/skills/csharp-change-budget-router/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: csharp-change-budget-router
 description: Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, enforce orchestration-first routing for larger changes, and use the VS Code extension command surface for promotion lifecycle steps when available.
@@ -42,7 +38,7 @@ Direct invocation of `csharp-typed-engineer` remains implementation-focused and 
 
 If direct implementation is requested but estimated scope is `>3` production files:
 - Stop before implementation.
-- Return explicit routing instruction to invoke `csharp-orchestrator` (or `.github/prompts/orchestrate-csharp-work.prompt.md`).
+- Return explicit routing instruction to invoke `csharp-orchestrator`.
 
 ## Documentation Expectations
 

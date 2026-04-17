@@ -10,8 +10,6 @@ allowed-tools:
 
 Produce a GitHub-ready Pull Request description from the standard PR context files.
 
-Canonical authored source: `.github/prompts/generate-pr.prompt.md`
-
 ## Inputs
 
 - `artifacts/pr_context.summary.txt` — PR context summary (primary)

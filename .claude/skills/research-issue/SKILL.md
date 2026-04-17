@@ -12,8 +12,6 @@ allowed-tools:
 
 Research the best implementation approach for a feature or bug described in the provided issue and spec documents. Output is a structured research file, not implementation code.
 
-Canonical authored source: `.github/prompts/research-issue.prompt.md`
-
 ## Inputs
 
 Accept one or more feature documents as context:

@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/atomic-plan-contract/SKILL.md`
->
-> This `.claude/skills/atomic-plan-contract/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: atomic-plan-contract
 description: 'Atomic plan format and toolchain contract shared by planning and execution agents. Use when generating, validating, or executing atomic plans with Phase 0, baseline capture, and final QA loops.'

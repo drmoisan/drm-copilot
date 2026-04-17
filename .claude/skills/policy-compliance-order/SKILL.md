@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/policy-compliance-order/SKILL.md`
->
-> This `.claude/skills/policy-compliance-order/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: policy-compliance-order
 description: 'Repository policy compliance order and hard constraints. Use when an agent must read mandatory policy files, apply repo-wide constraints, or restate policy precedence without duplicating blocks across agents.'
@@ -20,18 +16,20 @@ Use this skill when:
 
 ## Required Policy Reading Order (Baseline)
 
-1) `.github/copilot-instructions.md`
-2) `.github/instructions/general-code-change.instructions.md`
-3) `.github/instructions/general-unit-test.instructions.md`
-4) Language- or domain-specific policies based on files in scope:
-   - Python: `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`
-   - PowerShell: `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`
-   - GitHub Actions: `.github/instructions/github-actions.instructions.md` (for `.github/workflows/*`)
-   - Any other `.github/instructions/*.instructions.md` relevant to touched paths
+Claude Code auto-loads rules via path-scoped frontmatter in `.claude/rules/`. This ordering documents precedence when policies conflict:
+
+1) `CLAUDE.md` (standing instructions, always loaded)
+2) `.claude/rules/general-code-change.md` (cross-language code change policy)
+3) `.claude/rules/general-unit-test.md` (cross-language unit test policy)
+4) Language- or domain-specific rules based on files in scope:
+   - Python: `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`
+   - PowerShell: `.claude/rules/powershell.md`
+   - TypeScript: `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`
+   - C#: `.claude/rules/csharp.md`
 
 ## Hard Constraints (Baseline)
 
-- Do NOT modify policy documents under `.github/instructions/`.
+- Do NOT modify policy documents under `.claude/rules/` or `.github/instructions/`.
 - Do NOT create secrets or `.env` files unless explicitly requested.
 - Prefer repo-defined tasks/commands when running checks.
 - If information is missing, proceed with best-effort assumptions and document them.
