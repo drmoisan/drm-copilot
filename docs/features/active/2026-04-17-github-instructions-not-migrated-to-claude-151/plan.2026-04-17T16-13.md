@@ -26,35 +26,35 @@ Source documents:
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/issue.md` and `spec.md`; record the work mode (`full-bug`) and all 13 AC items (AC-1 through AC-13) verbatim in baseline evidence file `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/phase0-instructions-read.md`.
+- [x] [P0-T1] Read `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/issue.md` and `spec.md`; record the work mode (`full-bug`) and all 13 AC items (AC-1 through AC-13) verbatim in baseline evidence file `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/phase0-instructions-read.md`.
   - Acceptance: `phase0-instructions-read.md` exists and contains the fields `Timestamp:`, `Work Mode: full-bug`, `Policy Order:` (list of policy files read in compliance order), and all 13 AC item texts verbatim from `spec.md`.
 
-- [ ] [P0-T2] Record the current state of `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md`: capture the line count and confirm the file does NOT contain the string "Coverage Verification". Record under a `Baseline: bundled-mirror` section in `phase0-instructions-read.md`.
+- [x] [P0-T2] Record the current state of `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md`: capture the line count and confirm the file does NOT contain the string "Coverage Verification". Record under a `Baseline: bundled-mirror` section in `phase0-instructions-read.md`.
   - Acceptance: `phase0-instructions-read.md` contains a `Baseline: bundled-mirror` section that states the line count (expected: 41) and explicitly records the absence of the string "Coverage Verification" in the file.
 
-- [ ] [P0-T3] Record the current state of `.claude/rules/self-explanatory-code-commenting.md`: confirm the file does NOT contain a prohibition on numbered notes (`NOTE 1:`, `NOTE 2:`). Record under a `Baseline: self-explanatory-commenting` section in `phase0-instructions-read.md`.
+- [x] [P0-T3] Record the current state of `.claude/rules/self-explanatory-code-commenting.md`: confirm the file does NOT contain a prohibition on numbered notes (`NOTE 1:`, `NOTE 2:`). Record under a `Baseline: self-explanatory-commenting` section in `phase0-instructions-read.md`.
   - Acceptance: `phase0-instructions-read.md` contains a `Baseline: self-explanatory-commenting` section that explicitly records the absence of a numbered-notes prohibition in `.claude/rules/self-explanatory-code-commenting.md`.
 
 ---
 
 ### Phase 1 — Implementation
 
-- [ ] [P1-T1] Overwrite `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` with the complete, current content of `.github/agents/feature-review.agent.md`.
+- [x] [P1-T1] Overwrite `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` with the complete, current content of `.github/agents/feature-review.agent.md`.
   - Acceptance: `git diff extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md .github/agents/feature-review.agent.md` exits with code 0 and produces zero output (the two files are byte-identical).
 
-- [ ] [P1-T2] Add the numbered-notes prohibition to `.claude/rules/self-explanatory-code-commenting.md`. The addition must state that numbered notes (`NOTE 1:`, `NOTE 2:`) are prohibited and that `TODO:`, `WARNING:`, `PERF:`, or `SECURITY:` tags must be used instead. Content must match the "6. Do not number notes" section in `.github/instructions/self-explanatory-code-commenting.instructions.md`.
+- [x] [P1-T2] Add the numbered-notes prohibition to `.claude/rules/self-explanatory-code-commenting.md`. The addition must state that numbered notes (`NOTE 1:`, `NOTE 2:`) are prohibited and that `TODO:`, `WARNING:`, `PERF:`, or `SECURITY:` tags must be used instead. Content must match the "6. Do not number notes" section in `.github/instructions/self-explanatory-code-commenting.instructions.md`.
   - Acceptance: `grep -i "numbered" .claude/rules/self-explanatory-code-commenting.md` returns at least one match, and the file contains both `NOTE 1:` and `TODO:` in the prohibition text.
 
 ---
 
 ### Phase 2 — Final QC and Verification
 
-- [ ] [P2-T1] Verify all 13 AC items from `spec.md` are satisfied. For AC-1 through AC-12, grep each target file for the required content and confirm presence. For AC-13, confirm `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` and `.github/agents/feature-review.agent.md` are byte-identical using `git diff`. Record all 13 verification results in `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/phase2-ac-verification.md`.
+- [x] [P2-T1] Verify all 13 AC items from `spec.md` are satisfied. For AC-1 through AC-12, grep each target file for the required content and confirm presence. For AC-13, confirm `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` and `.github/agents/feature-review.agent.md` are byte-identical using `git diff`. Record all 13 verification results in `docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/phase2-ac-verification.md`.
   - Acceptance: `phase2-ac-verification.md` exists and contains one result line per AC item (AC-1 through AC-13), all marked PASS. The AC-13 result includes the `git diff` command and confirms zero output.
 
-- [ ] [P2-T2] Update `spec.md` status field from "In Progress" to "Delivered" after all 13 AC items are confirmed PASS in `phase2-ac-verification.md`.
+- [x] [P2-T2] Update `spec.md` status field from "In Progress" to "Delivered" after all 13 AC items are confirmed PASS in `phase2-ac-verification.md`.
   - Acceptance: `grep "Status" docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/spec.md` returns a line containing `Delivered`.
 
-- [ ] [P2-T3] Update the plan checklist in `plan.2026-04-17T16-13.md` to mark all completed tasks as `[x]`. Confirm no unchecked task boxes remain before reporting completion.
+- [x] [P2-T3] Update the plan checklist in `plan.2026-04-17T16-13.md` to mark all completed tasks as `[x]`. Confirm no unchecked task boxes remain before reporting completion.
   - Acceptance: `grep "\- \[ \]" docs/features/active/2026-04-17-github-instructions-not-migrated-to-claude-151/plan.2026-04-17T16-13.md` returns zero results.
 

@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-04-17
-- **Status:** In Progress
+- **Status:** Delivered
 - **Version:** 0.1
 
 ## Context
@@ -280,19 +280,19 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] AC-1: `.claude/rules/general-code-change.md` exists with `paths: **`, summarizes the cross-language design principles and the mandatory toolchain loop order (format → lint → type-check → test).
-- [ ] AC-2: `.claude/rules/general-unit-test.md` exists with `paths: **`, and explicitly states: repository-wide line coverage ≥ 80% and any new module/class/method ≥ 90%.
-- [ ] AC-3: `.claude/rules/typescript.md` Testing Standards section includes: coverage thresholds (≥80% repo-wide, ≥90% new code) and the coverage command (`npm run test:unit:coverage`).
-- [ ] AC-4: `.claude/rules/python.md` Testing Standards section includes the repo-wide ≥80% coverage floor (in addition to the existing ≥90% new-code statement).
-- [ ] AC-5: `.claude/rules/csharp.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
-- [ ] AC-6: `.claude/rules/powershell.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
-- [ ] AC-7: `.claude/rules/tonality.md` exists with `paths: **`, summarizes the professional tone requirements and the prohibitions on humor, hyperbole, and decorative metaphor.
-- [ ] AC-8: `.claude/rules/typescript-suppressions.md` exists with `paths: **/*.ts`, lists the pre-authorized `eslint-disable-next-line` and `@ts-expect-error` patterns with their required comment format.
-- [ ] AC-9: `.claude/rules/python-suppressions.md` exists with `paths: **/*.py`, lists at minimum the S603, ARG002, B008, BLE001, and S110 suppression patterns with their pre-authorized comment formats.
-- [ ] AC-10: `.claude/rules/self-explanatory-code-commenting.md` exists with `paths: **/*.py`, summarizes mandatory docstring requirements for classes and functions, and the rule that loops and branches must have intent comments.
-- [ ] AC-11: `.claude/skills/feature-review-workflow/SKILL.md` Step 5 check list includes a coverage verification step; Step 8 lists coverage regression as a remediation trigger.
-- [ ] AC-12: `.claude/agents/feature-review.md` includes instructions for how the reviewer handles coverage — either by verifying existing coverage artifacts or (if the tool policy is expanded) by running the coverage command directly.
-- [ ] AC-13: `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` is byte-identical to `.github/agents/feature-review.agent.md`.
+- [x] AC-1: `.claude/rules/general-code-change.md` exists with `paths: **`, summarizes the cross-language design principles and the mandatory toolchain loop order (format → lint → type-check → test).
+- [x] AC-2: `.claude/rules/general-unit-test.md` exists with `paths: **`, and explicitly states: repository-wide line coverage ≥ 80% and any new module/class/method ≥ 90%.
+- [x] AC-3: `.claude/rules/typescript.md` Testing Standards section includes: coverage thresholds (≥80% repo-wide, ≥90% new code) and the coverage command (`npm run test:unit:coverage`).
+- [x] AC-4: `.claude/rules/python.md` Testing Standards section includes the repo-wide ≥80% coverage floor (in addition to the existing ≥90% new-code statement).
+- [x] AC-5: `.claude/rules/csharp.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
+- [x] AC-6: `.claude/rules/powershell.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
+- [x] AC-7: `.claude/rules/tonality.md` exists with `paths: **`, summarizes the professional tone requirements and the prohibitions on humor, hyperbole, and decorative metaphor.
+- [x] AC-8: `.claude/rules/typescript-suppressions.md` exists with `paths: **/*.ts`, lists the pre-authorized `eslint-disable-next-line` and `@ts-expect-error` patterns with their required comment format.
+- [x] AC-9: `.claude/rules/python-suppressions.md` exists with `paths: **/*.py`, lists at minimum the S603, ARG002, B008, BLE001, and S110 suppression patterns with their pre-authorized comment formats.
+- [x] AC-10: `.claude/rules/self-explanatory-code-commenting.md` exists with `paths: **/*.py`, summarizes mandatory docstring requirements for classes and functions, and the rule that loops and branches must have intent comments.
+- [x] AC-11: `.claude/skills/feature-review-workflow/SKILL.md` Step 5 check list includes a coverage verification step; Step 8 lists coverage regression as a remediation trigger.
+- [x] AC-12: `.claude/agents/feature-review.md` includes instructions for how the reviewer handles coverage — either by verifying existing coverage artifacts or (if the tool policy is expanded) by running the coverage command directly.
+- [x] AC-13: `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` is byte-identical to `.github/agents/feature-review.agent.md`.
 
 ## Risks & Mitigations
 - Technical or operational risks: Rule file `paths:` scope errors could cause a rule intended for all files to silently fail to load for certain file types, or a rule intended for only `.ts` files to bleed into other contexts. Risk is low because Claude Code's path activation is straightforward.

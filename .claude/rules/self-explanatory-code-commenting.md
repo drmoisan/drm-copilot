@@ -61,13 +61,19 @@ When a sequence of tactical lines collectively accomplishes a larger goal, prece
 
 If the block is substantial, strongly prefer extracting it into a helper method with its own docstring.
 
-## Note Numbering — Prohibited
+## 6) Do not number notes
 
-Do not use numbered notes in code comments or docstrings:
-- **Prohibited:** `NOTE 1: ...`, `NOTE 2: ...`
+In code comments and docstrings, **do not** use fragile numbered notes like:
 
-Use unnumbered tags for follow-up markers:
-- **Allowed:** `TODO: ...`, `WARNING: ...`, `PERF: ...`, `SECURITY: ...`
+* `NOTE 1: ...`
+* `NOTE 2: ...`
+
+Prefer comments without tags for general explanations. But if a tag is necessary (e.g. follow-up is needed), use unnumbered tags instead:
+
+* `TODO: ...`
+* `WARNING: ...`
+* `PERF: ...`
+* `SECURITY: ...`
 
 ## Meta-What vs. Narration
 
