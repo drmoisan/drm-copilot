@@ -2,14 +2,25 @@
 
 from __future__ import annotations
 
+import importlib
 import importlib.util
+import io
 import sys
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, cast
 from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from types import ModuleType
+
+
+class _ClipboardCapableModule(Protocol):
+    """Protocol for the bundled resolver module's clipboard override point."""
+
+    copy_to_clipboard: Callable[[str], bool]
+
 
 ROOT = Path(__file__).resolve().parents[5]
 _TEMPLATE_PATH = (
@@ -156,3 +167,68 @@ def test_main_propagates_bundled_non_zero_exit_code() -> None:
         sys.argv = original_argv
         sys.path[:] = original_sys_path
         sys.modules.pop("ext_rapp_propagates_nonzero_exit", None)
+
+
+def test_main_executes_real_bundled_wrapper_with_workspace_contract() -> None:
+    """Execute the real bundled wrapper with the production workspace contract."""
+    assert _TEMPLATE_PATH.exists(), f"Expected wrapper to exist at {_TEMPLATE_PATH}"
+    original_argv = list(sys.argv)
+    original_sys_path = list(sys.path)
+
+    try:
+        module = _load_module_from_path(
+            "ext_rapp_real_workspace_contract",
+            _TEMPLATE_PATH,
+        )
+        workspace_root = ROOT
+        target_path = (
+            workspace_root
+            / "docs"
+            / "features"
+            / "active"
+            / "2026-04-17-bundle-resolve-atomic-plan-prompt-command-152"
+            / "plan.2026-04-17T19-54.md"
+        )
+        stdout_buffer = io.StringIO()
+        stderr_buffer = io.StringIO()
+        actual_import_module = importlib.import_module
+        sys.argv = [
+            "resolve_atomic_plan_prompt.py",
+            "--target",
+            str(target_path),
+            "--workspace",
+            str(workspace_root),
+        ]
+
+        def _copy_to_clipboard_fallback(_text: str) -> bool:
+            return False
+
+        def _import_real_module(module_name: str) -> object:
+            imported_module = actual_import_module(module_name)
+            if module_name == "dev_tools.resolve_file_prompt":
+                clipboard_module = cast("_ClipboardCapableModule", imported_module)
+                clipboard_module.copy_to_clipboard = _copy_to_clipboard_fallback
+            return imported_module
+
+        with (
+            patch.object(
+                module.importlib, "import_module", side_effect=_import_real_module
+            ),
+            redirect_stdout(stdout_buffer),
+            redirect_stderr(stderr_buffer),
+        ):
+            result = module.main()
+
+        assert result == 0
+        assert (
+            "Could not copy to clipboard; printing resolved prompt to stdout."
+            in stderr_buffer.getvalue()
+        )
+        assert (
+            "docs/features/active/2026-04-17-bundle-resolve-atomic-plan-prompt-command-152/plan.2026-04-17T19-54.md"
+            in stdout_buffer.getvalue()
+        )
+    finally:
+        sys.argv = original_argv
+        sys.path[:] = original_sys_path
+        sys.modules.pop("ext_rapp_real_workspace_contract", None)

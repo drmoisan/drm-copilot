@@ -276,6 +276,61 @@ def _resolve_work_mode_from_issue(
     )
 
 
+def _resolve_workspace_root(workspace_argument: str | None) -> Path:
+    """Resolve the workspace root used for path substitutions and file lookups.
+
+    Purpose:
+        Honor the extension-provided `--workspace` argument when present so the
+        bundled resolver behaves deterministically even when the current process
+        directory does not match the intended workspace root.
+
+    Args:
+        workspace_argument (str | None): Optional CLI-provided workspace root.
+
+    Returns:
+        Path: Absolute workspace root path.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+    if workspace_argument is None:
+        return Path.cwd()
+
+    return Path(workspace_argument).resolve()
+
+
+def _resolve_target_path(target_argument: str, workspace_root: Path) -> Path:
+    """Resolve the target path against the workspace root when needed.
+
+    Purpose:
+        Preserve workspace-relative target resolution semantics for the bundled
+        CLI contract while still supporting absolute target paths emitted by the
+        extension service.
+
+    Args:
+        target_argument (str): CLI-provided target path.
+        workspace_root (Path): Resolved workspace root for relative targets.
+
+    Returns:
+        Path: Absolute target path when the target is workspace-relative, or the
+            original absolute path unchanged.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+    target_path = Path(target_argument)
+    if target_path.is_absolute():
+        return target_path
+
+    return workspace_root / target_path
+
+
 def _replace_all_variables(template: str, variables: dict[str, str]) -> str:
     """Replace every referenced placeholder using the provided mapping."""
     referenced = _extract_template_variables(template)
@@ -354,10 +409,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Resolve atomic-plan prompt variables")
     parser.add_argument("--template", required=True, help="Path to the prompt template")
     parser.add_argument("--target", required=True, help="Path to the target file")
+    parser.add_argument(
+        "--workspace",
+        required=False,
+        help="Workspace root used for relative prompt-resolution substitutions",
+    )
     args = parser.parse_args()
 
     template_path = Path(args.template)
-    target_path = Path(args.target)
+    workspace_root = _resolve_workspace_root(args.workspace)
+    target_path = _resolve_target_path(args.target, workspace_root)
 
     if not template_path.exists():
         print(f"Error: Template file not found: {template_path}", file=sys.stderr)
@@ -374,7 +435,7 @@ def main() -> int:
         return 1
 
     try:
-        resolved_content = resolve_prompt(template_content, target_path, Path.cwd())
+        resolved_content = resolve_prompt(template_content, target_path, workspace_root)
     except Exception as error:  # noqa: BLE001 - CLI top-level error handling
         print(f"Error processing prompt: {error}", file=sys.stderr)
         return 1

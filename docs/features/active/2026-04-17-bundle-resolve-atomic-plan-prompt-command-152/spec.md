@@ -143,8 +143,8 @@ Data flow, storage, or state changes introduced by this feature.
 - [x] Acceptance criteria in `user-story.md` and `spec.md` are mapped to concrete Jest coverage or command demos
 - [x] The extension command behavior matches the documented success, picker, cancellation, and invalid-target flows in both repo and destination-workspace-style scenarios
 - [x] Jest tests cover command registration, active eligible-plan reuse, validated picker fallback, bundled-service invocation, and runtime failure handling
-- [ ] Edge cases cover no active editor, non-plan markdown targets, missing bundled runtime prerequisites, and clipboard failure reporting
-- [ ] Feature docs are updated in `docs/features/active/2026-04-17-bundle-resolve-atomic-plan-prompt-command-152/`, and any user-facing command documentation is updated if the command is exposed in extension docs
+- [x] Edge cases cover no active editor, non-plan markdown targets, missing bundled runtime prerequisites, and clipboard failure reporting
+- [x] Feature docs are updated in `docs/features/active/2026-04-17-bundle-resolve-atomic-plan-prompt-command-152/`, and any user-facing command documentation is updated if the command is exposed in extension docs
 - [x] Existing repo-automation logging or user-facing error surfaces are updated wherever the new command introduces a new failure path
 - [x] The extension toolchain completes a clean pass for formatting, linting, type-checking, and tests after implementation
 
@@ -152,4 +152,4 @@ Data flow, storage, or state changes introduced by this feature.
 - [x] Unit coverage for command registration, active eligible-plan detection, picker-based plan selection, bundled service invocation, and invalid active editor or invalid target handling
 - [x] Service-level coverage that verifies wrapper argv forwarding to `resolve_atomic_plan_prompt.py` and bundled asset path injection
 - [x] Integration scenarios covering the command in a destination-workspace-style environment where only extension-bundled resources are available
-- [ ] Command behavior examples for a successful active plan resolution path, picker fallback after no active editor, and the invalid-active-file error path
+- [x] Command behavior examples for a successful active plan resolution path, picker fallback after no active editor, and the invalid-active-file error path

@@ -121,6 +121,20 @@ function createMockProcess(exitCode: number): MockChildProcess {
   return processMock;
 }
 
+function createMockProcessWithStderr(
+  exitCode: number,
+  stderrLine: string,
+): MockChildProcess {
+  const processMock = new EventEmitter() as MockChildProcess;
+  processMock.stdout = new EventEmitter();
+  processMock.stderr = new EventEmitter();
+  process.nextTick(() => {
+    processMock.stderr.emit("data", Buffer.from(stderrLine, "utf-8"));
+    processMock.emit("close", exitCode);
+  });
+  return processMock;
+}
+
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {
     extensionUri: { fsPath: "C:/extension" },
@@ -274,5 +288,29 @@ describe("drm-copilot resolveAtomicPlanPrompt command", () => {
       "This command requires an active or selected plan markdown file under docs/features/active/**/plan*.md.",
     );
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("surfaces bundled-wrapper stderr when the runtime contract fails", async () => {
+    setExecutablePresence({ python: true });
+    setActiveEditorPath(
+      "C:/workspace/docs/features/active/feature-152/plan.2026-04-17T19-54.md",
+    );
+    childProcessMock.spawn.mockReturnValue(
+      createMockProcessWithStderr(
+        2,
+        "resolve_atomic_plan_prompt.py: error: unrecognized arguments: --workspace C:/workspace",
+      ),
+    );
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.resolveAtomicPlanPrompt",
+    );
+
+    await expect(handler()).rejects.toThrow("Command exited with code 2");
+    expect(
+      appendLineMock.mock.calls.some(([line]) =>
+        line.includes("unrecognized arguments: --workspace C:/workspace"),
+      ),
+    ).toBe(true);
   });
 });
