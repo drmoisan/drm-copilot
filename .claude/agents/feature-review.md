@@ -62,16 +62,34 @@ Read the work mode marker from `issue.md`:
 
 ## Coverage Verification
 
-The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
+Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
 
-- **TypeScript coverage artifact:** `coverage/lcov.info`
-- **Python coverage artifact:** `artifacts/python/lcov.info`
+### Coverage Artifact Paths by Language
 
-Verification procedure:
-1. Check whether the coverage artifact exists for the languages changed in this feature.
-2. If the artifact exists, parse the coverage percentage from it and report it in the policy audit.
-3. If the repo-wide coverage is below 80%, flag the finding as FAIL and add it to the remediation triggers.
-4. If any new module, class, or method introduced in this feature has coverage below 90%, flag the finding as FAIL and add it to the remediation triggers.
-5. If no coverage artifact is found, mark the coverage section as **UNVERIFIED** with the reason: "no coverage artifact found."
+| Language | Coverage Artifact |
+|---|---|
+| TypeScript | `coverage/lcov.info` |
+| Python | `artifacts/python/lcov.info` |
+| PowerShell | `artifacts/pester/powershell-coverage.xml` |
+| C# | `artifacts/csharp/coverage.xml` |
 
-The agent does NOT rerun coverage generation (`npm run test:unit:coverage` or `poetry run pytest --cov`). Evidence verification from existing artifacts is the required model.
+### Coverage Thresholds
+
+- **New code files** (files added in this feature, not previously existing): line coverage must be >= 90%.
+- **Modified files** (files that existed before and were changed): line coverage must show no regression relative to the baseline and must remain >= 80%.
+- **Repo-wide**: line coverage must remain >= 80% for each language.
+
+### Verification Procedure
+
+For each language that has changed files in the feature branch:
+
+1. Determine which files are new (added) vs modified (changed) using the PR diff.
+2. Check whether the coverage artifact exists for that language.
+3. If the artifact exists:
+   - Parse the repo-wide coverage percentage and report it in the policy audit.
+   - If repo-wide coverage is below 80%, flag as FAIL and add to remediation triggers.
+   - For each new file: if line coverage is below 90%, flag as FAIL and add to remediation triggers.
+   - For each modified file: if line coverage has regressed from baseline or is below 80%, flag as FAIL and add to remediation triggers.
+4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+
+The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.

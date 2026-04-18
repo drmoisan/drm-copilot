@@ -92,11 +92,17 @@ Always apply:
      2. lint check
      3. type check
      4. tests
-     5. coverage
-        - TypeScript: `npm run test:unit:coverage`
-        - Python: `poetry run pytest --cov`
-        - Record the coverage percentage. Flag as FAIL if repo-wide coverage is below 80% or any new module/class/method is below 90%.
+     5. coverage (mandatory for every language that has changed files)
+        - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
+        - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
+        - PowerShell: `mcp__drmCopilotExtension__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
+        - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
+        - Coverage thresholds:
+          - New code files (added in this feature): line coverage must be >= 90%. Flag as FAIL otherwise.
+          - Modified files (changed but previously existing): line coverage must show no regression relative to baseline and must remain >= 80%. Flag as FAIL otherwise.
+          - Repo-wide line coverage must remain >= 80% per language. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
+        - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
    - Run the smallest relevant subset first when the repo policy permits it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 
@@ -128,7 +134,8 @@ Always apply:
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage regression below policy threshold (< 80% repo-wide or < 90% for new code)
+     - coverage regression below policy threshold (< 80% repo-wide per language, < 80% or regression for modified files, or < 90% for new files)
+     - coverage artifact absent for any language that has changed files
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.
