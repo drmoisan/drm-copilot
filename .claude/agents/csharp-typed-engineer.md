@@ -7,7 +7,6 @@ tools:
   - Glob
   - "Bash(msbuild *)"
   - "Bash(dotnet *)"
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project

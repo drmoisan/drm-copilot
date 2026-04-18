@@ -67,6 +67,10 @@
         "title": "drm-copilot: Run PoshQC Suite"
       },
       {
+        "command": "drmCopilotExtension.listMcpTools",
+        "title": "drm-copilot: List MCP Tools"
+      },
+      {
         "command": "drmCopilotExtension.runPoshQCFormat",
         "title": "drm-copilot: Run PoshQC Format"
       },

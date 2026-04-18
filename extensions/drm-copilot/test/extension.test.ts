@@ -55,6 +55,12 @@ describe("drm-copilot core command behavior", () => {
     ).toBe(true);
   });
 
+  it("activate registers drmCopilotExtension.listMcpTools", () => {
+    activateAndGetHandler("drmCopilotExtension.listMcpTools");
+
+    expect(commandHandlers.has("drmCopilotExtension.listMcpTools")).toBe(true);
+  });
+
   it("activate registers drmCopilotExtension.resolvePolicyAuditTemplateAsset exactly once", () => {
     activateAndGetHandler(
       "drmCopilotExtension.resolvePolicyAuditTemplateAsset",

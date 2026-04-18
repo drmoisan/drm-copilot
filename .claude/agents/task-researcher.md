@@ -8,7 +8,6 @@ tools:
   - Glob
   - WebFetch
   - "Write(/artifacts/research/**)"
-skills:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:

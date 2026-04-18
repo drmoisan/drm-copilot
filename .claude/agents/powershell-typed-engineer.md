@@ -7,7 +7,6 @@ tools:
   - Glob
   - "Bash(pwsh *)"
   - mcp__drmCopilotExtension__.*
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project

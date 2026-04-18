@@ -6,7 +6,6 @@ tools:
   - Grep
   - Glob
   - "Bash(npx *)"
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project
