@@ -41,7 +41,8 @@
       "Skill(translate-copilot-to-claude *)",
       "Skill(execute-hard-lock *)",
       "Edit(/.claude/skills/execute-hard-lock/**)",
-      "Edit(/.claude/skills/feature-review-workflow/**)"
+      "Edit(/.claude/skills/feature-review-workflow/**)",
+      "Edit(/.claude/skills/csharp-qa-gate/**)"
     ],
     "deny": [
       "Read(./.env)",

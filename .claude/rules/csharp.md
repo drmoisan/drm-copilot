@@ -39,3 +39,24 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - Repository-wide line coverage must remain >= 80%.
 - Any new module, class, or method must reach >= 90% coverage.
 - Coverage regression on changed lines is a blocking finding.
+
+## Deterministic Test Rules
+
+Unit tests must not depend on network, mutable machine PATH or profile state, implicit working-directory assumptions, or external services. Use seam-based mocking for all external boundaries (processes, HTTP, filesystem, clocks). Tests must produce identical results in the IDE test runner and in CLI runs so local and CI behavior agree.
+
+## DI Seams
+
+Introduce the smallest seam that enables reliable unit testing. Apply in this order of preference:
+
+1. **Interface seam (preferred)** — extract boundary calls into narrow purpose-specific interfaces (for example, `IProcessRunner`, `IFileSystem`, `IClock`). Keep interfaces minimal.
+2. **Injectable delegate seam** — use a narrow `Func<>`/`Action<>` delegate for a single call path when a full interface is excessive. Default behavior must remain safe and deterministic.
+3. **Adapter seam for static or third-party APIs** — wrap the static or third-party call behind a small adapter so tests can mock the adapter with Moq.
+
+## Prohibited Behaviors
+
+- Broad refactors across unrelated projects or files.
+- Introducing heavy generic abstraction frameworks without need.
+- Creating analyzer debt and deferring cleanup.
+- Weakening assertions or relaxing test expectations to make tests pass.
+- Adding sleeps, retries, or timing hacks to mask flaky behavior.
+- Reporting success without running the required toolchain.
