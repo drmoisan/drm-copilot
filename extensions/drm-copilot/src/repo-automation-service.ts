@@ -13,32 +13,12 @@ import {
   POSH_QC_TOOL_CONFIG,
   type ScriptExecutionOptions,
 } from "./repo-automation-service-support";
+import { type RepoAutomationToolName } from "./repo-automation-tool-names";
 import {
   type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
   type WorkModeOption,
 } from "./workflow-command-arguments";
-
-export const REPO_AUTOMATION_TOOLS = [
-  "collect_commit_context",
-  "collect_pr_context",
-  "push_down_copilot_customizations",
-  "push_down_codex_and_agents_customizations",
-  "new_potential_bug_entry",
-  "new_potential_entry",
-  "potential_to_issue",
-  "new_active_feature_folder",
-  "run_poshqc_format",
-  "run_poshqc_analyze",
-  "run_poshqc_test",
-  "run_poshqc_analyze_autofix",
-  "run_poshqc_suite",
-  "resolve_policy_audit_template_asset",
-  "resolve_execute_hard_lock_prompt",
-  "validate_orchestration_artifacts",
-] as const;
-
-export type RepoAutomationToolName = (typeof REPO_AUTOMATION_TOOLS)[number];
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -116,6 +96,9 @@ export interface RepoAutomationService {
     },
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
+    input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  resolveAtomicPlanPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
   ): Promise<RepoAutomationExecutionResult>;
   validateOrchestrationArtifacts(
@@ -397,6 +380,20 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
       args: ["--target", input.target, "--workspace", input.workspaceRoot],
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+    });
+  }
+
+  async resolveAtomicPlanPrompt(
+    input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "resolve_atomic_plan_prompt",
+      runtimeKind: "python",
+      bundledRelativePath: "resources/templates/resolve_atomic_plan_prompt.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "resolve_atomic_plan_prompt",
+      args: ["--target", input.target, "--workspace", input.workspaceRoot],
+      summary: `Resolved the atomic-plan prompt for '${input.target}'.`,
     });
   }
 

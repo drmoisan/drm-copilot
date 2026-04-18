@@ -1,0 +1,4 @@
+Timestamp: 2026-04-18T17:44:00
+Command: derived-from-P0-T10, remediated pytest coverage run, and `changed-scope-coverage-proof.2026-04-18T17-44.md`
+EXIT_CODE: 0
+Output Summary: Baseline Python coverage from `P0-T10` was `TOTAL 6% (667/10564 covered)`. Remediated post-change Python coverage is `TOTAL 8% (863/10778 covered)`. The headline coverage increased by 2 percentage points and did not regress. Deterministic changed-scope proof is now available in `changed-scope-coverage-proof.2026-04-18T17-44.md`: `scripts/dev_tools/resolve_file_prompt.py` is at 93%, `extensions/drm-copilot/resources/templates/resolve_atomic_plan_prompt.py` is at 100%, and `extensions/drm-copilot/resources/scripts/dev_tools/resolve_file_prompt.py` is at 91%. The Python coverage disposition is `PASS` for the reviewed prompt-resolution source scope.

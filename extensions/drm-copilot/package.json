@@ -89,6 +89,10 @@
       {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
+      },
+      {
+        "command": "drmCopilotExtension.resolveAtomicPlanPrompt",
+        "title": "drm-copilot: Resolve Atomic Plan Prompt"
       }
     ]
   },
