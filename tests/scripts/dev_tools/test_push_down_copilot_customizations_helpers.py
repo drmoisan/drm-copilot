@@ -464,9 +464,15 @@ def test_real_filesystem_delegates_path_operations(
         calls["read"] = (self, encoding)
         return "file content"
 
-    def fake_write_text(self: Path, content: str, *, encoding: str) -> int:
-        """Record write delegation without touching disk."""
-        calls["write"] = (self, content, encoding)
+    def fake_write_text(
+        self: Path,
+        content: str,
+        *,
+        encoding: str,
+        newline: str,
+    ) -> int:
+        """Record write delegation and require LF-only output semantics."""
+        calls["write"] = (self, content, encoding, newline)
         return len(content)
 
     def fake_mkdir(self: Path, *, parents: bool, exist_ok: bool) -> None:
@@ -484,7 +490,7 @@ def test_real_filesystem_delegates_path_operations(
     adapter.ensure_dir(directory_path)
 
     assert calls["read"] == (file_path, "utf-8")
-    assert calls["write"] == (file_path, "updated content", "utf-8")
+    assert calls["write"] == (file_path, "updated content", "utf-8", "\n")
     assert mkdir_calls == [
         (directory_path, True, True),
         (directory_path, True, True),
