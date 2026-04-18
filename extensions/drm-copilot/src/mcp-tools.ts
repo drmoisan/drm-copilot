@@ -16,6 +16,7 @@ import {
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
   resolveRunPoshQCSuiteToolInput,
+  resolveResolveAtomicPlanPromptToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
   resolveValidateOrchestrationArtifactsToolInput,
 } from "./mcp-tool-inputs";
@@ -345,6 +346,23 @@ const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "resolve_atomic_plan_prompt",
+    description:
+      "Resolve the atomic-plan prompt for a target plan path using bundled extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        target: {
+          type: "string",
+          description: "Target Markdown plan path to resolve.",
+        },
+      },
+      required: ["target"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "validate_orchestration_artifacts",
     description:
       "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
@@ -537,6 +555,11 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(
           await service.resolveExecuteHardLockPrompt(input),
         );
+      }
+
+      case "resolve_atomic_plan_prompt": {
+        const input = resolveResolveAtomicPlanPromptToolInput(rawInput);
+        return toMcpToolResult(await service.resolveAtomicPlanPrompt(input));
       }
 
       case "validate_orchestration_artifacts": {

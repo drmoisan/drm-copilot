@@ -35,6 +35,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "run_poshqc_suite",
   "resolve_policy_audit_template_asset",
   "resolve_execute_hard_lock_prompt",
+  "resolve_atomic_plan_prompt",
   "validate_orchestration_artifacts",
 ] as const;
 
@@ -116,6 +117,9 @@ export interface RepoAutomationService {
     },
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
+    input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  resolveAtomicPlanPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
   ): Promise<RepoAutomationExecutionResult>;
   validateOrchestrationArtifacts(
@@ -397,6 +401,20 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
       args: ["--target", input.target, "--workspace", input.workspaceRoot],
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+    });
+  }
+
+  async resolveAtomicPlanPrompt(
+    input: WorkspaceExecutionInput & { readonly target: string },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "resolve_atomic_plan_prompt",
+      runtimeKind: "python",
+      bundledRelativePath: "resources/templates/resolve_atomic_plan_prompt.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "resolve_atomic_plan_prompt",
+      args: ["--target", input.target, "--workspace", input.workspaceRoot],
+      summary: `Resolved the atomic-plan prompt for '${input.target}'.`,
     });
   }
 

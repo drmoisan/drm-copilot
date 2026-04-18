@@ -414,6 +414,39 @@ describe("repo automation service", () => {
     expect(result.summary).toContain("autofix");
   });
 
+  it("resolveAtomicPlanPrompt uses the bundled wrapper with target and workspace arguments", async () => {
+    setExecutablePresence({ python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    const result = await service.resolveAtomicPlanPrompt({
+      workspaceRoot: "C:/workspace",
+      invocationId: "resolve_atomic_plan_prompt",
+      target:
+        "C:/workspace/docs/features/active/feature-152/plan.2026-04-17T19-54.md",
+    });
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
+    expect(executable).toBe("python");
+    expect(args).toEqual([
+      "C:/extension/resources/templates/resolve_atomic_plan_prompt.py",
+      "--target",
+      "C:/workspace/docs/features/active/feature-152/plan.2026-04-17T19-54.md",
+      "--workspace",
+      "C:/workspace",
+    ]);
+    expect(options.cwd).toBe("C:/workspace");
+    expect(options.shell).toBe(false);
+    expect(result.tool).toBe("resolve_atomic_plan_prompt");
+    expect(result.summary).toContain(
+      "C:/workspace/docs/features/active/feature-152/plan.2026-04-17T19-54.md",
+    );
+  });
+
   it("validateOrchestrationArtifacts spawns the bundled validator with correct args", async () => {
     setExecutablePresence({ python: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(0));

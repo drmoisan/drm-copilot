@@ -38,6 +38,10 @@ export interface ResolveExecuteHardLockPromptToolInput extends WorkspaceToolInpu
   readonly target: string;
 }
 
+export interface ResolveAtomicPlanPromptToolInput extends WorkspaceToolInput {
+  readonly target: string;
+}
+
 export interface ResolvePolicyAuditTemplateAssetToolInput extends WorkspaceToolInput {
   readonly asset: PolicyAuditTemplateAssetSelector;
   readonly targetPath?: string;
@@ -227,6 +231,20 @@ export function resolveResolveExecuteHardLockPromptToolInput(
   rawInput: unknown,
   fallbackWorkspaceRoot?: string,
 ): ResolveExecuteHardLockPromptToolInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolveResolveAtomicPlanPromptToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): ResolveAtomicPlanPromptToolInput {
   const args = asToolArgumentObject(rawInput);
   return {
     workspaceRoot: normalizeWorkspaceRoot(

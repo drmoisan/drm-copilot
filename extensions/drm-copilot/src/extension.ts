@@ -410,6 +410,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const [
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
+    resolveAtomicPlanPromptDisposable,
   ] = registerDocumentWorkflowCommands({
     output,
     service,
@@ -436,6 +437,7 @@ export function activate(context: vscode.ExtensionContext): void {
     newPotentialEntryDisposable,
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
+    resolveAtomicPlanPromptDisposable,
     ...mcpDisposables,
     output,
   );

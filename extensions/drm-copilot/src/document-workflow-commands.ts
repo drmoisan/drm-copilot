@@ -26,7 +26,7 @@ async function openBundledDocument(filePath: string): Promise<void> {
 
 export function registerDocumentWorkflowCommands(
   options: DocumentWorkflowCommandOptions,
-): readonly [vscode.Disposable, vscode.Disposable] {
+): readonly [vscode.Disposable, vscode.Disposable, vscode.Disposable] {
   const resolvePolicyAuditTemplateAssetDisposable =
     vscode.commands.registerCommand(
       "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
@@ -111,8 +111,27 @@ export function registerDocumentWorkflowCommands(
       },
     );
 
+  const resolveAtomicPlanPromptDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.resolveAtomicPlanPrompt",
+    async () => {
+      const commandId = "drmCopilotExtension.resolveAtomicPlanPrompt";
+      const workspaceRoot = getWorkspaceRoot();
+      const planPath = await promptForActiveFeaturePlan(workspaceRoot);
+      if (!planPath) {
+        return;
+      }
+
+      await options.service.resolveAtomicPlanPrompt({
+        workspaceRoot,
+        invocationId: commandId,
+        target: planPath,
+      });
+    },
+  );
+
   return [
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
+    resolveAtomicPlanPromptDisposable,
   ];
 }
