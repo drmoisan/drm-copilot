@@ -38,6 +38,9 @@
       "Skill(python-change-budget-router *)",
       "Skill(python-qa-gate *)",
       "Skill(invoke-python-engineer *)",
+      "Skill(powershell-change-budget-router *)",
+      "Skill(powershell-qa-gate *)",
+      "Skill(invoke-powershell-engineer *)",
       "Skill(translate-copilot-to-claude *)",
       "Skill(execute-hard-lock *)",
       "Edit(/.claude/skills/execute-hard-lock/**)",
@@ -82,7 +85,7 @@
     ],
     "SubagentStop": [
       {
-        "matcher": "atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer",
+        "matcher": "atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer",
         "hooks": [
           {
             "type": "command",
