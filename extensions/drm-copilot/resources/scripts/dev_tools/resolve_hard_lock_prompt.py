@@ -166,6 +166,48 @@ def _try_relative_to_workspace(path: Path, workspace_root: Path) -> Path:
         return path
 
 
+def _write_resolved_prompt(
+    resolved_prompt: str,
+    output_path: Path,
+    workspace_root: Path,
+) -> Path:
+    """Persist the resolved prompt text to a UTF-8 file, creating parents.
+
+    Purpose:
+        Provide a deterministic file-write side channel for non-interactive MCP
+        callers that cannot capture stdout from the wrapping ``executeScript``
+        invocation. Mirrors ``--target`` resolution: absolute paths are used
+        verbatim; relative paths resolve against ``workspace_root``.
+
+    Args:
+        resolved_prompt (str): Fully resolved prompt text to persist verbatim.
+        output_path (Path): Path supplied via ``--output`` (absolute or
+            workspace-relative).
+        workspace_root (Path): Active workspace root used to resolve relative
+            output paths against the same base used for ``--target``.
+
+    Returns:
+        Path: Absolute path that was actually written.
+
+    Raises:
+        OSError: When creating the parent directory or writing the file fails.
+
+    Side Effects:
+        Creates missing parent directories and writes the file as UTF-8 text
+        with no BOM.
+    """
+    # Absolute paths are honored verbatim; relative paths resolve against the
+    # workspace root to match how `--target` is resolved.
+    resolved_output = (
+        output_path if output_path.is_absolute() else workspace_root / output_path
+    )
+    # Create any missing parents so MCP callers can target deep directory paths
+    # without pre-staging. `exist_ok=True` keeps repeated writes idempotent.
+    resolved_output.parent.mkdir(parents=True, exist_ok=True)
+    resolved_output.write_text(resolved_prompt, encoding="utf-8")
+    return resolved_output
+
+
 def _resolve_issue_file_for_target(target_path: Path, workspace_root: Path) -> Path:
     """Resolve the most likely issue.md path for a target plan file.
 
@@ -309,8 +351,39 @@ def main() -> int:
         default=None,
         help="Optional directory containing hard-lock prompt templates.",
     )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help=(
+            "Optional path to write the resolved prompt text as UTF-8. "
+            "Relative paths resolve against --workspace (or cwd when omitted). "
+            "Parent directories are created if missing."
+        ),
+    )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        default=False,
+        help=(
+            "Suppress stdout print and clipboard copy when --output is also "
+            "provided. Using --quiet without --output is a hard error because "
+            "it would produce no user-visible output."
+        ),
+    )
 
     args = parser.parse_args()
+
+    # --quiet without --output would silently drop the resolved prompt; reject
+    # the combination explicitly so misconfigured callers see the failure.
+    if args.quiet and args.output is None:
+        print(
+            "Error: --quiet requires --output; --quiet alone would suppress all "
+            "output.",
+            file=sys.stderr,
+        )
+        return 1
+
     workspace_root = args.workspace if args.workspace else Path.cwd()
     template_name = _resolve_template_name(args.template_kind)
     template_path, checked_paths = _resolve_template_path(
@@ -339,6 +412,21 @@ def main() -> int:
         return 1
 
     resolved_prompt = resolve_prompt(template_content, args.target, workspace_root)
+
+    # When --output is provided, persist the resolved prompt so MCP callers
+    # that cannot capture stdout still receive the full content.
+    if args.output is not None:
+        try:
+            _write_resolved_prompt(resolved_prompt, args.output, workspace_root)
+        except OSError as error:
+            print(f"Error writing output file: {error}", file=sys.stderr)
+            return 1
+
+    # --quiet combined with --output suppresses both stdout and clipboard so
+    # non-interactive callers produce only the file side channel.
+    if args.quiet:
+        return 0
+
     print(resolved_prompt)
 
     if copy_to_clipboard(resolved_prompt):

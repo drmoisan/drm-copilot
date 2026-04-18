@@ -1,15 +1,14 @@
 ---
 name: execute-hard-lock
-description: Place the session in atomic execution mode bound to a specific plan-of-record. Enforces read-proof, preflight-only validation, and task-by-task execution without replanning. Use when a caller provides ${plan-path} and ${work-mode} and requires strict plan-following behavior.
+description: Place the session in atomic execution mode bound to a specific plan-of-record. Resolves the hard-lock prompt via the drmCopilotExtension MCP tool, then delegates to the atomic-executor subagent with the resolved text. Use when a caller provides ${plan-path} and ${work-mode} and requires strict plan-following behavior.
 allowed-tools:
   - mcp__drmCopilotExtension__resolve_execute_hard_lock_prompt
   - Read
-  - "Bash(git rev-parse *)"
 ---
 
 # Execute Hard Lock
 
-Deterministic hard-lock workflow that activates atomic execution mode for a specific plan-of-record. The `mcp__drmCopilotExtension__resolve_execute_hard_lock_prompt` MCP tool is the sole source of truth for the hard-lock instruction set. After resolution, this skill delegates execution to the `atomic-executor` subagent.
+Thin wrapper that resolves the hard-lock prompt via the drmCopilotExtension MCP tool and hands the resolved text to the `atomic-executor` subagent as kickoff directives. The resolved prompt is the authoritative instruction set for the session; this skill does not duplicate its contents.
 
 ## When to Use This Skill
 
@@ -17,7 +16,7 @@ Use this skill when:
 
 - The caller provides an explicit plan file path (`${plan-path}`) and a selected work mode (`${work-mode}`).
 - Strict plan-following behavior is required (no replanning, no reordering, no bucket tasks).
-- The caller wants the session to return a read-proof and `READY TO BEGIN FROM [P#-T#]` signal before execution starts.
+- The drmCopilotExtension MCP server is registered and reachable.
 
 ## Inputs
 
@@ -28,54 +27,47 @@ Required:
 
 ## Invocation Flow
 
-When this skill is invoked, perform these steps in order before executing any plan task.
-
-### 1. Resolve the Hard-Lock Prompt via MCP (Authoritative)
+### 1. Resolve the Hard-Lock Prompt via MCP
 
 Call the extension's resolver as the first action:
 
 - Tool: `mcp__drmCopilotExtension__resolve_execute_hard_lock_prompt`
 - Parameters:
   - `target` (required): the plan-of-record path (`${plan-path}`).
-  - `workspace_root` (optional): the workspace root (`${workspaceFolder}`). Omit to default to the current working directory.
+  - `workspace_root` (optional): the workspace root. Omit to default to the current working directory.
 
-The returned text is the authoritative hard-lock instruction set for this session.
+On success, the response contains an `artifacts` array whose first entry is the absolute path of a file containing the resolved hard-lock prompt (produced by the extension passing `--output` and `--quiet` to the bundled Python resolver).
 
-Abort on resolver failure: if the MCP tool is not available, is not permitted, or returns an error, stop immediately and report `BLOCKED: execute-hard-lock resolver unavailable`. Do not attempt to reconstruct or substitute the hard-lock contract from any other source. Execution must not proceed without a successful MCP resolution.
+### 2. Read the Resolved Prompt
 
-### 2. Record Mode Context
+Use the `Read` tool on the path returned in `artifacts[0]`. Treat the file contents as the authoritative hard-lock instruction set for this session.
 
-Record the selected work mode (`${work-mode}`) supplied by the caller. Resolve per the `Mode source precedence` rules in `atomic-plan-contract`. When the mode is absent or malformed, fail closed to `full-feature`.
+### 3. Delegate to atomic-executor
 
-### 3. Record Plan of Record
+Invoke the `atomic-executor` subagent via the Agent tool. Pass the resolved prompt text as the subagent's kickoff directive, followed by `${plan-path}` and `${work-mode}` as session context.
 
-Record `${plan-path}` as the sole plan-of-record for the session.
+The resolved prompt itself already instructs the subagent to perform the mandatory read-proof (`git rev-parse HEAD`, SHA-256 of the plan file, unchecked-task count), preflight validation, and `READY TO BEGIN FROM [P#-T#]` handshake before executing any task. This skill does not reissue those instructions locally — doing so would risk divergence from the canonical template.
 
-### 4. Mandatory Read-Proof (Before Any Task Execution)
+## Abort Conditions
 
-1. Confirm the plan-of-record file exists in the current branch.
-2. Output a fingerprint of what was read:
-   - `git rev-parse HEAD`
-   - SHA-256 of the plan file
-   - total count of lines matching `^- \[[ x]\] \[P` in the plan file
-3. Enter atomic execution mode under the instruction set returned by the MCP tool in step 1.
-4. Perform preflight validation only (no task execution).
-5. Identify the first unchecked `[ ]` task in plan order and print only:
-   - the exact line for that task
-   - two lines above and two lines below
-6. State `READY TO BEGIN FROM [P#-T#]` and wait for the caller to authorize execution.
+Stop immediately and report `BLOCKED: execute-hard-lock <cause>` in any of these cases. Do not reconstruct the hard-lock prompt from any other source and do not delegate to `atomic-executor` without a successful read in step 2.
+
+- MCP tool is not available or not permitted.
+- MCP response has `ok: false` or is otherwise malformed.
+- MCP response omits `artifacts` or `artifacts[0]`.
+- `Read` on the artifact path fails (file missing, unreadable, empty).
 
 ## Equivalent Entry Points (Reference)
 
-The following three entry points all produce the same resolved hard-lock prompt for a given plan path. This skill always uses the MCP form:
+The three entry points below all produce the same resolved hard-lock prompt for a given plan path. This skill always uses the MCP form:
 
-- MCP (used by this skill): `mcp__drmCopilotExtension__resolve_execute_hard_lock_prompt` with `target=<plan-path>`.
-- VS Code command: `@command:drmCopilotExtension.resolveExecuteHardLockPrompt`.
-- Local task (development only): `poetry run python scripts/dev_tools/resolve_hard_lock_prompt.py --target ${file} --workspace ${workspaceFolder}`.
+- MCP (used by this skill): `mcp__drmCopilotExtension__resolve_execute_hard_lock_prompt` with `target=<plan-path>`. The extension passes `--output artifacts/hard_lock_prompt.txt` and `--quiet` to the bundled Python resolver.
+- VS Code command: `@command:drmCopilotExtension.resolveExecuteHardLockPrompt` (interactive; writes to stdout + clipboard, no file artifact).
+- Local task (development only): `poetry run python scripts/dev_tools/resolve_hard_lock_prompt.py --target ${file} --workspace ${workspaceFolder}` (same: stdout + clipboard).
 
-## Delegation
+## Delegation Contract
 
-After the MCP tool returns the hard-lock instruction set and the read-proof is emitted, this skill delegates execution to the `atomic-executor` subagent. The subagent applies the instruction set together with the referenced shared skills:
+The `atomic-executor` subagent at [.claude/agents/atomic-executor.md](.claude/agents/atomic-executor.md) enforces the persistent execution-mode behaviors (anti-replanning, preflight-only blocking, persistence across turns, resume) and preloads the shared skills that support them:
 
 - `policy-compliance-order` — mandatory policy reading order.
 - `atomic-plan-contract` — plan format, Phase 0 requirements, preflight signals, validator gate, and mode-specific plan gates.
@@ -84,10 +76,9 @@ After the MCP tool returns the hard-lock instruction set and the read-proof is e
 
 ## Prohibitions
 
-- Do not proceed without a successful MCP resolver response.
-- Do not reconstruct the hard-lock contract from any other source.
-- Do not replan, reorder, or add tasks.
-- Do not check off tasks via any in-session tracker; only on-disk check-offs to the plan file are authoritative.
-- Do not block after execution begins.
+- Do not proceed without a successful MCP resolver response AND a successful `Read` of the artifact.
+- Do not reconstruct the hard-lock contract from any other source (not from this file, not from `.github/prompts/execute-hard-lock.prompt.md`, not from prior session memory).
+- Do not modify the resolved prompt text before passing it to `atomic-executor`.
+- Do not replan, reorder, or add tasks at this layer — the subagent owns that contract.
 - Do not modify policy files under `.claude/rules/` or `.github/instructions/`.
 - Do not create or read secrets unless explicitly authorized.

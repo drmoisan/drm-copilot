@@ -4,18 +4,10 @@ from io import StringIO
 from pathlib import Path, PurePosixPath
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from scripts.dev_tools.resolve_hard_lock_prompt import (
     main,
     resolve_prompt,
 )
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 def test_resolve_prompt_basic() -> None:
@@ -284,10 +276,10 @@ def test_copy_to_clipboard_no_mechanism() -> None:
         assert result is False
 
 
-def test_main_success(mem_path: Path) -> None:
+def test_main_success(mem_fs_path: Path) -> None:
     """Test successful main execution."""
     # Create workspace structure
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
 
     # Create template file
@@ -323,9 +315,9 @@ def test_main_success(mem_path: Path) -> None:
     assert "✓ Copied to clipboard" in mock_stderr.getvalue()
 
 
-def test_main_prefers_template_root_before_workspace_codex(mem_path: Path) -> None:
+def test_main_prefers_template_root_before_workspace_codex(mem_fs_path: Path) -> None:
     """Prefer the explicit template root over workspace codex templates."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
     workspace_template_dir = workspace / ".github" / "codex"
     workspace_template_dir.mkdir(parents=True)
@@ -333,7 +325,7 @@ def test_main_prefers_template_root_before_workspace_codex(mem_path: Path) -> No
         "workspace ${plan-path}",
         encoding="utf-8",
     )
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     (template_root / "execute-hard-lock.prompt.md").write_text(
         "bundled ${plan-path}",
@@ -370,10 +362,10 @@ def test_main_prefers_template_root_before_workspace_codex(mem_path: Path) -> No
 
 
 def test_main_falls_back_to_workspace_codex_when_template_root_template_is_missing(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Fall back to workspace codex when the explicit template root lacks it."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
     workspace_template_dir = workspace / ".github" / "codex"
     workspace_template_dir.mkdir(parents=True)
@@ -381,7 +373,7 @@ def test_main_falls_back_to_workspace_codex_when_template_root_template_is_missi
         "workspace ${plan-path}",
         encoding="utf-8",
     )
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     target_file = workspace / "docs" / "plan.md"
     target_file.parent.mkdir(parents=True)
@@ -414,12 +406,12 @@ def test_main_falls_back_to_workspace_codex_when_template_root_template_is_missi
 
 
 def test_main_reports_checked_template_paths_when_template_lookup_fails(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Report every checked template path when no template candidate exists."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     target_file = workspace / "docs" / "plan.md"
     target_file.parent.mkdir(parents=True)

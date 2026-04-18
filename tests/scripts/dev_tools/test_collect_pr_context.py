@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    import pytest
 
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
@@ -44,12 +44,6 @@ from scripts.dev_tools.pr_context.summary_helpers import (
 from scripts.dev_tools.pr_context.summary_helpers import (
     scoping_doc_changes as _scoping_doc_changes,
 )
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 class FakeRunner:
@@ -258,8 +252,8 @@ def test_build_pr_context_excludes_merge_pr_numbers_from_issue_refs():
     assert "#53" in context.referenced_prs
 
 
-def test_gather_feature_excerpts_reads_active_docs(mem_path: Path) -> None:
-    root = mem_path
+def test_gather_feature_excerpts_reads_active_docs(mem_fs_path: Path) -> None:
+    root = mem_fs_path
     feature = "2025-12-18-docs-v3-upgrade"
     feature_dir = root / "docs" / "features" / "active" / feature
     feature_dir.mkdir(parents=True)
@@ -322,10 +316,10 @@ def test_gather_feature_excerpts_reads_active_docs(mem_path: Path) -> None:
 
 
 def test_collector_includes_canonical_evidence_paths_in_additional_context_files(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Assert canonical feature evidence paths are enumerated as additional context."""
-    root = mem_path
+    root = mem_fs_path
     feature = "2026-02-22-pr-context-verification-contract-gap-46"
     feature_dir = root / "docs" / "features" / "active" / feature
     feature_dir.mkdir(parents=True)
@@ -483,7 +477,7 @@ def test_scoping_doc_changes_marks_non_material_link_only():
 
 
 def test_narrative_mentions_excluded_from_autoclose_section(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     """Assert narrative refs stay out of approved autoclose section."""
     outputs: list[tuple[Path, str]] = []
@@ -498,7 +492,7 @@ def test_narrative_mentions_excluded_from_autoclose_section(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -641,9 +635,9 @@ def test_narrative_mentions_excluded_from_autoclose_section(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )

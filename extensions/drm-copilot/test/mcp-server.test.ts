@@ -407,6 +407,38 @@ describe("repo automation MCP server", () => {
     });
   });
 
+  it("dispatches resolve_execute_hard_lock_prompt through the shared service with injected output and quiet defaults, and surfaces artifacts", async () => {
+    service.resolveExecuteHardLockPrompt.mockResolvedValue({
+      tool: "resolve_execute_hard_lock_prompt",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Resolved the execute hard-lock prompt for 'C:/workspace/docs/features/active/feature-123/plan.md'.",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+    });
+
+    const result = await client.callTool({
+      name: "resolve_execute_hard_lock_prompt",
+      arguments: {
+        workspace_root: "C:/workspace",
+        target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      },
+    });
+
+    expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      output: "artifacts/hard_lock_prompt.txt",
+      quiet: true,
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "resolve_execute_hard_lock_prompt",
+      workspace_root: "C:/workspace",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+    });
+  });
+
   it("returns validation error for invalid artifact_type", async () => {
     const result = await client.callTool({
       name: "validate_orchestration_artifacts",

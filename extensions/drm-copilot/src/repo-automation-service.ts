@@ -116,7 +116,11 @@ export interface RepoAutomationService {
     },
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
-    input: WorkspaceExecutionInput & { readonly target: string },
+    input: WorkspaceExecutionInput & {
+      readonly target: string;
+      readonly output?: string;
+      readonly quiet?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult>;
   validateOrchestrationArtifacts(
     input: WorkspaceExecutionInput & {
@@ -387,16 +391,51 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   }
 
   async resolveExecuteHardLockPrompt(
-    input: WorkspaceExecutionInput & { readonly target: string },
+    input: WorkspaceExecutionInput & {
+      readonly target: string;
+      readonly output?: string;
+      readonly quiet?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult> {
+    if (input.quiet === true && input.output === undefined) {
+      throw new Error(
+        "resolveExecuteHardLockPrompt: 'quiet' requires 'output' to be set.",
+      );
+    }
+
+    const args: string[] = [
+      "--target",
+      input.target,
+      "--workspace",
+      input.workspaceRoot,
+    ];
+    if (input.output !== undefined) {
+      args.push("--output", input.output);
+    }
+    if (input.quiet === true) {
+      args.push("--quiet");
+    }
+
+    const artifactPaths =
+      input.output === undefined
+        ? undefined
+        : [
+            normalizeGeneratedPath(
+              path.isAbsolute(input.output)
+                ? input.output
+                : path.join(input.workspaceRoot, input.output),
+            ),
+          ];
+
     return this.executeScript({
       tool: "resolve_execute_hard_lock_prompt",
       runtimeKind: "python",
       bundledRelativePath: "resources/templates/resolve_hard_lock_prompt.py",
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
-      args: ["--target", input.target, "--workspace", input.workspaceRoot],
+      args,
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+      ...(artifactPaths === undefined ? {} : { artifactPaths }),
     });
   }
 

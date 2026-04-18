@@ -535,7 +535,11 @@ export async function dispatchRepoAutomationTool(
       case "resolve_execute_hard_lock_prompt": {
         const input = resolveResolveExecuteHardLockPromptToolInput(rawInput);
         return toMcpToolResult(
-          await service.resolveExecuteHardLockPrompt(input),
+          await service.resolveExecuteHardLockPrompt({
+            ...input,
+            output: "artifacts/hard_lock_prompt.txt",
+            quiet: true,
+          }),
         );
       }
 

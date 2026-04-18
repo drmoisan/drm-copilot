@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    import pytest
 
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
@@ -16,12 +16,6 @@ from scripts.dev_tools.pr_context.collector import (
     collect_and_write,
 )
 from scripts.dev_tools.pr_context.models import FeatureDocExcerpt, PRContextResult
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 class FakeRunner:
@@ -117,7 +111,7 @@ class FakeGh:
 
 
 def test_collect_and_write_renders_non_material_scoping(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -130,7 +124,7 @@ def test_collect_and_write_renders_non_material_scoping(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -310,9 +304,9 @@ def test_collect_and_write_renders_non_material_scoping(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )
@@ -323,7 +317,7 @@ def test_collect_and_write_renders_non_material_scoping(
 
 
 def test_collect_and_write_handles_offline_gh(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -336,7 +330,7 @@ def test_collect_and_write_handles_offline_gh(
 
     class OfflineGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -401,9 +395,9 @@ def test_collect_and_write_handles_offline_gh(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )

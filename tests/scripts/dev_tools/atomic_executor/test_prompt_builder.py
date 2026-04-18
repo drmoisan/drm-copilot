@@ -4,7 +4,7 @@ Tests for atomic_executor.prompt_builder module.
 Tests cover PromptBuilder class methods for constructing prompts from templates
 and feature context (plan task excerpts + spec link).
 
-All tests use in-memory filesystem to avoid mem_path per repo policy.
+All tests use in-memory filesystem to avoid mem_fs_path per repo policy.
 """
 
 from collections.abc import Callable
@@ -15,12 +15,6 @@ import pytest
 from scripts.dev_tools.atomic_executor.plan_discovery import ResolvedPlan
 from scripts.dev_tools.atomic_executor.plan_parser import PlanTask
 from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 def make_default_plan_resolver(
@@ -58,7 +52,7 @@ class InMemoryPromptBuilderFileSystem:
     Purpose:
         Provides a pure in-memory filesystem abstraction that matches the
         PromptBuilderFileSystem protocol, enabling tests to run without
-        touching the real filesystem (no mem_path or write_text).
+        touching the real filesystem (no mem_fs_path or write_text).
 
     Usage:
         fs = InMemoryPromptBuilderFileSystem(
