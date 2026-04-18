@@ -102,4 +102,4 @@ MANDATORY READ-PROOF (DO THIS FIRST; NO EXECUTION YET)
 5) Identify the FIRST unchecked task ([ ]) in plan order and print ONLY:
    - the exact line for that task
    - 2 lines above and 2 lines below (no more)
-6) State: "READY TO BEGIN FROM [P#-T#]" and WAIT.
+6) State: "READY TO BEGIN FROM [P#-T#]" and immediately begin execution..
