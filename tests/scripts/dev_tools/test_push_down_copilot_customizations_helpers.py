@@ -638,6 +638,22 @@ def test_thinking_beast_mode_bundle_mirror_matches_root_agent() -> None:
     )
 
 
+def test_bundled_push_down_filesystem_matches_root_module() -> None:
+    """Keep the bundled push-down filesystem module identical to the root source."""
+    repo_root = Path(__file__).resolve().parents[3]
+    root_module_path = repo_root / (
+        "scripts/dev_tools/push_down_copilot_customizations_filesystem.py"
+    )
+    bundled_module_path = repo_root / (
+        "extensions/drm-copilot/resources/scripts/dev_tools/"
+        "push_down_copilot_customizations_filesystem.py"
+    )
+
+    assert bundled_module_path.read_text(
+        encoding="utf-8"
+    ) == root_module_path.read_text(encoding="utf-8")
+
+
 def test_split_trailing_punctuation_returns_core_and_suffix() -> None:
     """Split trailing prose punctuation away from the matched reference core."""
     rewrite_module = _load_rewrite_module()
