@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-04-17
-- **Status:** Delivered
+- **Status:** In Progress
 - **Version:** 0.1
 
 ## Context
@@ -68,19 +68,21 @@ Logs / Screenshots:
 
 ## Scope & Non-Goals
 - In scope:
-  - Create `.claude/rules/general-code-change.md` — cross-language design principles and toolchain loop
-  - Create `.claude/rules/general-unit-test.md` — cross-language coverage floors and test principles
-  - Create `.claude/rules/tonality.md` — communication tone policy
-  - Create `.claude/rules/typescript-suppressions.md` — TypeScript ESLint/TSC suppression authorization
-  - Create `.claude/rules/python-suppressions.md` — Python Ruff/Pyright suppression authorization
-  - Create `.claude/rules/self-explanatory-code-commenting.md` — code commenting standards
-  - Update `.claude/rules/typescript.md` — add coverage thresholds and `test:unit:coverage` command
-  - Update `.claude/rules/python.md` — add repo-wide ≥80% coverage floor
-  - Update `.claude/rules/csharp.md` — add coverage thresholds
-  - Update `.claude/rules/powershell.md` — add coverage thresholds
-  - Update `.claude/skills/feature-review-workflow/SKILL.md` — add coverage as a required check (Step 5) and as a remediation trigger (Step 8)
-  - Update `.claude/agents/feature-review.md` — decide and implement coverage execution model (evidence verification vs direct command allowance)
-  - Update `extensions/drm-copilot/package.json` — add `test:unit:coverage` npm script if not already present
+  - **DONE** — Create `.claude/rules/general-code-change.md` — cross-language design principles and toolchain loop
+  - **DONE** — Create `.claude/rules/general-unit-test.md` — cross-language coverage floors and test principles
+  - **DONE** — Create `.claude/rules/tonality.md` — communication tone policy
+  - **DONE** — Create `.claude/rules/typescript-suppressions.md` — TypeScript ESLint/TSC suppression authorization
+  - **DONE** — Create `.claude/rules/python-suppressions.md` — Python Ruff/Pyright suppression authorization
+  - **DONE** — Create `.claude/rules/self-explanatory-code-commenting.md` — code commenting standards
+  - **DONE** — Update `.claude/rules/typescript.md` — add coverage thresholds and `test:unit:coverage` command
+  - **DONE** — Update `.claude/rules/python.md` — add repo-wide ≥80% coverage floor
+  - **DONE** — Update `.claude/rules/csharp.md` — add coverage thresholds
+  - **DONE** — Update `.claude/rules/powershell.md` — add coverage thresholds
+  - **DONE** — Update `.claude/skills/feature-review-workflow/SKILL.md` — add coverage as required check (Step 5) and as a remediation trigger (Step 8)
+  - **DONE** — Update `.claude/agents/feature-review.md` — add evidence-based coverage verification instructions
+  - **DONE** — Update `.github/agents/feature-review.agent.md` — add evidence-based coverage verification instructions
+  - **DONE** — Update `package.json` (root) — add `test:unit:coverage` npm script
+  - **REMAINING** — Synchronize `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` with the root `.github/agents/feature-review.agent.md` — the bundled mirror has 41 lines vs root 112 lines; the Coverage Verification section, Constraints, Operating rules, and Phase A/B execution plan are absent from the bundled file
 
 - Out of scope / non-goals:
   - Do not modify any `.github/instructions/*.md` files; these remain the authoritative source
@@ -278,18 +280,19 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [x] AC-1: `.claude/rules/general-code-change.md` exists with `paths: **`, summarizes the cross-language design principles and the mandatory toolchain loop order (format → lint → type-check → test).
-- [x] AC-2: `.claude/rules/general-unit-test.md` exists with `paths: **`, and explicitly states: repository-wide line coverage ≥ 80% and any new module/class/method ≥ 90%.
-- [x] AC-3: `.claude/rules/typescript.md` Testing Standards section includes: coverage thresholds (≥80% repo-wide, ≥90% new code) and the coverage command (`npm run test:unit:coverage`).
-- [x] AC-4: `.claude/rules/python.md` Testing Standards section includes the repo-wide ≥80% coverage floor (in addition to the existing ≥90% new-code statement).
-- [x] AC-5: `.claude/rules/csharp.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
-- [x] AC-6: `.claude/rules/powershell.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
-- [x] AC-7: `.claude/rules/tonality.md` exists with `paths: **`, summarizes the professional tone requirements and the prohibitions on humor, hyperbole, and decorative metaphor.
-- [x] AC-8: `.claude/rules/typescript-suppressions.md` exists with `paths: **/*.ts`, lists the pre-authorized `eslint-disable-next-line` and `@ts-expect-error` patterns with their required comment format.
-- [x] AC-9: `.claude/rules/python-suppressions.md` exists with `paths: **/*.py`, lists at minimum the S603, ARG002, B008, BLE001, and S110 suppression patterns with their pre-authorized comment formats.
-- [x] AC-10: `.claude/rules/self-explanatory-code-commenting.md` exists with `paths: **/*.py`, summarizes mandatory docstring requirements for classes and functions, and the rule that loops and branches must have intent comments.
-- [x] AC-11: `.claude/skills/feature-review-workflow/SKILL.md` Step 5 check list includes a coverage verification step; Step 8 lists coverage regression as a remediation trigger.
-- [x] AC-12: `.claude/agents/feature-review.md` includes instructions for how the reviewer handles coverage — either by verifying existing coverage artifacts or (if the tool policy is expanded) by running the coverage command directly.
+- [ ] AC-1: `.claude/rules/general-code-change.md` exists with `paths: **`, summarizes the cross-language design principles and the mandatory toolchain loop order (format → lint → type-check → test).
+- [ ] AC-2: `.claude/rules/general-unit-test.md` exists with `paths: **`, and explicitly states: repository-wide line coverage ≥ 80% and any new module/class/method ≥ 90%.
+- [ ] AC-3: `.claude/rules/typescript.md` Testing Standards section includes: coverage thresholds (≥80% repo-wide, ≥90% new code) and the coverage command (`npm run test:unit:coverage`).
+- [ ] AC-4: `.claude/rules/python.md` Testing Standards section includes the repo-wide ≥80% coverage floor (in addition to the existing ≥90% new-code statement).
+- [ ] AC-5: `.claude/rules/csharp.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
+- [ ] AC-6: `.claude/rules/powershell.md` Testing Standards section includes coverage thresholds (≥80% repo, ≥90% new code).
+- [ ] AC-7: `.claude/rules/tonality.md` exists with `paths: **`, summarizes the professional tone requirements and the prohibitions on humor, hyperbole, and decorative metaphor.
+- [ ] AC-8: `.claude/rules/typescript-suppressions.md` exists with `paths: **/*.ts`, lists the pre-authorized `eslint-disable-next-line` and `@ts-expect-error` patterns with their required comment format.
+- [ ] AC-9: `.claude/rules/python-suppressions.md` exists with `paths: **/*.py`, lists at minimum the S603, ARG002, B008, BLE001, and S110 suppression patterns with their pre-authorized comment formats.
+- [ ] AC-10: `.claude/rules/self-explanatory-code-commenting.md` exists with `paths: **/*.py`, summarizes mandatory docstring requirements for classes and functions, and the rule that loops and branches must have intent comments.
+- [ ] AC-11: `.claude/skills/feature-review-workflow/SKILL.md` Step 5 check list includes a coverage verification step; Step 8 lists coverage regression as a remediation trigger.
+- [ ] AC-12: `.claude/agents/feature-review.md` includes instructions for how the reviewer handles coverage — either by verifying existing coverage artifacts or (if the tool policy is expanded) by running the coverage command directly.
+- [ ] AC-13: `extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md` is byte-identical to `.github/agents/feature-review.agent.md`.
 
 ## Risks & Mitigations
 - Technical or operational risks: Rule file `paths:` scope errors could cause a rule intended for all files to silently fail to load for certain file types, or a rule intended for only `.ts` files to bleed into other contexts. Risk is low because Claude Code's path activation is straightforward.
