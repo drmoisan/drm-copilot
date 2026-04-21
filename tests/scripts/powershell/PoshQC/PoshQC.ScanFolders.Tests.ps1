@@ -1,7 +1,15 @@
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1') -Force
+    $modulePath = (Resolve-Path -Path (Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1')).Path
+    foreach ($module in Get-Module -Name PoshQC) {
+        $loadedPath = if ($module.Path) { (Resolve-Path -Path $module.Path).Path } else { $null }
+        if ($loadedPath -ne $modulePath) {
+            Remove-Module -ModuleInfo $module -Force
+        }
+    }
+
+    Import-Module $modulePath -Force
 }
 
 Describe 'Get-PoshQCFileList scan-folder support' {
@@ -303,31 +311,19 @@ Describe 'Invoke-PoshQCAnalyze scan-folder support' {
 Describe 'bundled wrapper ScanFoldersJson transport' {
     AfterEach {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
-        Remove-Item Function:\Import-Module -ErrorAction SilentlyContinue
-        Remove-Item Function:\Invoke-PoshQCFormat -ErrorAction SilentlyContinue
-        Remove-Item Function:\Invoke-PoshQCAnalyze -ErrorAction SilentlyContinue
-        Remove-Item Function:\Invoke-PoshQCTest -ErrorAction SilentlyContinue
-        Remove-Item Function:\global:Import-Module -ErrorAction SilentlyContinue
-        Remove-Item Function:\global:Invoke-PoshQCFormat -ErrorAction SilentlyContinue
-        Remove-Item Function:\global:Invoke-PoshQCAnalyze -ErrorAction SilentlyContinue
-        Remove-Item Function:\global:Invoke-PoshQCTest -ErrorAction SilentlyContinue
     }
 
     It 'run-poshqc-format decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
 
-        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-format.ps1'
 
-        function global:Import-Module {
-            param()
-        }
-        function global:Invoke-PoshQCFormat {
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCFormat -MockWith {
             param([string] $Root, [string[]] $ScanFolders)
             [void] $Root
             $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
         }
-
-        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-format.ps1'
 
         & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/src","/repo/tests/powershell"]'
 
@@ -337,18 +333,14 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
     It 'run-poshqc-analyze decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
 
-        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-analyze.ps1'
 
-        function global:Import-Module {
-            param()
-        }
-        function global:Invoke-PoshQCAnalyze {
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCAnalyze -MockWith {
             param([string] $Root, [string[]] $ScanFolders)
             [void] $Root
             $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
         }
-
-        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-analyze.ps1'
 
         & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/src","/repo/tests/powershell"]'
 
@@ -358,12 +350,10 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
     It 'run-poshqc-test decodes ScanFoldersJson into string array input' {
         Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
 
-        Remove-Module PoshQC -Force -ErrorAction SilentlyContinue
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-test.ps1'
 
-        function global:Import-Module {
-            param()
-        }
-        function global:Invoke-PoshQCTest {
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCTest -MockWith {
             param(
                 [string] $Root,
                 [string[]] $ScanFolders,
@@ -375,8 +365,6 @@ Describe 'bundled wrapper ScanFoldersJson transport' {
             [void] $KoverageOutputPath
             $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
         }
-
-        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-test.ps1'
 
         & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/tests/claude-runtime","/repo/tests/claude-hooks"]'
 

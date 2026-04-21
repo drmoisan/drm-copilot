@@ -6,8 +6,18 @@ Set-StrictMode -Version Latest
 
 BeforeAll {
     $modulePath = Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1'
-    Import-Module -Name $modulePath -Force
-    $moduleInfo = Get-Module PoshQC
+    $resolvedModulePath = (Resolve-Path -Path $modulePath).Path
+    foreach ($module in Get-Module -Name PoshQC) {
+        $loadedPath = if ($module.Path) { (Resolve-Path -Path $module.Path).Path } else { $null }
+        if ($loadedPath -ne $resolvedModulePath) {
+            Remove-Module -ModuleInfo $module -Force
+        }
+    }
+
+    Import-Module -Name $resolvedModulePath -Force
+    $moduleInfo = Get-Module PoshQC |
+        Where-Object { $_.Path -and (Resolve-Path -Path $_.Path).Path -eq $resolvedModulePath } |
+            Select-Object -First 1
     $moduleRoot = Split-Path -Parent $moduleInfo.Path
     $script:TestSettingsPath = Join-Path $moduleRoot 'settings/pssa.settings.psd1'
 }
@@ -754,4 +764,3 @@ Describe 'Invoke-PoshQCTest' {
         }
     }
 }
-

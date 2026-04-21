@@ -8,7 +8,7 @@ allowed-tools:
 
 # PR Author Skill
 
-Produce a GitHub-ready Pull Request description from the standard PR context files.
+Produce a GitHub-ready Pull Request description from the standard PR context files. The pull request must be in a copy / paste block so that it can be copied easily to the PR extension.
 
 ## Inputs
 

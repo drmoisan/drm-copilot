@@ -1,27 +1,30 @@
 <#
 .SYNOPSIS
-    Pre-tool-use hook that enforces the Python per-batch change budget.
+    Pre-tool-use hook that enforces the PowerShell per-batch change budget.
 
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
-    operation. When the target file is a Python file, it classifies the file as either
-    production or test and checks the running count against the per-batch cap:
-      - 3 production .py files per batch
-      - 3 test .py files per batch
+    operation. When the target file is a PowerShell source file (.ps1, .psm1, .psd1),
+    it classifies the file as either production or test and checks the running count
+    against the per-batch cap:
+      - 3 production PowerShell files per batch
+      - 3 test PowerShell files per batch
 
     A "batch" is scoped to the current Claude Code session. The running count is
-    persisted under .claude/state/python-batch-budget.<session_id>.json. Only distinct
-    file paths are counted; repeated edits to the same file consume one slot.
+    persisted under .claude/state/powershell-batch-budget.<session_id>.json. Only
+    distinct file paths are counted; repeated edits to the same file consume one slot.
 
     Test files are those matching:
-      - tests/**/*.py
-      - test_*.py
+      - tests/**/*.ps1
+      - *.Tests.ps1
 
-    All other .py files are treated as production files. Non-Python paths pass through.
+    All other .ps1/.psm1/.psd1 files are treated as production files. Non-PowerShell
+    paths pass through.
 
     The cap may be overridden per session by setting the environment variable
-    CLAUDE_PYTHON_BUDGET_PROD or CLAUDE_PYTHON_BUDGET_TEST to a positive integer before
-    the session starts, or by writing {"prodCap": N, "testCap": M} into the state file.
+    CLAUDE_POWERSHELL_BUDGET_PROD or CLAUDE_POWERSHELL_BUDGET_TEST to a positive integer
+    before the session starts, or by writing {"prodCap": N, "testCap": M} into the
+    state file.
 
     When the cap would be exceeded by a new file, the script emits a JSON response with
     'decision': 'block' and exits 0. The session must explicitly reset the counter by
@@ -34,7 +37,7 @@
 [CmdletBinding()]
 param()
 
-function Get-PythonBatchBudgetState {
+function Get-PowerShellBatchBudgetState {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -53,7 +56,7 @@ function Get-PythonBatchBudgetState {
     }
 }
 
-function ConvertTo-PythonBatchBudgetState {
+function ConvertTo-PowerShellBatchBudgetState {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -67,7 +70,7 @@ function ConvertTo-PythonBatchBudgetState {
         [int] $TestCap
     )
 
-    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
+    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
     if ($null -ne $InputObject.prodCap) { $state.prodCap = [int]$InputObject.prodCap }
     if ($null -ne $InputObject.testCap) { $state.testCap = [int]$InputObject.testCap }
     if ($null -ne $InputObject.prodFiles) { $state.prodFiles = @($InputObject.prodFiles) }
@@ -76,7 +79,7 @@ function ConvertTo-PythonBatchBudgetState {
     return $state
 }
 
-function Get-PythonBatchBudgetBlockDecision {
+function Get-PowerShellBatchBudgetBlockDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -97,7 +100,7 @@ function Get-PythonBatchBudgetBlockDecision {
     return $decision
 }
 
-function Invoke-PythonBatchBudgetDecision {
+function Invoke-PowerShellBatchBudgetDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -112,11 +115,11 @@ function Invoke-PythonBatchBudgetDecision {
     )
 
     $normalized = $FilePath -replace '\\', '/'
-    if ($normalized -notmatch '\.py$') {
+    if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
         return [ordered]@{ decision = 'allow'; state = $State; shouldWriteState = $false }
     }
 
-    $isTestFile = ($normalized -match '(^|/)tests/.*\.py$') -or ($normalized -match '(^|/)test_[^/]+\.py$')
+    $isTestFile = ($normalized -match '(^|/)tests/.*\.ps1$') -or ($normalized -match '\.Tests\.ps1$')
     $targetList = if ($isTestFile) { @($State.testFiles) } else { @($State.prodFiles) }
     $cap = if ($isTestFile) { [int]$State.testCap } else { [int]$State.prodCap }
     $kind = if ($isTestFile) { 'test' } else { 'production' }
@@ -128,8 +131,8 @@ function Invoke-PythonBatchBudgetDecision {
     if ($targetList.Count -ge $cap) {
         $currentFiles = ($targetList -join ', ')
         $kindUpper = $kind.ToUpperInvariant()
-        $reason = "Python per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, raise the cap via CLAUDE_PYTHON_BUDGET_$kindUpper environment variable with approved scope, or reset the batch by deleting $StateFile."
-        return Get-PythonBatchBudgetBlockDecision -Reason $reason -State $State
+        $reason = "PowerShell per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, raise the cap via CLAUDE_POWERSHELL_BUDGET_$kindUpper environment variable with approved scope, or reset the batch by deleting $StateFile."
+        return Get-PowerShellBatchBudgetBlockDecision -Reason $reason -State $State
     }
 
     if ($isTestFile) {
@@ -141,7 +144,7 @@ function Invoke-PythonBatchBudgetDecision {
     return [ordered]@{ decision = 'allow'; state = $State; shouldWriteState = $true }
 }
 
-function Invoke-PythonBatchBudgetHook {
+function Invoke-PowerShellBatchBudgetHook {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -166,7 +169,7 @@ function Invoke-PythonBatchBudgetHook {
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return Get-PythonBatchBudgetBlockDecision -Reason 'Python batch-budget hook received malformed JSON in CLAUDE_TOOL_INPUT.'
+        return Get-PowerShellBatchBudgetBlockDecision -Reason 'PowerShell batch-budget hook received malformed JSON in CLAUDE_TOOL_INPUT.'
     }
 
     $filePath = $toolInput.file_path
@@ -175,7 +178,7 @@ function Invoke-PythonBatchBudgetHook {
     }
 
     $normalized = $filePath -replace '\\', '/'
-    if ($normalized -notmatch '\.py$') {
+    if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
         return [ordered]@{ decision = 'allow' }
     }
 
@@ -184,24 +187,24 @@ function Invoke-PythonBatchBudgetHook {
         & $EnsureDirectory $stateDir
     }
 
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")
-    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
+    $stateFile = Join-Path -Path $stateDir -ChildPath ("powershell-batch-budget.$SessionId.json")
+    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
 
     if (& $TestPathExists $stateFile) {
         try {
             $loaded = & $ReadState $stateFile | ConvertFrom-Json -ErrorAction Stop
-            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap
+            $state = ConvertTo-PowerShellBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap
         } catch {
-            Write-Verbose "Ignoring unreadable Python batch-budget state file '$stateFile': $($_.Exception.Message)"
+            Write-Verbose "Ignoring unreadable PowerShell batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
-    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile
+    $decision = Invoke-PowerShellBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile
     if ($decision.shouldWriteState) {
         try {
             & $WriteState $stateFile $decision.state
         } catch {
-            Write-Verbose "Unable to write Python batch-budget state file '$stateFile': $($_.Exception.Message)"
+            Write-Verbose "Unable to write PowerShell batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
@@ -219,14 +222,14 @@ if (-not $sessionId) {
 
 $prodCap = 3
 $testCap = 3
-if ($env:CLAUDE_PYTHON_BUDGET_PROD -match '^\d+$') {
-    $prodCap = [int]$env:CLAUDE_PYTHON_BUDGET_PROD
+if ($env:CLAUDE_POWERSHELL_BUDGET_PROD -match '^\d+$') {
+    $prodCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_PROD
 }
-if ($env:CLAUDE_PYTHON_BUDGET_TEST -match '^\d+$') {
-    $testCap = [int]$env:CLAUDE_PYTHON_BUDGET_TEST
+if ($env:CLAUDE_POWERSHELL_BUDGET_TEST -match '^\d+$') {
+    $testCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_TEST
 }
 
-$decision = Invoke-PythonBatchBudgetHook -ToolInputRaw $env:CLAUDE_TOOL_INPUT -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
+$decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $env:CLAUDE_TOOL_INPUT -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
 if ($decision.decision -eq 'block') {
     $decision.Remove('state')
     $decision | ConvertTo-Json -Compress | Write-Output
