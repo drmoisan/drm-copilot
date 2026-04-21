@@ -28,12 +28,12 @@ The calling orchestrator session retains control immediately after the script re
 
 ## Acceptance Criteria (early draft)
 
-- [ ] Invoking the script with a valid `-ShortName` and `-Objective` creates a git worktree at `<WorktreeParentPath>/drm-copilot-wt-<timestamp>-<ShortName>` on a new branch (`feature/<timestamp>-<ShortName>` when `-BranchName` is not supplied)
-- [ ] The Claude CLI process starts in the background in the new worktree's directory with the provided `-Objective` and `--dangerously-skip-permissions` in its arguments
-- [ ] The script returns to the caller immediately without blocking — `Start-Process` is called without `-Wait`
-- [ ] The script writes worktree path, process ID, and log file path to stdout before exiting `0`
-- [ ] If `claude` is not on `PATH`, the script exits non-zero with a descriptive error before any file system mutation
-- [ ] If the target worktree path already exists, the script exits non-zero with a descriptive error before calling `git worktree add`
+- [x] Invoking the script with a valid `-ShortName` and `-Objective` creates a git worktree at `<WorktreeParentPath>/drm-copilot-wt-<timestamp>-<ShortName>` on a new branch (`feature/<timestamp>-<ShortName>` when `-BranchName` is not supplied)
+- [x] The Claude CLI process starts in the background in the new worktree's directory with the provided `-Objective` and `--dangerously-skip-permissions` in its arguments
+- [x] The script returns to the caller immediately without blocking — `Start-Process` is called without `-Wait`
+- [x] The script writes worktree path, process ID, and log file path to stdout before exiting `0`
+- [x] If `claude` is not on `PATH`, the script exits non-zero with a descriptive error before any file system mutation
+- [x] If the target worktree path already exists, the script exits non-zero with a descriptive error before calling `git worktree add`
 
 ## Constraints & Risks
 
