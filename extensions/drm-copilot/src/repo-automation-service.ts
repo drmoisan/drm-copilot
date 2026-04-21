@@ -10,9 +10,14 @@ import {
 import {
   normalizeGeneratedPath,
   parseFirstArtifactPath,
-  POSH_QC_TOOL_CONFIG,
   type ScriptExecutionOptions,
 } from "./repo-automation-service-support";
+import {
+  buildNewActiveFeatureFolderArgs,
+  buildPoshQcWorkflowArguments,
+  buildResolveExecuteHardLockPromptArguments,
+  buildValidateOrchestrationArtifactsArgs,
+} from "./repo-automation-args";
 import {
   type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
@@ -298,17 +303,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly workMode: WorkModeOption;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const args = ["--feature-name", input.featureName, "--type", input.type];
-    if (input.issueNumber !== undefined) {
-      args.push("--issue-number", input.issueNumber);
-    }
-
-    args.push(
-      "--work-mode",
-      input.workMode,
-      "--template-root",
-      this.templateRoot,
-    );
+    const args = buildNewActiveFeatureFolderArgs(input, this.templateRoot);
     return this.executeScript({
       tool: "new_active_feature_folder",
       runtimeKind: "python",
@@ -397,35 +392,8 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly quiet?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    if (input.quiet === true && input.output === undefined) {
-      throw new Error(
-        "resolveExecuteHardLockPrompt: 'quiet' requires 'output' to be set.",
-      );
-    }
-
-    const args: string[] = [
-      "--target",
-      input.target,
-      "--workspace",
-      input.workspaceRoot,
-    ];
-    if (input.output !== undefined) {
-      args.push("--output", input.output);
-    }
-    if (input.quiet === true) {
-      args.push("--quiet");
-    }
-
-    const artifactPaths =
-      input.output === undefined
-        ? undefined
-        : [
-            normalizeGeneratedPath(
-              path.isAbsolute(input.output)
-                ? input.output
-                : path.join(input.workspaceRoot, input.output),
-            ),
-          ];
+    const { args, artifactPaths } =
+      buildResolveExecuteHardLockPromptArguments(input);
 
     return this.executeScript({
       tool: "resolve_execute_hard_lock_prompt",
@@ -450,34 +418,15 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const toolConfig = POSH_QC_TOOL_CONFIG[tool];
-    const args = ["-WorkspaceRoot", input.workspaceRoot];
-    if (input.scanFolders && input.scanFolders.length > 0) {
-      if (
-        tool === "run_poshqc_format" ||
-        tool === "run_poshqc_analyze" ||
-        tool === "run_poshqc_test"
-      ) {
-        args.push("-ScanFoldersJson", JSON.stringify(input.scanFolders));
-      } else {
-        for (const scanFolder of input.scanFolders) {
-          args.push("-ScanFolders", scanFolder);
-        }
-      }
-    }
-
-    const summaryTemplate =
-      input.scanFolders && input.scanFolders.length > 0
-        ? toolConfig.summaryWithFolders
-        : toolConfig.summaryWithoutFolders;
-    const summary = summaryTemplate
-      .replace("{workspaceRoot}", input.workspaceRoot)
-      .replace("{scanFolderCount}", String(input.scanFolders?.length ?? 0));
+    const { args, bundledRelativePath, summary } = buildPoshQcWorkflowArguments(
+      tool,
+      input,
+    );
 
     return this.executeScript({
       tool: tool as RepoAutomationToolName,
       runtimeKind: "powershell",
-      bundledRelativePath: toolConfig.bundledRelativePath,
+      bundledRelativePath,
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? tool,
       args,
@@ -492,10 +441,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly requireComplete?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const args = [input.artifactType, input.artifactPath];
-    if (input.requireComplete) {
-      args.push("--require-complete");
-    }
+    const args = buildValidateOrchestrationArtifactsArgs(input);
 
     return this.executeScript({
       tool: "validate_orchestration_artifacts",

@@ -279,6 +279,14 @@ Seeded from issue:
 - Manual validation steps (if required): Manually open a Claude Code session and confirm the new rule files are visible in the loaded context when working on a `.ts` or `.py` file. Confirm coverage thresholds appear in the TypeScript and Python rule text.
 
 
+## Mirror Verification Model
+
+Extension-bundled Python mirrors are verified through canonical-copy parity tests rather than direct LCOV measurement. The parity model compares observable behavior from the canonical implementation and the bundled mirror for the same fixture inputs.
+
+Mirror paths:
+- `extensions/drm-copilot/resources/scripts/dev_tools/push_down_copilot_customizations_filesystem.py`
+- `extensions/drm-copilot/resources/scripts/dev_tools/resolve_hard_lock_prompt.py`
+
 ## Acceptance Criteria
 - [x] AC-1: `.claude/rules/general-code-change.md` exists with `paths: **`, summarizes the cross-language design principles and the mandatory toolchain loop order (format → lint → type-check → test).
 - [x] AC-2: `.claude/rules/general-unit-test.md` exists with `paths: **`, and explicitly states: repository-wide line coverage ≥ 80% and any new module/class/method ≥ 90%.

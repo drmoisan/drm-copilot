@@ -12,6 +12,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 jest.mock("vscode", () => ({}), { virtual: true });
 
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
+import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
 
 function createMockService(): jest.Mocked<RepoAutomationService> {
@@ -427,7 +428,7 @@ describe("repo automation MCP server", () => {
     expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
       workspaceRoot: "C:/workspace",
       target: "C:/workspace/docs/features/active/feature-123/plan.md",
-      output: "artifacts/hard_lock_prompt.txt",
+      output: DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH,
       quiet: true,
     });
     expect(result.isError).toBe(false);
