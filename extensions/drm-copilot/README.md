@@ -23,6 +23,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.newActiveFeatureFolder`
 - `drmCopilotExtension.resolvePolicyAuditTemplateAsset`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
+- `drmCopilotExtension.resolveAtomicPlanPrompt`
 - `drmCopilotExtension.syncAgentsFromInstructions`
 - `drmCopilotExtension.listMcpTools`
 
@@ -52,6 +53,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `new_potential_entry`
 - `potential_to_issue`
 - `new_active_feature_folder`
+- `resolve_atomic_plan_prompt`
 - `resolve_execute_hard_lock_prompt`
 - `run_poshqc_format`
 - `run_poshqc_analyze`
@@ -104,6 +106,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
 - `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
 - `resolve_policy_audit_template_asset`: optional `workspace_root`, required `asset` (`template` | `code-review-template` | `feature-audit-template` | `agents`), optional `target_path`
+- `resolve_atomic_plan_prompt`: optional `workspace_root`, required `target`
 - `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
 - run_poshqc_format: optional `workspace_root`, optional `scan_folders`
 - run_poshqc_analyze: optional `workspace_root`, optional `scan_folders`
@@ -132,6 +135,8 @@ MCP tool calls return structured JSON with:
 
 `Resolve Execute Hard-Lock Prompt` depends on Python because it delegates to bundled Python resources at execution time.
 
+`Resolve Atomic Plan Prompt` also depends on Python because it delegates to bundled Python resources at execution time.
+
 ## Execution Model
 
 The shared repo-automation service executes these bundled wrapper resources:
@@ -148,6 +153,7 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/policy_audit/code-review.yyyy-MM-ddTHH-mm.md`
 - `resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md`
 - `resources/templates/policy_audit/AGENTS.md`
+- `resources/templates/resolve_atomic_plan_prompt.py`
 - `resources/templates/resolve_hard_lock_prompt.py`
 - `resources/templates/run-poshqc-format.ps1`
 - `resources/templates/run-poshqc-analyze.ps1`

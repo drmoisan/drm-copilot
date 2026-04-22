@@ -32,6 +32,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runPoshQCSuite: jest.fn(),
     resolvePolicyAuditTemplateAsset: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
+    resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
   };
 }
@@ -86,6 +87,7 @@ describe("repo automation MCP server", () => {
       "run_poshqc_suite",
       "resolve_policy_audit_template_asset",
       "resolve_execute_hard_lock_prompt",
+      "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
     ]);
   });

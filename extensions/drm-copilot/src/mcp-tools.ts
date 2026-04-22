@@ -1,7 +1,13 @@
 import { getStderrExcerpt } from "./command-runtime";
 import {
+  REPO_AUTOMATION_TOOL_DEFINITIONS,
+  type ToolDefinition,
+} from "./mcp-repo-automation-tool-definitions";
+import {
   type RepoAutomationExecutionResult,
   type RepoAutomationService,
+} from "./repo-automation-service";
+import {
   REPO_AUTOMATION_TOOLS,
   type RepoAutomationToolName,
 } from "./repo-automation-service";
@@ -103,7 +109,7 @@ function toFailureToolResult(
  * @returns Stable tool definitions advertised to MCP clients.
  */
 export function listRepoAutomationTools(): ReadonlyArray<ToolDefinition> {
-  return toolDefinitions;
+  return REPO_AUTOMATION_TOOL_DEFINITIONS;
 }
 
 /**
@@ -199,6 +205,11 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(
           await handleResolveExecuteHardLockPrompt(rawInput, service),
         );
+      }
+
+      case "resolve_atomic_plan_prompt": {
+        const input = resolveResolveAtomicPlanPromptToolInput(rawInput);
+        return toMcpToolResult(await service.resolveAtomicPlanPrompt(input));
       }
 
       case "validate_orchestration_artifacts": {
