@@ -10,8 +10,8 @@ import {
 import {
   REPO_AUTOMATION_TOOLS,
   type RepoAutomationToolName,
-} from "./repo-automation-service";
-import { toolDefinitions, type ToolDefinition } from "./mcp-tool-definitions";
+} from "./repo-automation-tool-names";
+import { resolveResolveAtomicPlanPromptToolInput } from "./mcp-tool-inputs";
 import {
   handleCollectCommitContext,
   handleCollectPrContext,
