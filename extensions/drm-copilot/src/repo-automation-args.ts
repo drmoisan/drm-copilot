@@ -5,9 +5,10 @@ import {
 } from "./repo-automation-service-support";
 import type { WorkspaceExecutionInput } from "./repo-automation-service";
 import type { RepoAutomationToolName } from "./repo-automation-tool-names";
-import type {
-  PotentialPromotionType,
-  WorkModeOption,
+import {
+  isAbsolutePathLike,
+  type PotentialPromotionType,
+  type WorkModeOption,
 } from "./workflow-command-arguments";
 
 export interface ResolveExecuteHardLockPromptArguments {
@@ -46,7 +47,7 @@ export function buildResolveExecuteHardLockPromptArguments(
       ? undefined
       : [
           normalizeGeneratedPath(
-            path.isAbsolute(input.output)
+            isAbsolutePathLike(input.output)
               ? input.output
               : path.join(input.workspaceRoot, input.output),
           ),

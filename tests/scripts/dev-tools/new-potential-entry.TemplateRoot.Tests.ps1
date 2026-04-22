@@ -23,7 +23,6 @@ Describe "new-potential-entry.ps1 - template root resolution" {
         $targetPath = $script:expectedPaths['TargetPath']
         $targetDirectory = $script:expectedPaths['TargetDirectory']
 
-        Mock -CommandName git -MockWith { "Test User" }
         Mock -CommandName Get-Date -MockWith {
             param([string] $Format)
 
@@ -79,7 +78,6 @@ Describe "new-potential-entry.ps1 - template root resolution" {
         $targetPath = $script:expectedPaths['TargetPath']
         $targetDirectory = $script:expectedPaths['TargetDirectory']
 
-        Mock -CommandName git -MockWith { "Test User" }
         Mock -CommandName Get-Date -MockWith {
             param([string] $Format)
 

@@ -253,7 +253,7 @@ export function normalizeWorkspaceRoot(
   return normalizeRequiredText(value, "workspace_root");
 }
 
-function isAbsolutePathLike(filePath: string): boolean {
+export function isAbsolutePathLike(filePath: string): boolean {
   return /^(?:[a-zA-Z]:[\\/]|\\\\|\/)/.test(filePath);
 }
 

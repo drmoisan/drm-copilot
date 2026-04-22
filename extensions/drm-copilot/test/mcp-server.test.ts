@@ -15,7 +15,7 @@ jest.mock("vscode", () => ({}), { virtual: true });
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
- 
+
 function createMockService(): jest.Mocked<RepoAutomationService> {
   return {
     collectCommitContext: jest.fn(),
