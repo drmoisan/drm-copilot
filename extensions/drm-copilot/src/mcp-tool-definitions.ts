@@ -1,4 +1,4 @@
-import type { RepoAutomationToolName } from "./repo-automation-service";
+import type { RepoAutomationToolName } from "./repo-automation-tool-names";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 
 export interface ToolDefinition {

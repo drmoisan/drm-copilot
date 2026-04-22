@@ -3,10 +3,8 @@ import {
   normalizeGeneratedPath,
   POSH_QC_TOOL_CONFIG,
 } from "./repo-automation-service-support";
-import type {
-  RepoAutomationToolName,
-  WorkspaceExecutionInput,
-} from "./repo-automation-service";
+import type { WorkspaceExecutionInput } from "./repo-automation-service";
+import type { RepoAutomationToolName } from "./repo-automation-tool-names";
 import type {
   PotentialPromotionType,
   WorkModeOption,

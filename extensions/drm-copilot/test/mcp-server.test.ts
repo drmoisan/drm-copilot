@@ -6,6 +6,7 @@ import {
   it,
   jest,
 } from "@jest/globals";
+import process from "node:process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
