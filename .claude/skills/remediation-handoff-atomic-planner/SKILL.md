@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/remediation-handoff-atomic-planner/SKILL.md`
->
-> This `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: remediation-handoff-atomic-planner
 description: 'Reusable remediation trigger and atomic_planner handoff steps. Use when audits require remediation inputs and a delegated remediation plan.'

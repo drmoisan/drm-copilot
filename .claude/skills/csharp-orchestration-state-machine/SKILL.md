@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/csharp-orchestration-state-machine/SKILL.md`
->
-> This `.claude/skills/csharp-orchestration-state-machine/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: csharp-orchestration-state-machine
 description: Checkpoint schema and resume protocol for long-running C# orchestration workflows.

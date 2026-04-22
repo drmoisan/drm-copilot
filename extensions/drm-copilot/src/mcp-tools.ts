@@ -11,22 +11,36 @@ import {
   REPO_AUTOMATION_TOOLS,
   type RepoAutomationToolName,
 } from "./repo-automation-tool-names";
+import { resolveResolveAtomicPlanPromptToolInput } from "./mcp-tool-inputs";
 import {
-  resolveCollectCommitContextToolInput,
-  resolveCollectPrContextToolInput,
-  resolveNewActiveFeatureFolderToolInput,
-  resolveNewPotentialBugEntryToolInput,
-  resolveNewPotentialEntryToolInput,
-  resolvePolicyAuditTemplateAssetToolInput,
-  resolvePotentialToIssueToolInput,
-  resolvePushDownCodexAndAgentsCustomizationsToolInput,
-  resolvePushDownCopilotCustomizationsToolInput,
-  resolveRunPoshQCSuiteToolInput,
-  resolveResolveAtomicPlanPromptToolInput,
-  resolveResolveExecuteHardLockPromptToolInput,
-  resolveValidateOrchestrationArtifactsToolInput,
-} from "./mcp-tool-inputs";
+  handleCollectCommitContext,
+  handleCollectPrContext,
+} from "./mcp-handlers/collect-context-handlers";
+import {
+  handleNewActiveFeatureFolder,
+  handleNewPotentialBugEntry,
+  handleNewPotentialEntry,
+  handlePotentialToIssue,
+} from "./mcp-handlers/feature-entry-handlers";
+import {
+  handleRunPoshQCAnalyze,
+  handleRunPoshQCAnalyzeAutofix,
+  handleRunPoshQCFormat,
+  handleRunPoshQCSuite,
+  handleRunPoshQCTest,
+} from "./mcp-handlers/poshqc-handlers";
+import {
+  handlePushDownCodexAndAgentsCustomizations,
+  handlePushDownCopilotCustomizations,
+} from "./mcp-handlers/push-down-handlers";
+import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
+import {
+  handleResolvePolicyAuditTemplateAsset,
+  handleValidateOrchestrationArtifacts,
+} from "./mcp-handlers/template-validation-handlers";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
+
+export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
 export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly ok: boolean;
@@ -116,86 +130,80 @@ export async function dispatchRepoAutomationTool(
   try {
     switch (toolName) {
       case "collect_commit_context": {
-        const input = resolveCollectCommitContextToolInput(rawInput);
-        return toMcpToolResult(await service.collectCommitContext(input));
+        return toMcpToolResult(
+          await handleCollectCommitContext(rawInput, service),
+        );
       }
 
       case "collect_pr_context": {
-        const input = resolveCollectPrContextToolInput(rawInput);
-        return toMcpToolResult(await service.collectPrContext(input));
+        return toMcpToolResult(await handleCollectPrContext(rawInput, service));
       }
 
       case "push_down_copilot_customizations": {
-        const input = resolvePushDownCopilotCustomizationsToolInput(rawInput);
         return toMcpToolResult(
-          await service.pushDownCopilotCustomizations(input),
+          await handlePushDownCopilotCustomizations(rawInput, service),
         );
       }
 
       case "push_down_codex_and_agents_customizations": {
-        const input =
-          resolvePushDownCodexAndAgentsCustomizationsToolInput(rawInput);
         return toMcpToolResult(
-          await service.pushDownCodexAndAgentsCustomizations(input),
+          await handlePushDownCodexAndAgentsCustomizations(rawInput, service),
         );
       }
 
       case "new_potential_bug_entry": {
-        const input = resolveNewPotentialBugEntryToolInput(rawInput);
-        return toMcpToolResult(await service.newPotentialBugEntry(input));
+        return toMcpToolResult(
+          await handleNewPotentialBugEntry(rawInput, service),
+        );
       }
 
       case "new_potential_entry": {
-        const input = resolveNewPotentialEntryToolInput(rawInput);
-        return toMcpToolResult(await service.newPotentialEntry(input));
+        return toMcpToolResult(
+          await handleNewPotentialEntry(rawInput, service),
+        );
       }
 
       case "potential_to_issue": {
-        const input = resolvePotentialToIssueToolInput(rawInput);
-        return toMcpToolResult(await service.potentialToIssue(input));
+        return toMcpToolResult(await handlePotentialToIssue(rawInput, service));
       }
 
       case "new_active_feature_folder": {
-        const input = resolveNewActiveFeatureFolderToolInput(rawInput);
-        return toMcpToolResult(await service.newActiveFeatureFolder(input));
+        return toMcpToolResult(
+          await handleNewActiveFeatureFolder(rawInput, service),
+        );
       }
 
       case "run_poshqc_format": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCFormat(input));
+        return toMcpToolResult(await handleRunPoshQCFormat(rawInput, service));
       }
 
       case "run_poshqc_analyze": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCAnalyze(input));
+        return toMcpToolResult(await handleRunPoshQCAnalyze(rawInput, service));
       }
 
       case "run_poshqc_test": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCTest(input));
+        return toMcpToolResult(await handleRunPoshQCTest(rawInput, service));
       }
 
       case "run_poshqc_analyze_autofix": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCAnalyzeAutofix(input));
+        return toMcpToolResult(
+          await handleRunPoshQCAnalyzeAutofix(rawInput, service),
+        );
       }
 
       case "run_poshqc_suite": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCSuite(input));
+        return toMcpToolResult(await handleRunPoshQCSuite(rawInput, service));
       }
 
       case "resolve_policy_audit_template_asset": {
-        const input = resolvePolicyAuditTemplateAssetToolInput(rawInput);
         return toMcpToolResult(
-          await service.resolvePolicyAuditTemplateAsset(input),
+          await handleResolvePolicyAuditTemplateAsset(rawInput, service),
         );
       }
 
       case "resolve_execute_hard_lock_prompt": {
-        const input = resolveResolveExecuteHardLockPromptToolInput(rawInput);
         return toMcpToolResult(
-          await service.resolveExecuteHardLockPrompt(input),
+          await handleResolveExecuteHardLockPrompt(rawInput, service),
         );
       }
 
@@ -205,9 +213,8 @@ export async function dispatchRepoAutomationTool(
       }
 
       case "validate_orchestration_artifacts": {
-        const input = resolveValidateOrchestrationArtifactsToolInput(rawInput);
         return toMcpToolResult(
-          await service.validateOrchestrationArtifacts(input),
+          await handleValidateOrchestrationArtifacts(rawInput, service),
         );
       }
     }

@@ -19,28 +19,22 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestMainEdgeCases:
     """Edge case tests for main execution flow."""
 
     def test_main_successful_execution_with_scoped_qc(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         """main() successfully executes task with scoped QC."""
         from scripts.dev_tools.atomic_executor.cli import main
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_fs_path / "config-root"))
 
         # Setup feature folder
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         plan_file = feature_dir / "plan.md"
         plan_file.write_text(
@@ -54,14 +48,14 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "Task: {{task_id}}\n", encoding="utf-8"
         )
 
         # Setup fake copilot on PATH for run_copilot
-        bin_dir = mem_path / "bin"
+        bin_dir = mem_fs_path / "bin"
         bin_dir.mkdir()
         copilot_exe = bin_dir / "copilot"
         copilot_exe.touch()
@@ -117,7 +111,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
                 "--skip-preflight-qc",
             ]
         )

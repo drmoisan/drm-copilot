@@ -1,9 +1,3 @@
-> Maintenance-only runtime mirror.
->
-> Canonical authored source: `.github/skills/skill-canonical-location-audit/SKILL.md`
->
-> Update the `.github` source first.
-
 ---
 name: skill-canonical-location-audit
 description: 'Audit skills for canonical-location duplication. Use when ensuring a canonical location for a given item is defined in exactly one skill and duplicates are flagged.'
@@ -22,7 +16,7 @@ Use this skill when:
 
 ## Scope
 
-- Applies to all skills under `.github/skills/**/SKILL.md`.
+- Applies to all skills under `.claude/skills/**/SKILL.md`.
 - Focuses on canonical locations (paths, folders, or file names) for a given item (e.g., PR context artifacts, evidence locations, issue mirrors).
 
 ## Audit Workflow

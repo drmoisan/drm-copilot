@@ -7,7 +7,6 @@ tools:
   - Glob
   - "Write(/artifacts/**)"
   - "Write(/docs/features/**)"
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project

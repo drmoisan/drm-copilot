@@ -1,9 +1,3 @@
-> Maintenance-only runtime mirror.
->
-> Canonical authored source: `.github/skills/policy-audit-template-usage/SKILL.md`
->
-> Update the `.github` source first.
-
 ---
 name: policy-audit-template-usage
 description: 'Policy audit template usage and output requirements. Use when creating policy-audit.<timestamp>.md artifacts from the repo templates.'

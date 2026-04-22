@@ -6,7 +6,6 @@ tools:
   - Grep
   - Glob
   - "Write(/docs/features/active/**)"
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project

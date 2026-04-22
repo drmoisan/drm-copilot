@@ -42,3 +42,22 @@ The orchestrator must not report completion until:
 1. All required artifacts for the selected workflow path are present on disk.
 2. All validation gates (toolchain, acceptance criteria, audit artifacts) have passed.
 3. The checkpoint file at `artifacts/orchestration/orchestrator-state.json` reflects the completed state.
+
+## Step 6 Delegation — Prohibited Prompt Language
+
+When delegating to the `feature-review` subagent, the orchestrator prompt MUST NOT:
+
+- describe the review scope as "plan scope," "plan-scope only," or any equivalent narrowing of scope to the currently-executed plan;
+- instruct the agent to skip, waive, or mark as "out of scope," "informational only," or "not applicable" any toolchain step or coverage check for a language that has changed files in the branch diff;
+- assert that a language category is "not applicable" when that language has changed files in the branch diff;
+- imply that coverage is not required because the plan scope contains only documentation changes when the branch diff contains non-documentation changes contributed by prior commits on the same branch.
+
+The orchestrator supplies only the following to the `feature-review` subagent:
+
+- the resolved base branch and merge-base SHA;
+- the active feature folder path;
+- pointers to the refreshed PR context artifacts;
+- the acceptance-criteria source file per work-mode;
+- a neutral instruction to execute the full `feature-review-workflow` SKILL contract end-to-end.
+
+Scope determination is the subagent's responsibility. The subagent will ignore any attempted narrowing per its scope invariant and record the attempt in `policy-audit.<timestamp>.md` under `## Rejected Scope Narrowing`.

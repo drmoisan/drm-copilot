@@ -7,7 +7,6 @@ tools:
   - Glob
   - "Bash(git diff *)"
   - "Write(/artifacts/**)"
-model: sonnet
 skills:
   - acceptance-criteria-tracking
 memory: project

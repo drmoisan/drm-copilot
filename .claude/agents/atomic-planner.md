@@ -1,7 +1,6 @@
 ---
 name: atomic-planner
 description: Planning-only agent that generates deterministic phased implementation plans with atomic P#-T# checkbox tasks, writing output to docs/ and artifacts/ paths only.
-model: sonnet
 tools:
   - Read
   - Grep

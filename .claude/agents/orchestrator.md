@@ -1,7 +1,6 @@
 ---
 name: orchestrator
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
-model: sonnet
 tools:
   - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
   - Read

@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/powershell-change-budget-router/SKILL.md`
->
-> This `.claude/skills/powershell-change-budget-router/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: powershell-change-budget-router
 description: Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.
@@ -42,7 +38,7 @@ Direct invocation of `powershell-typed-engineer` remains implementation-focused 
 
 If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:
 - Stop before implementation.
-- Return explicit routing instruction to invoke `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`).
+- Return explicit routing instruction to invoke `powershell-orchestrator`.
 
 ## Documentation Expectations
 

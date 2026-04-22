@@ -9,8 +9,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 if TYPE_CHECKING:
     from types import ModuleType
 
@@ -44,12 +42,6 @@ _BUNDLED_RESOLVER_PATH = (
 _BUNDLED_SCRIPTS_PATH = str(
     ROOT / "extensions" / "drm-copilot" / "resources" / "scripts"
 )
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 def _load_module_from_path(module_name: str, file_path: Path) -> ModuleType:
@@ -179,11 +171,11 @@ def test_main_preserves_explicit_template_root_when_wrapper_flag_is_present() ->
 
 
 def test_bundled_resolver_prefers_template_root_before_workspace_codex(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Prefer the explicit template root before the workspace codex fallback."""
     assert _BUNDLED_RESOLVER_PATH.exists()
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
     workspace_template_dir = workspace / ".github" / "codex"
     workspace_template_dir.mkdir(parents=True)
@@ -191,7 +183,7 @@ def test_bundled_resolver_prefers_template_root_before_workspace_codex(
         "workspace ${plan-path}",
         encoding="utf-8",
     )
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     (template_root / "execute-hard-lock.prompt.md").write_text(
         "bundled ${plan-path}",
@@ -236,11 +228,11 @@ def test_bundled_resolver_prefers_template_root_before_workspace_codex(
 
 
 def test_bundled_resolver_falls_back_to_workspace_codex_when_template_is_missing(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Fall back to workspace codex when the explicit template root lacks the file."""
     assert _BUNDLED_RESOLVER_PATH.exists()
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
     workspace_template_dir = workspace / ".github" / "codex"
     workspace_template_dir.mkdir(parents=True)
@@ -248,7 +240,7 @@ def test_bundled_resolver_falls_back_to_workspace_codex_when_template_is_missing
         "workspace ${plan-path}",
         encoding="utf-8",
     )
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     target_file = workspace / "docs" / "plan.md"
     target_file.parent.mkdir(parents=True)
@@ -289,13 +281,13 @@ def test_bundled_resolver_falls_back_to_workspace_codex_when_template_is_missing
 
 
 def test_bundled_resolver_reports_checked_template_paths_on_lookup_failure(
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     """Report both checked template locations when bundled lookup fails."""
     assert _BUNDLED_RESOLVER_PATH.exists()
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     target_file = workspace / "docs" / "plan.md"
     target_file.parent.mkdir(parents=True)

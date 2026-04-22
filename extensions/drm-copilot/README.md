@@ -25,6 +25,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
 - `drmCopilotExtension.resolveAtomicPlanPrompt`
 - `drmCopilotExtension.syncAgentsFromInstructions`
+- `drmCopilotExtension.listMcpTools`
 
 The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
 
@@ -35,6 +36,10 @@ Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `dr
 ## MCP Server
 
 The extension package also builds a stdio MCP server named `drmCopilotExtension`.
+
+## List MCP Tools
+
+Use the `drm-copilot: List MCP Tools` command (command ID: `drmCopilotExtension.listMcpTools`) from the Command Palette to inspect the tools currently exposed by the `drmCopilotExtension` MCP server. The command shows the semantic tool names, each tool's description, and its required input fields in a Quick Pick list, and it also writes the full list to the `drm-copilot` output channel for reference.
 
 Downstream Codex skills should depend on the MCP server name `drmCopilotExtension`, not on raw VS Code command IDs such as `drmCopilotExtension.collectPrContext`.
 

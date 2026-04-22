@@ -1,7 +1,3 @@
-> Canonical authored source: `.github/skills/feature-promotion-lifecycle/SKILL.md`
->
-> This `.claude/skills/feature-promotion-lifecycle/SKILL.md` file is a runtime mirror. Update the `.github` source first.
-
 ---
 name: feature-promotion-lifecycle
 description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Prefer VS Code extension command execution when extension tools are available; use underlying scripts only as fallback.

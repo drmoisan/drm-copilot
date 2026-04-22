@@ -17,18 +17,12 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestMainEdgeCases:
     """Edge case tests for main execution flow."""
 
     def test_main_exits_early_with_print_prompt(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -36,7 +30,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -49,7 +43,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -72,7 +66,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
                 "--print-prompt",
                 "--skip-preflight-qc",
             ]
@@ -85,7 +79,7 @@ class TestMainEdgeCases:
 
     def test_main_exits_early_with_copy_prompt(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -93,7 +87,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -106,7 +100,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -131,7 +125,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
                 "--copy-prompt",
                 "--skip-preflight-qc",
             ]
@@ -143,7 +137,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_error_for_missing_plan(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -151,7 +145,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder without plan.md
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
@@ -169,7 +163,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
             ]
         )
 
@@ -179,7 +173,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_zero_when_plan_already_complete(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -187,7 +181,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with all tasks checked
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [x] [P0-T1] Task 1\n\n"
@@ -200,7 +194,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -220,7 +214,7 @@ class TestMainEdgeCases:
                 "resume",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
             ]
         )
 
@@ -230,7 +224,7 @@ class TestMainEdgeCases:
 
     def test_main_returns_error_for_missing_template(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -238,7 +232,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with plan.md
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -267,7 +261,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
             ]
         )
 
@@ -277,7 +271,7 @@ class TestMainEdgeCases:
 
     def test_main_with_copy_prompt_fallback_when_clipboard_fails(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -285,7 +279,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup minimal feature folder
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [ ] [P0-T1] Task 1\n\n"
@@ -298,7 +292,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -324,7 +318,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
                 "--copy-prompt",
                 "--skip-preflight-qc",
             ]
@@ -337,7 +331,7 @@ class TestMainEdgeCases:
 
     def test_main_execute_with_start_flag(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -345,7 +339,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with multiple tasks
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n"
@@ -360,7 +354,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -380,7 +374,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
                 "--start",
                 "P0-T2",
                 "--print-prompt",
@@ -395,7 +389,7 @@ class TestMainEdgeCases:
 
     def test_main_execute_when_all_tasks_complete(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
         capsys: pytest.CaptureFixture[str],
     ) -> None:
@@ -403,7 +397,7 @@ class TestMainEdgeCases:
         from scripts.dev_tools.atomic_executor.cli import main
 
         # Setup feature folder with all tasks checked
-        feature_dir = mem_path / "docs" / "features" / "active" / "my-feature"
+        feature_dir = mem_fs_path / "docs" / "features" / "active" / "my-feature"
         feature_dir.mkdir(parents=True)
         (feature_dir / "plan.md").write_text(
             "# Phase 0\n- [x] [P0-T1] Task 1\n\n"
@@ -416,7 +410,7 @@ class TestMainEdgeCases:
         )
         (feature_dir / "spec.md").write_text("# Spec\n", encoding="utf-8")
 
-        template_dir = mem_path / ".github" / "prompts"
+        template_dir = mem_fs_path / ".github" / "prompts"
         template_dir.mkdir(parents=True)
         (template_dir / "execute-plan-template.md").write_text(
             "TEMPLATE\n", encoding="utf-8"
@@ -436,7 +430,7 @@ class TestMainEdgeCases:
                 "execute",
                 str(feature_dir),
                 "--workspace",
-                str(mem_path),
+                str(mem_fs_path),
             ]
         )
 

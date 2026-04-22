@@ -3,12 +3,12 @@ paths:
   - "**/*.ps1"
   - "**/*.psm1"
   - "**/*.psd1"
-description: PowerShell-specific toolchain and coding standards derived from .github/instructions/powershell-code-change.instructions.md and .github/instructions/powershell-unit-test.instructions.md.
+description: PowerShell-specific toolchain and coding standards.
 ---
 
 # PowerShell Code Standards
 
-This rule file summarizes the PowerShell-specific policies for this repository. The authoritative sources are `.github/instructions/powershell-code-change.instructions.md` and `.github/instructions/powershell-unit-test.instructions.md`.
+This rule file summarizes the PowerShell-specific policies for this repository.
 
 ## Toolchain
 
@@ -34,6 +34,23 @@ Run the toolchain in order: format → analyze → test. Restart from step 1 if 
 - Use approved verbs and descriptive nouns for function names (PSScriptAnalyzer enforces this).
 - Keep scripts cohesive and under 500 lines.
 
+## Change Budget
+
+- Direct-mode overall scope: up to 2 production PowerShell files (plus corresponding tests). Requests exceeding this must be routed to `powershell-orchestrator` per `powershell-change-budget-router`.
+- Per-batch cap in all modes: at most 3 production files and 3 test files unless an explicit override has been approved.
+- If a batch would exceed the cap, split the work into smaller batches.
+
+## Design Seams (Minimal DI)
+
+Introduce the smallest seam that enables reliable mocking. Apply these options in order:
+
+1. **Wrapper function seam (preferred)** — extract external executable calls into a wrapper function:
+   - Signature: `Invoke-<Tool>Exe -<Tool>Args <string[]>` (for example `Invoke-GitExe -GitArgs <string[]>`).
+   - The wrapper accepts a single array parameter and splats into the executable: `git @GitArgs 2>&1`.
+   - Parameter names must not be `Args` (automatic variable collision). Use `GitArgs`, `ToolArgs`, or `Arguments`.
+2. **Injectable delegate / ScriptBlock seam** — only when a wrapper is insufficient, add a narrowly-scoped optional delegate or `ScriptBlock` parameter with a safe default. Do not introduce generic runner frameworks.
+3. **Adapter seams for non-executable boundaries** — for filesystem, environment, or clock dependencies, introduce tiny helpers or narrow injectable parameters rather than threading raw I/O through domain logic.
+
 ## Testing Standards
 
 - Use **Pester** (v5.x) as the test framework.
@@ -43,3 +60,38 @@ Run the toolchain in order: format → analyze → test. Restart from step 1 if 
 - Write focused tests exercising a single function or behavior.
 - Mock sparingly; prefer real code paths.
 - No external dependencies in unit tests.
+- Repository-wide line coverage must remain >= 80%.
+- Any new module, class, or method must reach >= 90% coverage.
+- Coverage regression on changed lines is a blocking finding.
+
+### Deterministic Test Requirements
+
+Tests must not depend on:
+
+- network access,
+- mutable machine PATH or profile state,
+- implicit working-directory assumptions,
+- external services or live executables.
+
+Tests must produce identical results in Terminal and the VS Code Test Explorer. Assume a different PATH, current working directory, profile, and host when tests are run from Test Explorer; do not rely on ambient environment resolution.
+
+### Mocking Rules
+
+1. **External executable mocking** — never mock `git`, `gh`, `actionlint`, or other executables directly. Mock the wrapper function (for example `Invoke-GitExe`) instead.
+2. **Mock signature parity** — mock signatures must match production named parameters exactly. Example:
+   - production: `Invoke-GitExe -GitArgs $gitArgs`
+   - test mock: `param([string[]]$GitArgs)`
+3. **Mock registration order** — register mocks before the code under test can resolve commands, so Test Explorer parity is preserved.
+4. **AST/ScriptBlock import order** — when importing script functions via AST or `ScriptBlock` patterns:
+   - dot-source the returned `ScriptBlock` in the test scope,
+   - import dependencies in the correct order,
+   - import wrapper seams before mocking them when executable calls exist.
+
+## Prohibited Behaviors
+
+- Broad refactors across unrelated scripts or modules.
+- Introducing generic process-runner frameworks to replace the wrapper seam pattern.
+- Creating PSScriptAnalyzer debt and deferring cleanup.
+- Weakening assertions merely to make tests pass.
+- Adding sleeps, retries, or timing hacks to stabilize flaky tests.
+- Claiming success without running the required toolchain.

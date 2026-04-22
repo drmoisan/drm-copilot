@@ -11,8 +11,6 @@ allowed-tools:
 
 Generate a single conventional commit message from staged Git changes or a provided commit-context artifact.
 
-Canonical authored source: `.github/skills/commit-message-conventions/SKILL.md`
-
 ## Inputs
 
 - Staged Git changes are the primary source of truth.

@@ -22,12 +22,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestPreflightQC:
     """Tests for pre-flight QC functionality."""
 
@@ -54,21 +48,21 @@ class TestPreflightQC:
 
     def test_build_preflight_qc_fix_prompt_includes_workspace(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
     ) -> None:
         """_build_preflight_qc_fix_prompt includes workspace in prompt."""
         from scripts.dev_tools.atomic_executor.cli import _build_preflight_qc_fix_prompt
         from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
 
         prompt = _build_preflight_qc_fix_prompt(
-            workspace=mem_path,
+            workspace=mem_fs_path,
             qc_output="Black failed: file.py",
             toolchain=QCToolchain.PYTHON,
         )
 
         # Check key elements are present
         assert "Pre-flight QC Fix Required" in prompt
-        assert str(mem_path.as_posix()) in prompt
+        assert str(mem_fs_path.as_posix()) in prompt
         assert "Black failed: file.py" in prompt
         assert "poetry run black" in prompt
         assert "poetry run ruff" in prompt
@@ -94,7 +88,7 @@ class TestPreflightQC:
 
     def test_run_preflight_qc_with_capture_returns_success(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """_run_preflight_qc_with_capture returns success when all steps pass."""
@@ -115,7 +109,7 @@ class TestPreflightQC:
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
-        result = _run_preflight_qc_with_capture(mem_path)
+        result = _run_preflight_qc_with_capture(mem_fs_path)
 
         assert result.success is True
         assert result.failed_step is None
@@ -126,7 +120,7 @@ class TestPreflightQC:
 
     def test_run_preflight_qc_with_capture_returns_failure(
         self,
-        mem_path: Path,
+        mem_fs_path: Path,
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """_run_preflight_qc_with_capture returns failure when a step fails."""
@@ -153,7 +147,7 @@ class TestPreflightQC:
 
         monkeypatch.setattr("subprocess.run", mock_run)
 
-        result = _run_preflight_qc_with_capture(mem_path)
+        result = _run_preflight_qc_with_capture(mem_fs_path)
 
         assert result.success is False
         assert result.failed_step == "ruff"

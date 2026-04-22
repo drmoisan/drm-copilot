@@ -571,4 +571,3 @@ Describe 'Invoke-PoshQCTest' {
         $script:copyArgs[2] | Should -Be $customKoveragePath
     }
 }
-

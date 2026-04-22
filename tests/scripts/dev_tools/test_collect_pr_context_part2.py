@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    import pytest
 
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
@@ -37,12 +37,6 @@ from scripts.dev_tools.pr_context.summary_helpers import (
 from scripts.dev_tools.pr_context.summary_helpers import (
     pr_digest as _pr_digest,
 )
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 class FakeRunner:
@@ -201,7 +195,7 @@ def test_is_scoping_doc_identifies_feature_files():
 
 
 def test_collect_and_write_uses_feature_refs_and_scoping(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     captured: list[tuple[Path, str]] = []
 
@@ -349,9 +343,9 @@ def test_collect_and_write_uses_feature_refs_and_scoping(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )
@@ -376,8 +370,8 @@ def test_parse_numstat_detailed_skips_invalid_rows() -> None:
     assert mapping == {"file.py": (1, 1)}
 
 
-def test_write_output_creates_parent_and_appends(mem_path: Path) -> None:
-    target = mem_path / "nested" / "out.txt"
+def test_write_output_creates_parent_and_appends(mem_fs_path: Path) -> None:
+    target = mem_fs_path / "nested" / "out.txt"
     write_output("first", target, append=False)
     write_output("second", target, append=True)
     assert target.read_text(encoding="utf-8").endswith("firstsecond")

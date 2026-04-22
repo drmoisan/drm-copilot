@@ -10,10 +10,15 @@ import {
 import {
   normalizeGeneratedPath,
   parseFirstArtifactPath,
-  POSH_QC_TOOL_CONFIG,
   type ScriptExecutionOptions,
 } from "./repo-automation-service-support";
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
+import {
+  buildNewActiveFeatureFolderArgs,
+  buildPoshQcWorkflowArguments,
+  buildResolveExecuteHardLockPromptArguments,
+  buildValidateOrchestrationArtifactsArgs,
+} from "./repo-automation-args";
 import {
   type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
@@ -96,7 +101,11 @@ export interface RepoAutomationService {
     },
   ): Promise<RepoAutomationExecutionResult>;
   resolveExecuteHardLockPrompt(
-    input: WorkspaceExecutionInput & { readonly target: string },
+    input: WorkspaceExecutionInput & {
+      readonly target: string;
+      readonly output?: string;
+      readonly quiet?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult>;
   resolveAtomicPlanPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
@@ -277,17 +286,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly workMode: WorkModeOption;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const args = ["--feature-name", input.featureName, "--type", input.type];
-    if (input.issueNumber !== undefined) {
-      args.push("--issue-number", input.issueNumber);
-    }
-
-    args.push(
-      "--work-mode",
-      input.workMode,
-      "--template-root",
-      this.templateRoot,
-    );
+    const args = buildNewActiveFeatureFolderArgs(input, this.templateRoot);
     return this.executeScript({
       tool: "new_active_feature_folder",
       runtimeKind: "python",
@@ -370,16 +369,24 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   }
 
   async resolveExecuteHardLockPrompt(
-    input: WorkspaceExecutionInput & { readonly target: string },
+    input: WorkspaceExecutionInput & {
+      readonly target: string;
+      readonly output?: string;
+      readonly quiet?: boolean;
+    },
   ): Promise<RepoAutomationExecutionResult> {
+    const { args, artifactPaths } =
+      buildResolveExecuteHardLockPromptArguments(input);
+
     return this.executeScript({
       tool: "resolve_execute_hard_lock_prompt",
       runtimeKind: "python",
       bundledRelativePath: "resources/templates/resolve_hard_lock_prompt.py",
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
-      args: ["--target", input.target, "--workspace", input.workspaceRoot],
+      args,
       summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
+      ...(artifactPaths === undefined ? {} : { artifactPaths }),
     });
   }
 
@@ -408,34 +415,15 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly scanFolders?: ReadonlyArray<string>;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const toolConfig = POSH_QC_TOOL_CONFIG[tool];
-    const args = ["-WorkspaceRoot", input.workspaceRoot];
-    if (input.scanFolders && input.scanFolders.length > 0) {
-      if (
-        tool === "run_poshqc_format" ||
-        tool === "run_poshqc_analyze" ||
-        tool === "run_poshqc_test"
-      ) {
-        args.push("-ScanFoldersJson", JSON.stringify(input.scanFolders));
-      } else {
-        for (const scanFolder of input.scanFolders) {
-          args.push("-ScanFolders", scanFolder);
-        }
-      }
-    }
-
-    const summaryTemplate =
-      input.scanFolders && input.scanFolders.length > 0
-        ? toolConfig.summaryWithFolders
-        : toolConfig.summaryWithoutFolders;
-    const summary = summaryTemplate
-      .replace("{workspaceRoot}", input.workspaceRoot)
-      .replace("{scanFolderCount}", String(input.scanFolders?.length ?? 0));
+    const { args, bundledRelativePath, summary } = buildPoshQcWorkflowArguments(
+      tool,
+      input,
+    );
 
     return this.executeScript({
       tool: tool as RepoAutomationToolName,
       runtimeKind: "powershell",
-      bundledRelativePath: toolConfig.bundledRelativePath,
+      bundledRelativePath,
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? tool,
       args,
@@ -450,10 +438,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly requireComplete?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    const args = [input.artifactType, input.artifactPath];
-    if (input.requireComplete) {
-      args.push("--require-complete");
-    }
+    const args = buildValidateOrchestrationArtifactsArgs(input);
 
     return this.executeScript({
       tool: "validate_orchestration_artifacts",
