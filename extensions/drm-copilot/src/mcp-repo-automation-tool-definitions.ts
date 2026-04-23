@@ -107,6 +107,27 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "link_parent_child",
+    description:
+      "Link a child GitHub issue to a parent GitHub issue in the target workspace using the bundled PowerShell workflow.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        parent_issue_number: {
+          type: "string",
+          description: "Numeric issue number of the parent issue.",
+        },
+        child_issue_number: {
+          type: "string",
+          description: "Numeric issue number of the child issue.",
+        },
+      },
+      required: ["parent_issue_number", "child_issue_number"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "potential_to_issue",
     description:
       "Promote a potential entry into an issue-oriented feature workflow in the target workspace.",

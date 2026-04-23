@@ -11,7 +11,10 @@ import {
   REPO_AUTOMATION_TOOLS,
   type RepoAutomationToolName,
 } from "./repo-automation-tool-names";
-import { resolveResolveAtomicPlanPromptToolInput } from "./mcp-tool-inputs";
+import {
+  resolveLinkParentChildToolInput,
+  resolveResolveAtomicPlanPromptToolInput,
+} from "./mcp-tool-inputs";
 import {
   handleCollectCommitContext,
   handleCollectPrContext,
@@ -210,6 +213,11 @@ export async function dispatchRepoAutomationTool(
       case "resolve_atomic_plan_prompt": {
         const input = resolveResolveAtomicPlanPromptToolInput(rawInput);
         return toMcpToolResult(await service.resolveAtomicPlanPrompt(input));
+      }
+
+      case "link_parent_child": {
+        const input = resolveLinkParentChildToolInput(rawInput);
+        return toMcpToolResult(await service.linkParentChild(input));
       }
 
       case "validate_orchestration_artifacts": {

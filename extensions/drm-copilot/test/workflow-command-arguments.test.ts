@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   normalizeWorkspaceDestinationPath,
+  resolveLinkParentChildInvocation,
   resolvePolicyAuditTemplateAssetInvocation,
   resolveRunPoshQCAnalyzeAutofixInvocation,
   resolveRunPoshQCAnalyzeInvocation,
@@ -108,6 +109,48 @@ describe("resolvePolicyAuditTemplateAssetInvocation", () => {
     ).toThrow(
       "asset must be one of: template, agents, code-review-template, feature-audit-template.",
     );
+  });
+});
+
+describe("resolveLinkParentChildInvocation", () => {
+  it("returns interactive mode when no args are supplied", () => {
+    expect(resolveLinkParentChildInvocation([])).toEqual({
+      mode: "interactive",
+    });
+  });
+
+  it("parses direct child and parent issue flags", () => {
+    expect(
+      resolveLinkParentChildInvocation([
+        "-ChildIssueNumber",
+        "12",
+        "-ParentIssueNumber",
+        "34",
+      ]),
+    ).toEqual({
+      mode: "direct",
+      input: {
+        childIssueNumber: "12",
+        parentIssueNumber: "34",
+      },
+    });
+  });
+
+  it("rejects non-digit issue numbers", () => {
+    expect(() =>
+      resolveLinkParentChildInvocation([
+        "-ChildIssueNumber",
+        "child-12",
+        "-ParentIssueNumber",
+        "34",
+      ]),
+    ).toThrow("-ChildIssueNumber must be digits only.");
+  });
+
+  it("rejects missing required flags", () => {
+    expect(() =>
+      resolveLinkParentChildInvocation(["-ChildIssueNumber", "12"]),
+    ).toThrow("Missing required flag '-ParentIssueNumber'.");
   });
 });
 

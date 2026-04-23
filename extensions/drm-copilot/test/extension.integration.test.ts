@@ -592,6 +592,34 @@ describe("drm-copilot integration behavior", () => {
     expect(options.cwd).toBe("C:/workspace");
   });
 
+  it("linkParentChild runs the bundled PowerShell template against the active workspace root", async () => {
+    showInputBoxMock.mockResolvedValueOnce("12").mockResolvedValueOnce("34");
+
+    await handlerFor("drmCopilotExtension.linkParentChild")();
+
+    const [executable, args, options] = childProcessMock.spawn.mock
+      .calls[0] as [string, string[], { cwd: string }];
+    const childIndex = args.indexOf("-ChildIssueNumber");
+    const parentIndex = args.indexOf("-ParentIssueNumber");
+    const fileIndex = args.indexOf("-File");
+
+    expect(executable).toBe("pwsh");
+    expect(fileIndex).toBeGreaterThan(-1);
+    expect(args[fileIndex + 1]).toBe(
+      "C:/extension/resources/templates/link-parent-child.ps1",
+    );
+    expect(childIndex).toBeGreaterThan(-1);
+    expect(args[childIndex + 1]).toBe("12");
+    expect(parentIndex).toBeGreaterThan(-1);
+    expect(args[parentIndex + 1]).toBe("34");
+    expect(options.cwd).toBe("C:/workspace");
+    expect(
+      args.some((arg) =>
+        normalizePath(arg).includes("/scripts/dev-tools/link-parent-child.ps1"),
+      ),
+    ).toBe(false);
+  });
+
   it("newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates", async () => {
     const templateLessWorkspacePath = "C:/workspace/template-less";
     workspaceFoldersState = [

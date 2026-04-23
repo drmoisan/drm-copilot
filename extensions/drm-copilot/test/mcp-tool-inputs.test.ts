@@ -3,6 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import {
   resolveCollectCommitContextToolInput,
   resolveCollectPrContextToolInput,
+  resolveLinkParentChildToolInput,
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
@@ -318,6 +319,41 @@ describe("resolveNewPotentialEntryToolInput", () => {
         short_name: "new-feature",
       }),
     ).toEqual({ workspaceRoot: "C:/ws", shortName: "new-feature" });
+  });
+});
+
+describe("resolveLinkParentChildToolInput", () => {
+  it("returns workspaceRoot and both issue numbers for valid input", () => {
+    expect(
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        child_issue_number: "12",
+        parent_issue_number: "34",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/ws",
+      childIssueNumber: "12",
+      parentIssueNumber: "34",
+    });
+  });
+
+  it("rejects missing child_issue_number", () => {
+    expect(() =>
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        parent_issue_number: "34",
+      }),
+    ).toThrow("Field 'child_issue_number' must be a string.");
+  });
+
+  it("rejects non-digit parent_issue_number", () => {
+    expect(() =>
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        child_issue_number: "12",
+        parent_issue_number: "parent-34",
+      }),
+    ).toThrow("parent_issue_number must be digits only.");
   });
 });
 

@@ -24,6 +24,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     pushDownCodexAndAgentsCustomizations: jest.fn(),
     newPotentialBugEntry: jest.fn(),
     newPotentialEntry: jest.fn(),
+    linkParentChild: jest.fn(),
     potentialToIssue: jest.fn(),
     newActiveFeatureFolder: jest.fn(),
     runPoshQCFormat: jest.fn(),
@@ -79,6 +80,7 @@ describe("repo automation MCP server", () => {
       "push_down_codex_and_agents_customizations",
       "new_potential_bug_entry",
       "new_potential_entry",
+      "link_parent_child",
       "potential_to_issue",
       "new_active_feature_folder",
       "run_poshqc_format",
@@ -199,6 +201,36 @@ describe("repo automation MCP server", () => {
       artifacts: [
         "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
       ],
+    });
+  });
+
+  it("dispatches link_parent_child through the shared service with explicit issue numbers", async () => {
+    service.linkParentChild.mockResolvedValue({
+      tool: "link_parent_child",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Linked child issue #12 to parent issue #34 using the bundled workflow.",
+    });
+
+    const result = await client.callTool({
+      name: "link_parent_child",
+      arguments: {
+        workspace_root: "C:/workspace",
+        child_issue_number: "12",
+        parent_issue_number: "34",
+      },
+    });
+
+    expect(service.linkParentChild).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      childIssueNumber: "12",
+      parentIssueNumber: "34",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "link_parent_child",
+      workspace_root: "C:/workspace",
     });
   });
 

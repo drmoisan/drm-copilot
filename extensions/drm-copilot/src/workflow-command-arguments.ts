@@ -51,6 +51,11 @@ export interface NewPotentialEntryInput {
   readonly shortName: string;
 }
 
+export interface LinkParentChildInput {
+  readonly childIssueNumber: string;
+  readonly parentIssueNumber: string;
+}
+
 export interface PotentialToIssueInput {
   readonly potentialPath: string;
   readonly promotionType: PotentialPromotionType;
@@ -209,6 +214,18 @@ export function validateIssueNumber(
   return issueNumber;
 }
 
+export function validateRequiredIssueNumber(
+  issueNumber: string,
+  fieldName: string,
+): string {
+  const normalizedIssueNumber = normalizeRequiredText(issueNumber, fieldName);
+  if (!/^\d+$/.test(normalizedIssueNumber)) {
+    throw new Error(`${fieldName} must be digits only.`);
+  }
+
+  return normalizedIssueNumber;
+}
+
 export function getShortNameValidationMessage(
   value: string,
   fieldName: string,
@@ -224,6 +241,20 @@ export function getShortNameValidationMessage(
   } catch (error: unknown) {
     return error instanceof Error ? error.message : String(error);
   }
+}
+
+export function getRequiredIssueNumberValidationMessage(
+  value: string,
+  fieldName: string,
+): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return `${fieldName} is required.`;
+  }
+
+  return /^\d+$/.test(trimmed)
+    ? undefined
+    : `${fieldName} must be digits only.`;
 }
 
 export function getFeatureNameValidationMessage(
@@ -417,6 +448,38 @@ export function resolveNewPotentialBugEntryInvocation(
       shortName: validateShortName(
         getRequiredFlagValue(parsedArgs, "--short-name"),
         "--short-name",
+      ),
+    },
+  };
+}
+
+/**
+ * Resolves invocation mode for `drmCopilotExtension.linkParentChild`.
+ *
+ * @param rawArgs The raw command arguments supplied by VS Code.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
+ */
+export function resolveLinkParentChildInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<LinkParentChildInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
+  }
+
+  const parsedArgs = parseWorkflowCommandArguments(rawArgs, [
+    "-ChildIssueNumber",
+    "-ParentIssueNumber",
+  ]);
+  return {
+    mode: "direct",
+    input: {
+      childIssueNumber: validateRequiredIssueNumber(
+        getRequiredFlagValue(parsedArgs, "-ChildIssueNumber"),
+        "-ChildIssueNumber",
+      ),
+      parentIssueNumber: validateRequiredIssueNumber(
+        getRequiredFlagValue(parsedArgs, "-ParentIssueNumber"),
+        "-ParentIssueNumber",
       ),
     },
   };

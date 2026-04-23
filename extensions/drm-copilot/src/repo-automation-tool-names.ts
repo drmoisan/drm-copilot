@@ -5,6 +5,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "push_down_codex_and_agents_customizations",
   "new_potential_bug_entry",
   "new_potential_entry",
+  "link_parent_child",
   "potential_to_issue",
   "new_active_feature_folder",
   "run_poshqc_format",
