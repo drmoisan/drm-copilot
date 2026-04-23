@@ -1177,6 +1177,24 @@
 		},
 		{
 			"type": "npm",
+			"script": "build",
+			"path": "extensions/drm-copilot",
+			"label": "npm: build",
+			"detail": "Builds the extension package from extensions/drm-copilot/package.json.",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": "$tsc"
+		},
+		{
+			"type": "npm",
 			"script": "watch",
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,

@@ -1,0 +1,20 @@
+Timestamp: 2026-04-13T11:27:30-04:00
+Policy Order:
+1. `.github/copilot-instructions.md`
+2. `.github/instructions/general-code-change.instructions.md`
+3. `.github/instructions/general-unit-test.instructions.md`
+4. `.github/instructions/powershell-code-change.instructions.md`
+5. `.github/instructions/powershell-unit-test.instructions.md`
+6. `AGENTS.md`
+7. `docs/features/active/2026-04-11-claude-code-architecture-136/issue.md`
+8. `docs/features/active/2026-04-11-claude-code-architecture-136/v2/remediation-inputs.2026-04-13T11-06.md`
+Work Mode Marker: `- Work Mode: full-feature`
+Files Read:
+1. `.github/copilot-instructions.md`
+2. `.github/instructions/general-code-change.instructions.md`
+3. `.github/instructions/general-unit-test.instructions.md`
+4. `.github/instructions/powershell-code-change.instructions.md`
+5. `.github/instructions/powershell-unit-test.instructions.md`
+6. `AGENTS.md`
+7. `docs/features/active/2026-04-11-claude-code-architecture-136/issue.md`
+8. `docs/features/active/2026-04-11-claude-code-architecture-136/v2/remediation-inputs.2026-04-13T11-06.md`

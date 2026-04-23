@@ -188,10 +188,11 @@ class RealPushDownFileSystem:
             OSError: Propagated when the file cannot be written.
 
         Side Effects:
-            Creates parent directories and writes file content to disk.
+            Creates parent directories and writes LF-normalized file content to
+            disk.
         """
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
+        path.write_text(content, encoding="utf-8", newline="\n")
 
     def ensure_dir(self, path: Path) -> None:
         """

@@ -65,3 +65,6 @@ extensions/drm-copilot/coverage
 !extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/**
 !extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/
 !extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/**
+.claude/agent-memory
+.claude/state/
+

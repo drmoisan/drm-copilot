@@ -4,7 +4,10 @@ param(
     [string] $WorkspaceRoot = ".",
 
     [Parameter()]
-    [string[]] $ScanFolders
+    [string[]] $ScanFolders,
+
+    [Parameter()]
+    [string] $ScanFoldersJson
 )
 
 Set-StrictMode -Version Latest
@@ -13,4 +16,11 @@ $ErrorActionPreference = "Stop"
 $poshQcModulePath = Join-Path -Path $PSScriptRoot -ChildPath "..\powershell\PoshQC\PoshQC.psd1"
 Import-Module $poshQcModulePath -Force
 
-Invoke-PoshQCFormat -Root $WorkspaceRoot -ScanFolders $ScanFolders
+$resolvedScanFolders = $ScanFolders
+if (-not [string]::IsNullOrWhiteSpace($ScanFoldersJson)) {
+    $resolvedScanFolders = @(
+        ConvertFrom-Json -InputObject $ScanFoldersJson
+    ) | ForEach-Object { [string] $_ }
+}
+
+Invoke-PoshQCFormat -Root $WorkspaceRoot -ScanFolders $resolvedScanFolders

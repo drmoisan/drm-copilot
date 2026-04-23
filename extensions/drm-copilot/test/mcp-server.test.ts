@@ -6,12 +6,14 @@ import {
   it,
   jest,
 } from "@jest/globals";
+import process from "node:process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
+import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
 
 function createMockService(): jest.Mocked<RepoAutomationService> {
@@ -32,6 +34,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runPoshQCSuite: jest.fn(),
     resolvePolicyAuditTemplateAsset: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
+    resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
   };
 }
@@ -87,6 +90,7 @@ describe("repo automation MCP server", () => {
       "run_poshqc_suite",
       "resolve_policy_audit_template_asset",
       "resolve_execute_hard_lock_prompt",
+      "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
     ]);
   });
@@ -405,35 +409,69 @@ describe("repo automation MCP server", () => {
     service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
       tool: "resolve_policy_audit_template_asset",
       workspaceRoot: "C:/workspace",
-      summary: "Resolved bundled policy-audit asset 'agents'.",
-      artifacts: ["C:/extension/resources/templates/policy_audit/AGENTS.md"],
-      assetId: "policy_audit.agents",
+      summary: "Resolved bundled policy-audit asset 'feature-audit-template'.",
+      artifacts: [
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      ],
+      assetId: "policy_audit.feature_audit_template",
       bundledSourcePath:
-        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
     });
 
     const result = await client.callTool({
       name: "resolve_policy_audit_template_asset",
       arguments: {
         workspace_root: "C:/workspace",
-        asset: "agents",
-        target_path: "docs/policy-audit/AGENTS.md",
+        asset: "feature-audit-template",
+        target_path: "docs/policy-audit/feature-audit.md",
       },
     });
 
     expect(service.resolvePolicyAuditTemplateAsset).toHaveBeenCalledWith({
       workspaceRoot: "C:/workspace",
-      asset: "agents",
-      targetPath: "C:/workspace/docs/policy-audit/AGENTS.md",
+      asset: "feature-audit-template",
+      targetPath: "C:/workspace/docs/policy-audit/feature-audit.md",
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "resolve_policy_audit_template_asset",
       workspace_root: "C:/workspace",
-      asset_id: "policy_audit.agents",
+      asset_id: "policy_audit.feature_audit_template",
       bundled_source_path:
-        "C:/extension/resources/templates/policy_audit/AGENTS.md",
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+    });
+  });
+
+  it("dispatches resolve_execute_hard_lock_prompt through the shared service with injected output and quiet defaults, and surfaces artifacts", async () => {
+    service.resolveExecuteHardLockPrompt.mockResolvedValue({
+      tool: "resolve_execute_hard_lock_prompt",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Resolved the execute hard-lock prompt for 'C:/workspace/docs/features/active/feature-123/plan.md'.",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+    });
+
+    const result = await client.callTool({
+      name: "resolve_execute_hard_lock_prompt",
+      arguments: {
+        workspace_root: "C:/workspace",
+        target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      },
+    });
+
+    expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      output: DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH,
+      quiet: true,
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "resolve_execute_hard_lock_prompt",
+      workspace_root: "C:/workspace",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
     });
   });
 

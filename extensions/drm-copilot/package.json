@@ -71,6 +71,10 @@
         "title": "drm-copilot: Run PoshQC Suite"
       },
       {
+        "command": "drmCopilotExtension.listMcpTools",
+        "title": "drm-copilot: List MCP Tools"
+      },
+      {
         "command": "drmCopilotExtension.runPoshQCFormat",
         "title": "drm-copilot: Run PoshQC Format"
       },
@@ -93,6 +97,10 @@
       {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
+      },
+      {
+        "command": "drmCopilotExtension.resolveAtomicPlanPrompt",
+        "title": "drm-copilot: Resolve Atomic Plan Prompt"
       }
     ]
   },

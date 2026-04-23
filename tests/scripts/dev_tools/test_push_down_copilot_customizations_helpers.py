@@ -464,9 +464,15 @@ def test_real_filesystem_delegates_path_operations(
         calls["read"] = (self, encoding)
         return "file content"
 
-    def fake_write_text(self: Path, content: str, *, encoding: str) -> int:
-        """Record write delegation without touching disk."""
-        calls["write"] = (self, content, encoding)
+    def fake_write_text(
+        self: Path,
+        content: str,
+        *,
+        encoding: str,
+        newline: str,
+    ) -> int:
+        """Record write delegation and require LF-only output semantics."""
+        calls["write"] = (self, content, encoding, newline)
         return len(content)
 
     def fake_mkdir(self: Path, *, parents: bool, exist_ok: bool) -> None:
@@ -484,7 +490,7 @@ def test_real_filesystem_delegates_path_operations(
     adapter.ensure_dir(directory_path)
 
     assert calls["read"] == (file_path, "utf-8")
-    assert calls["write"] == (file_path, "updated content", "utf-8")
+    assert calls["write"] == (file_path, "updated content", "utf-8", "\n")
     assert mkdir_calls == [
         (directory_path, True, True),
         (directory_path, True, True),
@@ -630,6 +636,22 @@ def test_thinking_beast_mode_bundle_mirror_matches_root_agent() -> None:
     assert mirror_agent_path.read_text(encoding="utf-8") == root_agent_path.read_text(
         encoding="utf-8"
     )
+
+
+def test_bundled_push_down_filesystem_matches_root_module() -> None:
+    """Keep the bundled push-down filesystem module identical to the root source."""
+    repo_root = Path(__file__).resolve().parents[3]
+    root_module_path = repo_root / (
+        "scripts/dev_tools/push_down_copilot_customizations_filesystem.py"
+    )
+    bundled_module_path = repo_root / (
+        "extensions/drm-copilot/resources/scripts/dev_tools/"
+        "push_down_copilot_customizations_filesystem.py"
+    )
+
+    assert bundled_module_path.read_text(
+        encoding="utf-8"
+    ) == root_module_path.read_text(encoding="utf-8")
 
 
 def test_split_trailing_punctuation_returns_core_and_suffix() -> None:

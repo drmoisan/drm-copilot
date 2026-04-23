@@ -17,25 +17,19 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestRunCopilot:
     """Tests for run_copilot() function."""
 
     def test_run_copilot_permission_denied_fails_fast_with_actionable_error(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() raises promptly when Copilot reports a permission denial."""
 
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_fs_path / "config-root"))
         # Create a fake copilot executable on PATH.
-        fake_bin = mem_path / "bin"
+        fake_bin = mem_fs_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot.exe"
         fake_copilot.write_text("@echo fake copilot")
@@ -73,11 +67,11 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = mem_path / "test.log"
+        log_file = mem_fs_path / "test.log"
 
         with pytest.raises(RuntimeError) as exc_info:
             run_copilot(
-                workspace=mem_path,
+                workspace=mem_fs_path,
                 prompt_text="test prompt",
                 log_file=log_file,
                 task_id="P1-T1",
@@ -100,13 +94,13 @@ class TestRunCopilot:
         assert captured_argv[0] == str(fake_copilot)
 
     def test_run_copilot_reuses_session_when_requested(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() adds --continue when resume_session=True."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
-        fake_bin = mem_path / "bin"
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_fs_path / "config-root"))
+        fake_bin = mem_fs_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot"
         fake_copilot.write_text("#!/bin/sh\necho copilot")
@@ -134,10 +128,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = mem_path / "log" / "test.log"
+        log_file = mem_fs_path / "log" / "test.log"
 
         run_copilot(
-            workspace=mem_path,
+            workspace=mem_fs_path,
             prompt_text="retry prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -150,16 +144,16 @@ class TestRunCopilot:
         assert "--continue" in captured_argv
 
     def test_run_copilot_trusts_workspace_in_config(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() writes workspace to trusted_folders when enabled."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
         # Route Copilot config to a temp directory for isolation.
-        config_root = mem_path / "config-root"
+        config_root = mem_fs_path / "config-root"
         monkeypatch.setenv("XDG_CONFIG_HOME", str(config_root))
 
-        fake_bin = mem_path / "bin"
+        fake_bin = mem_fs_path / "bin"
         fake_bin.mkdir()
         fake_copilot = fake_bin / "copilot"
         fake_copilot.write_text("#!/bin/sh\necho copilot")
@@ -184,10 +178,10 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", MockPopen)
 
-        log_file = mem_path / "log" / "test.log"
+        log_file = mem_fs_path / "log" / "test.log"
 
         run_copilot(
-            workspace=mem_path,
+            workspace=mem_fs_path,
             prompt_text="trust prompt",
             log_file=log_file,
             task_id="P1-T1",
@@ -206,16 +200,16 @@ class TestRunCopilot:
 
         config_data = json.loads(config_text)
         trusted_folders = config_data.get("trusted_folders", [])
-        assert str(mem_path.resolve()) in trusted_folders
+        assert str(mem_fs_path.resolve()) in trusted_folders
 
     def test_run_copilot_times_out_when_cli_is_idle(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """run_copilot() terminates when Copilot CLI produces no output."""
         from scripts.dev_tools.atomic_executor.cli import run_copilot
 
-        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_path / "config-root"))
-        bin_dir = mem_path / "bin"
+        monkeypatch.setenv("XDG_CONFIG_HOME", str(mem_fs_path / "config-root"))
+        bin_dir = mem_fs_path / "bin"
         bin_dir.mkdir()
         copilot_exe = bin_dir / "copilot"
         copilot_exe.write_text("#!/bin/sh\nexit 0")
@@ -255,11 +249,11 @@ class TestRunCopilot:
 
         monkeypatch.setattr("subprocess.Popen", fake_popen)
 
-        log_file = mem_path / "log" / "test.log"
+        log_file = mem_fs_path / "log" / "test.log"
 
         with pytest.raises(TimeoutError):
             run_copilot(
-                workspace=mem_path,
+                workspace=mem_fs_path,
                 prompt_text="idle prompt",
                 log_file=log_file,
                 task_id="P1-T1",

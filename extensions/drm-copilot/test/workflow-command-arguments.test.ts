@@ -106,7 +106,9 @@ describe("resolvePolicyAuditTemplateAssetInvocation", () => {
   it("rejects unsupported asset selectors", () => {
     expect(() =>
       resolvePolicyAuditTemplateAssetInvocation(["-asset", "invalid"]),
-    ).toThrow("asset must be one of: template, agents.");
+    ).toThrow(
+      "asset must be one of: template, agents, code-review-template, feature-audit-template.",
+    );
   });
 });
 
@@ -153,14 +155,16 @@ describe("resolveLinkParentChildInvocation", () => {
 });
 
 describe("policy-audit helper validation", () => {
-  it.each(["template", "agents"] as const)(
-    "accepts the supported selector %s",
-    (asset) => {
-      expect(validatePolicyAuditTemplateAssetSelector(asset, "asset")).toBe(
-        asset,
-      );
-    },
-  );
+  it.each([
+    "template",
+    "agents",
+    "code-review-template",
+    "feature-audit-template",
+  ] as const)("accepts the supported selector %s", (asset) => {
+    expect(validatePolicyAuditTemplateAssetSelector(asset, "asset")).toBe(
+      asset,
+    );
+  });
 
   it("normalizes a workspace-relative destination path", () => {
     expect(

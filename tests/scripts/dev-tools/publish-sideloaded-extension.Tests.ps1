@@ -81,6 +81,34 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
     }
 }
 
+Describe "publish-sideloaded-extension.ps1 - Assert-RequiredCommandAvailable" {
+    BeforeAll {
+        $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/publish-sideloaded-extension.ps1"
+    }
+
+    BeforeEach {
+        . (Import-ScriptFunction -Path $script:scriptPath -Name "Assert-RequiredCommandAvailable")
+    }
+
+    It "does not throw when command is available on PATH" {
+        Mock -CommandName Get-Command -MockWith {
+            return [pscustomobject]@{ Name = "npm" }
+        }
+
+        { Assert-RequiredCommandAvailable -CommandName "npm" -InstallHint "Install Node.js" } | Should -Not -Throw
+    }
+
+    It "throws a clear prerequisite message when command is missing" {
+        Mock -CommandName Get-Command -MockWith {
+            return $null
+        }
+
+        {
+            Assert-RequiredCommandAvailable -CommandName "npm" -InstallHint "Install Node.js"
+        } | Should -Throw "*Required command 'npm' was not found on PATH*Install Node.js*"
+    }
+}
+
 Describe "scaffold extension package identity" {
     It "uses canonical drm-copilot name metadata" {
         $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../../..")

@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import Protocol
 
 try:
     from scripts.dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
-        PushDownSummary,
         RealPushDownFileSystem,
         resolve_cli_path,
     )
@@ -26,7 +26,6 @@ except ModuleNotFoundError as error:
         raise
     from dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
-        PushDownSummary,
         RealPushDownFileSystem,
         resolve_cli_path,
     )
@@ -39,6 +38,28 @@ MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customization
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
 
 __all__ = ["PushDownSummary", "main", "parse_args", "push_down_customizations"]
+
+
+class PushDownSummary(Protocol):
+    """
+    Describe the summary surface returned by the bundled push-down publisher.
+
+    Purpose:
+        Provide a stable typed contract for callers without tying Pyright to a
+        specific import path for the shared publisher implementation.
+
+    Usage:
+        Returned by `push_down_customizations()` and consumed by `main()` when
+        reporting the written artifact path.
+
+    Attributes:
+        artifact_path (str): JSON artifact path written for the run.
+    """
+
+    @property
+    def artifact_path(self) -> str:
+        """Return the JSON artifact path written for the push-down run."""
+        ...
 
 
 def _passthrough_rewrite(

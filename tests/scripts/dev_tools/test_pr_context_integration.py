@@ -19,12 +19,6 @@ if TYPE_CHECKING:
     from scripts.dev_tools.pr_context.git import CommandRunner, GitClient
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class StubGit:
     def __init__(self, root: Path, changed_path: str) -> None:
         self._root = root
@@ -182,7 +176,7 @@ def test_collect_and_write_end_to_end_scenarios(
     expect_autoclose: str | None,
     expect_feature_block: bool,
     monkeypatch: pytest.MonkeyPatch,
-    mem_path: Path,
+    mem_fs_path: Path,
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -274,8 +268,8 @@ def test_collect_and_write_end_to_end_scenarios(
     collect_and_write(
         base="main",
         head="feature/docs",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
         repo_root=repo_root,
         append=False,
         include_untracked=False,

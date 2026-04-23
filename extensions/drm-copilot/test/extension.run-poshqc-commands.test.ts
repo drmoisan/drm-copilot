@@ -21,19 +21,27 @@ const commandCases = [
   {
     commandId: "drmCopilotExtension.runPoshQCFormat",
     wrapperPath: "C:/extension/resources/templates/run-poshqc-format.ps1",
+    scanFolderFlag: "-ScanFoldersJson",
+    scanFolderArg: '["C:/workspace/src"]',
   },
   {
     commandId: "drmCopilotExtension.runPoshQCAnalyze",
     wrapperPath: "C:/extension/resources/templates/run-poshqc-analyze.ps1",
+    scanFolderFlag: "-ScanFoldersJson",
+    scanFolderArg: '["C:/workspace/src"]',
   },
   {
     commandId: "drmCopilotExtension.runPoshQCTest",
     wrapperPath: "C:/extension/resources/templates/run-poshqc-test.ps1",
+    scanFolderFlag: "-ScanFoldersJson",
+    scanFolderArg: '["C:/workspace/src"]',
   },
   {
     commandId: "drmCopilotExtension.runPoshQCAnalyzeAutofix",
     wrapperPath:
       "C:/extension/resources/templates/run-poshqc-analyze-autofix.ps1",
+    scanFolderFlag: "-ScanFolders",
+    scanFolderArg: "C:/workspace/src",
   },
 ] as const;
 
@@ -52,7 +60,7 @@ describe("granular PoshQC commands", () => {
 
   it.each(commandCases)(
     "passes direct scan folders to $commandId",
-    async ({ commandId, wrapperPath }) => {
+    async ({ commandId, wrapperPath, scanFolderFlag, scanFolderArg }) => {
       setExecutablePresence({ pwsh: true, powershell: false });
       childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
@@ -65,8 +73,8 @@ describe("granular PoshQC commands", () => {
         { cwd: string; shell: boolean },
       ];
       expect(args).toContain(wrapperPath);
-      expect(args).toContain("-ScanFolders");
-      expect(args).toContain("C:/workspace/src");
+      expect(args).toContain(scanFolderFlag);
+      expect(args).toContain(scanFolderArg);
       expect(options.cwd).toBe("C:/workspace");
       expect(options.shell).toBe(false);
     },
@@ -74,7 +82,7 @@ describe("granular PoshQC commands", () => {
 
   it.each(commandCases)(
     "prompts for folder selection in interactive mode for $commandId",
-    async ({ commandId }) => {
+    async ({ commandId, scanFolderFlag, scanFolderArg }) => {
       setExecutablePresence({ pwsh: true, powershell: false });
       showQuickPickMock.mockResolvedValueOnce("Select folders to scan");
       showOpenDialogMock.mockResolvedValueOnce([
@@ -89,8 +97,8 @@ describe("granular PoshQC commands", () => {
         string,
         string[],
       ];
-      expect(args).toContain("-ScanFolders");
-      expect(args).toContain("C:/workspace/src");
+      expect(args).toContain(scanFolderFlag);
+      expect(args).toContain(scanFolderArg);
     },
   );
 });

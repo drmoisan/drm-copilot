@@ -4,8 +4,18 @@ Set-StrictMode -Version Latest
 
 BeforeAll {
     $modulePath = Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1'
-    Import-Module -Name $modulePath -Force
-    $moduleInfo = Get-Module PoshQC
+    $resolvedModulePath = (Resolve-Path -Path $modulePath).Path
+    foreach ($module in Get-Module -Name PoshQC) {
+        $loadedPath = if ($module.Path) { (Resolve-Path -Path $module.Path).Path } else { $null }
+        if ($loadedPath -ne $resolvedModulePath) {
+            Remove-Module -ModuleInfo $module -Force
+        }
+    }
+
+    Import-Module -Name $resolvedModulePath -Force
+    $moduleInfo = Get-Module PoshQC |
+        Where-Object { $_.Path -and (Resolve-Path -Path $_.Path).Path -eq $resolvedModulePath } |
+            Select-Object -First 1
     $moduleRoot = Split-Path -Parent $moduleInfo.Path
     $script:TestSettingsPath = Join-Path $moduleRoot 'settings/pssa.settings.psd1'
     if (-not (Test-Path -Path $script:TestSettingsPath)) {
@@ -19,10 +29,34 @@ BeforeAll {
 # problematic and leads to brittle tests.
 
 Describe 'Install-PoshQCTool' {
-    It 'reports already-installed modules without error' {
-        # This test verifies the function runs successfully when dependencies are present
-        # It won't reinstall if PSScriptAnalyzer and Pester are already available
-        { Install-PoshQCTool -InformationAction SilentlyContinue } | Should -Not -Throw
+    It 'keeps manifest dependency requirements empty to allow bootstrap installs' {
+        $manifestPath = Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psd1'
+        $manifest = Import-PowerShellDataFile -Path $manifestPath
+
+        # RequiredModules prevents module import when tools are missing, which blocks the installer entry point.
+        $manifest.RequiredModules | Should -BeNullOrEmpty
+    }
+
+    It 'reports already-installed modules without external module lookup' {
+        $logs = New-Object System.Collections.Generic.List[string]
+
+        {
+            Install-PoshQCTool -FindModule {
+                param([string] $Name)
+                [pscustomobject]@{ Name = $Name; Version = [version]'9.9.9' }
+            } -InstallModule {
+                throw 'InstallModule should not be called for already-installed modules.'
+            } -SetTls { } -GetRepository {
+                [pscustomobject]@{ InstallationPolicy = 'Trusted' }
+            } -SetRepository { } -RegisterRepository { } -Logger {
+                param([string] $Message, [string] $Level)
+                [void] $Level
+                $logs.Add($Message) | Out-Null
+            }
+        } | Should -Not -Throw
+
+        $logs | Should -Contain 'PSScriptAnalyzer 9.9.9 already present.'
+        $logs | Should -Contain 'Pester 9.9.9 already present.'
     }
 }
 
@@ -49,10 +83,13 @@ Describe 'Invoke-PoshQCAnalyze' {
 }
 
 Describe 'Invoke-PoshQCTest' {
-    It 'validates Pester module availability' {
-        $pesterInstalled = Get-Module -ListAvailable -Name Pester
-        $pesterInstalled | Should -Not -BeNullOrEmpty -Because 'Pester should be installed for these tests to run'
+    It 'validates Pester module availability through injected module lookup' {
+        {
+            Invoke-PoshQCTest -Root $PSScriptRoot -EnsureModule {
+                param([string] $Name, [string] $ErrorMessage)
+                [void] $Name
+                throw $ErrorMessage
+            }
+        } | Should -Throw '*Pester is not installed*'
     }
 }
-
-

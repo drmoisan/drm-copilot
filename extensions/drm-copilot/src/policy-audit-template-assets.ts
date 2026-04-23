@@ -24,6 +24,14 @@ const POLICY_AUDIT_TEMPLATE_ASSET_METADATA: Readonly<
     assetId: "policy_audit.agents",
     fileName: "AGENTS.md",
   },
+  "code-review-template": {
+    assetId: "policy_audit.code_review_template",
+    fileName: "code-review.yyyy-MM-ddTHH-mm.md",
+  },
+  "feature-audit-template": {
+    assetId: "policy_audit.feature_audit_template",
+    fileName: "feature-audit.yyyy-MM-ddTHH-mm.md",
+  },
 };
 
 function normalizeRepoPath(filePath: string): string {

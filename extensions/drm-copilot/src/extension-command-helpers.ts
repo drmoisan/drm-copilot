@@ -27,6 +27,30 @@ export function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, "/");
 }
 
+function isEligibleActiveFeaturePlanPath(
+  workspaceRoot: string,
+  filePath: string,
+): boolean {
+  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
+  const normalizedFilePath = normalizePath(filePath).toLowerCase();
+  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
+
+  if (!normalizedFilePath.endsWith(".md")) {
+    return false;
+  }
+
+  if (!normalizedFilePath.startsWith(`${normalizedActiveFeatureRoot}/`)) {
+    return false;
+  }
+
+  const basename = normalizedFilePath.split("/").at(-1);
+  return basename?.startsWith("plan") ?? false;
+}
+
+function getActiveFeaturePlanValidationMessage(): string {
+  return "This command requires an active or selected plan markdown file under docs/features/active/**/plan*.md.";
+}
+
 /**
  * Return the fsPath of the active editor if it is a potential-entry file.
  *
@@ -73,18 +97,7 @@ export function getActiveFeaturePlanPath(
     return undefined;
   }
 
-  const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
-  const normalizedActiveEditorPath =
-    normalizePath(activeEditorPath).toLowerCase();
-  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
-
-  if (!normalizedActiveEditorPath.endsWith(".md")) {
-    return undefined;
-  }
-
-  if (
-    !normalizedActiveEditorPath.startsWith(`${normalizedActiveFeatureRoot}/`)
-  ) {
+  if (!isEligibleActiveFeaturePlanPath(workspaceRoot, activeEditorPath)) {
     return undefined;
   }
 
@@ -286,7 +299,16 @@ export async function promptForActiveFeaturePlan(
     },
   });
 
-  return selectedFile?.[0]?.fsPath;
+  const selectedPlanPath = selectedFile?.[0]?.fsPath;
+  if (selectedPlanPath === undefined) {
+    return undefined;
+  }
+
+  if (!isEligibleActiveFeaturePlanPath(workspaceRoot, selectedPlanPath)) {
+    throw new Error(getActiveFeaturePlanValidationMessage());
+  }
+
+  return selectedPlanPath;
 }
 
 /**

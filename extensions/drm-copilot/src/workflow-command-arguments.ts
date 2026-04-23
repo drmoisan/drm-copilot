@@ -34,6 +34,8 @@ export const WORK_MODE_OPTIONS = [
 export const POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS = [
   "template",
   "agents",
+  "code-review-template",
+  "feature-audit-template",
 ] as const;
 
 export type PotentialPromotionType = (typeof POTENTIAL_PROMOTION_TYPES)[number];
@@ -282,7 +284,7 @@ export function normalizeWorkspaceRoot(
   return normalizeRequiredText(value, "workspace_root");
 }
 
-function isAbsolutePathLike(filePath: string): boolean {
+export function isAbsolutePathLike(filePath: string): boolean {
   return /^(?:[a-zA-Z]:[\\/]|\\\\|\/)/.test(filePath);
 }
 

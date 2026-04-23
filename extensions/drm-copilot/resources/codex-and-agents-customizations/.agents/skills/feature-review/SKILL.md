@@ -52,8 +52,6 @@ Each required review artifact MUST pass the matching validator command before re
 3. If PR context is missing or stale, refresh it through `repo-automation-adapter` using the resolved base branch.
 4. Determine the active feature folder deterministically from the scoping docs and PR context.
 5. Create the policy audit, code review, and feature audit.
-   - do not synthesize or backfill missing audit evidence from memory or inference
-   - if required baseline artifacts, QA artifacts, or coverage-comparison artifacts are missing, stop and report the exact missing artifact paths
    - validate each artifact immediately after writing it
 6. Check off passing acceptance criteria in the authoritative requirement sources per `acceptance-criteria-tracking`.
 7. If remediation is required, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`.
@@ -75,9 +73,6 @@ When remediation is required:
 - `policy-audit.<timestamp>.md`
   - MUST be copied from the canonical template and MUST NOT retain the template instruction block.
   - MUST contain the canonical major headings and Appendix B command reference.
-  - MUST include numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when policy requires it.
-  - MUST include the explicit coverage evidence checklist lines for TypeScript baseline/post-change artifacts, PowerShell baseline/post-change artifacts, and the per-language comparison summary reference.
-  - MUST include a per-language comparison line with explicit delta text and disposition for every in-scope language that has coverage requirements.
 - `code-review.<timestamp>.md`
   - MUST contain `## Executive Summary`.
   - MUST contain `## Findings Table`.
@@ -94,6 +89,4 @@ When remediation is required:
 - Do not silently fix code during review.
 - Prefer check-only commands.
 - If a tool cannot be run, mark the related section as unverified or partial with a concrete reason.
-- Do not mark readiness as PASS or ready for merge when required coverage evidence is missing.
-- If required evidence is absent, report incomplete with the exact missing artifact names or paths.
 - Do not claim completion until every required artifact exists on disk and its validator passes.

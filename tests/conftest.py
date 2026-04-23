@@ -143,13 +143,14 @@ _MEM_TEST_ROOT_COUNTER = count(start=1)
 
 
 @pytest.fixture
-def tmp_path(monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Provide an in-memory ``tmp_path`` compatible with ``pathlib.Path`` APIs.
+def mem_fs_path(monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Provide an in-memory filesystem ``Path`` compatible with ``pathlib.Path`` APIs.
 
     Purpose:
         Replace pytest's default filesystem-backed temporary directory fixture with
         an in-memory path store to enforce repository policy against temporary file
-        usage in unit tests.
+        usage in unit tests. The fixture name reflects its actual behavior: a
+        fully in-memory filesystem, not an on-disk temporary directory.
 
     Args:
         monkeypatch (pytest.MonkeyPatch): Utility used to patch ``pathlib.Path``

@@ -50,7 +50,7 @@ describe("drm-copilot resolvePolicyAuditTemplateAsset command", () => {
     await handler();
 
     expect(showQuickPickMock).toHaveBeenCalledWith(
-      ["template", "agents"],
+      ["template", "agents", "code-review-template", "feature-audit-template"],
       expect.objectContaining({
         title: "drm-copilot: Resolve Policy Audit Template Asset",
       }),
@@ -68,13 +68,13 @@ describe("drm-copilot resolvePolicyAuditTemplateAsset command", () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
     );
-    await handler(["-asset", "template"]);
+    await handler(["-asset", "code-review-template"]);
 
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(openTextDocumentMock).toHaveBeenCalledWith(
       expect.objectContaining({
         fsPath:
-          "C:/extension/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md",
+          "C:/extension/resources/templates/policy_audit/code-review.yyyy-MM-ddTHH-mm.md",
       }),
     );
     expect(showTextDocumentMock).toHaveBeenCalledTimes(1);

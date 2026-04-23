@@ -119,6 +119,34 @@ describe("getActiveFeaturePlanPath", () => {
       "C:/workspace/docs/features/active/2026-01-01-feature/plan.md";
     expect(getActiveFeaturePlanPath("C:/workspace")).toBe(activeEditorFsPath);
   });
+
+  it("returns the fsPath when the open file is a timestamped plan under the active features folder", () => {
+    activeEditorFsPath =
+      "C:/workspace/docs/features/active/2026-04-17-feature-152/plan.2026-04-17T19-54.md";
+
+    expect(getActiveFeaturePlanPath("C:/workspace")).toBe(activeEditorFsPath);
+  });
+
+  it("returns undefined when the open file is issue.md under the active features folder", () => {
+    activeEditorFsPath =
+      "C:/workspace/docs/features/active/2026-04-17-feature-152/issue.md";
+
+    expect(getActiveFeaturePlanPath("C:/workspace")).toBeUndefined();
+  });
+
+  it("returns undefined when the open file is spec.md under the active features folder", () => {
+    activeEditorFsPath =
+      "C:/workspace/docs/features/active/2026-04-17-feature-152/spec.md";
+
+    expect(getActiveFeaturePlanPath("C:/workspace")).toBeUndefined();
+  });
+
+  it("returns undefined when the open file is user-story.md under the active features folder", () => {
+    activeEditorFsPath =
+      "C:/workspace/docs/features/active/2026-04-17-feature-152/user-story.md";
+
+    expect(getActiveFeaturePlanPath("C:/workspace")).toBeUndefined();
+  });
 });
 
 describe("promptForShortName", () => {
@@ -298,6 +326,21 @@ describe("promptForActiveFeaturePlan", () => {
       "C:/workspace/docs/features/active/2026-01-01-feat/plan.md",
     );
     expect(showOpenDialogMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws a clear validation error when the picker-selected file is not a plan markdown file", async () => {
+    activeEditorFsPath =
+      "C:/workspace/docs/features/active/2026-04-17-feature-152/spec.md";
+    showOpenDialogMock.mockResolvedValueOnce([
+      {
+        fsPath:
+          "C:/workspace/docs/features/active/2026-04-17-feature-152/spec.md",
+      },
+    ]);
+
+    await expect(promptForActiveFeaturePlan("C:/workspace")).rejects.toThrow(
+      "This command requires an active or selected plan markdown file under docs/features/active/**/plan*.md.",
+    );
   });
 });
 

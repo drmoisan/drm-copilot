@@ -123,6 +123,7 @@ Always apply:
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
+     - coverage regression below policy threshold (< 80% repo-wide or < 90% for new code)
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.

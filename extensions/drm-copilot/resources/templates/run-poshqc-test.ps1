@@ -7,6 +7,9 @@ param(
     [string[]] $ScanFolders,
 
     [Parameter()]
+    [string] $ScanFoldersJson,
+
+    [Parameter()]
     [switch] $DisableKoverageCopy,
 
     [Parameter()]
@@ -19,4 +22,11 @@ $ErrorActionPreference = "Stop"
 $poshQcModulePath = Join-Path -Path $PSScriptRoot -ChildPath "..\powershell\PoshQC\PoshQC.psd1"
 Import-Module $poshQcModulePath -Force
 
-Invoke-PoshQCTest -Root $WorkspaceRoot -ScanFolders $ScanFolders -DisableKoverageCopy:$DisableKoverageCopy -KoverageOutputPath $KoverageOutputPath
+$resolvedScanFolders = $ScanFolders
+if (-not [string]::IsNullOrWhiteSpace($ScanFoldersJson)) {
+    $resolvedScanFolders = @(
+        ConvertFrom-Json -InputObject $ScanFoldersJson
+    ) | ForEach-Object { [string] $_ }
+}
+
+Invoke-PoshQCTest -Root $WorkspaceRoot -ScanFolders $resolvedScanFolders -DisableKoverageCopy:$DisableKoverageCopy -KoverageOutputPath $KoverageOutputPath

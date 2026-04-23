@@ -1,37 +1,46 @@
 import { getStderrExcerpt } from "./command-runtime";
 import {
+  REPO_AUTOMATION_TOOL_DEFINITIONS,
+  type ToolDefinition,
+} from "./mcp-repo-automation-tool-definitions";
+import {
   type RepoAutomationExecutionResult,
   type RepoAutomationService,
-  REPO_AUTOMATION_TOOLS,
-  type RepoAutomationToolName,
 } from "./repo-automation-service";
 import {
-  resolveCollectCommitContextToolInput,
-  resolveCollectPrContextToolInput,
-  resolveLinkParentChildToolInput,
-  resolveNewActiveFeatureFolderToolInput,
-  resolveNewPotentialBugEntryToolInput,
-  resolveNewPotentialEntryToolInput,
-  resolvePolicyAuditTemplateAssetToolInput,
-  resolvePotentialToIssueToolInput,
-  resolvePushDownCodexAndAgentsCustomizationsToolInput,
-  resolvePushDownCopilotCustomizationsToolInput,
-  resolveRunPoshQCSuiteToolInput,
-  resolveResolveExecuteHardLockPromptToolInput,
-  resolveValidateOrchestrationArtifactsToolInput,
-} from "./mcp-tool-inputs";
+  REPO_AUTOMATION_TOOLS,
+  type RepoAutomationToolName,
+} from "./repo-automation-tool-names";
+import { resolveResolveAtomicPlanPromptToolInput } from "./mcp-tool-inputs";
+import {
+  handleCollectCommitContext,
+  handleCollectPrContext,
+} from "./mcp-handlers/collect-context-handlers";
+import {
+  handleNewActiveFeatureFolder,
+  handleNewPotentialBugEntry,
+  handleNewPotentialEntry,
+  handlePotentialToIssue,
+} from "./mcp-handlers/feature-entry-handlers";
+import {
+  handleRunPoshQCAnalyze,
+  handleRunPoshQCAnalyzeAutofix,
+  handleRunPoshQCFormat,
+  handleRunPoshQCSuite,
+  handleRunPoshQCTest,
+} from "./mcp-handlers/poshqc-handlers";
+import {
+  handlePushDownCodexAndAgentsCustomizations,
+  handlePushDownCopilotCustomizations,
+} from "./mcp-handlers/push-down-handlers";
+import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
+import {
+  handleResolvePolicyAuditTemplateAsset,
+  handleValidateOrchestrationArtifacts,
+} from "./mcp-handlers/template-validation-handlers";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 
-interface ToolDefinition {
-  readonly name: RepoAutomationToolName;
-  readonly description: string;
-  readonly inputSchema: {
-    readonly type: "object";
-    readonly properties: Readonly<Record<string, object>>;
-    readonly required?: ReadonlyArray<string>;
-    readonly additionalProperties: false;
-  };
-}
+export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
 export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly ok: boolean;
@@ -44,360 +53,6 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly summary: string;
   readonly stderr_excerpt?: string;
 }
-
-const workspaceRootProperty = {
-  type: "string",
-  description: "Target workspace root. Defaults to process.cwd() when omitted.",
-};
-
-const toolDefinitions: ReadonlyArray<ToolDefinition> = [
-  {
-    name: "collect_commit_context",
-    description:
-      "Collect commit context artifacts from the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "collect_pr_context",
-    description:
-      "Collect PR context artifacts for an explicit base branch using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        base: {
-          type: "string",
-          description:
-            "Explicit base branch or ref used for PR context collection.",
-        },
-      },
-      required: ["base"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "push_down_copilot_customizations",
-    description:
-      "Copy the bundled Copilot customization payload into the target workspace.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "push_down_codex_and_agents_customizations",
-    description:
-      "Copy the bundled Codex and agents customization payload into the target workspace.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "new_potential_bug_entry",
-    description:
-      "Create a new potential bug entry in the target workspace from bundled templates.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        short_name: {
-          type: "string",
-          description: "Kebab-case short name for the potential bug entry.",
-        },
-      },
-      required: ["short_name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "new_potential_entry",
-    description:
-      "Create a new potential entry in the target workspace from bundled templates.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        short_name: {
-          type: "string",
-          description: "Kebab-case short name for the potential entry.",
-        },
-      },
-      required: ["short_name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "link_parent_child",
-    description:
-      "Link a child GitHub issue to a parent tracking issue using the bundled PowerShell workflow.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        child_issue_number: {
-          type: "string",
-          description: "Child issue number to link.",
-        },
-        parent_issue_number: {
-          type: "string",
-          description: "Parent tracking issue number.",
-        },
-      },
-      required: ["child_issue_number", "parent_issue_number"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "potential_to_issue",
-    description:
-      "Promote a potential entry into an issue-oriented feature workflow in the target workspace.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        potential_path: {
-          type: "string",
-          description:
-            "Absolute or workspace-relative path to the potential Markdown file.",
-        },
-        promotion_type: {
-          type: "string",
-          enum: ["epic", "feature", "refactor", "bug"],
-          description: "Promotion type to generate.",
-        },
-        work_mode: {
-          type: "string",
-          enum: ["minor-audit", "full-feature", "full-bug", "full"],
-          description:
-            "Work mode marker applied to the resulting issue workflow.",
-        },
-      },
-      required: ["potential_path", "promotion_type", "work_mode"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "new_active_feature_folder",
-    description:
-      "Create a new active feature folder in the target workspace from bundled templates.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        feature_name: {
-          type: "string",
-          description:
-            "Feature folder name using kebab-case or underscore-case letters and numbers.",
-        },
-        type: {
-          type: "string",
-          enum: ["epic", "feature", "refactor", "bug"],
-          description: "Feature folder type to create.",
-        },
-        issue_number: {
-          type: "string",
-          description:
-            "Optional numeric issue number associated with the feature folder.",
-        },
-        work_mode: {
-          type: "string",
-          enum: ["minor-audit", "full-feature", "full-bug", "full"],
-          description: "Work mode marker applied to the feature folder.",
-        },
-      },
-      required: ["feature_name", "type", "work_mode"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_format",
-    description:
-      "Run bundled PoshQC formatting against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze",
-    description:
-      "Run bundled PoshQC analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_test",
-    description:
-      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze_autofix",
-    description:
-      "Apply bundled PoshQC analyzer autofixes, then rerun analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_suite",
-    description:
-      "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "resolve_policy_audit_template_asset",
-    description:
-      "Resolve a bundled policy-audit template asset from the published extension package, optionally copying it into the target workspace.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        asset: {
-          type: "string",
-          enum: ["template", "agents"],
-          description:
-            "Bundled policy-audit asset selector: 'template' for policy-audit.yyyy-MM-ddTHH-mm.md or 'agents' for AGENTS.md.",
-        },
-        target_path: {
-          type: "string",
-          description:
-            "Optional workspace-relative or absolute destination path for a copied asset.",
-        },
-      },
-      required: ["asset"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "resolve_execute_hard_lock_prompt",
-    description:
-      "Resolve the execute hard-lock prompt for a target plan path using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        target: {
-          type: "string",
-          description: "Target Markdown plan path to resolve.",
-        },
-      },
-      required: ["target"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "validate_orchestration_artifacts",
-    description:
-      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        artifact_type: {
-          type: "string",
-          enum: [
-            "plan",
-            "policy-audit",
-            "code-review",
-            "feature-audit",
-            "orchestrator-state",
-          ],
-          description: "The type of orchestration artifact to validate.",
-        },
-        artifact_path: {
-          type: "string",
-          description:
-            "Workspace-relative or absolute path to the artifact file.",
-        },
-        require_complete: {
-          type: "boolean",
-          description:
-            "When true and artifact_type is 'orchestrator-state', require all phases to be complete.",
-        },
-      },
-      required: ["artifact_type", "artifact_path"],
-      additionalProperties: false,
-    },
-  },
-];
 
 function inferWorkspaceRoot(rawInput: unknown): string {
   if (
@@ -454,7 +109,7 @@ function toFailureToolResult(
  * @returns Stable tool definitions advertised to MCP clients.
  */
 export function listRepoAutomationTools(): ReadonlyArray<ToolDefinition> {
-  return toolDefinitions;
+  return REPO_AUTOMATION_TOOL_DEFINITIONS;
 }
 
 /**
@@ -475,98 +130,91 @@ export async function dispatchRepoAutomationTool(
   try {
     switch (toolName) {
       case "collect_commit_context": {
-        const input = resolveCollectCommitContextToolInput(rawInput);
-        return toMcpToolResult(await service.collectCommitContext(input));
+        return toMcpToolResult(
+          await handleCollectCommitContext(rawInput, service),
+        );
       }
 
       case "collect_pr_context": {
-        const input = resolveCollectPrContextToolInput(rawInput);
-        return toMcpToolResult(await service.collectPrContext(input));
+        return toMcpToolResult(await handleCollectPrContext(rawInput, service));
       }
 
       case "push_down_copilot_customizations": {
-        const input = resolvePushDownCopilotCustomizationsToolInput(rawInput);
         return toMcpToolResult(
-          await service.pushDownCopilotCustomizations(input),
+          await handlePushDownCopilotCustomizations(rawInput, service),
         );
       }
 
       case "push_down_codex_and_agents_customizations": {
-        const input =
-          resolvePushDownCodexAndAgentsCustomizationsToolInput(rawInput);
         return toMcpToolResult(
-          await service.pushDownCodexAndAgentsCustomizations(input),
+          await handlePushDownCodexAndAgentsCustomizations(rawInput, service),
         );
       }
 
       case "new_potential_bug_entry": {
-        const input = resolveNewPotentialBugEntryToolInput(rawInput);
-        return toMcpToolResult(await service.newPotentialBugEntry(input));
+        return toMcpToolResult(
+          await handleNewPotentialBugEntry(rawInput, service),
+        );
       }
 
       case "new_potential_entry": {
-        const input = resolveNewPotentialEntryToolInput(rawInput);
-        return toMcpToolResult(await service.newPotentialEntry(input));
-      }
-
-      case "link_parent_child": {
-        const input = resolveLinkParentChildToolInput(rawInput);
-        return toMcpToolResult(await service.linkParentChild(input));
+        return toMcpToolResult(
+          await handleNewPotentialEntry(rawInput, service),
+        );
       }
 
       case "potential_to_issue": {
-        const input = resolvePotentialToIssueToolInput(rawInput);
-        return toMcpToolResult(await service.potentialToIssue(input));
+        return toMcpToolResult(await handlePotentialToIssue(rawInput, service));
       }
 
       case "new_active_feature_folder": {
-        const input = resolveNewActiveFeatureFolderToolInput(rawInput);
-        return toMcpToolResult(await service.newActiveFeatureFolder(input));
+        return toMcpToolResult(
+          await handleNewActiveFeatureFolder(rawInput, service),
+        );
       }
 
       case "run_poshqc_format": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCFormat(input));
+        return toMcpToolResult(await handleRunPoshQCFormat(rawInput, service));
       }
 
       case "run_poshqc_analyze": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCAnalyze(input));
+        return toMcpToolResult(await handleRunPoshQCAnalyze(rawInput, service));
       }
 
       case "run_poshqc_test": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCTest(input));
+        return toMcpToolResult(await handleRunPoshQCTest(rawInput, service));
       }
 
       case "run_poshqc_analyze_autofix": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCAnalyzeAutofix(input));
+        return toMcpToolResult(
+          await handleRunPoshQCAnalyzeAutofix(rawInput, service),
+        );
       }
 
       case "run_poshqc_suite": {
-        const input = resolveRunPoshQCSuiteToolInput(rawInput);
-        return toMcpToolResult(await service.runPoshQCSuite(input));
+        return toMcpToolResult(await handleRunPoshQCSuite(rawInput, service));
       }
 
       case "resolve_policy_audit_template_asset": {
-        const input = resolvePolicyAuditTemplateAssetToolInput(rawInput);
         return toMcpToolResult(
-          await service.resolvePolicyAuditTemplateAsset(input),
+          await handleResolvePolicyAuditTemplateAsset(rawInput, service),
         );
       }
 
       case "resolve_execute_hard_lock_prompt": {
-        const input = resolveResolveExecuteHardLockPromptToolInput(rawInput);
         return toMcpToolResult(
-          await service.resolveExecuteHardLockPrompt(input),
+          await handleResolveExecuteHardLockPrompt(rawInput, service),
         );
       }
 
+      case "resolve_atomic_plan_prompt": {
+        const input = resolveResolveAtomicPlanPromptToolInput(rawInput);
+        return toMcpToolResult(await service.resolveAtomicPlanPrompt(input));
+      }
+
       case "validate_orchestration_artifacts": {
-        const input = resolveValidateOrchestrationArtifactsToolInput(rawInput);
         return toMcpToolResult(
-          await service.validateOrchestrationArtifacts(input),
+          await handleValidateOrchestrationArtifacts(rawInput, service),
         );
       }
     }

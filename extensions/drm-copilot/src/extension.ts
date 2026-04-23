@@ -16,6 +16,7 @@ import {
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
 import { registerMcpProvider } from "./mcp-provider";
+import { listRepoAutomationTools } from "./mcp-tools";
 import { registerPoshQcCommands } from "./poshqc-command-registration";
 import {
   discoverPrBaseBranches,
@@ -221,6 +222,36 @@ export function activate(context: vscode.ExtensionContext): void {
       await service.runPoshQCSuite({
         workspaceRoot,
         invocationId: commandId,
+      });
+    },
+  );
+
+  const listMcpToolsDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.listMcpTools",
+    async () => {
+      const commandId = "drmCopilotExtension.listMcpTools";
+      const toolItems = listRepoAutomationTools().map((tool) => ({
+        label: tool.name,
+        description: tool.description,
+        detail:
+          tool.inputSchema.required === undefined ||
+          tool.inputSchema.required.length === 0
+            ? "Required inputs: none"
+            : `Required inputs: ${tool.inputSchema.required.join(", ")}`,
+      }));
+
+      output.appendLine(`[${commandId}] available MCP tools:`);
+      for (const toolItem of toolItems) {
+        output.appendLine(
+          `- ${toolItem.label}: ${toolItem.description} (${toolItem.detail})`,
+        );
+      }
+
+      await vscode.window.showQuickPick(toolItems, {
+        title: "drm-copilot: List MCP Tools",
+        placeHolder: "Available tools on the drmCopilotExtension MCP server.",
+        matchOnDescription: true,
+        matchOnDetail: true,
       });
     },
   );
@@ -456,6 +487,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const [
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
+    resolveAtomicPlanPromptDisposable,
   ] = registerDocumentWorkflowCommands({
     output,
     service,
@@ -474,6 +506,7 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCodexAndAgentsCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
     runPoshQCSuiteDisposable,
+    listMcpToolsDisposable,
     runPoshQCFormatDisposable,
     runPoshQCAnalyzeDisposable,
     runPoshQCTestDisposable,
@@ -483,6 +516,7 @@ export function activate(context: vscode.ExtensionContext): void {
     linkParentChildDisposable,
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
+    resolveAtomicPlanPromptDisposable,
     ...mcpDisposables,
     output,
   );
