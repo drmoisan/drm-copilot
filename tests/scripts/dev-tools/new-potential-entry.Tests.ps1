@@ -90,7 +90,9 @@ Describe "new-potential-entry.ps1 - Get-AuthorName" {
         }
 
         It "returns git config user.name when available" {
-            $result = Get-AuthorName -GetGitConfig { param($Key) $null = $Key; "John Doe" }
+            $result = Get-AuthorName `
+                -GetCommand { param($Name) $null = $Name; [pscustomobject]@{ Name = 'git' } } `
+                -GetGitConfig { param($Key) $null = $Key; "John Doe" }
             $result | Should -Be "John Doe"
         }
 
