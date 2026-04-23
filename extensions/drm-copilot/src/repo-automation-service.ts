@@ -54,6 +54,12 @@ export interface RepoAutomationService {
   newPotentialEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult>;
+  linkParentChild(
+    input: WorkspaceExecutionInput & {
+      readonly parentIssueNumber: string;
+      readonly childIssueNumber: string;
+    },
+  ): Promise<RepoAutomationExecutionResult>;
   potentialToIssue(
     input: WorkspaceExecutionInput & {
       readonly potentialPath: string;
@@ -252,6 +258,27 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       args: ["-ShortName", input.shortName, "-TemplateRoot", this.templateRoot],
       summary: `Created a new potential entry for '${input.shortName}'.`,
       stdoutArtifactPattern: /^Created:\s*(.+)$/im,
+    });
+  }
+  async linkParentChild(
+    input: WorkspaceExecutionInput & {
+      readonly parentIssueNumber: string;
+      readonly childIssueNumber: string;
+    },
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "link_parent_child",
+      runtimeKind: "powershell",
+      bundledRelativePath: "resources/templates/link-parent-child.ps1",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "link_parent_child",
+      args: [
+        "-ParentIssueNumber",
+        input.parentIssueNumber,
+        "-ChildIssueNumber",
+        input.childIssueNumber,
+      ],
+      summary: `Linked child issue #${input.childIssueNumber} to parent issue #${input.parentIssueNumber} using the bundled workflow.`,
     });
   }
   async potentialToIssue(
