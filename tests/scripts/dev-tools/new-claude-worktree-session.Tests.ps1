@@ -169,6 +169,19 @@ Describe "new-claude-worktree-session.ps1 - Start-ClaudeBackground" {
             }
             $result.Id | Should -Be 99999
         }
+
+        It "redirects stdout and stderr to distinct paths" {
+            $null = Start-ClaudeBackground `
+                -WorktreePath "/work/path" `
+                -InvokeStartProcess {
+                param([hashtable] $StartArgs)
+                $script:capturedStartArgs = $StartArgs
+                return [pscustomobject]@{ Id = 12345 }
+            }
+            $script:capturedStartArgs['RedirectStandardOutput'] | Should -Not -BeNullOrEmpty
+            $script:capturedStartArgs['RedirectStandardError'] | Should -Not -BeNullOrEmpty
+            $script:capturedStartArgs['RedirectStandardOutput'] | Should -Not -Be $script:capturedStartArgs['RedirectStandardError']
+        }
     }
 }
 
@@ -179,18 +192,23 @@ Describe "new-claude-worktree-session.ps1 - Write-LaunchResult" {
         }
 
         It "output contains a line starting with WorktreePath:" {
-            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -LogFile "/some/path/claude-session.log") -join "`n"
+            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -StdoutLog "/some/path/claude-session.stdout.log" -StderrLog "/some/path/claude-session.stderr.log") -join "`n"
             $output | Should -Match "WorktreePath:"
         }
 
         It "output contains a line starting with ProcessId:" {
-            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -LogFile "/some/path/claude-session.log") -join "`n"
+            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -StdoutLog "/some/path/claude-session.stdout.log" -StderrLog "/some/path/claude-session.stderr.log") -join "`n"
             $output | Should -Match "ProcessId:"
         }
 
-        It "output contains a line starting with LogFile:" {
-            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -LogFile "/some/path/claude-session.log") -join "`n"
-            $output | Should -Match "LogFile:"
+        It "output contains a line starting with StdoutLog:" {
+            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -StdoutLog "/some/path/claude-session.stdout.log" -StderrLog "/some/path/claude-session.stderr.log") -join "`n"
+            $output | Should -Match "StdoutLog:"
+        }
+
+        It "output contains a line starting with StderrLog:" {
+            $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -StdoutLog "/some/path/claude-session.stdout.log" -StderrLog "/some/path/claude-session.stderr.log") -join "`n"
+            $output | Should -Match "StderrLog:"
         }
     }
 }

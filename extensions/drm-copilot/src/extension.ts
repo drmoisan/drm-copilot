@@ -178,6 +178,45 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const newClaudeWorktreeSessionDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.newClaudeWorktreeSession",
+    async () => {
+      const commandId = "drmCopilotExtension.newClaudeWorktreeSession";
+
+      const shortName = await promptForShortName(
+        "drm-copilot: New Claude Worktree Session",
+        "Enter a kebab-case short name for the worktree and branch.",
+      );
+      if (!shortName) {
+        return;
+      }
+
+      const objective = await vscode.window.showInputBox({
+        title: "drm-copilot: New Claude Worktree Session",
+        prompt:
+          "Enter the objective to pass to claude as a prompt. Leave blank to skip.",
+        ignoreFocusOut: true,
+      });
+      if (objective === undefined) {
+        return;
+      }
+
+      const scriptArgs: string[] = ["-ShortName", shortName];
+      const trimmedObjective = objective.trim();
+      if (trimmedObjective.length > 0) {
+        scriptArgs.push("-Objective", trimmedObjective);
+      }
+
+      await executeBundledScript(context, output, {
+        runtimeKind: "powershell",
+        bundledRelativePath:
+          "resources/templates/new-claude-worktree-session.ps1",
+        commandId,
+        args: scriptArgs,
+      });
+    },
+  );
+
   const runPoshQCSuiteDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.runPoshQCSuite",
     async (...rawArgs: unknown[]) => {
@@ -505,6 +544,7 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCopilotCustomizationsDisposable,
     pushDownCodexAndAgentsCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
+    newClaudeWorktreeSessionDisposable,
     runPoshQCSuiteDisposable,
     listMcpToolsDisposable,
     runPoshQCFormatDisposable,

@@ -64,6 +64,10 @@ describe("drm-copilot workflow command behavior", () => {
     activateAndGetHandler("drmCopilotExtension.linkParentChild");
   });
 
+  it("registers newClaudeWorktreeSession", () => {
+    activateAndGetHandler("drmCopilotExtension.newClaudeWorktreeSession");
+  });
+
   it("activate registers the MCP server definition provider", () => {
     activateAndGetHandler("drmCopilotExtension.helloPython");
 
@@ -346,6 +350,86 @@ describe("drm-copilot workflow command behavior", () => {
     );
 
     await expect(handler()).rejects.toThrow("Command exited with code 2");
+  });
+
+  it("newClaudeWorktreeSession passes the bundled script path and prompt args", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock
+      .mockResolvedValueOnce("auth-refactor")
+      .mockResolvedValueOnce("Refactor the auth module.");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newClaudeWorktreeSession",
+    );
+    await handler();
+
+    expect(showInputBoxMock).toHaveBeenCalledTimes(2);
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/new-claude-worktree-session.ps1",
+    );
+    expect(args).toContain("-ShortName");
+    expect(args).toContain("auth-refactor");
+    expect(args).toContain("-Objective");
+    expect(args).toContain("Refactor the auth module.");
+  });
+
+  it("newClaudeWorktreeSession omits -Objective when the objective is blank", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    showInputBoxMock
+      .mockResolvedValueOnce("auth-refactor")
+      .mockResolvedValueOnce("   ");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newClaudeWorktreeSession",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain("-ShortName");
+    expect(args).toContain("auth-refactor");
+    expect(args).not.toContain("-Objective");
+  });
+
+  it("newClaudeWorktreeSession returns early when the short-name prompt is cancelled", async () => {
+    showInputBoxMock.mockResolvedValue(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newClaudeWorktreeSession",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newClaudeWorktreeSession returns early when the objective prompt is cancelled", async () => {
+    showInputBoxMock
+      .mockResolvedValueOnce("auth-refactor")
+      .mockResolvedValueOnce(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newClaudeWorktreeSession",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("newClaudeWorktreeSession surfaces a missing powershell runtime error", async () => {
+    setExecutablePresence({ pwsh: false, powershell: false });
+    showInputBoxMock
+      .mockResolvedValueOnce("auth-refactor")
+      .mockResolvedValueOnce("Refactor the auth module.");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newClaudeWorktreeSession",
+    );
+
+    await expect(handler()).rejects.toThrow(
+      "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
+    );
   });
 
   it("linkParentChild prompts for both issue numbers and runs the bundled script", async () => {
