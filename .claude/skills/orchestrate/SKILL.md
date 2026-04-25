@@ -35,6 +35,22 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
+## Evidence Location Authority
+
+All evidence artifacts produced during orchestration MUST comply with the canonical scheme defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. Evidence MUST be written to `<FEATURE>/evidence/<kind>/` only.
+
+Permitted `artifacts/`-rooted sub-paths (non-evidence orchestration use only):
+- `artifacts/orchestration/` — orchestrator state and checkpoints
+- `artifacts/research/` — research outputs from task-researcher
+- `artifacts/pr_context` — PR context artifacts
+- `artifacts/reviews/` — review staging artifacts
+- `artifacts/status/` — status update artifacts
+- `artifacts/python/` — Python coverage and lcov outputs
+- `artifacts/pester/` — Pester coverage outputs
+- `artifacts/csharp/` — C# coverage outputs
+
+All other `artifacts/` sub-paths (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`) are FORBIDDEN for evidence output and will be blocked by the `enforce-evidence-locations.ps1` PreToolUse hook.
+
 ## Completion Requirements
 
 The orchestrator must not report completion until:
