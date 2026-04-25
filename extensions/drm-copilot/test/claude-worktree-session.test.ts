@@ -3,7 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import {
   buildBranchName,
   buildWorktreePath,
-  buildWorktreeSessionCommand,
+  buildWorktreeSessionCommands,
   formatWorktreeTimestamp,
   quoteForPwsh,
 } from "../src/claude-worktree-session";
@@ -114,86 +114,122 @@ describe("quoteForPwsh", () => {
   });
 });
 
-describe("buildWorktreeSessionCommand", () => {
+describe("buildWorktreeSessionCommands", () => {
   const baseInput = {
     repoRoot: "/parent/drm-copilot",
     worktreePath: "/parent/drm-copilot-wt-20260420095937-auth",
     branchName: "feature/20260420095937-auth",
+    usePoetry: false,
   };
 
-  it("includes git -C <repoRoot> worktree add, Set-Location, and the claude command without the objective when objective is undefined", () => {
+  it("emits a git command that uses git -C <repoRoot> with quoted path and branch", () => {
     // Arrange / Act
-    const command = buildWorktreeSessionCommand({
+    const commands = buildWorktreeSessionCommands({
       ...baseInput,
       objective: undefined,
     });
 
     // Assert
-    expect(command).toContain(
+    expect(commands.git).toBe(
       "git -C '/parent/drm-copilot' worktree add '/parent/drm-copilot-wt-20260420095937-auth' -b 'feature/20260420095937-auth'",
     );
-    expect(command).toContain("$LASTEXITCODE -eq 0");
-    expect(command).toContain(
-      "Set-Location '/parent/drm-copilot-wt-20260420095937-auth'",
-    );
-    expect(command).toContain("claude --dangerously-skip-permissions");
-    expect(command).not.toContain("claude --dangerously-skip-permissions '");
   });
 
-  it("omits the trailing objective when objective trims to empty", () => {
+  it("emits a Set-Location command targeting the worktree path", () => {
     // Arrange / Act
-    const command = buildWorktreeSessionCommand({
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.setLocation).toBe(
+      "Set-Location '/parent/drm-copilot-wt-20260420095937-auth'",
+    );
+  });
+
+  it("returns undefined poetryInstall and activate when usePoetry is false", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      usePoetry: false,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.poetryInstall).toBeUndefined();
+    expect(commands.activate).toBeUndefined();
+  });
+
+  it("emits poetry install --with dev when usePoetry is true", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      usePoetry: true,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.poetryInstall).toBe("poetry install --with dev");
+  });
+
+  it("emits a relative-path activate command for the worktree-local venv when usePoetry is true", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      usePoetry: true,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.activate).toBe("& './.venv/Scripts/Activate.ps1'");
+  });
+
+  it("emits a claude command without a trailing objective when objective is undefined", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.claude).toBe("claude --dangerously-skip-permissions");
+  });
+
+  it("emits a claude command without a trailing objective when objective trims to empty", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
       ...baseInput,
       objective: "   ",
     });
 
     // Assert
-    expect(command).toContain("claude --dangerously-skip-permissions");
-    expect(command).not.toMatch(/claude --dangerously-skip-permissions '/);
+    expect(commands.claude).toBe("claude --dangerously-skip-permissions");
   });
 
-  it("appends a quoted objective when supplied", () => {
-    // Arrange
-    const objective = "Refactor the auth module.";
-
-    // Act
-    const command = buildWorktreeSessionCommand({
+  it("emits a claude command with the quoted objective when supplied", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
       ...baseInput,
-      objective,
+      objective: "Refactor the auth module.",
     });
 
     // Assert
-    expect(command).toContain(
+    expect(commands.claude).toBe(
       "claude --dangerously-skip-permissions 'Refactor the auth module.'",
     );
   });
 
-  it("escapes embedded apostrophes inside the objective", () => {
-    // Arrange
-    const objective = "don't break the build";
-
-    // Act
-    const command = buildWorktreeSessionCommand({
-      ...baseInput,
-      objective,
-    });
-
-    // Assert
-    expect(command).toContain(
-      "claude --dangerously-skip-permissions 'don''t break the build'",
-    );
-  });
-
-  it("guards the claude launch behind a $LASTEXITCODE check on the worktree add", () => {
+  it("escapes embedded apostrophes inside the claude objective", () => {
     // Arrange / Act
-    const command = buildWorktreeSessionCommand({
+    const commands = buildWorktreeSessionCommands({
       ...baseInput,
-      objective: undefined,
+      objective: "don't break the build",
     });
 
     // Assert
-    expect(command).toMatch(
-      /git -C .* worktree add .* -b .*; if \(\$LASTEXITCODE -eq 0\) \{ Set-Location .* claude --dangerously-skip-permissions \}$/,
+    expect(commands.claude).toBe(
+      "claude --dangerously-skip-permissions 'don''t break the build'",
     );
   });
 
@@ -203,16 +239,19 @@ describe("buildWorktreeSessionCommand", () => {
       repoRoot: "/parent dir/o'connor",
       worktreePath: "/parent dir/o'connor-wt",
       branchName: "feature/o'connor",
+      usePoetry: false,
       objective: undefined,
     };
 
     // Act
-    const command = buildWorktreeSessionCommand(tricky);
+    const commands = buildWorktreeSessionCommands(tricky);
 
     // Assert
-    expect(command).toContain(
+    expect(commands.git).toBe(
       "git -C '/parent dir/o''connor' worktree add '/parent dir/o''connor-wt' -b 'feature/o''connor'",
     );
-    expect(command).toContain("Set-Location '/parent dir/o''connor-wt'");
+    expect(commands.setLocation).toBe(
+      "Set-Location '/parent dir/o''connor-wt'",
+    );
   });
 });

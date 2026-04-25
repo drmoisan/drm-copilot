@@ -17,6 +17,7 @@ import {
   registerMcpServerDefinitionProviderMock,
   resetExtensionHarnessState,
   setExecutablePresence,
+  setPyprojectFixture,
   setWorkspaceFolders,
   showInputBoxMock,
   showQuickPickMock,
@@ -353,14 +354,18 @@ describe("drm-copilot workflow command behavior", () => {
     await expect(handler()).rejects.toThrow("Command exited with code 2");
   });
 
-  it("newClaudeWorktreeSession opens an integrated terminal with the worktree command and the objective", async () => {
-    // The handler defers terminal.sendText with setTimeout so that the
-    // VS Code Python extension's auto-activation injection lands first.
-    // Use fake timers so the test can deterministically advance past the
-    // grace period without waiting in real time.
+  it("newClaudeWorktreeSession without poetry sends git, Set-Location, and claude as separate sendText calls in order", async () => {
+    // The handler sends each step as its own sendText call so each appears
+    // on its own PowerShell prompt. With no poetry-flavored pyproject.toml
+    // present, only git and Set-Location fire synchronously; the claude
+    // call is deferred behind a grace period so VS Code's Python extension
+    // auto-activation can land at the host shell's prompt instead of being
+    // typed into claude's TUI.
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
+      // No setPyprojectFixture call here means the workspace has no
+      // pyproject.toml, so usePoetry resolves to false.
       showInputBoxMock
         .mockResolvedValueOnce("auth-refactor")
         .mockResolvedValueOnce("Refactor the auth module.");
@@ -394,32 +399,117 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
       expect(terminal.show).toHaveBeenCalledTimes(1);
-      // sendText must NOT have fired yet — the deferred timer is still pending.
-      expect(terminal.sendText).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(5000);
-
-      expect(terminal.sendText).toHaveBeenCalledTimes(1);
-      const [commandText, addNewLine] = terminal.sendText.mock.calls[0] as [
+      // No poetry => exactly two pre-claude sendText calls: git, Set-Location.
+      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+      const [gitCmd, gitNewline] = terminal.sendText.mock.calls[0] as [
         string,
         boolean,
       ];
-      expect(addNewLine).toBe(true);
-      // The command must use `git -C <repoRoot>` so it works regardless of the
-      // terminal's actual current working directory at launch time.
-      expect(commandText).toContain("git -C 'C:/workspace' worktree add");
-      expect(commandText).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'/);
-      expect(commandText).toContain(
+      const [setLocationCmd, setLocationNewline] = terminal.sendText.mock
+        .calls[1] as [string, boolean];
+      expect(gitNewline).toBe(true);
+      expect(setLocationNewline).toBe(true);
+      // The git command uses `git -C <repoRoot>` so it works regardless of
+      // the terminal's actual current working directory at launch time.
+      expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
+      expect(gitCmd).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'$/);
+      expect(setLocationCmd).toMatch(
+        /^Set-Location 'C:\/drm-copilot-wt-[0-9]{14}-auth-refactor'$/,
+      );
+
+      // The deferred claude sendText fires after the grace period.
+      jest.advanceTimersByTime(5000);
+
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [claudeCmd, claudeNewline] = terminal.sendText.mock.calls[2] as [
+        string,
+        boolean,
+      ];
+      expect(claudeNewline).toBe(true);
+      expect(claudeCmd).toBe(
         "claude --dangerously-skip-permissions 'Refactor the auth module.'",
       );
-      expect(commandText).toContain("$LASTEXITCODE -eq 0");
-      expect(commandText).toContain("Set-Location");
     } finally {
       jest.useRealTimers();
     }
   });
 
-  it("newClaudeWorktreeSession omits the objective from the terminal command when blank", async () => {
+  it("newClaudeWorktreeSession with a poetry pyproject sends poetry install --with dev and activates before claude", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      setPyprojectFixture(
+        '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n',
+      );
+      showInputBoxMock
+        .mockResolvedValueOnce("auth-refactor")
+        .mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      expect(createTerminalMock).toHaveBeenCalledTimes(1);
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // With poetry: four pre-claude sendText calls (git, Set-Location,
+      // poetry install, activate), then the deferred claude.
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [gitCmd] = terminal.sendText.mock.calls[0] as [string];
+      const [setLocationCmd] = terminal.sendText.mock.calls[1] as [string];
+      const [poetryInstallCmd] = terminal.sendText.mock.calls[2] as [string];
+      const [activateCmd] = terminal.sendText.mock.calls[3] as [string];
+      expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
+      expect(setLocationCmd).toMatch(/^Set-Location '/);
+      expect(poetryInstallCmd).toBe("poetry install --with dev");
+      expect(activateCmd).toBe("& './.venv/Scripts/Activate.ps1'");
+
+      jest.advanceTimersByTime(5000);
+
+      expect(terminal.sendText).toHaveBeenCalledTimes(5);
+      const [claudeCmd] = terminal.sendText.mock.calls[4] as [string];
+      expect(claudeCmd).toBe(
+        "claude --dangerously-skip-permissions 'Refactor the auth module.'",
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession ignores a pyproject that does not mention poetry", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      setPyprojectFixture(
+        '[project]\nname = "plain"\nversion = "0.1.0"\nrequires-python = ">=3.13"\n',
+      );
+      showInputBoxMock
+        .mockResolvedValueOnce("auth-refactor")
+        .mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // Pyproject exists but does not mention poetry => no install/activate.
+      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+      jest.advanceTimersByTime(5000);
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession omits the objective from the claude command when blank", async () => {
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
@@ -439,23 +529,18 @@ describe("drm-copilot workflow command behavior", () => {
 
       jest.advanceTimersByTime(5000);
 
-      const [commandText] = terminal.sendText.mock.calls[0] as [string];
-      expect(commandText).toContain("git -C 'C:/workspace' worktree add");
-      expect(commandText).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'/);
-      expect(commandText).toContain("claude --dangerously-skip-permissions");
-      // The objective trimmed to empty, so no quoted argument should follow the flag.
-      expect(commandText).not.toMatch(
-        /claude --dangerously-skip-permissions '/,
-      );
+      // Three sendText calls: git, Set-Location, claude (no poetry).
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(claudeCmd).toBe("claude --dangerously-skip-permissions");
     } finally {
       jest.useRealTimers();
     }
   });
 
-  it("newClaudeWorktreeSession defers the terminal sendText behind a grace period to avoid colliding with the Python extension's auto-activation injection", async () => {
-    // This is the regression guard for the timing fix. If the deferral is
-    // accidentally removed, sendText would fire synchronously and the test
-    // catches it.
+  it("newClaudeWorktreeSession defers the claude sendText behind a grace period so the Python extension's auto-activation cannot collide with claude's TUI input", async () => {
+    // Regression guard: if the deferral is accidentally removed, the claude
+    // sendText would fire synchronously and the test catches it.
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
@@ -472,16 +557,19 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // Immediately after the handler resolves, sendText is still pending.
-      expect(terminal.sendText).not.toHaveBeenCalled();
+      // Immediately after the handler resolves the pre-claude commands have
+      // fired (git + Set-Location, no poetry), but claude has not.
+      expect(terminal.sendText).toHaveBeenCalledTimes(2);
 
       // Even after most of the grace window elapses, the timer has not fired.
       jest.advanceTimersByTime(4999);
-      expect(terminal.sendText).not.toHaveBeenCalled();
+      expect(terminal.sendText).toHaveBeenCalledTimes(2);
 
-      // At the configured grace boundary, sendText fires exactly once.
+      // At the configured grace boundary, the claude sendText fires.
       jest.advanceTimersByTime(1);
-      expect(terminal.sendText).toHaveBeenCalledTimes(1);
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(claudeCmd).toContain("claude --dangerously-skip-permissions");
     } finally {
       jest.useRealTimers();
     }

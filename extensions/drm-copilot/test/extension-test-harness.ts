@@ -97,6 +97,7 @@ jest.mock("node:fs", () => ({
   copyFileSync: jest.fn(),
   existsSync: jest.fn(),
   mkdirSync: jest.fn(),
+  readFileSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -106,6 +107,9 @@ jest.mock("node:child_process", () => ({
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: MockExistsSync;
+  readFileSync: jest.MockedFunction<
+    (filePath: string, encoding?: string) => string
+  >;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
@@ -180,6 +184,41 @@ export function setExecutablePresence(presence: ExecutablePresence): void {
   setExecutablePresenceOnFsMock(fsMock, presence);
 }
 
+let pyprojectFixtureContent: string | undefined = undefined;
+
+/**
+ * Configures the fs mock to report a `pyproject.toml` at the workspace root
+ * with the supplied content. Pass `undefined` to clear the fixture (the
+ * default reset state).
+ *
+ * The pyproject detection layers on top of the executable-presence mock so
+ * tests calling `setExecutablePresence` followed by `setPyprojectFixture`
+ * get correct behavior for both runtime probing and pyproject detection.
+ *
+ * @param content The full text content of the simulated pyproject.toml.
+ */
+export function setPyprojectFixture(content: string | undefined): void {
+  pyprojectFixtureContent = content;
+
+  const previousExistsImpl = fsMock.existsSync.getMockImplementation();
+  fsMock.existsSync.mockImplementation((filePath: string): boolean => {
+    if (filePath.toLowerCase().endsWith("pyproject.toml")) {
+      return pyprojectFixtureContent !== undefined;
+    }
+    return previousExistsImpl ? previousExistsImpl(filePath) : false;
+  });
+
+  fsMock.readFileSync.mockImplementation((filePath: string): string => {
+    if (
+      filePath.toLowerCase().endsWith("pyproject.toml") &&
+      pyprojectFixtureContent !== undefined
+    ) {
+      return pyprojectFixtureContent;
+    }
+    throw new Error(`Unexpected fs.readFileSync call: ${filePath}`);
+  });
+}
+
 export function setFreshExecutablePresence(presence: ExecutablePresence): void {
   setExecutablePresenceOnFsMock(getFreshFsMock(), presence);
 }
@@ -199,6 +238,8 @@ export function resetExtensionHarnessState(): void {
   registerMcpServerDefinitionProviderMock.mockClear();
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
+  fsMock.readFileSync.mockReset();
+  pyprojectFixtureContent = undefined;
   showInputBoxMock.mockReset();
   showQuickPickMock.mockReset();
   showOpenDialogMock.mockReset();

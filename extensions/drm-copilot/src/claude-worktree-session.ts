@@ -10,14 +10,34 @@
  */
 
 /**
- * Inputs required to build the PowerShell command line that the integrated
+ * Inputs required to build the PowerShell commands that the integrated
  * terminal sends through `Terminal.sendText`.
  */
 export interface WorktreeSessionCommandInput {
   readonly repoRoot: string;
   readonly worktreePath: string;
   readonly branchName: string;
+  readonly usePoetry: boolean;
   readonly objective: string | undefined;
+}
+
+/**
+ * The ordered PowerShell commands that constitute a worktree session.
+ *
+ * @remarks
+ * The handler must send these as separate `sendText` invocations so each
+ * appears on its own PowerShell prompt and the user sees the output of
+ * each step independently. The `poetryInstall` and `activate` commands are
+ * present together when the workspace's `pyproject.toml` declares poetry,
+ * and absent together when it does not (in which case there is no
+ * environment to install or activate).
+ */
+export interface WorktreeSessionCommands {
+  readonly git: string;
+  readonly setLocation: string;
+  readonly poetryInstall: string | undefined;
+  readonly activate: string | undefined;
+  readonly claude: string;
 }
 
 /**
@@ -93,20 +113,22 @@ export function quoteForPwsh(value: string): string {
 }
 
 /**
- * Builds the PowerShell command line that creates the worktree, navigates
- * into it, and starts an interactive Claude CLI session.
+ * Builds the ordered PowerShell commands that the integrated terminal sends
+ * to create the worktree, navigate into it, install dependencies via poetry
+ * (when the workspace uses poetry), activate the resulting in-project venv,
+ * and start an interactive Claude CLI session.
  *
- * @param input The repository root, resolved worktree path, branch name, and
- *              optional objective text.
- * @returns A single-line PowerShell command suitable for `Terminal.sendText`.
- *          The command uses `git -C <repoRoot>` so it works regardless of
- *          the terminal's current working directory, and short-circuits the
- *          Claude launch when `git worktree add` exits non-zero so the user
- *          sees the failure rather than an unrelated downstream error.
+ * @param input The repository root, resolved worktree path, branch name,
+ *              poetry flag, and optional objective.
+ * @returns The git/setLocation/poetryInstall/activate/claude commands as
+ *          separate strings. Each is intended to be sent via its own
+ *          `Terminal.sendText` call so it appears on its own PowerShell
+ *          prompt. The poetryInstall and activate commands are both present
+ *          when `usePoetry` is true and both undefined otherwise.
  */
-export function buildWorktreeSessionCommand(
+export function buildWorktreeSessionCommands(
   input: WorktreeSessionCommandInput,
-): string {
+): WorktreeSessionCommands {
   const quotedRepoRoot = quoteForPwsh(input.repoRoot);
   const quotedPath = quoteForPwsh(input.worktreePath);
   const quotedBranch = quoteForPwsh(input.branchName);
@@ -115,11 +137,21 @@ export function buildWorktreeSessionCommand(
   const objectiveSuffix =
     trimmedObjective.length > 0 ? ` ${quoteForPwsh(trimmedObjective)}` : "";
 
-  return (
-    `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch};` +
-    ` if ($LASTEXITCODE -eq 0) {` +
-    ` Set-Location ${quotedPath};` +
-    ` claude --dangerously-skip-permissions${objectiveSuffix}` +
-    ` }`
-  );
+  // The poetry-managed venv is created in the worktree under .venv after
+  // `poetry install`. We Set-Location into the worktree before this step so
+  // the relative './.venv/Scripts/Activate.ps1' resolves correctly.
+  const poetryInstall = input.usePoetry
+    ? "poetry install --with dev"
+    : undefined;
+  const activate = input.usePoetry
+    ? "& './.venv/Scripts/Activate.ps1'"
+    : undefined;
+
+  return {
+    git: `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch}`,
+    setLocation: `Set-Location ${quotedPath}`,
+    poetryInstall,
+    activate,
+    claude: `claude --dangerously-skip-permissions${objectiveSuffix}`,
+  };
 }

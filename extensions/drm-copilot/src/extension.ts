@@ -1,9 +1,10 @@
+import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import {
   buildBranchName,
   buildWorktreePath,
-  buildWorktreeSessionCommand,
+  buildWorktreeSessionCommands,
   formatWorktreeTimestamp,
 } from "./claude-worktree-session";
 import {
@@ -47,14 +48,36 @@ import {
 export { detectRuntime };
 
 /**
- * Grace period (milliseconds) between opening the worktree session terminal
- * and sending our chained command. VS Code's Python extension auto-injects
- * venv activation via terminal.sendText after a short asynchronous delay;
- * this constant must be long enough that the activation lands while the host
- * shell is still at its prompt and consumes it normally, otherwise the
- * activation text gets buffered into claude's TUI input.
+ * Grace period (milliseconds) between sending the pre-claude commands
+ * (`git worktree add`, `Set-Location`, optional venv activate) and the final
+ * `claude` invocation. VS Code's Python extension auto-injects venv
+ * activation via terminal.sendText after a short asynchronous delay; this
+ * constant must be long enough that any such injection lands while the host
+ * shell is still at its prompt and is consumed normally, otherwise the
+ * injected text gets buffered into claude's TUI input.
  */
 const TERMINAL_AUTO_ACTIVATION_GRACE_MS = 5000;
+
+/**
+ * Detects whether the workspace's `pyproject.toml` declares poetry as the
+ * dependency-management tool, signalling that the worktree should run
+ * `poetry install --with dev` and activate the resulting in-project venv
+ * before starting Claude.
+ *
+ * @param workspaceRoot The absolute path of the source repository.
+ * @returns `true` when a `pyproject.toml` exists at the workspace root and
+ *          the literal substring "poetry" appears anywhere in the file.
+ */
+function pyprojectHasPoetry(workspaceRoot: string): boolean {
+  const normalizedRoot = workspaceRoot.replace(/\\/g, "/").replace(/\/+$/, "");
+  const pyprojectPath = `${normalizedRoot}/pyproject.toml`;
+  if (!fs.existsSync(pyprojectPath)) {
+    return false;
+  }
+
+  const contents = fs.readFileSync(pyprojectPath, "utf-8");
+  return contents.includes("poetry");
+}
 
 /**
  * Activates the extension by registering all command handlers and shared resources.
@@ -231,10 +254,12 @@ export function activate(context: vscode.ExtensionContext): void {
         shortName,
       );
       const branchName = buildBranchName(timestamp, shortName);
-      const command = buildWorktreeSessionCommand({
+      const usePoetry = pyprojectHasPoetry(workspaceRoot);
+      const commands = buildWorktreeSessionCommands({
         repoRoot: workspaceRoot,
         worktreePath,
         branchName,
+        usePoetry,
         objective,
       });
 
@@ -250,22 +275,39 @@ export function activate(context: vscode.ExtensionContext): void {
       });
       terminal.show();
 
-      // VS Code's Python extension and similar tooling auto-inject venv
-      // activation commands into newly created terminals via a deferred
-      // terminal.sendText. If our chained command runs before that injection
-      // arrives, claude takes over stdin and consumes the activation text as
-      // user input. Delaying our sendText allows the host shell to consume
-      // the activation at its prompt, then run our command in the activated
-      // environment.
+      // Send the pre-claude commands as separate sendText calls so each is
+      // processed at its own PowerShell prompt: git worktree add, then
+      // Set-Location into the new worktree, then (when the workspace uses
+      // poetry) install dependencies and activate the resulting venv.
+      // PowerShell's stdin is line-buffered, so queued lines are read one at
+      // a time once each prior command finishes.
+      terminal.sendText(commands.git, true);
+      terminal.sendText(commands.setLocation, true);
+      if (commands.poetryInstall !== undefined) {
+        terminal.sendText(commands.poetryInstall, true);
+      }
+      if (commands.activate !== undefined) {
+        terminal.sendText(commands.activate, true);
+      }
+
+      // Defer the final claude command. VS Code's Python extension auto-
+      // injects its own venv activation via a deferred terminal.sendText.
+      // If we start claude before that injection arrives, claude takes over
+      // stdin and the injected text is buffered into claude's TUI prompt.
+      // The grace window lets any such injection land at the host shell's
+      // prompt and be consumed normally before claude takes over.
       setTimeout(() => {
-        terminal.sendText(command, true);
+        terminal.sendText(commands.claude, true);
       }, TERMINAL_AUTO_ACTIVATION_GRACE_MS);
 
       // Log only the objective length so the channel record is useful for
       // diagnostics without recording potentially sensitive prompt text.
       const objectiveLength = objective.trim().length;
+      const poetryNote = usePoetry
+        ? "with poetry install and activation"
+        : "no poetry";
       output.appendLine(
-        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}); deferred command send by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}); claude send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
       );
     },
   );
