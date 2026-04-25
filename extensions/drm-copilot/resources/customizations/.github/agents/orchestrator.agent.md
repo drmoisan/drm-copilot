@@ -1,6 +1,5 @@
 ---
 name: orchestrator
-model: GPT-5.4 (copilot)
 description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
 tools: [vscode/runCommand, vscode/extensions, execute, read, agent, edit, search, web, 'drmcopilotextension/*', todo]

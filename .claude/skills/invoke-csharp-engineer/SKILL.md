@@ -28,7 +28,8 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 ## Output Paths
 
 - C# source and test files within the approved scope.
-- Baseline and post-change evidence under `artifacts/evidence/baseline/<timestamp>/` and `artifacts/evidence/post-change/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
 ## Required Reporting Block

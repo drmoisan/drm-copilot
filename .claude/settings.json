@@ -88,6 +88,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-powershell-batch-budget.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-evidence-locations.ps1"
           }
         ]
       }

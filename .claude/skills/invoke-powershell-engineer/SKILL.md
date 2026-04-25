@@ -28,7 +28,8 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 ## Output Paths
 
 - PowerShell source (`*.ps1`, `*.psm1`, `*.psd1`) and Pester test (`*.Tests.ps1`) files within the approved scope.
-- Baseline and post-change evidence under `artifacts/evidence/baseline/<timestamp>/` and `artifacts/evidence/post-change/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
 ## Required Reporting Block

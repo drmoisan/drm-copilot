@@ -113,3 +113,13 @@ For each language that has changed files in the feature branch:
 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
 
 The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
+
+## Evidence Location Invariant
+
+All evidence artifacts this agent produces (baselines, QA gates, regression results, coverage) MUST be written to `<FEATURE>/evidence/<kind>/` as defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
+
+Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or any other non-canonical path is a policy violation and will be caught by the `enforce-evidence-locations.ps1` PreToolUse hook.
+
+If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+
+The reviewer MUST scan the branch diff for files written under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. Each such file is a FAIL-level finding. Record each occurrence under the heading `## Evidence Location Compliance` in `policy-audit.<timestamp>.md`, listing the file path and its canonical replacement. Use `validate_evidence_locations.py --root .` to scan for violations; if the script exits non-zero, add all reported paths as FAIL findings.
