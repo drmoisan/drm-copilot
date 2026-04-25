@@ -13,6 +13,12 @@ import {
 
 type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 
+interface MockTerminal {
+  readonly show: jest.Mock;
+  readonly sendText: jest.Mock;
+  readonly dispose: jest.Mock;
+}
+
 const commandHandlers = new Map<string, CommandHandler>();
 const appendLineMock = jest.fn<(line: string) => void>();
 const showInputBoxMock = jest.fn();
@@ -20,6 +26,15 @@ const showQuickPickMock = jest.fn();
 const showOpenDialogMock = jest.fn();
 const openTextDocumentMock = jest.fn();
 const showTextDocumentMock = jest.fn();
+function buildMockTerminal(): MockTerminal {
+  return {
+    show: jest.fn(),
+    sendText: jest.fn(),
+    dispose: jest.fn(),
+  };
+}
+
+const createTerminalMock = jest.fn((): MockTerminal => buildMockTerminal());
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
     commandHandlers.set(command, handler);
@@ -51,6 +66,7 @@ jest.mock(
       showOpenDialog: showOpenDialogMock,
       showInputBox: showInputBoxMock,
       showQuickPick: showQuickPickMock,
+      createTerminal: createTerminalMock,
     },
     workspace: {
       get workspaceFolders() {
@@ -188,6 +204,10 @@ export function resetExtensionHarnessState(): void {
   showOpenDialogMock.mockReset();
   openTextDocumentMock.mockReset();
   showTextDocumentMock.mockReset();
+  createTerminalMock.mockReset();
+  createTerminalMock.mockImplementation(
+    (): MockTerminal => buildMockTerminal(),
+  );
   openTextDocumentMock.mockImplementation(async (uri: { fsPath: string }) => ({
     uri,
   }));
@@ -250,6 +270,7 @@ export {
   commandHandlers,
   createMockProcess,
   createMockProcessWithStderr,
+  createTerminalMock,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
   registerMcpServerDefinitionProviderMock,
@@ -260,4 +281,4 @@ export {
   showTextDocumentMock,
 };
 
-export type { CommandHandler, MockChildProcess };
+export type { CommandHandler, MockChildProcess, MockTerminal };

@@ -13,6 +13,7 @@ import {
   childProcessMock,
   createMockProcess,
   createMockProcessWithStderr,
+  createTerminalMock,
   registerMcpServerDefinitionProviderMock,
   resetExtensionHarnessState,
   setExecutablePresence,
@@ -352,45 +353,138 @@ describe("drm-copilot workflow command behavior", () => {
     await expect(handler()).rejects.toThrow("Command exited with code 2");
   });
 
-  it("newClaudeWorktreeSession passes the bundled script path and prompt args", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    showInputBoxMock
-      .mockResolvedValueOnce("auth-refactor")
-      .mockResolvedValueOnce("Refactor the auth module.");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("newClaudeWorktreeSession opens an integrated terminal with the worktree command and the objective", async () => {
+    // The handler defers terminal.sendText with setTimeout so that the
+    // VS Code Python extension's auto-activation injection lands first.
+    // Use fake timers so the test can deterministically advance past the
+    // grace period without waiting in real time.
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      showInputBoxMock
+        .mockResolvedValueOnce("auth-refactor")
+        .mockResolvedValueOnce("Refactor the auth module.");
 
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newClaudeWorktreeSession",
-    );
-    await handler();
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
 
-    expect(showInputBoxMock).toHaveBeenCalledTimes(2);
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
-      "C:/extension/resources/templates/new-claude-worktree-session.ps1",
-    );
-    expect(args).toContain("-ShortName");
-    expect(args).toContain("auth-refactor");
-    expect(args).toContain("-Objective");
-    expect(args).toContain("Refactor the auth module.");
+      expect(showInputBoxMock).toHaveBeenCalledTimes(2);
+      expect(createTerminalMock).toHaveBeenCalledTimes(1);
+      const [terminalOptions] = createTerminalMock.mock.calls[0] as [
+        {
+          name: string;
+          cwd: string;
+          shellPath: string;
+          shellArgs: ReadonlyArray<string>;
+        },
+      ];
+      expect(terminalOptions.name).toMatch(
+        /^Claude: feature\/.*-auth-refactor$/,
+      );
+      // The terminal must launch inside the source repository so `git worktree
+      // add` can find `.git`. The workspace fixture is "C:/workspace".
+      expect(terminalOptions.cwd).toBe("C:/workspace");
+      expect(terminalOptions.shellPath).toBe("pwsh");
+      expect(terminalOptions.shellArgs).toEqual(["-NoLogo"]);
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        show: jest.Mock;
+        sendText: jest.Mock;
+      };
+      expect(terminal.show).toHaveBeenCalledTimes(1);
+      // sendText must NOT have fired yet — the deferred timer is still pending.
+      expect(terminal.sendText).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(5000);
+
+      expect(terminal.sendText).toHaveBeenCalledTimes(1);
+      const [commandText, addNewLine] = terminal.sendText.mock.calls[0] as [
+        string,
+        boolean,
+      ];
+      expect(addNewLine).toBe(true);
+      // The command must use `git -C <repoRoot>` so it works regardless of the
+      // terminal's actual current working directory at launch time.
+      expect(commandText).toContain("git -C 'C:/workspace' worktree add");
+      expect(commandText).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'/);
+      expect(commandText).toContain(
+        "claude --dangerously-skip-permissions 'Refactor the auth module.'",
+      );
+      expect(commandText).toContain("$LASTEXITCODE -eq 0");
+      expect(commandText).toContain("Set-Location");
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
-  it("newClaudeWorktreeSession omits -Objective when the objective is blank", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    showInputBoxMock
-      .mockResolvedValueOnce("auth-refactor")
-      .mockResolvedValueOnce("   ");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("newClaudeWorktreeSession omits the objective from the terminal command when blank", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      showInputBoxMock
+        .mockResolvedValueOnce("auth-refactor")
+        .mockResolvedValueOnce("   ");
 
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newClaudeWorktreeSession",
-    );
-    await handler();
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("-ShortName");
-    expect(args).toContain("auth-refactor");
-    expect(args).not.toContain("-Objective");
+      expect(createTerminalMock).toHaveBeenCalledTimes(1);
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      jest.advanceTimersByTime(5000);
+
+      const [commandText] = terminal.sendText.mock.calls[0] as [string];
+      expect(commandText).toContain("git -C 'C:/workspace' worktree add");
+      expect(commandText).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'/);
+      expect(commandText).toContain("claude --dangerously-skip-permissions");
+      // The objective trimmed to empty, so no quoted argument should follow the flag.
+      expect(commandText).not.toMatch(
+        /claude --dangerously-skip-permissions '/,
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession defers the terminal sendText behind a grace period to avoid colliding with the Python extension's auto-activation injection", async () => {
+    // This is the regression guard for the timing fix. If the deferral is
+    // accidentally removed, sendText would fire synchronously and the test
+    // catches it.
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      showInputBoxMock
+        .mockResolvedValueOnce("auth-refactor")
+        .mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // Immediately after the handler resolves, sendText is still pending.
+      expect(terminal.sendText).not.toHaveBeenCalled();
+
+      // Even after most of the grace window elapses, the timer has not fired.
+      jest.advanceTimersByTime(4999);
+      expect(terminal.sendText).not.toHaveBeenCalled();
+
+      // At the configured grace boundary, sendText fires exactly once.
+      jest.advanceTimersByTime(1);
+      expect(terminal.sendText).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("newClaudeWorktreeSession returns early when the short-name prompt is cancelled", async () => {
@@ -401,6 +495,7 @@ describe("drm-copilot workflow command behavior", () => {
     );
     await handler();
 
+    expect(createTerminalMock).not.toHaveBeenCalled();
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
@@ -414,6 +509,7 @@ describe("drm-copilot workflow command behavior", () => {
     );
     await handler();
 
+    expect(createTerminalMock).not.toHaveBeenCalled();
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
@@ -430,6 +526,7 @@ describe("drm-copilot workflow command behavior", () => {
     await expect(handler()).rejects.toThrow(
       "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
     );
+    expect(createTerminalMock).not.toHaveBeenCalled();
   });
 
   it("linkParentChild prompts for both issue numbers and runs the bundled script", async () => {

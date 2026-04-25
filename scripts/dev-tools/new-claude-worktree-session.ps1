@@ -146,9 +146,27 @@ function Start-ClaudeBackground {
         $claudeArgs += $Objective
     }
 
+    # On Windows, the claude CLI is installed by npm as a .cmd shim. Setting
+    # RedirectStandardOutput/Error forces UseShellExecute = $false, under which
+    # .NET calls Win32 CreateProcess directly. CreateProcess cannot launch
+    # non-PE files (.cmd/.bat/.ps1) and returns ERROR_BAD_EXE_FORMAT (193).
+    # Route through cmd.exe (a real Win32 binary) so it resolves the .cmd shim.
+    $isWindowsHost = $IsWindows -or ($env:OS -eq 'Windows_NT')
+    if ($isWindowsHost) {
+        $comSpec = $env:ComSpec
+        if (-not $comSpec) {
+            $comSpec = 'cmd.exe'
+        }
+        $filePath = $comSpec
+        $argumentList = @('/d', '/s', '/c', 'claude') + $claudeArgs
+    } else {
+        $filePath = 'claude'
+        $argumentList = $claudeArgs
+    }
+
     $startArgs = @{
-        FilePath               = 'claude'
-        ArgumentList           = $claudeArgs
+        FilePath               = $filePath
+        ArgumentList           = $argumentList
         WorkingDirectory       = $WorktreePath
         RedirectStandardOutput = $stdoutLog
         RedirectStandardError  = $stderrLog

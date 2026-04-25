@@ -182,6 +182,56 @@ Describe "new-claude-worktree-session.ps1 - Start-ClaudeBackground" {
             $script:capturedStartArgs['RedirectStandardError'] | Should -Not -BeNullOrEmpty
             $script:capturedStartArgs['RedirectStandardOutput'] | Should -Not -Be $script:capturedStartArgs['RedirectStandardError']
         }
+
+        It "routes FilePath through cmd.exe on Windows" -Skip:(-not $IsWindows) {
+            $null = Start-ClaudeBackground `
+                -WorktreePath "/work/path" `
+                -InvokeStartProcess {
+                param([hashtable] $StartArgs)
+                $script:capturedStartArgs = $StartArgs
+                return [pscustomobject]@{ Id = 12345 }
+            }
+            $expectedFilePath = if ($env:ComSpec) { $env:ComSpec } else { 'cmd.exe' }
+            $script:capturedStartArgs['FilePath'] | Should -Be $expectedFilePath
+        }
+
+        It "ArgumentList begins with /d /s /c claude on Windows" -Skip:(-not $IsWindows) {
+            $null = Start-ClaudeBackground `
+                -WorktreePath "/work/path" `
+                -InvokeStartProcess {
+                param([hashtable] $StartArgs)
+                $script:capturedStartArgs = $StartArgs
+                return [pscustomobject]@{ Id = 12345 }
+            }
+            $argumentList = @($script:capturedStartArgs['ArgumentList'])
+            $argumentList[0] | Should -Be '/d'
+            $argumentList[1] | Should -Be '/s'
+            $argumentList[2] | Should -Be '/c'
+            $argumentList[3] | Should -Be 'claude'
+            $argumentList[4] | Should -Be '--dangerously-skip-permissions'
+        }
+
+        It "uses claude as FilePath on non-Windows hosts" -Skip:$IsWindows {
+            $null = Start-ClaudeBackground `
+                -WorktreePath "/work/path" `
+                -InvokeStartProcess {
+                param([hashtable] $StartArgs)
+                $script:capturedStartArgs = $StartArgs
+                return [pscustomobject]@{ Id = 12345 }
+            }
+            $script:capturedStartArgs['FilePath'] | Should -Be 'claude'
+        }
+
+        It "ArgumentList does not contain /c on non-Windows hosts" -Skip:$IsWindows {
+            $null = Start-ClaudeBackground `
+                -WorktreePath "/work/path" `
+                -InvokeStartProcess {
+                param([hashtable] $StartArgs)
+                $script:capturedStartArgs = $StartArgs
+                return [pscustomobject]@{ Id = 12345 }
+            }
+            $script:capturedStartArgs['ArgumentList'] | Should -Not -Contain '/c'
+        }
     }
 }
 

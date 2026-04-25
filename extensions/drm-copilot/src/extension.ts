@@ -1,6 +1,14 @@
+import * as path from "node:path";
 import * as vscode from "vscode";
 import {
+  buildBranchName,
+  buildWorktreePath,
+  buildWorktreeSessionCommand,
+  formatWorktreeTimestamp,
+} from "./claude-worktree-session";
+import {
   createOutputChannel,
+  detectRuntime,
   executeBundledScript,
   getWorkspaceRoot,
 } from "./command-runtime";
@@ -36,7 +44,17 @@ import {
 } from "./workflow-command-arguments";
 
 // Re-export detectRuntime so existing test imports from this module keep working.
-export { detectRuntime } from "./command-runtime";
+export { detectRuntime };
+
+/**
+ * Grace period (milliseconds) between opening the worktree session terminal
+ * and sending our chained command. VS Code's Python extension auto-injects
+ * venv activation via terminal.sendText after a short asynchronous delay;
+ * this constant must be long enough that the activation lands while the host
+ * shell is still at its prompt and consumes it normally, otherwise the
+ * activation text gets buffered into claude's TUI input.
+ */
+const TERMINAL_AUTO_ACTIVATION_GRACE_MS = 5000;
 
 /**
  * Activates the extension by registering all command handlers and shared resources.
@@ -201,19 +219,54 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
 
-      const scriptArgs: string[] = ["-ShortName", shortName];
-      const trimmedObjective = objective.trim();
-      if (trimmedObjective.length > 0) {
-        scriptArgs.push("-Objective", trimmedObjective);
-      }
-
-      await executeBundledScript(context, output, {
-        runtimeKind: "powershell",
-        bundledRelativePath:
-          "resources/templates/new-claude-worktree-session.ps1",
-        commandId,
-        args: scriptArgs,
+      // Resolve the PowerShell runtime first so a missing host fails fast with
+      // the established error message rather than after creating a terminal.
+      const runtime = detectRuntime("powershell");
+      const workspaceRoot = getWorkspaceRoot();
+      const workspaceParent = path.dirname(workspaceRoot);
+      const timestamp = formatWorktreeTimestamp(new Date());
+      const worktreePath = buildWorktreePath(
+        workspaceParent,
+        timestamp,
+        shortName,
+      );
+      const branchName = buildBranchName(timestamp, shortName);
+      const command = buildWorktreeSessionCommand({
+        repoRoot: workspaceRoot,
+        worktreePath,
+        branchName,
+        objective,
       });
+
+      // The terminal must start inside the source repository so that
+      // `git worktree add` can locate `.git`. The new worktree itself is
+      // created at worktreePath (which lives under workspaceParent) by the
+      // command sent to the terminal.
+      const terminal = vscode.window.createTerminal({
+        name: `Claude: ${branchName}`,
+        cwd: workspaceRoot,
+        shellPath: runtime.executable,
+        shellArgs: ["-NoLogo"],
+      });
+      terminal.show();
+
+      // VS Code's Python extension and similar tooling auto-inject venv
+      // activation commands into newly created terminals via a deferred
+      // terminal.sendText. If our chained command runs before that injection
+      // arrives, claude takes over stdin and consumes the activation text as
+      // user input. Delaying our sendText allows the host shell to consume
+      // the activation at its prompt, then run our command in the activated
+      // environment.
+      setTimeout(() => {
+        terminal.sendText(command, true);
+      }, TERMINAL_AUTO_ACTIVATION_GRACE_MS);
+
+      // Log only the objective length so the channel record is useful for
+      // diagnostics without recording potentially sensitive prompt text.
+      const objectiveLength = objective.trim().length;
+      output.appendLine(
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}); deferred command send by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+      );
     },
   );
 
