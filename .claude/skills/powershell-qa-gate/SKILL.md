@@ -60,9 +60,12 @@ Every completion response must include the following sections:
 
 Persist toolchain output according to `evidence-and-timestamp-conventions`:
 
-- store baseline outputs under `artifacts/evidence/baseline/<timestamp>/`,
-- store post-change outputs under `artifacts/evidence/post-change/<timestamp>/`,
+- store baseline outputs under `<FEATURE>/evidence/baseline/<timestamp>/`,
+- store post-change outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`,
 - use ISO-8601 UTC timestamps in folder names.
+
+This location is canonical per evidence-and-timestamp-conventions and is not overridable.
+See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 
 The evidence paths must be referenced in the agent's completion message to satisfy the `SubagentStop` completion-artifact gate.
 
