@@ -101,6 +101,10 @@
       {
         "command": "drmCopilotExtension.resolveAtomicPlanPrompt",
         "title": "drm-copilot: Resolve Atomic Plan Prompt"
+      },
+      {
+        "command": "drmCopilotExtension.newClaudeWorktreeSession",
+        "title": "drm-copilot: New Claude Worktree Session"
       }
     ]
   },
