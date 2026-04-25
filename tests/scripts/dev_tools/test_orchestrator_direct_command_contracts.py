@@ -38,9 +38,7 @@ def test_root_orchestrators_use_direct_potential_entry_commands() -> None:
         assert raw_bug_command not in agent_text
 
 
-def test_root_orchestrators_use_direct_potential_to_issue_commands_with_explicit_work_mode() -> (
-    None
-):
+def test_root_orchestrators_use_direct_potential_to_issue_commands() -> None:
     """Require root orchestrators to document direct promotion commands.
 
     The documented promotion flow must include explicit work-mode values.
