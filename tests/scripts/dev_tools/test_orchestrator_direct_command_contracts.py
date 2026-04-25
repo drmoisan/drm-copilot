@@ -38,7 +38,9 @@ def test_root_orchestrators_use_direct_potential_entry_commands() -> None:
         assert raw_bug_command not in agent_text
 
 
-def _assert_root_orchestrators_use_direct_potential_to_issue_commands() -> None:
+def test_root_orchestrators_use_direct_potential_to_issue_commands_with_explicit_work_mode() -> (
+    None
+):
     """Require root orchestrators to document direct promotion commands.
 
     The documented promotion flow must include explicit work-mode values.
@@ -53,12 +55,6 @@ def _assert_root_orchestrators_use_direct_potential_to_issue_commands() -> None:
         assert "full-feature" in agent_text
         assert "full-bug" in agent_text
         assert raw_promotion_command not in agent_text
-
-
-globals()[
-    "test_root_orchestrators_use_direct_potential_to_issue_commands_with_"
-    "explicit_work_mode"
-] = _assert_root_orchestrators_use_direct_potential_to_issue_commands
 
 
 def test_root_orchestrators_use_direct_new_active_feature_folder_commands() -> None:
