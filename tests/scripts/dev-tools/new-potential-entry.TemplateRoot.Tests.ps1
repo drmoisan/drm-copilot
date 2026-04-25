@@ -23,7 +23,6 @@ Describe "new-potential-entry.ps1 - template root resolution" {
         $targetPath = $script:expectedPaths['TargetPath']
         $targetDirectory = $script:expectedPaths['TargetDirectory']
 
-        Mock -CommandName git -MockWith { "Test User" }
         Mock -CommandName Get-Date -MockWith {
             param([string] $Format)
 
@@ -51,6 +50,7 @@ Describe "new-potential-entry.ps1 - template root resolution" {
             return $true
         }
         Mock -CommandName Copy-Item -MockWith { }
+        Mock -CommandName New-Item -MockWith { }
         Mock -CommandName Get-Content -MockWith { "# <feature-name> (Potential)`n- Date captured: YYYY-MM-DD`n- Author: name" }
         Mock -CommandName Set-Content -MockWith { }
         Mock -CommandName Get-Command -MockWith { $null }
@@ -78,7 +78,6 @@ Describe "new-potential-entry.ps1 - template root resolution" {
         $targetPath = $script:expectedPaths['TargetPath']
         $targetDirectory = $script:expectedPaths['TargetDirectory']
 
-        Mock -CommandName git -MockWith { "Test User" }
         Mock -CommandName Get-Date -MockWith {
             param([string] $Format)
 
@@ -106,6 +105,7 @@ Describe "new-potential-entry.ps1 - template root resolution" {
             return $true
         }
         Mock -CommandName Copy-Item -MockWith { }
+        Mock -CommandName New-Item -MockWith { }
         Mock -CommandName Get-Content -MockWith { "# <feature-name> (Potential)`n- Date captured: YYYY-MM-DD`n- Author: name" }
         Mock -CommandName Set-Content -MockWith { }
         Mock -CommandName Get-Command -MockWith { $null }
@@ -124,4 +124,3 @@ Describe "new-potential-entry.ps1 - template root resolution" {
         }
     }
 }
-

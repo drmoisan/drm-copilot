@@ -55,6 +55,30 @@ describe("drm-copilot core command behavior", () => {
     ).toBe(true);
   });
 
+  it("activate registers drmCopilotExtension.listMcpTools", () => {
+    activateAndGetHandler("drmCopilotExtension.listMcpTools");
+
+    expect(commandHandlers.has("drmCopilotExtension.listMcpTools")).toBe(true);
+  });
+
+  it("activate registers drmCopilotExtension.resolvePolicyAuditTemplateAsset exactly once", () => {
+    activateAndGetHandler(
+      "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
+    );
+
+    expect(
+      commandHandlers.has(
+        "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
+      ),
+    ).toBe(true);
+    expect(
+      [...commandHandlers.keys()].filter(
+        (commandId) =>
+          commandId === "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
+      ),
+    ).toHaveLength(1);
+  });
+
   it("does not register the retired placeholder commands", () => {
     activateAndGetHandler("drmCopilotExtension.newPotentialEntry");
 

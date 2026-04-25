@@ -1,7 +1,15 @@
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1') -Force
+    $modulePath = (Resolve-Path -Path (Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC/PoshQC.psm1')).Path
+    foreach ($module in Get-Module -Name PoshQC) {
+        $loadedPath = if ($module.Path) { (Resolve-Path -Path $module.Path).Path } else { $null }
+        if ($loadedPath -ne $modulePath) {
+            Remove-Module -ModuleInfo $module -Force
+        }
+    }
+
+    Import-Module $modulePath -Force
 }
 
 Describe 'Get-PoshQCFileList scan-folder support' {
@@ -203,7 +211,7 @@ Describe 'Invoke-PoshQCAnalyzeAutofix' {
 }
 
 Describe 'Invoke-PoshQCTest scan-folder support' {
-    It 'overrides run and coverage paths when scan folders are supplied' {
+    It 'overrides run paths and preserves configured coverage paths when scan folders are supplied' {
         $script:capturedRunPaths = $null
         $script:capturedCoveragePaths = $null
 
@@ -253,6 +261,8 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
             $script:capturedRunPaths = $Paths
             @([pscustomobject]@{ FullName = '/repo/tests/test.Tests.ps1' })
         } -InvokePester {
+            param($Config)
+            $script:capturedCoveragePaths = $Config.CodeCoverage.Path
             [pscustomobject]@{
                 Duration          = [timespan]::Zero
                 PassedCount       = 1
@@ -264,11 +274,13 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
             }
         } -CopyCoverage {
             param([string] $CoveragePath, [string] $RepoRoot, [string] $KoveragePath)
-            $script:capturedCoveragePaths = @($CoveragePath, $RepoRoot, $KoveragePath)
+            [void] $CoveragePath
+            [void] $RepoRoot
+            [void] $KoveragePath
         } -Logger { param([string] $Message) [void] $Message } | Out-Null
 
         $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
-        $script:capturedCoveragePaths[1] | Should -Be '/repo'
+        ($script:capturedCoveragePaths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/repo/src/**/*.ps1')
     }
 }
 
@@ -296,4 +308,66 @@ Describe 'Invoke-PoshQCAnalyze scan-folder support' {
     }
 }
 
+Describe 'bundled wrapper ScanFoldersJson transport' {
+    AfterEach {
+        Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
+    }
 
+    It 'run-poshqc-format decodes ScanFoldersJson into string array input' {
+        Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
+
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-format.ps1'
+
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCFormat -MockWith {
+            param([string] $Root, [string[]] $ScanFolders)
+            [void] $Root
+            $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
+        }
+
+        & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/src","/repo/tests/powershell"]'
+
+        ($env:POSHQC_CAPTURED_SCAN_FOLDERS -split '\|') | Should -Be @('/repo/src', '/repo/tests/powershell')
+    }
+
+    It 'run-poshqc-analyze decodes ScanFoldersJson into string array input' {
+        Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
+
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-analyze.ps1'
+
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCAnalyze -MockWith {
+            param([string] $Root, [string[]] $ScanFolders)
+            [void] $Root
+            $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
+        }
+
+        & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/src","/repo/tests/powershell"]'
+
+        ($env:POSHQC_CAPTURED_SCAN_FOLDERS -split '\|') | Should -Be @('/repo/src', '/repo/tests/powershell')
+    }
+
+    It 'run-poshqc-test decodes ScanFoldersJson into string array input' {
+        Remove-Item Env:\POSHQC_CAPTURED_SCAN_FOLDERS -ErrorAction SilentlyContinue
+
+        $wrapperPath = Join-Path $PSScriptRoot '../../../../extensions/drm-copilot/resources/templates/run-poshqc-test.ps1'
+
+        Mock -CommandName Import-Module -MockWith { }
+        Mock -CommandName Invoke-PoshQCTest -MockWith {
+            param(
+                [string] $Root,
+                [string[]] $ScanFolders,
+                [switch] $DisableKoverageCopy,
+                [string] $KoverageOutputPath
+            )
+            [void] $Root
+            [void] $DisableKoverageCopy
+            [void] $KoverageOutputPath
+            $env:POSHQC_CAPTURED_SCAN_FOLDERS = $ScanFolders -join '|'
+        }
+
+        & $wrapperPath -WorkspaceRoot '/repo' -ScanFoldersJson '["/repo/tests/claude-runtime","/repo/tests/claude-hooks"]'
+
+        ($env:POSHQC_CAPTURED_SCAN_FOLDERS -split '\|') | Should -Be @('/repo/tests/claude-runtime', '/repo/tests/claude-hooks')
+    }
+}

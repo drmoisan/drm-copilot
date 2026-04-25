@@ -8,10 +8,6 @@
     Description          = 'Reusable PowerShell QC helpers (format, analyze, test) using Invoke-Formatter, PSScriptAnalyzer, and Pester.'
     PowerShellVersion    = '5.1'
     CompatiblePSEditions = @('Desktop', 'Core')
-    RequiredModules      = @(
-        @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.22.0' },
-        @{ ModuleName = 'Pester'; ModuleVersion = '5.6.1' }
-    )
     FunctionsToExport    = @(
         'Convert-PoshQCCoverageToRelative',
         'Get-PoshQCFileList',

@@ -3,9 +3,11 @@ import { describe, expect, it } from "@jest/globals";
 import {
   resolveCollectCommitContextToolInput,
   resolveCollectPrContextToolInput,
+  resolveLinkParentChildToolInput,
   resolveNewActiveFeatureFolderToolInput,
   resolveNewPotentialBugEntryToolInput,
   resolveNewPotentialEntryToolInput,
+  resolvePolicyAuditTemplateAssetToolInput,
   resolvePotentialToIssueToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
@@ -139,6 +141,80 @@ describe("resolveValidateOrchestrationArtifactsToolInput", () => {
   });
 });
 
+describe("resolvePolicyAuditTemplateAssetToolInput", () => {
+  it("uses the fallback workspace root and omits targetPath when target_path is absent", () => {
+    const result = resolvePolicyAuditTemplateAssetToolInput(
+      {
+        asset: "agents",
+      },
+      "C:/fallback-workspace",
+    );
+
+    expect(result).toEqual({
+      workspaceRoot: "C:/fallback-workspace",
+      asset: "agents",
+    });
+    expect("targetPath" in result).toBe(false);
+  });
+
+  it("returns the normalized asset and workspace-relative target path", () => {
+    expect(
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "code-review-template",
+        target_path: "docs/code-review.md",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/workspace",
+      asset: "code-review-template",
+      targetPath: "C:/workspace/docs/code-review.md",
+    });
+  });
+
+  it("preserves an absolute target path", () => {
+    expect(
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "agents",
+        target_path: "D:/exports/policy-audit-agents.md",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/workspace",
+      asset: "agents",
+      targetPath: "D:/exports/policy-audit-agents.md",
+    });
+  });
+
+  it("rejects unsupported selectors", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "invalid",
+      }),
+    ).toThrow(
+      "asset must be one of: template, agents, code-review-template, feature-audit-template.",
+    );
+  });
+
+  it("rejects a missing asset", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+      }),
+    ).toThrow("Field 'asset' must be a string.");
+  });
+
+  it("rejects a non-string target_path", () => {
+    expect(() =>
+      resolvePolicyAuditTemplateAssetToolInput({
+        workspace_root: "C:/workspace",
+        asset: "template",
+        target_path: 42,
+      }),
+    ).toThrow("Field 'target_path' must be a string.");
+  });
+});
+
 describe("asToolArgumentObject via resolvers", () => {
   it("treats undefined rawInput as empty arguments", () => {
     const result = resolveCollectCommitContextToolInput(
@@ -243,6 +319,41 @@ describe("resolveNewPotentialEntryToolInput", () => {
         short_name: "new-feature",
       }),
     ).toEqual({ workspaceRoot: "C:/ws", shortName: "new-feature" });
+  });
+});
+
+describe("resolveLinkParentChildToolInput", () => {
+  it("returns workspaceRoot and both issue numbers for valid input", () => {
+    expect(
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        child_issue_number: "12",
+        parent_issue_number: "34",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/ws",
+      childIssueNumber: "12",
+      parentIssueNumber: "34",
+    });
+  });
+
+  it("rejects missing child_issue_number", () => {
+    expect(() =>
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        parent_issue_number: "34",
+      }),
+    ).toThrow("Field 'child_issue_number' must be a string.");
+  });
+
+  it("rejects non-digit parent_issue_number", () => {
+    expect(() =>
+      resolveLinkParentChildToolInput({
+        workspace_root: "C:/ws",
+        child_issue_number: "12",
+        parent_issue_number: "parent-34",
+      }),
+    ).toThrow("parent_issue_number must be digits only.");
   });
 });
 

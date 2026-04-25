@@ -3,10 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    import pytest
 
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
@@ -15,12 +15,6 @@ from scripts.dev_tools.pr_context.collector import (
     collect_and_write,
 )
 from scripts.dev_tools.pr_context.models import FeatureDocExcerpt, PRContextResult
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
 
 
 class FakeRunner:
@@ -116,7 +110,7 @@ class FakeGh:
 
 
 def test_collect_and_write_includes_intent_and_additional_context(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     outputs: list[tuple[Path, str]] = []
 
@@ -129,7 +123,7 @@ def test_collect_and_write_includes_intent_and_additional_context(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -265,7 +259,7 @@ def test_collect_and_write_includes_intent_and_additional_context(
     )
 
     evidence_path = (
-        mem_path
+        mem_fs_path
         / "docs"
         / "features"
         / "active"
@@ -280,12 +274,12 @@ def test_collect_and_write_includes_intent_and_additional_context(
         encoding="utf-8",
     )
 
-    repo_root = mem_path
+    repo_root = mem_fs_path
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
         repo_root=repo_root,
         append=False,
         include_untracked=False,
@@ -309,7 +303,7 @@ def test_collect_and_write_includes_intent_and_additional_context(
 
 
 def test_collector_verification_evidence_section_is_rendered_with_normalized_fields(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     """Require a normalized verification-evidence section in summary output."""
     outputs: list[tuple[Path, str]] = []
@@ -324,7 +318,7 @@ def test_collector_verification_evidence_section_is_rendered_with_normalized_fie
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -466,7 +460,7 @@ def test_collector_verification_evidence_section_is_rendered_with_normalized_fie
     )
 
     parseable_evidence_path = (
-        mem_path
+        mem_fs_path
         / "docs"
         / "features"
         / "active"
@@ -481,12 +475,12 @@ def test_collector_verification_evidence_section_is_rendered_with_normalized_fie
         encoding="utf-8",
     )
 
-    repo_root = mem_path
+    repo_root = mem_fs_path
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
         repo_root=repo_root,
         append=False,
         include_untracked=False,
@@ -504,7 +498,7 @@ def test_collector_verification_evidence_section_is_rendered_with_normalized_fie
 
 
 def test_collector_reports_unparseable_evidence_without_claiming_completion(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     """Require conservative fallback text when canonical evidence cannot be parsed."""
     outputs: list[tuple[Path, str]] = []
@@ -519,7 +513,7 @@ def test_collector_reports_unparseable_evidence_without_claiming_completion(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -660,7 +654,7 @@ def test_collector_reports_unparseable_evidence_without_claiming_completion(
     )
 
     malformed_evidence_path = (
-        mem_path
+        mem_fs_path
         / "docs"
         / "features"
         / "active"
@@ -675,12 +669,12 @@ def test_collector_reports_unparseable_evidence_without_claiming_completion(
         encoding="utf-8",
     )
 
-    repo_root = mem_path
+    repo_root = mem_fs_path
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
         repo_root=repo_root,
         append=False,
         include_untracked=False,
@@ -691,7 +685,7 @@ def test_collector_reports_unparseable_evidence_without_claiming_completion(
 
 
 def test_pass_readiness_autoclose_section(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     """Assert PASS readiness promotes deterministic primary issue."""
     outputs: list[tuple[Path, str]] = []
@@ -706,7 +700,7 @@ def test_pass_readiness_autoclose_section(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -849,9 +843,9 @@ def test_pass_readiness_autoclose_section(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )
@@ -862,7 +856,7 @@ def test_pass_readiness_autoclose_section(
 
 
 def test_non_pass_readiness_fallback(
-    monkeypatch: pytest.MonkeyPatch, mem_path: Path
+    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
 ) -> None:
     """Assert approved section emits explicit None fallback for non-PASS."""
     outputs: list[tuple[Path, str]] = []
@@ -877,7 +871,7 @@ def test_non_pass_readiness_fallback(
 
     class StubGit:
         def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_path
+            self._root = mem_fs_path
 
         def resolve_root(self) -> Path:
             return self._root
@@ -1020,9 +1014,9 @@ def test_non_pass_readiness_fallback(
     collect_and_write(
         base="main",
         head="feature",
-        out=mem_path / "summary.txt",
-        appendix_out=mem_path / "appendix.txt",
-        repo_root=mem_path,
+        out=mem_fs_path / "summary.txt",
+        appendix_out=mem_fs_path / "appendix.txt",
+        repo_root=mem_fs_path,
         append=False,
         include_untracked=False,
     )

@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from scripts.dev_tools.pr_context.render import (
     build_excerpt_text,
     extract_features_from_paths,
@@ -16,52 +14,46 @@ from scripts.dev_tools.pr_context.render import (
 )
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestResolveFeatureDir:
-    def test_exact_match(self, mem_path: Path) -> None:
+    def test_exact_match(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir returns directory with exact name match."""
-        base = mem_path / "features"
+        base = mem_fs_path / "features"
         feature_dir = base / "my-feature"
         feature_dir.mkdir(parents=True)
         result = resolve_feature_dir(base, "my-feature")
         assert result == feature_dir
 
-    def test_strong_pattern_match(self, mem_path: Path) -> None:
+    def test_strong_pattern_match(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir matches feature names with delimiters."""
-        base = mem_path / "features"
+        base = mem_fs_path / "features"
         feature_dir = base / "prefix-my-feature-suffix"
         feature_dir.mkdir(parents=True)
         result = resolve_feature_dir(base, "my-feature")
         assert result == feature_dir
 
-    def test_weak_substring_match(self, mem_path: Path) -> None:
+    def test_weak_substring_match(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir falls back to substring match."""
-        base = mem_path / "features"
+        base = mem_fs_path / "features"
         feature_dir = base / "somemyfeaturename"
         feature_dir.mkdir(parents=True)
         result = resolve_feature_dir(base, "myfeature")
         assert result == feature_dir
 
-    def test_no_match(self, mem_path: Path) -> None:
+    def test_no_match(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir returns None when no match found."""
-        base = mem_path / "features"
+        base = mem_fs_path / "features"
         base.mkdir()
         result = resolve_feature_dir(base, "nonexistent")
         assert result is None
 
-    def test_missing_base_dir(self, mem_path: Path) -> None:
+    def test_missing_base_dir(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir returns None when base doesn't exist."""
-        result = resolve_feature_dir(mem_path / "missing", "feature")
+        result = resolve_feature_dir(mem_fs_path / "missing", "feature")
         assert result is None
 
-    def test_ignores_files_in_fuzzy_search(self, mem_path: Path) -> None:
+    def test_ignores_files_in_fuzzy_search(self, mem_fs_path: Path) -> None:
         """resolve_feature_dir ignores files during pattern/fuzzy matching."""
-        base = mem_path / "features"
+        base = mem_fs_path / "features"
         base.mkdir()
         (base / "myfeature-file").write_text("file not dir")
         result = resolve_feature_dir(base, "myfeature")
@@ -69,16 +61,16 @@ class TestResolveFeatureDir:
 
 
 class TestReadTextFile:
-    def test_reads_existing_file(self, mem_path: Path) -> None:
+    def test_reads_existing_file(self, mem_fs_path: Path) -> None:
         """read_text_file reads content from existing file."""
-        file = mem_path / "test.txt"
+        file = mem_fs_path / "test.txt"
         file.write_text("test content", encoding="utf-8")
         result = read_text_file(file)
         assert result == "test content"
 
-    def test_missing_file_returns_empty(self, mem_path: Path) -> None:
+    def test_missing_file_returns_empty(self, mem_fs_path: Path) -> None:
         """read_text_file returns empty string for missing file."""
-        result = read_text_file(mem_path / "missing.txt")
+        result = read_text_file(mem_fs_path / "missing.txt")
         assert result == ""
 
 
@@ -219,9 +211,9 @@ class TestBuildExcerptText:
 
 
 class TestGatherFeatureExcerptsIntegration:
-    def test_full_integration_with_all_docs(self, mem_path: Path) -> None:
+    def test_full_integration_with_all_docs(self, mem_fs_path: Path) -> None:
         """gather_feature_excerpts integrates all helpers."""
-        active = mem_path / "docs" / "features" / "active"
+        active = mem_fs_path / "docs" / "features" / "active"
         feature_dir = active / "test-feature"
         feature_dir.mkdir(parents=True)
 
@@ -232,16 +224,16 @@ class TestGatherFeatureExcerptsIntegration:
         )
 
         changed = ["docs/features/active/test-feature/spec.md"]
-        result = gather_feature_excerpts(mem_path, changed)
+        result = gather_feature_excerpts(mem_fs_path, changed)
 
         assert len(result) == 1
         assert result[0].feature == "test-feature"
         assert "Context:" in result[0].excerpt
         assert "Done" in result[0].excerpt
 
-    def test_multiple_features(self, mem_path: Path) -> None:
+    def test_multiple_features(self, mem_fs_path: Path) -> None:
         """gather_feature_excerpts processes multiple features."""
-        active = mem_path / "docs" / "features" / "active"
+        active = mem_fs_path / "docs" / "features" / "active"
         for name in ["feat-a", "feat-b"]:
             feature_dir = active / name
             feature_dir.mkdir(parents=True)
@@ -251,13 +243,13 @@ class TestGatherFeatureExcerptsIntegration:
             "docs/features/active/feat-a/spec.md",
             "docs/features/active/feat-b/plan.md",
         ]
-        result = gather_feature_excerpts(mem_path, changed)
+        result = gather_feature_excerpts(mem_fs_path, changed)
 
         assert len(result) == 2
         assert {r.feature for r in result} == {"feat-a", "feat-b"}
 
-    def test_missing_feature_directory_skipped(self, mem_path: Path) -> None:
+    def test_missing_feature_directory_skipped(self, mem_fs_path: Path) -> None:
         """gather_feature_excerpts skips features with no directory."""
         changed = ["docs/features/active/nonexistent/spec.md"]
-        result = gather_feature_excerpts(mem_path, changed)
+        result = gather_feature_excerpts(mem_fs_path, changed)
         assert result == []

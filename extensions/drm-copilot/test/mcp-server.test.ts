@@ -6,12 +6,14 @@ import {
   it,
   jest,
 } from "@jest/globals";
+import process from "node:process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
+import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
 
 function createMockService(): jest.Mocked<RepoAutomationService> {
@@ -22,6 +24,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     pushDownCodexAndAgentsCustomizations: jest.fn(),
     newPotentialBugEntry: jest.fn(),
     newPotentialEntry: jest.fn(),
+    linkParentChild: jest.fn(),
     potentialToIssue: jest.fn(),
     newActiveFeatureFolder: jest.fn(),
     runPoshQCFormat: jest.fn(),
@@ -29,7 +32,9 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     runPoshQCTest: jest.fn(),
     runPoshQCAnalyzeAutofix: jest.fn(),
     runPoshQCSuite: jest.fn(),
+    resolvePolicyAuditTemplateAsset: jest.fn(),
     resolveExecuteHardLockPrompt: jest.fn(),
+    resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
   };
 }
@@ -75,6 +80,7 @@ describe("repo automation MCP server", () => {
       "push_down_codex_and_agents_customizations",
       "new_potential_bug_entry",
       "new_potential_entry",
+      "link_parent_child",
       "potential_to_issue",
       "new_active_feature_folder",
       "run_poshqc_format",
@@ -82,7 +88,9 @@ describe("repo automation MCP server", () => {
       "run_poshqc_test",
       "run_poshqc_analyze_autofix",
       "run_poshqc_suite",
+      "resolve_policy_audit_template_asset",
       "resolve_execute_hard_lock_prompt",
+      "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
     ]);
   });
@@ -193,6 +201,36 @@ describe("repo automation MCP server", () => {
       artifacts: [
         "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
       ],
+    });
+  });
+
+  it("dispatches link_parent_child through the shared service with explicit issue numbers", async () => {
+    service.linkParentChild.mockResolvedValue({
+      tool: "link_parent_child",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Linked child issue #12 to parent issue #34 using the bundled workflow.",
+    });
+
+    const result = await client.callTool({
+      name: "link_parent_child",
+      arguments: {
+        workspace_root: "C:/workspace",
+        child_issue_number: "12",
+        parent_issue_number: "34",
+      },
+    });
+
+    expect(service.linkParentChild).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      childIssueNumber: "12",
+      parentIssueNumber: "34",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "link_parent_child",
+      workspace_root: "C:/workspace",
     });
   });
 
@@ -364,6 +402,76 @@ describe("repo automation MCP server", () => {
       ok: true,
       tool: "validate_orchestration_artifacts",
       workspace_root: "C:/workspace",
+    });
+  });
+
+  it("dispatches resolve_policy_audit_template_asset through the shared service with normalized inputs", async () => {
+    service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
+      tool: "resolve_policy_audit_template_asset",
+      workspaceRoot: "C:/workspace",
+      summary: "Resolved bundled policy-audit asset 'feature-audit-template'.",
+      artifacts: [
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+      ],
+      assetId: "policy_audit.feature_audit_template",
+      bundledSourcePath:
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+    });
+
+    const result = await client.callTool({
+      name: "resolve_policy_audit_template_asset",
+      arguments: {
+        workspace_root: "C:/workspace",
+        asset: "feature-audit-template",
+        target_path: "docs/policy-audit/feature-audit.md",
+      },
+    });
+
+    expect(service.resolvePolicyAuditTemplateAsset).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      asset: "feature-audit-template",
+      targetPath: "C:/workspace/docs/policy-audit/feature-audit.md",
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "resolve_policy_audit_template_asset",
+      workspace_root: "C:/workspace",
+      asset_id: "policy_audit.feature_audit_template",
+      bundled_source_path:
+        "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
+    });
+  });
+
+  it("dispatches resolve_execute_hard_lock_prompt through the shared service with injected output and quiet defaults, and surfaces artifacts", async () => {
+    service.resolveExecuteHardLockPrompt.mockResolvedValue({
+      tool: "resolve_execute_hard_lock_prompt",
+      workspaceRoot: "C:/workspace",
+      summary:
+        "Resolved the execute hard-lock prompt for 'C:/workspace/docs/features/active/feature-123/plan.md'.",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+    });
+
+    const result = await client.callTool({
+      name: "resolve_execute_hard_lock_prompt",
+      arguments: {
+        workspace_root: "C:/workspace",
+        target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      },
+    });
+
+    expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      output: DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH,
+      quiet: true,
+    });
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject({
+      ok: true,
+      tool: "resolve_execute_hard_lock_prompt",
+      workspace_root: "C:/workspace",
+      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
     });
   });
 

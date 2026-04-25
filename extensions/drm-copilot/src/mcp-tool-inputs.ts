@@ -1,15 +1,20 @@
 import {
+  normalizeWorkspaceDestinationPath,
   normalizeOptionalText,
   normalizeRequiredText,
   normalizeWorkspaceRoot,
+  type LinkParentChildInput,
   type NewActiveFeatureFolderInput,
   type NewPotentialEntryInput,
+  type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
   type PotentialToIssueInput,
+  validatePolicyAuditTemplateAssetSelector,
   type WorkModeOption,
   validateFeatureName,
   validateIssueNumber,
   validatePromotionType,
+  validateRequiredIssueNumber,
   validateShortName,
   validateWorkMode,
 } from "./workflow-command-arguments";
@@ -25,6 +30,9 @@ export interface CollectPrContextToolInput extends WorkspaceToolInput {
 export interface NewPotentialEntryToolInput
   extends WorkspaceToolInput, NewPotentialEntryInput {}
 
+export interface LinkParentChildToolInput
+  extends WorkspaceToolInput, LinkParentChildInput {}
+
 export interface PotentialToIssueToolInput
   extends WorkspaceToolInput, PotentialToIssueInput {}
 
@@ -33,6 +41,15 @@ export interface NewActiveFeatureFolderToolInput
 
 export interface ResolveExecuteHardLockPromptToolInput extends WorkspaceToolInput {
   readonly target: string;
+}
+
+export interface ResolveAtomicPlanPromptToolInput extends WorkspaceToolInput {
+  readonly target: string;
+}
+
+export interface ResolvePolicyAuditTemplateAssetToolInput extends WorkspaceToolInput {
+  readonly asset: PolicyAuditTemplateAssetSelector;
+  readonly targetPath?: string;
 }
 
 export interface RunPoshQCSuiteToolInput extends WorkspaceToolInput {
@@ -170,6 +187,27 @@ export function resolveNewPotentialEntryToolInput(
   };
 }
 
+export function resolveLinkParentChildToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): LinkParentChildToolInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    childIssueNumber: validateRequiredIssueNumber(
+      normalizeRequiredText(args["child_issue_number"], "child_issue_number"),
+      "child_issue_number",
+    ),
+    parentIssueNumber: validateRequiredIssueNumber(
+      normalizeRequiredText(args["parent_issue_number"], "parent_issue_number"),
+      "parent_issue_number",
+    ),
+  };
+}
+
 export function resolvePotentialToIssueToolInput(
   rawInput: unknown,
   fallbackWorkspaceRoot?: string,
@@ -226,6 +264,49 @@ export function resolveResolveExecuteHardLockPromptToolInput(
       fallbackWorkspaceRoot,
     ),
     target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolveResolveAtomicPlanPromptToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): ResolveAtomicPlanPromptToolInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    target: normalizeRequiredText(args["target"], "target"),
+  };
+}
+
+export function resolvePolicyAuditTemplateAssetToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): ResolvePolicyAuditTemplateAssetToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const workspaceRoot = normalizeWorkspaceRoot(
+    args["workspace_root"],
+    fallbackWorkspaceRoot,
+  );
+  const targetPath = normalizeOptionalText(args["target_path"], "target_path");
+
+  return {
+    workspaceRoot,
+    asset: validatePolicyAuditTemplateAssetSelector(
+      normalizeRequiredText(args["asset"], "asset"),
+      "asset",
+    ),
+    ...(targetPath === undefined
+      ? {}
+      : {
+          targetPath: normalizeWorkspaceDestinationPath(
+            targetPath,
+            workspaceRoot,
+            "target_path",
+          ),
+        }),
   };
 }
 

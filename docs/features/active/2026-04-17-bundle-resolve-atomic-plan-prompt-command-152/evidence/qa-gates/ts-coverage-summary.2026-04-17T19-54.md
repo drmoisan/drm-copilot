@@ -1,0 +1,4 @@
+Timestamp: 2026-04-18T17:44:00
+Command: derived-from-P0-T6, `extensions/drm-copilot/coverage/coverage-summary.json`, and `changed-scope-coverage-proof.2026-04-18T17-44.md`
+EXIT_CODE: 0
+Output Summary: Baseline TypeScript coverage from `P0-T6` was Statements 94.78% (4179/4409), Branches 83.83% (472/563), Functions 98.65% (147/149), and Lines 94.78% (4179/4409). Current TypeScript coverage is Statements 94.54% (4265/4511), Branches 83.82% (487/581), Functions 98.03% (150/153), and Lines 94.54% (4265/4511). Although the overall headline percentage regressed slightly as the denominator grew, deterministic changed-scope proof is now available in `changed-scope-coverage-proof.2026-04-18T17-44.md`: all reviewed changed TypeScript source files are at or above 92.70% line coverage, including `repo-automation-service.ts` at 100%. The TypeScript coverage disposition is `PASS` for the reviewed changed source scope.

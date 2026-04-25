@@ -9,8 +9,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 if TYPE_CHECKING:
     from types import ModuleType
 
@@ -27,12 +25,6 @@ _BUNDLED_RESOLVER_PATH = (
 _BUNDLED_SCRIPTS_PATH = str(
     ROOT / "extensions" / "drm-copilot" / "resources" / "scripts"
 )
-
-
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter naming."""
-    return tmp_path
 
 
 def _load_module_from_path(module_name: str, file_path: Path) -> ModuleType:
@@ -210,11 +202,11 @@ def test_bundled_resolve_prompt_outside_workspace() -> None:
         sys.modules.pop("ext_bundled_resolver_outside_workspace", None)
 
 
-def test_bundled_main_target_not_found(mem_path: Path) -> None:
+def test_bundled_main_target_not_found(mem_fs_path: Path) -> None:
     """Return a clear error when the bundled resolver target path is missing."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     (template_root / "execute-hard-lock.prompt.md").write_text(
         "bundled ${plan-path}",
@@ -251,11 +243,11 @@ def test_bundled_main_target_not_found(mem_path: Path) -> None:
         sys.modules.pop("ext_bundled_resolver_target_missing", None)
 
 
-def test_bundled_main_clipboard_copy_fails(mem_path: Path) -> None:
+def test_bundled_main_clipboard_copy_fails(mem_fs_path: Path) -> None:
     """Keep bundled resolver success when clipboard copy is unavailable."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     (template_root / "execute-hard-lock.prompt.md").write_text(
         "bundled ${plan-path}",
@@ -299,11 +291,11 @@ def test_bundled_main_clipboard_copy_fails(mem_path: Path) -> None:
         sys.modules.pop("ext_bundled_resolver_clipboard_fails", None)
 
 
-def test_bundled_main_template_read_error(mem_path: Path) -> None:
+def test_bundled_main_template_read_error(mem_fs_path: Path) -> None:
     """Return a clear error when the bundled resolver cannot read the template."""
-    workspace = mem_path / "workspace"
+    workspace = mem_fs_path / "workspace"
     workspace.mkdir()
-    template_root = mem_path / "bundled-codex"
+    template_root = mem_fs_path / "bundled-codex"
     template_root.mkdir()
     template_file = template_root / "execute-hard-lock.prompt.md"
     template_file.write_text("bundled ${plan-path}", encoding="utf-8")

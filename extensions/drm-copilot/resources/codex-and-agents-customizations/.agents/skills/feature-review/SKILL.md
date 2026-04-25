@@ -37,18 +37,19 @@ Write timestamped artifacts into the active feature folder:
 - `remediation-inputs.<timestamp>.md` when remediation is required
 - `remediation-plan.<timestamp>.md` when remediation is required
 
-Each required review artifact MUST pass the matching `validate_orchestration_artifacts` MCP tool call before review can be reported as complete:
-- `artifact_type: "policy-audit"` with `artifact_path: <path>`
-- `artifact_type: "code-review"` with `artifact_path: <path>`
-- `artifact_type: "feature-audit"` with `artifact_path: <path>`
+Each required review artifact MUST pass the matching validator command before review can be reported as complete:
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <path>`
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "code-review"` and `artifact_path: <path>`
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "feature-audit"` and `artifact_path: <path>`
 
 ## Review Flow
 
 1. Resolve the base branch.
    - Use the supplied base when present.
-   - If ambiguous, use `pr-base-branch-merge-base`.
+  - If the supplied base is missing or ambiguous, use `pr-base-branch-merge-base`.
+  - Do not default to the repository default branch unless merge-base resolution fails for all candidates.
 2. Load PR context from the canonical artifacts defined by `pr-context-artifacts`.
-3. If PR context is missing or stale, refresh it through `repo-automation-adapter`.
+3. If PR context is missing or stale, refresh it through `repo-automation-adapter` using the resolved base branch.
 4. Determine the active feature folder deterministically from the scoping docs and PR context.
 5. Create the policy audit, code review, and feature audit.
    - validate each artifact immediately after writing it

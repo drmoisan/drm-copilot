@@ -56,13 +56,73 @@ def build_valid_orchestrator_state() -> dict[str, object]:
 
 
 def build_valid_policy_audit_text() -> str:
-    """Return a minimal policy-audit document that satisfies required headings."""
+    """Return a policy-audit document that satisfies structural and evidence gates."""
 
     return "\n".join(
         (
             "# Policy Compliance Audit: Component",
+            "**Audit Date:** 2026-04-12",
+            "**Code Under Test:** `src/example.ts`, `scripts/example.ps1`",
+            "**Coverage Metrics by Language:**",
+            "",
+            (
+                "| Language | Files Changed | Tests | Test Result | "
+                "Baseline Coverage | Post-Change Coverage | "
+                "New Code Coverage |"
+            ),
+            (
+                "|----------|--------------|-------|-------------|"
+                "-------------------|---------------------|"
+                "-------------------|"
+            ),
+            (
+                "| TypeScript | 2 files | 12 tests | [✅] 12 pass, 0 fail | "
+                "91% lines, 88% functions | 93% lines, 90% functions | 95% |"
+            ),
+            (
+                "| PowerShell | 1 file | 8 tests | [✅] 8 pass, 0 fail | "
+                "84% commands, 82% functions | 86% commands, 84% functions | "
+                "92% |"
+            ),
+            "",
+            "### Coverage Evidence Checklist",
+            "",
+            (
+                "- TypeScript baseline coverage artifact: "
+                "docs/features/active/example/evidence/baseline/typescript.md"
+            ),
+            (
+                "- TypeScript post-change coverage artifact: "
+                "docs/features/active/example/evidence/qa-gates/typescript.md"
+            ),
+            (
+                "- PowerShell baseline coverage artifact: "
+                "docs/features/active/example/evidence/baseline/powershell.md"
+            ),
+            (
+                "- PowerShell post-change coverage artifact: "
+                "docs/features/active/example/evidence/qa-gates/powershell.md"
+            ),
+            "- Per-language comparison summary: Section 1.2.1",
             "## Executive Summary",
             "## 1. General Unit Test Policy Compliance",
+            "### 1.2.1 Per-Language Coverage Comparison",
+            (
+                "- TypeScript: Baseline: 91% lines, 88% functions -> "
+                "Post-change: 93% lines, 90% functions. Change: +2% lines, "
+                "+2% functions. New/changed-code coverage: 95%. "
+                "Disposition: PASS. Evidence: "
+                "docs/features/active/example/evidence/baseline/typescript.md; "
+                "docs/features/active/example/evidence/qa-gates/typescript.md."
+            ),
+            (
+                "- PowerShell: Baseline: 84% commands, 82% functions -> "
+                "Post-change: 86% commands, 84% functions. Change: "
+                "+2% commands, +2% functions. New/changed-code coverage: 92%. "
+                "Disposition: PASS. Evidence: "
+                "docs/features/active/example/evidence/baseline/powershell.md; "
+                "docs/features/active/example/evidence/qa-gates/powershell.md."
+            ),
             "## 2. General Code Change Policy Compliance",
             "## 3. Language-Specific Code Change Policy Compliance",
             "## 4. Language-Specific Unit Test Policy Compliance",
@@ -134,6 +194,34 @@ def test_validate_policy_audit_text_rejects_template_block() -> None:
     )
 
     assert "template instruction block" in errors[0]
+
+
+def test_validate_policy_audit_text_requires_checklist_lines() -> None:
+    """Reject policy audits that omit the required coverage checklist."""
+
+    errors = validator.validate_policy_audit_text(
+        build_valid_policy_audit_text().replace(
+            "- PowerShell post-change coverage artifact: "
+            "docs/features/active/example/evidence/qa-gates/powershell.md\n",
+            "",
+        )
+    )
+
+    assert any("required checklist line" in error for error in errors)
+
+
+def test_validate_policy_audit_text_requires_numeric_coverage_values() -> None:
+    """Reject policy audits that omit numeric coverage metrics."""
+
+    errors = validator.validate_policy_audit_text(
+        build_valid_policy_audit_text().replace(
+            "91% lines, 88% functions",
+            "baseline pending",
+            1,
+        )
+    )
+
+    assert any("numeric baseline coverage for TypeScript" in error for error in errors)
 
 
 def test_validate_code_review_text_requires_findings_table() -> None:

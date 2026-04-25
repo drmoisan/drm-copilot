@@ -523,7 +523,7 @@ Describe 'Invoke-PoshQCTest' {
         ($copyArgs[2] -replace '\\', '/') | Should -Be ($expectedKoveragePath -replace '\\', '/')
     }
 
-    It 'preserves a custom KoverageOutputPath when ScanFolders override Run.Path and CodeCoverage.Path' {
+    It 'preserves a custom KoverageOutputPath when ScanFolders narrow Run.Path and preserve coverage paths' {
         $script:capturedRunPaths = $null
         $script:capturedCoveragePaths = $null
         $copyArgs = $null
@@ -567,10 +567,7 @@ Describe 'Invoke-PoshQCTest' {
         } -Logger { param([string] $Message) [void] $Message } | Out-Null
 
         $script:capturedRunPaths | Should -Be @('/repo/src', '/repo/tests/powershell')
-        $script:capturedCoveragePaths | Should -Be @('/repo/src', '/repo/tests/powershell')
+        ($script:capturedCoveragePaths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/repo/src/**/*.ps1')
         $script:copyArgs[2] | Should -Be $customKoveragePath
     }
 }
-
-
-

@@ -1,10 +1,17 @@
-"""Regression tests for Codex agent-wrapper parity against GitHub sources."""
+"""Regression tests for Codex agent-wrapper contracts."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+pytestmark = pytest.mark.skipif(
+    not (REPO_ROOT / ".codex" / "agents").exists(),
+    reason=".codex/agents is gitignored and unavailable in CI",
+)
 BUNDLED_ROOT = (
     REPO_ROOT
     / "extensions"
@@ -33,22 +40,12 @@ def assert_contains_all(text: str, fragments: tuple[str, ...]) -> None:
         assert fragment in text
 
 
-def test_atomic_planner_wrapper_preserves_github_preflight_handoff_contract() -> None:
-    """Require Codex planner wrapper to preserve GitHub preflight semantics."""
+def test_atomic_planner_wrapper_preserves_codex_preflight_handoff_contract() -> None:
+    """Require the Codex planner wrapper to preserve strict preflight semantics."""
 
-    github_text = read_repo_text(".github/agents/atomic_planning.agent.md")
+    root_text = read_repo_text(".codex/agents/atomic-planner.toml")
     codex_text = read_bundle_text(".codex/agents/atomic-planner.toml")
 
-    assert_contains_all(
-        github_text,
-        (
-            "label: Preflight validate plan (atomic_executor)",
-            "DIRECTIVE: PREFLIGHT VALIDATION ONLY",
-            "PREFLIGHT: ALL CLEAR or PREFLIGHT: REVISIONS REQUIRED",
-            "precise plan delta (exact edits)",
-            "MUST NOT create additional timestamped sibling files",
-        ),
-    )
     assert_contains_all(
         codex_text,
         (
@@ -64,26 +61,15 @@ def test_atomic_planner_wrapper_preserves_github_preflight_handoff_contract() ->
             "validate_orchestration_artifacts` MCP tool",
         ),
     )
+    assert root_text == codex_text
 
 
-def test_atomic_executor_wrapper_preserves_github_preflight_return_handoff() -> None:
-    """Require Codex executor wrapper to preserve planner-return handoff rules."""
+def test_atomic_executor_wrapper_preserves_codex_preflight_return_handoff() -> None:
+    """Require the Codex executor wrapper to preserve planner-return handoff rules."""
 
-    github_text = read_repo_text(".github/agents/atomic_executor.agent.md")
+    root_text = read_repo_text(".codex/agents/atomic-executor.toml")
     codex_text = read_bundle_text(".codex/agents/atomic-executor.toml")
 
-    assert_contains_all(
-        github_text,
-        (
-            "DIRECTIVE: PREFLIGHT VALIDATION ONLY",
-            "Validation-only required output:",
-            "Include a precise **plan delta** that `atomic_planner` can apply",
-            "Automatically hand off back to `atomic_planner` requesting it "
-            "apply the delta",
-            "Continue this validate → delta → planner-revise → validate loop "
-            "until you can return",
-        ),
-    )
     assert_contains_all(
         codex_text,
         (
@@ -98,26 +84,15 @@ def test_atomic_executor_wrapper_preserves_github_preflight_return_handoff() -> 
             "validate_orchestration_artifacts` MCP tool",
         ),
     )
+    assert root_text == codex_text
 
 
-def test_feature_reviewer_wrapper_preserves_github_remediation_handoff() -> None:
-    """Require Codex reviewer wrapper to preserve automatic remediation handoff."""
+def test_feature_reviewer_wrapper_preserves_codex_remediation_handoff() -> None:
+    """Require the Codex reviewer wrapper to preserve automatic remediation handoff."""
 
-    github_text = read_repo_text(".github/agents/feature-review.agent.md")
+    root_text = read_repo_text(".codex/agents/feature-reviewer.toml")
     codex_text = read_bundle_text(".codex/agents/feature-reviewer.toml")
 
-    assert_contains_all(
-        github_text,
-        (
-            "label: Create remediation plan (atomic_planner)",
-            "`${spec}`: `<FEATURE_FOLDER>/remediation-inputs.<timestamp>.md` "
-            "(PRIMARY requirements source)",
-            "The delegated prompt MUST inline the full text (verbatim) of:",
-            "Use the provided handoff “Create remediation plan " "(atomic_planner)”.",
-            "If remediation is needed: confirm the atomic_planner "
-            "delegation occurred",
-        ),
-    )
     assert_contains_all(
         codex_text,
         (
@@ -136,27 +111,15 @@ def test_feature_reviewer_wrapper_preserves_github_remediation_handoff() -> None
             "stop and report blocked state",
         ),
     )
+    assert root_text == codex_text
 
 
-def test_orchestrator_wrapper_preserves_github_mandatory_delegation_contract() -> None:
-    """Require Codex orchestrator wrapper to preserve GitHub delegation gates."""
+def test_orchestrator_wrapper_preserves_codex_mandatory_delegation_contract() -> None:
+    """Require the Codex orchestrator wrapper to preserve delegation gates."""
 
-    github_text = read_repo_text(".github/agents/orchestrator.agent.md")
+    root_text = read_repo_text(".codex/agents/orchestrator.toml")
     codex_text = read_bundle_text(".codex/agents/orchestrator.toml")
 
-    assert_contains_all(
-        github_text,
-        (
-            "agent: atomic_planner",
-            "agent: atomic_executor",
-            "agent: feature_code_review_agent",
-            "Do not mark Step 4 complete until delegate output includes "
-            "both a concrete `plan-path` and final `PREFLIGHT: ALL CLEAR`.",
-            "Do not mark Step 6 complete until expected review artifacts "
-            "are present on disk in `${feature-folder}`.",
-            "all required delegations completed",
-        ),
-    )
     assert_contains_all(
         codex_text,
         (
@@ -172,5 +135,8 @@ def test_orchestrator_wrapper_preserves_github_mandatory_delegation_contract() -
             "Do not claim mission completion unless all required "
             "delegations completed with receipts",
             "Do not accept PASS outcomes that rely on stale PR-context " "artifacts",
+            "Do not rename, back up, or create sidecar checkpoint files",
+            "Do not persist placeholder lifecycle values such as `NONE`, `TBD`",
         ),
     )
+    assert root_text == codex_text

@@ -1,0 +1,33 @@
+Timestamp: 2026-04-12T15:25:50-04:00
+Policy Order:
+1. .github/copilot-instructions.md
+2. .github/instructions/general-code-change.instructions.md
+3. .github/instructions/general-unit-test.instructions.md
+4. .github/instructions/typescript-code-change.instructions.md
+5. .github/instructions/typescript-unit-test.instructions.md
+6. .github/instructions/typescript-suppressions.instructions.md
+7. .github/instructions/powershell-code-change.instructions.md
+8. .github/instructions/powershell-unit-test.instructions.md
+9. AGENTS.md
+10. .vscode/tasks.json
+11. docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/issue.md
+12. docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/spec.md
+13. docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/user-story.md
+14. docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/research.md
+Work Mode Source: issue.md
+Resolved Work Mode: full-feature
+Files Read:
+- .github/copilot-instructions.md
+- .github/instructions/general-code-change.instructions.md
+- .github/instructions/general-unit-test.instructions.md
+- .github/instructions/typescript-code-change.instructions.md
+- .github/instructions/typescript-unit-test.instructions.md
+- .github/instructions/typescript-suppressions.instructions.md
+- .github/instructions/powershell-code-change.instructions.md
+- .github/instructions/powershell-unit-test.instructions.md
+- AGENTS.md
+- .vscode/tasks.json
+- docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/issue.md
+- docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/spec.md
+- docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/user-story.md
+- docs/features/active/2026-04-12-bundle-link-parent-child-into-extension-144/research.md

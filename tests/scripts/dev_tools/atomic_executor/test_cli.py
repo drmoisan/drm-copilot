@@ -27,12 +27,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-@pytest.fixture
-def mem_path(tmp_path: Path) -> Path:
-    """Alias fixture for cosmetic tmp_path->mem_path test parameter rename."""
-    return tmp_path
-
-
 class TestParseArgs:
     """Tests for parse_args() function."""
 
@@ -112,10 +106,10 @@ class TestParseArgs:
 class TestResolveWorkspace:
     """Tests for resolve_workspace() function."""
 
-    def test_resolve_uses_explicit_workspace(self, mem_path: Path) -> None:
+    def test_resolve_uses_explicit_workspace(self, mem_fs_path: Path) -> None:
         """resolve_workspace() uses explicit workspace argument."""
-        result = resolve_workspace(str(mem_path))
-        assert result == mem_path.resolve()
+        result = resolve_workspace(str(mem_fs_path))
+        assert result == mem_fs_path.resolve()
 
     def test_resolve_infers_from_file_location(
         self, monkeypatch: "MonkeyPatch"
@@ -137,7 +131,7 @@ class TestEnsureCleanTree:
     """Tests for ensure_clean_tree() function."""
 
     def test_ensure_clean_tree_passes_for_clean_tree(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """ensure_clean_tree() passes when tree is clean."""
 
@@ -151,10 +145,10 @@ class TestEnsureCleanTree:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         # Should not raise
-        ensure_clean_tree(mem_path)
+        ensure_clean_tree(mem_fs_path)
 
     def test_ensure_clean_tree_raises_for_dirty_tree(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """ensure_clean_tree() raises RuntimeError when tree has changes."""
 
@@ -168,14 +162,14 @@ class TestEnsureCleanTree:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="Working tree is not clean"):
-            ensure_clean_tree(mem_path)
+            ensure_clean_tree(mem_fs_path)
 
 
 class TestRefuseProtectedBranch:
     """Tests for refuse_protected_branch() function."""
 
     def test_refuse_raises_for_main_branch(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'main' branch."""
 
@@ -189,10 +183,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(mem_path)
+            refuse_protected_branch(mem_fs_path)
 
     def test_refuse_raises_for_master_branch(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'master' branch."""
 
@@ -206,10 +200,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(mem_path)
+            refuse_protected_branch(mem_fs_path)
 
     def test_refuse_raises_for_development_branch(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() raises for 'development' branch."""
 
@@ -223,10 +217,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         with pytest.raises(RuntimeError, match="protected branch"):
-            refuse_protected_branch(mem_path)
+            refuse_protected_branch(mem_fs_path)
 
     def test_refuse_passes_for_feature_branch(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() passes for non-protected branch."""
 
@@ -240,10 +234,10 @@ class TestRefuseProtectedBranch:
         monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git")
 
         # Should not raise
-        refuse_protected_branch(mem_path)
+        refuse_protected_branch(mem_fs_path)
 
     def test_refuse_handles_git_error(
-        self, mem_path: Path, monkeypatch: "MonkeyPatch"
+        self, mem_fs_path: Path, monkeypatch: "MonkeyPatch"
     ) -> None:
         """refuse_protected_branch() handles git errors gracefully."""
 
@@ -254,7 +248,7 @@ class TestRefuseProtectedBranch:
 
         # Should not raise when git fails (returns None, not in
         # PROTECTED_BRANCHES)
-        refuse_protected_branch(mem_path)
+        refuse_protected_branch(mem_fs_path)
 
 
 class TestCopyToClipboard:

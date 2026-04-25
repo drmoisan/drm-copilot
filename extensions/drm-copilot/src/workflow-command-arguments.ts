@@ -1,3 +1,5 @@
+import * as path from "node:path";
+
 export interface ParsedFlagArguments {
   readonly values: ReadonlyMap<string, string>;
 }
@@ -29,9 +31,17 @@ export const WORK_MODE_OPTIONS = [
   "full-bug",
   "full",
 ] as const;
+export const POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS = [
+  "template",
+  "agents",
+  "code-review-template",
+  "feature-audit-template",
+] as const;
 
 export type PotentialPromotionType = (typeof POTENTIAL_PROMOTION_TYPES)[number];
 export type WorkModeOption = (typeof WORK_MODE_OPTIONS)[number];
+export type PolicyAuditTemplateAssetSelector =
+  (typeof POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS)[number];
 
 export interface CollectPrContextInput {
   readonly base: string;
@@ -39,6 +49,11 @@ export interface CollectPrContextInput {
 
 export interface NewPotentialEntryInput {
   readonly shortName: string;
+}
+
+export interface LinkParentChildInput {
+  readonly childIssueNumber: string;
+  readonly parentIssueNumber: string;
 }
 
 export interface PotentialToIssueInput {
@@ -59,6 +74,11 @@ export interface RunPoshQCSuiteInput {
 }
 
 export type RunPoshQCCommandInput = RunPoshQCSuiteInput;
+
+export interface ResolvePolicyAuditTemplateAssetInput {
+  readonly asset: PolicyAuditTemplateAssetSelector;
+  readonly targetPath?: string;
+}
 
 function formatAllowedFlags(allowedFlags: ReadonlySet<string>): string {
   return [...allowedFlags].join(", ");
@@ -143,6 +163,17 @@ export function validateWorkMode(
   return validateChoice(value, fieldName, WORK_MODE_OPTIONS);
 }
 
+export function validatePolicyAuditTemplateAssetSelector(
+  value: string,
+  fieldName: string,
+): PolicyAuditTemplateAssetSelector {
+  return validateChoice(
+    value,
+    fieldName,
+    POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS,
+  );
+}
+
 export function validateShortName(
   shortName: string,
   fieldName: string,
@@ -183,6 +214,18 @@ export function validateIssueNumber(
   return issueNumber;
 }
 
+export function validateRequiredIssueNumber(
+  issueNumber: string,
+  fieldName: string,
+): string {
+  const normalizedIssueNumber = normalizeRequiredText(issueNumber, fieldName);
+  if (!/^\d+$/.test(normalizedIssueNumber)) {
+    throw new Error(`${fieldName} must be digits only.`);
+  }
+
+  return normalizedIssueNumber;
+}
+
 export function getShortNameValidationMessage(
   value: string,
   fieldName: string,
@@ -198,6 +241,20 @@ export function getShortNameValidationMessage(
   } catch (error: unknown) {
     return error instanceof Error ? error.message : String(error);
   }
+}
+
+export function getRequiredIssueNumberValidationMessage(
+  value: string,
+  fieldName: string,
+): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return `${fieldName} is required.`;
+  }
+
+  return /^\d+$/.test(trimmed)
+    ? undefined
+    : `${fieldName} must be digits only.`;
 }
 
 export function getFeatureNameValidationMessage(
@@ -225,6 +282,22 @@ export function normalizeWorkspaceRoot(
   }
 
   return normalizeRequiredText(value, "workspace_root");
+}
+
+export function isAbsolutePathLike(filePath: string): boolean {
+  return /^(?:[a-zA-Z]:[\\/]|\\\\|\/)/.test(filePath);
+}
+
+export function normalizeWorkspaceDestinationPath(
+  value: string,
+  workspaceRoot: string,
+  fieldName: string,
+): string {
+  const targetPath = normalizeRequiredText(value, fieldName);
+  const resolvedPath = isAbsolutePathLike(targetPath)
+    ? targetPath
+    : path.join(workspaceRoot, targetPath);
+  return resolvedPath.replace(/\\/g, "/");
 }
 
 /**
@@ -381,6 +454,38 @@ export function resolveNewPotentialBugEntryInvocation(
 }
 
 /**
+ * Resolves invocation mode for `drmCopilotExtension.linkParentChild`.
+ *
+ * @param rawArgs The raw command arguments supplied by VS Code.
+ * @returns Interactive mode when no args are supplied, otherwise validated direct-mode input.
+ */
+export function resolveLinkParentChildInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<LinkParentChildInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
+  }
+
+  const parsedArgs = parseWorkflowCommandArguments(rawArgs, [
+    "-ChildIssueNumber",
+    "-ParentIssueNumber",
+  ]);
+  return {
+    mode: "direct",
+    input: {
+      childIssueNumber: validateRequiredIssueNumber(
+        getRequiredFlagValue(parsedArgs, "-ChildIssueNumber"),
+        "-ChildIssueNumber",
+      ),
+      parentIssueNumber: validateRequiredIssueNumber(
+        getRequiredFlagValue(parsedArgs, "-ParentIssueNumber"),
+        "-ParentIssueNumber",
+      ),
+    },
+  };
+}
+
+/**
  * Resolves invocation mode for `drmCopilotExtension.potentialToIssue`.
  *
  * @param rawArgs The raw command arguments supplied by VS Code.
@@ -527,4 +632,32 @@ export function resolveRunPoshQCAnalyzeAutofixInvocation(
   rawArgs: readonly unknown[],
 ): WorkflowCommandInvocation<RunPoshQCCommandInput> {
   return resolveRunPoshQCSuiteInvocation(rawArgs);
+}
+
+export function resolvePolicyAuditTemplateAssetInvocation(
+  rawArgs: readonly unknown[],
+): WorkflowCommandInvocation<ResolvePolicyAuditTemplateAssetInput> {
+  if (rawArgs.length === 0) {
+    return { mode: "interactive" };
+  }
+
+  const parsedArgs = parseWorkflowCommandArguments(rawArgs, [
+    "-asset",
+    "-target",
+  ]);
+  const asset = validatePolicyAuditTemplateAssetSelector(
+    getRequiredFlagValue(parsedArgs, "-asset"),
+    "-asset",
+  );
+  const targetPath = getOptionalFlagValue(parsedArgs, "-target");
+
+  return {
+    mode: "direct",
+    input: {
+      asset,
+      ...(targetPath === undefined
+        ? {}
+        : { targetPath: normalizeRequiredText(targetPath, "-target") }),
+    },
+  };
 }

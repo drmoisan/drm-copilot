@@ -1,0 +1,74 @@
+Timestamp: 2026-04-11T22:38:55-04:00
+Reference Redirection Summary:
+- `.github/agents/staged-review.agent.md`
+  - Status: redirected
+  - Rationale: active automation guidance now instructs consumers to use MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with `asset: agents`.
+- `docs/features/templates/policy_audit/README.md`
+  - Status: redirected
+  - Rationale: source-template documentation now distinguishes source-artifact usage from published automation usage and points automation consumers at the MCP surface instead of the repo-local guidance file.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/issue.md:25`
+  - Category: feature-requirement text
+  - Rationale: preserved as the issue source that defines the problem statement using the pre-change repo-local path.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/issue.md:29`
+  - Category: feature-requirement text
+  - Rationale: preserved as the issue source that defines the requested published-surface behavior.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/issue.md:35`
+  - Category: feature-requirement text
+  - Rationale: preserved as the issue acceptance criterion describing the required redirection.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/issue.md:43`
+  - Category: feature-requirement text
+  - Rationale: preserved as the issue constraint text that limits the redirect scope.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/spec.md:12`
+  - Category: feature-requirement text
+  - Rationale: preserved as the spec problem statement.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/spec.md:16`
+  - Category: feature-requirement text
+  - Rationale: preserved as the spec behavior description for the new published surface.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/spec.md:27`
+  - Category: feature-requirement text
+  - Rationale: preserved as the spec output contract for redirecting prompt and skill references.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/spec.md:50`
+  - Category: feature-requirement text
+  - Rationale: preserved as the spec API contract text for rewriting current workflow assets.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/spec.md:72`
+  - Category: feature-requirement text
+  - Rationale: preserved as the spec scope constraint that names the redirected path.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/user-story.md:15`
+  - Category: feature-requirement text
+  - Rationale: preserved as the user-story problem statement.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/user-story.md:29`
+  - Category: feature-requirement text
+  - Rationale: preserved as the user-story scenario describing the semantic surface in contrast to the old repo-local path.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/user-story.md:43`
+  - Category: feature-requirement text
+  - Rationale: preserved as the user-story acceptance criterion for reference redirection.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/research.md:11`
+  - Category: historical evidence
+  - Rationale: preserved as pre-implementation research describing the requested scope.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/research.md:40`
+  - Category: historical evidence
+  - Rationale: preserved as research inventory of the source guidance file.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/research.md:62`
+  - Category: historical evidence
+  - Rationale: preserved as research analysis of the redirect scope.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/plan.2026-04-11T22-03.md:4`
+  - Category: historical evidence
+  - Rationale: preserved as the approved plan overview.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/plan.2026-04-11T22-03.md:15`
+  - Category: historical evidence
+  - Rationale: preserved as the approved Phase 0 acceptance text naming the required file reads.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/plan.2026-04-11T22-03.md:36`
+  - Category: historical evidence
+  - Rationale: preserved as the approved copy task for the bundled guidance asset.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/plan.2026-04-11T22-03.md:69`
+  - Category: historical evidence
+  - Rationale: preserved as the approved redirect task text.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/plan.2026-04-11T22-03.md:79`
+  - Category: historical evidence
+  - Rationale: preserved as the approved acceptance text for documenting any remaining matches.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/evidence/baseline/phase0-instructions-read.2026-04-11T22-03.md:10`
+  - Category: historical evidence
+  - Rationale: preserved as the immutable Phase 0 evidence of required file reads.
+- `docs/features/active/2026-04-11-expose-policy-audit-template-surface-141/evidence/baseline/phase0-instructions-read.2026-04-11T22-03.md:25`
+  - Category: historical evidence
+  - Rationale: preserved as the immutable Phase 0 evidence of required file reads.

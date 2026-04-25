@@ -51,6 +51,10 @@
         "title": "drm-copilot: New Potential Entry"
       },
       {
+        "command": "drmCopilotExtension.linkParentChild",
+        "title": "drm-copilot: Link Parent/Child Issues"
+      },
+      {
         "command": "drmCopilotExtension.pushDownCopilotCustomizations",
         "title": "drm-copilot: Push Down Copilot Customizations"
       },
@@ -65,6 +69,10 @@
       {
         "command": "drmCopilotExtension.runPoshQCSuite",
         "title": "drm-copilot: Run PoshQC Suite"
+      },
+      {
+        "command": "drmCopilotExtension.listMcpTools",
+        "title": "drm-copilot: List MCP Tools"
       },
       {
         "command": "drmCopilotExtension.runPoshQCFormat",
@@ -83,8 +91,20 @@
         "title": "drm-copilot: Run PoshQC Analyze Autofix"
       },
       {
+        "command": "drmCopilotExtension.resolvePolicyAuditTemplateAsset",
+        "title": "drm-copilot: Resolve Policy Audit Template Asset"
+      },
+      {
         "command": "drmCopilotExtension.resolveExecuteHardLockPrompt",
         "title": "drm-copilot: Resolve Execute Hard-Lock Prompt"
+      },
+      {
+        "command": "drmCopilotExtension.resolveAtomicPlanPrompt",
+        "title": "drm-copilot: Resolve Atomic Plan Prompt"
+      },
+      {
+        "command": "drmCopilotExtension.newClaudeWorktreeSession",
+        "title": "drm-copilot: New Claude Worktree Session"
       }
     ]
   },
