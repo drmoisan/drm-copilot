@@ -1,0 +1,555 @@
+import * as vscode from "vscode";
+import { executeBundledScript, getWorkspaceRoot } from "./command-runtime";
+import {
+  promptForChoice,
+  promptForFeatureName,
+  promptForIssueNumber,
+  promptForPotentialPath,
+  promptForRequiredIssueNumber,
+  promptForShortName,
+  resolveWorkflowInvocation,
+} from "./extension-command-helpers";
+import { listRepoAutomationTools } from "./mcp-tools";
+import {
+  discoverPrBaseBranches,
+  pickPrBaseBranch,
+} from "./pr-context-branches";
+import type { RepoAutomationService } from "./repo-automation-service";
+import {
+  POTENTIAL_PROMOTION_TYPES,
+  resolveCollectPrContextInvocation,
+  resolveLinkParentChildInvocation,
+  resolveNewActiveFeatureFolderInvocation,
+  resolveNewPotentialBugEntryInvocation,
+  resolveNewPotentialEntryInvocation,
+  resolvePotentialToIssueInvocation,
+  WORK_MODE_OPTIONS,
+} from "./workflow-command-arguments";
+
+interface RepoAutomationCommandRegistrationOptions {
+  readonly context: vscode.ExtensionContext;
+  readonly output: vscode.OutputChannel;
+  readonly service: RepoAutomationService;
+}
+
+function registerCollectCommitContextCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.collectCommitContext",
+    async () => {
+      const commandId = "drmCopilotExtension.collectCommitContext";
+      await options.service.collectCommitContext({
+        workspaceRoot: getWorkspaceRoot(),
+        invocationId: commandId,
+      });
+    },
+  );
+}
+
+function registerCollectPrContextCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.collectPrContext",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.collectPrContext";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolveCollectPrContextInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.collectPrContext({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      options.output.appendLine(`[${commandId}] branch discovery start`);
+      let discoveryResult: ReturnType<typeof discoverPrBaseBranches>;
+      try {
+        discoveryResult = discoverPrBaseBranches(
+          options.output,
+          commandId,
+          workspaceRoot,
+        );
+      } catch (error: unknown) {
+        options.output.appendLine(`[${commandId}] branch discovery failure`);
+        throw error;
+      }
+      options.output.appendLine(
+        `[${commandId}] branch discovery success: ${discoveryResult.candidates.join(", ")}`,
+      );
+
+      const selectedBase = await pickPrBaseBranch(
+        options.output,
+        commandId,
+        discoveryResult.candidates,
+        discoveryResult.defaultBranch,
+      );
+      if (!selectedBase) {
+        return;
+      }
+
+      await options.service.collectPrContext({
+        workspaceRoot,
+        invocationId: commandId,
+        base: selectedBase,
+      });
+    },
+  );
+}
+
+function registerPushDownCopilotCustomizationsCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.pushDownCopilotCustomizations",
+    async () => {
+      const commandId = "drmCopilotExtension.pushDownCopilotCustomizations";
+      await options.service.pushDownCopilotCustomizations({
+        workspaceRoot: getWorkspaceRoot(),
+        invocationId: commandId,
+      });
+    },
+  );
+}
+
+function registerPushDownCodexAndAgentsCustomizationsCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    async () => {
+      const commandId =
+        "drmCopilotExtension.pushDownCodexAndAgentsCustomizations";
+      await options.service.pushDownCodexAndAgentsCustomizations({
+        workspaceRoot: getWorkspaceRoot(),
+        invocationId: commandId,
+      });
+    },
+  );
+}
+
+function registerPushDownClaudeCustomizationsCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.pushDownClaudeCustomizations",
+    async () => {
+      const commandId = "drmCopilotExtension.pushDownClaudeCustomizations";
+      await options.service.pushDownClaudeCustomizations({
+        workspaceRoot: getWorkspaceRoot(),
+        invocationId: commandId,
+      });
+    },
+  );
+}
+
+function registerRunCodexNativeConverterCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.runCodexNativeConverter",
+    async () => {
+      const commandId = "drmCopilotExtension.runCodexNativeConverter";
+      const workspaceRoot = getWorkspaceRoot();
+      const mode = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Choose the converter mode.",
+        ["review", "apply"],
+      );
+      if (!mode) {
+        return;
+      }
+
+      const sourceEcosystem = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Choose the source ecosystem.",
+        ["github-copilot", "claude"],
+      );
+      if (!sourceEcosystem) {
+        return;
+      }
+
+      const sourceRoot = await vscode.window.showInputBox({
+        title: "drm-copilot: Run Codex-native Converter",
+        prompt: "Enter the source runtime root.",
+        value: workspaceRoot,
+        ignoreFocusOut: true,
+      });
+      if (sourceRoot === undefined || sourceRoot.trim().length === 0) {
+        return;
+      }
+
+      let destinationRoot: string | undefined;
+      if (mode === "apply") {
+        destinationRoot = await vscode.window.showInputBox({
+          title: "drm-copilot: Run Codex-native Converter",
+          prompt: "Enter the destination root for native output.",
+          value: workspaceRoot,
+          ignoreFocusOut: true,
+        });
+        if (
+          destinationRoot === undefined ||
+          destinationRoot.trim().length === 0
+        ) {
+          return;
+        }
+      }
+
+      const enableRepoPromptsChoice = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Enable repository-convention .codex/prompts output?",
+        ["No", "Yes"],
+      );
+      if (!enableRepoPromptsChoice) {
+        return;
+      }
+
+      await options.service.runCodexNativeConverter({
+        workspaceRoot,
+        invocationId: commandId,
+        mode,
+        sourceEcosystem,
+        sourceRoot,
+        ...(destinationRoot === undefined ? {} : { destinationRoot }),
+        enableRepoPrompts: enableRepoPromptsChoice === "Yes",
+      });
+    },
+  );
+}
+
+function registerSyncAgentsFromInstructionsCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.syncAgentsFromInstructions",
+    async () => {
+      const commandId = "drmCopilotExtension.syncAgentsFromInstructions";
+      const workspaceRoot = getWorkspaceRoot();
+
+      await executeBundledScript(options.context, options.output, {
+        runtimeKind: "powershell",
+        bundledRelativePath:
+          "resources/templates/sync-agents-from-instructions.ps1",
+        commandId,
+        args: ["-RepoRoot", workspaceRoot],
+      });
+    },
+  );
+}
+
+function registerListMcpToolsCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.listMcpTools",
+    async () => {
+      const commandId = "drmCopilotExtension.listMcpTools";
+      const toolItems = listRepoAutomationTools().map((tool) => ({
+        label: tool.name,
+        description: tool.description,
+        detail:
+          tool.inputSchema.required === undefined ||
+          tool.inputSchema.required.length === 0
+            ? "Required inputs: none"
+            : `Required inputs: ${tool.inputSchema.required.join(", ")}`,
+      }));
+
+      options.output.appendLine(`[${commandId}] available MCP tools:`);
+      for (const toolItem of toolItems) {
+        options.output.appendLine(
+          `- ${toolItem.label}: ${toolItem.description} (${toolItem.detail})`,
+        );
+      }
+
+      await vscode.window.showQuickPick(toolItems, {
+        title: "drm-copilot: List MCP Tools",
+        placeHolder: "Available tools on the drmCopilotExtension MCP server.",
+        matchOnDescription: true,
+        matchOnDetail: true,
+      });
+    },
+  );
+}
+
+function registerNewPotentialBugEntryCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.newPotentialBugEntry",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newPotentialBugEntry";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolveNewPotentialBugEntryInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.newPotentialBugEntry({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const shortName = await promptForShortName(
+        "drm-copilot: New Potential Bug Entry",
+        "Enter a kebab-case short name for the potential bug entry.",
+      );
+      if (!shortName) {
+        return;
+      }
+
+      await options.service.newPotentialBugEntry({
+        workspaceRoot,
+        invocationId: commandId,
+        shortName,
+      });
+    },
+  );
+}
+
+function registerNewPotentialEntryCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.newPotentialEntry",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newPotentialEntry";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolveNewPotentialEntryInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.newPotentialEntry({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const shortName = await promptForShortName(
+        "drm-copilot: New Potential Entry",
+        "Enter a kebab-case short name for the potential entry.",
+      );
+      if (!shortName) {
+        return;
+      }
+
+      await options.service.newPotentialEntry({
+        workspaceRoot,
+        invocationId: commandId,
+        shortName,
+      });
+    },
+  );
+}
+
+function registerLinkParentChildCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.linkParentChild",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.linkParentChild";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolveLinkParentChildInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.linkParentChild({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const childIssueNumber = await promptForRequiredIssueNumber(
+        "drm-copilot: Link Parent/Child Issues",
+        "Enter the child issue number.",
+        "Child issue number",
+      );
+      if (!childIssueNumber) {
+        return;
+      }
+
+      const parentIssueNumber = await promptForRequiredIssueNumber(
+        "drm-copilot: Link Parent/Child Issues",
+        "Enter the parent tracking issue number.",
+        "Parent issue number",
+      );
+      if (!parentIssueNumber) {
+        return;
+      }
+
+      await options.service.linkParentChild({
+        workspaceRoot,
+        invocationId: commandId,
+        childIssueNumber,
+        parentIssueNumber,
+      });
+    },
+  );
+}
+
+function registerPotentialToIssueCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.potentialToIssue",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.potentialToIssue";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolvePotentialToIssueInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.potentialToIssue({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const potentialPath = await promptForPotentialPath(workspaceRoot);
+      if (!potentialPath) {
+        return;
+      }
+
+      const promotionType = await promptForChoice(
+        "drm-copilot: Potential To Issue",
+        "Choose a promotion type.",
+        POTENTIAL_PROMOTION_TYPES,
+      );
+      if (!promotionType) {
+        return;
+      }
+
+      const workMode = await promptForChoice(
+        "drm-copilot: Potential To Issue",
+        "Choose a work mode.",
+        WORK_MODE_OPTIONS,
+      );
+      if (!workMode) {
+        return;
+      }
+
+      await options.service.potentialToIssue({
+        workspaceRoot,
+        invocationId: commandId,
+        potentialPath,
+        promotionType,
+        workMode,
+      });
+    },
+  );
+}
+
+function registerNewActiveFeatureFolderCommand(
+  options: RepoAutomationCommandRegistrationOptions,
+): vscode.Disposable {
+  return vscode.commands.registerCommand(
+    "drmCopilotExtension.newActiveFeatureFolder",
+    async (...rawArgs: unknown[]) => {
+      const commandId = "drmCopilotExtension.newActiveFeatureFolder";
+      const invocation = resolveWorkflowInvocation(
+        options.output,
+        commandId,
+        () => resolveNewActiveFeatureFolderInvocation(rawArgs),
+      );
+      const workspaceRoot = getWorkspaceRoot();
+      if (invocation.mode === "direct") {
+        await options.service.newActiveFeatureFolder({
+          workspaceRoot,
+          invocationId: commandId,
+          ...invocation.input,
+        });
+        return;
+      }
+
+      const featureType = await promptForChoice(
+        "drm-copilot: New Active Feature Folder",
+        "Choose the feature folder type.",
+        POTENTIAL_PROMOTION_TYPES,
+      );
+      if (!featureType) {
+        return;
+      }
+
+      const featureName = await promptForFeatureName(
+        "drm-copilot: New Active Feature Folder",
+        "Enter the feature name (kebab-case or underscore-case).",
+      );
+      if (!featureName) {
+        return;
+      }
+
+      const issueNumber = await promptForIssueNumber();
+      if (issueNumber === undefined) {
+        return;
+      }
+
+      const workMode = await promptForChoice(
+        "drm-copilot: New Active Feature Folder",
+        "Choose a work mode.",
+        WORK_MODE_OPTIONS,
+      );
+      if (!workMode) {
+        return;
+      }
+
+      await options.service.newActiveFeatureFolder({
+        workspaceRoot,
+        invocationId: commandId,
+        featureName,
+        type: featureType,
+        workMode,
+        ...(issueNumber === null ? {} : { issueNumber }),
+      });
+    },
+  );
+}
+
+/**
+ * Registers the interactive repo-automation workflow commands so `extension.ts`
+ * can remain a thin activation coordinator.
+ *
+ * @param options Shared command-registration dependencies.
+ * @returns The disposables that must be added to the extension subscriptions.
+ */
+export function registerRepoAutomationCommands(
+  options: RepoAutomationCommandRegistrationOptions,
+): ReadonlyArray<vscode.Disposable> {
+  return [
+    registerCollectCommitContextCommand(options),
+    registerCollectPrContextCommand(options),
+    registerPushDownCopilotCustomizationsCommand(options),
+    registerPushDownCodexAndAgentsCustomizationsCommand(options),
+    registerPushDownClaudeCustomizationsCommand(options),
+    registerRunCodexNativeConverterCommand(options),
+    registerSyncAgentsFromInstructionsCommand(options),
+    registerListMcpToolsCommand(options),
+    registerNewPotentialBugEntryCommand(options),
+    registerNewPotentialEntryCommand(options),
+    registerLinkParentChildCommand(options),
+    registerPotentialToIssueCommand(options),
+    registerNewActiveFeatureFolderCommand(options),
+  ];
+}
