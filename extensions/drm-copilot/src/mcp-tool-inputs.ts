@@ -153,6 +153,19 @@ export function resolvePushDownCodexAndAgentsCustomizationsToolInput(
   };
 }
 
+export function resolvePushDownClaudeCustomizationsToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): WorkspaceToolInput {
+  const args = asToolArgumentObject(rawInput);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+  };
+}
+
 export function resolveNewPotentialBugEntryToolInput(
   rawInput: unknown,
   fallbackWorkspaceRoot?: string,

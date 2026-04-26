@@ -1,6 +1,6 @@
 ---
 name: feature-promotion-lifecycle
-description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Prefer VS Code extension command execution when extension tools are available; use underlying scripts only as fallback.
+description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Prefer MCP server (drmCopilotExtension) tool invocations when the MCP server is reachable; use underlying scripts only as fallback.
 ---
 
 # Feature Promotion Lifecycle
@@ -15,18 +15,19 @@ Use this skill when:
 - An orchestrator must create potential docs, promote to issue, branch, and active feature folder.
 - Downstream research/spec agents depend on deterministic paths and identifiers.
 
-## Extension-First Execution Rule
+## MCP-First Execution Rule
 
-When the agent has access to the VS Code extension tool surface (in particular `vscode/runCommand` plus extension access), execute the lifecycle through the contributed extension commands first.
+When the MCP server (`drmCopilotExtension`) is reachable, execute the lifecycle through the MCP tool surface first.
 
-Canonical extension command invocations:
-- feature potential entry: `drmCopilotExtension.newPotentialEntry` with `[`"-ShortName"`, `"${short-name}"`]`
-- bug potential entry: `drmCopilotExtension.newPotentialBugEntry` with `[`"--short-name"`, `"${short-name}"`]`
-- potential-to-issue promotion: `drmCopilotExtension.potentialToIssue` with `[`"--potential-path"`, `"${relativeFile}"`, `"--promotion-type"`, `"${promotion-type}"`, `"--work-mode"`, `"${work-mode}"`]`
-- active feature folder creation: `drmCopilotExtension.newActiveFeatureFolder` with `[`"--feature-name"`, `"${long-name}"`, `"--type"`, `"${promotion-type}"`, `"--issue-number"`, `"${issue-num}"`, `"--work-mode"`, `"${work-mode}"`]`
+Canonical MCP tool invocations:
+- feature potential entry: `mcp__drmCopilotExtension__new_potential_entry` with `{"short_name": "${short-name}"}`
+- bug potential entry: `mcp__drmCopilotExtension__new_potential_bug_entry` with `{"short_name": "${short-name}"}`
+- potential-to-issue promotion: `mcp__drmCopilotExtension__potential_to_issue` with `{"potential_path": "${relativeFile}", "promotion_type": "${promotion-type}", "work_mode": "${work-mode}"}`
+- active feature folder creation: `mcp__drmCopilotExtension__new_active_feature_folder` with `{"feature_name": "${long-name}", "type": "${promotion-type}", "issue_number": "${issue-num}", "work_mode": "${work-mode}"}`
 
-Fallback rule:
-- Use the direct script/CLI commands below only when the agent host cannot invoke VS Code extension commands directly.
+Documented alternatives:
+- VS Code extension commands (via `vscode/runCommand`): use when MCP server is unreachable but the VS Code extension command surface is available.
+- Direct script/CLI commands: use only when neither MCP nor VS Code extension commands are available.
 - When falling back, preserve the same variable model, flags, and work-mode semantics.
 
 ## Canonical Variables

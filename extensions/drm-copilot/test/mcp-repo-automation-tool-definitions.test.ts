@@ -31,4 +31,20 @@ describe("repo automation MCP tool definitions", () => {
       },
     });
   });
+
+  it("includes a push_down_claude_customizations definition with workspace_root and no additional properties", () => {
+    const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "push_down_claude_customizations",
+    );
+
+    expect(definition).toMatchObject({
+      name: "push_down_claude_customizations",
+      inputSchema: {
+        properties: {
+          workspace_root: expect.objectContaining({ type: "string" }),
+        },
+        additionalProperties: false,
+      },
+    });
+  });
 });

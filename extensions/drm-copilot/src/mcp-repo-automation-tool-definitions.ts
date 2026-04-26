@@ -73,6 +73,18 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "push_down_claude_customizations",
+    description:
+      "Copy the bundled Claude Code customization payload into the target workspace.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: "new_potential_bug_entry",
     description:
       "Create a new potential bug entry in the target workspace from bundled templates.",

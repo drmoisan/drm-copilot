@@ -33,6 +33,7 @@ import {
   handleRunPoshQCTest,
 } from "./mcp-handlers/poshqc-handlers";
 import {
+  handlePushDownClaudeCustomizations,
   handlePushDownCodexAndAgentsCustomizations,
   handlePushDownCopilotCustomizations,
 } from "./mcp-handlers/push-down-handlers";
@@ -151,6 +152,12 @@ export async function dispatchRepoAutomationTool(
       case "push_down_codex_and_agents_customizations": {
         return toMcpToolResult(
           await handlePushDownCodexAndAgentsCustomizations(rawInput, service),
+        );
+      }
+
+      case "push_down_claude_customizations": {
+        return toMcpToolResult(
+          await handlePushDownClaudeCustomizations(rawInput, service),
         );
       }
 
