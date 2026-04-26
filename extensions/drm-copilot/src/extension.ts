@@ -215,6 +215,76 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
+  const runCodexNativeConverterDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.runCodexNativeConverter",
+    async () => {
+      const commandId = "drmCopilotExtension.runCodexNativeConverter";
+      const workspaceRoot = getWorkspaceRoot();
+      const mode = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Choose the converter mode.",
+        ["review", "apply"],
+      );
+      if (!mode) {
+        return;
+      }
+
+      const sourceEcosystem = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Choose the source ecosystem.",
+        ["github-copilot", "claude"],
+      );
+      if (!sourceEcosystem) {
+        return;
+      }
+
+      const sourceRoot = await vscode.window.showInputBox({
+        title: "drm-copilot: Run Codex-native Converter",
+        prompt: "Enter the source runtime root.",
+        value: workspaceRoot,
+        ignoreFocusOut: true,
+      });
+      if (sourceRoot === undefined || sourceRoot.trim().length === 0) {
+        return;
+      }
+
+      let destinationRoot: string | undefined;
+      if (mode === "apply") {
+        destinationRoot = await vscode.window.showInputBox({
+          title: "drm-copilot: Run Codex-native Converter",
+          prompt: "Enter the destination root for native output.",
+          value: workspaceRoot,
+          ignoreFocusOut: true,
+        });
+        if (
+          destinationRoot === undefined ||
+          destinationRoot.trim().length === 0
+        ) {
+          return;
+        }
+      }
+
+      const enableRepoPromptsChoice = await promptForChoice(
+        "drm-copilot: Run Codex-native Converter",
+        "Enable repository-convention .codex/prompts output?",
+        ["No", "Yes"],
+      );
+      if (!enableRepoPromptsChoice) {
+        return;
+      }
+
+      await service.runCodexNativeConverter({
+        workspaceRoot,
+        invocationId: commandId,
+        mode,
+        sourceEcosystem,
+        sourceRoot,
+        ...(destinationRoot === undefined ? {} : { destinationRoot }),
+        enableRepoPrompts: enableRepoPromptsChoice === "Yes",
+      });
+    },
+  );
+
   const syncAgentsFromInstructionsDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.syncAgentsFromInstructions",
     async () => {
@@ -651,6 +721,7 @@ export function activate(context: vscode.ExtensionContext): void {
     pushDownCopilotCustomizationsDisposable,
     pushDownCodexAndAgentsCustomizationsDisposable,
     pushDownClaudeCustomizationsDisposable,
+    runCodexNativeConverterDisposable,
     syncAgentsFromInstructionsDisposable,
     newClaudeWorktreeSessionDisposable,
     runPoshQCSuiteDisposable,

@@ -49,6 +49,54 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "run_codex_native_converter",
+    description:
+      "Run the bundled Codex-native converter in review or apply mode using the extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        mode: {
+          type: "string",
+          description: "Converter mode to execute.",
+        },
+        source_ecosystem: {
+          type: "string",
+          description: "Supported source ecosystem for the conversion run.",
+        },
+        source_root: {
+          type: "string",
+          description: "Workspace-relative or absolute source runtime root.",
+        },
+        selected_paths: {
+          type: "array",
+          description:
+            "Optional workspace-relative or absolute source paths beneath source_root.",
+          items: {
+            type: "string",
+          },
+        },
+        destination_root: {
+          type: "string",
+          description:
+            "Workspace-relative or absolute destination root required for apply mode.",
+        },
+        artifact_root: {
+          type: "string",
+          description:
+            "Optional workspace-relative or absolute artifact output root.",
+        },
+        enable_repo_prompts: {
+          type: "boolean",
+          description:
+            "When true, allow repository-convention .codex/prompts outputs.",
+        },
+      },
+      required: ["mode", "source_ecosystem", "source_root"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "push_down_copilot_customizations",
     description:
       "Copy the bundled Copilot customization payload into the target workspace.",

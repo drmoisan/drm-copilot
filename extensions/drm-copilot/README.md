@@ -15,6 +15,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.helloPowerShell`
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
+- `drmCopilotExtension.runCodexNativeConverter`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.newPotentialBugEntry`
@@ -48,6 +49,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 
 - `collect_commit_context`
 - `collect_pr_context`
+- `run_codex_native_converter`
 - `push_down_copilot_customizations`
 - `push_down_codex_and_agents_customizations`
 - `new_potential_bug_entry`
@@ -101,6 +103,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 
 - `collect_commit_context`: optional `workspace_root`
 - `collect_pr_context`: optional `workspace_root`, required `base`
+- `run_codex_native_converter`: optional `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
 - `push_down_copilot_customizations`: optional `workspace_root`
 - `push_down_codex_and_agents_customizations`: optional `workspace_root`
 - `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
@@ -146,6 +149,7 @@ The shared repo-automation service executes these bundled wrapper resources:
 
 - `resources/templates/collect_commit_context.py`
 - `resources/templates/collect_pr_context.py`
+- `resources/templates/codex_native_converter.py`
 - `resources/templates/push_down_copilot_customizations.py`
 - `resources/templates/push_down_codex_and_agents_customizations.py`
 - `resources/templates/new_potential_bug_entry.py`
@@ -169,6 +173,22 @@ The shared repo-automation service executes these bundled wrapper resources:
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
 
 `resolve_policy_audit_template_asset` and `drmCopilotExtension.resolvePolicyAuditTemplateAsset` are additive surface adapters over the same bundled policy-audit assets. They support the selectors `template`, `code-review-template`, `feature-audit-template`, and `agents`. In MCP mode, callers receive the canonical asset id plus the bundled source path and, when requested, the copied destination path. In VS Code, interactive use opens the bundled asset when no target is supplied and copies it into the workspace when `-target <path>` is supplied.
+
+## Codex-native converter wrapper
+
+Use the `drm-copilot: Run Codex-native Converter` command (command ID: `drmCopilotExtension.runCodexNativeConverter`) from the Command Palette to run the bundled Python converter against the active workspace. The command prompts for review or apply mode and the source ecosystem, then delegates to `resources/templates/codex_native_converter.py`.
+
+The same workflow is available through the semantic MCP tool `run_codex_native_converter`. MCP callers provide the non-interactive input contract directly:
+
+- required `mode`: `review` or `apply`
+- required `source_ecosystem`: `github-copilot` or `claude`
+- required `source_root`: workspace-relative or absolute source runtime root
+- optional `selected_paths`: repeated workspace-relative or absolute source paths to limit the run scope
+- optional `destination_root`: required when `mode` is `apply`
+- optional `artifact_root`: override for the report-set root
+- optional `enable_repo_prompts`: allow `.codex/prompts/**` output when the destination repository explicitly uses that surface
+
+The wrapper remains thin by design: it does not implement a second converter. It forwards arguments to the bundled Python CLI, surfaces the printed artifact root, and relies on the converter's fail-closed validation model before any destination writes occur.
 
 ## Push Down Codex and Agents Customizations
 

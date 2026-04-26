@@ -27,6 +27,16 @@ export interface CollectPrContextToolInput extends WorkspaceToolInput {
   readonly base: string;
 }
 
+export interface RunCodexNativeConverterToolInput extends WorkspaceToolInput {
+  readonly mode: "review" | "apply";
+  readonly sourceEcosystem: "github-copilot" | "claude";
+  readonly sourceRoot: string;
+  readonly selectedPaths?: ReadonlyArray<string>;
+  readonly destinationRoot?: string;
+  readonly artifactRoot?: string;
+  readonly enableRepoPrompts?: boolean;
+}
+
 export interface NewPotentialEntryToolInput
   extends WorkspaceToolInput, NewPotentialEntryInput {}
 
@@ -124,6 +134,101 @@ export function resolveCollectPrContextToolInput(
       fallbackWorkspaceRoot,
     ),
     base: normalizeRequiredText(args["base"], "base"),
+  };
+}
+
+export function resolveRunCodexNativeConverterToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): RunCodexNativeConverterToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const workspaceRoot = normalizeWorkspaceRoot(
+    args["workspace_root"],
+    fallbackWorkspaceRoot,
+  );
+  const mode = normalizeRequiredText(args["mode"], "mode");
+  if (mode !== "review" && mode !== "apply") {
+    throw new Error("Field 'mode' must be 'review' or 'apply'.");
+  }
+
+  const sourceEcosystem = normalizeRequiredText(
+    args["source_ecosystem"],
+    "source_ecosystem",
+  );
+  if (sourceEcosystem !== "github-copilot" && sourceEcosystem !== "claude") {
+    throw new Error(
+      "Field 'source_ecosystem' must be 'github-copilot' or 'claude'.",
+    );
+  }
+
+  const selectedPaths = args["selected_paths"];
+  if (selectedPaths !== undefined && !Array.isArray(selectedPaths)) {
+    throw new Error("Field 'selected_paths' must be an array when provided.");
+  }
+
+  const destinationRoot = normalizeOptionalText(
+    args["destination_root"],
+    "destination_root",
+  );
+  if (mode === "apply" && destinationRoot === undefined) {
+    throw new Error(
+      "Field 'destination_root' is required when mode is 'apply'.",
+    );
+  }
+
+  const artifactRoot = normalizeOptionalText(
+    args["artifact_root"],
+    "artifact_root",
+  );
+  const enableRepoPrompts = args["enable_repo_prompts"];
+  if (
+    enableRepoPrompts !== undefined &&
+    typeof enableRepoPrompts !== "boolean"
+  ) {
+    throw new Error(
+      "Field 'enable_repo_prompts' must be a boolean when provided.",
+    );
+  }
+
+  return {
+    workspaceRoot,
+    mode,
+    sourceEcosystem,
+    sourceRoot: normalizeWorkspaceDestinationPath(
+      normalizeRequiredText(args["source_root"], "source_root"),
+      workspaceRoot,
+      "source_root",
+    ),
+    ...(selectedPaths === undefined
+      ? {}
+      : {
+          selectedPaths: selectedPaths.map((selectedPath, index) =>
+            normalizeWorkspaceDestinationPath(
+              normalizeRequiredText(selectedPath, `selected_paths[${index}]`),
+              workspaceRoot,
+              `selected_paths[${index}]`,
+            ),
+          ),
+        }),
+    ...(destinationRoot === undefined
+      ? {}
+      : {
+          destinationRoot: normalizeWorkspaceDestinationPath(
+            destinationRoot,
+            workspaceRoot,
+            "destination_root",
+          ),
+        }),
+    ...(artifactRoot === undefined
+      ? {}
+      : {
+          artifactRoot: normalizeWorkspaceDestinationPath(
+            artifactRoot,
+            workspaceRoot,
+            "artifact_root",
+          ),
+        }),
+    ...(enableRepoPrompts === true ? { enableRepoPrompts: true } : {}),
   };
 }
 

@@ -35,12 +35,25 @@ export interface RepoAutomationExecutionResult {
   readonly destinationPath?: string;
 }
 
+export interface RunCodexNativeConverterInput extends WorkspaceExecutionInput {
+  readonly mode: "review" | "apply";
+  readonly sourceEcosystem: "github-copilot" | "claude";
+  readonly sourceRoot: string;
+  readonly selectedPaths?: ReadonlyArray<string>;
+  readonly destinationRoot?: string;
+  readonly artifactRoot?: string;
+  readonly enableRepoPrompts?: boolean;
+}
+
 export interface RepoAutomationService {
   collectCommitContext(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   collectPrContext(
     input: WorkspaceExecutionInput & { readonly base: string },
+  ): Promise<RepoAutomationExecutionResult>;
+  runCodexNativeConverter(
+    input: RunCodexNativeConverterInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCopilotCustomizations(
     input: WorkspaceExecutionInput,
@@ -196,6 +209,44 @@ class DefaultRepoAutomationService implements RepoAutomationService {
           path.join(input.workspaceRoot, "artifacts/pr_context.appendix.txt"),
         ),
       ],
+    });
+  }
+  async runCodexNativeConverter(
+    input: RunCodexNativeConverterInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    const args = [
+      input.mode,
+      "--source-root",
+      input.sourceRoot,
+      "--source-ecosystem",
+      input.sourceEcosystem,
+    ];
+
+    if (input.destinationRoot !== undefined) {
+      args.push("--destination-root", input.destinationRoot);
+    }
+
+    if (input.artifactRoot !== undefined) {
+      args.push("--artifact-root", input.artifactRoot);
+    }
+
+    if (input.enableRepoPrompts === true) {
+      args.push("--enable-repo-prompts");
+    }
+
+    for (const selectedPath of input.selectedPaths ?? []) {
+      args.push("--selected-path", selectedPath);
+    }
+
+    return this.executeScript({
+      tool: "run_codex_native_converter",
+      runtimeKind: "python",
+      bundledRelativePath: "resources/templates/codex_native_converter.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "run_codex_native_converter",
+      args,
+      summary: `Ran bundled codex-native-converter in ${input.mode} mode for '${input.sourceEcosystem}'.`,
+      stdoutArtifactPattern: /Artifact root:\s*(.+)/i,
     });
   }
   async pushDownCopilotCustomizations(
