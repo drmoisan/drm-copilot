@@ -203,6 +203,18 @@ export function activate(context: vscode.ExtensionContext): void {
       },
     );
 
+  const pushDownClaudeCustomizationsDisposable =
+    vscode.commands.registerCommand(
+      "drmCopilotExtension.pushDownClaudeCustomizations",
+      async () => {
+        const commandId = "drmCopilotExtension.pushDownClaudeCustomizations";
+        await service.pushDownClaudeCustomizations({
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
+        });
+      },
+    );
+
   const syncAgentsFromInstructionsDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.syncAgentsFromInstructions",
     async () => {
@@ -638,6 +650,7 @@ export function activate(context: vscode.ExtensionContext): void {
     potentialToIssueDisposable,
     pushDownCopilotCustomizationsDisposable,
     pushDownCodexAndAgentsCustomizationsDisposable,
+    pushDownClaudeCustomizationsDisposable,
     syncAgentsFromInstructionsDisposable,
     newClaudeWorktreeSessionDisposable,
     runPoshQCSuiteDisposable,

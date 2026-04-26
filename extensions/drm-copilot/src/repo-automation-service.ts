@@ -48,6 +48,9 @@ export interface RepoAutomationService {
   pushDownCodexAndAgentsCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
+  pushDownClaudeCustomizations(
+    input: WorkspaceExecutionInput,
+  ): Promise<RepoAutomationExecutionResult>;
   newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult>;
@@ -225,6 +228,22 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       args: ["--destination", input.workspaceRoot],
       summary:
         "Pushed bundled Codex and agents customizations into the destination workspace.",
+      stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
+    });
+  }
+  async pushDownClaudeCustomizations(
+    input: WorkspaceExecutionInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return this.executeScript({
+      tool: "push_down_claude_customizations",
+      runtimeKind: "python",
+      bundledRelativePath:
+        "resources/templates/push_down_claude_customizations.py",
+      workspaceRoot: input.workspaceRoot,
+      invocationId: input.invocationId ?? "push_down_claude_customizations",
+      args: ["--destination", input.workspaceRoot],
+      summary:
+        "Pushed bundled Claude Code customizations into the destination workspace.",
       stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
     });
   }
