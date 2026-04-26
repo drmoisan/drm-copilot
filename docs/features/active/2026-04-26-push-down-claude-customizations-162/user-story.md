@@ -107,24 +107,24 @@ A second concern compounds the distribution gap. Several `.claude/` markdown fil
 
 ## Acceptance Criteria
 
-- [ ] Zero local-script references remain in any `.claude/` markdown file (verified by repo-wide grep).
-- [ ] Every replaced reference points at an MCP tool that exists in `extensions/drm-copilot/src/repo-automation-tool-names.ts`.
-- [ ] `.claude/settings.json` allow list includes the seven previously-missing MCP tools.
-- [ ] `feature-promotion-lifecycle/SKILL.md` no longer references VS Code command IDs in its primary invocation surface; it references MCP tools and is reframed as "MCP-first".
-- [ ] `atomic-plan-contract/SKILL.md` and `policy-audit-template-usage/SKILL.md` use fully-qualified MCP tool names throughout.
-- [ ] `scripts/dev_tools/push_down_claude_customizations.py` exists and runs end-to-end against an in-memory destination workspace, copying every tracked `.claude/` file except `settings.local.json` and writing a summary artifact under `artifacts/claude-customizations/`.
-- [ ] The new push-down script is bundled into the extension at `extensions/drm-copilot/resources/templates/`.
-- [ ] The extension exposes `drmCopilotExtension.pushDownClaudeCustomizations` as a VS Code command and `mcp__drmCopilotExtension__push_down_claude_customizations` as an MCP tool.
-- [ ] Parity unit tests exist for the new Python module mirroring those for the Codex/Agents variant.
-- [ ] Parity unit tests exist for the new TypeScript MCP handler, service method, and command registration.
-- [ ] Repository-wide line coverage remains >= 80 %; new modules reach >= 90 %.
-- [ ] Toolchain passes in a single pass for both Python (Black -> Ruff -> Pyright -> Pytest) and TypeScript (Prettier -> ESLint -> TSC -> Jest).
-- [ ] `.claude/skills/orchestrate/SKILL.md` is present in the pushed-down `.claude/skills/` tree.
-- [ ] The orchestrate skill implements checkpoint resumption from `artifacts/orchestration/orchestrator-state.json`.
-- [ ] The remediation loop in the orchestrate skill terminates after at most 3 full iterations, recording `step6_status: "blocked_remediation_loop_limit"` when the limit is reached without resolution.
-- [ ] The PR creation gate in the orchestrate skill requires all four specified conditions to be simultaneously true before a PR is created.
-- [ ] The canonical issue number is derived from the feature folder name and supplied in every `atomic-planner`, `atomic-executor`, and `feature-review` delegation prompt.
-- [ ] Feature-review delegation prompts in the orchestrate skill contain none of the four categories of prohibited prompt language.
+- [x] Zero local-script references remain in any `.claude/` markdown file (verified by repo-wide grep).
+- [x] Every replaced reference points at an MCP tool that exists in `extensions/drm-copilot/src/repo-automation-tool-names.ts`.
+- [x] `.claude/settings.json` allow list includes the seven previously-missing MCP tools.
+- [x] `feature-promotion-lifecycle/SKILL.md` no longer references VS Code command IDs in its primary invocation surface; it references MCP tools and is reframed as "MCP-first".
+- [x] `atomic-plan-contract/SKILL.md` and `policy-audit-template-usage/SKILL.md` use fully-qualified MCP tool names throughout.
+- [x] `scripts/dev_tools/push_down_claude_customizations.py` exists and runs end-to-end against an in-memory destination workspace, copying every tracked `.claude/` file except `settings.local.json` and writing a summary artifact under `artifacts/claude-customizations/`.
+- [x] The new push-down script is bundled into the extension at `extensions/drm-copilot/resources/templates/`.
+- [x] The extension exposes `drmCopilotExtension.pushDownClaudeCustomizations` as a VS Code command and `mcp__drmCopilotExtension__push_down_claude_customizations` as an MCP tool.
+- [x] Parity unit tests exist for the new Python module mirroring those for the Codex/Agents variant.
+- [x] Parity unit tests exist for the new TypeScript MCP handler, service method, and command registration.
+- [x] Repository-wide line coverage remains >= 80 %; new modules reach >= 90 %.
+- [x] Toolchain passes in a single pass for both Python (Black -> Ruff -> Pyright -> Pytest) and TypeScript (Prettier -> ESLint -> TSC -> Jest).
+- [x] `.claude/skills/orchestrate/SKILL.md` is present in the pushed-down `.claude/skills/` tree.
+- [x] The orchestrate skill implements checkpoint resumption from `artifacts/orchestration/orchestrator-state.json`.
+- [x] The remediation loop in the orchestrate skill terminates after at most 3 full iterations, recording `step6_status: "blocked_remediation_loop_limit"` when the limit is reached without resolution.
+- [x] The PR creation gate in the orchestrate skill requires all four specified conditions to be simultaneously true before a PR is created.
+- [x] The canonical issue number is derived from the feature folder name and supplied in every `atomic-planner`, `atomic-executor`, and `feature-review` delegation prompt.
+- [x] Feature-review delegation prompts in the orchestrate skill contain none of the four categories of prohibited prompt language.
 
 
 ## Non-Goals
