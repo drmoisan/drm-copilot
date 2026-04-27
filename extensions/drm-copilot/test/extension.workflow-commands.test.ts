@@ -366,16 +366,14 @@ describe("drm-copilot workflow command behavior", () => {
       setExecutablePresence({ pwsh: true, powershell: false });
       // No setPyprojectFixture call here means the workspace has no
       // pyproject.toml, so usePoetry resolves to false.
-      showInputBoxMock
-        .mockResolvedValueOnce("auth-refactor")
-        .mockResolvedValueOnce("Refactor the auth module.");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
         "drmCopilotExtension.newClaudeWorktreeSession",
       );
       await handler();
 
-      expect(showInputBoxMock).toHaveBeenCalledTimes(2);
+      expect(showInputBoxMock).toHaveBeenCalledTimes(1);
       expect(createTerminalMock).toHaveBeenCalledTimes(1);
       const [terminalOptions] = createTerminalMock.mock.calls[0] as [
         {
@@ -385,9 +383,7 @@ describe("drm-copilot workflow command behavior", () => {
           shellArgs: ReadonlyArray<string>;
         },
       ];
-      expect(terminalOptions.name).toMatch(
-        /^Claude: feature\/.*-auth-refactor$/,
-      );
+      expect(terminalOptions.name).toMatch(/^Claude: workspace-wt-/);
       // The terminal must launch inside the source repository so `git worktree
       // add` can find `.git`. The workspace fixture is "C:/workspace".
       expect(terminalOptions.cwd).toBe("C:/workspace");
@@ -413,9 +409,11 @@ describe("drm-copilot workflow command behavior", () => {
       // The git command uses `git -C <repoRoot>` so it works regardless of
       // the terminal's actual current working directory at launch time.
       expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
-      expect(gitCmd).toMatch(/-b 'feature\/[0-9]{14}-auth-refactor'$/);
+      expect(gitCmd).toMatch(
+        /-b 'workspace-wt-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}'$/,
+      );
       expect(setLocationCmd).toMatch(
-        /^Set-Location 'C:\/drm-copilot-wt-[0-9]{14}-auth-refactor'$/,
+        /^Set-Location 'C:\/workspace-wt-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}'$/,
       );
 
       // The deferred claude sendText fires after the grace period.
@@ -442,9 +440,7 @@ describe("drm-copilot workflow command behavior", () => {
       setPyprojectFixture(
         '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n',
       );
-      showInputBoxMock
-        .mockResolvedValueOnce("auth-refactor")
-        .mockResolvedValueOnce("Refactor the auth module.");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
         "drmCopilotExtension.newClaudeWorktreeSession",
@@ -487,9 +483,7 @@ describe("drm-copilot workflow command behavior", () => {
       setPyprojectFixture(
         '[project]\nname = "plain"\nversion = "0.1.0"\nrequires-python = ">=3.13"\n',
       );
-      showInputBoxMock
-        .mockResolvedValueOnce("auth-refactor")
-        .mockResolvedValueOnce("Refactor the auth module.");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
         "drmCopilotExtension.newClaudeWorktreeSession",
@@ -513,9 +507,7 @@ describe("drm-copilot workflow command behavior", () => {
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
-      showInputBoxMock
-        .mockResolvedValueOnce("auth-refactor")
-        .mockResolvedValueOnce("   ");
+      showInputBoxMock.mockResolvedValueOnce("   ");
 
       const handler = activateAndGetHandler(
         "drmCopilotExtension.newClaudeWorktreeSession",
@@ -544,9 +536,7 @@ describe("drm-copilot workflow command behavior", () => {
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
-      showInputBoxMock
-        .mockResolvedValueOnce("auth-refactor")
-        .mockResolvedValueOnce("Refactor the auth module.");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
         "drmCopilotExtension.newClaudeWorktreeSession",
@@ -575,22 +565,8 @@ describe("drm-copilot workflow command behavior", () => {
     }
   });
 
-  it("newClaudeWorktreeSession returns early when the short-name prompt is cancelled", async () => {
-    showInputBoxMock.mockResolvedValue(undefined);
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newClaudeWorktreeSession",
-    );
-    await handler();
-
-    expect(createTerminalMock).not.toHaveBeenCalled();
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
   it("newClaudeWorktreeSession returns early when the objective prompt is cancelled", async () => {
-    showInputBoxMock
-      .mockResolvedValueOnce("auth-refactor")
-      .mockResolvedValueOnce(undefined);
+    showInputBoxMock.mockResolvedValue(undefined);
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newClaudeWorktreeSession",
@@ -603,9 +579,7 @@ describe("drm-copilot workflow command behavior", () => {
 
   it("newClaudeWorktreeSession surfaces a missing powershell runtime error", async () => {
     setExecutablePresence({ pwsh: false, powershell: false });
-    showInputBoxMock
-      .mockResolvedValueOnce("auth-refactor")
-      .mockResolvedValueOnce("Refactor the auth module.");
+    showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newClaudeWorktreeSession",
