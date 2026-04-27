@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-The remediation closed the structural policy blocker by reducing the two oversized touched TypeScript production files below the repository 500-line limit while preserving command behavior and the repo-automation service contract. The final TypeScript QA loop completed with a clean pass: formatting, linting, type checking, and Jest coverage all passed. The refreshed PR context now resolves to a non-empty commit range against `development`, so the rerun review scope is explicit.
+The remediation closed the two original structural blockers by reducing `extension.ts` and `repo-automation-service.ts` below the repository 500-line limit while preserving command behavior and the repo-automation service contract. The final TypeScript QA loop completed with a clean pass: formatting, linting, type checking, and Jest coverage all passed. The rerun review also found one remaining structural issue introduced by the split: `repo-automation-command-registration.ts` is 513 lines, which still exceeds the repository production-file limit.
 
 ## 1. General Unit Test Policy Compliance
 
@@ -22,7 +22,7 @@ The remediation closed the structural policy blocker by reducing the two oversiz
 
 ## 2. General Code Change Policy Compliance
 
-The remediation stayed within findings R-1 through R-3, preserved public command identifiers, and restored structural compliance by splitting the oversized TypeScript modules into focused helpers. Post-remediation line counts are `268` for `extension.ts` and `473` for `repo-automation-service.ts`.
+The remediation stayed within findings R-1 through R-3, preserved public command identifiers, and reduced the two originally oversized TypeScript modules below the limit. Post-remediation line counts are `268` for `extension.ts`, `473` for `repo-automation-service.ts`, and `513` for the newly extracted `repo-automation-command-registration.ts`, so structural compliance is improved but not yet complete.
 
 ## 3. Language-Specific Code Change Policy Compliance
 
@@ -49,19 +49,20 @@ Focused Jest coverage was added for the newly extracted registration module, and
 
 - Structural limit restored: `extension.ts` 687 → 268 lines.
 - Structural limit restored: `repo-automation-service.ts` 560 → 473 lines.
+- Residual structural blocker: `repo-automation-command-registration.ts` is 513 lines after extraction.
 - PR context refreshed: `artifacts/pr_context.summary.txt` now records a non-empty commit range to `origin/development`.
 
 ## 8. Gaps and Exceptions
 
-No open policy gaps remain in the remediation scope. The baseline formatting-check command recorded in Phase 0 behaved oddly on Windows through `npm exec`, but the final repository-approved formatting command completed cleanly and serves as the authoritative formatting result.
+One open policy gap remains: `extensions/drm-copilot/src/repo-automation-command-registration.ts` exceeds the 500-line production-file limit at 513 lines. The baseline formatting-check command recorded in Phase 0 behaved oddly on Windows through `npm exec`, but the final repository-approved formatting command completed cleanly and serves as the authoritative formatting result.
 
 ## 9. Summary of Changes
 
-The remediation introduced `repo-automation-command-registration.ts` and `repo-automation-service-workflows.ts`, reduced the two oversize files below the repository limit, added focused workflow tests for the extracted registration paths, refreshed PR context, and produced a clean final TypeScript QA pass.
+The remediation introduced `repo-automation-command-registration.ts` and `repo-automation-service-workflows.ts`, reduced the two original oversize files below the repository limit, added focused workflow tests for the extracted registration paths, refreshed PR context, and produced a clean final TypeScript QA pass. A follow-up split is still required for `repo-automation-command-registration.ts`.
 
 ## 10. Compliance Verdict
 
-PASS. The structural blocker identified in the prior review is closed, the touched production files are now below the 500-line limit, and the final TypeScript QA loop passed with numeric coverage evidence.
+FAIL. The original blockers on `extension.ts` and `repo-automation-service.ts` are closed, but the branch still carries one structural policy violation because `repo-automation-command-registration.ts` is 513 lines.
 
 ## Appendix A: Test Inventory
 

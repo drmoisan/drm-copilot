@@ -1,10 +1,10 @@
 # Remediation Final Verdict
 
-Timestamp: 2026-04-26T23:43:00
+Timestamp: 2026-04-26T23:48:00
 Command: document-remediation-final-verdict
 EXIT_CODE: 0
-Output Summary: Structural remediation closed the two TypeScript file-size blockers, the final TypeScript QA loop passed, and the rerun review artifacts validated successfully.
-Verdict: go
+Output Summary: Structural remediation closed the two original TypeScript file-size blockers and the final TypeScript QA loop passed, but the rerun review artifacts identified a remaining over-limit helper module.
+Verdict: no-go
 
 ## Post-Remediation Line Counts
 
@@ -28,8 +28,9 @@ Verdict: go
 - `policy-audit.2026-04-26T23-41.md` regenerated and validated successfully.
 - `code-review.2026-04-26T23-41.md` regenerated and validated successfully.
 - `feature-audit.2026-04-26T23-41.md` regenerated and validated successfully.
-- The rerun artifacts report no remaining FAIL findings in the remediation scope.
+- The rerun artifacts report one remaining FAIL finding: `extensions/drm-copilot/src/repo-automation-command-registration.ts` is 513 lines.
 
 ## Residual Blockers
 
-None. The branch is ready for re-review against the refreshed audit set.
+- `extensions/drm-copilot/src/repo-automation-command-registration.ts` remains over the 500-line production-file limit at 513 lines.
+- The branch is not yet ready for final re-review against the refreshed audit set.
