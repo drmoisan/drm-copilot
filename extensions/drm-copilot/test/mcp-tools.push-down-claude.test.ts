@@ -19,6 +19,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
   return {
     collectCommitContext: jest.fn(),
     collectPrContext: jest.fn(),
+    runCodexNativeConverter: jest.fn(),
     pushDownCopilotCustomizations: jest.fn(),
     pushDownCodexAndAgentsCustomizations: jest.fn(),
     pushDownClaudeCustomizations: jest.fn(),

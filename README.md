@@ -37,6 +37,38 @@ Selected CLI entrypoints exposed by Poetry include:
 - `dev.new-active-feature`
 - `dev.potential-to-issue`
 
+## Codex-native converter
+
+The Codex-native converter is a Python-first workflow that reviews or applies a deterministic migration from GitHub Copilot or Claude runtime customization surfaces into the native Codex layout expected by this repository.
+
+The Python CLI is the authoritative converter surface. The VS Code command and MCP tool added under `extensions/drm-copilot` are thin wrappers over the same bundled Python runner.
+
+### Python review and apply commands
+
+- Review mode: `poetry run codex-native-converter review --source-root <source-root> --source-ecosystem <github-copilot|claude>`
+- Apply mode: `poetry run codex-native-converter apply --source-root <source-root> --source-ecosystem <github-copilot|claude> --destination-root <destination-root>`
+
+Optional flags include:
+
+- `--selected-path <path>` repeated to restrict the reviewed source surface
+- `--artifact-root <artifact-root>` to override the default report location
+- `--enable-repo-prompts` to allow `.codex/prompts/**` output when repository prompts are intentionally enabled
+
+### Artifact outputs
+
+Each run writes a deterministic report set beneath the selected artifact root:
+
+- `conversion-report.md`
+- `mapping-catalog.json`
+- `validation-results.json`
+- `proposed-tree/`
+
+The CLI prints the resolved artifact root and the final validation outcome to stdout so wrapper layers can surface or collect the generated evidence.
+
+### Fail-closed validation model
+
+The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect the blocking findings without mutating the destination tree.
+
 ### VS Code extension
 
 The active extension package lives in `extensions/drm-copilot`. It now exposes both the existing VS Code command surface and a Codex-facing stdio MCP server named `drmCopilotExtension`.
@@ -47,6 +79,7 @@ The VS Code side continues to contribute these implemented commands:
 - `drmCopilotExtension.helloPowerShell`
 - `drmCopilotExtension.collectCommitContext`
 - `drmCopilotExtension.collectPrContext`
+- `drmCopilotExtension.runCodexNativeConverter`
 - `drmCopilotExtension.pushDownCopilotCustomizations`
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.newPotentialBugEntry`
@@ -60,6 +93,7 @@ The MCP side exposes semantic repo-automation tools such as:
 
 - `collect_commit_context`
 - `collect_pr_context`
+- `run_codex_native_converter`
 - `push_down_copilot_customizations`
 - `push_down_codex_and_agents_customizations`
 - `new_potential_bug_entry`

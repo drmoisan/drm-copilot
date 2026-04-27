@@ -54,6 +54,66 @@ describe("drm-copilot workflow command behavior", () => {
     activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
   });
 
+  it("runCodexNativeConverter review mode passes the selected prompt values to the bundled service", async () => {
+    setExecutablePresence({ python: true });
+    showQuickPickMock
+      .mockResolvedValueOnce("review")
+      .mockResolvedValueOnce("github-copilot")
+      .mockResolvedValueOnce("Yes");
+    showInputBoxMock.mockResolvedValueOnce("C:/source-runtime");
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.runCodexNativeConverter",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args[0]).toBe(
+      "C:/extension/resources/templates/codex_native_converter.py",
+    );
+    expect(args).toContain("review");
+    expect(args).toContain("--source-root");
+    expect(args).toContain("C:/source-runtime");
+    expect(args).toContain("--source-ecosystem");
+    expect(args).toContain("github-copilot");
+    expect(args).toContain("--enable-repo-prompts");
+    expect(args).not.toContain("--destination-root");
+  });
+
+  it("runCodexNativeConverter apply mode returns early when the destination root is blank", async () => {
+    showQuickPickMock
+      .mockResolvedValueOnce("apply")
+      .mockResolvedValueOnce("claude");
+    showInputBoxMock
+      .mockResolvedValueOnce("C:/source-runtime")
+      .mockResolvedValueOnce("   ");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.runCodexNativeConverter",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("syncAgentsFromInstructions runs the bundled PowerShell script with the workspace root", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.syncAgentsFromInstructions",
+    );
+    await handler();
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    expect(args).toContain(
+      "C:/extension/resources/templates/sync-agents-from-instructions.ps1",
+    );
+    expect(args).toContain("-RepoRoot");
+    expect(args).toContain("C:/workspace");
+  });
+
   it("registers newPotentialBugEntry", () => {
     activateAndGetHandler("drmCopilotExtension.newPotentialBugEntry");
   });
@@ -645,6 +705,19 @@ describe("drm-copilot workflow command behavior", () => {
 
   it("linkParentChild returns early when the child issue prompt is cancelled", async () => {
     showInputBoxMock.mockResolvedValue(undefined);
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.linkParentChild",
+    );
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("linkParentChild returns early when the parent issue prompt is cancelled", async () => {
+    showInputBoxMock
+      .mockResolvedValueOnce("12")
+      .mockResolvedValueOnce(undefined);
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.linkParentChild",

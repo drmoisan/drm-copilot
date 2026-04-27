@@ -38,6 +38,10 @@ describe("drm-copilot listMcpTools command", () => {
           detail: "Required inputs: base",
         }),
         expect.objectContaining({
+          label: "run_codex_native_converter",
+          detail: "Required inputs: mode, source_ecosystem, source_root",
+        }),
+        expect.objectContaining({
           label: "run_poshqc_suite",
         }),
         expect.objectContaining({
