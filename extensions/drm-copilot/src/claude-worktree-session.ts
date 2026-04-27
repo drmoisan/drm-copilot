@@ -41,13 +41,13 @@ export interface WorktreeSessionCommands {
 }
 
 /**
- * Formats a Date as the `yyyyMMddHHmmss` timestamp used by the worktree
+ * Formats a Date as the `yyyy-MM-dd-HH-mm` timestamp used by the worktree
  * session naming convention.
  *
  * @param date The instant to format. The local-time fields are used so the
  *             output matches the PowerShell `Get-WorktreeTimestamp` helper,
  *             which calls `[datetime]::Now`.
- * @returns A 14-character string composed of zero-padded calendar fields.
+ * @returns A 16-character dash-separated string in `yyyy-MM-dd-HH-mm` format.
  */
 export function formatWorktreeTimestamp(date: Date): string {
   const year = date.getFullYear().toString().padStart(4, "0");
@@ -55,41 +55,41 @@ export function formatWorktreeTimestamp(date: Date): string {
   const day = date.getDate().toString().padStart(2, "0");
   const hour = date.getHours().toString().padStart(2, "0");
   const minute = date.getMinutes().toString().padStart(2, "0");
-  const second = date.getSeconds().toString().padStart(2, "0");
-  return `${year}${month}${day}${hour}${minute}${second}`;
+  return `${year}-${month}-${day}-${hour}-${minute}`;
 }
 
 /**
  * Builds the absolute worktree directory path used for a session.
  *
  * @param workspaceParent Parent directory containing the new worktree.
- * @param timestamp A `yyyyMMddHHmmss` timestamp produced by
+ * @param timestamp A `yyyy-MM-dd-HH-mm` timestamp produced by
  *                  {@link formatWorktreeTimestamp}.
- * @param shortName Kebab-case short identifier supplied by the user.
- * @returns The full forward-slash path to the worktree directory. The path
- *          uses forward slashes so it matches the PowerShell helper output
- *          and remains valid in `Set-Location`.
+ * @param repoName Basename of the destination repository.
+ * @returns The full forward-slash path to the worktree directory in
+ *          `<parent>/<repoName>-wt-<timestamp>` format. The path uses forward
+ *          slashes so it matches the PowerShell helper output and remains
+ *          valid in `Set-Location`.
  */
 export function buildWorktreePath(
   workspaceParent: string,
   timestamp: string,
-  shortName: string,
+  repoName: string,
 ): string {
   const normalizedParent = workspaceParent
     .replace(/\\/g, "/")
     .replace(/\/+$/, "");
-  return `${normalizedParent}/drm-copilot-wt-${timestamp}-${shortName}`;
+  return `${normalizedParent}/${repoName}-wt-${timestamp}`;
 }
 
 /**
  * Builds the default branch name for a worktree session.
  *
- * @param timestamp A `yyyyMMddHHmmss` timestamp.
- * @param shortName Kebab-case short identifier supplied by the user.
- * @returns The conventional `feature/<timestamp>-<shortName>` branch name.
+ * @param timestamp A `yyyy-MM-dd-HH-mm` timestamp.
+ * @param repoName Basename of the destination repository.
+ * @returns A branch name in `<repoName>-wt-<timestamp>` format.
  */
-export function buildBranchName(timestamp: string, shortName: string): string {
-  return `feature/${timestamp}-${shortName}`;
+export function buildBranchName(timestamp: string, repoName: string): string {
+  return `${repoName}-wt-${timestamp}`;
 }
 
 /**

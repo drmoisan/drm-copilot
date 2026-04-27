@@ -236,14 +236,6 @@ export function activate(context: vscode.ExtensionContext): void {
     async () => {
       const commandId = "drmCopilotExtension.newClaudeWorktreeSession";
 
-      const shortName = await promptForShortName(
-        "drm-copilot: New Claude Worktree Session",
-        "Enter a kebab-case short name for the worktree and branch.",
-      );
-      if (!shortName) {
-        return;
-      }
-
       const objective = await vscode.window.showInputBox({
         title: "drm-copilot: New Claude Worktree Session",
         prompt:
@@ -258,14 +250,15 @@ export function activate(context: vscode.ExtensionContext): void {
       // the established error message rather than after creating a terminal.
       const runtime = detectRuntime("powershell");
       const workspaceRoot = getWorkspaceRoot();
+      const repoName = path.basename(workspaceRoot);
       const workspaceParent = path.dirname(workspaceRoot);
       const timestamp = formatWorktreeTimestamp(new Date());
       const worktreePath = buildWorktreePath(
         workspaceParent,
         timestamp,
-        shortName,
+        repoName,
       );
-      const branchName = buildBranchName(timestamp, shortName);
+      const branchName = buildBranchName(timestamp, repoName);
       const usePoetry = pyprojectHasPoetry(workspaceRoot);
       const commands = buildWorktreeSessionCommands({
         repoRoot: workspaceRoot,

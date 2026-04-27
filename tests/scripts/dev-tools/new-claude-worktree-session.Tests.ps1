@@ -17,10 +17,10 @@ Describe "new-claude-worktree-session.ps1 - Get-WorktreeTimestamp" {
             $result | Should -Not -BeNullOrEmpty
         }
 
-        It "returns correct yyyyMMddHHmmss format for injected fixed datetime" {
+        It "returns correct yyyy-MM-dd-HH-mm format for injected fixed datetime" {
             $fixedDate = [datetime]::new(2026, 4, 20, 9, 59, 37)
             $result = Get-WorktreeTimestamp -GetDateTime { $fixedDate }
-            $result | Should -Be "20260420095937"
+            $result | Should -Be "2026-04-20-09-59"
         }
     }
 }
@@ -31,19 +31,19 @@ Describe "new-claude-worktree-session.ps1 - Build-WorktreePath" {
             . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-WorktreePath")
         }
 
-        It "output contains the drm-copilot-wt- prefix" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "20260420095937" -ShortName "auth"
-            $result | Should -Match "drm-copilot-wt-"
+        It "output contains the repoName-wt- segment" {
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
+            $result | Should -Match "auth-wt-"
         }
 
-        It "output ends with the ShortName" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "20260420095937" -ShortName "auth"
-            $result | Should -Match "-auth$"
+        It "output ends with the timestamp" {
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
+            $result | Should -Match "-2026-04-20-09-59$"
         }
 
         It "full path matches expected format" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "20260420095937" -ShortName "auth"
-            $result | Should -Be "/parent/drm-copilot-wt-20260420095937-auth"
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
+            $result | Should -Be "/parent/auth-wt-2026-04-20-09-59"
         }
     }
 }
@@ -54,13 +54,13 @@ Describe "new-claude-worktree-session.ps1 - Build-BranchName" {
             . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-BranchName")
         }
 
-        It "returns default feature branch when BranchName is empty" {
-            $result = Build-BranchName -Timestamp "20260420095937" -ShortName "auth" -BranchName ""
-            $result | Should -Be "feature/20260420095937-auth"
+        It "returns default repoName-wt-timestamp branch when BranchName is empty" {
+            $result = Build-BranchName -Timestamp "2026-04-20-09-59" -RepoName "auth" -BranchName ""
+            $result | Should -Be "auth-wt-2026-04-20-09-59"
         }
 
         It "returns custom BranchName unchanged when supplied" {
-            $result = Build-BranchName -Timestamp "20260420095937" -ShortName "auth" -BranchName "fix/my-custom-branch"
+            $result = Build-BranchName -Timestamp "2026-04-20-09-59" -RepoName "auth" -BranchName "fix/my-custom-branch"
             $result | Should -Be "fix/my-custom-branch"
         }
     }
