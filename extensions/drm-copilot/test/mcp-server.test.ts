@@ -20,6 +20,7 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
   return {
     collectCommitContext: jest.fn(),
     collectPrContext: jest.fn(),
+    runCodexNativeConverter: jest.fn(),
     pushDownCopilotCustomizations: jest.fn(),
     pushDownCodexAndAgentsCustomizations: jest.fn(),
     pushDownClaudeCustomizations: jest.fn(),
@@ -77,6 +78,7 @@ describe("repo automation MCP server", () => {
     expect(result.tools.map((tool) => tool.name)).toEqual([
       "collect_commit_context",
       "collect_pr_context",
+      "run_codex_native_converter",
       "push_down_copilot_customizations",
       "push_down_codex_and_agents_customizations",
       "push_down_claude_customizations",

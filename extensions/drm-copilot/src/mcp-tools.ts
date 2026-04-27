@@ -19,6 +19,7 @@ import {
   handleCollectCommitContext,
   handleCollectPrContext,
 } from "./mcp-handlers/collect-context-handlers";
+import { handleRunCodexNativeConverter } from "./mcp-handlers/codex-native-converter-handlers";
 import {
   handleNewActiveFeatureFolder,
   handleNewPotentialBugEntry,
@@ -141,6 +142,12 @@ export async function dispatchRepoAutomationTool(
 
       case "collect_pr_context": {
         return toMcpToolResult(await handleCollectPrContext(rawInput, service));
+      }
+
+      case "run_codex_native_converter": {
+        return toMcpToolResult(
+          await handleRunCodexNativeConverter(rawInput, service),
+        );
       }
 
       case "push_down_copilot_customizations": {
