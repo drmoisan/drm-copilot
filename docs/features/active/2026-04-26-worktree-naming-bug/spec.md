@@ -58,14 +58,14 @@ ShortName is no longer part of the naming scheme. The following must be removed:
 
 ## Acceptance Criteria
 
-- [ ] AC1: `formatWorktreeTimestamp` returns a string matching `yyyy-MM-dd-HH-mm` (no seconds, dashes between all fields).
-- [ ] AC2: `buildWorktreePath` accepts `repoName` (not `shortName`) and returns `<parent>/<repoName>-wt-<timestamp>`.
-- [ ] AC3: `buildBranchName` accepts `repoName` (not `shortName`) and returns `<repoName>-wt-<timestamp>` (no `feature/` prefix).
-- [ ] AC4: The TypeScript `extension.ts` command handler no longer prompts for ShortName; it derives `repoName` from `path.basename(workspaceRoot)`.
-- [ ] AC5: `Get-WorktreeTimestamp` in both PowerShell scripts returns a string matching `yyyy-MM-dd-HH-mm`.
-- [ ] AC6: `Build-WorktreePath` in both PowerShell scripts accepts `$RepoName` (not `$ShortName`) and returns `$WorktreeParentPath/$RepoName-wt-$Timestamp`.
-- [ ] AC7: `Build-BranchName` in both PowerShell scripts accepts `$RepoName` (not `$ShortName`) and returns `$RepoName-wt-$Timestamp`.
-- [ ] AC8: The `$ShortName` mandatory parameter is removed from both PowerShell scripts.
-- [ ] AC9: All TypeScript tests pass with updated fixtures reflecting the new naming scheme.
-- [ ] AC10: All Pester tests pass with updated fixtures reflecting the new naming scheme.
-- [ ] AC11: Full toolchain passes (Prettier → ESLint → TSC → Jest; PoshQC format → PSScriptAnalyzer → Pester) with zero errors and no coverage regression.
+- [x] AC1: `formatWorktreeTimestamp` returns a string matching `yyyy-MM-dd-HH-mm` (no seconds, dashes between all fields).
+- [x] AC2: `buildWorktreePath` accepts `repoName` (not `shortName`) and returns `<parent>/<repoName>-wt-<timestamp>`.
+- [x] AC3: `buildBranchName` accepts `repoName` (not `shortName`) and returns `<repoName>-wt-<timestamp>` (no `feature/` prefix).
+- [x] AC4: The TypeScript `extension.ts` command handler no longer prompts for ShortName; it derives `repoName` from `path.basename(workspaceRoot)`.
+- [x] AC5: `Get-WorktreeTimestamp` in both PowerShell scripts returns a string matching `yyyy-MM-dd-HH-mm`.
+- [x] AC6: `Build-WorktreePath` in both PowerShell scripts accepts `$RepoName` (not `$ShortName`) and returns `$WorktreeParentPath/$RepoName-wt-$Timestamp`.
+- [x] AC7: `Build-BranchName` in both PowerShell scripts accepts `$RepoName` (not `$ShortName`) and returns `$RepoName-wt-$Timestamp`.
+- [x] AC8: The `$ShortName` mandatory parameter is removed from both PowerShell scripts.
+- [x] AC9: All TypeScript tests pass with updated fixtures reflecting the new naming scheme.
+- [x] AC10: All Pester tests pass with updated fixtures reflecting the new naming scheme.
+- [x] AC11: Full toolchain passes (Prettier → ESLint → TSC → Jest; PoshQC format → PSScriptAnalyzer → Pester) with zero errors and no coverage regression.
