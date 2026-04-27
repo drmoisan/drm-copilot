@@ -9,7 +9,7 @@ import {
 } from "../src/claude-worktree-session";
 
 describe("formatWorktreeTimestamp", () => {
-  it("formats a fixed local-time date as a 14-character yyyyMMddHHmmss string", () => {
+  it("formats a fixed local-time date as a 16-character yyyy-MM-dd-HH-mm string", () => {
     // Arrange
     const fixedDate = new Date(2026, 3, 20, 9, 59, 37);
 
@@ -17,7 +17,7 @@ describe("formatWorktreeTimestamp", () => {
     const result = formatWorktreeTimestamp(fixedDate);
 
     // Assert
-    expect(result).toBe("20260420095937");
+    expect(result).toBe("2026-04-20-09-59");
   });
 
   it("zero-pads single-digit calendar fields", () => {
@@ -28,23 +28,23 @@ describe("formatWorktreeTimestamp", () => {
     const result = formatWorktreeTimestamp(fixedDate);
 
     // Assert
-    expect(result).toBe("20260101000000");
-    expect(result).toHaveLength(14);
+    expect(result).toBe("2026-01-01-00-00");
+    expect(result).toHaveLength(16);
   });
 });
 
 describe("buildWorktreePath", () => {
-  it("composes the canonical drm-copilot-wt path with forward slashes", () => {
+  it("composes the canonical repoName-wt path with forward slashes", () => {
     // Arrange
     const parent = "/parent";
-    const timestamp = "20260420095937";
-    const shortName = "auth";
+    const timestamp = "2026-04-20-09-59";
+    const repoName = "auth";
 
     // Act
-    const result = buildWorktreePath(parent, timestamp, shortName);
+    const result = buildWorktreePath(parent, timestamp, repoName);
 
     // Assert
-    expect(result).toBe("/parent/drm-copilot-wt-20260420095937-auth");
+    expect(result).toBe("/parent/auth-wt-2026-04-20-09-59");
   });
 
   it("normalizes Windows-style backslashes in the parent directory to forward slashes", () => {
@@ -52,10 +52,10 @@ describe("buildWorktreePath", () => {
     const parent = "C:\\repos";
 
     // Act
-    const result = buildWorktreePath(parent, "20260420095937", "auth");
+    const result = buildWorktreePath(parent, "2026-04-20-09-59", "auth");
 
     // Assert
-    expect(result).toBe("C:/repos/drm-copilot-wt-20260420095937-auth");
+    expect(result).toBe("C:/repos/auth-wt-2026-04-20-09-59");
   });
 
   it("strips trailing slashes from the parent directory", () => {
@@ -63,20 +63,20 @@ describe("buildWorktreePath", () => {
     const parent = "/parent/";
 
     // Act
-    const result = buildWorktreePath(parent, "20260420095937", "auth");
+    const result = buildWorktreePath(parent, "2026-04-20-09-59", "auth");
 
     // Assert
-    expect(result).toBe("/parent/drm-copilot-wt-20260420095937-auth");
+    expect(result).toBe("/parent/auth-wt-2026-04-20-09-59");
   });
 });
 
 describe("buildBranchName", () => {
-  it("composes a feature/<timestamp>-<shortName> branch name", () => {
+  it("composes a <repoName>-wt-<timestamp> branch name", () => {
     // Arrange / Act
-    const result = buildBranchName("20260420095937", "auth");
+    const result = buildBranchName("2026-04-20-09-59", "auth");
 
     // Assert
-    expect(result).toBe("feature/20260420095937-auth");
+    expect(result).toBe("auth-wt-2026-04-20-09-59");
   });
 });
 
@@ -117,8 +117,8 @@ describe("quoteForPwsh", () => {
 describe("buildWorktreeSessionCommands", () => {
   const baseInput = {
     repoRoot: "/parent/drm-copilot",
-    worktreePath: "/parent/drm-copilot-wt-20260420095937-auth",
-    branchName: "feature/20260420095937-auth",
+    worktreePath: "/parent/auth-wt-2026-04-20-09-59",
+    branchName: "auth-wt-2026-04-20-09-59",
     usePoetry: false,
   };
 
@@ -131,7 +131,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.git).toBe(
-      "git -C '/parent/drm-copilot' worktree add '/parent/drm-copilot-wt-20260420095937-auth' -b 'feature/20260420095937-auth'",
+      "git -C '/parent/drm-copilot' worktree add '/parent/auth-wt-2026-04-20-09-59' -b 'auth-wt-2026-04-20-09-59'",
     );
   });
 
@@ -144,7 +144,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent/drm-copilot-wt-20260420095937-auth'",
+      "Set-Location '/parent/auth-wt-2026-04-20-09-59'",
     );
   });
 
