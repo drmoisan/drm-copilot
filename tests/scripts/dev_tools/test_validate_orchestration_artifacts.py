@@ -7,6 +7,8 @@ import json
 from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_orchestration_artifacts as validator
+import scripts.dev_tools.validate_orchestration_review_artifacts as review_validator
+import scripts.dev_tools.validate_orchestrator_state as state_validator
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -154,6 +156,25 @@ def get_first_receipt(state: dict[str, object]) -> dict[str, object]:
     return dict(receipts[0])
 
 
+def build_namespaced_orchestrator_state() -> dict[str, object]:
+    """Return a valid orchestrator-state payload using the promotion namespace."""
+
+    state = build_valid_orchestrator_state()
+    state["delegation_receipts"] = {
+        "promotion": {
+            "potential_entry": {"path": "docs/features/potential/demo.md"},
+            "issue": "https://github.com/drmoisan/drm-copilot/issues/168",
+            "feature_folder": {
+                "path": (
+                    "docs/features/active/2026-04-29-"
+                    "harden-feature-promotion-lifecycle-mcp-only-168"
+                )
+            },
+        }
+    }
+    return state
+
+
 def test_validate_plan_text_rejects_noncanonical_phase_heading() -> None:
     """Reject colon-style phase headings."""
 
@@ -244,6 +265,45 @@ def test_validate_feature_audit_text_requires_canonical_headings() -> None:
     assert any("Acceptance Criteria Inventory" in error for error in errors)
 
 
+def test_entrypoint_reexports_split_validator_functions() -> None:
+    """Require the stable entrypoint module to re-export the split validators.
+
+    Purpose:
+        Lock in the split-module layout while preserving the existing import
+        contract for callers that still import from the stable CLI entrypoint.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that the entrypoint aliases the extracted
+        review-artifact and orchestrator-state validators.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    assert (
+        validator.validate_policy_audit_text
+        is review_validator.validate_policy_audit_text
+    )
+    assert (
+        validator.validate_code_review_text
+        is review_validator.validate_code_review_text
+    )
+    assert (
+        validator.validate_feature_audit_text
+        is review_validator.validate_feature_audit_text
+    )
+    assert (
+        validator.validate_orchestrator_state_text
+        is state_validator.validate_orchestrator_state_text
+    )
+
+
 def test_validate_orchestrator_state_text_requires_receipts_for_completion() -> None:
     """Reject complete-state checkpoints that still show blocked delegation."""
 
@@ -257,6 +317,28 @@ def test_validate_orchestrator_state_text_requires_receipts_for_completion() -> 
     assert any("step8_status is blocked" in error for error in errors)
 
 
+def test_validate_orchestrator_state_text_accepts_legacy_list_delegation_receipts() -> (
+    None
+):
+    """Allow the legacy list-based delegation receipt payload."""
+
+    errors = validator.validate_orchestrator_state_text(
+        json.dumps(build_valid_orchestrator_state())
+    )
+
+    assert errors == []
+
+
+def test_validate_orchestrator_state_text_accepts_promotion_receipt_namespace() -> None:
+    """Allow the additive promotion receipt namespace without normalizing values."""
+
+    errors = validator.validate_orchestrator_state_text(
+        json.dumps(build_namespaced_orchestrator_state())
+    )
+
+    assert errors == []
+
+
 def test_validate_orchestrator_state_text_rejects_json_root_that_is_not_an_object() -> (
     None
 ):
@@ -267,15 +349,36 @@ def test_validate_orchestrator_state_text_rejects_json_root_that_is_not_an_objec
     assert errors == ["Checkpoint root must be a JSON object."]
 
 
-def test_validate_orchestrator_state_text_rejects_nonlist_delegation_receipts() -> None:
-    """Reject non-list delegation receipt collections."""
+def test_validate_orchestrator_state_rejects_noncontainer_receipts() -> None:
+    """Reject scalar delegation receipt payloads that are not containers."""
 
     state = build_valid_orchestrator_state()
     state["delegation_receipts"] = "invalid"
 
     errors = validator.validate_orchestrator_state_text(json.dumps(state))
 
-    assert any("delegation_receipts must be a list" in error for error in errors)
+    assert any(
+        "delegation_receipts must be a list or object namespace" in error
+        for error in errors
+    )
+
+
+def test_validate_orchestrator_state_rejects_unknown_promotion_receipt_keys() -> None:
+    """Reject nested promotion receipt keys outside the documented namespace."""
+
+    state = build_namespaced_orchestrator_state()
+    promotion = cast(
+        "dict[str, object]",
+        cast("dict[str, object]", state["delegation_receipts"])["promotion"],
+    )
+    promotion["extra_key"] = {"unexpected": True}
+
+    errors = validator.validate_orchestrator_state_text(json.dumps(state))
+
+    assert any(
+        "delegation_receipts.promotion contains unsupported key: extra_key" in error
+        for error in errors
+    )
 
 
 def test_validate_orchestrator_state_text_rejects_receipt_missing_result_signal() -> (

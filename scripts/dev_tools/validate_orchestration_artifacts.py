@@ -1,124 +1,76 @@
 """Validate orchestration plan, review, and checkpoint artifacts.
 
 Purpose:
-    Provide a fail-closed validator for deterministic orchestration contracts so
-    plan approval, review completion, and checkpoint completion can rely on
-    schema checks instead of narrative judgment.
+    Provide the stable CLI entrypoint for deterministic orchestration artifact
+    validation while delegating review- and checkpoint-specific logic to smaller
+    modules that remain under the repository file-size limit.
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, cast
+
+from scripts.dev_tools.validate_orchestration_review_artifacts import (
+    validate_code_review_text,
+    validate_feature_audit_text,
+    validate_policy_audit_text,
+)
+from scripts.dev_tools.validate_orchestrator_state import (
+    validate_orchestrator_state_text,
+)
 
 PLAN_PHASE_RE = re.compile(r"^### Phase (?P<phase>\d+) — (?P<title>.+)$")
 PLAN_TASK_RE = re.compile(
     r"^- \[(?P<state>[ xX])\] \[P(?P<phase>\d+)-T(?P<task>\d+)\] (?P<title>.+)$"
 )
-COVERAGE_PERCENT_RE = re.compile(r"\b\d+(?:\.\d+)?%")
-
-POLICY_AUDIT_REQUIRED_HEADINGS = (
-    "## Executive Summary",
-    "## 1. General Unit Test Policy Compliance",
-    "## 2. General Code Change Policy Compliance",
-    "## 3. Language-Specific Code Change Policy Compliance",
-    "## 4. Language-Specific Unit Test Policy Compliance",
-    "## 5. Test Coverage Detail",
-    "## 6. Test Execution Metrics",
-    "## 7. Code Quality Checks",
-    "## 8. Gaps and Exceptions",
-    "## 9. Summary of Changes",
-    "## 10. Compliance Verdict",
-    "## Appendix A: Test Inventory",
-    "## Appendix B: Toolchain Commands Reference",
-)
-POLICY_AUDIT_REQUIRED_CHECKLIST_LABELS = (
-    "TypeScript baseline coverage artifact:",
-    "TypeScript post-change coverage artifact:",
-    "PowerShell baseline coverage artifact:",
-    "PowerShell post-change coverage artifact:",
-    "Per-language comparison summary:",
-)
-POLICY_AUDIT_COMPARISON_HEADING = "### 1.2.1 Per-Language Coverage Comparison"
-CODE_REVIEW_REQUIRED_HEADINGS = (
-    "## Executive Summary",
-    "## Findings Table",
-)
-FEATURE_AUDIT_REQUIRED_HEADINGS = (
-    "## Scope and Baseline",
-    "## Acceptance Criteria Inventory",
-    "## Acceptance Criteria Evaluation",
-    "## Summary",
-    "## Acceptance Criteria Check-off",
-)
-REQUIRED_STATE_KEYS = (
-    "objective",
-    "change_budget_estimate",
-    "path_selected",
-    "promotion-type",
-    "short-name",
-    "relativeFile",
-    "long-name",
-    "issue-num",
-    "feature-folder",
-    "work-mode",
-    "plan-path",
-    "completed_steps",
-    "next_step",
-    "last_updated",
-    "step5_status",
-    "step6_status",
-    "step7_status",
-    "step8_status",
-    "step9_status",
-    "step10_status",
-    "delegation_receipts",
-    "blocked_reason",
-)
-VALID_STEP_STATUS = {"not-applicable", "pending", "delegated", "verified", "blocked"}
-VALID_BLOCKED_REASONS = {
-    "none",
-    "spawn_agent_unavailable",
-    "delegation_launch_failed",
-    "delegate_no_receipt",
-    "delegate_contract_incomplete",
-    "validator_failed",
-    "user_requested_stop",
-}
-REQUIRED_RECEIPT_KEYS = (
-    "step",
-    "agent_name",
-    "agent_id",
-    "skill_source",
-    "started_at",
-    "completed_at",
-    "result_signal",
-    "artifact_paths",
-)
-PLACEHOLDER_MARKERS = (
-    "[n]",
-    "[path",
-    "[artifact",
-    "[section reference",
-    "[language]",
-    "tbd",
-    "unverified",
-    "missing",
-)
 
 
 def _read_text(path: Path) -> str:
-    """Read a UTF-8 artifact from disk."""
+    """Read a UTF-8 artifact from disk.
+
+    Purpose:
+        Centralize file reading for the CLI dispatcher and monkeypatched unit
+        tests.
+
+    Args:
+        path (Path): Artifact path to read.
+
+    Returns:
+        str: UTF-8 text content for the requested artifact.
+
+    Raises:
+        OSError: Raised when the file cannot be read.
+
+    Side Effects:
+        Reads from disk.
+    """
 
     return path.read_text(encoding="utf-8")
 
 
 def validate_plan_text(text: str) -> list[str]:
-    """Validate canonical atomic-plan structure."""
+    """Validate canonical atomic-plan structure.
+
+    Purpose:
+        Enforce the repository's required phase and task formatting for atomic
+        execution plans.
+
+    Args:
+        text (str): Full plan document text.
+
+    Returns:
+        list[str]: Validation errors describing any structural contract
+        violations.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
 
     errors: list[str] = []
     current_phase: int | None = None
@@ -126,6 +78,8 @@ def validate_plan_text(text: str) -> list[str]:
     expected_task_num: dict[int, int] = {}
     found_task = False
 
+    # Walk the document in source order so numbering and phase mismatches are
+    # reported against the same line numbers a maintainer sees in the plan.
     for line_number, line in enumerate(text.splitlines(), start=1):
         if line.startswith("### Phase "):
             match = PLAN_PHASE_RE.match(line)
@@ -179,323 +133,26 @@ def validate_plan_text(text: str) -> list[str]:
     return errors
 
 
-def _has_numeric_coverage(value: str) -> bool:
-    """Return True when a coverage value contains a numeric percentage."""
-
-    return COVERAGE_PERCENT_RE.search(value) is not None
-
-
-def _is_na_value(value: str) -> bool:
-    """Return True when an audit field explicitly records not-applicable."""
-
-    return value.strip().lower().startswith("n/a")
-
-
-def _has_placeholder_marker(value: str) -> bool:
-    """Return True when an audit field still contains template placeholders."""
-
-    lowered = value.lower()
-    return any(marker in lowered for marker in PLACEHOLDER_MARKERS)
-
-
-def _extract_policy_audit_coverage_rows(text: str) -> list[dict[str, str]]:
-    """Parse the coverage metrics table rows from a policy audit."""
-
-    rows: list[dict[str, str]] = []
-    for line in text.splitlines():
-        if not line.startswith("|"):
-            continue
-        cells = [cell.strip() for cell in line.split("|")[1:-1]]
-        if len(cells) != 7:
-            continue
-        language = cells[0]
-        if language in {"Language", "----------"} or not language:
-            continue
-        if set(language) == {"-"}:
-            continue
-        rows.append(
-            {
-                "Language": language,
-                "Files Changed": cells[1],
-                "Tests": cells[2],
-                "Test Result": cells[3],
-                "Baseline Coverage": cells[4],
-                "Post-Change Coverage": cells[5],
-                "New Code Coverage": cells[6],
-            }
-        )
-    return rows
-
-
-def _find_policy_audit_checklist_line(text: str, label: str) -> str | None:
-    """Return the checklist line containing the provided label, if present."""
-
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("- ") and label in stripped:
-            return stripped
-    return None
-
-
-def _extract_policy_audit_comparison_lines(text: str) -> dict[str, str]:
-    """Return per-language comparison lines keyed by normalized language name."""
-
-    in_section = False
-    comparison_lines: dict[str, str] = {}
-
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped == POLICY_AUDIT_COMPARISON_HEADING:
-            in_section = True
-            continue
-        if in_section and stripped.startswith("### "):
-            break
-        if not in_section or not stripped.startswith("- "):
-            continue
-        language, separator, _ = stripped[2:].partition(":")
-        if not separator:
-            continue
-        comparison_lines[language.strip().lower()] = stripped
-
-    return comparison_lines
-
-
-def _comparison_line_has_labelled_percentage(line: str, label: str) -> bool:
-    """Return True when the line contains a numeric percentage after a label."""
-
-    pattern = re.compile(rf"{re.escape(label)}.*?\d+(?:\.\d+)?%")
-    return pattern.search(line) is not None
-
-
-def validate_policy_audit_substantive_requirements(text: str) -> list[str]:
-    """Validate policy-audit evidence requirements beyond headings."""
-
-    errors: list[str] = []
-
-    for label in POLICY_AUDIT_REQUIRED_CHECKLIST_LABELS:
-        line = _find_policy_audit_checklist_line(text, label)
-        if line is None:
-            errors.append(f"Policy audit missing required checklist line: {label}")
-            continue
-        if _has_placeholder_marker(line):
-            errors.append(
-                f"Policy audit checklist line still contains placeholder text: {label}"
-            )
-
-    coverage_rows = _extract_policy_audit_coverage_rows(text)
-    if not coverage_rows:
-        errors.append("Policy audit missing coverage metrics table rows.")
-
-    if POLICY_AUDIT_COMPARISON_HEADING not in text:
-        errors.append(
-            "Policy audit missing required heading: "
-            f"{POLICY_AUDIT_COMPARISON_HEADING}"
-        )
-
-    comparison_lines = _extract_policy_audit_comparison_lines(text)
-    for row in coverage_rows:
-        language = row["Language"]
-        baseline = row["Baseline Coverage"]
-        post_change = row["Post-Change Coverage"]
-        new_code = row["New Code Coverage"]
-        requires_coverage_comparison = any(
-            not _is_na_value(value) for value in (baseline, post_change, new_code)
-        )
-
-        if not _is_na_value(baseline) and not _has_numeric_coverage(baseline):
-            errors.append(
-                f"Policy audit missing numeric baseline coverage for {language}."
-            )
-        if not _is_na_value(post_change) and not _has_numeric_coverage(post_change):
-            errors.append(
-                f"Policy audit missing numeric post-change coverage for {language}."
-            )
-        if not _is_na_value(new_code) and not _has_numeric_coverage(new_code):
-            errors.append(
-                f"Policy audit missing numeric new/changed-code coverage for "
-                f"{language}."
-            )
-
-        if not requires_coverage_comparison:
-            continue
-
-        comparison_line = comparison_lines.get(language.lower())
-        if comparison_line is None:
-            errors.append(
-                "Policy audit missing per-language comparison line for " f"{language}."
-            )
-            continue
-
-        if not _comparison_line_has_labelled_percentage(comparison_line, "Baseline:"):
-            errors.append(
-                f"Policy audit comparison line missing numeric baseline for "
-                f"{language}."
-            )
-        if not _comparison_line_has_labelled_percentage(
-            comparison_line, "Post-change:"
-        ):
-            errors.append(
-                f"Policy audit comparison line missing numeric post-change "
-                f"coverage for {language}."
-            )
-        if "Change:" not in comparison_line:
-            errors.append(
-                f"Policy audit comparison line missing explicit change text for "
-                f"{language}."
-            )
-        if (
-            re.search(
-                r"Disposition:\s*(PASS|FAIL|N/A|INCOMPLETE|BLOCKED)",
-                comparison_line,
-            )
-            is None
-        ):
-            errors.append(
-                f"Policy audit comparison line missing disposition for " f"{language}."
-            )
-        if not _is_na_value(new_code) and not _comparison_line_has_labelled_percentage(
-            comparison_line, "New/changed-code coverage:"
-        ):
-            errors.append(
-                "Policy audit comparison line missing numeric new/changed-code "
-                f"coverage for {language}."
-            )
-        if "Evidence:" not in comparison_line:
-            errors.append(
-                f"Policy audit comparison line missing evidence reference for "
-                f"{language}."
-            )
-        elif _has_placeholder_marker(comparison_line):
-            errors.append(
-                "Policy audit comparison line still contains placeholder text for "
-                f"{language}."
-            )
-
-    return errors
-
-
-def validate_policy_audit_text(text: str) -> list[str]:
-    """Validate template-derived policy-audit structure."""
-
-    errors: list[str] = []
-    if "Template Usage Instructions" in text:
-        errors.append("Policy audit still contains the template instruction block.")
-    if "[Component Name]" in text:
-        errors.append("Policy audit still contains placeholder component text.")
-    for heading in POLICY_AUDIT_REQUIRED_HEADINGS:
-        if heading not in text:
-            errors.append(f"Policy audit missing required heading: {heading}")
-    errors.extend(validate_policy_audit_substantive_requirements(text))
-    return errors
-
-
-def validate_code_review_text(text: str) -> list[str]:
-    """Validate audit-grade code-review structure."""
-
-    errors: list[str] = []
-    for heading in CODE_REVIEW_REQUIRED_HEADINGS:
-        if heading not in text:
-            errors.append(f"Code review missing required heading: {heading}")
-    table_header = (
-        "| Severity | File | Location | Finding | Recommendation | "
-        "Rationale | Evidence |"
-    )
-    if table_header not in text:
-        errors.append("Code review missing the required findings table header.")
-    return errors
-
-
-def validate_feature_audit_text(text: str) -> list[str]:
-    """Validate feature-audit structure."""
-
-    errors: list[str] = []
-    for heading in FEATURE_AUDIT_REQUIRED_HEADINGS:
-        if heading not in text:
-            errors.append(f"Feature audit missing required heading: {heading}")
-    return errors
-
-
-def validate_orchestrator_state_text(
-    text: str, *, require_complete: bool = False
-) -> list[str]:
-    """Validate checkpoint schema and completion-state fields."""
-
-    errors: list[str] = []
-    try:
-        state = json.loads(text)
-    except json.JSONDecodeError as exc:
-        return [f"Checkpoint is not valid JSON: {exc}"]
-
-    if not isinstance(state, dict):
-        return ["Checkpoint root must be a JSON object."]
-    state_map = cast(dict[str, Any], state)
-
-    for key in REQUIRED_STATE_KEYS:
-        if key not in state_map:
-            errors.append(f"Checkpoint missing required key: {key}")
-
-    for key in (
-        "step5_status",
-        "step6_status",
-        "step7_status",
-        "step8_status",
-        "step9_status",
-        "step10_status",
-    ):
-        value = state_map.get(key)
-        if value is not None and value not in VALID_STEP_STATUS:
-            errors.append(f"Checkpoint has invalid {key}: {value}")
-
-    blocked_reason = state_map.get("blocked_reason")
-    if blocked_reason is not None and blocked_reason not in VALID_BLOCKED_REASONS:
-        errors.append(f"Checkpoint has invalid blocked_reason: {blocked_reason}")
-
-    receipts = state_map.get("delegation_receipts")
-    if receipts is not None and not isinstance(receipts, list):
-        errors.append("Checkpoint delegation_receipts must be a list.")
-    if isinstance(receipts, list):
-        typed_receipts = cast(list[object], receipts)
-        for index, receipt in enumerate(typed_receipts):
-            if not isinstance(receipt, dict):
-                errors.append(
-                    f"Checkpoint delegation receipt #{index} must be an object."
-                )
-                continue
-            for key in REQUIRED_RECEIPT_KEYS:
-                if key not in receipt:
-                    errors.append(
-                        f"Checkpoint delegation receipt #{index} missing key: {key}"
-                    )
-            artifact_paths = cast(dict[str, Any], receipt).get("artifact_paths")
-            if artifact_paths is not None and not isinstance(artifact_paths, list):
-                errors.append(
-                    "Checkpoint delegation receipt "
-                    f"#{index} artifact_paths must be a list."
-                )
-
-    if require_complete:
-        for key in (
-            "step5_status",
-            "step6_status",
-            "step7_status",
-            "step8_status",
-            "step9_status",
-            "step10_status",
-        ):
-            value = state_map.get(key)
-            if value in {"pending", "blocked"}:
-                errors.append(
-                    f"Checkpoint completion validation failed: {key} is {value}."
-                )
-        if state_map.get("blocked_reason") not in {None, "none"}:
-            errors.append(
-                "Checkpoint completion validation failed: blocked_reason is not `none`."
-            )
-    return errors
-
-
 def build_parser() -> argparse.ArgumentParser:
-    """Create the CLI parser."""
+    """Create the CLI parser.
+
+    Purpose:
+        Define the stable command-line contract for orchestration artifact
+        validation.
+
+    Args:
+        None.
+
+    Returns:
+        argparse.ArgumentParser: Configured parser for the supported artifact
+        types.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
 
     parser = argparse.ArgumentParser(
         description="Validate deterministic orchestration artifacts."
@@ -517,7 +174,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _validate_from_args(args: argparse.Namespace) -> list[str]:
-    """Dispatch the requested validator."""
+    """Dispatch the requested validator.
+
+    Purpose:
+        Route the parsed CLI request to the correct validator without changing
+        the public artifact-type names accepted by the entrypoint.
+
+    Args:
+        args (argparse.Namespace): Parsed CLI arguments.
+
+    Returns:
+        list[str]: Validation errors produced by the selected validator.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads the target artifact from disk.
+    """
 
     path = Path(args.path)
     text = _read_text(path)
@@ -537,7 +211,25 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Run the orchestration-artifact validator CLI."""
+    """Run the orchestration-artifact validator CLI.
+
+    Purpose:
+        Execute the stable CLI entrypoint that validates orchestration plans,
+        review artifacts, and checkpoint state.
+
+    Args:
+        argv (list[str] | None): Optional command-line arguments for testing or
+            programmatic invocation.
+
+    Returns:
+        int: Exit code `0` for success and `1` for validation failure.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads files from disk and writes validation results to stdout/stderr.
+    """
 
     parser = build_parser()
     args = parser.parse_args(argv)
