@@ -18,7 +18,7 @@
   - Primary: `artifacts/pr_context.summary.txt`
   - Secondary baseline diff: `artifacts/pr_context.appendix.txt`
   - Feature evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/`
-  - Additional evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
+  - Additional evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/other/p1-t6.post-refactor-line-count.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t4.python-pytest.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t5.python-coverage-comparison.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
 - **Feature folder used:** `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168`
 - **Requirements source:** `spec.md` and `user-story.md`
 - **Work mode resolution note:** `issue.md` explicitly declares `- Work Mode: full-feature`, so the authoritative acceptance-criteria sources for this review are `spec.md` and `user-story.md`.
@@ -81,7 +81,7 @@
 **Recommended follow-up verification steps:**
 
 1. Use the companion `policy-audit.2026-04-29T15-18.md` and `code-review.2026-04-29T15-18.md` as the authoritative merge-gate artifacts for policy readiness.
-2. After remediation of the oversized validator module and coverage gaps, refresh PR context again and rerun the review package.
+2. Commit the reviewed working-tree changes before the next PR-context refresh so future branch-level review artifacts show a non-empty commit range.
 
 ---
 

@@ -16,11 +16,11 @@ from pathlib import Path
 from scripts.dev_tools.validate_orchestration_review_artifacts import (
     validate_code_review_text,
     validate_feature_audit_text,
-    validate_policy_audit_text,
 )
 from scripts.dev_tools.validate_orchestrator_state import (
     validate_orchestrator_state_text,
 )
+from scripts.dev_tools.validate_policy_audit_artifact import validate_policy_audit_text
 
 PLAN_PHASE_RE = re.compile(r"^### Phase (?P<phase>\d+) — (?P<title>.+)$")
 PLAN_TASK_RE = re.compile(

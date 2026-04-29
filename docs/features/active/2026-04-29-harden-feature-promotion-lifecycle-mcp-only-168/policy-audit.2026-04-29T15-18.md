@@ -1,13 +1,13 @@
 # Policy Compliance Audit: harden feature promotion lifecycle MCP-only (Issue #168)
 
 **Audit Date:** 2026-04-29  
-**Code Under Test:** `.claude/skills/feature-promotion-lifecycle/SKILL.md`, `.claude/settings.json`, `.claude/hooks/enforce-promotion-mcp-only.ps1`, `.claude/agents/orchestrator.md`, `scripts/dev_tools/validate_orchestration_artifacts.py`, `scripts/dev_tools/validate_orchestration_review_artifacts.py`, `scripts/dev_tools/validate_orchestrator_state.py`, `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1`, `tests/scripts/claude-runtime/claude-settings.Tests.ps1`, `tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`, `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`
+**Code Under Test:** `.claude/skills/feature-promotion-lifecycle/SKILL.md`, `.claude/settings.json`, `.claude/hooks/enforce-promotion-mcp-only.ps1`, `.claude/agents/orchestrator.md`, `scripts/dev_tools/validate_orchestration_artifacts.py`, `scripts/dev_tools/validate_orchestration_review_artifacts.py`, `scripts/dev_tools/validate_policy_audit_artifact.py`, `scripts/dev_tools/validate_orchestrator_state.py`, `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1`, `tests/scripts/claude-runtime/claude-settings.Tests.ps1`, `tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`, `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`, `tests/scripts/dev_tools/test_validate_policy_audit_artifact.py`, `tests/scripts/dev_tools/test_validate_orchestrator_state.py`
 
 **Coverage Metrics by Language:**
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
 |----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
-| Python | 3 files | 29 tests | ✅ 29 pass, 0 fail | 87% lines | 87% lines | 87% |
+| Python | 4 files | 44 tests | ✅ 44 pass, 0 fail | 87% lines | 93% lines | 90% |
 | PowerShell | 3 files | 72 tests | ✅ 72 pass, 0 fail | 96.83% line coverage | 96.83% line coverage | N/A - generated coverage report does not expose a numeric changed-file metric |
 | JSON | 1 file | N/A | ✅ validation | N/A (config files) | N/A (config files) | N/A |
 
@@ -17,7 +17,7 @@
 - TypeScript post-change coverage artifact: `N/A - out of scope`
 - PowerShell baseline coverage artifact: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/powershell-test.2026-04-29T08-56.md`
 - PowerShell post-change coverage artifact: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-test.2026-04-29T08-56.md`
-- Per-language comparison summary: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/python-coverage-comparison.2026-04-29T08-56.md` and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-coverage-comparison.2026-04-29T08-56.md`
+- Per-language comparison summary: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t5.python-coverage-comparison.2026-04-29T15-18.md` and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-coverage-comparison.2026-04-29T08-56.md`
 
 **Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
 
@@ -29,9 +29,9 @@
 
 ## Executive Summary
 
-This rerun supersedes the earlier 2026-04-29T13-55 review package after refreshing PR context against `development` and re-checking the working tree. The feature behavior remains implemented and acceptance evidence remains intact, but the earlier review package was materially inaccurate on one merge gate: `scripts/dev_tools/validate_orchestration_review_artifacts.py` is currently 516 lines, so the repository's 500-line production-file rule is still violated.
+This rerun supersedes the earlier 2026-04-29T13-55 review package after refreshing PR context against `development`, re-checking the working tree, and executing the remediation plan through the final Python QA loop. The prior blockers are now resolved: `scripts/dev_tools/validate_orchestration_review_artifacts.py` was reduced to 99 lines, the new `scripts/dev_tools/validate_policy_audit_artifact.py` module remains below the 500-line cap at 448 lines, and the focused Python coverage evidence now meets the repository's 90% new-module target.
 
-The rerun also confirms that the workspace validator entrypoint accepts the live checkpoint shape and that the current review artifacts validate structurally. The overall policy result is **non-compliant** because the oversized production file remains and the new split Python modules are still below the repository's 90% coverage target for new modules.
+The rerun also confirms that the stable workspace validator entrypoint accepts the live checkpoint shape, the additive `delegation_receipts.promotion.*` namespace remains valid, and the current review artifacts validate structurally. The overall policy result is **compliant** because the file-size and Python coverage merge gates now pass with refreshed evidence.
 
 **Policy documents evaluated:**
 - [✅] `general-code-change.instructions.md`
@@ -66,9 +66,9 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Baseline Coverage Documented** | [✅] [PASS] | Baseline Python and PowerShell evidence exists under `evidence/baseline/` for this feature folder. |
-| **No Coverage Regression** | [✅] [PASS] | Python remained `87% -> 87%`. PowerShell remained `96.83% -> 96.83%` per the baseline and QA comparison artifacts. |
-| **New Code Coverage ≥90%** | [❌] [FAIL] | `scripts/dev_tools/validate_orchestration_review_artifacts.py` and `scripts/dev_tools/validate_orchestrator_state.py` remain below the repository target at 87% and 83% in the QA evidence. |
-| **Comprehensive Coverage** | [⚠️] [PARTIAL] | The validator and hook behavior are well covered, but the uncovered branches in the two new Python modules keep new-module coverage below policy target. |
+| **No Coverage Regression** | [✅] [PASS] | Python improved from `87% -> 93%` total coverage in the focused QA evidence, and PowerShell remained `96.83% -> 96.83%` per the stored comparison artifacts. |
+| **New Code Coverage ≥90%** | [✅] [PASS] | `validate_orchestration_review_artifacts.py` now measures 100%, `validate_policy_audit_artifact.py` measures 90%, and `validate_orchestrator_state.py` measures 97% in `p3-t4.python-pytest.2026-04-29T15-18.md`. |
+| **Comprehensive Coverage** | [✅] [PASS] | The refreshed Python tests now cover the split policy-audit and orchestrator-state defensive branches sufficiently to satisfy the repository threshold. |
 | **Positive Flows** - Valid inputs | [✅] [PASS] | Positive tests cover the MCP-only skill wording, benign Bash commands, legacy receipt validation, namespaced receipt validation, and the workspace validator CLI path. |
 | **Negative Flows** - Invalid inputs | [✅] [PASS] | Negative tests cover each forbidden promotion token, scalar receipt rejection, and unsupported receipt-key rejection. |
 | **Edge Cases** - Boundary conditions | [✅] [PASS] | The validator tests cover both legacy list receipts and additive namespaced receipts, and the hook allows empty or benign command input. |
@@ -78,7 +78,7 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 
 ### 1.2.1 Per-Language Coverage Comparison
 
-- Python: Baseline: 87% lines -> Post-change: 87% lines. Change: +0% lines. New/changed-code coverage: 87%. Disposition: FAIL. Evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/python-pytest.2026-04-29T10-52.md`.
+- Python: Baseline: 87% lines -> Post-change: 93% lines. Change: +6% lines. New/changed-code coverage: 90%. Disposition: PASS. Evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t4.python-pytest.2026-04-29T15-18.md`; `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t5.python-coverage-comparison.2026-04-29T15-18.md`.
 - PowerShell: Baseline: 96.83% line coverage -> Post-change: 96.83% line coverage. Change: +0%. New/changed-code coverage: `N/A - generated report does not provide a numeric changed-file metric`. Disposition: PASS. Evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-coverage-comparison.2026-04-29T08-56.md`.
 
 ### 1.3 Test Structure and Diagnostics
@@ -129,7 +129,7 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Cohesive modules** | [✅] [PASS] | The touched files still have single, clear responsibilities. |
-| **Under 500 lines** | [❌] [FAIL] | `pwsh` line-count check on 2026-04-29 reported `.claude/hooks/enforce-promotion-mcp-only.ps1` = 147, `scripts/dev_tools/validate_orchestration_artifacts.py` = 246, `scripts/dev_tools/validate_orchestration_review_artifacts.py` = 516, and `scripts/dev_tools/validate_orchestrator_state.py` = 287. The 500-line production-file rule is therefore still violated. |
+| **Under 500 lines** | [✅] [PASS] | `p1-t6.post-refactor-line-count.2026-04-29T15-18.md` records `.claude/hooks/enforce-promotion-mcp-only.ps1` below the limit and the Python validator files at `246`, `99`, `448`, and `289` lines respectively, so no production file in scope exceeds `499`. |
 | **Public vs internal** | [✅] [PASS] | The public CLI entrypoint remains `scripts.dev_tools.validate_orchestration_artifacts`; helper modules remain internal implementation detail. |
 | **No circular dependencies** | [✅] [PASS] | The current split uses one-way imports from the entrypoint into helper modules and no circular dependency was observed in the reviewed scope. |
 
@@ -145,11 +145,11 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **1. Formatting** | [✅] [PASS] | **Command:** `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
-| **2. Linting** | [✅] [PASS] | **Command:** `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
-| **3. Type checking** | [✅] [PASS] | **Command:** `poetry run pyright`.<br>**Result:** Existing QA evidence records `0 errors, 0 warnings, 0 informations`. |
-| **4. Testing** | [✅] [PASS] | **Command:** `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` plus the recorded PowerShell QA loop.<br>**Result:** Existing QA evidence records passing runs. |
-| **Full toolchain loop** | [✅] [PASS] | The feature folder already contains clean final QA-loop evidence for the implementation scope. |
+| **1. Formatting** | [✅] [PASS] | **Command:** `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_policy_audit_artifact.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** `p3-t1.python-black.2026-04-29T15-18.md` records a clean final pass. |
+| **2. Linting** | [✅] [PASS] | **Command:** `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_policy_audit_artifact.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** `p3-t2.python-ruff.2026-04-29T15-18.md` records a clean final pass. |
+| **3. Type checking** | [✅] [PASS] | **Command:** `poetry run pyright`.<br>**Result:** `p3-t3.python-pyright.2026-04-29T15-18.md` records `0 errors, 0 warnings, 0 informations`. |
+| **4. Testing** | [✅] [PASS] | **Command:** `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_policy_audit_artifact --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` plus the recorded PowerShell QA loop.<br>**Result:** `p3-t4.python-pytest.2026-04-29T15-18.md` records 44 passing Python tests and the refreshed coverage metrics. |
+| **Full toolchain loop** | [✅] [PASS] | The feature folder now contains refreshed final QA-loop evidence for the implementation scope, including the remediation rerun artifacts `p3-t1` through `p3-t7`. |
 | **Explicit reporting** | [✅] [PASS] | The commands and evidence paths are documented in this rerun and in the feature-folder evidence artifacts. |
 
 ### 2.6 Summarize and Document
@@ -159,7 +159,7 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 | **Summarize changes** | [✅] [PASS] | The feature folder documents the Claude-side MCP-only hardening work and the validator split. |
 | **Design choices explained** | [✅] [PASS] | The feature docs explain the MCP-only contract and the additive receipt-namespace design. |
 | **Update supporting documents** | [✅] [PASS] | The active feature folder contains issue, spec, user story, plan, evidence, and rerun review artifacts. |
-| **Provide next steps** | [❌] [FAIL] | The reviewed working tree still needs remediation for the oversized production file and new-module coverage shortfall before merge. |
+| **Provide next steps** | [✅] [PASS] | The reviewed working tree now has refreshed remediation evidence, validated review artifacts, and a clear merge-ready audit package. |
 
 ---
 
@@ -259,7 +259,7 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Use Pytest** | [✅] [PASS] | The reviewed Python tests run under Pytest. |
-| **Coverage expectation** | [❌] [FAIL] | Repo-wide coverage remains above 80%, but the two new Python modules remain below the 90% new-module target. |
+| **Coverage expectation** | [✅] [PASS] | Repo-wide coverage remains above 80%, and the refreshed focused evidence shows the tracked Python validator modules at 100%, 90%, and 97% respectively. |
 
 #### 4A.2 Test Style and Structure
 
@@ -333,9 +333,9 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 | `test_validate_orchestrator_state_rejects_unknown_promotion_receipt_keys` | Negative | Unsupported nested-key rejection | ✅ |
 | `test_claude_feature_promotion_lifecycle_requires_mcp_preflight` | Contract | MCP-only wording contract | ✅ |
 
-**Coverage:** `scripts/dev_tools/validate_orchestration_artifacts.py` 90.48%, `scripts/dev_tools/validate_orchestration_review_artifacts.py` 87.02%, and `scripts/dev_tools/validate_orchestrator_state.py` 83.33% per the current `coverage.xml` and feature-folder QA evidence.
+**Coverage:** `scripts/dev_tools/validate_orchestration_artifacts.py` 91%, `scripts/dev_tools/validate_orchestration_review_artifacts.py` 100%, `scripts/dev_tools/validate_policy_audit_artifact.py` 90%, and `scripts/dev_tools/validate_orchestrator_state.py` 97% per `p3-t4.python-pytest.2026-04-29T15-18.md`.
 
-**Not covered:** Defensive edge paths in `validate_orchestration_review_artifacts.py` and `validate_orchestrator_state.py` remain unexecuted in the focused suite.
+**Not covered:** A small number of defensive policy-audit branches remain unexecuted, but the refreshed module coverage satisfies the repository threshold for each tracked Python validator module.
 
 ### PowerShell hook coverage
 
@@ -355,15 +355,15 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Total Tests | 29 reviewed Python tests plus 72 recorded PowerShell tests | ✅ |
-| Tests Passed | 29/29 Python; 72/72 PowerShell | ✅ |
+| Total Tests | 44 reviewed Python tests plus 72 recorded PowerShell tests | ✅ |
+| Tests Passed | 44/44 Python; 72/72 PowerShell | ✅ |
 | Tests Failed | 0 in the recorded evidence | ✅ |
-| Execution Time | 0.16s for the focused Python suite | ✅ Fast |
+| Execution Time | 0.21s for the focused Python suite | ✅ Fast |
 | Average Time per Test | N/A - mixed runners and stored evidence | ✅ |
 | Discovery Time | N/A - not surfaced in the stored evidence | ✅ |
 | Functions/Classes Tested | Multiple validator and hook behaviors across the changed scope | ✅ |
 | Test File Size | The changed test files remain under the repository size limit | ✅ |
-| Code Coverage (if applicable) | Python new-module coverage remains below policy target | ❌ |
+| Code Coverage (if applicable) | Python validator-module coverage meets or exceeds the repository target | ✅ |
 
 ---
 
@@ -373,10 +373,10 @@ The rerun also confirms that the workspace validator entrypoint accepts the live
 
 | Check | Command | Result | Status |
 |-------|---------|--------|--------|
-| Black Formatting | `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in QA evidence | ✅ |
-| Ruff Linting | `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in QA evidence | ✅ |
+| Black Formatting | `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_policy_audit_artifact.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in `p3-t1.python-black.2026-04-29T15-18.md` | ✅ |
+| Ruff Linting | `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_policy_audit_artifact.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in `p3-t2.python-ruff.2026-04-29T15-18.md` | ✅ |
 | Pyright Type Checking | `poetry run pyright` | Clean final pass recorded in QA evidence | ✅ |
-| Pytest Tests | `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` | `29 passed in 0.16s` recorded in QA evidence | ✅ |
+| Pytest Tests | `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_policy_audit_artifact.py tests/scripts/dev_tools/test_validate_orchestrator_state.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_policy_audit_artifact --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` | `44 passed in 0.21s` recorded in `p3-t4.python-pytest.2026-04-29T15-18.md` | ✅ |
 
 **For PowerShell:**
 
@@ -394,8 +394,7 @@ The rerun additionally verified these current-session checks: refreshed PR conte
 ## 8. Gaps and Exceptions
 
 ### Identified Gaps
-- `scripts/dev_tools/validate_orchestration_review_artifacts.py` remains 516 lines, which violates the repository 500-line production-file limit.
-- `scripts/dev_tools/validate_orchestration_review_artifacts.py` and `scripts/dev_tools/validate_orchestrator_state.py` remain below the repository 90% coverage target for new modules.
+- None in the reviewed implementation scope. The remediation evidence resolves the prior file-size and Python coverage blockers.
 
 ### Approved Exceptions
 **None.** No policy exceptions were approved for the reviewed scope.
@@ -428,22 +427,25 @@ The refreshed PR context against `development` shows no commits in range because
 5. **`scripts/dev_tools/validate_orchestration_artifacts.py`** (MODIFIED)
    - Remains the stable CLI entrypoint for orchestration-artifact validation.
 
-6. **`scripts/dev_tools/validate_orchestration_review_artifacts.py`** (NEW)
-   - Holds review-artifact validation helpers and currently remains oversized at 516 lines.
+6. **`scripts/dev_tools/validate_orchestration_review_artifacts.py`** (MODIFIED)
+   - Retains the code-review and feature-audit validators locally and re-exports policy-audit validation from the split helper module at 99 lines.
 
-7. **`scripts/dev_tools/validate_orchestrator_state.py`** (NEW)
-   - Holds orchestrator-state and receipt-namespace validation helpers.
+7. **`scripts/dev_tools/validate_policy_audit_artifact.py`** (NEW)
+   - Holds the extracted policy-audit parsing and substantive validation logic while remaining below the repository file-size limit.
 
-8. **PowerShell and Python test files** (MODIFIED)
-   - Preserve the hook and validator contracts under the new layout.
+8. **`scripts/dev_tools/validate_orchestrator_state.py`** (MODIFIED)
+   - Holds orchestrator-state and receipt-namespace validation helpers with refreshed focused coverage.
+
+9. **PowerShell and Python test files** (MODIFIED)
+   - Preserve the hook and validator contracts under the new layout and now cover the remediation branches that lifted the split validators to the repository coverage target.
 
 ---
 
 ## 10. Compliance Verdict
 
-### Overall Status: ❌ NON-COMPLIANT
+### Overall Status: ✅ COMPLIANT
 
-The feature behavior is present and the acceptance criteria are satisfied, but the reviewed working tree is not policy-compliant because one production Python file still exceeds 500 lines and two new Python modules remain below the repository's new-module coverage target.
+The feature behavior is present, the acceptance criteria are satisfied, the oversized validator module was split below the repository limit, and the refreshed Python evidence lifts each tracked validator module to the required coverage threshold.
 
 **Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is missing.
 
@@ -454,10 +456,10 @@ The feature behavior is present and the acceptance criteria are satisfied, but t
 #### General Code Change Policy (Section 2)
 - [✅] Before Making Changes: Planning artifacts exist.
 - [✅] Design Principles: The scope remains narrow and additive.
-- [❌] Module & File Structure: `validate_orchestration_review_artifacts.py` remains above 500 lines.
+- [✅] Module & File Structure: All production files in scope remain below the repository 500-line limit.
 - [✅] Naming, Docs, Comments: Clear and contract-oriented.
 - [✅] Toolchain Execution: Existing QA evidence is complete.
-- [❌] Summarize & Document: The implementation still needs remediation before merge.
+- [✅] Summarize & Document: The implementation now has refreshed remediation, QA, and review artifacts for merge review.
 
 #### Language-Specific Code Change Policy (Section 3)
 
@@ -474,7 +476,7 @@ The feature behavior is present and the acceptance criteria are satisfied, but t
 
 #### General Unit Test Policy (Section 1)
 - [✅] Core Principles: Independent, deterministic, and focused.
-- [❌] Coverage & Scenarios: New-module coverage remains below 90%.
+- [✅] Coverage & Scenarios: New-module coverage now meets the repository threshold.
 - [✅] Test Structure: Clear and maintainable.
 - [✅] External Dependencies: None.
 - [✅] Policy Audit: This rerun fulfills the review requirement.
@@ -485,7 +487,7 @@ The feature behavior is present and the acceptance criteria are satisfied, but t
 - [✅] Framework & Scope: Pytest used correctly.
 - [✅] Test Style & Structure: Focused on contracts and validator behavior.
 - [✅] Naming & Readability: Descriptive.
-- [❌] Toolchain: Coverage target for new modules is still unmet.
+- [✅] Toolchain: The refreshed QA loop passes and the coverage target for tracked validator modules is met.
 
 **For PowerShell:**
 - [✅] Framework & Scope: Pester through PoshQC.
@@ -497,19 +499,19 @@ The feature behavior is present and the acceptance criteria are satisfied, but t
 
 ### Metrics Summary
 
-- [✅] 29/29 focused Python tests passing in the recorded QA evidence.
+- [✅] 44/44 focused Python tests passing in the recorded QA evidence.
 - [✅] 72/72 PowerShell tests passing in the recorded QA evidence.
-- [❌] One production file remains above the 500-line limit: `scripts/dev_tools/validate_orchestration_review_artifacts.py` at 516 lines.
-- [❌] New Python modules remain below the repository 90% coverage target: 87.02% and 83.33%.
+- [✅] The split Python validator files now remain under the 500-line limit: `validate_orchestration_artifacts.py` 246, `validate_orchestration_review_artifacts.py` 99, `validate_policy_audit_artifact.py` 448, and `validate_orchestrator_state.py` 289.
+- [✅] The tracked Python validator modules now meet the repository coverage target: 100%, 90%, and 97%.
 - [✅] The current review artifacts and workspace validator entrypoint both validate successfully for their intended scopes.
 
 ---
 
 ### Recommendation
 
-**Needs revision**
+**Ready for merge review**
 
-Reduce `scripts/dev_tools/validate_orchestration_review_artifacts.py` below 500 lines and add targeted tests that raise the two new Python modules to the repository's 90% new-module coverage target before merge.
+Use this refreshed policy audit together with the companion `code-review.2026-04-29T15-18.md` and `feature-audit.2026-04-29T15-18.md` artifacts as the current evidence package for normal PR review.
 
 ---
 
