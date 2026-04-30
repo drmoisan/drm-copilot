@@ -2,9 +2,9 @@
 
 ## Source review artifacts
 
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md`
 
 ## Enumerated fix list
 
@@ -13,9 +13,9 @@
    - **Expected behavior:** The review-artifact validation logic remains functionally identical, the public CLI entrypoint and artifact-type names remain unchanged, and every touched production file is below 500 lines.
    - **Verification commands:**
      - `pwsh -NoProfile -Command "foreach ($path in @('scripts/dev_tools/validate_orchestration_artifacts.py','scripts/dev_tools/validate_orchestration_review_artifacts.py','scripts/dev_tools/validate_orchestrator_state.py')) { $count = (Get-Content -Path $path).Count; Write-Output (\"$path`t$count\") }"`
-     - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`
-     - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
-     - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md`
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md`
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md`
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md`
 
 2. **Raise the new Python modules to the repository coverage target**
    - **Files:** `scripts/dev_tools/validate_orchestration_review_artifacts.py`, `scripts/dev_tools/validate_orchestrator_state.py`, `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`, and any direct helper-test modules created to cover the remaining branches

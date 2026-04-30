@@ -8,9 +8,9 @@ This remediation plan addresses the post-implementation review finding that `scr
 
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-plan.2026-04-29T13-55.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-inputs.2026-04-29T13-55.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T13-55.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T13-55.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/policy-audit.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/code-review.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/issue.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/spec.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/user-story.md`
@@ -22,9 +22,9 @@ This remediation plan addresses the post-implementation review finding that `scr
 - `scripts/dev_tools/validate_orchestrator_state.py`
 - `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`
 - `tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T13-55.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T13-55.md`
-- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/policy-audit.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/code-review.2026-04-29T13-55.md`
+- `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/spec.md`
 - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/user-story.md`
 
@@ -40,7 +40,7 @@ This remediation plan addresses the post-implementation review finding that `scr
 
 - [x] [P0-T1] Read the required repository policy files and the authoritative remediation inputs in order, then write `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/phase0-instructions-read.yyyy-MM-ddTHH-mm.md`.
 	- Preconditions: The feature folder inputs and repository instruction files exist at the paths listed above.
-	- Acceptance: The artifact exists under `evidence/baseline/` and includes `Timestamp:`, `Policy Order:`, and an explicit ordered list covering `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, `.github/instructions/self-explanatory-code-commenting.instructions.md`, `issue.md`, `spec.md`, `user-story.md`, `remediation-inputs.2026-04-29T13-55.md`, `policy-audit.2026-04-29T13-55.md`, `code-review.2026-04-29T13-55.md`, and `feature-audit.2026-04-29T13-55.md`.
+	- Acceptance: The artifact exists under `evidence/baseline/` and includes `Timestamp:`, `Policy Order:`, and an explicit ordered list covering `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, `.github/instructions/self-explanatory-code-commenting.instructions.md`, `issue.md`, `spec.md`, `user-story.md`, `remediation-inputs.2026-04-29T13-55.md`, `audit-2026-04-29T13-55/policy-audit.2026-04-29T13-55.md`, `audit-2026-04-29T13-55/code-review.2026-04-29T13-55.md`, and `audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md`.
 - [x] [P0-T2] Capture the current remediation file-state baseline for the validator, direct Python tests, and review artifacts in `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/remediation-file-state.yyyy-MM-ddTHH-mm.md`.
 	- Preconditions: [P0-T1] is complete.
 	- Acceptance: The artifact exists under `evidence/baseline/`, includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and the summary names the current `scripts/dev_tools/validate_orchestration_artifacts.py` line count plus the tracked remediation files.
@@ -89,15 +89,15 @@ This remediation plan addresses the post-implementation review finding that `scr
 
 ### Phase 3 — Refresh review artifacts
 
-- [x] [P3-T1] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T13-55.md` so it removes the 500-line file-size failure when the split succeeds and cites the refreshed Python baseline and final-QA evidence.
+- [x] [P3-T1] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/policy-audit.2026-04-29T13-55.md` so it removes the 500-line file-size failure when the split succeeds and cites the refreshed Python baseline and final-QA evidence.
 	- Preconditions: [P2-T4] completed with a clean Pytest pass.
-	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T13-55.md` exits with code 0, and the refreshed audit records the split validator files instead of the prior 615-line failure.
-- [x] [P3-T2] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T13-55.md` so its findings table and verdict reflect the split validator layout and the unchanged CLI and artifact-type contract.
+	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/policy-audit.2026-04-29T13-55.md` exits with code 0, and the refreshed audit records the split validator files instead of the prior 615-line failure.
+- [x] [P3-T2] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/code-review.2026-04-29T13-55.md` so its findings table and verdict reflect the split validator layout and the unchanged CLI and artifact-type contract.
 	- Preconditions: [P3-T1] is complete.
-	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T13-55.md` exits with code 0, and the refreshed review no longer reports the 500-line production-file violation.
-- [x] [P3-T3] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T13-55.md` and record the updated validator-dependent feature-review verification results.
+	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/code-review.2026-04-29T13-55.md` exits with code 0, and the refreshed review no longer reports the 500-line production-file violation.
+- [x] [P3-T3] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md` and record the updated validator-dependent feature-review verification results.
 	- Preconditions: [P3-T2] is complete.
-	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T13-55.md` exits with code 0, and the refreshed feature audit references the remediated validator split and the updated Python QA evidence.
+	- Acceptance: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md` exits with code 0, and the refreshed feature audit references the remediated validator split and the updated Python QA evidence.
 - [x] [P3-T4] Check off satisfied acceptance criteria in both `spec.md` and `user-story.md` for the `full-feature` work mode.
 	- Preconditions: [P3-T3] is complete.
-	- Acceptance: `user-story.md` checkbox-backed acceptance criteria reflect the delivered remediation status, and `spec.md` is reconciled according to its source format without inventing new checklist items; if `spec.md` still contains prose-only corroboration, the refreshed `feature-audit.2026-04-29T13-55.md` explicitly records that no checkbox edits were available there while preserving the satisfied full-feature acceptance evidence.
+	- Acceptance: `user-story.md` checkbox-backed acceptance criteria reflect the delivered remediation status, and `spec.md` is reconciled according to its source format without inventing new checklist items; if `spec.md` still contains prose-only corroboration, the refreshed `audit-2026-04-29T13-55/feature-audit.2026-04-29T13-55.md` explicitly records that no checkbox edits were available there while preserving the satisfied full-feature acceptance evidence.

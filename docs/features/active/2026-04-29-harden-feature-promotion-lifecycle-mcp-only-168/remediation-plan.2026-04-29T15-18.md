@@ -11,9 +11,9 @@ source_of_truth:
   - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/user-story.md"
   - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-inputs.2026-04-29T15-18.md"
 review_inputs:
-  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md"
-  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md"
-  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md"
+  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md"
+  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md"
+  - "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md"
 plan_path: "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-plan.2026-04-29T15-18.md"
 work_mode_source: "docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/issue.md"
 work_mode_marker: "- Work Mode: full-feature"
@@ -33,9 +33,9 @@ This remediation plan addresses the rerun findings recorded at `2026-04-29T15-18
 - Target plan path: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-plan.2026-04-29T15-18.md`
 - Authoritative remediation scope: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-inputs.2026-04-29T15-18.md`
 - Authoritative review context:
-  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`
-  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
-  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md`
+  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md`
+  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md`
+  - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md`
 - Work-mode source: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/issue.md`
 - Acceptance-criteria sources for `full-feature` mode:
   - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/spec.md`
@@ -78,9 +78,9 @@ This remediation plan addresses the rerun findings recorded at `2026-04-29T15-18
   - `pwsh -NoProfile -Command "foreach ($path in @('scripts/dev_tools/validate_orchestration_artifacts.py','scripts/dev_tools/validate_orchestration_review_artifacts.py','scripts/dev_tools/validate_policy_audit_artifact.py','scripts/dev_tools/validate_orchestrator_state.py')) { $count = (Get-Content -Path $path).Count; Write-Output (\"$path`t$count\") }"`
 - Use these exact review-refresh validation commands from the repository root:
   - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json`
-  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`
-  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`
-  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md`
+  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md`
+  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md`
+  - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md`
   - `mcp_drmcopilotext_collect_pr_context base=development`
 - If any final-QA step fails or changes files, restart the Python QA loop from `P3-T1`.
 
@@ -89,7 +89,7 @@ This remediation plan addresses the rerun findings recorded at `2026-04-29T15-18
 - [x] [P0-T1] Create the feature evidence directories `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/regression-testing/`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/other/`, and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/issue-updates/`.
   - Acceptance: All five directories exist at the exact paths named in this task.
 
-- [x] [P0-T2] Read the required policy and context files in this exact order and write `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/phase0-instructions-read.2026-04-29T15-18.md`: `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, `.github/instructions/self-explanatory-code-commenting.instructions.md`, `.github/instructions/tonality.instructions.md`, `AGENTS.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/issue.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/spec.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/user-story.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-inputs.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md`, and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md`.
+- [x] [P0-T2] Read the required policy and context files in this exact order and write `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/phase0-instructions-read.2026-04-29T15-18.md`: `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.github/instructions/python-suppressions.instructions.md`, `.github/instructions/self-explanatory-code-commenting.instructions.md`, `.github/instructions/tonality.instructions.md`, `AGENTS.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/issue.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/spec.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/user-story.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/remediation-inputs.2026-04-29T15-18.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md`, `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md`, and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md`.
   - Acceptance:
     - The artifact exists at the exact path named in this task.
     - The artifact contains `Timestamp:`.
@@ -248,20 +248,20 @@ This remediation plan addresses the rerun findings recorded at `2026-04-29T15-18
     - The artifact contains `EXIT_CODE: 0`.
     - `Output Summary:` names `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` as the refreshed review inputs.
 
-- [x] [P3-T8] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md` so it reports the resolved file-size evidence, the refreshed Python coverage numbers, and the current merge-gate status.
+- [x] [P3-T8] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md` so it reports the resolved file-size evidence, the refreshed Python coverage numbers, and the current merge-gate status.
   - Acceptance:
-    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md` cites `p1-t6.post-refactor-line-count.2026-04-29T15-18.md`, `p3-t4.python-pytest.2026-04-29T15-18.md`, and `p3-t5.python-coverage-comparison.2026-04-29T15-18.md`.
-    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/policy-audit.2026-04-29T15-18.md` exits with code `0`.
+    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md` cites `p1-t6.post-refactor-line-count.2026-04-29T15-18.md`, `p3-t4.python-pytest.2026-04-29T15-18.md`, and `p3-t5.python-coverage-comparison.2026-04-29T15-18.md`.
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/policy-audit.2026-04-29T12-38.md` exits with code `0`.
 
-- [x] [P3-T9] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md` so its findings table reflects the corrected file-size and coverage status for the split Python validators.
+- [x] [P3-T9] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md` so its findings table reflects the corrected file-size and coverage status for the split Python validators.
   - Acceptance:
-    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md` cites `p1-t6.post-refactor-line-count.2026-04-29T15-18.md` and `p3-t4.python-pytest.2026-04-29T15-18.md`.
-    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/code-review.2026-04-29T15-18.md` exits with code `0`.
+    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md` cites `p1-t6.post-refactor-line-count.2026-04-29T15-18.md` and `p3-t4.python-pytest.2026-04-29T15-18.md`.
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/code-review.2026-04-29T12-38.md` exits with code `0`.
 
-- [x] [P3-T10] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md` so it references the remediated validator evidence and the current acceptance status against `spec.md` and `user-story.md`.
+- [x] [P3-T10] Refresh `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md` so it references the remediated validator evidence and the current acceptance status against `spec.md` and `user-story.md`.
   - Acceptance:
-    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md` cites `p3-t4.python-pytest.2026-04-29T15-18.md`, `p3-t5.python-coverage-comparison.2026-04-29T15-18.md`, and `p3-t6.orchestrator-state-validation.2026-04-29T15-18.md`.
-    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/feature-audit.2026-04-29T15-18.md` exits with code `0`.
+    - `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md` cites `p3-t4.python-pytest.2026-04-29T15-18.md`, `p3-t5.python-coverage-comparison.2026-04-29T15-18.md`, and `p3-t6.orchestrator-state-validation.2026-04-29T15-18.md`.
+    - `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/audit-2026-04-29T12-38/feature-audit.2026-04-29T12-38.md` exits with code `0`.
 
 - [x] [P3-T11] Write `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/p3-t11.acceptance-criteria-status.2026-04-29T15-18.md` summarizing acceptance-criteria status from `spec.md` and `user-story.md`, and update only any pre-existing unchecked acceptance checkboxes that this remediation verifies as newly satisfied.
   - Acceptance:
