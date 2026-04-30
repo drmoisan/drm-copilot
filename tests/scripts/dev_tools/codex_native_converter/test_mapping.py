@@ -51,3 +51,37 @@ def test_plan_target_paths_emits_codex_prompts_when_repo_prompts_enabled() -> No
     planned_record = plan_target_paths(mapping_record, enable_repo_prompts=True)
 
     assert planned_record.target_path == ".codex/prompts/launch-review.md"
+
+
+def test_plan_target_paths_uses_skill_folder_name_for_reusable_skill_targets() -> None:
+    """Use the reusable skill folder name instead of the literal `SKILL` filename."""
+
+    mapping_record = MappingRecord(
+        source_path=".github/skills/review-workflow/SKILL.md",
+        source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+        source_kind=SourceKind.REUSABLE_SKILL,
+        conversion_class=ConversionClass.DIRECT,
+        target_role=TargetRole.SHARED_SKILL,
+        target_path=None,
+    )
+
+    planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
+
+    assert planned_record.target_path == ".agents/skills/review-workflow/SKILL.md"
+
+
+def test_plan_target_paths_keeps_filename_naming_for_path_scoped_instructions() -> None:
+    """Keep filename-based naming for path-scoped instruction surfaces."""
+
+    mapping_record = MappingRecord(
+        source_path=".github/instructions/general-code-change.instructions.md",
+        source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+        source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
+        conversion_class=ConversionClass.DECOMPOSED,
+        target_role=TargetRole.SHARED_SKILL,
+        target_path=None,
+    )
+
+    planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
+
+    assert planned_record.target_path == ".agents/skills/general-code-change/SKILL.md"

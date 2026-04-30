@@ -54,10 +54,12 @@ def test_discover_source_artifacts_returns_deterministic_relative_path_order() -
     )
 
     assert [path.as_posix() for path in discovered_paths] == [
+        ".github/agents/beast-topology.agent.md",
         ".github/agents/orchestrator.agent.md",
         ".github/copilot-instructions.md",
         ".github/instructions/general-code-change.instructions.md",
         ".github/prompts/launch-review.prompt.md",
+        ".github/prompts/mixed-runtime.prompt.md",
         ".github/skills/review-workflow/SKILL.md",
     ]
 

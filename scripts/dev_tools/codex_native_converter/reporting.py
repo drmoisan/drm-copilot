@@ -34,6 +34,8 @@ if TYPE_CHECKING:
     from scripts.dev_tools.codex_native_converter.models import (
         MappingRecord,
         RunOptions,
+        TopologyEdge,
+        TranslationTrace,
         ValidationFinding,
     )
 
@@ -158,9 +160,97 @@ class ReportSetPaths:
     proposed_tree_root: Path
 
 
+def _mermaid_label(text: str) -> str:
+    """Escape one Mermaid node label deterministically."""
+
+    return json.dumps(text)[1:-1]
+
+
+def _render_source_to_destination_chart(
+    topology_edges: tuple[TopologyEdge, ...],
+) -> list[str]:
+    """Render a Mermaid chart with shared source and destination nodes."""
+
+    source_node_ids: dict[str, str] = {}
+    destination_node_ids: dict[str, str] = {}
+    lines = ["```mermaid", "graph LR"]
+
+    for index, topology_edge in enumerate(topology_edges):
+        source_path = topology_edge.source_path
+        target_label = topology_edge.destination_path
+        source_node_id = source_node_ids.get(source_path)
+        if source_node_id is None:
+            source_node_id = f"source_{index}"
+            source_node_ids[source_path] = source_node_id
+            lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
+
+        destination_node_id = destination_node_ids.get(target_label)
+        if destination_node_id is None:
+            destination_node_id = f"destination_{index}"
+            destination_node_ids[target_label] = destination_node_id
+            lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
+
+        lines.append(f"    {source_node_id} --> {destination_node_id}")
+
+    lines.append("```")
+    return lines
+
+
+def _render_source_to_repeated_destination_chart(
+    topology_edges: tuple[TopologyEdge, ...],
+) -> list[str]:
+    """Render a Mermaid chart that repeats destination nodes per mapping."""
+
+    source_node_ids: dict[str, str] = {}
+    lines = ["```mermaid", "graph LR"]
+
+    for index, topology_edge in enumerate(topology_edges):
+        source_path = topology_edge.source_path
+        target_label = topology_edge.destination_path
+        source_node_id = source_node_ids.get(source_path)
+        if source_node_id is None:
+            source_node_id = f"source_{index}"
+            source_node_ids[source_path] = source_node_id
+            lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
+
+        destination_node_id = f"destination_{index}"
+        lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
+        lines.append(f"    {source_node_id} --> {destination_node_id}")
+
+    lines.append("```")
+    return lines
+
+
+def _render_destination_to_repeated_source_chart(
+    topology_edges: tuple[TopologyEdge, ...],
+) -> list[str]:
+    """Render a Mermaid chart that repeats source nodes per mapping."""
+
+    destination_node_ids: dict[str, str] = {}
+    lines = ["```mermaid", "graph LR"]
+
+    for index, topology_edge in enumerate(topology_edges):
+        source_path = topology_edge.source_path
+        target_label = topology_edge.destination_path
+        destination_node_id = destination_node_ids.get(target_label)
+        if destination_node_id is None:
+            destination_node_id = f"destination_{index}"
+            destination_node_ids[target_label] = destination_node_id
+            lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
+
+        source_node_id = f"source_{index}"
+        lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
+        lines.append(f"    {destination_node_id} --> {source_node_id}")
+
+    lines.append("```")
+    return lines
+
+
 def _render_conversion_report(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
+    topology_edges: tuple[TopologyEdge, ...],
+    translation_traces: tuple[TranslationTrace, ...],
     validation_findings: tuple[ValidationFinding, ...],
 ) -> str:
     """Render the human-readable Markdown conversion report.
@@ -190,6 +280,26 @@ def _render_conversion_report(
         if run_options.destination_root is not None
         else "review-only"
     )
+    sorted_mapping_records = tuple(
+        sorted(mapping_records, key=lambda record: record.source_path)
+    )
+    sorted_topology_edges = tuple(
+        sorted(
+            topology_edges,
+            key=lambda edge: (edge.source_path, edge.destination_path),
+        )
+    )
+    sorted_translation_traces = tuple(
+        sorted(
+            translation_traces,
+            key=lambda trace: (
+                trace.source_path,
+                trace.section_id,
+                trace.target_role.value,
+                trace.target_path or "",
+            ),
+        )
+    )
     lines = [
         "# Conversion Report",
         "",
@@ -204,17 +314,51 @@ def _render_conversion_report(
             f"({blocking_count} blocking)"
         ),
         "",
-        "## Mappings",
+        "## Mapping Topology",
         "",
-        "| Source path | Conversion class | Target role | Target path | Notes |",
-        "| --- | --- | --- | --- | --- |",
+        "### Shared Destination Nodes",
+        "",
+        "Source and destination nodes are both deduplicated in this view.",
+        "",
     ]
+    lines.extend(_render_source_to_destination_chart(sorted_topology_edges))
+    lines.extend(
+        (
+            "",
+            "### Repeated Destination Nodes",
+            "",
+            (
+                "Destination nodes may repeat in this source-to-destination "
+                "view so fan-in stays legible."
+            ),
+        )
+    )
+    lines.extend(_render_source_to_repeated_destination_chart(sorted_topology_edges))
+    lines.extend(
+        (
+            "",
+            "### Repeated Source Nodes",
+            "",
+            (
+                "Source nodes may repeat in this destination-to-source view so "
+                "fan-out stays legible."
+            ),
+        )
+    )
+    lines.extend(_render_destination_to_repeated_source_chart(sorted_topology_edges))
+    lines.extend(
+        (
+            "",
+            "## Mappings",
+            "",
+            "| Source path | Conversion class | Target role | Target path | Notes |",
+            "| --- | --- | --- | --- | --- |",
+        )
+    )
 
     # Render mappings in stable source-path order so review diffs stay small
     # and predictable.
-    for mapping_record in sorted(
-        mapping_records, key=lambda record: record.source_path
-    ):
+    for mapping_record in sorted_mapping_records:
         notes = "<br>".join(mapping_record.notes) if mapping_record.notes else ""
         lines.append(
             "| "
@@ -223,6 +367,33 @@ def _render_conversion_report(
             f"`{mapping_record.target_role.value}` | "
             f"`{mapping_record.target_path or ''}` | {notes} |"
         )
+
+    lines.extend(["", "## Section Mappings", ""])
+    if not sorted_translation_traces:
+        lines.append("- None")
+    else:
+        lines.extend(
+            (
+                (
+                    "| Source path | Section | Intent | Target role | "
+                    "Target path | Notes |"
+                ),
+                "| --- | --- | --- | --- | --- | --- |",
+            )
+        )
+        for translation_trace in sorted_translation_traces:
+            notes = (
+                "<br>".join(translation_trace.notes) if translation_trace.notes else ""
+            )
+            lines.append(
+                "| "
+                f"`{translation_trace.source_path}` | "
+                f"`{translation_trace.heading}` | "
+                f"`{translation_trace.intent_kind.value}` | "
+                f"`{translation_trace.target_role.value}` | "
+                f"`{translation_trace.target_path or ''}` | "
+                f"{notes} |"
+            )
 
     lines.extend(["", "## Validation Findings", ""])
     if not validation_findings:
@@ -246,6 +417,8 @@ def _render_conversion_report(
 def write_conversion_report_set(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
+    topology_edges: tuple[TopologyEdge, ...],
+    translation_traces: tuple[TranslationTrace, ...],
     validation_findings: tuple[ValidationFinding, ...],
     generated_output: dict[str, str],
     *,
@@ -260,6 +433,10 @@ def write_conversion_report_set(
     Args:
         run_options (RunOptions): Requested run options.
         mapping_records (tuple[MappingRecord, ...]): Planned mappings.
+        topology_edges (tuple[TopologyEdge, ...]): Derived topology edges for
+            Mermaid report rendering.
+        translation_traces (tuple[TranslationTrace, ...]): Section-level
+            translation traces for mixed-content report rendering.
         validation_findings (tuple[ValidationFinding, ...]): Validation results.
         generated_output (dict[str, str]): Generated output keyed by target path.
         fs (ConverterFileSystem | None): Filesystem adapter for writes.
@@ -308,7 +485,13 @@ def write_conversion_report_set(
 
     resolved_fs.write_text(
         report_paths.conversion_report,
-        _render_conversion_report(run_options, mapping_records, validation_findings),
+        _render_conversion_report(
+            run_options,
+            mapping_records,
+            topology_edges,
+            translation_traces,
+            validation_findings,
+        ),
     )
     resolved_fs.write_text(
         report_paths.mapping_catalog,

@@ -70,7 +70,7 @@ def _test_classify_github_copilot_expected_conversion_classes() -> None:
     assert standing_guidance.conversion_class is ConversionClass.DIRECT
     assert standing_guidance.target_role is TargetRole.STANDING_GUIDANCE
     assert path_scoped_instruction.conversion_class is ConversionClass.DECOMPOSED
-    assert path_scoped_instruction.target_role is TargetRole.SHARED_SKILL
+    assert path_scoped_instruction.target_role is TargetRole.STANDING_GUIDANCE
     assert reusable_skill.conversion_class is ConversionClass.DIRECT
     assert reusable_skill.target_role is TargetRole.SHARED_SKILL
     assert launcher_prompt.conversion_class is ConversionClass.REPO_CONVENTION
@@ -80,6 +80,21 @@ def _test_classify_github_copilot_expected_conversion_classes() -> None:
 globals()[
     "test_classify_github_copilot_surfaces_maps_supported_items_to_expected_conversion_classes"
 ] = _test_classify_github_copilot_expected_conversion_classes
+
+
+def test_classify_repo_wide_github_instruction_as_standing_guidance() -> None:
+    """Map repo-wide GitHub instructions into standing guidance instead of a skill."""
+
+    fixture_root = _fixture_root("github_copilot")
+    repo_wide_instruction = classify_source_artifact(
+        fixture_root,
+        Path(".github/instructions/general-code-change.instructions.md"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert repo_wide_instruction.conversion_class is ConversionClass.DECOMPOSED
+    assert repo_wide_instruction.target_role is TargetRole.STANDING_GUIDANCE
+    assert any("repo-wide" in note.lower() for note in repo_wide_instruction.notes)
 
 
 def test_classify_claude_surfaces_marks_rules_and_unverified_handoffs_as_expected() -> (
@@ -104,3 +119,33 @@ def test_classify_claude_surfaces_marks_rules_and_unverified_handoffs_as_expecte
     assert claude_agent.conversion_class is ConversionClass.DECOMPOSED
     assert claude_agent.target_role is TargetRole.SUBAGENT
     assert any("handoff" in note.lower() for note in claude_agent.notes)
+
+
+def test_classify_github_prompt_templates_as_optional_launcher_artifacts() -> None:
+    """Treat non-`.prompt.md` prompt templates as optional launcher artifacts."""
+
+    fixture_root = _fixture_root("github_copilot")
+    prompt_template = classify_source_artifact(
+        fixture_root,
+        Path(".github/prompts/execute-plan-template.md"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert prompt_template.conversion_class is ConversionClass.REPO_CONVENTION
+    assert prompt_template.target_role is TargetRole.LAUNCHER
+    assert prompt_template.is_required is False
+
+
+def test_classify_github_skills_readme_as_optional_unsupported_documentation() -> None:
+    """Treat the skills index as optional documentation instead of a blocker."""
+
+    fixture_root = _fixture_root("github_copilot")
+    skills_readme = classify_source_artifact(
+        fixture_root,
+        Path(".github/skills/README.md"),
+        SourceEcosystem.GITHUB_COPILOT,
+    )
+
+    assert skills_readme.conversion_class is ConversionClass.UNSUPPORTED
+    assert skills_readme.target_role is TargetRole.UNSUPPORTED
+    assert skills_readme.is_required is False

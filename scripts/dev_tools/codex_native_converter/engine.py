@@ -25,18 +25,30 @@ Side Effects:
 
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
-from scripts.dev_tools.codex_native_converter.classifier import classify_source_artifact
+from scripts.dev_tools.codex_native_converter.classifier import (
+    classify_prompt_sections,
+    classify_source_artifact,
+)
 from scripts.dev_tools.codex_native_converter.inventory import discover_source_artifacts
-from scripts.dev_tools.codex_native_converter.mapping import plan_target_paths
+from scripts.dev_tools.codex_native_converter.mapping import (
+    plan_section_target_path,
+    plan_target_paths,
+)
 from scripts.dev_tools.codex_native_converter.models import (
     MappingRecord,
     RunOptions,
+    SectionIntentKind,
+    SourceKind,
     TargetRole,
+    TopologyEdge,
+    TranslationTrace,
     ValidationFinding,
 )
+from scripts.dev_tools.codex_native_converter.parser import parse_source_artifact
 from scripts.dev_tools.codex_native_converter.reporting import (
     ConverterFileSystem,
     RealConverterFileSystem,
@@ -77,6 +89,7 @@ class ConversionRunResult:
     report_paths: ReportSetPaths
     generated_output: dict[str, str]
     wrote_destination: bool
+    translation_traces: tuple[TranslationTrace, ...] = ()
 
 
 def _read_source_text(source_root: Path, source_path: str) -> str:
@@ -104,7 +117,10 @@ def _read_source_text(source_root: Path, source_path: str) -> str:
 
 
 def _render_target_content(
-    run_options: RunOptions, mapping_record: MappingRecord
+    run_options: RunOptions,
+    mapping_record: MappingRecord,
+    *,
+    standing_guidance_source_paths: tuple[str, ...],
 ) -> str:
     """Render one generated target file for the mapping record.
 
@@ -127,7 +143,9 @@ def _render_target_content(
 
     source_text = _read_source_text(run_options.source_root, mapping_record.source_path)
     rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
-        source_text
+        source_text,
+        enable_repo_prompts=run_options.enable_repo_prompts,
+        standing_guidance_source_paths=standing_guidance_source_paths,
     )
     rewrite_summary = (
         "\n".join(f"- {description}" for description in applied_rewrites)
@@ -185,6 +203,61 @@ def _render_target_content(
         return f"# Converted launcher prompt\n\n" f"{rewritten_text.rstrip()}\n"
 
     return rewritten_text
+
+
+def _render_merged_standing_guidance(
+    run_options: RunOptions,
+    mapping_records: tuple[MappingRecord, ...],
+) -> str:
+    """Render one merged `AGENTS.md` output from standing-guidance sources.
+
+    Purpose:
+        Combine repo-wide standing-guidance inputs into one deterministic native
+        `AGENTS.md` output while preserving source ordering and rewrite notes.
+
+    Args:
+        run_options (RunOptions): Requested run options for the current run.
+        mapping_records (tuple[MappingRecord, ...]): Standing-guidance mapping
+            records that all target `AGENTS.md`.
+
+    Returns:
+        str: One merged `AGENTS.md` output body.
+
+    Raises:
+        OSError: Raised when a required source file cannot be read.
+
+    Side Effects:
+        Reads the source files associated with the mapping records.
+    """
+
+    standing_guidance_source_paths = tuple(
+        record.source_path for record in mapping_records
+    )
+    rendered_sections: list[str] = [
+        "# Converted standing guidance",
+        "",
+        "Merged standing-guidance sources:",
+        *(f"- `{Path(record.source_path).name}`" for record in mapping_records),
+        "",
+    ]
+
+    for mapping_record in mapping_records:
+        rendered_text = _render_target_content(
+            run_options,
+            mapping_record,
+            standing_guidance_source_paths=standing_guidance_source_paths,
+        ).rstrip()
+        section_label = Path(mapping_record.source_path).name
+        rendered_sections.extend(
+            (
+                f"## Source: `{section_label}`",
+                "",
+                rendered_text,
+                "",
+            )
+        )
+
+    return "\n".join(rendered_sections).rstrip() + "\n"
 
 
 def _plan_mappings(run_options: RunOptions) -> tuple[MappingRecord, ...]:
@@ -257,17 +330,303 @@ def _render_generated_output(
     """
 
     generated_output: dict[str, str] = {}
+    standing_guidance_source_paths = tuple(
+        record.source_path
+        for record in mapping_records
+        if record.target_role is TargetRole.STANDING_GUIDANCE
+        and record.target_path == "AGENTS.md"
+    )
+    mapping_records_by_target: dict[str, list[MappingRecord]] = defaultdict(list)
 
     # Render only records with concrete target paths because unsupported items
     # are still represented through validation findings and report rows.
     for mapping_record in mapping_records:
         if mapping_record.target_path is None:
             continue
-        generated_output[mapping_record.target_path] = _render_target_content(
+        mapping_records_by_target[mapping_record.target_path].append(mapping_record)
+
+    for target_path in sorted(mapping_records_by_target):
+        records_for_target = mapping_records_by_target[target_path]
+        if not records_for_target:
+            continue
+        target_records = tuple(records_for_target)
+        if (
+            target_path == "AGENTS.md"
+            and all(
+                record.target_role is TargetRole.STANDING_GUIDANCE
+                for record in target_records
+            )
+            and len(target_records) > 1
+        ):
+            generated_output[target_path] = _render_merged_standing_guidance(
+                run_options,
+                target_records,
+            )
+            continue
+        generated_output[target_path] = _render_target_content(
             run_options,
-            mapping_record,
+            records_for_target[-1],
+            standing_guidance_source_paths=standing_guidance_source_paths,
         )
     return generated_output
+
+
+def _extract_topology_destinations(
+    rendered_text: str,
+    known_destination_paths: tuple[str, ...],
+) -> tuple[str, ...]:
+    """Extract referenced native destinations from rendered output text.
+
+    Purpose:
+        Recover decomposition fan-out by detecting native target paths that
+        appear in one source artifact's rendered native content.
+
+    Args:
+        rendered_text (str): Rendered native output derived from one source.
+        known_destination_paths (tuple[str, ...]): Known native target paths
+            from the current conversion plan.
+
+    Returns:
+        tuple[str, ...]: Referenced destination paths in deterministic order.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    destinations_by_position: list[tuple[int, str]] = []
+    for destination_path in known_destination_paths:
+        position = rendered_text.find(destination_path)
+        if position >= 0:
+            destinations_by_position.append((position, destination_path))
+    return tuple(
+        destination_path
+        for _, destination_path in sorted(
+            destinations_by_position,
+            key=lambda item: (item[0], item[1]),
+        )
+    )
+
+
+def _build_topology_edges(
+    run_options: RunOptions,
+    mapping_records: tuple[MappingRecord, ...],
+    translation_traces: tuple[TranslationTrace, ...],
+) -> tuple[TopologyEdge, ...]:
+    """Build report topology edges from per-source rendered native intent.
+
+    Purpose:
+        Capture many-to-many relationships for decomposed artifacts and merged
+        targets so Mermaid charts reflect actual native fan-out and fan-in.
+
+    Args:
+        run_options (RunOptions): Requested run options.
+        mapping_records (tuple[MappingRecord, ...]): Planned mappings.
+
+    Returns:
+        tuple[TopologyEdge, ...]: Deterministic topology edges for reporting.
+
+    Raises:
+        OSError: Raised when a required source file cannot be read.
+
+    Side Effects:
+        Reads source files from disk through target rendering.
+    """
+
+    standing_guidance_source_paths = tuple(
+        record.source_path
+        for record in mapping_records
+        if record.target_role is TargetRole.STANDING_GUIDANCE
+        and record.target_path == "AGENTS.md"
+    )
+    known_destination_paths = tuple(
+        sorted(
+            {
+                record.target_path
+                for record in mapping_records
+                if record.target_path is not None
+            }
+        )
+    )
+    topology_edges: list[TopologyEdge] = []
+    translation_trace_source_paths = {trace.source_path for trace in translation_traces}
+
+    for translation_trace in translation_traces:
+        topology_edges.append(
+            TopologyEdge(
+                source_path=translation_trace.source_path,
+                destination_path=translation_trace.target_path or "[no target]",
+            )
+        )
+
+    for mapping_record in mapping_records:
+        if mapping_record.source_path in translation_trace_source_paths:
+            continue
+        rendered_text = ""
+        if mapping_record.target_path is not None:
+            rendered_text = _render_target_content(
+                run_options,
+                mapping_record,
+                standing_guidance_source_paths=standing_guidance_source_paths,
+            )
+
+        destination_paths: list[str] = []
+        if mapping_record.target_path is not None:
+            destination_paths.append(mapping_record.target_path)
+            for destination_path in _extract_topology_destinations(
+                rendered_text,
+                known_destination_paths,
+            ):
+                if destination_path not in destination_paths:
+                    destination_paths.append(destination_path)
+        else:
+            destination_paths.append("[no target]")
+
+        for destination_path in destination_paths:
+            topology_edges.append(
+                TopologyEdge(
+                    source_path=mapping_record.source_path,
+                    destination_path=destination_path,
+                )
+            )
+
+    return tuple(
+        sorted(
+            topology_edges,
+            key=lambda edge: (edge.source_path, edge.destination_path),
+        )
+    )
+
+
+def _build_prompt_translation_traces(
+    run_options: RunOptions,
+    mapping_record: MappingRecord,
+) -> tuple[TranslationTrace, ...]:
+    """Build section-level translation traces for one GitHub prompt artifact.
+
+    Purpose:
+        Recover content-aware decomposition for prompt files without changing
+        the existing file-level apply pipeline yet.
+
+    Args:
+        run_options (RunOptions): Requested run options.
+        mapping_record (MappingRecord): File-level mapping record for one prompt.
+
+    Returns:
+        tuple[TranslationTrace, ...]: Section-level traces for launcher,
+            workflow, and enforcement sections in deterministic order.
+
+    Raises:
+        OSError: Raised when the source file cannot be read.
+
+    Side Effects:
+        Reads the prompt source file from disk.
+    """
+
+    if mapping_record.source_kind is not SourceKind.LAUNCHER_PROMPT:
+        return ()
+
+    source_artifact = parse_source_artifact(
+        run_options.source_root,
+        Path(mapping_record.source_path),
+        mapping_record.source_ecosystem,
+        mapping_record.source_kind,
+    )
+    translation_traces: list[TranslationTrace] = []
+    launcher_target_path = plan_section_target_path(
+        mapping_record.source_path,
+        source_ecosystem=mapping_record.source_ecosystem,
+        source_kind=mapping_record.source_kind,
+        target_role=TargetRole.LAUNCHER,
+        enable_repo_prompts=run_options.enable_repo_prompts,
+    )
+    launcher_notes: tuple[str, ...] = (
+        (
+            "Prompt launcher wrapper maps only to the repository-convention "
+            "launcher surface."
+        ),
+        *(
+            ("Repository-convention prompt output is disabled for this run.",)
+            if launcher_target_path is None
+            else ()
+        ),
+    )
+    translation_traces.append(
+        TranslationTrace(
+            source_path=mapping_record.source_path,
+            section_id=f"{mapping_record.source_path}#__launcher__",
+            heading="Launcher Surface",
+            intent_kind=SectionIntentKind.LAUNCHER_ONLY,
+            target_role=TargetRole.LAUNCHER,
+            target_path=launcher_target_path,
+            notes=launcher_notes,
+        )
+    )
+
+    for section_intent in classify_prompt_sections(source_artifact):
+        target_role = TargetRole.UNSUPPORTED
+        if section_intent.intent_kind is SectionIntentKind.SHARED_WORKFLOW:
+            target_role = TargetRole.SHARED_SKILL
+        elif section_intent.intent_kind is SectionIntentKind.HOOK_CANDIDATE:
+            target_role = TargetRole.HOOK
+
+        if target_role is TargetRole.UNSUPPORTED:
+            continue
+
+        translation_traces.append(
+            TranslationTrace(
+                source_path=section_intent.source_path,
+                section_id=section_intent.section_id,
+                heading=section_intent.heading,
+                intent_kind=section_intent.intent_kind,
+                target_role=target_role,
+                target_path=plan_section_target_path(
+                    mapping_record.source_path,
+                    source_ecosystem=mapping_record.source_ecosystem,
+                    source_kind=mapping_record.source_kind,
+                    target_role=target_role,
+                    enable_repo_prompts=run_options.enable_repo_prompts,
+                ),
+                notes=section_intent.notes,
+            )
+        )
+
+    return tuple(
+        sorted(
+            translation_traces,
+            key=lambda trace: (
+                trace.source_path,
+                trace.section_id,
+                trace.target_role.value,
+            ),
+        )
+    )
+
+
+def _build_translation_traces(
+    run_options: RunOptions,
+    mapping_records: tuple[MappingRecord, ...],
+) -> tuple[TranslationTrace, ...]:
+    """Build section-aware translation traces for mixed prompt artifacts."""
+
+    translation_traces: list[TranslationTrace] = []
+    for mapping_record in mapping_records:
+        translation_traces.extend(
+            _build_prompt_translation_traces(run_options, mapping_record)
+        )
+
+    return tuple(
+        sorted(
+            translation_traces,
+            key=lambda trace: (
+                trace.source_path,
+                trace.section_id,
+                trace.target_role.value,
+            ),
+        )
+    )
 
 
 def _write_destination_outputs(
@@ -331,6 +690,12 @@ def _run_conversion(
     resolved_fs = fs or RealConverterFileSystem()
     mapping_records = _plan_mappings(run_options)
     generated_output = _render_generated_output(run_options, mapping_records)
+    translation_traces = _build_translation_traces(run_options, mapping_records)
+    topology_edges = _build_topology_edges(
+        run_options,
+        mapping_records,
+        translation_traces,
+    )
     validation_findings = validate_conversion_plan(
         run_options,
         mapping_records,
@@ -339,6 +704,8 @@ def _run_conversion(
     report_paths = write_conversion_report_set(
         run_options,
         mapping_records,
+        topology_edges,
+        translation_traces,
         validation_findings,
         generated_output,
         fs=resolved_fs,
@@ -360,6 +727,7 @@ def _run_conversion(
 
     return ConversionRunResult(
         mapping_records=mapping_records,
+        translation_traces=translation_traces,
         validation_findings=validation_findings,
         report_paths=report_paths,
         generated_output=generated_output,

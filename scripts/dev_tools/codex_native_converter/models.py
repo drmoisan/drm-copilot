@@ -152,6 +152,186 @@ class TargetRole(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
+class SectionIntentKind(str, Enum):
+    """Describe the semantic intent detected for one source section.
+
+    Purpose:
+        Capture section-level meaning so mixed-concern source files can be
+        decomposed into multiple Codex-native surfaces deterministically.
+
+    Usage:
+        Parser and classifier stages assign these intent kinds before the
+        planner maps them to concrete target roles and target paths.
+
+    Flow:
+        One source artifact is parsed into sections, each section receives one
+        semantic intent, and later stages convert the intent into a native
+        emission or an unresolved finding.
+
+    Invariants / Constraints:
+        Intents describe section meaning, not final output locations.
+
+    Side Effects:
+        None.
+    """
+
+    IDENTITY = "identity"
+    SHARED_WORKFLOW = "shared-workflow"
+    HOOK_CANDIDATE = "hook-candidate"
+    LAUNCHER_ONLY = "launcher-only"
+    UNSUPPORTED = "unsupported"
+
+
+class SemanticCueKind(str, Enum):
+    """Describe one low-level semantic cue discovered in a source section."""
+
+    HEADING = "heading"
+    NUMBERED_WORKFLOW = "numbered-workflow"
+    HARD_GATE = "hard-gate"
+    FORBIDDEN_PATTERN = "forbidden-pattern"
+    LAUNCHER_WRAPPER = "launcher-wrapper"
+
+
+@dataclass(frozen=True, slots=True)
+class SemanticCue:
+    """Represent one semantic cue detected in a source section.
+
+    Purpose:
+        Preserve the evidence that led a section classifier toward one intent.
+
+    Usage:
+        Parser and classifier stages attach cue records to sections so later
+        reporting can explain why a section was decomposed to a native surface.
+
+    Side Effects:
+        None.
+    """
+
+    cue_kind: SemanticCueKind
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class SourceSection:
+    """Represent one parsed section from a source artifact.
+
+    Purpose:
+        Preserve heading structure, source spans, and semantic cues so mixed
+        artifacts can be translated section by section.
+
+    Usage:
+        The parser emits one `SourceSection` per top-level or implicit body
+        section inside one source file.
+
+    Side Effects:
+        None.
+    """
+
+    section_id: str
+    heading: str
+    level: int
+    content: str
+    start_line: int
+    end_line: int
+    cues: tuple[SemanticCue, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class SourceArtifact:
+    """Represent one parsed source artifact with structured sections.
+
+    Purpose:
+        Carry file-level metadata and section structure through the compiler-
+        style translation pipeline.
+
+    Usage:
+        The parser creates one artifact per source file before section-level
+        classification and planning begin.
+
+    Side Effects:
+        None.
+    """
+
+    source_path: str
+    source_ecosystem: SourceEcosystem
+    source_kind: SourceKind
+    frontmatter: dict[str, str]
+    raw_text: str
+    sections: tuple[SourceSection, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SectionIntent:
+    """Represent the classified intent for one parsed source section.
+
+    Purpose:
+        Separate section meaning from final target planning so planners can map
+        one source file to multiple native destinations.
+
+    Usage:
+        Section classifiers emit one intent record per parsed section.
+
+    Side Effects:
+        None.
+    """
+
+    source_path: str
+    section_id: str
+    heading: str
+    intent_kind: SectionIntentKind
+    notes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class PlannedEmission:
+    """Represent one planned native emission for one source section.
+
+    Purpose:
+        Capture section-level mapping decisions before final rendering or
+        validation.
+
+    Usage:
+        The planner emits these values when one section should contribute to a
+        skill, hook, launcher prompt, or other native surface.
+
+    Side Effects:
+        None.
+    """
+
+    source_path: str
+    section_id: str
+    heading: str
+    intent_kind: SectionIntentKind
+    target_role: TargetRole
+    target_path: str | None
+    notes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class TranslationTrace:
+    """Represent one section-level source-to-native translation trace.
+
+    Purpose:
+        Provide a report-friendly trace of how one source section maps to one
+        native target or unresolved native concept.
+
+    Usage:
+        The engine derives these traces for Mermaid topology graphs and the
+        section-level mapping table in the conversion report.
+
+    Side Effects:
+        None.
+    """
+
+    source_path: str
+    section_id: str
+    heading: str
+    intent_kind: SectionIntentKind
+    target_role: TargetRole
+    target_path: str | None
+    notes: tuple[str, ...] = ()
+
+
 @dataclass(frozen=True, slots=True)
 class MappingRecord:
     """Represent the planned conversion of one source artifact.
@@ -226,6 +406,38 @@ class MappingRecord:
             "notes": list(self.notes),
             "is_required": self.is_required,
         }
+
+
+@dataclass(frozen=True, slots=True)
+class TopologyEdge:
+    """Represent one source-to-destination relationship for reporting.
+
+    Purpose:
+        Capture the topology relationships that the human-readable report should
+        visualize, including decomposition fan-out and merged-target fan-in.
+
+    Usage:
+        The engine derives these edges after rendering per-source native output
+        intent, and the reporting layer renders them into Mermaid diagrams.
+
+    Flow:
+        One source artifact may contribute multiple edges when its converted
+        content references additional native targets beyond its primary output.
+
+    Invariants / Constraints:
+        Paths are stored as normalized relative text so diagrams remain
+        deterministic across operating systems.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        source_path (str): Normalized source-relative artifact path.
+        destination_path (str): Native destination path or sentinel label.
+    """
+
+    source_path: str
+    destination_path: str
 
 
 @dataclass(frozen=True, slots=True)

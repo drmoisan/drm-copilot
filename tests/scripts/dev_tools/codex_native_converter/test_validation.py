@@ -112,7 +112,10 @@ def _test_validate_conversion_plan_blocks_duplicate_targets_and_runtime_refs() -
         ),
     )
     generated_output = {
-        ".agents/skills/shared/SKILL.md": "This output still points at .github/runtime."
+        ".agents/skills/shared/SKILL.md": (
+            "This output still points at "
+            ".github/instructions/runtime.instructions.md."
+        )
     }
 
     findings = validate_conversion_plan(
@@ -127,3 +130,30 @@ def _test_validate_conversion_plan_blocks_duplicate_targets_and_runtime_refs() -
 globals()[
     "test_validate_conversion_plan_blocks_duplicate_targets_and_lingering_source_runtime_references"
 ] = _test_validate_conversion_plan_blocks_duplicate_targets_and_runtime_refs
+
+
+def test_validate_conversion_plan_allows_merged_standing_guidance_targets() -> None:
+    """Allow multiple standing-guidance inputs to merge into one `AGENTS.md` target."""
+
+    mapping_records = (
+        MappingRecord(
+            source_path=".github/copilot-instructions.md",
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.STANDING_INSTRUCTION,
+            conversion_class=ConversionClass.DIRECT,
+            target_role=TargetRole.STANDING_GUIDANCE,
+            target_path="AGENTS.md",
+        ),
+        MappingRecord(
+            source_path=".github/instructions/general-code-change.instructions.md",
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
+            conversion_class=ConversionClass.DECOMPOSED,
+            target_role=TargetRole.STANDING_GUIDANCE,
+            target_path="AGENTS.md",
+        ),
+    )
+
+    findings = validate_conversion_plan(_run_options(), mapping_records, {})
+
+    assert not any(finding.code == "duplicate-target-path" for finding in findings)

@@ -54,6 +54,10 @@ Optional flags include:
 - `--artifact-root <artifact-root>` to override the default report location
 - `--enable-repo-prompts` to allow `.codex/prompts/**` output when repository prompts are intentionally enabled
 
+Repo-wide GitHub instruction files that declare `applyTo: "**"` are merged into the converter's generated `AGENTS.md`. Narrower `.github/instructions/*.instructions.md` files continue to map to `.agents/skills/**`.
+
+GitHub prompt assets under `.github/prompts/*.md`, including template-style files such as `execute-plan-template.md`, are treated as optional launcher inputs. They do not block validation by themselves when prompt output is intentionally disabled, but generated content that still references prompt surfaces will continue to fail validation until those references are rewritten or prompt output is enabled.
+
 ### Artifact outputs
 
 Each run writes a deterministic report set beneath the selected artifact root:
@@ -63,11 +67,15 @@ Each run writes a deterministic report set beneath the selected artifact root:
 - `validation-results.json`
 - `proposed-tree/`
 
+The Markdown conversion report includes three Mermaid topology views: a shared-node source-to-destination graph, a source-to-destination graph with repeated destination nodes for readability, and a destination-to-source graph with repeated source nodes for readability.
+
 The CLI prints the resolved artifact root and the final validation outcome to stdout so wrapper layers can surface or collect the generated evidence.
 
 ### Fail-closed validation model
 
 The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect the blocking findings without mutating the destination tree.
+
+Informational source files such as `.github/skills/README.md` are still cataloged in the reports, but they are treated as optional documentation rather than required runtime artifacts.
 
 ### VS Code extension
 

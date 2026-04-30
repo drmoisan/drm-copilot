@@ -229,6 +229,15 @@ def _validate_duplicate_targets(
     """
 
     findings: list[ValidationFinding] = []
+    mapping_records_by_target: dict[str, list[MappingRecord]] = {}
+
+    for mapping_record in mapping_records:
+        if mapping_record.target_path is None:
+            continue
+        mapping_records_by_target.setdefault(mapping_record.target_path, []).append(
+            mapping_record
+        )
+
     target_counter = Counter(
         mapping_record.target_path
         for mapping_record in mapping_records
@@ -236,6 +245,14 @@ def _validate_duplicate_targets(
     )
     duplicated_targets = {
         target_path for target_path, count in target_counter.items() if count > 1
+    }
+    duplicated_targets -= {
+        target_path
+        for target_path, records in mapping_records_by_target.items()
+        if target_path == "AGENTS.md"
+        and all(
+            record.target_role is TargetRole.STANDING_GUIDANCE for record in records
+        )
     }
 
     # Report every record that participates in a duplicate target collision so

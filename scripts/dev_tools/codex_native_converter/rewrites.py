@@ -27,6 +27,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,11 +55,118 @@ class RewriteRule:
     """
 
     pattern: re.Pattern[str]
-    replacement: str
+    replacement: str | Callable[[re.Match[str]], str]
     description: str
 
 
-_REWRITE_RULES: tuple[RewriteRule, ...] = (
+def _normalize_target_name(name: str) -> str:
+    """Normalize one extracted path segment for use in native target paths."""
+
+    return name.replace("_", "-")
+
+
+def _camel_or_pascal_to_snake(value: str) -> str:
+    """Convert a mixed-case command identifier into snake_case."""
+
+    snake_value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
+    snake_value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", snake_value)
+    return snake_value.replace("-", "_").lower()
+
+
+_BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/copilot-instructions\.md\b"),
+        replacement="AGENTS.md",
+        description="Rewrite GitHub Copilot standing guidance paths to AGENTS.md.",
+    ),
+    RewriteRule(
+        pattern=re.compile(
+            r"(?<![A-Za-z0-9_])\.github/instructions/([A-Za-z0-9_.-]+)\.instructions\.md\b"
+        ),
+        replacement=lambda match: (
+            f".agents/skills/{_normalize_target_name(match.group(1))}/SKILL.md"
+        ),
+        description=(
+            "Rewrite GitHub Copilot path-scoped instructions to shared skill paths."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(
+            r"(?<![A-Za-z0-9_])\.github/skills/([A-Za-z0-9_.-]+)/SKILL\.md\b"
+        ),
+        replacement=lambda match: (
+            f".agents/skills/{_normalize_target_name(match.group(1))}/SKILL.md"
+        ),
+        description=(
+            "Rewrite GitHub Copilot reusable skill paths to shared skill paths."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(
+            r"(?<![A-Za-z0-9_])\.github/agents/([A-Za-z0-9_.-]+)\.agent\.md\b"
+        ),
+        replacement=lambda match: (
+            f".codex/agents/{_normalize_target_name(match.group(1))}.toml"
+        ),
+        description="Rewrite GitHub Copilot agent manifest paths to Codex agent paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/instructions/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite GitHub Copilot instruction-directory references to the native "
+            "skill root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/skills/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite GitHub Copilot skill-directory references to the native skill "
+            "root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/agents/"),
+        replacement=".codex/agents/",
+        description=(
+            "Rewrite GitHub Copilot agent-directory references to the native agent "
+            "root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])CLAUDE\.md\b"),
+        replacement="AGENTS.md",
+        description="Rewrite Claude standing guidance paths to AGENTS.md.",
+    ),
+    RewriteRule(
+        pattern=re.compile(
+            r"(?<![A-Za-z0-9_])\.claude/skills/([A-Za-z0-9_.-]+)/SKILL\.md\b"
+        ),
+        replacement=lambda match: (
+            f".agents/skills/{_normalize_target_name(match.group(1))}/SKILL.md"
+        ),
+        description="Rewrite Claude skill paths to shared skill paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/agents/([A-Za-z0-9_.-]+)\.md\b"),
+        replacement=lambda match: (
+            f".codex/agents/{_normalize_target_name(match.group(1))}.toml"
+        ),
+        description="Rewrite Claude agent manifest paths to Codex agent paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/hooks/([A-Za-z0-9_.-]+)\b"),
+        replacement=lambda match: (
+            f".codex/hooks/{_normalize_target_name(match.group(1))}.py"
+        ),
+        description="Rewrite Claude hook paths to Codex hook paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/settings\.json\b"),
+        replacement=".codex/config.toml",
+        description="Rewrite Claude settings paths to Codex config paths.",
+    ),
     RewriteRule(
         pattern=re.compile(r"\bdrmCopilotExtension\.collectPrContext\b"),
         replacement="mcp__drmCopilotExtension__collect_pr_context",
@@ -78,15 +189,78 @@ _REWRITE_RULES: tuple[RewriteRule, ...] = (
             "Rewrite PoshQC suite command IDs to the semantic MCP analyzer " "surface."
         ),
     ),
+    RewriteRule(
+        pattern=re.compile(r"\bdrmCopilotExtension\.([A-Za-z0-9_]+)\b"),
+        replacement=lambda match: (
+            "mcp__drmCopilotExtension__" + _camel_or_pascal_to_snake(match.group(1))
+        ),
+        description="Rewrite remaining VS Code command IDs to semantic MCP tool usage.",
+    ),
 )
+
+
+def _rewrite_rules(
+    *,
+    enable_repo_prompts: bool,
+    standing_guidance_source_paths: tuple[str, ...],
+) -> tuple[RewriteRule, ...]:
+    """Build the ordered rewrite catalog for one converter run."""
+
+    standing_guidance_rules = tuple(
+        RewriteRule(
+            pattern=re.compile(rf"(?<![A-Za-z0-9_]){re.escape(source_path)}\b"),
+            replacement="AGENTS.md",
+            description=(
+                "Rewrite merged standing-guidance source paths to the native "
+                "AGENTS.md target."
+            ),
+        )
+        for source_path in standing_guidance_source_paths
+    )
+    prompt_rewrite_rules: tuple[RewriteRule, ...] = ()
+    if enable_repo_prompts:
+        prompt_rewrite_rules = (
+            RewriteRule(
+                pattern=re.compile(
+                    r"(?<![A-Za-z0-9_])\.github/prompts/([A-Za-z0-9_.-]+?)(?:\.prompt)?\.md\b"
+                ),
+                replacement=lambda match: (
+                    f".codex/prompts/{_normalize_target_name(match.group(1))}.md"
+                ),
+                description=(
+                    "Rewrite GitHub prompt references to repository prompt paths."
+                ),
+            ),
+            RewriteRule(
+                pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/prompts/"),
+                replacement=".codex/prompts/",
+                description=(
+                    "Rewrite GitHub prompt-directory references to repository prompt "
+                    "paths."
+                ),
+            ),
+        )
+
+    return standing_guidance_rules + _BASE_REWRITE_RULES + prompt_rewrite_rules
+
 
 _UNRESOLVED_RUNTIME_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (
         re.compile(r"\bdrmCopilotExtension\.[A-Za-z0-9_]+\b"),
         "raw VS Code command identifier",
     ),
-    (re.compile(r"(^|[^A-Za-z0-9_])\.github/"), "GitHub Copilot runtime path"),
-    (re.compile(r"(^|[^A-Za-z0-9_])\.claude/"), "Claude runtime path"),
+    (
+        re.compile(
+            r"(^|[^A-Za-z0-9_])\.github/(copilot-instructions\.md|instructions/|skills/|agents/|prompts/)"
+        ),
+        "GitHub Copilot runtime path",
+    ),
+    (
+        re.compile(
+            r"(^|[^A-Za-z0-9_])\.claude/(skills/|agents/|hooks/|settings\.json)"
+        ),
+        "Claude runtime path",
+    ),
     (re.compile(r"\bCLAUDE\.md\b"), "Claude standing-instructions file"),
     (
         re.compile(r"\bscripts/dev_tools/[A-Za-z0-9_./-]+\b"),
@@ -95,7 +269,12 @@ _UNRESOLVED_RUNTIME_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 
-def rewrite_supported_automation_reference(text: str) -> tuple[str, tuple[str, ...]]:
+def rewrite_supported_automation_reference(
+    text: str,
+    *,
+    enable_repo_prompts: bool,
+    standing_guidance_source_paths: tuple[str, ...] = (),
+) -> tuple[str, tuple[str, ...]]:
     """Rewrite supported runtime references toward semantic MCP usage.
 
     Purpose:
@@ -121,7 +300,10 @@ def rewrite_supported_automation_reference(text: str) -> tuple[str, tuple[str, .
 
     # Apply the catalog in a fixed order so the same input always yields the
     # same rewritten output and applied-rule metadata.
-    for rewrite_rule in _REWRITE_RULES:
+    for rewrite_rule in _rewrite_rules(
+        enable_repo_prompts=enable_repo_prompts,
+        standing_guidance_source_paths=standing_guidance_source_paths,
+    ):
         updated_text, replacement_count = rewrite_rule.pattern.subn(
             rewrite_rule.replacement,
             rewritten_text,
