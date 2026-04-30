@@ -29,6 +29,7 @@ from collections import Counter
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     MappingRecord,
+    PlannedEmission,
     RunOptions,
     TargetRole,
     ValidationFinding,
@@ -208,6 +209,7 @@ def _validate_mapping_records(
 
 def _validate_duplicate_targets(
     mapping_records: tuple[MappingRecord, ...],
+    planned_emissions: tuple[PlannedEmission, ...],
 ) -> list[ValidationFinding]:
     """Validate that planned target paths are unique.
 
@@ -217,6 +219,8 @@ def _validate_duplicate_targets(
     Args:
         mapping_records (tuple[MappingRecord, ...]): Planned mappings for the
             current run.
+        planned_emissions (tuple[PlannedEmission, ...]): Section-level planned
+            emissions that may also claim target paths.
 
     Returns:
         list[ValidationFinding]: Findings for duplicate target paths.
@@ -230,12 +234,19 @@ def _validate_duplicate_targets(
 
     findings: list[ValidationFinding] = []
     mapping_records_by_target: dict[str, list[MappingRecord]] = {}
+    section_emissions_by_target: dict[str, list[PlannedEmission]] = {}
 
     for mapping_record in mapping_records:
         if mapping_record.target_path is None:
             continue
         mapping_records_by_target.setdefault(mapping_record.target_path, []).append(
             mapping_record
+        )
+    for planned_emission in planned_emissions:
+        if planned_emission.target_path is None:
+            continue
+        section_emissions_by_target.setdefault(planned_emission.target_path, []).append(
+            planned_emission
         )
 
     target_counter = Counter(
@@ -271,6 +282,39 @@ def _validate_duplicate_targets(
                     recommended_action=(
                         "Refine the mapping plan so each target path has "
                         "exactly one authoritative source."
+                    ),
+                )
+            )
+
+    conflicting_targets = {
+        target_path
+        for target_path, section_emissions in section_emissions_by_target.items()
+        if (
+            target_path in mapping_records_by_target
+            or len(
+                {
+                    (planned_emission.source_path, planned_emission.target_role)
+                    for planned_emission in section_emissions
+                }
+            )
+            > 1
+        )
+    }
+
+    for target_path in sorted(conflicting_targets):
+        for planned_emission in section_emissions_by_target[target_path]:
+            findings.append(
+                _build_finding(
+                    code="duplicate-target-path",
+                    blocking=True,
+                    source_path=planned_emission.source_path,
+                    target_path=target_path,
+                    message=(
+                        "Multiple planned emissions resolve to the same target path."
+                    ),
+                    recommended_action=(
+                        "Refine the section-level mapping plan so each target path has "
+                        "exactly one authoritative emission group."
                     ),
                 )
             )
@@ -329,6 +373,7 @@ def _validate_generated_output(
 def validate_conversion_plan(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
+    planned_emissions: tuple[PlannedEmission, ...],
     generated_output: dict[str, str],
 ) -> tuple[ValidationFinding, ...]:
     """Validate one planned conversion run.
@@ -341,6 +386,8 @@ def validate_conversion_plan(
         run_options (RunOptions): Requested converter run options.
         mapping_records (tuple[MappingRecord, ...]): Planned mappings for the
             current run.
+        planned_emissions (tuple[PlannedEmission, ...]): Section-level planned
+            emissions for the current run.
         generated_output (dict[str, str]): Generated output keyed by target path.
 
     Returns:
@@ -356,7 +403,7 @@ def validate_conversion_plan(
     findings: list[ValidationFinding] = []
     findings.extend(_validate_required_inputs(run_options))
     findings.extend(_validate_mapping_records(mapping_records))
-    findings.extend(_validate_duplicate_targets(mapping_records))
+    findings.extend(_validate_duplicate_targets(mapping_records, planned_emissions))
     findings.extend(_validate_generated_output(generated_output))
 
     return tuple(

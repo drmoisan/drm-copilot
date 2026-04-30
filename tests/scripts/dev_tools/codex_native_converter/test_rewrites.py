@@ -37,7 +37,7 @@ Run drmCopilotExtension.collectPrContext before proceeding.
 
 
 def test_rewrite_supported_automation_reference_rewrites_prompt_paths() -> None:
-    """Rewrite GitHub prompt references only when prompt output is enabled."""
+    """Rewrite GitHub prompt references to native targets in both prompt modes."""
 
     source_text = "Launch .github/prompts/launch-review.prompt.md after setup."
 
@@ -54,6 +54,29 @@ def test_rewrite_supported_automation_reference_rewrites_prompt_paths() -> None:
     assert ".codex/prompts/launch-review.md" in rewritten_with_prompts
 
 
+def test_rewrite_supported_automation_reference_rewrites_known_prompt_fallbacks() -> (
+    None
+):
+    """Rewrite known prompt references to shared-skill fallbacks when disabled."""
+
+    source_text = """
+Use .github/prompts/generate-atomic-plan.prompt.md as the canonical template.
+Then run .github/prompts/review-feature.prompt.md for the audit workflow.
+Finally use .github/prompts/research-issue.prompt.md for implementation research.
+""".strip()
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".agents/skills/atomic-plan-contract/SKILL.md" in rewritten_text
+    assert ".agents/skills/review-feature/SKILL.md" in rewritten_text
+    assert ".agents/skills/research-issue/SKILL.md" in rewritten_text
+    assert ".github/prompts/" not in rewritten_text
+    assert not detect_unresolved_runtime_reference(rewritten_text)
+
+
 def test_rewrite_supported_automation_reference_rewrites_instruction_directories() -> (
     None
 ):
@@ -68,6 +91,22 @@ def test_rewrite_supported_automation_reference_rewrites_instruction_directories
 
     assert ".agents/skills/" in rewritten_text
     assert ".github/instructions/" not in rewritten_text
+    assert not detect_unresolved_runtime_reference(rewritten_text)
+
+
+def test_rewrite_supported_automation_reference_rewrites_claude_hook_paths() -> None:
+    """Rewrite Claude hook paths to PowerShell Codex hook targets."""
+
+    source_text = "Run .claude/hooks/check-python-test-purity.ps1 before review."
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".codex/hooks/check-python-test-purity.ps1" in rewritten_text
+    assert ".ps1.ps1" not in rewritten_text
+    assert ".py" not in rewritten_text
     assert not detect_unresolved_runtime_reference(rewritten_text)
 
 

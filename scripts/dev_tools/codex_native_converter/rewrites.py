@@ -65,6 +65,16 @@ def _normalize_target_name(name: str) -> str:
     return name.replace("_", "-")
 
 
+def _normalize_hook_target_name(name: str) -> str:
+    """Normalize one extracted hook path segment without script extensions."""
+
+    normalized_name = _normalize_target_name(name)
+    for suffix in (".ps1", ".py"):
+        if normalized_name.endswith(suffix):
+            return normalized_name[: -len(suffix)]
+    return normalized_name
+
+
 def _camel_or_pascal_to_snake(value: str) -> str:
     """Convert a mixed-case command identifier into snake_case."""
 
@@ -158,7 +168,7 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
     RewriteRule(
         pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/hooks/([A-Za-z0-9_.-]+)\b"),
         replacement=lambda match: (
-            f".codex/hooks/{_normalize_target_name(match.group(1))}.py"
+            f".codex/hooks/{_normalize_hook_target_name(match.group(1))}.ps1"
         ),
         description="Rewrite Claude hook paths to Codex hook paths.",
     ),
@@ -198,6 +208,41 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
     ),
 )
 
+_PROMPT_SKILL_FALLBACKS: tuple[tuple[str, str], ...] = (
+    (
+        ".github/prompts/fillout-prd-feature.prompt.md",
+        ".agents/skills/fillout-prd-feature/SKILL.md",
+    ),
+    (
+        ".github/prompts/generate-atomic-plan.prompt.md",
+        ".agents/skills/atomic-plan-contract/SKILL.md",
+    ),
+    (
+        ".github/prompts/orchestrate-csharp-work.prompt.md",
+        ".agents/skills/orchestrate-csharp-work/SKILL.md",
+    ),
+    (
+        ".github/prompts/orchestrate-powershell-work.prompt.md",
+        ".agents/skills/orchestrate-powershell-work/SKILL.md",
+    ),
+    (
+        ".github/prompts/orchestrate-python-work.prompt.md",
+        ".agents/skills/orchestrate-python-work/SKILL.md",
+    ),
+    (
+        ".github/prompts/orchestrate-work.prompt.md",
+        ".agents/skills/orchestrate-work/SKILL.md",
+    ),
+    (
+        ".github/prompts/research-issue.prompt.md",
+        ".agents/skills/research-issue/SKILL.md",
+    ),
+    (
+        ".github/prompts/review-feature.prompt.md",
+        ".agents/skills/review-feature/SKILL.md",
+    ),
+)
+
 
 def _rewrite_rules(
     *,
@@ -216,6 +261,17 @@ def _rewrite_rules(
             ),
         )
         for source_path in standing_guidance_source_paths
+    )
+    prompt_skill_fallback_rules = tuple(
+        RewriteRule(
+            pattern=re.compile(rf"(?<![A-Za-z0-9_]){re.escape(source_path)}\b"),
+            replacement=target_path,
+            description=(
+                "Rewrite a known GitHub prompt reference to the native shared "
+                "skill fallback when repository prompt launchers are disabled."
+            ),
+        )
+        for source_path, target_path in _PROMPT_SKILL_FALLBACKS
     )
     prompt_rewrite_rules: tuple[RewriteRule, ...] = ()
     if enable_repo_prompts:
@@ -241,7 +297,12 @@ def _rewrite_rules(
             ),
         )
 
-    return standing_guidance_rules + _BASE_REWRITE_RULES + prompt_rewrite_rules
+    return (
+        standing_guidance_rules
+        + _BASE_REWRITE_RULES
+        + (() if enable_repo_prompts else prompt_skill_fallback_rules)
+        + prompt_rewrite_rules
+    )
 
 
 _UNRESOLVED_RUNTIME_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (

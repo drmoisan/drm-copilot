@@ -40,9 +40,11 @@ from scripts.dev_tools.codex_native_converter.mapping import (
 )
 from scripts.dev_tools.codex_native_converter.models import (
     MappingRecord,
+    PlannedEmission,
     RunOptions,
     SectionIntentKind,
     SourceKind,
+    SourceSection,
     TargetRole,
     TopologyEdge,
     TranslationTrace,
@@ -116,6 +118,88 @@ def _read_source_text(source_root: Path, source_path: str) -> str:
     return (source_root.resolve() / source_path).read_text(encoding="utf-8")
 
 
+def _rewrite_text(
+    run_options: RunOptions,
+    source_text: str,
+    *,
+    standing_guidance_source_paths: tuple[str, ...],
+) -> tuple[str, str]:
+    """Rewrite one source text block and summarize applied rewrites."""
+
+    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=run_options.enable_repo_prompts,
+        standing_guidance_source_paths=standing_guidance_source_paths,
+    )
+    rewrite_summary = (
+        "\n".join(f"- {description}" for description in applied_rewrites)
+        if applied_rewrites
+        else "- None"
+    )
+    return rewritten_text.rstrip(), rewrite_summary
+
+
+def _wrap_rendered_target_content(
+    *,
+    target_role: TargetRole,
+    target_path: str | None,
+    rewritten_text: str,
+    rewrite_summary: str,
+) -> str:
+    """Wrap rewritten text in the target-role-specific native output shape."""
+
+    if target_role is TargetRole.STANDING_GUIDANCE:
+        return (
+            "# Converted standing guidance\n\n"
+            f"Applied rewrites:\n{rewrite_summary}\n\n"
+            f"{rewritten_text}\n"
+        )
+
+    if target_role is TargetRole.SHARED_SKILL:
+        return (
+            "# Converted skill\n\n"
+            f"Applied rewrites:\n{rewrite_summary}\n\n"
+            f"{rewritten_text}\n"
+        )
+
+    if target_role is TargetRole.SUBAGENT:
+        agent_name = Path(target_path or "agent.toml").stem
+        return (
+            f'name = "{agent_name}"\n'
+            'description = "Converted subagent"\n'
+            "developer_instructions = '''\n"
+            f"Applied rewrites:\n{rewrite_summary}\n\n"
+            f"{rewritten_text}\n"
+            "'''\n"
+        )
+
+    if target_role is TargetRole.MCP_CONFIG:
+        return (
+            "# Review and merge native MCP, hook, and approval settings "
+            "intentionally.\n\n"
+            f"{rewritten_text}\n"
+        )
+
+    if target_role is TargetRole.HOOK:
+        return (
+            "# Converted hook\n"
+            "# Review the generated hook behavior before enabling it.\n\n"
+            f"{rewritten_text}\n"
+        )
+
+    if target_role is TargetRole.APPROVAL_RULE:
+        return (
+            "# Converted approval rule candidate\n"
+            "# Review the generated rule semantics before enforcement.\n\n"
+            f"{rewritten_text}\n"
+        )
+
+    if target_role is TargetRole.LAUNCHER:
+        return f"# Converted launcher prompt\n\n{rewritten_text}\n"
+
+    return f"{rewritten_text}\n"
+
+
 def _render_target_content(
     run_options: RunOptions,
     mapping_record: MappingRecord,
@@ -142,67 +226,17 @@ def _render_target_content(
     """
 
     source_text = _read_source_text(run_options.source_root, mapping_record.source_path)
-    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
+    rewritten_text, rewrite_summary = _rewrite_text(
+        run_options,
         source_text,
-        enable_repo_prompts=run_options.enable_repo_prompts,
         standing_guidance_source_paths=standing_guidance_source_paths,
     )
-    rewrite_summary = (
-        "\n".join(f"- {description}" for description in applied_rewrites)
-        if applied_rewrites
-        else "- None"
+    return _wrap_rendered_target_content(
+        target_role=mapping_record.target_role,
+        target_path=mapping_record.target_path,
+        rewritten_text=rewritten_text,
+        rewrite_summary=rewrite_summary,
     )
-
-    if mapping_record.target_role is TargetRole.STANDING_GUIDANCE:
-        return (
-            f"# Converted standing guidance\n\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.SHARED_SKILL:
-        return (
-            f"# Converted skill\n\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.SUBAGENT:
-        agent_name = Path(mapping_record.target_path or "agent.toml").stem
-        return (
-            f'name = "{agent_name}"\n'
-            'description = "Converted subagent"\n'
-            "developer_instructions = '''\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-            "'''\n"
-        )
-
-    if mapping_record.target_role is TargetRole.MCP_CONFIG:
-        return (
-            "# Review and merge native MCP, hook, and approval settings "
-            "intentionally.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.HOOK:
-        return (
-            f"# Converted hook\n"
-            "# Review the generated hook behavior before enabling it.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.APPROVAL_RULE:
-        return (
-            "# Converted approval rule candidate\n"
-            "# Review the generated rule semantics before enforcement.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.LAUNCHER:
-        return f"# Converted launcher prompt\n\n" f"{rewritten_text.rstrip()}\n"
-
-    return rewritten_text
 
 
 def _render_merged_standing_guidance(
@@ -260,6 +294,81 @@ def _render_merged_standing_guidance(
     return "\n".join(rendered_sections).rstrip() + "\n"
 
 
+def _render_section_emission_content(
+    run_options: RunOptions,
+    target_path: str,
+    planned_emissions: tuple[PlannedEmission, ...],
+    section_lookup_by_id: dict[str, SourceSection],
+    *,
+    standing_guidance_source_paths: tuple[str, ...],
+) -> str:
+    """Render one merged native output from section-level planned emissions."""
+
+    if not planned_emissions:
+        return ""
+
+    target_role = planned_emissions[0].target_role
+    merged_sections: list[str] = []
+    all_rewrite_descriptions: list[str] = []
+    source_paths = tuple(
+        dict.fromkeys(
+            planned_emission.source_path for planned_emission in planned_emissions
+        )
+    )
+
+    for planned_emission in planned_emissions:
+        source_section = section_lookup_by_id.get(planned_emission.section_id)
+        if source_section is None:
+            continue
+        rewritten_text, rewrite_summary = _rewrite_text(
+            run_options,
+            source_section.content,
+            standing_guidance_source_paths=standing_guidance_source_paths,
+        )
+        rewrite_lines = tuple(
+            line for line in rewrite_summary.splitlines() if line and line != "- None"
+        )
+        all_rewrite_descriptions.extend(rewrite_lines)
+        merged_sections.extend(
+            (
+                f"## Source section: `{planned_emission.heading}`",
+                "",
+                "Applied rewrites:",
+                *(rewrite_lines or ("- None",)),
+                "",
+                rewritten_text,
+                "",
+            )
+        )
+
+    unique_rewrite_descriptions = tuple(dict.fromkeys(all_rewrite_descriptions))
+    rewrite_summary = (
+        "\n".join(unique_rewrite_descriptions)
+        if unique_rewrite_descriptions
+        else "- None"
+    )
+    merged_text = "\n".join(
+        (
+            "Derived prompt sections:",
+            *(
+                f"- `{planned_emission.heading}`"
+                for planned_emission in planned_emissions
+            ),
+            "",
+            "Source artifacts:",
+            *(f"- `{Path(source_path).name}`" for source_path in source_paths),
+            "",
+            *merged_sections,
+        )
+    ).rstrip()
+    return _wrap_rendered_target_content(
+        target_role=target_role,
+        target_path=target_path,
+        rewritten_text=merged_text,
+        rewrite_summary=rewrite_summary,
+    )
+
+
 def _plan_mappings(run_options: RunOptions) -> tuple[MappingRecord, ...]:
     """Plan mappings for one converter run.
 
@@ -308,6 +417,7 @@ def _plan_mappings(run_options: RunOptions) -> tuple[MappingRecord, ...]:
 def _render_generated_output(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
+    planned_emissions: tuple[PlannedEmission, ...],
 ) -> dict[str, str]:
     """Render the generated output set for one run.
 
@@ -337,6 +447,7 @@ def _render_generated_output(
         and record.target_path == "AGENTS.md"
     )
     mapping_records_by_target: dict[str, list[MappingRecord]] = defaultdict(list)
+    section_emissions_by_target: dict[str, list[PlannedEmission]] = defaultdict(list)
 
     # Render only records with concrete target paths because unsupported items
     # are still represented through validation findings and report rows.
@@ -344,6 +455,12 @@ def _render_generated_output(
         if mapping_record.target_path is None:
             continue
         mapping_records_by_target[mapping_record.target_path].append(mapping_record)
+    for planned_emission in planned_emissions:
+        if planned_emission.target_path is None:
+            continue
+        section_emissions_by_target[planned_emission.target_path].append(
+            planned_emission
+        )
 
     for target_path in sorted(mapping_records_by_target):
         records_for_target = mapping_records_by_target[target_path]
@@ -366,6 +483,38 @@ def _render_generated_output(
         generated_output[target_path] = _render_target_content(
             run_options,
             records_for_target[-1],
+            standing_guidance_source_paths=standing_guidance_source_paths,
+        )
+    section_lookup_by_id: dict[str, SourceSection] = {}
+    parsed_source_paths = sorted(
+        {
+            planned_emission.source_path
+            for planned_emission in planned_emissions
+            if planned_emission.target_path is not None
+        }
+    )
+    for source_path in parsed_source_paths:
+        source_artifact = parse_source_artifact(
+            run_options.source_root,
+            Path(source_path),
+            run_options.source_ecosystem,
+            SourceKind.LAUNCHER_PROMPT,
+        )
+        section_lookup_by_id.update(
+            {
+                source_section.section_id: source_section
+                for source_section in source_artifact.sections
+            }
+        )
+
+    for target_path in sorted(section_emissions_by_target):
+        if target_path in generated_output:
+            continue
+        generated_output[target_path] = _render_section_emission_content(
+            run_options,
+            target_path,
+            tuple(section_emissions_by_target[target_path]),
+            section_lookup_by_id,
             standing_guidance_source_paths=standing_guidance_source_paths,
         )
     return generated_output
@@ -629,6 +778,27 @@ def _build_translation_traces(
     )
 
 
+def _build_planned_emissions(
+    translation_traces: tuple[TranslationTrace, ...],
+) -> tuple[PlannedEmission, ...]:
+    """Build section-level planned emissions from translation traces."""
+
+    return tuple(
+        PlannedEmission(
+            source_path=translation_trace.source_path,
+            section_id=translation_trace.section_id,
+            heading=translation_trace.heading,
+            intent_kind=translation_trace.intent_kind,
+            target_role=translation_trace.target_role,
+            target_path=translation_trace.target_path,
+            notes=translation_trace.notes,
+        )
+        for translation_trace in translation_traces
+        if translation_trace.target_path is not None
+        and translation_trace.target_role in {TargetRole.SHARED_SKILL, TargetRole.HOOK}
+    )
+
+
 def _write_destination_outputs(
     destination_root: Path,
     generated_output: dict[str, str],
@@ -689,8 +859,13 @@ def _run_conversion(
 
     resolved_fs = fs or RealConverterFileSystem()
     mapping_records = _plan_mappings(run_options)
-    generated_output = _render_generated_output(run_options, mapping_records)
     translation_traces = _build_translation_traces(run_options, mapping_records)
+    planned_emissions = _build_planned_emissions(translation_traces)
+    generated_output = _render_generated_output(
+        run_options,
+        mapping_records,
+        planned_emissions,
+    )
     topology_edges = _build_topology_edges(
         run_options,
         mapping_records,
@@ -699,6 +874,7 @@ def _run_conversion(
     validation_findings = validate_conversion_plan(
         run_options,
         mapping_records,
+        planned_emissions,
         generated_output,
     )
     report_paths = write_conversion_report_set(

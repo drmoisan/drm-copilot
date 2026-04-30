@@ -1,0 +1,92 @@
+[
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".agents/skills/csharp-change-budget-router/SKILL.md"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".agents/skills/powershell-change-budget-router/SKILL.md"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".agents/skills/review-feature/SKILL.md"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/csharp-orchestrator.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/csharp-typed-engineer.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/feature-review.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/orchestrator.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/powershell-orchestrator.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/powershell-typed-engineer.toml"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/agents/python-orchestrator.toml"
+  }
+]

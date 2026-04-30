@@ -85,3 +85,20 @@ def test_plan_target_paths_keeps_filename_naming_for_path_scoped_instructions() 
     planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
 
     assert planned_record.target_path == ".agents/skills/general-code-change/SKILL.md"
+
+
+def test_plan_target_paths_emits_powershell_hook_targets() -> None:
+    """Emit PowerShell hook targets without duplicating source script extensions."""
+
+    mapping_record = MappingRecord(
+        source_path=".claude/hooks/check-python-test-purity.ps1",
+        source_ecosystem=SourceEcosystem.CLAUDE,
+        source_kind=SourceKind.HOOK_DEFINITION,
+        conversion_class=ConversionClass.DIRECT,
+        target_role=TargetRole.HOOK,
+        target_path=None,
+    )
+
+    planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
+
+    assert planned_record.target_path == ".codex/hooks/check-python-test-purity.ps1"

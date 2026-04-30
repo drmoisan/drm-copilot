@@ -1,0 +1,82 @@
+[
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/beast-topology.agent.md",
+    "target_path": ".codex/agents/beast-topology.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/orchestrator.agent.md",
+    "target_path": ".codex/agents/orchestrator.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "standing-instruction",
+    "source_path": ".github/copilot-instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Repo-wide instruction applies to all files and merges into standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/general-code-change.instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/launch-review.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/mixed-runtime.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/review-workflow/SKILL.md",
+    "target_path": ".agents/skills/review-workflow/SKILL.md",
+    "target_role": "shared-skill"
+  }
+]

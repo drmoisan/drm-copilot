@@ -95,6 +95,16 @@ def _planned_skill_name(mapping_record: MappingRecord) -> str:
     return _normalized_name(mapping_record.source_path)
 
 
+def _planned_hook_name(mapping_record: MappingRecord) -> str:
+    """Derive the target hook name without carrying source script extensions."""
+
+    source_name = PurePosixPath(mapping_record.source_path).name
+    if source_name.endswith((".ps1", ".py")):
+        normalized_name = source_name.rsplit(".", 1)[0]
+        return normalized_name.replace("_", "-")
+    return _normalized_name(mapping_record.source_path)
+
+
 def plan_target_paths(
     mapping_record: MappingRecord,
     *,
@@ -144,10 +154,10 @@ def plan_target_paths(
         return replace(mapping_record, target_path=".codex/config.toml")
 
     if mapping_record.target_role is TargetRole.HOOK:
-        hook_name = _normalized_name(mapping_record.source_path)
+        hook_name = _planned_hook_name(mapping_record)
         return replace(
             mapping_record,
-            target_path=f".codex/hooks/{hook_name}.py",
+            target_path=f".codex/hooks/{hook_name}.ps1",
         )
 
     if mapping_record.target_role is TargetRole.APPROVAL_RULE:
