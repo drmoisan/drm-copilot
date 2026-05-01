@@ -63,7 +63,7 @@ def _as_push_down_filesystem_module(module: ModuleType) -> PushDownFilesystemMod
     """Return a typed view over a dynamically loaded filesystem module."""
     if not hasattr(module, "RealPushDownFileSystem"):
         raise AssertionError("Module does not expose RealPushDownFileSystem")
-    return cast(PushDownFilesystemModule, module)
+    return cast("PushDownFilesystemModule", module)
 
 
 def _relative_paths(paths: list[Path]) -> list[str]:

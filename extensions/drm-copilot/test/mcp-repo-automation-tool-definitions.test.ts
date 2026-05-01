@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 
+import { toolDefinitions } from "../src/mcp-tool-definitions";
 import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
 import { REPO_AUTOMATION_TOOLS } from "../src/repo-automation-tool-names";
 
@@ -28,6 +29,68 @@ describe("repo automation MCP tool definitions", () => {
             type: "string",
           },
         },
+      },
+    });
+  });
+
+  it("includes a push_down_claude_customizations definition with workspace_root and no additional properties", () => {
+    const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "push_down_claude_customizations",
+    );
+
+    expect(definition).toMatchObject({
+      name: "push_down_claude_customizations",
+      inputSchema: {
+        properties: {
+          workspace_root: expect.objectContaining({ type: "string" }),
+        },
+        additionalProperties: false,
+      },
+    });
+  });
+
+  it("includes a run_codex_native_converter definition with the required converter fields", () => {
+    const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "run_codex_native_converter",
+    );
+
+    expect(definition).toMatchObject({
+      name: "run_codex_native_converter",
+      inputSchema: {
+        required: ["mode", "source_ecosystem", "source_root"],
+        properties: {
+          mode: expect.objectContaining({ type: "string" }),
+          source_ecosystem: expect.objectContaining({ type: "string" }),
+          source_root: expect.objectContaining({ type: "string" }),
+          selected_paths: expect.objectContaining({ type: "array" }),
+          destination_root: expect.objectContaining({ type: "string" }),
+          artifact_root: expect.objectContaining({ type: "string" }),
+          enable_repo_prompts: expect.objectContaining({ type: "boolean" }),
+        },
+        additionalProperties: false,
+      },
+    });
+  });
+
+  it("keeps the base toolDefinitions schema aligned for run_codex_native_converter", () => {
+    const definition = toolDefinitions.find(
+      ({ name }) => name === "run_codex_native_converter",
+    );
+
+    expect(definition).toMatchObject({
+      name: "run_codex_native_converter",
+      inputSchema: {
+        required: ["mode", "source_ecosystem", "source_root"],
+        properties: {
+          mode: expect.objectContaining({ type: "string" }),
+          source_ecosystem: expect.objectContaining({ type: "string" }),
+          source_root: expect.objectContaining({ type: "string" }),
+          selected_paths: expect.objectContaining({ type: "array" }),
+          destination_root: expect.objectContaining({ type: "string" }),
+          artifact_root: expect.objectContaining({ type: "string" }),
+          enable_repo_prompts: expect.objectContaining({ type: "boolean" }),
+        },
+        additionalProperties: false,
       },
     });
   });

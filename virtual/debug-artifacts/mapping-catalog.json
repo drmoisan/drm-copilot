@@ -1,0 +1,1220 @@
+[
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/5.1-Beast-adjusted.agent.md",
+    "target_path": ".codex/agents/5.1-Beast-adjusted.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/5.1-Thinking-Beast-Mode-adjusted.agent.md",
+    "target_path": ".codex/agents/5.1-Thinking-Beast-Mode-adjusted.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/Powershell DI Unit Test Engineer.agent.md",
+    "target_path": ".codex/agents/Powershell DI Unit Test Engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/api-architect.agent.md",
+    "target_path": ".codex/agents/api-architect.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/atomic_executor.agent.md",
+    "target_path": ".codex/agents/atomic-executor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/atomic_planning.agent.md",
+    "target_path": ".codex/agents/atomic-planning.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/commentary-remediation.agent.md",
+    "target_path": ".codex/agents/commentary-remediation.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/commit-steward.agent.md",
+    "target_path": ".codex/agents/commit-steward.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/csharp-atomic-executor.agent.md",
+    "target_path": ".codex/agents/csharp-atomic-executor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/csharp-atomic-planning.agent.md",
+    "target_path": ".codex/agents/csharp-atomic-planning.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/csharp-orchestrator.agent.md",
+    "target_path": ".codex/agents/csharp-orchestrator.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/csharp-typed-engineer.agent.md",
+    "target_path": ".codex/agents/csharp-typed-engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/epic-review.agent.md",
+    "target_path": ".codex/agents/epic-review.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/expert-nextjs-developer.agent.md",
+    "target_path": ".codex/agents/expert-nextjs-developer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/expert-react-frontend-engineer.agent.md",
+    "target_path": ".codex/agents/expert-react-frontend-engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/feature-review.agent.md",
+    "target_path": ".codex/agents/feature-review.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/gpt-5-beast-mode.agent.md",
+    "target_path": ".codex/agents/gpt-5-beast-mode.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/hlbpa.agent.md",
+    "target_path": ".codex/agents/hlbpa.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/mentor.agent.md",
+    "target_path": ".codex/agents/mentor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/orchestrator.agent.md",
+    "target_path": ".codex/agents/orchestrator.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/powershell-atomic-executor.agent.md",
+    "target_path": ".codex/agents/powershell-atomic-executor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/powershell-atomic-planning.agent.md",
+    "target_path": ".codex/agents/powershell-atomic-planning.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/powershell-orchestrator.agent.md",
+    "target_path": ".codex/agents/powershell-orchestrator.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/powershell-typed-engineer.agent.md",
+    "target_path": ".codex/agents/powershell-typed-engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/pr-author.agent.md",
+    "target_path": ".codex/agents/pr-author.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/prd-feature.agent.md",
+    "target_path": ".codex/agents/prd-feature.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/prd.agent.md",
+    "target_path": ".codex/agents/prd.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/pytest-unit-test-coding.agent.md",
+    "target_path": ".codex/agents/pytest-unit-test-coding.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/python-atomic-executor.agent.md",
+    "target_path": ".codex/agents/python-atomic-executor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/python-atomic-planning.agent.md",
+    "target_path": ".codex/agents/python-atomic-planning.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/python-execution-only-typed.agent.md",
+    "target_path": ".codex/agents/python-execution-only-typed.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/python-orchestrator.agent.md",
+    "target_path": ".codex/agents/python-orchestrator.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/python-typed-engineer.agent.md",
+    "target_path": ".codex/agents/python-typed-engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/staged-review.agent.md",
+    "target_path": ".codex/agents/staged-review.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/status_updater.agent.md",
+    "target_path": ".codex/agents/status-updater.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/task-researcher.agent.md",
+    "target_path": ".codex/agents/task-researcher.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/tdd-green.agent.md",
+    "target_path": ".codex/agents/tdd-green.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/tdd-red.agent.md",
+    "target_path": ".codex/agents/tdd-red.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/tdd-refactor.agent.md",
+    "target_path": ".codex/agents/tdd-refactor.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Agent manifest contains handoff semantics that require validation before apply mode."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/typescript-engineer.agent.md",
+    "target_path": ".codex/agents/typescript-engineer.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "agent-manifest",
+    "source_path": ".github/agents/voidbeast-gpt41enhanced.agent.md",
+    "target_path": ".codex/agents/voidbeast-gpt41enhanced.toml",
+    "target_role": "subagent"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "standing-instruction",
+    "source_path": ".github/copilot-instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/csharp-code-change.instructions.md",
+    "target_path": ".agents/skills/csharp-code-change/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/csharp-unit-test.instructions.md",
+    "target_path": ".agents/skills/csharp-unit-test/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Repo-wide instruction applies to all files and merges into standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/general-code-change.instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Repo-wide instruction applies to all files and merges into standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/general-unit-test.instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
+    "target_path": ".agents/skills/github-actions-ci-cd-best-practices/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/github-actions.instructions.md",
+    "target_path": ".agents/skills/github-actions/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/powershell-code-change.instructions.md",
+    "target_path": ".agents/skills/powershell-code-change/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/powershell-unit-test.instructions.md",
+    "target_path": ".agents/skills/powershell-unit-test/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/python-code-change.instructions.md",
+    "target_path": ".agents/skills/python-code-change/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/python-suppressions.instructions.md",
+    "target_path": ".agents/skills/python-suppressions/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/python-unit-test.instructions.md",
+    "target_path": ".agents/skills/python-unit-test/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/self-explanatory-code-commenting.instructions.md",
+    "target_path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Repo-wide instruction applies to all files and merges into standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/tonality.instructions.md",
+    "target_path": "AGENTS.md",
+    "target_role": "standing-guidance"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/typescript-code-change.instructions.md",
+    "target_path": ".agents/skills/typescript-code-change/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/typescript-suppressions.instructions.md",
+    "target_path": ".agents/skills/typescript-suppressions/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "decomposed",
+    "is_required": true,
+    "notes": [
+      "Path-scoped instruction requires decomposition into shared skills or standing guidance."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "path-scoped-instruction",
+    "source_path": ".github/instructions/typescript-unit-test.instructions.md",
+    "target_path": ".agents/skills/typescript-unit-test/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/add-educational-comments.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/breakdown-bug-prd.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/breakdown-epic-arch.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/breakdown-epic-pm.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/breakdown-feature-implementation.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/breakdown-feature-prd.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/code-exemplars-blueprint-generator.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/drafts/create-github-issues-feature-from-implementation-plan.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/drafts/create-implementation-plan.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/drafts/create-technical-spike.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/drafts/potential-feature-prd.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/drafts/update-implementation-plan.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/execute-hard-lock.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/execute-plan-template.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/export-chat.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/fillout-prd-feature.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/generate-atomic-plan.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/generate-commit-message-repo.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/generate-pr.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/javascript-typescript-jest.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/orchestrate-csharp-work.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/orchestrate-powershell-work.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/orchestrate-python-work.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/orchestrate-work.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/remediate-comments.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/research-issue.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/review-epic.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/review-feature.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/review-staged.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Launcher prompts map only to the repository-convention .codex/prompts surface when explicitly enabled.",
+      "Repository-convention prompt output is disabled for this run."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "launcher-prompt",
+    "source_path": ".github/prompts/update_status.prompt.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "unsupported",
+    "is_required": false,
+    "notes": [
+      "Skills index documentation has no native runtime surface in v1."
+    ],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "unknown",
+    "source_path": ".github/skills/README.md",
+    "target_path": null,
+    "target_role": "unsupported"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/acceptance-criteria-tracking/SKILL.md",
+    "target_path": ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/atomic-plan-contract/SKILL.md",
+    "target_path": ".agents/skills/atomic-plan-contract/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/csharp-change-budget-router/SKILL.md",
+    "target_path": ".agents/skills/csharp-change-budget-router/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/csharp-orchestration-state-machine/SKILL.md",
+    "target_path": ".agents/skills/csharp-orchestration-state-machine/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/evidence-and-timestamp-conventions/SKILL.md",
+    "target_path": ".agents/skills/evidence-and-timestamp-conventions/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/feature-promotion-lifecycle/SKILL.md",
+    "target_path": ".agents/skills/feature-promotion-lifecycle/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/feature-review-workflow/SKILL.md",
+    "target_path": ".agents/skills/feature-review-workflow/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/make-skill-template/SKILL.md",
+    "target_path": ".agents/skills/make-skill-template/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/policy-audit-template-usage/SKILL.md",
+    "target_path": ".agents/skills/policy-audit-template-usage/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/policy-compliance-order/SKILL.md",
+    "target_path": ".agents/skills/policy-compliance-order/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/powershell-change-budget-router/SKILL.md",
+    "target_path": ".agents/skills/powershell-change-budget-router/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/powershell-orchestration-state-machine/SKILL.md",
+    "target_path": ".agents/skills/powershell-orchestration-state-machine/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/pr-base-branch-merge-base/SKILL.md",
+    "target_path": ".agents/skills/pr-base-branch-merge-base/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/pr-context-artifacts/SKILL.md",
+    "target_path": ".agents/skills/pr-context-artifacts/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/remediation-handoff-atomic-planner/SKILL.md",
+    "target_path": ".agents/skills/remediation-handoff-atomic-planner/SKILL.md",
+    "target_role": "shared-skill"
+  },
+  {
+    "conversion_class": "direct",
+    "is_required": true,
+    "notes": [],
+    "source_ecosystem": "github-copilot",
+    "source_kind": "reusable-skill",
+    "source_path": ".github/skills/skill-canonical-location-audit/SKILL.md",
+    "target_path": ".agents/skills/skill-canonical-location-audit/SKILL.md",
+    "target_role": "shared-skill"
+  }
+]

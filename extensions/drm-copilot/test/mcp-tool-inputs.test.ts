@@ -10,6 +10,7 @@ import {
   resolvePolicyAuditTemplateAssetToolInput,
   resolvePotentialToIssueToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
+  resolvePushDownClaudeCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
   resolveRunPoshQCSuiteToolInput,
@@ -291,6 +292,26 @@ describe("resolvePushDownCodexAndAgentsCustomizationsToolInput", () => {
         workspace_root: "C:/ws",
       }),
     ).toEqual({ workspaceRoot: "C:/ws" });
+  });
+});
+
+describe("resolvePushDownClaudeCustomizationsToolInput", () => {
+  it("returns workspaceRoot from 'workspace_root' arg", () => {
+    expect(
+      resolvePushDownClaudeCustomizationsToolInput({ workspace_root: "C:/ws" }),
+    ).toEqual({ workspaceRoot: "C:/ws" });
+  });
+
+  it("falls back to fallbackWorkspaceRoot when workspace_root is omitted", () => {
+    expect(
+      resolvePushDownClaudeCustomizationsToolInput({}, "C:/fallback"),
+    ).toEqual({ workspaceRoot: "C:/fallback" });
+  });
+
+  it("throws when rawInput is not an object", () => {
+    expect(() =>
+      resolvePushDownClaudeCustomizationsToolInput("not-an-object"),
+    ).toThrow();
   });
 });
 

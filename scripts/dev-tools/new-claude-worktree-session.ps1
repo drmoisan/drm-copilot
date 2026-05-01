@@ -3,12 +3,10 @@
     Creates a git worktree and launches a Claude CLI session inside it as a background process.
 
 .DESCRIPTION
-    Creates a new git worktree at a timestamped path derived from -ShortName, branches it
-    off the current HEAD, and starts the Claude CLI non-blocking via Start-Process.
+    Creates a new git worktree at a timestamped path derived from the destination
+    repository's basename, branches it off the current HEAD, and starts the Claude CLI
+    non-blocking via Start-Process.
     Writes WorktreePath, ProcessId, and LogFile to stdout before returning to the caller.
-
-.PARAMETER ShortName
-    Short identifier used in the worktree directory name and branch name.
 
 .PARAMETER Objective
     Prompt text passed to the Claude CLI as its primary argument.
@@ -18,13 +16,10 @@
 
 .PARAMETER BranchName
     Explicit branch name for the new worktree. When omitted, defaults to
-    feature/<timestamp>-<ShortName>.
+    <repoName>-wt-<timestamp>.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [Parameter(Mandatory = $true)]
-    [string] $ShortName,
-
     [string] $Objective,
 
     [string] $WorktreeParentPath,
@@ -42,7 +37,7 @@ function Get-WorktreeTimestamp {
     )
 
     $now = & $GetDateTime
-    return $now.ToString('yyyyMMddHHmmss')
+    return $now.ToString('yyyy-MM-dd-HH-mm')
 }
 
 function Build-WorktreePath {
@@ -56,10 +51,10 @@ function Build-WorktreePath {
         [string] $Timestamp,
 
         [Parameter(Mandatory = $true)]
-        [string] $ShortName
+        [string] $RepoName
     )
 
-    return "$WorktreeParentPath/drm-copilot-wt-$Timestamp-$ShortName"
+    return "$WorktreeParentPath/$RepoName-wt-$Timestamp"
 }
 
 function Build-BranchName {
@@ -70,7 +65,7 @@ function Build-BranchName {
         [string] $Timestamp,
 
         [Parameter(Mandatory = $true)]
-        [string] $ShortName,
+        [string] $RepoName,
 
         [string] $BranchName
     )
@@ -79,7 +74,7 @@ function Build-BranchName {
         return $BranchName
     }
 
-    return "feature/$Timestamp-$ShortName"
+    return "$RepoName-wt-$Timestamp"
 }
 
 function Test-PreconditionsMet {
@@ -105,7 +100,7 @@ function Test-PreconditionsMet {
 
     $pathExists = & $TestPath $WorktreePath
     if ($pathExists) {
-        throw "Target worktree path already exists: $WorktreePath. Choose a different -ShortName or remove the existing directory."
+        throw "Target worktree path already exists: $WorktreePath. Remove the existing directory before retrying."
     }
 }
 
@@ -202,14 +197,15 @@ function Write-LaunchResult {
 # ---------------------------------------------------------------------------
 
 # Resolve default WorktreeParentPath when not supplied
+$repoRoot = (git rev-parse --show-toplevel 2>$null).Trim()
 if (-not $WorktreeParentPath) {
-    $repoRoot = (git rev-parse --show-toplevel 2>$null).Trim()
     $WorktreeParentPath = Split-Path -Parent $repoRoot
 }
+$repoName = Split-Path -Leaf $repoRoot
 
 $timestamp = Get-WorktreeTimestamp
-$worktreePath = Build-WorktreePath -WorktreeParentPath $WorktreeParentPath -Timestamp $timestamp -ShortName $ShortName
-$resolvedBranch = Build-BranchName -Timestamp $timestamp -ShortName $ShortName -BranchName $BranchName
+$worktreePath = Build-WorktreePath -WorktreeParentPath $WorktreeParentPath -Timestamp $timestamp -RepoName $repoName
+$resolvedBranch = Build-BranchName -Timestamp $timestamp -RepoName $repoName -BranchName $BranchName
 
 try {
     Test-PreconditionsMet -WorktreePath $worktreePath

@@ -175,3 +175,86 @@ def test_orchestration_skills_state_non_interpretable_guardrails() -> None:
 
         for fragment in required_fragments:
             assert fragment in file_text
+
+
+def test_claude_feature_promotion_lifecycle_requires_mcp_preflight() -> None:
+    """Require the Claude lifecycle skill to fail closed without MCP access."""
+
+    skill_text = read_repo_text(".claude/skills/feature-promotion-lifecycle/SKILL.md")
+
+    required_fragments = (
+        (
+            "Before any promotion step starts, verify that the required "
+            "`drmCopilotExtension` MCP tools are available in the current "
+            "agent session."
+        ),
+        (
+            "If the required MCP tools are unavailable, stop before "
+            "potential-entry creation, issue promotion, or active-folder "
+            "creation begins."
+        ),
+        (
+            "Agent sessions do not have an approved non-MCP execution "
+            "branch for promotion work."
+        ),
+    )
+
+    for fragment in required_fragments:
+        assert fragment in skill_text
+
+
+def test_claude_feature_promotion_lifecycle_requires_raw_promotion_receipts() -> None:
+    """Require the Claude lifecycle skill to name the raw promotion receipt keys."""
+
+    skill_text = read_repo_text(".claude/skills/feature-promotion-lifecycle/SKILL.md")
+
+    required_fragments = (
+        "delegation_receipts.promotion.potential_entry",
+        "delegation_receipts.promotion.issue",
+        "delegation_receipts.promotion.feature_folder",
+        "raw MCP receipt payload",
+    )
+
+    for fragment in required_fragments:
+        assert fragment in skill_text
+
+
+def test_claude_feature_promotion_lifecycle_excludes_banned_script_guidance() -> None:
+    """Require the Claude lifecycle skill to exclude banned script wording."""
+
+    skill_text = read_repo_text(".claude/skills/feature-promotion-lifecycle/SKILL.md")
+
+    banned_fragments = (
+        "Fallback",
+        "fallback",
+        "dev_tools",
+        "dev-tools",
+        "poetry run python -m scripts",
+    )
+
+    for fragment in banned_fragments:
+        assert fragment not in skill_text
+
+
+def test_claude_feature_promotion_lifecycle_keeps_one_vscode_note() -> None:
+    """Require exactly one VS Code command-palette note for interactive use."""
+
+    skill_text = read_repo_text(".claude/skills/feature-promotion-lifecycle/SKILL.md")
+
+    assert skill_text.count("VS Code command-palette") == 1
+    assert "non-authoritative for agent sessions" in skill_text
+
+
+def test_claude_orchestrator_documents_promotion_receipt_namespace() -> None:
+    """Require the Claude orchestrator contract to name promotion receipt keys."""
+
+    orchestrator_text = read_repo_text(".claude/agents/orchestrator.md")
+
+    required_fragments = (
+        "delegation_receipts.promotion.potential_entry",
+        "delegation_receipts.promotion.issue",
+        "delegation_receipts.promotion.feature_folder",
+    )
+
+    for fragment in required_fragments:
+        assert fragment in orchestrator_text

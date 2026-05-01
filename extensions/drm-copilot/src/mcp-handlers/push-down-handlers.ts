@@ -1,4 +1,5 @@
 import {
+  resolvePushDownClaudeCustomizationsToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
 } from "../mcp-tool-inputs";
@@ -21,4 +22,12 @@ export async function handlePushDownCodexAndAgentsCustomizations(
 ): Promise<RepoAutomationExecutionResult> {
   const input = resolvePushDownCodexAndAgentsCustomizationsToolInput(rawInput);
   return service.pushDownCodexAndAgentsCustomizations(input);
+}
+
+export async function handlePushDownClaudeCustomizations(
+  rawInput: unknown,
+  service: RepoAutomationService,
+): Promise<RepoAutomationExecutionResult> {
+  const input = resolvePushDownClaudeCustomizationsToolInput(rawInput);
+  return service.pushDownClaudeCustomizations(input);
 }

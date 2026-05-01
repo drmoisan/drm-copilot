@@ -11,7 +11,7 @@ preserve task ordering until the retry succeeds.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest  # noqa: TCH002 - pytest required at runtime for fixtures
 
@@ -21,8 +21,10 @@ from scripts.dev_tools.atomic_executor.copilot_throttling import (
     ExponentialBackoff,
 )
 from scripts.dev_tools.atomic_executor.plan_parser import PlanParser, PlanTask
-from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
-from scripts.dev_tools.atomic_executor.qc_runner import QCRunner
+
+if TYPE_CHECKING:
+    from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
+    from scripts.dev_tools.atomic_executor.qc_runner import QCRunner
 
 
 class _FakePromptBuilder:
@@ -235,9 +237,9 @@ def test_execute_one_task_retries_on_throttle_then_succeeds(
     exit_code = cli_mod.execute_one_task(
         workspace=Path("/repo"),  # noqa: S108 - test fixture path
         cur=task,
-        parser=cast(PlanParser, fake_parser),
-        builder=cast(PromptBuilder, fake_builder),
-        qc_runner=cast(QCRunner, fake_qc),
+        parser=cast("PlanParser", fake_parser),
+        builder=cast("PromptBuilder", fake_builder),
+        qc_runner=cast("QCRunner", fake_qc),
         log_file=Path("/dev/null"),  # noqa: S108 - test fixture path
         prompt_template_path=Path("/template.md"),  # noqa: S108 - test fixture path
         max_fix_attempts=3,

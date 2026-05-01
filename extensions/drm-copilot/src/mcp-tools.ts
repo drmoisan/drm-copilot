@@ -19,6 +19,7 @@ import {
   handleCollectCommitContext,
   handleCollectPrContext,
 } from "./mcp-handlers/collect-context-handlers";
+import { handleRunCodexNativeConverter } from "./mcp-handlers/codex-native-converter-handlers";
 import {
   handleNewActiveFeatureFolder,
   handleNewPotentialBugEntry,
@@ -33,6 +34,7 @@ import {
   handleRunPoshQCTest,
 } from "./mcp-handlers/poshqc-handlers";
 import {
+  handlePushDownClaudeCustomizations,
   handlePushDownCodexAndAgentsCustomizations,
   handlePushDownCopilotCustomizations,
 } from "./mcp-handlers/push-down-handlers";
@@ -142,6 +144,12 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(await handleCollectPrContext(rawInput, service));
       }
 
+      case "run_codex_native_converter": {
+        return toMcpToolResult(
+          await handleRunCodexNativeConverter(rawInput, service),
+        );
+      }
+
       case "push_down_copilot_customizations": {
         return toMcpToolResult(
           await handlePushDownCopilotCustomizations(rawInput, service),
@@ -151,6 +159,12 @@ export async function dispatchRepoAutomationTool(
       case "push_down_codex_and_agents_customizations": {
         return toMcpToolResult(
           await handlePushDownCodexAndAgentsCustomizations(rawInput, service),
+        );
+      }
+
+      case "push_down_claude_customizations": {
+        return toMcpToolResult(
+          await handlePushDownClaudeCustomizations(rawInput, service),
         );
       }
 

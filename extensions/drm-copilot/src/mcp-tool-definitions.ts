@@ -49,6 +49,56 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   {
+    name: "run_codex_native_converter",
+    description:
+      "Run the bundled Codex-native converter in review or apply mode using the extension resources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        mode: {
+          type: "string",
+          enum: ["review", "apply"],
+          description: "Converter mode to execute.",
+        },
+        source_ecosystem: {
+          type: "string",
+          enum: ["github-copilot", "claude"],
+          description: "Supported source ecosystem for the conversion run.",
+        },
+        source_root: {
+          type: "string",
+          description: "Workspace-relative or absolute source runtime root.",
+        },
+        selected_paths: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional workspace-relative or absolute source paths beneath source_root.",
+        },
+        destination_root: {
+          type: "string",
+          description:
+            "Workspace-relative or absolute destination root required for apply mode.",
+        },
+        artifact_root: {
+          type: "string",
+          description:
+            "Optional workspace-relative or absolute artifact output root.",
+        },
+        enable_repo_prompts: {
+          type: "boolean",
+          description:
+            "When true, allow repository-convention .codex/prompts outputs.",
+        },
+      },
+      required: ["mode", "source_ecosystem", "source_root"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "push_down_copilot_customizations",
     description:
       "Copy the bundled Copilot customization payload into the target workspace.",
@@ -64,6 +114,18 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     name: "push_down_codex_and_agents_customizations",
     description:
       "Copy the bundled Codex and agents customization payload into the target workspace.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "push_down_claude_customizations",
+    description:
+      "Copy the bundled Claude Code customization payload into the target workspace.",
     inputSchema: {
       type: "object",
       properties: {

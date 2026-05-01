@@ -25,9 +25,11 @@ from __future__ import annotations
 
 import importlib
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _ensure_bundled_scripts_import_path() -> None:
@@ -63,7 +65,7 @@ def main() -> int:
     """
     _ensure_bundled_scripts_import_path()
     collector_module = importlib.import_module("dev_tools.pr_context.collector")
-    collector_main = cast(Callable[[], int], collector_module.main)
+    collector_main = cast("Callable[[], int]", collector_module.main)
 
     return collector_main()
 

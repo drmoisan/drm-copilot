@@ -112,7 +112,7 @@ def guard_unmocked_code_launcher_subprocess(
         if isinstance(command, list | tuple):
             if not command:
                 return None
-            token_text = str(cast(object, command[0]))
+            token_text = str(cast("object", command[0]))
         else:
             token_text = str(command)
         return token_text.replace("\\", "/").rsplit("/", maxsplit=1)[-1].lower()

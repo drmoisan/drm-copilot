@@ -1,0 +1,20 @@
+[
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".agents/skills/mixed-runtime/SKILL.md"
+  },
+  {
+    "blocking": true,
+    "code": "lingering-source-runtime-reference",
+    "message": "Generated output retains unresolved source-runtime references: GitHub Copilot runtime path",
+    "recommended_action": "Add a verified rewrite or adjust the generated content before apply mode.",
+    "severity": "error",
+    "source_path": null,
+    "target_path": ".codex/hooks/mixed-runtime.py"
+  }
+]

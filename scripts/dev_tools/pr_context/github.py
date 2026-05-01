@@ -96,7 +96,7 @@ class GhClient:
         if not isinstance(payload, dict):
             return None
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
         name_raw = payload_dict.get("nameWithOwner")
         if isinstance(name_raw, str):
             self._repo_cache = name_raw
@@ -166,16 +166,16 @@ class GhClient:
         if not isinstance(payload, dict):
             return []
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
         issues_raw: object | None = payload_dict.get("closingIssuesReferences")
         numbers: list[str] = []
         if isinstance(issues_raw, list):
-            issues_list = cast(list[object], issues_raw)
+            issues_list = cast("list[object]", issues_raw)
             for entry in issues_list:
                 if not isinstance(entry, dict):
                     continue
 
-                entry_dict = cast(dict[str, object], entry)
+                entry_dict = cast("dict[str, object]", entry)
                 number = entry_dict.get("number")
                 if isinstance(number, int):
                     numbers.append(f"#{number}")
@@ -195,7 +195,7 @@ class GhClient:
         if not isinstance(payload, dict):
             raise RuntimeError("Unexpected issue payload format.")
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
 
         title_raw = payload_dict.get("title")
         title = title_raw if isinstance(title_raw, str) else ""
@@ -208,9 +208,9 @@ class GhClient:
         labels_raw = payload_dict.get("labels")
         labels: list[str] = []
         if isinstance(labels_raw, list):
-            for entry in cast(list[object], labels_raw):
+            for entry in cast("list[object]", labels_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     name_raw = entry_dict.get("name")
                     if isinstance(name_raw, str):
                         labels.append(name_raw)
@@ -218,9 +218,9 @@ class GhClient:
         assignees_raw = payload_dict.get("assignees")
         assignees: list[str] = []
         if isinstance(assignees_raw, list):
-            for entry in cast(list[object], assignees_raw):
+            for entry in cast("list[object]", assignees_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     login_raw = entry_dict.get("login")
                     if isinstance(login_raw, str):
                         assignees.append(login_raw)
@@ -228,7 +228,7 @@ class GhClient:
         user_raw = payload_dict.get("user")
         author = ""
         if isinstance(user_raw, dict):
-            user_dict = cast(dict[str, object], user_raw)
+            user_dict = cast("dict[str, object]", user_raw)
             login_raw = user_dict.get("login")
             author = login_raw if isinstance(login_raw, str) else ""
 
@@ -247,15 +247,15 @@ class GhClient:
                 context="Fetch issue comments",
             )
             if isinstance(comment_payload, list):
-                comment_entries = cast(list[object], comment_payload)
+                comment_entries = cast("list[object]", comment_payload)
                 for entry in comment_entries:
                     if not isinstance(entry, dict):
                         continue
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     user_raw = entry_dict.get("user")
                     login = ""
                     if isinstance(user_raw, dict):
-                        user_dict = cast(dict[str, object], user_raw)
+                        user_dict = cast("dict[str, object]", user_raw)
                         login_raw = user_dict.get("login")
                         if isinstance(login_raw, str):
                             login = login_raw
@@ -318,7 +318,7 @@ class GhClient:
         if not isinstance(payload, dict):
             raise RuntimeError("Unexpected pull request payload format.")
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
 
         title_raw = payload_dict.get("title")
         title = title_raw if isinstance(title_raw, str) else ""
@@ -330,9 +330,9 @@ class GhClient:
         closing: list[str] = []
         closing_raw = payload_dict.get("closingIssuesReferences")
         if isinstance(closing_raw, list):
-            for entry in cast(list[object], closing_raw):
+            for entry in cast("list[object]", closing_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     num_raw = entry_dict.get("number")
                     if isinstance(num_raw, int):
                         closing.append(f"#{num_raw}")
@@ -340,9 +340,9 @@ class GhClient:
         labels_raw = payload_dict.get("labels")
         labels: list[str] = []
         if isinstance(labels_raw, list):
-            for entry in cast(list[object], labels_raw):
+            for entry in cast("list[object]", labels_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     name_raw = entry_dict.get("name")
                     if isinstance(name_raw, str):
                         labels.append(name_raw)
@@ -350,9 +350,9 @@ class GhClient:
         assignees_raw = payload_dict.get("assignees")
         assignees: list[str] = []
         if isinstance(assignees_raw, list):
-            for entry in cast(list[object], assignees_raw):
+            for entry in cast("list[object]", assignees_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     login_raw = entry_dict.get("login")
                     if isinstance(login_raw, str):
                         assignees.append(login_raw)
@@ -360,7 +360,7 @@ class GhClient:
         author_raw = payload_dict.get("author")
         author_login = ""
         if isinstance(author_raw, dict):
-            author_dict = cast(dict[str, object], author_raw)
+            author_dict = cast("dict[str, object]", author_raw)
             author_login_raw = author_dict.get("login")
             author_login = author_login_raw if isinstance(author_login_raw, str) else ""
 
@@ -372,9 +372,9 @@ class GhClient:
         files_raw = payload_dict.get("files")
         files_changed: list[str] = []
         if isinstance(files_raw, list):
-            for entry in cast(list[object], files_raw):
+            for entry in cast("list[object]", files_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     path_raw = entry_dict.get("path")
                     if isinstance(path_raw, str):
                         files_changed.append(path_raw)
@@ -422,16 +422,16 @@ class GhClient:
         if not isinstance(payload, dict):
             return None
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
 
         closing_raw = payload_dict.get("closingIssuesReferences")
         closing: list[str] = []
         if isinstance(closing_raw, list):
-            closing_entries = cast(list[object], closing_raw)
+            closing_entries = cast("list[object]", closing_raw)
             for entry in closing_entries:
                 if not isinstance(entry, dict):
                     continue
-                entry_dict = cast(dict[str, object], entry)
+                entry_dict = cast("dict[str, object]", entry)
                 number = entry_dict.get("number")
                 if isinstance(number, int):
                     closing.append(f"#{number}")
@@ -450,7 +450,7 @@ class GhClient:
         author_raw = payload_dict.get("author")
         author_login = ""
         if isinstance(author_raw, dict):
-            author_dict = cast(dict[str, object], author_raw)
+            author_dict = cast("dict[str, object]", author_raw)
             author_login_raw = author_dict.get("login")
             author_login = author_login_raw if isinstance(author_login_raw, str) else ""
         base_ref_raw = payload_dict.get("baseRefName")
@@ -461,18 +461,18 @@ class GhClient:
         labels_raw = payload_dict.get("labels")
         labels: list[str] = []
         if isinstance(labels_raw, list):
-            for entry in cast(list[object], labels_raw):
+            for entry in cast("list[object]", labels_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     name_raw = entry_dict.get("name")
                     if isinstance(name_raw, str):
                         labels.append(name_raw)
         assignees_raw = payload_dict.get("assignees")
         assignees: list[str] = []
         if isinstance(assignees_raw, list):
-            for entry in cast(list[object], assignees_raw):
+            for entry in cast("list[object]", assignees_raw):
                 if isinstance(entry, dict):
-                    entry_dict = cast(dict[str, object], entry)
+                    entry_dict = cast("dict[str, object]", entry)
                     login_raw = entry_dict.get("login")
                     if isinstance(login_raw, str):
                         assignees.append(login_raw)
@@ -511,7 +511,7 @@ class GhClient:
         if not isinstance(payload, dict):
             return None
 
-        payload_dict = cast(dict[str, object], payload)
+        payload_dict = cast("dict[str, object]", payload)
 
         content_raw = payload_dict.get("content")
         if not isinstance(content_raw, str):
@@ -539,11 +539,11 @@ class GhClient:
         payload = self._request_json(args, context="Fetch CI status")
         if not isinstance(payload, list) or not payload:
             return None, []
-        runs = cast(list[object], payload)
+        runs = cast("list[object]", payload)
         first_obj = runs[0]
         if not isinstance(first_obj, dict):
             return None, []
-        first = cast(dict[str, object], first_obj)
+        first = cast("dict[str, object]", first_obj)
         status_raw = first.get("status") or first.get("conclusion")
         status = status_raw if isinstance(status_raw, str) else None
         return status, []

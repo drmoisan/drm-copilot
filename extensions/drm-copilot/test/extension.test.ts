@@ -61,6 +61,14 @@ describe("drm-copilot core command behavior", () => {
     expect(commandHandlers.has("drmCopilotExtension.listMcpTools")).toBe(true);
   });
 
+  it("activate registers drmCopilotExtension.runCodexNativeConverter", () => {
+    activateAndGetHandler("drmCopilotExtension.runCodexNativeConverter");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.runCodexNativeConverter"),
+    ).toBe(true);
+  });
+
   it("activate registers drmCopilotExtension.resolvePolicyAuditTemplateAsset exactly once", () => {
     activateAndGetHandler(
       "drmCopilotExtension.resolvePolicyAuditTemplateAsset",

@@ -6,7 +6,7 @@
  * transitively imports command-runtime which has a top-level vscode import,
  * but the MCP code path never calls any vscode API.
  */
-const esbuild = require("esbuild");
+import esbuild from "esbuild";
 
 /** @type {import("esbuild").Plugin} */
 const vscodeShimPlugin = {

@@ -1,0 +1,543 @@
+# Policy Compliance Audit: harden feature promotion lifecycle MCP-only (Issue #168)
+
+**Audit Date:** 2026-04-29  
+**Code Under Test:** `.claude/skills/feature-promotion-lifecycle/SKILL.md`, `.claude/settings.json`, `.claude/hooks/enforce-promotion-mcp-only.ps1`, `.claude/agents/orchestrator.md`, `scripts/dev_tools/validate_orchestration_artifacts.py`, `scripts/dev_tools/validate_orchestration_review_artifacts.py`, `scripts/dev_tools/validate_orchestrator_state.py`, `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1`, `tests/scripts/claude-runtime/claude-settings.Tests.ps1`, `tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`, `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`
+
+**Coverage Metrics by Language:**
+
+| Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
+|----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
+| Python | 3 files | 29 tests | Γ£à 29 pass, 0 fail | 87% lines | 87% lines | 87% |
+| PowerShell | 3 files | 72 tests | Γ£à 72 pass, 0 fail | 96.83% line coverage | 96.83% line coverage | N/A - generated coverage report does not expose a numeric changed-file metric |
+| JSON | 1 file | N/A | Γ£à validation | N/A (config files) | N/A (config files) | N/A |
+
+### Coverage Evidence Checklist
+
+- TypeScript baseline coverage artifact: `N/A - out of scope`
+- TypeScript post-change coverage artifact: `N/A - out of scope`
+- PowerShell baseline coverage artifact: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/baseline/powershell-test.2026-04-29T08-56.md`
+- PowerShell post-change coverage artifact: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-test.2026-04-29T08-56.md`
+- Per-language comparison summary: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/python-coverage-comparison.2026-04-29T08-56.md` and `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-coverage-comparison.2026-04-29T08-56.md`
+
+**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+
+**Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
+
+---
+
+## Executive Summary
+
+This rerun supersedes the earlier 2026-04-29T13-55 review package after refreshing PR context against `development` and re-checking the working tree. The feature behavior remains implemented and acceptance evidence remains intact, but the earlier review package was materially inaccurate on one merge gate: `scripts/dev_tools/validate_orchestration_review_artifacts.py` is currently 516 lines, so the repository's 500-line production-file rule is still violated.
+
+The rerun also confirms that the workspace validator entrypoint accepts the live checkpoint shape and that the current review artifacts validate structurally. The overall policy result is **non-compliant** because the oversized production file remains and the new split Python modules are still below the repository's 90% coverage target for new modules.
+
+**Policy documents evaluated:**
+- [Γ£à] `general-code-change.instructions.md`
+- [Γ£à] `general-unit-test.instructions.md`
+
+**Language-specific policies evaluated:**
+- [Γ£à] `python-code-change.instructions.md` + `python-unit-test.instructions.md`
+- [Γ£à] `powershell-code-change.instructions.md` + `powershell-unit-test.instructions.md`
+- [Γ£à] JSON: `validate_json`
+
+**Temporary artifacts cleanup:**
+- [Γ£à] All temporary or one-time scripts created during development have been deleted
+- [Γ£à] Any ongoing tooling scripts are fully tested and compliant with repo policies
+- Kept with tests: `.claude/hooks/enforce-promotion-mcp-only.ps1`, `scripts/dev_tools/validate_orchestration_review_artifacts.py`, `scripts/dev_tools/validate_orchestrator_state.py`
+
+---
+
+## 1. General Unit Test Policy Compliance
+
+### 1.1 Core Principles
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Independence** - Tests run in any order | [Γ£à] [PASS] | The added Python and PowerShell tests use repository text plus synthetic payloads only and do not share mutable state. |
+| **Isolation** - Each test targets single behavior | [Γ£à] [PASS] | The changed suites isolate wording contracts, receipt-shape validation, and Bash-hook allow or deny behavior in individual cases. |
+| **Fast Execution** - Tests complete quickly | [Γ£à] [PASS] | The focused Python suite completed in `0.16s` for 29 tests. The feature evidence records 72 passing PowerShell tests without long-running dependencies. |
+| **Determinism** - Consistent results | [Γ£à] [PASS] | The tests use local files and static strings only; no network, database, or temporary-file creation is involved. |
+| **Readability & Maintainability** - Clear structure | [Γ£à] [PASS] | Test names remain descriptive and the file layout mirrors the production surfaces under review. |
+
+### 1.2 Coverage and Scenarios
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Baseline Coverage Documented** | [Γ£à] [PASS] | Baseline Python and PowerShell evidence exists under `evidence/baseline/` for this feature folder. |
+| **No Coverage Regression** | [Γ£à] [PASS] | Python remained `87% -> 87%`. PowerShell remained `96.83% -> 96.83%` per the baseline and QA comparison artifacts. |
+| **New Code Coverage ΓëÑ90%** | [Γ¥î] [FAIL] | `scripts/dev_tools/validate_orchestration_review_artifacts.py` and `scripts/dev_tools/validate_orchestrator_state.py` remain below the repository target at 87% and 83% in the QA evidence. |
+| **Comprehensive Coverage** | [ΓÜá∩╕Å] [PARTIAL] | The validator and hook behavior are well covered, but the uncovered branches in the two new Python modules keep new-module coverage below policy target. |
+| **Positive Flows** - Valid inputs | [Γ£à] [PASS] | Positive tests cover the MCP-only skill wording, benign Bash commands, legacy receipt validation, namespaced receipt validation, and the workspace validator CLI path. |
+| **Negative Flows** - Invalid inputs | [Γ£à] [PASS] | Negative tests cover each forbidden promotion token, scalar receipt rejection, and unsupported receipt-key rejection. |
+| **Edge Cases** - Boundary conditions | [Γ£à] [PASS] | The validator tests cover both legacy list receipts and additive namespaced receipts, and the hook allows empty or benign command input. |
+| **Error Handling** - Error paths | [Γ£à] [PASS] | The validator rejects malformed structures explicitly, and the hook surfaces malformed JSON instead of suppressing it. |
+| **Concurrency** - If applicable | [N/A] [N/A] | The reviewed scope is synchronous validation and hook logic. |
+| **State Transitions** - If applicable | [N/A] [N/A] | No new runtime state machine was added in this scope. |
+
+### 1.2.1 Per-Language Coverage Comparison
+
+- Python: Baseline: 87% lines -> Post-change: 87% lines. Change: +0% lines. New/changed-code coverage: 87%. Disposition: FAIL. Evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/python-pytest.2026-04-29T10-52.md`.
+- PowerShell: Baseline: 96.83% line coverage -> Post-change: 96.83% line coverage. Change: +0%. New/changed-code coverage: `N/A - generated report does not provide a numeric changed-file metric`. Disposition: PASS. Evidence: `docs/features/active/2026-04-29-harden-feature-promotion-lifecycle-mcp-only-168/evidence/qa-gates/powershell-coverage-comparison.2026-04-29T08-56.md`.
+
+### 1.3 Test Structure and Diagnostics
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Clear Failure Messages** | [Γ£à] [PASS] | The tests assert exact wording fragments or exact deny messages, so failures identify the missing contract or incorrect branch directly. |
+| **Arrange-Act-Assert Pattern** | [Γ£à] [PASS] | The PowerShell suite uses explicit arrange, act, and assert stages, and the Pytest cases follow the same structure through local builders and direct assertions. |
+| **Document Intent** | [Γ£à] [PASS] | The changed tests use descriptive names such as `test_validate_orchestrator_state_text_accepts_promotion_receipt_namespace`. |
+
+### 1.4 External Dependencies and Environment
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Avoid External Dependencies** | [Γ£à] [PASS] | No reviewed test depends on a network, database, or external process. |
+| **Use Mocks/Stubs** | [Γ£à] [PASS] | No mocking framework was required; synthetic inputs were sufficient for the isolated behaviors under test. |
+| **Environment Stability** | [Γ£à] [PASS] | The tests do not create temporary files and do not rely on mutable external configuration. |
+
+### 1.5 Policy Audit Requirement
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Pre-submission Review** | [Γ£à] [PASS] | This rerun policy audit, together with the companion code review and feature audit, is the required post-implementation review set for this feature folder. |
+
+---
+
+## 2. General Code Change Policy Compliance
+
+### 2.1 Before Making Changes
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Clarify the objective** | [Γ£à] [PASS] | The objective remains documented in `issue.md`, `spec.md`, and `user-story.md` for issue `#168`. |
+| **Read existing change plans** | [Γ£à] [PASS] | The feature folder contains `plan.2026-04-29T08-56.md` and the remediation inputs and plan from the prior rerun. |
+| **Document the plan** | [Γ£à] [PASS] | Planning and remediation documents exist in the active feature folder. |
+
+### 2.2 Design Principles
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Simplicity first** | [Γ£à] [PASS] | The feature remains scoped to Claude-side skill, settings, hook, and validator surfaces. |
+| **Reusability** | [Γ£à] [PASS] | The validation logic is split into reusable modules and the PowerShell hook exposes focused helper functions exercised by tests. |
+| **Extensibility** | [Γ£à] [PASS] | Receipt validation remains additive for the nested promotion namespace while preserving the legacy list path. |
+| **Separation of concerns** | [Γ£à] [PASS] | Documentation, hook enforcement, and validator logic remain separated by file responsibility. |
+
+### 2.3 Module & File Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Cohesive modules** | [Γ£à] [PASS] | The touched files still have single, clear responsibilities. |
+| **Under 500 lines** | [Γ¥î] [FAIL] | `pwsh` line-count check on 2026-04-29 reported `.claude/hooks/enforce-promotion-mcp-only.ps1` = 147, `scripts/dev_tools/validate_orchestration_artifacts.py` = 246, `scripts/dev_tools/validate_orchestration_review_artifacts.py` = 516, and `scripts/dev_tools/validate_orchestrator_state.py` = 287. The 500-line production-file rule is therefore still violated. |
+| **Public vs internal** | [Γ£à] [PASS] | The public CLI entrypoint remains `scripts.dev_tools.validate_orchestration_artifacts`; helper modules remain internal implementation detail. |
+| **No circular dependencies** | [Γ£à] [PASS] | The current split uses one-way imports from the entrypoint into helper modules and no circular dependency was observed in the reviewed scope. |
+
+### 2.4 Naming, Docs, and Comments
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Descriptive names** | [Γ£à] [PASS] | The hook, validator helpers, and tests use behavior-oriented names. |
+| **Docs/docstrings** | [Γ£à] [PASS] | The new Python modules and hook include contract-oriented documentation. |
+| **Comment why, not what** | [Γ£à] [PASS] | The current comments explain rationale for narrow Bash command inspection and validation delegation. |
+
+### 2.5 After Making Changes - Toolchain Execution
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **1. Formatting** | [Γ£à] [PASS] | **Command:** `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
+| **2. Linting** | [Γ£à] [PASS] | **Command:** `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
+| **3. Type checking** | [Γ£à] [PASS] | **Command:** `poetry run pyright`.<br>**Result:** Existing QA evidence records `0 errors, 0 warnings, 0 informations`. |
+| **4. Testing** | [Γ£à] [PASS] | **Command:** `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` plus the recorded PowerShell QA loop.<br>**Result:** Existing QA evidence records passing runs. |
+| **Full toolchain loop** | [Γ£à] [PASS] | The feature folder already contains clean final QA-loop evidence for the implementation scope. |
+| **Explicit reporting** | [Γ£à] [PASS] | The commands and evidence paths are documented in this rerun and in the feature-folder evidence artifacts. |
+
+### 2.6 Summarize and Document
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Summarize changes** | [Γ£à] [PASS] | The feature folder documents the Claude-side MCP-only hardening work and the validator split. |
+| **Design choices explained** | [Γ£à] [PASS] | The feature docs explain the MCP-only contract and the additive receipt-namespace design. |
+| **Update supporting documents** | [Γ£à] [PASS] | The active feature folder contains issue, spec, user story, plan, evidence, and rerun review artifacts. |
+| **Provide next steps** | [Γ¥î] [FAIL] | The reviewed working tree still needs remediation for the oversized production file and new-module coverage shortfall before merge. |
+
+---
+
+## 3. Language-Specific Code Change Policy Compliance
+
+### Section 3A: Python Code Change Policy Compliance
+
+#### 3A.1 Tooling & Baseline
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Formatting with Black** | [Γ£à] [PASS] | **Command:** `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
+| **Linting with Ruff** | [Γ£à] [PASS] | **Command:** `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`.<br>**Result:** Existing QA evidence records a clean final pass. |
+| **Type checking with Pyright** | [Γ£à] [PASS] | **Command:** `poetry run pyright`.<br>**Result:** Existing QA evidence records a clean final pass. |
+| **Testing with Pytest** | [Γ£à] [PASS] | **Command:** `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info`.<br>**Result:** Existing QA evidence records `29 passed in 0.16s`. |
+
+#### 3A.2 Python Design & Typing
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Strong typing** | [Γ£à] [PASS] | The validator entrypoint and helper modules remain typed and the recorded Pyright pass is clean. |
+| **Dataclasses for value objects** | [N/A] [N/A] | No new Python value objects were introduced in this scope. |
+| **Protocols/ABCs for interfaces** | [N/A] [N/A] | No new Python interface layer was introduced. |
+| **Avoid utility classes** | [Γ£à] [PASS] | The implementation uses top-level modules and functions rather than static-method utility classes. |
+
+#### 3A.3 Python Error Handling
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Specific exceptions** | [Γ£à] [PASS] | The validator logic handles malformed input explicitly rather than through broad suppression. |
+| **Logging over print** | [Γ£à] [PASS] | The CLI entrypoint uses validation output conventions and does not introduce ad-hoc debug prints. |
+| **Invariants at construction** | [N/A] [N/A] | No new Python classes were added in this scope. |
+
+### Section 3B: PowerShell Code Change Policy Compliance
+
+#### 3B.1 Tooling & Baseline
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Formatting with Invoke-Formatter** | [Γ£à] [PASS] | Existing PoshQC evidence records a clean formatter pass for the PowerShell scope. |
+| **Linting with PSScriptAnalyzer** | [Γ£à] [PASS] | Existing PoshQC evidence records a clean analyzer pass for the PowerShell scope. |
+| **Fix all findings** | [Γ£à] [PASS] | The final QA evidence records no remaining PowerShell findings. |
+| **PowerShell 7+ compatible** | [Γ£à] [PASS] | The reviewed hook and tests align with the repository's PowerShell 7 tooling contract. |
+
+#### 3B.2 PowerShell Design & Safety
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Advanced functions** | [Γ£à] [PASS] | The hook uses focused helper functions and deterministic JSON responses. |
+| **Parameter validation** | [Γ£à] [PASS] | The helper functions use explicit parameters for command-text inspection. |
+| **Avoid global state** | [Γ£à] [PASS] | The hook relies on local inputs and one canonical deny-message constant only. |
+| **Error handling** | [Γ£à] [PASS] | Malformed `CLAUDE_TOOL_INPUT` is surfaced explicitly and the hook fails closed for forbidden commands. |
+
+#### 3B.3 Structure, Naming, and Comments
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Cohesive and under 500 lines** | [Γ£à] [PASS] | `.claude/hooks/enforce-promotion-mcp-only.ps1` is 147 lines and remains below the repository limit. |
+| **Approved verbs** | [Γ£à] [PASS] | The reviewed functions use approved verbs such as `Get`, `Test`, and `Invoke`. |
+| **Comment why** | [Γ£à] [PASS] | The hook comments explain the intent of narrow Bash-token enforcement. |
+
+#### 3B.4 Running the Toolchain
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Step 1: Format** | [Γ£à] [PASS] | Existing PoshQC evidence records a clean formatter pass. |
+| **Step 2: Analyze** | [Γ£à] [PASS] | Existing PoshQC evidence records a clean analyzer pass. |
+| **Step 3: Type check** | N/A | Not applicable for PowerShell. |
+| **Step 4: Test** | [Γ£à] [PASS] | Existing PoshQC evidence records passing Pester results. |
+| **Rerun loop if needed** | [Γ£à] [PASS] | The stored QA evidence shows a completed PowerShell QA loop for this feature scope. |
+
+### Section 3D: JSON Configuration Policy Compliance
+
+#### 3D.1 JSON Tooling
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Formatting with jq** | [N/A] [N/A] | No separate JSON reformatting pass was required for this rerun. |
+| **Schema validation** | [Γ£à] [PASS] | `shell: JSON: validate` completed successfully in the workspace context. |
+| **Required $schema** | [Γ£à] [PASS] | `.claude/settings.json` continues to declare the appropriate schema key. |
+
+#### 3D.2 JSON Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Strict JSON only** | [Γ£à] [PASS] | `.claude/settings.json` remains strict JSON. |
+| **Deterministic key order** | [Γ£à] [PASS] | The file remains valid and stable under repository validation. |
+
+---
+
+## 4. Language-Specific Unit Test Policy Compliance
+
+### Section 4A: Python Unit Test Policy Compliance
+
+#### 4A.1 Framework and Scope
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use Pytest** | [Γ£à] [PASS] | The reviewed Python tests run under Pytest. |
+| **Coverage expectation** | [Γ¥î] [FAIL] | Repo-wide coverage remains above 80%, but the two new Python modules remain below the 90% new-module target. |
+
+#### 4A.2 Test Style and Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Focused unit tests** | [Γ£à] [PASS] | Each reviewed test covers one contract or one validator branch. |
+| **Mocking sparingly** | [Γ£à] [PASS] | The tests use direct input construction rather than broad mocking. |
+| **Organization** | [Γ£à] [PASS] | The test files mirror the validator and guardrail locations. |
+
+#### 4A.3 Naming and Readability
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Naming conventions** | [Γ£à] [PASS] | The test names are descriptive and scenario-specific. |
+| **Docstrings/comments** | [Γ£à] [PASS] | The changed tests include concise intent-oriented docstrings. |
+
+#### 4A.4 Running the Toolchain
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use Pytest** | [Γ£à] [PASS] | Existing QA evidence records `29 passed in 0.16s`. |
+| **No Alternative Test Runners** | [Γ£à] [PASS] | Only Pytest was used for the Python scope. |
+
+### Section 4B: PowerShell Unit Test Policy Compliance
+
+#### 4B.1 Framework and Scope
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use Pester v5.x** | [Γ£à] [PASS] | The reviewed PowerShell tests use the repository Pester structure. |
+| **Use PoshQC Configuration** | [Γ£à] [PASS] | The stored QA evidence records the required PoshQC test path. |
+| **PowerShell 7+ Compatible** | [Γ£à] [PASS] | The reviewed PowerShell evidence is aligned with the repository's PowerShell 7 setup. |
+
+#### 4B.2 Test Style and Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Focused Unit Tests** | [Γ£à] [PASS] | The new PowerShell tests isolate the allow path and each forbidden-token deny path. |
+| **Test Behavior Over Implementation** | [Γ£à] [PASS] | The tests assert observable allow and deny decisions. |
+| **Mocking Used Sparingly** | [Γ£à] [PASS] | No mocking framework is used in the reviewed PowerShell scope. |
+| **Organization** | [Γ£à] [PASS] | `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1` mirrors `.claude/hooks/enforce-promotion-mcp-only.ps1`. |
+
+#### 4B.3 Naming and Readability
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **File Naming** - *.Tests.ps1 | [Γ£à] [PASS] | The reviewed PowerShell test file uses the required suffix. |
+| **Describe/Context/It Structure** | [Γ£à] [PASS] | The suite uses standard `Describe`, `Context`, and `It` structure. |
+| **Logical Grouping** | [Γ£à] [PASS] | Benign and forbidden-command scenarios are grouped separately. |
+| **Docstrings/Comments** | [Γ£à] [PASS] | The reviewed suite is self-documenting through its case names. |
+
+#### 4B.4 Running the Toolchain
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use PoshQCTest Command** | [Γ£à] [PASS] | Existing QA evidence records a passing Pester run for this feature scope. |
+| **No Alternative Test Runners** | [Γ£à] [PASS] | Only the repository PowerShell QA tooling was used. |
+
+---
+
+## 5. Test Coverage Detail
+
+### Python validator modules and guardrail contracts
+
+| Test Name | Scenario Type | Lines Covered | Status |
+|-----------|--------------|---------------|--------|
+| `test_entrypoint_reexports_split_validator_functions` | Positive | Stable entrypoint aliasing after the split | Γ£à |
+| `test_validate_orchestrator_state_text_accepts_legacy_list_delegation_receipts` | Positive | Legacy receipt validation path | Γ£à |
+| `test_validate_orchestrator_state_text_accepts_promotion_receipt_namespace` | Positive | Additive namespaced receipt validation path | Γ£à |
+| `test_validate_orchestrator_state_rejects_noncontainer_receipts` | Negative | Scalar receipt rejection | Γ£à |
+| `test_validate_orchestrator_state_rejects_unknown_promotion_receipt_keys` | Negative | Unsupported nested-key rejection | Γ£à |
+| `test_claude_feature_promotion_lifecycle_requires_mcp_preflight` | Contract | MCP-only wording contract | Γ£à |
+
+**Coverage:** `scripts/dev_tools/validate_orchestration_artifacts.py` 90.48%, `scripts/dev_tools/validate_orchestration_review_artifacts.py` 87.02%, and `scripts/dev_tools/validate_orchestrator_state.py` 83.33% per the current `coverage.xml` and feature-folder QA evidence.
+
+**Not covered:** Defensive edge paths in `validate_orchestration_review_artifacts.py` and `validate_orchestrator_state.py` remain unexecuted in the focused suite.
+
+### PowerShell hook coverage
+
+| Test Name | Scenario Type | Lines Covered | Status |
+|-----------|--------------|---------------|--------|
+| `allows benign Bash commands` | Positive | Allow decision path | Γ£à |
+| `blocks new-potential-entry.ps1` | Negative | Forbidden-token deny path | Γ£à |
+| `blocks new_potential_bug_entry` | Negative | Forbidden-token deny path | Γ£à |
+| `blocks potential_to_issue` | Negative | Forbidden-token deny path | Γ£à |
+| `blocks new_active_feature_folder` | Negative | Forbidden-token deny path | Γ£à |
+
+**Coverage:** Aggregate PowerShell coverage remained 96.83%; the generated report does not provide an isolated numeric changed-file metric for the new hook.
+
+---
+
+## 6. Test Execution Metrics
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Total Tests | 29 reviewed Python tests plus 72 recorded PowerShell tests | Γ£à |
+| Tests Passed | 29/29 Python; 72/72 PowerShell | Γ£à |
+| Tests Failed | 0 in the recorded evidence | Γ£à |
+| Execution Time | 0.16s for the focused Python suite | Γ£à Fast |
+| Average Time per Test | N/A - mixed runners and stored evidence | Γ£à |
+| Discovery Time | N/A - not surfaced in the stored evidence | Γ£à |
+| Functions/Classes Tested | Multiple validator and hook behaviors across the changed scope | Γ£à |
+| Test File Size | The changed test files remain under the repository size limit | Γ£à |
+| Code Coverage (if applicable) | Python new-module coverage remains below policy target | Γ¥î |
+
+---
+
+## 7. Code Quality Checks
+
+**For Python:**
+
+| Check | Command | Result | Status |
+|-------|---------|--------|--------|
+| Black Formatting | `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in QA evidence | Γ£à |
+| Ruff Linting | `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py` | Clean final pass recorded in QA evidence | Γ£à |
+| Pyright Type Checking | `poetry run pyright` | Clean final pass recorded in QA evidence | Γ£à |
+| Pytest Tests | `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info` | `29 passed in 0.16s` recorded in QA evidence | Γ£à |
+
+**For PowerShell:**
+
+| Check | Command | Result | Status |
+|-------|---------|--------|--------|
+| Invoke-Formatter | `mcp_drmcopilotext_run_poshqc_format scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]` | Clean final pass recorded in QA evidence | Γ£à |
+| PSScriptAnalyzer | `mcp_drmcopilotext_run_poshqc_analyze scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]` | Clean final pass recorded in QA evidence | Γ£à |
+| Pester Tests | `mcp_drmcopilotext_run_poshqc_test scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]` | Passing run recorded in QA evidence | Γ£à |
+
+**Notes:**
+The rerun additionally verified these current-session checks: refreshed PR context against `development`; structural validation of the prior review artifacts; workspace CLI validation of `artifacts/orchestration/orchestrator-state.json`; and live line-count inspection for the touched production files.
+
+---
+
+## 8. Gaps and Exceptions
+
+### Identified Gaps
+- `scripts/dev_tools/validate_orchestration_review_artifacts.py` remains 516 lines, which violates the repository 500-line production-file limit.
+- `scripts/dev_tools/validate_orchestration_review_artifacts.py` and `scripts/dev_tools/validate_orchestrator_state.py` remain below the repository 90% coverage target for new modules.
+
+### Approved Exceptions
+**None.** No policy exceptions were approved for the reviewed scope.
+
+### Removed/Skipped Tests
+**None.** The rerun did not identify removed or skipped tests in the reviewed scope.
+
+---
+
+## 9. Summary of Changes
+
+### Commits in This PR/Branch
+
+The refreshed PR context against `development` shows no commits in range because the review is currently working-tree based.
+
+### Files Modified
+
+1. **`.claude/skills/feature-promotion-lifecycle/SKILL.md`** (MODIFIED)
+   - Hardens the Claude promotion guidance to MCP-only execution.
+
+2. **`.claude/settings.json`** (MODIFIED)
+   - Registers the promotion-specific Bash pre-tool hook.
+
+3. **`.claude/hooks/enforce-promotion-mcp-only.ps1`** (NEW)
+   - Blocks direct Bash promotion-script bypass attempts.
+
+4. **`.claude/agents/orchestrator.md`** (MODIFIED)
+   - Documents the `delegation_receipts.promotion.*` receipt namespace.
+
+5. **`scripts/dev_tools/validate_orchestration_artifacts.py`** (MODIFIED)
+   - Remains the stable CLI entrypoint for orchestration-artifact validation.
+
+6. **`scripts/dev_tools/validate_orchestration_review_artifacts.py`** (NEW)
+   - Holds review-artifact validation helpers and currently remains oversized at 516 lines.
+
+7. **`scripts/dev_tools/validate_orchestrator_state.py`** (NEW)
+   - Holds orchestrator-state and receipt-namespace validation helpers.
+
+8. **PowerShell and Python test files** (MODIFIED)
+   - Preserve the hook and validator contracts under the new layout.
+
+---
+
+## 10. Compliance Verdict
+
+### Overall Status: Γ¥î NON-COMPLIANT
+
+The feature behavior is present and the acceptance criteria are satisfied, but the reviewed working tree is not policy-compliant because one production Python file still exceeds 500 lines and two new Python modules remain below the repository's new-module coverage target.
+
+**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is missing.
+
+---
+
+### Policy-by-Policy Summary
+
+#### General Code Change Policy (Section 2)
+- [Γ£à] Before Making Changes: Planning artifacts exist.
+- [Γ£à] Design Principles: The scope remains narrow and additive.
+- [Γ¥î] Module & File Structure: `validate_orchestration_review_artifacts.py` remains above 500 lines.
+- [Γ£à] Naming, Docs, Comments: Clear and contract-oriented.
+- [Γ£à] Toolchain Execution: Existing QA evidence is complete.
+- [Γ¥î] Summarize & Document: The implementation still needs remediation before merge.
+
+#### Language-Specific Code Change Policy (Section 3)
+
+**For Python:**
+- [Γ£à] Tooling & Baseline: Black, Ruff, Pyright, and Pytest evidence is clean.
+- [Γ£à] Python Design & Typing: Typed and CLI-compatible.
+- [Γ£à] Error Handling: Explicit validation failures remain in place.
+
+**For PowerShell:**
+- [Γ£à] Tooling & Baseline: PowerShell QA evidence is clean.
+- [Γ£à] PowerShell Design & Safety: Narrow and explicit hook logic.
+- [Γ£à] Structure & Naming: The PowerShell scope remains under 500 lines.
+- [Γ£à] Toolchain: Passing evidence is present.
+
+#### General Unit Test Policy (Section 1)
+- [Γ£à] Core Principles: Independent, deterministic, and focused.
+- [Γ¥î] Coverage & Scenarios: New-module coverage remains below 90%.
+- [Γ£à] Test Structure: Clear and maintainable.
+- [Γ£à] External Dependencies: None.
+- [Γ£à] Policy Audit: This rerun fulfills the review requirement.
+
+#### Language-Specific Unit Test Policy (Section 4)
+
+**For Python:**
+- [Γ£à] Framework & Scope: Pytest used correctly.
+- [Γ£à] Test Style & Structure: Focused on contracts and validator behavior.
+- [Γ£à] Naming & Readability: Descriptive.
+- [Γ¥î] Toolchain: Coverage target for new modules is still unmet.
+
+**For PowerShell:**
+- [Γ£à] Framework & Scope: Pester through PoshQC.
+- [Γ£à] Test Style & Structure: Focused one-behavior cases.
+- [Γ£à] Naming & Readability: Standard `*.Tests.ps1` layout.
+- [Γ£à] Toolchain: Passing evidence is present.
+
+---
+
+### Metrics Summary
+
+- [Γ£à] 29/29 focused Python tests passing in the recorded QA evidence.
+- [Γ£à] 72/72 PowerShell tests passing in the recorded QA evidence.
+- [Γ¥î] One production file remains above the 500-line limit: `scripts/dev_tools/validate_orchestration_review_artifacts.py` at 516 lines.
+- [Γ¥î] New Python modules remain below the repository 90% coverage target: 87.02% and 83.33%.
+- [Γ£à] The current review artifacts and workspace validator entrypoint both validate successfully for their intended scopes.
+
+---
+
+### Recommendation
+
+**Needs revision**
+
+Reduce `scripts/dev_tools/validate_orchestration_review_artifacts.py` below 500 lines and add targeted tests that raise the two new Python modules to the repository's 90% new-module coverage target before merge.
+
+---
+
+## Appendix A: Test Inventory
+
+### Complete Test List
+
+- `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`
+- `tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`
+- `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Tests.ps1`
+- `tests/scripts/claude-runtime/claude-settings.Tests.ps1`
+
+---
+
+## Appendix B: Toolchain Commands Reference
+
+- `poetry run black scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`
+- `poetry run ruff check scripts/dev_tools/validate_orchestration_artifacts.py scripts/dev_tools/validate_orchestration_review_artifacts.py scripts/dev_tools/validate_orchestrator_state.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py`
+- `poetry run pyright`
+- `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_orchestration_guardrail_contracts.py --cov=scripts.dev_tools.validate_orchestration_artifacts --cov=scripts.dev_tools.validate_orchestration_review_artifacts --cov=scripts.dev_tools.validate_orchestrator_state --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=lcov:artifacts/python/lcov.info`
+- `mcp_drmcopilotext_run_poshqc_format scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]`
+- `mcp_drmcopilotext_run_poshqc_analyze scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]`
+- `mcp_drmcopilotext_run_poshqc_test scan_folders=[".claude/hooks","tests/scripts/claude-hooks","tests/scripts/claude-runtime"]`
+- `pwsh -NoProfile -Command "foreach ($path in @('.claude/hooks/enforce-promotion-mcp-only.ps1','scripts/dev_tools/validate_orchestration_artifacts.py','scripts/dev_tools/validate_orchestration_review_artifacts.py','scripts/dev_tools/validate_orchestrator_state.py')) { $count = (Get-Content -Path $path).Count; Write-Output (\"$path`t$count\") }"`
+- `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json`
+
+---
+
+**Audit Completed By:** GitHub Copilot  
+**Audit Date:** 2026-04-29  
+**Policy Version:** Current as of 2026-04-29

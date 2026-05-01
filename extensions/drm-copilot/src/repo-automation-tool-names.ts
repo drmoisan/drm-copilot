@@ -1,8 +1,10 @@
 export const REPO_AUTOMATION_TOOLS = [
   "collect_commit_context",
   "collect_pr_context",
+  "run_codex_native_converter",
   "push_down_copilot_customizations",
   "push_down_codex_and_agents_customizations",
+  "push_down_claude_customizations",
   "new_potential_bug_entry",
   "new_potential_entry",
   "link_parent_child",
