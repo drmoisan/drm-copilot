@@ -55,7 +55,7 @@ def _as_hard_lock_prompt_module(module: ModuleType) -> HardLockPromptModule:
     """Return a typed view over a dynamically loaded hard-lock prompt module."""
     if not hasattr(module, "resolve_prompt"):
         raise AssertionError("Module does not expose resolve_prompt")
-    return cast(HardLockPromptModule, module)
+    return cast("HardLockPromptModule", module)
 
 
 def _restore_modules(preserved_modules: dict[str, ModuleType | None]) -> None:

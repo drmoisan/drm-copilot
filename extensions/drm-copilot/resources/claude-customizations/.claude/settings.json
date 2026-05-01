@@ -74,6 +74,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/validate-bash.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-promotion-mcp-only.ps1"
           }
         ]
       },

@@ -87,8 +87,8 @@ def pick_file_with_tkinter(*, title: str, initial_dir: Path | None) -> Path | No
 
         # Import Tkinter dynamically to avoid strict-mode typing friction while
         # keeping callers fully typed.
-        tk_mod = cast(Any, importlib.import_module("tkinter"))
-        filedialog_mod = cast(Any, importlib.import_module("tkinter.filedialog"))
+        tk_mod = cast("Any", importlib.import_module("tkinter"))
+        filedialog_mod = cast("Any", importlib.import_module("tkinter.filedialog"))
     except ImportError:
         return None
 

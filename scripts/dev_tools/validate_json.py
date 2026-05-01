@@ -193,7 +193,7 @@ def validate_file(path: Path, cache_dir: Path) -> tuple[bool, str]:
     if not isinstance(data_raw, dict):
         return False, f"{path}: JSON root must be an object for validation"
 
-    data = cast(dict[str, Any], data_raw)
+    data = cast("dict[str, Any]", data_raw)
     schema_value = data.get("$schema")
     if not isinstance(schema_value, str):
         return False, f"{path}: missing $schema"

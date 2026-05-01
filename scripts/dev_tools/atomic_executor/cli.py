@@ -197,8 +197,8 @@ def execute_one_task(*args: object, **kwargs: object) -> int:
     forwarded_kwargs = dict(kwargs)
     forwarded_kwargs.setdefault("run_copilot_fn", run_copilot)
     forwarded_kwargs.setdefault("log_msg_fn", _log_msg)
-    executor = cast(Any, _execute_one_task_impl)
-    return cast(int, executor(*args, **forwarded_kwargs))
+    executor = cast("Any", _execute_one_task_impl)
+    return cast("int", executor(*args, **forwarded_kwargs))
 
 
 _run_preflight_qc_fix_loop = run_preflight_qc_fix_loop

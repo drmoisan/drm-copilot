@@ -56,7 +56,7 @@ def main() -> int:
         sys.argv.extend(["--template-root", template_root])
 
     module = importlib.import_module("dev_tools.new_active_feature_folder")
-    module_main = cast(Callable[[], None], module.main)
+    module_main = cast("Callable[[], None]", module.main)
     module_main()
     return 0
 

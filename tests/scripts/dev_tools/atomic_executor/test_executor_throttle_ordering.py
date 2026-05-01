@@ -231,9 +231,9 @@ def test_executor_does_not_flip_checkbox_until_throttle_resolves(
     exit_code = cli.execute_one_task(
         workspace=Path("repo"),
         cur=cur,
-        parser=cast(PlanParser, parser),
-        builder=cast(PromptBuilder, builder),
-        qc_runner=cast(QCRunner, qc_runner),
+        parser=cast("PlanParser", parser),
+        builder=cast("PromptBuilder", builder),
+        qc_runner=cast("QCRunner", qc_runner),
         log_file=Path("log.txt"),
         prompt_template_path=Path("prompt_template.md"),
         max_fix_attempts=1,

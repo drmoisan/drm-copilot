@@ -55,7 +55,7 @@ def main() -> int:
         sys.argv.extend(["--template-root", template_root])
 
     module = importlib.import_module("dev_tools.resolve_hard_lock_prompt")
-    module_main = cast(Callable[[], int], module.main)
+    module_main = cast("Callable[[], int]", module.main)
     return int(module_main())
 
 

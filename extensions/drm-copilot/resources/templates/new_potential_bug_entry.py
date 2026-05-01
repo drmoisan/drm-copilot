@@ -43,7 +43,7 @@ def main() -> int:
     """Execute bundled potential-bug-entry entrypoint in-process."""
     _ensure_bundled_scripts_import_path()
     module = importlib.import_module("dev_tools.new_potential_bug_entry")
-    module_main = cast(Callable[[], None], module.main)
+    module_main = cast("Callable[[], None]", module.main)
     module_main()
     return 0
 

@@ -402,7 +402,7 @@ def test_copy_to_clipboard_without_clipboard(monkeypatch: pytest.MonkeyPatch) ->
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     assert module.copy_to_clipboard("hello") is False
@@ -422,7 +422,7 @@ def test_copy_to_clipboard_pyperclip_error(monkeypatch: pytest.MonkeyPatch) -> N
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     result = module.copy_to_clipboard("hello")
@@ -437,7 +437,7 @@ def test_copy_to_clipboard_command_success(monkeypatch: pytest.MonkeyPatch) -> N
         return "/usr/bin/pbcopy" if name == "pbcopy" else None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     with patch.object(
@@ -457,7 +457,7 @@ def test_copy_to_clipboard_command_failure(monkeypatch: pytest.MonkeyPatch) -> N
         return "/usr/bin/pbcopy" if name == "pbcopy" else None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     with patch.object(

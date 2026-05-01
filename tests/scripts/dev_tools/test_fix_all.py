@@ -56,7 +56,7 @@ def build_logger() -> fix_all.StepLogger:
 
 
 def read_log(logger: fix_all.StepLogger) -> str:
-    return cast(StringIO, logger.stream).getvalue()
+    return cast("StringIO", logger.stream).getvalue()
 
 
 def base_success_responses(

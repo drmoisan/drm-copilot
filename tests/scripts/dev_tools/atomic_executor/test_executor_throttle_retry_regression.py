@@ -235,9 +235,9 @@ def test_execute_one_task_retries_on_throttle_then_succeeds(
     exit_code = cli_mod.execute_one_task(
         workspace=Path("/repo"),  # noqa: S108 - test fixture path
         cur=task,
-        parser=cast(PlanParser, fake_parser),
-        builder=cast(PromptBuilder, fake_builder),
-        qc_runner=cast(QCRunner, fake_qc),
+        parser=cast("PlanParser", fake_parser),
+        builder=cast("PromptBuilder", fake_builder),
+        qc_runner=cast("QCRunner", fake_qc),
         log_file=Path("/dev/null"),  # noqa: S108 - test fixture path
         prompt_template_path=Path("/template.md"),  # noqa: S108 - test fixture path
         max_fix_attempts=3,
