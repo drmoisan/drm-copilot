@@ -428,7 +428,7 @@ def validate_orchestrator_state_text(
 
     if not isinstance(state, dict):
         return ["Checkpoint root must be a JSON object."]
-    state_map = cast(dict[str, Any], state)
+    state_map = cast("dict[str, Any]", state)
 
     for key in REQUIRED_STATE_KEYS:
         if key not in state_map:
@@ -454,7 +454,7 @@ def validate_orchestrator_state_text(
     if receipts is not None and not isinstance(receipts, list):
         errors.append("Checkpoint delegation_receipts must be a list.")
     if isinstance(receipts, list):
-        typed_receipts = cast(list[object], receipts)
+        typed_receipts = cast("list[object]", receipts)
         for index, receipt in enumerate(typed_receipts):
             if not isinstance(receipt, dict):
                 errors.append(
@@ -466,7 +466,7 @@ def validate_orchestrator_state_text(
                     errors.append(
                         f"Checkpoint delegation receipt #{index} missing key: {key}"
                     )
-            artifact_paths = cast(dict[str, Any], receipt).get("artifact_paths")
+            artifact_paths = cast("dict[str, Any]", receipt).get("artifact_paths")
             if artifact_paths is not None and not isinstance(artifact_paths, list):
                 errors.append(
                     "Checkpoint delegation receipt "

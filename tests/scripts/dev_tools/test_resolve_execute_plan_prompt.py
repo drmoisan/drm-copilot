@@ -17,15 +17,17 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from unittest.mock import Mock, patch
 
 import pytest
 
 from scripts.dev_tools import resolve_execute_plan_prompt as module
 from scripts.dev_tools.atomic_executor.plan_discovery import ResolvedPlan
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 FIXTURE_ROOT = (
     Path(__file__).resolve().parent.parent.parent
@@ -402,7 +404,7 @@ def test_copy_to_clipboard_without_clipboard(monkeypatch: pytest.MonkeyPatch) ->
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     assert module.copy_to_clipboard("hello") is False
@@ -422,7 +424,7 @@ def test_copy_to_clipboard_pyperclip_error(monkeypatch: pytest.MonkeyPatch) -> N
         return None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     result = module.copy_to_clipboard("hello")
@@ -437,7 +439,7 @@ def test_copy_to_clipboard_command_success(monkeypatch: pytest.MonkeyPatch) -> N
         return "/usr/bin/pbcopy" if name == "pbcopy" else None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     with patch.object(
@@ -457,7 +459,7 @@ def test_copy_to_clipboard_command_failure(monkeypatch: pytest.MonkeyPatch) -> N
         return "/usr/bin/pbcopy" if name == "pbcopy" else None
 
     monkeypatch.setattr(
-        module.shutil, "which", cast(Callable[[str], str | None], _which)
+        module.shutil, "which", cast("Callable[[str], str | None]", _which)
     )
 
     with patch.object(

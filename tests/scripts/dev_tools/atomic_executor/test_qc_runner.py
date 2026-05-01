@@ -196,7 +196,7 @@ class TestQCRunnerFullLoop:
             argv = kwargs.get("argv")
             env = kwargs.get("env")
             if isinstance(argv, list) and "pytest" in argv and isinstance(env, dict):
-                pytest_env = cast(dict[str, str], env)
+                pytest_env = cast("dict[str, str]", env)
             return QCToolResult(step="tool", returncode=0, output="")
 
         runner = QCRunner(mem_fs_path)

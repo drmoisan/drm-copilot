@@ -18,4 +18,4 @@ export default tseslint.config(
   {
     ignores: ["out/**", "node_modules/**"],
   },
-);
+); 

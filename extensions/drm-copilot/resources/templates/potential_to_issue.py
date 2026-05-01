@@ -26,9 +26,11 @@ from __future__ import annotations
 
 import importlib
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _ensure_bundled_scripts_import_path() -> None:
@@ -44,7 +46,7 @@ def main() -> int:
     """Execute bundled potential-to-issue entrypoint in-process."""
     _ensure_bundled_scripts_import_path()
     module = importlib.import_module("dev_tools.potential_to_issue")
-    module_main = cast(Callable[[], None], module.main)
+    module_main = cast("Callable[[], None]", module.main)
     module_main()
     return 0
 

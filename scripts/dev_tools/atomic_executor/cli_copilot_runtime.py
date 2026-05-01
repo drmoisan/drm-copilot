@@ -283,7 +283,7 @@ def _ensure_trusted_workspace(*, workspace: Path) -> None:
         trusted_folders_list: list[str] = []
     elif isinstance(trusted_folders, list):
         trusted_folders_list = [
-            str(item) for item in cast(list[object], trusted_folders)
+            str(item) for item in cast("list[object]", trusted_folders)
         ]
     else:
         raise RuntimeError(
@@ -341,7 +341,7 @@ def _stream_copilot_output(
         try:
             while True:
                 chunk: bytes = (
-                    cast(bytes, read1(4096)) if callable(read1) else stream.read(4096)
+                    cast("bytes", read1(4096)) if callable(read1) else stream.read(4096)
                 )
 
                 if not chunk:

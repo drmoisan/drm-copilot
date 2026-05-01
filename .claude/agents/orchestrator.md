@@ -65,6 +65,11 @@ Update `artifacts/orchestration/orchestrator-state.json` after every completed s
 - `completed_steps`, `next_step`, `last_updated`
 - Step statuses: `step5_status` through `step10_status`
 - `delegation_receipts`, `blocked_reason`
+- Persist raw promotion MCP receipts under:
+  - `delegation_receipts.promotion.potential_entry`
+  - `delegation_receipts.promotion.issue`
+  - `delegation_receipts.promotion.feature_folder`
+- Each `delegation_receipts.promotion.*` field stores the raw MCP receipt payload from the matching promotion operation.
 
 ## Completion Requirements
 

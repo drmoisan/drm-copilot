@@ -18,7 +18,7 @@ from scripts.dev_tools.codex_native_converter.models import (
     TranslationTrace,
 )
 
-REPORTING_HELPERS = cast(Any, reporting)
+REPORTING_HELPERS = cast("Any", reporting)
 
 
 def test_render_conversion_report_includes_three_mermaid_topology_charts() -> None:

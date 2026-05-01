@@ -20,7 +20,7 @@ from scripts.dev_tools.codex_native_converter.reporting import ReportSetPaths
 # Pyright correctly enforces private-module access. These tests intentionally
 # exercise the private helpers that dominate package coverage, so they route
 # through an Any-typed alias to keep the production module surface unchanged.
-CLI_HELPERS = cast(Any, cli)
+CLI_HELPERS = cast("Any", cli)
 
 
 def _fixture_root(fixture_name: str) -> Path:

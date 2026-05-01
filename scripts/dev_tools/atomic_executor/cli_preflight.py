@@ -63,7 +63,7 @@ def resolve_preflight_toolchains(parser: PlanParser) -> list[QCToolchain]:
     detected_raw = detected_attr()
     if not isinstance(detected_raw, set):
         return [QCToolchain.PYTHON]
-    detected = cast(set[QCToolchain], detected_raw)
+    detected = cast("set[QCToolchain]", detected_raw)
     if not detected:
         return [QCToolchain.PYTHON]
 
