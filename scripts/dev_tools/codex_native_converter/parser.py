@@ -29,6 +29,8 @@ import re
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.codex_native_converter.models import (
+    SemanticCue,
+    SemanticCueKind,
     SourceArtifact,
     SourceEcosystem,
     SourceKind,
@@ -40,6 +42,29 @@ if TYPE_CHECKING:
 
 _FRONTMATTER_BOUNDARY = "---"
 _HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+
+# Patterns for semantic cue detection within section content.
+_NUMBERED_WORKFLOW_PATTERN = re.compile(
+    r"^\s*(\d+[.)\s]|STEP\s+\d+)",
+    re.MULTILINE,
+)
+_HARD_GATE_PATTERN = re.compile(
+    r"\b(you MUST|MUST(?! NOT)|REQUIRED|SHALL(?! NOT)|is required|non-negotiable)",
+    re.MULTILINE,
+)
+_FORBIDDEN_PATTERN_RE = re.compile(
+    r"\b(MUST NOT|do NOT|NEVER|is forbidden|is prohibited|SHALL NOT|you must not)",
+    re.MULTILINE | re.IGNORECASE,
+)
+_LAUNCHER_WRAPPER_PATTERN = re.compile(
+    r"(```[\s\S]*?```|poetry run|node |npx |pwsh |bash "
+    r"|cmd\.exe|Resolve.*Prompt|launch)",
+    re.MULTILINE,
+)
+_TOOL_REQUIREMENT_PATTERN = re.compile(
+    r"(mcp__|\btools:\b|\buses:\b|\bwith:\b|\btool_call|function_call|tool_definitions|allowed-tools)",
+    re.MULTILINE,
+)
 
 
 def _read_source_text(source_root: Path, source_path: Path) -> str:
@@ -73,6 +98,90 @@ def _parse_frontmatter(lines: list[str]) -> tuple[dict[str, str], int]:
     return frontmatter, closing_index + 1
 
 
+def _detect_cues(heading: str, content: str) -> tuple[SemanticCue, ...]:
+    """Detect semantic cues present in one section's heading and content.
+
+    Purpose:
+        Produce evidence records so the section-intent classifier can make
+        deterministic decisions based on explicit content signals rather than
+        ad-hoc string matching at classification time.
+
+    Args:
+        heading (str): The section heading text.
+        content (str): The full content of the section, including the heading
+            line.
+
+    Returns:
+        tuple[SemanticCue, ...]: Zero or more cue instances in detection order.
+
+    Side Effects:
+        None.
+    """
+
+    cues: list[SemanticCue] = []
+
+    # Every section that has a non-empty heading carries a heading-structure cue.
+    if heading.strip():
+        cues.append(SemanticCue(kind=SemanticCueKind.HEADING, value=heading))
+
+    # Detect numbered-workflow patterns such as "1. Step", "2. Step", or
+    # "STEP 1:" which indicate a procedural workflow block.
+    if _NUMBERED_WORKFLOW_PATTERN.search(content):
+        match = _NUMBERED_WORKFLOW_PATTERN.search(content)
+        cues.append(
+            SemanticCue(
+                kind=SemanticCueKind.NUMBERED_WORKFLOW,
+                value=(match.group(0).strip() if match else ""),
+            )
+        )
+
+    # Detect hard-gate language that signals enforcement requirements such as
+    # "you MUST", "REQUIRED", "non-negotiable".
+    if _HARD_GATE_PATTERN.search(content):
+        match = _HARD_GATE_PATTERN.search(content)
+        cues.append(
+            SemanticCue(
+                kind=SemanticCueKind.HARD_GATE,
+                value=(match.group(0).strip() if match else ""),
+            )
+        )
+
+    # Detect forbidden-action language such as "MUST NOT", "do NOT", "NEVER",
+    # "is forbidden".
+    if _FORBIDDEN_PATTERN_RE.search(content):
+        match = _FORBIDDEN_PATTERN_RE.search(content)
+        cues.append(
+            SemanticCue(
+                kind=SemanticCueKind.FORBIDDEN_PATTERN,
+                value=(match.group(0).strip() if match else ""),
+            )
+        )
+
+    # Detect launcher-wrapper patterns such as shell invocations in code blocks
+    # or known launcher command prefixes.
+    if _LAUNCHER_WRAPPER_PATTERN.search(content):
+        match = _LAUNCHER_WRAPPER_PATTERN.search(content)
+        cues.append(
+            SemanticCue(
+                kind=SemanticCueKind.LAUNCHER_WRAPPER,
+                value=(match.group(0).strip()[:60] if match else ""),
+            )
+        )
+
+    # Detect tool-requirement language such as MCP tool references ("mcp__"),
+    # tool definition keywords ("tools:", "uses:"), or allowed-tools declarations.
+    if _TOOL_REQUIREMENT_PATTERN.search(content):
+        match = _TOOL_REQUIREMENT_PATTERN.search(content)
+        cues.append(
+            SemanticCue(
+                kind=SemanticCueKind.TOOL_REQUIREMENT,
+                value=(match.group(0).strip() if match else ""),
+            )
+        )
+
+    return tuple(cues)
+
+
 def _build_section(
     source_path: Path,
     lines: list[str],
@@ -82,10 +191,11 @@ def _build_section(
     start_line: int,
     end_line: int,
 ) -> SourceSection:
-    """Build one parsed section with normalized body text."""
+    """Build one parsed section with normalized body text and attached cues."""
 
     body_text = "\n".join(lines[start_line - 1 : end_line]).rstrip()
     section_stem = re.sub(r"[^a-z0-9]+", "-", heading.lower()).strip("-") or "body"
+    cues = _detect_cues(heading, body_text)
     return SourceSection(
         section_id=f"{source_path.as_posix()}#{section_stem}-{start_line}",
         heading=heading,
@@ -93,6 +203,7 @@ def _build_section(
         content=body_text,
         start_line=start_line,
         end_line=end_line,
+        cues=cues,
     )
 
 
@@ -141,14 +252,19 @@ def _split_sections(
     if sections:
         return tuple(sections)
 
+    # No heading-based split was possible; treat the entire body as one section
+    # and still detect cues so classifiers have evidence to work with.
+    fallback_content = raw_text.rstrip()
+    fallback_cues = _detect_cues("Body", fallback_content)
     return (
         SourceSection(
             section_id=f"{source_path.as_posix()}#body-1",
             heading="Body",
             level=0,
-            content=raw_text.rstrip(),
+            content=fallback_content,
             start_line=1,
             end_line=len(lines),
+            cues=fallback_cues,
         ),
     )
 

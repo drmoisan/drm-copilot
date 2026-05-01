@@ -39,6 +39,13 @@ if TYPE_CHECKING:
         ValidationFinding,
     )
 
+# Import topology rendering helpers from the dedicated topology module.
+from scripts.dev_tools.codex_native_converter._reporting_topology import (
+    render_destination_to_repeated_source_chart,
+    render_source_to_destination_chart,
+    render_source_to_repeated_destination_chart,
+)
+
 
 class ConverterFileSystem(Protocol):
     """Describe the filesystem operations needed by report writing.
@@ -160,92 +167,6 @@ class ReportSetPaths:
     proposed_tree_root: Path
 
 
-def _mermaid_label(text: str) -> str:
-    """Escape one Mermaid node label deterministically."""
-
-    return json.dumps(text)[1:-1]
-
-
-def _render_source_to_destination_chart(
-    topology_edges: tuple[TopologyEdge, ...],
-) -> list[str]:
-    """Render a Mermaid chart with shared source and destination nodes."""
-
-    source_node_ids: dict[str, str] = {}
-    destination_node_ids: dict[str, str] = {}
-    lines = ["```mermaid", "graph LR"]
-
-    for index, topology_edge in enumerate(topology_edges):
-        source_path = topology_edge.source_path
-        target_label = topology_edge.destination_path
-        source_node_id = source_node_ids.get(source_path)
-        if source_node_id is None:
-            source_node_id = f"source_{index}"
-            source_node_ids[source_path] = source_node_id
-            lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
-
-        destination_node_id = destination_node_ids.get(target_label)
-        if destination_node_id is None:
-            destination_node_id = f"destination_{index}"
-            destination_node_ids[target_label] = destination_node_id
-            lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
-
-        lines.append(f"    {source_node_id} --> {destination_node_id}")
-
-    lines.append("```")
-    return lines
-
-
-def _render_source_to_repeated_destination_chart(
-    topology_edges: tuple[TopologyEdge, ...],
-) -> list[str]:
-    """Render a Mermaid chart that repeats destination nodes per mapping."""
-
-    source_node_ids: dict[str, str] = {}
-    lines = ["```mermaid", "graph LR"]
-
-    for index, topology_edge in enumerate(topology_edges):
-        source_path = topology_edge.source_path
-        target_label = topology_edge.destination_path
-        source_node_id = source_node_ids.get(source_path)
-        if source_node_id is None:
-            source_node_id = f"source_{index}"
-            source_node_ids[source_path] = source_node_id
-            lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
-
-        destination_node_id = f"destination_{index}"
-        lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
-        lines.append(f"    {source_node_id} --> {destination_node_id}")
-
-    lines.append("```")
-    return lines
-
-
-def _render_destination_to_repeated_source_chart(
-    topology_edges: tuple[TopologyEdge, ...],
-) -> list[str]:
-    """Render a Mermaid chart that repeats source nodes per mapping."""
-
-    destination_node_ids: dict[str, str] = {}
-    lines = ["```mermaid", "graph LR"]
-
-    for index, topology_edge in enumerate(topology_edges):
-        source_path = topology_edge.source_path
-        target_label = topology_edge.destination_path
-        destination_node_id = destination_node_ids.get(target_label)
-        if destination_node_id is None:
-            destination_node_id = f"destination_{index}"
-            destination_node_ids[target_label] = destination_node_id
-            lines.append(f'    {destination_node_id}["{_mermaid_label(target_label)}"]')
-
-        source_node_id = f"source_{index}"
-        lines.append(f'    {source_node_id}["{_mermaid_label(source_path)}"]')
-        lines.append(f"    {destination_node_id} --> {source_node_id}")
-
-    lines.append("```")
-    return lines
-
-
 def _render_conversion_report(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
@@ -321,7 +242,7 @@ def _render_conversion_report(
         "Source and destination nodes are both deduplicated in this view.",
         "",
     ]
-    lines.extend(_render_source_to_destination_chart(sorted_topology_edges))
+    lines.extend(render_source_to_destination_chart(sorted_topology_edges))
     lines.extend(
         (
             "",
@@ -333,7 +254,7 @@ def _render_conversion_report(
             ),
         )
     )
-    lines.extend(_render_source_to_repeated_destination_chart(sorted_topology_edges))
+    lines.extend(render_source_to_repeated_destination_chart(sorted_topology_edges))
     lines.extend(
         (
             "",
@@ -345,7 +266,7 @@ def _render_conversion_report(
             ),
         )
     )
-    lines.extend(_render_destination_to_repeated_source_chart(sorted_topology_edges))
+    lines.extend(render_destination_to_repeated_source_chart(sorted_topology_edges))
     lines.extend(
         (
             "",

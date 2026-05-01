@@ -30,6 +30,36 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
+# Import intermediate types so consumers can continue importing from this module
+# for backward compatibility.  The `as name` form signals intentional re-export
+# to Ruff and prevents F401.  The full list is also declared in __all__ so that
+# SourceSection and TargetRole (which appear in class-field annotations here)
+# are not incorrectly moved to TYPE_CHECKING by Ruff's TCH001 rule.
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    PlannedEmission as PlannedEmission,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SectionIntent as SectionIntent,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SectionIntentKind as SectionIntentKind,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SemanticCue as SemanticCue,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SemanticCueKind as SemanticCueKind,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SourceSection as SourceSection,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    TargetRole as TargetRole,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    TranslationTrace as TranslationTrace,
+)
+
 
 class SourceEcosystem(str, Enum):
     """Describe a supported source runtime ecosystem.
@@ -120,122 +150,6 @@ class ConversionClass(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
-class TargetRole(str, Enum):
-    """Describe the Codex-native role targeted by a mapped artifact.
-
-    Purpose:
-        Capture the intended Codex-native destination role independent of the
-        final file path.
-
-    Usage:
-        Mapping records use this enum to explain why a given output path was
-        selected and which native runtime surface it serves.
-
-    Flow:
-        The classifier assigns a role, then the mapping module resolves the
-        concrete path for that role.
-
-    Invariants / Constraints:
-        Roles are limited to the native surfaces approved by the feature scope.
-
-    Side Effects:
-        None.
-    """
-
-    STANDING_GUIDANCE = "standing-guidance"
-    SHARED_SKILL = "shared-skill"
-    SUBAGENT = "subagent"
-    HOOK = "hook"
-    APPROVAL_RULE = "approval-rule"
-    MCP_CONFIG = "mcp-config"
-    LAUNCHER = "launcher"
-    UNSUPPORTED = "unsupported"
-
-
-class SectionIntentKind(str, Enum):
-    """Describe the semantic intent detected for one source section.
-
-    Purpose:
-        Capture section-level meaning so mixed-concern source files can be
-        decomposed into multiple Codex-native surfaces deterministically.
-
-    Usage:
-        Parser and classifier stages assign these intent kinds before the
-        planner maps them to concrete target roles and target paths.
-
-    Flow:
-        One source artifact is parsed into sections, each section receives one
-        semantic intent, and later stages convert the intent into a native
-        emission or an unresolved finding.
-
-    Invariants / Constraints:
-        Intents describe section meaning, not final output locations.
-
-    Side Effects:
-        None.
-    """
-
-    IDENTITY = "identity"
-    SHARED_WORKFLOW = "shared-workflow"
-    HOOK_CANDIDATE = "hook-candidate"
-    LAUNCHER_ONLY = "launcher-only"
-    UNSUPPORTED = "unsupported"
-
-
-class SemanticCueKind(str, Enum):
-    """Describe one low-level semantic cue discovered in a source section."""
-
-    HEADING = "heading"
-    NUMBERED_WORKFLOW = "numbered-workflow"
-    HARD_GATE = "hard-gate"
-    FORBIDDEN_PATTERN = "forbidden-pattern"
-    LAUNCHER_WRAPPER = "launcher-wrapper"
-
-
-@dataclass(frozen=True, slots=True)
-class SemanticCue:
-    """Represent one semantic cue detected in a source section.
-
-    Purpose:
-        Preserve the evidence that led a section classifier toward one intent.
-
-    Usage:
-        Parser and classifier stages attach cue records to sections so later
-        reporting can explain why a section was decomposed to a native surface.
-
-    Side Effects:
-        None.
-    """
-
-    cue_kind: SemanticCueKind
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class SourceSection:
-    """Represent one parsed section from a source artifact.
-
-    Purpose:
-        Preserve heading structure, source spans, and semantic cues so mixed
-        artifacts can be translated section by section.
-
-    Usage:
-        The parser emits one `SourceSection` per top-level or implicit body
-        section inside one source file.
-
-    Side Effects:
-        None.
-    """
-
-    section_id: str
-    heading: str
-    level: int
-    content: str
-    start_line: int
-    end_line: int
-    cues: tuple[SemanticCue, ...] = ()
-
-
 @dataclass(frozen=True, slots=True)
 class SourceArtifact:
     """Represent one parsed source artifact with structured sections.
@@ -258,78 +172,6 @@ class SourceArtifact:
     frontmatter: dict[str, str]
     raw_text: str
     sections: tuple[SourceSection, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class SectionIntent:
-    """Represent the classified intent for one parsed source section.
-
-    Purpose:
-        Separate section meaning from final target planning so planners can map
-        one source file to multiple native destinations.
-
-    Usage:
-        Section classifiers emit one intent record per parsed section.
-
-    Side Effects:
-        None.
-    """
-
-    source_path: str
-    section_id: str
-    heading: str
-    intent_kind: SectionIntentKind
-    notes: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class PlannedEmission:
-    """Represent one planned native emission for one source section.
-
-    Purpose:
-        Capture section-level mapping decisions before final rendering or
-        validation.
-
-    Usage:
-        The planner emits these values when one section should contribute to a
-        skill, hook, launcher prompt, or other native surface.
-
-    Side Effects:
-        None.
-    """
-
-    source_path: str
-    section_id: str
-    heading: str
-    intent_kind: SectionIntentKind
-    target_role: TargetRole
-    target_path: str | None
-    notes: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class TranslationTrace:
-    """Represent one section-level source-to-native translation trace.
-
-    Purpose:
-        Provide a report-friendly trace of how one source section maps to one
-        native target or unresolved native concept.
-
-    Usage:
-        The engine derives these traces for Mermaid topology graphs and the
-        section-level mapping table in the conversion report.
-
-    Side Effects:
-        None.
-    """
-
-    source_path: str
-    section_id: str
-    heading: str
-    intent_kind: SectionIntentKind
-    target_role: TargetRole
-    target_path: str | None
-    notes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -546,6 +388,8 @@ class RunOptions:
         artifact_root (Path): Artifact output root.
         enable_repo_prompts (bool): Whether repo-convention prompt output is
             enabled.
+        emit_intermediate_state (bool): Whether the compiler-like intermediate
+            state JSON files should be written to the artifact root.
     """
 
     mode: str
@@ -555,6 +399,7 @@ class RunOptions:
     destination_root: Path | None
     artifact_root: Path
     enable_repo_prompts: bool = False
+    emit_intermediate_state: bool = False
 
     def to_json_dict(self) -> dict[str, object]:
         """Serialize the run options to a JSON-friendly dictionary.
@@ -588,4 +433,28 @@ class RunOptions:
             ),
             "artifact_root": self.artifact_root.as_posix(),
             "enable_repo_prompts": self.enable_repo_prompts,
+            "emit_intermediate_state": self.emit_intermediate_state,
         }
+
+
+# Declare the full public surface so Ruff does not move SourceSection or
+# TargetRole into a TYPE_CHECKING block: those names appear in class-field
+# annotations here AND are re-exported for backward compatibility.
+__all__ = [
+    "ConversionClass",
+    "MappingRecord",
+    "PlannedEmission",
+    "RunOptions",
+    "SemanticCue",
+    "SemanticCueKind",
+    "SectionIntent",
+    "SectionIntentKind",
+    "SourceArtifact",
+    "SourceEcosystem",
+    "SourceKind",
+    "SourceSection",
+    "TargetRole",
+    "TopologyEdge",
+    "TranslationTrace",
+    "ValidationFinding",
+]

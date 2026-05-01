@@ -71,6 +71,29 @@ The Markdown conversion report includes three Mermaid topology views: a shared-n
 
 The CLI prints the resolved artifact root and the final validation outcome to stdout so wrapper layers can surface or collect the generated evidence.
 
+### Module layout
+
+The converter is implemented in `scripts/dev_tools/codex_native_converter/`. The following table documents each module's role.
+
+| Module | Role |
+|---|---|
+| `cli.py` | CLI entrypoint; parses arguments and delegates to `engine.py`. |
+| `engine.py` | Pipeline orchestrator; exposes `run_review_mode` and `run_apply_mode`. Delegates v2 stage work to `pipeline.py`. |
+| `pipeline.py` | V2 rendering, topology edge construction, and translation-trace stage functions extracted from `engine.py` to satisfy the 500-line file-size policy. Not intended for direct import outside the converter. |
+| `models.py` | Core typed enums and dataclasses (`MappingRecord`, `ValidationFinding`, `RunOptions`, etc.). Re-exports all v2 intermediate types from `models_intermediate.py` for backward compatibility; consumers should import from `models` rather than `models_intermediate` directly. |
+| `models_intermediate.py` | Six v2 intermediate dataclasses (`SourceArtifact`, `SourceSection`, `SemanticCue`, `SectionIntent`, `PlannedEmission`, `TranslationTrace`) extracted from `models.py` to satisfy the 500-line policy. |
+| `parser.py` | Reads a source file, splits optional YAML frontmatter, divides Markdown headings into deterministic sections, attaches `SemanticCue` instances, and returns a `SourceArtifact`. |
+| `section_intent.py` | Classifies each `SourceSection` into one of eight intent kinds (`identity`, `standing_guidance`, `shared_workflow`, `hook_candidate`, `rule_candidate`, `config_candidate`, `launcher_only`, `unsupported`) based on its semantic cues and heading text. |
+| `intermediate_state.py` | Writes four machine-readable JSON files under `artifact_root/intermediate/` when `RunOptions.emit_intermediate_state` is `True`, exposing the full parsed and classified pipeline state for auditing. |
+| `classifier.py` | Assigns `ConversionClass` and `TargetRole` to each discovered source artifact. |
+| `inventory.py` | Discovers source files under the selected ecosystem surface. |
+| `mapping.py` | Builds `MappingRecord` instances by pairing classified sources with target paths. |
+| `rewrites.py` | Applies content rewrites required for native Codex output (e.g., MCP server references, cross-file link normalization). |
+| `validation.py` | Enforces the fail-closed validation model against proposed destination content. |
+| `reporting.py` | Writes `conversion-report.md`, `mapping-catalog.json`, `validation-results.json`, and `proposed-tree/`. Delegates Mermaid rendering to `_reporting_topology.py`. |
+| `_reporting_topology.py` | Pure Mermaid topology chart helpers extracted from `reporting.py` to satisfy the 500-line policy. Not part of the public package surface. |
+| `_pipeline_traces.py` | Prompt translation-trace construction helpers, also extracted for size compliance. Not part of the public package surface. |
+
 ### Fail-closed validation model
 
 The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect the blocking findings without mutating the destination tree.
