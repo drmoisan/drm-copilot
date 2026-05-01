@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_policy_audit_artifact as policy_validator
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # Bind the internal parser helper through typed runtime lookup so the tests can
 # cover the extracted helper behavior without changing production visibility.

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_orchestrator_state as state_validator
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # Bind targeted internal helpers through typed runtime lookup so the tests can
 # cover the split-validator branches without widening the production surface.

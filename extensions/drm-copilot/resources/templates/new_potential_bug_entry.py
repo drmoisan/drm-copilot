@@ -25,9 +25,11 @@ from __future__ import annotations
 
 import importlib
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _ensure_bundled_scripts_import_path() -> None:
