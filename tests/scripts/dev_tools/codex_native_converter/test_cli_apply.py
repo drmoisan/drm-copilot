@@ -71,7 +71,7 @@ def _test_apply_mode_requires_destination_root_and_writes_outputs() -> None:
         artifact_root=Path("virtual/invalid-artifacts"),
     )
 
-    findings = validate_conversion_plan(invalid_run_options, (), {})
+    findings = validate_conversion_plan(invalid_run_options, (), (), {})
 
     assert any(finding.code == "missing-required-input" for finding in findings)
 

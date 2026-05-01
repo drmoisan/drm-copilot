@@ -29,6 +29,8 @@ from pathlib import PurePosixPath
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     MappingRecord,
+    SourceEcosystem,
+    SourceKind,
     TargetRole,
 )
 
@@ -60,6 +62,47 @@ def _normalized_name(source_path: str) -> str:
             normalized_name = normalized_name[: -len(suffix)]
             break
     return normalized_name.replace("_", "-")
+
+
+def _planned_skill_name(mapping_record: MappingRecord) -> str:
+    """Derive the target skill name for one mapped skill-like artifact.
+
+    Purpose:
+        Preserve the reusable skill folder identity for `*/skills/<name>/SKILL.md`
+        while keeping filename-based naming for path-scoped instruction files.
+
+    Args:
+        mapping_record (MappingRecord): Skill-like mapping record whose target
+            folder name must be planned.
+
+    Returns:
+        str: The normalized skill folder name for the target path.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    source_path = PurePosixPath(mapping_record.source_path)
+    if (
+        mapping_record.source_kind is SourceKind.REUSABLE_SKILL
+        and source_path.name == "SKILL.md"
+        and source_path.parent.name
+    ):
+        return source_path.parent.name.replace("_", "-")
+    return _normalized_name(mapping_record.source_path)
+
+
+def _planned_hook_name(mapping_record: MappingRecord) -> str:
+    """Derive the target hook name without carrying source script extensions."""
+
+    source_name = PurePosixPath(mapping_record.source_path).name
+    if source_name.endswith((".ps1", ".py")):
+        normalized_name = source_name.rsplit(".", 1)[0]
+        return normalized_name.replace("_", "-")
+    return _normalized_name(mapping_record.source_path)
 
 
 def plan_target_paths(
@@ -94,7 +137,7 @@ def plan_target_paths(
         return replace(mapping_record, target_path="AGENTS.md")
 
     if mapping_record.target_role is TargetRole.SHARED_SKILL:
-        skill_name = _normalized_name(mapping_record.source_path)
+        skill_name = _planned_skill_name(mapping_record)
         return replace(
             mapping_record,
             target_path=f".agents/skills/{skill_name}/SKILL.md",
@@ -111,10 +154,10 @@ def plan_target_paths(
         return replace(mapping_record, target_path=".codex/config.toml")
 
     if mapping_record.target_role is TargetRole.HOOK:
-        hook_name = _normalized_name(mapping_record.source_path)
+        hook_name = _planned_hook_name(mapping_record)
         return replace(
             mapping_record,
-            target_path=f".codex/hooks/{hook_name}.py",
+            target_path=f".codex/hooks/{hook_name}.ps1",
         )
 
     if mapping_record.target_role is TargetRole.APPROVAL_RULE:
@@ -144,3 +187,48 @@ def plan_target_paths(
         )
 
     return replace(mapping_record, target_path=None)
+
+
+def plan_section_target_path(
+    source_path: str,
+    *,
+    source_ecosystem: SourceEcosystem,
+    source_kind: SourceKind,
+    target_role: TargetRole,
+    enable_repo_prompts: bool,
+) -> str | None:
+    """Resolve a native target path for one section-level planned emission.
+
+    Purpose:
+        Reuse the file-level path-planning rules for section-level prompt and
+        mixed-artifact emissions without duplicating naming logic.
+
+    Args:
+        source_path (str): Source-root-relative artifact path.
+        source_kind (SourceKind): Source kind associated with the section.
+        target_role (TargetRole): Native role selected for the section.
+        enable_repo_prompts (bool): Whether repository-convention prompt output
+            is enabled for the current run.
+
+    Returns:
+        str | None: Planned target path when the role has an approved native
+            destination, otherwise None.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return plan_target_paths(
+        MappingRecord(
+            source_path=source_path,
+            source_ecosystem=source_ecosystem,
+            source_kind=source_kind,
+            conversion_class=ConversionClass.DECOMPOSED,
+            target_role=target_role,
+            target_path=None,
+        ),
+        enable_repo_prompts=enable_repo_prompts,
+    ).target_path

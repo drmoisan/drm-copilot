@@ -4,8 +4,8 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-04-26T18-01
-- **Status:** Draft
-- **Version:** 0.1
+- **Status:** Superceded by 2.0
+- **Version:** 1.0
 
 ## Overview
 

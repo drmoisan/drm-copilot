@@ -16,7 +16,6 @@ import {
 import { registerDocumentWorkflowCommands } from "./document-workflow-commands";
 import {
   promptForChoice,
-  promptForShortName,
   promptForWorkspaceScanFolders,
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";

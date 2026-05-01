@@ -25,17 +25,36 @@ Side Effects:
 
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
 from scripts.dev_tools.codex_native_converter.classifier import classify_source_artifact
+from scripts.dev_tools.codex_native_converter.intermediate_state import (
+    IntermediateState,
+    write_intermediate_state_artifacts,
+)
 from scripts.dev_tools.codex_native_converter.inventory import discover_source_artifacts
 from scripts.dev_tools.codex_native_converter.mapping import plan_target_paths
 from scripts.dev_tools.codex_native_converter.models import (
     MappingRecord,
+    PlannedEmission,
     RunOptions,
+    SectionIntent,
+    SourceArtifact,
+    SourceKind,
+    SourceSection,
     TargetRole,
+    TranslationTrace,
     ValidationFinding,
+)
+from scripts.dev_tools.codex_native_converter.parser import parse_source_artifact
+from scripts.dev_tools.codex_native_converter.pipeline import (
+    build_prompt_translation_traces,
+    build_topology_edges,
+    render_merged_standing_guidance,
+    render_section_emission_content,
+    render_target_content,
 )
 from scripts.dev_tools.codex_native_converter.reporting import (
     ConverterFileSystem,
@@ -43,8 +62,8 @@ from scripts.dev_tools.codex_native_converter.reporting import (
     ReportSetPaths,
     write_conversion_report_set,
 )
-from scripts.dev_tools.codex_native_converter.rewrites import (
-    rewrite_supported_automation_reference,
+from scripts.dev_tools.codex_native_converter.section_intent import (
+    classify_section_intent,
 )
 from scripts.dev_tools.codex_native_converter.validation import validate_conversion_plan
 
@@ -67,9 +86,6 @@ class ConversionRunResult:
 
     Invariants / Constraints:
         Report paths always point to the written artifact set for the run.
-
-    Side Effects:
-        None.
     """
 
     mapping_records: tuple[MappingRecord, ...]
@@ -77,114 +93,7 @@ class ConversionRunResult:
     report_paths: ReportSetPaths
     generated_output: dict[str, str]
     wrote_destination: bool
-
-
-def _read_source_text(source_root: Path, source_path: str) -> str:
-    """Read one source artifact from the source root.
-
-    Purpose:
-        Provide the original source text that the engine will rewrite and wrap
-        into native outputs.
-
-    Args:
-        source_root (Path): Source tree root.
-        source_path (str): Source-root-relative artifact path.
-
-    Returns:
-        str: Source text decoded as UTF-8.
-
-    Raises:
-        OSError: Raised when the source file cannot be read.
-
-    Side Effects:
-        Reads one source file from disk.
-    """
-
-    return (source_root.resolve() / source_path).read_text(encoding="utf-8")
-
-
-def _render_target_content(
-    run_options: RunOptions, mapping_record: MappingRecord
-) -> str:
-    """Render one generated target file for the mapping record.
-
-    Purpose:
-        Produce deterministic native output content for one mapped artifact.
-
-    Args:
-        run_options (RunOptions): Requested run options for the current run.
-        mapping_record (MappingRecord): Planned mapping record.
-
-    Returns:
-        str: Rendered output text for the target path.
-
-    Raises:
-        OSError: Raised when a required source file cannot be read.
-
-    Side Effects:
-        Reads the source file associated with the mapping record.
-    """
-
-    source_text = _read_source_text(run_options.source_root, mapping_record.source_path)
-    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
-        source_text
-    )
-    rewrite_summary = (
-        "\n".join(f"- {description}" for description in applied_rewrites)
-        if applied_rewrites
-        else "- None"
-    )
-
-    if mapping_record.target_role is TargetRole.STANDING_GUIDANCE:
-        return (
-            f"# Converted standing guidance\n\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.SHARED_SKILL:
-        return (
-            f"# Converted skill\n\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.SUBAGENT:
-        agent_name = Path(mapping_record.target_path or "agent.toml").stem
-        return (
-            f'name = "{agent_name}"\n'
-            'description = "Converted subagent"\n'
-            "developer_instructions = '''\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text.rstrip()}\n"
-            "'''\n"
-        )
-
-    if mapping_record.target_role is TargetRole.MCP_CONFIG:
-        return (
-            "# Review and merge native MCP, hook, and approval settings "
-            "intentionally.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.HOOK:
-        return (
-            f"# Converted hook\n"
-            "# Review the generated hook behavior before enabling it.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.APPROVAL_RULE:
-        return (
-            "# Converted approval rule candidate\n"
-            "# Review the generated rule semantics before enforcement.\n\n"
-            f"{rewritten_text.rstrip()}\n"
-        )
-
-    if mapping_record.target_role is TargetRole.LAUNCHER:
-        return f"# Converted launcher prompt\n\n" f"{rewritten_text.rstrip()}\n"
-
-    return rewritten_text
+    translation_traces: tuple[TranslationTrace, ...] = ()
 
 
 def _plan_mappings(run_options: RunOptions) -> tuple[MappingRecord, ...]:
@@ -235,6 +144,7 @@ def _plan_mappings(run_options: RunOptions) -> tuple[MappingRecord, ...]:
 def _render_generated_output(
     run_options: RunOptions,
     mapping_records: tuple[MappingRecord, ...],
+    planned_emissions: tuple[PlannedEmission, ...],
 ) -> dict[str, str]:
     """Render the generated output set for one run.
 
@@ -257,17 +167,129 @@ def _render_generated_output(
     """
 
     generated_output: dict[str, str] = {}
+    standing_guidance_source_paths = tuple(
+        record.source_path
+        for record in mapping_records
+        if record.target_role is TargetRole.STANDING_GUIDANCE
+        and record.target_path == "AGENTS.md"
+    )
+    mapping_records_by_target: dict[str, list[MappingRecord]] = defaultdict(list)
+    section_emissions_by_target: dict[str, list[PlannedEmission]] = defaultdict(list)
 
     # Render only records with concrete target paths because unsupported items
     # are still represented through validation findings and report rows.
     for mapping_record in mapping_records:
         if mapping_record.target_path is None:
             continue
-        generated_output[mapping_record.target_path] = _render_target_content(
+        mapping_records_by_target[mapping_record.target_path].append(mapping_record)
+    for planned_emission in planned_emissions:
+        if planned_emission.target_path is None:
+            continue
+        section_emissions_by_target[planned_emission.target_path].append(
+            planned_emission
+        )
+
+    for target_path in sorted(mapping_records_by_target):
+        records_for_target = mapping_records_by_target[target_path]
+        if not records_for_target:
+            continue
+        target_records = tuple(records_for_target)
+        if (
+            target_path == "AGENTS.md"
+            and all(
+                record.target_role is TargetRole.STANDING_GUIDANCE
+                for record in target_records
+            )
+            and len(target_records) > 1
+        ):
+            generated_output[target_path] = render_merged_standing_guidance(
+                run_options,
+                target_records,
+            )
+            continue
+        generated_output[target_path] = render_target_content(
             run_options,
-            mapping_record,
+            records_for_target[-1],
+            standing_guidance_source_paths=standing_guidance_source_paths,
+        )
+    section_lookup_by_id: dict[str, SourceSection] = {}
+    parsed_source_paths = sorted(
+        {
+            planned_emission.source_path
+            for planned_emission in planned_emissions
+            if planned_emission.target_path is not None
+        }
+    )
+    for source_path in parsed_source_paths:
+        source_artifact = parse_source_artifact(
+            run_options.source_root,
+            Path(source_path),
+            run_options.source_ecosystem,
+            SourceKind.LAUNCHER_PROMPT,
+        )
+        section_lookup_by_id.update(
+            {
+                source_section.section_id: source_section
+                for source_section in source_artifact.sections
+            }
+        )
+
+    for target_path in sorted(section_emissions_by_target):
+        if target_path in generated_output:
+            continue
+        generated_output[target_path] = render_section_emission_content(
+            run_options,
+            target_path,
+            tuple(section_emissions_by_target[target_path]),
+            section_lookup_by_id,
+            standing_guidance_source_paths=standing_guidance_source_paths,
         )
     return generated_output
+
+
+def _build_translation_traces(
+    run_options: RunOptions,
+    mapping_records: tuple[MappingRecord, ...],
+) -> tuple[TranslationTrace, ...]:
+    """Build section-aware translation traces for mixed prompt artifacts."""
+
+    translation_traces: list[TranslationTrace] = []
+    for mapping_record in mapping_records:
+        translation_traces.extend(
+            build_prompt_translation_traces(run_options, mapping_record)
+        )
+
+    return tuple(
+        sorted(
+            translation_traces,
+            key=lambda trace: (
+                trace.source_path,
+                trace.section_id,
+                trace.target_role.value,
+            ),
+        )
+    )
+
+
+def _build_planned_emissions(
+    translation_traces: tuple[TranslationTrace, ...],
+) -> tuple[PlannedEmission, ...]:
+    """Build section-level planned emissions from translation traces."""
+
+    return tuple(
+        PlannedEmission(
+            source_path=translation_trace.source_path,
+            section_id=translation_trace.section_id,
+            heading=translation_trace.heading,
+            intent_kind=translation_trace.intent_kind,
+            target_role=translation_trace.target_role,
+            target_path=translation_trace.target_path,
+            notes=translation_trace.notes,
+        )
+        for translation_trace in translation_traces
+        if translation_trace.target_path is not None
+        and translation_trace.target_role in {TargetRole.SHARED_SKILL, TargetRole.HOOK}
+    )
 
 
 def _write_destination_outputs(
@@ -330,15 +352,65 @@ def _run_conversion(
 
     resolved_fs = fs or RealConverterFileSystem()
     mapping_records = _plan_mappings(run_options)
-    generated_output = _render_generated_output(run_options, mapping_records)
+    translation_traces = _build_translation_traces(run_options, mapping_records)
+    planned_emissions = _build_planned_emissions(translation_traces)
+
+    # Classify section intents for all parsed source artifacts so the
+    # intermediate state captures the full v2 pipeline view. Parsing is
+    # performed here in discovery order to keep the collection deterministic.
+    source_artifacts: list[SourceArtifact] = []
+    section_intents: list[SectionIntent] = []
+    for mapping_record in mapping_records:
+        source_artifact = parse_source_artifact(
+            run_options.source_root,
+            Path(mapping_record.source_path),
+            mapping_record.source_ecosystem,
+            mapping_record.source_kind,
+        )
+        source_artifacts.append(source_artifact)
+        # Classify each section and accumulate intents for the intermediate
+        # state and any downstream consumers.
+        for source_section in source_artifact.sections:
+            section_intents.append(
+                classify_section_intent(source_section, source_artifact)
+            )
+
+    # Write intermediate state files when the caller has opted in, so the full
+    # compiler-like pipeline state is available for audit without affecting
+    # the emitted native outputs.
+    if run_options.emit_intermediate_state:
+        intermediate = IntermediateState(
+            source_artifacts=tuple(source_artifacts),
+            section_intents=tuple(section_intents),
+            planned_emissions=planned_emissions,
+            translation_traces=translation_traces,
+        )
+        write_intermediate_state_artifacts(
+            intermediate,
+            run_options.artifact_root,
+        )
+
+    generated_output = _render_generated_output(
+        run_options,
+        mapping_records,
+        planned_emissions,
+    )
+    topology_edges = build_topology_edges(
+        run_options,
+        mapping_records,
+        translation_traces,
+    )
     validation_findings = validate_conversion_plan(
         run_options,
         mapping_records,
+        planned_emissions,
         generated_output,
     )
     report_paths = write_conversion_report_set(
         run_options,
         mapping_records,
+        topology_edges,
+        translation_traces,
         validation_findings,
         generated_output,
         fs=resolved_fs,
@@ -360,6 +432,7 @@ def _run_conversion(
 
     return ConversionRunResult(
         mapping_records=mapping_records,
+        translation_traces=translation_traces,
         validation_findings=validation_findings,
         report_paths=report_paths,
         generated_output=generated_output,

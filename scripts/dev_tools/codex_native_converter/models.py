@@ -30,6 +30,36 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
+# Import intermediate types so consumers can continue importing from this module
+# for backward compatibility.  The `as name` form signals intentional re-export
+# to Ruff and prevents F401.  The full list is also declared in __all__ so that
+# SourceSection and TargetRole (which appear in class-field annotations here)
+# are not incorrectly moved to TYPE_CHECKING by Ruff's TCH001 rule.
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    PlannedEmission as PlannedEmission,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SectionIntent as SectionIntent,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SectionIntentKind as SectionIntentKind,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SemanticCue as SemanticCue,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SemanticCueKind as SemanticCueKind,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    SourceSection as SourceSection,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    TargetRole as TargetRole,
+)
+from scripts.dev_tools.codex_native_converter.models_intermediate import (
+    TranslationTrace as TranslationTrace,
+)
+
 
 class SourceEcosystem(str, Enum):
     """Describe a supported source runtime ecosystem.
@@ -120,36 +150,28 @@ class ConversionClass(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
-class TargetRole(str, Enum):
-    """Describe the Codex-native role targeted by a mapped artifact.
+@dataclass(frozen=True, slots=True)
+class SourceArtifact:
+    """Represent one parsed source artifact with structured sections.
 
     Purpose:
-        Capture the intended Codex-native destination role independent of the
-        final file path.
+        Carry file-level metadata and section structure through the compiler-
+        style translation pipeline.
 
     Usage:
-        Mapping records use this enum to explain why a given output path was
-        selected and which native runtime surface it serves.
-
-    Flow:
-        The classifier assigns a role, then the mapping module resolves the
-        concrete path for that role.
-
-    Invariants / Constraints:
-        Roles are limited to the native surfaces approved by the feature scope.
+        The parser creates one artifact per source file before section-level
+        classification and planning begin.
 
     Side Effects:
         None.
     """
 
-    STANDING_GUIDANCE = "standing-guidance"
-    SHARED_SKILL = "shared-skill"
-    SUBAGENT = "subagent"
-    HOOK = "hook"
-    APPROVAL_RULE = "approval-rule"
-    MCP_CONFIG = "mcp-config"
-    LAUNCHER = "launcher"
-    UNSUPPORTED = "unsupported"
+    source_path: str
+    source_ecosystem: SourceEcosystem
+    source_kind: SourceKind
+    frontmatter: dict[str, str]
+    raw_text: str
+    sections: tuple[SourceSection, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -226,6 +248,38 @@ class MappingRecord:
             "notes": list(self.notes),
             "is_required": self.is_required,
         }
+
+
+@dataclass(frozen=True, slots=True)
+class TopologyEdge:
+    """Represent one source-to-destination relationship for reporting.
+
+    Purpose:
+        Capture the topology relationships that the human-readable report should
+        visualize, including decomposition fan-out and merged-target fan-in.
+
+    Usage:
+        The engine derives these edges after rendering per-source native output
+        intent, and the reporting layer renders them into Mermaid diagrams.
+
+    Flow:
+        One source artifact may contribute multiple edges when its converted
+        content references additional native targets beyond its primary output.
+
+    Invariants / Constraints:
+        Paths are stored as normalized relative text so diagrams remain
+        deterministic across operating systems.
+
+    Side Effects:
+        None.
+
+    Attributes:
+        source_path (str): Normalized source-relative artifact path.
+        destination_path (str): Native destination path or sentinel label.
+    """
+
+    source_path: str
+    destination_path: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -334,6 +388,8 @@ class RunOptions:
         artifact_root (Path): Artifact output root.
         enable_repo_prompts (bool): Whether repo-convention prompt output is
             enabled.
+        emit_intermediate_state (bool): Whether the compiler-like intermediate
+            state JSON files should be written to the artifact root.
     """
 
     mode: str
@@ -343,6 +399,7 @@ class RunOptions:
     destination_root: Path | None
     artifact_root: Path
     enable_repo_prompts: bool = False
+    emit_intermediate_state: bool = False
 
     def to_json_dict(self) -> dict[str, object]:
         """Serialize the run options to a JSON-friendly dictionary.
@@ -376,4 +433,28 @@ class RunOptions:
             ),
             "artifact_root": self.artifact_root.as_posix(),
             "enable_repo_prompts": self.enable_repo_prompts,
+            "emit_intermediate_state": self.emit_intermediate_state,
         }
+
+
+# Declare the full public surface so Ruff does not move SourceSection or
+# TargetRole into a TYPE_CHECKING block: those names appear in class-field
+# annotations here AND are re-exported for backward compatibility.
+__all__ = [
+    "ConversionClass",
+    "MappingRecord",
+    "PlannedEmission",
+    "RunOptions",
+    "SemanticCue",
+    "SemanticCueKind",
+    "SectionIntent",
+    "SectionIntentKind",
+    "SourceArtifact",
+    "SourceEcosystem",
+    "SourceKind",
+    "SourceSection",
+    "TargetRole",
+    "TopologyEdge",
+    "TranslationTrace",
+    "ValidationFinding",
+]

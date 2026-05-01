@@ -1,35 +1,111 @@
-Timestamp: 2026-04-26T19:12:50-04:00
+# Post-Implementation Review Prep
+
+Feature: codex-native-converter v2 — compiler-style intermediate state pipeline
+Plan: `docs/features/active/2026-04-26-codex-native-converter-164/v2/plan.2026-04-30T19-56.md`
+Timestamp: 2026-05-01T00-00Z
+
+---
 
 ## Changed Files
 
-- Python converter package: `scripts/dev_tools/codex_native_converter/__init__.py`, `models.py`, `inventory.py`, `classifier.py`, `mapping.py`, `rewrites.py`, `validation.py`, `reporting.py`, `engine.py`, `cli.py`, and `__main__.py`.
-- Python converter tests and fixtures: `tests/scripts/dev_tools/codex_native_converter/*.py` and `tests/fixtures/codex_native_converter/**`.
-- Poetry entrypoint: `pyproject.toml`.
-- Extension wrapper implementation: `extensions/drm-copilot/resources/templates/codex_native_converter.py`, `extensions/drm-copilot/resources/scripts/dev_tools/codex_native_converter/**`, `src/repo-automation-tool-names.ts`, `src/repo-automation-service.ts`, `src/mcp-tool-definitions.ts`, `src/mcp-repo-automation-tool-definitions.ts`, `src/mcp-tool-inputs.ts`, `src/mcp-handlers/codex-native-converter-handlers.ts`, `src/mcp-tools.ts`, `src/extension.ts`, and `package.json`.
-- Extension tests: `extensions/drm-copilot/test/*codex-native-converter*.test.ts` plus discoverability assertions in existing MCP and command tests.
-- Documentation and evidence: `README.md`, `extensions/drm-copilot/README.md`, `docs/features/active/2026-04-26-codex-native-converter-164/spec.md`, `user-story.md`, `plan.2026-04-26T18-01.md`, and the Phase 0 / Phase 7 evidence artifacts.
+### Python — New Production Files (v2 additions)
+
+- `scripts/dev_tools/codex_native_converter/intermediate_state.py` — new; writes compiler-like intermediate state JSON artifacts when `emit_intermediate_state=True`
+- `scripts/dev_tools/codex_native_converter/section_intent.py` — new; classifies each `SourceSection` into one of eight `SectionIntentKind` values
+- `scripts/dev_tools/codex_native_converter/parser.py` — new; parses Markdown source files into `SourceArtifact` typed intermediate representation
+
+### Python — Modified Production Files
+
+- `scripts/dev_tools/codex_native_converter/models.py` — extended with six v2 domain types (`SourceArtifact`, `SourceSection`, `SemanticCue`, `SectionIntent`, `PlannedEmission`, `TranslationTrace`), three new enums (`SectionIntentKind`, `SemanticCueKind`, plus `RunOptions.emit_intermediate_state` field)
+- `scripts/dev_tools/codex_native_converter/engine.py` — updated to run the full v2 compiler pipeline: parse → classify → plan → optionally write intermediate state → render → validate
+
+### Python — New Test Files (v2 additions)
+
+- `tests/scripts/dev_tools/codex_native_converter/test_parser.py` — tests for `parser.py`
+- `tests/scripts/dev_tools/codex_native_converter/test_section_intent.py` — tests for `section_intent.py`
+- `tests/scripts/dev_tools/codex_native_converter/test_intermediate_state.py` — tests for `intermediate_state.py`
+
+### Python — Modified Test Files (v2 integration tests pre-existing)
+
+- `tests/scripts/dev_tools/codex_native_converter/test_end_to_end.py`, `test_classifier.py`, `test_mapping.py`, `test_validation.py`, `test_inventory.py`, `test_cli_apply.py`, `test_reporting.py`, `test_reporting_topology_end_to_end.py`, `test_prompt_decomposition_end_to_end.py`, `test_rewrites.py`, `test_section_classifier.py` — pre-existing test files updated to exercise the v2 code paths
+
+### TypeScript — New and Modified Extension Files (Phase 5)
+
+New files (command-registration split):
+- `extensions/drm-copilot/src/repo-automation-command-registration-admin.ts`
+- `extensions/drm-copilot/src/repo-automation-command-registration-feature-workflows.ts`
+- `extensions/drm-copilot/src/repo-automation-command-registration-types.ts`
+- `extensions/drm-copilot/src/repo-automation-command-registration.ts`
+- `extensions/drm-copilot/src/repo-automation-service-workflows.ts`
+
+Modified files:
+- `extensions/drm-copilot/src/extension.ts` — removed unused import (`promptForShortName`), updated command registration wiring
+- `extensions/drm-copilot/src/claude-worktree-session.ts` — updated for v2 converter invocation surface
+- `extensions/drm-copilot/src/repo-automation-service.ts` — extended with v2 converter command handlers
+
+New test files:
+- `extensions/drm-copilot/test/claude-worktree-session.test.ts`
+- `extensions/drm-copilot/test/extension.workflow-commands.test.ts`
+
+---
 
 ## Evidence Index
 
-- Baseline evidence: `evidence/baseline/phase0-instructions-read.md`, `phase0-feature-state.md`, `phase0-python-format.md`, `phase0-python-lint.md`, `phase0-python-typecheck.md`, `phase0-python-test-coverage.md`, `phase0-typescript-format.md`, `phase0-typescript-lint.md`, `phase0-typescript-typecheck.md`, `phase0-typescript-test-coverage.md`, and `phase0-converter-surface-inventory.md`.
-- Plan gate: `evidence/qa-gates/phase0-plan-validator.md`.
-- Final Python QA: `evidence/qa-gates/final-python-format.md`, `final-python-lint.md`, `final-python-typecheck.md`, `final-python-test-coverage.md`, `final-python-targeted-coverage.md`, and `final-python-coverage-delta.md`.
-- Final TypeScript QA: `evidence/qa-gates/final-typescript-format.md`, `final-typescript-lint.md`, `final-typescript-typecheck.md`, `final-typescript-test-coverage.md`, and `final-typescript-coverage-delta.md`.
-- Combined coverage summary: `evidence/qa-gates/final-coverage-delta.md`.
-- Requirements traceability: `evidence/other/p1-requirements-traceability.md`.
+### Baseline Evidence (from git commit `79d02b7`)
+
+| Artifact | Description |
+|---|---|
+| `evidence/baseline/` (in `v1/` tree and `79d02b7`) | Phase 0 baseline coverage, format, lint, typecheck |
+
+### QA Gate Evidence
+
+| Artifact | Description |
+|---|---|
+| `evidence/qa-gates/final-python-format.md` | Black format — clean (P7-T1) |
+| `evidence/qa-gates/final-python-lint.md` | Ruff lint — clean (P7-T2) |
+| `evidence/qa-gates/final-python-typecheck.md` | Pyright — 0 errors (P7-T3) |
+| `evidence/qa-gates/final-python-test-coverage.md` | Pytest — 1060 passed, 84% coverage (P7-T4) |
+| `evidence/qa-gates/final-python-targeted-coverage.md` | Pytest targeted — 48 passed, 95% converter package (P7-T5) |
+| `evidence/qa-gates/final-typescript-format.md` | Prettier — all unchanged (P7-T6) |
+| `evidence/qa-gates/final-typescript-lint.md` | ESLint — clean (P7-T7) |
+| `evidence/qa-gates/final-typescript-typecheck.md` | TSC — 0 errors (P7-T8) |
+| `evidence/qa-gates/final-typescript-test-coverage.md` | Jest — 348 passed, 95.5% coverage (P7-T9) |
+| `evidence/qa-gates/final-python-coverage-delta.md` | Python coverage delta (P7-T10) |
+| `evidence/qa-gates/final-typescript-coverage-delta.md` | TypeScript coverage delta (P7-T11) |
+| `evidence/qa-gates/final-coverage-delta.md` | Combined coverage delta summary (P7-T12) |
+
+### Report Artifacts (generated by converter review run)
+
+| Artifact | Path |
+|---|---|
+| Conversion report | `artifacts/codex-native-converter/conversion-report.md` |
+| Mapping catalog | `artifacts/codex-native-converter/mapping-catalog.json` |
+| Validation results | `artifacts/codex-native-converter/validation-results.json` |
+| Proposed tree | `artifacts/codex-native-converter/proposed-tree/` |
+
+---
 
 ## Remaining Unsupported Mappings
 
-- `.github/prompts/**` remains a repository-convention output only and is emitted to `.codex/prompts/**` only when `--enable-repo-prompts` is explicitly enabled.
-- Claude `.claude/rules/**` inputs remain unsupported in v1 because the repository does not treat Markdown rules as a verified direct execution-policy surface.
-- Source handoff semantics without a verified Codex-native equivalent remain fail-closed and continue to block apply mode.
-- Any raw `.github`, `.claude`, `CLAUDE.md`, raw `drmCopilotExtension.*` command identifiers, or repository-local script references that survive rewrite remain blocking validation findings.
-- Ecosystems beyond the documented GitHub Copilot and Claude source surfaces remain unsupported in v1.
+As of this v2 implementation, the following categories are flagged as `unsupported` or `launcher_only` and do not generate output in apply mode:
+
+- Source sections classified as `launcher_only` — these correspond to Copilot prompt launcher buttons or Claude launch wrappers that have no equivalent native Codex surface and no approved rewrite.
+- Source sections classified as `unsupported` — these correspond to ecosystem-specific configuration or behavior (e.g., VS Code extension host lifecycle) with no Codex-native equivalent.
+- Source sections with `HOOK_CANDIDATE` intent where no verified hook-slot mapping exists in `mapping.py` — these remain as classification outputs but do not produce emissions.
+- Repository-local script references without a verified native rewrite in `rewrites.py`.
+
+These are explicitly surfaced in `validation-results.json` and `conversion-report.md`. Reviewers should verify that all blocking validation findings are expected and acceptable, or tracked as separate follow-up issues.
+
+---
 
 ## Reviewer Focus Areas
 
-- Verify that the Python package remains the authoritative converter implementation and that the extension layer stays a thin wrapper with no duplicate conversion logic.
-- Verify the fail-closed validation categories for unresolved hard gates, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering source-runtime references, and missing required inputs.
-- Verify the extension bridge paths: `resources/templates/codex_native_converter.py` and `resources/scripts/dev_tools/codex_native_converter/**`.
-- Verify the final coverage evidence, especially the 94% targeted Python coverage and the per-file TypeScript wrapper coverage recorded in `final-typescript-test-coverage.md`.
-- Verify that `spec.md` and `user-story.md` checkoffs correspond directly to the recorded Phase 7 evidence and that the telemetry line remains unchanged because no telemetry requirement was introduced.
+1. **`section_intent.py` coverage gap (76%)**: Lines 163-166, 179-182, 203-204, 214-215, 240-243 correspond to the `LAUNCHER_ONLY`, `UNSUPPORTED`, and deep-fallback branches. These are exercised via integration but not via isolated unit tests. A follow-up to add targeted unit tests for these branches is recommended.
+
+2. **`intermediate_state.py` coverage gap (87%)**: Lines 96, 128, 150, 174 are the serialization branches for non-empty collections in the JSON writers. The P4-T19 test exercises the happy path with an empty state. A follow-up to add non-empty-state tests is recommended.
+
+3. **TypeScript `promptForShortName` removal**: A pre-existing unused import was removed from `extension.ts` during this QA pass (P7-T7). Reviewers should verify the function is not expected to be wired to any upcoming command.
+
+4. **v2 engine integration**: `engine.py` orchestrates the full parser → classify → plan → optionally write intermediate state → render → validate pipeline. The 8 uncovered lines (200, 209, 317, 331, 469, 477, 521, 734) are in error-handling and edge paths. Review these for correctness.
+
+5. **Intermediate state determinism**: The plan AC specifies that disabling `emit_intermediate_state` must not change planned emissions or report artifacts. P4-T20 verifies this contract. Reviewers should confirm the mock-based isolation test is adequate for the feature's correctness guarantee.

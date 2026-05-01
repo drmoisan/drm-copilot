@@ -82,6 +82,41 @@ def test_github_copilot_fixture_review_run_produces_required_report_set() -> Non
     assert len(result.mapping_records) >= 4
 
 
+def test_github_copilot_fixture_merges_repo_wide_instructions_into_agents() -> None:
+    """Merge repo-wide GitHub instruction files into one generated `AGENTS.md`."""
+
+    recording_fs = RecordingFileSystem()
+    result = run_review_mode(
+        RunOptions(
+            mode="review",
+            source_root=_fixture_root("github_copilot"),
+            source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+            selected_paths=(),
+            destination_root=None,
+            artifact_root=Path("virtual/end-to-end/github"),
+        ),
+        fs=recording_fs,
+    )
+
+    agents_output = next(
+        content
+        for path, content in recording_fs.files.items()
+        if path.endswith("proposed-tree/AGENTS.md")
+    )
+
+    assert "Copilot fixture instructions" in agents_output
+    assert "fixture-general-policy" in agents_output
+    assert any(
+        record.source_path == ".github/instructions/general-code-change.instructions.md"
+        and record.target_path == "AGENTS.md"
+        for record in result.mapping_records
+    )
+    assert not any(
+        finding.code == "duplicate-target-path"
+        for finding in result.validation_findings
+    )
+
+
 def _test_claude_fixture_review_surfaces_unsupported_constructs() -> None:
     """Surface unsupported Claude constructs in reports instead of dropping them."""
 
