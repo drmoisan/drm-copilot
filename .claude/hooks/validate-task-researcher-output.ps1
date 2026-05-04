@@ -1,29 +1,18 @@
-﻿<#
+<#
 .SYNOPSIS
     SubagentStop hook for the task-researcher subagent.
 
 .DESCRIPTION
     Blocks termination of the task-researcher subagent unless the agent's
     final output advertises a `research-path` token, the path is rooted
-    under artifacts/research/, and the file exists on disk.
-
-    Per the task-researcher agent contract, all research artifacts must be
-    written to artifacts/research/ using the convention:
-        artifacts/research/<timestamp>-<short-name>-research.md
-
-    This hook confirms that:
-      - the hook payload is well-formed JSON,
-      - the agent output is non-empty,
-      - the output advertises a research-path token in one of the supported
-        forms (key:value, key=value, quoted, or markdown-link),
-      - the resolved path begins with artifacts/research/,
-      - the file exists at that location.
+    under artifacts/research/, matches the documented filename convention,
+    and the file exists on disk.
 
 .NOTES
     Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
     termination; exits 1 with an error message to block. Filesystem reads go
-    through Test-ResearchFile so tests can mock the boundary without
-    writing temporary files.
+    through Test-ResearchFile so tests can mock the boundary without writing
+    temporary files.
 #>
 
 [CmdletBinding()]
@@ -33,13 +22,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Test-ResearchFile {
-    <#
-    .SYNOPSIS
-        Thin wrapper around the filesystem-existence boundary for research files.
-    .DESCRIPTION
-        Returns $true when the path resolves to a file on disk, $false otherwise.
-        Tests mock this function to inject existence results without temp files.
-    #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
@@ -51,17 +33,6 @@ function Test-ResearchFile {
 }
 
 function Get-ResearchPathFromOutput {
-    <#
-    .SYNOPSIS
-        Extracts the research-path token from agent output.
-    .DESCRIPTION
-        Supports the same forms as the planner and executor hooks:
-            research-path: artifacts/research/<file>.md
-            research-path = artifacts/research/<file>.md
-            research-path: "artifacts/research/<file>.md"
-            [research-path](artifacts/research/<file>.md)
-        Returns the trimmed path string, or $null when no token is present.
-    #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
@@ -85,13 +56,6 @@ function Get-ResearchPathFromOutput {
 }
 
 function Test-IsUnderResearchRoot {
-    <#
-    .SYNOPSIS
-        Validates that a path is rooted under artifacts/research/.
-    .DESCRIPTION
-        Normalizes forward and back slashes, then checks the prefix.
-        This is a string check; it does not touch the filesystem.
-    #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
@@ -103,15 +67,23 @@ function Test-IsUnderResearchRoot {
     return $normalized.StartsWith('artifacts/research/', [System.StringComparison]::OrdinalIgnoreCase)
 }
 
+function Test-IsValidResearchFileName {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    $normalized = $Path -replace '\\', '/'
+    $fileName = [System.IO.Path]::GetFileName($normalized)
+    return [regex]::IsMatch(
+        $fileName,
+        '^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-[A-Za-z0-9][A-Za-z0-9-]*-research\.md$'
+    )
+}
+
 function Invoke-TaskResearcherOutputValidation {
-    <#
-    .SYNOPSIS
-        Parses the hook payload and returns an ok-or-block decision.
-    .DESCRIPTION
-        Returns a hashtable with keys:
-          - Ok:      $true to allow termination, $false to block.
-          - Message: error message when blocking; $null on success.
-    #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
@@ -124,7 +96,8 @@ function Invoke-TaskResearcherOutputValidation {
 
     try {
         $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    } catch {
+    }
+    catch {
         return @{ Ok = $false; Message = "task-researcher hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
     }
 
@@ -145,6 +118,10 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is not under artifacts/research/. All research artifacts must be written to artifacts/research/." }
     }
 
+    if (-not (Test-IsValidResearchFileName -Path $researchPath)) {
+        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' does not match the required filename convention `artifacts/research/<timestamp>-<short-name>-research.md`." }
+    }
+
     if (-not (Test-ResearchFile -Path $researchPath)) {
         return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
     }
@@ -152,7 +129,6 @@ function Invoke-TaskResearcherOutputValidation {
     return @{ Ok = $true; Message = $null }
 }
 
-# Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }

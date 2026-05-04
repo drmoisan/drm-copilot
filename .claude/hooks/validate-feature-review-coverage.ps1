@@ -1,87 +1,137 @@
 <#
 .SYNOPSIS
-    SubagentStop hook that validates feature-review coverage verdicts against the branch diff.
+    SubagentStop hook that validates feature-review artifacts and coverage verdicts.
 
 .DESCRIPTION
-    Runs when the feature-review subagent terminates. Cross-checks the most recent
-    policy-audit.<timestamp>.md under docs/features/active/**/ against the PR context
-    summary at artifacts/pr_context.summary.txt and against existing coverage artifacts.
+    Runs when the feature-review subagent terminates. Validates that the final
+    output advertises the required review artifact paths, that those artifacts
+    exist in the canonical active-feature location, and that the policy audit
+    carries explicit PASS or FAIL coverage verdicts for each language with
+    changed files in the branch diff.
 
-    Validation rules:
-      - Enumerate languages that have changed files in the branch diff:
+    Required advertised output tokens:
+      - policy-audit-path
+      - code-review-path
+      - feature-audit-path
+
+    Optional advertised output token:
+      - remediation-inputs-path
+
+    Additional coverage rules:
+      - Enumerate languages that have changed files in artifacts/pr_context.summary.txt:
           .ts / .tsx            -> TypeScript
           .py                   -> Python
           .ps1 / .psm1          -> PowerShell
           .cs                   -> CSharp
-      - For each language with one or more changed files, the policy audit must contain
-        a coverage-scoped row or line that states an explicit PASS or FAIL verdict for
-        that language. Scope-narrowing phrases on those rows are treated as validation
-        failures:
-          "informational only", "context only", "out of plan scope", "out of scope",
-          "not applicable", "N/A", "UNVERIFIED".
-      - If the coverage artifact for a language is present, repo-wide line coverage is
-        parsed and compared against the 80 percent floor. When repo-wide coverage is
-        below 80 percent and the audit does not carry a FAIL verdict on a coverage row
-        for that language, validation fails.
-
-    Coverage artifact paths by language:
-        TypeScript  coverage/lcov.info                          (LCOV text)
-        Python      artifacts/python/lcov.info                  (LCOV text)
-        PowerShell  artifacts/pester/powershell-coverage.xml    (JaCoCo XML)
-        CSharp      artifacts/csharp/coverage.xml               (JaCoCo XML)
-
-    On a validation failure the script writes a block decision to stdout and exits 1.
-    Read-only: inspects artifacts on disk and never modifies state.
+      - For each changed language, the policy audit must contain a
+        coverage-scoped PASS or FAIL verdict.
+      - Scope-narrowing phrases on coverage rows are treated as failures.
+      - When repo-wide coverage is below 80 percent for an available artifact,
+        the policy audit must carry a FAIL verdict for that language.
 
 .NOTES
-    Compatible with PowerShell 7+.
+    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
+    termination; exits 1 with an error message to block.
 #>
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
 
-function Get-RepoRoot {
-    $start = (Get-Location).Path
-    $current = $start
-    while ($true) {
-        if (Test-Path (Join-Path $current '.claude')) { return $current }
-        $parent = Split-Path $current -Parent
-        if (-not $parent -or $parent -eq $current) { break }
-        $current = $parent
+function Get-ArtifactFileContent {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return @{ Exists = $false; Text = $null; Lines = @() }
     }
-    return $start
+
+    $text = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+    $lines = Get-Content -LiteralPath $Path -ErrorAction Stop
+    if ($null -eq $lines) {
+        $lines = @()
+    }
+    elseif ($lines -isnot [array]) {
+        $lines = @($lines)
+    }
+
+    return @{ Exists = $true; Text = $text; Lines = $lines }
 }
 
-function Get-LatestPolicyAudit {
-    [OutputType([System.IO.FileInfo])]
-    param([string]$RepoRoot)
+function Get-ReviewArtifactPathFromOutput {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $AgentOutput,
 
-    $activeRoot = Join-Path $RepoRoot 'docs/features/active'
-    if (-not (Test-Path $activeRoot)) { return $null }
+        [Parameter(Mandatory = $true)]
+        [string] $Token
+    )
 
-    Get-ChildItem -Path $activeRoot -Recurse -File -Filter 'policy-audit.*.md' |
-        Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
+    $escapedToken = [regex]::Escape($Token)
+    $pattern = "$escapedToken\s*[:=]\s*[""']?([^\s""'\)`]+)|\[$escapedToken\]\(([^)]+)\)"
+    $match = [regex]::Match(
+        $AgentOutput,
+        $pattern,
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    if (-not $match.Success) {
+        return $null
+    }
+
+    $value = if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value }
+    $value = $value.Trim()
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        return $null
+    }
+
+    return $value
+}
+
+function Get-ReviewArtifactInfo {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Stem
+    )
+
+    $normalized = $Path -replace '\\', '/'
+    $pattern = "^docs/features/active/(?<Folder>.+)/$Stem\.(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.md$"
+    $match = [regex]::Match($normalized, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    if (-not $match.Success) {
+        return $null
+    }
+
+    return @{
+        Folder    = $match.Groups['Folder'].Value
+        Timestamp = $match.Groups['Timestamp'].Value
+        Path      = $normalized
+    }
 }
 
 function Get-ChangedLanguageSet {
     [OutputType([System.Collections.Hashtable])]
-    param([string]$RepoRoot)
+    param([string[]]$Lines)
 
-    $prSummary = Join-Path $RepoRoot 'artifacts/pr_context.summary.txt'
     $langs = [ordered]@{}
-    if (-not (Test-Path $prSummary)) { return $langs }
-
-    foreach ($line in Get-Content -Path $prSummary) {
+    foreach ($line in $Lines) {
         if ($line -notmatch '^\s*-\s+(\S+)\s+\(\+\d+/-\d+\)\s*$') { continue }
         $path = $matches[1]
         $ext = [IO.Path]::GetExtension($path).ToLowerInvariant()
         switch -Regex ($ext) {
             '^\.(ts|tsx)$' { $langs['TypeScript'] = $true }
-            '^\.py$' { $langs['Python']     = $true }
+            '^\.py$' { $langs['Python'] = $true }
             '^\.(ps1|psm1)$' { $langs['PowerShell'] = $true }
-            '^\.cs$' { $langs['CSharp']     = $true }
+            '^\.cs$' { $langs['CSharp'] = $true }
         }
     }
     return $langs
@@ -91,11 +141,12 @@ function Get-LcovRepoCoverage {
     [OutputType([Nullable[double]])]
     param([string]$Path)
 
-    if (-not (Test-Path $Path)) { return $null }
+    $file = Get-ArtifactFileContent -Path $Path
+    if (-not $file.Exists) { return $null }
 
     $totalFound = 0
     $totalHit = 0
-    foreach ($line in Get-Content -Path $Path) {
+    foreach ($line in $file.Lines) {
         if ($line.StartsWith('LF:')) {
             $totalFound += [int]($line.Substring(3))
         }
@@ -111,9 +162,10 @@ function Get-JacocoRepoCoverage {
     [OutputType([Nullable[double]])]
     param([string]$Path)
 
-    if (-not (Test-Path $Path)) { return $null }
+    $file = Get-ArtifactFileContent -Path $Path
+    if (-not $file.Exists) { return $null }
 
-    [xml]$doc = Get-Content -Path $Path -Raw
+    [xml]$doc = $file.Text
     $counters = $doc.SelectNodes('//counter[@type="LINE"]')
     if (-not $counters -or $counters.Count -eq 0) { return $null }
 
@@ -131,15 +183,14 @@ function Get-JacocoRepoCoverage {
 function Get-LanguageRepoCoverage {
     [OutputType([Nullable[double]])]
     param(
-        [string]$RepoRoot,
         [string]$Language
     )
 
     switch ($Language) {
-        'TypeScript' { return Get-LcovRepoCoverage -Path (Join-Path $RepoRoot 'coverage/lcov.info') }
-        'Python' { return Get-LcovRepoCoverage -Path (Join-Path $RepoRoot 'artifacts/python/lcov.info') }
-        'PowerShell' { return Get-JacocoRepoCoverage -Path (Join-Path $RepoRoot 'artifacts/pester/powershell-coverage.xml') }
-        'CSharp' { return Get-JacocoRepoCoverage -Path (Join-Path $RepoRoot 'artifacts/csharp/coverage.xml') }
+        'TypeScript' { return Get-LcovRepoCoverage -Path 'coverage/lcov.info' }
+        'Python' { return Get-LcovRepoCoverage -Path 'artifacts/python/lcov.info' }
+        'PowerShell' { return Get-JacocoRepoCoverage -Path 'artifacts/pester/powershell-coverage.xml' }
+        'CSharp' { return Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml' }
     }
     return $null
 }
@@ -211,53 +262,128 @@ function Test-LanguageCoverageRow {
     return @{ Ok = $true; Reason = $null }
 }
 
-function Write-BlockDecision {
-    param([string]$Reason)
+function Invoke-FeatureReviewCoverageValidation {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [string] $RawPayload
+    )
 
-    $payload = [ordered]@{
-        decision = 'block'
-        reason   = $Reason
-    } | ConvertTo-Json -Compress
-    Write-Output $payload
-}
-
-try {
-    $repoRoot = Get-RepoRoot
-    $audit = Get-LatestPolicyAudit -RepoRoot $repoRoot
-    if (-not $audit) {
-        # No audit to validate. The existing SubagentStop artifact-presence hook covers this case.
-        exit 0
+    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
+        return @{ Ok = $false; Message = 'feature-review hook: CLAUDE_HOOK_INPUT is empty; cannot validate review output.' }
     }
 
-    $auditText = Get-Content -Path $audit.FullName -Raw
-    $changedLanguages = Get-ChangedLanguageSet -RepoRoot $repoRoot
-
-    if ($changedLanguages.Count -eq 0) {
-        exit 0
+    try {
+        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        return @{ Ok = $false; Message = "feature-review hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
     }
 
-    $failures = [System.Collections.Generic.List[string]]::new()
+    $agentOutput = $null
+    if ($payload.PSObject.Properties.Name -contains 'output') {
+        $agentOutput = $payload.output
+    }
+    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+        return @{ Ok = $false; Message = 'feature-review hook: agent output is empty; feature-review must report required artifact paths before termination.' }
+    }
 
-    foreach ($lang in $changedLanguages.Keys) {
-        $repoPct = Get-LanguageRepoCoverage -RepoRoot $repoRoot -Language $lang
-        $result = Test-LanguageCoverageRow -AuditText $auditText -Language $lang -RepoWidePct $repoPct
-        if (-not $result.Ok) {
-            $failures.Add($result.Reason)
+    $requiredArtifacts = @(
+        @{ Token = 'policy-audit-path'; Stem = 'policy-audit'; Description = 'policy audit artifact' },
+        @{ Token = 'code-review-path'; Stem = 'code-review'; Description = 'code review artifact' },
+        @{ Token = 'feature-audit-path'; Stem = 'feature-audit'; Description = 'feature audit artifact' }
+    )
+
+    $artifactMeta = @{}
+    $errors = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($artifact in $requiredArtifacts) {
+        $path = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token $artifact.Token
+        if ($null -eq $path) {
+            $errors.Add("missing $($artifact.Token): <path> for the required $($artifact.Description)")
+            continue
+        }
+
+        $metadata = Get-ReviewArtifactInfo -Path $path -Stem $artifact.Stem
+        if ($null -eq $metadata) {
+            $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
+            continue
+        }
+
+        $file = Get-ArtifactFileContent -Path $path
+        if (-not $file.Exists) {
+            $errors.Add("$($artifact.Token) '$path' was advertised for the $($artifact.Description) but no file exists at that location")
+            continue
+        }
+
+        $metadata['Text'] = $file.Text
+        $artifactMeta[$artifact.Stem] = $metadata
+    }
+
+    if ($artifactMeta.ContainsKey('policy-audit')) {
+        $reference = $artifactMeta['policy-audit']
+        foreach ($stem in @('code-review', 'feature-audit')) {
+            if (-not $artifactMeta.ContainsKey($stem)) {
+                continue
+            }
+            $candidate = $artifactMeta[$stem]
+            if ($candidate.Folder -ne $reference.Folder -or $candidate.Timestamp -ne $reference.Timestamp) {
+                $errors.Add("$stem artifact must share the same feature folder and timestamp as the policy audit artifact.")
+            }
+        }
+
+        $remediationPath = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token 'remediation-inputs-path'
+        if ($null -ne $remediationPath) {
+            $remediation = Get-ReviewArtifactInfo -Path $remediationPath -Stem 'remediation-inputs'
+            if ($null -eq $remediation) {
+                $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
+            }
+            elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {
+                $errors.Add('remediation-inputs artifact must share the same feature folder and timestamp as the policy audit artifact.')
+            }
+            elseif (-not (Get-ArtifactFileContent -Path $remediationPath).Exists) {
+                $errors.Add("remediation-inputs-path '$remediationPath' was advertised but no file exists at that location")
+            }
         }
     }
 
-    if ($failures.Count -gt 0) {
-        $header = "Feature-review coverage validation failed against branch diff."
-        $body   = "  - " + ($failures -join "`n  - ")
-        $footer = "Audit file: $($audit.FullName)`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below 80% as FAIL."
-        Write-BlockDecision -Reason ("{0}`n{1}`n{2}" -f $header, $body, $footer)
-        exit 1
+    if ($errors.Count -gt 0) {
+        $message = "feature-review hook: required review artifact validation failed:`n  - " + ($errors -join "`n  - ")
+        return @{ Ok = $false; Message = $message }
     }
 
-    exit 0
+    $prSummary = Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt'
+    $changedLanguages = if ($prSummary.Exists) { Get-ChangedLanguageSet -Lines $prSummary.Lines } else { [ordered]@{} }
+    if ($changedLanguages.Count -eq 0) {
+        return @{ Ok = $true; Message = $null }
+    }
+
+    $policyAuditText = $artifactMeta['policy-audit'].Text
+    $coverageFailures = [System.Collections.Generic.List[string]]::new()
+    foreach ($lang in $changedLanguages.Keys) {
+        $repoPct = Get-LanguageRepoCoverage -Language $lang
+        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct
+        if (-not $result.Ok) {
+            $coverageFailures.Add($result.Reason)
+        }
+    }
+
+    if ($coverageFailures.Count -gt 0) {
+        $message = "feature-review hook: coverage validation failed against branch diff:`n  - " + ($coverageFailures -join "`n  - ")
+        return @{ Ok = $false; Message = $message }
+    }
+
+    return @{ Ok = $true; Message = $null }
 }
-catch {
-    Write-BlockDecision -Reason ("Feature-review coverage validator error: {0}" -f $_.Exception.Message)
+
+if ($MyInvocation.InvocationName -eq '.') {
+    return
+}
+
+$result = Invoke-FeatureReviewCoverageValidation -RawPayload $env:CLAUDE_HOOK_INPUT
+if (-not $result.Ok) {
+    Write-Error $result.Message
     exit 1
 }
 
+exit 0

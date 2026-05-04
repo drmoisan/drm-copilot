@@ -9,6 +9,12 @@ tools:
 skills:
   - acceptance-criteria-tracking
 memory: project
+hooks:
+  SubagentStop:
+    - matcher: "epic-review"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName epic-review -RequiredArtifact 'epic-audit-path|^docs/features/epics/.+/epic-audit\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}\.md$|epic audit artifact'
 ---
 
 # Epic Review Agent
@@ -18,6 +24,12 @@ Review epic-level scope and write the resulting epic-audit artifact.
 ## Expected Outputs
 
 - `docs/features/epics/<epic>/epic-audit.<timestamp>.md`
+
+## Output Reporting
+
+Report the final artifact path as:
+
+- `epic-audit-path: docs/features/epics/<epic>/epic-audit.<timestamp>.md`
 
 ## Evidence Location Invariant
 

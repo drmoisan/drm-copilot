@@ -9,6 +9,12 @@ tools:
 skills:
   - acceptance-criteria-tracking
 memory: project
+hooks:
+  SubagentStop:
+    - matcher: "prd-feature"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName prd-feature -RequiredArtifact 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact' -RequiredArtifact 'user-story-path|^docs/features/active/.+/user-story\.md$|feature user story artifact'
 ---
 
 # PRD Feature Agent
@@ -19,6 +25,13 @@ Produce feature-document outputs for the active feature folder.
 
 - `docs/features/active/<feature>/spec.md`
 - `docs/features/active/<feature>/user-story.md`
+
+## Output Reporting
+
+Report the final artifact paths as:
+
+- `spec-path: docs/features/active/<feature>/spec.md`
+- `user-story-path: docs/features/active/<feature>/user-story.md`
 
 ## Evidence Location Invariant
 
