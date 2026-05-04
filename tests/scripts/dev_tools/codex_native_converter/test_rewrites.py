@@ -152,6 +152,36 @@ def test_rewrite_supported_automation_reference_rewrites_claude_rule_paths() -> 
     assert ".claude/rules/" not in rewritten_text
 
 
+def test_rewrite_supported_reference_expands_atomic_planner_preflight_contract() -> (
+    None
+):
+    """Expand the Claude planner shorthand into the Codex handoff contract."""
+
+    source_text = (
+        "Return the finalized plan for validation-only preflight through "
+        "`atomic-executor` and preserve the same target file path across revision "
+        "loops. Do not claim nested worker delegation from within planner execution."
+    )
+
+    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert "explicitly spawn the `atomic-executor` subagent" in rewritten_text
+    assert "`DIRECTIVE: PREFLIGHT VALIDATION ONLY`" in rewritten_text
+    assert "`PREFLIGHT: ALL CLEAR`" in rewritten_text
+    assert "`PREFLIGHT: REVISIONS REQUIRED`" in rewritten_text
+    assert "Treat executor preflight findings as binding plan defects" in rewritten_text
+    assert "Reuse the same target plan file" in rewritten_text
+    assert "stop and report blocked state" in rewritten_text
+    assert "validate_orchestration_artifacts` MCP tool" in rewritten_text
+    assert any(
+        "Expand the Claude atomic-planner preflight shorthand" in description
+        for description in applied_rewrites
+    )
+
+
 def test_rewrite_supported_automation_reference_rewrites_claude_rules_directory() -> (
     None
 ):

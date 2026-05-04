@@ -60,7 +60,18 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 
 ## Preflight Validation
 
-Return the finalized plan for validation-only preflight through `atomic-executor` and preserve the same target file path across revision loops. Do not claim nested worker delegation from within planner execution.
+Before reporting completion, explicitly spawn the `atomic-executor` subagent for validation-only preflight. The delegated prompt MUST include the exact directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.
+
+- `atomic-executor` MUST return exactly one of:
+  - `PREFLIGHT: ALL CLEAR`
+  - `PREFLIGHT: REVISIONS REQUIRED`
+- Treat executor preflight findings as binding plan defects.
+- If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the same target plan file using the executor's precise plan delta and re-run preflight.
+- Reuse the same target plan file for every preflight revision iteration in the same planning cycle.
+- If the required `atomic-executor` handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
+- Before reporting completion, the target plan MUST pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`.
+
+Do not claim nested worker delegation from within planner execution.
 
 ## Output
 

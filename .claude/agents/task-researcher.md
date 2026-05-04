@@ -11,9 +11,11 @@ tools:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      command: "pwsh -NoProfile -File .claude/hooks/validate-task-researcher-output.ps1"
+  SubagentStop:
+    - matcher: "task-researcher"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-task-researcher-output.ps1
 ---
 
 # Task Researcher Agent

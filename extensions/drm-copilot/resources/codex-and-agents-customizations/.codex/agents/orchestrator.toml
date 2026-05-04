@@ -63,6 +63,18 @@ Delegate exclusively through configured subagents:
 
 For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop execution and record blocked state. Do not perform the step locally.
 
+## Mandatory Delegation Gates
+
+- Treat `spawn_agent` availability as the mechanical availability signal for required delegated specialists.
+- For required delegated steps, you must delegate or stop execution.
+- For planning steps, do not perform planning locally when delegation is required.
+- For delivery steps, do not perform preflight validation, execution, or post-delivery validation locally when delegation is required.
+- For review steps, do not perform post-implementation review locally when delegation is required.
+- Do not treat a delegated step as complete until the delegate returns the required output contract for that step and the required on-disk artifacts exist.
+- Do not accept PASS outcomes that rely on stale PR-context artifacts, missing receipts, or missing required evidence artifacts.
+- Do not rename, back up, or create sidecar checkpoint files.
+- Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
+
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/orchestrator-state.json` after every completed step with:
@@ -86,4 +98,5 @@ Do not report completion until:
 2. All validation gates (toolchain, acceptance criteria, audit artifacts) have passed.
 3. The checkpoint file reflects the completed state.
 4. Acceptance criteria in AC source files have been checked off per the `acceptance-criteria-tracking` skill.
+5. Do not claim mission completion unless all required delegations completed with receipts and the required orchestration artifacts exist on disk.
 '''

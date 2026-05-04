@@ -87,10 +87,15 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 ## Preflight Validation
 
-When receiving a plan with directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, perform only format and structure validation. Return exactly one of:
+When receiving a plan with directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, perform validation only and return exactly one of `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.
 
 - `PREFLIGHT: ALL CLEAR`
-- `PREFLIGHT: REVISIONS REQUIRED` (with precise plan delta)
+- `PREFLIGHT: REVISIONS REQUIRED`
+- If revisions are required, include a precise plan delta that can be applied to the same plan file.
+- When returning `PREFLIGHT: REVISIONS REQUIRED`, automatically hand off back to `atomic-planner` and request that it apply the delta to the same plan file.
+- Continue the validate -> delta -> planner-revise -> validate loop until preflight can return `PREFLIGHT: ALL CLEAR`.
+- If the handoff loop cannot proceed or the required validator is unavailable, stop and report blocked state.
+- Before any `PREFLIGHT: ALL CLEAR` result is treated as approved, the target plan must pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`.
 
 ## Blocking Protocol
 

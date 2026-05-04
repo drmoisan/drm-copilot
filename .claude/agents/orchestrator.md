@@ -19,9 +19,11 @@ skills:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      command: "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1"
+  SubagentStop:
+    - matcher: "orchestrator"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1
 ---
 
 # Orchestrator Agent
