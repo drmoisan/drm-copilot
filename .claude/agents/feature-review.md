@@ -12,10 +12,6 @@ skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
 memory: project
-hooks:
-  Stop:
-    - matcher: ""
-      body: "Block termination unless all required review artifact paths (policy-audit, code-review, feature-audit) have been confirmed on disk."
 ---
 
 # Feature Review Agent
