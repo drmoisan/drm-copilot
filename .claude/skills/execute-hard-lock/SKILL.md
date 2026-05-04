@@ -66,7 +66,7 @@ The three entry points below all produce the same resolved hard-lock prompt for 
 
 ## Delegation Contract
 
-The `atomic-executor` subagent at [.claude/agents/atomic-executor.md](.claude/agents/atomic-executor.md) enforces the persistent execution-mode behaviors (anti-replanning, preflight-only blocking, persistence across turns, resume) and preloads the shared skills that support them:
+The `atomic-executor` subagent at [../../agents/atomic-executor.md](../../agents/atomic-executor.md) enforces the persistent execution-mode behaviors (anti-replanning, preflight-only blocking, persistence across turns, resume) and preloads the shared skills that support them:
 
 - `policy-compliance-order` — mandatory policy reading order.
 - `atomic-plan-contract` — plan format, Phase 0 requirements, preflight signals, validator gate, and mode-specific plan gates.
