@@ -21,23 +21,25 @@ You can invoke the converter through the installed Poetry script or through the 
 
 Use review mode when you want to inspect the proposed conversion before allowing destination writes.
 
-- `poetry run codex-native-converter review --source-root <source-root> --source-ecosystem <github-copilot|claude>`
-- `python -m scripts.dev_tools.codex_native_converter review --source-root <source-root> --source-ecosystem <github-copilot|claude>`
+- `poetry run codex-native-converter review --source-root <source-root> --source-ecosystem <github-copilot|claude> [--emit-intermediate-state]`
+- `python -m scripts.dev_tools.codex_native_converter review --source-root <source-root> --source-ecosystem <github-copilot|claude> [--emit-intermediate-state]`
 
 Example:
 
-- `poetry run codex-native-converter review --source-root tests/fixtures/codex_native_converter/github_copilot --source-ecosystem github-copilot`
+- `poetry run codex-native-converter review --source-root tests/fixtures/codex_native_converter/github_copilot --source-ecosystem github-copilot --emit-intermediate-state`
+- `poetry run codex-native-converter review --source-root . --source-ecosystem claude --emit-intermediate-state`
 
 ### Apply mode
 
 Use apply mode when you want the converter to write native output after validation passes.
 
-- `poetry run codex-native-converter apply --source-root <source-root> --source-ecosystem <github-copilot|claude> --destination-root <destination-root>`
-- `python -m scripts.dev_tools.codex_native_converter apply --source-root <source-root> --source-ecosystem <github-copilot|claude> --destination-root <destination-root>`
+- `poetry run codex-native-converter apply --source-root <source-root> --source-ecosystem <github-copilot|claude> --destination-root <destination-root> [--emit-intermediate-state]`
+- `python -m scripts.dev_tools.codex_native_converter apply --source-root <source-root> --source-ecosystem <github-copilot|claude> --destination-root <destination-root> [--emit-intermediate-state]`
 
 Example:
 
-- `poetry run codex-native-converter apply --source-root tests/fixtures/codex_native_converter/github_copilot --source-ecosystem github-copilot --destination-root virtual/codex-native-output`
+- `poetry run codex-native-converter apply --source-root tests/fixtures/codex_native_converter/github_copilot --source-ecosystem github-copilot --destination-root virtual/codex-native-output --emit-intermediate-state`
+- `poetry run codex-native-converter apply --source-root . --source-ecosystem claude --destination-root virtual/codex-native-output-from-claude --emit-intermediate-state`
 
 ## Options
 
@@ -50,6 +52,7 @@ Both commands accept these options:
 | `--selected-path` | Optional source-root-relative path filter. Repeat this option to limit conversion to specific files or directories beneath the source root. |
 | `--artifact-root` | Optional output directory for converter reports. When omitted, the default is `<source-root>/artifacts/codex-native-converter`. |
 | `--enable-repo-prompts` | Enables repository-convention `.codex/prompts/**` output when prompt generation is intentionally required. |
+| `--emit-intermediate-state` | Writes compiler-like intermediate state JSON artifacts under `<artifact-root>/intermediate/`. |
 | `--destination-root` | Required in `apply` mode only. Native output root for generated files. |
 
 ## Supported input surfaces

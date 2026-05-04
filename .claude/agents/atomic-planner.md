@@ -15,9 +15,11 @@ skills:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      body: "Block termination unless the output plan file path has been confirmed on disk and the plan passes structural validation."
+  SubagentStop:
+    - matcher: "atomic-planner"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-planner-output.ps1
 ---
 
 # Atomic Planner Agent

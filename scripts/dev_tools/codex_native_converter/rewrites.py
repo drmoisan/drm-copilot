@@ -178,6 +178,41 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         description="Rewrite Claude settings paths to Codex config paths.",
     ),
     RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/rules/([A-Za-z0-9_.-]+)\.md\b"),
+        replacement=lambda match: (
+            f".agents/skills/{_normalize_target_name(match.group(1))}/SKILL.md"
+        ),
+        description="Rewrite Claude rule paths to shared skill paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/rules/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite Claude rules-directory references to the native skill root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/skills/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite Claude skill-directory references to the native skill root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/agents/"),
+        replacement=".codex/agents/",
+        description=(
+            "Rewrite Claude agent-directory references to the native agent root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/hooks/"),
+        replacement=".codex/hooks/",
+        description=(
+            "Rewrite Claude hook-directory references to the native hook root."
+        ),
+    ),
+    RewriteRule(
         pattern=re.compile(r"\bdrmCopilotExtension\.collectPrContext\b"),
         replacement="mcp__drmCopilotExtension__collect_pr_context",
         description=(
@@ -272,6 +307,15 @@ def _rewrite_rules(
             ),
         )
         for source_path, target_path in _PROMPT_SKILL_FALLBACKS
+    ) + (
+        RewriteRule(
+            pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/prompts/"),
+            replacement=".agents/skills/",
+            description=(
+                "Rewrite GitHub prompt-directory references to the native shared "
+                "skill root when repository prompt launchers are disabled."
+            ),
+        ),
     )
     prompt_rewrite_rules: tuple[RewriteRule, ...] = ()
     if enable_repo_prompts:

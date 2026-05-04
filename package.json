@@ -4,10 +4,6 @@
   "displayName": "drm-copilot",
   "description": "VS Code extension to facilitate standardized development tools to repos.",
   "version": "0.0.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/drmoisan/drm-copilot.git"
-  },
   "engines": {
     "vscode": "^1.118.0"
   },

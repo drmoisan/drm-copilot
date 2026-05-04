@@ -10,3 +10,8 @@ eslint.config.mjs
 run-jest.cjs
 esbuild-mcp-server.cjs
 package-lock.json
+PUBLISHING.md
+.vscode-test/**
+**/__pycache__/**
+**/*.pyc
+**/*.pyo

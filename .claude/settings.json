@@ -125,6 +125,15 @@
             "command": "pwsh -NoProfile -File .claude/hooks/validate-feature-review-coverage.ps1"
           }
         ]
+      },
+      {
+        "matcher": "atomic-planner",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-planner-output.ps1"
+          }
+        ]
       }
     ]
   },

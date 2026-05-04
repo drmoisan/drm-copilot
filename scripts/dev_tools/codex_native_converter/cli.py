@@ -50,6 +50,11 @@ ARTIFACT_ROOT_OPTION = typer.Option(None, help="Optional artifact output root.")
 ENABLE_REPO_PROMPTS_OPTION = typer.Option(
     False, help="Enable repository-convention .codex/prompts output."
 )
+EMIT_INTERMEDIATE_STATE_OPTION = typer.Option(
+    False,
+    "--emit-intermediate-state",
+    help="Write compiler-like intermediate state JSON artifacts.",
+)
 
 
 def _resolve_source_ecosystem(source_ecosystem: str) -> SourceEcosystem:
@@ -89,6 +94,7 @@ def _resolve_run_options(
     destination_root: Path | None,
     artifact_root: Path | None,
     enable_repo_prompts: bool,
+    emit_intermediate_state: bool,
 ) -> RunOptions:
     """Validate CLI input and build one run-options value object.
 
@@ -105,6 +111,8 @@ def _resolve_run_options(
         destination_root (Path | None): Optional destination root.
         artifact_root (Path | None): Optional artifact root.
         enable_repo_prompts (bool): Whether prompt output is enabled.
+        emit_intermediate_state (bool): Whether intermediate-state artifacts
+            should be written.
 
     Returns:
         RunOptions: Validated run options for the engine.
@@ -138,6 +146,7 @@ def _resolve_run_options(
         destination_root=resolved_destination_root,
         artifact_root=resolved_artifact_root,
         enable_repo_prompts=enable_repo_prompts,
+        emit_intermediate_state=emit_intermediate_state,
     )
 
 
@@ -183,6 +192,7 @@ def review(
     selected_path: list[Path] = SELECTED_PATH_OPTION,
     artifact_root: Path | None = ARTIFACT_ROOT_OPTION,
     enable_repo_prompts: bool = ENABLE_REPO_PROMPTS_OPTION,
+    emit_intermediate_state: bool = EMIT_INTERMEDIATE_STATE_OPTION,
 ) -> None:
     """Run the converter in non-mutating review mode.
 
@@ -195,6 +205,8 @@ def review(
         selected_path (list[Path]): Optional selected source paths.
         artifact_root (Path | None): Optional artifact output root.
         enable_repo_prompts (bool): Whether repository prompt output is enabled.
+        emit_intermediate_state (bool): Whether intermediate-state artifacts
+            should be written.
 
     Returns:
         None: This command writes stdout summary lines.
@@ -214,6 +226,7 @@ def review(
         destination_root=None,
         artifact_root=artifact_root,
         enable_repo_prompts=enable_repo_prompts,
+        emit_intermediate_state=emit_intermediate_state,
     )
     result = run_review_mode(run_options)
     _print_run_summary(result)
@@ -227,6 +240,7 @@ def apply(
     selected_path: list[Path] = SELECTED_PATH_OPTION,
     artifact_root: Path | None = ARTIFACT_ROOT_OPTION,
     enable_repo_prompts: bool = ENABLE_REPO_PROMPTS_OPTION,
+    emit_intermediate_state: bool = EMIT_INTERMEDIATE_STATE_OPTION,
 ) -> None:
     """Run the converter in mutating apply mode.
 
@@ -241,6 +255,8 @@ def apply(
         selected_path (list[Path]): Optional selected source paths.
         artifact_root (Path | None): Optional artifact output root.
         enable_repo_prompts (bool): Whether repository prompt output is enabled.
+        emit_intermediate_state (bool): Whether intermediate-state artifacts
+            should be written.
 
     Returns:
         None: This command writes stdout summary lines.
@@ -260,6 +276,7 @@ def apply(
         destination_root=destination_root,
         artifact_root=artifact_root,
         enable_repo_prompts=enable_repo_prompts,
+        emit_intermediate_state=emit_intermediate_state,
     )
     result = run_apply_mode(run_options)
     _print_run_summary(result)

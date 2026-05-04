@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 _REPO_WIDE_APPLY_TO_PATTERN = re.compile(r"(?m)^applyTo:\s*([\"'])?\*\*(?:\1)?\s*$")
+_REPO_WIDE_PATHS_PATTERN = re.compile(r"(?m)^paths:\s*\n\s*-\s*([\"'])?\*\*(?:\1)?\s*$")
 _PROMPT_WORKFLOW_HEADING_PATTERN = re.compile(
     r"(workflow|steps|task execution|required orchestration behavior|"
     r"completion criteria|output format|what to investigate|section rules|"
@@ -108,6 +109,32 @@ def _has_repo_wide_apply_to(source_root: Path, source_path: Path) -> bool:
 
     source_text = _read_optional_text(source_root, source_path)
     return bool(_REPO_WIDE_APPLY_TO_PATTERN.search(source_text))
+
+
+def _has_repo_wide_paths_yaml(source_root: Path, source_path: Path) -> bool:
+    """Determine whether one rule file declares repo-wide YAML `paths` scope.
+
+    Purpose:
+        Identify Claude rule files whose declared scope is every path in the
+        repository so they can merge into standing guidance instead of a skill.
+
+    Args:
+        source_root (Path): Absolute or relative source root.
+        source_path (Path): Source-root-relative path to inspect.
+
+    Returns:
+        bool: True when the rule declares a YAML list-form `paths:` block whose
+        only entry is `**`.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads one source file from disk.
+    """
+
+    source_text = _read_optional_text(source_root, source_path)
+    return bool(_REPO_WIDE_PATHS_PATTERN.search(source_text))
 
 
 def _classify_github_copilot(source_root: Path, source_path: Path) -> MappingRecord:
@@ -321,17 +348,30 @@ def _classify_claude(source_root: Path, source_path: Path) -> MappingRecord:
             ),
         )
 
-    if path_text.startswith(".claude/rules/"):
+    if path_text.startswith(".claude/rules/") and path_text.endswith(".md"):
+        if _has_repo_wide_paths_yaml(source_root, source_path):
+            return MappingRecord(
+                source_path=path_text,
+                source_ecosystem=SourceEcosystem.CLAUDE,
+                source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
+                conversion_class=ConversionClass.DECOMPOSED,
+                target_role=TargetRole.STANDING_GUIDANCE,
+                target_path=None,
+                notes=(
+                    "Repo-wide Claude rule applies to all files and merges into "
+                    "standing guidance.",
+                ),
+            )
         return MappingRecord(
             source_path=path_text,
             source_ecosystem=SourceEcosystem.CLAUDE,
-            source_kind=SourceKind.SHELL_POLICY_OR_RULE,
-            conversion_class=ConversionClass.UNSUPPORTED,
-            target_role=TargetRole.UNSUPPORTED,
+            source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
+            conversion_class=ConversionClass.DECOMPOSED,
+            target_role=TargetRole.SHARED_SKILL,
             target_path=None,
             notes=(
-                "Claude Markdown rules do not have a verified direct "
-                "Codex-native execution-policy mapping in v1.",
+                "Path-scoped Claude rule requires decomposition into shared "
+                "skills or standing guidance.",
             ),
         )
 
