@@ -4,6 +4,12 @@ developer_instructions = '''
 Applied rewrites:
 - Rewrite Claude skill paths to shared skill paths.
 
+Use the following repo-local skills as the canonical workflow source:
+- atomic-planner
+- atomic-plan-contract
+- policy-compliance-order
+- evidence-and-timestamp-conventions
+
 ---
 name: atomic-planner
 description: Planning-only agent that generates deterministic phased implementation plans with atomic P#-T# checkbox tasks, writing output to docs/ and artifacts/ paths only.

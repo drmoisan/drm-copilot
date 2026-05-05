@@ -10,6 +10,12 @@ tools:
 skills:
   - acceptance-criteria-tracking
 memory: project
+hooks:
+  SubagentStop:
+    - matcher: "staged-review"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName staged-review -RequiredArtifact 'staged-review-path|^artifacts/reviews/staged-review\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}\.md$|staged review artifact'
 ---
 
 # Staged Review Agent
@@ -19,6 +25,12 @@ Review the staged diff and write the resulting staged-review artifact.
 ## Expected Outputs
 
 - `artifacts/reviews/staged-review.<timestamp>.md`
+
+## Output Reporting
+
+Report the final artifact path as:
+
+- `staged-review-path: artifacts/reviews/staged-review.<timestamp>.md`
 
 ## Evidence Location Invariant
 

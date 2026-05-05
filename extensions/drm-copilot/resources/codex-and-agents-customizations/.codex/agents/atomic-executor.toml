@@ -4,6 +4,12 @@ developer_instructions = '''
 Applied rewrites:
 - Rewrite Claude skill paths to shared skill paths.
 
+Use the following repo-local skills as the canonical workflow source:
+- atomic-executor
+- atomic-plan-contract
+- policy-compliance-order
+- acceptance-criteria-tracking
+
 ---
 name: atomic-executor
 description: Plan execution agent that runs approved atomic plans task-by-task with explicit toolchain commands for Python, TypeScript, PowerShell, and C# quality gates.

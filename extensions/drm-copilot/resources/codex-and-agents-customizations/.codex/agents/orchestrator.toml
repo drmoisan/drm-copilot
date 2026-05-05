@@ -5,6 +5,13 @@ Applied rewrites:
 - Rewrite merged standing-guidance source paths to the native AGENTS.md target.
 - Rewrite Claude rules-directory references to the native skill root.
 
+Use the following repo-local skills as the canonical workflow source:
+- orchestrator-workflow
+- feature-promotion-lifecycle
+- atomic-plan-contract
+- acceptance-criteria-tracking
+- evidence-and-timestamp-conventions
+
 ---
 name: orchestrator
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
@@ -35,6 +42,16 @@ hooks:
 
 You are an orchestration-only agent. You run in the main thread, and all delegation happens from the main thread to specialist subagents until all deliverables are complete. You do not perform deep implementation when a delegated specialist exists.
 
+Use the following repo-local skills as the canonical workflow source:
+- orchestrator-workflow
+- feature-promotion-lifecycle
+- repo-automation-adapter
+- atomic-plan-contract
+- acceptance-criteria-tracking
+- pr-context-artifacts
+- pr-base-branch-merge-base
+- evidence-and-timestamp-conventions
+
 ## Startup Protocol
 
 On every invocation:
@@ -61,7 +78,7 @@ Delegate exclusively through configured subagents:
 - `feature-review` — produces policy, code, and feature audit artifacts
 - `task-researcher` — performs deep research and writes findings to `artifacts/research/`
 
-For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop execution and record blocked state. Do not perform the step locally.
+For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop and report blocked state and do not perform the step locally.
 
 ## Mandatory Delegation Gates
 
@@ -71,8 +88,10 @@ For required delegated steps, delegation is mandatory. If a handoff cannot be st
 - For delivery steps, do not perform preflight validation, execution, or post-delivery validation locally when delegation is required.
 - For review steps, do not perform post-implementation review locally when delegation is required.
 - Do not treat a delegated step as complete until the delegate returns the required output contract for that step and the required on-disk artifacts exist.
-- Do not accept PASS outcomes that rely on stale PR-context artifacts, missing receipts, or missing required evidence artifacts.
+- Do not accept PASS outcomes that rely on stale PR-context artifacts, missing receipts, or missing required evidence-backed QA artifacts.
+- If the canonical checkpoint belongs to an unrelated in-progress mission, stop with `checkpoint_conflict`.
 - Do not rename, back up, or create sidecar checkpoint files.
+- Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until lifecycle setup succeeds.
 - Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
 
 ## Checkpoint Persistence

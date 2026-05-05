@@ -57,7 +57,17 @@ Note: VS Code command-palette commands may exist for interactive extension use, 
 - `${work-mode}`: `minor-audit`, `full-feature`, or `full-bug` (legacy `full` is accepted only as an alias for `full-feature`)
 - `${short-path-flag}`: `--work-mode minor-audit` (mandatory for short-path promotion/folder creation)
 
+`${relativeFile}` MUST resolve to a real potential markdown path before promotion begins. If the path is missing, invalid, or non-markdown, stop. Do not infer or synthesize the missing value.
+
+`${issue-num}` MUST be numeric after promotion and before branch or folder creation. If promotion does not return a numeric issue number, stop. Do not infer or synthesize the missing value.
+
 When orchestrator routing selects short path, promotion/folder initialization still occurs and MUST use `minor-audit` mode.
+
+Lifecycle guardrails:
+- `${relativeFile}` MUST resolve to a real potential markdown path before promotion.
+- `${issue-num}` MUST be numeric after promotion and before branch or folder creation.
+- Do not infer or synthesize the missing value.
+- If `${relativeFile}` or `${issue-num}` is missing, placeholder text, or unverified, stop before branch creation, active-folder creation, or active-folder authoring.
 
 1) Use the same MCP tool-availability preflight described above and continue only when the required promotion tools are available.
 
