@@ -1,0 +1,4 @@
+{
+  "extends": "../../extensions/drm-copilot/tsconfig.json",
+  "include": ["../../extensions/drm-copilot/src"]
+}
