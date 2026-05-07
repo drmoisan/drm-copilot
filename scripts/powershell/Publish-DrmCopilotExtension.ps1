@@ -120,13 +120,13 @@ Write-Host "[1/6] Validating manifest..." -ForegroundColor Cyan
 $Manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
 
 $RequiredFields = @{
-    'name'             = $Manifest.name
-    'version'          = $Manifest.version
-    'publisher'        = $Manifest.publisher
-    'engines.vscode'   = if ($Manifest.engines) { $Manifest.engines.vscode } else { $null }
-    'main'             = $Manifest.main
-    'displayName'      = $Manifest.displayName
-    'description'      = $Manifest.description
+    'name'           = $Manifest.name
+    'version'        = $Manifest.version
+    'publisher'      = $Manifest.publisher
+    'engines.vscode' = if ($Manifest.engines) { $Manifest.engines.vscode } else { $null }
+    'main'           = $Manifest.main
+    'displayName'    = $Manifest.displayName
+    'description'    = $Manifest.description
 }
 
 $MissingFields = @()
@@ -332,3 +332,4 @@ if ($Tag) {
         Write-Host "  Tag created. Push with: git push origin $TagName" -ForegroundColor Gray
     }
 }
+
