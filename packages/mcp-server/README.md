@@ -26,11 +26,14 @@ Add the following to your MCP client configuration file (e.g., `claude_desktop_c
   "mcpServers": {
     "drm-copilot": {
       "command": "npx",
-      "args": ["-y", "@danmoisan/drm-copilot-mcp"]
+      "args": ["-y", "@danmoisan/drm-copilot-mcp"],
+      "cwd": "/absolute/path/to/your/workspace"
     }
   }
 }
 ```
+
+Set `cwd` to the absolute path of the workspace root that the MCP server tools should operate on.
 
 ## Runtime Prerequisites
 

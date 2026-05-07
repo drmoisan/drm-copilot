@@ -29,6 +29,7 @@ esbuild
     bundle: true,
     platform: "node",
     target: "node18",
+    format: "cjs",
     outfile: "out/mcp-server.js",
     allowOverwrite: true,
     banner: { js: "#!/usr/bin/env node" },

@@ -44,13 +44,13 @@ The drm-copilot MCP server runs as a standalone Node.js stdio process with no VS
 
 ## Acceptance Criteria
 
-- [ ] AC1. `packages/mcp-server/` exists with a publishable package.json (correct name, bin, files, engines, license, repository, type).
-- [ ] AC2. The esbuild build produces an `out/mcp-server.js` bundle starting with `#!/usr/bin/env node`.
-- [ ] AC3. The published tarball, when generated locally via `npm pack`, includes `out/mcp-server.js` and the `resources/` tree, and excludes test sources.
-- [ ] AC4. A top-level MIT LICENSE file exists at the repo root and the docs-validation CI job passes.
-- [ ] AC5. A GitHub Actions workflow at `.github/workflows/publish-mcp-npm.yml` (or equivalent) is present, triggers on a semver tag push (pattern `mcp-server-v*`), depends on the existing extension-tests job, uses NPM_TOKEN, and runs `npm publish --access public`.
-- [ ] AC6. README.md inside the package documents: install/usage via `npx -y @danmoisan/drm-copilot-mcp`, the MCP client config snippet (command/args/cwd), and the runtime prerequisites (Node >=18 mandatory; Python 3 and pwsh 7+ for script-backed tools).
-- [ ] AC7. The package version equals the version in extensions/drm-copilot/package.json at release time.
+- [x] AC1. `packages/mcp-server/` exists with a publishable package.json (correct name, bin, files, engines, license, repository, type).
+- [x] AC2. The esbuild build produces an `out/mcp-server.js` bundle starting with `#!/usr/bin/env node`.
+- [x] AC3. The published tarball, when generated locally via `npm pack`, includes `out/mcp-server.js` and the `resources/` tree, and excludes test sources.
+- [x] AC4. A top-level MIT LICENSE file exists at the repo root and the docs-validation CI job passes.
+- [x] AC5. A GitHub Actions workflow at `.github/workflows/publish-mcp-npm.yml` (or equivalent) is present, triggers on a semver tag push (pattern `mcp-server-v*`), depends on the existing extension-tests job, uses NPM_TOKEN, and runs `npm publish --access public`.
+- [x] AC6. README.md inside the package documents: install/usage via `npx -y @danmoisan/drm-copilot-mcp`, the MCP client config snippet (command/args/cwd), and the runtime prerequisites (Node >=18 mandatory; Python 3 and pwsh 7+ for script-backed tools).
+- [x] AC7. The package version equals the version in extensions/drm-copilot/package.json at release time.
 
 ## Non-Goals
 
