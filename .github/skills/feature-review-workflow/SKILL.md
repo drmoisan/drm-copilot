@@ -132,6 +132,14 @@ Always apply:
 9. **Finalize the review**
    - Verify every reported artifact exists on disk before reporting completion.
    - Report artifact paths and a concise go/no-go recommendation for PR readiness.
+   - End the final report with these exact single-line fields:
+     - `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+     - `FEATURE_FOLDER: <path>`
+     - `POLICY_AUDIT: <path>`
+     - `CODE_REVIEW: <path>`
+     - `FEATURE_AUDIT: <path>`
+     - `REMEDIATION_INPUTS: <path-or-NONE>`
+     - `REMEDIATION_PLAN: <path-or-NONE>`
 
 ## Required Artifact Shapes
 
@@ -151,3 +159,4 @@ Always apply:
 - Prefer check-only commands.
 - Do not claim completion until every required artifact exists and its validator passes.
 - Use shared skills as the source of truth for policy order, base-branch resolution, PR-context handling, acceptance-criteria tracking, template usage, and remediation handoff.
+- Do not omit any required final result field from the review report.

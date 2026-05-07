@@ -1,0 +1,57 @@
+name: Publish MCP Server to npm
+
+on:
+  push:
+    tags:
+      - "mcp-server-v*"
+
+jobs:
+  drm-copilot-extension-tests:
+    name: Extension Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install extension dependencies
+        run: npm --prefix extensions/drm-copilot ci
+
+      - name: Run extension tests
+        run: npm --prefix extensions/drm-copilot run test
+
+  publish:
+    name: Publish to npm
+    needs: drm-copilot-extension-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: https://registry.npmjs.org
+
+      - name: Install MCP server dependencies
+        run: npm --prefix packages/mcp-server ci
+
+      - name: Copy resources (prepack)
+        run: npm --prefix packages/mcp-server run prepack
+
+      - name: Build MCP server bundle
+        run: npm --prefix packages/mcp-server run build
+
+      - name: Publish to npm
+        working-directory: packages/mcp-server
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
