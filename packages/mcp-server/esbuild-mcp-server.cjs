@@ -6,6 +6,7 @@
  * transitively imports command-runtime which has a top-level vscode import,
  * but the MCP code path never calls any vscode API.
  */
+const path = require("path");
 const esbuild = require("esbuild");
 
 /** @type {import("esbuild").Plugin} */
@@ -35,5 +36,10 @@ esbuild
     banner: { js: "#!/usr/bin/env node" },
     plugins: [vscodeShimPlugin],
     tsconfig: "../../extensions/drm-copilot/tsconfig.json",
+    // Ensure packages/mcp-server/node_modules is searched when resolving
+    // imports from the entry point, which lives under extensions/drm-copilot/.
+    // Without this, esbuild only walks up from the entry point directory and
+    // misses dependencies installed in this package.
+    nodePaths: [path.resolve(__dirname, "node_modules")],
   })
   .catch(() => process.exit(1));
