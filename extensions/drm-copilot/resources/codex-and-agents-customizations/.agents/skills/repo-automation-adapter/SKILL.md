@@ -94,11 +94,16 @@ For any host-specific workflow step:
 - When the caller already resolved a base branch, pass that base explicitly.
 - Current fallback: use deterministic git commands to reconstruct equivalent context when review workflows only need base/head, merge-base, commits, and changed files.
 - When using fallback, record the provenance in the generated review artifact.
+- For orchestrator remediation loops, PR-context refresh is mandatory after each remediation commit and before each re-review.
+- When the caller explicitly requires MCP tooling for PR-context refresh, do not silently downgrade to fallback; stop and report the dependency gap instead.
 
 ### Commit context collection
 
 - Preferred: call tool `collect_commit_context` on MCP server `drmCopilotExtension`.
 - If the MCP server is unavailable and the workflow only needs staged-diff summary, use non-destructive git inspection as fallback and record that provenance.
+- For orchestrator remediation loops, collect commit context only after `git add -A` and only when staged changes exist.
+- For orchestrator remediation loops, do not continue to commit-message generation without an on-disk commit-context artifact path produced by the selected adapter path.
+- When the caller explicitly requires MCP tooling for commit-context collection, do not silently downgrade to fallback; stop and report the dependency gap instead.
 
 ### Feature promotion and active feature folder creation
 
