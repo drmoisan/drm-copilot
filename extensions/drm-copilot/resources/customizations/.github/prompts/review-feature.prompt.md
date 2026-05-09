@@ -69,6 +69,20 @@ If any minor-audit integrity condition fails:
    - MUST use `.github/prompts/generate-atomic-plan.prompt.md` as the base prompt template, with all template variables filled deterministically.
    - MUST be written to the same active feature folder as the audit documents.
 
+## Final report contract (mandatory)
+
+The final response MUST end with these exact single-line fields:
+
+- `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+- `FEATURE_FOLDER: <path>`
+- `POLICY_AUDIT: <path>`
+- `CODE_REVIEW: <path>`
+- `FEATURE_AUDIT: <path>`
+- `REMEDIATION_INPUTS: <path-or-NONE>`
+- `REMEDIATION_PLAN: <path-or-NONE>`
+
+Set `REVIEW_STATUS: PASS` only when no remediation artifact is required. Set `REVIEW_STATUS: REMEDIATION_REQUIRED` when remediation inputs or a remediation plan was required.
+
 #### Atomic planner delegation requirements (mandatory when remediation is triggered)
 
 When remediation is triggered, the feature review agent MUST:

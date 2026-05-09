@@ -38,6 +38,7 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `atomic-planner` — generates phased implementation plans
 - `atomic-executor` — executes approved plans task-by-task
 - `feature-review` — produces policy, code, and feature audit artifacts
+- `commit-steward` — writes commit messages from commit-context artifacts
 - `task-researcher` — performs deep research and writes findings to `artifacts/research/`
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
@@ -71,9 +72,10 @@ The orchestrator must not report completion until:
 Before delegating to the `feature-review` subagent, the orchestrator must:
 
 1. Stage all modified and new files: `git add -A`.
-2. Invoke the `commit-message` skill to generate a conventional commit message from the staged diff.
-3. Commit using the generated message: `git commit -m "<generated message>"`.
-4. Only after a successful commit may the orchestrator proceed to the `feature-review` delegation.
+2. Run MCP tool `collect_commit_context` and capture the returned on-disk artifact path.
+3. Delegate to `commit_steward` using that commit-context artifact as the authoritative staged-change input.
+4. Commit using the generated message: `git commit -m "<generated message>"`.
+5. Only after a successful commit may the orchestrator proceed to the `feature-review` delegation.
 
 The review subagent compares against a base branch; uncommitted changes are invisible to the diff tool and cannot be audited.
 
@@ -81,20 +83,21 @@ The review subagent compares against a base branch; uncommitted changes are invi
 
 After each `feature-review` delegation returns:
 
-1. Locate `remediation-inputs.<timestamp>.md` in the active feature folder (match the highest ISO-8601 timestamp).
-2. If no such file exists, treat as zero blocking findings and advance to the PR creation gate.
-3. If the file exists, count lines matching `BLOCKING` or `Severity: Blocking` (case-sensitive). If count >= 1, enter the remediation loop. If count = 0, advance to the PR creation gate.
+1. Read the exact terminal status lines from the review result.
+2. If the result does not include `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`, stop and record blocked state.
+3. If the result is `REVIEW_STATUS: PASS`, advance to the PR creation gate.
+4. If the result is `REVIEW_STATUS: REMEDIATION_REQUIRED`, require both `REMEDIATION_INPUTS: <path>` and `REMEDIATION_PLAN: <path>` and then enter the remediation loop.
 
 ## Remediation Loop (R1–R5)
 
 A bounded loop consisting of five steps. The loop variable `remediation_pass` starts at 1 and increments at R5 before returning to R1.
 
-- **R1 — Remediation planning:** Delegate to `atomic-planner` with `remediation-inputs.<timestamp>.md` path as primary context. Receive `remediation-plan.<timestamp>.md` in the active feature folder.
-- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 and re-delegate to `atomic-planner` with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
+- **R1 — Remediation plan of record:** Use the exact `REMEDIATION_PLAN: <path>` returned by the review as the starting plan of record for the loop.
+- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 by re-delegating to `atomic-planner` against the same remediation-plan path with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
-- **Pre-R4 commit:** Stage all changes (`git add -A`), invoke the `commit-message` skill to generate a commit message from the staged diff, commit with the generated message. Advance to R4 only after a successful commit.
-- **R4 — Re-audit:** Delegate to `feature-review` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
-- **R5 — Loop-exit decision:** If the re-audit produces zero blocking findings, exit the loop and advance to the PR creation gate. Otherwise, record `remediation_pass` increment in the checkpoint and return to R1.
+- **Pre-R4 commit:** Stage all changes (`git add -A`), run MCP tool `collect_commit_context`, delegate to `commit_steward` using the resulting artifact, and commit with the generated message. Advance to R4 only after a successful commit.
+- **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-review` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
+- **R5 — Loop-exit decision:** If the re-audit returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. Otherwise, record `remediation_pass` increment in the checkpoint and return to R1.
 
 **Termination guard:** If `remediation_pass` reaches 3 without resolution, the orchestrator records `step6_status: "blocked_remediation_loop_limit"` in the checkpoint and halts. No further automation is attempted.
 
@@ -113,6 +116,7 @@ If a subagent artifact references a different issue number, the orchestrator rej
 The orchestrator must not create a PR, push a branch for PR purposes, or report work complete until all four conditions are simultaneously true:
 
 1. `blocking_findings_resolved: true` — the most recent `feature-review` produced zero blocking findings.
+   Equivalent deterministic gate: the latest review returned `REVIEW_STATUS: PASS`.
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr`.
