@@ -10,7 +10,7 @@ tools:
   - "Bash(poetry run *)"
   - "Bash(npx *)"
   - "Bash(pwsh *)"
-  - "mcp__drmCopilotExtension__.*"
+  - "mcp__drm-copilot__.*"
 skills:
   - policy-compliance-order
   - feature-promotion-lifecycle

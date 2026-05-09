@@ -91,7 +91,7 @@ If any gate fails:
 You must run the repo toolchain via `#tool:terminal`.
 
 ### Baseline runs (required before edits)
-- Analyzer baseline (repo standard): `mcp__drmCopilotExtension__run_poshqc_analyze`
+- Analyzer baseline (repo standard): `mcp__drm-copilot__run_poshqc_analyze`
 - Test baseline (targeted): run only the relevant Pester file(s) or tag/filter used by the repo
 - Coverage baseline: capture per-file coverage for the touched file(s), and overall if applicable
 

@@ -6,7 +6,7 @@
 
 ## Problem / Why
 
-The Claude-side `feature-promotion-lifecycle` skill still documents fallback script paths and alternate execution routes, which weakens the contract that agent sessions must use the `drmCopilotExtension` MCP tool surface for promotion work. The current Bash pre-tool hook only blocks destructive shell patterns, so direct Bash invocations of promotion scripts can still bypass the intended MCP path, and the checkpoint documentation does not yet spell out the raw promotion receipt fields that should be retained under `delegation_receipts.promotion`.
+The Claude-side `feature-promotion-lifecycle` skill still documents fallback script paths and alternate execution routes, which weakens the contract that agent sessions must use the `drm-copilot` MCP tool surface for promotion work. The current Bash pre-tool hook only blocks destructive shell patterns, so direct Bash invocations of promotion scripts can still bypass the intended MCP path, and the checkpoint documentation does not yet spell out the raw promotion receipt fields that should be retained under `delegation_receipts.promotion`.
 
 This gap makes promotion behavior less deterministic, less auditable, and easier to drift away from the supported agent workflow. Hardening the skill, hook registration, and checkpoint schema documentation would make MCP invocation mandatory for agent sessions without changing the underlying promotion scripts or MCP server implementation.
 

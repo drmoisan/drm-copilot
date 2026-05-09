@@ -38,10 +38,10 @@ Describe "claude-settings" {
         $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
         $content = Get-Content -Path $settingsPath -Raw
 
-        $content | Should -Match 'mcp__drmCopilotExtension__run_poshqc_format'
-        $content | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze'
-        $content | Should -Match 'mcp__drmCopilotExtension__run_poshqc_test'
-        $content | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze_autofix'
+        $content | Should -Match 'mcp__drm-copilot__run_poshqc_format'
+        $content | Should -Match 'mcp__drm-copilot__run_poshqc_analyze'
+        $content | Should -Match 'mcp__drm-copilot__run_poshqc_test'
+        $content | Should -Match 'mcp__drm-copilot__run_poshqc_analyze_autofix'
         $content | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 

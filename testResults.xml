@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="15" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-05-08" time="23:12:32">
+  <environment machine-name="MEGALODON4" clr-version="10.0.5" nunit-version="2.5.8.0" user-domain="Megalodon4" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" cwd="C:\Users\DanMoisan\repos\drm-copilot" user="DanMoisan" os-version="10.0.26200" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="0.8151" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1" executed="True" result="Success" success="True" time="0.4741" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-architecture-doc" executed="True" result="Success" success="True" time="0.1512" asserts="0" description="claude-architecture-doc">
+            <results>
+              <test-case description="requires the architecture document to cover research sufficiency, main-thread orchestration, and full migration tables" name="claude-architecture-doc.requires the architecture document to cover research sufficiency, main-thread orchestration, and full migration tables" time="0.0626" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the architecture document to keep .github/skills/README.md documentation-only and not require .claude/skills/README.md" name="claude-architecture-doc.requires the architecture document to keep .github/skills/README.md documentation-only and not require .claude/skills/README.md" time="0.0077" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/rules/powershell.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires .claude/rules/powershell.md to use the active PowerShell MCP contract" time="0.0307" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/atomic-executor.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires .claude/agents/atomic-executor.md to use the active PowerShell MCP contract" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" time="0.0081" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/feature-review.md to support writing review artifacts into a selected version folder" name="claude-architecture-doc.requires .claude/agents/feature-review.md to support writing review artifacts into a selected version folder" time="0.0042" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1" executed="True" result="Success" success="True" time="0.1191" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-runtime-structure" executed="True" result="Success" success="True" time="0.0626" asserts="0" description="claude-runtime-structure">
+            <results>
+              <test-case description="requires .claude/skills/orchestrate/SKILL.md to avoid context fork and orchestrator agent routing" name="claude-runtime-structure.requires .claude/skills/orchestrate/SKILL.md to avoid context fork and orchestrator agent routing" time="0.0039" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the five wrapper skills to exist under .claude/skills" name="claude-runtime-structure.requires the five wrapper skills to exist under .claude/skills" time="0.0168" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(prd-feature)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(prd-feature)" time="0.003" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(staged-review), Agent(epic-review), and Agent(status-updater)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(staged-review), Agent(epic-review), and Agent(status-updater)" time="0.0041" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(python-typed-engineer), Agent(powershell-typed-engineer), Agent(csharp-typed-engineer), and Agent(typescript-engineer)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(python-typed-engineer), Agent(powershell-typed-engineer), Agent(csharp-typed-engineer), and Agent(typescript-engineer)" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires bounded worker agents and excludes repository-disallowed persona files" name="claude-runtime-structure.requires bounded worker agents and excludes repository-disallowed persona files" time="0.0183" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1" executed="True" result="Success" success="True" time="0.2219" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-settings" executed="True" result="Success" success="True" time="0.1366" asserts="0" description="claude-settings">
+            <results>
+              <test-case description="requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage" name="claude-settings.requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage" time="0.0955" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/settings.json to use the active PowerShell MCP contract" name="claude-settings.requires .claude/settings.json to use the active PowerShell MCP contract" time="0.0122" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" name="claude-settings.requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" time="0.0123" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

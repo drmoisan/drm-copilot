@@ -23,7 +23,7 @@
 [CmdletBinding()]
 param()
 
-$script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drmCopilotExtension MCP promotion tools instead.'
+$script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drm-copilot MCP promotion tools instead.'
 
 function Get-PromotionMcpOnlyBlockedReason {
     <#

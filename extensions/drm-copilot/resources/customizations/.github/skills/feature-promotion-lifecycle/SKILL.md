@@ -1,6 +1,6 @@
 ---
 name: feature-promotion-lifecycle
-description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Prefer MCP server (drmCopilotExtension) tool invocations when the MCP server is reachable; use underlying scripts only as fallback.
+description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Prefer MCP server (drm-copilot) tool invocations when the MCP server is reachable; use underlying scripts only as fallback.
 ---
 
 # Feature Promotion Lifecycle
@@ -17,13 +17,13 @@ Use this skill when:
 
 ## MCP-First Execution Rule
 
-When the MCP server (`drmCopilotExtension`) is reachable, execute the lifecycle through the MCP tool surface first.
+When the MCP server (`drm-copilot`) is reachable, execute the lifecycle through the MCP tool surface first.
 
 Canonical MCP tool invocations:
-- feature potential entry: `mcp__drmCopilotExtension__new_potential_entry` with `{"short_name": "${short-name}"}`
-- bug potential entry: `mcp__drmCopilotExtension__new_potential_bug_entry` with `{"short_name": "${short-name}"}`
-- potential-to-issue promotion: `mcp__drmCopilotExtension__potential_to_issue` with `{"potential_path": "${relativeFile}", "promotion_type": "${promotion-type}", "work_mode": "${work-mode}"}`
-- active feature folder creation: `mcp__drmCopilotExtension__new_active_feature_folder` with `{"feature_name": "${long-name}", "type": "${promotion-type}", "issue_number": "${issue-num}", "work_mode": "${work-mode}"}`
+- feature potential entry: `mcp__drm-copilot__new_potential_entry` with `{"short_name": "${short-name}"}`
+- bug potential entry: `mcp__drm-copilot__new_potential_bug_entry` with `{"short_name": "${short-name}"}`
+- potential-to-issue promotion: `mcp__drm-copilot__potential_to_issue` with `{"potential_path": "${relativeFile}", "promotion_type": "${promotion-type}", "work_mode": "${work-mode}"}`
+- active feature folder creation: `mcp__drm-copilot__new_active_feature_folder` with `{"feature_name": "${long-name}", "type": "${promotion-type}", "issue_number": "${issue-num}", "work_mode": "${work-mode}"}`
 
 Documented alternatives:
 - VS Code extension commands (via `vscode/runCommand`): use when MCP server is unreachable but the VS Code extension command surface is available.
@@ -90,8 +90,12 @@ When orchestrator routing selects short path, promotion/folder initialization st
 6) Execute plan Phase 0 only via executor and checkpoint evidence.
 
 7) Branch:
-- manual bootstrap: save state and stop,
+- manual bootstrap: save state and stop ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - non-bootstrap: continue with constrained small-path development.
+
+Automation rule:
+- do not introduce manual bootstrap, human-operator validation, or any other manual handoff later in orchestration unless that initial explicit opt-in exists
+- if automation cannot proceed, record blocked automated state instead of asking for manual intervention
 
 8) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 

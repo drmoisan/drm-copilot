@@ -95,7 +95,7 @@ Always apply:
      5. coverage (mandatory for every language that has changed files)
         - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
         - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
-        - PowerShell: `mcp__drmCopilotExtension__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
+        - PowerShell: `mcp__drm-copilot__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
         - Coverage thresholds:
           - New code files (added in this feature): line coverage must be >= 90%. Flag as FAIL otherwise.

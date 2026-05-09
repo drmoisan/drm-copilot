@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "drmCopilotExtension": {
-      "command": "node",
-      "args": ["extensions/drm-copilot/out/mcp-server.js"]
+    "drm-copilot": {
+      "command": "npx",
+      "args": ["-y", "@danmoisan/drm-copilot-mcp"]
     }
   }
 }
