@@ -67,7 +67,12 @@ Describe "DrmCopilotPromptSupport.ps1" {
                 $script:capturedActivationScriptPath = $ActivationScriptPath
                 $script:capturedPromptName = $ResolvedPromptName
             } `
-                -GetLocationPath { "C:\Users\DanMoisan\repos\drm-copilot\scripts" }
+                -GetLocationPath { "C:\Users\DanMoisan\repos\drm-copilot\scripts" } `
+                -ResolveActivationScriptPath {
+                param([string]$RepoRootPath, [string]$VirtualEnvironmentPath)
+                $null = $RepoRootPath
+                Join-Path -Path $VirtualEnvironmentPath -ChildPath "Scripts\Activate.ps1"
+            }
 
             $script:capturedActivationScriptPath | Should -Be "C:\Users\DanMoisan\repos\drm-copilot\.venv\Scripts\Activate.ps1"
             $script:capturedPromptName | Should -Be "drm-copilot"

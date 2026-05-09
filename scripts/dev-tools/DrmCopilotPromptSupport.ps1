@@ -149,12 +149,18 @@ function global:Start-DrmCopilotPromptSession {
         },
 
         [Parameter()]
-        [scriptblock]$GetLocationPath = { (Get-Location).Path }
+        [scriptblock]$GetLocationPath = { (Get-Location).Path },
+
+        [Parameter()]
+        [scriptblock]$ResolveActivationScriptPath = {
+            param([string]$RepoRootPath, [string]$VirtualEnvironmentPath)
+            Resolve-DrmCopilotActivationScriptPath `
+                -RepoRootPath $RepoRootPath `
+                -VirtualEnvironmentPath $VirtualEnvironmentPath
+        }
     )
 
-    $activationScriptPath = Resolve-DrmCopilotActivationScriptPath `
-        -RepoRootPath $RepoRootPath `
-        -VirtualEnvironmentPath $VirtualEnvironmentPath
+    $activationScriptPath = & $ResolveActivationScriptPath $RepoRootPath $VirtualEnvironmentPath
 
     & $ActivateEnvironment $activationScriptPath $PromptName
     Set-DrmCopilotPrompt -RepoRootPath $RepoRootPath -PromptName $PromptName -GetLocationPath $GetLocationPath
