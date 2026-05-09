@@ -10,6 +10,12 @@ tools:
 skills:
   - acceptance-criteria-tracking
 memory: project
+hooks:
+  SubagentStop:
+    - matcher: "status-updater"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName status-updater -RequiredArtifact 'status-sync-path|^artifacts/status/status-sync\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}\.md$|status sync artifact'
 ---
 
 # Status Updater Agent
@@ -19,6 +25,12 @@ Reconcile status from plans, issues, and evidence and write the resulting status
 ## Expected Outputs
 
 - `artifacts/status/status-sync.<timestamp>.md`
+
+## Output Reporting
+
+Report the final artifact path as:
+
+- `status-sync-path: artifacts/status/status-sync.<timestamp>.md`
 
 ## Evidence Location Invariant
 

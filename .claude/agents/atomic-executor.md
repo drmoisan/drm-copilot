@@ -29,8 +29,10 @@ skills:
 memory: project
 hooks:
   SubagentStop:
-    - condition: "plan tasks remain unchecked"
-      action: "block termination until all plan tasks are verified and checked off"
+    - matcher: "atomic-executor"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-executor-output.ps1
 ---
 
 # Atomic Executor Agent

@@ -8,6 +8,7 @@ from typing import Any, cast
 
 import pytest
 import typer
+from typer.testing import CliRunner
 
 from scripts.dev_tools.codex_native_converter import cli
 from scripts.dev_tools.codex_native_converter.engine import ConversionRunResult
@@ -21,6 +22,7 @@ from scripts.dev_tools.codex_native_converter.reporting import ReportSetPaths
 # exercise the private helpers that dominate package coverage, so they route
 # through an Any-typed alias to keep the production module surface unchanged.
 CLI_HELPERS = cast("Any", cli)
+CLI_RUNNER = CliRunner()
 
 
 def _fixture_root(fixture_name: str) -> Path:
@@ -88,6 +90,7 @@ def test_resolve_run_options_validates_inputs_and_sets_default_artifact_root() -
             destination_root=None,
             artifact_root=None,
             enable_repo_prompts=False,
+            emit_intermediate_state=False,
         )
 
     with pytest.raises(typer.BadParameter, match="apply mode requires"):
@@ -99,6 +102,7 @@ def test_resolve_run_options_validates_inputs_and_sets_default_artifact_root() -
             destination_root=None,
             artifact_root=None,
             enable_repo_prompts=False,
+            emit_intermediate_state=False,
         )
 
     result = CLI_HELPERS._resolve_run_options(
@@ -109,6 +113,7 @@ def test_resolve_run_options_validates_inputs_and_sets_default_artifact_root() -
         destination_root=None,
         artifact_root=None,
         enable_repo_prompts=True,
+        emit_intermediate_state=True,
     )
 
     assert result.mode == "review"
@@ -118,6 +123,7 @@ def test_resolve_run_options_validates_inputs_and_sets_default_artifact_root() -
     )
     assert result.selected_paths == (fixture_root / ".github",)
     assert result.enable_repo_prompts is True
+    assert result.emit_intermediate_state is True
 
 
 def test_print_run_summary_reports_pass_and_blocking_failures(
@@ -164,6 +170,7 @@ def test_review_command_builds_run_options_and_prints_summary(
         selected_path=[fixture_root / ".github"],
         artifact_root=Path("virtual/review-artifacts"),
         enable_repo_prompts=True,
+        emit_intermediate_state=True,
     )
 
     run_options = captured["run_options"]
@@ -172,7 +179,38 @@ def test_review_command_builds_run_options_and_prints_summary(
     assert run_options.artifact_root == Path("virtual/review-artifacts").resolve()
     assert run_options.destination_root is None
     assert run_options.enable_repo_prompts is True
+    assert run_options.emit_intermediate_state is True
     assert "Validation outcome: pass" in capsys.readouterr().out
+
+
+def test_review_cli_accepts_emit_intermediate_state_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Parse the documented intermediate-state flag through the Typer CLI."""
+
+    fixture_root = _fixture_root("github_copilot")
+    captured: dict[str, RunOptions] = {}
+
+    def _fake_run_review_mode(run_options: RunOptions) -> ConversionRunResult:
+        captured["run_options"] = run_options
+        return _build_result(blocking=False, wrote_destination=False)
+
+    monkeypatch.setattr(cli, "run_review_mode", _fake_run_review_mode)
+
+    result = CLI_RUNNER.invoke(
+        cli.app,
+        [
+            "review",
+            "--source-root",
+            str(fixture_root),
+            "--source-ecosystem",
+            "github-copilot",
+            "--emit-intermediate-state",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert captured["run_options"].emit_intermediate_state is True
 
 
 # This test covers both apply command branches because the CLI must exit nonzero
@@ -203,11 +241,13 @@ def test_apply_command_reports_success_and_exits_on_blocking_failures(
         selected_path=[],
         artifact_root=Path("virtual/apply-artifacts"),
         enable_repo_prompts=False,
+        emit_intermediate_state=True,
     )
 
     first_run_options = captured[0]
     assert first_run_options.mode == "apply"
     assert first_run_options.destination_root == destination_root.resolve()
+    assert first_run_options.emit_intermediate_state is True
     assert "Validation outcome: pass" in capsys.readouterr().out
 
     with pytest.raises(typer.Exit) as exit_info:
@@ -218,6 +258,7 @@ def test_apply_command_reports_success_and_exits_on_blocking_failures(
             selected_path=[],
             artifact_root=Path("virtual/apply-artifacts"),
             enable_repo_prompts=False,
+            emit_intermediate_state=True,
         )
 
     assert exit_info.value.exit_code == 1

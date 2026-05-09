@@ -216,11 +216,24 @@ def render_merged_standing_guidance(
     standing_guidance_source_paths = tuple(
         record.source_path for record in mapping_records
     )
+
+    # Pre-rewrite the human-readable source labels so that header listings and
+    # per-source sub-headings cannot reintroduce raw source-runtime references
+    # (for example, a literal "CLAUDE.md" filename) that the validator would
+    # later flag as a lingering source-runtime reference.
+    def _label_for(source_path: str) -> str:
+        rewritten_label, _ = rewrite_supported_automation_reference(
+            Path(source_path).name,
+            enable_repo_prompts=run_options.enable_repo_prompts,
+            standing_guidance_source_paths=standing_guidance_source_paths,
+        )
+        return rewritten_label
+
     rendered_sections: list[str] = [
         "# Converted standing guidance",
         "",
         "Merged standing-guidance sources:",
-        *(f"- `{Path(record.source_path).name}`" for record in mapping_records),
+        *(f"- `{_label_for(record.source_path)}`" for record in mapping_records),
         "",
     ]
 
@@ -230,7 +243,7 @@ def render_merged_standing_guidance(
             mapping_record,
             standing_guidance_source_paths=standing_guidance_source_paths,
         ).rstrip()
-        section_label = Path(mapping_record.source_path).name
+        section_label = _label_for(mapping_record.source_path)
         rendered_sections.extend(
             (
                 f"## Source: `{section_label}`",

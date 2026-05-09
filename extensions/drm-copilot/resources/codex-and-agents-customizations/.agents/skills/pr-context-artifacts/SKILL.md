@@ -1,3 +1,8 @@
+# Converted skill
+
+Applied rewrites:
+- None
+
 ---
 name: pr-context-artifacts
 description: 'PR context artifact locations and refresh rules. Use when generating, reading, or inlining pr_context summary/appendix artifacts.'

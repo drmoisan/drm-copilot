@@ -66,7 +66,7 @@ The three entry points below all produce the same resolved hard-lock prompt for 
 
 ## Delegation Contract
 
-The `atomic-executor` subagent at [.claude/agents/atomic-executor.md](.claude/agents/atomic-executor.md) enforces the persistent execution-mode behaviors (anti-replanning, preflight-only blocking, persistence across turns, resume) and preloads the shared skills that support them:
+The `atomic-executor` subagent at [../../agents/atomic-executor.md](../../agents/atomic-executor.md) enforces the persistent execution-mode behaviors (anti-replanning, preflight-only blocking, persistence across turns, resume) and preloads the shared skills that support them:
 
 - `policy-compliance-order` — mandatory policy reading order.
 - `atomic-plan-contract` — plan format, Phase 0 requirements, preflight signals, validator gate, and mode-specific plan gates.
@@ -76,8 +76,7 @@ The `atomic-executor` subagent at [.claude/agents/atomic-executor.md](.claude/ag
 ## Prohibitions
 
 - Do not proceed without a successful MCP resolver response AND a successful `Read` of the artifact.
-- Do not reconstruct the hard-lock contract from any other source (not from this file, not from `.github/prompts/execute-hard-lock.prompt.md`, not from prior session memory).
+- Do not reconstruct the hard-lock contract from any other source (not from this file nor from prior session memory).
 - Do not modify the resolved prompt text before passing it to `atomic-executor`.
 - Do not replan, reorder, or add tasks at this layer — the subagent owns that contract.
-- Do not modify policy files under `.claude/rules/` or `.github/instructions/`.
 - Do not create or read secrets unless explicitly authorized.

@@ -124,12 +124,6 @@ function Resolve-ExtensionProjectRoot {
         return '{0}/{1}' -f $normalizedBasePath, $normalizedChildPath.TrimStart('/')
     }
 
-    $repoPackageJsonPath = & $joinProjectPath $RepoRoot "package.json"
-    $repoManifest = Get-PackageManifest -PackageJsonPath $repoPackageJsonPath
-    if (Test-IsVsCodeExtensionManifest -Manifest $repoManifest) {
-        return $RepoRoot
-    }
-
     $extensionProjectRoot = & $joinProjectPath $RepoRoot $RelativeExtensionPath
     $extensionPackageJsonPath = & $joinProjectPath $extensionProjectRoot "package.json"
 
@@ -138,6 +132,12 @@ function Resolve-ExtensionProjectRoot {
         if (Test-IsVsCodeExtensionManifest -Manifest $extensionManifest) {
             return $extensionProjectRoot
         }
+    }
+
+    $repoPackageJsonPath = & $joinProjectPath $RepoRoot "package.json"
+    $repoManifest = Get-PackageManifest -PackageJsonPath $repoPackageJsonPath
+    if (Test-IsVsCodeExtensionManifest -Manifest $repoManifest) {
+        return $RepoRoot
     }
 
     throw "Could not find a VS Code extension manifest with 'engines.vscode'. Checked: $repoPackageJsonPath, $extensionPackageJsonPath"

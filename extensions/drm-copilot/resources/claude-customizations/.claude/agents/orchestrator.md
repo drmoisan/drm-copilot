@@ -19,9 +19,11 @@ skills:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      body: "Block termination unless artifacts/orchestration/orchestrator-state.json has been updated with current completed_steps and next_step, and all required artifact paths for the selected workflow path have been confirmed on disk."
+  SubagentStop:
+    - matcher: "orchestrator"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1
 ---
 
 # Orchestrator Agent

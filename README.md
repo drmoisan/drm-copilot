@@ -176,6 +176,14 @@ Common local commands:
 - `poetry run pyright`
 - `poetry run pytest`
 
+### PowerShell repo session
+
+To activate the workspace virtual environment and replace the default PowerShell prompt with a repo-relative prompt, run:
+
+- `& ./scripts/dev-tools/Enter-DrmCopilotShell.ps1`
+
+When the current directory is inside this repository, the prompt renders as `(drm-copilot):\` plus the relative path from the repo root. For example, `scripts/dev-tools` renders as `(drm-copilot):\scripts\dev-tools>`.
+
 ### Extension quality loop
 
 Run extension-specific checks from the extension folder (or by using `npm --prefix extensions/drm-copilot ...`):

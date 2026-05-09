@@ -14,7 +14,7 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
         . (Import-ScriptFunction -Path $script:scriptPath -Name "Resolve-ExtensionProjectRoot")
     }
 
-    It "selects the extension folder when root package.json is not a VS Code extension manifest" {
+    It "selects the extension folder when it contains a VS Code extension manifest" {
         $repoRoot = "/repo"
         $repoPackagePath = "/repo/package.json"
         $extensionRoot = "/repo/extensions/drm-copilot"
@@ -45,7 +45,38 @@ Describe "publish-sideloaded-extension.ps1 - Resolve-ExtensionProjectRoot" {
         $result | Should -Be $extensionRoot
     }
 
-    It "keeps repo root when package.json already has engines.vscode" {
+    It "prefers the extension folder when both root and extension package.json have engines.vscode" {
+        $repoRoot = "/repo"
+        $repoPackagePath = "/repo/package.json"
+        $extensionRoot = "/repo/extensions/drm-copilot"
+        $extensionPackagePath = "/repo/extensions/drm-copilot/package.json"
+
+        Mock -CommandName Test-Path -MockWith {
+            param([string]$LiteralPath)
+
+            switch ($LiteralPath) {
+                $repoPackagePath { return $true }
+                $extensionPackagePath { return $true }
+                default { return $false }
+            }
+        }
+
+        Mock -CommandName Get-Content -MockWith {
+            param([string]$LiteralPath, [switch]$Raw)
+            $null = $Raw
+
+            switch ($LiteralPath) {
+                $repoPackagePath { return '{"name":"repo-extension","engines":{"vscode":"^1.108.0"}}' }
+                $extensionPackagePath { return '{"name":"drm-copilot","engines":{"vscode":"^1.108.0"}}' }
+                default { throw "Unexpected path: $LiteralPath" }
+            }
+        }
+
+        $result = Resolve-ExtensionProjectRoot -RepoRoot $repoRoot
+        $result | Should -Be $extensionRoot
+    }
+
+    It "keeps repo root when only root package.json has engines.vscode" {
         $repoRoot = "/repo"
         $repoPackagePath = "/repo/package.json"
 
