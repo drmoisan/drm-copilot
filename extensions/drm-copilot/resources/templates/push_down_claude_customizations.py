@@ -10,7 +10,33 @@ Purpose:
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+
+def _ensure_bundled_scripts_import_path() -> None:
+    """Prepend bundled ``resources/scripts`` directory to ``sys.path``.
+
+    Purpose:
+        Make extension-bundled Python packages importable when this template is
+        invoked directly from ``resources/templates/`` rather than from the
+        repository root. Without this bootstrap, neither
+        ``scripts.dev_tools.push_down_copilot_customizations`` nor the fallback
+        ``dev_tools.push_down_copilot_customizations`` import resolves because
+        ``resources/scripts`` is not on ``sys.path`` by default.
+
+    Side Effects:
+        Mutates ``sys.path`` by inserting the bundled scripts directory at
+        index 0 when not already present.
+    """
+    scripts_dir = Path(__file__).resolve().parent.parent / "scripts"
+    scripts_dir_str = str(scripts_dir)
+
+    if scripts_dir_str not in sys.path:
+        sys.path.insert(0, scripts_dir_str)
+
+
+_ensure_bundled_scripts_import_path()
 
 try:
     from scripts.dev_tools.push_down_copilot_customizations import (
