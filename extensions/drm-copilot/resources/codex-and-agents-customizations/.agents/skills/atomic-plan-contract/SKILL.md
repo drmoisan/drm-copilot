@@ -24,7 +24,7 @@ Use this skill when:
 - Phase headings must be: `### Phase N — <Title>`
 - Tasks must start with: `- [ ] [P#-T#]` (or `[x]` for completed)
 - Task IDs must match their phase and be sequential per phase.
-- Plans must pass the `mcp__drmCopilotExtension__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
+- Plans must pass the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
 
 ## Short-Path Minimal Plan Contract
 
@@ -78,8 +78,21 @@ After preflight all-clear on the minimal-audit plan:
 - orchestrator MUST checkpoint Phase 0 evidence before branching.
 
 Branching after Phase 0:
-- `manual bootstrap` → save state and stop for manual resume,
+- `manual bootstrap` → save state and stop for manual resume ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - otherwise continue with constrained small-path development, then executor validation, then reduced audit/remediation loop.
+
+## No-Manual-Step Contract (Mandatory)
+
+Unless the user's initial request explicitly opts into manual orchestration from the beginning, approved plans and remediation plans MUST remain fully automated.
+
+This prohibition includes:
+
+- manual bootstrap pauses,
+- human-operator validation tasks,
+- user-performed repro or QA steps,
+- requests for screenshots, notes, or runtime evidence that the agent cannot collect itself.
+
+When a fully automated equivalent is unavailable, the plan MUST fail closed by recording blocked or remediation-required automated state. It MUST NOT introduce a new manual step later in the workflow.
 
 ## Phase 0 Requirements
 
@@ -158,7 +171,7 @@ When validating or handing off plans for execution:
 
 Before a plan can be treated as approved:
 
-- run the `mcp__drmCopilotExtension__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
+- run the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
 - reject the plan if that validator exits non-zero,
 - do not treat human-readable summaries as a substitute for validator success.
 

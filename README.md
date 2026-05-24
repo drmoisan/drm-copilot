@@ -151,7 +151,7 @@ Run the standalone package workflow from the repository root:
 
 ### VS Code extension
 
-The active extension package lives in `extensions/drm-copilot`. It now exposes both the existing VS Code command surface and a Codex-facing stdio MCP server named `drmCopilotExtension`.
+The active extension package lives in `extensions/drm-copilot`. It now exposes both the existing VS Code command surface and a Codex-facing stdio MCP server named `drm-copilot`.
 
 The standalone npm package and the VS Code extension share the same MCP server source entrypoint. The extension remains the authoritative development surface, while `packages/mcp-server` provides an external distribution channel.
 
@@ -184,7 +184,7 @@ The MCP side exposes semantic repo-automation tools such as:
 - `new_active_feature_folder`
 - `resolve_execute_hard_lock_prompt`
 
-Downstream Codex skills should depend on the MCP server name `drmCopilotExtension`, not on raw VS Code command IDs.
+Downstream Codex skills should depend on the MCP server name `drm-copilot`, not on raw VS Code command IDs.
 
 The same repo-automation MCP tool surface is now also available through the published npm package `@danmoisan/drm-copilot-mcp`.
 
@@ -307,7 +307,7 @@ Use `drmCopilotExtension.pushDownCodexAndAgentsCustomizations` from the Command 
 
 ### MCP tool
 
-Use `push_down_codex_and_agents_customizations` from the `drmCopilotExtension` MCP server to invoke the same bundled publisher non-interactively.
+Use `push_down_codex_and_agents_customizations` from the `drm-copilot` MCP server to invoke the same bundled publisher non-interactively.
 
 ## CI coverage
 

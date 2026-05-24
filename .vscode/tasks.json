@@ -146,6 +146,16 @@
 		"description": "Path to feature folder or plan file (relative or absolute)",
 		"id": "AtomicFeaturePath",
 		"type": "promptString"
+		},
+		{
+		"default": "no",
+		"description": "Confirm publish to VS Code Marketplace. Marketplace versions are immutable.",
+		"id": "MarketplacePublishConfirm",
+		"options": [
+			"no",
+			"yes"
+		],
+		"type": "pickString"
 		}
 	],
 	"tasks": [
@@ -177,6 +187,26 @@
 			],
 			"command": "pwsh",
 			"label": "Publish (Side-load) VSIX",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/dev-tools/Invoke-MarketplacePublish.ps1",
+				"-ConfirmToken",
+				"${input:MarketplacePublishConfirm}"
+			],
+			"command": "pwsh",
+			"detail": "Bumps patch version, builds, packages, publishes the extension to the VS Code Marketplace, and creates a v<version> git tag. Requires prior 'vsce login DanMoisan'. Marketplace versions are immutable.",
+			"label": "Publish: Marketplace VSIX (patch + tag)",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},

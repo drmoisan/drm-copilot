@@ -33,9 +33,9 @@ Before invoking this gate, the agent must have:
 
 Run the full toolchain in this exact order. If any step fails or modifies files, fix the issue and restart from step 1. Do not stop the loop until all steps complete without errors in a single pass.
 
-1. `mcp__drmCopilotExtension__run_poshqc_format`
-2. `mcp__drmCopilotExtension__run_poshqc_analyze`
-3. `mcp__drmCopilotExtension__run_poshqc_test`
+1. `mcp__drm-copilot__run_poshqc_format`
+2. `mcp__drm-copilot__run_poshqc_analyze`
+3. `mcp__drm-copilot__run_poshqc_test`
 4. Coverage check (when enforced by task/repo flow) — use the Pester coverage output from step 3 or the repo coverage task.
 
 If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.

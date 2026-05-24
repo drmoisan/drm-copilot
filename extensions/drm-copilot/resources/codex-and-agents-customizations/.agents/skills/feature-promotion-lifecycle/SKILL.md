@@ -5,7 +5,7 @@ Applied rewrites:
 
 ---
 name: feature-promotion-lifecycle
-description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Agent sessions must use the drmCopilotExtension MCP tool surface and record raw promotion receipts under the canonical checkpoint namespace.
+description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Agent sessions must use the drm-copilot MCP tool surface and record raw promotion receipts under the canonical checkpoint namespace.
 ---
 
 # Feature Promotion Lifecycle
@@ -22,13 +22,13 @@ Use this skill when:
 
 ## MCP Tool Availability Preflight
 
-Before any promotion step starts, verify that the required `drmCopilotExtension` MCP tools are available in the current agent session.
+Before any promotion step starts, verify that the required `drm-copilot` MCP tools are available in the current agent session.
 
 Required MCP tool set:
-- feature potential entry: `mcp__drmCopilotExtension__new_potential_entry` with `short_name=${short-name}`
-- bug potential entry: `mcp__drmCopilotExtension__new_potential_bug_entry` with `short_name=${short-name}`
-- potential-to-issue promotion: `mcp__drmCopilotExtension__potential_to_issue` with `potential_path=${relativeFile}`, `promotion_type=${promotion-type}`, `work_mode=${work-mode}`
-- active feature folder creation: `mcp__drmCopilotExtension__new_active_feature_folder` with `feature_name=${long-name}`, `type=${promotion-type}`, `issue_number=${issue-num}`, `work_mode=${work-mode}`
+- feature potential entry: `mcp__drm-copilot__new_potential_entry` with `short_name=${short-name}`
+- bug potential entry: `mcp__drm-copilot__new_potential_bug_entry` with `short_name=${short-name}`
+- potential-to-issue promotion: `mcp__drm-copilot__potential_to_issue` with `potential_path=${relativeFile}`, `promotion_type=${promotion-type}`, `work_mode=${work-mode}`
+- active feature folder creation: `mcp__drm-copilot__new_active_feature_folder` with `feature_name=${long-name}`, `type=${promotion-type}`, `issue_number=${issue-num}`, `work_mode=${work-mode}`
 
 If the required MCP tools are unavailable, stop before potential-entry creation, issue promotion, or active-folder creation begins. Restore MCP connectivity first. Agent sessions do not have an approved non-MCP execution branch for promotion work.
 
@@ -71,12 +71,12 @@ Lifecycle guardrails:
 
 1) Use the same MCP tool-availability preflight described above and continue only when the required promotion tools are available.
 
-2) Promote the potential document through `mcp__drmCopilotExtension__potential_to_issue` with `work_mode=minor-audit`.
+2) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with `work_mode=minor-audit`.
 
 3) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
-4) Create the active feature folder through `mcp__drmCopilotExtension__new_active_feature_folder` with `work_mode=minor-audit`.
+4) Create the active feature folder through `mcp__drm-copilot__new_active_feature_folder` with `work_mode=minor-audit`.
 
 4a) Verify minor-audit folder integrity before proceeding:
 - `${feature-folder}/issue.md` exists and contains `- Work Mode: minor-audit`
@@ -98,8 +98,12 @@ Lifecycle guardrails:
 7) Execute plan Phase 0 only via executor and checkpoint evidence.
 
 8) Branch:
-- manual bootstrap: save state and stop,
+- manual bootstrap: save state and stop ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - non-bootstrap: continue with constrained small-path development.
+
+Automation rule:
+- do not introduce manual bootstrap, human-operator validation, or any other manual handoff later in orchestration unless that initial explicit opt-in exists
+- if automation cannot proceed, record blocked automated state instead of asking for manual intervention
 
 9) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 

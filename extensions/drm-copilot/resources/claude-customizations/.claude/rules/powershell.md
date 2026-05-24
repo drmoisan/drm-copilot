@@ -12,10 +12,10 @@ This rule file summarizes the PowerShell-specific policies for this repository.
 
 ## Toolchain
 
-1. **Formatting — Invoke-Formatter**: Format all PowerShell files via PoshQC. MCP command: `mcp__drmCopilotExtension__run_poshqc_format`
-2. **Linting — PSScriptAnalyzer**: Run PoshQC analyzer with repo settings. MCP command: `mcp__drmCopilotExtension__run_poshqc_analyze`. Optional autofix: `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`
+1. **Formatting — Invoke-Formatter**: Format all PowerShell files via PoshQC. MCP command: `mcp__drm-copilot__run_poshqc_format`
+2. **Linting — PSScriptAnalyzer**: Run PoshQC analyzer with repo settings. MCP command: `mcp__drm-copilot__run_poshqc_analyze`. Optional autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`
 3. **Type checking**: Not applicable for PowerShell; skip to testing.
-4. **Testing — Pester (v5.x)**: Run tests via MCP. MCP command: `mcp__drmCopilotExtension__run_poshqc_test`. Use repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
+4. **Testing — Pester (v5.x)**: Run tests via MCP. MCP command: `mcp__drm-copilot__run_poshqc_test`. Use repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
 
 Run the toolchain in order: format → analyze → test. Restart from step 1 if any step fails or changes files. Use the MCP server functions; do not substitute VS Code task wrappers.
 
@@ -60,8 +60,8 @@ Introduce the smallest seam that enables reliable mocking. Apply these options i
 - Write focused tests exercising a single function or behavior.
 - Mock sparingly; prefer real code paths.
 - No external dependencies in unit tests.
-- Repository-wide line coverage must remain >= 80%.
-- Any new module, class, or method must reach >= 90% coverage.
+- Line coverage must remain >= 85% across all tiers (T1–T4) per `.claude/rules/quality-tiers.md`.
+- Branch coverage must remain >= 75% across all tiers (T1–T4).
 - Coverage regression on changed lines is a blocking finding.
 
 ### Deterministic Test Requirements

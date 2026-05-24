@@ -29,10 +29,10 @@ Describe "claude-architecture-doc" {
         $powershellRulePath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'rules', 'powershell.md'
         $powershellRuleContent = Get-Content -Path $powershellRulePath -Raw
 
-        $powershellRuleContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_format'
-        $powershellRuleContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze'
-        $powershellRuleContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_test'
-        $powershellRuleContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze_autofix'
+        $powershellRuleContent | Should -Match 'mcp__drm-copilot__run_poshqc_format'
+        $powershellRuleContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze'
+        $powershellRuleContent | Should -Match 'mcp__drm-copilot__run_poshqc_test'
+        $powershellRuleContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze_autofix'
         $powershellRuleContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
@@ -40,10 +40,10 @@ Describe "claude-architecture-doc" {
         $atomicExecutorPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'agents', 'atomic-executor.md'
         $atomicExecutorContent = Get-Content -Path $atomicExecutorPath -Raw
 
-        $atomicExecutorContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_format'
-        $atomicExecutorContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze'
-        $atomicExecutorContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_test'
-        $atomicExecutorContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze_autofix'
+        $atomicExecutorContent | Should -Match 'mcp__drm-copilot__run_poshqc_format'
+        $atomicExecutorContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze'
+        $atomicExecutorContent | Should -Match 'mcp__drm-copilot__run_poshqc_test'
+        $atomicExecutorContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze_autofix'
         $atomicExecutorContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
@@ -51,10 +51,10 @@ Describe "claude-architecture-doc" {
         $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $docContent = Get-Content -Path $docPath -Raw
 
-        $docContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_format'
-        $docContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze'
-        $docContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_test'
-        $docContent | Should -Match 'mcp__drmCopilotExtension__run_poshqc_analyze_autofix'
+        $docContent | Should -Match 'mcp__drm-copilot__run_poshqc_format'
+        $docContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze'
+        $docContent | Should -Match 'mcp__drm-copilot__run_poshqc_test'
+        $docContent | Should -Match 'mcp__drm-copilot__run_poshqc_analyze_autofix'
         $docContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 

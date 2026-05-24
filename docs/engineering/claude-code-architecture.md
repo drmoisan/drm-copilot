@@ -220,7 +220,7 @@ The `atomic-planner` produces a phased plan file at `docs/features/active/<featu
 
 **Step 5 — Orchestrator delegates to `atomic-executor`**
 
-The orchestrator reads the plan path from the planner's output and delegates execution to the `atomic-executor` subagent (`.claude/agents/atomic-executor.md`). The executor has scoped `Bash(...)` patterns for each toolchain command (`poetry run black *`, `npx prettier *`, `pwsh *`, etc.) and PowerShell MCP access via `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp__drmCopilotExtension__run_poshqc_test`, and `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`.
+The orchestrator reads the plan path from the planner's output and delegates execution to the `atomic-executor` subagent (`.claude/agents/atomic-executor.md`). The executor has scoped `Bash(...)` patterns for each toolchain command (`poetry run black *`, `npx prettier *`, `pwsh *`, etc.) and PowerShell MCP access via `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, and `mcp__drm-copilot__run_poshqc_analyze_autofix`.
 
 **Step 6 — Executor runs toolchain and writes evidence**
 

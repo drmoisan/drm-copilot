@@ -262,7 +262,7 @@ function Invoke-ExecutorOutputValidation {
         return @{ Ok = $false; Message = 'atomic-executor hook: completion output must include an `AC Status Summary` section.' }
     }
 
-    $hasCommandEvidence = $agentOutput -match '(?i)(Commands Run|Command[s]?:|poetry run |npx |pwsh |git |mcp__drmCopilotExtension__)'
+    $hasCommandEvidence = $agentOutput -match '(?i)(Commands Run|Command[s]?:|poetry run |npx |pwsh |git |mcp__drm-copilot__)'
     $hasStatusEvidence = $agentOutput -match '(?i)\b(PASS|FAIL)\b'
     if (-not $hasCommandEvidence -or -not $hasStatusEvidence) {
         return @{ Ok = $false; Message = 'atomic-executor hook: completion output must report commands run and pass/fail status results.' }

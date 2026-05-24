@@ -27,9 +27,9 @@ Before invoking this gate, the agent must have:
 
 Run the full toolchain in this exact order. If any step fails or modifies files, fix the issue and restart from step 1. Do not stop the loop until all steps complete without errors in a single pass.
 
-1. `mcp__drmCopilotExtension__run_poshqc_format`
-2. `mcp__drmCopilotExtension__run_poshqc_analyze`
-3. `mcp__drmCopilotExtension__run_poshqc_test`
+1. `mcp__drm-copilot__run_poshqc_format`
+2. `mcp__drm-copilot__run_poshqc_analyze`
+3. `mcp__drm-copilot__run_poshqc_test`
 4. Coverage check (when enforced by task/repo flow) — use the Pester coverage output from step 3 or the repo coverage task.
 
 If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
@@ -42,7 +42,7 @@ Compare the final results to the Phase A baseline. All of the following must hol
 - **Pester delta**: 0 new failing tests.
 - **Per-file coverage delta**: coverage for every touched file is greater than or equal to the baseline for that file.
 - **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
-- **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+- **New modules, classes, or methods**: line coverage >= 85% and branch coverage >= 75% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines.
 
 If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
 
