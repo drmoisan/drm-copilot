@@ -3,3 +3,4 @@
 - [Repo root is source of truth for codex bundle](feedback_repo_root_is_source_of_truth.md) — when repo `.codex/`, `.agents/`, `AGENTS.md` differ from bundled copies, update the bundle to match.
 - [Published MCP server identity](project_published_mcp_server.md) — published as `@danmoisan/drm-copilot-mcp`; tool prefix is `mcp__drm-copilot__`; side-loaded extension is no longer the MCP source.
 - [Sync bundled mirrors after runtime edits](feedback_bundle_sync_after_runtime_edit.md) — every runtime file under .claude/.codex/.agents/.github has a bundled mirror enforced by python contract tests; run pytest+pester before reporting completion.
+- [Policy requirements are not optional gaps](feedback_policy_compliance_not_optional.md) — never frame skipped policy requirements as "known gaps" or defer them; comply before reporting completion.
