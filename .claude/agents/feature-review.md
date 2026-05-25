@@ -13,9 +13,11 @@ skills:
   - acceptance-criteria-tracking
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      body: "Block termination unless all required review artifact paths (policy-audit, code-review, feature-audit) have been confirmed on disk."
+  SubagentStop:
+    - matcher: "feature-review"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-feature-review-coverage.ps1
 ---
 
 # Feature Review Agent
@@ -32,6 +34,15 @@ When the active review scope is a selected version folder such as `docs/features
 4. If remediation is needed: `docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths
 
 Timestamp format: `yyyy-MM-ddTHH-mm` (ISO-8601).
+
+## Output Reporting
+
+Report the required artifact paths in the final response using these tokens:
+
+- `policy-audit-path: docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md`
+- `code-review-path: docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md`
+- `feature-audit-path: docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
+- When remediation inputs are produced: `remediation-inputs-path: docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md`
 
 ## Context Sources
 
@@ -95,9 +106,13 @@ Coverage metrics are mandatory for every language that has changed files in the 
 
 ### Coverage Thresholds
 
-- **New code files** (files added in this feature, not previously existing): line coverage must be >= 90%.
-- **Modified files** (files that existed before and were changed): line coverage must show no regression relative to the baseline and must remain >= 80%.
-- **Repo-wide**: line coverage must remain >= 80% for each language.
+Coverage thresholds follow the uniform tier rule (Authoritative Decision #2) defined in `.claude/rules/quality-tiers.md`:
+
+- **New code files** (files added in this feature, not previously existing): line coverage >= 85%, branch coverage >= 75%.
+- **Modified files** (files that existed before and were changed): line coverage >= 85%, branch coverage >= 75%, and no regression on changed lines relative to baseline.
+- **Repo-wide per language**: line coverage >= 85%, branch coverage >= 75%.
+
+Tier-specific lower thresholds are not used.
 
 ### Verification Procedure
 

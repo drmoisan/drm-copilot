@@ -1,3 +1,8 @@
+# Converted skill
+
+Applied rewrites:
+- None
+
 ---
 name: powershell-orchestration-state-machine
 description: Checkpoint schema and resume protocol for long-running PowerShell orchestration workflows.
@@ -17,6 +22,8 @@ Use this skill when:
 ## Canonical Checkpoint Location
 
 - `artifacts/orchestration/powershell-orchestrator-state.json`
+
+Never create sidecar checkpoint files, suffixed variants, or backup files as active state. If checkpoint state is conflicted, stale, or belongs to another mission, stop and report the conflict instead of renaming or backing up the active checkpoint.
 
 ## Required Checkpoint Fields
 
@@ -47,8 +54,6 @@ For short-path runs, also persist:
 - Write checkpoint after every completed orchestration sub-step.
 - Treat checkpoint as source-of-truth for progress state.
 - Never claim mission completion until checkpoint marks final state.
-- Never create sidecar checkpoint files, suffixed variants, or backup files as active state.
-- If the canonical checkpoint path is occupied by an unrelated in-progress mission, stop and report the conflict instead of renaming or backing up the active checkpoint.
 
 ## Resume Protocol
 

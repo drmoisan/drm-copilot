@@ -185,7 +185,7 @@ def test_claude_feature_promotion_lifecycle_requires_mcp_preflight() -> None:
     required_fragments = (
         (
             "Before any promotion step starts, verify that the required "
-            "`drmCopilotExtension` MCP tools are available in the current "
+            "`drm-copilot` MCP tools are available in the current "
             "agent session."
         ),
         (

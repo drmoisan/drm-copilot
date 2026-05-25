@@ -178,6 +178,41 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         description="Rewrite Claude settings paths to Codex config paths.",
     ),
     RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/rules/([A-Za-z0-9_.-]+)\.md\b"),
+        replacement=lambda match: (
+            f".agents/skills/{_normalize_target_name(match.group(1))}/SKILL.md"
+        ),
+        description="Rewrite Claude rule paths to shared skill paths.",
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/rules/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite Claude rules-directory references to the native skill root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/skills/"),
+        replacement=".agents/skills/",
+        description=(
+            "Rewrite Claude skill-directory references to the native skill root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/agents/"),
+        replacement=".codex/agents/",
+        description=(
+            "Rewrite Claude agent-directory references to the native agent root."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(r"(?<![A-Za-z0-9_])\.claude/hooks/"),
+        replacement=".codex/hooks/",
+        description=(
+            "Rewrite Claude hook-directory references to the native hook root."
+        ),
+    ),
+    RewriteRule(
         pattern=re.compile(r"\bdrmCopilotExtension\.collectPrContext\b"),
         replacement="mcp__drmCopilotExtension__collect_pr_context",
         description=(
@@ -190,6 +225,39 @@ _BASE_REWRITE_RULES: tuple[RewriteRule, ...] = (
         replacement="mcp__drmCopilotExtension__validate_orchestration_artifacts",
         description=(
             "Rewrite orchestration validator command IDs to semantic MCP tool " "usage."
+        ),
+    ),
+    RewriteRule(
+        pattern=re.compile(
+            r"Return the finalized plan for validation-only preflight through "
+            r"`atomic-executor` and preserve the same target file path across "
+            r"revision loops\. Do not claim nested worker delegation from within "
+            r"planner execution\."
+        ),
+        replacement=(
+            "Before reporting completion, explicitly spawn the `atomic-executor` "
+            "subagent for validation-only preflight. The delegated prompt MUST "
+            "include the exact directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.\n\n"
+            "- `atomic-executor` MUST return exactly one of:\n"
+            "  - `PREFLIGHT: ALL CLEAR`\n"
+            "  - `PREFLIGHT: REVISIONS REQUIRED`\n"
+            "- Treat executor preflight findings as binding plan defects.\n"
+            "- If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the "
+            "same target plan file using the executor's precise plan delta and "
+            "re-run preflight.\n"
+            "- Reuse the same target plan file for every preflight revision "
+            "iteration in the same planning cycle.\n"
+            "- If the required `atomic-executor` handoff cannot be started or "
+            "completed, stop and report blocked state; do not self-approve the "
+            "plan.\n"
+            "- Before reporting completion, the target plan MUST pass the "
+            "`validate_orchestration_artifacts` MCP tool with `artifact_type: "
+            '"plan"` and `artifact_path: <plan-path>`.\n\n'
+            "Do not claim nested worker delegation from within planner execution."
+        ),
+        description=(
+            "Expand the Claude atomic-planner preflight shorthand into the strict "
+            "Codex atomic-executor handoff contract."
         ),
     ),
     RewriteRule(
@@ -272,6 +340,15 @@ def _rewrite_rules(
             ),
         )
         for source_path, target_path in _PROMPT_SKILL_FALLBACKS
+    ) + (
+        RewriteRule(
+            pattern=re.compile(r"(?<![A-Za-z0-9_])\.github/prompts/"),
+            replacement=".agents/skills/",
+            description=(
+                "Rewrite GitHub prompt-directory references to the native shared "
+                "skill root when repository prompt launchers are disabled."
+            ),
+        ),
     )
     prompt_rewrite_rules: tuple[RewriteRule, ...] = ()
     if enable_repo_prompts:

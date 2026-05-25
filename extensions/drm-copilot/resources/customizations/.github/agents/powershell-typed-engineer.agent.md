@@ -175,8 +175,8 @@ If any gate fails, revert/fix immediately before proceeding.
 
 Run the repo-standard PowerShell toolchain in this order:
 
-1) **Format** (`mcp__drmCopilotExtension__run_poshqc_format`)
-2) **Analyze** (`mcp__drmCopilotExtension__run_poshqc_analyze`)
+1) **Format** (`mcp__drm-copilot__run_poshqc_format`)
+2) **Analyze** (`mcp__drm-copilot__run_poshqc_analyze`)
 3) **Test** (`mcp_drmcopilotext_run_poshqc_test`)
 4) **Coverage** (when enforced by task/repo flow)
 

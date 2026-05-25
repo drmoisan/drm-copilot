@@ -1,3 +1,8 @@
+# Converted skill
+
+Applied rewrites:
+- None
+
 ---
 name: acceptance-criteria-tracking
 description: 'Track and check off acceptance criteria in requirement source files (issue.md, spec.md, user-story.md) as they are delivered. Use when executing plans, reviewing features, or validating delivery to keep AC checkboxes current.'

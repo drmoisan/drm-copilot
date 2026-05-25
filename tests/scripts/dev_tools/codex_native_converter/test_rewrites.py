@@ -50,7 +50,8 @@ def test_rewrite_supported_automation_reference_rewrites_prompt_paths() -> None:
         enable_repo_prompts=True,
     )
 
-    assert ".github/prompts/launch-review.prompt.md" in rewritten_without_prompts
+    assert ".github/prompts/" not in rewritten_without_prompts
+    assert ".agents/skills/launch-review.prompt.md" in rewritten_without_prompts
     assert ".codex/prompts/launch-review.md" in rewritten_with_prompts
 
 
@@ -107,6 +108,110 @@ def test_rewrite_supported_automation_reference_rewrites_claude_hook_paths() -> 
     assert ".codex/hooks/check-python-test-purity.ps1" in rewritten_text
     assert ".ps1.ps1" not in rewritten_text
     assert ".py" not in rewritten_text
+    assert not detect_unresolved_runtime_reference(rewritten_text)
+
+
+def test_rewrite_supported_automation_reference_rewrites_claude_dir_fallbacks() -> None:
+    """Rewrite bare and placeholder Claude directory references to native roots."""
+
+    source_text = """
+See .claude/skills/<name>/SKILL.md and .claude/skills/**/SKILL.md examples.
+Reference .claude/agents/*.md and .claude/hooks/<name>.ps1 for routing.
+Edit(/.claude/skills/execute-hard-lock/**) is also possible.
+Bare ref: .claude/hooks/ followed by content.
+""".strip()
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".claude/skills/" not in rewritten_text
+    assert ".claude/agents/" not in rewritten_text
+    assert ".claude/hooks/" not in rewritten_text
+    assert ".agents/skills/" in rewritten_text
+    assert ".codex/agents/" in rewritten_text
+    assert ".codex/hooks/" in rewritten_text
+    assert not detect_unresolved_runtime_reference(rewritten_text)
+
+
+def test_rewrite_supported_automation_reference_rewrites_claude_rule_paths() -> None:
+    """Rewrite named Claude rule paths to shared skill paths."""
+
+    source_text = (
+        "Apply .claude/rules/python.md and .claude/rules/tonality.md before review."
+    )
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".agents/skills/python/SKILL.md" in rewritten_text
+    assert ".agents/skills/tonality/SKILL.md" in rewritten_text
+    assert ".claude/rules/" not in rewritten_text
+
+
+def test_rewrite_supported_reference_expands_atomic_planner_preflight_contract() -> (
+    None
+):
+    """Expand the Claude planner shorthand into the Codex handoff contract."""
+
+    source_text = (
+        "Return the finalized plan for validation-only preflight through "
+        "`atomic-executor` and preserve the same target file path across revision "
+        "loops. Do not claim nested worker delegation from within planner execution."
+    )
+
+    rewritten_text, applied_rewrites = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert "explicitly spawn the `atomic-executor` subagent" in rewritten_text
+    assert "`DIRECTIVE: PREFLIGHT VALIDATION ONLY`" in rewritten_text
+    assert "`PREFLIGHT: ALL CLEAR`" in rewritten_text
+    assert "`PREFLIGHT: REVISIONS REQUIRED`" in rewritten_text
+    assert "Treat executor preflight findings as binding plan defects" in rewritten_text
+    assert "Reuse the same target plan file" in rewritten_text
+    assert "stop and report blocked state" in rewritten_text
+    assert "validate_orchestration_artifacts` MCP tool" in rewritten_text
+    assert any(
+        "Expand the Claude atomic-planner preflight shorthand" in description
+        for description in applied_rewrites
+    )
+
+
+def test_rewrite_supported_automation_reference_rewrites_claude_rules_directory() -> (
+    None
+):
+    """Rewrite bare Claude rules-directory references to the native skill root."""
+
+    source_text = "Browse .claude/rules/ for the policy catalog."
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".claude/rules/" not in rewritten_text
+    assert ".agents/skills/" in rewritten_text
+
+
+def test_rewrite_supported_reference_rewrites_prompt_dir_when_disabled() -> None:
+    """Rewrite bare GitHub prompt-directory references when prompts are disabled."""
+
+    source_text = (
+        "Browse .github/prompts/ and look at .github/prompts/*.prompt.md for guidance."
+    )
+
+    rewritten_text, _ = rewrite_supported_automation_reference(
+        source_text,
+        enable_repo_prompts=False,
+    )
+
+    assert ".github/prompts/" not in rewritten_text
+    assert ".agents/skills/" in rewritten_text
     assert not detect_unresolved_runtime_reference(rewritten_text)
 
 

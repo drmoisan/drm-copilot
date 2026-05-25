@@ -6,7 +6,7 @@ tools:
   - Grep
   - Glob
   - "Bash(pwsh *)"
-  - mcp__drmCopilotExtension__.*
+  - mcp__drm-copilot__.*
   - Write
   - Edit
 skills:

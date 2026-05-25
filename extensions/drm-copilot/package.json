@@ -2,7 +2,29 @@
   "name": "drm-copilot",
   "displayName": "drm-copilot",
   "description": "Extension-side bundled workflow execution utilities and MCP bridge.",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "publisher": "DanMoisan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drmoisan/drm-copilot.git",
+    "directory": "extensions/drm-copilot"
+  },
+  "bugs": {
+    "url": "https://github.com/drmoisan/drm-copilot/issues"
+  },
+  "homepage": "https://github.com/drmoisan/drm-copilot#readme",
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "mcp",
+    "copilot",
+    "claude",
+    "codex",
+    "automation",
+    "workflow"
+  ],
   "engines": {
     "vscode": "^1.108.0"
   },

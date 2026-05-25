@@ -21,9 +21,9 @@ Do not encode host-specific execution details in multiple workflow skills. Put t
 ## Published Codex Automation Surface
 
 The canonical Codex automation dependency for this repo is the published MCP server:
-- `drmCopilotExtension`
+- `drm-copilot`
 
-Downstream Codex skills should depend on the MCP server name `drmCopilotExtension`, not on raw VS Code command IDs.
+Downstream Codex skills should depend on the MCP server name `drm-copilot`, not on raw VS Code command IDs.
 
 Declare that dependency once on this skill via `agents/openai.yaml`.
 
@@ -71,7 +71,7 @@ Legacy VS Code command IDs remain historical source material only:
 
 Before treating the MCP path as available, assume these prerequisites:
 
-- the Codex client is configured with MCP server name `drmCopilotExtension`
+- the Codex client is configured with MCP server name `drm-copilot`
 - the published extension or bridge is installed and built
 - an open workspace folder exists for workspace-targeted operations
 - `python` is on `PATH`
@@ -81,7 +81,7 @@ Before treating the MCP path as available, assume these prerequisites:
 
 For any host-specific workflow step:
 
-1. Prefer the published `drmCopilotExtension` MCP tool when it covers the requested operation.
+1. Prefer the published `drm-copilot` MCP tool when it covers the requested operation.
 2. If the MCP server is unavailable, determine whether a deterministic git or filesystem fallback is sufficient.
 3. If a deterministic fallback is sufficient, use it and record that the result is a fallback artifact rather than a canonical tool-produced artifact.
 4. If no MCP path or safe fallback exists, stop and report the missing automation dependency instead of inventing behavior.
@@ -90,15 +90,20 @@ For any host-specific workflow step:
 
 ### PR context collection
 
-- Preferred: call tool `collect_pr_context` on MCP server `drmCopilotExtension`.
+- Preferred: call tool `collect_pr_context` on MCP server `drm-copilot`.
 - When the caller already resolved a base branch, pass that base explicitly.
 - Current fallback: use deterministic git commands to reconstruct equivalent context when review workflows only need base/head, merge-base, commits, and changed files.
 - When using fallback, record the provenance in the generated review artifact.
+- For orchestrator remediation loops, PR-context refresh is mandatory after each remediation commit and before each re-review.
+- When the caller explicitly requires MCP tooling for PR-context refresh, do not silently downgrade to fallback; stop and report the dependency gap instead.
 
 ### Commit context collection
 
-- Preferred: call tool `collect_commit_context` on MCP server `drmCopilotExtension`.
+- Preferred: call tool `collect_commit_context` on MCP server `drm-copilot`.
 - If the MCP server is unavailable and the workflow only needs staged-diff summary, use non-destructive git inspection as fallback and record that provenance.
+- For orchestrator remediation loops, collect commit context only after `git add -A` and only when staged changes exist.
+- For orchestrator remediation loops, do not continue to commit-message generation without an on-disk commit-context artifact path produced by the selected adapter path.
+- When the caller explicitly requires MCP tooling for commit-context collection, do not silently downgrade to fallback; stop and report the dependency gap instead.
 
 ### Feature promotion and active feature folder creation
 

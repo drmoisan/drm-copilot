@@ -6,11 +6,26 @@ tools:
   - Read
   - Grep
   - Glob
+  - Write
+  - Edit
   - "Bash(git *)"
   - "Bash(poetry run *)"
   - "Bash(npx *)"
   - "Bash(pwsh *)"
-  - "mcp__drmCopilotExtension__.*"
+  - "Bash(gh *)"
+  - "mcp__drm-copilot__run_poshqc_format"
+  - "mcp__drm-copilot__run_poshqc_analyze"
+  - "mcp__drm-copilot__run_poshqc_analyze_autofix"
+  - "mcp__drm-copilot__run_poshqc_test"
+  - "mcp__drm-copilot__resolve_execute_hard_lock_prompt"
+  - "mcp__drm-copilot__resolve_atomic_plan_prompt"
+  - "mcp__drm-copilot__collect_pr_context"
+  - "mcp__drm-copilot__new_potential_entry"
+  - "mcp__drm-copilot__new_potential_bug_entry"
+  - "mcp__drm-copilot__potential_to_issue"
+  - "mcp__drm-copilot__new_active_feature_folder"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
+  - "mcp__drm-copilot__.*"
 skills:
   - policy-compliance-order
   - feature-promotion-lifecycle
@@ -19,9 +34,11 @@ skills:
   - evidence-and-timestamp-conventions
 memory: project
 hooks:
-  Stop:
-    - matcher: ""
-      body: "Block termination unless artifacts/orchestration/orchestrator-state.json has been updated with current completed_steps and next_step, and all required artifact paths for the selected workflow path have been confirmed on disk."
+  SubagentStop:
+    - matcher: "orchestrator"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1
 ---
 
 # Orchestrator Agent

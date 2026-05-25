@@ -14,13 +14,13 @@ tools:
   - "Bash(npx prettier *)"
   - "Bash(npx eslint *)"
   - "Bash(npx tsc *)"
-  - "Bash(npx jest *)"
+  - "Bash(npx vitest *)"
   - "Bash(pwsh *)"
   - "Bash(git *)"
-  - "mcp__drmCopilotExtension__run_poshqc_format"
-  - "mcp__drmCopilotExtension__run_poshqc_analyze"
-  - "mcp__drmCopilotExtension__run_poshqc_test"
-  - "mcp__drmCopilotExtension__run_poshqc_analyze_autofix"
+  - "mcp__drm-copilot__run_poshqc_format"
+  - "mcp__drm-copilot__run_poshqc_analyze"
+  - "mcp__drm-copilot__run_poshqc_test"
+  - "mcp__drm-copilot__run_poshqc_analyze_autofix"
 skills:
   - policy-compliance-order
   - atomic-plan-contract
@@ -29,8 +29,10 @@ skills:
 memory: project
 hooks:
   SubagentStop:
-    - condition: "plan tasks remain unchecked"
-      action: "block termination until all plan tasks are verified and checked off"
+    - matcher: "atomic-executor"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-executor-output.ps1
 ---
 
 # Atomic Executor Agent
@@ -73,8 +75,8 @@ For each task:
 Use the scoped tool patterns for quality gates:
 
 - **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
-- **PowerShell**: MCP server functions (`mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp__drmCopilotExtension__run_poshqc_test`, `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`)
+- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx vitest`
+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 - **Git**: `git diff`, `git status`, `git log`
 
 Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.

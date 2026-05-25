@@ -1,0 +1,365 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="124" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-05-24" time="14:50:23">
+  <environment nunit-version="2.5.8.0" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" os-version="10.0.26200" clr-version="10.0.5" user-domain="Megalodon4" user="DanMoisan" machine-name="MEGALODON4" cwd="C:\Users\DanMoisan\repos\drm-copilot" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="4.8851" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\check-powershell-test-purity.Tests.ps1" executed="True" result="Success" success="True" time="0.9091" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\check-powershell-test-purity.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="check-powershell-test-purity.ps1" executed="True" result="Success" success="True" time="0.4258" asserts="0" description="check-powershell-test-purity.ps1">
+            <results>
+              <test-case description="allows safe Pester test content" name="check-powershell-test-purity.ps1.allows safe Pester test content" time="0.1884" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows empty content and empty new_string edits" name="check-powershell-test-purity.ps1.allows empty content and empty new_string edits" time="0.0221" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="ignores non-test and non-PowerShell file paths" name="check-powershell-test-purity.ps1.ignores non-test and non-PowerShell file paths" time="0.02" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks forbidden Pester runtime and mock patterns" name="check-powershell-test-purity.ps1.blocks forbidden Pester runtime and mock patterns" time="0.1119" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\check-python-test-purity.Tests.ps1" executed="True" result="Success" success="True" time="0.2273" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\check-python-test-purity.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="check-python-test-purity.ps1" executed="True" result="Success" success="True" time="0.1534" asserts="0" description="check-python-test-purity.ps1">
+            <results>
+              <test-case description="allows missing tool input and missing file path" name="check-python-test-purity.ps1.allows missing tool input and missing file path" time="0.0161" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows safe Python test content" name="check-python-test-purity.ps1.allows safe Python test content" time="0.0107" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows empty content and empty new_string edits" name="check-python-test-purity.ps1.allows empty content and empty new_string edits" time="0.0114" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="ignores non-test and non-Python file paths" name="check-python-test-purity.ps1.ignores non-test and non-Python file paths" time="0.0107" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks forbidden Python unit-test runtime patterns" name="check-python-test-purity.ps1.blocks forbidden Python unit-test runtime patterns" time="0.0404" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks malformed tool-input JSON with a diagnostic" name="check-python-test-purity.ps1.blocks malformed tool-input JSON with a diagnostic" time="0.0151" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="emits a block response from the hook entrypoint" name="check-python-test-purity.ps1.emits a block response from the hook entrypoint" time="0.0171" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-evidence-locations.Tests.ps1" executed="True" result="Success" success="True" time="0.2103" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-evidence-locations.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="enforce-evidence-locations.ps1" executed="True" result="Success" success="True" time="0.1003" asserts="0" description="enforce-evidence-locations.ps1">
+            <results>
+              <test-suite type="TestFixture" name="enforce-evidence-locations.ps1.forbidden evidence locations" executed="True" result="Success" success="True" time="0.0239" asserts="0" description="enforce-evidence-locations.ps1.forbidden evidence locations">
+                <results>
+                  <test-case description="blocks writes to artifacts/baselines/ (forbidden prefix)" name="enforce-evidence-locations.ps1.forbidden evidence locations.blocks writes to artifacts/baselines/ (forbidden prefix)" time="0.0178" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="enforce-evidence-locations.ps1.allowed artifacts/ sub-paths" executed="True" result="Success" success="True" time="0.0506" asserts="0" description="enforce-evidence-locations.ps1.allowed artifacts/ sub-paths">
+                <results>
+                  <test-case description="allows writes to artifacts/orchestration/ (permitted orchestration path)" name="enforce-evidence-locations.ps1.allowed artifacts/ sub-paths.allows writes to artifacts/orchestration/ (permitted orchestration path)" time="0.011" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows writes to artifacts/research/ (permitted research path)" name="enforce-evidence-locations.ps1.allowed artifacts/ sub-paths.allows writes to artifacts/research/ (permitted research path)" time="0.0095" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="enforce-evidence-locations.ps1.canonical evidence paths" executed="True" result="Success" success="True" time="0.0761" asserts="0" description="enforce-evidence-locations.ps1.canonical evidence paths">
+                <results>
+                  <test-case description="allows writes to /evidence/baseline/ (canonical evidence path)" name="enforce-evidence-locations.ps1.canonical evidence paths.allows writes to /evidence/baseline/ (canonical evidence path)" time="0.0195" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="enforce-evidence-locations.ps1.source code paths" executed="True" result="Success" success="True" time="0.0915" asserts="0" description="enforce-evidence-locations.ps1.source code paths">
+                <results>
+                  <test-case description="allows writes to source code files (non-artifacts path)" name="enforce-evidence-locations.ps1.source code paths.allows writes to source code files (non-artifacts path)" time="0.0095" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-powershell-batch-budget.Tests.ps1" executed="True" result="Success" success="True" time="0.406" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-powershell-batch-budget.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="enforce-powershell-batch-budget.ps1" executed="True" result="Success" success="True" time="0.3347" asserts="0" description="enforce-powershell-batch-budget.ps1">
+            <results>
+              <test-case description="allows a new production file under the production cap and records it" name="enforce-powershell-batch-budget.ps1.allows a new production file under the production cap and records it" time="0.0303" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows PowerShell module and data files as production files" name="enforce-powershell-batch-budget.ps1.allows PowerShell module and data files as production files" time="0.0128" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows a new Pester test file under the test cap and records it" name="enforce-powershell-batch-budget.ps1.allows a new Pester test file under the test cap and records it" time="0.0292" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows repeated file edits without consuming another slot" name="enforce-powershell-batch-budget.ps1.allows repeated file edits without consuming another slot" time="0.0254" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks a new production file when the production cap is full" name="enforce-powershell-batch-budget.ps1.blocks a new production file when the production cap is full" time="0.0136" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks a new test file when the test cap is full" name="enforce-powershell-batch-budget.ps1.blocks a new test file when the test cap is full" time="0.0112" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="ignores non-PowerShell file paths" name="enforce-powershell-batch-budget.ps1.ignores non-PowerShell file paths" time="0.0111" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="uses loaded state when evaluating session budget" name="enforce-powershell-batch-budget.ps1.uses loaded state when evaluating session budget" time="0.0182" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks malformed tool-input JSON with a diagnostic before touching state" name="enforce-powershell-batch-budget.ps1.blocks malformed tool-input JSON with a diagnostic before touching state" time="0.0175" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows valid non-PowerShell tool input without touching state" name="enforce-powershell-batch-budget.ps1.allows valid non-PowerShell tool input without touching state" time="0.0114" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="writes state for valid PowerShell tool input through injected state operations" name="enforce-powershell-batch-budget.ps1.writes state for valid PowerShell tool input through injected state operations" time="0.0329" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="loads existing state through injected state operations" name="enforce-powershell-batch-budget.ps1.loads existing state through injected state operations" time="0.0379" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="continues when injected state read and write operations fail" name="enforce-powershell-batch-budget.ps1.continues when injected state read and write operations fail" time="0.0318" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="honors entrypoint environment caps while blocking malformed JSON" name="enforce-powershell-batch-budget.ps1.honors entrypoint environment caps while blocking malformed JSON" time="0.0209" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-promotion-mcp-only.Tests.ps1" executed="True" result="Success" success="True" time="0.1646" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-promotion-mcp-only.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="enforce-promotion-mcp-only.ps1" executed="True" result="Success" success="True" time="0.0804" asserts="0" description="enforce-promotion-mcp-only.ps1">
+            <results>
+              <test-suite type="TestFixture" name="enforce-promotion-mcp-only.ps1.benign Bash commands" executed="True" result="Success" success="True" time="0.0202" asserts="0" description="enforce-promotion-mcp-only.ps1.benign Bash commands">
+                <results>
+                  <test-case description="allows benign Bash commands" name="enforce-promotion-mcp-only.ps1.benign Bash commands.allows benign Bash commands" time="0.0144" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens" executed="True" result="Success" success="True" time="0.0743" asserts="0" description="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens">
+                <results>
+                  <test-case description="blocks new-potential-entry.ps1" name="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens.blocks new-potential-entry.ps1" time="0.0114" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks new_potential_bug_entry" name="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens.blocks new_potential_bug_entry" time="0.0109" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks potential_to_issue" name="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens.blocks potential_to_issue" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks new_active_feature_folder" name="enforce-promotion-mcp-only.ps1.forbidden promotion-script tokens.blocks new_active_feature_folder" time="0.0127" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-python-batch-budget.Tests.ps1" executed="True" result="Success" success="True" time="0.2731" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\enforce-python-batch-budget.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="enforce-python-batch-budget.ps1" executed="True" result="Success" success="True" time="0.1937" asserts="0" description="enforce-python-batch-budget.ps1">
+            <results>
+              <test-case description="allows a new production file under the production cap and records it" name="enforce-python-batch-budget.ps1.allows a new production file under the production cap and records it" time="0.0181" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows a new test file under the test cap and records it" name="enforce-python-batch-budget.ps1.allows a new test file under the test cap and records it" time="0.0152" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows repeated file edits without consuming another slot" name="enforce-python-batch-budget.ps1.allows repeated file edits without consuming another slot" time="0.0094" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks a new production file when the production cap is full" name="enforce-python-batch-budget.ps1.blocks a new production file when the production cap is full" time="0.0093" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks a new test file when the test cap is full" name="enforce-python-batch-budget.ps1.blocks a new test file when the test cap is full" time="0.0092" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="ignores non-Python file paths" name="enforce-python-batch-budget.ps1.ignores non-Python file paths" time="0.0095" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="uses loaded state when evaluating session budget" name="enforce-python-batch-budget.ps1.uses loaded state when evaluating session budget" time="0.0106" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks malformed tool-input JSON with a diagnostic before touching state" name="enforce-python-batch-budget.ps1.blocks malformed tool-input JSON with a diagnostic before touching state" time="0.0114" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows valid non-Python tool input without touching state" name="enforce-python-batch-budget.ps1.allows valid non-Python tool input without touching state" time="0.0089" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="writes state for valid Python tool input through injected state operations" name="enforce-python-batch-budget.ps1.writes state for valid Python tool input through injected state operations" time="0.0133" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="loads existing state through injected state operations" name="enforce-python-batch-budget.ps1.loads existing state through injected state operations" time="0.0193" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="continues when injected state read and write operations fail" name="enforce-python-batch-budget.ps1.continues when injected state read and write operations fail" time="0.0127" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="honors entrypoint environment caps while blocking malformed JSON" name="enforce-python-batch-budget.ps1.honors entrypoint environment caps while blocking malformed JSON" time="0.0179" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-bash.Tests.ps1" executed="True" result="Success" success="True" time="0.4114" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-bash.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-bash.ps1" executed="True" result="Success" success="True" time="0.2955" asserts="0" description="validate-bash.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-bash.ps1.Blocked patterns" executed="True" result="Success" success="True" time="0.1212" asserts="0" description="validate-bash.ps1.Blocked patterns">
+                <results>
+                  <test-case description="keeps blocking all repository-dangerous command patterns used by the Claude runtime" name="validate-bash.ps1.Blocked patterns.keeps blocking all repository-dangerous command patterns used by the Claude runtime" time="0.0376" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'rm -rf' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'rm -rf' commands with exit code 1" time="0.0133" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'git push --force' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'git push --force' commands with exit code 1" time="0.013" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'git push origin --force' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'git push origin --force' commands with exit code 1" time="0.0127" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'Remove-Item -Recurse -Force' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'Remove-Item -Recurse -Force' commands with exit code 1" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'git reset --hard' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'git reset --hard' commands with exit code 1" time="0.013" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks 'git push -f' commands with exit code 1" name="validate-bash.ps1.Blocked patterns.blocks 'git push -f' commands with exit code 1" time="0.0131" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-bash.ps1.Safe commands" executed="True" result="Success" success="True" time="0.1689" asserts="0" description="validate-bash.ps1.Safe commands">
+                <results>
+                  <test-case description="allows 'ls -la' with exit code 0" name="validate-bash.ps1.Safe commands.allows 'ls -la' with exit code 0" time="0.0137" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows 'git status' with exit code 0" name="validate-bash.ps1.Safe commands.allows 'git status' with exit code 0" time="0.0136" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows 'echo hello' with exit code 0" name="validate-bash.ps1.Safe commands.allows 'echo hello' with exit code 0" time="0.014" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-bash.ps1.Empty input" executed="True" result="Success" success="True" time="0.1895" asserts="0" description="validate-bash.ps1.Empty input">
+                <results>
+                  <test-case description="exits with code 0 when no command is provided" name="validate-bash.ps1.Empty input.exits with code 0 when no command is provided" time="0.0146" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-bash.ps1.Malformed JSON in CLAUDE_TOOL_INPUT" executed="True" result="Success" success="True" time="0.2342" asserts="0" description="validate-bash.ps1.Malformed JSON in CLAUDE_TOOL_INPUT">
+                <results>
+                  <test-case description="falls back to raw environment variable value when JSON is malformed" name="validate-bash.ps1.Malformed JSON in CLAUDE_TOOL_INPUT.falls back to raw environment variable value when JSON is malformed" time="0.0253" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="falls back to raw environment variable value when JSON is malformed and value is safe" name="validate-bash.ps1.Malformed JSON in CLAUDE_TOOL_INPUT.falls back to raw environment variable value when JSON is malformed and value is safe" time="0.0135" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-bash.ps1.CLAUDE_TOOL_INPUT with valid JSON" executed="True" result="Success" success="True" time="0.2716" asserts="0" description="validate-bash.ps1.CLAUDE_TOOL_INPUT with valid JSON">
+                <results>
+                  <test-case description="reads command from JSON 'command' field" name="validate-bash.ps1.CLAUDE_TOOL_INPUT with valid JSON.reads command from JSON 'command' field" time="0.0194" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="reads safe command from JSON 'command' field and exits 0" name="validate-bash.ps1.CLAUDE_TOOL_INPUT with valid JSON.reads safe command from JSON 'command' field and exits 0" time="0.0121" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-executor-output.Tests.ps1" executed="True" result="Success" success="True" time="0.5514" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-executor-output.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-executor-output.ps1" executed="True" result="Success" success="True" time="0.4344" asserts="0" description="validate-executor-output.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-executor-output.ps1.payload validation" executed="True" result="Success" success="True" time="0.0396" asserts="0" description="validate-executor-output.ps1.payload validation">
+                <results>
+                  <test-case description="blocks when CLAUDE_HOOK_INPUT is empty" name="validate-executor-output.ps1.payload validation.blocks when CLAUDE_HOOK_INPUT is empty" time="0.0154" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the output does not advertise a plan-path token" name="validate-executor-output.ps1.payload validation.blocks when the output does not advertise a plan-path token" time="0.0181" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-executor-output.ps1.preflight validation" executed="True" result="Success" success="True" time="0.2835" asserts="0" description="validate-executor-output.ps1.preflight validation">
+                <results>
+                  <test-case description="allows a preflight plan to stop with PREFLIGHT: ALL CLEAR even when tasks remain unchecked" name="validate-executor-output.ps1.preflight validation.allows a preflight plan to stop with PREFLIGHT: ALL CLEAR even when tasks remain unchecked" time="0.2003" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks a preflight plan when the exact preflight signal is missing" name="validate-executor-output.ps1.preflight validation.blocks a preflight plan when the exact preflight signal is missing" time="0.0227" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks malformed preflight blocked text" name="validate-executor-output.ps1.preflight validation.blocks malformed preflight blocked text" time="0.0142" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-executor-output.ps1.execution validation" executed="True" result="Success" success="True" time="0.3902" asserts="0" description="validate-executor-output.ps1.execution validation">
+                <results>
+                  <test-case description="blocks non-preflight output that claims a blocked state" name="validate-executor-output.ps1.execution validation.blocks non-preflight output that claims a blocked state" time="0.0295" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when AC Status Summary is missing" name="validate-executor-output.ps1.execution validation.blocks when AC Status Summary is missing" time="0.0148" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when command/status reporting is missing" name="validate-executor-output.ps1.execution validation.blocks when command/status reporting is missing" time="0.014" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when a touched language lacks an explicit PASS or FAIL status line" name="validate-executor-output.ps1.execution validation.blocks when a touched language lacks an explicit PASS or FAIL status line" time="0.0239" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows termination when checklist, AC summary, commands, and language status lines are present" name="validate-executor-output.ps1.execution validation.allows termination when checklist, AC summary, commands, and language status lines are present" time="0.0165" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-executor-output.ps1.path parsing helpers" executed="True" result="Success" success="True" time="0.4287" asserts="0" description="validate-executor-output.ps1.path parsing helpers">
+                <results>
+                  <test-case description="extracts a quoted plan-path value" name="validate-executor-output.ps1.path parsing helpers.extracts a quoted plan-path value" time="0.0109" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="detects preflight plans from the directive line" name="validate-executor-output.ps1.path parsing helpers.detects preflight plans from the directive line" time="0.0121" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="detects touched PowerShell files from plan paths" name="validate-executor-output.ps1.path parsing helpers.detects touched PowerShell files from plan paths" time="0.0093" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-feature-review-coverage.Tests.ps1" executed="True" result="Success" success="True" time="0.2964" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-feature-review-coverage.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-feature-review-coverage.ps1" executed="True" result="Success" success="True" time="0.1943" asserts="0" description="validate-feature-review-coverage.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-feature-review-coverage.ps1.required artifact tokens" executed="True" result="Success" success="True" time="0.0675" asserts="0" description="validate-feature-review-coverage.ps1.required artifact tokens">
+                <results>
+                  <test-case description="blocks when required review artifact tokens are missing" name="validate-feature-review-coverage.ps1.required artifact tokens.blocks when required review artifact tokens are missing" time="0.0174" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when required review artifacts do not share the same timestamp" name="validate-feature-review-coverage.ps1.required artifact tokens.blocks when required review artifacts do not share the same timestamp" time="0.0434" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-feature-review-coverage.ps1.coverage verdict enforcement" executed="True" result="Success" success="True" time="0.1882" asserts="0" description="validate-feature-review-coverage.ps1.coverage verdict enforcement">
+                <results>
+                  <test-case description="blocks when a changed language lacks an explicit PASS or FAIL coverage verdict" name="validate-feature-review-coverage.ps1.coverage verdict enforcement.blocks when a changed language lacks an explicit PASS or FAIL coverage verdict" time="0.091" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows termination when required artifacts exist and no changed languages need coverage validation" name="validate-feature-review-coverage.ps1.coverage verdict enforcement.allows termination when required artifacts exist and no changed languages need coverage validation" time="0.023" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-orchestrator-output.Tests.ps1" executed="True" result="Success" success="True" time="0.3432" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-orchestrator-output.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-orchestrator-output.ps1" executed="True" result="Success" success="True" time="0.2349" asserts="0" description="validate-orchestrator-output.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-orchestrator-output.ps1.payload validation" executed="True" result="Success" success="True" time="0.0457" asserts="0" description="validate-orchestrator-output.ps1.payload validation">
+                <results>
+                  <test-case description="blocks when CLAUDE_HOOK_INPUT is empty" name="validate-orchestrator-output.ps1.payload validation.blocks when CLAUDE_HOOK_INPUT is empty" time="0.012" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when CLAUDE_HOOK_INPUT contains malformed JSON" name="validate-orchestrator-output.ps1.payload validation.blocks when CLAUDE_HOOK_INPUT contains malformed JSON" time="0.0095" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the output field is empty" name="validate-orchestrator-output.ps1.payload validation.blocks when the output field is empty" time="0.0087" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the JSON payload omits the output field entirely" name="validate-orchestrator-output.ps1.payload validation.blocks when the JSON payload omits the output field entirely" time="0.0096" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-orchestrator-output.ps1.checkpoint file presence" executed="True" result="Success" success="True" time="0.1071" asserts="0" description="validate-orchestrator-output.ps1.checkpoint file presence">
+                <results>
+                  <test-case description="blocks when the checkpoint file does not exist" name="validate-orchestrator-output.ps1.checkpoint file presence.blocks when the checkpoint file does not exist" time="0.0306" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the checkpoint file content is empty" name="validate-orchestrator-output.ps1.checkpoint file presence.blocks when the checkpoint file content is empty" time="0.0247" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-orchestrator-output.ps1.checkpoint structure validation" executed="True" result="Success" success="True" time="0.1996" asserts="0" description="validate-orchestrator-output.ps1.checkpoint structure validation">
+                <results>
+                  <test-case description="blocks when the checkpoint file is not valid JSON" name="validate-orchestrator-output.ps1.checkpoint structure validation.blocks when the checkpoint file is not valid JSON" time="0.0213" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when checkpoint is missing required fields" name="validate-orchestrator-output.ps1.checkpoint structure validation.blocks when checkpoint is missing required fields" time="0.0248" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when checkpoint has empty objective" name="validate-orchestrator-output.ps1.checkpoint structure validation.blocks when checkpoint has empty objective" time="0.0202" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows termination when all required fields are present and objective is set" name="validate-orchestrator-output.ps1.checkpoint structure validation.allows termination when all required fields are present and objective is set" time="0.0202" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-orchestrator-output.ps1.Get-CheckpointFileContent" executed="True" result="Success" success="True" time="0.2293" asserts="0" description="validate-orchestrator-output.ps1.Get-CheckpointFileContent">
+                <results>
+                  <test-case description="reports Exists=$false for a path that does not exist" name="validate-orchestrator-output.ps1.Get-CheckpointFileContent.reports Exists=$false for a path that does not exist" time="0.0115" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="reads content from a real file on disk (uses the test file as fixture)" name="validate-orchestrator-output.ps1.Get-CheckpointFileContent.reads content from a real file on disk (uses the test file as fixture)" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-planner-output.Tests.ps1" executed="True" result="Success" success="True" time="0.2549" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-planner-output.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-planner-output.ps1" executed="True" result="Success" success="True" time="0.1512" asserts="0" description="validate-planner-output.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-planner-output.ps1.payload validation" executed="True" result="Success" success="True" time="0.0335" asserts="0" description="validate-planner-output.ps1.payload validation">
+                <results>
+                  <test-case description="blocks when CLAUDE_HOOK_INPUT is empty" name="validate-planner-output.ps1.payload validation.blocks when CLAUDE_HOOK_INPUT is empty" time="0.0148" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the output is missing an exact preflight signal" name="validate-planner-output.ps1.payload validation.blocks when the output is missing an exact preflight signal" time="0.0128" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-planner-output.ps1.plan structure validation" executed="True" result="Success" success="True" time="0.1452" asserts="0" description="validate-planner-output.ps1.plan structure validation">
+                <results>
+                  <test-case description="blocks when the advertised plan-path does not exist on disk" name="validate-planner-output.ps1.plan structure validation.blocks when the advertised plan-path does not exist on disk" time="0.0196" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when Phase 0 baseline and policy-read tasks are missing" name="validate-planner-output.ps1.plan structure validation.blocks when Phase 0 baseline and policy-read tasks are missing" time="0.0298" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when a task omits an explicit path" name="validate-planner-output.ps1.plan structure validation.blocks when a task omits an explicit path" time="0.0239" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows termination when the plan satisfies the structural contract" name="validate-planner-output.ps1.plan structure validation.allows termination when the plan satisfies the structural contract" time="0.0323" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-required-artifact-output.Tests.ps1" executed="True" result="Success" success="True" time="0.1536" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-required-artifact-output.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-required-artifact-output.ps1" executed="True" result="Success" success="True" time="0.0732" asserts="0" description="validate-required-artifact-output.ps1">
+            <results>
+              <test-case description="blocks when the required token is missing from output" name="validate-required-artifact-output.ps1.blocks when the required token is missing from output" time="0.0143" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="blocks when the advertised path violates the required pattern" name="validate-required-artifact-output.ps1.blocks when the advertised path violates the required pattern" time="0.0212" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows termination when the required artifact path is present and exists" name="validate-required-artifact-output.ps1.allows termination when the required artifact path is present and exists" time="0.0315" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-task-researcher-output.Tests.ps1" executed="True" result="Success" success="True" time="0.242" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-task-researcher-output.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate-task-researcher-output.ps1" executed="True" result="Success" success="True" time="0.1419" asserts="0" description="validate-task-researcher-output.ps1">
+            <results>
+              <test-suite type="TestFixture" name="validate-task-researcher-output.ps1.payload validation" executed="True" result="Success" success="True" time="0.0265" asserts="0" description="validate-task-researcher-output.ps1.payload validation">
+                <results>
+                  <test-case description="blocks when CLAUDE_HOOK_INPUT is empty" name="validate-task-researcher-output.ps1.payload validation.blocks when CLAUDE_HOOK_INPUT is empty" time="0.011" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the output does not advertise a research-path token" name="validate-task-researcher-output.ps1.payload validation.blocks when the output does not advertise a research-path token" time="0.0098" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-task-researcher-output.ps1.research root and filename enforcement" executed="True" result="Success" success="True" time="0.0889" asserts="0" description="validate-task-researcher-output.ps1.research root and filename enforcement">
+                <results>
+                  <test-case description="blocks when the research-path is not under artifacts/research/" name="validate-task-researcher-output.ps1.research root and filename enforcement.blocks when the research-path is not under artifacts/research/" time="0.0117" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="blocks when the research-path filename does not match the documented convention" name="validate-task-researcher-output.ps1.research root and filename enforcement.blocks when the research-path filename does not match the documented convention" time="0.0147" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="allows termination when the research-path is valid and the file exists" name="validate-task-researcher-output.ps1.research root and filename enforcement.allows termination when the research-path is valid and the file exists" time="0.0289" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="validate-task-researcher-output.ps1.helper functions" executed="True" result="Success" success="True" time="0.1356" asserts="0" description="validate-task-researcher-output.ps1.helper functions">
+                <results>
+                  <test-case description="extracts a quoted research-path value" name="validate-task-researcher-output.ps1.helper functions.extracts a quoted research-path value" time="0.0123" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="returns true for valid research filenames" name="validate-task-researcher-output.ps1.helper functions.returns true for valid research filenames" time="0.0104" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="returns false for invalid research filenames" name="validate-task-researcher-output.ps1.helper functions.returns false for invalid research filenames" time="0.0168" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1" executed="True" result="Success" success="True" time="0.1605" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-architecture-doc" executed="True" result="Success" success="True" time="0.0968" asserts="0" description="claude-architecture-doc">
+            <results>
+              <test-case description="requires the architecture document to cover research sufficiency, main-thread orchestration, and full migration tables" name="claude-architecture-doc.requires the architecture document to cover research sufficiency, main-thread orchestration, and full migration tables" time="0.017" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the architecture document to keep .github/skills/README.md documentation-only and not require .claude/skills/README.md" name="claude-architecture-doc.requires the architecture document to keep .github/skills/README.md documentation-only and not require .claude/skills/README.md" time="0.0141" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/rules/powershell.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires .claude/rules/powershell.md to use the active PowerShell MCP contract" time="0.0123" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/atomic-executor.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires .claude/agents/atomic-executor.md to use the active PowerShell MCP contract" time="0.014" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" name="claude-architecture-doc.requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" time="0.0143" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/feature-review.md to support writing review artifacts into a selected version folder" name="claude-architecture-doc.requires .claude/agents/feature-review.md to support writing review artifacts into a selected version folder" time="0.0097" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1" executed="True" result="Success" success="True" time="0.1582" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-runtime-structure" executed="True" result="Success" success="True" time="0.0828" asserts="0" description="claude-runtime-structure">
+            <results>
+              <test-case description="requires .claude/skills/orchestrate/SKILL.md to avoid context fork and orchestrator agent routing" name="claude-runtime-structure.requires .claude/skills/orchestrate/SKILL.md to avoid context fork and orchestrator agent routing" time="0.0129" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the five wrapper skills to exist under .claude/skills" name="claude-runtime-structure.requires the five wrapper skills to exist under .claude/skills" time="0.0127" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(prd-feature)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(prd-feature)" time="0.0103" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(staged-review), Agent(epic-review), and Agent(status-updater)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(staged-review), Agent(epic-review), and Agent(status-updater)" time="0.0112" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/agents/orchestrator.md to allow Agent(python-typed-engineer), Agent(powershell-typed-engineer), Agent(csharp-typed-engineer), and Agent(typescript-engineer)" name="claude-runtime-structure.requires .claude/agents/orchestrator.md to allow Agent(python-typed-engineer), Agent(powershell-typed-engineer), Agent(csharp-typed-engineer), and Agent(typescript-engineer)" time="0.0107" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires bounded worker agents and excludes repository-disallowed persona files" name="claude-runtime-structure.requires bounded worker agents and excludes repository-disallowed persona files" time="0.0177" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1" executed="True" result="Success" success="True" time="0.1232" asserts="0" description="C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="claude-settings" executed="True" result="Success" success="True" time="0.0633" asserts="0" description="claude-settings">
+            <results>
+              <test-case description="requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage" name="claude-settings.requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage" time="0.0218" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires .claude/settings.json to use the active PowerShell MCP contract" name="claude-settings.requires .claude/settings.json to use the active PowerShell MCP contract" time="0.015" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" name="claude-settings.requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" time="0.0187" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

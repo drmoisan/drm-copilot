@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
+description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review. When review requires remediation, drive a deterministic loop of remediation plan clearance -> remediation execution -> staged commit message generation -> commit -> PR-context refresh -> re-review until the review gate is clean.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
 tools: [vscode/runCommand, vscode/extensions, execute, read, agent, edit, search, web, 'drmcopilotextension/*', todo]
 handoffs:
@@ -44,9 +44,25 @@ handoffs:
     agent: atomic_executor
     prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results; if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
+  - label: Preflight remediation plan clearance
+    agent: atomic_executor
+    prompt: "DIRECTIVE: PREFLIGHT VALIDATION ONLY\n\nValidate only the remediation plan at `${remediation-plan-path}` for `${feature-folder}`. Treat that exact file as the sole remediation plan of record. Do not execute tasks. Return exactly one terminal signal:\n- `PREFLIGHT: ALL CLEAR`\n- `PREFLIGHT: REVISIONS REQUIRED`\n\nIf revisions are required, include a precise in-place plan delta that `atomic_planner` can apply to `${remediation-plan-path}` without creating sibling remediation plan files. Return `plan-path` and the final preflight signal."
+    send: true
+  - label: Revise remediation plan in place
+    agent: atomic_planner
+    prompt: "Update `${remediation-plan-path}` in place using `${remediation-inputs-path}` as the authoritative requirements source. Apply the exact preflight delta supplied by the orchestrator, preserve the same file path, and do NOT create sibling remediation plan files. Planning only. Return `plan-path` and final preflight signal or blocked state."
+    send: true
+  - label: Execute remediation plan
+    agent: atomic_executor
+    prompt: "Execute the remediation plan at `${remediation-plan-path}` exactly as written for `${feature-folder}`. Do not replan or reorder tasks.\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved remediation plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce the repo-standard quality gates for every affected language.\n4) Report execution summary, QA summary, lint/type/test/coverage deltas, and updated remediation-plan checklist state.\n5) When policy requires coverage, include numeric baseline/post/new-code coverage metrics.\n6) Synchronize completed work back to the original feature plan when the remediation plan requires status-sync tasks.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated remediation-plan checklist state"
+    send: true
+  - label: Write remediation commit message
+    agent: commit_steward
+    prompt: "Use only the commit-context artifact at `${commit-context-path}` as the authoritative staged-change input. Follow `.github/prompts/generate-commit-message-repo.prompt.md`. Return exactly one fenced `text` code block containing the commit message and no other text."
+    send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
-    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Resolve `PRBaseBranch` via `pr-base-branch-merge-base` and pass that resolved branch from orchestration context (do not default to `main` unless merge-base resolution fails for all candidates). If remediation is required, trigger atomic planner remediation flow automatically."
+    prompt: "Use `.github/prompts/review-feature.prompt.md` for this feature folder and generate policy/code/feature audits. Resolve `PRBaseBranch` via `pr-base-branch-merge-base` and pass that resolved branch from orchestration context (do not default to `main` unless merge-base resolution fails for all candidates). If remediation is required, trigger atomic planner remediation flow automatically. Your final report MUST end with these exact single-line fields so orchestration can gate deterministically:\n- `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`\n- `FEATURE_FOLDER: <path>`\n- `POLICY_AUDIT: <path>`\n- `CODE_REVIEW: <path>`\n- `FEATURE_AUDIT: <path>`\n- `REMEDIATION_INPUTS: <path-or-NONE>`\n- `REMEDIATION_PLAN: <path-or-NONE>`"
     send: true
 ---
 
@@ -69,6 +85,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `pr-context-artifacts`
 - `pr-base-branch-merge-base`
 - `feature-promotion-lifecycle`
+- `repo-automation-adapter`
 - `atomic-plan-contract`
 - `acceptance-criteria-tracking`
 
@@ -108,6 +125,31 @@ Use these reusable skills to avoid duplicating shared operations:
   - `${issue-num}`: promoted GitHub issue number
   - `${feature-folder}`: created active feature folder path
   - `${plan-path}`: workspace-relative path to the single plan file that must be updated in-place across all planning/preflight iterations
+  - `${review-status}`: `PASS` or `REMEDIATION_REQUIRED`
+  - `${remediation-inputs-path}`: latest remediation inputs artifact path or `NONE`
+  - `${remediation-plan-path}`: latest remediation plan artifact path or `NONE`
+  - `${remediation-pass}`: integer loop counter starting at `1`
+  - `${commit-context-path}`: on-disk commit-context artifact path returned by MCP tooling
+  - `${pr-context-base-branch}`: resolved base branch used for PR-context refresh during review loops
+
+# Deterministic handoff gate contract
+
+Use exact gate signals and exact path fields. Do not infer loop transitions from prose summaries when an exact field is required.
+
+- Feature review gate:
+  - `REVIEW_STATUS: PASS`
+  - `REVIEW_STATUS: REMEDIATION_REQUIRED`
+- Remediation preflight gate:
+  - `PREFLIGHT: ALL CLEAR`
+  - `PREFLIGHT: REVISIONS REQUIRED`
+- Commit-message gate:
+  - one fenced `text` code block only from `commit_steward`
+
+If any required signal or required path field is missing, stop and record blocked state instead of inferring success.
+
+5) **No manual steps by default**
+- Do not introduce manual bootstrap, human-operator validation, user-performed repro steps, or any other manual handoff unless the initial user request explicitly asked for manual orchestration from the beginning.
+- If a delegated plan, review, or remediation flow proposes a new manual step without that explicit initial opt-in, reject it, request a revision, or record blocked automated state instead of asking the user to perform the step.
 
 # Workflow router
 
@@ -196,11 +238,11 @@ Hard enforcement for S4:
 
 ### Step S5 — Branch by bootstrap mode
 
-S5.1 If request is `manual bootstrap`:
+S5.1 Only if the initial user request explicitly requested `manual bootstrap` from the beginning:
 - Save checkpoint with `next_step` at Phase 1 resume point.
 - Stop execution and return resume instructions.
 
-S5.2 If request is small development (not manual bootstrap):
+S5.2 Otherwise continue automated small development:
 - Continue to Step S6.
 
 ### Step S6 — Delegate constrained small-path development
@@ -227,10 +269,9 @@ Hard enforcement for S7:
 S8.1 Delegate handoff **Post-implementation small-path audit**.
 
 S8.2 If audit triggers remediation:
-- generate remediation inputs + remediation plan,
-- execute remediation,
-- re-run reduced audit,
-- repeat until ready-to-merge gate passes.
+- enter the shared remediation loop defined below,
+- do not bypass remediation preflight, remediation execution, staged commit generation, commit creation, PR-context refresh, or re-review,
+- repeat until the latest reduced audit returns `REVIEW_STATUS: PASS`.
 
 Hard enforcement for S8:
 - Orchestrator MUST delegate the short-path audit to `feature_code_review_agent` as defined in `.github/agents/feature-review.agent.md`; direct creation or replacement of `policy-audit.*.md`, `feature-audit.*.md`, or `code-review.*.md` by the orchestrator is prohibited.
@@ -325,6 +366,37 @@ Delegate to `feature_code_review_agent` via handoff **Post-implementation featur
 Hard enforcement for Step 6:
 - Do not mark Step 6 complete until expected review artifacts are present on disk in `${feature-folder}`.
 - Do not accept PASS policy-audit outcomes that leave required coverage fields as `UNVERIFIED` for languages in scope.
+- If the review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, enter the shared remediation loop defined below and do not mark the large path complete until the latest re-review returns `REVIEW_STATUS: PASS`.
+
+---
+
+# Shared remediation loop (mandatory after any review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`)
+
+Apply this exact loop after the first feature-review result and after every re-review result that still requires remediation.
+
+1. Verify that the latest review returned:
+   - `REVIEW_STATUS: REMEDIATION_REQUIRED`
+   - `REMEDIATION_INPUTS: <path>`
+   - `REMEDIATION_PLAN: <path>`
+2. Persist `${review-status}`, `${remediation-inputs-path}`, `${remediation-plan-path}`, and `${remediation-pass}` in the checkpoint.
+3. Delegate handoff **Preflight remediation plan clearance** against `${remediation-plan-path}`.
+4. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, delegate handoff **Revise remediation plan in place** and then repeat Step 3 against the same `${remediation-plan-path}` until the terminal signal is `PREFLIGHT: ALL CLEAR`.
+5. Delegate handoff **Execute remediation plan** only after the exact preflight signal is `PREFLIGHT: ALL CLEAR`.
+6. Stage all files with `git add -A`.
+7. Do not continue unless staged changes now exist. If staging is empty, stop and record blocked state because remediation execution did not produce a commit-ready delta.
+8. Run the MCP server tooling `collect_commit_context` via `repo-automation-adapter`, persist the returned on-disk artifact path as `${commit-context-path}`, and do not continue without that artifact path.
+9. Delegate handoff **Write remediation commit message** using `${commit-context-path}`.
+10. Commit the staged work using the exact message returned by `commit_steward`.
+11. Refresh PR context through the MCP server tooling `collect_pr_context` via `repo-automation-adapter` using the resolved `${pr-context-base-branch}`.
+12. Delegate handoff **Post-implementation feature review** again.
+13. If the re-review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, increment `${remediation-pass}` and repeat this loop. Exit only when the latest review returns `REVIEW_STATUS: PASS`.
+
+Hard enforcement for the shared remediation loop:
+- The orchestrator MUST own the preflight-clearance decision; do not treat the existence of `remediation-plan.<timestamp>.md` as clearance.
+- The remediation planner MUST update `${remediation-plan-path}` in place across revision loops; sibling remediation plan files are not allowed during the same loop.
+- Commit creation is mandatory between remediation execution and PR-context refresh.
+- PR-context refresh is mandatory between remediation commit and re-review.
+- Missing exact signals (`REVIEW_STATUS`, `PREFLIGHT`) or missing artifact paths are hard failures, not warnings.
 
 ---
 
@@ -352,13 +424,13 @@ Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
 - `phase0-instructions-read.md` and baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
-- If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
+- If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist, at least one remediation execution receipt and one remediation commit receipt must exist, and the latest re-audit must return `REVIEW_STATUS: PASS`.
 
 Artifact verification gate before mission completion (large path):
 - At least one `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one `code-review.<timestamp>.md` exists under `${feature-folder}`.
 - At least one `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
-- If remediation was triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` exist under `${feature-folder}`.
+- If remediation was triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` exist under `${feature-folder}`, at least one remediation execution receipt and one remediation commit receipt exist, and the latest review returned `REVIEW_STATUS: PASS`.
 - The approved plan and each required review artifact pass the `validate_orchestration_artifacts` MCP tool.
 - The checkpoint contains delegation receipts for every required delegated step and no required step is left in `pending` or `blocked`.
 
@@ -368,6 +440,7 @@ You are complete only when:
 - selected path has run end-to-end,
 - all required delegations completed with receipts,
 - feature review completed (large path) or reduced small-path audit completed (small path),
+- if remediation was required, the deterministic remediation loop completed with a remediation commit and a final `REVIEW_STATUS: PASS`,
 - checkpoint indicates completed mission,
 - user receives concise summary with produced paths/artifacts and branch info.
 

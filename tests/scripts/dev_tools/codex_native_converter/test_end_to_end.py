@@ -117,8 +117,8 @@ def test_github_copilot_fixture_merges_repo_wide_instructions_into_agents() -> N
     )
 
 
-def _test_claude_fixture_review_surfaces_unsupported_constructs() -> None:
-    """Surface unsupported Claude constructs in reports instead of dropping them."""
+def _test_claude_fixture_review_maps_rules_to_shared_skills() -> None:
+    """Map Claude rule files to shared skills or standing guidance."""
 
     recording_fs = RecordingFileSystem()
     result = run_review_mode(
@@ -133,14 +133,14 @@ def _test_claude_fixture_review_surfaces_unsupported_constructs() -> None:
         fs=recording_fs,
     )
 
-    unsupported_rule_record = next(
+    rule_record = next(
         record
         for record in result.mapping_records
         if record.source_path == ".claude/rules/general-code-change.md"
     )
 
-    assert unsupported_rule_record.target_path is None
-    assert any(
+    assert rule_record.target_path is not None
+    assert not any(
         finding.source_path == ".claude/rules/general-code-change.md"
         and finding.code == "unsupported-ecosystem"
         for finding in result.validation_findings
@@ -150,5 +150,5 @@ def _test_claude_fixture_review_surfaces_unsupported_constructs() -> None:
 
 
 globals()[
-    "test_claude_fixture_review_run_surfaces_unsupported_constructs_without_dropping_them"
-] = _test_claude_fixture_review_surfaces_unsupported_constructs
+    "test_claude_fixture_review_run_maps_rules_to_shared_skills_without_failing"
+] = _test_claude_fixture_review_maps_rules_to_shared_skills

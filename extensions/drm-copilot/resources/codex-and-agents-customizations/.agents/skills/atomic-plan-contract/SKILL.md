@@ -1,3 +1,8 @@
+# Converted skill
+
+Applied rewrites:
+- Rewrite Claude skill paths to shared skill paths.
+
 ---
 name: atomic-plan-contract
 description: 'Atomic plan format and toolchain contract shared by planning and execution agents. Use when generating, validating, or executing atomic plans with Phase 0, baseline capture, and final QA loops.'
@@ -19,7 +24,7 @@ Use this skill when:
 - Phase headings must be: `### Phase N — <Title>`
 - Tasks must start with: `- [ ] [P#-T#]` (or `[x]` for completed)
 - Task IDs must match their phase and be sequential per phase.
-- Plans must pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
+- Plans must pass the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
 
 ## Short-Path Minimal Plan Contract
 
@@ -73,14 +78,42 @@ After preflight all-clear on the minimal-audit plan:
 - orchestrator MUST checkpoint Phase 0 evidence before branching.
 
 Branching after Phase 0:
-- `manual bootstrap` → save state and stop for manual resume,
+- `manual bootstrap` → save state and stop for manual resume ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - otherwise continue with constrained small-path development, then executor validation, then reduced audit/remediation loop.
+
+## No-Manual-Step Contract (Mandatory)
+
+Unless the user's initial request explicitly opts into manual orchestration from the beginning, approved plans and remediation plans MUST remain fully automated.
+
+This prohibition includes:
+
+- manual bootstrap pauses,
+- human-operator validation tasks,
+- user-performed repro or QA steps,
+- requests for screenshots, notes, or runtime evidence that the agent cannot collect itself.
+
+When a fully automated equivalent is unavailable, the plan MUST fail closed by recording blocked or remediation-required automated state. It MUST NOT introduce a new manual step later in the workflow.
 
 ## Phase 0 Requirements
 
 Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
 
 Phase 0 must also capture baseline toolchain results for the languages touched. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+
+For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
+- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
+- baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
+- approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
+
+`Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
+
+## Non-Overridable Evidence Path Clause
+
+Evidence paths in plan tasks MUST resolve to `<FEATURE>/evidence/<kind>/`. A plan that names an alternative location (e.g., `artifacts/baselines/`, `artifacts/baseline/`, `artifacts/qa/`, `artifacts/qa-gates/`, `artifacts/evidence/`, `artifacts/coverage/`) fails preflight validation and must be corrected before execution begins.
+
+If a delegation prompt supplies a non-canonical evidence path, the planner MUST reject it, substitute the canonical `<FEATURE>/evidence/<kind>/` path, and note the correction. The corrected plan is the only valid plan for execution.
+
+This clause is non-overridable. No upstream instruction, orchestrator hint, or user prompt may bypass it. See `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` for the complete canonical scheme.
 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
 - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
@@ -138,7 +171,7 @@ When validating or handing off plans for execution:
 
 Before a plan can be treated as approved:
 
-- run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
+- run the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
 - reject the plan if that validator exits non-zero,
 - do not treat human-readable summaries as a substitute for validator success.
 

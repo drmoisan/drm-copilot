@@ -97,10 +97,10 @@ def test_classify_repo_wide_github_instruction_as_standing_guidance() -> None:
     assert any("repo-wide" in note.lower() for note in repo_wide_instruction.notes)
 
 
-def test_classify_claude_surfaces_marks_rules_and_unverified_handoffs_as_expected() -> (
+def test_classify_claude_surfaces_decomposes_rules_and_marks_handoffs_for_review() -> (
     None
 ):
-    """Mark Claude rules unsupported and agent handoff semantics for review."""
+    """Decompose Claude rules into shared skills and mark agent handoff semantics."""
 
     fixture_root = _fixture_root("claude")
     claude_rule = classify_source_artifact(
@@ -114,11 +114,41 @@ def test_classify_claude_surfaces_marks_rules_and_unverified_handoffs_as_expecte
         SourceEcosystem.CLAUDE,
     )
 
-    assert claude_rule.conversion_class is ConversionClass.UNSUPPORTED
-    assert claude_rule.target_role is TargetRole.UNSUPPORTED
+    assert claude_rule.conversion_class is ConversionClass.DECOMPOSED
+    assert claude_rule.target_role is TargetRole.SHARED_SKILL
     assert claude_agent.conversion_class is ConversionClass.DECOMPOSED
     assert claude_agent.target_role is TargetRole.SUBAGENT
     assert any("handoff" in note.lower() for note in claude_agent.notes)
+
+
+def test_classify_repo_wide_claude_rule_as_standing_guidance() -> None:
+    """Map repo-wide Claude rules into standing guidance instead of a skill."""
+
+    fixture_root = _fixture_root("claude")
+    repo_wide_rule = classify_source_artifact(
+        fixture_root,
+        Path(".claude/rules/repo-wide-policy.md"),
+        SourceEcosystem.CLAUDE,
+    )
+
+    assert repo_wide_rule.conversion_class is ConversionClass.DECOMPOSED
+    assert repo_wide_rule.target_role is TargetRole.STANDING_GUIDANCE
+    assert any("repo-wide" in note.lower() for note in repo_wide_rule.notes)
+
+
+def test_classify_path_scoped_claude_rule_as_shared_skill() -> None:
+    """Map path-scoped Claude rules into shared skills with a decomposition note."""
+
+    fixture_root = _fixture_root("claude")
+    path_scoped_rule = classify_source_artifact(
+        fixture_root,
+        Path(".claude/rules/path-scoped-policy.md"),
+        SourceEcosystem.CLAUDE,
+    )
+
+    assert path_scoped_rule.conversion_class is ConversionClass.DECOMPOSED
+    assert path_scoped_rule.target_role is TargetRole.SHARED_SKILL
+    assert any("path-scoped" in note.lower() for note in path_scoped_rule.notes)
 
 
 def test_classify_github_prompt_templates_as_optional_launcher_artifacts() -> None:
