@@ -2,6 +2,9 @@
 name: Policy requirements are not optional gaps
 description: Never frame skipped policy requirements as "known gaps" or defer them to user opt-in; comply before reporting completion.
 type: feedback
+metadata:
+  type: feedback
+  scope: general
 ---
 
 When repository policy (`.claude/rules/*.md`, `.github/instructions/*.md`) requires something — tests, coverage, toolchain steps, file-size limits — completing the change without satisfying that requirement is a policy violation, not a "known gap" or "follow-up."

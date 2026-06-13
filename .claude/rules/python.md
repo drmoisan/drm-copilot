@@ -88,6 +88,7 @@ Do not introduce generic service-locator patterns or heavy dependency-injection 
 - Line coverage must remain >= 85% across all tiers (T1–T4) per `.claude/rules/quality-tiers.md`.
 - Branch coverage must remain >= 75% across all tiers (T1–T4).
 - Coverage regression on changed lines is a blocking finding.
+- Type-only modules with no executable behavior — for example `Protocol`-only modules consumed only under `TYPE_CHECKING` — may be omitted from coverage measurement. Such modules legitimately report 0% executable coverage. This is a clarification only; it does not lower any coverage threshold.
 
 ## Prohibited Behaviors
 

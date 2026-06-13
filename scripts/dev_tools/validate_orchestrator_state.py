@@ -90,6 +90,128 @@ PROMOTION_RECEIPT_KEYS = (
     "issue",
     "feature_folder",
 )
+REMEDIATION_LOOP_KEY = "remediation_loop"
+REMEDIATION_CYCLES_KEY = "cycles"
+# Execution statuses that may only be recorded once a cycle's preflight gate has
+# cleared; recording any of these before preflight clears is a malformed cycle.
+EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT = {
+    "in_progress",
+    "complete",
+    "failed",
+}
+PREFLIGHT_CLEARED_STATUS = "clear"
+
+
+def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
+    """Validate the three invariants for one remediation cycle.
+
+    Purpose:
+        Enforce the orchestrator-state remediation-cycle invariants documented
+        in `.claude/rules/orchestrator-state.md` for a single cycle object:
+        non-empty `plan_path`, execution only after a cleared preflight, and a
+        satisfied exit gate only with zero blocking findings.
+
+    Args:
+        index (int): Zero-based position of this cycle within the
+            `remediation_loop.cycles` array, used for error context.
+        cycle (dict[str, Any]): The raw cycle object extracted from the
+            checkpoint JSON.
+
+    Returns:
+        list[str]: One error string per violated invariant; an empty list when
+        the cycle satisfies all three invariants.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    errors: list[str] = []
+
+    # Invariant 1: plan_path must be a non-empty, non-whitespace string.
+    plan_path = cycle.get("plan_path")
+    if not isinstance(plan_path, str) or not plan_path.strip():
+        errors.append(
+            f"Checkpoint remediation cycle #{index} plan_path must be a "
+            "non-empty string."
+        )
+
+    # Invariant 2: an execution status in the blocked set requires that the
+    # cycle's preflight gate reports exactly the cleared status.
+    execution_status = cycle.get("execution_status")
+    if execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT:
+        preflight = cycle.get("preflight")
+        # Read the nested preflight final status defensively; a missing or
+        # non-object preflight cannot satisfy the cleared requirement.
+        preflight_status: object = (
+            cast("dict[str, Any]", preflight).get("final_status")
+            if isinstance(preflight, dict)
+            else None
+        )
+        if preflight_status != PREFLIGHT_CLEARED_STATUS:
+            errors.append(
+                f"Checkpoint remediation cycle #{index} execution_status is "
+                f"{execution_status} but preflight.final_status is not 'clear'."
+            )
+
+    # Invariant 3: a satisfied exit gate requires zero blocking findings.
+    if cycle.get("exit_condition_met") is True and cycle.get("blocking_count") != 0:
+        errors.append(
+            f"Checkpoint remediation cycle #{index} exit_condition_met is true "
+            "but blocking_count is not 0."
+        )
+
+    return errors
+
+
+def _validate_remediation_loop(remediation_loop: object) -> list[str]:
+    """Validate the remediation-loop structure and each of its cycles.
+
+    Purpose:
+        Apply the additive remediation-cycle invariants only when a checkpoint
+        carries a `remediation_loop`. When the structure is absent, malformed,
+        or has no cycles, the function produces no errors so existing
+        step-based checkpoints validate unchanged.
+
+    Args:
+        remediation_loop (object): The raw value of the checkpoint's top-level
+            `remediation_loop` key.
+
+    Returns:
+        list[str]: Validation errors collected across all cycles; empty when no
+        cycles are present or the structure carries no cycle objects.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    errors: list[str] = []
+
+    # A non-object remediation_loop carries no cycles to validate; treat it as
+    # nothing to enforce rather than fabricating a structural error here.
+    if not isinstance(remediation_loop, dict):
+        return errors
+    loop_map = cast("dict[str, Any]", remediation_loop)
+
+    cycles = loop_map.get(REMEDIATION_CYCLES_KEY)
+    if not isinstance(cycles, list):
+        return errors
+    cycle_list = cast("list[object]", cycles)
+
+    # Validate each cycle independently so callers receive a complete error
+    # list instead of stopping at the first malformed cycle.
+    for index, cycle in enumerate(cycle_list):
+        if not isinstance(cycle, dict):
+            errors.append(f"Checkpoint remediation cycle #{index} must be an object.")
+            continue
+        errors.extend(_validate_remediation_cycle(index, cast("dict[str, Any]", cycle)))
+
+    return errors
 
 
 def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
@@ -264,6 +386,11 @@ def validate_orchestrator_state_text(
             errors.append(
                 "Checkpoint delegation_receipts must be a list or object namespace."
             )
+
+    # Apply the additive remediation-cycle invariants only when the checkpoint
+    # carries a remediation_loop; absent the key, behavior is unchanged.
+    if REMEDIATION_LOOP_KEY in state_map:
+        errors.extend(_validate_remediation_loop(state_map.get(REMEDIATION_LOOP_KEY)))
 
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into

@@ -331,3 +331,168 @@ def test_validate_orchestrator_state_text_rejects_malformed_json() -> None:
 
     assert len(errors) == 1
     assert errors[0].startswith("Checkpoint is not valid JSON:")
+
+
+def _build_cycle() -> dict[str, object]:
+    """Return a single well-formed remediation cycle for mutation.
+
+    Purpose:
+        Provide a valid cycle so each invariant test can mutate one field at a
+        time without duplicating unrelated cycle setup.
+
+    Args:
+        None.
+
+    Returns:
+        dict[str, object]: A cycle satisfying all three remediation-cycle
+        invariants.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return {
+        "plan_path": "docs/features/active/feature-1/remediation-plan.md",
+        "preflight": {"final_status": "clear"},
+        "execution_status": "complete",
+        "exit_condition_met": True,
+        "blocking_count": 0,
+    }
+
+
+def _state_with_cycle(cycle: dict[str, object]) -> str:
+    """Return checkpoint JSON carrying a single-cycle remediation loop.
+
+    Purpose:
+        Wrap one cycle in an otherwise-valid checkpoint so the public
+        validator exercises the additive remediation-loop branch.
+
+    Args:
+        cycle (dict[str, object]): The cycle object to embed.
+
+    Returns:
+        str: Serialized checkpoint JSON including the cycle.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    state["remediation_loop"] = {"cycles": [cycle]}
+    return json.dumps(state)
+
+
+def test_no_remediation_loop_is_backward_compatible() -> None:
+    """A checkpoint with no remediation_loop validates exactly as before.
+
+    Purpose:
+        Guard the additive change: the pre-change error set for a valid
+        step-based checkpoint must be unchanged when no remediation_loop key is
+        present.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify no errors are produced and no remediation-cycle
+        error text appears.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    assert "remediation_loop" not in state
+
+    errors = state_validator.validate_orchestrator_state_text(json.dumps(state))
+
+    assert errors == []
+    assert not any("remediation cycle" in error for error in errors)
+
+
+def test_remediation_cycle_empty_plan_path_is_rejected() -> None:
+    """A whitespace-only plan_path produces the non-empty-string error."""
+
+    cycle = _build_cycle()
+    cycle["plan_path"] = "   "
+
+    errors = state_validator.validate_orchestrator_state_text(_state_with_cycle(cycle))
+
+    assert any(
+        "remediation cycle #0 plan_path must be a non-empty string" in error
+        for error in errors
+    )
+
+
+def test_remediation_cycle_valid_plan_path_has_no_error() -> None:
+    """A non-empty plan_path produces no plan_path error."""
+
+    errors = state_validator.validate_orchestrator_state_text(
+        _state_with_cycle(_build_cycle())
+    )
+
+    assert not any("plan_path" in error for error in errors)
+
+
+def test_remediation_cycle_execution_without_clear_preflight_is_rejected() -> None:
+    """An in_progress execution with non-clear preflight is rejected."""
+
+    cycle = _build_cycle()
+    cycle["execution_status"] = "in_progress"
+    cycle["preflight"] = {"final_status": "pending"}
+
+    errors = state_validator.validate_orchestrator_state_text(_state_with_cycle(cycle))
+
+    assert any(
+        "execution_status is in_progress but preflight.final_status is not 'clear'"
+        in error
+        for error in errors
+    )
+
+
+def test_remediation_cycle_execution_with_clear_preflight_has_no_error() -> None:
+    """An execution status with a cleared preflight produces no preflight error."""
+
+    cycle = _build_cycle()
+    cycle["execution_status"] = "in_progress"
+    cycle["preflight"] = {"final_status": "clear"}
+
+    errors = state_validator.validate_orchestrator_state_text(_state_with_cycle(cycle))
+
+    assert not any("preflight.final_status" in error for error in errors)
+
+
+def test_remediation_cycle_exit_with_blocking_findings_is_rejected() -> None:
+    """exit_condition_met true with non-zero blocking_count is rejected."""
+
+    cycle = _build_cycle()
+    cycle["exit_condition_met"] = True
+    cycle["blocking_count"] = 2
+
+    errors = state_validator.validate_orchestrator_state_text(_state_with_cycle(cycle))
+
+    assert any(
+        "exit_condition_met is true but blocking_count is not 0" in error
+        for error in errors
+    )
+
+
+def test_remediation_cycle_exit_with_zero_blocking_has_no_error() -> None:
+    """exit_condition_met true with blocking_count 0 produces no exit-gate error."""
+
+    cycle = _build_cycle()
+    cycle["exit_condition_met"] = True
+    cycle["blocking_count"] = 0
+
+    errors = state_validator.validate_orchestrator_state_text(_state_with_cycle(cycle))
+
+    assert not any("blocking_count" in error for error in errors)

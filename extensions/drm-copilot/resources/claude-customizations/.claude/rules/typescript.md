@@ -50,6 +50,7 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - Coverage thresholds follow the uniform tier rule defined in `.claude/rules/quality-tiers.md`: line coverage >= 85% and branch coverage >= 75% across all tiers (T1–T4).
 - Coverage command: `npm run test:coverage` (the script is wired in Prompt B1 alongside the Vitest dependency).
 - Coverage regression on changed lines is a blocking finding.
+- Interface/type-only files with no executable behavior — files consisting solely of `interface` or `type` declarations — may be omitted from coverage measurement. Such files legitimately report 0% executable coverage. This is a clarification only; it does not lower any coverage threshold.
 
 ## Architecture Boundaries
 
