@@ -109,15 +109,15 @@ irrelevant or misleading.
 - [x] An unmarked, missing-frontmatter, malformed, or unrecognized-scope memory is treated as `repo` and not distributed (fail-safe default).
 - [x] Files outside `.claude/agent-memory/` are copied verbatim and are unaffected by the scope filter.
 - [x] The extension template resolves its source root to the bundled `claude-customizations/` directory, aligned with the codex template, and carries the scope filter.
-- [ ] The bundled `.claude/agent-memory` copy contains only `scope: general` memories plus the orchestrator `MEMORY.md` index (which remains `scope: repo` and is never pushed); `orchestrator/feedback_policy_compliance_not_optional.md` is retained as `scope: general`.
-- [ ] Repo-specific memories are physically removed from the bundle and relocated to the root `.claude/agent-memory` folder (gitignored / local-only); the `prd-feature/` and `task-researcher/` agent-memory subdirectories are removed from the bundle entirely.
-- [ ] The resource-contract parity test requires every NON-index bundled agent-memory file to carry `scope: general` and every `MEMORY.md` index to carry `scope: repo`.
+- [x] The bundled `.claude/agent-memory` copy contains only `scope: general` memories plus the orchestrator `MEMORY.md` index (which remains `scope: repo` and is never pushed); `orchestrator/feedback_policy_compliance_not_optional.md` is retained as `scope: general`.
+- [x] Repo-specific memories are physically removed from the bundle and relocated to the root `.claude/agent-memory` folder (gitignored / local-only); the `prd-feature/` and `task-researcher/` agent-memory subdirectories are removed from the bundle entirely.
+- [x] The resource-contract parity test requires every NON-index bundled agent-memory file to carry `scope: general` and every `MEMORY.md` index to carry `scope: repo`.
 - [x] Six domain-neutral orchestration memories are present in the bundle as `scope: general` with repository-neutral wording, referenced by the bundled orchestrator `MEMORY.md`.
 - [x] The orchestrator-state validator rejects a cycle with an empty `plan_path`, an execution status started without a cleared preflight, or an exit marked met while blocking findings remain; a checkpoint with no `remediation_loop` validates unchanged.
 - [x] The orchestrator-state invariants are documented as a prose rule mirrored byte-identically into root and bundle.
 - [x] The type-only / interface-only coverage exemption is documented in the general unit-test rule and the Python, TypeScript, and C# rules, mirrored byte-identically into root and bundle.
 - [x] Root coverage policy is unchanged (85% line / 75% branch, tier system retained); no rejected snapshot artifact is introduced.
-- [ ] Three follow-up GitHub issues are opened for the cross-language items in Decision L.
+- [x] Three follow-up GitHub issues are opened for the cross-language items in Decision L. (#182 new-code delta coverage gate; #183 test-purity hooks TS/C#; #184 batch-budget hooks TS/C#.)
 
 ## Out of Scope
 
