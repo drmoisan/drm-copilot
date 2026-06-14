@@ -44,6 +44,7 @@ Run the toolchain in order: format → lint → type-check → architecture → 
 - Line coverage line >= 85% and branch coverage branch >= 75% uniform across all tiers (T1–T4). No tier-specific lower floor is used.
 - Mutation score mutation >= 75% on T1 modules (via Stryker.NET).
 - Coverage regression on changed lines is a blocking finding.
+- Interface-only files with no executable behavior — files consisting solely of `interface` declarations or abstract contracts — may be omitted from coverage measurement. Such files legitimately report 0% executable coverage. This is a clarification only; it does not lower any coverage threshold.
 
 ### Property-Based and Mutation Testing
 
