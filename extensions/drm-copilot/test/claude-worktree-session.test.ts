@@ -120,6 +120,7 @@ describe("buildWorktreeSessionCommands", () => {
     worktreePath: "/parent/auth-wt-2026-04-20-09-59",
     branchName: "auth-wt-2026-04-20-09-59",
     usePoetry: false,
+    preClaudeScriptPath: undefined,
   };
 
   it("emits a git command that uses git -C <repoRoot> with quoted path and branch", () => {
@@ -241,6 +242,7 @@ describe("buildWorktreeSessionCommands", () => {
       branchName: "feature/o'connor",
       usePoetry: false,
       objective: undefined,
+      preClaudeScriptPath: undefined,
     };
 
     // Act
@@ -252,6 +254,70 @@ describe("buildWorktreeSessionCommands", () => {
     );
     expect(commands.setLocation).toBe(
       "Set-Location '/parent dir/o''connor-wt'",
+    );
+  });
+
+  it("emits preClaude as undefined when preClaudeScriptPath is undefined", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+      preClaudeScriptPath: undefined,
+    });
+
+    // Assert
+    expect(commands.preClaude).toBeUndefined();
+  });
+
+  it("emits preClaude as undefined for an empty preClaudeScriptPath", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+      preClaudeScriptPath: "",
+    });
+
+    // Assert
+    expect(commands.preClaude).toBeUndefined();
+  });
+
+  it("emits preClaude as undefined for a whitespace-only preClaudeScriptPath", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+      preClaudeScriptPath: "   ",
+    });
+
+    // Assert
+    expect(commands.preClaude).toBeUndefined();
+  });
+
+  it("emits a Test-Path-guarded preClaude command for a normal script path", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+      preClaudeScriptPath: ".claude/hooks/pre-claude-session.ps1",
+    });
+
+    // Assert
+    expect(commands.preClaude).toBe(
+      "if (Test-Path -LiteralPath '.claude/hooks/pre-claude-session.ps1') { & '.claude/hooks/pre-claude-session.ps1' }",
+    );
+  });
+
+  it("preserves spaces and doubles apostrophes in the preClaude script path", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+      preClaudeScriptPath: "C:/o'connor dir/pre.ps1",
+    });
+
+    // Assert
+    expect(commands.preClaude).toBe(
+      "if (Test-Path -LiteralPath 'C:/o''connor dir/pre.ps1') { & 'C:/o''connor dir/pre.ps1' }",
     );
   });
 });

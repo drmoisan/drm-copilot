@@ -19,6 +19,12 @@ export interface WorktreeSessionCommandInput {
   readonly branchName: string;
   readonly usePoetry: boolean;
   readonly objective: string | undefined;
+  /**
+   * Worktree-relative path to a PowerShell script to run immediately before
+   * `claude`. When `undefined`, empty, or whitespace-only no pre-`claude`
+   * command is emitted.
+   */
+  readonly preClaudeScriptPath: string | undefined;
 }
 
 /**
@@ -37,6 +43,12 @@ export interface WorktreeSessionCommands {
   readonly setLocation: string;
   readonly poetryInstall: string | undefined;
   readonly activate: string | undefined;
+  /**
+   * Guarded PowerShell command that runs the configured pre-`claude` script
+   * only when it exists in the worktree. Present only when a non-empty script
+   * path is supplied; `undefined` otherwise.
+   */
+  readonly preClaude: string | undefined;
   readonly claude: string;
 }
 
@@ -147,11 +159,26 @@ export function buildWorktreeSessionCommands(
     ? "& './.venv/Scripts/Activate.ps1'"
     : undefined;
 
+  // Guard the pre-`claude` script behind a runtime Test-Path so a missing
+  // script at the configured path does not cause an error. The path is
+  // embedded with the single-quote escaping helper so spaces and apostrophes
+  // are preserved literally. An undefined/empty/whitespace path yields no
+  // command.
+  const trimmedPreClaudePath = input.preClaudeScriptPath?.trim() ?? "";
+  let preClaude: string | undefined;
+  if (trimmedPreClaudePath.length > 0) {
+    const quotedPreClaude = quoteForPwsh(trimmedPreClaudePath);
+    preClaude = `if (Test-Path -LiteralPath ${quotedPreClaude}) { & ${quotedPreClaude} }`;
+  } else {
+    preClaude = undefined;
+  }
+
   return {
     git: `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch}`,
     setLocation: `Set-Location ${quotedPath}`,
     poetryInstall,
     activate,
+    preClaude,
     claude: `claude --dangerously-skip-permissions${objectiveSuffix}`,
   };
 }

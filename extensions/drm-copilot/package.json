@@ -39,6 +39,16 @@
         "label": "drm-copilot Repo Automation"
       }
     ],
+    "configuration": {
+      "title": "drm-copilot",
+      "properties": {
+        "drmCopilotExtension.newClaudeWorktreeSession.preClaudeScriptPath": {
+          "type": "string",
+          "default": ".claude/hooks/pre-claude-session.ps1",
+          "description": "Worktree-relative path to a PowerShell script that the New Claude Worktree Session command runs immediately before 'claude'. The path is resolved relative to the worktree root. A missing script at this path is not an error; the command proceeds to 'claude'."
+        }
+      }
+    },
     "commands": [
       {
         "command": "drmCopilotExtension.helloPython",

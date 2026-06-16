@@ -130,12 +130,18 @@ export function activate(context: vscode.ExtensionContext): void {
       );
       const branchName = buildBranchName(timestamp, repoName);
       const usePoetry = pyprojectHasPoetry(workspaceRoot);
+      const configuredPreClaudeScriptPath =
+        vscode.workspace
+          .getConfiguration("drmCopilotExtension.newClaudeWorktreeSession")
+          .get<string>("preClaudeScriptPath") ??
+        ".claude/hooks/pre-claude-session.ps1";
       const commands = buildWorktreeSessionCommands({
         repoRoot: workspaceRoot,
         worktreePath,
         branchName,
         usePoetry,
         objective,
+        preClaudeScriptPath: configuredPreClaudeScriptPath,
       });
 
       // The terminal must start inside the source repository so that
@@ -165,6 +171,13 @@ export function activate(context: vscode.ExtensionContext): void {
         terminal.sendText(commands.activate, true);
       }
 
+      // Run the configured pre-`claude` script (guarded by a runtime
+      // Test-Path) after the poetry activation step and before the deferred
+      // claude send, so repo-local setup runs immediately before claude.
+      if (commands.preClaude !== undefined) {
+        terminal.sendText(commands.preClaude, true);
+      }
+
       // Defer the final claude command. VS Code's Python extension auto-
       // injects its own venv activation via a deferred terminal.sendText.
       // If we start claude before that injection arrives, claude takes over
@@ -181,8 +194,12 @@ export function activate(context: vscode.ExtensionContext): void {
       const poetryNote = usePoetry
         ? "with poetry install and activation"
         : "no poetry";
+      const preClaudeNote =
+        commands.preClaude !== undefined
+          ? "pre-claude script: emitted"
+          : "pre-claude script: none";
       output.appendLine(
-        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}); claude send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, ${preClaudeNote}); claude send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
       );
     },
   );

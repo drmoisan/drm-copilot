@@ -51,6 +51,20 @@ const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
   dispose: jest.fn(),
 }));
 
+let preClaudeScriptPathConfig: string | undefined = undefined;
+
+const getConfigurationMock = jest.fn((section?: string) => ({
+  get: <T>(key: string): T | undefined => {
+    if (
+      section === "drmCopilotExtension.newClaudeWorktreeSession" &&
+      key === "preClaudeScriptPath"
+    ) {
+      return preClaudeScriptPathConfig as T | undefined;
+    }
+    return undefined;
+  },
+}));
+
 jest.mock(
   "vscode",
   () => ({
@@ -73,6 +87,7 @@ jest.mock(
         return workspaceFoldersState;
       },
       openTextDocument: openTextDocumentMock,
+      getConfiguration: getConfigurationMock,
     },
     Uri: {
       joinPath: jest.fn((base: { fsPath: string }, ...segments: string[]) => ({
@@ -229,6 +244,19 @@ export function setWorkspaceFolders(
   workspaceFoldersState = value;
 }
 
+/**
+ * Controls the value returned by
+ * `vscode.workspace.getConfiguration("drmCopilotExtension.newClaudeWorktreeSession").get<string>("preClaudeScriptPath")`.
+ * Pass `undefined` to simulate the setting being unset (the default reset
+ * state), in which case the handler applies its TypeScript-side default.
+ *
+ * @param value The configured pre-`claude` script path, or `undefined` to
+ *              leave the setting unset.
+ */
+export function setPreClaudeScriptPathConfig(value: string | undefined): void {
+  preClaudeScriptPathConfig = value;
+}
+
 export function resetExtensionHarnessState(): void {
   process.env.PATH = "C:/bin";
   process.env.PATHEXT = ".EXE;.CMD";
@@ -236,6 +264,8 @@ export function resetExtensionHarnessState(): void {
   appendLineMock.mockReset();
   registerCommandMock.mockClear();
   registerMcpServerDefinitionProviderMock.mockClear();
+  getConfigurationMock.mockClear();
+  preClaudeScriptPathConfig = undefined;
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
   fsMock.readFileSync.mockReset();
@@ -312,6 +342,7 @@ export {
   createMockProcess,
   createMockProcessWithStderr,
   createTerminalMock,
+  getConfigurationMock,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
   registerMcpServerDefinitionProviderMock,
