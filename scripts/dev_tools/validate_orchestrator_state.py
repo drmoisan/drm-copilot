@@ -31,6 +31,11 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools._orchestrator_state_human_interaction import (
+    HUMAN_INTERACTION_KEY,
+    _validate_human_interaction,
+)
+
 REQUIRED_STATE_KEYS = (
     "objective",
     "change_budget_estimate",
@@ -391,6 +396,11 @@ def validate_orchestrator_state_text(
     # carries a remediation_loop; absent the key, behavior is unchanged.
     if REMEDIATION_LOOP_KEY in state_map:
         errors.extend(_validate_remediation_loop(state_map.get(REMEDIATION_LOOP_KEY)))
+
+    # Apply the additive human_interaction invariants only when the checkpoint
+    # carries a human_interaction key; absent the key, behavior is unchanged.
+    if HUMAN_INTERACTION_KEY in state_map:
+        errors.extend(_validate_human_interaction(state_map.get(HUMAN_INTERACTION_KEY)))
 
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into
