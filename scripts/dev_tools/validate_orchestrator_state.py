@@ -31,6 +31,11 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools._orchestrator_state_human_interaction import (
+    HUMAN_INTERACTION_KEY,
+    _validate_human_interaction,
+)
+
 REQUIRED_STATE_KEYS = (
     "objective",
     "change_budget_estimate",
@@ -100,90 +105,6 @@ EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT = {
     "failed",
 }
 PREFLIGHT_CLEARED_STATUS = "clear"
-HUMAN_INTERACTION_KEY = "human_interaction"
-HUMAN_INTERACTION_REQUIREMENTS_KEY = "requirements"
-# The three permitted responses for an unautomatable requirement under the
-# autonomous-execution mandate (see `.claude/skills/orchestrate/SKILL.md`).
-HUMAN_INTERACTION_RESPONSE_ENUM = {"scope_change", "exception", "halt"}
-HUMAN_INTERACTION_EXCEPTION_RESPONSE = "exception"
-
-
-def _validate_human_interaction(human_interaction: object) -> list[str]:
-    """Validate the optional ``human_interaction`` block invariants.
-
-    Purpose:
-        Apply the autonomous-execution mandate invariants to the checkpoint's
-        optional top-level ``human_interaction`` object, mirroring the schema
-        invariants documented in `.claude/rules/orchestrator-state.md`. The
-        validator never imports `schemas/orchestrator-state.schema.json`; the
-        invariants are expressed directly here in the existing helper-plus-
-        error-list style.
-
-    Args:
-        human_interaction (object): The raw value of the checkpoint's top-level
-            ``human_interaction`` key. Callers invoke this helper only when the
-            key is present, so a non-object value is itself a malformed block.
-
-    Returns:
-        list[str]: One error string per violated invariant; an empty list when
-        the block is well-formed. The three invariants are: ``requirements`` is
-        present and is a list; each requirement is an object whose ``response``
-        is within the permitted enum; a requirement whose ``response`` is
-        ``exception`` carries a non-empty ``runbook_path`` string.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    errors: list[str] = []
-
-    # A non-object human_interaction cannot carry a requirements list; the key
-    # was present, so this is a malformed block rather than an absent one.
-    if not isinstance(human_interaction, dict):
-        errors.append("Checkpoint human_interaction must be an object when present.")
-        return errors
-    human_interaction_map = cast("dict[str, Any]", human_interaction)
-
-    # Invariant 1: requirements must be present and a list.
-    requirements = human_interaction_map.get(HUMAN_INTERACTION_REQUIREMENTS_KEY)
-    if not isinstance(requirements, list):
-        errors.append("Checkpoint human_interaction.requirements must be a list.")
-        return errors
-    requirement_list = cast("list[object]", requirements)
-
-    # Validate each requirement independently so callers receive a complete
-    # error list instead of stopping at the first malformed requirement.
-    for index, requirement in enumerate(requirement_list):
-        if not isinstance(requirement, dict):
-            errors.append(
-                f"Checkpoint human_interaction.requirements #{index} must be an "
-                "object."
-            )
-            continue
-        requirement_map = cast("dict[str, Any]", requirement)
-
-        # Invariant 2: response must be within the permitted enum.
-        response = requirement_map.get("response")
-        if response not in HUMAN_INTERACTION_RESPONSE_ENUM:
-            errors.append(
-                f"Checkpoint human_interaction.requirements #{index} response "
-                f"must be one of scope_change, exception, halt; got: {response}"
-            )
-            continue
-
-        # Invariant 3: an exception response requires a non-empty runbook_path.
-        if response == HUMAN_INTERACTION_EXCEPTION_RESPONSE:
-            runbook_path = requirement_map.get("runbook_path")
-            if not isinstance(runbook_path, str) or not runbook_path.strip():
-                errors.append(
-                    f"Checkpoint human_interaction.requirements #{index} "
-                    "response is exception but runbook_path is missing or empty."
-                )
-
-    return errors
 
 
 def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:

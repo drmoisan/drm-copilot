@@ -60,9 +60,10 @@ function Get-CheckpointFileContent {
 function Test-HumanInteractionShape {
     <#
     .SYNOPSIS
-        Validates the optional human_interaction sub-object against the schema
-        at .claude/schemas/orchestrator-state.schema.json, enforcing the
-        autonomous-execution mandate at the completion gate.
+        Validates the optional human_interaction sub-object against the
+        invariants documented in .claude/rules/orchestrator-state.md and
+        enforced by scripts/dev_tools/validate_orchestrator_state.py,
+        enforcing the autonomous-execution mandate at the completion gate.
     .DESCRIPTION
         Returns a hashtable with keys:
           - Ok:      $true if the field is absent or every requirement is resolved.
