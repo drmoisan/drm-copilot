@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "mcp-server-v*"
+  workflow_dispatch:
 
 jobs:
   drm-copilot-extension-tests:
@@ -54,6 +55,7 @@ jobs:
         run: npm --prefix packages/mcp-server run build
 
       - name: Publish to npm
+        if: github.event_name == 'push'
         working-directory: packages/mcp-server
         run: npm publish --provenance --access public
         env:
