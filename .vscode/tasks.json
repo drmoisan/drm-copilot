@@ -156,6 +156,16 @@
 			"yes"
 		],
 		"type": "pickString"
+		},
+		{
+		"default": "no",
+		"description": "Confirm full release (bump both manifests, publish extension, push mcp-server tag). Marketplace and npm versions are immutable.",
+		"id": "FullReleaseConfirm",
+		"options": [
+			"no",
+			"yes"
+		],
+		"type": "pickString"
 		}
 	],
 	"tasks": [
@@ -207,6 +217,26 @@
 			"command": "pwsh",
 			"detail": "Bumps patch version, builds, packages, publishes the extension to the VS Code Marketplace, and creates a v<version> git tag. Requires prior 'vsce login DanMoisan'. Marketplace versions are immutable.",
 			"label": "Publish: Marketplace VSIX (patch + tag)",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/dev-tools/Invoke-FullRelease.ps1",
+				"-ConfirmToken",
+				"${input:FullReleaseConfirm}"
+			],
+			"command": "pwsh",
+			"detail": "Patch-bumps both package manifests, publishes the extension to the VS Code Marketplace, and creates and pushes a mcp-server-v<version> git tag to trigger the npm publish workflow. Marketplace and npm versions are immutable.",
+			"label": "Publish: Full Release (bump both + Marketplace + npm tag)",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
