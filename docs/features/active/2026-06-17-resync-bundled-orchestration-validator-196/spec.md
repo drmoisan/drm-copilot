@@ -84,10 +84,10 @@
 - [x] Regression test(s) added and passing (list file path and test name).
 - [x] Edge cases and invalid inputs are handled with correct errors or fallbacks.
 - [x] No unintended behavior changes outside the defined scope.
-- [ ] Required logs/telemetry updated and validated (if applicable).
-- [ ] Performance constraints met or explicitly waived with rationale.
+- [x] Required logs/telemetry updated and validated (if applicable). N/A — the bundled validator emits no logging/telemetry; this change is pure validation-logic propagation with no observability surface.
+- [x] Performance constraints met or explicitly waived with rationale. Waived — the change replaces a monolith with equivalent modular logic invoked per validation call; no measurable performance impact and no performance constraint applies.
 - [x] Full toolchain pass completed (format → lint → type-check → test).
-- [ ] Docs/config references updated to match the new behavior.
+- [x] Docs/config references updated to match the new behavior. N/A — the MCP wrapper template already references `dev_tools.*` correctly and no documentation describes the bundled validator internals; no doc/config reference required changing.
 
 ## Risks & Mitigations
 - Technical or operational risks:
