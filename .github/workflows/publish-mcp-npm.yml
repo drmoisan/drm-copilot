@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "mcp-server-v*"
+  workflow_dispatch:
 
 jobs:
   drm-copilot-extension-tests:
@@ -31,6 +32,9 @@ jobs:
     name: Publish to npm
     needs: drm-copilot-extension-tests
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,7 +55,8 @@ jobs:
         run: npm --prefix packages/mcp-server run build
 
       - name: Publish to npm
+        if: github.event_name == 'push'
         working-directory: packages/mcp-server
-        run: npm publish --access public
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
