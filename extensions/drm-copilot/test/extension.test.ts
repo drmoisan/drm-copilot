@@ -14,14 +14,19 @@ import {
   childProcessMock,
   commandHandlers,
   createMockProcess,
+  createMockProcessWithStderr,
   deactivate,
   detectRuntime,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
+  registerCommandMock,
   resetExtensionHarnessState,
   setExecutablePresence,
   setFreshExecutablePresence,
   setWorkspaceFolders,
+  showWarningMessageMock,
+  showInformationMessageMock,
+  showErrorMessageMock,
 } from "./extension-test-harness";
 
 describe("drm-copilot core command behavior", () => {
@@ -281,6 +286,56 @@ describe("drm-copilot core command behavior", () => {
       jest.dontMock("node:path");
       jest.resetModules();
     }
+  });
+});
+
+describe("drmCopilotExtension.removeSecondaryWorktrees", () => {
+  beforeEach(() => {
+    resetExtensionHarnessState();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("activate registers the command exactly once", () => {
+    activateAndGetHandler("drmCopilotExtension.removeSecondaryWorktrees");
+
+    expect(
+      commandHandlers.has("drmCopilotExtension.removeSecondaryWorktrees"),
+    ).toBe(true);
+    const registrations = registerCommandMock.mock.calls.filter(
+      ([command]) => command === "drmCopilotExtension.removeSecondaryWorktrees",
+    ).length;
+    expect(registrations).toBe(1);
+  });
+
+  it("issues no git command when the confirmation is cancelled", async () => {
+    showWarningMessageMock.mockResolvedValue(undefined);
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.removeSecondaryWorktrees",
+    );
+
+    await handler();
+
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(showInformationMessageMock).not.toHaveBeenCalled();
+  });
+
+  it("surfaces an error when git worktree list exits non-zero", async () => {
+    showWarningMessageMock.mockResolvedValue("Remove All");
+    childProcessMock.spawn.mockReturnValue(
+      createMockProcessWithStderr(128, "fatal: not a git repository"),
+    );
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.removeSecondaryWorktrees",
+    );
+
+    await handler();
+
+    expect(showErrorMessageMock).toHaveBeenCalledTimes(1);
+    const [message] = showErrorMessageMock.mock.calls[0] as [string];
+    expect(message).toContain("Remove Secondary Worktrees failed");
   });
 });
 

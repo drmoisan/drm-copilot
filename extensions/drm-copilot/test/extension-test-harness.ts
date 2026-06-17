@@ -24,6 +24,9 @@ const appendLineMock = jest.fn<(line: string) => void>();
 const showInputBoxMock = jest.fn();
 const showQuickPickMock = jest.fn();
 const showOpenDialogMock = jest.fn();
+const showWarningMessageMock = jest.fn();
+const showInformationMessageMock = jest.fn();
+const showErrorMessageMock = jest.fn();
 const openTextDocumentMock = jest.fn();
 const showTextDocumentMock = jest.fn();
 function buildMockTerminal(): MockTerminal {
@@ -80,6 +83,9 @@ jest.mock(
       showOpenDialog: showOpenDialogMock,
       showInputBox: showInputBoxMock,
       showQuickPick: showQuickPickMock,
+      showWarningMessage: showWarningMessageMock,
+      showInformationMessage: showInformationMessageMock,
+      showErrorMessage: showErrorMessageMock,
       createTerminal: createTerminalMock,
     },
     workspace: {
@@ -273,6 +279,9 @@ export function resetExtensionHarnessState(): void {
   showInputBoxMock.mockReset();
   showQuickPickMock.mockReset();
   showOpenDialogMock.mockReset();
+  showWarningMessageMock.mockReset();
+  showInformationMessageMock.mockReset();
+  showErrorMessageMock.mockReset();
   openTextDocumentMock.mockReset();
   showTextDocumentMock.mockReset();
   createTerminalMock.mockReset();
@@ -345,11 +354,15 @@ export {
   getConfigurationMock,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
+  registerCommandMock,
   registerMcpServerDefinitionProviderMock,
   openTextDocumentMock,
   showInputBoxMock,
   showOpenDialogMock,
   showQuickPickMock,
+  showWarningMessageMock,
+  showInformationMessageMock,
+  showErrorMessageMock,
   showTextDocumentMock,
 };
 

@@ -145,6 +145,10 @@
       {
         "command": "drmCopilotExtension.newClaudeWorktreeSession",
         "title": "drm-copilot: New Claude Worktree Session"
+      },
+      {
+        "command": "drmCopilotExtension.removeSecondaryWorktrees",
+        "title": "drm-copilot: Remove Secondary Worktrees"
       }
     ]
   },
