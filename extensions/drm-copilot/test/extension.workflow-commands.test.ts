@@ -17,6 +17,7 @@ import {
   registerMcpServerDefinitionProviderMock,
   resetExtensionHarnessState,
   setExecutablePresence,
+  setPreClaudeScriptPathConfig,
   setPyprojectFixture,
   setWorkspaceFolders,
   showInputBoxMock,
@@ -426,6 +427,9 @@ describe("drm-copilot workflow command behavior", () => {
       setExecutablePresence({ pwsh: true, powershell: false });
       // No setPyprojectFixture call here means the workspace has no
       // pyproject.toml, so usePoetry resolves to false.
+      // Empty pre-claude path so this test isolates git/Set-Location/claude
+      // ordering without an additional preClaude send.
+      setPreClaudeScriptPathConfig("");
       showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
@@ -500,6 +504,9 @@ describe("drm-copilot workflow command behavior", () => {
       setPyprojectFixture(
         '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n',
       );
+      // Empty pre-claude path so this test isolates the poetry install and
+      // activate ordering without an additional preClaude send.
+      setPreClaudeScriptPathConfig("");
       showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
@@ -543,6 +550,9 @@ describe("drm-copilot workflow command behavior", () => {
       setPyprojectFixture(
         '[project]\nname = "plain"\nversion = "0.1.0"\nrequires-python = ">=3.13"\n',
       );
+      // Empty pre-claude path so this test isolates the no-poetry behavior
+      // without an additional preClaude send.
+      setPreClaudeScriptPathConfig("");
       showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
@@ -567,6 +577,9 @@ describe("drm-copilot workflow command behavior", () => {
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
+      // Empty pre-claude path so this test isolates the blank-objective claude
+      // command without an additional preClaude send.
+      setPreClaudeScriptPathConfig("");
       showInputBoxMock.mockResolvedValueOnce("   ");
 
       const handler = activateAndGetHandler(
@@ -596,6 +609,9 @@ describe("drm-copilot workflow command behavior", () => {
     jest.useFakeTimers();
     try {
       setExecutablePresence({ pwsh: true, powershell: false });
+      // Empty pre-claude path so this deferral guard isolates the git +
+      // Set-Location synchronous sends without an additional preClaude send.
+      setPreClaudeScriptPathConfig("");
       showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
 
       const handler = activateAndGetHandler(
@@ -617,6 +633,152 @@ describe("drm-copilot workflow command behavior", () => {
 
       // At the configured grace boundary, the claude sendText fires.
       jest.advanceTimersByTime(1);
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(claudeCmd).toContain("claude --dangerously-skip-permissions");
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession applies the default pre-claude script path when the setting is unset", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      // No setPreClaudeScriptPathConfig call: the setting is unset, so the
+      // handler applies its TypeScript-side default.
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // No poetry => synchronous order is git, Set-Location, preClaude.
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [preClaudeCmd, preClaudeNewline] = terminal.sendText.mock
+        .calls[2] as [string, boolean];
+      expect(preClaudeNewline).toBe(true);
+      expect(preClaudeCmd).toBe(
+        "if (Test-Path -LiteralPath '.claude/hooks/pre-claude-session.ps1') { & '.claude/hooks/pre-claude-session.ps1' }",
+      );
+
+      jest.advanceTimersByTime(5000);
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession sends preClaude immediately after activate and before the deferred claude when poetry is present", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      setPyprojectFixture(
+        '[tool.poetry]\nname = "drm-copilot"\nversion = "0.1.0"\n',
+      );
+      setPreClaudeScriptPathConfig("scripts/bootstrap.ps1");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // Synchronous order: git, Set-Location, poetry install, activate,
+      // preClaude (five calls). claude is deferred.
+      expect(terminal.sendText).toHaveBeenCalledTimes(5);
+      const [poetryInstallCmd] = terminal.sendText.mock.calls[2] as [string];
+      const [activateCmd] = terminal.sendText.mock.calls[3] as [string];
+      const [preClaudeCmd] = terminal.sendText.mock.calls[4] as [string];
+      expect(poetryInstallCmd).toBe("poetry install --with dev");
+      expect(activateCmd).toBe("& './.venv/Scripts/Activate.ps1'");
+      expect(preClaudeCmd).toBe(
+        "if (Test-Path -LiteralPath 'scripts/bootstrap.ps1') { & 'scripts/bootstrap.ps1' }",
+      );
+
+      jest.advanceTimersByTime(5000);
+
+      // claude is the last call.
+      expect(terminal.sendText).toHaveBeenCalledTimes(6);
+      const [claudeCmd] = terminal.sendText.mock.calls[5] as [string];
+      expect(claudeCmd).toBe(
+        "claude --dangerously-skip-permissions 'Refactor the auth module.'",
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession sends preClaude after Set-Location and before the deferred claude when poetry is absent", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      // No pyproject fixture => no poetry.
+      setPreClaudeScriptPathConfig("scripts/bootstrap.ps1");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // Synchronous order: git, Set-Location, preClaude (three calls).
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [setLocationCmd] = terminal.sendText.mock.calls[1] as [string];
+      const [preClaudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(setLocationCmd).toMatch(/^Set-Location '/);
+      expect(preClaudeCmd).toBe(
+        "if (Test-Path -LiteralPath 'scripts/bootstrap.ps1') { & 'scripts/bootstrap.ps1' }",
+      );
+
+      jest.advanceTimersByTime(5000);
+
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [claudeCmd] = terminal.sendText.mock.calls[3] as [string];
+      expect(claudeCmd).toBe(
+        "claude --dangerously-skip-permissions 'Refactor the auth module.'",
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("newClaudeWorktreeSession sends no extra command when the configured pre-claude path is empty", async () => {
+    jest.useFakeTimers();
+    try {
+      setExecutablePresence({ pwsh: true, powershell: false });
+      // Empty configured path => builder yields preClaude === undefined.
+      setPreClaudeScriptPathConfig("");
+      showInputBoxMock.mockResolvedValueOnce("Refactor the auth module.");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newClaudeWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+
+      // No poetry, no preClaude => only git and Set-Location synchronously.
+      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+
+      jest.advanceTimersByTime(5000);
+
+      // Only the deferred claude send is added; no preClaude send.
       expect(terminal.sendText).toHaveBeenCalledTimes(3);
       const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
       expect(claudeCmd).toContain("claude --dangerously-skip-permissions");

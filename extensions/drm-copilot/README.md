@@ -28,12 +28,44 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.resolveAtomicPlanPrompt`
 - `drmCopilotExtension.syncAgentsFromInstructions`
 - `drmCopilotExtension.listMcpTools`
+- `drmCopilotExtension.newClaudeWorktreeSession`
 
 The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
 
 ## Sync AGENTS.md from Instructions
 
 Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `drmCopilotExtension.syncAgentsFromInstructions`) from the Command Palette to regenerate `AGENTS.md` in the active workspace. The bundled PowerShell script discovers all `.github/instructions/*.instructions.md` files under the active workspace root, aggregates their content in a deterministic order, and writes the consolidated result to `AGENTS.md` at the workspace root. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the workspace's canonical `.github` instruction files.
+
+## New Claude Worktree Session
+
+Use the `drm-copilot: New Claude Worktree Session` command (command ID: `drmCopilotExtension.newClaudeWorktreeSession`) from the Command Palette to open an integrated PowerShell terminal that creates a new git worktree, navigates into it, optionally installs and activates the poetry environment when the workspace declares poetry, and then starts an interactive `claude` session. The command prompts for an optional objective to pass to `claude` as the initial prompt.
+
+### Injecting a pre-`claude` script
+
+The command can run a local PowerShell script in the new worktree immediately before `claude` is started. This lets a repository carry its own pre-session setup (for example, copying machine-local configuration, seeding environment variables, or running a repo-specific bootstrap) in the local repository rather than centrally in the extension.
+
+How it works:
+
+- The script path is read from the `drmCopilotExtension.newClaudeWorktreeSession.preClaudeScriptPath` configuration setting.
+- The default value is `.claude/hooks/pre-claude-session.ps1`, resolved relative to the new worktree root.
+- After the worktree is created, navigated into, and (when applicable) the poetry environment is installed and activated, the command runs the configured script if it exists in the worktree, then starts `claude`.
+- The script runs only when it exists: the command emits a runtime existence guard (`if (Test-Path -LiteralPath '<path>') { & '<path>' }`), so a missing script is not an error and the session proceeds directly to `claude`.
+
+To use the default convention, commit a PowerShell script to the repository at `.claude/hooks/pre-claude-session.ps1`. Because the script lives in the repository, it is present in the new worktree after `git worktree add` and runs automatically on the next worktree session.
+
+To use a different path, set the configuration value in the repository's `.vscode/settings.json` so the setting travels with the local repository:
+
+```json
+{
+  "drmCopilotExtension.newClaudeWorktreeSession.preClaudeScriptPath": ".claude/hooks/my-bootstrap.ps1"
+}
+```
+
+Notes:
+
+- The path is resolved relative to the worktree root and is embedded with PowerShell single-quote escaping, so paths containing spaces or apostrophes are preserved literally.
+- Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; no additional command is sent.
+- The script runs in the worktree's PowerShell session before `claude` takes over the terminal.
 
 ## MCP Server
 
