@@ -29,6 +29,7 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.syncAgentsFromInstructions`
 - `drmCopilotExtension.listMcpTools`
 - `drmCopilotExtension.newClaudeWorktreeSession`
+- `drmCopilotExtension.removeSecondaryWorktrees`
 
 The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
 
@@ -66,6 +67,20 @@ Notes:
 - The path is resolved relative to the worktree root and is embedded with PowerShell single-quote escaping, so paths containing spaces or apostrophes are preserved literally.
 - Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; no additional command is sent.
 - The script runs in the worktree's PowerShell session before `claude` takes over the terminal.
+
+## Remove Secondary Worktrees
+
+Use the `drm-copilot: Remove Secondary Worktrees` command (command ID: `drmCopilotExtension.removeSecondaryWorktrees`) from the Command Palette to remove all secondary git worktrees of the current repository. The primary (main) worktree is never removed.
+
+How it works:
+
+- The command first shows a modal confirmation. It proceeds only when you select "Remove All"; any other choice (including dismissal) cancels the operation without issuing any git command.
+- It enumerates worktrees via `git worktree list --porcelain` and excludes the primary worktree by position (the first reported block), so the primary is never selected for removal.
+- Each secondary worktree is removed with NON-force `git worktree remove <path>`. The `--force` option is never used, so a worktree that cannot be fully removed (for example, one with modified or untracked files) fails the removal cleanly and is left intact rather than partially deleted.
+- Locked worktrees and prunable worktrees (those whose working directory is missing on disk) are skipped with a reason and left intact; no removal is attempted for them.
+- `git worktree prune` is not invoked automatically. Prunable worktrees are reported as skipped rather than pruned.
+- A worktree that cannot be removed does not abort the operation; the command continues with the remaining worktrees.
+- Removed and skipped outcomes (with reasons) are written to the `drm-copilot` output channel. A summary notification is shown when the command completes: an information message when everything was removed or no secondary worktrees were found, and a warning message when one or more worktrees were skipped.
 
 ## MCP Server
 

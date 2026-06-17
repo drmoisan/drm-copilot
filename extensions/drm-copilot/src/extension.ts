@@ -21,6 +21,11 @@ import {
 } from "./extension-command-helpers";
 import { registerMcpProvider } from "./mcp-provider";
 import { registerPoshQcCommands } from "./poshqc-command-registration";
+import { buildRemovalSummaryMessage } from "./remove-worktrees";
+import {
+  createGitRunner,
+  removeAllSecondaryWorktrees,
+} from "./remove-worktrees-runner";
 import { createRepoAutomationService } from "./repo-automation-service";
 import { registerRepoAutomationCommands } from "./repo-automation-command-registration";
 import { resolveRunPoshQCSuiteInvocation } from "./workflow-command-arguments";
@@ -204,6 +209,45 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const removeSecondaryWorktreesDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.removeSecondaryWorktrees",
+    async () => {
+      const commandId = "drmCopilotExtension.removeSecondaryWorktrees";
+      try {
+        const workspaceRoot = getWorkspaceRoot();
+
+        const confirmation = await vscode.window.showWarningMessage(
+          "Remove all secondary git worktrees? This action removes each secondary worktree directory.",
+          { modal: true },
+          "Remove All",
+        );
+        if (confirmation !== "Remove All") {
+          return;
+        }
+
+        const summary = await removeAllSecondaryWorktrees(
+          workspaceRoot,
+          createGitRunner(),
+          output,
+        );
+        const message = buildRemovalSummaryMessage(summary);
+        output.appendLine(`[${commandId}] ${message}`);
+        if (summary.skipped.length > 0) {
+          await vscode.window.showWarningMessage(message);
+        } else {
+          await vscode.window.showInformationMessage(message);
+        }
+      } catch (error: unknown) {
+        const detail =
+          error instanceof Error ? error.message : "Unknown error.";
+        output.appendLine(`[${commandId}] failed: ${detail}`);
+        await vscode.window.showErrorMessage(
+          `Remove Secondary Worktrees failed: ${detail}`,
+        );
+      }
+    },
+  );
+
   const runPoshQCSuiteDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.runPoshQCSuite",
     async (...rawArgs: unknown[]) => {
@@ -277,6 +321,7 @@ export function activate(context: vscode.ExtensionContext): void {
     helloPythonDisposable,
     helloPowerShellDisposable,
     newClaudeWorktreeSessionDisposable,
+    removeSecondaryWorktreesDisposable,
     runPoshQCSuiteDisposable,
     runPoshQCFormatDisposable,
     runPoshQCAnalyzeDisposable,
