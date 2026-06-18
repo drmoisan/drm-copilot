@@ -55,27 +55,21 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
         }
 
-        It "is case-sensitive: ConfirmToken 'YES' is rejected with code 2" {
+        # A non-case CaseLabel is included in the It name so the two -ForEach
+        # cases produce names that differ by something other than letter case.
+        # The VS Code Pester adapter folds discovered test IDs to uppercase
+        # during static discovery; without the label, "YES" and "Yes" would
+        # collide to a single uppercased ID and the duplicate would be dropped.
+        It "is case-sensitive: ConfirmToken '<ConfirmToken>' (<CaseLabel>) is rejected with code 2" -ForEach @(
+            @{ ConfirmToken = "YES"; CaseLabel = "uppercase" }
+            @{ ConfirmToken = "Yes"; CaseLabel = "titlecase" }
+        ) {
             Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
             Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
             Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; throw "publish script should not be invoked" }
             Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
 
-            $result = Invoke-FullReleaseGuarded -ConfirmToken "YES" -RepoRoot "/repo"
-
-            $result | Should -Be 2
-            Should -Invoke -CommandName Invoke-NpmExe -Times 0 -Exactly
-            Should -Invoke -CommandName Invoke-PublishScript -Times 0 -Exactly
-            Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
-        }
-
-        It "is case-sensitive: ConfirmToken 'Yes' is rejected with code 2" {
-            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
-            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
-            Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; throw "publish script should not be invoked" }
-            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
-
-            $result = Invoke-FullReleaseGuarded -ConfirmToken "Yes" -RepoRoot "/repo"
+            $result = Invoke-FullReleaseGuarded -ConfirmToken $ConfirmToken -RepoRoot "/repo"
 
             $result | Should -Be 2
             Should -Invoke -CommandName Invoke-NpmExe -Times 0 -Exactly
