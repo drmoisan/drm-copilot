@@ -1,13 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite GitHub Copilot instruction-directory references to the native skill root.
-- Rewrite Claude rule paths to shared skill paths.
-- Rewrite Claude rules-directory references to the native skill root.
-
 ---
 name: policy-compliance-order
 description: 'Repository policy compliance order and hard constraints. Use when an agent must read mandatory policy files, apply repo-wide constraints, or restate policy precedence without duplicating blocks across agents.'

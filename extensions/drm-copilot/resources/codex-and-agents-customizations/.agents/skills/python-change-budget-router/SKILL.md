@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: python-change-budget-router
 description: Budget-first routing and batch-scope contract for Python work. Estimate production-file scope, choose small vs large path, enforce the 3 production + 3 test per-batch cap, and halt the agent for scope expansion approval when the estimate exceeds the budget.
@@ -64,7 +59,7 @@ If `python-typed-engineer` is invoked directly and estimated scope is `>3` produ
 
 When routed through the orchestrator, the small path still requires lifecycle scaffolding before implementation:
 
-- invoke promotion and folder lifecycle steps through `vscode/runCommand` and extension access per `feature-promotion-lifecycle` when available. Use script or CLI fallback only when direct extension command execution is unavailable.
+- invoke promotion and folder lifecycle steps through the `drm-copilot` MCP tools required by `repo-automation-adapter`. If the MCP server or required tool is unavailable, stop before promotion.
 - promote the potential item to a GitHub issue with `--work-mode minor-audit`,
 - create the active feature folder with `--work-mode minor-audit`,
 - delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,

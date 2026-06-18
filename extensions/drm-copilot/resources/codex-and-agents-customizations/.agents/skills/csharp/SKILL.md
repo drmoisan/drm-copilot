@@ -1,9 +1,5 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: csharp
 paths:
   - "**/*.cs"
   - "**/*.csproj"

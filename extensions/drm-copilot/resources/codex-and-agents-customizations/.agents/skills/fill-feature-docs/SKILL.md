@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: fill-feature-docs
 description: Invoke the prd-feature worker to produce feature-document outputs from issue and research inputs.

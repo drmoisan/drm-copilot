@@ -1,9 +1,5 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite Claude skill-directory references to the native skill root.
-
 ---
+name: typescript
 paths:
   - "**/*.ts"
 description: TypeScript-specific toolchain and coding standards.

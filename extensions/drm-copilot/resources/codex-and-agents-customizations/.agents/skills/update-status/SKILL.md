@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: update-status
 description: Invoke the status-updater worker to reconcile status artifacts and synchronized status outputs.

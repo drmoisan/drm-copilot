@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: review-feature
 description: Invoke the feature-review worker to produce feature-audit artifacts for an active feature folder.

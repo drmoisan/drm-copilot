@@ -1,9 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude rule paths to shared skill paths.
-
 ---
 name: powershell-qa-gate
 description: Final QA gate for PowerShell changes. Executes the full PoshQC format -> analyze -> test toolchain (with coverage where enforced), compares against a captured baseline, enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.

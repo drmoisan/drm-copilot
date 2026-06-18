@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: powershell-orchestration-state-machine
 description: Checkpoint schema and resume protocol for long-running PowerShell orchestration workflows.

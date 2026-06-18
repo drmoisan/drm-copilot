@@ -1,137 +1,52 @@
-# Review and merge native MCP, hook, and approval settings intentionally.
+default_permissions = "orchestrator-workspace"
 
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "agent": "orchestrator",
-  "permissions": {
-    "allow": [
-      "Bash(git *)",
-      "Bash(poetry run *)",
-      "Bash(pwsh *)",
-      "Read",
-      "Edit(/docs/**)",
-      "Write(/docs/**)",
-      "Write(/artifacts/**)",
-      "mcp__drm-copilot__run_poshqc_format",
-      "mcp__drm-copilot__run_poshqc_analyze",
-      "mcp__drm-copilot__run_poshqc_test",
-      "mcp__drm-copilot__run_poshqc_analyze_autofix",
-      "mcp__drm-copilot__resolve_execute_hard_lock_prompt",
-      "mcp__drm-copilot__collect_pr_context",
-      "mcp__drm-copilot__new_potential_entry",
-      "mcp__drm-copilot__new_potential_bug_entry",
-      "mcp__drm-copilot__potential_to_issue",
-      "mcp__drm-copilot__new_active_feature_folder",
-      "mcp__drm-copilot__validate_orchestration_artifacts",
-      "mcp__drm-copilot__resolve_atomic_plan_prompt",
-      "Agent(atomic-planner)",
-      "Agent(atomic-executor)",
-      "Agent(feature-review)",
-      "Agent(task-researcher)",
-      "Agent(prd-feature)",
-      "Agent(staged-review)",
-      "Agent(epic-review)",
-      "Agent(status-updater)",
-      "Agent(python-typed-engineer)",
-      "Agent(powershell-typed-engineer)",
-      "Agent(csharp-typed-engineer)",
-      "Agent(typescript-engineer)",
-      "Skill(orchestrate *)",
-      "Skill(commit-message *)",
-      "Skill(pr-author *)",
-      "Skill(research-issue *)",
-      "Skill(review-feature *)",
-      "Skill(review-staged *)",
-      "Skill(review-epic *)",
-      "Skill(update-status *)",
-      "Skill(fill-feature-docs *)",
-      "Skill(python-change-budget-router *)",
-      "Skill(python-qa-gate *)",
-      "Skill(invoke-python-engineer *)",
-      "Skill(powershell-change-budget-router *)",
-      "Skill(powershell-qa-gate *)",
-      "Skill(invoke-powershell-engineer *)",
-      "Skill(translate-copilot-to-claude *)",
-      "Skill(execute-hard-lock *)",
-      "Edit(/.agents/skills/execute-hard-lock/**)",
-      "Edit(/.agents/skills/feature-review-workflow/**)",
-      "Edit(/.agents/skills/csharp-qa-gate/**)"
-    ],
-    "deny": [
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./secrets/**)",
-      "Edit(./secrets/**)",
-      "Write(./secrets/**)"
-    ],
-    "additionalDirectories": [
-      "c:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\skills\\execute-hard-lock"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/validate-bash.ps1"
-          },
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/enforce-promotion-mcp-only.ps1"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/check-python-test-purity.ps1"
-          },
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/enforce-python-batch-budget.ps1"
-          },
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/check-powershell-test-purity.ps1"
-          },
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/enforce-powershell-batch-budget.ps1"
-          },
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/enforce-evidence-locations.ps1"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -Command \"$input = $env:CLAUDE_HOOK_INPUT | ConvertFrom-Json; $output = $input.output; if (-not ($output -match '(plan-path|research-path|review-artifact|PREFLIGHT|evidence/)')) { Write-Error 'Subagent stopped without required completion artifact path'; exit 1 }; exit 0\""
-          }
-        ]
-      },
-      {
-        "matcher": "feature-review",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "pwsh -NoProfile -File .codex/hooks/validate-feature-review-coverage.ps1"
-          }
-        ]
-      }
-    ]
-  },
-  "enabledPlugins": {
-    "skill-creator@claude-plugins-official": true
-  },
-  "defaultPermissionMode": "bypassPermissions"
-}
+[mcp_servers.drm-copilot]
+command = "npx"
+args = ["-y", "@danmoisan/drm-copilot-mcp"]
+required = true
+enabled_tools = [
+    "collect_commit_context",
+    "collect_pr_context",
+    "new_potential_entry",
+    "new_potential_bug_entry",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "validate_orchestration_artifacts",
+    "resolve_atomic_plan_prompt",
+    "resolve_execute_hard_lock_prompt",
+    "run_poshqc_format",
+    "run_poshqc_analyze",
+    "run_poshqc_analyze_autofix",
+    "run_poshqc_test",
+]
+default_tools_approval_mode = "prompt"
+
+[mcp_servers.drm-copilot.tools.validate_orchestration_artifacts]
+approval_mode = "approve"
+
+[features]
+multi_agent = true
+
+[permissions.orchestrator-workspace]
+description = "Workspace editing for deterministic orchestration with secret-path deny rules."
+extends = ":workspace"
+
+[permissions.orchestrator-workspace.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.orchestrator-workspace.filesystem.":workspace_roots"]
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"secrets" = "deny"
+"secrets/**" = "deny"
+
+[permissions.orchestrator-workspace.network]
+enabled = true
+
+[permissions.orchestrator-workspace.network.domains]
+"github.com" = "allow"
+"api.github.com" = "allow"
+"objects.githubusercontent.com" = "allow"
+"registry.npmjs.org" = "allow"
+"pypi.org" = "allow"
+"files.pythonhosted.org" = "allow"

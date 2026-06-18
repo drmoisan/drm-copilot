@@ -1,12 +1,8 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: python-suppressions
 paths:
   - "**/*.py"
-description: Pre-authorized Python Ruff and Pyright suppression patterns. Applies to Python files.
+description: Python suppression policy for linting and type-checking exceptions.
 ---
 
 # Python Suppression Policy

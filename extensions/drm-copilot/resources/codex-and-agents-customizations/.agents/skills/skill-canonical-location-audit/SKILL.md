@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite Claude skill-directory references to the native skill root.
-
 ---
 name: skill-canonical-location-audit
 description: 'Audit skills for canonical-location duplication. Use when ensuring a canonical location for a given item is defined in exactly one skill and duplicates are flagged.'

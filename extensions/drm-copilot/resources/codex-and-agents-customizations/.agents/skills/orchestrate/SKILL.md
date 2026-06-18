@@ -1,10 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude rules-directory references to the native skill root.
-
 ---
 name: orchestrate
 description: Route a repository request through the deterministic orchestration workflow for feature, bug, research, planning, execution, and review handoffs.
@@ -30,6 +23,64 @@ On every invocation, the main session must:
 1. Read `artifacts/orchestration/orchestrator-state.json` to check for existing state.
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
+4. Read `config/orchestration-routing.json` before route selection and copy the
+   selected route's required agents, skills, and MCP tools into checkpoint
+   state.
+
+## Hard Enforcement Boundary
+
+The hard completion boundary for Codex orchestration is the deterministic
+orchestrator-state validator exposed through the `drm-copilot` MCP server, not
+a Codex lifecycle hook. Before any DONE transition, PR creation gate, or final
+completion report, the orchestrator must validate the canonical checkpoint with
+`validate_orchestration_artifacts` on the `drm-copilot` MCP server using
+`artifact_type: "orchestrator-state"`,
+`artifact_path: "artifacts/orchestration/orchestrator-state.json"`, and
+`require_complete: true`.
+
+There is no fallback. If the MCP server or validation tool is unavailable, or
+if validation fails, the orchestrator must update blocked state and stop rather
+than reporting completion.
+
+The repository CI gate `Orchestrator State Gate` runs the same validator when a
+checkpoint is present. Branch protection should require this check for branches
+that use orchestrated completion.
+
+Completion validation requires the checkpoint to prove mandatory handoffs and
+skill use. The checkpoint must include:
+
+- `route_id`: the selected route key from `config/orchestration-routing.json`
+- `required_agents`: exactly the selected route's `required_agents`
+- `required_skills`: exactly the selected route's `required_skills`
+- `required_mcp_tools`: exactly the selected route's `required_mcp_tools`
+- `delegation_receipts`: one receipt for each required agent
+- `skill_receipts`: one required receipt for each required skill, with evidence
+- `mcp_call_receipts`: one successful receipt for each required MCP tool
+- `local_execution_overrides`: an empty list at completion
+- `delegation_bypasses`: an empty list at completion
+- `lifecycle_operations`: any lifecycle operation must record `surface: "mcp"`
+
+If any required handoff, skill receipt, MCP receipt, or empty bypass list is
+missing, `validate_orchestration_artifacts --require-complete` fails and the
+orchestrator must not report DONE.
+
+## Autonomous-Execution Mandate
+
+The orchestrator must achieve all actions agentically with no unrecorded manual
+dependency. Every unautomatable requirement must be detected early, resolved by
+exactly one of the permitted responses below, and recorded in checkpoint state
+under `human_interaction.requirements[]`.
+
+Permitted responses:
+
+- `scope_change`: change scope to remove the manual dependency.
+- `exception`: permit an exception only when a runbook exists and its path is
+  recorded in `runbook_path`.
+- `halt`: halt until further instruction. A `halt` blocks DONE while present.
+
+The checkpoint validator enforces the `human_interaction` invariants. An
+unresolved response, invalid response value, `halt`, or exception without an
+existing runbook path blocks completion.
 
 ## Delegation Model
 
@@ -38,10 +89,35 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `atomic-planner` — generates phased implementation plans
 - `atomic-executor` — executes approved plans task-by-task
 - `feature-review` — produces policy, code, and feature audit artifacts
-- `commit-steward` — writes commit messages from commit-context artifacts
 - `task-researcher` — performs deep research and writes findings to `artifacts/research/`
+- `prd-feature` — produces issue, specification, and user-story artifacts when required by the selected workflow
+- `staged-review` — reviews staged changes when a pre-commit review is required
+- `epic-review` — reviews epic-level artifacts when the work item is an epic
+- `status-updater` — produces status update artifacts when the workflow requires status synchronization
+- `python-typed-engineer` — performs delegated Python implementation work
+- `powershell-typed-engineer` — performs delegated PowerShell implementation work
+- `csharp-typed-engineer` — performs delegated C# implementation work
+- `typescript-engineer` — performs delegated TypeScript implementation work
+- `commit-steward` — writes commit messages from commit-context artifacts
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
+
+Every worker listed above must exist as a native Codex agent under `.codex/agents/`.
+For required delegated steps, missing agent configuration, failed spawn, missing
+receipt, or missing required artifact output is a hard block. The orchestrator
+must persist blocked state and stop rather than performing that step locally.
+
+Every required skill listed in the selected route must be acknowledged in
+`skill_receipts[]` with:
+
+- `skill`
+- `required: true`
+- `acknowledged_at_phase`
+- `evidence`
+
+The evidence value must point to objective evidence: a checkpoint field, MCP
+receipt, artifact path, validator output, or test result. A bare narrative
+statement is not sufficient.
 
 ## Evidence Location Authority
 
@@ -66,6 +142,7 @@ The orchestrator must not report completion until:
 1. All required artifacts for the selected workflow path are present on disk.
 2. All validation gates (toolchain, acceptance criteria, audit artifacts) have passed.
 3. The checkpoint file at `artifacts/orchestration/orchestrator-state.json` reflects the completed state.
+4. The orchestrator-state validator passes with `--require-complete`.
 
 ## Pre-Feature-Review Commit
 
@@ -111,6 +188,13 @@ Every delegation prompt to `atomic-planner`, `atomic-executor`, and `feature-rev
 
 If a subagent artifact references a different issue number, the orchestrator rejects it, requests correction, and records the discrepancy under `artifact_errors` in the checkpoint.
 
+## CI Green Gate
+
+Before PR/DONE completion, the orchestrator must observe the live PR head SHA
+and required GitHub checks through `gh`. The checkpoint must record the checked
+head SHA and CI result. DONE is blocked unless the required checks pass for the
+current PR head SHA.
+
 ## PR Creation Gate
 
 The orchestrator must not create a PR, push a branch for PR purposes, or report work complete until all four conditions are simultaneously true:
@@ -120,6 +204,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr`.
+5. The required CI checks pass for the current PR head SHA.
 
 This gate is non-negotiable. Each condition is independently verified before PR creation proceeds.
 

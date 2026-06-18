@@ -1,9 +1,5 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: python
 paths:
   - "**/*.py"
 description: Python-specific toolchain and coding standards.

@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite Claude skill paths to shared skill paths.
-
 ---
 name: python-qa-gate
 description: Final QA gate for Python changes. Executes the full Black -> Ruff -> Pyright -> Pytest toolchain, compares against a captured baseline, enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
