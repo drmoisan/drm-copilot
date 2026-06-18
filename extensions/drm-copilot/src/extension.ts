@@ -7,6 +7,7 @@ import {
   buildWorktreeSessionCommands,
   formatWorktreeTimestamp,
 } from "./claude-worktree-session";
+import { buildCodexWorktreeSessionCommands } from "./codex-worktree-session";
 import {
   createOutputChannel,
   detectRuntime,
@@ -209,6 +210,86 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
+  const newCodexWorktreeSessionDisposable = vscode.commands.registerCommand(
+    "drmCopilotExtension.newCodexWorktreeSession",
+    async () => {
+      const commandId = "drmCopilotExtension.newCodexWorktreeSession";
+
+      const objective = await vscode.window.showInputBox({
+        title: "drm-copilot: New Codex Worktree Session",
+        prompt:
+          "Enter the objective to pass to codex as a prompt. Leave blank to skip.",
+        ignoreFocusOut: true,
+      });
+      if (objective === undefined) {
+        return;
+      }
+
+      const runtime = detectRuntime("powershell");
+      const workspaceRoot = getWorkspaceRoot();
+      const repoName = path.basename(workspaceRoot);
+      const workspaceParent = path.dirname(workspaceRoot);
+      const timestamp = formatWorktreeTimestamp(new Date());
+      const worktreePath = buildWorktreePath(
+        workspaceParent,
+        timestamp,
+        repoName,
+      );
+      const branchName = buildBranchName(timestamp, repoName);
+      const usePoetry = pyprojectHasPoetry(workspaceRoot);
+      const configuredPostCodexScriptPath =
+        vscode.workspace
+          .getConfiguration("drmCopilotExtension.newCodexWorktreeSession")
+          .get<string>("postCodexScriptPath") ??
+        ".codex/scripts/post-codex-worktree-session.ps1";
+      const commands = buildCodexWorktreeSessionCommands({
+        repoRoot: workspaceRoot,
+        worktreePath,
+        branchName,
+        usePoetry,
+        objective,
+        postCodexScriptPath: configuredPostCodexScriptPath,
+      });
+
+      const terminal = vscode.window.createTerminal({
+        name: `Codex: ${branchName}`,
+        cwd: workspaceRoot,
+        shellPath: runtime.executable,
+        shellArgs: ["-NoLogo"],
+      });
+      terminal.show();
+
+      terminal.sendText(commands.git, true);
+      terminal.sendText(commands.setLocation, true);
+      terminal.sendText(commands.trustCodexProject, true);
+      if (commands.poetryInstall !== undefined) {
+        terminal.sendText(commands.poetryInstall, true);
+      }
+      if (commands.activate !== undefined) {
+        terminal.sendText(commands.activate, true);
+      }
+      if (commands.postCodex !== undefined) {
+        terminal.sendText(commands.postCodex, true);
+      }
+
+      setTimeout(() => {
+        terminal.sendText(commands.codex, true);
+      }, TERMINAL_AUTO_ACTIVATION_GRACE_MS);
+
+      const objectiveLength = objective.trim().length;
+      const poetryNote = usePoetry
+        ? "with poetry install and activation"
+        : "no poetry";
+      const postCodexNote =
+        commands.postCodex !== undefined
+          ? "post-codex script: emitted"
+          : "post-codex script: none";
+      output.appendLine(
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, trust command: emitted, ${postCodexNote}); codex send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+      );
+    },
+  );
+
   const removeSecondaryWorktreesDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.removeSecondaryWorktrees",
     async () => {
@@ -321,6 +402,7 @@ export function activate(context: vscode.ExtensionContext): void {
     helloPythonDisposable,
     helloPowerShellDisposable,
     newClaudeWorktreeSessionDisposable,
+    newCodexWorktreeSessionDisposable,
     removeSecondaryWorktreesDisposable,
     runPoshQCSuiteDisposable,
     runPoshQCFormatDisposable,

@@ -46,6 +46,11 @@
           "type": "string",
           "default": ".claude/hooks/pre-claude-session.ps1",
           "description": "Worktree-relative path to a PowerShell script that the New Claude Worktree Session command runs immediately before 'claude'. The path is resolved relative to the worktree root. A missing script at this path is not an error; the command proceeds to 'claude'."
+        },
+        "drmCopilotExtension.newCodexWorktreeSession.postCodexScriptPath": {
+          "type": "string",
+          "default": ".codex/scripts/post-codex-worktree-session.ps1",
+          "description": "Worktree-relative path to a PowerShell script that the New Codex Worktree Session command runs after adding the worktree to Codex trusted projects and before starting 'codex'. The path is resolved relative to the worktree root. A missing script at this path is not an error; the command proceeds to 'codex'."
         }
       }
     },
@@ -145,6 +150,10 @@
       {
         "command": "drmCopilotExtension.newClaudeWorktreeSession",
         "title": "drm-copilot: New Claude Worktree Session"
+      },
+      {
+        "command": "drmCopilotExtension.newCodexWorktreeSession",
+        "title": "drm-copilot: New Codex Worktree Session"
       },
       {
         "command": "drmCopilotExtension.removeSecondaryWorktrees",
