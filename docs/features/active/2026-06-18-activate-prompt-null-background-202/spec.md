@@ -67,11 +67,11 @@ Logs / Screenshots:
 - Manual validation: in the VS Code Test Explorer, the `activate.Tests.ps1` items pass after reload.
 
 ## Acceptance Criteria
-- [ ] AC1: `Get-VenvAwarePrompt -BackgroundColor $null` returns the uncolored prompt and does not throw.
-- [ ] AC2: A valid background color is unchanged in behavior (dark -> green-wrapped, light/non-dark -> plain).
-- [ ] AC3: A deterministic regression test for the null-background case exists and passes without depending on the ambient host.
-- [ ] AC4: `tests/scripts/dev-tools/activate.Tests.ps1` passes in full (no failures).
-- [ ] AC5: Full PowerShell toolchain passes (format -> analyze -> test) with zero new findings.
+- [x] AC1: `Get-VenvAwarePrompt -BackgroundColor $null` returns the uncolored prompt and does not throw.
+- [x] AC2: A valid background color is unchanged in behavior (dark -> green-wrapped, light/non-dark -> plain).
+- [x] AC3: A deterministic regression test for the null-background case exists and passes without depending on the ambient host.
+- [x] AC4: `tests/scripts/dev-tools/activate.Tests.ps1` passes in full (no failures).
+- [x] AC5: Full PowerShell toolchain passes (format -> analyze -> test) with zero new findings.
 - [ ] AC6: CI required checks are green on the PR head.
 
 ## Risks & Mitigations
