@@ -72,7 +72,7 @@ Logs / Screenshots:
 - [x] AC3: A deterministic regression test for the null-background case exists and passes without depending on the ambient host.
 - [x] AC4: `tests/scripts/dev-tools/activate.Tests.ps1` passes in full (no failures).
 - [x] AC5: Full PowerShell toolchain passes (format -> analyze -> test) with zero new findings.
-- [ ] AC6: CI required checks are green on the PR head.
+- [x] AC6: CI required checks are green on the PR head. Verified: 11/11 required checks pass on head 3fe3b21 (run 27763492993; PowerShell QC passed after re-running a transient NuGet tooling-install flake).
 
 ## Risks & Mitigations
 - Risk: a host reporting a non-null but invalid background (for example integer -1) would still fail. Mitigation: out of scope for the observed defect (null); the guard covers the reported condition. A follow-up can normalize other invalid values if observed.
