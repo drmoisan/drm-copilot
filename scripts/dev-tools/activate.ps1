@@ -263,7 +263,10 @@ function Get-VenvAwarePrompt {
     .PARAMETER BackgroundColor
         The console background color used to decide whether to render the prompt in
         green. Supplied by the shim from $Host.UI.RawUI.BackgroundColor so this
-        pure function performs no host access.
+        pure function performs no host access. May be $null when the host does not
+        expose a console background (for example a non-interactive or redirected
+        host such as the VS Code Pester test adapter); a null background is treated
+        as unknown and the prompt is rendered without color.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -277,8 +280,9 @@ function Get-VenvAwarePrompt {
         [AllowNull()]
         [string] $VenvEnv,
 
-        [Parameter(Mandatory)]
-        [System.ConsoleColor] $BackgroundColor
+        [Parameter()]
+        [AllowNull()]
+        [System.Nullable[System.ConsoleColor]] $BackgroundColor
     )
 
     if ([string]::IsNullOrEmpty($VenvEnv)) {
@@ -289,7 +293,17 @@ function Get-VenvAwarePrompt {
         $promptText = Get-RepoRelativePrompt -CurrentPath $CurrentPath -VenvRoot $venvRoot
     }
 
-    $isDark = Test-IsDarkBackground -BackgroundColor $BackgroundColor
+    # A host that does not expose a console background (for example a
+    # non-interactive or redirected host such as the VS Code Pester test adapter)
+    # reports a null background color. Treat an unknown background as not-dark so
+    # the prompt renders without color instead of failing to bind a null into the
+    # non-nullable dark-background predicate.
+    $isDark = if ($null -ne $BackgroundColor) {
+        Test-IsDarkBackground -BackgroundColor $BackgroundColor
+    }
+    else {
+        $false
+    }
     return Get-ColorizedPrompt -PromptText $promptText -IsDarkBackground $isDark
 }
 

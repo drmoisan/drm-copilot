@@ -218,6 +218,18 @@ Describe 'Get-VenvAwarePrompt (prompt decision used by the shim)' {
             -BackgroundColor ([System.ConsoleColor]::Black) |
             Should -Be "$script:Green(mix-calculator)> $script:Reset"
     }
+
+    It 'renders the prompt uncolored when the host background is null (Test Explorer host parity)' {
+        # A non-interactive or redirected host (for example the VS Code Pester
+        # test adapter) reports a null console background. The pure function must
+        # accept null and render the prompt without color rather than failing to
+        # bind, so the installed shim does not throw when
+        # $Host.UI.RawUI.BackgroundColor is null. Deterministic: the null value is
+        # supplied explicitly and does not depend on the ambient host.
+        Get-VenvAwarePrompt -CurrentPath 'C:\repo\mix-calculator' -VenvEnv 'C:\repo\mix-calculator\.venv' `
+            -BackgroundColor $null |
+            Should -Be '(mix-calculator)> '
+    }
 }
 
 Describe 'Resolve-RepoRoot (depth-robust ancestor walk)' {
