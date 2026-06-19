@@ -1,16 +1,6 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: research-issue
 description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to artifacts/research/.
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-  - WebFetch
 ---
 
 # Research Issue Skill

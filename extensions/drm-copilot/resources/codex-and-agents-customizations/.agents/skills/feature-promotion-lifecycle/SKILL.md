@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: feature-promotion-lifecycle
 description: Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. Agent sessions must use the drm-copilot MCP tool surface and record raw promotion receipts under the canonical checkpoint namespace.

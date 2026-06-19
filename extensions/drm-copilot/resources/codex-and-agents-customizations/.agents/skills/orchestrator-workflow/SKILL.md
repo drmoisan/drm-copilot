@@ -30,11 +30,22 @@ Use as needed:
 - Required delegated specialists:
   - `atomic-planner`
   - `atomic-executor`
+  - `feature-review`
   - `feature-reviewer`
+  - `task-researcher`
+  - `prd-feature`
+  - `staged-review`
+  - `epic-review`
+  - `status-updater`
+  - `python-typed-engineer`
+  - `powershell-typed-engineer`
+  - `csharp-typed-engineer`
+  - `typescript-engineer`
   - `commit-steward`
 - Deterministic availability rule:
-  - if the host exposes `spawn_agent`, treat all four required delegated specialists as available,
+  - if the host exposes `spawn_agent` and the required `.codex/agents/<name>.toml` file exists, treat that delegated specialist as available,
   - do not infer unavailability from missing nicknames, missing prior agent instances, or lack of a dedicated launcher alias.
+- Every required delegated specialist must exist as a native Codex agent under `.codex/agents/`. If a required agent file is missing, set `blocked_reason` to `spawn_agent_unavailable` and stop.
 - Required delegated steps MUST delegate or stop execution.
 - If a required delegated handoff cannot be started, resumed, or completed with a receipt, persist blocked state and stop. Do not perform that step directly.
 - Direct local execution is allowed only for workflow steps that are not designated below as required delegated handoffs.
@@ -43,6 +54,9 @@ Use as needed:
 
 Canonical checkpoint path:
 - `artifacts/orchestration/orchestrator-state.json`
+
+Canonical route matrix:
+- `config/orchestration-routing.json`
 
 Persist and reuse these fields exactly:
 - `objective`
@@ -73,6 +87,15 @@ Persist and reuse these fields exactly:
 - `step10_status`
 - `delegation_receipts`
 - `blocked_reason`
+- `route_id`
+- `required_agents`
+- `required_skills`
+- `required_mcp_tools`
+- `skill_receipts`
+- `mcp_call_receipts`
+- `local_execution_overrides`
+- `delegation_bypasses`
+- `lifecycle_operations`
 
 For small-path runs, also persist:
 - `bootstrap_mode`
@@ -114,6 +137,32 @@ Delegation receipt schema:
   - `completed_at`
   - `result_signal`
   - `artifact_paths`
+
+Skill receipt schema:
+- `skill_receipts` MUST be a list of objects with:
+  - `skill`
+  - `required`
+  - `acknowledged_at_phase`
+  - `evidence`
+
+MCP receipt schema:
+- `mcp_call_receipts` MUST be a list of objects with:
+  - `tool`
+  - `ok`
+  - `evidence`
+
+Completion-state invariants:
+- `route_id` MUST identify an entry in `config/orchestration-routing.json`.
+- `required_agents`, `required_skills`, and `required_mcp_tools` MUST exactly
+  match the selected route matrix entry.
+- every required agent MUST have a matching `delegation_receipts[].agent_name`.
+- every required skill MUST have a matching required `skill_receipts[].skill`
+  with non-empty evidence.
+- every required MCP tool MUST have a successful `mcp_call_receipts[].tool`
+  receipt with non-empty evidence.
+- `local_execution_overrides` and `delegation_bypasses` MUST be empty lists at
+  completion.
+- every recorded `lifecycle_operations[]` item MUST use `surface: "mcp"`.
 
 Required-delegation step map:
 - small path:
@@ -170,6 +219,9 @@ If an exact signal or required path field is missing, set the relevant step to `
 4. If the scope is primarily PowerShell, use `powershell-change-budget-router`.
 5. If the scope is mixed-language, ambiguous, or unsupported by an existing change-budget router, fail closed to the large path.
 6. Treat any request outside the applicable small-path budget as large path.
+7. Select `route_id` from `config/orchestration-routing.json` and persist the
+   exact required agent, skill, and MCP lists from the matrix before starting
+   lifecycle automation.
 
 ## Small Path
 
@@ -288,6 +340,9 @@ Do not claim mission completion until all of the following are true:
 
 - the selected path completed end to end
 - all required delegations completed with receipts
+- all required skills have `skill_receipts` with evidence
+- all required MCP tools have successful `mcp_call_receipts`
+- no local execution override or delegation bypass is recorded
 - the checkpoint is updated with the final state
 - the canonical checkpoint path was used without sidecar replacement or backup substitution
 - `${relativeFile}` is a real promoted-input path and `${issue-num}` is numeric when lifecycle setup was required
@@ -300,6 +355,8 @@ Do not claim mission completion until all of the following are true:
 - any required remediation artifacts exist on disk and the latest re-review is clean
 - any required remediation loop run also includes a remediation execution receipt, a remediation commit receipt, and a final `REVIEW_STATUS: PASS`
 - validator-backed checks for the approved plan, policy audit, code review, feature audit, and checkpoint state pass
+- the canonical checkpoint passes `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"` and `require_complete: true`
+- required GitHub checks pass for the current PR head SHA before PR/DONE completion
 
 ## Hard Constraints
 
@@ -315,4 +372,5 @@ Do not claim mission completion until all of the following are true:
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
 - Do not accept stale PR-context artifacts, unsupported checklist checkoffs, or missing required evidence as PASS outcomes.
+- Do not treat Codex lifecycle hooks as the hard completion boundary; use deterministic validator and CI gates for completion enforcement.
 - Do not claim completion without reporting the checkpoint path and the created or updated artifact paths.

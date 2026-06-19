@@ -1,12 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude rule paths to shared skill paths.
-
 ---
 name: invoke-csharp-engineer
 description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates.

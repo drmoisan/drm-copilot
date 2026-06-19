@@ -1,12 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude rule paths to shared skill paths.
-
 ---
 name: invoke-python-engineer
 description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 3-production + 3-test per-batch budget, and zero-regression quality gates.

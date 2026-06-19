@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: policy-audit-template-usage
 description: 'Policy audit template usage and output requirements. Use when creating policy-audit.<timestamp>.md artifacts from the repo templates.'

@@ -1,14 +1,6 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: pr-author
 description: Write a GitHub-ready pull request body from the canonical PR-context bundle with strict verification and auto-close rules.
-allowed-tools:
-  - Read
-  - "Bash(git log *)"
 ---
 
 # PR Author Skill
@@ -52,4 +44,4 @@ Use these sections in this order:
 - Only mention an issue/PR number if it appears verbatim in the provided context.
 - Do not treat PR numbers as issues.
 - Auto-close bullets must use exactly `- Closes #NNN` format, sourced only from "Issues to autoclose" or "Author-asserted autoclose issues."
-- If GitHub validation is unavailable/unverified, do not emit `Closes`; use the fallback `None` bullet.
+- If GitHub validation is unavailable or unverified, do not emit `Closes`; use the `None` bullet.

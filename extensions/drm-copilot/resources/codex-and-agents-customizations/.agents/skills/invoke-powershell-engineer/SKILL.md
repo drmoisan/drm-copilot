@@ -1,12 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude rule paths to shared skill paths.
-
 ---
 name: invoke-powershell-engineer
 description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.

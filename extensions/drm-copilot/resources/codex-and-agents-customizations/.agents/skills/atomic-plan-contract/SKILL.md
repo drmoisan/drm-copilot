@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite Claude skill paths to shared skill paths.
-
 ---
 name: atomic-plan-contract
 description: 'Atomic plan format and toolchain contract shared by planning and execution agents. Use when generating, validating, or executing atomic plans with Phase 0, baseline capture, and final QA loops.'

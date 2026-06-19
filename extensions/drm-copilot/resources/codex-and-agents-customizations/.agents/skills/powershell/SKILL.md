@@ -1,9 +1,5 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: powershell
 paths:
   - "**/*.ps1"
   - "**/*.psm1"

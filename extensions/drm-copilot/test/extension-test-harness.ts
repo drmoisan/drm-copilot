@@ -55,6 +55,7 @@ const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
 }));
 
 let preClaudeScriptPathConfig: string | undefined = undefined;
+let postCodexScriptPathConfig: string | undefined = undefined;
 
 const getConfigurationMock = jest.fn((section?: string) => ({
   get: <T>(key: string): T | undefined => {
@@ -63,6 +64,12 @@ const getConfigurationMock = jest.fn((section?: string) => ({
       key === "preClaudeScriptPath"
     ) {
       return preClaudeScriptPathConfig as T | undefined;
+    }
+    if (
+      section === "drmCopilotExtension.newCodexWorktreeSession" &&
+      key === "postCodexScriptPath"
+    ) {
+      return postCodexScriptPathConfig as T | undefined;
     }
     return undefined;
   },
@@ -263,6 +270,17 @@ export function setPreClaudeScriptPathConfig(value: string | undefined): void {
   preClaudeScriptPathConfig = value;
 }
 
+/**
+ * Controls the value returned by
+ * `vscode.workspace.getConfiguration("drmCopilotExtension.newCodexWorktreeSession").get<string>("postCodexScriptPath")`.
+ * Pass `undefined` to simulate the setting being unset.
+ *
+ * @param value The configured post-`codex` script path, or `undefined`.
+ */
+export function setPostCodexScriptPathConfig(value: string | undefined): void {
+  postCodexScriptPathConfig = value;
+}
+
 export function resetExtensionHarnessState(): void {
   process.env.PATH = "C:/bin";
   process.env.PATHEXT = ".EXE;.CMD";
@@ -272,6 +290,7 @@ export function resetExtensionHarnessState(): void {
   registerMcpServerDefinitionProviderMock.mockClear();
   getConfigurationMock.mockClear();
   preClaudeScriptPathConfig = undefined;
+  postCodexScriptPathConfig = undefined;
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
   fsMock.readFileSync.mockReset();

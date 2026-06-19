@@ -1,12 +1,8 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: self-explanatory-code-commenting
 paths:
   - "**/*.py"
-description: Intent-first docstring and commenting standards. Applies to Python files.
+description: Intent-first docstring and commenting standards.
 ---
 
 # Code Commenting and Docstring Policy

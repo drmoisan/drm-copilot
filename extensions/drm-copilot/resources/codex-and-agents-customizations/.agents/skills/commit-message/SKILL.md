@@ -1,15 +1,6 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: commit-message
 description: Generate a conventional commit message from staged Git changes following the repository's commit message conventions.
-allowed-tools:
-  - Read
-  - "Bash(git log *)"
-  - "Bash(git diff *)"
 ---
 
 # Commit Message Skill
@@ -26,12 +17,13 @@ Generate a single conventional commit message from staged Git changes or a provi
 ## Context Gathering
 
 1. Use the supplied commit-context artifact first when present.
-2. Otherwise inspect the staged diff and commit history only:
+2. When the `drm-copilot` MCP commit-context tool is available for the workflow, collect commit context through that tool and stop if the MCP call fails.
+3. Otherwise inspect read-only staged Git state only:
    - `git diff --cached --stat`
    - `git diff --cached`
    - `git diff --cached --name-only`
    - `git log --oneline -n 20`
-3. Do not infer intent from unstaged files or unrelated commit history.
+4. Do not infer intent from unstaged files or unrelated commit history.
 
 ## Classification
 

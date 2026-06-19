@@ -1,25 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite merged standing-guidance source paths to the native AGENTS.md target.
-- Rewrite GitHub Copilot standing guidance paths to AGENTS.md.
-- Rewrite GitHub Copilot path-scoped instructions to shared skill paths.
-- Rewrite GitHub Copilot agent manifest paths to Codex agent paths.
-- Rewrite GitHub Copilot instruction-directory references to the native skill root.
-- Rewrite GitHub Copilot skill-directory references to the native skill root.
-- Rewrite GitHub Copilot agent-directory references to the native agent root.
-- Rewrite Claude skill paths to shared skill paths.
-- Rewrite Claude agent manifest paths to Codex agent paths.
-- Rewrite Claude hook paths to Codex hook paths.
-- Rewrite Claude settings paths to Codex config paths.
-- Rewrite Claude rule paths to shared skill paths.
-- Rewrite Claude rules-directory references to the native skill root.
-- Rewrite Claude skill-directory references to the native skill root.
-- Rewrite Claude agent-directory references to the native agent root.
-- Rewrite Claude hook-directory references to the native hook root.
-- Rewrite GitHub prompt-directory references to the native shared skill root when repository prompt launchers are disabled.
-
 ---
 name: translate-copilot-to-claude
 description: Translate one or more GitHub Copilot native files (AGENTS.md, .agents/skills/*.instructions.md, .codex/agents/*.agent.md, .agents/skills/*.prompt.md, .agents/skills/<name>/SKILL.md) into the native Claude runtime. Classify each section into agent/rule/skill/hook surfaces, diff against existing .claude/ state, produce a translation plan for user approval, and then apply the plan.

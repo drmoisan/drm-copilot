@@ -1,0 +1,15 @@
+name: Orchestrator State Gate
+
+on:
+  pull_request:
+    branches: [main, development]
+  push:
+    branches: [main, development]
+  workflow_dispatch:
+
+jobs:
+  validate-orchestrator-state:
+    uses: ./.github/workflows/_validate-orchestrator-state.yml
+    with:
+      state-path: artifacts/orchestration/orchestrator-state.json
+      require-checkpoint: false

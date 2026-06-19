@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: feature-review-workflow
 description: 'Feature-branch review workflow for base-branch resolution, PR-context refresh, active feature folder selection, review artifact generation, validator gates, acceptance-criteria check-off, and remediation triggers. Use when authoring or executing PR-style feature reviews.'

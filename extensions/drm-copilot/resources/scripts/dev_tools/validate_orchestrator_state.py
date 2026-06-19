@@ -35,6 +35,7 @@ from dev_tools._orchestrator_state_human_interaction import (
     HUMAN_INTERACTION_KEY,
     _validate_human_interaction,
 )
+from dev_tools._orchestrator_state_routing import validate_routing_contract
 
 REQUIRED_STATE_KEYS = (
     "objective",
@@ -422,5 +423,6 @@ def validate_orchestrator_state_text(
             errors.append(
                 "Checkpoint completion validation failed: blocked_reason is not `none`."
             )
+        errors.extend(validate_routing_contract(state_map))
 
     return errors

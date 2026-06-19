@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: evidence-and-timestamp-conventions
 description: 'Evidence storage and timestamp naming conventions for audits and remediation. Use when storing baseline/regression/QA evidence or naming audit artifacts with ISO-8601 timestamps.'

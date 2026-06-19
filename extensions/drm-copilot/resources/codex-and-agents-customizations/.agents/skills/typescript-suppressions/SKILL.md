@@ -1,12 +1,8 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
+name: typescript-suppressions
 paths:
   - "**/*.ts"
-description: Pre-authorized ESLint and TypeScript suppression patterns. Applies to TypeScript files.
+description: TypeScript suppression policy for linting and type-checking exceptions.
 ---
 
 # TypeScript Suppression Policy

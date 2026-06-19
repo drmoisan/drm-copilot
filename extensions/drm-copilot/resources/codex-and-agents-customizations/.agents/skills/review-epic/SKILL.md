@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: review-epic
 description: Invoke the epic-review worker to produce epic-audit artifacts for an epic folder.

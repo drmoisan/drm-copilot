@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: powershell-change-budget-router
 description: Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.
@@ -29,7 +24,7 @@ Use this skill when:
 ## Orchestrated Small-Path Requirements
 
 When routed through `powershell-orchestrator`, small path still requires lifecycle scaffolding before implementation:
-- invoke promotion/folder lifecycle steps through `vscode/runCommand` + extension access per `feature-promotion-lifecycle` when available; use script/CLI fallback only when direct extension command execution is unavailable,
+- invoke promotion/folder lifecycle steps through the `drm-copilot` MCP tools required by `repo-automation-adapter`. If the MCP server or required tool is unavailable, stop before promotion,
 - promote potential item to GitHub issue with `--work-mode minor-audit`,
 - create active feature folder with `--work-mode minor-audit`,
 - delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,

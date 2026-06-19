@@ -1,8 +1,3 @@
-# Converted skill
-
-Applied rewrites:
-- None
-
 ---
 name: review-staged
 description: Invoke the staged-review worker to produce staged-review artifacts from the staged diff.
