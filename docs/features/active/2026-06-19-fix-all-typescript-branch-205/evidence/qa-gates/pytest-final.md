@@ -1,9 +1,21 @@
 # Pytest Final QC (with coverage)
 
-Timestamp: 2026-06-19T17-36
-Command: poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_fix_all.py
+Timestamp: 2026-06-19T18-05
+Command: poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_fix_all.py tests/scripts/dev_tools/test_fix_all_branches.py tests/scripts/dev_tools/test_fix_all_failure_paths.py
 EXIT_CODE: 0
 Output Summary:
+- 46 tests passed (34 existing + 12 new failure-path tests); no failures.
+- Post-remediation per-module coverage:
+  - scripts/dev_tools/fix_all_runtime.py: 98.73% line, 95.45% branch.
+  - scripts/dev_tools/fix_all_branches.py: 96.34% line, 95.83% branch.
+  - scripts/dev_tools/fix_all_branches_extra.py: 100.00% line, 100.00% branch.
+
+## Prior record (2026-06-19T17-36, single test file)
+
+The entries below are the pre-remediation record, retained for history. The
+original documented command referenced only `test_fix_all.py`; the authoritative
+command now references all three fix-all test files (see header above).
+
 - 34 tests passed in approximately 2.69s; no failures.
 - The five new TypeScript-branch tests pass:
   - test_pipeline_stops_on_prettier_failure

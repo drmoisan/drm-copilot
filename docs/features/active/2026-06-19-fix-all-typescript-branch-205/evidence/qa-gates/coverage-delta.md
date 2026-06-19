@@ -2,9 +2,25 @@
 
 Timestamp: 2026-06-19T17-36
 Module under review: scripts/dev_tools/fix_all_runtime.py
-Command (baseline, on merge-base 18121fbd via temporary worktree): poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=json tests/scripts/dev_tools/test_fix_all.py
-Command (post-change, current branch): poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_fix_all.py
+Command (baseline, on merge-base 18121fbd via temporary worktree): poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=json tests/scripts/dev_tools/test_fix_all.py tests/scripts/dev_tools/test_fix_all_branches.py
+Command (post-change, current branch): poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_fix_all.py tests/scripts/dev_tools/test_fix_all_branches.py tests/scripts/dev_tools/test_fix_all_failure_paths.py
 EXIT_CODE: 0
+
+## Correction (Issue #205 remediation, 2026-06-19T18-05)
+
+The original documented commands above were corrected to reference all fix-all
+test files. The authoritative post-remediation coverage command is:
+
+`poetry run pytest --cov=scripts/dev_tools --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_fix_all.py tests/scripts/dev_tools/test_fix_all_branches.py tests/scripts/dev_tools/test_fix_all_failure_paths.py`
+
+After remediation (R1 file split + R2 failure-path tests), per-module coverage is:
+- `scripts/dev_tools/fix_all_runtime.py`: 98.73% line, 95.45% branch.
+- `scripts/dev_tools/fix_all_branches.py`: 96.34% line, 95.83% branch.
+- `scripts/dev_tools/fix_all_branches_extra.py`: 100.00% line, 100.00% branch.
+
+All three modules now meet the >= 85% line and >= 75% branch thresholds. The
+pre-existing sub-85% module-line condition described below was resolved by the
+remediation; the analysis below is retained as the historical baseline record.
 
 ## Coverage Comparison (scripts/dev_tools/fix_all_runtime.py)
 
