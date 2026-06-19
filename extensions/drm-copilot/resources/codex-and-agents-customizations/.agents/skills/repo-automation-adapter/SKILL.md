@@ -109,7 +109,7 @@ Required tools:
 - `potential_to_issue`
 - `new_active_feature_folder`
 
-Execute lifecycle operations as one ordered MCP chain:
+Execute these lifecycle operations as one ordered chain:
 
 1. Create the potential entry.
 2. Promote with `potential_to_issue`.
