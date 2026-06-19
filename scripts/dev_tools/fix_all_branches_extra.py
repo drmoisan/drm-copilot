@@ -27,6 +27,7 @@ Important side effects:
 
 from __future__ import annotations
 
+import shutil
 from io import StringIO
 from typing import TYPE_CHECKING
 
@@ -189,6 +190,29 @@ def run_python_branch(
     return api.BranchResult(name="python", success=True, output=output)
 
 
+def _resolve_npm() -> str | None:
+    """Resolve the ``npm`` executable to a full filesystem path.
+
+    Purpose:
+        Locate ``npm`` on PATH and return its absolute path. The TypeScript
+        branch must launch ``npm`` through the no-shell subprocess runner, and
+        on Windows ``npm`` is a ``.cmd`` shim rather than a PE executable.
+        ``subprocess`` cannot launch the bare name ``npm`` there (it raises
+        ``FileNotFoundError``), so the command must use the full path that
+        PATHEXT resolution yields (for example ``npm.CMD``). ``shutil.which``
+        performs that PATHEXT-aware lookup on every platform.
+
+    Returns:
+        str | None: The absolute path to ``npm`` (``npm.cmd`` on Windows, the
+            ``npm`` binary on POSIX), or ``None`` when ``npm`` is not installed
+            or not resolvable on PATH.
+
+    Side Effects:
+        None. Performs a read-only PATH lookup.
+    """
+    return shutil.which("npm")
+
+
 def run_typescript_branch(
     *,
     factory: Callable[[str, StepLogger], CommandRunner],
@@ -220,6 +244,25 @@ def run_typescript_branch(
     branch_logger = api.StepLogger(stream=branch_stream)
     branch_runner = factory("typescript", branch_logger)
 
+    # Resolve npm to a full path before any step. The no-shell subprocess runner
+    # cannot launch the bare name "npm" on Windows (it is a .cmd shim), so a
+    # missing or unresolvable npm must fail this branch cleanly rather than raise
+    # FileNotFoundError inside the worker thread.
+    npm = _resolve_npm()
+    if npm is None:
+        branch_logger.failure(
+            "npm executable not found on PATH; cannot run the TypeScript "
+            "toolchain branch. Install Node.js/npm or remove it from scope."
+        )
+        output = branch_stream.getvalue()
+        emit_status_transition("typescript", "FAIL")
+        return api.BranchResult(
+            name="typescript",
+            success=False,
+            output=output,
+            failed_step="Prettier: format",
+        )
+
     # Prettier auto-fixes formatting in place; there is no separate fix step.
     emit_status_transition("typescript", "Prettier: format")
     if not api.run_simple_step(
@@ -228,7 +271,7 @@ def run_typescript_branch(
         step_name="Prettier: format",
         success_message="Prettier formatting completed",
         failure_message="Prettier formatting failed. Please review errors above.",
-        command=["npm", "run", "format"],
+        command=[npm, "run", "format"],
         runner=branch_runner,
         logger=branch_logger,
     ):
@@ -248,7 +291,7 @@ def run_typescript_branch(
         step_name="ESLint: lint",
         success_message="ESLint linting passed",
         failure_message="ESLint linting failed. Please review errors above.",
-        command=["npm", "run", "lint"],
+        command=[npm, "run", "lint"],
         runner=branch_runner,
         logger=branch_logger,
     ):
@@ -268,7 +311,7 @@ def run_typescript_branch(
         step_name="TSC: type-check",
         success_message="TSC type checking passed",
         failure_message="TSC type checking failed. Please review errors above.",
-        command=["npm", "run", "typecheck"],
+        command=[npm, "run", "typecheck"],
         runner=branch_runner,
         logger=branch_logger,
     ):
@@ -283,9 +326,9 @@ def run_typescript_branch(
 
     # Switch Jest step name and command on coverage, mirroring the python branch.
     jest_command = (
-        ["npm", "run", "test:unit:coverage"]
+        [npm, "run", "test:unit:coverage"]
         if include_coverage
-        else ["npm", "run", "test:unit"]
+        else [npm, "run", "test:unit"]
     )
     jest_step_name = "Jest: test with coverage" if include_coverage else "Jest: test"
 

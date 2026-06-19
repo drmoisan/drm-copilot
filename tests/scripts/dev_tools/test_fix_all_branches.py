@@ -3,12 +3,19 @@ from __future__ import annotations
 from io import StringIO
 from typing import TYPE_CHECKING, TextIO, cast
 
-from scripts.dev_tools import fix_all
+from scripts.dev_tools import fix_all, fix_all_branches_extra
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
 
     from pytest import MonkeyPatch
+
+# Capture the real resolver before the conftest autouse stub replaces it, so a
+# direct test can exercise its body. A __dict__ lookup (rather than attribute
+# access or getattr) avoids both the ruff B009 and pyright private-usage rules.
+_real_resolve_npm: Callable[[], str | None] = fix_all_branches_extra.__dict__[
+    "_resolve_npm"
+]
 
 
 def make_result(code: int, output: str = "") -> fix_all.CommandResult:
@@ -189,6 +196,63 @@ def test_typescript_jest_step_name_switches_with_coverage() -> None:
     assert "Jest: test with coverage" not in step_names
     jest_call = next(call for call in typescript_calls if call[0] == "Jest: test")
     assert jest_call[1] == ["npm", "run", "test:unit"]
+
+
+def test_typescript_branch_fails_cleanly_when_npm_missing(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """When npm is not on PATH the typescript branch fails without crashing.
+
+    Regression: the runner cannot launch the bare name ``npm`` on Windows, so an
+    unresolvable npm must produce a tagged failure rather than a
+    FileNotFoundError raised inside the worker thread.
+    """
+    monkeypatch.setattr(fix_all_branches_extra, "_resolve_npm", lambda: None)
+    factory = FakeRunnerFactory(base_success_responses())
+    logger = build_logger()
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=logger,
+        complete_all=True,
+    )
+    assert exit_code == 1
+    # No npm step should have been attempted through the runner.
+    assert factory.runners["typescript"].calls == []
+    assert "npm executable not found on PATH" in read_log(logger)
+
+
+def test_typescript_commands_use_resolved_npm_path(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The typescript branch invokes the full resolved npm path, not a bare name."""
+    resolved = r"C:\fake\nodejs\npm.CMD"
+    monkeypatch.setattr(fix_all_branches_extra, "_resolve_npm", lambda: resolved)
+    factory = FakeRunnerFactory(base_success_responses(include_coverage=False))
+    logger = build_logger()
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=False,
+        runner_factory=factory,
+        logger=logger,
+    )
+    assert exit_code == 0
+    typescript_calls = factory.runners["typescript"].calls
+    # Every npm-backed step must use the resolved path as the executable token.
+    assert typescript_calls
+    for _step_name, command in typescript_calls:
+        assert command[0] == resolved
+
+
+def test_resolve_npm_delegates_to_shutil_which(monkeypatch: MonkeyPatch) -> None:
+    """_resolve_npm returns whatever PATHEXT-aware shutil.which resolves for npm."""
+
+    def fake_which(cmd: str, *_args: object, **_kwargs: object) -> str:
+        return f"/resolved/{cmd}.CMD"
+
+    monkeypatch.setattr(fix_all_branches_extra.shutil, "which", fake_which)
+    assert _real_resolve_npm() == "/resolved/npm.CMD"
 
 
 def test_format_status_transition_line_exact_format() -> None:
