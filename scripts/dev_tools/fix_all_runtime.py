@@ -37,6 +37,7 @@ def run_fix_all(
         "shell": "pending",
         "python": "pending",
         "powershell": "pending",
+        "typescript": "pending",
     }
     has_rendered_board = False
 
@@ -48,7 +49,13 @@ def run_fix_all(
                 status_by_branch[branch] = status
                 lines = [
                     f"{name}: {status_by_branch[name]}"
-                    for name in ("json", "shell", "python", "powershell")
+                    for name in (
+                        "json",
+                        "shell",
+                        "python",
+                        "powershell",
+                        "typescript",
+                    )
                 ]
                 width = max(len(line) for line in lines) if lines else 1
                 board = api.render_status_board(lines, width=width)
@@ -443,11 +450,132 @@ def run_fix_all(
         emit_status_transition("powershell", "PASS")
         return api.BranchResult(name="powershell", success=True, output=output)
 
+    def run_typescript_branch() -> BranchResult:
+        """
+        Run the TypeScript toolchain branch.
+
+        Purpose:
+            Execute the TypeScript quality steps in format -> lint -> type-check ->
+            test order via npm scripts, mirroring the linear structure of the
+            PowerShell branch (no auto-fix retry loop).
+
+        Returns:
+            BranchResult: Success result when all steps pass, or a failure result
+                tagged with the first failing step name.
+
+        Side Effects:
+            Spawns npm subprocesses for each step, writes step output to an
+            isolated branch stream, and emits status-board transitions.
+        """
+        branch_stream: StringIO = StringIO()
+        branch_logger = api.StepLogger(stream=branch_stream)
+        branch_runner = factory("typescript", branch_logger)
+
+        # Prettier auto-fixes formatting in place; there is no separate fix step.
+        emit_status_transition("typescript", "Prettier: format")
+        if not api.run_simple_step(
+            step_number=1,
+            description="Running Prettier formatting (npm run format)...",
+            step_name="Prettier: format",
+            success_message="Prettier formatting completed",
+            failure_message="Prettier formatting failed. Please review errors above.",
+            command=["npm", "run", "format"],
+            runner=branch_runner,
+            logger=branch_logger,
+        ):
+            output = branch_stream.getvalue()
+            emit_status_transition("typescript", "FAIL")
+            return api.BranchResult(
+                name="typescript",
+                success=False,
+                output=output,
+                failed_step="Prettier: format",
+            )
+
+        emit_status_transition("typescript", "ESLint: lint")
+        if not api.run_simple_step(
+            step_number=2,
+            description="Running ESLint linting (npm run lint)...",
+            step_name="ESLint: lint",
+            success_message="ESLint linting passed",
+            failure_message="ESLint linting failed. Please review errors above.",
+            command=["npm", "run", "lint"],
+            runner=branch_runner,
+            logger=branch_logger,
+        ):
+            output = branch_stream.getvalue()
+            emit_status_transition("typescript", "FAIL")
+            return api.BranchResult(
+                name="typescript",
+                success=False,
+                output=output,
+                failed_step="ESLint: lint",
+            )
+
+        emit_status_transition("typescript", "TSC: type-check")
+        if not api.run_simple_step(
+            step_number=3,
+            description="Running TSC type checking (npm run typecheck)...",
+            step_name="TSC: type-check",
+            success_message="TSC type checking passed",
+            failure_message="TSC type checking failed. Please review errors above.",
+            command=["npm", "run", "typecheck"],
+            runner=branch_runner,
+            logger=branch_logger,
+        ):
+            output = branch_stream.getvalue()
+            emit_status_transition("typescript", "FAIL")
+            return api.BranchResult(
+                name="typescript",
+                success=False,
+                output=output,
+                failed_step="TSC: type-check",
+            )
+
+        # Switch Jest step name and command on coverage, mirroring the python branch.
+        jest_command = (
+            ["npm", "run", "test:unit:coverage"]
+            if include_coverage
+            else ["npm", "run", "test:unit"]
+        )
+        jest_step_name = (
+            "Jest: test with coverage" if include_coverage else "Jest: test"
+        )
+
+        emit_status_transition("typescript", jest_step_name)
+        if not api.run_simple_step(
+            step_number=4,
+            description=(
+                "Running Jest with coverage..."
+                if include_coverage
+                else "Running Jest..."
+            ),
+            step_name=jest_step_name,
+            success_message="Jest passed",
+            failure_message="Jest failed. Please review errors above.",
+            command=jest_command,
+            runner=branch_runner,
+            logger=branch_logger,
+        ):
+            output = branch_stream.getvalue()
+            emit_status_transition("typescript", "FAIL")
+            return api.BranchResult(
+                name="typescript",
+                success=False,
+                output=output,
+                failed_step=jest_step_name,
+            )
+
+        output = branch_stream.getvalue()
+        emit_status_transition("typescript", "PASS")
+        return api.BranchResult(name="typescript", success=True, output=output)
+
     branch_functions = [
         ("json", run_json_branch),
         ("shell", run_shell_branch),
         ("python", run_python_branch),
         ("powershell", run_powershell_branch),
+        ("typescript", run_typescript_branch),
     ]
 
     results: dict[str, BranchResult] = {}
