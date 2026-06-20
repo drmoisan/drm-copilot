@@ -9,7 +9,19 @@
   },
   "overrides": {
     "diff": "^8.0.3",
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "fast-uri": "^3.1.2",
+    "hono": "^4.12.25",
+    "ip-address": "^10.2.0",
+    "qs": "^6.15.2",
+    "@babel/core": "^7.29.6",
+    "js-yaml": "^4.2.0",
+    "c8": {
+      "brace-expansion": "^5.0.6"
+    },
+    "babel-plugin-istanbul": {
+      "test-exclude": "^7.0.2"
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
