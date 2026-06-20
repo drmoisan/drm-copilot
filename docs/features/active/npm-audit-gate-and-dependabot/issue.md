@@ -38,7 +38,7 @@ callee via `uses: ./.github/workflows/_npm-audit-gate.yml`.
 - [x] `.github/dependabot.yml` configures weekly grouped npm updates for `/`, `/extensions/drm-copilot`, `/packages/mcp-server`, and github-actions.
 - [x] All workflow YAML passes `actionlint` and parses as valid YAML.
 - [x] The gate passes against the current (remediated) lockfiles: `npm audit --audit-level=moderate` exits 0 for all three manifests.
-- [ ] A green run of the new gate is observed on the PR (satisfies `modified-workflow-needs-green-run`).
+- [x] A green run of the new gate is observed on the PR (satisfies `modified-workflow-needs-green-run`). PR #210, npm Audit Gate run 27855136501 against head 948b03e — all three manifests SUCCESS.
 
 ## Dependencies / Risks
 
@@ -62,7 +62,7 @@ callee via `uses: ./.github/workflows/_npm-audit-gate.yml`.
 
 - [x] baseline — PR #209 established 0 vulnerabilities across all three manifests.
 - [x] targeted verification — YAML parse, actionlint exit 0, local audit exit 0 per manifest.
-- [ ] end-state — green `npm Audit Gate` run observed on the PR.
+- [x] end-state — green `npm Audit Gate` run observed on PR #210 (run 27855136501, head 948b03e).
 
 ## References
 
