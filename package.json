@@ -39,18 +39,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@jest/globals": "^30.0.0",
+    "@jest/globals": "^30.4.1",
     "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "@types/vscode": "^1.118.0",
+    "@types/node": "26.x",
+    "@types/vscode": "^1.125.0",
     "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.39.2",
-    "jest": "^30.0.0",
-    "prettier": "^3.6.0",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.52.0"
+    "@vscode/test-electron": "^3.0.0",
+    "eslint": "^10.5.0",
+    "jest": "^30.4.2",
+    "prettier": "^3.8.4",
+    "ts-jest": "^29.4.11",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"
