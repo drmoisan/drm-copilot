@@ -87,6 +87,6 @@ Diagnosis reference: `artifacts/research/release-version-bump-publish-diagnosis.
 - [x] Post-merge tag-push task pushes `v*` and `mcp-server-v*` from the committed `main` versions, behind a `yes` confirmation.
 - [x] New `publish-extension.yml` publishes via `vsce publish --pat ${{ secrets.VSCE_PAT }}`, publish step gated to `push`, with `workflow_dispatch`.
 - [x] `tasks.json` retargeted; labels/detail describe the PR-gated/CI-published model.
-- [ ] Two human-exception runbooks authored and recorded in orchestrator state (`VSCE_PAT`, merge approval).
-- [ ] Pester tests added/updated; coverage thresholds met; PoshQC format → analyze → test clean.
-- [ ] `actionlint` clean and a green `workflow_dispatch` run recorded for the new workflow.
+- [x] Two human-exception runbooks authored and recorded in orchestrator state (`VSCE_PAT`, merge approval).
+- [x] Pester tests added/updated; coverage thresholds met; PoshQC format → analyze → test clean.
+- [x] `actionlint` clean and a green `workflow_dispatch` run recorded for the new workflow.
