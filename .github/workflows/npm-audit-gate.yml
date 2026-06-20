@@ -1,0 +1,21 @@
+name: npm Audit Gate
+
+on:
+  schedule:
+    # Weekly, Monday 07:00 UTC. Catches advisories disclosed against the
+    # committed lockfiles after they were last regenerated.
+    - cron: "0 7 * * 1"
+  pull_request:
+    branches: [main, development]
+    paths:
+      - "**/package.json"
+      - "**/package-lock.json"
+      - ".github/workflows/npm-audit-gate.yml"
+      - ".github/workflows/_npm-audit-gate.yml"
+  workflow_dispatch:
+
+jobs:
+  npm-audit:
+    uses: ./.github/workflows/_npm-audit-gate.yml
+    with:
+      audit-level: moderate
