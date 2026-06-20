@@ -1,6 +1,6 @@
 {
   "name": "@danmoisan/drm-copilot-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Stdio MCP server exposing drm-copilot repo-automation tools.",
   "license": "MIT",
   "type": "commonjs",
@@ -19,9 +19,19 @@
     "url": "https://github.com/drmoisan/drm-copilot.git",
     "directory": "packages/mcp-server"
   },
-  "bugs": { "url": "https://github.com/drmoisan/drm-copilot/issues" },
+  "bugs": {
+    "url": "https://github.com/drmoisan/drm-copilot/issues"
+  },
   "homepage": "https://github.com/drmoisan/drm-copilot#readme",
-  "keywords": ["mcp", "copilot", "claude", "codex", "automation", "workflow", "stdio"],
+  "keywords": [
+    "mcp",
+    "copilot",
+    "claude",
+    "codex",
+    "automation",
+    "workflow",
+    "stdio"
+  ],
   "author": "Dan Moisan",
   "scripts": {
     "build": "node esbuild-mcp-server.cjs",
