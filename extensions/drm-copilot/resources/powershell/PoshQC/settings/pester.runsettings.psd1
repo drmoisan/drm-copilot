@@ -26,6 +26,13 @@
             '.claude/hooks/check-powershell-test-purity.ps1'
             '.claude/hooks/enforce-python-batch-budget.ps1'
             '.claude/hooks/enforce-powershell-batch-budget.ps1'
+            # Issue #214 added/changed these four release scripts and provided dedicated
+            # Pester suites; they are measured here to produce real per-file changed-line
+            # coverage rather than relying on behavioral-only evidence.
+            'scripts/powershell/Publish-DrmCopilotExtension.ps1'
+            'scripts/dev-tools/Invoke-FullRelease.ps1'
+            'scripts/dev-tools/Invoke-MarketplacePublish.ps1'
+            'scripts/dev-tools/Invoke-ReleaseTagPush.ps1'
         )
         ExcludedPath          = @(
             '.claude/hooks/validate-feature-review-coverage.ps1' # Feature-review wrapper around repository evidence; not deterministic in normal unit-test execution.

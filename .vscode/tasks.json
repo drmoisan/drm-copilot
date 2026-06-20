@@ -149,7 +149,7 @@
 		},
 		{
 		"default": "no",
-		"description": "Confirm publish to VS Code Marketplace. Marketplace versions are immutable.",
+		"description": "Confirm opening an extension-only version-bump PR (bump extensions/drm-copilot/package.json on a branch, open a PR against main). No publish, no tag.",
 		"id": "MarketplacePublishConfirm",
 		"options": [
 			"no",
@@ -159,8 +159,18 @@
 		},
 		{
 		"default": "no",
-		"description": "Confirm full release (bump both manifests, publish extension, push mcp-server tag). Marketplace and npm versions are immutable.",
+		"description": "Confirm opening a full version-bump PR (bump both manifests on a branch, open a PR against main). No publish, no tag push.",
 		"id": "FullReleaseConfirm",
+		"options": [
+			"no",
+			"yes"
+		],
+		"type": "pickString"
+		},
+		{
+		"default": "no",
+		"description": "Confirm pushing the v* and mcp-server-v* release tags after the version-bump PR has merged to main. This triggers the CI publish workflows.",
+		"id": "ReleaseTagPushConfirm",
 		"options": [
 			"no",
 			"yes"
@@ -215,8 +225,8 @@
 				"${input:MarketplacePublishConfirm}"
 			],
 			"command": "pwsh",
-			"detail": "Bumps patch version, builds, packages, publishes the extension to the VS Code Marketplace, and creates a v<version> git tag. Requires prior 'vsce login DanMoisan'. Marketplace versions are immutable.",
-			"label": "Publish: Marketplace VSIX (patch + tag)",
+			"detail": "Patch-bumps extensions/drm-copilot/package.json on a release branch, commits, and opens a PR against main via gh. Does not upload to the Marketplace and does not create a release tag; CI publishes after the PR merges.",
+			"label": "Release: Open Extension Version-Bump PR",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
@@ -235,8 +245,28 @@
 				"${input:FullReleaseConfirm}"
 			],
 			"command": "pwsh",
-			"detail": "Patch-bumps both package manifests, publishes the extension to the VS Code Marketplace, and creates and pushes a mcp-server-v<version> git tag to trigger the npm publish workflow. Marketplace and npm versions are immutable.",
-			"label": "Publish: Full Release (bump both + Marketplace + npm tag)",
+			"detail": "Patch-bumps both package manifests on a release branch, commits, and opens a PR against main via gh. Does not publish and does not push a release tag; CI publishes after the PR merges and the post-merge tag-push task runs.",
+			"label": "Release: Open Full Version-Bump PR",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/dev-tools/Invoke-ReleaseTagPush.ps1",
+				"-ConfirmToken",
+				"${input:ReleaseTagPushConfirm}"
+			],
+			"command": "pwsh",
+			"detail": "Post-merge: pushes the v<version> and mcp-server-v<version> release tags from the merged main versions to trigger the CI publish workflows. Performs no version bump and no upload.",
+			"label": "Release: Push Release Tags (post-merge)",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},

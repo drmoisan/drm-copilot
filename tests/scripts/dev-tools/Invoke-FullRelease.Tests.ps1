@@ -1,156 +1,322 @@
 Set-StrictMode -Version Latest
 
-$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
-
 Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
     BeforeAll {
-        $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullRelease.ps1"
+        $script:scriptPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullRelease.ps1")).Path
+        # Dot-source the production script so its on-disk lines execute under Pester
+        # coverage instrumentation. The mandatory -ConfirmToken is supplied to bind
+        # the param without prompting; the entry-point block is skipped because
+        # $MyInvocation.InvocationName -eq '.' when dot-sourced.
+        . $script:scriptPath -ConfirmToken 'no'
     }
 
     BeforeEach {
-        # Import the functions under test from the production script (AST import,
-        # no entry-point execution). Wrapper seams are imported before mocking.
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Write-StderrLine")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-GitExe")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-NpmExe")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-PublishScript")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-NpmVersion")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-McpServerTagName")
-        . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-FullReleaseGuarded")
-
         $script:capturedMessage = $null
-        $script:capturedNpmArgs = $null
+        $script:capturedNpmArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedGitArgsList = [System.Collections.Generic.List[object]]::new()
+        $script:capturedGhArgsList = [System.Collections.Generic.List[object]]::new()
     }
 
     Context "confirmation guard" {
-        It "returns 2 and invokes no bump/publish/tag wrapper when ConfirmToken is 'no'" {
+        It "returns 2 and invokes no npm/git/gh wrapper when ConfirmToken is 'no'" {
             Mock -CommandName Write-StderrLine -MockWith {
                 param([string]$Message)
                 $script:capturedMessage = $Message
             }
-            Mock -CommandName Invoke-NpmExe -MockWith {
-                param([string[]]$NpmArgs)
-                $null = $NpmArgs
-                throw "npm wrapper should not be invoked"
-            }
-            Mock -CommandName Invoke-PublishScript -MockWith {
-                param([string]$ScriptPath)
-                $null = $ScriptPath
-                throw "publish script should not be invoked"
-            }
-            Mock -CommandName Invoke-GitExe -MockWith {
-                param([string[]]$GitArgs)
-                $null = $GitArgs
-                throw "git wrapper should not be invoked"
-            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
+            Mock -CommandName Invoke-GhExe -MockWith { param([string[]]$GhArgs) $null = $GhArgs; throw "gh wrapper should not be invoked" }
 
             $result = Invoke-FullReleaseGuarded -ConfirmToken "no" -RepoRoot "/repo"
 
             $result | Should -Be 2
             $script:capturedMessage | Should -Match "Full release not confirmed \(got 'no'\)"
             Should -Invoke -CommandName Invoke-NpmExe -Times 0 -Exactly
-            Should -Invoke -CommandName Invoke-PublishScript -Times 0 -Exactly
             Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
+            Should -Invoke -CommandName Invoke-GhExe -Times 0 -Exactly
         }
 
-        # A non-case CaseLabel is included in the It name so the two -ForEach
-        # cases produce names that differ by something other than letter case.
-        # The VS Code Pester adapter folds discovered test IDs to uppercase
-        # during static discovery; without the label, "YES" and "Yes" would
-        # collide to a single uppercased ID and the duplicate would be dropped.
         It "is case-sensitive: ConfirmToken '<ConfirmToken>' (<CaseLabel>) is rejected with code 2" -ForEach @(
             @{ ConfirmToken = "YES"; CaseLabel = "uppercase" }
             @{ ConfirmToken = "Yes"; CaseLabel = "titlecase" }
         ) {
             Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
             Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
-            Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; throw "publish script should not be invoked" }
             Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
+            Mock -CommandName Invoke-GhExe -MockWith { param([string[]]$GhArgs) $null = $GhArgs; throw "gh wrapper should not be invoked" }
 
             $result = Invoke-FullReleaseGuarded -ConfirmToken $ConfirmToken -RepoRoot "/repo"
 
             $result | Should -Be 2
             Should -Invoke -CommandName Invoke-NpmExe -Times 0 -Exactly
-            Should -Invoke -CommandName Invoke-PublishScript -Times 0 -Exactly
             Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
+            Should -Invoke -CommandName Invoke-GhExe -Times 0 -Exactly
         }
     }
 
-    Context "mcp-server manifest bump" {
-        It "requests the patch bump with the expected npm wrapper arguments and uses the derived post-bump version" {
+    Context "confirmed run opens a PR" {
+        It "bumps both manifests and opens a PR against main" {
             Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
             Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
+            Mock -CommandName Get-NpmVersion -MockWith {
+                param([string]$ManifestPath)
+                if ($ManifestPath -match 'mcp-server') { return "0.0.2" }
+                return "0.0.3"
+            }
             Mock -CommandName Invoke-NpmExe -MockWith {
                 param([string[]]$NpmArgs)
-                $script:capturedNpmArgs = $NpmArgs
+                $script:capturedNpmArgsList.Add($NpmArgs)
                 return 0
             }
-            # Deterministic post-bump version via stubbed manifest read (no disk access).
-            Mock -CommandName Get-NpmVersion -MockWith { param([string]$ManifestPath) $null = $ManifestPath; return "0.0.2" }
-            Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; return 0 }
             Mock -CommandName Invoke-GitExe -MockWith {
                 param([string[]]$GitArgs)
                 $script:capturedGitArgsList.Add($GitArgs)
+                # Clean tree on status; success otherwise.
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-GhExe -MockWith {
+                param([string[]]$GhArgs)
+                $script:capturedGhArgsList.Add($GhArgs)
                 return 0
             }
 
             $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
 
             $result | Should -Be 0
-            Should -Invoke -CommandName Invoke-NpmExe -Times 1 -Exactly
-            ($script:capturedNpmArgs -contains "version") | Should -BeTrue
-            ($script:capturedNpmArgs -contains "patch") | Should -BeTrue
-            ($script:capturedNpmArgs -contains "--no-git-tag-version") | Should -BeTrue
-            ($script:capturedNpmArgs -join " ") | Should -Match "packages[\\/]mcp-server"
-            Get-NpmVersion -ManifestPath "/repo/packages/mcp-server/package.json" | Should -Be "0.0.2"
+            Should -Invoke -CommandName Invoke-NpmExe -Times 2 -Exactly
+            $npmFlat = @($script:capturedNpmArgsList | ForEach-Object { $_ -join " " })
+            ($npmFlat -join "`n") | Should -Match "extensions[\\/]drm-copilot"
+            ($npmFlat -join "`n") | Should -Match "packages[\\/]mcp-server"
+            ($npmFlat -join "`n") | Should -Match "--no-git-tag-version"
+            Should -Invoke -CommandName Invoke-GhExe -Times 1 -Exactly
+            $ghFlat = @($script:capturedGhArgsList | ForEach-Object { $_ }) -join " "
+            $ghFlat | Should -Match "pr create"
+            $ghFlat | Should -Match "--base main"
         }
     }
 
-    Context "mcp-server tag derivation and push" {
-        It "derives mcp-server-v0.0.2 from input 0.0.2 (pure function)" {
-            Get-McpServerTagName -Version "0.0.2" | Should -Be "mcp-server-v0.0.2"
-        }
-
-        It "calls the git tag wrapper with the derived mcp-server-v0.0.2 tag on a confirmed run" {
+    Context "dirty working tree" {
+        It "blocks the bump and returns 1 before any npm call when git status is non-empty" {
             Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
-            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
-            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
-            Mock -CommandName Get-NpmVersion -MockWith { param([string]$ManifestPath) $null = $ManifestPath; return "0.0.2" }
-            Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; return 0 }
-            Mock -CommandName Invoke-GitExe -MockWith {
-                param([string[]]$GitArgs)
-                $script:capturedGitArgsList.Add($GitArgs)
-                return 0
-            }
-
-            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
-
-            $result | Should -Be 0
-            $flattened = @($script:capturedGitArgsList | ForEach-Object { $_ }) -join " "
-            $flattened | Should -Match "mcp-server-v0\.0\.2"
-            # Both a tag-create and a tag-push call occurred.
-            $script:capturedGitArgsList.Count | Should -Be 2
-        }
-    }
-
-    Context "missing publish script" {
-        It "returns 1, writes an error, and attempts no git tag push when the publish script is missing" {
-            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $false }
             Mock -CommandName Write-StderrLine -MockWith {
                 param([string]$Message)
                 $script:capturedMessage = $Message
             }
             Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
-            Mock -CommandName Invoke-PublishScript -MockWith { param([string]$ScriptPath) $null = $ScriptPath; throw "publish script should not be invoked" }
-            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
+            Mock -CommandName Invoke-GhExe -MockWith { param([string[]]$GhArgs) $null = $GhArgs; throw "gh wrapper should not be invoked" }
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                $script:capturedGitArgsList.Add($GitArgs)
+                return @{ Output = @(" M extensions/drm-copilot/package.json"); ExitCode = 0 }
+            }
 
-            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/nonexistent/repo"
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
 
             $result | Should -Be 1
-            $script:capturedMessage | Should -Match "Publish script not found"
+            $script:capturedMessage | Should -Match "Working tree is not clean"
+            Should -Invoke -CommandName Invoke-NpmExe -Times 0 -Exactly
+            Should -Invoke -CommandName Invoke-GhExe -Times 0 -Exactly
+        }
+    }
+
+    Context "release-branch derivation (pure function)" {
+        It "derives release/full-<timestamp> from a fixed Now" {
+            $fixed = [datetime]::new(2026, 6, 19, 21, 18, 0, [DateTimeKind]::Utc)
+            Get-ReleaseBranchName -Label 'full' -Now $fixed | Should -Be "release/full-20260619211800"
+        }
+    }
+
+    Context "tag/publish absence" {
+        It "the production script body invokes no git tag, tag push, or publish seam" {
+            $raw = Get-Content -LiteralPath (Resolve-Path -Path $script:scriptPath) -Raw
+            $raw | Should -Not -Match 'Invoke-PublishScript'
+            $raw | Should -Not -Match "'tag'"
+            $raw | Should -Not -Match 'vsce publish'
+        }
+    }
+
+    Context "missing manifests" {
+        It "reports a missing extension manifest and returns 1" {
+            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $script:capturedMessage = $Message }
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $false }
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Extension manifest not found"
             Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
+        }
+
+        It "reports a missing mcp-server manifest and returns 1" {
+            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $script:capturedMessage = $Message }
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) return ($LiteralPath -notmatch 'mcp-server') }
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; throw "git wrapper should not be invoked" }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "mcp-server manifest not found"
+            Should -Invoke -CommandName Invoke-GitExe -Times 0 -Exactly
+        }
+    }
+
+    Context "git/npm/gh seam failures" {
+        BeforeEach {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $script:capturedMessage = $Message }
+            Mock -CommandName Get-NpmVersion -MockWith {
+                param([string]$ManifestPath)
+                if ($ManifestPath -match 'mcp-server') { return "0.0.2" }
+                return "0.0.3"
+            }
+        }
+
+        It "returns 1 when 'git status --porcelain' fails" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^status ") { return @{ Output = @("fatal"); ExitCode = 128 } }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to read git status"
+        }
+
+        It "returns 1 when 'git checkout -b' (branch create) fails" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^checkout ") { return @{ Output = @("exists"); ExitCode = 1 } }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; throw "npm wrapper should not be invoked" }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to create release branch"
+        }
+
+        It "returns the npm exit code when the extension version bump fails" {
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; return @{ Output = @(); ExitCode = 0 } }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 7 }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 7
+            $script:capturedMessage | Should -Match "Extension version bump failed"
+        }
+
+        It "returns the npm exit code when the mcp-server version bump fails" {
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; return @{ Output = @(); ExitCode = 0 } }
+            Mock -CommandName Invoke-NpmExe -MockWith {
+                param([string[]]$NpmArgs)
+                if (($NpmArgs -join " ") -match "mcp-server") { return 9 }
+                return 0
+            }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 9
+            $script:capturedMessage | Should -Match "mcp-server version bump failed"
+        }
+
+        It "returns 1 when staging the bumped manifests fails" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^add ") { return @{ Output = @("err"); ExitCode = 1 } }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to stage bumped manifests"
+        }
+
+        It "returns 1 when committing the bumped manifests fails" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^commit ") { return @{ Output = @("err"); ExitCode = 1 } }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to commit bumped manifests"
+        }
+
+        It "returns 1 when 'gh pr create' fails" {
+            Mock -CommandName Invoke-GitExe -MockWith { param([string[]]$GitArgs) $null = $GitArgs; return @{ Output = @(); ExitCode = 0 } }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
+            Mock -CommandName Invoke-GhExe -MockWith { param([string[]]$GhArgs) $null = $GhArgs; return 1 }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to open release PR"
+        }
+    }
+
+    Context "Get-NpmVersion (real reader)" {
+        It "returns the version field from a manifest" {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Get-Content -MockWith { param($LiteralPath, [switch]$Raw) $null = $LiteralPath; $null = $Raw; return '{ "version": "2.3.4" }' }
+
+            Get-NpmVersion -ManifestPath "/repo/extensions/drm-copilot/package.json" | Should -Be "2.3.4"
+        }
+
+        It "throws when the manifest file does not exist" {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $false }
+
+            { Get-NpmVersion -ManifestPath "/repo/missing/package.json" } | Should -Throw "*Manifest not found*"
+        }
+
+        It "throws when the manifest has no version field" {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Get-Content -MockWith { param($LiteralPath, [switch]$Raw) $null = $LiteralPath; $null = $Raw; return '{ "name": "no-version" }' }
+
+            { Get-NpmVersion -ManifestPath "/repo/extensions/drm-copilot/package.json" } | Should -Throw "*no 'version' field*"
+        }
+    }
+
+    Context "Write-StderrLine (real writer)" {
+        It "writes the supplied message to the console error stream" {
+            $originalError = [Console]::Error
+            $capture = [System.IO.StringWriter]::new()
+            try {
+                [Console]::SetError($capture)
+                Write-StderrLine -Message "full release diagnostic"
+            }
+            finally {
+                [Console]::SetError($originalError)
+            }
+            $capture.ToString() | Should -Match "full release diagnostic"
+        }
+    }
+
+    Context "entry point (script invoked, not dot-sourced)" {
+        It "returns exit code 2 when invoked with an unconfirmed token" {
+            # Execute the production entry-point block in-process via the call
+            # operator. The confirmation guard returns 2 before any seam call, so
+            # no real git/npm/gh executable is invoked and the run is deterministic.
+            $originalError = [Console]::Error
+            $capture = [System.IO.StringWriter]::new()
+            try {
+                [Console]::SetError($capture)
+                & $script:scriptPath -ConfirmToken 'no'
+            }
+            finally {
+                [Console]::SetError($originalError)
+            }
+            $LASTEXITCODE | Should -Be 2
+            $capture.ToString() | Should -Match "Full release not confirmed"
         }
     }
 }
