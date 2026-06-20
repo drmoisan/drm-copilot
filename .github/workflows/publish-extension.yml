@@ -1,0 +1,57 @@
+name: Publish Extension to VS Code Marketplace
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  drm-copilot-extension-tests:
+    name: Extension Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install extension dependencies
+        run: npm --prefix extensions/drm-copilot ci
+
+      - name: Run extension tests
+        run: npm --prefix extensions/drm-copilot run test
+
+  publish:
+    name: Publish to Marketplace
+    needs: drm-copilot-extension-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install extension dependencies
+        run: npm --prefix extensions/drm-copilot ci
+
+      - name: Build extension bundle
+        run: npm --prefix extensions/drm-copilot run compile
+
+      - name: Package extension
+        working-directory: extensions/drm-copilot
+        run: npx --yes @vscode/vsce package
+
+      - name: Publish to Marketplace
+        if: github.event_name == 'push'
+        working-directory: extensions/drm-copilot
+        run: npx --yes @vscode/vsce publish --pat ${{ secrets.VSCE_PAT }}

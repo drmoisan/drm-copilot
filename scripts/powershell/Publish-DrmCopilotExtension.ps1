@@ -1,32 +1,31 @@
-﻿<#
+<#
 .SYNOPSIS
-    Build, validate, and publish the drm-copilot VS Code extension.
+    Build, validate, and locally package the drm-copilot VS Code extension.
 
 .DESCRIPTION
-    Automates the publish workflow for extensions/drm-copilot/. Always runs
-    pre-flight validation against the extension manifest. Modes:
+    Provides the local-only modes for the extensions/drm-copilot/ extension.
+    Always runs pre-flight validation against the extension manifest. Modes:
 
-      -DryRun    : Validate manifest and run vsce ls. No package, no publish.
+      -DryRun    : Validate manifest and run vsce ls. No package, no upload.
       -Package   : Validate, build, and produce a timestamped .vsix in
-                   artifacts/vsix/. No publish.
-      -Publish   : Validate, build, package, and publish to the VS Code
-                   Marketplace via vsce publish. Requires an authenticated
-                   vsce session (run 'vsce login DanMoisan' once first).
+                   artifacts/vsix/. No upload.
 
-    Default mode is -DryRun. The script never publishes unless -Publish is
-    supplied explicitly.
+    Default mode is -DryRun. This script never uploads to the VS Code
+    Marketplace and never creates or pushes a release tag. Marketplace upload
+    and release tagging are performed by CI: the tag-triggered workflow
+    .github/workflows/publish-extension.yml runs the Marketplace upload against
+    the tagged commit. The local responsibility of this script ends at
+    producing a .vsix for inspection (-Package) and validating the manifest
+    (-DryRun).
 
-.PARAMETER VersionBump
-    Optional. One of patch | minor | major. If supplied, the version field
-    in extensions/drm-copilot/package.json is incremented before packaging.
-    Ignored in -DryRun mode.
+    External executable calls (npm, vsce) are isolated behind wrapper-function
+    seams (Invoke-NpmExe, Invoke-VsceExe, Get-VsceListing) so Pester unit tests
+    can mock them without invoking real npm/vsce or the network, per repo
+    policy.
 
 .PARAMETER SkipBuild
     Skip the npm install + npm run compile steps. Useful when the extension
     is already built and you only want to repackage.
-
-.PARAMETER Tag
-    Optional git tag to create after a successful publish. Format: v<version>.
 
 .EXAMPLE
     pwsh ./scripts/powershell/Publish-DrmCopilotExtension.ps1 -DryRun
@@ -38,28 +37,17 @@
 
     Produces a timestamped .vsix in artifacts/vsix/ for local testing.
 
-.EXAMPLE
-    pwsh ./scripts/powershell/Publish-DrmCopilotExtension.ps1 -Publish -VersionBump patch -Tag
-
-    Bumps the patch version, builds, packages, publishes to Marketplace,
-    and creates a v<new-version> git tag.
-
 .NOTES
-    Prerequisites for -Publish mode:
-      1. Marketplace publisher 'DanMoisan' exists.
-      2. PAT with Marketplace (Manage) scope obtained from Azure DevOps.
-      3. 'vsce login DanMoisan' has been run successfully on this machine.
-      4. The extension manifest contains all required fields (the script
-         validates this and exits non-zero if any are missing).
+    Version bumping is a PR-gated source change (open a release PR via the
+    "Release: Open ... Version-Bump PR" tasks). Marketplace upload and the
+    v<version> release tag are performed by CI after the bump PR merges, not
+    by this script.
 
     Marketplace versions are immutable. A published version cannot be
-    republished or deleted, only unpublished. Confirm the version is correct
-    before invoking -Publish.
+    republished or deleted, only unpublished.
 #>
 
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DryRun', Justification = 'Used indirectly via PSCmdlet.ParameterSetName.')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Package', Justification = 'Used indirectly via PSCmdlet.ParameterSetName.')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Publish', Justification = 'Used indirectly via PSCmdlet.ParameterSetName.')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'SkipBuild', Justification = 'Forwarded to Invoke-ExtensionPackage as a switch.')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '', Justification = 'npm and vsce are external tools that require positional command arguments by convention.')]
 [CmdletBinding(DefaultParameterSetName = 'DryRun')]
 param(
@@ -69,272 +57,290 @@ param(
     [Parameter(ParameterSetName = 'Package')]
     [switch]$Package,
 
-    [Parameter(ParameterSetName = 'Publish')]
-    [switch]$Publish,
-
-    [ValidateSet('patch', 'minor', 'major')]
-    [string]$VersionBump,
-
-    [switch]$SkipBuild,
-
-    [switch]$Tag
+    [switch]$SkipBuild
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $InformationPreference = 'Continue'
 
-# ---------------------------------------------------------------------------
-# Resolve paths.
-# ---------------------------------------------------------------------------
-
-$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$ExtensionDir = Join-Path $RepoRoot 'extensions\drm-copilot'
-$ManifestPath = Join-Path $ExtensionDir 'package.json'
-$VsixOutDir = Join-Path $RepoRoot 'artifacts\vsix'
-
-if (-not (Test-Path $ManifestPath)) {
-    Write-Error "Extension manifest not found at $ManifestPath"
+function Invoke-NpmExe {
+    <#
+    .SYNOPSIS
+        Wrapper seam for invoking npm. Exists so tests can mock the external
+        call without executing real npm. Splats the supplied argument array
+        into npm and returns the process exit code.
+    .OUTPUTS
+        The npm process exit code.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$NpmArgs
+    )
+    & npm @NpmArgs 2>&1 | Out-Host
+    return $LASTEXITCODE
 }
 
-if (-not (Test-Path $VsixOutDir)) {
-    New-Item -ItemType Directory -Path $VsixOutDir -Force | Out-Null
+function Invoke-VsceExe {
+    <#
+    .SYNOPSIS
+        Wrapper seam for invoking vsce. Exists so tests can mock the external
+        call without executing real vsce. Splats the supplied argument array
+        into vsce and returns the process exit code.
+    .OUTPUTS
+        The vsce process exit code.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$VsceArgs
+    )
+    & vsce @VsceArgs 2>&1 | Out-Host
+    return $LASTEXITCODE
 }
 
-# Determine mode.
-$Mode = $PSCmdlet.ParameterSetName
-Write-Information "drm-copilot publish script — mode: $Mode"
-Write-Information "Extension directory: $ExtensionDir"
-Write-Information ""
-
-# ---------------------------------------------------------------------------
-# Verify vsce is available.
-# ---------------------------------------------------------------------------
-
-$VsceCmd = Get-Command vsce -ErrorAction SilentlyContinue
-if ($null -eq $VsceCmd) {
-    Write-Error "vsce is not on PATH. Install with: npm install -g @vscode/vsce"
+function Get-VsceListing {
+    <#
+    .SYNOPSIS
+        Wrapper seam for `vsce ls`. Exists so tests can mock the file listing
+        without executing real vsce. Returns the raw listing lines.
+    .OUTPUTS
+        The lines emitted by `vsce ls`.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param()
+    return (vsce ls 2>&1)
 }
 
-# ---------------------------------------------------------------------------
-# Manifest pre-flight validation.
-# ---------------------------------------------------------------------------
+function Test-ExtensionManifest {
+    <#
+    .SYNOPSIS
+        Validates the extension manifest. Pure read of the manifest JSON;
+        performs no external executable call. Throws on a missing manifest or
+        a missing required field; emits warnings for missing recommended files.
+    .OUTPUTS
+        The parsed manifest object.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ManifestPath,
+        [Parameter(Mandatory = $true)]
+        [string]$ExtensionDir
+    )
 
-Write-Information "[1/6] Validating manifest..."
-
-$Manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
-
-$RequiredFields = @{
-    'name'           = $Manifest.name
-    'version'        = $Manifest.version
-    'publisher'      = $Manifest.publisher
-    'engines.vscode' = if ($Manifest.engines) { $Manifest.engines.vscode } else { $null }
-    'main'           = $Manifest.main
-    'displayName'    = $Manifest.displayName
-    'description'    = $Manifest.description
-}
-
-$MissingFields = @()
-foreach ($field in $RequiredFields.Keys) {
-    if ([string]::IsNullOrWhiteSpace($RequiredFields[$field])) {
-        $MissingFields += $field
+    if (-not (Test-Path -LiteralPath $ManifestPath)) {
+        throw "Extension manifest not found at $ManifestPath"
     }
-}
 
-if ($MissingFields.Count -gt 0) {
-    Write-Error "Manifest is missing required fields: $($MissingFields -join ', ')"
-}
+    $manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
 
-$RecommendedFields = @{
-    'license'    = $Manifest.license
-    'repository' = $Manifest.repository
-    'categories' = $Manifest.categories
-}
-
-$MissingRecommended = @()
-foreach ($field in $RecommendedFields.Keys) {
-    $value = $RecommendedFields[$field]
-    if ($null -eq $value -or ($value -is [string] -and [string]::IsNullOrWhiteSpace($value))) {
-        $MissingRecommended += $field
+    $requiredFields = @{
+        'name'           = $manifest.name
+        'version'        = $manifest.version
+        'publisher'      = $manifest.publisher
+        'engines.vscode' = if ($manifest.engines) { $manifest.engines.vscode } else { $null }
+        'main'           = $manifest.main
+        'displayName'    = $manifest.displayName
+        'description'    = $manifest.description
     }
-}
 
-if ($MissingRecommended.Count -gt 0) {
-    Write-Warning "Manifest is missing recommended fields: $($MissingRecommended -join ', ')"
-}
-
-$LicensePath = Join-Path $ExtensionDir 'LICENSE'
-if (-not (Test-Path $LicensePath)) {
-    Write-Warning "LICENSE file not found at $LicensePath. Marketplace listing will lack license attribution."
-}
-
-$ChangelogPath = Join-Path $ExtensionDir 'CHANGELOG.md'
-if (-not (Test-Path $ChangelogPath)) {
-    Write-Warning "CHANGELOG.md not found at $ChangelogPath. Marketplace will not display a changelog."
-}
-
-$ReadmePath = Join-Path $ExtensionDir 'README.md'
-if (-not (Test-Path $ReadmePath)) {
-    Write-Error "README.md not found at $ReadmePath. vsce requires a README."
-}
-
-Write-Information "  Publisher : $($Manifest.publisher)"
-Write-Information "  Name      : $($Manifest.name)"
-Write-Information "  Version   : $($Manifest.version)"
-Write-Information "  Engine    : $($Manifest.engines.vscode)"
-Write-Information "  Main      : $($Manifest.main)"
-Write-Information ""
-
-# ---------------------------------------------------------------------------
-# Optional: bump version.
-# ---------------------------------------------------------------------------
-
-if ($VersionBump -and $Mode -ne 'DryRun') {
-    Write-Information "[2/6] Bumping version ($VersionBump)..."
-    Push-Location $ExtensionDir
-    try {
-        npm version $VersionBump --no-git-tag-version | Out-Null
-    }
-    finally {
-        Pop-Location
-    }
-    $Manifest = Get-Content $ManifestPath -Raw | ConvertFrom-Json
-    Write-Information "  New version: $($Manifest.version)"
-    Write-Information ""
-}
-else {
-    Write-Information "[2/6] No version bump requested."
-    Write-Information ""
-}
-
-# ---------------------------------------------------------------------------
-# Build (npm install + npm run compile).
-# ---------------------------------------------------------------------------
-
-if (-not $SkipBuild) {
-    Write-Information "[3/6] Building extension..."
-    Push-Location $ExtensionDir
-    try {
-        if (-not (Test-Path (Join-Path $ExtensionDir 'node_modules'))) {
-            Write-Information "  Running npm install..."
-            npm install
-            if ($LASTEXITCODE -ne 0) { Write-Error "npm install failed." }
+    $missingFields = @()
+    foreach ($field in $requiredFields.Keys) {
+        if ([string]::IsNullOrWhiteSpace($requiredFields[$field])) {
+            $missingFields += $field
         }
-        Write-Information "  Running npm run compile..."
-        npm run compile
-        if ($LASTEXITCODE -ne 0) { Write-Error "npm run compile failed." }
     }
-    finally {
-        Pop-Location
+
+    if ($missingFields.Count -gt 0) {
+        throw "Manifest is missing required fields: $($missingFields -join ', ')"
     }
-    Write-Information ""
-}
-else {
-    Write-Information "[3/6] Build skipped (-SkipBuild)."
-    Write-Information ""
-}
 
-# ---------------------------------------------------------------------------
-# vsce ls — list files that would ship.
-# ---------------------------------------------------------------------------
-
-Write-Information "[4/6] Listing files to be packaged..."
-Push-Location $ExtensionDir
-try {
-    $LsOutput = vsce ls 2>&1
-    $FileCount = ($LsOutput | Measure-Object -Line).Lines
-    Write-Information "  Files to ship: $FileCount"
-
-    # Patterns that should never ship. resources/**/.claude/ is intentionally
-    # bundled by this extension (it pushes those templates down to user repos),
-    # so .claude/ outside resources/ is the only forbidden form.
-    $Forbidden = $LsOutput | Select-String -Pattern '(^|/)\.git/|\.venv/|virtual/|pyproject\.toml|\.whl$|\.pyc$|\.pyo$|__pycache__|coverage\.xml|^artifacts/|^docs/|^memories/'
-    $Forbidden += $LsOutput | Select-String -Pattern '\.claude/' | Where-Object { $_ -notmatch '^resources/' }
-    if ($Forbidden) {
-        Write-Warning "vsce ls flagged potentially unwanted files:"
-        $Forbidden | ForEach-Object { Write-Information "    $_" }
+    $recommendedFields = @{
+        'license'    = $manifest.license
+        'repository' = $manifest.repository
+        'categories' = $manifest.categories
     }
-}
-finally {
-    Pop-Location
-}
-Write-Information ""
 
-# ---------------------------------------------------------------------------
-# Mode-specific actions.
-# ---------------------------------------------------------------------------
+    $missingRecommended = @()
+    foreach ($field in $recommendedFields.Keys) {
+        $value = $recommendedFields[$field]
+        if ($null -eq $value -or ($value -is [string] -and [string]::IsNullOrWhiteSpace($value))) {
+            $missingRecommended += $field
+        }
+    }
 
-if ($Mode -eq 'DryRun') {
-    Write-Information "[5/6] Dry-run complete. No package or publish performed."
-    Write-Information "[6/6] To produce a .vsix, re-run with -Package."
-    Write-Information "      To publish, re-run with -Publish (irreversible)."
-    return
-}
+    if ($missingRecommended.Count -gt 0) {
+        Write-Warning "Manifest is missing recommended fields: $($missingRecommended -join ', ')"
+    }
 
-# Build vsix output filename.
-$Timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$VsixName = "drm-copilot-$($Manifest.version)-$Timestamp.vsix"
-$VsixPath = Join-Path $VsixOutDir $VsixName
+    $licensePath = Join-Path $ExtensionDir 'LICENSE'
+    if (-not (Test-Path $licensePath)) {
+        Write-Warning "LICENSE file not found at $licensePath. Marketplace listing will lack license attribution."
+    }
 
-Write-Information "[5/6] Packaging to $VsixPath..."
-Push-Location $ExtensionDir
-try {
-    vsce package --out $VsixPath
-    if ($LASTEXITCODE -ne 0) { Write-Error "vsce package failed." }
-    $VsixInfo = Get-Item $VsixPath
-    Write-Information "  Created: $($VsixInfo.Name)"
-    Write-Information "  Size   : $([math]::Round($VsixInfo.Length / 1KB, 1)) KB"
-}
-finally {
-    Pop-Location
-}
-Write-Information ""
+    $changelogPath = Join-Path $ExtensionDir 'CHANGELOG.md'
+    if (-not (Test-Path $changelogPath)) {
+        Write-Warning "CHANGELOG.md not found at $changelogPath. Marketplace will not display a changelog."
+    }
 
-if ($Mode -eq 'Package') {
-    Write-Information "[6/6] Package complete. Install locally with:"
-    Write-Information "      code --install-extension `"$VsixPath`""
-    Write-Information "  Or for VS Code Insiders:"
-    Write-Information "      code-insiders --install-extension `"$VsixPath`""
-    return
+    $readmePath = Join-Path $ExtensionDir 'README.md'
+    if (-not (Test-Path $readmePath)) {
+        throw "README.md not found at $readmePath. vsce requires a README."
+    }
+
+    return $manifest
 }
 
-# ---------------------------------------------------------------------------
-# Publish mode.
-# ---------------------------------------------------------------------------
+function Get-ForbiddenPackagedFile {
+    <#
+    .SYNOPSIS
+        Filters a `vsce ls` listing for files that must never ship. Pure
+        function; performs no external call.
+    .OUTPUTS
+        The listing lines that match a forbidden pattern.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [object[]]$Listing
+    )
 
-Write-Information "[6/6] Publishing to VS Code Marketplace..."
-Write-Information "  Publisher: $($Manifest.publisher)"
-Write-Information "  Version  : $($Manifest.version)"
-Write-Information ""
-Write-Information "  Marketplace versions are IMMUTABLE. Confirm before continuing."
-$confirmation = Read-Host "  Type the version number to confirm publish ($($Manifest.version))"
-if ($confirmation -ne $Manifest.version) {
-    Write-Error "Confirmation did not match version. Publish aborted."
+    # resources/**/.claude/ is intentionally bundled by this extension (it
+    # pushes those templates down to user repos), so .claude/ outside
+    # resources/ is the only forbidden form.
+    $forbidden = @($Listing | Select-String -Pattern '(^|/)\.git/|\.venv/|virtual/|pyproject\.toml|\.whl$|\.pyc$|\.pyo$|__pycache__|coverage\.xml|^artifacts/|^docs/|^memories/')
+    $forbidden += @($Listing | Select-String -Pattern '\.claude/' | Where-Object { $_ -notmatch '^resources/' })
+    return $forbidden
 }
 
-Push-Location $ExtensionDir
-try {
-    vsce publish --packagePath $VsixPath
-    if ($LASTEXITCODE -ne 0) { Write-Error "vsce publish failed." }
-}
-finally {
-    Pop-Location
-}
+function Invoke-ExtensionPackage {
+    <#
+    .SYNOPSIS
+        Runs the local package/dry-run workflow: validate the manifest,
+        optionally build, run the `vsce ls` forbidden-file scan, and, in
+        Package mode, produce a timestamped .vsix. Never uploads to the
+        Marketplace and never tags.
+    .OUTPUTS
+        In Package mode, the .vsix path produced. In DryRun mode, $null.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('DryRun', 'Package')]
+        [string]$Mode,
+        [Parameter(Mandatory = $true)]
+        [string]$ExtensionDir,
+        [Parameter(Mandatory = $true)]
+        [string]$ManifestPath,
+        [Parameter(Mandatory = $true)]
+        [string]$VsixOutDir,
+        [switch]$SkipBuild
+    )
 
-Write-Information ""
-Write-Information "Publish complete."
-Write-Information "Marketplace URL: https://marketplace.visualstudio.com/items?itemName=$($Manifest.publisher).$($Manifest.name)"
-
-if ($Tag) {
-    $TagName = "v$($Manifest.version)"
+    Write-Information "drm-copilot package script - mode: $Mode"
+    Write-Information "Extension directory: $ExtensionDir"
     Write-Information ""
-    Write-Information "Creating git tag $TagName..."
-    git tag -a $TagName -m "Release $TagName"
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "git tag failed. Tag the release manually if desired."
+
+    Write-Information "[1/5] Validating manifest..."
+    $manifest = Test-ExtensionManifest -ManifestPath $ManifestPath -ExtensionDir $ExtensionDir
+    Write-Information "  Publisher : $($manifest.publisher)"
+    Write-Information "  Name      : $($manifest.name)"
+    Write-Information "  Version   : $($manifest.version)"
+    Write-Information ""
+
+    if (-not $SkipBuild) {
+        Write-Information "[2/5] Building extension..."
+        Push-Location $ExtensionDir
+        try {
+            if (-not (Test-Path (Join-Path $ExtensionDir 'node_modules'))) {
+                Write-Information "  Running npm install..."
+                $installExit = Invoke-NpmExe -NpmArgs @('install')
+                if ($installExit -ne 0) { throw "npm install failed." }
+            }
+            Write-Information "  Running npm run compile..."
+            $compileExit = Invoke-NpmExe -NpmArgs @('run', 'compile')
+            if ($compileExit -ne 0) { throw "npm run compile failed." }
+        }
+        finally {
+            Pop-Location
+        }
+        Write-Information ""
     }
     else {
-        Write-Information "  Tag created. Push with: git push origin $TagName"
+        Write-Information "[2/5] Build skipped (-SkipBuild)."
+        Write-Information ""
     }
+
+    Write-Information "[3/5] Listing files to be packaged..."
+    Push-Location $ExtensionDir
+    try {
+        $lsOutput = Get-VsceListing
+        $fileCount = ($lsOutput | Measure-Object -Line).Lines
+        Write-Information "  Files to ship: $fileCount"
+        $forbidden = Get-ForbiddenPackagedFile -Listing @($lsOutput)
+        if ($forbidden) {
+            Write-Warning "vsce ls flagged potentially unwanted files:"
+            $forbidden | ForEach-Object { Write-Information "    $_" }
+        }
+    }
+    finally {
+        Pop-Location
+    }
+    Write-Information ""
+
+    if ($Mode -eq 'DryRun') {
+        Write-Information "[4/5] Dry-run complete. No package performed."
+        Write-Information "[5/5] To produce a .vsix, re-run with -Package."
+        Write-Information "      Marketplace upload and tagging are performed by CI after the version-bump PR merges."
+        return $null
+    }
+
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $vsixName = "drm-copilot-$($manifest.version)-$timestamp.vsix"
+    $vsixPath = Join-Path $VsixOutDir $vsixName
+
+    Write-Information "[4/5] Packaging to $vsixPath..."
+    Push-Location $ExtensionDir
+    try {
+        $packageExit = Invoke-VsceExe -VsceArgs @('package', '--out', $vsixPath)
+        if ($packageExit -ne 0) { throw "vsce package failed." }
+    }
+    finally {
+        Pop-Location
+    }
+    Write-Information ""
+
+    Write-Information "[5/5] Package complete. Install locally with:"
+    Write-Information "      code --install-extension `"$vsixPath`""
+    Write-Information "      Marketplace upload and the release tag are performed by CI"
+    Write-Information "      (.github/workflows/publish-extension.yml) after the bump PR merges."
+    return $vsixPath
 }
 
+# Entry point: skipped when the script is dot-sourced for testing.
+if ($MyInvocation.InvocationName -ne '.') {
+    $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+    $extensionDir = Join-Path $repoRoot 'extensions\drm-copilot'
+    $manifestPath = Join-Path $extensionDir 'package.json'
+    $vsixOutDir = Join-Path $repoRoot 'artifacts\vsix'
+
+    if (-not (Test-Path $vsixOutDir)) {
+        New-Item -ItemType Directory -Path $vsixOutDir -Force | Out-Null
+    }
+
+    $vsceCmd = Get-Command vsce -ErrorAction SilentlyContinue
+    if ($null -eq $vsceCmd) {
+        Write-Error "vsce is not on PATH. Install with: npm install -g @vscode/vsce"
+    }
+
+    $mode = $PSCmdlet.ParameterSetName
+    $null = $DryRun
+    $null = $Package
+    $null = Invoke-ExtensionPackage -Mode $mode -ExtensionDir $extensionDir -ManifestPath $manifestPath -VsixOutDir $vsixOutDir -SkipBuild:$SkipBuild
+}

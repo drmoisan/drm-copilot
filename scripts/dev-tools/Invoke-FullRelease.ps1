@@ -1,37 +1,36 @@
 <#
 .SYNOPSIS
-    Task wrapper that gates a combined extension + mcp-server release behind an
-    explicit confirmation token.
+    Task wrapper that opens a full release version-bump PR behind an explicit
+    confirmation token.
 
 .DESCRIPTION
-    Invoked by the VS Code task "Publish: Full Release (bump both + Marketplace
-    + npm tag)". Exits non-zero unless -ConfirmToken equals the literal string
-    'yes'. On confirmation, in one run:
+    Invoked by the VS Code task "Release: Open Full Version-Bump PR". Exits
+    non-zero unless -ConfirmToken equals the literal string 'yes'. On
+    confirmation, in one run:
 
-      1. Patch-bumps the mcp-server manifest (packages/mcp-server/package.json)
-         via npm with --no-git-tag-version (smallest increment, no git tag),
-         then derives the post-bump version and the mcp-server-v<version> tag.
-      2. Publishes the extension to the VS Code Marketplace by delegating to
-         scripts/powershell/Publish-DrmCopilotExtension.ps1 with -Publish
-         -VersionBump patch -Tag (the delegated script bumps the extension
-         manifest's patch version). A non-zero publish exit code stops the run
-         before the mcp-server tag is pushed.
-      3. Creates and pushes the mcp-server-v<version> git tag, which fires the
-         existing .github/workflows/publish-mcp-npm.yml workflow (tag-trigger
-         model; no local npm token required).
+      1. Verifies a clean working tree (git status --porcelain). A non-empty
+         status blocks the run with a reported error and a non-zero exit.
+      2. Creates a release branch from the current HEAD.
+      3. Patch-bumps both manifests (extensions/drm-copilot/package.json and
+         packages/mcp-server/package.json) via npm with --no-git-tag-version
+         (smallest increment; npm does not create a tag).
+      4. Commits the bumped manifests on the release branch.
+      5. Opens a PR against main via gh pr create.
 
-    The wrapper exists so the task can use pwsh -File (no nested-quoting
-    issues) instead of an inline -Command string. All external executable
-    calls are isolated behind wrapper-function seams (Invoke-GitExe,
-    Invoke-NpmExe, Invoke-PublishScript) so Pester unit tests can mock them
-    without touching real git/npm or the network, per repo policy.
+    This task never publishes and never pushes a release tag. Marketplace
+    upload and npm publish are performed by CI after the bump PR merges and the
+    post-merge tag-push task (Invoke-ReleaseTagPush.ps1) pushes the release
+    tags.
+
+    All external executable calls are isolated behind wrapper-function seams
+    (Invoke-GitExe, Invoke-NpmExe, Invoke-GhExe) so Pester unit tests can mock
+    them without touching real git/npm/gh or the network, per repo policy.
 
 .PARAMETER ConfirmToken
-    Must be the literal string 'yes' (case-sensitive) for the release to
+    Must be the literal string 'yes' (case-sensitive) for the PR opener to
     proceed. Any other value causes the wrapper to write an error and return
     exit code 2. Named -ConfirmToken (rather than -Confirm) to avoid collision
-    with the PowerShell common parameter -Confirm. Marketplace and npm
-    versions are immutable, so confirmation is required.
+    with the PowerShell common parameter -Confirm.
 
 .EXAMPLE
     pwsh ./scripts/dev-tools/Invoke-FullRelease.ps1 -ConfirmToken yes
@@ -57,16 +56,18 @@ function Invoke-GitExe {
     .SYNOPSIS
         Wrapper seam for invoking git. Exists so tests can mock the external
         call without executing real git. Splats the supplied argument array
-        into git and propagates the process exit code.
+        into git and returns the captured output plus exit code.
+    .OUTPUTS
+        A hashtable with keys Output (string[]) and ExitCode (int).
     #>
     [CmdletBinding()]
-    [OutputType([int])]
+    [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$GitArgs
     )
-    & git @GitArgs 2>&1 | Out-Host
-    return $LASTEXITCODE
+    $output = & git @GitArgs 2>&1
+    return @{ Output = @($output); ExitCode = $LASTEXITCODE }
 }
 
 function Invoke-NpmExe {
@@ -74,7 +75,9 @@ function Invoke-NpmExe {
     .SYNOPSIS
         Wrapper seam for invoking npm. Exists so tests can mock the external
         call without executing real npm. Splats the supplied argument array
-        into npm and propagates the process exit code.
+        into npm and returns the process exit code.
+    .OUTPUTS
+        The npm process exit code.
     #>
     [CmdletBinding()]
     [OutputType([int])]
@@ -86,20 +89,22 @@ function Invoke-NpmExe {
     return $LASTEXITCODE
 }
 
-function Invoke-PublishScript {
+function Invoke-GhExe {
     <#
     .SYNOPSIS
-        Wrapper seam for invoking the underlying extension publish script.
-        Exists so tests can mock the external call without executing the real
-        publish. Returns the publish script's exit code.
+        Wrapper seam for invoking gh. Exists so tests can mock the external
+        call without executing real gh. Splats the supplied argument array
+        into gh and returns the process exit code.
+    .OUTPUTS
+        The gh process exit code.
     #>
     [CmdletBinding()]
     [OutputType([int])]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$ScriptPath
+        [string[]]$GhArgs
     )
-    & $ScriptPath -Publish -VersionBump patch -Tag
+    & gh @GhArgs 2>&1 | Out-Host
     return $LASTEXITCODE
 }
 
@@ -133,33 +138,35 @@ function Get-NpmVersion {
     return [string]$version
 }
 
-function Get-McpServerTagName {
+function Get-ReleaseBranchName {
     <#
     .SYNOPSIS
-        Constructs the mcp-server git tag name from a version string. Pure
-        function; performs no external call.
+        Constructs a release branch name from a label and a UTC timestamp.
+        Pure function; performs no external call.
     .OUTPUTS
-        The tag name in the form mcp-server-v<version>.
+        The branch name in the form release/<Label>-<yyyyMMddHHmmss>.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Version
+        [string]$Label,
+        [Parameter(Mandatory = $true)]
+        [datetime]$Now
     )
-    return "mcp-server-v$Version"
+    return "release/$Label-$($Now.ToString('yyyyMMddHHmmss'))"
 }
 
 function Invoke-FullReleaseGuarded {
     <#
     .SYNOPSIS
-        Validates the confirmation token and performs the combined release:
-        mcp-server manifest patch bump, extension Marketplace publish, and
-        mcp-server tag creation + push.
+        Validates the confirmation token and opens a full release PR: verify a
+        clean tree, create a release branch, patch-bump both manifests, commit,
+        and open a PR against main. Never publishes and never tags.
     .OUTPUTS
-        Integer exit code: 0 on success; 1 on missing publish script or a
-        failed git tag operation; 2 on missing confirmation; or the publish
-        script's own non-zero exit code on publish failure.
+        Integer exit code: 0 on success; 1 on a missing manifest, a dirty tree,
+        or a failed git/gh seam; 2 on missing confirmation; or the npm bump
+        exit code on a failed version bump.
     #>
     [CmdletBinding()]
     [OutputType([int])]
@@ -175,47 +182,74 @@ function Invoke-FullReleaseGuarded {
         return 2
     }
 
-    $publishScript = Join-Path -Path $RepoRoot -ChildPath 'scripts/powershell/Publish-DrmCopilotExtension.ps1'
-    $mcpManifest = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package.json'
     $extensionManifest = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot/package.json'
+    $mcpManifest = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package.json'
+    $extensionDir = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot'
     $mcpServerDir = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server'
 
-    if (-not (Test-Path -LiteralPath $publishScript)) {
-        Write-StderrLine -Message "Publish script not found at '$publishScript'."
+    if (-not (Test-Path -LiteralPath $extensionManifest)) {
+        Write-StderrLine -Message "Extension manifest not found at '$extensionManifest'."
+        return 1
+    }
+    if (-not (Test-Path -LiteralPath $mcpManifest)) {
+        Write-StderrLine -Message "mcp-server manifest not found at '$mcpManifest'."
         return 1
     }
 
-    # Step 1: patch-bump the mcp-server manifest (no git tag), then derive the
-    # new version and the mcp-server-v<version> tag name.
-    $bumpExit = Invoke-NpmExe -NpmArgs @('--prefix', $mcpServerDir, 'version', 'patch', '--no-git-tag-version')
-    if ($bumpExit -ne 0) {
-        Write-StderrLine -Message "mcp-server version bump failed (npm exit code $bumpExit)."
-        return $bumpExit
+    # Step 1: verify a clean working tree. Non-empty porcelain output blocks.
+    $status = Invoke-GitExe -GitArgs @('status', '--porcelain')
+    if ($status.ExitCode -ne 0) {
+        Write-StderrLine -Message "Failed to read git status (git exit code $($status.ExitCode))."
+        return 1
+    }
+    $statusText = ($status.Output -join "`n").Trim()
+    if (-not [string]::IsNullOrWhiteSpace($statusText)) {
+        Write-StderrLine -Message "Working tree is not clean. Commit or stash changes before opening a release PR."
+        return 1
     }
 
+    # Step 2: create a release branch.
+    $branchName = Get-ReleaseBranchName -Label 'full' -Now ([datetime]::UtcNow)
+    $branch = Invoke-GitExe -GitArgs @('checkout', '-b', $branchName)
+    if ($branch.ExitCode -ne 0) {
+        Write-StderrLine -Message "Failed to create release branch '$branchName' (git exit code $($branch.ExitCode))."
+        return 1
+    }
+
+    # Step 3: patch-bump both manifests (npm does not create a tag).
+    $extBumpExit = Invoke-NpmExe -NpmArgs @('--prefix', $extensionDir, 'version', 'patch', '--no-git-tag-version')
+    if ($extBumpExit -ne 0) {
+        Write-StderrLine -Message "Extension version bump failed (npm exit code $extBumpExit)."
+        return $extBumpExit
+    }
+    $mcpBumpExit = Invoke-NpmExe -NpmArgs @('--prefix', $mcpServerDir, 'version', 'patch', '--no-git-tag-version')
+    if ($mcpBumpExit -ne 0) {
+        Write-StderrLine -Message "mcp-server version bump failed (npm exit code $mcpBumpExit)."
+        return $mcpBumpExit
+    }
+
+    $newExtVersion = Get-NpmVersion -ManifestPath $extensionManifest
     $newMcpVersion = Get-NpmVersion -ManifestPath $mcpManifest
-    $mcpTagName = Get-McpServerTagName -Version $newMcpVersion
 
-    # Step 2: publish the extension via the delegated script (it patch-bumps
-    # the extension manifest). Stop before the tag push on any failure.
-    $publishExit = Invoke-PublishScript -ScriptPath $publishScript
-    if ($publishExit -ne 0) {
-        Write-StderrLine -Message "Extension publish failed (exit code $publishExit). mcp-server tag '$mcpTagName' was not pushed."
-        return $publishExit
+    # Step 4: commit the bumped manifests.
+    $add = Invoke-GitExe -GitArgs @('add', $extensionManifest, $mcpManifest)
+    if ($add.ExitCode -ne 0) {
+        Write-StderrLine -Message "Failed to stage bumped manifests (git exit code $($add.ExitCode))."
+        return 1
     }
-
-    $null = $extensionManifest
-
-    # Step 3: create and push the mcp-server tag to trigger the npm publish.
-    $tagCreateExit = Invoke-GitExe -GitArgs @('tag', '-a', $mcpTagName, '-m', "mcp-server $newMcpVersion")
-    if ($tagCreateExit -ne 0) {
-        Write-StderrLine -Message "Failed to create git tag '$mcpTagName' (git exit code $tagCreateExit)."
+    $commitMessage = "release: bump extension to $newExtVersion and mcp-server to $newMcpVersion"
+    $commit = Invoke-GitExe -GitArgs @('commit', '-m', $commitMessage)
+    if ($commit.ExitCode -ne 0) {
+        Write-StderrLine -Message "Failed to commit bumped manifests (git exit code $($commit.ExitCode))."
         return 1
     }
 
-    $tagPushExit = Invoke-GitExe -GitArgs @('push', 'origin', $mcpTagName)
-    if ($tagPushExit -ne 0) {
-        Write-StderrLine -Message "Failed to push git tag '$mcpTagName' (git exit code $tagPushExit)."
+    # Step 5: open a PR against main.
+    $prTitle = "release: bump extension $newExtVersion and mcp-server $newMcpVersion"
+    $prBody = "Automated full release version-bump PR. Extension -> $newExtVersion, mcp-server -> $newMcpVersion. Merge to main, then run the post-merge tag-push task to publish."
+    $prExit = Invoke-GhExe -GhArgs @('pr', 'create', '--base', 'main', '--head', $branchName, '--title', $prTitle, '--body', $prBody)
+    if ($prExit -ne 0) {
+        Write-StderrLine -Message "Failed to open release PR (gh exit code $prExit)."
         return 1
     }
 
