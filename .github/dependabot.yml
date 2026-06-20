@@ -1,0 +1,67 @@
+version: 2
+
+updates:
+  # Root VS Code extension manifest.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      npm-root:
+        patterns:
+          - "*"
+
+  # Extension-side bundled workflow utilities and MCP bridge.
+  - package-ecosystem: npm
+    directory: "/extensions/drm-copilot"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      npm-extensions-drm-copilot:
+        patterns:
+          - "*"
+
+  # Stdio MCP server package.
+  - package-ecosystem: npm
+    directory: "/packages/mcp-server"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      npm-mcp-server:
+        patterns:
+          - "*"
+
+  # GitHub Actions used by the workflows in this repository.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"

@@ -1,0 +1,54 @@
+name: npm Audit Gate (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      audit-level:
+        description: >-
+          Minimum advisory severity that fails the gate
+          (low | moderate | high | critical).
+        required: false
+        type: string
+        default: moderate
+  workflow_dispatch:
+    inputs:
+      audit-level:
+        description: >-
+          Minimum advisory severity that fails the gate
+          (low | moderate | high | critical).
+        required: false
+        type: string
+        default: moderate
+
+jobs:
+  npm-audit:
+    name: npm audit (${{ matrix.manifest }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        manifest:
+          - "."
+          - extensions/drm-copilot
+          - packages/mcp-server
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ${{ matrix.manifest }}/package-lock.json
+
+      - name: Install from lockfile (verifies lockfile/manifest sync)
+        working-directory: ${{ matrix.manifest }}
+        run: npm ci
+
+      - name: Audit dependencies
+        working-directory: ${{ matrix.manifest }}
+        env:
+          AUDIT_LEVEL: ${{ inputs.audit-level }}
+        run: npm audit --audit-level="$AUDIT_LEVEL"
