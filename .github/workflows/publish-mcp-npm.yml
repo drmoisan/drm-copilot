@@ -32,9 +32,6 @@ jobs:
     name: Publish to npm
     needs: drm-copilot-extension-tests
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -57,6 +54,6 @@ jobs:
       - name: Publish to npm
         if: github.event_name == 'push'
         working-directory: packages/mcp-server
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
