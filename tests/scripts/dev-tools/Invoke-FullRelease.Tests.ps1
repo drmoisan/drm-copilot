@@ -97,6 +97,18 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             $ghFlat | Should -Match "pr create"
             $ghFlat | Should -Match "--base main"
 
+            # The 'git add' staging call must include both package.json manifests
+            # and both package-lock.json lockfiles. npm version (npm 7+) updates
+            # the lockfiles too, so all four paths must be staged or the lockfile
+            # changes are left uncommitted.
+            $addCall = $script:capturedGitArgsList | Where-Object { @($_)[0] -eq 'add' } | Select-Object -First 1
+            $addCall | Should -Not -BeNullOrEmpty
+            $addFlat = (@($addCall) -join " ")
+            $addFlat | Should -Match "extensions[\\/]drm-copilot[\\/]package\.json"
+            $addFlat | Should -Match "packages[\\/]mcp-server[\\/]package\.json"
+            $addFlat | Should -Match "extensions[\\/]drm-copilot[\\/]package-lock\.json"
+            $addFlat | Should -Match "packages[\\/]mcp-server[\\/]package-lock\.json"
+
             # The release branch must be pushed to origin before the PR is opened.
             $gitFlat = @($script:capturedGitArgsList | ForEach-Object { $_ -join " " })
             $pushIndex = $gitFlat.IndexOf(($gitFlat | Where-Object { $_ -match "^push -u origin release/" } | Select-Object -First 1))
