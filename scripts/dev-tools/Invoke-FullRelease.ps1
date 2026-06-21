@@ -15,7 +15,8 @@
          packages/mcp-server/package.json) via npm with --no-git-tag-version
          (smallest increment; npm does not create a tag).
       4. Commits the bumped manifests on the release branch.
-      5. Opens a PR against main via gh pr create.
+      5. Pushes the release branch to origin so the PR has a remote ref.
+      6. Opens a PR against main via gh pr create.
 
     This task never publishes and never pushes a release tag. Marketplace
     upload and npm publish are performed by CI after the bump PR merges and the
@@ -244,7 +245,14 @@ function Invoke-FullReleaseGuarded {
         return 1
     }
 
-    # Step 5: open a PR against main.
+    # Step 5: publish the release branch so gh pr create has a remote ref.
+    $push = Invoke-GitExe -GitArgs @('push', '-u', 'origin', $branchName)
+    if ($push.ExitCode -ne 0) {
+        Write-StderrLine -Message "Failed to push release branch '$branchName' to origin (git exit code $($push.ExitCode))."
+        return 1
+    }
+
+    # Step 6: open a PR against main.
     $prTitle = "release: bump extension $newExtVersion and mcp-server $newMcpVersion"
     $prBody = "Automated full release version-bump PR. Extension -> $newExtVersion, mcp-server -> $newMcpVersion. Merge to main, then run the post-merge tag-push task to publish."
     $prExit = Invoke-GhExe -GhArgs @('pr', 'create', '--base', 'main', '--head', $branchName, '--title', $prTitle, '--body', $prBody)
