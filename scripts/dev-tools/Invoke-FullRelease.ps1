@@ -185,6 +185,8 @@ function Invoke-FullReleaseGuarded {
 
     $extensionManifest = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot/package.json'
     $mcpManifest = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package.json'
+    $extensionLockfile = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot/package-lock.json'
+    $mcpLockfile = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package-lock.json'
     $extensionDir = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot'
     $mcpServerDir = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server'
 
@@ -232,8 +234,10 @@ function Invoke-FullReleaseGuarded {
     $newExtVersion = Get-NpmVersion -ManifestPath $extensionManifest
     $newMcpVersion = Get-NpmVersion -ManifestPath $mcpManifest
 
-    # Step 4: commit the bumped manifests.
-    $add = Invoke-GitExe -GitArgs @('add', $extensionManifest, $mcpManifest)
+    # Step 4: commit the bumped manifests and their lockfiles. npm version
+    # (npm 7+) updates both package.json and package-lock.json, so all four
+    # files must be staged or the lockfile changes are left uncommitted.
+    $add = Invoke-GitExe -GitArgs @('add', $extensionManifest, $mcpManifest, $extensionLockfile, $mcpLockfile)
     if ($add.ExitCode -ne 0) {
         Write-StderrLine -Message "Failed to stage bumped manifests (git exit code $($add.ExitCode))."
         return 1
