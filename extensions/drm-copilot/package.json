@@ -2,7 +2,7 @@
   "name": "drm-copilot",
   "displayName": "drm-copilot",
   "description": "Extension-side bundled workflow execution utilities and MCP bridge.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "DanMoisan",
   "license": "MIT",
   "repository": {
