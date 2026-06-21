@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "commonjs",
   "bin": {
-    "drm-copilot-mcp": "./out/mcp-server.js"
+    "drm-copilot-mcp": "out/mcp-server.js"
   },
   "files": [
     "out/mcp-server.js",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/drmoisan/drm-copilot.git",
+    "url": "git+https://github.com/drmoisan/drm-copilot.git",
     "directory": "packages/mcp-server"
   },
   "bugs": {
