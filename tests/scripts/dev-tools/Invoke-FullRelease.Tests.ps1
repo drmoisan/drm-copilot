@@ -15,6 +15,7 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
         $script:capturedNpmArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedGitArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedGhArgsList = [System.Collections.Generic.List[object]]::new()
+        $script:ghInvokedAfterGitCount = -1
     }
 
     Context "confirmation guard" {
@@ -71,12 +72,15 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             Mock -CommandName Invoke-GitExe -MockWith {
                 param([string[]]$GitArgs)
                 $script:capturedGitArgsList.Add($GitArgs)
-                # Clean tree on status; success otherwise.
+                # Clean tree on status; success otherwise (including the branch push).
                 return @{ Output = @(); ExitCode = 0 }
             }
             Mock -CommandName Invoke-GhExe -MockWith {
                 param([string[]]$GhArgs)
                 $script:capturedGhArgsList.Add($GhArgs)
+                # Record the relative order of git vs gh calls so the test can
+                # assert the push is issued before PR creation.
+                $script:ghInvokedAfterGitCount = $script:capturedGitArgsList.Count
                 return 0
             }
 
@@ -92,6 +96,16 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             $ghFlat = @($script:capturedGhArgsList | ForEach-Object { $_ }) -join " "
             $ghFlat | Should -Match "pr create"
             $ghFlat | Should -Match "--base main"
+
+            # The release branch must be pushed to origin before the PR is opened.
+            $gitFlat = @($script:capturedGitArgsList | ForEach-Object { $_ -join " " })
+            $pushIndex = $gitFlat.IndexOf(($gitFlat | Where-Object { $_ -match "^push -u origin release/" } | Select-Object -First 1))
+            $pushIndex | Should -BeGreaterOrEqual 0
+            ($gitFlat[$pushIndex]) | Should -Match "^push -u origin release/"
+            # gh pr create was invoked only after all recorded git calls, which
+            # include the push; therefore the push precedes PR creation.
+            $script:ghInvokedAfterGitCount | Should -Be $script:capturedGitArgsList.Count
+            ($pushIndex + 1) | Should -BeLessOrEqual $script:ghInvokedAfterGitCount
         }
     }
 
@@ -261,6 +275,22 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
 
             $result | Should -Be 1
             $script:capturedMessage | Should -Match "Failed to open release PR"
+        }
+
+        It "returns 1 and does not open a PR when 'git push -u origin <branch>' fails" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^push ") { return @{ Output = @("rejected"); ExitCode = 1 } }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
+            Mock -CommandName Invoke-GhExe -MockWith { param([string[]]$GhArgs) $null = $GhArgs; throw "gh wrapper should not be invoked" }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to push release branch"
+            Should -Invoke -CommandName Invoke-GhExe -Times 0 -Exactly
         }
     }
 
