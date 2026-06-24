@@ -89,7 +89,7 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `atomic-planner` — generates phased implementation plans
 - `atomic-executor` — executes approved plans task-by-task
 - `feature-review` — produces policy, code, and feature audit artifacts
-- `task-researcher` — performs deep research and writes findings to `artifacts/research/`
+- `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 - `prd-feature` — produces issue, specification, and user-story artifacts when required by the selected workflow
 - `staged-review` — reviews staged changes when a pre-commit review is required
 - `epic-review` — reviews epic-level artifacts when the work item is an epic
@@ -125,7 +125,6 @@ All evidence artifacts produced during orchestration MUST comply with the canoni
 
 Permitted `artifacts/`-rooted sub-paths (non-evidence orchestration use only):
 - `artifacts/orchestration/` — orchestrator state and checkpoints
-- `artifacts/research/` — research outputs from task-researcher
 - `artifacts/pr_context` — PR context artifacts
 - `artifacts/reviews/` — review staging artifacts
 - `artifacts/status/` — status update artifacts

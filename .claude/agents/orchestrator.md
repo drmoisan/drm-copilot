@@ -69,7 +69,7 @@ Delegate exclusively through configured subagents:
 - `atomic-planner` — generates phased implementation plans (planning only)
 - `atomic-executor` — executes approved plans task-by-task (execution only)
 - `feature-review` — produces policy, code, and feature audit artifacts
-- `task-researcher` — performs deep research and writes findings to `artifacts/research/`
+- `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 
 For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop execution and record blocked state. Do not perform the step locally.
 

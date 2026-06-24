@@ -35,6 +35,7 @@ _FORBIDDEN_PREFIX_TO_CANONICAL: dict[str, str] = {
     "artifacts/evidence/": "<FEATURE>/evidence/<kind>/",
     "artifacts/regression-testing/": "<FEATURE>/evidence/qa-gates/",
     "artifacts/post-change/": "<FEATURE>/evidence/qa-gates/",
+    "artifacts/research/": "docs/features/active/<feature>/research/ or docs/research/",
 }
 
 

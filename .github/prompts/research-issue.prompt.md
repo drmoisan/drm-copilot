@@ -16,7 +16,7 @@ Your output must be actionable for an engineer/agent to implement, and must be g
 
 ## Scope and operating rules
 
-Follow the operating rules in your agent definition (research-only, write to `artifacts/research/`, evidence-based). Do not restate those rules in the research notes; apply them.
+Follow the operating rules in your agent definition (research-only; write to the orchestrator-supplied research root under `docs/features/<feature>/research/` for feature-associated research or `docs/research/` for one-off research; evidence-based). Do not restate those rules in the research notes; apply them.
 
 ## Inputs / Context (authoritative)
 
@@ -31,11 +31,12 @@ Also identify (from the feature docs) the **implementation target files** in the
 
 ## Research Outputs (required)
 
-Create (or update) a single research file under `artifacts/research/` using the Task Researcher template exactly.
+Create (or update) a single research file under the orchestrator-supplied research root using the Task Researcher template exactly. The two tracked research roots are `docs/features/<feature>/research/` (feature-associated; for example `docs/features/active/<feature>/research/`) and `docs/research/` (one-off, not tied to a feature). Routing rule: use the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise use `docs/research/`.
 
 Filename convention:
 
-- `artifacts/research/YYYYMMDD-<short-feature-name>-implementation-research.md`
+- `docs/features/<feature>/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (feature-associated), or
+- `docs/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (one-off)
 
 In the research file, keep any discussion of non-selected approaches *brief and non-exhaustive*. After selecting a recommendation, remove detailed notes for other approaches and keep only a short “Rejected alternatives” summary (what was rejected and why).
 

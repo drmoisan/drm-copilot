@@ -5,8 +5,10 @@
 .DESCRIPTION
     Blocks termination of the task-researcher subagent unless the agent's
     final output advertises a `research-path` token, the path is rooted
-    under artifacts/research/, matches the documented filename convention,
-    and the file exists on disk.
+    under one of the two tracked research roots
+    (docs/features/<feature>/research/ for feature-associated research, or
+    docs/research/ for one-off research), matches the documented filename
+    convention, and the file exists on disk.
 
 .NOTES
     Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
@@ -64,7 +66,20 @@ function Test-IsUnderResearchRoot {
     )
 
     $normalized = $Path -replace '\\', '/'
-    return $normalized.StartsWith('artifacts/research/', [System.StringComparison]::OrdinalIgnoreCase)
+
+    # Accept either of the two tracked research roots:
+    #   - feature-associated research: docs/features/<...>/research/<file>
+    #     (a feature-folder path that contains a /research/ segment), or
+    #   - one-off research: docs/research/<file>.
+    # The /research/ segment requirement distinguishes feature research from
+    # other files under docs/features/ (for example spec.md or plan files).
+    $isFeatureResearch =
+    $normalized.StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -and
+    $normalized.IndexOf('/research/', [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+    $isOneOffResearch =
+    $normalized.StartsWith('docs/research/', [System.StringComparison]::OrdinalIgnoreCase)
+
+    return ($isFeatureResearch -or $isOneOffResearch)
 }
 
 function Test-IsValidResearchFileName {
@@ -174,15 +189,15 @@ function Invoke-TaskResearcherOutputValidation {
 
     $researchPath = Get-ResearchPathFromOutput -AgentOutput $agentOutput
     if ($null -eq $researchPath) {
-        return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to artifacts/research/.' }
+        return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
 
     if (-not (Test-IsUnderResearchRoot -Path $researchPath)) {
-        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is not under artifacts/research/. All research artifacts must be written to artifacts/research/." }
+        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is not under a tracked research root. All research artifacts must be written to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off)." }
     }
 
     if (-not (Test-IsValidResearchFileName -Path $researchPath)) {
-        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' does not match the required filename convention `artifacts/research/<timestamp>-<short-name>-research.md`." }
+        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' does not match the required filename convention `<timestamp>-<short-name>-research.md` under docs/features/<feature>/research/ or docs/research/." }
     }
 
     if (-not (Test-ResearchFile -Path $researchPath)) {
@@ -208,3 +223,4 @@ if (-not $result.Ok) {
 }
 
 exit 0
+
