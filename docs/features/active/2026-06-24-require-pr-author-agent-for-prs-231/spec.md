@@ -151,6 +151,8 @@ Mapped to `issue.md`. These mirror the issue's acceptance criteria with the enfo
 - [x] AC7: The new SubagentStop validator hook (`validate-pr-author-output.ps1`) verifies the `pr-author` agent's output reports a PR URL or PR number, and is covered by tests.
 - [x] AC8: All documentation describing the enforcement characterizes it as a policy guardrail, not a cryptographic or security control, and records the forgeability limitation.
 
+> AC reconciliation (F-1 remediation, 2026-06-24T15-59): AC3 and AC5 were checked before inline `gh pr edit --body` was actually blocked and before the inline-edit-body tests existed. As of this remediation cycle, the `enforce-pr-author-skill.ps1` Case A guard blocks inline `--body` on both `gh pr create` and `gh pr edit` (evidence: `evidence/qa-gates/final-pester.md`, `evidence/regression-testing/backward-compat.md`), and `tests/scripts/claude-hooks/enforce-pr-author-skill.Tests.ps1` now contains the inline-edit-body BLOCK cases (both `--body "x"` and `--body='x'` forms) plus a `gh pr edit --title` no-body ALLOW regression case (44 tests, 0 failures). AC3 and AC5 therefore remain `[x]` on verified evidence.
+
 ## 7. Testing Requirements
 
 Tests must satisfy the repository unit-test policy: deterministic, isolated, independent, no temporary files, and no reliance on real `gh` or wall-clock time. The hook tests must use injectable seams.

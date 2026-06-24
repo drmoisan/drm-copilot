@@ -18,7 +18,7 @@
          (or gh pr edit --body-file ...)
 
     Block cases:
-      Case A - gh pr create with --body (inline, no --body-file): blocked.
+      Case A - gh pr create or gh pr edit with --body (inline, no --body-file): blocked.
       Case B - gh pr create with neither --body nor --body-file: blocked.
       Case C - gh pr create or gh pr edit with --body-file but context artifact absent: blocked.
       Case D - --body-file present, context artifact present, but the authorization sentinel
@@ -177,8 +177,9 @@ function Get-PrAuthorBypassReason {
     .SYNOPSIS
         Inspect the command text and return a block reason string, or $null when the command is allowed.
     .DESCRIPTION
-        Returns PR_AUTHOR_SKILL_BLOCKED when gh pr create is run with --body (inline) or with no body
-        flag at all. Returns PR_CONTEXT_MISSING when --body-file is present but the context artifact
+        Returns PR_AUTHOR_SKILL_BLOCKED when gh pr create or gh pr edit is run with --body (inline,
+        no --body-file), or when gh pr create is run with no body flag at all. Returns
+        PR_CONTEXT_MISSING when --body-file is present but the context artifact
         does not exist on disk. When --body-file is present and the context artifact exists, evaluates
         the authorization sentinel via Test-PrAuthorAuthorization and returns its block reason
         (PR_AGENT_AUTHORIZATION_*) when authorization fails. Returns $null for all allowed patterns.
@@ -212,12 +213,13 @@ function Get-PrAuthorBypassReason {
     $hasBodyFile = $CommandText -match '(?i)--body-file\b'
     $hasInlineBody = $CommandText -match '(?i)--body(?!-file)\b'
 
-    if ($isPrCreate) {
-        # Case A: gh pr create with inline --body (not --body-file).
-        if ($hasInlineBody -and -not $hasBodyFile) {
-            return "PR_AUTHOR_SKILL_BLOCKED: ``gh pr create`` must use ``--body-file`` with a file produced by the pr-author skill from ``$script:PrContextArtifactPath``. Run ``mcp__drm-copilot__collect_pr_context`` to generate the context file, apply the pr-author skill to produce ``artifacts/pr_body_<N>.md``, then pass that file via ``--body-file``."
-        }
+    # Case A: gh pr create OR gh pr edit with inline --body (not --body-file). Evaluated before the
+    # gh pr edit no-body allow short-circuit so inline-body edits are blocked, not allowed.
+    if (($isPrCreate -or $isPrEdit) -and $hasInlineBody -and -not $hasBodyFile) {
+        return "PR_AUTHOR_SKILL_BLOCKED: ``gh pr create`` and ``gh pr edit`` must use ``--body-file`` with a file produced by the pr-author skill from ``$script:PrContextArtifactPath``. Run ``mcp__drm-copilot__collect_pr_context`` to generate the context file, apply the pr-author skill to produce ``artifacts/pr_body_<N>.md``, then pass that file via ``--body-file``."
+    }
 
+    if ($isPrCreate) {
         # Case B: gh pr create with no body flag at all.
         if (-not $hasInlineBody -and -not $hasBodyFile) {
             return "PR_AUTHOR_SKILL_BLOCKED: New PRs require ``--body-file``. Run ``mcp__drm-copilot__collect_pr_context`` to generate ``$script:PrContextArtifactPath``, apply the pr-author skill to produce ``artifacts/pr_body_<N>.md``, then pass that file via ``--body-file``."

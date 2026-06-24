@@ -44,6 +44,35 @@ Describe 'enforce-pr-author-skill.ps1' {
         }
     }
 
+    Context 'gh pr edit - inline body (Case A)' {
+        BeforeEach {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+        }
+
+        It 'blocks gh pr edit --body "inline text" (no --body-file)' {
+            # Inline --body on gh pr edit must be blocked by Case A before the no-body allow path.
+            $json = '{"command":"gh pr edit 42 --body \"inline text\""}'
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It "blocks gh pr edit --body='inline' (equals-sign form, no --body-file)" {
+            # Equals-sign inline --body on gh pr edit must also be blocked by Case A.
+            $json = '{"command":"gh pr edit 42 --body=''inline''"}'
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It 'allows gh pr edit --title "x" (no body flag remains allowed)' {
+            # Regression guard: an edit with no body flag must remain allowed after the Case A change.
+            $json = '{"command":"gh pr edit 42 --title \"x\""}'
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
+            $decision['decision'] | Should -Be 'allow'
+        }
+    }
+
     Context 'gh pr create - missing body (Case B)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }

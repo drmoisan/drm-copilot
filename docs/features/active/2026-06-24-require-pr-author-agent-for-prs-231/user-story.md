@@ -41,6 +41,8 @@ PR bodies must be produced by the `pr-author` skill, but the current enforcement
 - [x] Hook behavior is covered by tests (allowed: pr-author agent; blocked: non-agent / inline body / missing context).
 - [x] The orchestrate skill documents mandatory delegation to the `pr-author` agent for PR creation.
 
+> AC reconciliation (F-1 remediation, 2026-06-24T15-59): the body-edit-restriction item ("PR body edits (`gh pr edit` with a body) are likewise restricted to the `pr-author` agent") and the inline-body test item ("Hook behavior is covered by tests ... blocked: ... inline body ...") were checked before inline `gh pr edit --body` was actually blocked and before the inline-edit-body tests existed. As of this remediation cycle, `enforce-pr-author-skill.ps1` blocks inline `--body` on `gh pr edit` via the unified Case A guard, and the test suite now asserts the inline-edit-body BLOCK cases plus a `gh pr edit --title` no-body ALLOW regression (44 tests, 0 failures). Evidence: `evidence/qa-gates/final-pester.md`, `evidence/regression-testing/backward-compat.md`. Both items remain `[x]` on verified evidence.
+
 
 ## Non-Goals
 

@@ -14,6 +14,8 @@ All pre-existing test cases in `tests/scripts/claude-hooks/enforce-pr-author-ski
 | malformed JSON throws | throw / exit 1 | throw / exit 1 (pass) |
 | Case A: `gh pr create --body "inline"` | block PR_AUTHOR_SKILL_BLOCKED | block (pass) |
 | Case A: `gh pr create --body='inline'` (equals form) | block PR_AUTHOR_SKILL_BLOCKED | block (pass) |
+| Case A: `gh pr edit --body "inline"` (no `--body-file`) | block PR_AUTHOR_SKILL_BLOCKED | block (pass) — F-1 fix |
+| Case A: `gh pr edit --body='inline'` (equals form, no `--body-file`) | block PR_AUTHOR_SKILL_BLOCKED | block (pass) — F-1 fix |
 | Case B: `gh pr create` no body flags | block PR_AUTHOR_SKILL_BLOCKED | block (pass) |
 | Case B: `gh pr create --title foo` no body | block PR_AUTHOR_SKILL_BLOCKED | block (pass) |
 | Case C: `gh pr create --body-file` context absent | block PR_CONTEXT_MISSING | block (pass) |
@@ -31,5 +33,6 @@ All pre-existing test cases in `tests/scripts/claude-hooks/enforce-pr-author-ski
 ## Verification
 
 - Command: `Invoke-Pester` over `tests/scripts/claude-hooks/enforce-pr-author-skill.Tests.ps1`.
-- Result: 41 tests, 0 failures, 0 errors. All pre-existing expectations preserved.
-- `gh pr edit --title` (no body flag) continues to short-circuit to allow without requiring a sentinel.
+- Result (F-1 remediation, 2026-06-24T15-59): 44 tests, 0 failures, 0 errors. All pre-existing expectations preserved; +3 new cases added (two inline-edit-body BLOCK, one `gh pr edit --title` no-body ALLOW regression).
+- `gh pr edit --title` (no body flag) continues to short-circuit to allow without requiring a sentinel (confirmed by the dedicated regression `It` case).
+- F-1 fix: inline `--body` on `gh pr edit` (both `--body "x"` and `--body='x'` forms, without `--body-file`) is now blocked by the unified Case A guard, which is evaluated before the `gh pr edit` no-body allow short-circuit.
