@@ -7,14 +7,11 @@
       "required_agents": [
         "atomic-planner",
         "atomic-executor",
-        "feature-reviewer",
-        "commit-steward"
+        "feature-review"
       ],
       "required_skills": [
         "orchestrate",
-        "orchestrator-workflow",
         "feature-promotion-lifecycle",
-        "repo-automation-adapter",
         "atomic-plan-contract",
         "acceptance-criteria-tracking",
         "pr-context-artifacts",
@@ -24,7 +21,6 @@
         "new_potential_entry",
         "potential_to_issue",
         "new_active_feature_folder",
-        "collect_commit_context",
         "collect_pr_context",
         "validate_orchestration_artifacts"
       ]
@@ -36,14 +32,11 @@
         "prd-feature",
         "atomic-planner",
         "atomic-executor",
-        "feature-reviewer",
-        "commit-steward"
+        "feature-review"
       ],
       "required_skills": [
         "orchestrate",
-        "orchestrator-workflow",
         "feature-promotion-lifecycle",
-        "repo-automation-adapter",
         "atomic-plan-contract",
         "acceptance-criteria-tracking",
         "pr-context-artifacts",
@@ -53,7 +46,6 @@
         "new_potential_entry",
         "potential_to_issue",
         "new_active_feature_folder",
-        "collect_commit_context",
         "collect_pr_context",
         "validate_orchestration_artifacts"
       ]
@@ -63,19 +55,15 @@
       "required_agents": [
         "atomic-planner",
         "atomic-executor",
-        "feature-reviewer",
-        "commit-steward"
+        "feature-review"
       ],
       "required_skills": [
         "orchestrate",
-        "orchestrator-workflow",
-        "repo-automation-adapter",
         "atomic-plan-contract",
         "acceptance-criteria-tracking",
         "pr-context-artifacts"
       ],
       "required_mcp_tools": [
-        "collect_commit_context",
         "collect_pr_context",
         "validate_orchestration_artifacts"
       ]

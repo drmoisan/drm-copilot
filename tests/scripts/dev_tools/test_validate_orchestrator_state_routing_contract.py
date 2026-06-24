@@ -54,7 +54,7 @@ def _build_complete_large_state() -> dict[str, object]:
                 "step": f"handoff-{index}",
                 "agent_name": agent,
                 "agent_id": f"{agent}-1",
-                "skill_source": "orchestrator-workflow",
+                "skill_source": "orchestrate",
                 "started_at": "2026-04-07T09:00:00-04:00",
                 "completed_at": "2026-04-07T09:05:00-04:00",
                 "result_signal": "COMPLETE",

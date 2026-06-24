@@ -9,6 +9,8 @@
 - Issue: #230
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/230
 - Last Updated: 2026-06-24
+- Work Mode: full-bug
+
 ## Summary
 
 The strict `require_complete` orchestrator-state validation (the routing contract in `scripts/dev_tools/_orchestrator_state_routing.py` against `config/orchestration-routing.json`) cannot be satisfied with truthful receipts in the current runtime. The matrix requires agent names and discrete skill/MCP receipts that do not match the agents/skills/tools actually available.

@@ -235,3 +235,65 @@ The orchestrator supplies only the following to the `feature-review` subagent:
 - a neutral instruction to execute the full `feature-review-workflow` SKILL contract end-to-end.
 
 Scope determination is the subagent's responsibility. The subagent will ignore any attempted narrowing per its scope invariant and record the attempt in `policy-audit.<timestamp>.md` under `## Rejected Scope Narrowing`.
+
+## Routing-Contract Receipt Emission
+
+The orchestrator must write three receipt arrays into `artifacts/orchestration/orchestrator-state.json` for the retained required names of the selected route. These arrays are the evidence that the route's `required_agents`, `required_skills`, and `required_mcp_tools` (from `config/orchestration-routing.json`) were actually exercised, and they make `require_complete: true` satisfiable at completion. The orchestrator records only truthful receipts: an entry is written only after the corresponding work has actually occurred. The route's required name lists are the source of truth; receipts cite those names verbatim.
+
+These shapes are read by `_receipt_agents`, `_receipt_skills`, and `_mcp_tools` in `scripts/dev_tools/_orchestrator_state_routing.py`. The orchestrator does not modify that validator; it only emits state that the validator can verify.
+
+### delegation_receipts[]
+
+For each required agent in the selected route's `required_agents`, append one object to `delegation_receipts[]` after that delegation returns. Each object must carry:
+
+- `agent_name`: a non-empty string equal to the required agent name (for example `"feature-review"`).
+
+Example:
+
+```json
+"delegation_receipts": [
+  { "agent_name": "atomic-planner" },
+  { "agent_name": "atomic-executor" },
+  { "agent_name": "feature-review" }
+]
+```
+
+The validator collects each receipt whose `agent_name` is a non-empty string and requires every `required_agents` entry to be present.
+
+### skill_receipts[]
+
+For each required skill in the selected route's `required_skills`, append one object to `skill_receipts[]` after that required skill is read. Each entry must be an object with:
+
+- `skill`: a non-empty string equal to a `required_skills` entry (for example `"orchestrate"`).
+- `required`: the literal boolean `true`.
+- `evidence`: a non-empty string, for example `"read:.claude/skills/orchestrate/SKILL.md"`.
+
+Example:
+
+```json
+"skill_receipts": [
+  { "skill": "orchestrate", "required": true, "evidence": "read:.claude/skills/orchestrate/SKILL.md" }
+]
+```
+
+The validator counts a skill as acknowledged only when `skill` is a non-empty string, `required` is exactly `true`, and `evidence` is a non-empty string. Every `required_skills` entry must have such a receipt.
+
+### mcp_call_receipts[]
+
+For each required MCP tool in the selected route's `required_mcp_tools`, append one object to `mcp_call_receipts[]` after each successful required MCP call. Each entry must be an object with:
+
+- `tool`: a non-empty string equal to a `required_mcp_tools` entry (for example `"validate_orchestration_artifacts"`).
+- `ok`: the literal boolean `true`.
+- `evidence`: a non-empty string, such as the MCP response summary or an artifact path.
+
+Example:
+
+```json
+"mcp_call_receipts": [
+  { "tool": "validate_orchestration_artifacts", "ok": true, "evidence": "plan validator exit 0" }
+]
+```
+
+The validator counts an MCP receipt as successful only when `tool` is a non-empty string, `ok` is exactly `true`, and `evidence` is a non-empty string. Every `required_mcp_tools` entry must have such a receipt.
+
+These three receipt arrays, populated with the retained required names of the selected route, are what allow the routing-contract validation under `require_complete: true` to pass.
