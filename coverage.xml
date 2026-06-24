@@ -1,54 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
-<report name="Pester (06/24/2026 15:56:56)">
-  <sessioninfo id="this" start="1782316613452" dump="1782316616523" />
+<report name="Pester (06/24/2026 16:25:43)">
+  <sessioninfo id="this" start="1782318342058" dump="1782318343131" />
   <package name="hooks">
-    <class name="hooks/enforce-pr-author-skill" sourcefilename="enforce-pr-author-skill.ps1">
-      <method name="&lt;script&gt;" desc="()" line="47">
-        <counter type="INSTRUCTION" missed="7" covered="4" />
-        <counter type="LINE" missed="5" covered="4" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Get-PrContextArtifactExistence" desc="()" line="62">
-        <counter type="INSTRUCTION" missed="0" covered="2" />
-        <counter type="LINE" missed="0" covered="1" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Get-PrAuthorAuthorizationContent" desc="()" line="80">
-        <counter type="INSTRUCTION" missed="0" covered="5" />
-        <counter type="LINE" missed="0" covered="3" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Get-CurrentDateTimeUtc" desc="()" line="98">
-        <counter type="INSTRUCTION" missed="0" covered="1" />
-        <counter type="LINE" missed="0" covered="1" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Test-PrAuthorAuthorization" desc="()" line="125">
-        <counter type="INSTRUCTION" missed="0" covered="27" />
-        <counter type="LINE" missed="0" covered="23" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Get-PrAuthorBypassReason" desc="()" line="202">
-        <counter type="INSTRUCTION" missed="0" covered="21" />
-        <counter type="LINE" missed="0" covered="21" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Invoke-PrAuthorSkillDecision" desc="()" line="265">
-        <counter type="INSTRUCTION" missed="0" covered="18" />
-        <counter type="LINE" missed="0" covered="14" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <method name="Test-PrAuthorBypassRequired" desc="()" line="314">
-        <counter type="INSTRUCTION" missed="0" covered="3" />
-        <counter type="LINE" missed="0" covered="1" />
-        <counter type="METHOD" missed="0" covered="1" />
-      </method>
-      <counter type="INSTRUCTION" missed="7" covered="81" />
-      <counter type="LINE" missed="5" covered="68" />
-      <counter type="METHOD" missed="0" covered="8" />
-      <counter type="CLASS" missed="0" covered="1" />
-    </class>
     <class name="hooks/validate-pr-author-output" sourcefilename="validate-pr-author-output.ps1">
       <method name="Test-PrAuthorOutputReportsPr" desc="()" line="49">
         <counter type="INSTRUCTION" missed="0" covered="11" />
@@ -70,85 +24,6 @@
       <counter type="METHOD" missed="0" covered="3" />
       <counter type="CLASS" missed="0" covered="1" />
     </class>
-    <sourcefile name="enforce-pr-author-skill.ps1">
-      <line nr="47" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="48" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="49" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="62" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="80" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="81" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="84" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="98" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="125" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="127" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="128" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="132" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="134" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="137" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="138" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="139" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="142" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="143" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="148" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="149" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="152" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="153" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="156" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="157" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="158" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="159" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="160" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="164" mi="0" ci="3" mb="0" cb="0" />
-      <line nr="165" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="166" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="169" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="202" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="203" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="205" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="206" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="209" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="210" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="212" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="214" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="215" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="219" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="220" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="224" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="226" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="227" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="232" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="233" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="238" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="239" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="240" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="241" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="245" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="265" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="266" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="270" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="272" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="275" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="276" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="277" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="280" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="281" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="283" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="284" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="285" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="286" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="290" mi="0" ci="2" mb="0" cb="0" />
-      <line nr="314" mi="0" ci="3" mb="0" cb="0" />
-      <line nr="318" mi="0" ci="1" mb="0" cb="0" />
-      <line nr="323" mi="1" ci="0" mb="0" cb="0" />
-      <line nr="325" mi="1" ci="0" mb="0" cb="0" />
-      <line nr="326" mi="1" ci="0" mb="0" cb="0" />
-      <line nr="329" mi="3" ci="0" mb="0" cb="0" />
-      <line nr="331" mi="1" ci="0" mb="0" cb="0" />
-      <counter type="INSTRUCTION" missed="7" covered="81" />
-      <counter type="LINE" missed="5" covered="68" />
-      <counter type="METHOD" missed="0" covered="8" />
-      <counter type="CLASS" missed="0" covered="1" />
-    </sourcefile>
     <sourcefile name="validate-pr-author-output.ps1">
       <line nr="49" mi="0" ci="1" mb="0" cb="0" />
       <line nr="50" mi="0" ci="1" mb="0" cb="0" />
@@ -188,13 +63,13 @@
       <counter type="METHOD" missed="0" covered="3" />
       <counter type="CLASS" missed="0" covered="1" />
     </sourcefile>
-    <counter type="INSTRUCTION" missed="12" covered="113" />
-    <counter type="LINE" missed="10" covered="96" />
-    <counter type="METHOD" missed="0" covered="11" />
-    <counter type="CLASS" missed="0" covered="2" />
+    <counter type="INSTRUCTION" missed="5" covered="32" />
+    <counter type="LINE" missed="5" covered="28" />
+    <counter type="METHOD" missed="0" covered="3" />
+    <counter type="CLASS" missed="0" covered="1" />
   </package>
-  <counter type="INSTRUCTION" missed="12" covered="113" />
-  <counter type="LINE" missed="10" covered="96" />
-  <counter type="METHOD" missed="0" covered="11" />
-  <counter type="CLASS" missed="0" covered="2" />
+  <counter type="INSTRUCTION" missed="5" covered="32" />
+  <counter type="LINE" missed="5" covered="28" />
+  <counter type="METHOD" missed="0" covered="3" />
+  <counter type="CLASS" missed="0" covered="1" />
 </report>
