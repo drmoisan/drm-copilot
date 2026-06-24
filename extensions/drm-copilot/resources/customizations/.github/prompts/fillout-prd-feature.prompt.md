@@ -18,7 +18,7 @@ Use this prompt when invoking the prd_feature agent via `/fillout-prd-feature <p
 
 1. Load each supplied path in order; note missing or unreadable files explicitly.
 2. Extract available details (issue number, owner, status, story statements, constraints, inputs/outputs, CLI flags, personas, risks, acceptance criteria, non-goals).
-3. If research exists under `artifacts/research`, the caller must include the specific research file paths in the `/fillout-prd-feature` command; the agent must read each provided research file before writing.
+3. If research exists under `docs/features/<feature>/research/` (feature-associated) or `docs/research/` (one-off), the caller must include the specific research file paths in the `/fillout-prd-feature` command; the agent must read each provided research file before writing.
 4. Identify gaps; if the research document is insufficient to populate required sections, delegate additional research to the Task Researcher Agent and pause drafting until that research is complete.
 5. Before writing, run a technical completeness check: confirm Proposed Fix, Assumptions, Data/Config Impact, Test Strategy, and Acceptance Criteria can be filled with domain-specific, testable details (no placeholders).
 6. Apply the prd_feature agent’s section guidance when filling content:

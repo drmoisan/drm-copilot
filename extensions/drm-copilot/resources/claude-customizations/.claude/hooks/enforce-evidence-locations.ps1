@@ -17,12 +17,15 @@
       - artifacts/evidence/
       - artifacts/regression-testing/
       - artifacts/post-change/
+      - artifacts/research/
 
     All other paths pass through, including canonical evidence paths of the form
     <FEATURE>/evidence/<kind>/ and permitted artifacts/ sub-paths such as
-    artifacts/orchestration/, artifacts/research/, artifacts/pr_context,
-    artifacts/reviews/, artifacts/status/, artifacts/python/, artifacts/pester/,
-    and artifacts/csharp/.
+    artifacts/orchestration/, artifacts/pr_context, artifacts/reviews/,
+    artifacts/status/, artifacts/python/, artifacts/pester/, and
+    artifacts/csharp/. Research output is no longer an artifacts/ sub-path; it
+    is written to the tracked roots docs/features/<feature>/research/
+    (feature-associated) or docs/research/ (one-off).
 
     If the file_path resolves to a forbidden prefix, the script writes a JSON response
     to stdout with 'decision': 'block' and exits with code 0 so Claude Code surfaces
@@ -61,7 +64,8 @@ function Test-EvidenceLocationForbidden {
         'artifacts/coverage/',
         'artifacts/evidence/',
         'artifacts/regression-testing/',
-        'artifacts/post-change/'
+        'artifacts/post-change/',
+        'artifacts/research/'
     )
 
     # Match the prefix either at the start of the string or after any directory separator,

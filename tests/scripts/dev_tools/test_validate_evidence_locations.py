@@ -3,6 +3,8 @@
 Covers:
     - find_forbidden_paths yields no results on a tree with no forbidden paths.
     - find_forbidden_paths yields a violation when a forbidden path is present.
+    - artifacts/research/ is treated as a forbidden prefix with a canonical
+      suggestion naming both new tracked research roots.
     - Non-file entries (directories) are skipped.
     - Entries where relative_to raises ValueError are skipped.
     - main() exits 0 with no output for a clean tree.
@@ -36,7 +38,7 @@ def test_clean_tree_exits_zero(monkeypatch: MagicMock) -> None:
         Path("/fake/repo/src/hello.ts"),
         Path("/fake/repo/docs/features/active/feat/evidence/baseline/result.md"),
         Path("/fake/repo/artifacts/orchestration/orchestrator-state.json"),
-        Path("/fake/repo/artifacts/research/notes.md"),
+        Path("/fake/repo/docs/features/active/my-feature/research/note.md"),
     ]
 
     # Each mock path must respond to is_file() → True and relative_to(root)
@@ -90,6 +92,44 @@ def test_seeded_violation_exits_one(monkeypatch: MagicMock) -> None:
     ), "Expected the forbidden mock path to be returned"
     assert "evidence/baseline/" in canonical_suggestion, (
         f"Expected canonical_suggestion to contain 'evidence/baseline/', "
+        f"got: {canonical_suggestion!r}"
+    )
+
+
+def test_artifacts_research_is_forbidden(monkeypatch: MagicMock) -> None:
+    """find_forbidden_paths flags a file under artifacts/research/ as a violation.
+
+    Scenario: rglob returns one file seeded under artifacts/research/ (the retired
+    research root, now forbidden).
+    Expected: exactly one (path, canonical_suggestion) tuple is yielded, and the
+    canonical suggestion references both new tracked research roots.
+    """
+    root = Path("/fake/repo")
+    forbidden_abs = Path("/fake/repo/artifacts/research/seeded.md")
+
+    # Build a mock representing the seeded forbidden research file.
+    forbidden_mock = MagicMock(spec=Path)
+    forbidden_mock.is_file.return_value = True
+    forbidden_mock.relative_to.return_value = forbidden_abs.relative_to(root)
+
+    # Patch rglob to return only the one forbidden file.
+    root_mock = MagicMock(spec=Path)
+    root_mock.rglob.return_value = iter([forbidden_mock])
+
+    results = list(find_forbidden_paths(root_mock))
+
+    # Assert: exactly one violation, with a suggestion naming both new roots.
+    assert len(results) == 1, f"Expected 1 violation but got {len(results)}: {results}"
+    reported_path, canonical_suggestion = results[0]
+    assert (
+        reported_path is forbidden_mock
+    ), "Expected the seeded research mock path to be returned"
+    assert "docs/features/active/<feature>/research/" in canonical_suggestion, (
+        f"Expected canonical_suggestion to name the feature research root, "
+        f"got: {canonical_suggestion!r}"
+    )
+    assert "docs/research/" in canonical_suggestion, (
+        f"Expected canonical_suggestion to name the one-off research root, "
         f"got: {canonical_suggestion!r}"
     )
 

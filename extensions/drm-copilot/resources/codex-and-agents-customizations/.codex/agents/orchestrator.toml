@@ -45,7 +45,7 @@ Delegate exclusively through configured subagents for required specialist steps:
 - `atomic-planner`: planning only.
 - `atomic-executor`: preflight validation and execution only.
 - `feature-review`: policy, code, and feature audit artifacts.
-- `task-researcher`: research artifacts under `artifacts/research/`.
+- `task-researcher`: research artifacts under the research path the orchestrator resolves before delegating — `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research; the orchestrator passes the resolved path in the delegation prompt.
 - `prd-feature`: issue, specification, and user-story authoring when full feature or bug workflow requires it.
 - `staged-review`: staged-diff review when the workflow requires pre-commit inspection.
 - `epic-review`: epic-level review when the promoted work item is an epic.
