@@ -65,6 +65,19 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
+## PR Creation Delegation
+
+PR creation and PR body edits are delegated work, not orchestrator work. The orchestrator MUST NOT call `gh pr create` or `gh pr edit --body*` directly from the main thread; the `enforce-pr-author-skill.ps1` PreToolUse hook blocks those commands unless a valid authorization sentinel issued by the `pr-author` agent is present.
+
+The mandatory sequence is:
+
+1. The orchestrator first produces the PR-context artifact via `mcp__drm-copilot__collect_pr_context` (or the equivalent context-collection mechanism), which writes `artifacts/pr_context.summary.txt`.
+2. The orchestrator then delegates PR creation and any PR body edits to `Agent(pr-author)`. The `pr-author` agent runs the `pr-author` skill, writes the short-lived authorization sentinel `artifacts/pr_author_authorization.json` immediately before each `gh` command, issues `gh pr create`/`gh pr edit --body-file ...` within the TTL, deletes the sentinel afterward, and reports the resulting PR URL or PR number.
+
+`Agent(pr-author)` is the mandatory delegate for PR creation and PR body edits. Direct `gh pr create`/`gh pr edit --body*` from the main thread is prohibited and is blocked by the hook.
+
+The authorization sentinel is a policy guardrail, not a cryptographic or security control; any actor with `Write(/artifacts/**)` access can forge it. It prevents accidental bypass and requires a deliberate, documented act to circumvent.
+
 ## Evidence Location Authority
 
 All evidence artifacts produced during orchestration MUST comply with the canonical scheme defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. Evidence MUST be written to `<FEATURE>/evidence/<kind>/` only.
