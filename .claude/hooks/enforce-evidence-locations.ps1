@@ -137,18 +137,40 @@ function Invoke-EvidenceLocationDecision {
     return [ordered]@{ decision = 'allow' }
 }
 
+function Invoke-EvidenceLocationEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the evidence-location decision and returns the process exit code.
+    .DESCRIPTION
+        Wraps the dispatch logic that the hook entry point performs so it can be
+        exercised by unit tests. On success it writes the compact JSON decision to
+        the output stream and returns 0. On a hard failure (malformed JSON) it
+        writes the error record and returns 1. This function does not call exit;
+        the thin entry-point wiring converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        The raw JSON string from $env:CLAUDE_TOOL_INPUT.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [string] $ToolInputRaw = $env:CLAUDE_TOOL_INPUT
+    )
+
+    try {
+        $decision = Invoke-EvidenceLocationDecision -ToolInputRaw $ToolInputRaw
+    } catch {
+        Write-Error $_
+        return 1
+    }
+
+    $decision | ConvertTo-Json -Compress | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress | Write-Output
-
-exit 0
+exit (Invoke-EvidenceLocationEntryPoint)

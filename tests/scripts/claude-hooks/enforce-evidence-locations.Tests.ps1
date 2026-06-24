@@ -122,4 +122,50 @@ Describe 'enforce-evidence-locations.ps1' {
                 Should -Throw '*malformed JSON*'
         }
     }
+
+    Context 'entry-point dispatch' {
+        It 'returns exit code 0 and emits allow JSON for an allowed path' {
+            # Arrange — a representative allowed file_path
+            $allowedJson = '{"file_path":"src/hello-typescript.ts"}'
+
+            # Act — the function emits the JSON on the output stream and returns the
+            # int exit code as the final pipeline element; collect both.
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $allowedJson)
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
+            # Assert — exit code is 0 and emitted JSON is the compact allow decision
+            $code | Should -Be 0
+            $stdout | Should -Match '"decision":"allow"'
+        }
+
+        It 'returns exit code 1 and writes a malformed-JSON error for unparseable input' {
+            # Arrange — unparseable payload triggers the hard-failure path
+            $errorRecords = $null
+
+            # Act — capture the error stream while collecting the function output
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw '{ not valid json' -ErrorAction SilentlyContinue -ErrorVariable errorRecords)
+            $code = $emitted[-1]
+
+            # Assert — exit code is 1 and an error record matching the malformed-JSON message was written
+            $code | Should -Be 1
+            $errorRecords | Should -Not -BeNullOrEmpty
+            ($errorRecords | Out-String) | Should -Match 'malformed JSON'
+        }
+
+        It 'returns exit code 0 and emits block JSON for a forbidden path' {
+            # Arrange — a retired/forbidden artifacts/research path
+            $forbiddenJson = '{"file_path":"artifacts/research/notes.md"}'
+
+            # Act — collect the function output and the returned exit code
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $forbiddenJson)
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
+            # Assert — exit code is 0 and emitted JSON is the compact block decision
+            $code | Should -Be 0
+            $stdout | Should -Match '"decision":"block"'
+            $stdout | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
+        }
+    }
 }
