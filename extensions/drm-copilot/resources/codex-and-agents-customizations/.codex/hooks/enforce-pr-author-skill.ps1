@@ -1,3 +1,6 @@
+# Converted hook
+# Review the generated hook behavior before enabling it.
+
 <#
 .SYNOPSIS
     Pre-tool-use hook that enforces the pr-author skill is used before gh pr create or gh pr edit.

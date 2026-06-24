@@ -34,12 +34,12 @@ PR bodies must be produced by the `pr-author` skill, but the current enforcement
 
 ## Acceptance Criteria
 
-- [ ] A `pr-author.md` agent exists under `.claude/agents/` and runs the `pr-author` skill, with bundled Codex and GitHub Copilot equivalents.
-- [ ] No PR can be opened (`gh pr create`) except by the `pr-author` agent; main-thread or other-agent attempts are blocked by a PreToolUse hook.
-- [ ] PR body edits (`gh pr edit` with a body) are likewise restricted to the `pr-author` agent.
-- [ ] The enforcement is consistent across the Claude, Codex, and GitHub Copilot ecosystems and their bundled copies.
-- [ ] Hook behavior is covered by tests (allowed: pr-author agent; blocked: non-agent / inline body / missing context).
-- [ ] The orchestrate skill documents mandatory delegation to the `pr-author` agent for PR creation.
+- [x] A `pr-author.md` agent exists under `.claude/agents/` and runs the `pr-author` skill, with bundled Codex and GitHub Copilot equivalents.
+- [x] No PR can be opened (`gh pr create`) except by the `pr-author` agent; main-thread or other-agent attempts are blocked by a PreToolUse hook.
+- [x] PR body edits (`gh pr edit` with a body) are likewise restricted to the `pr-author` agent.
+- [x] The enforcement is consistent across the Claude, Codex, and GitHub Copilot ecosystems and their bundled copies.
+- [x] Hook behavior is covered by tests (allowed: pr-author agent; blocked: non-agent / inline body / missing context).
+- [x] The orchestrate skill documents mandatory delegation to the `pr-author` agent for PR creation.
 
 
 ## Non-Goals

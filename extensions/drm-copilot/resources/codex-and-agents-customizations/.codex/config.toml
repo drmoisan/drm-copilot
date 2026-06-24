@@ -27,6 +27,15 @@ approval_mode = "approve"
 [features]
 multi_agent = true
 
+# PreToolUse hook wiring. Each entry runs a converted PowerShell hook before the matched tool.
+# enforce-pr-author-skill.ps1 blocks gh pr create / gh pr edit --body* unless the pr-author skill
+# workflow and a valid authorization sentinel are present (Cases A/B/C plus D/E/F/malformed). The
+# sentinel is a policy guardrail, not a cryptographic or security control; it is forgeable by any
+# actor with write access to artifacts/.
+[[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-pr-author-skill.ps1"
+
 [permissions.orchestrator-workspace]
 description = "Workspace editing for deterministic orchestration with secret-path deny rules."
 extends = ":workspace"

@@ -2,7 +2,7 @@
 name: orchestrator
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
 tools:
-  - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
+  - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,pr-author,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
   - Read
   - Grep
   - Glob
@@ -72,6 +72,10 @@ Delegate exclusively through configured subagents:
 - `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 
 For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop execution and record blocked state. Do not perform the step locally.
+
+## PR Creation Delegation
+
+PR creation and PR body edits must be delegated to `Agent(pr-author)`. The orchestrator must not call `gh pr create` or `gh pr edit --body*` directly from the main thread; those commands are blocked by the `enforce-pr-author-skill.ps1` PreToolUse hook unless a valid authorization sentinel issued by the `pr-author` agent is present. The orchestrator first produces the PR-context artifact via `mcp__drm-copilot__collect_pr_context`, then delegates to `Agent(pr-author)`, which authors the PR body via the `pr-author` skill, writes and deletes the authorization sentinel around the `gh` command, and reports the resulting PR URL or PR number.
 
 ## Checkpoint Persistence
 

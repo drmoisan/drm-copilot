@@ -136,3 +136,28 @@ Use these sections, in this order:
 - No hallucinated issue/PR numbers.
 
 That’s it. Produce the PR body.
+
+## Authorization Sentinel Protocol (Documentation-Only in This Ecosystem)
+
+When this agent opens or updates a pull request via `gh pr create` or `gh pr edit --body*`, it follows
+the cross-ecosystem authorization sentinel protocol:
+
+1. Run `git rev-parse HEAD` to obtain `head_sha`.
+2. Write `artifacts/pr_author_authorization.json` with exactly: `issued_by` set to `"pr-author"`,
+   `issued_at` as a UTC ISO-8601 timestamp, `head_sha` from step 1, and `ttl_seconds` set to `120`.
+3. Issue the `gh pr create` / `gh pr edit --body-file ...` command immediately, within the 120-second
+   TTL. Pass the PR body via `--body-file`; inline `--body` is not used.
+4. Delete `artifacts/pr_author_authorization.json` after the command completes (success or failure).
+
+After opening or updating the PR, report the resulting PR URL or PR number.
+
+Enforcement in the GitHub Copilot ecosystem is **documentation-only**: the Copilot ecosystem has no
+PreToolUse hook surface, so the sentinel protocol cannot be mechanically enforced here. The protocol
+is documented for consistency with the Claude and Codex ecosystems, where a PreToolUse hook verifies
+the sentinel.
+
+The authorization sentinel is a **policy guardrail, not a cryptographic or security control.** Any
+actor with write access to `artifacts/` can forge `artifacts/pr_author_authorization.json`, because
+all agents share the same filesystem and the runtime exposes no native agent-identity signal at tool
+pre-use time. The mechanism prevents accidental bypass and requires a deliberate, documented act to
+circumvent. It is not tamper-proof and is not a security boundary.

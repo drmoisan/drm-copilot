@@ -30,6 +30,7 @@
       "Agent(staged-review)",
       "Agent(epic-review)",
       "Agent(status-updater)",
+      "Agent(pr-author)",
       "Agent(python-typed-engineer)",
       "Agent(powershell-typed-engineer)",
       "Agent(csharp-typed-engineer)",
@@ -157,6 +158,15 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/validate-planner-output.ps1"
+          }
+        ]
+      },
+      {
+        "matcher": "pr-author",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-pr-author-output.ps1"
           }
         ]
       }
