@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Blocks implementation writes before Issue #232 orchestration readiness exists.
+    Blocks implementation operations before orchestration readiness exists.
 #>
 [CmdletBinding()]
 param()
@@ -29,12 +29,12 @@ function Get-StringProperty {
     return ([string]$Value.$Name).Trim()
 }
 
-function Test-DocumentationOrEvidencePath {
+function Test-FeatureDocumentationOrEvidencePath {
     [CmdletBinding()]
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $NormalizedPath)
 
-    return $NormalizedPath.StartsWith($script:Issue232FeatureFolder + '/')
+    return $NormalizedPath.StartsWith('docs/features/active/')
 }
 
 function Test-ImplementationPath {
@@ -42,7 +42,7 @@ function Test-ImplementationPath {
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $NormalizedPath)
 
-    if (Test-DocumentationOrEvidencePath -NormalizedPath $NormalizedPath) {
+    if (Test-FeatureDocumentationOrEvidencePath -NormalizedPath $NormalizedPath) {
         return $false
     }
     if ($NormalizedPath -eq $script:CheckpointPath) {
@@ -51,7 +51,46 @@ function Test-ImplementationPath {
     return $NormalizedPath -match '\.(py|ps1|psm1|ts|tsx|js|jsx|cs|json|yml|yaml)$'
 }
 
-function Test-Issue232OrchestrationReady {
+function Test-ImplementationCommand {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][string] $Command)
+
+    $normalizedCommand = $Command.Trim()
+    if (-not $normalizedCommand) {
+        return $false
+    }
+
+    $implementationCommandPatterns = @(
+        '(^|\s)git\s+(add|commit)\b',
+        '(^|\s)(poetry\s+run\s+)?(black|ruff|pyright|pytest)\b',
+        '(^|\s)npm\s+.*\s+(prettier|lint|typecheck|test:unit)\b',
+        '(^|\s)npx\s+(prettier|eslint|tsc|jest)\b',
+        '(^|\s)pwsh\s+.*(Invoke-Pester|tests/scripts/)'
+    )
+
+    foreach ($pattern in $implementationCommandPatterns) {
+        if ($normalizedCommand -match $pattern) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Test-ImplementationDelegation {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowNull()] $ToolInput)
+
+    if ($null -eq $ToolInput) {
+        return $false
+    }
+
+    $payloadText = ($ToolInput | ConvertTo-Json -Depth 20 -Compress)
+    return $payloadText -match '(python-typed-engineer|powershell-typed-engineer|typescript-engineer|csharp-typed-engineer|atomic-executor|implementation|execute)'
+}
+
+function Test-OrchestrationReady {
     [CmdletBinding()]
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowNull()] $Payload)
@@ -70,9 +109,16 @@ function Test-Issue232OrchestrationReady {
         $lifecycleReady = [bool]$Payload.lifecycle_ready
     }
 
+    if (-not $issueNum -or -not $featureFolder -or -not $routeId -or -not $lifecycleReady) {
+        return $false
+    }
+
+    if ($issueNum -eq '232' -and $featureFolder -ne $script:Issue232FeatureFolder) {
+        return $false
+    }
+
     return (
-        $issueNum -eq '232' -and
-        $featureFolder -eq $script:Issue232FeatureFolder -and
+        $featureFolder.StartsWith('docs/features/active/') -and
         $routeId -and
         $lifecycleReady
     )
@@ -106,12 +152,21 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         throw "enforce-orchestration-preimplementation-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
     }
 
-    $filePath = $toolInput.file_path
-    if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+    $requiresReadyCheckpoint = $false
+    $filePath = Get-StringProperty -Value $toolInput -Name 'file_path'
+    if ($filePath) {
+        $normalized = ([string]$filePath) -replace '\\', '/'
+        $requiresReadyCheckpoint = Test-ImplementationPath -NormalizedPath $normalized
+    } else {
+        $command = Get-StringProperty -Value $toolInput -Name 'command'
+        if ($command) {
+            $requiresReadyCheckpoint = Test-ImplementationCommand -Command $command
+        } else {
+            $requiresReadyCheckpoint = Test-ImplementationDelegation -ToolInput $toolInput
+        }
     }
-    $normalized = ([string]$filePath) -replace '\\', '/'
-    if (-not (Test-ImplementationPath -NormalizedPath $normalized)) {
+
+    if (-not $requiresReadyCheckpoint) {
         return [ordered]@{ decision = 'allow' }
     }
 
@@ -124,12 +179,19 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         $checkpoint = $null
     }
 
-    if (Test-Issue232OrchestrationReady -Payload $checkpoint) {
+    if (Test-OrchestrationReady -Payload $checkpoint) {
         return [ordered]@{ decision = 'allow' }
+    }
+    $issueNum = Get-StringProperty -Value $checkpoint -Name 'issue-num'
+    if ($issueNum -eq '232') {
+        return [ordered]@{
+            decision = 'block'
+            reason   = 'PREIMPLEMENTATION_GATE_BLOCKED: Issue #232 implementation operations require artifacts/orchestration/orchestrator-state.json to contain route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
+        }
     }
     return [ordered]@{
         decision = 'block'
-        reason   = 'PREIMPLEMENTATION_GATE_BLOCKED: Issue #232 implementation writes require artifacts/orchestration/orchestrator-state.json to contain route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
+        reason   = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
     }
 }
 

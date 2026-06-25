@@ -46,6 +46,10 @@ matcher = "Bash"
 command = "pwsh -NoProfile -File .codex/hooks/enforce-pr-author-skill.ps1"
 
 [[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+
+[[hooks.PreToolUse]]
 matcher = "Write|Edit"
 command = "pwsh -NoProfile -File .codex/hooks/check-python-test-purity.ps1"
 
@@ -76,6 +80,10 @@ command = "pwsh -NoProfile -File .codex/hooks/enforce-checkpoint-monotonic.ps1"
 [[hooks.PreToolUse]]
 matcher = "Write|Edit"
 command = "pwsh -NoProfile -File .codex/hooks/enforce-completion-consistency.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Agent"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
 
 [[hooks.SubagentStop]]
 matcher = "feature-review|feature-reviewer"
