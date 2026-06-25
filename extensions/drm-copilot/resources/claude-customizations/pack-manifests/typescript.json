@@ -1,0 +1,9 @@
+{
+  "name": "typescript",
+  "label": "TypeScript",
+  "paths": [
+    ".claude/rules/typescript.md",
+    ".claude/rules/typescript-suppressions.md",
+    ".claude/agents/typescript-engineer.md"
+  ]
+}

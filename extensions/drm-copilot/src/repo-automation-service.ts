@@ -62,7 +62,7 @@ export interface RepoAutomationService {
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownClaudeCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownClaudeCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult>;
   newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
@@ -144,6 +144,12 @@ export interface RepoAutomationService {
 export interface WorkspaceExecutionInput {
   readonly workspaceRoot: string;
   readonly invocationId?: string;
+}
+
+export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: "modern" | "legacy";
+  readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
 export interface RepoAutomationServiceOptions {
@@ -248,8 +254,21 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     });
   }
   async pushDownClaudeCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownClaudeCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
+    // Start from the backward-compatible destination-only arg vector and append
+    // optional pack, variant, and memory-mode flags only when supplied so a
+    // no-field input spawns exactly ["--destination", workspaceRoot].
+    const args: string[] = ["--destination", input.workspaceRoot];
+    if (input.packs !== undefined && input.packs.length > 0) {
+      args.push("--packs", input.packs.join(","));
+    }
+    if (input.csharpVariant !== undefined) {
+      args.push("--csharp-variant", input.csharpVariant);
+    }
+    if (input.memoryMode !== undefined) {
+      args.push("--memory-mode", input.memoryMode);
+    }
     return this.executeScript({
       tool: "push_down_claude_customizations",
       runtimeKind: "python",
@@ -257,7 +276,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
         "resources/templates/push_down_claude_customizations.py",
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? "push_down_claude_customizations",
-      args: ["--destination", input.workspaceRoot],
+      args,
       summary:
         "Pushed bundled Claude Code customizations into the destination workspace.",
       stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,

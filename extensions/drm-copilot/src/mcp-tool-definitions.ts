@@ -130,6 +130,26 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
+        packs: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional language pack names to publish (for example 'core', 'typescript'). When omitted, the full tree is published. 'core' is always included.",
+        },
+        csharp_variant: {
+          type: "string",
+          enum: ["modern", "legacy"],
+          description:
+            "Optional C# toolchain variant to source ('modern' default or 'legacy').",
+        },
+        memory_mode: {
+          type: "string",
+          enum: ["overwrite", "merge", "skip"],
+          description:
+            "Optional agent-memory handling mode: 'overwrite' (default), 'merge', or 'skip'.",
+        },
       },
       additionalProperties: false,
     },

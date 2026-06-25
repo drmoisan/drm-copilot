@@ -18,31 +18,60 @@ Purpose:
 from __future__ import annotations
 
 import argparse
-import re
 from pathlib import Path
 
-AGENT_MEMORY_RELATIVE_ROOT = Path(".claude/agent-memory")
-GENERAL_MEMORY_SCOPE = "general"
-REPO_MEMORY_SCOPE = "repo"
+try:
+    from scripts.dev_tools.push_down_claude_filesystem import (
+        AGENT_MEMORY_RELATIVE_ROOT,
+        GENERAL_MEMORY_SCOPE,
+        REPO_MEMORY_SCOPE,
+        ExcludingFileSystem,
+        is_general_memory_file,
+        read_memory_scope,
+    )
+    from scripts.dev_tools.push_down_claude_pack_selection import (
+        CSharpVariant,
+        ManifestError,
+        MemoryMode,
+        PackManifest,
+        assert_single_csharp_toolchain,
+        compute_published_paths,
+        load_pack_manifests,
+    )
+except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallback
+    if error.name is None or not error.name.startswith("scripts"):
+        raise
+    from dev_tools.push_down_claude_filesystem import (
+        AGENT_MEMORY_RELATIVE_ROOT,
+        GENERAL_MEMORY_SCOPE,
+        REPO_MEMORY_SCOPE,
+        ExcludingFileSystem,
+        is_general_memory_file,
+        read_memory_scope,
+    )
+    from dev_tools.push_down_claude_pack_selection import (
+        CSharpVariant,
+        ManifestError,
+        MemoryMode,
+        PackManifest,
+        assert_single_csharp_toolchain,
+        compute_published_paths,
+        load_pack_manifests,
+    )
 
-# Match a leading YAML frontmatter block: the first `---` line, the block body,
-# and the closing `---` line. DOTALL lets the body span multiple lines.
-_FRONTMATTER_PATTERN = re.compile(
-    r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|\Z)", re.DOTALL
+# Repo-relative location of the bundle root that holds the pack manifests and
+# the legacy variant subtree. In the repository CLI the source root is the repo
+# root, so the manifests and variant live under this bundle path. The bundled
+# template overrides ``bundle_root`` because its source root already is the
+# bundle's ``claude-customizations`` directory.
+BUNDLE_ROOT_RELATIVE_DIR = Path(
+    "extensions/drm-copilot/resources/claude-customizations"
 )
-# Match a `metadata:` mapping key at column zero, then capture the indented
-# block lines that belong to it (lines that are more-indented or blank) until
-# the next column-zero key or end of the frontmatter body.
-_METADATA_BLOCK_PATTERN = re.compile(
-    r"^metadata:[ \t]*\r?\n((?:[ \t]+.*(?:\r?\n|\Z)|\r?\n)*)",
-    re.MULTILINE,
-)
-# Match a `scope:` leaf inside the metadata block, capturing its scalar value
-# up to an optional inline comment. Surrounding quotes are stripped later.
-_SCOPE_LEAF_PATTERN = re.compile(
-    r"^[ \t]+scope:[ \t]*([^\r\n#]*)",
-    re.MULTILINE,
-)
+# Subdirectory under the bundle root that contains the pack-manifest JSON files.
+PACK_MANIFEST_SUBDIR = "pack-manifests"
+# Valid CLI choices for the C# variant and memory-mode arguments.
+CSHARP_VARIANT_CHOICES: tuple[str, ...] = ("modern", "legacy")
+MEMORY_MODE_CHOICES: tuple[str, ...] = ("overwrite", "merge", "skip")
 
 try:
     from scripts.dev_tools.push_down_copilot_customizations import (
@@ -75,8 +104,13 @@ EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (Path(".claude/settings.local.json")
 __all__ = [
     "AGENT_MEMORY_RELATIVE_ROOT",
     "ARTIFACT_DIRECTORY",
+    "CSHARP_VARIANT_CHOICES",
     "EXCLUDED_RELATIVE_PATHS",
     "GENERAL_MEMORY_SCOPE",
+    "BUNDLE_ROOT_RELATIVE_DIR",
+    "MEMORY_MODE_CHOICES",
+    "PACK_MANIFEST_SUBDIR",
+    "ManifestError",
     "PushDownSummary",
     "REPO_MEMORY_SCOPE",
     "ROOT_FOLDERS",
@@ -85,213 +119,11 @@ __all__ = [
     "push_down_customizations",
 ]
 
-
-def _read_memory_scope(content: str) -> str:
-    """Return the declared memory scope from a file's YAML frontmatter.
-
-    Purpose:
-        Extract the `metadata.scope` leaf from the leading YAML frontmatter
-        block using a narrow `re`-based parser. This avoids adding a runtime
-        YAML dependency (PyYAML) while reading only the single leaf the
-        push-down scope filter requires.
-
-    Args:
-        content (str): The full text of a candidate memory file, including any
-            leading `---` frontmatter block.
-
-    Returns:
-        str: ``"general"`` only when the frontmatter contains a `metadata:`
-        mapping whose `scope:` leaf is exactly ``general`` (quotes and inline
-        comments stripped). In every other case — missing frontmatter, no
-        closing `---`, no `metadata:` block, no `scope:` leaf, or any value
-        other than exactly ``general`` — it returns ``"repo"`` as the fail-safe
-        default so nothing leaks by accident.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    # Isolate the leading frontmatter block; absent or unterminated frontmatter
-    # fails safe to the repo scope so unmarked files are never distributed.
-    frontmatter_match = _FRONTMATTER_PATTERN.match(content)
-    if frontmatter_match is None:
-        return REPO_MEMORY_SCOPE
-    frontmatter_body = frontmatter_match.group(1)
-
-    # Locate the metadata mapping; without it there is no scope leaf to read.
-    metadata_match = _METADATA_BLOCK_PATTERN.search(frontmatter_body)
-    if metadata_match is None:
-        return REPO_MEMORY_SCOPE
-    metadata_block = metadata_match.group(1)
-
-    # Read the scope leaf from within the metadata block only; a top-level
-    # `scope:` outside `metadata:` is intentionally ignored.
-    scope_match = _SCOPE_LEAF_PATTERN.search(metadata_block)
-    if scope_match is None:
-        return REPO_MEMORY_SCOPE
-
-    # Strip surrounding whitespace and optional matching quotes before the
-    # exact-match comparison; only an exact `general` is treated as general.
-    scope_value = scope_match.group(1).strip()
-    if (
-        len(scope_value) >= 2
-        and scope_value[0] == scope_value[-1]
-        and scope_value[0] in {'"', "'"}
-    ):
-        scope_value = scope_value[1:-1].strip()
-    if scope_value == GENERAL_MEMORY_SCOPE:
-        return GENERAL_MEMORY_SCOPE
-    return REPO_MEMORY_SCOPE
-
-
-def _is_general_memory_file(relative_path: Path, content: str) -> bool:
-    """Return whether a candidate file may be distributed by push-down.
-
-    Purpose:
-        Decide inclusion for one source file. Files under
-        `.claude/agent-memory/` are distributed only when general-scoped;
-        every other file is always distributed and is unaffected by the scope
-        filter.
-
-    Args:
-        relative_path (Path): The file path relative to the repository root.
-        content (str): The full text of the file, used to read the memory
-            scope when the path is under the agent-memory subtree.
-
-    Returns:
-        bool: ``True`` when the path is outside `.claude/agent-memory/`, or when
-        the path is under that subtree and `_read_memory_scope(content)` is
-        exactly ``general``. ``False`` only for an agent-memory file whose
-        scope is not general (the fail-safe exclusion).
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    # Files outside the agent-memory subtree are always copied; the scope
-    # filter never applies to rules, skills, agents, hooks, or settings.
-    try:
-        relative_path.relative_to(AGENT_MEMORY_RELATIVE_ROOT)
-    except ValueError:
-        return True
-    return _read_memory_scope(content) == GENERAL_MEMORY_SCOPE
-
-
-class _ExcludingFileSystem:
-    """Wrap a PushDownFileSystem and filter specified paths from list_files.
-
-    Purpose:
-        Prevent host-specific files (e.g. `settings.local.json`) from being
-        included when the publisher enumerates source files, and exclude
-        repository-specific agent memories so only general-scoped memories are
-        distributed. Chosen over a post-enumeration filter so the exclusion
-        travels with the filesystem contract and is transparent to the shared
-        engine.
-
-    Usage:
-        Instantiate with the inner adapter and exclusion paths relative to
-        the repo root; pass the result as the `fs` argument to the engine.
-
-    Invariants / Constraints:
-        Excluded paths are resolved once at construction time for O(1) checks.
-        The content-based scope filter reads file content only for candidates
-        under `.claude/agent-memory/`; all other files skip the read.
-
-    Side Effects:
-        Delegates all I/O to the inner adapter.
-    """
-
-    def __init__(
-        self, inner: PushDownFileSystem, repo_root: Path, excluded: tuple[Path, ...]
-    ) -> None:
-        """Set up the adapter; resolve exclusion paths relative to repo_root."""
-        self._inner = inner
-        # Retain the resolved repo root so per-file scope checks can derive the
-        # repo-relative path needed by the agent-memory scope filter.
-        self._repo_root = repo_root.resolve()
-        # Resolve once at init so list_files per-path checks are O(1).
-        self._excluded: frozenset[Path] = frozenset(
-            (repo_root / p).resolve() for p in excluded
-        )
-
-    def _is_scope_included(self, path: Path) -> bool:
-        """Return whether a candidate file passes the agent-memory scope filter.
-
-        Purpose:
-            Apply the general-vs-repo memory scope decision to one enumerated
-            file, reading its content only when the path is under the
-            agent-memory subtree.
-
-        Args:
-            path (Path): The absolute candidate path returned by the inner
-                adapter's ``list_files``.
-
-        Returns:
-            bool: ``True`` when the file is outside `.claude/agent-memory/` or
-            is a general-scoped memory; ``False`` for a non-general memory.
-
-        Raises:
-            None.
-
-        Side Effects:
-            Reads file content via the inner adapter for agent-memory
-            candidates only.
-        """
-
-        # Derive the repo-relative path so the agent-memory check matches the
-        # `.claude/agent-memory/` prefix regardless of the absolute location.
-        try:
-            relative_path = path.resolve().relative_to(self._repo_root)
-        except ValueError:
-            # A path outside the repo root cannot be an agent memory; include it.
-            return True
-
-        # Skip the content read entirely for files outside the memory subtree.
-        try:
-            relative_path.relative_to(AGENT_MEMORY_RELATIVE_ROOT)
-        except ValueError:
-            return True
-
-        content = self._inner.read_text(path)
-        return _is_general_memory_file(relative_path, content)
-
-    def list_files(self, root: Path) -> list[Path]:
-        """Return inner list_files output with excluded paths removed.
-
-        Drops paths in ``EXCLUDED_RELATIVE_PATHS`` and any agent-memory file
-        that is not general-scoped per the content-based scope filter.
-        """
-        return [
-            p
-            for p in self._inner.list_files(root)
-            if p.resolve() not in self._excluded and self._is_scope_included(p)
-        ]
-
-    def is_dir(self, path: Path) -> bool:
-        """Delegate to inner adapter."""
-        return self._inner.is_dir(path)
-
-    def is_file(self, path: Path) -> bool:
-        """Delegate to inner adapter."""
-        return self._inner.is_file(path)
-
-    def read_text(self, path: Path) -> str:
-        """Delegate to inner adapter."""
-        return self._inner.read_text(path)
-
-    def write_text(self, path: Path, content: str) -> None:
-        """Delegate to inner adapter."""
-        self._inner.write_text(path, content)
-
-    def ensure_dir(self, path: Path) -> None:
-        """Delegate to inner adapter."""
-        self._inner.ensure_dir(path)
+# Backward-compatible private aliases. The memory-scope helpers moved to
+# ``push_down_claude_filesystem``; these aliases keep the prior import location
+# stable for existing callers and tests that referenced the private names here.
+_read_memory_scope = read_memory_scope
+_is_general_memory_file = is_general_memory_file
 
 
 def _passthrough_rewrite(
@@ -302,6 +134,57 @@ def _passthrough_rewrite(
     return text, 0, 0, []
 
 
+def _resolve_published_paths(
+    *,
+    packs: frozenset[str] | None,
+    bundle_root: Path,
+    fs: PushDownFileSystem,
+) -> frozenset[str] | None:
+    """Compute the published `.claude`-relative path set for a pack selection.
+
+    Purpose:
+        Load the selected pack manifests from the bundle, compute the union of
+        their destination paths (always including ``core``), and assert C#
+        mutual exclusion. Returns ``None`` when no pack selection was supplied so
+        the publisher falls back to the backward-compatible publish-everything
+        path with no manifest read.
+
+    Args:
+        packs (frozenset[str] | None): Selected pack names, or ``None``/empty for
+            the publish-everything default.
+        bundle_root (Path): Bundle root that contains the ``pack-manifests``
+            subdirectory and the legacy variant subtree.
+        fs (PushDownFileSystem): Adapter used to read the manifest files.
+
+    Returns:
+        frozenset[str] | None: The union of selected packs' paths plus ``core``,
+        or ``None`` to signal the publish-everything default.
+
+    Raises:
+        ManifestError: When a manifest is missing/malformed or both C# variants
+            are selected in the same run.
+
+    Side Effects:
+        Reads manifest files through the adapter when a selection is present.
+    """
+
+    # No explicit selection means the backward-compatible default: publish the
+    # full tree without reading any manifest.
+    if not packs:
+        return None
+
+    manifest_dir = bundle_root / PACK_MANIFEST_SUBDIR
+    manifests: dict[str, PackManifest] = load_pack_manifests(manifest_dir, packs, fs)
+    published = compute_published_paths(packs, manifests)
+    # compute_published_paths returns None only for an empty selection, which the
+    # early return above already excluded; treat a None here as an empty set so
+    # the C# exclusion check still runs on a concrete value.
+    empty: frozenset[str] = frozenset()
+    effective_published = published if published is not None else empty
+    assert_single_csharp_toolchain(effective_published, packs)
+    return effective_published
+
+
 def push_down_customizations(
     *,
     repo_root: Path,
@@ -309,15 +192,83 @@ def push_down_customizations(
     fs: PushDownFileSystem,
     source_root: Path | None = None,
     artifact_root: Path | None = None,
+    packs: frozenset[str] | None = None,
+    csharp_variant: CSharpVariant = "modern",
+    memory_mode: MemoryMode = "overwrite",
+    bundle_root: Path | None = None,
 ) -> PushDownSummary:
     """Copy the `.claude` tree into the destination workspace.
 
-    Excludes paths in `EXCLUDED_RELATIVE_PATHS` by wrapping `fs` in
-    `_ExcludingFileSystem` before delegating to the shared engine.
+    Purpose:
+        Publish the bundled `.claude` customizations into a destination
+        workspace, optionally filtered to a set of language packs, optionally
+        sourcing the C# toolchain from the legacy variant, and applying the
+        selected agent-memory mode.
+
+    Args:
+        repo_root (Path): Source repository root.
+        destination_root (Path): Destination workspace root.
+        fs (PushDownFileSystem): Filesystem adapter.
+        source_root (Path | None): Explicit source root for packaged content;
+            defaults to ``repo_root``.
+        artifact_root (Path | None): Explicit artifact root; defaults to
+            ``repo_root``.
+        packs (frozenset[str] | None): Selected pack names. ``None``/empty
+            publishes the full tree (backward-compatible default) with no
+            manifest read and no variant routing.
+        csharp_variant (CSharpVariant): ``"modern"`` (default) reads C# files
+            from `.claude`; ``"legacy"`` reads them from the bundle-only legacy
+            variant subtree while still writing the canonical destination paths.
+        memory_mode (MemoryMode): ``overwrite`` (default), ``merge``, or
+            ``skip`` for agent-memory handling.
+        bundle_root (Path | None): Root that holds the ``pack-manifests``
+            subdirectory and the legacy variant subtree. Defaults to
+            ``source_root / BUNDLE_ROOT_RELATIVE_DIR`` (the repository CLI
+            layout). The bundled template passes its ``claude-customizations``
+            directory directly because its source root already is that bundle.
+
+    Returns:
+        PushDownSummary: The shared engine's run summary.
+
+    Raises:
+        ManifestError: When a selected manifest is missing/malformed or both C#
+            variants are selected.
+
+    Side Effects:
+        Reads source files and writes destination files and the summary artifact
+        through the adapter.
     """
 
-    # Wrap the caller-supplied adapter so enumeration omits excluded paths.
-    excluding_fs = _ExcludingFileSystem(fs, repo_root, EXCLUDED_RELATIVE_PATHS)
+    effective_source = source_root if source_root is not None else repo_root
+    # Resolve the bundle root that holds manifests and the variant subtree. The
+    # repository CLI nests the bundle under the source root; the template passes
+    # its own bundle directory directly.
+    effective_bundle = (
+        bundle_root
+        if bundle_root is not None
+        else effective_source / BUNDLE_ROOT_RELATIVE_DIR
+    )
+    # Resolve the published-path set only when a pack selection is supplied so
+    # the no-argument path performs no manifest I/O and stays byte-equivalent.
+    published_paths = _resolve_published_paths(
+        packs=packs,
+        bundle_root=effective_bundle,
+        fs=fs,
+    )
+
+    # Wrap the caller-supplied adapter so enumeration omits excluded paths and
+    # honors the pack, variant, and memory-mode selections.
+    excluding_fs = ExcludingFileSystem(
+        fs,
+        repo_root,
+        EXCLUDED_RELATIVE_PATHS,
+        source_root=effective_source,
+        destination_root=destination_root,
+        published_paths=published_paths,
+        csharp_variant=csharp_variant,
+        memory_mode=memory_mode,
+        variant_root=effective_bundle,
+    )
     return push_down_scoped_customizations(
         repo_root=repo_root,
         destination_root=destination_root,
@@ -331,7 +282,27 @@ def push_down_customizations(
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Parse CLI arguments for the Claude customization push-down publisher."""
+    """Parse CLI arguments for the Claude customization push-down publisher.
+
+    Purpose:
+        Define the CLI contract, including the optional pack selection, C#
+        variant, and memory-mode flags. When the optional flags are omitted the
+        parsed namespace yields the backward-compatible defaults
+        (``packs=None``, ``csharp_variant="modern"``, ``memory_mode="overwrite"``).
+
+    Args:
+        argv (list[str] | None): Optional argument list for tests or embedding.
+
+    Returns:
+        argparse.Namespace: Parsed arguments with attributes ``destination``,
+        ``packs``, ``csharp_variant``, and ``memory_mode``.
+
+    Raises:
+        SystemExit: Raised by ``argparse`` when arguments are invalid.
+
+    Side Effects:
+        Emits usage/help text through ``argparse`` when parsing fails.
+    """
 
     parser = argparse.ArgumentParser(
         description=(
@@ -344,7 +315,55 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         required=True,
         help=("Destination workspace root that will receive the copied .claude tree."),
     )
+    parser.add_argument(
+        "--packs",
+        default=None,
+        help=(
+            "Comma-separated language pack names to publish (for example "
+            "'core,typescript'). When omitted, the full tree is published. "
+            "'core' is always included."
+        ),
+    )
+    parser.add_argument(
+        "--csharp-variant",
+        dest="csharp_variant",
+        choices=CSHARP_VARIANT_CHOICES,
+        default="modern",
+        help="C# toolchain variant to source ('modern' default or 'legacy').",
+    )
+    parser.add_argument(
+        "--memory-mode",
+        dest="memory_mode",
+        choices=MEMORY_MODE_CHOICES,
+        default="overwrite",
+        help=(
+            "Agent-memory handling mode: 'overwrite' (default), 'merge', or " "'skip'."
+        ),
+    )
     return parser.parse_args(argv)
+
+
+def _parse_packs_argument(packs_value: str | None) -> frozenset[str] | None:
+    """Parse the raw ``--packs`` CLI value into a normalized pack-name set.
+
+    Args:
+        packs_value (str | None): The raw comma-separated value, or ``None`` when
+            the flag was omitted.
+
+    Returns:
+        frozenset[str] | None: The set of non-empty, stripped pack names, or
+        ``None`` when the flag was omitted or contained only empty entries (the
+        publish-everything default).
+    """
+
+    if packs_value is None:
+        return None
+    # Strip whitespace and drop empty entries so trailing commas or stray spaces
+    # do not produce empty pack names.
+    names = {entry.strip() for entry in packs_value.split(",") if entry.strip()}
+    if not names:
+        return None
+    return frozenset(names)
 
 
 def main(
@@ -353,18 +372,28 @@ def main(
     repo_root: Path | None = None,
     fs: PushDownFileSystem | None = None,
 ) -> int:
-    """Run the Claude customization push-down publisher CLI."""
+    """Run the Claude customization push-down publisher CLI.
+
+    Parses arguments, resolves defaults, threads the pack selection, C# variant,
+    and memory mode into ``push_down_customizations``, and prints the summary
+    artifact path. With no optional flags this is byte-for-byte equivalent to
+    the prior publish-everything/overwrite behavior.
+    """
 
     args = parse_args(argv)
     resolved_repo_root = resolve_cli_path(repo_root or Path.cwd())
     resolved_destination = resolve_cli_path(args.destination)
     resolved_fs = fs or RealPushDownFileSystem()
+    packs = _parse_packs_argument(args.packs)
     summary = push_down_customizations(
         repo_root=resolved_repo_root,
         destination_root=resolved_destination,
         fs=resolved_fs,
         source_root=resolved_repo_root,
         artifact_root=resolved_repo_root,
+        packs=packs,
+        csharp_variant=args.csharp_variant,
+        memory_mode=args.memory_mode,
     )
     print(f"Wrote push-down summary artifact to: {summary.artifact_path}")
     return 0
