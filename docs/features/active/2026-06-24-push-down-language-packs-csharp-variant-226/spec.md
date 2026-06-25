@@ -215,42 +215,42 @@ and test adaptations.
 
 ## Acceptance Criteria
 
-- [ ] Invoking the push-down with no pack, variant, or memory-mode arguments copies the
+- [x] Invoking the push-down with no pack, variant, or memory-mode arguments copies the
       complete `.claude` tree and overwrites general-scoped memories, matching current
       behavior byte-for-byte (backward compatibility).
-- [ ] The `core` pack is always included in the pushed set regardless of which language
+- [x] The `core` pack is always included in the pushed set regardless of which language
       packs are selected.
-- [ ] Supplying `--packs core,typescript` copies only `core` and TypeScript pack files;
+- [x] Supplying `--packs core,typescript` copies only `core` and TypeScript pack files;
       Python, PowerShell, and C# pack files are not written to the destination.
-- [ ] The legacy C# variant files exist only under the bundle-only subtree
+- [x] The legacy C# variant files exist only under the bundle-only subtree
       `.claude-variants/csharp-legacy/` and never at the repository root `.claude` tree.
-- [ ] Exactly one C# toolchain lands at the destination root `.claude` tree; selecting
+- [x] Exactly one C# toolchain lands at the destination root `.claude` tree; selecting
       the legacy variant writes legacy content to the canonical destination C# paths
       (`.claude/rules/csharp.md`, `.claude/agents/csharp-typed-engineer.md`,
       `.claude/skills/csharp-qa-gate/SKILL.md`,
       `.claude/skills/invoke-csharp-engineer/SKILL.md`) and the modern C# files are not
       also written there.
-- [ ] Memory mode `overwrite` copies general-scoped memories, overwriting destination
+- [x] Memory mode `overwrite` copies general-scoped memories, overwriting destination
       files at the same path.
-- [ ] Memory mode `merge` copies only general-scoped memories that do not already exist
+- [x] Memory mode `merge` copies only general-scoped memories that do not already exist
       at the destination and preserves destination files that do exist.
-- [ ] Memory mode `skip` excludes the entire `.claude/agent-memory/**` subtree from the
+- [x] Memory mode `skip` excludes the entire `.claude/agent-memory/**` subtree from the
       copy regardless of scope.
-- [ ] The VS Code command presents a multi-select QuickPick for language packs, a
+- [x] The VS Code command presents a multi-select QuickPick for language packs, a
       single-select QuickPick for the C# variant shown only when the C# pack is selected,
       and a single-select QuickPick for memory mode; selections are mapped to the
       `--packs`, `--csharp-variant`, and `--memory-mode` Python CLI arguments.
-- [ ] The MCP tool `push_down_claude_customizations` schema gains optional `packs`,
+- [x] The MCP tool `push_down_claude_customizations` schema gains optional `packs`,
       `csharp_variant`, and `memory_mode` fields; an invocation with only `workspace_root`
       remains valid and backward-compatible.
-- [ ] The parity test in `test_push_down_claude_resource_contracts.py` excludes the
+- [x] The parity test in `test_push_down_claude_resource_contracts.py` excludes the
       bundle-only variant subtree from the root-to-bundle byte-identical assertion.
-- [ ] A new test asserts the variant subtree never collides with a root `.claude` path
+- [x] A new test asserts the variant subtree never collides with a root `.claude` path
       (conflict-prevention guarantee) and that the destination receives exactly one C#
       toolchain.
-- [ ] Python toolchain is green: Black, Ruff, Pyright, and Pytest with coverage
+- [x] Python toolchain is green: Black, Ruff, Pyright, and Pytest with coverage
       >= 85% line and >= 75% branch.
-- [ ] TypeScript toolchain is green: Prettier, ESLint, tsc, and Vitest with coverage
+- [x] TypeScript toolchain is green: Prettier, ESLint, tsc, and Vitest with coverage
       meeting the repository thresholds.
 
 ## Seeded Test Conditions (from potential)

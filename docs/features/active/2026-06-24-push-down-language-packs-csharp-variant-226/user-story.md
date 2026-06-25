@@ -92,25 +92,25 @@ current no-argument behavior for callers that do not opt in.
 
 ## Acceptance Criteria
 
-- [ ] Invoking the push-down with no pack, variant, or memory-mode arguments copies the
+- [x] Invoking the push-down with no pack, variant, or memory-mode arguments copies the
       complete `.claude` tree and overwrites general-scoped memories, matching current
       behavior (backward compatibility).
-- [ ] The `core` pack is always included regardless of which language packs are selected.
-- [ ] Supplying a pack selection of `core` plus TypeScript copies only `core` and
+- [x] The `core` pack is always included regardless of which language packs are selected.
+- [x] Supplying a pack selection of `core` plus TypeScript copies only `core` and
       TypeScript pack files; Python, PowerShell, and C# pack files are not written.
-- [ ] The legacy C# variant files exist only under the bundle-only subtree
+- [x] The legacy C# variant files exist only under the bundle-only subtree
       `.claude-variants/csharp-legacy/` and never at the repository root `.claude` tree.
-- [ ] Exactly one C# toolchain lands at the destination root; selecting the legacy
+- [x] Exactly one C# toolchain lands at the destination root; selecting the legacy
       variant writes legacy content to the canonical destination C# paths and the modern
       C# files are not also written there.
-- [ ] The VS Code command shows a multi-select QuickPick for language packs, a
+- [x] The VS Code command shows a multi-select QuickPick for language packs, a
       single-select C# variant QuickPick only when the C# pack is selected, and a
       single-select memory-mode QuickPick; cancellation at any prompt aborts the push-down.
-- [ ] The C# variant single-select enforces that only one C# toolchain is chosen
+- [x] The C# variant single-select enforces that only one C# toolchain is chosen
       (mutual exclusion at the UI layer).
-- [ ] Memory mode selection (overwrite, merge, skip) is presented and applied to the
+- [x] Memory mode selection (overwrite, merge, skip) is presented and applied to the
       `.claude/agent-memory/**` subtree.
-- [ ] An MCP or automation invocation with only `workspace_root` remains valid and
+- [x] An MCP or automation invocation with only `workspace_root` remains valid and
       behaves as today.
 
 ## Non-Goals
