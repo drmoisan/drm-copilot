@@ -64,13 +64,13 @@ Note: VS Code command-palette commands may exist for interactive extension use, 
 
 `${relativeFile}` MUST resolve to a real potential markdown path before promotion begins. If the path is missing, invalid, or non-markdown, stop. Do not infer or synthesize the missing value.
 
-`${issue-num}` MUST be numeric after promotion and before final branch rename or folder creation. If promotion does not return a numeric issue number, stop. Do not infer or synthesize the missing value.
+`${issue-num}` MUST be numeric after promotion and before branch or folder creation. If promotion does not return a numeric issue number, stop. Do not infer or synthesize the missing value.
 
 When orchestrator routing selects short path, promotion/folder initialization still occurs and MUST use `minor-audit` mode.
 
 Lifecycle guardrails:
 - `${relativeFile}` MUST resolve to a real potential markdown path before promotion.
-- `${issue-num}` MUST be numeric after promotion and before final branch rename or folder creation.
+- `${issue-num}` MUST be numeric after promotion and before branch or folder creation.
 - Do not infer or synthesize the missing value.
 - If `${relativeFile}` or `${issue-num}` is missing, placeholder text, or unverified, stop before final branch rename, active-folder creation, or active-folder authoring.
 

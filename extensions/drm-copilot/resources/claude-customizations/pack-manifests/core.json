@@ -16,6 +16,7 @@
     ".claude/hooks/enforce-completion-consistency.ps1",
     ".claude/hooks/enforce-evidence-locations.ps1",
     ".claude/hooks/enforce-feature-folder-order.ps1",
+    ".claude/hooks/enforce-orchestration-preimplementation-gate.ps1",
     ".claude/hooks/enforce-pr-author-skill.ps1",
     ".claude/hooks/enforce-prd-feature-before-planner.ps1",
     ".claude/hooks/enforce-promotion-mcp-only.ps1",

@@ -188,6 +188,28 @@ function Get-MissingCompletionEvidence {
         }
     }
 
+    if ($issueNum -eq '232') {
+        $prGate = $null
+        if ($null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'pr_gate')) {
+            $prGate = $Payload.pr_gate
+        }
+        if ($null -eq $prGate -or $prGate -isnot [System.Management.Automation.PSCustomObject]) {
+            $missing += 'pr_gate (object with pr_number, pr_url, head_branch, and head_sha)'
+        }
+        else {
+            foreach ($field in @('pr_number', 'pr_url', 'head_branch', 'head_sha')) {
+                if (-not (Get-CheckpointStringValue -Payload $prGate -Name $field)) {
+                    $missing += "pr_gate.$field"
+                }
+            }
+            $prHeadSha = Get-CheckpointStringValue -Payload $prGate -Name 'head_sha'
+            $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
+            if ($prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+                $missing += 'ci_gate.head_sha matching pr_gate.head_sha'
+            }
+        }
+    }
+
     return [string[]]$missing
 }
 
@@ -249,9 +271,14 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ decision = 'allow' }
     }
 
+    $issueContext = ''
+    if ((Get-CheckpointStringValue -Payload $payload -Name 'issue-num') -eq '232') {
+        $issueContext = ' Issue #232 requires pr_gate evidence and current-head ci_gate evidence.'
+    }
+
     return [ordered]@{
         decision = 'block'
-        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha. Supply the missing evidence or remove the completion assertion."
+        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', ').$issueContext A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha. Supply the missing evidence or remove the completion assertion."
     }
 }
 
