@@ -2,7 +2,7 @@
 
 ---
 
-**Audit Date:** 2026-06-25  
+**Audit Date:** 2026-06-25
 **Code Under Test:** Issue #232 feature branch `feature/harden-orchestrate-skill-232` at `d84541fc3f9234708194b35304febde903ccf380`; base `main` at merge-base `041e45bbbe44101378486d28f74294ddf44460aa`.
 
 **Coverage Metrics by Language:**
@@ -303,6 +303,6 @@ $required = @('pre-issue branch','potential entry creation','potential_to_issue'
 rg -n "feature-review subagent|feature-review delegation|delegate to feature-review|delegating to feature-review|latest feature-review" .agents/skills/orchestrate/SKILL.md .agents/skills/orchestrator-workflow/SKILL.md .agents/skills/feature-promotion-lifecycle/SKILL.md .agents/skills/repo-automation-adapter/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-promotion-lifecycle/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-workflow/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md
 ```
 
-**Audit Completed By:** Codex feature-branch reviewer  
-**Audit Date:** 2026-06-25  
+**Audit Completed By:** Codex feature-branch reviewer
+**Audit Date:** 2026-06-25
 **Policy Version:** Current as of audit date

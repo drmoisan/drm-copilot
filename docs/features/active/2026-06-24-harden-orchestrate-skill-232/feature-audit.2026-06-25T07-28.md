@@ -2,11 +2,11 @@
 
 ---
 
-**Audit Date:** 2026-06-25  
-**Feature Folder:** `docs/features/active/2026-06-24-harden-orchestrate-skill-232`  
-**Base Branch:** `main`  
-**Head Branch:** `feature/harden-orchestrate-skill-232` at `d84541fc3f9234708194b35304febde903ccf380`  
-**Work Mode:** `full-feature`  
+**Audit Date:** 2026-06-25
+**Feature Folder:** `docs/features/active/2026-06-24-harden-orchestrate-skill-232`
+**Base Branch:** `main`
+**Head Branch:** `feature/harden-orchestrate-skill-232` at `d84541fc3f9234708194b35304febde903ccf380`
+**Work Mode:** `full-feature`
 **Audit Type:** Initial acceptance review
 
 ---

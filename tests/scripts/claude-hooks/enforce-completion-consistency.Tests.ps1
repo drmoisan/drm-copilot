@@ -235,4 +235,3 @@ Describe 'enforce-completion-consistency.ps1' {
         }
     }
 }
-

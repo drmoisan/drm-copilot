@@ -2,12 +2,12 @@
 
 ---
 
-**Review Date:** 2026-06-25  
-**Reviewer:** Codex feature-branch reviewer  
-**Feature Folder:** `docs/features/active/2026-06-24-harden-orchestrate-skill-232`  
-**Feature Folder Selection Rule:** Explicit user-provided active feature folder and PR context scoping docs for Issue #232.  
-**Base Branch:** `main`  
-**Head Branch:** `feature/harden-orchestrate-skill-232` at `d84541fc3f9234708194b35304febde903ccf380`  
+**Review Date:** 2026-06-25
+**Reviewer:** Codex feature-branch reviewer
+**Feature Folder:** `docs/features/active/2026-06-24-harden-orchestrate-skill-232`
+**Feature Folder Selection Rule:** Explicit user-provided active feature folder and PR context scoping docs for Issue #232.
+**Base Branch:** `main`
+**Head Branch:** `feature/harden-orchestrate-skill-232` at `d84541fc3f9234708194b35304febde903ccf380`
 **Review Type:** Initial review
 
 ---
