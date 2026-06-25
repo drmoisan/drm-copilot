@@ -1,0 +1,14 @@
+{
+  "name": "python",
+  "label": "Python",
+  "paths": [
+    ".claude/rules/python.md",
+    ".claude/rules/python-suppressions.md",
+    ".claude/agents/python-typed-engineer.md",
+    ".claude/hooks/check-python-test-purity.ps1",
+    ".claude/hooks/enforce-python-batch-budget.ps1",
+    ".claude/skills/invoke-python-engineer/SKILL.md",
+    ".claude/skills/python-change-budget-router/SKILL.md",
+    ".claude/skills/python-qa-gate/SKILL.md"
+  ]
+}

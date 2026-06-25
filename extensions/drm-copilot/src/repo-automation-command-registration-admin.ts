@@ -116,6 +116,25 @@ function registerPushDownCodexAndAgentsCustomizationsCommand(
   );
 }
 
+/**
+ * Selectable language packs for the Claude push-down command, ordered for the
+ * multi-select QuickPick. Each entry maps a human-readable label to the
+ * corresponding pack manifest name. `core` is always published by the engine
+ * and is therefore not offered as a selectable item here.
+ */
+const CLAUDE_PUSH_DOWN_PACK_ITEMS: ReadonlyArray<{
+  readonly label: string;
+  readonly pack: string;
+}> = [
+  { label: "Python", pack: "python" },
+  { label: "PowerShell", pack: "powershell" },
+  { label: "TypeScript", pack: "typescript" },
+  { label: "C#", pack: "csharp" },
+];
+
+const CLAUDE_PUSH_DOWN_TITLE =
+  "drm-copilot: Push Down Claude Code Customizations";
+
 function registerPushDownClaudeCustomizationsCommand(
   options: RepoAutomationCommandRegistrationOptions,
 ): vscode.Disposable {
@@ -123,9 +142,60 @@ function registerPushDownClaudeCustomizationsCommand(
     "drmCopilotExtension.pushDownClaudeCustomizations",
     async () => {
       const commandId = "drmCopilotExtension.pushDownClaudeCustomizations";
+
+      // Step 1: multi-select the language packs to publish. All packs are
+      // pre-picked so the default selection matches the prior publish-all
+      // behavior. Cancellation (undefined) aborts without invoking the service.
+      const packSelection = await vscode.window.showQuickPick(
+        CLAUDE_PUSH_DOWN_PACK_ITEMS.map((item) => ({
+          label: item.label,
+          pack: item.pack,
+          picked: true,
+        })),
+        {
+          title: CLAUDE_PUSH_DOWN_TITLE,
+          placeHolder:
+            "Select the language packs to publish (core is always included).",
+          canPickMany: true,
+          ignoreFocusOut: true,
+        },
+      );
+      if (packSelection === undefined) {
+        return;
+      }
+      const packs = packSelection.map((item) => item.pack);
+
+      // Step 2: when the C# pack is selected, choose the C# variant. The prompt
+      // is skipped entirely when C# was not selected.
+      let csharpVariant: "modern" | "legacy" | undefined;
+      if (packs.includes("csharp")) {
+        const variantChoice = await promptForChoice(
+          CLAUDE_PUSH_DOWN_TITLE,
+          "Choose the C# toolchain variant.",
+          ["modern", "legacy"],
+        );
+        if (!variantChoice) {
+          return;
+        }
+        csharpVariant = variantChoice;
+      }
+
+      // Step 3: choose the agent-memory mode.
+      const memoryMode = await promptForChoice(
+        CLAUDE_PUSH_DOWN_TITLE,
+        "Choose the agent-memory handling mode.",
+        ["overwrite", "merge", "skip"],
+      );
+      if (!memoryMode) {
+        return;
+      }
+
       await options.service.pushDownClaudeCustomizations({
         workspaceRoot: getWorkspaceRoot(),
         invocationId: commandId,
+        packs,
+        ...(csharpVariant === undefined ? {} : { csharpVariant }),
+        memoryMode,
       });
     },
   );

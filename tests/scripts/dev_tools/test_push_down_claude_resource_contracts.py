@@ -125,6 +125,26 @@ def test_bundled_claude_payload_contains_all_repo_runtime_contracts() -> None:
         ), f"Bundle content differs from repo for: {relative_path}"
 
 
+def test_pack_manifests_are_outside_the_parity_scope() -> None:
+    """Verify pack manifests live outside the `.claude/**` parity scope.
+
+    The root-to-bundle parity assertion compares only `.claude/**` files
+    (``SCOPED_ROOTS == (Path(".claude"),)``). The pack manifests live under
+    ``pack-manifests/`` (a sibling of `.claude/`), so they must never appear in
+    the enumerated `.claude/**` payload and are not pushed to a destination.
+    """
+
+    # The manifest directory exists in the bundle as a sibling of `.claude`.
+    manifest_dir = BUNDLED_ROOT / "pack-manifests"
+    assert manifest_dir.is_dir(), "Bundled pack-manifests directory must exist."
+
+    # No enumerated `.claude/**` payload path may reference pack-manifests.
+    bundled_files = list_scoped_files(BUNDLED_ROOT)
+    assert not any(
+        "pack-manifests" in relative_path.as_posix() for relative_path in bundled_files
+    ), "pack-manifests must not be enumerated within the .claude parity scope."
+
+
 def test_bundled_claude_payload_excludes_settings_local_json() -> None:
     """Verify settings.local.json is absent from the bundled payload.
 
@@ -134,6 +154,62 @@ def test_bundled_claude_payload_excludes_settings_local_json() -> None:
     assert not (
         BUNDLED_ROOT / ".claude" / "settings.local.json"
     ).exists(), "settings.local.json must not be present in the bundled payload"
+
+
+VARIANT_SUBTREE_RELATIVE = Path(".claude-variants/csharp-legacy")
+
+
+def test_bundled_claude_payload_excludes_variant_subtree_from_parity() -> None:
+    """Verify the variant subtree is outside the byte-identical parity scope.
+
+    The root-to-bundle parity comparison enumerates only `.claude/**`. The
+    legacy variant subtree lives at `.claude-variants/csharp-legacy/` (a sibling
+    of `.claude/`), so no enumerated parity path may reference it.
+    """
+
+    bundled_files = list_scoped_files(BUNDLED_ROOT)
+    # No `.claude/**` payload path may reference the variant subtree directory.
+    assert not any(
+        ".claude-variants" in relative_path.as_posix()
+        for relative_path in bundled_files
+    ), ".claude-variants must not be enumerated within the .claude parity scope."
+
+
+def test_variant_subtree_is_bundle_only_and_non_colliding() -> None:
+    """Assert the legacy variant subtree is bundle-only and non-colliding.
+
+    Three invariants are checked:
+    - No `.claude-variants/` directory exists at the repository root; the
+      variant lives only in the bundle.
+    - Every variant file maps to an existing modern file at the root `.claude`
+      tree (so the variant is a true alternative, not a stray file).
+    - Each variant file's content differs from its root `.claude` counterpart
+      (so the legacy variant is a distinct profile, not a duplicate).
+    """
+
+    # The variant must not leak to the repository root .claude-variants path.
+    assert not (
+        REPO_ROOT / ".claude-variants"
+    ).exists(), "No .claude-variants directory may exist at the repository root."
+
+    variant_root = BUNDLED_ROOT / VARIANT_SUBTREE_RELATIVE
+    assert variant_root.is_dir(), "Bundled legacy variant subtree must exist."
+
+    # Enumerate every variant file and verify it maps to a distinct modern file.
+    variant_files = sorted(path for path in variant_root.rglob("*") if path.is_file())
+    assert variant_files, "Legacy variant subtree must contain files."
+
+    for variant_path in variant_files:
+        # Map the variant file to its canonical `.claude/` destination tail.
+        tail = variant_path.relative_to(variant_root)
+        root_path = REPO_ROOT / ".claude" / tail
+        assert (
+            root_path.is_file()
+        ), f"Variant file has no modern counterpart at root: {tail}"
+        # The variant must be a distinct profile, not a byte copy of the modern.
+        assert variant_path.read_text(encoding="utf-8") != root_path.read_text(
+            encoding="utf-8"
+        ), f"Variant file is byte-identical to its root counterpart: {tail}"
 
 
 def _frontmatter_declares_scope(content: str) -> bool:

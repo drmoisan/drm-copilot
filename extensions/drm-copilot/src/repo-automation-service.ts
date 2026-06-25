@@ -10,6 +10,7 @@ import {
 } from "./repo-automation-service-support";
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
 import { buildPoshQcWorkflowArguments } from "./repo-automation-args";
+import { buildPushDownClaudeCustomizationsOptions } from "./repo-automation-service-push-down";
 import {
   buildNewActiveFeatureFolderOptions,
   buildResolveAtomicPlanPromptOptions,
@@ -62,7 +63,7 @@ export interface RepoAutomationService {
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownClaudeCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownClaudeCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult>;
   newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
@@ -144,6 +145,12 @@ export interface RepoAutomationService {
 export interface WorkspaceExecutionInput {
   readonly workspaceRoot: string;
   readonly invocationId?: string;
+}
+
+export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: "modern" | "legacy";
+  readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
 export interface RepoAutomationServiceOptions {
@@ -248,20 +255,9 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     });
   }
   async pushDownClaudeCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownClaudeCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "push_down_claude_customizations",
-      runtimeKind: "python",
-      bundledRelativePath:
-        "resources/templates/push_down_claude_customizations.py",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "push_down_claude_customizations",
-      args: ["--destination", input.workspaceRoot],
-      summary:
-        "Pushed bundled Claude Code customizations into the destination workspace.",
-      stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
-    });
+    return this.executeScript(buildPushDownClaudeCustomizationsOptions(input));
   }
   async newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },

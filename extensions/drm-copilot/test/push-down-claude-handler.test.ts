@@ -43,6 +43,62 @@ describe("handlePushDownClaudeCustomizations", () => {
     expect(result).toBe(mockResult);
   });
 
+  it("forwards resolved packs, csharp_variant, and memory_mode to the service", async () => {
+    const mockResult: RepoAutomationExecutionResult = {
+      tool: "push_down_claude_customizations",
+      workspaceRoot: "C:/workspace",
+      artifacts: [],
+      summary: "Pushed bundled Claude Code customizations.",
+    };
+    const service = createMockService();
+    service.pushDownClaudeCustomizations.mockResolvedValue(mockResult);
+
+    await handlePushDownClaudeCustomizations(
+      {
+        workspace_root: "C:/workspace",
+        packs: ["core", "typescript"],
+        csharp_variant: "legacy",
+        memory_mode: "merge",
+      },
+      service as unknown as RepoAutomationService,
+    );
+
+    // The resolved input maps the raw snake_case fields to camelCase service
+    // fields and forwards them to the service.
+    expect(service.pushDownClaudeCustomizations).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      packs: ["core", "typescript"],
+      csharpVariant: "legacy",
+      memoryMode: "merge",
+    });
+  });
+
+  it("rejects an out-of-range memory_mode enum value", async () => {
+    const service = createMockService();
+
+    await expect(
+      handlePushDownClaudeCustomizations(
+        { workspace_root: "C:/workspace", memory_mode: "replace" },
+        service as unknown as RepoAutomationService,
+      ),
+    ).rejects.toThrow(/memory_mode/);
+
+    expect(service.pushDownClaudeCustomizations).not.toHaveBeenCalled();
+  });
+
+  it("rejects an out-of-range csharp_variant enum value", async () => {
+    const service = createMockService();
+
+    await expect(
+      handlePushDownClaudeCustomizations(
+        { workspace_root: "C:/workspace", csharp_variant: "vintage" },
+        service as unknown as RepoAutomationService,
+      ),
+    ).rejects.toThrow(/csharp_variant/);
+
+    expect(service.pushDownClaudeCustomizations).not.toHaveBeenCalled();
+  });
+
   it("propagates rejection when the resolver throws on missing workspace_root", async () => {
     const service = createMockService();
 

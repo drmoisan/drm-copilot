@@ -23,6 +23,9 @@ export interface WorkspaceToolInput {
   readonly workspaceRoot: string;
 }
 
+export { resolvePushDownClaudeCustomizationsToolInput } from "./mcp-tool-inputs-push-down";
+export type { PushDownClaudeCustomizationsToolInput } from "./mcp-tool-inputs-push-down";
+
 export interface CollectPrContextToolInput extends WorkspaceToolInput {
   readonly base: string;
 }
@@ -72,7 +75,7 @@ export interface ValidateOrchestrationArtifactsToolInput extends WorkspaceToolIn
   readonly requireComplete?: boolean;
 }
 
-function asToolArgumentObject(
+export function asToolArgumentObject(
   rawInput: unknown,
 ): Readonly<Record<string, unknown>> {
   if (rawInput === undefined) {
@@ -246,19 +249,6 @@ export function resolvePushDownCopilotCustomizationsToolInput(
 }
 
 export function resolvePushDownCodexAndAgentsCustomizationsToolInput(
-  rawInput: unknown,
-  fallbackWorkspaceRoot?: string,
-): WorkspaceToolInput {
-  const args = asToolArgumentObject(rawInput);
-  return {
-    workspaceRoot: normalizeWorkspaceRoot(
-      args["workspace_root"],
-      fallbackWorkspaceRoot,
-    ),
-  };
-}
-
-export function resolvePushDownClaudeCustomizationsToolInput(
   rawInput: unknown,
   fallbackWorkspaceRoot?: string,
 ): WorkspaceToolInput {

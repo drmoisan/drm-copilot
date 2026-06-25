@@ -112,4 +112,71 @@ describe("repo automation service pushDownClaudeCustomizations", () => {
     expect(result.tool).toBe("push_down_claude_customizations");
     expect(result.workspaceRoot).toBe("C:/workspace");
   });
+
+  it("appends --packs, --csharp-variant, and --memory-mode when supplied", async () => {
+    setExecutablePresenceOnFsMock(fsMock, { python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.pushDownClaudeCustomizations({
+      workspaceRoot: "C:/workspace",
+      packs: ["core", "typescript"],
+      csharpVariant: "legacy",
+      memoryMode: "merge",
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    // The packs array is joined into a single comma-separated CLI value.
+    const packsIndex = args.indexOf("--packs");
+    expect(packsIndex).toBeGreaterThanOrEqual(0);
+    expect(args[packsIndex + 1]).toBe("core,typescript");
+    const variantIndex = args.indexOf("--csharp-variant");
+    expect(variantIndex).toBeGreaterThanOrEqual(0);
+    expect(args[variantIndex + 1]).toBe("legacy");
+    const memoryIndex = args.indexOf("--memory-mode");
+    expect(memoryIndex).toBeGreaterThanOrEqual(0);
+    expect(args[memoryIndex + 1]).toBe("merge");
+  });
+
+  it("spawns exactly the destination args for a no-field input (backward compatible)", async () => {
+    setExecutablePresenceOnFsMock(fsMock, { python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.pushDownClaudeCustomizations({
+      workspaceRoot: "C:/workspace",
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    // The first arg is the bundled script path; the rest are exactly the
+    // destination flag and the workspace root, with no optional flags appended.
+    expect(args.slice(1)).toStrictEqual(["--destination", "C:/workspace"]);
+    expect(args).not.toContain("--packs");
+    expect(args).not.toContain("--csharp-variant");
+    expect(args).not.toContain("--memory-mode");
+  });
+
+  it("omits --packs when the packs array is empty", async () => {
+    setExecutablePresenceOnFsMock(fsMock, { python: true });
+    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+    });
+
+    await service.pushDownClaudeCustomizations({
+      workspaceRoot: "C:/workspace",
+      packs: [],
+    });
+
+    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
+    // An empty packs array must not produce a --packs flag.
+    expect(args).not.toContain("--packs");
+  });
 });
