@@ -84,6 +84,63 @@ Describe 'enforce-completion-consistency.ps1' {
         }
     }
 
+    Context 'Issue #232 completion asserted without PR evidence is blocked' {
+        It 'blocks and references pr_gate when a complete checkpoint has no PR evidence' {
+            $json = ConvertTo-CheckpointToolInput -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '232'
+                'feature-folder' = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232'
+                ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
+            }
+
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
+
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'pr_gate'
+            $decision['reason'] | Should -Match 'Issue #232'
+        }
+    }
+
+    Context 'Issue #232 completion asserted with stale CI evidence is blocked' {
+        It 'blocks when ci_gate.head_sha does not match pr_gate.head_sha' {
+            $json = ConvertTo-CheckpointToolInput -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '232'
+                'feature-folder' = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232'
+                pr_gate          = @{
+                    pr_number   = 232
+                    pr_url      = 'https://github.com/drmoisan/drm-copilot/pull/232'
+                    head_branch = 'feature/harden-orchestrate-skill-232'
+                    head_sha    = 'current-head'
+                }
+                ci_gate          = @{ conclusion = 'success'; head_sha = 'stale-head' }
+            }
+
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
+
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'ci_gate.head_sha'
+            $decision['reason'] | Should -Match 'pr_gate.head_sha'
+        }
+
+        It 'allows when Issue #232 PR and CI evidence use the same head SHA' {
+            $json = ConvertTo-CheckpointToolInput -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '232'
+                'feature-folder' = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232'
+                pr_gate          = @{
+                    pr_number   = 232
+                    pr_url      = 'https://github.com/drmoisan/drm-copilot/pull/232'
+                    head_branch = 'feature/harden-orchestrate-skill-232'
+                    head_sha    = 'current-head'
+                }
+                ci_gate          = @{ conclusion = 'success'; head_sha = 'current-head' }
+            }
+
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+        }
+    }
+
     Context 'completion asserted with missing ci_gate is blocked' {
         It 'blocks and references ci_gate when ci_gate is absent' {
             $json = ConvertTo-CheckpointToolInput -Payload @{
@@ -178,3 +235,4 @@ Describe 'enforce-completion-consistency.ps1' {
         }
     }
 }
+

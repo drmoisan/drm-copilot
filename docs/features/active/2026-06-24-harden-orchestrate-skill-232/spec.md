@@ -216,6 +216,11 @@ store.
       orchestration gates.
 - [x] Review delegation naming uses `feature-reviewer` for route-required
       receipts and preserves `feature-review` only for the skill/workflow name.
+- [x] Executable pre-implementation gates in `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` and `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` block implementation edits, formatters, tests, staging, commits, and implementation delegation until Issue #232 route metadata, lifecycle readiness, and checkpoint state are present.
+- [x] Lifecycle sequencing and completion enforcement in `scripts/dev_tools/validate_orchestrator_state.py`, `.codex/hooks/enforce-checkpoint-monotonic.ps1`, `.claude/hooks/enforce-checkpoint-monotonic.ps1`, `.codex/hooks/enforce-completion-consistency.ps1`, and `.claude/hooks/enforce-completion-consistency.ps1` reject out-of-order Issue #232 checkpoint transitions and reject completion without required PR and CI evidence.
+- [x] MCP-only template resolver enforcement exposes `resolve_policy_audit_template_asset` through `extensions/drm-copilot/src/repo-automation-tool-names.ts`, `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts`, `extensions/drm-copilot/src/mcp-tool-definitions.ts`, and `extensions/drm-copilot/src/mcp-tools.ts`, and `scripts/dev_tools/validate_policy_audit_artifact.py` rejects policy-audit PASS or READY artifacts that report fallback template behavior or missing resolver exposure.
+- [x] PR and current-head CI completion gates require `pr_gate` evidence, require `ci_gate.head_sha` to match `pr_gate.head_sha`, and use `scripts/orchestration/Invoke-CiGateParser.ps1` to emit the CI head SHA metadata consumed by checkpoint validation.
+- [x] Canonical Issue #232 remediation evidence is stored under `docs/features/active/2026-06-24-harden-orchestrate-skill-232/evidence/` and records fail-before exceptions, regression results, QA gates, and acceptance traceability without using non-canonical artifact evidence paths.
 
 ## Definition of Done
 

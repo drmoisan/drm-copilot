@@ -67,6 +67,11 @@ route selection, checkpoint state, and lifecycle setup are complete.
 - [x] The skill defines violation handling when implementation work occurs before the required orchestration gates.
 - [x] The skill aligns review-delegate naming with route-required `feature-reviewer` receipts while preserving `feature-review` as the skill/workflow name.
 - [x] The companion lifecycle skill is updated when branch sequencing belongs in `feature-promotion-lifecycle` rather than only in `orchestrate`.
+- [x] As an orchestrating agent, I am blocked by executable pre-implementation gates in `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` and `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` until Issue #232 route metadata, lifecycle readiness, and checkpoint state are present.
+- [x] As a repository maintainer, I can verify lifecycle sequencing and completion enforcement through `scripts/dev_tools/validate_orchestrator_state.py`, `.codex/hooks/enforce-checkpoint-monotonic.ps1`, `.claude/hooks/enforce-checkpoint-monotonic.ps1`, `.codex/hooks/enforce-completion-consistency.ps1`, and `.claude/hooks/enforce-completion-consistency.ps1` so Issue #232 cannot be marked complete from out-of-order checkpoints or without required PR and CI evidence.
+- [x] As a policy reviewer, I can verify MCP-only template resolver enforcement through `extensions/drm-copilot/src/repo-automation-tool-names.ts`, `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts`, `extensions/drm-copilot/src/mcp-tool-definitions.ts`, and `extensions/drm-copilot/src/mcp-tools.ts`, and `scripts/dev_tools/validate_policy_audit_artifact.py` so policy-audit PASS or READY artifacts cannot rely on fallback template behavior or missing resolver exposure.
+- [x] As a repository maintainer, I can verify Issue #232 DONE status requires `pr_gate`, requires `ci_gate.head_sha` to match `pr_gate.head_sha`, and uses `scripts/orchestration/Invoke-CiGateParser.ps1` to capture current-head CI metadata.
+- [x] As an auditor, I can find canonical Issue #232 remediation evidence under `docs/features/active/2026-06-24-harden-orchestrate-skill-232/evidence/`, including fail-before exceptions, regression results, QA gates, and acceptance traceability, with no required evidence stored in non-canonical artifact evidence paths.
 
 
 ## Non-Goals

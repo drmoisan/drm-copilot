@@ -438,3 +438,40 @@ def _test_policy_audit_allows_na_new_code_without_percentage() -> None:
 globals()[
     "test_validate_policy_audit_substantive_requirements_allows_na_new_code_without_percentage"
 ] = _test_policy_audit_allows_na_new_code_without_percentage
+
+
+def test_validate_policy_audit_text_rejects_missing_mcp_template_resolver_pass() -> (
+    None
+):
+    """Reject PASS artifacts that report missing MCP template resolver exposure.
+
+    Purpose:
+        Cover the Issue #232 failure mode where a policy audit recorded missing
+        `resolve_policy_audit_template_asset` exposure but still reported a
+        passing or ready outcome.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that the resolver fallback is rejected.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    text = "\n".join(
+        (
+            build_valid_policy_audit_text(),
+            "MCP resolver status: resolve_policy_audit_template_asset was not exposed.",
+            "Review readiness: READY.",
+            "Final disposition: PASS.",
+        )
+    )
+
+    errors = policy_validator.validate_policy_audit_text(text)
+
+    assert any("resolve_policy_audit_template_asset" in error for error in errors)

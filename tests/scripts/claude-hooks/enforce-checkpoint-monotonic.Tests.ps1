@@ -67,6 +67,25 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
             $decision['reason'] | Should -Match 'S4_atomic_planning'
         }
 
+        It 'blocks Issue #232 implementation completion without promotion and planning prerequisites' {
+            $content = '{"issue-num":"232","completed_steps":["S5_atomic_execution"]}'
+            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
+
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'S3_promotion'
+            $decision['reason'] | Should -Match 'S4_atomic_planning'
+        }
+
+        It 'blocks Issue #232 PR completion without planning prerequisite' {
+            $content = '{"issue-num":"232","completed_steps":["S3_promotion_issue","S8_create_pr"]}'
+            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
+
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'S4_atomic_planning'
+        }
+
         It 'allows out-of-order when rollback_history is non-empty' {
             $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"],"rollback_history":[{"step":"S5_atomic_execution","reason":"reset"}]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)

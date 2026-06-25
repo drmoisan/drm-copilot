@@ -331,3 +331,197 @@ def test_validate_orchestrator_state_text_rejects_malformed_json() -> None:
 
     assert len(errors) == 1
     assert errors[0].startswith("Checkpoint is not valid JSON:")
+
+
+def test_require_complete_rejects_issue_232_without_pr_gate() -> None:
+    """Reject Issue #232 completion when PR evidence is absent.
+
+    Purpose:
+        Cover the completion gate requiring `pr_gate` evidence before the
+        Issue #232 checkpoint can be accepted as complete.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that missing PR evidence is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    state["issue-num"] = "232"
+    state["feature-folder"] = (
+        "docs/features/active/2026-06-24-harden-orchestrate-skill-232"
+    )
+    state["plan-path"] = (
+        "docs/features/active/2026-06-24-harden-orchestrate-skill-232/"
+        "remediation-plan.2026-06-25T07-45.md"
+    )
+    state["blocked_reason"] = "none"
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("pr_gate" in error for error in errors)
+
+
+def test_require_complete_rejects_issue_232_stale_ci_head_sha() -> None:
+    """Reject Issue #232 completion when CI evidence is stale.
+
+    Purpose:
+        Cover the completion gate requiring `ci_gate.head_sha` to match
+        `pr_gate.head_sha` before Issue #232 can be accepted as complete.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that stale CI evidence is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    state["issue-num"] = "232"
+    state["feature-folder"] = (
+        "docs/features/active/2026-06-24-harden-orchestrate-skill-232"
+    )
+    state["plan-path"] = (
+        "docs/features/active/2026-06-24-harden-orchestrate-skill-232/"
+        "remediation-plan.2026-06-25T07-45.md"
+    )
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_sha": "current-head-sha",
+    }
+    state["ci_gate"] = {
+        "conclusion": "success",
+        "head_sha": "stale-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any(
+        "ci_gate.head_sha" in error and "pr_gate.head_sha" in error for error in errors
+    )
+
+
+def test_require_complete_rejects_issue_232_wrong_pr_branch() -> None:
+    state = build_valid_orchestrator_state()
+    state["issue-num"] = "232"
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/wrong-branch",
+        "head_sha": "current-head-sha",
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("pr_gate.head_branch" in error for error in errors)
+
+
+def test_require_complete_rejects_missing_ci_gate() -> None:
+    state = build_valid_orchestrator_state()
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_sha": "current-head-sha",
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("ci_gate" in error for error in errors)
+
+
+def test_require_complete_rejects_failed_ci_gate() -> None:
+    state = build_valid_orchestrator_state()
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_sha": "current-head-sha",
+    }
+    state["ci_gate"] = {
+        "conclusion": "failure",
+        "head_sha": "current-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("ci_gate.conclusion" in error for error in errors)
+
+
+def test_require_complete_rejects_issue_232_missing_promotion_receipts() -> None:
+    state = build_valid_orchestrator_state()
+    state["issue-num"] = "232"
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_sha": "current-head-sha",
+    }
+    state["ci_gate"] = {
+        "conclusion": "success",
+        "head_sha": "current-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+    state["delegation_receipts"] = {"promotion": {"issue": "#232"}}
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("delegation_receipts.promotion" in error for error in errors)
+
+
+def test_require_complete_accepts_issue_232_top_level_promotion_receipts() -> None:
+    state = build_valid_orchestrator_state()
+    state["issue-num"] = "232"
+    state["pr_gate"] = {
+        "pr_number": 232,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
+        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_sha": "current-head-sha",
+    }
+    state["ci_gate"] = {
+        "conclusion": "success",
+        "head_sha": "current-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+    state["promotion_receipts"] = {
+        "potential_entry": {"path": "docs/features/potential/demo.md"},
+        "issue": {"number": 232},
+        "feature_folder": {
+            "path": ("docs/features/active/" "2026-06-24-harden-orchestrate-skill-232")
+        },
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert not any("promotion_receipts" in error for error in errors)

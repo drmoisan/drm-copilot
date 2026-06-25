@@ -13,17 +13,16 @@ Usage:
 Flow:
     1. Parse the checkpoint JSON payload.
     2. Validate required top-level keys and status values.
-    3. Validate either the legacy list-based receipts or the additive
-       ``delegation_receipts.promotion.*`` namespace.
+    3. Validate either the legacy list-based receipts, top-level promotion
+       receipts, or the additive ``delegation_receipts.promotion.*``
+       namespace.
 
 Invariants / Constraints:
-    - The validator accepts both the legacy list and the additive promotion
-      namespace forms for ``delegation_receipts``.
+    - The validator accepts the legacy list, top-level promotion receipts, and
+      the additive promotion namespace forms for receipt evidence.
     - Unsupported namespace keys are rejected.
     - The validator returns error strings and never mutates the checkpoint.
 
-Side Effects:
-    None.
 """
 
 from __future__ import annotations
@@ -96,6 +95,10 @@ PROMOTION_RECEIPT_KEYS = (
     "issue",
     "feature_folder",
 )
+ISSUE_232 = "232"
+ISSUE_232_BRANCH = "feature/harden-orchestrate-skill-232"
+PR_GATE_KEYS = ("pr_number", "pr_url", "head_branch", "head_sha")
+CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
 REMEDIATION_LOOP_KEY = "remediation_loop"
 REMEDIATION_CYCLES_KEY = "cycles"
 # Execution statuses that may only be recorded once a cycle's preflight gate has
@@ -173,29 +176,6 @@ def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
 
 
 def _validate_remediation_loop(remediation_loop: object) -> list[str]:
-    """Validate the remediation-loop structure and each of its cycles.
-
-    Purpose:
-        Apply the additive remediation-cycle invariants only when a checkpoint
-        carries a `remediation_loop`. When the structure is absent, malformed,
-        or has no cycles, the function produces no errors so existing
-        step-based checkpoints validate unchanged.
-
-    Args:
-        remediation_loop (object): The raw value of the checkpoint's top-level
-            `remediation_loop` key.
-
-    Returns:
-        list[str]: Validation errors collected across all cycles; empty when no
-        cycles are present or the structure carries no cycle objects.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
     errors: list[str] = []
 
     # A non-object remediation_loop carries no cycles to validate; treat it as
@@ -218,6 +198,100 @@ def _validate_remediation_loop(remediation_loop: object) -> list[str]:
         errors.extend(_validate_remediation_cycle(index, cast("dict[str, Any]", cycle)))
 
     return errors
+
+
+def _missing_object_keys(value: object, keys: tuple[str, ...]) -> list[str]:
+    if not isinstance(value, dict):
+        return list(keys)
+    value_map = cast("dict[str, object]", value)
+    missing: list[str] = []
+    for key in keys:
+        item = value_map.get(key)
+        if item is None or (isinstance(item, str) and not item.strip()):
+            missing.append(key)
+    return missing
+
+
+def _validate_completion_pr_gate(state: dict[str, Any]) -> list[str]:
+    pr_gate = state.get("pr_gate")
+    missing = _missing_object_keys(pr_gate, PR_GATE_KEYS)
+    if not isinstance(pr_gate, dict):
+        return [
+            "Checkpoint completion validation failed: pr_gate must be an object "
+            f"with keys: {', '.join(PR_GATE_KEYS)}."
+        ]
+    errors: list[str] = []
+    if missing:
+        errors.append(
+            "Checkpoint completion validation failed: pr_gate missing required "
+            f"fields: {', '.join(missing)}."
+        )
+    if state.get("issue-num") == ISSUE_232:
+        head_branch = cast("dict[str, object]", pr_gate).get("head_branch")
+        if head_branch != ISSUE_232_BRANCH:
+            errors.append(
+                "Checkpoint completion validation failed: pr_gate.head_branch "
+                f"must be {ISSUE_232_BRANCH} for Issue #232."
+            )
+    return errors
+
+
+def _validate_completion_ci_gate(state: dict[str, Any]) -> list[str]:
+    ci_gate = state.get("ci_gate")
+    missing = _missing_object_keys(ci_gate, CI_GATE_KEYS)
+    if not isinstance(ci_gate, dict):
+        return [
+            "Checkpoint completion validation failed: ci_gate must be an object "
+            f"with keys: {', '.join(CI_GATE_KEYS)}."
+        ]
+    errors: list[str] = []
+    if missing:
+        errors.append(
+            "Checkpoint completion validation failed: ci_gate missing required "
+            f"fields: {', '.join(missing)}."
+        )
+    ci_map = cast("dict[str, object]", ci_gate)
+    if ci_map.get("conclusion") != "success":
+        errors.append(
+            "Checkpoint completion validation failed: ci_gate.conclusion must be "
+            "success."
+        )
+    pr_gate = state.get("pr_gate")
+    if isinstance(pr_gate, dict):
+        pr_map = cast("dict[str, object]", pr_gate)
+        pr_head_sha = pr_map.get("head_sha")
+    else:
+        pr_head_sha = None
+    if pr_head_sha is not None and ci_map.get("head_sha") != pr_head_sha:
+        errors.append(
+            "Checkpoint completion validation failed: ci_gate.head_sha must match "
+            "pr_gate.head_sha."
+        )
+    return errors
+
+
+def _validate_issue_232_promotion_receipts(state: dict[str, Any]) -> list[str]:
+    if state.get("issue-num") != ISSUE_232:
+        return []
+    receipts = state.get("delegation_receipts")
+    promotion_source = "promotion_receipts"
+    promotion: object = state.get("promotion_receipts")
+    if isinstance(receipts, dict):
+        receipts_map = cast("dict[str, object]", receipts)
+        namespaced_promotion = receipts_map.get(PROMOTION_RECEIPT_NAMESPACE_KEY)
+        if namespaced_promotion is not None:
+            promotion_source = "delegation_receipts.promotion"
+            promotion = namespaced_promotion
+    missing = _missing_object_keys(promotion, PROMOTION_RECEIPT_KEYS)
+    return (
+        [
+            "Checkpoint completion validation failed: "
+            f"{promotion_source} missing required Issue #232 "
+            f"receipt keys: {', '.join(missing)}."
+        ]
+        if missing
+        else []
+    )
 
 
 def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
@@ -423,6 +497,9 @@ def validate_orchestrator_state_text(
             errors.append(
                 "Checkpoint completion validation failed: blocked_reason is not `none`."
             )
+        errors.extend(_validate_completion_pr_gate(state_map))
+        errors.extend(_validate_completion_ci_gate(state_map))
+        errors.extend(_validate_issue_232_promotion_receipts(state_map))
         errors.extend(validate_routing_contract(state_map))
 
     return errors

@@ -14,6 +14,7 @@ enabled_tools = [
     "validate_orchestration_artifacts",
     "resolve_atomic_plan_prompt",
     "resolve_execute_hard_lock_prompt",
+    "resolve_policy_audit_template_asset",
     "run_poshqc_format",
     "run_poshqc_analyze",
     "run_poshqc_analyze_autofix",
@@ -34,7 +35,51 @@ multi_agent = true
 # actor with write access to artifacts/.
 [[hooks.PreToolUse]]
 matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/validate-bash.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-promotion-mcp-only.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
 command = "pwsh -NoProfile -File .codex/hooks/enforce-pr-author-skill.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/check-python-test-purity.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-python-batch-budget.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/check-powershell-test-purity.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-powershell-batch-budget.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-evidence-locations.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-checkpoint-monotonic.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-completion-consistency.ps1"
+
+[[hooks.SubagentStop]]
+matcher = "feature-review|feature-reviewer"
+command = "pwsh -NoProfile -File .codex/hooks/validate-feature-review-coverage.ps1"
 
 [permissions.orchestrator-workspace]
 description = "Workspace editing for deterministic orchestration with secret-path deny rules."

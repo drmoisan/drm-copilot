@@ -46,6 +46,17 @@ def _build_complete_large_state() -> dict[str, object]:
         "step8_status": "verified",
         "step9_status": "verified",
         "step10_status": "not-applicable",
+        "pr_gate": {
+            "pr_number": 1,
+            "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1",
+            "head_branch": "feature-1",
+            "head_sha": "current-head-sha",
+        },
+        "ci_gate": {
+            "conclusion": "success",
+            "head_sha": "current-head-sha",
+            "verified_at": "2026-04-07T10:00:00Z",
+        },
         "required_agents": required_agents,
         "required_skills": required_skills,
         "required_mcp_tools": required_mcp_tools,
