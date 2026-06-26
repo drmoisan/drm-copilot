@@ -83,12 +83,36 @@ describe("repo automation dispatch", () => {
     jest.clearAllMocks();
   });
 
-  it("collectPrContext uses bundled extension resources for non-interactive execution", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("collectPrContext runs in-process using the injected runner and filesystem", async () => {
+    // Inject hermetic fakes so the in-process TS port (F9) runs without a Python
+    // spawn; record the git cwd and the written artifact paths.
+    const gitCwds: Array<string | undefined> = [];
+    const writes = new Map<string, string>();
+    const ensured: string[] = [];
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
       output: { appendLine: appendLineMock },
+      fileSystem: {
+        glob: () => [],
+        isFile: (p: string) => writes.has(p.replace(/\\/g, "/")),
+        exists: (p: string) => p.replace(/\\/g, "/").endsWith("/.git"),
+        isDirectory: () => false,
+        listDirectory: () => [],
+        readTextFile: () => "",
+        writeTextFile: (p: string, c: string) =>
+          void writes.set(p.replace(/\\/g, "/"), c),
+        ensureDir: (d: string) => void ensured.push(d.replace(/\\/g, "/")),
+      },
+      runner: {
+        run: (args: readonly string[], options?: { cwd?: string }) => {
+          gitCwds.push(options?.cwd);
+          // gh is unavailable in this hermetic test (auth fails); git resolves.
+          if (args[0] === "gh" || String(args[0]).endsWith("gh")) {
+            return { stdout: "", stderr: "offline", code: 1 };
+          }
+          return { stdout: "", stderr: "", code: 0 };
+        },
+      },
     });
 
     const result = await service.collectPrContext({
@@ -97,55 +121,18 @@ describe("repo automation dispatch", () => {
       base: "origin/main",
     });
 
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
-    expect(executable).toBe("python");
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/collect_pr_context.py",
+    // Assert in-process behavior and the preserved service return contract.
+    const summary = "C:/workspace/artifacts/pr_context.summary.txt";
+    const appendix = "C:/workspace/artifacts/pr_context.appendix.txt";
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(gitCwds.length).toBeGreaterThan(0);
+    expect(writes.has("artifacts/pr_context.summary.txt")).toBe(true);
+    expect(writes.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    expect(result.tool).toBe("collect_pr_context");
+    expect(result.summary).toBe(
+      "Collected PR context against base 'origin/main'.",
     );
-    expect(args).toEqual(
-      expect.arrayContaining([
-        "--base",
-        "origin/main",
-        "--repo-root",
-        "C:/workspace",
-        "--out",
-        "artifacts/pr_context.summary.txt",
-        "--appendix-out",
-        "artifacts/pr_context.appendix.txt",
-      ]),
-    );
-    expect(options.cwd).toBe("C:/workspace");
-    expect(options.shell).toBe(false);
-    expect(result.artifacts).toEqual([
-      "C:/workspace/artifacts/pr_context.summary.txt",
-      "C:/workspace/artifacts/pr_context.appendix.txt",
-    ]);
-  });
-
-  it("collectPrContext falls back to py -3 when python is unavailable", async () => {
-    setExecutablePresence({ python: false, py: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-    const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
-      output: { appendLine: appendLineMock },
-    });
-
-    await service.collectPrContext({
-      workspaceRoot: "C:/workspace",
-      invocationId: "collect_pr_context",
-      base: "origin/main",
-    });
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
-    expect(executable).toBe("py");
-    expect(args[0]).toBe("-3");
-    expect(args[1]).toBe(
-      "C:/extension/resources/templates/collect_pr_context.py",
-    );
-    expect(options.cwd).toBe("C:/workspace");
-    expect(options.shell).toBe(false);
+    expect(result.artifacts).toEqual([summary, appendix]);
   });
 
   it("collectCommitContext runs in-process using the injected runner and filesystem", async () => {

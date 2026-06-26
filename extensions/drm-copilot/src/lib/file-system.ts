@@ -35,6 +35,40 @@ export interface FileSystem {
   /** Return true when `path` refers to an existing regular file. */
   isFile(path: string): boolean;
 
+  /**
+   * Return true when `path` exists (file, directory, or other entry).
+   *
+   * Mirrors Python `Path.exists()`: any access error (missing path, permission
+   * failure) resolves to `false` rather than raising.
+   *
+   * @param path Path to test.
+   */
+  exists(path: string): boolean;
+
+  /**
+   * Return true when `path` exists and is a directory.
+   *
+   * Mirrors Python `Path.is_dir()`: a missing path or non-directory entry
+   * resolves to `false` rather than raising.
+   *
+   * @param path Path to test.
+   */
+  isDirectory(path: string): boolean;
+
+  /**
+   * List the immediate child entry names of the directory at `path`.
+   *
+   * Mirrors Python `Path.iterdir()` (names only), returning the child names
+   * sorted lexicographically. When `path` is absent or is not a directory, an
+   * empty array is returned rather than raising, matching the tolerant
+   * discovery semantics the pr-context port relies on.
+   *
+   * @param path Directory whose immediate children are listed.
+   * @returns Sorted child names, or an empty array when `path` is not a
+   *   readable directory.
+   */
+  listDirectory(path: string): string[];
+
   /** Read the file at `path` as UTF-8 text. */
   readTextFile(path: string): string;
 
@@ -219,6 +253,43 @@ export class RealFileSystem implements FileSystem {
       return fs.statSync(path).isFile();
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * @param path Path to test.
+   * @returns True when `path` exists; false on any access error.
+   */
+  exists(path: string): boolean {
+    return fs.existsSync(path);
+  }
+
+  /**
+   * @param path Path to test.
+   * @returns True when `path` exists and is a directory; false otherwise.
+   */
+  isDirectory(path: string): boolean {
+    try {
+      return fs.statSync(path).isDirectory();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * @param path Directory whose immediate children are listed.
+   * @returns Sorted child names; an empty array when `path` is not a readable
+   *   directory.
+   */
+  listDirectory(path: string): string[] {
+    try {
+      // `readdirSync` raises for a missing path or a non-directory; treat any
+      // such failure as "no children" to match Python's tolerant discovery.
+      return fs
+        .readdirSync(path)
+        .sort((left, right) => left.localeCompare(right));
+    } catch {
+      return [];
     }
   }
 

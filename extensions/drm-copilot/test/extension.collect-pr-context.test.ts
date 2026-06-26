@@ -68,6 +68,11 @@ jest.mock(
 
 jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
+  statSync: jest.fn(),
+  readdirSync: jest.fn(),
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -79,12 +84,44 @@ import { activate } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
+  statSync: jest.Mock;
+  readdirSync: jest.Mock;
+  readFileSync: jest.Mock;
+  writeFileSync: jest.Mock;
+  mkdirSync: jest.Mock;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
   spawnSync: jest.Mock;
 };
+
+/** Files written through the mocked node:fs during a collector run. */
+const writtenFiles = new Map<string, string>();
+
+/**
+ * Configure the node:fs mock so the in-process collector's RealFileSystem can
+ * read the (empty) repo tree and capture the artifact writes. Branch-discovery
+ * uses the separate `existsSync` python-presence mock, so this preserves that.
+ */
+function setCollectorFileSystemState(): void {
+  writtenFiles.clear();
+  fsMock.statSync.mockImplementation((filePath: string) => {
+    // No directories exist in this hermetic fixture, so statSync raises like a
+    // missing path; RealFileSystem treats that as "not a directory".
+    throw new Error(`ENOENT: ${filePath}`);
+  });
+  fsMock.readdirSync.mockReturnValue([]);
+  fsMock.readFileSync.mockImplementation((filePath: string) => {
+    throw new Error(`ENOENT: ${filePath}`);
+  });
+  fsMock.mkdirSync.mockReturnValue(undefined);
+  fsMock.writeFileSync.mockImplementation(
+    (filePath: string, content: string) => {
+      writtenFiles.set(filePath, content);
+    },
+  );
+}
 
 function setGitBranchDiscoveryState(input: {
   readonly originHead?: string;
@@ -177,20 +214,6 @@ function createMockProcess(exitCode: number): MockChildProcess {
   return processMock;
 }
 
-function createMockProcessWithStderr(
-  exitCode: number,
-  stderrLine: string,
-): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.stderr.emit("data", Buffer.from(stderrLine, "utf-8"));
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
-}
-
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {
     extensionUri: { fsPath: "C:/extension" },
@@ -218,6 +241,7 @@ describe("drm-copilot collectPrContext command behavior", () => {
     showQuickPickMock.mockReset();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
     quickPickResultLabel = "origin/main";
+    setCollectorFileSystemState();
     setGitBranchDiscoveryState({
       originHead: "origin/main",
       remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
@@ -281,9 +305,8 @@ describe("drm-copilot collectPrContext command behavior", () => {
     expect(defaultItem?.description).toBe("default");
   });
 
-  it("collectPrContext passes base and artifact args", async () => {
+  it("collectPrContext runs in-process and writes both artifacts without spawning Python", async () => {
     setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
     setGitBranchDiscoveryState({
       originHead: "origin/main",
       remoteRefs: ["origin/HEAD", "origin/main", "origin/release/1.0"],
@@ -294,22 +317,19 @@ describe("drm-copilot collectPrContext command behavior", () => {
     );
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/collect_pr_context.py",
+    // No Python (or any) process is spawned via child_process.spawn.
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    // The in-process collector wrote both artifacts through node:fs.
+    expect(writtenFiles.has("artifacts/pr_context.summary.txt")).toBe(true);
+    expect(writtenFiles.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    // The summary references the selected base.
+    expect(writtenFiles.get("artifacts/pr_context.summary.txt")).toContain(
+      "Base ref (requested): origin/main",
     );
-    expect(args).toContain("--base");
-    expect(args).toContain("--repo-root");
-    expect(args).toContain("C:/workspace");
-    expect(args).toContain("--out");
-    expect(args).toContain("artifacts/pr_context.summary.txt");
-    expect(args).toContain("--appendix-out");
-    expect(args).toContain("artifacts/pr_context.appendix.txt");
   });
 
   it("collectPrContext direct invocation uses explicit base without prompting", async () => {
     setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.collectPrContext",
@@ -317,9 +337,11 @@ describe("drm-copilot collectPrContext command behavior", () => {
     await handler("--base", "origin/release/1.0");
 
     expect(showQuickPickMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--base");
-    expect(args).toContain("origin/release/1.0");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    // The in-process collector used the explicit base in the written summary.
+    expect(writtenFiles.get("artifacts/pr_context.summary.txt")).toContain(
+      "Base ref (requested): origin/release/1.0",
+    );
   });
 
   it("collectPrContext git branch discovery failure", async () => {
@@ -362,31 +384,34 @@ describe("drm-copilot collectPrContext command behavior", () => {
     );
   });
 
-  it("collectPrContext non-zero collector exit diagnostics", async () => {
+  it("collectPrContext emits the in-process collector log lines", async () => {
     setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(
-      createMockProcessWithStderr(7, "collector crashed: simulated stderr"),
-    );
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.collectPrContext",
     );
-    await expect(handler()).rejects.toThrow("Command exited with code 7");
+    await handler();
 
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
     const logs = appendLineMock.mock.calls.map(([line]) => line);
     expect(
-      logs.some((line) => line.includes("collector crashed: simulated stderr")),
+      logs.some((line) =>
+        line.includes(
+          "Wrote context summary to: artifacts/pr_context.summary.txt",
+        ),
+      ),
     ).toBe(true);
     expect(
       logs.some((line) =>
-        line.includes("[drmCopilotExtension.collectPrContext] command failure"),
+        line.includes(
+          "Wrote context appendix to: artifacts/pr_context.appendix.txt",
+        ),
       ),
     ).toBe(true);
   });
 
-  it("collectPrContext executes bundled wrapper script", async () => {
+  it("collectPrContext does not spawn the bundled Python wrapper script", async () => {
     setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.collectPrContext",
@@ -394,24 +419,29 @@ describe("drm-copilot collectPrContext command behavior", () => {
 
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/collect_pr_context.py",
+    // The in-process port never spawns resources/templates/collect_pr_context.py.
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    const spawnTargets = childProcessMock.spawn.mock.calls.map((call) =>
+      String((call as unknown[])[0]),
     );
+    expect(
+      spawnTargets.some((target) => target.includes("collect_pr_context.py")),
+    ).toBe(false);
   });
 
-  it("collectPrContext always propagates --repo-root with workspace path", async () => {
+  it("collectPrContext writes artifacts against the workspace root in-process", async () => {
     setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.collectPrContext",
     );
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const repoRootIndex = args.indexOf("--repo-root");
-    expect(repoRootIndex).toBeGreaterThan(-1);
-    expect(args[repoRootIndex + 1]).toBe("C:/workspace");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    // The collector wrote both repo-relative artifacts via node:fs.
+    expect([...writtenFiles.keys()].sort()).toEqual([
+      "artifacts/pr_context.appendix.txt",
+      "artifacts/pr_context.summary.txt",
+    ]);
   });
 });
