@@ -16,7 +16,6 @@ import {
   runPushDownCopilotCustomizations,
 } from "./repo-automation-service-push-down";
 import {
-  buildRunCodexNativeConverterOptions,
   buildTemplateRoot,
   resolvePolicyAuditTemplateAssetResult,
   type ResolvePromptServiceDeps,
@@ -24,6 +23,7 @@ import {
   runResolveAtomicPlanPrompt,
   runResolveExecuteHardLockPrompt,
 } from "./repo-automation-service-workflows";
+import { runCodexNativeConverterServiceCall } from "./lib/codex-native-converter/codex-native-converter-service-call";
 import {
   type PolicyAuditTemplateAssetSelector,
   type PotentialPromotionType,
@@ -227,7 +227,20 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   async runCodexNativeConverter(
     input: RunCodexNativeConverterInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(buildRunCodexNativeConverterOptions(input));
+    // In-process TS port of codex_native_converter (F10): delegate to the
+    // extracted helper instead of spawning the bundled Python script.
+    return runCodexNativeConverterServiceCall({
+      fileSystem: this.fileSystem,
+      workspaceRoot: input.workspaceRoot,
+      mode: input.mode,
+      sourceEcosystem: input.sourceEcosystem,
+      sourceRoot: input.sourceRoot,
+      selectedPaths: input.selectedPaths,
+      destinationRoot: input.destinationRoot,
+      artifactRoot: input.artifactRoot,
+      enableRepoPrompts: input.enableRepoPrompts,
+      log: (message) => this.output.appendLine(message),
+    });
   }
   async pushDownCopilotCustomizations(
     input: WorkspaceExecutionInput,

@@ -65,45 +65,6 @@ interface ValidateOrchestrationArtifactsInput extends WorkspaceExecutionInput {
   readonly requireComplete?: boolean;
 }
 
-export function buildRunCodexNativeConverterOptions(
-  input: RunCodexNativeConverterInput,
-): ScriptExecutionOptions & { readonly tool: "run_codex_native_converter" } {
-  const args = [
-    input.mode,
-    "--source-root",
-    input.sourceRoot,
-    "--source-ecosystem",
-    input.sourceEcosystem,
-  ];
-
-  if (input.destinationRoot !== undefined) {
-    args.push("--destination-root", input.destinationRoot);
-  }
-
-  if (input.artifactRoot !== undefined) {
-    args.push("--artifact-root", input.artifactRoot);
-  }
-
-  if (input.enableRepoPrompts === true) {
-    args.push("--enable-repo-prompts");
-  }
-
-  for (const selectedPath of input.selectedPaths ?? []) {
-    args.push("--selected-path", selectedPath);
-  }
-
-  return {
-    tool: "run_codex_native_converter",
-    runtimeKind: "python",
-    bundledRelativePath: "resources/templates/codex_native_converter.py",
-    workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "run_codex_native_converter",
-    args,
-    summary: `Ran bundled codex-native-converter in ${input.mode} mode for '${input.sourceEcosystem}'.`,
-    stdoutArtifactPattern: /Artifact root:\s*(.+)/i,
-  };
-}
-
 export function buildNewActiveFeatureFolderOptions(
   input: NewActiveFeatureFolderInput,
   templateRoot: string,
