@@ -1,10 +1,8 @@
-import * as path from "node:path";
 import {
   type CommandOutput,
   executeBundledScriptFromExtensionRoot,
 } from "./command-runtime";
 import {
-  normalizeGeneratedPath,
   parseFirstArtifactPath,
   runCollectCommitContext,
   type ScriptExecutionOptions,
@@ -35,6 +33,7 @@ import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
+import { collectPrContextServiceCall } from "./lib/pr-context/pr-context-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
 import { newActiveFeatureFolderServiceCall } from "./lib/new-active-feature-folder/new-active-feature-folder-service-call";
 import {
@@ -215,31 +214,14 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   async collectPrContext(
     input: WorkspaceExecutionInput & { readonly base: string },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "collect_pr_context",
-      runtimeKind: "python",
-      bundledRelativePath: "resources/templates/collect_pr_context.py",
+    // In-process TS port of the pr_context collector (F9): delegate to the
+    // extracted helper instead of spawning the bundled Python script.
+    return collectPrContextServiceCall({
+      runner: this.runner,
+      fileSystem: this.fileSystem,
       workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "collect_pr_context",
-      args: [
-        "--base",
-        input.base,
-        "--repo-root",
-        input.workspaceRoot,
-        "--out",
-        "artifacts/pr_context.summary.txt",
-        "--appendix-out",
-        "artifacts/pr_context.appendix.txt",
-      ],
-      summary: `Collected PR context against base '${input.base}'.`,
-      artifactPaths: [
-        normalizeGeneratedPath(
-          path.join(input.workspaceRoot, "artifacts/pr_context.summary.txt"),
-        ),
-        normalizeGeneratedPath(
-          path.join(input.workspaceRoot, "artifacts/pr_context.appendix.txt"),
-        ),
-      ],
+      base: input.base,
+      log: (message) => this.output.appendLine(message),
     });
   }
   async runCodexNativeConverter(
