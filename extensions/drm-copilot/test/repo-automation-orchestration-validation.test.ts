@@ -7,10 +7,7 @@ import {
   jest,
 } from "@jest/globals";
 
-import {
-  createMockProcess,
-  setExecutablePresenceOnFsMock,
-} from "./runtime-test-helpers";
+import type { FileSystem } from "../src/lib/file-system";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
@@ -28,27 +25,48 @@ jest.mock("node:child_process", () => ({
 
 import { createRepoAutomationService } from "../src/repo-automation-service";
 
-const fsMock = jest.requireMock("node:fs") as {
-  copyFileSync: jest.MockedFunction<
-    (source: string, destination: string) => void
-  >;
-  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-  mkdirSync: jest.MockedFunction<
-    (filePath: string, options?: { recursive?: boolean }) => void
-  >;
-};
-
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
-function setExecutablePresence(presence: {
-  readonly python?: boolean;
-  readonly py?: boolean;
-  readonly pwsh?: boolean;
-  readonly powershell?: boolean;
-}): void {
-  setExecutablePresenceOnFsMock(fsMock, presence);
+const VALID_PLAN = [
+  "# Plan",
+  "### Phase 0 — Setup",
+  "- [ ] [P0-T1] First task",
+].join("\n");
+
+/**
+ * In-memory FileSystem fake mapping artifact paths to text. The
+ * `validateOrchestrationArtifacts` method is the only consumer, so glob/isFile
+ * default to empty/false; orchestrator-state routing uses an explicit matrix in
+ * its own unit tests rather than this fake.
+ */
+class VirtualFileSystem implements FileSystem {
+  private readonly contents: Map<string, string>;
+
+  constructor(files: Record<string, string>) {
+    this.contents = new Map(Object.entries(files));
+  }
+
+  glob(): string[] {
+    return [];
+  }
+
+  isFile(path: string): boolean {
+    return this.contents.has(path);
+  }
+
+  readTextFile(path: string): string {
+    const content = this.contents.get(path);
+    if (content === undefined) {
+      throw new Error(`ENOENT: ${path}`);
+    }
+    return content;
+  }
+
+  writeTextFile(): void {
+    throw new Error("not used");
+  }
 }
 
 describe("repo automation orchestration validation", () => {
@@ -57,22 +75,24 @@ describe("repo automation orchestration validation", () => {
     process.env.PATHEXT = ".EXE;.CMD";
     appendLineMock.mockReset();
     childProcessMock.spawn.mockReset();
-    fsMock.copyFileSync.mockReset();
-    fsMock.mkdirSync.mockReset();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("validateOrchestrationArtifacts spawns the bundled validator with correct args", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("validateOrchestrationArtifacts validates in-process and preserves the summary", async () => {
+    // Arrange: inject a filesystem returning a valid plan at the resolved path.
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/plan.md": VALID_PLAN,
+    });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
       output: { appendLine: appendLineMock },
+      fileSystem,
     });
 
+    // Act
     const result = await service.validateOrchestrationArtifacts({
       workspaceRoot: "C:/workspace",
       invocationId: "validate_orchestration_artifacts",
@@ -81,39 +101,59 @@ describe("repo automation orchestration validation", () => {
       requireComplete: false,
     });
 
-    const [executable, args] = childProcessMock.spawn.mock.calls[0] as [
-      string,
-      string[],
-    ];
-    expect(executable).toBe("python");
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/validate_orchestration_artifacts.py",
-    );
-    expect(args).toContain("plan");
-    expect(args).toContain("docs/plan.md");
-    expect(args).not.toContain("--require-complete");
+    // Assert: no Python subprocess; result preserves tool + summary contract.
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
     expect(result.tool).toBe("validate_orchestration_artifacts");
+    expect(result.summary).toBe("Validated plan artifact at 'docs/plan.md'.");
   });
 
-  it("validateOrchestrationArtifacts passes --require-complete when requested", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("validateOrchestrationArtifacts routes require-complete to the orchestrator-state path", async () => {
+    // Arrange: a non-object orchestrator-state document under requireComplete.
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/state.json": "[]",
+    });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
       output: { appendLine: appendLineMock },
+      fileSystem,
     });
 
-    await service.validateOrchestrationArtifacts({
-      workspaceRoot: "C:/workspace",
-      invocationId: "validate_orchestration_artifacts",
-      artifactType: "policy-audit",
-      artifactPath: "docs/policy-audit.md",
-      requireComplete: true,
+    // Act / Assert: the orchestrator-state validator reports the root error and
+    // the method throws, surfacing the failure to the MCP handler.
+    await expect(
+      service.validateOrchestrationArtifacts({
+        workspaceRoot: "C:/workspace",
+        invocationId: "validate_orchestration_artifacts",
+        artifactType: "orchestrator-state",
+        artifactPath: "docs/state.json",
+        requireComplete: true,
+      }),
+    ).rejects.toThrow("Checkpoint root must be a JSON object.");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("validateOrchestrationArtifacts throws when validation errors are present", async () => {
+    // Arrange: a policy-audit document missing required headings.
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/policy-audit.md": "incomplete document",
+    });
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+      fileSystem,
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--require-complete");
-    expect(args).toContain("policy-audit");
-    expect(args).toContain("docs/policy-audit.md");
+    // Act / Assert
+    await expect(
+      service.validateOrchestrationArtifacts({
+        workspaceRoot: "C:/workspace",
+        invocationId: "validate_orchestration_artifacts",
+        artifactType: "policy-audit",
+        artifactPath: "docs/policy-audit.md",
+        requireComplete: true,
+      }),
+    ).rejects.toThrow(
+      "Validation failed for policy-audit artifact at 'docs/policy-audit.md':",
+    );
   });
 });

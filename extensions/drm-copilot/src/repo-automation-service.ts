@@ -17,7 +17,6 @@ import {
   buildResolveExecuteHardLockPromptOptions,
   buildRunCodexNativeConverterOptions,
   buildTemplateRoot,
-  buildValidateOrchestrationArtifactsOptions,
   resolvePolicyAuditTemplateAssetResult,
 } from "./repo-automation-service-workflows";
 import {
@@ -25,6 +24,12 @@ import {
   type PotentialPromotionType,
   type WorkModeOption,
 } from "./workflow-command-arguments";
+import {
+  type FileSystem,
+  RealFileSystem,
+  toPosixPath,
+} from "./lib/file-system";
+import { validateArtifact } from "./lib/validate/orchestration-artifacts";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -156,17 +161,25 @@ export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInp
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
   readonly output: CommandOutput;
+  /**
+   * Optional filesystem injection. Tests supply an in-memory implementation to
+   * keep `validateOrchestrationArtifacts` hermetic; production defaults to a
+   * {@link RealFileSystem}.
+   */
+  readonly fileSystem?: FileSystem;
 }
 
 class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly extensionRoot: string;
   private readonly output: CommandOutput;
   private readonly templateRoot: string;
+  private readonly fileSystem: FileSystem;
 
   constructor(options: RepoAutomationServiceOptions) {
     this.extensionRoot = options.extensionRoot;
     this.output = options.output;
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
+    this.fileSystem = options.fileSystem ?? new RealFileSystem();
   }
   async collectCommitContext(
     input: WorkspaceExecutionInput,
@@ -443,9 +456,38 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly requireComplete?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(
-      buildValidateOrchestrationArtifactsOptions(input),
+    // Resolve the artifact path relative to the workspace root, matching the
+    // Python `Path(args.path)` semantics, then validate in-process. The path is
+    // normalized to forward slashes to match the F1 FileSystem path convention.
+    const artifactFullPath = toPosixPath(
+      path.join(input.workspaceRoot, input.artifactPath),
     );
+    const text = this.fileSystem.readTextFile(artifactFullPath);
+    const errors = validateArtifact({
+      artifactType: input.artifactType,
+      text,
+      ...(input.requireComplete === undefined
+        ? {}
+        : { requireComplete: input.requireComplete }),
+      fs: this.fileSystem,
+      root: input.workspaceRoot,
+    });
+
+    // Surface validation failure as a thrown error so the MCP handler reports a
+    // non-zero outcome, mirroring the Python stderr-per-line, exit-1 behavior.
+    if (errors.length > 0) {
+      throw new Error(
+        `Validation failed for ${input.artifactType} artifact at ` +
+          `'${input.artifactPath}':\n${errors.join("\n")}`,
+      );
+    }
+
+    // Preserve the existing success summary string.
+    return {
+      tool: "validate_orchestration_artifacts",
+      workspaceRoot: input.workspaceRoot,
+      summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
+    };
   }
 
   private async executeScript(
