@@ -7,176 +7,206 @@ import {
   jest,
 } from "@jest/globals";
 
-import {
-  createMockProcess,
-  setExecutablePresenceOnFsMock,
-} from "./runtime-test-helpers";
+import { InMemoryPushDownFileSystem } from "./lib/push-down/push-down.test-helpers";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
-jest.mock("node:fs", () => ({
-  copyFileSync: jest.fn(),
-  existsSync: jest.fn(),
-  mkdirSync: jest.fn(),
-}));
-
-jest.mock("node:child_process", () => ({
-  spawn: jest.fn(),
-}));
-
 import { createRepoAutomationService } from "../src/repo-automation-service";
 
-const fsMock = jest.requireMock("node:fs") as {
-  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-};
+const EXT = "C:/extension";
+const WS = "C:/workspace";
+const BUNDLE = `${EXT}/resources/claude-customizations`;
 
-const childProcessMock = jest.requireMock("node:child_process") as {
-  spawn: jest.Mock;
-};
+/**
+ * Build an in-memory push-down filesystem seeded with a minimal `.claude`
+ * tree, a legacy C# variant subtree, and pack manifests.
+ *
+ * @returns A seeded in-memory push-down filesystem with the workspace ensured.
+ */
+function seedClaudeBundle(): InMemoryPushDownFileSystem {
+  const fs = new InMemoryPushDownFileSystem();
+  fs.seedDir(WS);
+  fs.seedFile(`${BUNDLE}/.claude/rules/typescript.md`, "# TS\n");
+  fs.seedFile(`${BUNDLE}/.claude/rules/csharp.md`, "# Modern C#\n");
+  fs.seedFile(`${BUNDLE}/.claude/agents/orchestrator.md`, "# Orchestrator\n");
+  fs.seedFile(
+    `${BUNDLE}/.claude-variants/csharp-legacy/rules/csharp.md`,
+    "# Legacy C#\n",
+  );
+  fs.seedFile(
+    `${BUNDLE}/pack-manifests/core.json`,
+    JSON.stringify({
+      name: "core",
+      label: "Core",
+      paths: [".claude/agents/orchestrator.md"],
+    }),
+  );
+  fs.seedFile(
+    `${BUNDLE}/pack-manifests/typescript.json`,
+    JSON.stringify({
+      name: "typescript",
+      label: "TypeScript",
+      paths: [".claude/rules/typescript.md"],
+    }),
+  );
+  fs.seedFile(
+    `${BUNDLE}/pack-manifests/csharp-legacy.json`,
+    JSON.stringify({
+      name: "csharp-legacy",
+      label: "C# Legacy",
+      paths: [".claude/rules/csharp.md"],
+      source_prefix: ".claude-variants/csharp-legacy",
+    }),
+  );
+  return fs;
+}
 
-describe("repo automation service pushDownClaudeCustomizations", () => {
+describe("repo automation service pushDownClaudeCustomizations (in-process)", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
     appendLineMock.mockReset();
-    childProcessMock.spawn.mockReset();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("invokes executeScript with the correct tool, runtimeKind, bundledRelativePath, args, summary, and stdoutArtifactPattern", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("returns the preserved tool, summary, and a single artifact entry", async () => {
+    // Arrange
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
-    const workspaceRoot = "C:/workspace";
 
+    // Act
     const result = await service.pushDownClaudeCustomizations({
-      workspaceRoot,
+      workspaceRoot: WS,
       invocationId: "push_down_claude_customizations",
     });
 
-    // Verify the bundled script path and arguments passed to spawn.
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string; shell: boolean }];
-    expect(executable).toBe("python");
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/push_down_claude_customizations.py",
-    );
-    expect(args).toContain("--destination");
-    expect(args).toContain(workspaceRoot);
-    expect(options.cwd).toBe(workspaceRoot);
-    expect(options.shell).toBe(false);
+    // Assert: the in-process port preserves the return contract.
     expect(result.tool).toBe("push_down_claude_customizations");
     expect(result.summary).toContain(
       "Pushed bundled Claude Code customizations",
     );
+    expect(result.workspaceRoot).toBe(WS);
+    expect(result.artifacts).toHaveLength(1);
+    expect(result.artifacts?.[0]).toContain(
+      "artifacts/claude-customizations/push-down-",
+    );
   });
 
-  it("defaults invocationId to 'push_down_claude_customizations' when omitted from input", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("defaults to the in-process port when invocationId is omitted", async () => {
+    // Arrange
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
 
-    // Omit invocationId — the service should supply the default.
+    // Act
     const result = await service.pushDownClaudeCustomizations({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WS,
     });
 
+    // Assert
     expect(result.tool).toBe("push_down_claude_customizations");
   });
 
-  it("forwards an explicit invocationId when provided", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("preserves the canonical tool name even with an explicit invocationId", async () => {
+    // Arrange
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
 
+    // Act
     const result = await service.pushDownClaudeCustomizations({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WS,
       invocationId: "custom-id-123",
     });
 
-    // The result.tool reflects the canonical tool name, not the invocationId.
+    // Assert
     expect(result.tool).toBe("push_down_claude_customizations");
-    expect(result.workspaceRoot).toBe("C:/workspace");
+    expect(result.workspaceRoot).toBe(WS);
   });
 
-  it("appends --packs, --csharp-variant, and --memory-mode when supplied", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("threads packs, csharpVariant, and memoryMode into the in-process port", async () => {
+    // Arrange: select csharp-legacy with the legacy variant.
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
 
+    // Act
     await service.pushDownClaudeCustomizations({
-      workspaceRoot: "C:/workspace",
-      packs: ["core", "typescript"],
+      workspaceRoot: WS,
+      packs: ["core", "csharp-legacy"],
       csharpVariant: "legacy",
       memoryMode: "merge",
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    // The packs array is joined into a single comma-separated CLI value.
-    const packsIndex = args.indexOf("--packs");
-    expect(packsIndex).toBeGreaterThanOrEqual(0);
-    expect(args[packsIndex + 1]).toBe("core,typescript");
-    const variantIndex = args.indexOf("--csharp-variant");
-    expect(variantIndex).toBeGreaterThanOrEqual(0);
-    expect(args[variantIndex + 1]).toBe("legacy");
-    const memoryIndex = args.indexOf("--memory-mode");
-    expect(memoryIndex).toBeGreaterThanOrEqual(0);
-    expect(args[memoryIndex + 1]).toBe("merge");
+    // Assert: pack filtering and legacy variant routing are reflected in the
+    // copied destination files (the in-process port received the inputs).
+    expect(
+      pushDownFileSystem.readTextFile(`${WS}/.claude/rules/csharp.md`),
+    ).toBe("# Legacy C#\n");
+    expect(
+      pushDownFileSystem.isFile(`${WS}/.claude/agents/orchestrator.md`),
+    ).toBe(true);
+    // typescript was not selected, so it is excluded from the published set.
+    expect(pushDownFileSystem.isFile(`${WS}/.claude/rules/typescript.md`)).toBe(
+      false,
+    );
   });
 
-  it("spawns exactly the destination args for a no-field input (backward compatible)", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("publishes the full tree for a no-field input (backward compatible)", async () => {
+    // Arrange
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
 
-    await service.pushDownClaudeCustomizations({
-      workspaceRoot: "C:/workspace",
-    });
+    // Act
+    await service.pushDownClaudeCustomizations({ workspaceRoot: WS });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    // The first arg is the bundled script path; the rest are exactly the
-    // destination flag and the workspace root, with no optional flags appended.
-    expect(args.slice(1)).toStrictEqual(["--destination", "C:/workspace"]);
-    expect(args).not.toContain("--packs");
-    expect(args).not.toContain("--csharp-variant");
-    expect(args).not.toContain("--memory-mode");
+    // Assert: no pack selection publishes everything under `.claude`.
+    expect(pushDownFileSystem.isFile(`${WS}/.claude/rules/typescript.md`)).toBe(
+      true,
+    );
+    expect(pushDownFileSystem.isFile(`${WS}/.claude/rules/csharp.md`)).toBe(
+      true,
+    );
   });
 
-  it("omits --packs when the packs array is empty", async () => {
-    setExecutablePresenceOnFsMock(fsMock, { python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("publishes the full tree when the packs array is empty", async () => {
+    // Arrange
+    const pushDownFileSystem = seedClaudeBundle();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXT,
       output: { appendLine: appendLineMock },
+      pushDownFileSystem,
     });
 
+    // Act
     await service.pushDownClaudeCustomizations({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WS,
       packs: [],
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    // An empty packs array must not produce a --packs flag.
-    expect(args).not.toContain("--packs");
+    // Assert: an empty packs array behaves like no selection (publish all).
+    expect(pushDownFileSystem.isFile(`${WS}/.claude/rules/typescript.md`)).toBe(
+      true,
+    );
   });
 });
