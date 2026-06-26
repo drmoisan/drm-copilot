@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib
 import io
 import json
-import sys
 from contextlib import redirect_stdout
 from dataclasses import dataclass
 from pathlib import Path
@@ -65,30 +64,6 @@ class RecordingFileSystem:
         """Track created directories."""
 
         self.directories.add(path)
-
-
-def _bundled_scripts_root() -> Path:
-    """Resolve the bundled `resources/scripts` root used by the extension."""
-
-    repo_root = Path(__file__).resolve().parents[3]
-    return repo_root / "extensions" / "drm-copilot" / "resources" / "scripts"
-
-
-def _bundled_only_sys_path(repo_root: Path, bundled_scripts_root: Path) -> list[str]:
-    """Build a sys.path that exposes bundled `dev_tools` without repo-root `scripts`."""
-
-    filtered_path: list[str] = []
-    for entry in sys.path:
-        if entry == "":
-            continue
-        try:
-            if Path(entry).resolve() == repo_root:
-                continue
-        except OSError:
-            pass
-        filtered_path.append(entry)
-
-    return [str(bundled_scripts_root), *filtered_path]
 
 
 def _load_module():
@@ -307,68 +282,3 @@ def test_parse_args_returns_destination_value() -> None:
     args = module.parse_args(["--destination", "C:/dest"])
 
     assert args.destination == "C:/dest"
-
-
-def test_bundled_module_imports_without_repo_root_scripts_package(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify bundled import and CLI execution work with only packaged sources."""
-
-    repo_root = Path(__file__).resolve().parents[3]
-    bundled_scripts_root = _bundled_scripts_root()
-    import_state = [
-        "scripts",
-        "scripts.dev_tools",
-        "scripts.dev_tools.agentic_sync",
-        "scripts.dev_tools.push_down_copilot_customizations",
-        "scripts.dev_tools.push_down_copilot_customizations_filesystem",
-        "scripts.dev_tools.push_down_copilot_customizations_rewrites",
-        "scripts.dev_tools.push_down_claude_customizations",
-        "dev_tools",
-        "dev_tools.agentic_sync",
-        "dev_tools.push_down_copilot_customizations",
-        "dev_tools.push_down_copilot_customizations_filesystem",
-        "dev_tools.push_down_copilot_customizations_rewrites",
-        "dev_tools.push_down_claude_customizations",
-    ]
-    saved_modules = {name: sys.modules.get(name) for name in import_state}
-
-    for module_name in import_state:
-        sys.modules.pop(module_name, None)
-
-    monkeypatch.setattr(
-        sys,
-        "path",
-        _bundled_only_sys_path(repo_root, bundled_scripts_root),
-    )
-    importlib.invalidate_caches()
-
-    try:
-        module = importlib.import_module("dev_tools.push_down_claude_customizations")
-        assert callable(module.push_down_customizations)
-        assert module.MODULE_ENTRY_POINT.endswith("push_down_claude_customizations")
-        source_root = Path("C:/repo")
-        destination_root = Path("C:/dest")
-        fs = RecordingFileSystem(
-            files={
-                source_root / ".claude" / "settings.json": MemoryFile('{"v": 1}\n'),
-            }
-        )
-        fs.directories.update({source_root, source_root / ".claude", destination_root})
-
-        exit_code = module.main(
-            ["--destination", str(destination_root)],
-            repo_root=source_root,
-            fs=fs,
-        )
-
-        assert exit_code == 0
-        assert (
-            fs.read_text(destination_root / ".claude" / "settings.json") == '{"v": 1}\n'
-        )
-    finally:
-        for module_name in import_state:
-            sys.modules.pop(module_name, None)
-        for module_name, module in saved_modules.items():
-            if module is not None:
-                sys.modules[module_name] = module

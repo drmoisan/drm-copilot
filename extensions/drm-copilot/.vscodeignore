@@ -15,3 +15,5 @@ PUBLISHING.md
 **/__pycache__/**
 **/*.pyc
 **/*.pyo
+**/*.py
+resources/scripts/**

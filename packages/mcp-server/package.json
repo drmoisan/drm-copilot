@@ -35,7 +35,7 @@
   "author": "Dan Moisan",
   "scripts": {
     "build": "node esbuild-mcp-server.cjs",
-    "prepack": "node -e \"const{cpSync}=require('fs');cpSync('../../extensions/drm-copilot/resources','./resources',{recursive:true,force:true})\""
+    "prepack": "node prepack.cjs"
   },
   "overrides": {
     "fast-uri": "^3.1.2",

@@ -181,35 +181,23 @@ MCP tool calls return structured JSON with:
 
 ## Runtime Requirements
 
-- Python commands expect `python` on `PATH`.
+- All commands run in-process in TypeScript; no `python` interpreter is required for any extension or MCP command.
 - PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available.
 - An open workspace folder is required for workspace-targeted VS Code commands.
 - MCP clients must build the package so `out/mcp-server.js` exists before launching the server.
 
-`Resolve Execute Hard-Lock Prompt` depends on Python because it delegates to bundled Python resources at execution time.
-
-`Resolve Atomic Plan Prompt` also depends on Python because it delegates to bundled Python resources at execution time.
+`Resolve Execute Hard-Lock Prompt` and `Resolve Atomic Plan Prompt` run entirely in-process in TypeScript; they no longer require a Python runtime.
 
 ## Execution Model
 
-The shared repo-automation service executes these bundled wrapper resources:
+The shared repo-automation service runs the formerly-Python commands in-process in TypeScript (no interpreter is spawned). The remaining bundled wrapper resources it executes are PowerShell scripts and data assets:
 
-- `resources/templates/collect_commit_context.py`
-- `resources/templates/collect_pr_context.py`
-- `resources/templates/codex_native_converter.py`
-- `resources/templates/push_down_copilot_customizations.py`
-- `resources/templates/push_down_codex_and_agents_customizations.py`
-- `resources/templates/new_potential_bug_entry.py`
 - `resources/templates/new-potential-entry.ps1`
 - `resources/templates/link-parent-child.ps1`
-- `resources/templates/potential_to_issue.py`
-- `resources/templates/new_active_feature_folder.py`
 - `resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
 - `resources/templates/policy_audit/code-review.yyyy-MM-ddTHH-mm.md`
 - `resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md`
 - `resources/templates/policy_audit/AGENTS.md`
-- `resources/templates/resolve_atomic_plan_prompt.py`
-- `resources/templates/resolve_hard_lock_prompt.py`
 - `resources/templates/run-poshqc-format.ps1`
 - `resources/templates/run-poshqc-analyze.ps1`
 - `resources/templates/run-poshqc-test.ps1`
@@ -217,13 +205,15 @@ The shared repo-automation service executes these bundled wrapper resources:
 - `resources/templates/run-poshqc-suite.ps1`
 - `resources/powershell/PoshQC/`
 
+In-process commands (commit context, PR context, Codex-native converter, push-down publishers, new potential bug entry, potential-to-issue, new active feature folder, resolve hard-lock prompt, resolve atomic-plan prompt, and the `helloPython` smoke test) execute directly in TypeScript against the workspace and the bundled data payloads under `resources/`; they spawn no Python.
+
 The VS Code command adapters and the MCP server both call that same service layer. This preserves backward compatibility for the command IDs while providing a semantic MCP tool surface for downstream automation.
 
 `resolve_policy_audit_template_asset` and `drmCopilotExtension.resolvePolicyAuditTemplateAsset` are additive surface adapters over the same bundled policy-audit assets. They support the selectors `template`, `code-review-template`, `feature-audit-template`, and `agents`. In MCP mode, callers receive the canonical asset id plus the bundled source path and, when requested, the copied destination path. In VS Code, interactive use opens the bundled asset when no target is supplied and copies it into the workspace when `-target <path>` is supplied.
 
 ## Codex-native converter wrapper
 
-Use the `drm-copilot: Run Codex-native Converter` command (command ID: `drmCopilotExtension.runCodexNativeConverter`) from the Command Palette to run the bundled Python converter against the active workspace. The command prompts for review or apply mode and the source ecosystem, then delegates to `resources/templates/codex_native_converter.py`.
+Use the `drm-copilot: Run Codex-native Converter` command (command ID: `drmCopilotExtension.runCodexNativeConverter`) from the Command Palette to run the in-process TypeScript converter against the active workspace. The command prompts for review or apply mode and the source ecosystem, then runs the converter in-process.
 
 The same workflow is available through the semantic MCP tool `run_codex_native_converter`. MCP callers provide the non-interactive input contract directly:
 
@@ -235,11 +225,11 @@ The same workflow is available through the semantic MCP tool `run_codex_native_c
 - optional `artifact_root`: override for the report-set root
 - optional `enable_repo_prompts`: allow `.codex/prompts/**` output when the destination repository explicitly uses that surface
 
-The wrapper remains thin by design: it does not implement a second converter. It forwards arguments to the bundled Python CLI, surfaces the printed artifact root, and relies on the converter's fail-closed validation model before any destination writes occur.
+The command adapter remains thin by design: it does not implement a second converter. It passes the resolved input to the in-process TypeScript converter, surfaces the artifact root, and relies on the converter's fail-closed validation model before any destination writes occur.
 
 ## Push Down Codex and Agents Customizations
 
-Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The bundled Python wrapper executes the packaged publisher from `resources/templates/push_down_codex_and_agents_customizations.py`, uses the extension-packaged payload root at `resources/codex-and-agents-customizations/`, and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
+Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The in-process TypeScript publisher uses the extension-packaged payload root at `resources/codex-and-agents-customizations/` and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
 
 ## Run PoshQC Suite
 

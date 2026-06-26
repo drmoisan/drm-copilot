@@ -17,6 +17,7 @@ import {
   createMockProcessWithStderr,
   deactivate,
   detectRuntime,
+  fsMock,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
   registerCommandMock,
@@ -113,13 +114,14 @@ describe("drm-copilot core command behavior", () => {
     ).toBe(false);
   });
 
-  it("no workspace throws clear no-workspace error", async () => {
+  it("no workspace throws clear no-workspace error", () => {
     setWorkspaceFolders(undefined);
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
-    await expect(handler()).rejects.toThrow("No workspace");
+    // The in-process helloPython resolves the workspace root via
+    // getWorkspaceRoot(), which throws synchronously when no workspace folder
+    // is open.
+    expect(() => handler()).toThrow("No workspace");
   });
 
   it("detectRuntime probes pwsh then powershell", () => {
@@ -137,33 +139,20 @@ describe("drm-copilot core command behavior", () => {
     );
   });
 
-  it("detectRuntime returns named Python error when python missing", () => {
-    setExecutablePresence({ python: false });
-
-    expect(() => detectRuntime("python")).toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
-  });
-
-  it("detectRuntime falls back to py -3 when python is unavailable", () => {
-    setExecutablePresence({ python: false, py: true });
-
-    const runtime = detectRuntime("python");
-    expect(runtime).toEqual({
-      executable: "py",
-      argsPrefix: ["-3"],
-    });
-  });
-
-  it("helloPython uses bundled extension script path", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
+  it("helloPython writes artifacts/hello_python.txt in-process without spawning", async () => {
     const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe("C:/extension/resources/templates/hello_python.py");
+    // The in-process path writes the smoke-test file through node:fs and never
+    // spawns a runtime.
+    const writeCall = fsMock.writeFileSync.mock.calls[0] as [
+      string,
+      string,
+      string,
+    ];
+    expect(writeCall[0]).toBe("C:/workspace/artifacts/hello_python.txt");
+    expect(writeCall[1]).toBe("hello_python:ok\n");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("helloPowerShell uses bundled extension script path", async () => {
@@ -181,38 +170,40 @@ describe("drm-copilot core command behavior", () => {
     );
   });
 
-  it("helloPython uses explicit executable and argv arrays", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
+  it("helloPython ensures the artifacts parent directory in-process", async () => {
     const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { shell: boolean; cwd: string }];
-    expect(executable).toBe("python");
-    expect(Array.isArray(args)).toBe(true);
-    expect(options.shell).toBe(false);
+    const mkdirCall = fsMock.mkdirSync.mock.calls[0] as [
+      string,
+      { recursive?: boolean },
+    ];
+    expect(mkdirCall[0]).toBe("C:/workspace/artifacts");
+    expect(mkdirCall[1]).toEqual({ recursive: true });
   });
 
-  it("hello commands do not copy hello scripts into workspace root", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
+  it("helloPython does not copy the hello script into the workspace root", async () => {
     const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const scriptPath = args[0];
-    expect(scriptPath.includes("/resources/templates/")).toBe(true);
-    expect(scriptPath.includes("C:/workspace/hello_python.py")).toBe(false);
+    // The in-process write targets artifacts/hello_python.txt only; no script
+    // file is copied into the workspace root.
+    const writtenPaths = fsMock.writeFileSync.mock.calls.map(
+      ([writtenPath]) => writtenPath,
+    );
+    expect(writtenPaths).toContain("C:/workspace/artifacts/hello_python.txt");
+    expect(writtenPaths).not.toContain("C:/workspace/hello_python.py");
   });
 
   it("handlers log runtime probe start success failure to Scaffold Utils output channel", async () => {
-    setExecutablePresence({ python: true });
+    // The PowerShell command still spawns a runtime, so it exercises the
+    // runtime-probe logging path that this test asserts.
+    setExecutablePresence({ pwsh: true });
     childProcessMock.spawn.mockReturnValue(createMockProcess(1));
 
-    const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.helloPowerShell",
+    );
     await expect(handler()).rejects.toThrow("Command exited with code 1");
 
     const logs = appendLineMock.mock.calls.map(([line]) => line);
@@ -240,28 +231,6 @@ describe("drm-copilot core command behavior", () => {
     expect(Array.isArray(args)).toBe(true);
     expect(options.shell).toBe(false);
     expect(executable.includes(" ")).toBe(false);
-  });
-
-  it("helloPython preserves C:/extension on POSIX hosts", async () => {
-    try {
-      prepareFreshModulesWithPosixPathResolve();
-      setFreshExecutablePresence({ python: true });
-      const freshChildProcessMock = getFreshChildProcessMock();
-      freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
-      const handler = await activateFreshHandlerWithPosixPathResolve(
-        "drmCopilotExtension.helloPython",
-      );
-      await handler();
-
-      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
-        string,
-        string[],
-      ];
-      expect(args[0]).toBe("C:/extension/resources/templates/hello_python.py");
-    } finally {
-      jest.dontMock("node:path");
-      jest.resetModules();
-    }
   });
 
   it("helloPowerShell preserves C:/extension on POSIX hosts", async () => {

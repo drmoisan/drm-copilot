@@ -15,6 +15,8 @@ import {
   getWorkspaceRoot,
 } from "./command-runtime";
 import { registerDocumentWorkflowCommands } from "./document-workflow-commands";
+import { RealFileSystem } from "./lib/file-system";
+import { writeHelloMessage } from "./lib/hello-message";
 import {
   promptForChoice,
   promptForWorkspaceScanFolders,
@@ -81,12 +83,15 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const helloPythonDisposable = vscode.commands.registerCommand(
     "drmCopilotExtension.helloPython",
-    async () => {
-      await executeBundledScript(context, output, {
-        runtimeKind: "python",
-        bundledRelativePath: "resources/templates/hello_python.py",
-        commandId: "drmCopilotExtension.helloPython",
+    () => {
+      // Run the smoke test in-process: resolve the workspace root and write
+      // artifacts/hello_python.txt through the real filesystem. This preserves
+      // the command's observable output contract without spawning a runtime.
+      const result = writeHelloMessage({
+        fileSystem: new RealFileSystem(),
+        workspaceRoot: getWorkspaceRoot(),
       });
+      output.appendLine(`[drmCopilotExtension.helloPython] ${result.summary}`);
     },
   );
 
