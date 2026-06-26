@@ -18,6 +18,11 @@ downloads/
 eggs/
 .eggs/
 lib/
+# TypeScript source/test directories named "lib" are not Python build artifacts.
+!extensions/drm-copilot/src/lib/
+!extensions/drm-copilot/src/lib/**
+!extensions/drm-copilot/test/lib/
+!extensions/drm-copilot/test/lib/**
 lib64/
 parts/
 sdist/
