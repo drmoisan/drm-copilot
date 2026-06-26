@@ -160,88 +160,10 @@ describe("drm-copilot workflow command behavior", () => {
   // of this file (which already exceeds the 500-line limit) when F4 ported the
   // command to the in-process TS path, to avoid growing this file further.
 
-  it("newPotentialBugEntry passes the bundled script path and short-name args", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/new_potential_bug_entry.py",
-    );
-    expect(args[1]).toBe("--short-name");
-    expect(args[2]).toBe("blank-pr-context");
-  });
-
-  it("newPotentialBugEntry direct --short-name invocation skips prompts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler(["--short-name", "blank-pr-context"]);
-
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[1]).toBe("--short-name");
-    expect(args[2]).toBe("blank-pr-context");
-  });
-
-  it("newPotentialBugEntry direct mode rejects invalid short-name pattern", async () => {
-    setExecutablePresence({ python: true });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler(["--short-name", "Invalid Name"])).rejects.toThrow(
-      /short-name/i,
-    );
-    expect(showInputBoxMock).not.toHaveBeenCalled();
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialBugEntry returns early when the input box is cancelled", async () => {
-    showInputBoxMock.mockResolvedValue(undefined);
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("newPotentialBugEntry surfaces a missing python runtime error", async () => {
-    setExecutablePresence({ python: false });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
-  });
-
-  it("newPotentialBugEntry surfaces non-zero exit failures", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("blank-pr-context");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
-  });
+  // The behavioral `newPotentialBugEntry` cases were moved to
+  // `extension.new-potential-bug-entry-inprocess.test.ts` for the F6 in-process
+  // port (this file already exceeds 500 lines and must not grow). The
+  // registration case remains above.
 
   it("newPotentialEntry passes the bundled script path and short-name args", async () => {
     setExecutablePresence({ pwsh: true, powershell: false });
@@ -825,21 +747,9 @@ describe("drm-copilot workflow command behavior", () => {
     );
   });
 
-  it("newPotentialBugEntry passes --template-root pointing to bundled feature-templates", async () => {
-    setExecutablePresence({ python: true });
-    showInputBoxMock.mockResolvedValue("test-bug");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newPotentialBugEntry",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const templateRootIdx = args.indexOf("--template-root");
-    expect(templateRootIdx).toBeGreaterThan(-1);
-    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
-  });
+  // The `newPotentialBugEntry passes --template-root ...` case was moved to
+  // `extension.new-potential-bug-entry-inprocess.test.ts` and reworked to assert
+  // the in-process template read under the bundled feature-templates root.
 
   it("newPotentialEntry passes -TemplateRoot pointing to bundled feature-templates", async () => {
     setExecutablePresence({ pwsh: true, powershell: false });

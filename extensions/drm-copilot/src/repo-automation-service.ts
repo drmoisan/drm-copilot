@@ -30,6 +30,7 @@ import {
 import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
+import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -269,19 +270,16 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   async newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "new_potential_bug_entry",
-      runtimeKind: "python",
-      bundledRelativePath: "resources/templates/new_potential_bug_entry.py",
+    // In-process TS port of new_potential_bug_entry.py (F6): delegate to the
+    // extracted helper instead of spawning the bundled Python script. The helper
+    // passes a no-op editor launcher so no `code`/`code-insiders` subprocess runs.
+    return newPotentialBugEntryServiceCall({
+      fileSystem: this.fileSystem,
+      runner: this.runner,
       workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "new_potential_bug_entry",
-      args: [
-        "--short-name",
-        input.shortName,
-        "--template-root",
-        this.templateRoot,
-      ],
-      summary: `Created a new potential bug entry for '${input.shortName}'.`,
+      shortName: input.shortName,
+      templateRoot: this.templateRoot,
+      log: (message) => this.output.appendLine(message),
     });
   }
   async newPotentialEntry(
