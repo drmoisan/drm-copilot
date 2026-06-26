@@ -127,6 +127,13 @@ jest.mock("node:fs", () => ({
   mkdirSync: jest.fn(),
   readFileSync: jest.fn(),
   writeFileSync: jest.fn(),
+  // statSync/readdirSync support the in-process push-down filesystem adapter
+  // (F3). They default to "not found"/"empty" so suites that do not seed a
+  // push-down tree are unaffected.
+  statSync: jest.fn(() => {
+    throw new Error("ENOENT");
+  }),
+  readdirSync: jest.fn(() => []),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -145,6 +152,8 @@ const fsMock = jest.requireMock("node:fs") as {
   mkdirSync: jest.MockedFunction<
     (dirPath: string, options?: { recursive?: boolean }) => void
   >;
+  statSync: jest.MockedFunction<(filePath: string) => unknown>;
+  readdirSync: jest.MockedFunction<(dirPath: string) => unknown[]>;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
@@ -303,6 +312,12 @@ export function resetExtensionHarnessState(): void {
   fsMock.readFileSync.mockReset();
   fsMock.writeFileSync.mockReset();
   fsMock.mkdirSync.mockReset();
+  fsMock.statSync.mockReset();
+  fsMock.statSync.mockImplementation(() => {
+    throw new Error("ENOENT");
+  });
+  fsMock.readdirSync.mockReset();
+  fsMock.readdirSync.mockReturnValue([]);
   pyprojectFixtureContent = undefined;
   showInputBoxMock.mockReset();
   showQuickPickMock.mockReset();

@@ -397,97 +397,17 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(false);
   });
 
-  it("pushDownCopilotCustomizations executes bundled wrapper script in workspace", async () => {
-    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    expect(executable).toBe("python");
-    expect(
-      normalizePath(args[0]).endsWith(
-        "resources/templates/push_down_copilot_customizations.py",
-      ),
-    ).toBe(true);
-    expect(options.cwd).toBe("C:/workspace");
-  });
-
-  it("pushDownCopilotCustomizations passes workspace root as --destination", async () => {
-    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const destinationIndex = args.indexOf("--destination");
-    expect(destinationIndex).toBeGreaterThan(-1);
-    expect(args[destinationIndex + 1]).toBe("C:/workspace");
-  });
-
-  it("pushDownCopilotCustomizations falls back to py -3 when python is unavailable", async () => {
-    setExecutablePresence({ python: false, py: true, pwsh: true });
-
-    await handlerFor("drmCopilotExtension.pushDownCopilotCustomizations")();
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    expect(executable).toBe("py");
-    expect(args[0]).toBe("-3");
-    expect(
-      normalizePath(args[1]).endsWith(
-        "resources/templates/push_down_copilot_customizations.py",
-      ),
-    ).toBe(true);
-    const destinationIndex = args.indexOf("--destination");
-    expect(destinationIndex).toBeGreaterThan(-1);
-    expect(args[destinationIndex + 1]).toBe("C:/workspace");
-    expect(options.cwd).toBe("C:/workspace");
-  });
-
-  it("pushDownCodexAndAgentsCustomizations executes bundled wrapper script in workspace", async () => {
-    await handlerFor(
-      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
-    )();
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    expect(executable).toBe("python");
-    expect(
-      normalizePath(args[0]).endsWith(
-        "resources/templates/push_down_codex_and_agents_customizations.py",
-      ),
-    ).toBe(true);
-    expect(options.cwd).toBe("C:/workspace");
-  });
-
-  it("pushDownCodexAndAgentsCustomizations passes workspace root as --destination", async () => {
-    await handlerFor(
-      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
-    )();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const destinationIndex = args.indexOf("--destination");
-    expect(destinationIndex).toBeGreaterThan(-1);
-    expect(args[destinationIndex + 1]).toBe("C:/workspace");
-  });
-
-  it("pushDownCodexAndAgentsCustomizations falls back to py -3 when python is unavailable", async () => {
-    setExecutablePresence({ python: false, py: true, pwsh: true });
-
-    await handlerFor(
-      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
-    )();
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    expect(executable).toBe("py");
-    expect(args[0]).toBe("-3");
-    expect(
-      normalizePath(args[1]).endsWith(
-        "resources/templates/push_down_codex_and_agents_customizations.py",
-      ),
-    ).toBe(true);
-    const destinationIndex = args.indexOf("--destination");
-    expect(destinationIndex).toBeGreaterThan(-1);
-    expect(args[destinationIndex + 1]).toBe("C:/workspace");
-    expect(options.cwd).toBe("C:/workspace");
-  });
+  // NOTE: The push-down copilot and codex/agents integration cases previously
+  // here asserted a bundled-Python spawn (executable === "python", bundled
+  // `resources/templates/push_down_*.py` path, py -3 fallback). F3 ported these
+  // two commands to the in-process TS path, so they no longer spawn Python. The
+  // in-process delegation and the preserved `tool`/`summary`/`artifacts`
+  // contract are covered by the service-call unit suite
+  // (`test/lib/push-down/push-down-service-call.test.ts`), mirroring the F4
+  // `collectCommitContext` precedent that removed its Python-spawn integration
+  // cases. Unrelated spawn-based cases (PowerShell commands and the still-Python
+  // commands such as `collect_pr_context` and `potential_to_issue`) are
+  // unchanged below.
 
   it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {
     await handlerFor("drmCopilotExtension.syncAgentsFromInstructions")();

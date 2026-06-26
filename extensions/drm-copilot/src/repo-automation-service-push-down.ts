@@ -1,33 +1,135 @@
-import { type PushDownClaudeCustomizationsInput } from "./repo-automation-service";
-import { type ScriptExecutionOptions } from "./repo-automation-service-support";
-import { type RepoAutomationToolName } from "./repo-automation-tool-names";
+import {
+  type PushDownClaudeCustomizationsInput,
+  type RepoAutomationExecutionResult,
+} from "./repo-automation-service";
+import {
+  type CSharpVariant,
+  type MemoryMode,
+} from "./lib/push-down/claude-customizations";
+import { type PushDownFileSystem } from "./lib/push-down/filesystem-adapter";
+import {
+  pushDownClaudeCustomizationsServiceCall,
+  pushDownCodexAndAgentsCustomizationsServiceCall,
+  pushDownCopilotCustomizationsServiceCall,
+} from "./lib/push-down/push-down-service-call";
 
+/**
+ * Forwarded options for the in-process Claude customization push-down call.
+ *
+ * Replaces the prior Python arg-vector builder. The three push-down service
+ * methods now invoke the in-process TypeScript port (F3), so this builder only
+ * carries the destination workspace root plus the optional pack selection, C#
+ * variant, and memory mode forwarded to `pushDownClaudeCustomizationsServiceCall`.
+ */
+export interface PushDownClaudeServiceForwardedOptions {
+  /** Destination workspace root that receives the copied `.claude` tree. */
+  readonly workspaceRoot: string;
+  /** Optional language-pack selection. */
+  readonly packs?: ReadonlyArray<string>;
+  /** Optional C# toolchain variant. */
+  readonly csharpVariant?: CSharpVariant;
+  /** Optional agent-memory handling mode. */
+  readonly memoryMode?: MemoryMode;
+}
+
+/**
+ * Build the forwarded options for the in-process Claude push-down call.
+ *
+ * Carries the workspace root and only the optional selection fields that were
+ * supplied, so a no-field input forwards just the workspace root (matching the
+ * backward-compatible publish-everything default).
+ *
+ * @param input The Claude push-down service input.
+ * @returns Forwarded options for `pushDownClaudeCustomizationsServiceCall`.
+ */
 export function buildPushDownClaudeCustomizationsOptions(
   input: PushDownClaudeCustomizationsInput,
-): ScriptExecutionOptions & { tool: RepoAutomationToolName } {
-  // Start from the backward-compatible destination-only arg vector and append
-  // optional pack, variant, and memory-mode flags only when supplied so a
-  // no-field input spawns exactly ["--destination", workspaceRoot].
-  const args: string[] = ["--destination", input.workspaceRoot];
-  if (input.packs !== undefined && input.packs.length > 0) {
-    args.push("--packs", input.packs.join(","));
-  }
-  if (input.csharpVariant !== undefined) {
-    args.push("--csharp-variant", input.csharpVariant);
-  }
-  if (input.memoryMode !== undefined) {
-    args.push("--memory-mode", input.memoryMode);
-  }
+): PushDownClaudeServiceForwardedOptions {
   return {
-    tool: "push_down_claude_customizations",
-    runtimeKind: "python",
-    bundledRelativePath:
-      "resources/templates/push_down_claude_customizations.py",
     workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "push_down_claude_customizations",
-    args,
-    summary:
-      "Pushed bundled Claude Code customizations into the destination workspace.",
-    stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
+    ...(input.packs === undefined ? {} : { packs: input.packs }),
+    ...(input.csharpVariant === undefined
+      ? {}
+      : { csharpVariant: input.csharpVariant }),
+    ...(input.memoryMode === undefined ? {} : { memoryMode: input.memoryMode }),
   };
+}
+
+/** Dependencies the push-down service calls need from the service. */
+export interface PushDownServiceDeps {
+  /** Injected push-down filesystem. */
+  readonly fs: PushDownFileSystem;
+  /** Extension root used to resolve the bundled source tree. */
+  readonly extensionRoot: string;
+  /** Log sink wired to the service output channel. */
+  readonly log: (message: string) => void;
+}
+
+/**
+ * Run the in-process Copilot push-down service call.
+ *
+ * @param workspaceRoot Destination workspace root.
+ * @param deps The filesystem, extension root, and log sink from the service.
+ * @returns The preserved push-down execution result.
+ */
+export function runPushDownCopilotCustomizations(
+  workspaceRoot: string,
+  deps: PushDownServiceDeps,
+): RepoAutomationExecutionResult {
+  return pushDownCopilotCustomizationsServiceCall({
+    fs: deps.fs,
+    extensionRoot: deps.extensionRoot,
+    workspaceRoot,
+    log: deps.log,
+  });
+}
+
+/**
+ * Run the in-process Codex/agents push-down service call.
+ *
+ * @param workspaceRoot Destination workspace root.
+ * @param deps The filesystem, extension root, and log sink from the service.
+ * @returns The preserved push-down execution result.
+ */
+export function runPushDownCodexAndAgentsCustomizations(
+  workspaceRoot: string,
+  deps: PushDownServiceDeps,
+): RepoAutomationExecutionResult {
+  return pushDownCodexAndAgentsCustomizationsServiceCall({
+    fs: deps.fs,
+    extensionRoot: deps.extensionRoot,
+    workspaceRoot,
+    log: deps.log,
+  });
+}
+
+/**
+ * Run the in-process Claude push-down service call from a service input.
+ *
+ * Keeps the optional pack/variant/memory forwarding out of the service file so
+ * `repo-automation-service.ts` stays within the 500-line limit. Forwards only
+ * the optional fields that were supplied.
+ *
+ * @param input The Claude push-down service input.
+ * @param deps The filesystem, extension root, and log sink from the service.
+ * @returns The preserved push-down execution result.
+ */
+export function runPushDownClaudeCustomizations(
+  input: PushDownClaudeCustomizationsInput,
+  deps: PushDownServiceDeps,
+): RepoAutomationExecutionResult {
+  const forwarded = buildPushDownClaudeCustomizationsOptions(input);
+  return pushDownClaudeCustomizationsServiceCall({
+    fs: deps.fs,
+    extensionRoot: deps.extensionRoot,
+    workspaceRoot: forwarded.workspaceRoot,
+    log: deps.log,
+    ...(forwarded.packs === undefined ? {} : { packs: forwarded.packs }),
+    ...(forwarded.csharpVariant === undefined
+      ? {}
+      : { csharpVariant: forwarded.csharpVariant }),
+    ...(forwarded.memoryMode === undefined
+      ? {}
+      : { memoryMode: forwarded.memoryMode }),
+  });
 }

@@ -11,7 +11,12 @@ import {
 } from "./repo-automation-service-support";
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
 import { buildPoshQcWorkflowArguments } from "./repo-automation-args";
-import { buildPushDownClaudeCustomizationsOptions } from "./repo-automation-service-push-down";
+import {
+  type PushDownServiceDeps,
+  runPushDownClaudeCustomizations,
+  runPushDownCodexAndAgentsCustomizations,
+  runPushDownCopilotCustomizations,
+} from "./repo-automation-service-push-down";
 import {
   buildNewActiveFeatureFolderOptions,
   buildRunCodexNativeConverterOptions,
@@ -31,6 +36,10 @@ import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
+import {
+  type PushDownFileSystem,
+  RealPushDownFileSystem,
+} from "./lib/push-down/filesystem-adapter";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -160,6 +169,8 @@ export interface RepoAutomationServiceOptions {
   readonly fileSystem?: FileSystem;
   /** Command-runner for the in-process `collectCommitContext` git calls; defaults to {@link SubprocessRunner}, faked in tests. */
   readonly runner?: CommandRunner;
+  /** Optional push-down filesystem (distinct from {@link FileSystem}); tests inject an in-memory fake, production defaults to {@link RealPushDownFileSystem}. */
+  readonly pushDownFileSystem?: PushDownFileSystem;
 }
 
 class DefaultRepoAutomationService implements RepoAutomationService {
@@ -169,6 +180,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly fileSystem: FileSystem;
   private readonly runner: CommandRunner;
   private readonly resolvePromptDeps: ResolvePromptServiceDeps;
+  private readonly pushDownDeps: PushDownServiceDeps;
 
   constructor(options: RepoAutomationServiceOptions) {
     this.extensionRoot = options.extensionRoot;
@@ -178,6 +190,11 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     this.runner = options.runner ?? new SubprocessRunner();
     this.resolvePromptDeps = {
       fileSystem: this.fileSystem,
+      extensionRoot: this.extensionRoot,
+      log: (message) => this.output.appendLine(message),
+    };
+    this.pushDownDeps = {
+      fs: options.pushDownFileSystem ?? new RealPushDownFileSystem(),
       extensionRoot: this.extensionRoot,
       log: (message) => this.output.appendLine(message),
     };
@@ -232,40 +249,25 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   async pushDownCopilotCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "push_down_copilot_customizations",
-      runtimeKind: "python",
-      bundledRelativePath:
-        "resources/templates/push_down_copilot_customizations.py",
-      workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "push_down_copilot_customizations",
-      args: ["--destination", input.workspaceRoot],
-      summary:
-        "Pushed bundled Copilot customizations into the destination workspace.",
-      stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
-    });
+    // In-process TS port (F3): delegate to the push-down helper.
+    return runPushDownCopilotCustomizations(
+      input.workspaceRoot,
+      this.pushDownDeps,
+    );
   }
   async pushDownCodexAndAgentsCustomizations(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "push_down_codex_and_agents_customizations",
-      runtimeKind: "python",
-      bundledRelativePath:
-        "resources/templates/push_down_codex_and_agents_customizations.py",
-      workspaceRoot: input.workspaceRoot,
-      invocationId:
-        input.invocationId ?? "push_down_codex_and_agents_customizations",
-      args: ["--destination", input.workspaceRoot],
-      summary:
-        "Pushed bundled Codex and agents customizations into the destination workspace.",
-      stdoutArtifactPattern: /Wrote push-down summary artifact to:\s*(.+)/i,
-    });
+    return runPushDownCodexAndAgentsCustomizations(
+      input.workspaceRoot,
+      this.pushDownDeps,
+    );
   }
   async pushDownClaudeCustomizations(
     input: PushDownClaudeCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(buildPushDownClaudeCustomizationsOptions(input));
+    // In-process TS port (F3): the helper forwards optional pack/variant/memory.
+    return runPushDownClaudeCustomizations(input, this.pushDownDeps);
   }
   async newPotentialBugEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
