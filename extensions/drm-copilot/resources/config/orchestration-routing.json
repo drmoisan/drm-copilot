@@ -27,13 +27,14 @@
     },
     "large": {
       "description": "Full feature or bug path for work outside small-path budget.",
+      "requires_pr_gate": true,
       "required_agents": [
         "task-researcher",
         "prd-feature",
         "atomic-planner",
         "atomic-executor",
-        "feature-reviewer",
-        "commit-steward"
+        "feature-review",
+        "pr-author"
       ],
       "required_skills": [
         "orchestrate",

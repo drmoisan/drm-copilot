@@ -333,12 +333,13 @@ def test_validate_orchestrator_state_text_rejects_malformed_json() -> None:
     assert errors[0].startswith("Checkpoint is not valid JSON:")
 
 
-def test_require_complete_rejects_issue_232_without_pr_gate() -> None:
-    """Reject Issue #232 completion when PR evidence is absent.
+def test_require_complete_rejects_pr_gate_required_route_without_pr_gate() -> None:
+    """Reject completion when a pr-gate route omits PR evidence.
 
     Purpose:
-        Cover the completion gate requiring `pr_gate` evidence before the
-        Issue #232 checkpoint can be accepted as complete.
+        Cover the route-driven completion gate requiring `pr_gate` evidence for
+        a route whose `requires_pr_gate` is True (the `large` route), with no
+        issue-number special-casing.
 
     Args:
         None.
@@ -354,14 +355,8 @@ def test_require_complete_rejects_issue_232_without_pr_gate() -> None:
     """
 
     state = build_valid_orchestrator_state()
-    state["issue-num"] = "232"
-    state["feature-folder"] = (
-        "docs/features/active/2026-06-24-harden-orchestrate-skill-232"
-    )
-    state["plan-path"] = (
-        "docs/features/active/2026-06-24-harden-orchestrate-skill-232/"
-        "remediation-plan.2026-06-25T07-45.md"
-    )
+    # Any issue number; route is `large`, which requires the PR gate.
+    state["issue-num"] = "999"
     state["blocked_reason"] = "none"
 
     errors = state_validator.validate_orchestrator_state_text(
@@ -371,18 +366,57 @@ def test_require_complete_rejects_issue_232_without_pr_gate() -> None:
     assert any("pr_gate" in error for error in errors)
 
 
-def test_require_complete_rejects_issue_232_stale_ci_head_sha() -> None:
-    """Reject Issue #232 completion when CI evidence is stale.
+def test_require_complete_skips_pr_gate_for_non_pr_gate_route() -> None:
+    """Do not require PR evidence for a route without `requires_pr_gate`.
 
     Purpose:
-        Cover the completion gate requiring `ci_gate.head_sha` to match
-        `pr_gate.head_sha` before Issue #232 can be accepted as complete.
+        Cover the route-driven completion gate returning no `pr_gate` errors for
+        the `small` route, which does not opt into the PR gate.
 
     Args:
         None.
 
     Returns:
-        None: Assertions verify that stale CI evidence is reported.
+        None: Assertions verify that no `pr_gate` error is produced.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    state["path_selected"] = "small"
+    state["issue-num"] = "123"
+    state["blocked_reason"] = "none"
+    # Provide ci_gate so any ci-gate errors do not mask the pr_gate assertion.
+    state["ci_gate"] = {
+        "conclusion": "success",
+        "head_sha": "current-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert not any("pr_gate" in error for error in errors)
+
+
+def test_require_complete_emits_no_issue_232_branch_error_for_any_issue() -> None:
+    """Confirm no issue-232 branch-name error is produced for any issue number.
+
+    Purpose:
+        Cover the removal of the `ISSUE_232_BRANCH` head-branch check; a PR with
+        an arbitrary head branch must not produce a branch-name completion error.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that no head_branch branch-name error is
+        reported for an arbitrary branch.
 
     Raises:
         None.
@@ -393,22 +427,15 @@ def test_require_complete_rejects_issue_232_stale_ci_head_sha() -> None:
 
     state = build_valid_orchestrator_state()
     state["issue-num"] = "232"
-    state["feature-folder"] = (
-        "docs/features/active/2026-06-24-harden-orchestrate-skill-232"
-    )
-    state["plan-path"] = (
-        "docs/features/active/2026-06-24-harden-orchestrate-skill-232/"
-        "remediation-plan.2026-06-25T07-45.md"
-    )
     state["pr_gate"] = {
         "pr_number": 232,
         "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
-        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_branch": "feature/any-arbitrary-branch",
         "head_sha": "current-head-sha",
     }
     state["ci_gate"] = {
         "conclusion": "success",
-        "head_sha": "stale-head-sha",
+        "head_sha": "current-head-sha",
         "verified_at": "2026-06-25T07:45:00Z",
     }
 
@@ -416,26 +443,7 @@ def test_require_complete_rejects_issue_232_stale_ci_head_sha() -> None:
         json.dumps(state), require_complete=True
     )
 
-    assert any(
-        "ci_gate.head_sha" in error and "pr_gate.head_sha" in error for error in errors
-    )
-
-
-def test_require_complete_rejects_issue_232_wrong_pr_branch() -> None:
-    state = build_valid_orchestrator_state()
-    state["issue-num"] = "232"
-    state["pr_gate"] = {
-        "pr_number": 232,
-        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
-        "head_branch": "feature/wrong-branch",
-        "head_sha": "current-head-sha",
-    }
-
-    errors = state_validator.validate_orchestrator_state_text(
-        json.dumps(state), require_complete=True
-    )
-
-    assert any("pr_gate.head_branch" in error for error in errors)
+    assert not any("head_branch" in error for error in errors)
 
 
 def test_require_complete_rejects_missing_ci_gate() -> None:
@@ -475,53 +483,253 @@ def test_require_complete_rejects_failed_ci_gate() -> None:
     assert any("ci_gate.conclusion" in error for error in errors)
 
 
-def test_require_complete_rejects_issue_232_missing_promotion_receipts() -> None:
+def test_require_complete_rejects_stale_ci_head_sha_for_pr_gate_route() -> None:
+    """Reject completion when CI head_sha does not match PR head_sha.
+
+    Purpose:
+        Cover the preserved `ci_gate.head_sha` / `pr_gate.head_sha` match check
+        for a route that requires the PR gate (the `large` route).
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that the stale-head error is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
     state = build_valid_orchestrator_state()
-    state["issue-num"] = "232"
     state["pr_gate"] = {
         "pr_number": 232,
         "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
-        "head_branch": "feature/harden-orchestrate-skill-232",
+        "head_branch": "feature/any-branch",
         "head_sha": "current-head-sha",
     }
     state["ci_gate"] = {
         "conclusion": "success",
-        "head_sha": "current-head-sha",
+        "head_sha": "stale-head-sha",
         "verified_at": "2026-06-25T07:45:00Z",
-    }
-    state["delegation_receipts"] = {"promotion": {"issue": "#232"}}
-
-    errors = state_validator.validate_orchestrator_state_text(
-        json.dumps(state), require_complete=True
-    )
-
-    assert any("delegation_receipts.promotion" in error for error in errors)
-
-
-def test_require_complete_accepts_issue_232_top_level_promotion_receipts() -> None:
-    state = build_valid_orchestrator_state()
-    state["issue-num"] = "232"
-    state["pr_gate"] = {
-        "pr_number": 232,
-        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/232",
-        "head_branch": "feature/harden-orchestrate-skill-232",
-        "head_sha": "current-head-sha",
-    }
-    state["ci_gate"] = {
-        "conclusion": "success",
-        "head_sha": "current-head-sha",
-        "verified_at": "2026-06-25T07:45:00Z",
-    }
-    state["promotion_receipts"] = {
-        "potential_entry": {"path": "docs/features/potential/demo.md"},
-        "issue": {"number": 232},
-        "feature_folder": {
-            "path": ("docs/features/active/" "2026-06-24-harden-orchestrate-skill-232")
-        },
     }
 
     errors = state_validator.validate_orchestrator_state_text(
         json.dumps(state), require_complete=True
     )
 
-    assert not any("promotion_receipts" in error for error in errors)
+    assert any(
+        "ci_gate.head_sha" in error and "pr_gate.head_sha" in error for error in errors
+    )
+
+
+def test_strict_route_membership_rejects_unknown_route() -> None:
+    """Reject an unknown route when strict_route_membership is enabled.
+
+    Purpose:
+        Cover the opt-in strict route-membership gate appending an error for a
+        checkpoint that selects a fabricated route.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify the unknown-route error is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    state["path_selected"] = "direct_powershell_engineer_remediation"
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), strict_route_membership=True
+    )
+
+    assert any(
+        "is not a routing-matrix route: direct_powershell_engineer_remediation" in error
+        for error in errors
+    )
+
+
+def test_non_strict_route_membership_allows_missing_route_id() -> None:
+    """Do not reject a checkpoint missing route_id/path_selected by default.
+
+    Purpose:
+        Cover the backward-compatibility default where route-membership errors
+        are not appended for a checkpoint that selects no route.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify no route-membership error is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_valid_orchestrator_state()
+    del state["path_selected"]
+
+    errors = state_validator.validate_orchestrator_state_text(json.dumps(state))
+
+    assert not any("must select a route" in error for error in errors)
+    assert not any("routing-matrix route" in error for error in errors)
+
+
+def _build_complete_small_state() -> dict[str, object]:
+    """Return a completion-safe small-route checkpoint for mutation.
+
+    Purpose:
+        Provide a small-route checkpoint that satisfies the routing-contract and
+        phase-completeness checks so focused tests can mutate a single branch.
+
+    Args:
+        None.
+
+    Returns:
+        dict[str, object]: A completion-safe small-route checkpoint payload.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    from scripts.dev_tools._orchestrator_state_routing import load_routing_matrix
+
+    matrix = load_routing_matrix()
+    small = cast(
+        "dict[str, object]", cast("dict[str, object]", matrix["routes"])["small"]
+    )
+    required_agents = cast("list[str]", small["required_agents"])
+    required_skills = cast("list[str]", small["required_skills"])
+    required_mcp_tools = cast("list[str]", small["required_mcp_tools"])
+    return {
+        "objective": "obj",
+        "change_budget_estimate": "small",
+        "route_id": "small",
+        "path_selected": "small",
+        "promotion-type": "feature",
+        "short-name": "short",
+        "relativeFile": "docs/features/potential/x.md",
+        "long-name": "feature-1",
+        "issue-num": "1",
+        "feature-folder": "docs/features/active/feature-1",
+        "work-mode": "minor-audit",
+        "plan-path": "docs/features/active/feature-1/plan.md",
+        "completed_steps": ["S3_promotion", "S4_atomic_planning"],
+        "next_step": "done",
+        "last_updated": "2026-04-07T10:00:00-04:00",
+        "step5_status": "not-applicable",
+        "step6_status": "not-applicable",
+        "step7_status": "verified",
+        "step8_status": "verified",
+        "step9_status": "verified",
+        "step10_status": "not-applicable",
+        "required_agents": required_agents,
+        "required_skills": required_skills,
+        "required_mcp_tools": required_mcp_tools,
+        "delegation_receipts": [
+            {
+                "step": f"handoff-{index}",
+                "agent_name": agent,
+                "agent_id": f"{agent}-1",
+                "skill_source": "orchestrate",
+                "started_at": "2026-04-07T09:00:00-04:00",
+                "completed_at": "2026-04-07T09:05:00-04:00",
+                "result_signal": "COMPLETE",
+                "artifact_paths": [f"artifacts/orchestration/{agent}.receipt.json"],
+            }
+            for index, agent in enumerate(required_agents, start=1)
+        ],
+        "skill_receipts": [
+            {
+                "skill": skill,
+                "required": True,
+                "acknowledged_at_phase": "completion",
+                "evidence": f"artifact:{skill}",
+            }
+            for skill in required_skills
+        ],
+        "mcp_call_receipts": [
+            {"tool": tool, "ok": True, "evidence": f"mcp_call:{tool}"}
+            for tool in required_mcp_tools
+        ],
+        "local_execution_overrides": [],
+        "delegation_bypasses": [],
+        "lifecycle_operations": [
+            {"name": tool, "surface": "mcp"} for tool in required_mcp_tools
+        ],
+        "blocked_reason": "none",
+    }
+
+
+def test_require_complete_accepts_small_route_with_all_mandatory_phases() -> None:
+    """Accept a small-route checkpoint that records all mandatory phases.
+
+    Purpose:
+        Cover the phase-completeness pass case under require_complete for the
+        `small` route whose mandatory phases are both present.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify no phase-completeness error is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = _build_complete_small_state()
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert not any("mandatory phase" in error for error in errors)
+
+
+def test_require_complete_rejects_small_route_missing_promotion_phase() -> None:
+    """Reject a small-route checkpoint missing the S3_promotion phase.
+
+    Purpose:
+        Cover the phase-completeness fail case under require_complete when the
+        `small` route omits a mandatory phase.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify the missing-phase error names S3_promotion.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = _build_complete_small_state()
+    state["completed_steps"] = ["S4_atomic_planning"]
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_complete=True
+    )
+
+    assert any("missing mandatory phase S3_promotion" in error for error in errors)

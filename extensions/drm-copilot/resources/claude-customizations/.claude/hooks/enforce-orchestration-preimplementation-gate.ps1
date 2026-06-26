@@ -6,7 +6,6 @@
 param()
 
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
-$script:Issue232FeatureFolder = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232'
 
 function ConvertFrom-CheckpointJson {
     [CmdletBinding()]
@@ -113,10 +112,6 @@ function Test-OrchestrationReady {
         return $false
     }
 
-    if ($issueNum -eq '232' -and $featureFolder -ne $script:Issue232FeatureFolder) {
-        return $false
-    }
-
     return (
         $featureFolder.StartsWith('docs/features/active/') -and
         $routeId -and
@@ -181,13 +176,6 @@ function Invoke-OrchestrationPreimplementationGateDecision {
 
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return [ordered]@{ decision = 'allow' }
-    }
-    $issueNum = Get-StringProperty -Value $checkpoint -Name 'issue-num'
-    if ($issueNum -eq '232') {
-        return [ordered]@{
-            decision = 'block'
-            reason   = 'PREIMPLEMENTATION_GATE_BLOCKED: Issue #232 implementation operations require artifacts/orchestration/orchestrator-state.json to contain route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
-        }
     }
     return [ordered]@{
         decision = 'block'
