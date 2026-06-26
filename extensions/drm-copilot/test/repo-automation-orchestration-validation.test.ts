@@ -67,6 +67,10 @@ class VirtualFileSystem implements FileSystem {
   writeTextFile(): void {
     throw new Error("not used");
   }
+
+  ensureDir(): void {
+    throw new Error("not used");
+  }
 }
 
 describe("repo automation orchestration validation", () => {

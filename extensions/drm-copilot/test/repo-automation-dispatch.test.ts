@@ -148,34 +148,44 @@ describe("repo automation dispatch", () => {
     expect(options.shell).toBe(false);
   });
 
-  it("collectCommitContext preserves C:/extension on POSIX hosts", async () => {
-    prepareFreshModulesWithPosixPathResolve();
-    setFreshExecutablePresence({ python: true });
-    const freshChildProcessMock = getFreshChildProcessMock();
-    freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
-    const freshModule = createFreshRepoAutomationService();
-    const service = freshModule.createRepoAutomationService({
+  it("collectCommitContext runs in-process using the injected runner and filesystem", async () => {
+    // Inject hermetic fakes so the in-process TS port runs without a Python
+    // spawn; record the git cwd and the written artifact path.
+    const gitCwds: Array<string | undefined> = [];
+    const writes = new Map<string, string>();
+    const ensured: string[] = [];
+    const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
       output: { appendLine: appendLineMock },
+      fileSystem: {
+        glob: () => [],
+        isFile: () => false,
+        readTextFile: () => "",
+        writeTextFile: (p: string, c: string) =>
+          void writes.set(p.replace(/\\/g, "/"), c),
+        ensureDir: (d: string) => void ensured.push(d.replace(/\\/g, "/")),
+      },
+      runner: {
+        run: (_args: readonly string[], options?: { cwd?: string }) => {
+          gitCwds.push(options?.cwd);
+          return { stdout: "value", stderr: "", code: 0 };
+        },
+      },
     });
 
-    try {
-      await service.collectCommitContext({
-        workspaceRoot: "C:/workspace",
-        invocationId: "collect_commit_context",
-      });
+    const result = await service.collectCommitContext({
+      workspaceRoot: "C:/workspace",
+      invocationId: "collect_commit_context",
+    });
 
-      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
-        string,
-        string[],
-      ];
-      expect(args[0].startsWith("C:/extension/resources/templates/")).toBe(
-        true,
-      );
-    } finally {
-      jest.dontMock("node:path");
-      jest.resetModules();
-    }
+    // Assert in-process behavior and preserved service return contract.
+    const artifact = "C:/workspace/artifacts/commit_context.txt";
+    expect(gitCwds.length).toBeGreaterThan(0);
+    expect(gitCwds.every((c) => c === "C:/workspace")).toBe(true);
+    expect(writes.has(artifact)).toBe(true);
+    expect(ensured).toContain("C:/workspace/artifacts");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(result.artifacts).toEqual([artifact]);
   });
 
   it("newPotentialEntry keeps subprocess execution argv-based with shell disabled", async () => {

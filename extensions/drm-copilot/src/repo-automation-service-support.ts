@@ -1,4 +1,9 @@
+import * as path from "node:path";
+
 import type { BundledScriptExecutionResult } from "./command-runtime";
+import { collectCommitContext } from "./lib/collect-commit-context";
+import type { CommandRunner } from "./lib/subprocess-runner";
+import type { FileSystem } from "./lib/file-system";
 
 export interface ScriptExecutionOptions {
   readonly tool: string;
@@ -64,6 +69,59 @@ export const POSH_QC_TOOL_CONFIG: Readonly<
 
 export function normalizeGeneratedPath(filePath: string): string {
   return filePath.replace(/\\/g, "/");
+}
+
+/**
+ * Result record produced by {@link runCollectCommitContext}, matching the
+ * historical `collectCommitContext` service return contract.
+ */
+export interface CollectCommitContextResult {
+  readonly tool: "collect_commit_context";
+  readonly workspaceRoot: string;
+  readonly summary: string;
+  readonly artifacts: ReadonlyArray<string>;
+}
+
+/**
+ * Run the in-process `collect_commit_context.py` port (F4) and build the
+ * service result.
+ *
+ * Purpose:
+ *     Keep the `RepoAutomationService.collectCommitContext` method thin by
+ *     centralizing output-path construction, the library invocation, the log
+ *     callback wiring, and the result record here.
+ *
+ * Side effects:
+ *     Runs git child processes through `runner` and writes one file through
+ *     `fileSystem` (delegated to {@link collectCommitContext}).
+ *
+ * @param input Dependencies and workspace root for the run.
+ * @returns The collect-commit-context result record with the normalized
+ *   artifact path.
+ */
+export function runCollectCommitContext(input: {
+  readonly runner: CommandRunner;
+  readonly fileSystem: FileSystem;
+  readonly workspaceRoot: string;
+  readonly log: (message: string) => void;
+}): CollectCommitContextResult {
+  const outputPath = path.join(
+    input.workspaceRoot,
+    "artifacts/commit_context.txt",
+  );
+  collectCommitContext({
+    runner: input.runner,
+    fileSystem: input.fileSystem,
+    cwd: input.workspaceRoot,
+    outputPath,
+    log: input.log,
+  });
+  return {
+    tool: "collect_commit_context",
+    workspaceRoot: input.workspaceRoot,
+    summary: "Collected commit context into artifacts/commit_context.txt.",
+    artifacts: [normalizeGeneratedPath(outputPath)],
+  };
 }
 
 export function parseFirstArtifactPath(

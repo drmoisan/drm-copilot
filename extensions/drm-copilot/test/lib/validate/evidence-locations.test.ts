@@ -44,6 +44,10 @@ class VirtualFileSystem implements FileSystem {
   writeTextFile(): void {
     throw new Error("not used");
   }
+
+  ensureDir(): void {
+    throw new Error("not used");
+  }
 }
 
 describe("findForbiddenPaths", () => {
@@ -125,6 +129,9 @@ describe("findForbiddenPaths", () => {
       writeTextFile: () => {
         throw new Error("not used");
       },
+      ensureDir: () => {
+        throw new Error("not used");
+      },
     };
 
     // Act
@@ -143,6 +150,9 @@ describe("findForbiddenPaths", () => {
         throw new Error("not used");
       },
       writeTextFile: () => {
+        throw new Error("not used");
+      },
+      ensureDir: () => {
         throw new Error("not used");
       },
     };

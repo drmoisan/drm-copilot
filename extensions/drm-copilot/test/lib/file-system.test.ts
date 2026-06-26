@@ -8,6 +8,7 @@ jest.mock("node:fs", () => ({
   statSync: jest.fn(),
   readFileSync: jest.fn(),
   writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
 
 const readdirSyncMock = fs.readdirSync as jest.MockedFunction<
@@ -20,6 +21,7 @@ const readFileSyncMock = fs.readFileSync as jest.MockedFunction<
 const writeFileSyncMock = fs.writeFileSync as jest.MockedFunction<
   typeof fs.writeFileSync
 >;
+const mkdirSyncMock = fs.mkdirSync as jest.MockedFunction<typeof fs.mkdirSync>;
 
 /**
  * Build a minimal Dirent-like entry for mocking readdirSync results.
@@ -101,6 +103,23 @@ describe("RealFileSystem", () => {
         "content",
         "utf8",
       );
+    });
+  });
+
+  describe("ensureDir", () => {
+    it("creates a nested directory path recursively and is idempotent", () => {
+      // Arrange
+      const sut = new RealFileSystem();
+
+      // Act: call twice to confirm idempotent re-create does not raise.
+      sut.ensureDir("/out/nested/dir");
+      sut.ensureDir("/out/nested/dir");
+
+      // Assert: each call delegates to mkdirSync with recursive creation.
+      expect(mkdirSyncMock).toHaveBeenCalledTimes(2);
+      expect(mkdirSyncMock).toHaveBeenCalledWith("/out/nested/dir", {
+        recursive: true,
+      });
     });
   });
 
