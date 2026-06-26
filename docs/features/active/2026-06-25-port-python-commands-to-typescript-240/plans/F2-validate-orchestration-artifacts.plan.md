@@ -140,7 +140,7 @@ Run the full toolchain in order from `extensions/drm-copilot/`. If any step chan
 - [x] AC-F2-11: F1 shared lib modules are reused (`file-system.ts`, `json-config.ts`); none are re-ported.
 - [x] AC-F2-12: All new `src/lib/validate/**` files and ported test files are covered by Jest tests; line coverage >= 85% and branch coverage >= 75% on `src/lib/validate/**`, with numeric evidence recorded.
 - [x] AC-F2-13: Format, lint, type-check, and test all pass from `extensions/drm-copilot/` in a single clean final-QA pass.
-- [ ] AC-F2-14: No production or test file exceeds 500 lines; tests are hermetic (no real subprocess, no real filesystem temp files). [feature-review 2026-06-25T23-45: reverted to unchecked — modified production file `extensions/drm-copilot/src/repo-automation-service.ts` is 526 lines (484 at baseline), exceeding the 500-line limit. Tests remain hermetic. Remediation required.]
+- [x] AC-F2-14: No production or test file exceeds 500 lines; tests are hermetic (no real subprocess, no real filesystem temp files). [feature-review 2026-06-26T00-03: re-checked — remediation extracted the validation wiring into `extensions/drm-copilot/src/lib/validate/validate-orchestration-service-call.ts` (90 lines); `extensions/drm-copilot/src/repo-automation-service.ts` is now exactly 500 lines (was 526), within the limit. All `src/lib/validate/**` files < 500 (max 433). Tests remain hermetic. Finding resolved.]
 - [x] AC-F2-15: All Python `scripts/dev_tools/**` source files remain intact (unmodified).
 
 ## Validator Gate (run before treating this plan as approved)
