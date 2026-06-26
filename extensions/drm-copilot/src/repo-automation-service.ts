@@ -17,7 +17,6 @@ import {
   buildResolveExecuteHardLockPromptOptions,
   buildRunCodexNativeConverterOptions,
   buildTemplateRoot,
-  buildValidateOrchestrationArtifactsOptions,
   resolvePolicyAuditTemplateAssetResult,
 } from "./repo-automation-service-workflows";
 import {
@@ -25,6 +24,8 @@ import {
   type PotentialPromotionType,
   type WorkModeOption,
 } from "./workflow-command-arguments";
+import { type FileSystem, RealFileSystem } from "./lib/file-system";
+import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -156,17 +157,25 @@ export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInp
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
   readonly output: CommandOutput;
+  /**
+   * Optional filesystem injection. Tests supply an in-memory implementation to
+   * keep `validateOrchestrationArtifacts` hermetic; production defaults to a
+   * {@link RealFileSystem}.
+   */
+  readonly fileSystem?: FileSystem;
 }
 
 class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly extensionRoot: string;
   private readonly output: CommandOutput;
   private readonly templateRoot: string;
+  private readonly fileSystem: FileSystem;
 
   constructor(options: RepoAutomationServiceOptions) {
     this.extensionRoot = options.extensionRoot;
     this.output = options.output;
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
+    this.fileSystem = options.fileSystem ?? new RealFileSystem();
   }
   async collectCommitContext(
     input: WorkspaceExecutionInput,
@@ -443,9 +452,16 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly requireComplete?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(
-      buildValidateOrchestrationArtifactsOptions(input),
-    );
+    // Delegate to the extracted helper, which preserves the observable behavior.
+    return validateOrchestrationServiceCall({
+      fileSystem: this.fileSystem,
+      workspaceRoot: input.workspaceRoot,
+      artifactType: input.artifactType,
+      artifactPath: input.artifactPath,
+      ...(input.requireComplete === undefined
+        ? {}
+        : { requireComplete: input.requireComplete }),
+    });
   }
 
   private async executeScript(
