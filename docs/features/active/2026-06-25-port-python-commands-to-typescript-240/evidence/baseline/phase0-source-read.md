@@ -1,44 +1,45 @@
-# Phase 0 — F9 Source and Wiring Read (ts-pr-context)
+# Phase 0 — F10 Source and Wiring Read (ts-codex-native-converter)
 
-Timestamp: 2026-06-26T10-02
+Timestamp: 2026-06-26T11-29
 
-Python source modules read (parity targets — bundled copies):
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/models.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/git.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/github.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/feature_docs.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/render.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/render_feature_excerpts.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/render_pr_helpers.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/summary_helpers.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/verification_evidence.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/collector.py
-- extensions/drm-copilot/resources/scripts/dev_tools/pr_context/__init__.py (empty)
-- extensions/drm-copilot/resources/templates/collect_pr_context.py (thin wrapper)
+Files Read (authoritative Python source modules):
+- scripts/dev_tools/codex_native_converter/models.py (460 lines)
+- scripts/dev_tools/codex_native_converter/models_intermediate.py (226 lines)
+- scripts/dev_tools/codex_native_converter/inventory.py (217 lines)
+- scripts/dev_tools/codex_native_converter/classifier.py (484 lines)
+- scripts/dev_tools/codex_native_converter/section_intent.py (249 lines)
+- scripts/dev_tools/codex_native_converter/parser.py (292 lines)
+- scripts/dev_tools/codex_native_converter/mapping.py (234 lines)
+- scripts/dev_tools/codex_native_converter/rewrites.py (485 lines)
+- scripts/dev_tools/codex_native_converter/validation.py (418 lines)
+- scripts/dev_tools/codex_native_converter/pipeline.py (462 lines)
+- scripts/dev_tools/codex_native_converter/intermediate_state.py (271 lines)
+- scripts/dev_tools/codex_native_converter/reporting.py (433 lines)
+- scripts/dev_tools/codex_native_converter/_pipeline_traces.py (139 lines)
+- scripts/dev_tools/codex_native_converter/_reporting_topology.py (175 lines)
+- scripts/dev_tools/codex_native_converter/engine.py (499 lines)
+- scripts/dev_tools/codex_native_converter/cli.py (308 lines)
+- scripts/dev_tools/codex_native_converter/__init__.py (24 lines)
+- scripts/dev_tools/codex_native_converter/__main__.py (23 lines)
 
-TypeScript wiring targets read:
-- extensions/drm-copilot/src/repo-automation-service.ts (collectPrContext at lines 215-244; 499 lines total)
-- extensions/drm-copilot/src/pr-context-branches.ts (branch discovery; uses cp.spawnSync git)
-- extensions/drm-copilot/src/mcp-handlers/collect-context-handlers.ts (not to be modified)
-- extensions/drm-copilot/src/mcp-tool-inputs.ts (not to be modified)
-- extensions/drm-copilot/src/repo-automation-service-support.ts (normalizeGeneratedPath at line 70)
-- extensions/drm-copilot/src/lib/file-system.ts (F1 FileSystem; glob/isFile/readTextFile/writeTextFile/ensureDir)
-- extensions/drm-copilot/src/lib/subprocess-runner.ts (F1 CommandRunner/CommandResult; rstrip + parity error message)
-- extensions/drm-copilot/src/lib/new-potential-bug-entry-service-call.ts (service-call precedent)
+Wiring targets:
+- extensions/drm-copilot/resources/templates/codex_native_converter.py
+- extensions/drm-copilot/src/repo-automation-service.ts (481 lines; runCodexNativeConverter at lines 227-231)
+- extensions/drm-copilot/src/repo-automation-service-workflows.ts (262 lines; buildRunCodexNativeConverterOptions at lines 68-105, RunCodexNativeConverterInput at lines 30-38)
+- extensions/drm-copilot/src/mcp-handlers/codex-native-converter-handlers.ts
+- extensions/drm-copilot/src/mcp-tool-inputs.ts
+- extensions/drm-copilot/src/lib/file-system.ts (shared F1 FileSystem; exposes glob/isFile/exists/isDirectory/listDirectory/readTextFile/writeTextFile/ensureDir; toPosixPath helper)
 
-Python test files (ports per Phase 2-8; read phase-by-phase during execution):
-- tests/scripts/dev_tools/test_git.py
-- tests/scripts/dev_tools/test_github.py
-- tests/scripts/dev_tools/test_github_part2.py
-- tests/scripts/dev_tools/test_github_part3.py
-- tests/scripts/dev_tools/test_feature_docs.py
-- tests/scripts/dev_tools/test_render.py
-- tests/scripts/dev_tools/test_render_helpers.py
-- tests/scripts/dev_tools/test_collect_pr_context.py
-- tests/scripts/dev_tools/test_collect_pr_context_part2.py
-- tests/scripts/dev_tools/test_collect_pr_context_part3.py
-- tests/scripts/dev_tools/test_collect_pr_context_part4.py
-- tests/scripts/dev_tools/test_pr_context_integration.py
+Python test files (16) under tests/scripts/dev_tools/codex_native_converter/:
+- test_classifier.py, test_cli_apply.py, test_cli_entrypoints.py, test_cli_review.py, test_end_to_end.py, test_intermediate_state.py, test_inventory.py, test_mapping.py, test_parser.py, test_prompt_decomposition_end_to_end.py, test_reporting.py, test_reporting_topology_end_to_end.py, test_rewrites.py, test_section_classifier.py, test_section_intent.py, test_validation.py
 
-Existing extension test to rework (Phase 8):
-- extensions/drm-copilot/test/extension.collect-pr-context.test.ts (417 lines)
+Porting notes captured during read:
+- classifier.py and parser.py read source content via Path.read_text and resolve(); the TS port injects FileSystem.readTextFile. Optional reads (classifier _read_optional_text) catch OSError -> ""; the TS port wraps readTextFile in try/catch -> "".
+- inventory.py uses rglob over supported roots and resolve()/relative_to with an escape-root ValueError; the TS port uses FileSystem listDirectory/isDirectory/isFile/exists with POSIX relative normalization and preserves the exact "Selected path escapes the declared source root: <path>" message.
+- mapping.py, section_intent.py, rewrites.py, validation.py, _reporting_topology.py, _pipeline_traces.py are pure logic (no I/O).
+- reporting.py defines ConverterFileSystem Protocol (mkdir/write_text); the TS port adapts the shared FileSystem (ensureDir/writeTextFile).
+- engine.py orchestrates; ConversionRunResult has mapping_records, validation_findings, report_paths, generated_output, wrote_destination, translation_traces.
+- cli.py uses Typer; error strings: "source_root must point to an existing directory.", "apply mode requires --destination-root.", "source_ecosystem must be 'github-copilot' or 'claude'." Apply raises Exit(1) when not wrote_destination and any blocking.
+- Existing spawn-asserting test: test/repo-automation-service.codex-native-converter.test.ts asserts the Python spawn argv (P8-T6 target). The three P8-T5 files (mcp-tools, handlers, mcp-tool-inputs) assert dispatch/normalization only; mcp-tools mocks spawn but does not assert this command's argv.
+
+Note: This shared epic evidence folder previously held the F9 phase0-source-read.md; F9's content remains in git history and is referenced by the F9 plan. This file now records the F10 source read per the F10 plan task P0-T2.

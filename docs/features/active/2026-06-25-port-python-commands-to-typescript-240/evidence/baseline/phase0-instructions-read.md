@@ -1,6 +1,6 @@
-# Phase 0 — Policy Instructions Read (F9 ts-pr-context)
+# Phase 0 — Policy Instructions Read (F10 ts-codex-native-converter)
 
-Timestamp: 2026-06-26T10-02
+Timestamp: 2026-06-26T11-29
 
 Policy Order:
 1. .github/copilot-instructions.md (repository tone and communication policy)
@@ -11,6 +11,7 @@ Policy Order:
    - .claude/rules/typescript-suppressions.md
    - .claude/rules/architecture-boundaries.md
    - .claude/rules/quality-tiers.md
+   - .claude/rules/self-explanatory-code-commenting.md
    - .claude/rules/tonality.md
 
 Files Read:
@@ -20,9 +21,11 @@ Files Read:
 - .claude/rules/typescript.md — toolchain order, strong typing, no `any`, ES modules, kebab-case filenames, coverage thresholds, injected Clock for wall-clock reads.
 - .claude/rules/typescript-suppressions.md — pre-authorized single-line suppressions only; prohibited file-level disables and `@ts-ignore`/`@ts-nocheck`.
 - .claude/rules/architecture-boundaries.md — layer boundary and No-COM assertions; dependency-cruiser is the TS enforcement tool.
-- .claude/rules/quality-tiers.md — T1–T4 tiers; uniform coverage thresholds.
+- .claude/rules/quality-tiers.md — T1–T4 tiers; uniform coverage thresholds; classifier engines are T1.
+- .claude/rules/self-explanatory-code-commenting.md — intent-first docstrings/comments standard.
 - .claude/rules/tonality.md — professional tone; no humor, hyperbole, decorative metaphor; evidence-first wording.
 
 Notes:
 - Toolchain deviation recorded: the extensions/drm-copilot package uses Jest (not Vitest, which .claude/rules/typescript.md names). Per the explicit feature directive, Jest is the test framework for this package (@jest/globals, jest.fn(), jest.mock). Coverage thresholds (line >= 85%, branch >= 75%) and all other TypeScript standards apply unchanged.
-- Wall-clock reads route through an injected clock (() => Date) per typescript.md determinism rule.
+- codex-native-converter classifier modules are T1 (classifier engines): require property-based and/or exhaustive table-driven invariant coverage per quality-tiers.md.
+- All filesystem I/O routes through the injected F1 `FileSystem` (`src/lib/file-system.ts`); tests are hermetic with an in-memory fake.
