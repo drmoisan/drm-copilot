@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
   afterEach,
   beforeEach,
@@ -10,10 +9,6 @@ import {
 
 type CommandHandler = () => Promise<void> | void;
 type MockUri = { fsPath: string };
-type MockChildProcess = EventEmitter & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
-};
 
 const commandHandlers = new Map<string, CommandHandler>();
 const appendLineMock = jest.fn<(line: string) => void>();
@@ -80,8 +75,14 @@ jest.mock(
   { virtual: true },
 );
 
+// The in-process resolver reads templates/targets through RealFileSystem; route
+// those reads through the node:fs mock so no real disk I/O occurs.
 jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
+  statSync: jest.fn(),
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -93,6 +94,16 @@ import { activate } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
+  statSync: jest.MockedFunction<(filePath: string) => { isFile(): boolean }>;
+  readFileSync: jest.MockedFunction<
+    (filePath: string, encoding: string) => string
+  >;
+  writeFileSync: jest.MockedFunction<
+    (filePath: string, content: string, encoding: string) => void
+  >;
+  mkdirSync: jest.MockedFunction<
+    (filePath: string, options?: { recursive?: boolean }) => void
+  >;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
@@ -100,25 +111,16 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   spawnSync: jest.Mock;
 };
 
-function setExecutablePresence(presence: { readonly python?: boolean }): void {
-  fsMock.existsSync.mockImplementation((filePath: string) => {
-    const lowerPath = filePath.toLowerCase();
-    if (lowerPath.includes("python")) {
-      return presence.python ?? false;
-    }
-
-    return false;
-  });
-}
-
-function createMockProcess(exitCode: number): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
+/**
+ * Seed the node:fs mock so RealFileSystem treats every path as an existing file
+ * and returns a hard-lock template containing `${plan-path}`. This keeps the
+ * command-handler suite hermetic while exercising the in-process resolver.
+ */
+function seedInProcessFileSystem(): void {
+  fsMock.statSync.mockReturnValue({ isFile: () => true });
+  fsMock.readFileSync.mockReturnValue("Plan: ${plan-path}\n");
+  fsMock.writeFileSync.mockReturnValue(undefined);
+  fsMock.mkdirSync.mockReturnValue(undefined);
 }
 
 function activateAndGetHandler(commandId: string): CommandHandler {
@@ -156,6 +158,11 @@ describe("drm-copilot resolveExecuteHardLockPrompt command", () => {
     appendLineMock.mockReset();
     registerCommandMock.mockClear();
     showOpenDialogMock.mockReset();
+    fsMock.existsSync.mockReset();
+    fsMock.statSync.mockReset();
+    fsMock.readFileSync.mockReset();
+    fsMock.writeFileSync.mockReset();
+    fsMock.mkdirSync.mockReset();
     childProcessMock.spawn.mockReset();
     childProcessMock.spawnSync.mockReset();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
@@ -175,38 +182,39 @@ describe("drm-copilot resolveExecuteHardLockPrompt command", () => {
   });
 
   it("reuses the active feature plan editor before opening the picker", async () => {
-    setExecutablePresence({ python: true });
+    // Arrange
+    seedInProcessFileSystem();
     setActiveEditorPath(
       "C:/workspace/docs/features/active/feature-123/plan.md",
     );
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
+    // Act
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolveExecuteHardLockPrompt",
     );
     await handler();
 
+    // Assert: the active editor is reused without the picker, and the
+    // in-process path runs (no Python spawn).
     expect(showOpenDialogMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--target");
-    expect(args).toContain(
-      "C:/workspace/docs/features/active/feature-123/plan.md",
-    );
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
   it("opens a docs/features/active picker when the active editor is not eligible", async () => {
-    setExecutablePresence({ python: true });
+    // Arrange
+    seedInProcessFileSystem();
     setActiveEditorPath("C:/workspace/README.md");
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/active/feature-123/plan.md" },
     ]);
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
+    // Act
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolveExecuteHardLockPrompt",
     );
     await handler();
 
+    // Assert
     expect(showOpenDialogMock).toHaveBeenCalledWith(
       expect.objectContaining({
         defaultUri: expect.objectContaining({
@@ -219,53 +227,63 @@ describe("drm-copilot resolveExecuteHardLockPrompt command", () => {
     );
   });
 
-  it("passes the wrapper path plus --target and --workspace argument pairs", async () => {
-    setExecutablePresence({ python: true });
+  it("resolves the selected plan via the in-process path without a Python spawn", async () => {
+    // Arrange
+    seedInProcessFileSystem();
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/active/feature-123/plan.md" },
     ]);
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
+    // Act
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolveExecuteHardLockPrompt",
     );
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/resolve_hard_lock_prompt.py",
-    );
-    expect(args[1]).toBe("--target");
-    expect(args[2]).toBe(
-      "C:/workspace/docs/features/active/feature-123/plan.md",
-    );
-    expect(args[3]).toBe("--workspace");
-    expect(args[4]).toBe("C:/workspace");
+    // Assert: the in-process resolver reads the hard-lock template through the
+    // injected filesystem and emits the resolved content; no Python spawn occurs.
+    // The command handler does not supply --output, so the non-quiet branch
+    // emits the resolved prompt via the output channel.
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(fsMock.readFileSync).toHaveBeenCalled();
+    expect(
+      appendLineMock.mock.calls.some(([line]) =>
+        line.includes("Plan: docs/features/active/feature-123/plan.md"),
+      ),
+    ).toBe(true);
   });
 
   it("returns early when the feature plan picker is cancelled", async () => {
+    // Arrange
     showOpenDialogMock.mockResolvedValue(undefined);
 
+    // Act
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolveExecuteHardLockPrompt",
     );
     await handler();
 
+    // Assert
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
   });
 
-  it("surfaces a missing python runtime error for resolveExecuteHardLockPrompt", async () => {
-    setExecutablePresence({ python: false });
+  it("completes via the in-process path without probing a Python runtime", async () => {
+    // Arrange: existsSync returns false everywhere (no Python on PATH); the
+    // in-process resolver does not probe Python, so the command still succeeds.
+    seedInProcessFileSystem();
+    fsMock.existsSync.mockReturnValue(false);
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/active/feature-123/plan.md" },
     ]);
 
+    // Act
     const handler = activateAndGetHandler(
       "drmCopilotExtension.resolveExecuteHardLockPrompt",
     );
 
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
+    // Assert: no Python-runtime error is thrown.
+    await expect(handler()).resolves.toBeUndefined();
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 });

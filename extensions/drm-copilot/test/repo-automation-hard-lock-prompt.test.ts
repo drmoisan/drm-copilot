@@ -7,20 +7,11 @@ import {
   jest,
 } from "@jest/globals";
 
-import {
-  createMockProcess,
-  setExecutablePresenceOnFsMock,
-} from "./runtime-test-helpers";
+import type { FileSystem } from "../src/lib/file-system";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
 jest.mock("vscode", () => ({}), { virtual: true });
-
-jest.mock("node:fs", () => ({
-  copyFileSync: jest.fn(),
-  existsSync: jest.fn(),
-  mkdirSync: jest.fn(),
-}));
 
 jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
@@ -28,181 +19,179 @@ jest.mock("node:child_process", () => ({
 
 import { createRepoAutomationService } from "../src/repo-automation-service";
 
-const fsMock = jest.requireMock("node:fs") as {
-  copyFileSync: jest.MockedFunction<
-    (source: string, destination: string) => void
-  >;
-  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-  mkdirSync: jest.MockedFunction<
-    (filePath: string, options?: { recursive?: boolean }) => void
-  >;
-};
-
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
-function setExecutablePresence(presence: {
-  readonly python?: boolean;
-  readonly py?: boolean;
-  readonly pwsh?: boolean;
-  readonly powershell?: boolean;
-}): void {
-  setExecutablePresenceOnFsMock(fsMock, presence);
+const EXTENSION_ROOT = "C:/extension";
+const WORKSPACE = "C:/workspace";
+const TEMPLATE_PATH =
+  "C:/extension/resources/customizations/.github/codex/execute-hard-lock.prompt.md";
+const TARGET = "C:/workspace/docs/features/active/feature-123/plan.md";
+
+/**
+ * In-memory {@link FileSystem} fake keyed on POSIX paths.
+ *
+ * Seeds the hard-lock template (containing `${plan-path}`) and the target so the
+ * in-process resolver succeeds; records `writeTextFile`/`ensureDir` calls so the
+ * output write is observable.
+ */
+function createFakeFileSystem(
+  extraFiles: Readonly<Record<string, string>> = {},
+): {
+  fs: FileSystem;
+  writes: Array<{ path: string; content: string }>;
+} {
+  const store = new Map<string, string>(
+    Object.entries({
+      [TEMPLATE_PATH]: "Plan: ${plan-path}\n",
+      [TARGET]: "plan",
+      ...extraFiles,
+    }),
+  );
+  const writes: Array<{ path: string; content: string }> = [];
+  const fs: FileSystem = {
+    glob: () => [],
+    isFile: (path: string) => store.has(path),
+    readTextFile: (path: string) => {
+      const content = store.get(path);
+      if (content === undefined) {
+        throw new Error(`ENOENT: ${path}`);
+      }
+      return content;
+    },
+    writeTextFile: (path: string, content: string) => {
+      writes.push({ path, content });
+      store.set(path, content);
+    },
+    ensureDir: () => undefined,
+  };
+  return { fs, writes };
 }
 
-describe("repo automation hard-lock prompt resolution", () => {
+describe("repo automation hard-lock prompt resolution (in-process)", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
     appendLineMock.mockReset();
     childProcessMock.spawn.mockReset();
-    fsMock.copyFileSync.mockReset();
-    fsMock.mkdirSync.mockReset();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("resolveExecuteHardLockPrompt without output or quiet produces only --target and --workspace args and no artifacts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("without output returns no artifacts and does not write a file", async () => {
+    // Arrange
+    const { fs, writes } = createFakeFileSystem();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXTENSION_ROOT,
       output: { appendLine: appendLineMock },
+      fileSystem: fs,
     });
 
+    // Act
     const result = await service.resolveExecuteHardLockPrompt({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WORKSPACE,
       invocationId: "resolve_execute_hard_lock_prompt",
-      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      target: TARGET,
     });
 
-    const [executable, args] = childProcessMock.spawn.mock.calls[0] as [
-      string,
-      string[],
-    ];
-    expect(executable).toBe("python");
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/resolve_hard_lock_prompt.py",
-    );
-    expect(args).toEqual([
-      "C:/extension/resources/templates/resolve_hard_lock_prompt.py",
-      "--target",
-      "C:/workspace/docs/features/active/feature-123/plan.md",
-      "--workspace",
-      "C:/workspace",
-    ]);
-    expect(args).not.toContain("--output");
-    expect(args).not.toContain("--quiet");
+    // Assert
     expect(result.artifacts).toBeUndefined();
+    expect(writes).toHaveLength(0);
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("resolveExecuteHardLockPrompt with output appends --output and returns the absolute artifact path", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("with output returns the absolute artifact path and writes the resolved prompt", async () => {
+    // Arrange
+    const { fs, writes } = createFakeFileSystem();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXTENSION_ROOT,
       output: { appendLine: appendLineMock },
+      fileSystem: fs,
     });
 
+    // Act
     const result = await service.resolveExecuteHardLockPrompt({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WORKSPACE,
       invocationId: "resolve_execute_hard_lock_prompt",
-      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      target: TARGET,
       output: "artifacts/hard_lock_prompt.txt",
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toEqual(
-      expect.arrayContaining([
-        "--target",
-        "C:/workspace/docs/features/active/feature-123/plan.md",
-        "--workspace",
-        "C:/workspace",
-        "--output",
-        "artifacts/hard_lock_prompt.txt",
-      ]),
-    );
-    expect(args).not.toContain("--quiet");
+    // Assert
     expect(result.artifacts).toEqual([
       "C:/workspace/artifacts/hard_lock_prompt.txt",
     ]);
+    expect(writes[0]?.path).toBe("C:/workspace/artifacts/hard_lock_prompt.txt");
+    expect(writes[0]?.content).toContain(
+      "Plan: docs/features/active/feature-123/plan.md",
+    );
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 
-  it("resolveExecuteHardLockPrompt with output and quiet appends both flags and returns the artifact path", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("with output and quiet returns the artifact path and writes the resolved prompt", async () => {
+    // Arrange
+    const { fs, writes } = createFakeFileSystem();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXTENSION_ROOT,
       output: { appendLine: appendLineMock },
+      fileSystem: fs,
     });
 
+    // Act
     const result = await service.resolveExecuteHardLockPrompt({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WORKSPACE,
       invocationId: "resolve_execute_hard_lock_prompt",
-      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      target: TARGET,
       output: "artifacts/hard_lock_prompt.txt",
       quiet: true,
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toEqual(
-      expect.arrayContaining([
-        "--target",
-        "C:/workspace/docs/features/active/feature-123/plan.md",
-        "--workspace",
-        "C:/workspace",
-        "--output",
-        "artifacts/hard_lock_prompt.txt",
-        "--quiet",
-      ]),
-    );
+    // Assert
     expect(result.artifacts).toEqual([
       "C:/workspace/artifacts/hard_lock_prompt.txt",
     ]);
+    expect(writes[0]?.path).toBe("C:/workspace/artifacts/hard_lock_prompt.txt");
   });
 
-  it("resolveExecuteHardLockPrompt with an absolute output path uses it directly in artifacts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("with an absolute output path uses it directly in artifacts", async () => {
+    // Arrange
+    const { fs, writes } = createFakeFileSystem();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXTENSION_ROOT,
       output: { appendLine: appendLineMock },
+      fileSystem: fs,
     });
 
+    // Act
     const result = await service.resolveExecuteHardLockPrompt({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: WORKSPACE,
       invocationId: "resolve_execute_hard_lock_prompt",
-      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      target: TARGET,
       output: "C:/absolute/hard_lock_prompt.txt",
       quiet: true,
     });
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toEqual(
-      expect.arrayContaining([
-        "--output",
-        "C:/absolute/hard_lock_prompt.txt",
-        "--quiet",
-      ]),
-    );
+    // Assert
     expect(result.artifacts).toEqual(["C:/absolute/hard_lock_prompt.txt"]);
+    expect(writes[0]?.path).toBe("C:/absolute/hard_lock_prompt.txt");
   });
 
-  it("resolveExecuteHardLockPrompt rejects quiet without output at the TS layer", async () => {
-    setExecutablePresence({ python: true });
+  it("rejects quiet without output at the TS layer without any Python spawn", async () => {
+    // Arrange
+    const { fs } = createFakeFileSystem();
     const service = createRepoAutomationService({
-      extensionRoot: "C:/extension",
+      extensionRoot: EXTENSION_ROOT,
       output: { appendLine: appendLineMock },
+      fileSystem: fs,
     });
 
+    // Act / Assert
     await expect(
       service.resolveExecuteHardLockPrompt({
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: WORKSPACE,
         invocationId: "resolve_execute_hard_lock_prompt",
-        target: "C:/workspace/docs/features/active/feature-123/plan.md",
+        target: TARGET,
         quiet: true,
       }),
     ).rejects.toThrow(

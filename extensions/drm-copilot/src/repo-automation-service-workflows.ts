@@ -3,6 +3,11 @@ import {
   copyBundledPolicyAuditTemplateAsset,
   resolveBundledPolicyAuditTemplateAsset,
 } from "./policy-audit-template-assets";
+import type { FileSystem } from "./lib/file-system";
+import {
+  resolveAtomicPlanPromptServiceCall,
+  resolveExecuteHardLockPromptServiceCall,
+} from "./lib/resolve/resolve-prompts-service-call";
 import {
   buildNewActiveFeatureFolderArgs,
   buildResolveExecuteHardLockPromptArguments,
@@ -14,7 +19,6 @@ import {
 } from "./repo-automation-service-support";
 import type {
   RepoAutomationExecutionResult,
-  RunCodexNativeConverterInput,
   WorkspaceExecutionInput,
 } from "./repo-automation-service";
 import type {
@@ -22,6 +26,16 @@ import type {
   PotentialPromotionType,
   WorkModeOption,
 } from "./workflow-command-arguments";
+
+export interface RunCodexNativeConverterInput extends WorkspaceExecutionInput {
+  readonly mode: "review" | "apply";
+  readonly sourceEcosystem: "github-copilot" | "claude";
+  readonly sourceRoot: string;
+  readonly selectedPaths?: ReadonlyArray<string>;
+  readonly destinationRoot?: string;
+  readonly artifactRoot?: string;
+  readonly enableRepoPrompts?: boolean;
+}
 
 interface NewActiveFeatureFolderInput extends WorkspaceExecutionInput {
   readonly featureName: string;
@@ -192,4 +206,57 @@ export function buildTemplateRoot(extensionRoot: string): string {
   return normalizeGeneratedPath(
     path.join(extensionRoot, "resources", "feature-templates"),
   );
+}
+
+/** Dependencies the F5 in-process resolvers need from the service. */
+export interface ResolvePromptServiceDeps {
+  readonly fileSystem: FileSystem;
+  readonly extensionRoot: string;
+  readonly log: (message: string) => void;
+}
+
+/**
+ * Run the in-process hard-lock resolver and return the preserved result.
+ *
+ * Thin wrapper that keeps `RepoAutomationService.resolveExecuteHardLockPrompt`
+ * a single delegation while the F5 wiring lives in
+ * `lib/resolve/resolve-prompts-service-call.ts`.
+ *
+ * @param deps Filesystem, extension root, and log sink from the service.
+ * @param input Workspace root, target, and optional output/quiet.
+ * @returns The preserved hard-lock service result record.
+ */
+export function runResolveExecuteHardLockPrompt(
+  deps: ResolvePromptServiceDeps,
+  input: ResolveExecuteHardLockPromptInput,
+): RepoAutomationExecutionResult {
+  return resolveExecuteHardLockPromptServiceCall({
+    fileSystem: deps.fileSystem,
+    extensionRoot: deps.extensionRoot,
+    workspaceRoot: input.workspaceRoot,
+    target: input.target,
+    output: input.output,
+    quiet: input.quiet,
+    log: deps.log,
+  });
+}
+
+/**
+ * Run the in-process atomic-plan resolver and return the preserved result.
+ *
+ * @param deps Filesystem, extension root, and log sink from the service.
+ * @param input Workspace root and target.
+ * @returns The preserved atomic-plan service result record.
+ */
+export function runResolveAtomicPlanPrompt(
+  deps: ResolvePromptServiceDeps,
+  input: ResolveAtomicPlanPromptInput,
+): RepoAutomationExecutionResult {
+  return resolveAtomicPlanPromptServiceCall({
+    fileSystem: deps.fileSystem,
+    extensionRoot: deps.extensionRoot,
+    workspaceRoot: input.workspaceRoot,
+    target: input.target,
+    log: deps.log,
+  });
 }
