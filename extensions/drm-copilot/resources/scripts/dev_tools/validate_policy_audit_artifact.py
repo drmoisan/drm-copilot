@@ -66,6 +66,14 @@ PLACEHOLDER_MARKERS = (
     "unverified",
     "missing",
 )
+TEMPLATE_RESOLVER_TOOL = "resolve_policy_audit_template_asset"
+TEMPLATE_RESOLVER_MISSING_MARKERS = (
+    "not exposed",
+    "was not exposed",
+    "missing resolver exposure",
+    "fallback template",
+    "fallback-template",
+)
 
 
 def _has_numeric_coverage(value: str) -> bool:
@@ -136,6 +144,17 @@ def _has_placeholder_marker(value: str) -> bool:
 
     lowered = value.lower()
     return any(marker in lowered for marker in PLACEHOLDER_MARKERS)
+
+
+def _reports_missing_template_resolver_success(text: str) -> bool:
+    """Return True for fallback-template artifacts that still claim success."""
+
+    lowered = text.lower()
+    if TEMPLATE_RESOLVER_TOOL not in lowered:
+        return False
+    if not any(marker in lowered for marker in TEMPLATE_RESOLVER_MISSING_MARKERS):
+        return False
+    return re.search(r"\b(pass|ready|readiness)\b", lowered) is not None
 
 
 def _extract_policy_audit_coverage_rows(text: str) -> list[dict[str, str]]:
@@ -441,6 +460,11 @@ def validate_policy_audit_text(text: str) -> list[str]:
         errors.append("Policy audit still contains the template instruction block.")
     if "[Component Name]" in text:
         errors.append("Policy audit still contains placeholder component text.")
+    if _reports_missing_template_resolver_success(text):
+        errors.append(
+            "Policy audit cannot report PASS or READY when "
+            f"{TEMPLATE_RESOLVER_TOOL} is reported as missing or not exposed."
+        )
     for heading in POLICY_AUDIT_REQUIRED_HEADINGS:
         if heading not in text:
             errors.append(f"Policy audit missing required heading: {heading}")

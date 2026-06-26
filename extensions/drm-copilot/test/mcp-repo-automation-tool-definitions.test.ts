@@ -5,6 +5,12 @@ import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-too
 import { REPO_AUTOMATION_TOOLS } from "../src/repo-automation-tool-names";
 
 describe("repo automation MCP tool definitions", () => {
+  it("exports resolve_policy_audit_template_asset as a repo automation tool", () => {
+    expect(REPO_AUTOMATION_TOOLS).toContain(
+      "resolve_policy_audit_template_asset",
+    );
+  });
+
   it("defines one schema entry for every advertised repo automation tool", () => {
     const definitionNames = REPO_AUTOMATION_TOOL_DEFINITIONS.map(
       (definition) => definition.name,
@@ -14,23 +20,28 @@ describe("repo automation MCP tool definitions", () => {
   });
 
   it("keeps the policy-audit asset selector schema aligned with the bundled asset tool", () => {
-    const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+    const repoAutomationDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "resolve_policy_audit_template_asset",
+    );
+    const baseDefinition = toolDefinitions.find(
       ({ name }) => name === "resolve_policy_audit_template_asset",
     );
 
-    expect(definition).toMatchObject({
-      inputSchema: {
-        required: ["asset"],
-        properties: {
-          asset: {
-            type: "string",
-          },
-          target_path: {
-            type: "string",
+    for (const definition of [repoAutomationDefinition, baseDefinition]) {
+      expect(definition).toMatchObject({
+        inputSchema: {
+          required: ["asset"],
+          properties: {
+            asset: {
+              type: "string",
+            },
+            target_path: {
+              type: "string",
+            },
           },
         },
-      },
-    });
+      });
+    }
   });
 
   it("includes a push_down_claude_customizations definition with workspace_root and no additional properties", () => {

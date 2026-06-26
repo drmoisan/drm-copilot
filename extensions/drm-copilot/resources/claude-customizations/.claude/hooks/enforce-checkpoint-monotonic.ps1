@@ -134,6 +134,53 @@ function Get-OutOfOrderPair {
     return $null
 }
 
+function Test-StepHasPrefix {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $StepEntry,
+
+        [Parameter(Mandatory)]
+        [string] $Prefix
+    )
+
+    return $StepEntry -eq $Prefix -or $StepEntry.StartsWith("$Prefix" + '_') -or $StepEntry.StartsWith("$Prefix.") -or $StepEntry.StartsWith("$Prefix-")
+}
+
+function Get-MissingPrerequisiteForAdvancedStep {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CompletedSteps
+    )
+
+    $hasPromotion = $false
+    $hasPlanning = $false
+    foreach ($step in $CompletedSteps) {
+        if (Test-StepHasPrefix -StepEntry $step -Prefix 'S3_promotion') {
+            $hasPromotion = $true
+        }
+        if (Test-StepHasPrefix -StepEntry $step -Prefix 'S4_atomic_planning') {
+            $hasPlanning = $true
+        }
+    }
+
+    foreach ($step in $CompletedSteps) {
+        $index = Get-CanonicalStepIndex -StepEntry $step
+        if ($index -ge 5 -and (-not $hasPromotion -or -not $hasPlanning)) {
+            return [pscustomobject]@{
+                Step             = $step
+                MissingPromotion = -not $hasPromotion
+                MissingPlanning  = -not $hasPlanning
+            }
+        }
+    }
+
+    return $null
+}
+
 function Test-IsCheckpointPath {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -204,10 +251,6 @@ function Invoke-CheckpointMonotonicDecision {
         }
     }
 
-    if ($steps.Count -lt 2) {
-        return [ordered]@{ decision = 'allow' }
-    }
-
     $rollbackHistory = $null
     if ($payload.PSObject.Properties.Name -contains 'rollback_history') {
         $rollbackHistory = $payload.rollback_history
@@ -216,15 +259,30 @@ function Invoke-CheckpointMonotonicDecision {
         return [ordered]@{ decision = 'allow' }
     }
 
-    $pair = Get-OutOfOrderPair -CompletedSteps $steps
-    if ($null -eq $pair) {
-        return [ordered]@{ decision = 'allow' }
+    $pair = if ($steps.Count -ge 2) { Get-OutOfOrderPair -CompletedSteps $steps } else { $null }
+    if ($null -ne $pair) {
+        return [ordered]@{
+            decision = 'block'
+            reason   = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($pair.EarlierEntry)' at position $($pair.EarlierPos) before '$($pair.LaterEntry)' at position $($pair.LaterPos), but the canonical orchestrator workflow requires the later step to follow the earlier one. Reorder completed_steps or, if a rollback occurred, record it in rollback_history."
+        }
     }
 
-    return [ordered]@{
-        decision = 'block'
-        reason   = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($pair.EarlierEntry)' at position $($pair.EarlierPos) before '$($pair.LaterEntry)' at position $($pair.LaterPos), but the canonical orchestrator workflow requires the later step to follow the earlier one. Reorder completed_steps or, if a rollback occurred, record it in rollback_history."
+    $missingPrerequisite = Get-MissingPrerequisiteForAdvancedStep -CompletedSteps $steps
+    if ($null -ne $missingPrerequisite) {
+        $missing = @()
+        if ($missingPrerequisite.MissingPromotion) {
+            $missing += 'S3_promotion'
+        }
+        if ($missingPrerequisite.MissingPlanning) {
+            $missing += 'S4_atomic_planning'
+        }
+        return [ordered]@{
+            decision = 'block'
+            reason   = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($missingPrerequisite.Step)' before required prerequisite step(s): $($missing -join ', '). Record promotion and planning completion before implementation, review, PR, CI, or DONE steps."
+        }
     }
+
+    return [ordered]@{ decision = 'allow' }
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.

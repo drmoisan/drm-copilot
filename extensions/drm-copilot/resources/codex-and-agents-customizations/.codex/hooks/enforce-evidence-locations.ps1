@@ -20,15 +20,12 @@
       - artifacts/evidence/
       - artifacts/regression-testing/
       - artifacts/post-change/
-      - artifacts/research/
 
     All other paths pass through, including canonical evidence paths of the form
     <FEATURE>/evidence/<kind>/ and permitted artifacts/ sub-paths such as
-    artifacts/orchestration/, artifacts/pr_context, artifacts/reviews/,
-    artifacts/status/, artifacts/python/, artifacts/pester/, and
-    artifacts/csharp/. Research output is no longer an artifacts/ sub-path; it
-    is written to the tracked roots docs/features/<feature>/research/
-    (feature-associated) or docs/research/ (one-off).
+    artifacts/orchestration/, artifacts/research/, artifacts/pr_context,
+    artifacts/reviews/, artifacts/status/, artifacts/python/, artifacts/pester/,
+    and artifacts/csharp/.
 
     If the file_path resolves to a forbidden prefix, the script writes a JSON response
     to stdout with 'decision': 'block' and exits with code 0 so Claude Code surfaces
@@ -67,8 +64,7 @@ function Test-EvidenceLocationForbidden {
         'artifacts/coverage/',
         'artifacts/evidence/',
         'artifacts/regression-testing/',
-        'artifacts/post-change/',
-        'artifacts/research/'
+        'artifacts/post-change/'
     )
 
     # Match the prefix either at the start of the string or after any directory separator,
@@ -140,40 +136,18 @@ function Invoke-EvidenceLocationDecision {
     return [ordered]@{ decision = 'allow' }
 }
 
-function Invoke-EvidenceLocationEntryPoint {
-    <#
-    .SYNOPSIS
-        Runs the evidence-location decision and returns the process exit code.
-    .DESCRIPTION
-        Wraps the dispatch logic that the hook entry point performs so it can be
-        exercised by unit tests. On success it writes the compact JSON decision to
-        the output stream and returns 0. On a hard failure (malformed JSON) it
-        writes the error record and returns 1. This function does not call exit;
-        the thin entry-point wiring converts the returned code into a process exit.
-    .PARAMETER ToolInputRaw
-        The raw JSON string from $env:CLAUDE_TOOL_INPUT.
-    #>
-    [CmdletBinding()]
-    [OutputType([int])]
-    param(
-        [string] $ToolInputRaw = $env:CLAUDE_TOOL_INPUT
-    )
-
-    try {
-        $decision = Invoke-EvidenceLocationDecision -ToolInputRaw $ToolInputRaw
-    } catch {
-        Write-Error $_
-        return 1
-    }
-
-    $decision | ConvertTo-Json -Compress | Write-Output
-
-    return 0
-}
-
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-exit (Invoke-EvidenceLocationEntryPoint)
+try {
+    $decision = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+} catch {
+    Write-Error $_
+    exit 1
+}
+
+$decision | ConvertTo-Json -Compress | Write-Output
+
+exit 0
