@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
   afterEach,
   beforeEach,
@@ -8,12 +7,17 @@ import {
   jest,
 } from "@jest/globals";
 
+/**
+ * Extension-level cases for the `potentialToIssue` command. After F7 the command
+ * runs the promotion workflow in-process (no Python spawn), so these cases drive
+ * the command handler with the `node:fs` and `node:child_process` module mocks
+ * configured to provide an in-memory potential file and seeded `gh` responses.
+ * The Python-spawn assertions were replaced with in-process equivalents; the
+ * argument-parsing, UI-resolution, and cancellation behaviors are preserved.
+ */
+
 type CommandHandler = (...args: unknown[]) => Promise<void> | void;
 type MockUri = { fsPath: string };
-type MockChildProcess = EventEmitter & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
-};
 
 const commandHandlers = new Map<string, CommandHandler>();
 const showOpenDialogMock =
@@ -32,13 +36,7 @@ let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
 let activeTextEditorState:
-  | {
-      document: {
-        uri: {
-          fsPath: string;
-        };
-      };
-    }
+  | { document: { uri: { fsPath: string } } }
   | undefined;
 
 jest.mock(
@@ -86,43 +84,100 @@ jest.mock(
 
 jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
+  renameSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
   spawnSync: jest.fn(),
+  execSync: jest.fn(),
 }));
 
 import { activate } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
+  readFileSync: jest.MockedFunction<(filePath: string) => string>;
+  writeFileSync: jest.MockedFunction<
+    (filePath: string, content: string) => void
+  >;
+  mkdirSync: jest.MockedFunction<(dirPath: string) => void>;
+  renameSync: jest.MockedFunction<(src: string, dest: string) => void>;
 };
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
   spawnSync: jest.Mock;
+  execSync: jest.Mock;
 };
 
-function setExecutablePresence(presence: { readonly python?: boolean }): void {
-  fsMock.existsSync.mockImplementation((filePath: string) => {
-    const lowerPath = filePath.toLowerCase();
-    if (lowerPath.includes("python")) {
-      return presence.python ?? false;
+/** Minimal feature potential content used by the in-process scenarios. */
+const FEATURE_CONTENT = [
+  "# Feature Title",
+  "## Problem / Why",
+  "why",
+  "## Proposed Behavior",
+  "behave",
+].join("\n");
+
+/**
+ * Configure the in-process seams so the promotion workflow runs hermetically:
+ * `gh` resolves on PATH (execSync), `gh` calls return a seeded create result
+ * (spawnSync), and the potential file exists with feature content.
+ *
+ * @param createExitCode Exit code returned by the seeded `gh issue create`.
+ */
+function installInProcessSeams(createExitCode = 0): {
+  readonly spawnSyncArgs: string[][];
+} {
+  const spawnSyncArgs: string[][] = [];
+
+  // `gh` path lookup uses execSync; resolve it to a fake path.
+  childProcessMock.execSync.mockReturnValue("/usr/bin/gh\n");
+
+  // `gh` invocations route through spawnSync. Seed auth-success and a create
+  // result; the workflow inspects exit codes itself.
+  childProcessMock.spawnSync.mockImplementation((...rawArgs: unknown[]) => {
+    const exe = rawArgs[0] as string;
+    const args = (rawArgs[1] as string[] | undefined) ?? [];
+    if (exe === "/usr/bin/gh") {
+      spawnSyncArgs.push([...args]);
+      if (args[0] === "auth") {
+        return { status: 0, stdout: "ok", stderr: "" };
+      }
+      if (args[0] === "issue" && args[1] === "create") {
+        return {
+          status: createExitCode,
+          stdout:
+            createExitCode === 0
+              ? "Created: https://example.com/issues/123"
+              : "gh: create failed",
+          stderr: "",
+        };
+      }
+      if (args[0] === "issue" && args[1] === "view") {
+        return {
+          status: 0,
+          stdout: '{"number":123,"updatedAt":"2024-01-02T00:00:00Z"}',
+          stderr: "",
+        };
+      }
     }
-
-    return false;
+    return { status: 0, stdout: "", stderr: "" };
   });
-}
 
-function createMockProcess(exitCode: number): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
+  // The potential file exists and holds feature content; metadata writes and
+  // the move are recorded by the fs mock (no real disk access).
+  fsMock.existsSync.mockReturnValue(true);
+  fsMock.readFileSync.mockReturnValue(FEATURE_CONTENT);
+  fsMock.writeFileSync.mockReturnValue(undefined);
+  fsMock.mkdirSync.mockReturnValue(undefined);
+  fsMock.renameSync.mockReturnValue(undefined);
+
+  return { spawnSyncArgs };
 }
 
 function activateAndGetHandler(commandId: string): CommandHandler {
@@ -142,14 +197,18 @@ function activateAndGetHandler(commandId: string): CommandHandler {
 
 function setActiveEditorPath(filePath: string | undefined): void {
   activeTextEditorState = filePath
-    ? {
-        document: {
-          uri: {
-            fsPath: filePath,
-          },
-        },
-      }
+    ? { document: { uri: { fsPath: filePath } } }
     : undefined;
+}
+
+/** Assert that no Python `.py` script was spawned. */
+function expectNoPythonSpawn(): void {
+  const pySpawned = childProcessMock.spawn.mock.calls.some((call: unknown[]) =>
+    ((call[1] as string[] | undefined) ?? []).some((arg) =>
+      arg.endsWith("/resources/templates/potential_to_issue.py"),
+    ),
+  );
+  expect(pySpawned).toBe(false);
 }
 
 describe("drm-copilot potentialToIssue command", () => {
@@ -161,6 +220,12 @@ describe("drm-copilot potentialToIssue command", () => {
     registerCommandMock.mockClear();
     childProcessMock.spawn.mockReset();
     childProcessMock.spawnSync.mockReset();
+    childProcessMock.execSync.mockReset();
+    fsMock.existsSync.mockReset();
+    fsMock.readFileSync.mockReset();
+    fsMock.writeFileSync.mockReset();
+    fsMock.mkdirSync.mockReset();
+    fsMock.renameSync.mockReset();
     showInputBoxMock.mockReset();
     showOpenDialogMock.mockReset();
     showQuickPickMock.mockReset();
@@ -180,36 +245,27 @@ describe("drm-copilot potentialToIssue command", () => {
     );
   });
 
-  it("passes the bundled script path and argument pairs", async () => {
-    setExecutablePresence({ python: true });
+  it("runs the promotion in-process without spawning the bundled script", async () => {
+    installInProcessSeams();
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/potential/sample.md" },
     ]);
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("full");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
     );
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/potential_to_issue.py",
-    );
-    expect(args[1]).toBe("--potential-path");
-    expect(args[2]).toBe("C:/workspace/docs/features/potential/sample.md");
-    expect(args[3]).toBe("--promotion-type");
-    expect(args[4]).toBe("feature");
-    expect(args[5]).toBe("--work-mode");
-    expect(args[6]).toBe("full");
+    // The in-process workflow runs the gh CLI via spawnSync; no Python spawn.
+    expectNoPythonSpawn();
+    expect(childProcessMock.spawnSync).toHaveBeenCalled();
   });
 
   it("potentialToIssue direct invocation skips active-editor and prompt UI", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+    installInProcessSeams();
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
@@ -223,20 +279,13 @@ describe("drm-copilot potentialToIssue command", () => {
       "full-feature",
     ]);
 
+    // Direct invocation resolves arguments without the file picker or quick picks.
     expect(showOpenDialogMock).not.toHaveBeenCalled();
     expect(showQuickPickMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--potential-path");
-    expect(args).toContain("C:/workspace/docs/features/potential/direct.md");
-    expect(args).toContain("--promotion-type");
-    expect(args).toContain("feature");
-    expect(args).toContain("--work-mode");
-    expect(args).toContain("full-feature");
+    expectNoPythonSpawn();
   });
 
   it("potentialToIssue direct mode rejects unknown flag", async () => {
-    setExecutablePresence({ python: true });
-
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
     );
@@ -259,8 +308,6 @@ describe("drm-copilot potentialToIssue command", () => {
   });
 
   it("potentialToIssue direct mode rejects invalid work mode", async () => {
-    setExecutablePresence({ python: true });
-
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
     );
@@ -281,31 +328,28 @@ describe("drm-copilot potentialToIssue command", () => {
   });
 
   it("reuses the active potential editor path before falling back to the file picker", async () => {
-    setExecutablePresence({ python: true });
+    installInProcessSeams();
     setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("minor-audit");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
     );
     await handler();
 
+    // The active editor path is reused, so the file picker is not shown.
     expect(showOpenDialogMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--potential-path");
-    expect(args).toContain("C:/workspace/docs/features/potential/active.md");
+    expectNoPythonSpawn();
   });
 
   it("keeps the promotion-type quick pick after active-editor auto-resolution", async () => {
-    setExecutablePresence({ python: true });
+    installInProcessSeams();
     setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
     showQuickPickMock
       .mockResolvedValueOnce("bug")
       .mockResolvedValueOnce("full-bug");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
@@ -319,18 +363,15 @@ describe("drm-copilot potentialToIssue command", () => {
         prompt: "Choose a promotion type.",
       }),
     );
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--promotion-type");
-    expect(args).toContain("bug");
+    expectNoPythonSpawn();
   });
 
   it("keeps the work-mode quick pick after active-editor auto-resolution", async () => {
-    setExecutablePresence({ python: true });
+    installInProcessSeams();
     setActiveEditorPath("C:/workspace/docs/features/potential/active.md");
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("minor-audit");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
@@ -349,9 +390,7 @@ describe("drm-copilot potentialToIssue command", () => {
         prompt: "Choose a work mode.",
       }),
     );
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--work-mode");
-    expect(args).toContain("minor-audit");
+    expectNoPythonSpawn();
   });
 
   it("returns early when the file picker is cancelled", async () => {
@@ -363,6 +402,7 @@ describe("drm-copilot potentialToIssue command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(childProcessMock.spawnSync).not.toHaveBeenCalled();
   });
 
   it("returns early when the promotion-type quick pick is cancelled", async () => {
@@ -377,6 +417,7 @@ describe("drm-copilot potentialToIssue command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(childProcessMock.spawnSync).not.toHaveBeenCalled();
   });
 
   it("returns early when the work-mode quick pick is cancelled", async () => {
@@ -393,10 +434,13 @@ describe("drm-copilot potentialToIssue command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(childProcessMock.spawnSync).not.toHaveBeenCalled();
   });
 
-  it("surfaces a missing python runtime error", async () => {
-    setExecutablePresence({ python: false });
+  it("succeeds without any Python runtime present (in-process port)", async () => {
+    // The prior Python-runtime requirement is intentionally inverted: with no
+    // python on PATH the in-process workflow still completes.
+    installInProcessSeams();
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/potential/sample.md" },
     ]);
@@ -408,20 +452,18 @@ describe("drm-copilot potentialToIssue command", () => {
       "drmCopilotExtension.potentialToIssue",
     );
 
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
+    await expect(handler()).resolves.toBeUndefined();
+    expectNoPythonSpawn();
   });
 
   it("passes default folder for potential docs to showOpenDialog", async () => {
-    setExecutablePresence({ python: true });
+    installInProcessSeams();
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/potential/sample.md" },
     ]);
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("full");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",
@@ -437,15 +479,15 @@ describe("drm-copilot potentialToIssue command", () => {
     );
   });
 
-  it("surfaces non-zero exit failures", async () => {
-    setExecutablePresence({ python: true });
+  it("surfaces a non-zero in-process promotion failure", async () => {
+    // A non-zero gh create exit surfaces as the preserved failure contract.
+    installInProcessSeams(2);
     showOpenDialogMock.mockResolvedValue([
       { fsPath: "C:/workspace/docs/features/potential/sample.md" },
     ]);
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("full");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.potentialToIssue",

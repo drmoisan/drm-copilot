@@ -405,9 +405,11 @@ describe("drm-copilot integration behavior", () => {
   // contract are covered by the service-call unit suite
   // (`test/lib/push-down/push-down-service-call.test.ts`), mirroring the F4
   // `collectCommitContext` precedent that removed its Python-spawn integration
-  // cases. Unrelated spawn-based cases (PowerShell commands and the still-Python
-  // commands such as `collect_pr_context` and `potential_to_issue`) are
-  // unchanged below.
+  // cases. The `potentialToIssue` command was likewise ported to the in-process
+  // TS path (F7); its in-process behavior is covered by the
+  // `test/lib/potential-to-issue/**` and `extension.potential-to-issue.test.ts`
+  // suites. Unrelated spawn-based cases (PowerShell commands and the still-Python
+  // `collect_pr_context` command) are unchanged below.
 
   it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {
     await handlerFor("drmCopilotExtension.syncAgentsFromInstructions")();

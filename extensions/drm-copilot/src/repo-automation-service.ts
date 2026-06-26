@@ -36,6 +36,7 @@ import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
+import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
 import {
   type PushDownFileSystem,
   RealPushDownFileSystem,
@@ -326,21 +327,16 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly workMode: WorkModeOption;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "potential_to_issue",
-      runtimeKind: "python",
-      bundledRelativePath: "resources/templates/potential_to_issue.py",
+    // In-process TS port of potential_to_issue.py (F7): delegate to the extracted
+    // helper instead of spawning the bundled Python script. The helper runs the
+    // gh calls through the injected runner and preserves the return contract.
+    return potentialToIssueServiceCall({
+      runner: this.runner,
       workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "potential_to_issue",
-      args: [
-        "--potential-path",
-        input.potentialPath,
-        "--promotion-type",
-        input.promotionType,
-        "--work-mode",
-        input.workMode,
-      ],
-      summary: `Promoted '${input.potentialPath}' as a ${input.promotionType} workflow in ${input.workMode} mode.`,
+      potentialPath: input.potentialPath,
+      promotionType: input.promotionType,
+      workMode: input.workMode,
+      log: (message) => this.output.appendLine(message),
     });
   }
   async newActiveFeatureFolder(
