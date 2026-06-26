@@ -18,7 +18,6 @@ import {
   runPushDownCopilotCustomizations,
 } from "./repo-automation-service-push-down";
 import {
-  buildNewActiveFeatureFolderOptions,
   buildRunCodexNativeConverterOptions,
   buildTemplateRoot,
   resolvePolicyAuditTemplateAssetResult,
@@ -37,6 +36,7 @@ import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
+import { newActiveFeatureFolderServiceCall } from "./lib/new-active-feature-folder/new-active-feature-folder-service-call";
 import {
   type PushDownFileSystem,
   RealPushDownFileSystem,
@@ -347,9 +347,12 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly workMode: WorkModeOption;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(
-      buildNewActiveFeatureFolderOptions(input, this.templateRoot),
-    );
+    return newActiveFeatureFolderServiceCall({
+      ...input,
+      runner: this.runner,
+      templateRoot: this.templateRoot,
+      log: (message) => this.output.appendLine(message),
+    });
   }
   async runPoshQCFormat(
     input: WorkspaceExecutionInput & {

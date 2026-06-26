@@ -1,4 +1,3 @@
-import { EventEmitter } from "node:events";
 import {
   afterEach,
   beforeEach,
@@ -8,11 +7,15 @@ import {
   jest,
 } from "@jest/globals";
 
+import {
+  createMemTree,
+  installInProcessFs,
+  type NafFsMock,
+  pythonScriptSpawned,
+  seedTemplateTree,
+} from "./new-active-feature-folder-fs-harness";
+
 type CommandHandler = (...args: unknown[]) => Promise<void> | void;
-type MockChildProcess = EventEmitter & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
-};
 
 const commandHandlers = new Map<string, CommandHandler>();
 const showInputBoxMock = jest.fn<() => Promise<string | undefined>>();
@@ -32,9 +35,7 @@ let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
 jest.mock(
   "vscode",
   () => ({
-    commands: {
-      registerCommand: registerCommandMock,
-    },
+    commands: { registerCommand: registerCommandMock },
     window: {
       createOutputChannel: jest.fn(() => ({
         appendLine: appendLineMock,
@@ -58,10 +59,7 @@ jest.mock(
         dispose: jest.fn(),
       })),
     },
-    EventEmitter: jest.fn(() => ({
-      event: jest.fn(),
-      dispose: jest.fn(),
-    })),
+    EventEmitter: jest.fn(() => ({ event: jest.fn(), dispose: jest.fn() })),
     McpStdioServerDefinition: jest.fn(),
   }),
   { virtual: true },
@@ -69,6 +67,14 @@ jest.mock(
 
 jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
+  copyFileSync: jest.fn(),
+  renameSync: jest.fn(),
+  unlinkSync: jest.fn(),
+  statSync: jest.fn(),
+  readdirSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -78,35 +84,13 @@ jest.mock("node:child_process", () => ({
 
 import { activate } from "../src/extension";
 
-const fsMock = jest.requireMock("node:fs") as {
-  existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-};
-
+const fsMock = jest.requireMock("node:fs") as NafFsMock;
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
   spawnSync: jest.Mock;
 };
 
-function setExecutablePresence(presence: { readonly python?: boolean }): void {
-  fsMock.existsSync.mockImplementation((filePath: string) => {
-    const lowerPath = filePath.toLowerCase();
-    if (lowerPath.includes("python")) {
-      return presence.python ?? false;
-    }
-
-    return false;
-  });
-}
-
-function createMockProcess(exitCode: number): MockChildProcess {
-  const processMock = new EventEmitter() as MockChildProcess;
-  processMock.stdout = new EventEmitter();
-  processMock.stderr = new EventEmitter();
-  process.nextTick(() => {
-    processMock.emit("close", exitCode);
-  });
-  return processMock;
-}
+const tree = createMemTree();
 
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {
@@ -132,9 +116,15 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     registerCommandMock.mockClear();
     childProcessMock.spawn.mockReset();
     childProcessMock.spawnSync.mockReset();
+    for (const mock of Object.values(fsMock)) {
+      mock.mockReset();
+    }
     showInputBoxMock.mockReset();
     showQuickPickMock.mockReset();
+    tree.files.clear();
+    tree.dirs.clear();
     workspaceFoldersState = [{ uri: { fsPath: "C:/workspace" } }];
+    installInProcessFs(fsMock, tree);
   });
 
   afterEach(() => {
@@ -149,37 +139,33 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     ).toBe(true);
   });
 
-  it("passes the bundled script path and omits --issue-number when blank", async () => {
-    setExecutablePresence({ python: true });
+  it("runs in-process and omits --issue-number when blank (no python spawn)", async () => {
+    // Arrange: prompt flow resolves a feature/full creation with no issue.
+    seedTemplateTree(tree, "feature");
     showQuickPickMock
       .mockResolvedValueOnce("feature")
       .mockResolvedValueOnce("full");
     showInputBoxMock
       .mockResolvedValueOnce("blank-pr-context")
       .mockResolvedValueOnce("");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newActiveFeatureFolder",
     );
     await handler();
 
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/new_active_feature_folder.py",
-    );
-    expect(args[1]).toBe("--feature-name");
-    expect(args[2]).toBe("blank-pr-context");
-    expect(args[3]).toBe("--type");
-    expect(args[4]).toBe("feature");
-    expect(args[5]).toBe("--work-mode");
-    expect(args[6]).toBe("full");
-    expect(args).not.toContain("--issue-number");
+    // Assert: no Python script spawned; the in-process workflow created the folder.
+    expect(pythonScriptSpawned(childProcessMock)).toBe(false);
+    expect(
+      tree.files.has(
+        "C:/workspace/docs/features/active/blank-pr-context/spec.md",
+      ),
+    ).toBe(true);
   });
 
-  it("newActiveFeatureFolder direct invocation forwards issue number without prompts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("direct invocation forwards the issue number without prompts", async () => {
+    // Arrange
+    seedTemplateTree(tree, "feature");
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newActiveFeatureFolder",
@@ -195,22 +181,20 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
       "full-feature",
     ]);
 
+    // Assert: UI skipped, no python spawn, issue number flows into the slug.
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--feature-name");
-    expect(args).toContain("blank-pr-context");
-    expect(args).toContain("--type");
-    expect(args).toContain("feature");
-    expect(args).toContain("--issue-number");
-    expect(args).toContain("104");
-    expect(args).toContain("--work-mode");
-    expect(args).toContain("full-feature");
+    expect(pythonScriptSpawned(childProcessMock)).toBe(false);
+    expect(
+      tree.files.has(
+        "C:/workspace/docs/features/active/blank-pr-context-104/spec.md",
+      ),
+    ).toBe(true);
   });
 
-  it("newActiveFeatureFolder direct invocation omits issue number without prompts", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
+  it("direct invocation omits the issue number without prompts", async () => {
+    // Arrange
+    seedTemplateTree(tree, "feature");
 
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newActiveFeatureFolder",
@@ -224,21 +208,18 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
       "minor-audit",
     ]);
 
+    // Assert: minor-audit writes issue.md with no issue-number suffix.
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain("--feature-name");
-    expect(args).toContain("blank-pr-context");
-    expect(args).toContain("--type");
-    expect(args).toContain("feature");
-    expect(args).toContain("--work-mode");
-    expect(args).toContain("minor-audit");
-    expect(args).not.toContain("--issue-number");
+    expect(pythonScriptSpawned(childProcessMock)).toBe(false);
+    expect(
+      tree.files.has(
+        "C:/workspace/docs/features/active/blank-pr-context/issue.md",
+      ),
+    ).toBe(true);
   });
 
-  it("newActiveFeatureFolder direct mode rejects non-digit issue number", async () => {
-    setExecutablePresence({ python: true });
-
+  it("direct mode rejects a non-digit issue number without running the workflow", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newActiveFeatureFolder",
     );
@@ -258,11 +239,10 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(tree.files.size).toBe(0);
   });
 
-  it("newActiveFeatureFolder direct mode rejects invalid type", async () => {
-    setExecutablePresence({ python: true });
-
+  it("direct mode rejects an invalid type without running the workflow", async () => {
     const handler = activateAndGetHandler(
       "drmCopilotExtension.newActiveFeatureFolder",
     );
@@ -280,6 +260,7 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(showInputBoxMock).not.toHaveBeenCalled();
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(tree.files.size).toBe(0);
   });
 
   it("returns early when the type quick pick is cancelled", async () => {
@@ -291,6 +272,7 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(tree.files.size).toBe(0);
   });
 
   it("returns early when the feature-name input is cancelled", async () => {
@@ -303,6 +285,7 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(tree.files.size).toBe(0);
   });
 
   it("returns early when the issue-number input is cancelled", async () => {
@@ -317,6 +300,7 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(tree.files.size).toBe(0);
   });
 
   it("returns early when the work-mode quick pick is cancelled", async () => {
@@ -333,40 +317,6 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("surfaces a missing python runtime error", async () => {
-    setExecutablePresence({ python: false });
-    showQuickPickMock
-      .mockResolvedValueOnce("feature")
-      .mockResolvedValueOnce("full");
-    showInputBoxMock
-      .mockResolvedValueOnce("blank-pr-context")
-      .mockResolvedValueOnce("");
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newActiveFeatureFolder",
-    );
-
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
-  });
-
-  it("surfaces non-zero exit failures", async () => {
-    setExecutablePresence({ python: true });
-    showQuickPickMock
-      .mockResolvedValueOnce("feature")
-      .mockResolvedValueOnce("full");
-    showInputBoxMock
-      .mockResolvedValueOnce("blank-pr-context")
-      .mockResolvedValueOnce("");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newActiveFeatureFolder",
-    );
-
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
+    expect(tree.files.size).toBe(0);
   });
 });
