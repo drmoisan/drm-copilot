@@ -767,24 +767,9 @@ describe("drm-copilot workflow command behavior", () => {
     expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
   });
 
-  it("newActiveFeatureFolder passes --template-root pointing to bundled feature-templates", async () => {
-    setExecutablePresence({ python: true });
-    showQuickPickMock
-      .mockResolvedValueOnce("feature")
-      .mockResolvedValueOnce("minor-audit");
-    showInputBoxMock
-      .mockResolvedValueOnce("test-feature")
-      .mockResolvedValueOnce("");
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.newActiveFeatureFolder",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const templateRootIdx = args.indexOf("--template-root");
-    expect(templateRootIdx).toBeGreaterThan(-1);
-    expect(args[templateRootIdx + 1]).toContain("resources/feature-templates");
-  });
+  // The former `newActiveFeatureFolder passes --template-root ...` Python-spawn
+  // assertion was reworked to the in-process expectation in
+  // `extension.new-active-feature-folder-inprocess.test.ts` (F8): the service
+  // forwards `this.templateRoot` to the in-process workflow, which resolves the
+  // bundled `resources/feature-templates` tree without spawning a `.py` script.
 });
