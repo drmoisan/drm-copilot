@@ -24,12 +24,8 @@ import {
   type PotentialPromotionType,
   type WorkModeOption,
 } from "./workflow-command-arguments";
-import {
-  type FileSystem,
-  RealFileSystem,
-  toPosixPath,
-} from "./lib/file-system";
-import { validateArtifact } from "./lib/validate/orchestration-artifacts";
+import { type FileSystem, RealFileSystem } from "./lib/file-system";
+import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -456,38 +452,16 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly requireComplete?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    // Resolve the artifact path relative to the workspace root, matching the
-    // Python `Path(args.path)` semantics, then validate in-process. The path is
-    // normalized to forward slashes to match the F1 FileSystem path convention.
-    const artifactFullPath = toPosixPath(
-      path.join(input.workspaceRoot, input.artifactPath),
-    );
-    const text = this.fileSystem.readTextFile(artifactFullPath);
-    const errors = validateArtifact({
+    // Delegate to the extracted helper, which preserves the observable behavior.
+    return validateOrchestrationServiceCall({
+      fileSystem: this.fileSystem,
+      workspaceRoot: input.workspaceRoot,
       artifactType: input.artifactType,
-      text,
+      artifactPath: input.artifactPath,
       ...(input.requireComplete === undefined
         ? {}
         : { requireComplete: input.requireComplete }),
-      fs: this.fileSystem,
-      root: input.workspaceRoot,
     });
-
-    // Surface validation failure as a thrown error so the MCP handler reports a
-    // non-zero outcome, mirroring the Python stderr-per-line, exit-1 behavior.
-    if (errors.length > 0) {
-      throw new Error(
-        `Validation failed for ${input.artifactType} artifact at ` +
-          `'${input.artifactPath}':\n${errors.join("\n")}`,
-      );
-    }
-
-    // Preserve the existing success summary string.
-    return {
-      tool: "validate_orchestration_artifacts",
-      workspaceRoot: input.workspaceRoot,
-      summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
-    };
   }
 
   private async executeScript(
