@@ -1,6 +1,6 @@
 {
   "name": "@danmoisan/drm-copilot-mcp",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Stdio MCP server exposing drm-copilot repo-automation tools.",
   "license": "MIT",
   "type": "commonjs",
