@@ -8,24 +8,12 @@ import {
   resolveAtomicPlanPromptServiceCall,
   resolveExecuteHardLockPromptServiceCall,
 } from "./lib/resolve/resolve-prompts-service-call";
-import {
-  buildNewActiveFeatureFolderArgs,
-  buildResolveExecuteHardLockPromptArguments,
-  buildValidateOrchestrationArtifactsArgs,
-} from "./repo-automation-args";
-import {
-  normalizeGeneratedPath,
-  type ScriptExecutionOptions,
-} from "./repo-automation-service-support";
+import { normalizeGeneratedPath } from "./repo-automation-service-support";
 import type {
   RepoAutomationExecutionResult,
   WorkspaceExecutionInput,
 } from "./repo-automation-service";
-import type {
-  PolicyAuditTemplateAssetSelector,
-  PotentialPromotionType,
-  WorkModeOption,
-} from "./workflow-command-arguments";
+import type { PolicyAuditTemplateAssetSelector } from "./workflow-command-arguments";
 
 export interface RunCodexNativeConverterInput extends WorkspaceExecutionInput {
   readonly mode: "review" | "apply";
@@ -35,13 +23,6 @@ export interface RunCodexNativeConverterInput extends WorkspaceExecutionInput {
   readonly destinationRoot?: string;
   readonly artifactRoot?: string;
   readonly enableRepoPrompts?: boolean;
-}
-
-interface NewActiveFeatureFolderInput extends WorkspaceExecutionInput {
-  readonly featureName: string;
-  readonly type: PotentialPromotionType;
-  readonly issueNumber?: string;
-  readonly workMode: WorkModeOption;
 }
 
 interface PolicyAuditTemplateAssetInput extends WorkspaceExecutionInput {
@@ -57,27 +38,6 @@ interface ResolveExecuteHardLockPromptInput extends WorkspaceExecutionInput {
 
 interface ResolveAtomicPlanPromptInput extends WorkspaceExecutionInput {
   readonly target: string;
-}
-
-interface ValidateOrchestrationArtifactsInput extends WorkspaceExecutionInput {
-  readonly artifactType: string;
-  readonly artifactPath: string;
-  readonly requireComplete?: boolean;
-}
-
-export function buildNewActiveFeatureFolderOptions(
-  input: NewActiveFeatureFolderInput,
-  templateRoot: string,
-): ScriptExecutionOptions & { readonly tool: "new_active_feature_folder" } {
-  return {
-    tool: "new_active_feature_folder",
-    runtimeKind: "python",
-    bundledRelativePath: "resources/templates/new_active_feature_folder.py",
-    workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "new_active_feature_folder",
-    args: buildNewActiveFeatureFolderArgs(input, templateRoot),
-    summary: `Created a new active ${input.type} feature folder for '${input.featureName}'.`,
-  };
 }
 
 export function resolvePolicyAuditTemplateAssetResult(
@@ -110,56 +70,6 @@ export function resolvePolicyAuditTemplateAssetResult(
     assetId: resolvedAsset.assetId,
     bundledSourcePath: resolvedAsset.bundledSourcePath,
     ...(destinationPath === undefined ? {} : { destinationPath }),
-  };
-}
-
-export function buildResolveExecuteHardLockPromptOptions(
-  input: ResolveExecuteHardLockPromptInput,
-): ScriptExecutionOptions & {
-  readonly tool: "resolve_execute_hard_lock_prompt";
-} {
-  const { args, artifactPaths } =
-    buildResolveExecuteHardLockPromptArguments(input);
-  return {
-    tool: "resolve_execute_hard_lock_prompt",
-    runtimeKind: "python",
-    bundledRelativePath: "resources/templates/resolve_hard_lock_prompt.py",
-    workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "resolve_execute_hard_lock_prompt",
-    args,
-    summary: `Resolved the execute hard-lock prompt for '${input.target}'.`,
-    ...(artifactPaths === undefined ? {} : { artifactPaths }),
-  };
-}
-
-export function buildResolveAtomicPlanPromptOptions(
-  input: ResolveAtomicPlanPromptInput,
-): ScriptExecutionOptions & { readonly tool: "resolve_atomic_plan_prompt" } {
-  return {
-    tool: "resolve_atomic_plan_prompt",
-    runtimeKind: "python",
-    bundledRelativePath: "resources/templates/resolve_atomic_plan_prompt.py",
-    workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "resolve_atomic_plan_prompt",
-    args: ["--target", input.target, "--workspace", input.workspaceRoot],
-    summary: `Resolved the atomic-plan prompt for '${input.target}'.`,
-  };
-}
-
-export function buildValidateOrchestrationArtifactsOptions(
-  input: ValidateOrchestrationArtifactsInput,
-): ScriptExecutionOptions & {
-  readonly tool: "validate_orchestration_artifacts";
-} {
-  return {
-    tool: "validate_orchestration_artifacts",
-    runtimeKind: "python",
-    bundledRelativePath:
-      "resources/templates/validate_orchestration_artifacts.py",
-    workspaceRoot: input.workspaceRoot,
-    invocationId: input.invocationId ?? "validate_orchestration_artifacts",
-    args: buildValidateOrchestrationArtifactsArgs(input),
-    summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
   };
 }
 

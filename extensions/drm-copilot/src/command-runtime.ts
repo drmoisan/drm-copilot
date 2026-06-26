@@ -5,8 +5,11 @@ import * as vscode from "vscode";
 
 /**
  * Identifies which interpreter family is required to launch a bundled script.
+ *
+ * Only PowerShell remains: all formerly-interpreted commands run in-process in
+ * TypeScript, so no interpreter is detected or spawned beyond PowerShell.
  */
-export type RuntimeKind = "python" | "powershell";
+export type RuntimeKind = "powershell";
 
 /**
  * Describes the executable and fixed argument prefix needed to launch a script.
@@ -171,37 +174,21 @@ function executableExists(executable: string): boolean {
 }
 
 /**
- * Resolves the interpreter required to execute a bundled script.
+ * Resolves the PowerShell interpreter required to execute a bundled script.
  *
- * @param runtimeKind The runtime family requested by the command.
+ * PowerShell is the only supported runtime: every formerly-Python command now
+ * runs in-process in TypeScript, so this function resolves only PowerShell and
+ * never probes a Python interpreter.
+ *
+ * @param runtimeKind The runtime family requested by the command (always
+ *   `"powershell"`).
  * @returns The executable name and fixed argument prefix needed to launch the script.
- * @throws Error when the required runtime cannot be found on PATH.
+ * @throws Error when neither `pwsh` nor `powershell` can be found on PATH.
  */
 export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
-  // Python commands have a single acceptable runtime, so fail fast with a
-  // targeted error message instead of falling through the PowerShell probes.
-  if (runtimeKind === "python") {
-    // Keep `python` as the primary probe everywhere, then fall back to the
-    // Windows launcher so common Windows installations still work when only
-    // `py` is exposed on PATH.
-    if (executableExists("python")) {
-      return {
-        executable: "python",
-        argsPrefix: [],
-      };
-    }
-
-    if (executableExists("py")) {
-      return {
-        executable: "py",
-        argsPrefix: ["-3"],
-      };
-    }
-
-    throw new Error(
-      "Python runtime 'python' not found on PATH. On Windows, 'py -3' is also accepted.",
-    );
-  }
+  // The parameter is retained so call sites remain explicit about the runtime
+  // they request; only the PowerShell family is supported.
+  void runtimeKind;
 
   // Prefer PowerShell Core when available, then fall back to Windows PowerShell
   // so the extension works across newer and older developer environments.

@@ -13,15 +13,15 @@ have Python installed.
 
 ## Epic Acceptance Criteria
 
-- [ ] AC-E1: Every Python command script invoked by the extension or MCP server has a
+- [x] AC-E1: Every Python command script invoked by the extension or MCP server has a
       TypeScript equivalent with behavior parity (CLI output, exit codes, file artifacts,
-      JSON shapes).
-- [ ] AC-E2: TypeScript test coverage for ported modules meets policy (line >= 85%,
-      branch >= 75%).
-- [ ] AC-E3: `RepoAutomationService` methods invoke in-process TypeScript instead of
+      JSON shapes). (Delivered by F2-F10; all 12 in-scope commands wired to in-process TS.)
+- [x] AC-E2: TypeScript test coverage for ported modules meets policy (line >= 85%,
+      branch >= 75%). (Verified per feature; final src/lib coverage line 96.62% / branch 88.29%.)
+- [x] AC-E3: `RepoAutomationService` methods invoke in-process TypeScript instead of
       spawning Python; the `"python"` runtime branch and bundled Python resources are
       removed (delivered by F11).
-- [ ] AC-E4: No remaining runtime dependency on a `python` interpreter for extension or
+- [x] AC-E4: No remaining runtime dependency on a `python` interpreter for extension or
       MCP command execution.
 - [ ] AC-E5: All CI gates pass on each feature PR.
 

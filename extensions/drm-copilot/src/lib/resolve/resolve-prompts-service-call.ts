@@ -82,8 +82,8 @@ export interface ResolveAtomicPlanPromptServiceCallResult {
  * file work, resolves the bundled hard-lock template root from `extensionRoot`,
  * invokes {@link resolveExecuteHardLockCommand} with a no-op clipboard seam,
  * surfaces a non-zero command outcome as a thrown error, and returns the
- * preserved result record (with `artifacts` computed exactly as the prior
- * `buildResolveExecuteHardLockPromptArguments`).
+ * preserved result record (with `artifacts` computed from the resolved output
+ * path, matching the previously-spawned command's artifact contract).
  *
  * @param input Filesystem, extension/workspace roots, target, and optional
  *   output/quiet/log.

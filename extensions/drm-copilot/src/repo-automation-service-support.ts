@@ -7,7 +7,7 @@ import type { FileSystem } from "./lib/file-system";
 
 export interface ScriptExecutionOptions {
   readonly tool: string;
-  readonly runtimeKind: "python" | "powershell";
+  readonly runtimeKind: "powershell";
   readonly bundledRelativePath: string;
   readonly workspaceRoot: string;
   readonly invocationId: string;

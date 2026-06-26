@@ -1,28 +1,15 @@
-# Phase 9 — Test + Coverage Final (F9 ts-pr-context)
+# P7-T5 — Final Test + Coverage (F11 ts-command-runtime-cleanup)
 
-Timestamp: 2026-06-26T10-56
-Command: node run-jest.cjs --coverage --collectCoverageFrom="src/lib/**/*.ts"
+Timestamp: 2026-06-26T09-27
+Command: node run-jest.cjs --coverage --collectCoverageFrom="src/**/*.ts" (from extensions/drm-copilot/)
 EXIT_CODE: 0
 Output Summary:
-- Test result: 99 suites passed, 1226 tests passed, 0 failed. Time ~3.6s.
-  (Baseline was 85 suites / 999 tests; F9 added 14 suites / 227 tests.)
-- Coverage headline (collectCoverageFrom=src/lib/**/*.ts):
-  - All files: line 96.45%, branch 88.07%, functions 86.46%.
-  - src/lib/pr-context (aggregate): line 93.86%, branch 87.59%, functions 85.34%.
-- Per-file coverage for src/lib/pr-context/** (line% / branch%); all meet line >= 85% and branch >= 75%:
-  - models.ts: 100 / 100
-  - git-client.ts: 99.06 / 100
-  - gh-client-core.ts: 96.33 / 80
-  - gh-client-details.ts: 93.96 / 91.35
-  - verification-evidence.ts: 95.56 / 80
-  - feature-docs-parsers.ts: 96.89 / 88.52
-  - feature-docs.ts: 94.48 / 87.27
-  - render-pr-helpers.ts: 88.77 / 93.02
-  - render-feature-excerpts.ts: 95.08 / 84.26
-  - render.ts: 98.04 / 88 (functions 22.22 is a v8 artifact: the `export { ... } from` re-export statements are counted as uncovered "functions"; the real functions are exercised)
-  - summary-helpers.ts: 93.09 / 87.14
-  - summary-digests.ts: 100 / 93.61
-  - collector-core.ts: 97.66 / 86.56
-  - collector-output.ts: 97.55 / 80.51
-  - pr-context-service-call.ts: 100 / 100
-- All existing tests pass (no regression); the reworked extension.collect-pr-context.test.ts, extension.integration.test.ts, and repo-automation-dispatch.test.ts assert the in-process path.
+- Test Suites: 116 passed, 116 total
+- Tests: 1389 passed, 1389 total; 0 failed
+- Overall src coverage (All files): Lines 96.62%, Branch 88.29%, Funcs 86.54%, Stmts 96.62%
+- Per-file (F11-touched):
+  - src/lib/hello-message.ts: Lines 100%, Branch 100%, Funcs 100% (meets line >= 85% / branch >= 75%)
+  - src/command-runtime.ts: Lines 91.5%, Branch 78.57% (PowerShell-only resolution after Python branch removed; still above thresholds)
+  - src/repo-automation-service-workflows.ts: Lines 100%, Branch 100%
+  - src/repo-automation-args.ts: Lines 100%, Branch 100%
+- No test asserts a `helloPython` Python spawn; no test references removed bundled paths (verified in P7-T9).

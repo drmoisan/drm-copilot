@@ -231,14 +231,17 @@ describe("drm-copilot integration behavior", () => {
     activate(context as never);
   });
 
-  it("helloPython produces artifacts/hello_python.txt using bundled script execution", async () => {
+  it("helloPython produces artifacts/hello_python.txt in-process without spawning", async () => {
+    inProcessWrites.clear();
+
     await handlerFor("drmCopilotExtension.helloPython")();
 
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    expect(executable).toBe("python");
-    expect(args[0]).toBe("C:/extension/resources/templates/hello_python.py");
-    expect(options.cwd).toBe("C:/workspace");
+    // The in-process port writes the smoke-test file through node:fs against the
+    // workspace root and never spawns a runtime.
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    expect(inProcessWrites.get("C:/workspace/artifacts/hello_python.txt")).toBe(
+      "hello_python:ok\n",
+    );
   });
 
   it("helloPowerShell produces artifacts/hello_pwsh.txt using bundled script execution", async () => {
@@ -254,21 +257,26 @@ describe("drm-copilot integration behavior", () => {
   });
 
   it("execution enforces no copy of hello_python.py or hello_pwsh.ps1 into workspace root", async () => {
+    inProcessWrites.clear();
+
     await handlerFor("drmCopilotExtension.helloPython")();
     await handlerFor("drmCopilotExtension.helloPowerShell")();
 
+    // helloPython (in-process) writes only artifacts/hello_python.txt; no
+    // hello_python.py is copied into the workspace root.
+    expect(inProcessWrites.has("C:/workspace/artifacts/hello_python.txt")).toBe(
+      true,
+    );
+    expect(inProcessWrites.has("C:/workspace/hello_python.py")).toBe(false);
+
+    // helloPowerShell still spawns the bundled .ps1; assert it is never copied
+    // into the workspace root.
     const scriptPaths = childProcessMock.spawn.mock.calls.map(
       (call: unknown[]) => {
         const args = call[1] as string[];
         return args[args.length - 1];
       },
     );
-
-    expect(
-      scriptPaths.some(
-        (pathValue) => pathValue === "C:/workspace/hello_python.py",
-      ),
-    ).toBe(false);
     expect(
       scriptPaths.some(
         (pathValue) => pathValue === "C:/workspace/hello_pwsh.ps1",
