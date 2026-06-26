@@ -40,6 +40,19 @@ export interface FileSystem {
 
   /** Write `content` to `path` as UTF-8 text. */
   writeTextFile(path: string, content: string): void;
+
+  /**
+   * Ensure that the directory at `path` exists, creating parent directories as
+   * needed.
+   *
+   * Mirrors Python `Path.mkdir(parents=True, exist_ok=True)`: the call is
+   * idempotent and does not raise when the directory already exists. Consumers
+   * (e.g. the commit-context port) call this before writing an output file so
+   * the parent directory is guaranteed to exist.
+   *
+   * @param path Directory path to create, including any missing ancestors.
+   */
+  ensureDir(path: string): void;
 }
 
 /**
@@ -223,5 +236,18 @@ export class RealFileSystem implements FileSystem {
    */
   writeTextFile(path: string, content: string): void {
     fs.writeFileSync(path, content, "utf8");
+  }
+
+  /**
+   * Create the directory at `path`, including any missing parents.
+   *
+   * Uses `fs.mkdirSync(path, { recursive: true })`, which is idempotent and
+   * does not raise when the directory already exists, matching Python
+   * `Path.mkdir(parents=True, exist_ok=True)`.
+   *
+   * @param path Directory path to create.
+   */
+  ensureDir(path: string): void {
+    fs.mkdirSync(path, { recursive: true });
   }
 }

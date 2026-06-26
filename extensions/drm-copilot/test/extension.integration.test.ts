@@ -1,6 +1,4 @@
 import { EventEmitter } from "node:events";
-import * as fs from "node:fs";
-import * as path from "node:path";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 type CommandHandler = () => Promise<void> | void;
@@ -165,12 +163,6 @@ function normalizePath(pathValue: string): string {
   return pathValue.replace(/\\/g, "/");
 }
 
-function loadFixtureArtifact(fixtureFileName: string): string {
-  const realFs = jest.requireActual("node:fs") as typeof fs;
-  const fixturePath = path.join(__dirname, "fixtures", fixtureFileName);
-  return realFs.readFileSync(fixturePath, "utf-8");
-}
-
 function isPlaceholderOnlyArtifact(text: string, heading: string): boolean {
   const meaningfulLines = text
     .split(/\r?\n/)
@@ -278,89 +270,12 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(false);
   });
 
-  it("collectCommitContext executes bundled resource without workspace script copy", async () => {
-    await handlerFor("drmCopilotExtension.collectCommitContext")();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    const scriptPath = normalizePath(args[0]);
-    const extensionRoot = normalizePath("C:/extension");
-    const workspaceRoot = normalizePath("C:/workspace");
-
-    expect(scriptPath.startsWith(extensionRoot)).toBe(true);
-    expect(
-      scriptPath.endsWith("/resources/templates/collect_commit_context.py"),
-    ).toBe(true);
-    expect(scriptPath.startsWith(workspaceRoot)).toBe(false);
-  });
-
-  it("collectCommitContext artifact includes required sections for staged changes", async () => {
-    childProcessMock.spawn.mockImplementation(
-      (_executable: string, args: string[], options: { cwd: string }) => {
-        const outputIndex = args.indexOf("--output");
-        if (outputIndex >= 0) {
-          const outputRelativePath =
-            args[outputIndex + 1] ?? "artifacts/commit_context.txt";
-          generatedArtifacts.set(
-            `${options.cwd}/${outputRelativePath}`,
-            loadFixtureArtifact("collect_commit_context.staged.fixture.txt"),
-          );
-        }
-        return mockProcessSuccess();
-      },
-    );
-
-    await handlerFor("drmCopilotExtension.collectCommitContext")();
-
-    const artifactPath = "C:/workspace/artifacts/commit_context.txt";
-    const artifactText = generatedArtifacts.get(artifactPath);
-    expect(artifactText).toBeDefined();
-
-    const requiredHeaders = [
-      "===== Repository remotes =====",
-      "===== Current branch =====",
-      "===== Upstream =====",
-      "===== Status (short) =====",
-      "===== Staged files (name-status) =====",
-      "===== Staged diff =====",
-      "===== Unstaged files (name-status) =====",
-      "===== Unstaged diff =====",
-      "===== Untracked files =====",
-      "===== Diff stat (staged + unstaged) =====",
-      "===== Changed Python files =====",
-      "===== Last commit (header only) =====",
-    ];
-
-    for (const header of requiredHeaders) {
-      const count = artifactText?.split(header).length ?? 0;
-      expect(count - 1).toBe(1);
-    }
-
-    expect(artifactText).toContain("fixture-staged-sentinel");
-  });
-
-  it("collectCommitContext artifact marks no staged changes", async () => {
-    childProcessMock.spawn.mockImplementation(
-      (_executable: string, args: string[], options: { cwd: string }) => {
-        const outputIndex = args.indexOf("--output");
-        if (outputIndex >= 0) {
-          const outputRelativePath =
-            args[outputIndex + 1] ?? "artifacts/commit_context.txt";
-          generatedArtifacts.set(
-            `${options.cwd}/${outputRelativePath}`,
-            loadFixtureArtifact("collect_commit_context.no_staged.fixture.txt"),
-          );
-        }
-        return mockProcessSuccess();
-      },
-    );
-
-    await handlerFor("drmCopilotExtension.collectCommitContext")();
-
-    const artifactPath = "C:/workspace/artifacts/commit_context.txt";
-    const artifactText = generatedArtifacts.get(artifactPath) ?? "";
-    expect(artifactText).toContain("===== Staged files (name-status) =====");
-    expect(artifactText).toContain("(no staged changes)");
-  });
+  // NOTE: The three `collectCommitContext` integration cases previously here
+  // (bundled-resource Python spawn, staged-sections fixture, no-staged marker)
+  // moved to `extension.collect-commit-context.integration.test.ts` when F4
+  // ported the command to the in-process TS path. The original file already
+  // exceeded the 500-line limit, so the reworked cases were extracted rather
+  // than grown in place.
 
   it("collectPrContext executes bundled wrapper script in destination workspace", async () => {
     await handlerFor("drmCopilotExtension.collectPrContext")();

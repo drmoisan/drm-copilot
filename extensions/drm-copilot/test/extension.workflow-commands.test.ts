@@ -9,10 +9,8 @@ import {
 
 import {
   activateAndGetHandler,
-  appendLineMock,
   childProcessMock,
   createMockProcess,
-  createMockProcessWithStderr,
   createTerminalMock,
   registerMcpServerDefinitionProviderMock,
   resetExtensionHarnessState,
@@ -155,87 +153,12 @@ describe("drm-copilot workflow command behavior", () => {
     await expect(handler()).rejects.toThrow("No workspace folder is open.");
   });
 
-  it("collectCommitContext fails when python runtime is unavailable", async () => {
-    setExecutablePresence({ python: false });
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow(
-      "Python runtime 'python' not found on PATH.",
-    );
-  });
-
-  it("collectCommitContext passes explicit output args to bundled script", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args[0]).toBe(
-      "C:/extension/resources/templates/collect_commit_context.py",
-    );
-    expect(args[1]).toBe("--output");
-    expect(args[2]).toBe("artifacts/commit_context.txt");
-  });
-
-  it("collectCommitContext runs with workspace cwd", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await handler();
-
-    const [, , options] = childProcessMock.spawn.mock.calls[0] as [
-      string,
-      string[],
-      { cwd: string; shell: boolean },
-    ];
-    expect(options.cwd).toBe("C:/workspace");
-    expect(options.shell).toBe(false);
-  });
-
-  it("collectCommitContext logs and throws on non-zero exit", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(2));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow("Command exited with code 2");
-
-    const logs = appendLineMock.mock.calls.map(([line]) => line);
-    expect(
-      logs.some((line) =>
-        line.includes(
-          "[drmCopilotExtension.collectCommitContext] command failure",
-        ),
-      ),
-    ).toBe(true);
-  });
-
-  it("collectCommitContext reports git failure details from collector stderr", async () => {
-    setExecutablePresence({ python: true });
-    childProcessMock.spawn.mockReturnValue(
-      createMockProcessWithStderr(1, "git executable not found on PATH"),
-    );
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.collectCommitContext",
-    );
-    await expect(handler()).rejects.toThrow("Command exited with code 1");
-
-    const logs = appendLineMock.mock.calls.map(([line]) => line);
-    expect(
-      logs.some((line) => line.includes("git executable not found on PATH")),
-    ).toBe(true);
-  });
+  // NOTE: The in-process `collectCommitContext` behavioral cases (no python
+  // runtime required, in-process artifact write, workspace cwd, mandatory git
+  // failure, stderr detail) live in
+  // `extension.collect-commit-context-inprocess.test.ts`. They were moved out
+  // of this file (which already exceeds the 500-line limit) when F4 ported the
+  // command to the in-process TS path, to avoid growing this file further.
 
   it("newPotentialBugEntry passes the bundled script path and short-name args", async () => {
     setExecutablePresence({ python: true });

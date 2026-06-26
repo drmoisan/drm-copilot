@@ -6,6 +6,7 @@ import {
 import {
   normalizeGeneratedPath,
   parseFirstArtifactPath,
+  runCollectCommitContext,
   type ScriptExecutionOptions,
 } from "./repo-automation-service-support";
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
@@ -25,6 +26,7 @@ import {
   type WorkModeOption,
 } from "./workflow-command-arguments";
 import { type FileSystem, RealFileSystem } from "./lib/file-system";
+import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 
 export interface RepoAutomationExecutionResult {
@@ -163,6 +165,8 @@ export interface RepoAutomationServiceOptions {
    * {@link RealFileSystem}.
    */
   readonly fileSystem?: FileSystem;
+  /** Command-runner for the in-process `collectCommitContext` git calls; defaults to {@link SubprocessRunner}, faked in tests. */
+  readonly runner?: CommandRunner;
 }
 
 class DefaultRepoAutomationService implements RepoAutomationService {
@@ -170,29 +174,25 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly output: CommandOutput;
   private readonly templateRoot: string;
   private readonly fileSystem: FileSystem;
+  private readonly runner: CommandRunner;
 
   constructor(options: RepoAutomationServiceOptions) {
     this.extensionRoot = options.extensionRoot;
     this.output = options.output;
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
     this.fileSystem = options.fileSystem ?? new RealFileSystem();
+    this.runner = options.runner ?? new SubprocessRunner();
   }
   async collectCommitContext(
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript({
-      tool: "collect_commit_context",
-      runtimeKind: "python",
-      bundledRelativePath: "resources/templates/collect_commit_context.py",
+    // In-process TS port of collect_commit_context.py (F4): delegate to the
+    // support helper instead of spawning the bundled Python script.
+    return runCollectCommitContext({
+      runner: this.runner,
+      fileSystem: this.fileSystem,
       workspaceRoot: input.workspaceRoot,
-      invocationId: input.invocationId ?? "collect_commit_context",
-      args: ["--output", "artifacts/commit_context.txt"],
-      summary: "Collected commit context into artifacts/commit_context.txt.",
-      artifactPaths: [
-        normalizeGeneratedPath(
-          path.join(input.workspaceRoot, "artifacts/commit_context.txt"),
-        ),
-      ],
+      log: (message) => this.output.appendLine(message),
     });
   }
   async collectPrContext(

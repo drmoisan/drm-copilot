@@ -40,6 +40,10 @@ class InMemoryFileSystem implements FileSystem {
   writeTextFile(path: string, content: string): void {
     this.files.set(path, content);
   }
+
+  ensureDir(): void {
+    // No-op: this in-memory fake does not model directories.
+  }
 }
 
 describe("markdown-label-formatter constants", () => {

@@ -126,6 +126,7 @@ jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
   mkdirSync: jest.fn(),
   readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
 }));
 
 jest.mock("node:child_process", () => ({
@@ -137,6 +138,12 @@ const fsMock = jest.requireMock("node:fs") as {
   existsSync: MockExistsSync;
   readFileSync: jest.MockedFunction<
     (filePath: string, encoding?: string) => string
+  >;
+  writeFileSync: jest.MockedFunction<
+    (filePath: string, content: string, encoding?: string) => void
+  >;
+  mkdirSync: jest.MockedFunction<
+    (dirPath: string, options?: { recursive?: boolean }) => void
   >;
 };
 
@@ -294,6 +301,8 @@ export function resetExtensionHarnessState(): void {
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
   fsMock.readFileSync.mockReset();
+  fsMock.writeFileSync.mockReset();
+  fsMock.mkdirSync.mockReset();
   pyprojectFixtureContent = undefined;
   showInputBoxMock.mockReset();
   showQuickPickMock.mockReset();
@@ -370,6 +379,7 @@ export {
   createMockProcess,
   createMockProcessWithStderr,
   createTerminalMock,
+  fsMock,
   getConfigurationMock,
   getFreshChildProcessMock,
   prepareFreshModulesWithPosixPathResolve,
