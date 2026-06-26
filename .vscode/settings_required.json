@@ -37,5 +37,16 @@
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": ["tests"],
-    "python.testing.autoTestDiscoverOnSaveEnabled": false
+    "python.testing.autoTestDiscoverOnSaveEnabled": false,
+    "terminal.integrated.profiles.windows": {
+        "PowerShell 7 (drm-copilot)": {
+            "source": "PowerShell",
+            "args": [
+                "-NoExit",
+                "-Command",
+                ". '${workspaceFolder}/scripts/dev-tools/activate.ps1'"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell 7 (drm-copilot)"
 }
