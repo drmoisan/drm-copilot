@@ -14,11 +14,13 @@ import { buildPoshQcWorkflowArguments } from "./repo-automation-args";
 import { buildPushDownClaudeCustomizationsOptions } from "./repo-automation-service-push-down";
 import {
   buildNewActiveFeatureFolderOptions,
-  buildResolveAtomicPlanPromptOptions,
-  buildResolveExecuteHardLockPromptOptions,
   buildRunCodexNativeConverterOptions,
   buildTemplateRoot,
   resolvePolicyAuditTemplateAssetResult,
+  type ResolvePromptServiceDeps,
+  type RunCodexNativeConverterInput,
+  runResolveAtomicPlanPrompt,
+  runResolveExecuteHardLockPrompt,
 } from "./repo-automation-service-workflows";
 import {
   type PolicyAuditTemplateAssetSelector,
@@ -37,16 +39,6 @@ export interface RepoAutomationExecutionResult {
   readonly assetId?: string;
   readonly bundledSourcePath?: string;
   readonly destinationPath?: string;
-}
-
-export interface RunCodexNativeConverterInput extends WorkspaceExecutionInput {
-  readonly mode: "review" | "apply";
-  readonly sourceEcosystem: "github-copilot" | "claude";
-  readonly sourceRoot: string;
-  readonly selectedPaths?: ReadonlyArray<string>;
-  readonly destinationRoot?: string;
-  readonly artifactRoot?: string;
-  readonly enableRepoPrompts?: boolean;
 }
 
 export interface RepoAutomationService {
@@ -175,6 +167,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly templateRoot: string;
   private readonly fileSystem: FileSystem;
   private readonly runner: CommandRunner;
+  private readonly resolvePromptDeps: ResolvePromptServiceDeps;
 
   constructor(options: RepoAutomationServiceOptions) {
     this.extensionRoot = options.extensionRoot;
@@ -182,6 +175,11 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
     this.fileSystem = options.fileSystem ?? new RealFileSystem();
     this.runner = options.runner ?? new SubprocessRunner();
+    this.resolvePromptDeps = {
+      fileSystem: this.fileSystem,
+      extensionRoot: this.extensionRoot,
+      log: (message) => this.output.appendLine(message),
+    };
   }
   async collectCommitContext(
     input: WorkspaceExecutionInput,
@@ -409,13 +407,15 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly quiet?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(buildResolveExecuteHardLockPromptOptions(input));
+    // In-process TS port of resolve_hard_lock_prompt.py (F5).
+    return runResolveExecuteHardLockPrompt(this.resolvePromptDeps, input);
   }
 
   async resolveAtomicPlanPrompt(
     input: WorkspaceExecutionInput & { readonly target: string },
   ): Promise<RepoAutomationExecutionResult> {
-    return this.executeScript(buildResolveAtomicPlanPromptOptions(input));
+    // In-process TS port of the bundled resolve_file_prompt.py (F5).
+    return runResolveAtomicPlanPrompt(this.resolvePromptDeps, input);
   }
 
   private async runPoshQcWorkflow(
