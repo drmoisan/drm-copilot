@@ -59,10 +59,10 @@ function seedInProcessFileSystem(): Map<string, string> {
       }),
     ],
     [
-      `${BUNDLE}/pack-manifests/csharp.json`,
+      `${BUNDLE}/pack-manifests/csharp-legacy.json`,
       JSON.stringify({
-        name: "csharp",
-        label: "C#",
+        name: "csharp-legacy",
+        label: "C# (legacy)",
         paths: [".claude/rules/csharp.md"],
       }),
     ],

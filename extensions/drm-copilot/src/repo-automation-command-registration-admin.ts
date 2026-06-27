@@ -5,6 +5,7 @@ import {
   promptForChoice,
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
+import { translateSelectedPackNames } from "./lib/push-down/claude-pack-name-translation";
 import { listRepoAutomationTools } from "./mcp-tools";
 import {
   discoverPrBaseBranches,
@@ -190,13 +191,26 @@ function registerPushDownClaudeCustomizationsCommand(
         return;
       }
 
-      await options.service.pushDownClaudeCustomizations({
-        workspaceRoot: getWorkspaceRoot(),
-        invocationId: commandId,
-        packs,
-        ...(csharpVariant === undefined ? {} : { csharpVariant }),
-        memoryMode,
-      });
+      // Step 4: translate the selected pack names so a `csharp` selection is
+      // forwarded as its variant-qualified manifest name
+      // (`csharp-modern` / `csharp-legacy`). Non-C# names are unchanged.
+      const translatedPacks = translateSelectedPackNames(packs, csharpVariant);
+
+      try {
+        await options.service.pushDownClaudeCustomizations({
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
+          packs: translatedPacks,
+          ...(csharpVariant === undefined ? {} : { csharpVariant }),
+          memoryMode,
+        });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        options.output.appendLine(
+          `[${commandId}] push-down failure: ${message}`,
+        );
+        throw error;
+      }
     },
   );
 }

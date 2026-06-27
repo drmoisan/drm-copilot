@@ -23,6 +23,6 @@
 		"jq-syntax-highlighting.jq-syntax-highlighting",
 		"ZainChen.json",
 		"bierner.markdown-checkbox",
-		"bierner.markdown-mermaid"
+		"MermaidChart.vscode-mermaid-chart"
 	]
 }
