@@ -153,13 +153,138 @@ Describe 'validate-orchestrator-output.ps1' {
                 }
             }
             $raw = '{"output":"Final summary: orchestration complete."}'
+            # Inject a clean routing seam so no real Python subprocess runs.
+            $routingStub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = '' } }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'routing-contract validation (Gap 1)' {
+        BeforeEach {
+            # A structurally valid checkpoint that passes the presence checks so
+            # the routing-contract seam is the deciding factor.
+            Mock -CommandName Get-CheckpointFileContent -MockWith {
+                @{
+                    Exists  = $true
+                    Content = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"complete","last_updated":"2026-05-04T00-00"}'
+                }
+            }
+        }
+
+        It 'blocks DONE with ROUTING_CONTRACT_BLOCKED when the validator reports errors' {
+            # Arrange — fabricated-route checkpoint: the injected seam reports the
+            # validator error the Python validator would emit for an unknown route.
+            $raw = '{"output":"Final summary."}'
+            $routingStub = {
+                param($Path)
+                [pscustomobject]@{
+                    ExitCode = 1
+                    Output   = 'Checkpoint selected route is not a routing-matrix route: direct_powershell_engineer_remediation.'
+                }
+            }
+
+            # Act
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+
+            # Assert
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match '^ROUTING_CONTRACT_BLOCKED:'
+            $result.Message | Should -Match 'direct_powershell_engineer_remediation'
+        }
+
+        It 'allows DONE when the routing validator returns a clean result' {
+            # Arrange — seam reports a clean validator run (exit 0, no output).
+            $raw = '{"output":"Final summary."}'
+            $routingStub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = '' } }
+
+            # Act
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+
+            # Assert
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'is mockable without invoking Python (the injected scriptblock is used)' {
+            # Arrange — a tracking seam that records it was called; if the hook
+            # invoked Python instead, the tracker would not flip.
+            $raw = '{"output":"Final summary."}'
+            $script:seamInvoked = $false
+            $routingStub = {
+                param($Path)
+                $script:seamInvoked = $true
+                [pscustomobject]@{ ExitCode = 0; Output = '' }
+            }
+
+            # Act
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+
+            # Assert
+            $script:seamInvoked | Should -BeTrue
+            $result.Ok | Should -BeTrue
+        }
+
+        It 'blocks a fabricated-route checkpoint (pass-after for the P3-T1 fail-before)' {
+            # Arrange — the silent-deviation scenario: a structurally valid
+            # checkpoint selecting a fabricated route is now blocked.
+            $raw = '{"output":"Final summary."}'
+            $routingStub = {
+                param($Path)
+                [pscustomobject]@{
+                    ExitCode = 1
+                    Output   = 'Checkpoint selected route is not a routing-matrix route: direct_powershell_engineer_remediation.'
+                }
+            }
+
+            # Act
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+
+            # Assert
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'ROUTING_CONTRACT_BLOCKED'
+        }
+    }
+
+    Context 'Invoke-RoutingContractValidation' {
+        It 'reports HasErrors when the seam returns a non-zero exit code' {
+            # Arrange
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 1; Output = '' } }
+
+            # Act
+            $result = Invoke-RoutingContractValidation -CheckpointPath 'x.json' -Invoker $stub
+
+            # Assert
+            $result.HasErrors | Should -BeTrue
+        }
+
+        It 'reports HasErrors when the seam returns error text with exit 0' {
+            # Arrange
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = 'some error' } }
+
+            # Act
+            $result = Invoke-RoutingContractValidation -CheckpointPath 'x.json' -Invoker $stub
+
+            # Assert
+            $result.HasErrors | Should -BeTrue
+            $result.ErrorText | Should -Match 'some error'
+        }
+
+        It 'reports no errors when the seam returns exit 0 and empty output' {
+            # Arrange
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = '' } }
+
+            # Act
+            $result = Invoke-RoutingContractValidation -CheckpointPath 'x.json' -Invoker $stub
+
+            # Assert
+            $result.HasErrors | Should -BeFalse
+            $result.ErrorText | Should -BeNullOrEmpty
         }
     }
 

@@ -6,7 +6,10 @@ import json
 from typing import Any, cast
 
 import scripts.dev_tools.validate_orchestrator_state as state_validator
-from scripts.dev_tools._orchestrator_state_routing import load_routing_matrix
+from scripts.dev_tools._orchestrator_state_routing import (
+    load_routing_matrix,
+    validate_route_membership,
+)
 
 
 def _large_route() -> dict[str, Any]:
@@ -182,3 +185,48 @@ def test_complete_state_rejects_non_mcp_lifecycle_operation() -> None:
     errors = _validate(state)
 
     assert "Checkpoint lifecycle_operations #0 did not use MCP surface." in errors
+
+
+def test_validate_route_membership_accepts_small_route() -> None:
+    """Accept a checkpoint whose path_selected is the known `small` route."""
+
+    errors = validate_route_membership({"path_selected": "small"})
+
+    assert errors == []
+
+
+def test_validate_route_membership_accepts_large_route_via_route_id() -> None:
+    """Accept a checkpoint whose route_id is the known `large` route."""
+
+    errors = validate_route_membership({"route_id": "large"})
+
+    assert errors == []
+
+
+def test_validate_route_membership_rejects_fabricated_route() -> None:
+    """Reject a fabricated execution mode that is not a routing-matrix route."""
+
+    errors = validate_route_membership(
+        {"path_selected": "direct_powershell_engineer_remediation"}
+    )
+
+    assert errors == [
+        "Checkpoint selected route is not a routing-matrix route: "
+        "direct_powershell_engineer_remediation."
+    ]
+
+
+def test_validate_route_membership_rejects_missing_route_id() -> None:
+    """Reject a checkpoint that selects no route via route_id/path_selected."""
+
+    errors = validate_route_membership({})
+
+    assert errors == ["Checkpoint route_id or path_selected must select a route."]
+
+
+def test_validate_route_membership_rejects_blank_route_id() -> None:
+    """Reject a checkpoint whose route id is whitespace-only."""
+
+    errors = validate_route_membership({"route_id": "   "})
+
+    assert errors == ["Checkpoint route_id or path_selected must select a route."]

@@ -175,6 +175,108 @@ def build_namespaced_orchestrator_state() -> dict[str, object]:
     return state
 
 
+def build_complete_large_orchestrator_state() -> dict[str, object]:
+    """Return a completion-safe large-route checkpoint for CLI require-complete.
+
+    Purpose:
+        Provide a checkpoint that satisfies the full completion contract for the
+        `large` route (including route-driven PR-gate evidence and routing-matrix
+        receipts) so the CLI require-complete success path can be exercised.
+
+    Args:
+        None.
+
+    Returns:
+        dict[str, object]: A completion-safe large-route checkpoint payload.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    from scripts.dev_tools._orchestrator_state_routing import load_routing_matrix
+
+    matrix = load_routing_matrix()
+    large = cast(
+        "dict[str, object]",
+        cast("dict[str, object]", matrix["routes"])["large"],
+    )
+    required_agents = cast("list[str]", large["required_agents"])
+    required_skills = cast("list[str]", large["required_skills"])
+    required_mcp_tools = cast("list[str]", large["required_mcp_tools"])
+    return {
+        "objective": "obj",
+        "change_budget_estimate": "large",
+        "route_id": "large",
+        "path_selected": "large",
+        "promotion-type": "feature",
+        "short-name": "short",
+        "relativeFile": "docs/features/potential/x.md",
+        "long-name": "feature-1",
+        "issue-num": "1",
+        "feature-folder": "docs/features/active/feature-1",
+        "work-mode": "full-feature",
+        "plan-path": "docs/features/active/feature-1/plan.md",
+        "completed_steps": ["S7", "S8", "S9"],
+        "next_step": "done",
+        "last_updated": "2026-04-07T10:00:00-04:00",
+        "step5_status": "not-applicable",
+        "step6_status": "not-applicable",
+        "step7_status": "verified",
+        "step8_status": "verified",
+        "step9_status": "verified",
+        "step10_status": "not-applicable",
+        "pr_gate": {
+            "pr_number": 1,
+            "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1",
+            "head_branch": "feature-1",
+            "head_sha": "current-head-sha",
+        },
+        "ci_gate": {
+            "conclusion": "success",
+            "head_sha": "current-head-sha",
+            "verified_at": "2026-04-07T10:00:00Z",
+        },
+        "required_agents": required_agents,
+        "required_skills": required_skills,
+        "required_mcp_tools": required_mcp_tools,
+        "delegation_receipts": [
+            {
+                "step": f"handoff-{index}",
+                "agent_name": agent,
+                "agent_id": f"{agent}-1",
+                "skill_source": "orchestrate",
+                "started_at": "2026-04-07T09:00:00-04:00",
+                "completed_at": "2026-04-07T09:05:00-04:00",
+                "result_signal": "COMPLETE",
+                "artifact_paths": [f"artifacts/orchestration/{agent}.receipt.json"],
+            }
+            for index, agent in enumerate(required_agents, start=1)
+        ],
+        "skill_receipts": [
+            {
+                "skill": skill,
+                "required": True,
+                "acknowledged_at_phase": "completion",
+                "evidence": f"artifact:{skill}",
+            }
+            for skill in required_skills
+        ],
+        "mcp_call_receipts": [
+            {"tool": tool, "ok": True, "evidence": f"mcp_call:{tool}"}
+            for tool in required_mcp_tools
+        ],
+        "local_execution_overrides": [],
+        "delegation_bypasses": [],
+        "lifecycle_operations": [
+            {"name": tool, "surface": "mcp"} for tool in required_mcp_tools
+        ],
+        "blocked_reason": "none",
+    }
+
+
 def test_validate_plan_text_rejects_noncanonical_phase_heading() -> None:
     """Reject colon-style phase headings."""
 
@@ -455,5 +557,79 @@ def test_main_returns_zero_for_valid_policy_audit(monkeypatch: MonkeyPatch) -> N
     )
 
     result = validator.main(["policy-audit", "ignored.md"])
+
+    assert result == 0
+
+
+def test_main_orchestrator_state_require_complete_returns_1_for_invalid(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Return failure for an invalid require-complete checkpoint via the CLI.
+
+    Purpose:
+        Exercise the `orchestrator-state <path> --require-complete` CLI
+        subcommand contract used by the SubagentStop subprocess seam, asserting
+        the validator returns a non-zero exit code for an invalid checkpoint.
+
+    Args:
+        monkeypatch (MonkeyPatch): Pytest fixture used to inject checkpoint text
+            in memory so no real subprocess or temporary file is required.
+
+    Returns:
+        None: Assertions verify the CLI returns exit code 1.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # A blocked lifecycle status is invalid under require_complete.
+    state = build_valid_orchestrator_state()
+    state["step8_status"] = "blocked"
+    monkeypatch.setattr(
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
+    )
+
+    result = validator.main(
+        ["orchestrator-state", "ignored.json", "--require-complete"]
+    )
+
+    assert result == 1
+
+
+def test_main_orchestrator_state_require_complete_returns_0_for_valid(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Return success for a valid require-complete checkpoint via the CLI.
+
+    Purpose:
+        Confirm the `orchestrator-state <path> --require-complete` CLI
+        subcommand returns exit code 0 for a checkpoint that satisfies the full
+        completion contract, including route-driven PR-gate evidence.
+
+    Args:
+        monkeypatch (MonkeyPatch): Pytest fixture used to inject checkpoint text
+            in memory so no real subprocess or temporary file is required.
+
+    Returns:
+        None: Assertions verify the CLI returns exit code 0.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_complete_large_orchestrator_state()
+    monkeypatch.setattr(
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
+    )
+
+    result = validator.main(
+        ["orchestrator-state", "ignored.json", "--require-complete"]
+    )
 
     assert result == 0

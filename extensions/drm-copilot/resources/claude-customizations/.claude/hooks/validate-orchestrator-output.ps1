@@ -141,6 +141,58 @@ function Test-HumanInteractionShape {
     return @{ Ok = $true; Message = $null }
 }
 
+function Invoke-RoutingContractValidation {
+    <#
+    .SYNOPSIS
+        Runs the authoritative Python routing-contract validator against the
+        on-disk checkpoint and reports whether it emitted errors.
+    .DESCRIPTION
+        Invokes the validator through an injectable subprocess scriptblock seam.
+        The default Invoker runs the authoritative Python CLI:
+          python -m scripts.dev_tools.validate_orchestration_artifacts \
+              orchestrator-state <CheckpointPath> --require-complete
+        Tests inject a mock scriptblock so no Python process runs. The function
+        does not reimplement routing logic; it delegates to the Python validator.
+
+        Returns a hashtable with keys:
+          - HasErrors:  $true when the validator reported a non-zero exit or
+                        produced any error text; $false when clean.
+          - ErrorText:  the validator's combined output text (empty on success).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $CheckpointPath,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $Invoker = {
+            param($Path)
+            $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
+                orchestrator-state $Path --require-complete 2>&1
+            [pscustomobject]@{
+                ExitCode = $LASTEXITCODE
+                Output   = ($output | Out-String)
+            }
+        }
+    )
+
+    $result = & $Invoker $CheckpointPath
+    $exitCode = 0
+    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'ExitCode')) {
+        $exitCode = [int]$result.ExitCode
+    }
+    $outputText = ''
+    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'Output')) {
+        $outputText = ([string]$result.Output).Trim()
+    }
+
+    # The validator signals a routing-contract failure either through a non-zero
+    # exit code or through emitted error text; either condition blocks DONE.
+    $hasErrors = ($exitCode -ne 0) -or (-not [string]::IsNullOrWhiteSpace($outputText))
+    return @{ HasErrors = $hasErrors; ErrorText = $outputText }
+}
+
 function Invoke-OrchestratorOutputValidation {
     <#
     .SYNOPSIS
@@ -154,7 +206,10 @@ function Invoke-OrchestratorOutputValidation {
     [OutputType([hashtable])]
     param(
         [string] $RawPayload,
-        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingInvoker
     )
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) {
@@ -215,6 +270,18 @@ function Invoke-OrchestratorOutputValidation {
     $hiResult = Test-HumanInteractionShape -HumanInteraction $humanInteraction
     if (-not $hiResult.Ok) {
         return @{ Ok = $false; Message = $hiResult.Message }
+    }
+
+    # Delegate to the authoritative Python routing-contract validator. The
+    # optional RoutingInvoker seam lets tests inject a mock; the default seam
+    # produces the real subprocess call.
+    $routingArgs = @{ CheckpointPath = $CheckpointPath }
+    if ($PSBoundParameters.ContainsKey('RoutingInvoker') -and $null -ne $RoutingInvoker) {
+        $routingArgs['Invoker'] = $RoutingInvoker
+    }
+    $routingResult = Invoke-RoutingContractValidation @routingArgs
+    if ($routingResult.HasErrors) {
+        return @{ Ok = $false; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 
     return @{ Ok = $true; Message = $null }

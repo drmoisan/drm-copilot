@@ -39,6 +39,11 @@
 [CmdletBinding()]
 param()
 
+# Dot-source the shared validation helpers. Guarded so a missing file produces a
+# clear error and so dot-sourcing this hook in tests loads the helpers too.
+$script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
+. $script:CompletionHelpersPath
+
 function ConvertFrom-CheckpointJson {
     <#
     .SYNOPSIS
@@ -51,6 +56,29 @@ function ConvertFrom-CheckpointJson {
     )
 
     return $Json | ConvertFrom-Json -ErrorAction Stop
+}
+
+function Get-CheckpointFileContent {
+    <#
+    .SYNOPSIS
+        Reads the on-disk checkpoint content for the read-then-validate Edit path.
+    .DESCRIPTION
+        Returns the full file text when the path resolves to a file on disk, or
+        $null when the file does not exist. Tests inject a CheckpointReader
+        scriptblock instead of mocking this function so no temporary files are
+        required.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+    return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
 }
 
 function Test-IsCheckpointPath {
@@ -149,7 +177,13 @@ function Get-MissingCompletionEvidence {
     param(
         [Parameter(Mandatory)]
         [AllowNull()]
-        $Payload
+        $Payload,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FolderExistsCheck = { param($p) Test-Path -LiteralPath $p -PathType Container },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingMatrixReader
     )
 
     $missing = @()
@@ -158,16 +192,17 @@ function Get-MissingCompletionEvidence {
     if (-not $issueNum -and $null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'variables')) {
         $issueNum = Get-CheckpointStringValue -Payload $Payload.variables -Name 'issue-num'
     }
-    if (-not $issueNum) {
-        $missing += 'issue-num'
+    if (-not (Test-IsValidIssueNum -Value $issueNum)) {
+        # Name the offending value so sentinel/placeholder inputs are explicit.
+        $missing += "issue-num value '$issueNum' is not a valid issue number (must be digits-only)"
     }
 
     $featureFolder = Get-CheckpointStringValue -Payload $Payload -Name 'feature-folder'
     if (-not $featureFolder -and $null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'variables')) {
         $featureFolder = Get-CheckpointStringValue -Payload $Payload.variables -Name 'feature-folder'
     }
-    if (-not $featureFolder) {
-        $missing += 'feature-folder'
+    if (-not (Test-IsValidFeatureFolder -Value $featureFolder -FolderExistsCheck $FolderExistsCheck)) {
+        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under docs/features/active/ and exist)"
     }
 
     $ciGate = $null
@@ -188,7 +223,14 @@ function Get-MissingCompletionEvidence {
         }
     }
 
-    if ($issueNum -eq '232') {
+    # PR-gate evidence is required only when the checkpoint's selected route
+    # opts into it via requires_pr_gate in the routing matrix. This replaces the
+    # former issue-number special-casing with route-driven enforcement.
+    $prGateArgs = @{ Payload = $Payload }
+    if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
+        $prGateArgs['RoutingMatrixReader'] = $RoutingMatrixReader
+    }
+    if (Test-RouteRequiresPrGate @prGateArgs) {
         $prGate = $null
         if ($null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'pr_gate')) {
             $prGate = $Payload.pr_gate
@@ -213,6 +255,60 @@ function Get-MissingCompletionEvidence {
     return [string[]]$missing
 }
 
+function Resolve-EditedCheckpointContent {
+    <#
+    .SYNOPSIS
+        Returns the patched checkpoint content for an Edit-tool call, or $null
+        when the patch cannot be applied against the on-disk checkpoint.
+    .DESCRIPTION
+        Implements the read-then-validate Edit path. When the tool input carries
+        an old_string (an Edit patch), the on-disk checkpoint is read through the
+        injectable CheckpointReader seam and the old_string -> new_string
+        replacement is applied in memory (no on-disk mutation). Returns $null
+        when there is no old_string, the on-disk file does not exist, or the
+        old_string is not present in the on-disk content, signalling the caller
+        to allow (defer).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $ToolInput,
+
+        [Parameter(Mandatory)]
+        [scriptblock] $CheckpointReader
+    )
+
+    $oldString = $null
+    if ($null -ne $ToolInput -and ($ToolInput.PSObject.Properties.Name -contains 'old_string')) {
+        $oldString = [string]$ToolInput.old_string
+    }
+    if ([string]::IsNullOrEmpty($oldString)) {
+        return $null
+    }
+
+    $newString = ''
+    if ($ToolInput.PSObject.Properties.Name -contains 'new_string') {
+        $newString = [string]$ToolInput.new_string
+    }
+
+    $onDisk = & $CheckpointReader 'artifacts/orchestration/orchestrator-state.json'
+    if ([string]::IsNullOrEmpty([string]$onDisk)) {
+        # The on-disk checkpoint does not exist (or is empty); cannot patch.
+        return $null
+    }
+
+    $onDiskText = [string]$onDisk
+    if (-not $onDiskText.Contains($oldString)) {
+        # The old_string is not present, so the patch does not apply here.
+        return $null
+    }
+
+    # Apply the patch in memory using a literal (non-regex) replacement.
+    return $onDiskText.Replace($oldString, $newString)
+}
+
 function Invoke-CompletionConsistencyDecision {
     <#
     .SYNOPSIS
@@ -222,7 +318,16 @@ function Invoke-CompletionConsistencyDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FolderExistsCheck = { param($p) Test-Path -LiteralPath $p -PathType Container },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $CheckpointReader = { param($Path) Get-CheckpointFileContent -Path $Path },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingMatrixReader
     )
 
     if (-not $ToolInputRaw) {
@@ -246,11 +351,17 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ decision = 'allow' }
     }
 
-    # Write tool: validate the content payload. Edit tool: partial new_string is
-    # not reliable without the full target file content, so allow.
+    # Write tool: validate the content payload directly. Edit tool: no content is
+    # supplied, so read the on-disk checkpoint through the injectable seam and
+    # apply the old_string -> new_string patch in memory (read-then-validate).
     $content = $toolInput.content
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
+        if (-not $content) {
+            # No content, and the Edit could not be resolved against on-disk
+            # state (missing file or non-matching patch): defer and allow.
+            return [ordered]@{ decision = 'allow' }
+        }
     }
 
     try {
@@ -266,19 +377,18 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ decision = 'allow' }
     }
 
-    $missing = Get-MissingCompletionEvidence -Payload $payload
+    $missingArgs = @{ Payload = $payload; FolderExistsCheck = $FolderExistsCheck }
+    if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
+        $missingArgs['RoutingMatrixReader'] = $RoutingMatrixReader
+    }
+    $missing = Get-MissingCompletionEvidence @missingArgs
     if ($missing.Count -eq 0) {
         return [ordered]@{ decision = 'allow' }
     }
 
-    $issueContext = ''
-    if ((Get-CheckpointStringValue -Payload $payload -Name 'issue-num') -eq '232') {
-        $issueContext = ' Issue #232 requires pr_gate evidence and current-head ci_gate evidence.'
-    }
-
     return [ordered]@{
         decision = 'block'
-        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', ').$issueContext A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha. Supply the missing evidence or remove the completion assertion."
+        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
     }
 }
 

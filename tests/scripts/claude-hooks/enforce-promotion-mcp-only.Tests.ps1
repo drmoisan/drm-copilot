@@ -137,13 +137,18 @@ Describe 'enforce-promotion-mcp-only.ps1' {
     Context 'script entrypoint' {
         BeforeAll {
             $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-promotion-mcp-only.ps1").Path
+            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
+                (Get-Process -Id $PID).Path
+            } else {
+                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+            }
         }
 
         It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, decision allow)' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
-                $out = & pwsh -NoProfile -File $script:HookPath
+                $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
                 ($out | ConvertFrom-Json).decision | Should -Be 'allow'
             } finally {
@@ -155,7 +160,7 @@ Describe 'enforce-promotion-mcp-only.ps1' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{"command":"gh issue create --title foo"}'
-                $out = & pwsh -NoProfile -File $script:HookPath
+                $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
                 $decision = $out | ConvertFrom-Json
                 $decision.decision | Should -Be 'block'
@@ -169,7 +174,7 @@ Describe 'enforce-promotion-mcp-only.ps1' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & pwsh -NoProfile -File $script:HookPath 2>&1
+                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
                 $LASTEXITCODE | Should -Be 1
             } finally {
                 $env:CLAUDE_TOOL_INPUT = $prev

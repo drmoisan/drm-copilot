@@ -6,6 +6,11 @@ Describe 'validate-pr-author-output.ps1' {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/validate-pr-author-output.ps1").Path
         . $script:UnderTest
         $script:HookPath = $script:UnderTest
+        $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
+            (Get-Process -Id $PID).Path
+        } else {
+            (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        }
     }
 
     Context 'Get-PrAuthorOutputDecision - allow scenarios' {
@@ -90,7 +95,7 @@ Describe 'validate-pr-author-output.ps1' {
             $prev = $env:CLAUDE_HOOK_INPUT
             try {
                 $env:CLAUDE_HOOK_INPUT = '{"output":"Opened https://github.com/o/r/pull/231"}'
-                $null = & pwsh -NoProfile -File $script:HookPath 2>&1
+                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
                 $LASTEXITCODE | Should -Be 0
             } finally {
                 $env:CLAUDE_HOOK_INPUT = $prev
@@ -101,7 +106,7 @@ Describe 'validate-pr-author-output.ps1' {
             $prev = $env:CLAUDE_HOOK_INPUT
             try {
                 $env:CLAUDE_HOOK_INPUT = ''
-                $null = & pwsh -NoProfile -File $script:HookPath 2>&1
+                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
                 $LASTEXITCODE | Should -Be 1
             } finally {
                 $env:CLAUDE_HOOK_INPUT = $prev
@@ -112,7 +117,7 @@ Describe 'validate-pr-author-output.ps1' {
             $prev = $env:CLAUDE_HOOK_INPUT
             try {
                 $env:CLAUDE_HOOK_INPUT = '{not-json'
-                $null = & pwsh -NoProfile -File $script:HookPath 2>&1
+                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
                 $LASTEXITCODE | Should -Be 1
             } finally {
                 $env:CLAUDE_HOOK_INPUT = $prev

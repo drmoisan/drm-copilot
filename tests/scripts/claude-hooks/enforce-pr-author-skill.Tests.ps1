@@ -408,13 +408,18 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'script entrypoint (end-to-end)' {
         BeforeAll {
             $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
+            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
+                (Get-Process -Id $PID).Path
+            } else {
+                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+            }
         }
 
         It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
-                $out = & pwsh -NoProfile -File $script:HookPath
+                $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
                 ($out | ConvertFrom-Json).decision | Should -Be 'allow'
             } finally {
@@ -426,7 +431,7 @@ Describe 'enforce-pr-author-skill.ps1' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{"command":"gh pr create --title \"foo\" --body \"inline\""}'
-                $out = & pwsh -NoProfile -File $script:HookPath
+                $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
                 $parsed = $out | ConvertFrom-Json
                 $parsed.decision | Should -Be 'block'
@@ -440,7 +445,7 @@ Describe 'enforce-pr-author-skill.ps1' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & pwsh -NoProfile -File $script:HookPath 2>&1
+                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
                 $LASTEXITCODE | Should -Be 1
             } finally {
                 $env:CLAUDE_TOOL_INPUT = $prev

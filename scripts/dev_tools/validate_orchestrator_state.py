@@ -7,22 +7,18 @@ Purpose:
 
 Usage:
     Import ``validate_orchestrator_state_text`` from
-    ``scripts.dev_tools.validate_orchestration_artifacts`` or directly from this
-    module when a caller needs checkpoint validation.
+    ``scripts.dev_tools.validate_orchestration_artifacts`` or this module.
 
 Flow:
-    1. Parse the checkpoint JSON payload.
-    2. Validate required top-level keys and status values.
-    3. Validate either the legacy list-based receipts, top-level promotion
-       receipts, or the additive ``delegation_receipts.promotion.*``
-       namespace.
+    Parse the checkpoint JSON, validate required top-level keys and status
+    values, then validate the legacy list, top-level promotion, or additive
+    ``delegation_receipts.promotion.*`` receipt forms.
 
 Invariants / Constraints:
     - The validator accepts the legacy list, top-level promotion receipts, and
       the additive promotion namespace forms for receipt evidence.
     - Unsupported namespace keys are rejected.
     - The validator returns error strings and never mutates the checkpoint.
-
 """
 
 from __future__ import annotations
@@ -34,7 +30,12 @@ from scripts.dev_tools._orchestrator_state_human_interaction import (
     HUMAN_INTERACTION_KEY,
     _validate_human_interaction,
 )
-from scripts.dev_tools._orchestrator_state_routing import validate_routing_contract
+from scripts.dev_tools._orchestrator_state_routing import (
+    validate_completion_pr_gate,
+    validate_phase_completeness,
+    validate_route_membership,
+    validate_routing_contract,
+)
 
 REQUIRED_STATE_KEYS = (
     "objective",
@@ -95,9 +96,6 @@ PROMOTION_RECEIPT_KEYS = (
     "issue",
     "feature_folder",
 )
-ISSUE_232 = "232"
-ISSUE_232_BRANCH = "feature/harden-orchestrate-skill-232"
-PR_GATE_KEYS = ("pr_number", "pr_url", "head_branch", "head_sha")
 CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
 REMEDIATION_LOOP_KEY = "remediation_loop"
 REMEDIATION_CYCLES_KEY = "cycles"
@@ -212,30 +210,6 @@ def _missing_object_keys(value: object, keys: tuple[str, ...]) -> list[str]:
     return missing
 
 
-def _validate_completion_pr_gate(state: dict[str, Any]) -> list[str]:
-    pr_gate = state.get("pr_gate")
-    missing = _missing_object_keys(pr_gate, PR_GATE_KEYS)
-    if not isinstance(pr_gate, dict):
-        return [
-            "Checkpoint completion validation failed: pr_gate must be an object "
-            f"with keys: {', '.join(PR_GATE_KEYS)}."
-        ]
-    errors: list[str] = []
-    if missing:
-        errors.append(
-            "Checkpoint completion validation failed: pr_gate missing required "
-            f"fields: {', '.join(missing)}."
-        )
-    if state.get("issue-num") == ISSUE_232:
-        head_branch = cast("dict[str, object]", pr_gate).get("head_branch")
-        if head_branch != ISSUE_232_BRANCH:
-            errors.append(
-                "Checkpoint completion validation failed: pr_gate.head_branch "
-                f"must be {ISSUE_232_BRANCH} for Issue #232."
-            )
-    return errors
-
-
 def _validate_completion_ci_gate(state: dict[str, Any]) -> list[str]:
     ci_gate = state.get("ci_gate")
     missing = _missing_object_keys(ci_gate, CI_GATE_KEYS)
@@ -268,30 +242,6 @@ def _validate_completion_ci_gate(state: dict[str, Any]) -> list[str]:
             "pr_gate.head_sha."
         )
     return errors
-
-
-def _validate_issue_232_promotion_receipts(state: dict[str, Any]) -> list[str]:
-    if state.get("issue-num") != ISSUE_232:
-        return []
-    receipts = state.get("delegation_receipts")
-    promotion_source = "promotion_receipts"
-    promotion: object = state.get("promotion_receipts")
-    if isinstance(receipts, dict):
-        receipts_map = cast("dict[str, object]", receipts)
-        namespaced_promotion = receipts_map.get(PROMOTION_RECEIPT_NAMESPACE_KEY)
-        if namespaced_promotion is not None:
-            promotion_source = "delegation_receipts.promotion"
-            promotion = namespaced_promotion
-    missing = _missing_object_keys(promotion, PROMOTION_RECEIPT_KEYS)
-    return (
-        [
-            "Checkpoint completion validation failed: "
-            f"{promotion_source} missing required Issue #232 "
-            f"receipt keys: {', '.join(missing)}."
-        ]
-        if missing
-        else []
-    )
 
 
 def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
@@ -394,7 +344,10 @@ def _validate_namespaced_delegation_receipts(receipts: dict[str, Any]) -> list[s
 
 
 def validate_orchestrator_state_text(
-    text: str, *, require_complete: bool = False
+    text: str,
+    *,
+    require_complete: bool = False,
+    strict_route_membership: bool = False,
 ) -> list[str]:
     """Validate checkpoint schema and completion-state fields.
 
@@ -405,7 +358,12 @@ def validate_orchestrator_state_text(
     Args:
         text (str): Raw checkpoint JSON text.
         require_complete (bool): When True, require all tracked lifecycle states
-            to be completion-safe.
+            to be completion-safe and verify route phase completeness.
+        strict_route_membership (bool): When True, append route-membership
+            errors so a checkpoint selecting an unknown route is rejected. When
+            False (default), route-membership errors are not appended, preserving
+            backward compatibility for checkpoints without `route_id`/
+            `path_selected`.
 
     Returns:
         list[str]: Validation errors for malformed or incomplete checkpoint
@@ -415,7 +373,7 @@ def validate_orchestrator_state_text(
         None.
 
     Side Effects:
-        None.
+        Reads the routing matrix from disk when completion/route checks run.
     """
 
     errors: list[str] = []
@@ -477,6 +435,13 @@ def validate_orchestrator_state_text(
     if HUMAN_INTERACTION_KEY in state_map:
         errors.extend(_validate_human_interaction(state_map.get(HUMAN_INTERACTION_KEY)))
 
+    # Route membership is evaluated unconditionally so the opt-in strict caller
+    # (the completion gate) can reject unknown routes; non-strict callers ignore
+    # the result, preserving backward compatibility for legacy checkpoints.
+    route_membership_errors = validate_route_membership(state_map)
+    if strict_route_membership:
+        errors.extend(route_membership_errors)
+
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into
         # the stricter completion gate.
@@ -497,9 +462,9 @@ def validate_orchestrator_state_text(
             errors.append(
                 "Checkpoint completion validation failed: blocked_reason is not `none`."
             )
-        errors.extend(_validate_completion_pr_gate(state_map))
+        errors.extend(validate_completion_pr_gate(state_map))
         errors.extend(_validate_completion_ci_gate(state_map))
-        errors.extend(_validate_issue_232_promotion_receipts(state_map))
+        errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
 
     return errors

@@ -29,8 +29,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
         function ConvertTo-CheckpointRaw {
             param(
-                [string] $IssueNum = '232',
-                [string] $FeatureFolder = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232',
+                [string] $IssueNum = '253',
+                [string] $FeatureFolder = 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253',
                 [string] $RouteId = 'large',
                 [bool] $LifecycleReady = $true
             )
@@ -45,7 +45,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
     }
 
     Context 'implementation writes before orchestration readiness' {
-        It 'blocks Issue #232 implementation writes when route metadata and lifecycle readiness are absent' {
+        It 'blocks implementation writes when route metadata and lifecycle readiness are absent (generalized message)' {
             $json = ConvertTo-ImplementationWriteToolInput
             $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
 
@@ -53,32 +53,32 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision['decision'] | Should -Be 'block'
             $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
-            $decision['reason'] | Should -Match 'Issue #232'
+            $decision['reason'] | Should -Not -Match '#232'
             $decision['reason'] | Should -Match 'route metadata'
             $decision['reason'] | Should -Match 'lifecycle readiness'
         }
 
-        It 'allows Issue #232 feature documentation writes' {
-            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-24-harden-orchestrate-skill-232/spec.md'
+        It 'allows feature documentation writes' {
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253/spec.md'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
             $decision['decision'] | Should -Be 'allow'
         }
 
-        It 'allows Issue #232 evidence writes' {
-            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-24-harden-orchestrate-skill-232/evidence/qa-gates/example.md'
+        It 'allows evidence writes' {
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253/evidence/qa-gates/example.md'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
             $decision['decision'] | Should -Be 'allow'
         }
 
-        It 'allows implementation writes when Issue #232 readiness is present' {
+        It 'allows implementation writes when checkpoint readiness is present, regardless of issue number' {
             $json = ConvertTo-ImplementationWriteToolInput
             $checkpoint = @{
-                'issue-num'      = '232'
-                'feature-folder' = 'docs/features/active/2026-06-24-harden-orchestrate-skill-232'
+                'issue-num'      = '424'
+                'feature-folder' = 'docs/features/active/some-feature-424'
                 route_id         = 'large'
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
@@ -88,17 +88,18 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             $decision['decision'] | Should -Be 'allow'
         }
 
-        It 'blocks implementation command payloads before Issue #232 readiness' {
+        It 'blocks implementation command payloads before readiness (generalized message)' {
             $json = ConvertTo-CommandToolInput -Command 'poetry run pytest tests/scripts/dev_tools/test_validate_orchestrator_state.py'
             $checkpoint = ConvertTo-CheckpointRaw -LifecycleReady $false
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
             $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'Issue #232'
+            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision['reason'] | Should -Not -Match '#232'
         }
 
-        It 'blocks staging and commit command payloads before Issue #232 readiness' {
+        It 'blocks staging and commit command payloads before readiness' {
             $checkpoint = ConvertTo-CheckpointRaw -LifecycleReady $false
             $commands = @('git add .', 'git commit -m "test"')
 
@@ -110,7 +111,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             }
         }
 
-        It 'blocks formatter and test command payloads before Issue #232 readiness' {
+        It 'blocks formatter and test command payloads before readiness' {
             $checkpoint = ConvertTo-CheckpointRaw -LifecycleReady $false
             $commands = @(
                 'poetry run black scripts/dev_tools/validate_orchestrator_state.py --check',
@@ -126,23 +127,105 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             }
         }
 
-        It 'blocks implementation delegation payloads before Issue #232 readiness' {
+        It 'blocks implementation delegation payloads before readiness (generalized message)' {
             $json = ConvertTo-DelegationToolInput
             $checkpoint = ConvertTo-CheckpointRaw -LifecycleReady $false
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
             $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'Issue #232'
+            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision['reason'] | Should -Not -Match '#232'
         }
 
-        It 'allows implementation operations for a ready non-232 workflow state' {
+        It 'allows implementation operations for any ready workflow state regardless of issue number' {
             $json = ConvertTo-ImplementationWriteToolInput -FilePath 'scripts/dev_tools/validate_orchestration_artifacts.py'
             $checkpoint = ConvertTo-CheckpointRaw -IssueNum '233' -FeatureFolder 'docs/features/active/2026-06-25-other-feature-233'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
             $decision['decision'] | Should -Be 'allow'
+        }
+    }
+
+    Context 'tool input parsing and checkpoint resolution' {
+        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '')['decision'] | Should -Be 'allow'
+        }
+
+        It 'throws on malformed top-level JSON' {
+            { Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{not json' } | Should -Throw
+        }
+
+        It 'allows a non-implementation file write (documentation path) without a checkpoint' {
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/feature-x/notes.md'
+            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+        }
+
+        It 'blocks an implementation write when the resolved checkpoint is malformed JSON' {
+            $json = ConvertTo-ImplementationWriteToolInput
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw '{broken'
+            $decision['decision'] | Should -Be 'block'
+            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+
+        It 'allows an implementation write when readiness is supplied via path_selected fallback' {
+            $json = ConvertTo-ImplementationWriteToolInput
+            $checkpoint = @{
+                'issue-num'      = '500'
+                'feature-folder' = 'docs/features/active/feature-500'
+                path_selected    = 'small'
+                lifecycle_ready  = $true
+            } | ConvertTo-Json -Compress
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+            $decision['decision'] | Should -Be 'allow'
+        }
+
+        It 'blocks an implementation write when the checkpoint omits the feature folder' {
+            $json = ConvertTo-ImplementationWriteToolInput
+            $checkpoint = @{
+                'issue-num'      = '500'
+                'feature-folder' = ''
+                route_id         = 'large'
+                lifecycle_ready  = $true
+            } | ConvertTo-Json -Compress
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+            $decision['decision'] | Should -Be 'block'
+        }
+
+        It 'Test-OrchestrationReady returns false for a null payload' {
+            Test-OrchestrationReady -Payload $null | Should -BeFalse
+        }
+
+        It 'Test-ImplementationDelegation returns false for a null tool input' {
+            Test-ImplementationDelegation -ToolInput $null | Should -BeFalse
+        }
+    }
+
+    Context 'Entrypoint (script body)' {
+        It 'emits an allow decision JSON when CLAUDE_TOOL_INPUT is empty' {
+            $prev = $env:CLAUDE_TOOL_INPUT
+            try {
+                $env:CLAUDE_TOOL_INPUT = ''
+                $output = & $script:UnderTest
+                $output | Should -Match '"decision"\s*:\s*"allow"'
+            }
+            finally {
+                $env:CLAUDE_TOOL_INPUT = $prev
+            }
+        }
+
+        It 'emits an allow decision JSON for a documentation write (deterministic, no checkpoint read)' {
+            $prev = $env:CLAUDE_TOOL_INPUT
+            try {
+                $content = (@{ file_path = 'docs/features/active/feature-x/notes.md'; content = 'x' } | ConvertTo-Json -Compress)
+                $env:CLAUDE_TOOL_INPUT = $content
+                $output = & $script:UnderTest
+                $output | Should -Match '"decision"\s*:\s*"allow"'
+            }
+            finally {
+                $env:CLAUDE_TOOL_INPUT = $prev
+            }
         }
     }
 
