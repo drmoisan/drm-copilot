@@ -3,7 +3,7 @@
   "publisher": "DanMoisan",
   "displayName": "drm-copilot",
   "description": "VS Code extension to facilitate standardized development tools to repos.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.118.0"
   },
