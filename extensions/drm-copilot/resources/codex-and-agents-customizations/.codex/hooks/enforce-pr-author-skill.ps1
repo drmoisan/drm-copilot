@@ -13,7 +13,9 @@
 
     Required sequence:
       1. mcp__drm-copilot__collect_pr_context writes artifacts/pr_context.summary.txt
-      2. pr-author skill reads that file and writes artifacts/pr_body_<N>.md
+      2. pr-author skill produces the body text; the pr-author agent writes
+         artifacts/pr_body_<N>.md and a sibling integrity receipt
+         artifacts/pr_body_<N>.receipt.json
       3. gh pr create --body-file artifacts/pr_body_<N>.md
          (or gh pr edit --body-file ...)
 
@@ -21,35 +23,28 @@
       Case A - gh pr create or gh pr edit with --body (inline, no --body-file): blocked.
       Case B - gh pr create with neither --body nor --body-file: blocked.
       Case C - gh pr create or gh pr edit with --body-file but context artifact absent: blocked.
-      Case D - --body-file present, context artifact present, but the authorization sentinel
-               artifacts/pr_author_authorization.json is absent or empty: blocked
-               (PR_AGENT_AUTHORIZATION_MISSING).
-      Malformed - sentinel present but not valid JSON, or issued_at missing/unparseable: blocked
-               (PR_AGENT_AUTHORIZATION_MALFORMED).
-      Case E - sentinel valid JSON but issued_by != "pr-author": blocked
-               (PR_AGENT_AUTHORIZATION_INVALID).
-      Case F - sentinel issued_by == "pr-author" but elapsed time since issued_at exceeds
-               ttl_seconds: blocked (PR_AGENT_AUTHORIZATION_EXPIRED).
+      Receipt - --body-file present and context artifact present: the SHA-256 receipt is verified
+                in five ordered checks (Section below). The first failing check blocks.
 
-    Authorization sentinel decision order on the --body-file-with-context path:
-      missing -> malformed -> invalid issuer -> expired -> allow.
+    Receipt verification decision order on the --body-file-with-context path:
+      PR_BODY_PATH_NONCANONICAL -> PR_AUTHOR_RECEIPT_MISSING -> PR_AUTHOR_RECEIPT_NUMBER_MISMATCH
+      -> PR_AUTHOR_RECEIPT_HASH_MISMATCH -> PR_AUTHOR_RECEIPT_STALE -> allow.
 
 .NOTES
     Compatible with PowerShell 7+. No external module dependencies.
 
-    Enforcement strength: the authorization sentinel is a policy guardrail, not a cryptographic
-    or security control. Any actor with Write access to artifacts/ can forge
-    artifacts/pr_author_authorization.json, because all agents share the same filesystem and the
-    runtime exposes no native agent-identity signal at Bash PreToolUse time. The mechanism prevents
-    accidental bypass and requires a deliberate, documented act to circumvent. It MUST NOT be
-    described as tamper-proof or as a security boundary.
+    Enforcement strength: the SHA-256 receipt is a policy-level integrity check that binds the
+    PR body bytes to the receipt the pr-author agent wrote. It is not a cryptographic or security
+    boundary: any actor with Write access to artifacts/ can replace both the body file and the
+    receipt together, because all agents share the same filesystem and the runtime exposes no
+    native agent-identity signal at Bash PreToolUse time. The mechanism prevents accidental bypass
+    and requires a deliberate, documented act to circumvent. It MUST NOT be described as
+    tamper-proof or as a security boundary.
 #>
 [CmdletBinding()]
 param()
 
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
-$script:PrAuthorAuthorizationPath = 'artifacts/pr_author_authorization.json'
-$script:PrAuthorAuthorizationTtlSeconds = 120
 
 function Get-PrContextArtifactExistence {
     <#
@@ -65,108 +60,180 @@ function Get-PrContextArtifactExistence {
     return [bool](Test-Path -LiteralPath $script:PrContextArtifactPath)
 }
 
-function Get-PrAuthorAuthorizationContent {
+function Get-PrBodyFileBytes {
     <#
     .SYNOPSIS
-        Read the raw text of the authorization sentinel. Tests mock this function (read seam).
+        Read the raw bytes of the PR body file. Tests mock this function (read seam).
     .DESCRIPTION
-        Returns the raw text content of artifacts/pr_author_authorization.json, or $null when the
-        sentinel file is absent. This is the injectable boundary for sentinel content in tests; no
-        test writes the sentinel file to disk.
+        Returns the byte content of the supplied body-file path, or $null when the file is absent.
+        This is the injectable boundary for body-file bytes in tests; no test writes the body file
+        to disk. The bytes are hashed inline by the receipt verification function.
+    .PARAMETER BodyFilePath
+        The relative path to the PR body file (for example artifacts/pr_body_5.md).
+    .OUTPUTS
+        System.Byte[] or $null
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'The plural noun names the byte-array return; the seam name is fixed by the receipt contract.')]
+    [CmdletBinding()]
+    [OutputType([byte[]])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $BodyFilePath
+    )
+
+    if (-not (Test-Path -LiteralPath $BodyFilePath)) {
+        return $null
+    }
+
+    return [System.IO.File]::ReadAllBytes($BodyFilePath)
+}
+
+function Get-PrAuthorReceiptContent {
+    <#
+    .SYNOPSIS
+        Read the raw JSON text of the PR body receipt. Tests mock this function (read seam).
+    .DESCRIPTION
+        Returns the raw text content of the sibling receipt file artifacts/pr_body_<N>.receipt.json,
+        or $null when the receipt file is absent. This is the injectable boundary for receipt
+        content in tests; no test writes the receipt file to disk.
+    .PARAMETER ReceiptFilePath
+        The relative path to the receipt file (for example artifacts/pr_body_5.receipt.json).
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param(
+        [Parameter(Mandatory)]
+        [string] $ReceiptFilePath
+    )
 
-    if (-not (Test-Path -LiteralPath $script:PrAuthorAuthorizationPath)) {
+    if (-not (Test-Path -LiteralPath $ReceiptFilePath)) {
         return $null
     }
 
-    return (Get-Content -LiteralPath $script:PrAuthorAuthorizationPath -Raw)
+    return (Get-Content -LiteralPath $ReceiptFilePath -Raw)
 }
 
-function Get-CurrentDateTimeUtc {
+function Get-PrContextSummaryLastWriteUtc {
     <#
     .SYNOPSIS
-        Return the current UTC time. Tests mock this function (clock seam) for time-travel scenarios.
+        Return the UTC last-write time of the PR context summary. Tests mock this function (seam).
+    .DESCRIPTION
+        Returns the LastWriteTimeUtc of artifacts/pr_context.summary.txt, or $null when the file is
+        absent. The staleness check compares the receipt's created_at against this value; both are
+        artifact metadata, so no wall-clock seam is required.
     .OUTPUTS
-        System.DateTime
+        System.DateTime or $null
     #>
     [CmdletBinding()]
     [OutputType([datetime])]
     param()
 
-    return [DateTime]::UtcNow
+    if (-not (Test-Path -LiteralPath $script:PrContextArtifactPath)) {
+        return $null
+    }
+
+    return (Get-Item -LiteralPath $script:PrContextArtifactPath).LastWriteTimeUtc
 }
 
-function Test-PrAuthorAuthorization {
+function Test-PrAuthorReceiptVerification {
     <#
     .SYNOPSIS
-        Validate the authorization sentinel and return a block-reason string, or $null when authorized.
+        Verify the SHA-256 receipt and return a block-reason string, or $null when verified.
     .DESCRIPTION
-        Reads the sentinel via Get-PrAuthorAuthorizationContent and computes elapsed time via
-        Get-CurrentDateTimeUtc. Applies the decision order missing -> malformed -> invalid issuer ->
-        expired -> allow (spec FR-2 step 3):
-          - $null/empty contents              -> PR_AGENT_AUTHORIZATION_MISSING
-          - not valid JSON, or issued_at
-            missing/unparseable               -> PR_AGENT_AUTHORIZATION_MALFORMED
-          - issued_by != "pr-author"          -> PR_AGENT_AUTHORIZATION_INVALID
-          - elapsed seconds > ttl_seconds     -> PR_AGENT_AUTHORIZATION_EXPIRED
-          - all checks pass                   -> $null (allow)
-        The ttl_seconds value defaults to the named constant when absent from the sentinel.
-        This is a policy guardrail, not a cryptographic control; the sentinel is forgeable by any
-        actor with Write access to artifacts/.
+        Runs the five ordered receipt checks on the --body-file-with-context path. Each check is its
+        own short-circuiting branch; the first failure returns its reason code:
+          1. PR_BODY_PATH_NONCANONICAL        - --body-file path does not match the canonical
+                                                 artifacts/pr_body_<N>.md pattern (case-sensitive).
+          2. PR_AUTHOR_RECEIPT_MISSING        - sibling artifacts/pr_body_<N>.receipt.json absent.
+          3. PR_AUTHOR_RECEIPT_NUMBER_MISMATCH- receipt.number (integer) != <N> from the path.
+          4. PR_AUTHOR_RECEIPT_HASH_MISMATCH  - inline SHA-256 (lowercase hex) of the body bytes
+                                                 != receipt.sha256.
+          5. PR_AUTHOR_RECEIPT_STALE          - receipt.created_at (UTC) not strictly newer than the
+                                                 context summary last-write time.
+        Returns $null when all five checks pass (allow). All disk access flows through the three
+        injectable seams (Get-PrBodyFileBytes, Get-PrAuthorReceiptContent,
+        Get-PrContextSummaryLastWriteUtc); SHA-256 is computed inline. This is a policy-level
+        integrity check, not a cryptographic control: any actor with Write access to artifacts/ can
+        replace the body file and the receipt together.
+    .PARAMETER CommandText
+        The Bash command text containing the --body-file argument.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param(
+        [Parameter(Mandatory)]
+        [string] $CommandText
+    )
 
-    $contents = Get-PrAuthorAuthorizationContent
-
-    if ([string]::IsNullOrWhiteSpace($contents)) {
-        return "PR_AGENT_AUTHORIZATION_MISSING: ``$script:PrAuthorAuthorizationPath`` is absent or empty. The pr-author agent must write the authorization sentinel immediately before issuing ``gh pr create``/``gh pr edit --body*``."
+    # Check 1: the --body-file argument must match the canonical artifacts/pr_body_<N>.md pattern.
+    # The match is case-sensitive (-cmatch) so a non-canonical path is rejected before any read.
+    if ($CommandText -cnotmatch '--body-file\s+artifacts/pr_body_(\d+)\.md\b') {
+        return "PR_BODY_PATH_NONCANONICAL: ``--body-file`` must reference a canonical ``artifacts/pr_body_<N>.md`` file produced by the pr-author skill. The path supplied does not match ``artifacts/pr_body_<N>.md``."
     }
 
+    $bodyNumber = [int]$Matches[1]
+    $bodyFilePath = "artifacts/pr_body_$bodyNumber.md"
+    $receiptFilePath = "artifacts/pr_body_$bodyNumber.receipt.json"
+
+    # Check 2: the sibling receipt file must exist (read via the injectable seam).
+    $receiptRaw = Get-PrAuthorReceiptContent -ReceiptFilePath $receiptFilePath
+    if ([string]::IsNullOrWhiteSpace($receiptRaw)) {
+        return "PR_AUTHOR_RECEIPT_MISSING: ``$receiptFilePath`` is absent. The pr-author agent must write the SHA-256 receipt alongside ``$bodyFilePath`` before issuing ``gh pr create``/``gh pr edit --body-file``."
+    }
+
+    # A receipt that is present but not valid JSON cannot be verified; treat it as missing content.
     try {
-        $sentinel = $contents | ConvertFrom-Json -ErrorAction Stop
+        $receipt = $receiptRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return "PR_AGENT_AUTHORIZATION_MALFORMED: ``$script:PrAuthorAuthorizationPath`` is not valid JSON. The pr-author agent must write a well-formed sentinel with ``issued_by``, ``issued_at``, and ``ttl_seconds``."
+        return "PR_AUTHOR_RECEIPT_MISSING: ``$receiptFilePath`` is not valid JSON. The pr-author agent must write a well-formed receipt with ``number``, ``sha256``, and ``created_at``."
     }
 
-    $issuedAtRaw = $sentinel.issued_at
-    if ([string]::IsNullOrWhiteSpace([string]$issuedAtRaw)) {
-        return "PR_AGENT_AUTHORIZATION_MALFORMED: ``$script:PrAuthorAuthorizationPath`` is missing ``issued_at``. The pr-author agent must record a UTC ISO-8601 ``issued_at`` timestamp."
+    # Check 3: the receipt number must equal the <N> extracted from the canonical path.
+    $receiptNumber = $null
+    $parsedNumber = 0
+    if ([int]::TryParse([string]$receipt.number, [ref] $parsedNumber)) {
+        $receiptNumber = $parsedNumber
+    }
+    if ($receiptNumber -ne $bodyNumber) {
+        return "PR_AUTHOR_RECEIPT_NUMBER_MISMATCH: ``$receiptFilePath`` ``number`` ($($receipt.number)) does not equal the body-file number ($bodyNumber). The receipt must bind to ``$bodyFilePath``."
     }
 
-    $issuedAt = [DateTime]::MinValue
-    $parsed = [DateTime]::TryParse(
-        [string]$issuedAtRaw,
+    # Check 4: the inline SHA-256 (lowercase hex) of the body bytes must equal receipt.sha256.
+    $bodyBytes = Get-PrBodyFileBytes -BodyFilePath $bodyFilePath
+    if ($null -eq $bodyBytes) {
+        return "PR_AUTHOR_RECEIPT_HASH_MISMATCH: ``$bodyFilePath`` could not be read to verify its SHA-256 against ``$receiptFilePath``."
+    }
+
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hashBytes = $sha256.ComputeHash($bodyBytes)
+    } finally {
+        $sha256.Dispose()
+    }
+    $computedHash = ([System.BitConverter]::ToString($hashBytes) -replace '-', '').ToLowerInvariant()
+
+    if ($computedHash -ne ([string]$receipt.sha256).ToLowerInvariant()) {
+        return "PR_AUTHOR_RECEIPT_HASH_MISMATCH: the SHA-256 of ``$bodyFilePath`` does not equal ``sha256`` in ``$receiptFilePath``. The body file was modified after the receipt was written."
+    }
+
+    # Check 5: receipt.created_at (UTC) must be strictly newer than the context summary last-write.
+    $createdAt = [DateTime]::MinValue
+    $createdParsed = [DateTime]::TryParse(
+        [string]$receipt.created_at,
         [System.Globalization.CultureInfo]::InvariantCulture,
         [System.Globalization.DateTimeStyles]::AdjustToUniversal -bor [System.Globalization.DateTimeStyles]::AssumeUniversal,
-        [ref] $issuedAt)
-    if (-not $parsed) {
-        return "PR_AGENT_AUTHORIZATION_MALFORMED: ``$script:PrAuthorAuthorizationPath`` has an unparseable ``issued_at``. The pr-author agent must record a UTC ISO-8601 ``issued_at`` timestamp."
+        [ref] $createdAt)
+    if (-not $createdParsed) {
+        return "PR_AUTHOR_RECEIPT_STALE: ``$receiptFilePath`` has a missing or unparseable ``created_at``. The pr-author agent must record a UTC ISO-8601 ``created_at`` strictly newer than ``$script:PrContextArtifactPath``."
     }
 
-    if ($sentinel.issued_by -ne 'pr-author') {
-        return "PR_AGENT_AUTHORIZATION_INVALID: ``$script:PrAuthorAuthorizationPath`` ``issued_by`` is not ``pr-author``. Only the pr-author agent may authorize PR creation or body edits."
-    }
-
-    $ttlSeconds = $script:PrAuthorAuthorizationTtlSeconds
-    if ($null -ne $sentinel.ttl_seconds) {
-        $candidateTtl = 0
-        if ([int]::TryParse([string]$sentinel.ttl_seconds, [ref] $candidateTtl)) {
-            $ttlSeconds = $candidateTtl
-        }
-    }
-
-    $elapsedSeconds = ((Get-CurrentDateTimeUtc) - $issuedAt).TotalSeconds
-    if ($elapsedSeconds -gt $ttlSeconds) {
-        return "PR_AGENT_AUTHORIZATION_EXPIRED: ``$script:PrAuthorAuthorizationPath`` issued $([math]::Round($elapsedSeconds)) s ago, exceeding the ${ttlSeconds}s TTL. The pr-author agent must write a fresh sentinel immediately before the ``gh`` command."
+    $contextLastWrite = Get-PrContextSummaryLastWriteUtc
+    if (($null -eq $contextLastWrite) -or ($createdAt -le $contextLastWrite)) {
+        return "PR_AUTHOR_RECEIPT_STALE: ``$receiptFilePath`` ``created_at`` is not strictly newer than the last-write time of ``$script:PrContextArtifactPath``. The pr-author agent must regenerate the body and receipt after refreshing the PR context."
     }
 
     return $null
@@ -179,12 +246,12 @@ function Get-PrAuthorBypassReason {
     .DESCRIPTION
         Returns PR_AUTHOR_SKILL_BLOCKED when gh pr create or gh pr edit is run with --body (inline,
         no --body-file), or when gh pr create is run with no body flag at all. Returns
-        PR_CONTEXT_MISSING when --body-file is present but the context artifact
-        does not exist on disk. When --body-file is present and the context artifact exists, evaluates
-        the authorization sentinel via Test-PrAuthorAuthorization and returns its block reason
-        (PR_AGENT_AUTHORIZATION_*) when authorization fails. Returns $null for all allowed patterns.
-        Cases A, B, and C are evaluated first and unchanged; the sentinel check only extends the
-        previously-allowed --body-file-with-context path.
+        PR_CONTEXT_MISSING when --body-file is present but the context artifact does not exist on
+        disk. When --body-file is present and the context artifact exists, verifies the SHA-256
+        receipt via Test-PrAuthorReceiptVerification and returns its block reason
+        (PR_BODY_PATH_NONCANONICAL / PR_AUTHOR_RECEIPT_*) when verification fails. Returns $null for
+        all allowed patterns. Cases A, B, and C are evaluated first and unchanged; receipt
+        verification only extends the previously-allowed --body-file-with-context path.
     .PARAMETER CommandText
         The Bash command text extracted from CLAUDE_TOOL_INPUT.
     .PARAMETER ContextExists
@@ -238,12 +305,12 @@ function Get-PrAuthorBypassReason {
         return "PR_CONTEXT_MISSING: ``$script:PrContextArtifactPath`` is absent. Run ``mcp__drm-copilot__collect_pr_context`` before creating or editing the PR body."
     }
 
-    # Cases D/E/F and malformed: --body-file present and context artifact exists; verify the
-    # authorization sentinel. This extends, and does not replace, the previously-allowed path.
+    # Receipt verification: --body-file present and context artifact exists. Verify the SHA-256
+    # receipt in five ordered checks. This extends, and does not replace, the previously-allowed path.
     if ($hasBodyFile -and $ContextExists) {
-        $authorizationReason = Test-PrAuthorAuthorization
-        if ($authorizationReason) {
-            return $authorizationReason
+        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText
+        if ($receiptReason) {
+            return $receiptReason
         }
     }
 
@@ -268,7 +335,7 @@ function Invoke-PrAuthorSkillDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PrAuthorSkillAllowDecision
     }
 
     try {
@@ -279,20 +346,61 @@ function Invoke-PrAuthorSkillDecision {
 
     $commandText = $toolInput.command
     if (-not $commandText) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PrAuthorSkillAllowDecision
     }
 
     $contextExists = Get-PrContextArtifactExistence
     $reason = Get-PrAuthorBypassReason -CommandText $commandText -ContextExists $contextExists
 
     if ($reason) {
-        return [ordered]@{
-            decision = 'block'
-            reason   = $reason
-        }
+        return Get-PrAuthorSkillBlockDecision -Reason $reason
     }
 
-    return [ordered]@{ decision = 'allow' }
+    return Get-PrAuthorSkillAllowDecision
+}
+
+function Get-PrAuthorSkillAllowDecision {
+    <#
+    .SYNOPSIS
+        Construct the PreToolUse allow decision for a permitted Bash command.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param()
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName      = 'PreToolUse'
+            permissionDecision = 'allow'
+        }
+    }
+}
+
+function Get-PrAuthorSkillBlockDecision {
+    <#
+    .SYNOPSIS
+        Construct the PreToolUse deny decision for a forbidden Bash command.
+    .PARAMETER Reason
+        The specific deny reason to surface in the decision.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
 }
 
 function Test-PrAuthorBypassRequired {
@@ -331,6 +439,6 @@ try {
     exit 1
 }
 
-$decision | ConvertTo-Json -Compress | Write-Output
+$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 
 exit 0

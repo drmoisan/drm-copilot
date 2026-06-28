@@ -5,6 +5,9 @@ Describe 'enforce-pr-author-skill.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+
+        # SHA-256 (lowercase hex) of a single 0x41 ('A') byte, used by the receipt allow/hash tests.
+        $script:HashOf0x41 = '559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd'
     }
 
     Context 'tool input parsing' {
@@ -120,13 +123,14 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'allowed commands' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            # Supply a valid, in-TTL pr-author sentinel so the extended --body-file path still allows.
-            $script:FixedNow = [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime()
-            $issuedAt = '2026-06-24T12:00:00Z'
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { $script:FixedNow }
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                "{`"issued_by`":`"pr-author`",`"issued_at`":`"$issuedAt`",`"head_sha`":`"abc123`",`"ttl_seconds`":120}"
+            # Supply a matching, in-date receipt so the extended --body-file path still allows.
+            # Body bytes are a single 0x41 ('A'); the receipt sha256 is its SHA-256; created_at is
+            # strictly newer than the mocked context-summary last-write time.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                "{`"number`":12,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-24T12:00:05Z`"}"
             }
+            Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:00Z').ToUniversalTime() }
         }
 
         It 'allows gh pr create --body-file artifacts/pr_body_12.md when context exists' {
@@ -184,110 +188,103 @@ Describe 'enforce-pr-author-skill.ps1' {
         }
     }
 
-    Context 'authorization sentinel - missing (Case D)' {
+    Context 'receipt - noncanonical body-file path (PR_BODY_PATH_NONCANONICAL)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime() }
         }
 
-        It 'blocks with PR_AGENT_AUTHORIZATION_MISSING when the sentinel read seam returns null' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { $null }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
+        It 'blocks a --body-file artifacts/pr_body.md (no number) with PR_BODY_PATH_NONCANONICAL' {
+            # The canonical pattern requires artifacts/pr_body_<N>.md; a numberless path is rejected
+            # before any receipt read, using injectable seams only (no disk/network/temp files).
+            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
-        }
-
-        It 'blocks with PR_AGENT_AUTHORIZATION_MISSING when the sentinel read seam returns empty/whitespace' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { '   ' }
-            $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
-            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_BODY_PATH_NONCANONICAL'
         }
     }
 
-    Context 'authorization sentinel - invalid issuer (Case E)' {
+    Context 'receipt - missing (PR_AUTHOR_RECEIPT_MISSING)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime() }
         }
 
-        It 'blocks with PR_AGENT_AUTHORIZATION_INVALID when issued_by is orchestrator within TTL' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"orchestrator","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
-            }
+        It 'blocks with PR_AUTHOR_RECEIPT_MISSING when the receipt read seam returns null' {
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith { $null }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_INVALID'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_RECEIPT_MISSING'
         }
     }
 
-    Context 'authorization sentinel - expired (Case F)' {
+    Context 'receipt - number mismatch (PR_AUTHOR_RECEIPT_NUMBER_MISMATCH)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            # Injected clock is 300 s after issued_at; default TTL is 120 s.
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:05:00Z').ToUniversalTime() }
         }
 
-        It 'blocks with PR_AGENT_AUTHORIZATION_EXPIRED when issued 300 s before the injected clock' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
+        It 'blocks with PR_AUTHOR_RECEIPT_NUMBER_MISMATCH when receipt.number does not match the path number' {
+            # Canonical path number is 5; the receipt declares number 7.
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                '{"number":7,"sha256":"abc","created_at":"2026-06-24T12:00:05Z"}'
             }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
+            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_5.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_EXPIRED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_RECEIPT_NUMBER_MISMATCH'
         }
     }
 
-    Context 'authorization sentinel - malformed' {
+    Context 'receipt - hash mismatch (PR_AUTHOR_RECEIPT_HASH_MISMATCH)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime() }
         }
 
-        It 'blocks with PR_AGENT_AUTHORIZATION_MALFORMED when the sentinel content is not valid JSON' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { '{not-json' }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
-            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
-        }
-
-        It 'blocks with PR_AGENT_AUTHORIZATION_MALFORMED when issued_at is missing' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","head_sha":"abc123","ttl_seconds":120}'
+        It 'blocks with PR_AUTHOR_RECEIPT_HASH_MISMATCH when the body SHA-256 does not match receipt.sha256' {
+            # Number matches first; body bytes are 0x41 but the receipt sha256 is a wrong value.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                '{"number":12,"sha256":"0000000000000000000000000000000000000000000000000000000000000000","created_at":"2026-06-24T12:00:05Z"}'
             }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_RECEIPT_HASH_MISMATCH'
         }
     }
 
-    Context 'authorization sentinel - valid authorization (allow)' {
+    Context 'receipt - stale (PR_AUTHOR_RECEIPT_STALE)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            # Injected clock is 5 s after issued_at; within the 120 s TTL.
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime() }
         }
 
-        It 'allows when issued_by is pr-author and issued_at is 5 s before the injected clock' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
+        It 'blocks with PR_AUTHOR_RECEIPT_STALE when created_at is not strictly newer than the context last-write' {
+            # Number and sha256 match (body = 0x41); created_at equals/precedes the context last-write.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                "{`"number`":12,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T10:00:00Z`"}"
             }
+            Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_RECEIPT_STALE'
+        }
+    }
+
+    Context 'receipt - all checks pass (allow)' {
+        BeforeEach {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            # Canonical path, present receipt, matching number, matching inline-computed sha256, and
+            # a created_at strictly newer than the context last-write time.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                "{`"number`":12,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
+            }
+            Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
         }
 
-        It 'allows gh pr edit --body-file with a valid in-TTL pr-author sentinel' {
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
-            }
-            $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
+        It 'allows when all five receipt checks pass' {
+            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -295,12 +292,12 @@ Describe 'enforce-pr-author-skill.ps1' {
 
     Context 'Get-PrAuthorBypassReason helper' {
         BeforeEach {
-            # Valid, in-TTL pr-author sentinel so the extended --body-file path still allows.
-            $script:FixedNow = [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime()
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { $script:FixedNow }
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
+            # Matching, in-date receipt so the extended --body-file path still allows.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                "{`"number`":1,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
             }
+            Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
         }
 
         It 'returns null for allowed command' {
@@ -338,12 +335,12 @@ Describe 'enforce-pr-author-skill.ps1' {
 
     Context 'Test-PrAuthorBypassRequired helper' {
         BeforeEach {
-            # Valid, in-TTL pr-author sentinel so the extended --body-file path still allows.
-            $script:FixedNow = [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime()
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { $script:FixedNow }
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"2026-06-24T12:00:00Z","head_sha":"abc123","ttl_seconds":120}'
+            # Matching, in-date receipt so the extended --body-file path still allows.
+            Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
+            Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
+                "{`"number`":1,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
             }
+            Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
         }
 
         It 'returns false for an allowed command' {
@@ -369,47 +366,53 @@ Describe 'enforce-pr-author-skill.ps1' {
         }
     }
 
-    Context 'Get-PrAuthorAuthorizationContent real read seam' {
-        It 'returns $null when the sentinel path does not exist' {
-            $prev = $script:PrAuthorAuthorizationPath
-            try {
-                $script:PrAuthorAuthorizationPath = 'artifacts/this-sentinel-path-does-not-exist.json'
-                Get-PrAuthorAuthorizationContent | Should -BeNullOrEmpty
-            } finally {
-                $script:PrAuthorAuthorizationPath = $prev
-            }
+    Context 'Get-PrBodyFileBytes real read seam' {
+        It 'returns $null when the body-file path does not exist' {
+            Get-PrBodyFileBytes -BodyFilePath 'artifacts/this-body-path-does-not-exist.md' | Should -BeNullOrEmpty
         }
 
-        It 'returns the raw file text when the sentinel path exists (points at the hook script itself)' {
-            $prev = $script:PrAuthorAuthorizationPath
-            try {
-                # Point the seam at an existing real file (no temporary file is created).
-                $script:PrAuthorAuthorizationPath = $script:UnderTest
-                $content = Get-PrAuthorAuthorizationContent
-                $content | Should -Not -BeNullOrEmpty
-                $content | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
-            } finally {
-                $script:PrAuthorAuthorizationPath = $prev
-            }
+        It 'returns the raw bytes when the path exists (points at the hook script itself)' {
+            # Point the seam at an existing real file (no temporary file is created).
+            $bytes = Get-PrBodyFileBytes -BodyFilePath $script:UnderTest
+            $bytes | Should -Not -BeNullOrEmpty
+            $bytes.Count | Should -BeGreaterThan 0
         }
     }
 
-    Context 'Get-CurrentDateTimeUtc real clock seam' {
-        It 'returns a UTC DateTime without throwing' {
-            $now = Get-CurrentDateTimeUtc
-            $now | Should -BeOfType [datetime]
-            $now.Kind | Should -Be ([System.DateTimeKind]::Utc)
+    Context 'Get-PrAuthorReceiptContent real read seam' {
+        It 'returns $null when the receipt path does not exist' {
+            Get-PrAuthorReceiptContent -ReceiptFilePath 'artifacts/this-receipt-path-does-not-exist.json' | Should -BeNullOrEmpty
+        }
+
+        It 'returns the raw file text when the receipt path exists (points at the hook script itself)' {
+            # Point the seam at an existing real file (no temporary file is created).
+            $content = Get-PrAuthorReceiptContent -ReceiptFilePath $script:UnderTest
+            $content | Should -Not -BeNullOrEmpty
+            $content | Should -Match 'PR_AUTHOR_RECEIPT_MISSING'
         }
     }
 
-    Context 'Test-PrAuthorAuthorization unparseable issued_at (malformed)' {
-        It 'returns PR_AGENT_AUTHORIZATION_MALFORMED when issued_at is present but unparseable' {
-            Mock -CommandName Get-CurrentDateTimeUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:05Z').ToUniversalTime() }
-            Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith {
-                '{"issued_by":"pr-author","issued_at":"not-a-timestamp","ttl_seconds":120}'
+    Context 'Get-PrContextSummaryLastWriteUtc real seam' {
+        It 'returns $null when the context summary path does not exist' {
+            $prev = $script:PrContextArtifactPath
+            try {
+                $script:PrContextArtifactPath = 'artifacts/this-context-path-does-not-exist.txt'
+                Get-PrContextSummaryLastWriteUtc | Should -BeNullOrEmpty
+            } finally {
+                $script:PrContextArtifactPath = $prev
             }
-            $result = Test-PrAuthorAuthorization
-            $result | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
+        }
+
+        It 'returns a UTC DateTime when the context path exists (points at the hook script itself)' {
+            $prev = $script:PrContextArtifactPath
+            try {
+                $script:PrContextArtifactPath = $script:UnderTest
+                $when = Get-PrContextSummaryLastWriteUtc
+                $when | Should -BeOfType [datetime]
+                $when.Kind | Should -Be ([System.DateTimeKind]::Utc)
+            } finally {
+                $script:PrContextArtifactPath = $prev
+            }
         }
     }
 

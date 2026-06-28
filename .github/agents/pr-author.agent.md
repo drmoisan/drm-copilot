@@ -136,3 +136,34 @@ Use these sections, in this order:
 - No hallucinated issue/PR numbers.
 
 That’s it. Produce the PR body.
+
+## PR Body and Receipt Protocol (Documentation-Only in This Ecosystem)
+
+When this agent opens or updates a pull request via `gh pr create` or `gh pr edit --body*`, it follows
+the cross-ecosystem PR body and receipt protocol:
+
+1. Write the PR body text to `artifacts/pr_body_<N>.md`, where `<N>` is the target issue or PR number.
+2. Compute the SHA-256 of the body file bytes and render it as lowercase hexadecimal.
+3. Write the sibling receipt `artifacts/pr_body_<N>.receipt.json` with exactly: `skill` set to
+   `"pr-author"`, `pr_body_path` set to `"artifacts/pr_body_<N>.md"`, `number` set to `<N>`, `sha256`
+   set to the lowercase-hex SHA-256 from step 2, `context_summary_path` set to
+   `"artifacts/pr_context.summary.txt"`, and `created_at` as a UTC ISO-8601 timestamp strictly newer
+   than the last-write time of `artifacts/pr_context.summary.txt`.
+4. Issue the `gh pr create --body-file artifacts/pr_body_<N>.md` (or
+   `gh pr edit --body-file ...`) command. Pass the PR body via `--body-file`; inline `--body` is not
+   used.
+
+After opening or updating the PR, report the resulting PR URL or PR number.
+
+Enforcement in the GitHub Copilot ecosystem is **documentation-only**: the Copilot ecosystem has no
+PreToolUse hook surface, so the receipt protocol cannot be mechanically enforced here. The protocol is
+documented for consistency with the Claude and Codex ecosystems, where a PreToolUse hook verifies the
+receipt in five ordered checks (canonical body-file path, receipt present, number match, SHA-256
+match, and `created_at` newer than the context summary last-write).
+
+The SHA-256 receipt is a **policy-level integrity check, not a cryptographic or security control.** It
+binds the PR body bytes to the receipt. Any actor with write access to `artifacts/` can replace both
+`artifacts/pr_body_<N>.md` and `artifacts/pr_body_<N>.receipt.json` together with a matching SHA-256,
+because all agents share the same filesystem and the runtime exposes no native agent-identity signal
+at tool pre-use time. The mechanism prevents accidental bypass and requires a deliberate, documented
+act to circumvent. It is not tamper-proof and is not a security boundary.
