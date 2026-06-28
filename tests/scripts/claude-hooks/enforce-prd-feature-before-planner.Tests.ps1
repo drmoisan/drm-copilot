@@ -9,17 +9,17 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
 
     Context 'tool input parsing' {
         It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw '')['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when subagent_type is not atomic-planner' {
             $json = (@{ subagent_type = 'something-else'; prompt = 'docs/features/active/foo' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when subagent_type is missing' {
             $json = (@{ prompt = 'irrelevant' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed JSON so the hook exits 1' {
@@ -31,7 +31,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'allows when both spec.md and user-story.md exist in the target folder (prompt path)' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'See docs/features/active/2026-05-10-foo-1 for details.' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks when spec.md is missing' {
@@ -41,9 +41,9 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-05-10-foo-1/' } | ConvertTo-Json -Compress)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'spec\.md'
-            $decision['reason'] | Should -Match 'prd-feature'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'prd-feature'
         }
 
         It 'blocks when user-story.md is missing' {
@@ -53,8 +53,8 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-05-10-foo-1' } | ConvertTo-Json -Compress)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'user-story\.md'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'user-story\.md'
         }
 
         It 'blocks when no feature folder is found in prompt and no checkpoint exists' {
@@ -62,15 +62,15 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'plan something generic' } | ConvertTo-Json -Compress)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'feature folder'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature folder'
         }
 
         It 'falls back to orchestrator-state.json when prompt has no folder reference' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-05-10-bar-2' }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'continue planning' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'prefers the prompt-derived folder over the checkpoint folder' {
@@ -82,7 +82,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/checkpoint-folder' }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'work in docs/features/active/prompt-folder now' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             ($script:capturedPaths -join '|') | Should -Match 'prompt-folder'
             ($script:capturedPaths -join '|') | Should -Not -Match 'checkpoint-folder'
         }
@@ -95,7 +95,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
                 return $true
             }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'See docs/features/active/2026-05-10-foo-1/spec.md for the spec.' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             # Parent directory should be checked, not the .md path itself
             # Parent directory derivation: the spec.md leaf in the prompt should be stripped,
             # and the sibling spec.md / user-story.md should be probed under the parent folder.
@@ -106,7 +106,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'accepts backslash separators inside the prompt path' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{ subagent_type = 'atomic-planner'; prompt = 'docs\features\active\2026-05-10-foo-1' } | ConvertTo-Json -Compress)
-            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -116,7 +116,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"allow"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
             }
             finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
@@ -129,7 +129,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
                 $payload = (@{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/__nonexistent_feature_for_test__' } | ConvertTo-Json -Compress)
                 $env:CLAUDE_TOOL_INPUT = $payload
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"block"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
                 $output | Should -Match 'PRD_FEATURE_BLOCKED'
             }
             finally {

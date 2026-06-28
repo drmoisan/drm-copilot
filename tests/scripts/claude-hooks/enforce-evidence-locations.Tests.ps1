@@ -12,16 +12,17 @@ BeforeAll {
 
 Describe 'enforce-evidence-locations.ps1' {
     Context 'forbidden evidence locations' {
-        It 'blocks writes to artifacts/baselines/ (forbidden prefix)' {
+        It 'denies writes to artifacts/baselines/ (forbidden prefix)' {
             # Arrange
             $env:CLAUDE_TOOL_INPUT = '{"file_path":"artifacts/baselines/foo.md"}'
 
             # Act
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
-            # Assert — forbidden path must produce a block decision with the required reason token
-            $result.decision | Should -Be 'block'
-            $result.reason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
+            # Assert — forbidden path must produce a PreToolUse deny decision with the required reason token
+            $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
         }
     }
 
@@ -34,20 +35,20 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'blocks writes to artifacts/research/ (retired research path)' {
+        It 'denies writes to artifacts/research/ (retired research path)' {
             # Arrange — research is no longer a permitted artifacts/ sub-path;
-            # it must now resolve to a tracked docs/ root and is blocked here.
+            # it must now resolve to a tracked docs/ root and is denied here.
             $env:CLAUDE_TOOL_INPUT = '{"file_path":"artifacts/research/notes.md"}'
 
             # Act
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'block'
-            $result.reason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
         }
     }
 
@@ -60,7 +61,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows writes to docs/features/ research subfolder (new canonical feature research path)' {
@@ -71,7 +72,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows writes to docs/research/ (new canonical one-off research path)' {
@@ -82,7 +83,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -95,7 +96,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -105,7 +106,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw ''
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when the JSON has no file_path field' {
@@ -113,7 +114,7 @@ Describe 'enforce-evidence-locations.ps1' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{"other":"value"}'
 
             # Assert
-            $result.decision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed JSON input' {
@@ -134,9 +135,11 @@ Describe 'enforce-evidence-locations.ps1' {
             $code = $emitted[-1]
             $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
 
-            # Assert — exit code is 0 and emitted JSON is the compact allow decision
+            # Assert — exit code is 0 and emitted JSON is the compact PreToolUse allow decision
             $code | Should -Be 0
-            $stdout | Should -Match '"decision":"allow"'
+            $parsed = $stdout | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'returns exit code 1 and writes a malformed-JSON error for unparseable input' {
@@ -153,7 +156,7 @@ Describe 'enforce-evidence-locations.ps1' {
             ($errorRecords | Out-String) | Should -Match 'malformed JSON'
         }
 
-        It 'returns exit code 0 and emits block JSON for a forbidden path' {
+        It 'returns exit code 0 and emits deny JSON for a forbidden path' {
             # Arrange — a retired/forbidden artifacts/research path
             $forbiddenJson = '{"file_path":"artifacts/research/notes.md"}'
 
@@ -162,10 +165,12 @@ Describe 'enforce-evidence-locations.ps1' {
             $code = $emitted[-1]
             $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
 
-            # Assert — exit code is 0 and emitted JSON is the compact block decision
+            # Assert — exit code is 0 and emitted JSON is the compact PreToolUse deny decision
             $code | Should -Be 0
-            $stdout | Should -Match '"decision":"block"'
-            $stdout | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
+            $parsed = $stdout | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
         }
     }
 }

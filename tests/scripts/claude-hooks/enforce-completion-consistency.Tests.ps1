@@ -22,11 +22,11 @@ Describe 'enforce-completion-consistency.ps1' {
 
     Context 'tool input parsing' {
         It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw '')['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when file_path is missing' {
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw '{"content":"{}"}')['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw '{"content":"{}"}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed top-level JSON so the hook exits 1' {
@@ -35,21 +35,21 @@ Describe 'enforce-completion-consistency.ps1' {
 
         It 'allows when content itself is not valid JSON (defers to downstream tools)' {
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' } | ConvertTo-Json -Compress)
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'path matching (non-checkpoint path is allowed)' {
         It 'allows a file_path other than the checkpoint' {
             $json = ConvertTo-CheckpointToolInput -FilePath 'some/other.json' -Payload @{ next_step = 'complete' }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'Edit tool calls (no full content)' {
         It 'allows an Edit-style call that only supplies old_string/new_string on the checkpoint path' {
             $json = '{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}'
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -62,7 +62,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 step9_status    = 'pending'
                 step10_status   = 'pending'
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -74,7 +74,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 'feature-folder' = 'docs/features/active/2026-06-19-harden-small-path-completion-gate-207'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'accepts variables.issue-num and variables.feature-folder fallbacks' {
@@ -83,7 +83,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 variables       = @{ 'issue-num' = '207'; 'feature-folder' = 'docs/features/active/feature-207' }
                 ci_gate         = @{ conclusion = 'success'; head_sha = 'abc123' }
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true })['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true }).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -114,8 +114,8 @@ Describe 'enforce-completion-consistency.ps1' {
 
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'pr_gate'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'pr_gate'
         }
 
         It 'does NOT require pr_gate for the small route (no requires_pr_gate)' {
@@ -127,7 +127,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'enforces the gate for a non-232 route with requires_pr_gate true (route-driven, not issue-driven)' {
@@ -141,8 +141,8 @@ Describe 'enforce-completion-consistency.ps1' {
 
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'pr_gate'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'pr_gate'
         }
 
         It 'blocks when a requires_pr_gate route has stale ci_gate.head_sha versus pr_gate.head_sha' {
@@ -162,9 +162,9 @@ Describe 'enforce-completion-consistency.ps1' {
 
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'ci_gate.head_sha'
-            $decision['reason'] | Should -Match 'pr_gate.head_sha'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ci_gate.head_sha'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'pr_gate.head_sha'
         }
 
         It 'allows when a requires_pr_gate route supplies complete matching PR and CI evidence' {
@@ -182,7 +182,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'current-head' }
             }
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderTrue -RoutingMatrixReader $script:matrixWithPrGate).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -216,9 +216,9 @@ Describe 'enforce-completion-consistency.ps1' {
                 'feature-folder' = 'docs/f'
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
-            $decision['reason'] | Should -Match 'ci_gate'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ci_gate'
         }
     }
 
@@ -231,8 +231,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'issue-num'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'issue-num'
         }
     }
 
@@ -245,8 +245,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'feature-folder'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature-folder'
         }
     }
 
@@ -259,8 +259,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'failure'; head_sha = 'abc123' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'conclusion'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'conclusion'
         }
     }
 
@@ -285,8 +285,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'issue-num'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'issue-num'
         }
 
         It 'allows a digits-only issue-num with a valid existing feature-folder' {
@@ -296,7 +296,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 'feature-folder' = 'docs/features/active/my-feature-233'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks a feature-folder sentinel "n/a"' {
@@ -307,8 +307,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'feature-folder'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature-folder'
         }
 
         It 'allows a valid docs/features/active/... feature-folder that exists' {
@@ -318,7 +318,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 'feature-folder' = 'docs/features/active/my-feature-233'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $script:folderExistsTrue).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks a valid-shaped feature-folder when the injected existence check returns false' {
@@ -330,8 +330,8 @@ Describe 'enforce-completion-consistency.ps1' {
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck $folderExistsFalse
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'feature-folder'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature-folder'
         }
     }
 
@@ -351,8 +351,8 @@ Describe 'enforce-completion-consistency.ps1' {
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader
 
             # Assert
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
         }
 
         It 'allows an Edit whose patched checkpoint does not assert completion' {
@@ -364,7 +364,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 new_string = '"next_step":"S6_review"'
             } | ConvertTo-Json -Compress
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an Edit when the on-disk checkpoint file does not exist' {
@@ -375,7 +375,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 new_string = '"next_step":"complete"'
             } | ConvertTo-Json -Compress
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an Edit when old_string is not found in the on-disk content' {
@@ -387,7 +387,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 new_string = '"next_step":"complete"'
             } | ConvertTo-Json -Compress
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an Edit on a non-checkpoint path' {
@@ -398,7 +398,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 new_string = '"next_step":"complete"'
             } | ConvertTo-Json -Compress
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -435,7 +435,7 @@ Describe 'enforce-completion-consistency.ps1' {
         It 'allows when the mocked content parser throws (invalid content JSON path)' {
             Mock -CommandName ConvertFrom-CheckpointJson -MockWith { throw 'simulated parse failure' }
             $json = ConvertTo-CheckpointToolInput -Payload @{ next_step = 'complete' }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke -CommandName ConvertFrom-CheckpointJson -Times 1
         }
     }
@@ -446,7 +446,7 @@ Describe 'enforce-completion-consistency.ps1' {
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"allow"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
             }
             finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
@@ -460,7 +460,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 $payload = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
                 $env:CLAUDE_TOOL_INPUT = $payload
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"block"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
                 $output | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
             }
             finally {

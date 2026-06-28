@@ -30,7 +30,8 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/app.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.shouldWriteState | Should -BeTrue
         $result.state.prodFiles | Should -Contain 'src/app.py'
         $result.state.testFiles | Should -BeNullOrEmpty
@@ -41,7 +42,7 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'tests/unit/test_app.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.shouldWriteState | Should -BeTrue
         $result.state.testFiles | Should -Contain 'tests/unit/test_app.py'
         $result.state.prodFiles | Should -BeNullOrEmpty
@@ -53,31 +54,44 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/app.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.shouldWriteState | Should -BeFalse
         $result.state.prodFiles | Should -HaveCount 1
     }
 
-    It 'blocks a new production file when the production cap is full' {
+    It 'denies a new production file when the production cap is full' {
         $state = Get-PythonBatchBudgetState -ProdCap 1 -TestCap 1
         $state.prodFiles = @('src/first.py')
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/second.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*production file cap is 1*'
-        $result.reason | Should -BeLike '*src/second.py*'
+        $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*production file cap is 1*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*src/second.py*'
+        $result.state | Should -Not -BeNullOrEmpty
     }
 
-    It 'blocks a new test file when the test cap is full' {
+    It 'denies a new test file when the test cap is full' {
         $state = Get-PythonBatchBudgetState -ProdCap 1 -TestCap 1
         $state.testFiles = @('tests/unit/test_first.py')
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'tests/unit/test_second.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*test file cap is 1*'
-        $result.reason | Should -BeLike '*tests/unit/test_second.py*'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*test file cap is 1*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tests/unit/test_second.py*'
+    }
+
+    It 'serializes the deny decision into the PreToolUse hookSpecificOutput envelope' {
+        $state = Get-PythonBatchBudgetState -ProdCap 1 -TestCap 1
+        $state.prodFiles = @('src/first.py')
+
+        $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/second.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
+        $parsed = $result | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+
+        $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
     }
 
     It 'ignores non-Python file paths' {
@@ -85,7 +99,7 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'README.md' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.shouldWriteState | Should -BeFalse
         $result.state.prodFiles | Should -BeNullOrEmpty
         $result.state.testFiles | Should -BeNullOrEmpty
@@ -102,24 +116,24 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/second.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.state.prodFiles | Should -HaveCount 2
         $result.state.prodFiles | Should -Contain 'src/first.py'
         $result.state.prodFiles | Should -Contain 'src/second.py'
         $result.state.testFiles | Should -Contain 'tests/unit/test_first.py'
     }
 
-    It 'blocks malformed tool-input JSON with a diagnostic before touching state' {
+    It 'denies malformed tool-input JSON with a diagnostic before touching state' {
         $result = Invoke-PythonBatchBudgetHook -ToolInputRaw '{not-json' -SessionId 'session-a' -Root '/repo'
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*malformed JSON*'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
     }
 
     It 'allows valid non-Python tool input without touching state' {
         $result = Invoke-PythonBatchBudgetHook -ToolInputRaw (Get-PythonToolInput -FilePath 'docs/readme.md') -SessionId 'session-a' -Root '/repo'
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
     }
 
     It 'writes state for valid Python tool input through injected state operations' {
@@ -135,7 +149,7 @@ Describe 'enforce-python-batch-budget.ps1' {
             -EnsureDirectory { param([string] $Path) $script:createdStateDir = $Path } `
             -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) $script:writtenStateFile = $Path; $script:writtenState = $State }
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         ($script:createdStateDir -replace '\\', '/') | Should -BeLike '*/.claude/state'
         $script:writtenStateFile | Should -BeLike '*python-batch-budget.session-a.json'
         $script:writtenState.prodFiles | Should -Contain 'src/app.py'
@@ -159,7 +173,7 @@ Describe 'enforce-python-batch-budget.ps1' {
             -ReadState { param([string] $Path) [void] $Path; return $stateJson } `
             -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $Path; $script:writtenState = $State }
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $script:writtenState.prodFiles | Should -Contain 'src/first.py'
         $script:writtenState.prodFiles | Should -Contain 'src/second.py'
     }
@@ -173,11 +187,11 @@ Describe 'enforce-python-batch-budget.ps1' {
             -ReadState { param([string] $Path) [void] $Path; return '{not-json' } `
             -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $Path; [void] $State; throw 'write failed' }
 
-        $result.decision | Should -Be 'allow'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $result.state.prodFiles | Should -Contain 'src/app.py'
     }
 
-    It 'honors entrypoint environment caps while blocking malformed JSON' {
+    It 'honors entrypoint environment caps while denying malformed JSON' {
         $env:CLAUDE_TOOL_INPUT = '{not-json'
         $env:CLAUDE_SESSION_ID = 'session-a'
         $env:CLAUDE_PYTHON_BUDGET_PROD = '7'
@@ -185,7 +199,9 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result = & $script:ScriptPath | ConvertFrom-Json
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*malformed JSON*'
+        $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
+        $result.PSObject.Properties.Name | Should -Not -Contain 'state'
     }
 }

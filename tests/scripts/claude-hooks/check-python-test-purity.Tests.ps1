@@ -1,6 +1,12 @@
 <#
 .SYNOPSIS
     Pester tests for the check-python-test-purity.ps1 Claude Code hook.
+
+.DESCRIPTION
+    Verifies the PreToolUse deny schema: blocked content yields a decision whose
+    hookSpecificOutput.permissionDecision is 'deny', and allow paths return no
+    decision ($null), which is a valid allow at PreToolUse. No disk, network, or
+    temporary-file use.
 #>
 
 Set-StrictMode -Version Latest
@@ -37,39 +43,39 @@ Describe 'check-python-test-purity.ps1' {
         $env:CLAUDE_TOOL_INPUT = $null
     }
 
-    It 'allows missing tool input and missing file path' {
+    It 'allows (no decision) missing tool input and missing file path' {
         $emptyResult = Invoke-PythonTestPurityDecision -ToolInputRaw ''
         $missingPathResult = Invoke-PythonTestPurityDecision -ToolInputRaw '{}'
 
-        $emptyResult.decision | Should -Be 'allow'
-        $missingPathResult.decision | Should -Be 'allow'
+        $emptyResult | Should -BeNullOrEmpty
+        $missingPathResult | Should -BeNullOrEmpty
     }
 
-    It 'allows safe Python test content' {
+    It 'allows (no decision) safe Python test content' {
         $inputJson = Get-PythonPurityInput -FilePath 'tests/unit/test_safe.py' -Content 'def test_value(): assert 1 == 1'
 
         $result = Invoke-PythonTestPurityDecision -ToolInputRaw $inputJson
 
-        $result.decision | Should -Be 'allow'
+        $result | Should -BeNullOrEmpty
     }
 
-    It 'allows empty content and empty new_string edits' {
+    It 'allows (no decision) empty content and empty new_string edits' {
         $contentResult = Invoke-PythonTestPurityDecision -ToolInputRaw (Get-PythonPurityInput -FilePath 'tests/unit/test_empty.py' -Content '')
         $newStringResult = Invoke-PythonTestPurityDecision -ToolInputRaw (Get-PythonPurityInput -FilePath 'tests/unit/test_empty.py' -NewString '')
 
-        $contentResult.decision | Should -Be 'allow'
-        $newStringResult.decision | Should -Be 'allow'
+        $contentResult | Should -BeNullOrEmpty
+        $newStringResult | Should -BeNullOrEmpty
     }
 
-    It 'ignores non-test and non-Python file paths' {
+    It 'ignores (no decision) non-test and non-Python file paths' {
         $sourceResult = Invoke-PythonTestPurityDecision -ToolInputRaw (Get-PythonPurityInput -FilePath 'src/module.py' -Content 'import tempfile')
         $markdownResult = Invoke-PythonTestPurityDecision -ToolInputRaw (Get-PythonPurityInput -FilePath 'tests/readme.md' -Content 'import tempfile')
 
-        $sourceResult.decision | Should -Be 'allow'
-        $markdownResult.decision | Should -Be 'allow'
+        $sourceResult | Should -BeNullOrEmpty
+        $markdownResult | Should -BeNullOrEmpty
     }
 
-    It 'blocks forbidden Python unit-test runtime patterns' {
+    It 'blocks forbidden Python unit-test runtime patterns with the deny schema' {
         $blockedExamples = @(
             @{ Content = 'import tempfile'; Reason = 'tempfile usage forbidden in unit tests' },
             @{ Content = 'from tempfile import TemporaryDirectory'; Reason = 'tempfile usage forbidden in unit tests' },
@@ -97,24 +103,42 @@ Describe 'check-python-test-purity.ps1' {
 
             $result = Invoke-PythonTestPurityDecision -ToolInputRaw $inputJson
 
-            $result.decision | Should -Be 'block'
-            $result.reason | Should -BeLike "*$($example.Reason)*"
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($example.Reason)*"
         }
     }
 
-    It 'blocks malformed tool-input JSON with a diagnostic' {
-        $result = Invoke-PythonTestPurityDecision -ToolInputRaw '{not-json'
+    It 'Get-PythonTestPurityBlockDecision emits the PreToolUse deny schema after serialize-then-parse' {
+        $decision = Get-PythonTestPurityBlockDecision -Reason 'tempfile usage forbidden in unit tests'
+        $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*malformed JSON*'
+        $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $parsed.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tempfile usage forbidden*'
     }
 
-    It 'emits a block response from the hook entrypoint' {
+    It 'blocks malformed tool-input JSON with a diagnostic deny' {
+        $result = Invoke-PythonTestPurityDecision -ToolInputRaw '{not-json'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
+    }
+
+    It 'emits a deny response from the hook entrypoint' {
         $env:CLAUDE_TOOL_INPUT = Get-PythonPurityInput -FilePath 'tests/unit/test_bad.py' -Content 'import tempfile'
 
         $result = & $script:ScriptPath | ConvertFrom-Json
 
-        $result.decision | Should -Be 'block'
-        $result.reason | Should -BeLike '*tempfile usage forbidden in unit tests*'
+        $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tempfile usage forbidden in unit tests*'
+    }
+
+    It 'emits no output (allow) from the hook entrypoint on safe content' {
+        $env:CLAUDE_TOOL_INPUT = Get-PythonPurityInput -FilePath 'tests/unit/test_safe.py' -Content 'def test_value(): assert 1 == 1'
+
+        $output = & $script:ScriptPath
+
+        $output | Should -BeNullOrEmpty
     }
 }

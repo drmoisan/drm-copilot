@@ -130,6 +130,36 @@ function Get-CheckpointContent {
     return Get-Content -Raw -LiteralPath $script:CheckpointPath
 }
 
+function Get-OrchestrationPreimplementationGateAllowDecision {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param()
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName      = 'PreToolUse'
+            permissionDecision = 'allow'
+        }
+    }
+}
+
+function Get-OrchestrationPreimplementationGateBlockDecision {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
+}
+
 function Invoke-OrchestrationPreimplementationGateDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -139,7 +169,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-OrchestrationPreimplementationGateAllowDecision
     }
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
@@ -162,7 +192,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     }
 
     if (-not $requiresReadyCheckpoint) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-OrchestrationPreimplementationGateAllowDecision
     }
 
     if (-not $CheckpointRaw) {
@@ -175,12 +205,9 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     }
 
     if (Test-OrchestrationReady -Payload $checkpoint) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-OrchestrationPreimplementationGateAllowDecision
     }
-    return [ordered]@{
-        decision = 'block'
-        reason   = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
-    }
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
 }
 
 if ($MyInvocation.InvocationName -eq '.') {
@@ -194,5 +221,5 @@ try {
     exit 1
 }
 
-$decision | ConvertTo-Json -Compress | Write-Output
+$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 exit 0

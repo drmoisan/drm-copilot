@@ -51,11 +51,23 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
-            $decision['reason'] | Should -Not -Match '#232'
-            $decision['reason'] | Should -Match 'route metadata'
-            $decision['reason'] | Should -Match 'lifecycle readiness'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match '#232'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'route metadata'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'lifecycle readiness'
+        }
+
+        It 'emits the PreToolUse deny schema (hookEventName + permissionDecision=deny) after serialize-then-parse' {
+            $json = ConvertTo-ImplementationWriteToolInput
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+            $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
 
         It 'allows feature documentation writes' {
@@ -63,7 +75,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows evidence writes' {
@@ -71,7 +83,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows implementation writes when checkpoint readiness is present, regardless of issue number' {
@@ -85,7 +97,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks implementation command payloads before readiness (generalized message)' {
@@ -94,9 +106,9 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
-            $decision['reason'] | Should -Not -Match '#232'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match '#232'
         }
 
         It 'blocks staging and commit command payloads before readiness' {
@@ -106,8 +118,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             foreach ($command in $commands) {
                 $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-CommandToolInput -Command $command) -CheckpointRaw $checkpoint
 
-                $decision['decision'] | Should -Be 'block'
-                $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+                $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+                $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
             }
         }
 
@@ -122,8 +134,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             foreach ($command in $commands) {
                 $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-CommandToolInput -Command $command) -CheckpointRaw $checkpoint
 
-                $decision['decision'] | Should -Be 'block'
-                $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+                $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+                $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
             }
         }
 
@@ -133,9 +145,9 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
-            $decision['reason'] | Should -Not -Match '#232'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match '#232'
         }
 
         It 'allows implementation operations for any ready workflow state regardless of issue number' {
@@ -144,13 +156,13 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'tool input parsing and checkpoint resolution' {
         It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '')['decision'] | Should -Be 'allow'
+            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed top-level JSON' {
@@ -159,14 +171,14 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
         It 'allows a non-implementation file write (documentation path) without a checkpoint' {
             $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/feature-x/notes.md'
-            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks an implementation write when the resolved checkpoint is malformed JSON' {
             $json = ConvertTo-ImplementationWriteToolInput
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw '{broken'
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
 
         It 'allows an implementation write when readiness is supplied via path_selected fallback' {
@@ -178,7 +190,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'blocks an implementation write when the checkpoint omits the feature folder' {
@@ -190,7 +202,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
-            $decision['decision'] | Should -Be 'block'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'Test-OrchestrationReady returns false for a null payload' {
@@ -208,7 +220,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"allow"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
             }
             finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
@@ -221,7 +233,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
                 $content = (@{ file_path = 'docs/features/active/feature-x/notes.md'; content = 'x' } | ConvertTo-Json -Compress)
                 $env:CLAUDE_TOOL_INPUT = $content
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"allow"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
             }
             finally {
                 $env:CLAUDE_TOOL_INPUT = $prev

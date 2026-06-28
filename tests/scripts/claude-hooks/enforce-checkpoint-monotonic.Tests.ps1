@@ -9,16 +9,16 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
 
     Context 'tool input parsing' {
         It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '')['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when file_path is missing' {
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '{"content":"{}"}')['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '{"content":"{}"}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when path is not the checkpoint' {
             $json = '{"file_path":"some/other.json","content":"{\"completed_steps\":[\"S1\"]}"}'
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed JSON so the hook exits 1' {
@@ -29,7 +29,7 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
     Context 'Edit tool calls (no full content)' {
         It 'allows an Edit-style call that only supplies old_string/new_string' {
             $json = '{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}'
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -37,64 +37,79 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
         It 'allows when content has no completed_steps field' {
             $content = '{"objective":"x"}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows when steps are in canonical order' {
-            $content = '{"completed_steps":["S0_startup_checks","S1_change_budget_estimation","S3_promotion_potential","S4_atomic_planning","S5_atomic_execution","S12_complete"]}'
+        It 'allows when steps are in canonical order with promotion and planning present' {
+            $content = '{"completed_steps":["S0_startup_checks","S1_change_budget_estimation","S3_promotion","S4_atomic_planning","S5_atomic_execution","S12_complete"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when a single canonical step is present' {
             $content = '{"completed_steps":["S0_startup_checks"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows non-canonical informational entries' {
             $content = '{"completed_steps":["S0_startup_checks","informational_note","S4_atomic_planning"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'blocks when later step appears before earlier step' {
+        It 'denies when later step appears before earlier step' {
             $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'S5_atomic_execution'
-            $decision['reason'] | Should -Match 'S4_atomic_planning'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S5_atomic_execution'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S4_atomic_planning'
         }
 
-        It 'blocks Issue #232 implementation completion without promotion and planning prerequisites' {
+        It 'denies Issue #232 implementation completion without promotion and planning prerequisites' {
             $content = '{"issue-num":"232","completed_steps":["S5_atomic_execution"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'S3_promotion'
-            $decision['reason'] | Should -Match 'S4_atomic_planning'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S3_promotion'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S4_atomic_planning'
         }
 
-        It 'blocks Issue #232 PR completion without planning prerequisite' {
+        It 'denies Issue #232 PR completion without planning prerequisite' {
             $content = '{"issue-num":"232","completed_steps":["S3_promotion_issue","S8_create_pr"]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
 
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'S4_atomic_planning'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S4_atomic_planning'
         }
 
         It 'allows out-of-order when rollback_history is non-empty' {
             $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"],"rollback_history":[{"step":"S5_atomic_execution","reason":"reset"}]}'
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when content itself is not valid JSON (defers to downstream tools)' {
             $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' } | ConvertTo-Json -Compress)
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json)['decision'] | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
+
+    Context 'Part-4 prerequisite gate (serialize-then-parse contract)' {
+        It 'denies an advanced step with S3_promotion and S4_atomic_planning both missing and names both prerequisites in the deny reason' {
+            $content = '{"completed_steps":["S5_atomic_execution"]}'
+            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
+
+            $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'S3_promotion'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'S4_atomic_planning'
         }
     }
 
@@ -104,21 +119,21 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
             try {
                 $env:CLAUDE_TOOL_INPUT = ''
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"allow"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
             }
             finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
             }
         }
 
-        It 'emits a block decision JSON when steps are out of order' {
+        It 'emits a deny decision JSON when steps are out of order' {
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"]}'
                 $payload = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
                 $env:CLAUDE_TOOL_INPUT = $payload
                 $output = & $script:UnderTest
-                $output | Should -Match '"decision"\s*:\s*"block"'
+                $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
                 $output | Should -Match 'CHECKPOINT_ORDER_BLOCKED'
             }
             finally {

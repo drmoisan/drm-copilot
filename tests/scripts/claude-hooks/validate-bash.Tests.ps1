@@ -3,13 +3,13 @@
     Pester v5.x unit tests for the validate-bash.ps1 Claude Code pre-tool-use hook.
 
 .DESCRIPTION
-    Exercises all 6 blocked command patterns, safe-command pass-through,
-    empty-input handling, malformed-JSON fallback, and valid-JSON command
-    extraction for the validate-bash.ps1 pre-tool-use hook.
-
-    The production script is invoked directly via its resolved path.
-    Environment variable state (CLAUDE_TOOL_INPUT) is saved and restored
-    around each test that modifies it.
+    Exercises the pure detector and deny-decision builder of validate-bash.ps1.
+    Asserts that a blocked command yields the matched pattern via Get-BashBlockReason,
+    that a safe command yields $null, and that the deny decision, after
+    ConvertTo-Json -Depth 5 then ConvertFrom-Json, carries the PreToolUse schema
+    (hookSpecificOutput.hookEventName = 'PreToolUse',
+    hookSpecificOutput.permissionDecision = 'deny'). Also asserts the hook contains
+    no deny-path 'exit 1'. No disk, network, or temporary-file use.
 #>
 
 Set-StrictMode -Version Latest
@@ -19,136 +19,103 @@ Describe "validate-bash.ps1" {
         # Resolve the production script path relative to the repo root.
         $script:ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..', '.claude', 'hooks', 'validate-bash.ps1'
         $script:ScriptPath = (Resolve-Path $script:ScriptPath).Path
+
+        # Dot-source the hook so its pure functions are available in the test scope.
+        # The dot-sourcing guard inside the hook returns early, so no entrypoint runs.
+        . $script:ScriptPath
     }
 
-    Context "Blocked patterns" {
-        It "keeps blocking all repository-dangerous command patterns used by the Claude runtime" {
-            $blockedCommands = @(
-                'git push --force',
-                'git push origin --force',
-                'git push -f',
-                'git reset --hard',
-                'rm -rf /some/path',
-                'Remove-Item -Recurse -Force C:\temp'
+    Context "Get-BlockedPatternMatch / Get-BashBlockReason on blocked commands" {
+        It "returns the matched pattern for every repository-dangerous command" {
+            $cases = @(
+                @{ Command = 'git push --force'; Pattern = 'git push --force' },
+                @{ Command = 'git push origin --force'; Pattern = 'git push origin --force' },
+                @{ Command = 'git push -f'; Pattern = 'git push -f' },
+                @{ Command = 'git reset --hard'; Pattern = 'git reset --hard' },
+                @{ Command = 'rm -rf /some/path'; Pattern = 'rm -rf' },
+                @{ Command = 'Remove-Item -Recurse -Force C:\temp'; Pattern = 'Remove-Item -Recurse -Force' }
             )
 
-            foreach ($command in $blockedCommands) {
-                $ErrorActionPreference = 'Continue'
-                & $script:ScriptPath $command 2>$null
-                $LASTEXITCODE | Should -Be 1
+            foreach ($case in $cases) {
+                $matched = Get-BlockedPatternMatch -Command $case.Command
+                $matched | Should -Be $case.Pattern
             }
         }
 
-        It "blocks 'rm -rf' commands with exit code 1" {
-            # Override ErrorActionPreference so Write-Error in the production
-            # script does not become a terminating error under PoshQC's Stop preference.
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'rm -rf /some/path' 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "blocks 'git push --force' commands with exit code 1" {
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'git push --force' 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "blocks 'git push origin --force' commands with exit code 1" {
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'git push origin --force' 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "blocks 'Remove-Item -Recurse -Force' commands with exit code 1" {
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'Remove-Item -Recurse -Force C:\temp' 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "blocks 'git reset --hard' commands with exit code 1" {
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'git reset --hard' 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "blocks 'git push -f' commands with exit code 1" {
-            $ErrorActionPreference = 'Continue'
-            & $script:ScriptPath 'git push -f' 2>$null
-            $LASTEXITCODE | Should -Be 1
+        It "produces a deny reason naming the matched pattern for a blocked command" {
+            $reason = Get-BashBlockReason -Command 'rm -rf /some/path'
+            $reason | Should -BeLike "*rm -rf*"
         }
     }
 
-    Context "Safe commands" {
-        It "allows 'ls -la' with exit code 0" {
-            & $script:ScriptPath 'ls -la'
-            $LASTEXITCODE | Should -Be 0
+    Context "Get-BlockedPatternMatch / Get-BashBlockReason on safe commands" {
+        It "returns `$null for safe commands" {
+            Get-BlockedPatternMatch -Command 'git status' | Should -BeNullOrEmpty
+            Get-BlockedPatternMatch -Command 'ls -la' | Should -BeNullOrEmpty
+            Get-BashBlockReason -Command 'echo hello' | Should -BeNullOrEmpty
         }
 
-        It "allows 'git status' with exit code 0" {
-            & $script:ScriptPath 'git status'
-            $LASTEXITCODE | Should -Be 0
-        }
-
-        It "allows 'echo hello' with exit code 0" {
-            & $script:ScriptPath 'echo hello'
-            $LASTEXITCODE | Should -Be 0
+        It "returns `$null for empty or null input" {
+            Get-BlockedPatternMatch -Command '' | Should -BeNullOrEmpty
+            Get-BashBlockReason -Command '' | Should -BeNullOrEmpty
         }
     }
 
-    Context "Empty input" {
-        It "exits with code 0 when no command is provided" {
-            # Save and clear the environment variable to ensure empty-input path.
-            $savedEnv = $env:CLAUDE_TOOL_INPUT
-            $env:CLAUDE_TOOL_INPUT = $null
-            try {
-                & $script:ScriptPath
-                $LASTEXITCODE | Should -Be 0
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $savedEnv
-            }
+    Context "Get-BashDenyDecision emits the PreToolUse deny schema" {
+        It "carries hookEventName=PreToolUse and permissionDecision=deny after serialize-then-parse" {
+            $reason = Get-BashBlockReason -Command 'git reset --hard'
+            $decision = Get-BashDenyDecision -Reason $reason
+
+            $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*git reset --hard*"
+        }
+
+        It "does not carry the legacy top-level decision/reason keys" {
+            $decision = Get-BashDenyDecision -Reason 'test reason'
+            $decision.Contains('decision') | Should -BeFalse
+            $decision.Contains('reason') | Should -BeFalse
         }
     }
 
-    Context "Malformed JSON in CLAUDE_TOOL_INPUT" {
-        AfterEach {
-            # Restore the environment variable after each test.
-            $env:CLAUDE_TOOL_INPUT = $null
+    Context "Invoke-ValidateBashDecision routes JSON and positional input" {
+        It "returns a deny decision from a blocked command in JSON 'command' field" {
+            $decision = Invoke-ValidateBashDecision -ToolInputRaw '{"command":"rm -rf /tmp"}'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
-        It "falls back to raw environment variable value when JSON is malformed" {
-            # Set malformed JSON containing a blocked pattern so the
-            # fallback text itself triggers the block.
-            $ErrorActionPreference = 'Continue'
-            $env:CLAUDE_TOOL_INPUT = 'not-valid-json rm -rf /danger'
-            & $script:ScriptPath 2>$null
-            $LASTEXITCODE | Should -Be 1
+        It "returns `$null (allow) for a safe command in JSON 'command' field" {
+            Invoke-ValidateBashDecision -ToolInputRaw '{"command":"git status"}' | Should -BeNullOrEmpty
         }
 
-        It "falls back to raw environment variable value when JSON is malformed and value is safe" {
-            $env:CLAUDE_TOOL_INPUT = 'not-json-but-safe'
-            & $script:ScriptPath
-            $LASTEXITCODE | Should -Be 0
+        It "falls back to raw input when JSON is malformed and blocked" {
+            $decision = Invoke-ValidateBashDecision -ToolInputRaw 'not-valid-json rm -rf /danger'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It "returns `$null (allow) when malformed JSON value is safe" {
+            Invoke-ValidateBashDecision -ToolInputRaw 'not-json-but-safe' | Should -BeNullOrEmpty
+        }
+
+        It "uses the positional input when no tool input is provided" {
+            $decision = Invoke-ValidateBashDecision -PositionalInput 'git push --force'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It "returns `$null (allow) when no input is provided" {
+            Invoke-ValidateBashDecision | Should -BeNullOrEmpty
         }
     }
 
-    Context "CLAUDE_TOOL_INPUT with valid JSON" {
-        AfterEach {
-            $env:CLAUDE_TOOL_INPUT = $null
-        }
-
-        It "reads command from JSON 'command' field" {
-            # Valid JSON with a blocked command in the 'command' field.
-            $ErrorActionPreference = 'Continue'
-            $env:CLAUDE_TOOL_INPUT = '{"command":"rm -rf /tmp"}'
-            & $script:ScriptPath 2>$null
-            $LASTEXITCODE | Should -Be 1
-        }
-
-        It "reads safe command from JSON 'command' field and exits 0" {
-            $env:CLAUDE_TOOL_INPUT = '{"command":"git status"}'
-            & $script:ScriptPath
-            $LASTEXITCODE | Should -Be 0
+    Context "Hook source contains no deny-path exit 1" {
+        It "does not use an 'exit 1' statement anywhere in the hook source" {
+            # Match an exit-1 statement (optional leading whitespace then 'exit 1'),
+            # which excludes the quoted 'exit 1' mention inside the doc comment.
+            $lines = Get-Content -Path $script:ScriptPath
+            $exitOneLines = $lines | Where-Object { $_ -match '^\s*exit\s+1\b' }
+            $exitOneLines | Should -BeNullOrEmpty
         }
     }
 }
