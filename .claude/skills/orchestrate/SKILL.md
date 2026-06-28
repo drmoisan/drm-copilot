@@ -65,18 +65,19 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
-## PR Creation Delegation
+## PR Authoring (pr-author Handoff)
 
-PR creation and PR body edits are delegated work, not orchestrator work. The orchestrator MUST NOT call `gh pr create` or `gh pr edit --body*` directly from the main thread; the `enforce-pr-author-skill.ps1` PreToolUse hook blocks those commands unless a valid authorization sentinel issued by the `pr-author` agent is present.
+PR creation and PR body edits are delegated work, not orchestrator work. The orchestrator MUST NOT call `gh pr create` or `gh pr edit --body*` directly from the main thread; the `enforce-pr-author-skill.ps1` PreToolUse hook blocks those commands unless the `--body-file` argument resolves to a canonical `artifacts/pr_body_<N>.md` path with a matching, verified `artifacts/pr_body_<N>.receipt.json`.
 
 The mandatory sequence is:
 
-1. The orchestrator first produces the PR-context artifact via `mcp__drm-copilot__collect_pr_context` (or the equivalent context-collection mechanism), which writes `artifacts/pr_context.summary.txt`.
-2. The orchestrator then delegates PR creation and any PR body edits to `Agent(pr-author)`. The `pr-author` agent runs the `pr-author` skill, writes the short-lived authorization sentinel `artifacts/pr_author_authorization.json` immediately before each `gh` command, issues `gh pr create`/`gh pr edit --body-file ...` within the TTL, deletes the sentinel afterward, and reports the resulting PR URL or PR number.
+1. The orchestrator first refreshes the PR-context artifact via `mcp__drm-copilot__collect_pr_context` (or the equivalent context-collection mechanism), which writes `artifacts/pr_context.summary.txt`.
+2. The orchestrator then delegates PR creation and any PR body edits to `Agent(pr-author)`. The `pr-author` agent runs the `pr-author` skill to author the body, writes the body file `artifacts/pr_body_<N>.md` and the sibling receipt `artifacts/pr_body_<N>.receipt.json` with the shape `{skill, pr_body_path, number, sha256 (lowercase hex of the body bytes), context_summary_path, created_at (ISO-8601 UTC, strictly newer than `artifacts/pr_context.summary.txt` last-write)}`, issues `gh pr create --body-file artifacts/pr_body_<N>.md` (or `gh pr edit --body-file ...`), and reports the resulting PR URL or PR number.
+3. The orchestrator records `pr_author_receipt` in the checkpoint, citing the body-file path and the receipt path that were verified.
 
-`Agent(pr-author)` is the mandatory delegate for PR creation and PR body edits. Direct `gh pr create`/`gh pr edit --body*` from the main thread is prohibited and is blocked by the hook.
+`Agent(pr-author)` is the mandatory delegate for PR creation and PR body edits. Direct `gh pr create`/`gh pr edit --body*` from the main thread is prohibited and is blocked by the hook. The PreToolUse hook verifies the receipt in five ordered checks: canonical body-file path, receipt present, `number` match, `sha256` match against the body bytes, and `created_at` strictly newer than the context summary last-write.
 
-The authorization sentinel is a policy guardrail, not a cryptographic or security control; any actor with `Write(/artifacts/**)` access can forge it. It prevents accidental bypass and requires a deliberate, documented act to circumvent.
+The SHA-256 receipt is a policy-level integrity check, not a cryptographic or security boundary; any actor with `Write(/artifacts/**)` access can replace both the body file and its receipt together with a matching SHA-256. It binds the body bytes to the receipt, prevents accidental bypass, and requires a deliberate, documented act to circumvent.
 
 ## Evidence Location Authority
 
@@ -207,15 +208,16 @@ When S9 records `step9_status: "failed_remediation_required"` (a failed required
 
 ## PR Creation Gate
 
-The orchestrator must not create a PR, push a branch for PR purposes, or report work complete until all five conditions are simultaneously true:
+The orchestrator must not create a PR, push a branch for PR purposes, or report work complete until all six conditions are simultaneously true:
 
 1. `blocking_findings_resolved: true` — the most recent `feature-review` produced zero blocking findings.
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr` (precondition to entering S9).
-5. `ci_gate.conclusion == "success"` AND `ci_gate.head_sha == current head SHA of the PR branch`. DONE is not written while either sub-condition is false.
+5. PR body produced via the pr-author handoff: `artifacts/pr_body_<N>.md` exists with a matching `artifacts/pr_body_<N>.receipt.json`, created with `--body-file`.
+6. `ci_gate.conclusion == "success"` AND `ci_gate.head_sha == current head SHA of the PR branch`. DONE is not written while either sub-condition is false.
 
-This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; condition 5 is additive.
+This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; condition 5 (receipt handoff) and condition 6 (CI-green gate) are additive.
 
 ## Step 6 Delegation — Prohibited Prompt Language
 
