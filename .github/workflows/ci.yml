@@ -33,7 +33,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
@@ -235,7 +235,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .venv
           key: venv-${{ runner.os }}-3.13-${{ hashFiles('**/poetry.lock') }}
@@ -259,7 +259,7 @@ jobs:
 
       - name: Cache kcov build
         id: cache-kcov
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /tmp/kcov-install
           key: kcov-v43-ubuntu-latest
