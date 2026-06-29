@@ -27,10 +27,11 @@
     is written to the tracked roots docs/features/<feature>/research/
     (feature-associated) or docs/research/ (one-off).
 
-    If the file_path resolves to a forbidden prefix, the script writes a JSON response
-    to stdout with 'decision': 'block' and exits with code 0 so Claude Code surfaces
-    the reason. For allowed paths, 'decision': 'allow' is written to stdout and the
-    script exits 0. On hard failure (malformed JSON input), the script exits 1.
+    If the file_path resolves to a forbidden prefix, the script writes a PreToolUse JSON
+    response to stdout with hookSpecificOutput.permissionDecision = 'deny' and exits with
+    code 0 so Claude Code surfaces the reason. For allowed paths, a PreToolUse response
+    with permissionDecision = 'allow' is written to stdout and the script exits 0. On hard
+    failure (malformed JSON input), the script exits 1.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -83,9 +84,9 @@ function Test-EvidenceLocationForbidden {
 function Get-EvidenceLocationBlockDecision {
     <#
     .SYNOPSIS
-        Constructs a block-decision ordered dictionary for the supplied forbidden path.
+        Constructs a deny-decision ordered dictionary for the supplied forbidden path.
     .PARAMETER FilePath
-        The file path that triggered the block.
+        The file path that triggered the deny decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -95,8 +96,11 @@ function Get-EvidenceLocationBlockDecision {
     )
 
     [ordered]@{
-        decision = 'block'
-        reason   = "EVIDENCE_LOCATION_BLOCKED: '$FilePath' is not a canonical evidence location. Use <FEATURE>/evidence/<kind>/ instead. See .claude/skills/evidence-and-timestamp-conventions/SKILL.md for the canonical scheme."
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = "EVIDENCE_LOCATION_BLOCKED: '$FilePath' is not a canonical evidence location. Use <FEATURE>/evidence/<kind>/ instead. See .claude/skills/evidence-and-timestamp-conventions/SKILL.md for the canonical scheme."
+        }
     }
 }
 
@@ -115,7 +119,7 @@ function Invoke-EvidenceLocationDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     try {
@@ -127,14 +131,14 @@ function Invoke-EvidenceLocationDecision {
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     if (Test-EvidenceLocationForbidden -FilePath $filePath) {
         return Get-EvidenceLocationBlockDecision -FilePath $filePath
     }
 
-    return [ordered]@{ decision = 'allow' }
+    return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
 }
 
 function Invoke-EvidenceLocationEntryPoint {
@@ -163,7 +167,7 @@ function Invoke-EvidenceLocationEntryPoint {
         return 1
     }
 
-    $decision | ConvertTo-Json -Compress | Write-Output
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 
     return 0
 }

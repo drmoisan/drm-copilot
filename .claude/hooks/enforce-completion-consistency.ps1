@@ -23,9 +23,11 @@
         variables.feature-folder);
       - a ci_gate object with conclusion == "success" and a non-empty head_sha.
 
-    The block reason names the specific missing evidence so the caller can
-    remediate. When completion is not asserted, the write is allowed
-    (backward compatibility).
+    When completion evidence is missing the hook emits a PreToolUse JSON
+    response with hookSpecificOutput.permissionDecision='deny' and a reason that
+    names the specific missing evidence so the caller can remediate. When
+    completion is not asserted, the write is allowed via
+    hookSpecificOutput.permissionDecision='allow' (backward compatibility).
 
     Edit tool calls supply only old_string/new_string (a partial patch) and
     cannot be reliably validated without the full target file content, so they
@@ -331,7 +333,7 @@ function Invoke-CompletionConsistencyDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     try {
@@ -343,12 +345,12 @@ function Invoke-CompletionConsistencyDecision {
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $normalized = $filePath -replace '\\', '/'
     if (-not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     # Write tool: validate the content payload directly. Edit tool: no content is
@@ -360,7 +362,7 @@ function Invoke-CompletionConsistencyDecision {
         if (-not $content) {
             # No content, and the Edit could not be resolved against on-disk
             # state (missing file or non-matching patch): defer and allow.
-            return [ordered]@{ decision = 'allow' }
+            return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
         }
     }
 
@@ -370,11 +372,11 @@ function Invoke-CompletionConsistencyDecision {
     catch {
         # The content itself is not valid JSON. Let downstream tools surface the
         # error rather than blocking with a misleading reason here.
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     if (-not (Test-CompletionAsserted -Payload $payload)) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $missingArgs = @{ Payload = $payload; FolderExistsCheck = $FolderExistsCheck }
@@ -383,12 +385,16 @@ function Invoke-CompletionConsistencyDecision {
     }
     $missing = Get-MissingCompletionEvidence @missingArgs
     if ($missing.Count -eq 0) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
+    $reason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
     return [ordered]@{
-        decision = 'block'
-        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $reason
+        }
     }
 }
 
@@ -405,6 +411,6 @@ catch {
     exit 1
 }
 
-$decision | ConvertTo-Json -Compress | Write-Output
+$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 
 exit 0

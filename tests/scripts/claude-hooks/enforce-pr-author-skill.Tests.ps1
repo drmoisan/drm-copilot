@@ -10,13 +10,13 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'tool input parsing' {
         It 'allows when CLAUDE_TOOL_INPUT is empty' {
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw ''
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when JSON has no command field' {
             $json = '{"other":"value"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'throws on malformed JSON so the hook exits 1' {
@@ -32,15 +32,15 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'blocks gh pr create --body "inline string"' {
             $json = '{"command":"gh pr create --title \"foo\" --body \"inline string\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
 
         It "blocks gh pr create --body='inline' (equals-sign form)" {
             $json = '{"command":"gh pr create --title \"foo\" --body=''inline text''"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
     }
 
@@ -53,23 +53,23 @@ Describe 'enforce-pr-author-skill.ps1' {
             # Inline --body on gh pr edit must be blocked by Case A before the no-body allow path.
             $json = '{"command":"gh pr edit 42 --body \"inline text\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
 
         It "blocks gh pr edit --body='inline' (equals-sign form, no --body-file)" {
             # Equals-sign inline --body on gh pr edit must also be blocked by Case A.
             $json = '{"command":"gh pr edit 42 --body=''inline''"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
 
         It 'allows gh pr edit --title "x" (no body flag remains allowed)' {
             # Regression guard: an edit with no body flag must remain allowed after the Case A change.
             $json = '{"command":"gh pr edit 42 --title \"x\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -81,17 +81,17 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'blocks gh pr create with no body flags' {
             $json = '{"command":"gh pr create"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
-            $decision['reason'] | Should -Match '--body-file'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match '--body-file'
         }
 
         It 'blocks gh pr create --title foo with no body flags' {
             $json = '{"command":"gh pr create --title \"my feature\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
-            $decision['reason'] | Should -Match '--body-file'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match '--body-file'
         }
     }
 
@@ -103,17 +103,17 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'blocks gh pr create --body-file artifacts/pr_body_12.md when context is absent' {
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_CONTEXT_MISSING'
-            $decision['reason'] | Should -Match 'collect_pr_context'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_CONTEXT_MISSING'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'collect_pr_context'
         }
 
         It 'blocks gh pr edit --body-file artifacts/pr_body_12.md when context is absent' {
             $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_CONTEXT_MISSING'
-            $decision['reason'] | Should -Match 'collect_pr_context'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_CONTEXT_MISSING'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'collect_pr_context'
         }
     }
 
@@ -132,55 +132,55 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'allows gh pr create --body-file artifacts/pr_body_12.md when context exists' {
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr edit --body-file artifacts/pr_body_12.md when context exists' {
             $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr edit --title "new title" (no body flag)' {
             $json = '{"command":"gh pr edit 42 --title \"new title\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr edit --add-label bug (no body flag)' {
             $json = '{"command":"gh pr edit 42 --add-label bug"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr view 13' {
             $json = '{"command":"gh pr view 13"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr list' {
             $json = '{"command":"gh pr list"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr merge' {
             $json = '{"command":"gh pr merge 42 --squash"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr checkout 13' {
             $json = '{"command":"gh pr checkout 13"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh issue create (not guarded by this hook)' {
             $json = '{"command":"gh issue create --title foo"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -194,16 +194,16 @@ Describe 'enforce-pr-author-skill.ps1' {
             Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { $null }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
         }
 
         It 'blocks with PR_AGENT_AUTHORIZATION_MISSING when the sentinel read seam returns empty/whitespace' {
             Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { '   ' }
             $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MISSING'
         }
     }
 
@@ -219,8 +219,8 @@ Describe 'enforce-pr-author-skill.ps1' {
             }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_INVALID'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_INVALID'
         }
     }
 
@@ -237,8 +237,8 @@ Describe 'enforce-pr-author-skill.ps1' {
             }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_EXPIRED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_EXPIRED'
         }
     }
 
@@ -252,8 +252,8 @@ Describe 'enforce-pr-author-skill.ps1' {
             Mock -CommandName Get-PrAuthorAuthorizationContent -MockWith { '{not-json' }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
         }
 
         It 'blocks with PR_AGENT_AUTHORIZATION_MALFORMED when issued_at is missing' {
@@ -262,8 +262,8 @@ Describe 'enforce-pr-author-skill.ps1' {
             }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AGENT_AUTHORIZATION_MALFORMED'
         }
     }
 
@@ -280,7 +280,7 @@ Describe 'enforce-pr-author-skill.ps1' {
             }
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr edit --body-file with a valid in-TTL pr-author sentinel' {
@@ -289,7 +289,7 @@ Describe 'enforce-pr-author-skill.ps1' {
             }
             $json = '{"command":"gh pr edit 42 --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -316,6 +316,23 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'returns PR_CONTEXT_MISSING when --body-file present but context absent' {
             $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_1.md' -ContextExists $false
             $result | Should -Match 'PR_CONTEXT_MISSING'
+        }
+    }
+
+    Context 'decision builders emit the PreToolUse schema' {
+        It 'Get-PrAuthorSkillBlockDecision yields hookEventName=PreToolUse and permissionDecision=deny after serialize-then-parse' {
+            $d = Get-PrAuthorSkillBlockDecision -Reason 'PR_AUTHOR_SKILL_BLOCKED: test reason'
+            $parsed = $d | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It 'Get-PrAuthorSkillAllowDecision yields permissionDecision=allow' {
+            $d = Get-PrAuthorSkillAllowDecision
+            $parsed = $d | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
@@ -400,8 +417,8 @@ Describe 'enforce-pr-author-skill.ps1' {
         It 'blocks gh pr create with no body flags regardless of context artifact' {
             $json = '{"command":"gh pr create --title \"foo\""}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
-            $decision['decision'] | Should -Be 'block'
-            $decision['reason'] | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
     }
 
@@ -421,7 +438,7 @@ Describe 'enforce-pr-author-skill.ps1' {
                 $env:CLAUDE_TOOL_INPUT = ''
                 $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).decision | Should -Be 'allow'
+                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             } finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
             }
@@ -434,8 +451,9 @@ Describe 'enforce-pr-author-skill.ps1' {
                 $out = & $script:PwshExe -NoProfile -File $script:HookPath
                 $LASTEXITCODE | Should -Be 0
                 $parsed = $out | ConvertFrom-Json
-                $parsed.decision | Should -Be 'block'
-                $parsed.reason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+                $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+                $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+                $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
             } finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
             }

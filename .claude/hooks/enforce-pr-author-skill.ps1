@@ -265,7 +265,7 @@ function Invoke-PrAuthorSkillDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PrAuthorSkillAllowDecision
     }
 
     try {
@@ -276,20 +276,61 @@ function Invoke-PrAuthorSkillDecision {
 
     $commandText = $toolInput.command
     if (-not $commandText) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PrAuthorSkillAllowDecision
     }
 
     $contextExists = Get-PrContextArtifactExistence
     $reason = Get-PrAuthorBypassReason -CommandText $commandText -ContextExists $contextExists
 
     if ($reason) {
-        return [ordered]@{
-            decision = 'block'
-            reason   = $reason
-        }
+        return Get-PrAuthorSkillBlockDecision -Reason $reason
     }
 
-    return [ordered]@{ decision = 'allow' }
+    return Get-PrAuthorSkillAllowDecision
+}
+
+function Get-PrAuthorSkillAllowDecision {
+    <#
+    .SYNOPSIS
+        Construct the PreToolUse allow decision for a permitted Bash command.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param()
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName      = 'PreToolUse'
+            permissionDecision = 'allow'
+        }
+    }
+}
+
+function Get-PrAuthorSkillBlockDecision {
+    <#
+    .SYNOPSIS
+        Construct the PreToolUse deny decision for a forbidden Bash command.
+    .PARAMETER Reason
+        The specific deny reason to surface in the decision.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
 }
 
 function Test-PrAuthorBypassRequired {
@@ -328,6 +369,6 @@ try {
     exit 1
 }
 
-$decision | ConvertTo-Json -Compress | Write-Output
+$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 
 exit 0

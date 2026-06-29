@@ -38,8 +38,11 @@ function Get-PythonTestPurityBlockDecision {
     )
 
     [ordered]@{
-        decision = 'block'
-        reason   = $Reason
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
     }
 }
 
@@ -63,7 +66,7 @@ function Invoke-PythonTestPurityDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     try {
@@ -74,11 +77,11 @@ function Invoke-PythonTestPurityDecision {
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     if (-not (Test-PythonTestFilePath -FilePath $filePath)) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $content = $null
@@ -89,7 +92,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $forbiddenPatterns = @(
@@ -125,7 +128,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if ($violations.Count -eq 0) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $uniqueViolations = $violations | Select-Object -Unique
@@ -139,8 +142,8 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 $decision = Invoke-PythonTestPurityDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-if ($decision.decision -eq 'block') {
-    $decision | ConvertTo-Json -Compress | Write-Output
+if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 }
 
 exit 0

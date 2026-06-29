@@ -9,6 +9,7 @@ Describe 'check-powershell-test-purity.ps1' {
     BeforeAll {
         $script:ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..', '.claude', 'hooks', 'check-powershell-test-purity.ps1'
         $script:ScriptPath = (Resolve-Path $script:ScriptPath).Path
+        . $script:ScriptPath
 
         function Get-PowerShellPurityInput {
             param(
@@ -30,49 +31,45 @@ Describe 'check-powershell-test-purity.ps1' {
 
             return ($payload | ConvertTo-Json -Compress)
         }
-
-        function Invoke-PowerShellPurityHook {
-            param([Parameter(Mandatory)][string] $ToolInputRaw)
-
-            $env:CLAUDE_TOOL_INPUT = $ToolInputRaw
-            $output = & $script:ScriptPath
-            if ($output) {
-                return ($output | ConvertFrom-Json)
-            }
-
-            return [pscustomobject]@{ decision = 'allow'; reason = $null }
-        }
     }
 
     AfterEach {
         $env:CLAUDE_TOOL_INPUT = $null
     }
 
-    It 'allows safe Pester test content' {
+    It 'returns no decision for safe Pester test content' {
         $inputJson = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'It "passes" { 1 | Should -Be 1 }'
 
-        $result = Invoke-PowerShellPurityHook -ToolInputRaw $inputJson
+        $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw $inputJson
 
-        $result.decision | Should -Be 'allow'
+        $result | Should -BeNullOrEmpty
     }
 
-    It 'allows empty content and empty new_string edits' {
-        $contentResult = Invoke-PowerShellPurityHook -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content '')
-        $newStringResult = Invoke-PowerShellPurityHook -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -NewString '')
+    It 'returns no decision for empty content and empty new_string edits' {
+        $contentResult = Invoke-PowerShellTestPurityDecision -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content '')
+        $newStringResult = Invoke-PowerShellTestPurityDecision -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -NewString '')
 
-        $contentResult.decision | Should -Be 'allow'
-        $newStringResult.decision | Should -Be 'allow'
+        $contentResult | Should -BeNullOrEmpty
+        $newStringResult | Should -BeNullOrEmpty
     }
 
     It 'ignores non-test and non-PowerShell file paths' {
-        $sourceResult = Invoke-PowerShellPurityHook -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'scripts/tool.ps1' -Content 'Start-Sleep -Seconds 1')
-        $markdownResult = Invoke-PowerShellPurityHook -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/readme.md' -Content 'Start-Sleep -Seconds 1')
+        $sourceResult = Invoke-PowerShellTestPurityDecision -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'scripts/tool.ps1' -Content 'Start-Sleep -Seconds 1')
+        $markdownResult = Invoke-PowerShellTestPurityDecision -ToolInputRaw (Get-PowerShellPurityInput -FilePath 'tests/readme.md' -Content 'Start-Sleep -Seconds 1')
 
-        $sourceResult.decision | Should -Be 'allow'
-        $markdownResult.decision | Should -Be 'allow'
+        $sourceResult | Should -BeNullOrEmpty
+        $markdownResult | Should -BeNullOrEmpty
     }
 
-    It 'blocks forbidden Pester runtime and mock patterns' {
+    It 'returns no decision for absent or malformed tool input' {
+        $absent = Invoke-PowerShellTestPurityDecision -ToolInputRaw ''
+        $malformed = Invoke-PowerShellTestPurityDecision -ToolInputRaw '{not-json'
+
+        $absent | Should -BeNullOrEmpty
+        $malformed | Should -BeNullOrEmpty
+    }
+
+    It 'denies forbidden Pester runtime and mock patterns with the PreToolUse deny shape' {
         $blockedExamples = @(
             @{ Content = 'Mock git'; Reason = 'direct Mock git forbidden in Pester tests' },
             @{ Content = 'Mock gh'; Reason = 'direct Mock gh forbidden in Pester tests' },
@@ -95,10 +92,37 @@ Describe 'check-powershell-test-purity.ps1' {
         foreach ($example in $blockedExamples) {
             $inputJson = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content $example.Content
 
-            $result = Invoke-PowerShellPurityHook -ToolInputRaw $inputJson
+            $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw $inputJson
 
-            $result.decision | Should -Be 'block'
-            $result.reason | Should -BeLike "*$($example.Reason)*"
+            $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($example.Reason)*"
         }
+    }
+
+    It 'builds a deny decision that survives serialize-then-parse round-tripping' {
+        $decision = Get-PowerShellTestPurityBlockDecision -Reason 'PowerShell unit test purity violations in test.Tests.ps1'
+        $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+
+        $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $parsed.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*PowerShell unit test purity violations*'
+    }
+
+    It 'emits the compact deny JSON from the entrypoint on a forbidden pattern' {
+        $env:CLAUDE_TOOL_INPUT = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'Start-Sleep -Seconds 1'
+
+        $output = & $script:ScriptPath | ConvertFrom-Json
+
+        $output.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $output.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+    }
+
+    It 'emits nothing from the entrypoint for safe content' {
+        $env:CLAUDE_TOOL_INPUT = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'It "passes" { 1 | Should -Be 1 }'
+
+        $output = & $script:ScriptPath
+
+        $output | Should -BeNullOrEmpty
     }
 }
