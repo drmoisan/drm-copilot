@@ -192,12 +192,12 @@
     "@types/node": "26.x",
     "@types/vscode": "^1.108.1",
     "esbuild": "^0.28.0",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "jest": "^30.0.0",
-    "prettier": "^3.6.0",
+    "prettier": "^3.9.1",
     "ts-jest": "^29.4.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.52.0"
+    "typescript-eslint": "^8.62.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"
