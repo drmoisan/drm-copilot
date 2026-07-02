@@ -22,6 +22,7 @@ import {
   prepareFreshModulesWithPosixPathResolve,
   registerCommandMock,
   resetExtensionHarnessState,
+  resolveCodexExecutable,
   setExecutablePresence,
   setFreshExecutablePresence,
   setWorkspaceFolders,
@@ -29,6 +30,9 @@ import {
   showInformationMessageMock,
   showErrorMessageMock,
 } from "./extension-test-harness";
+
+const expectedPathResolvedCodexExecutable =
+  process.platform === "win32" ? "C:/bin/codex.EXE" : "C/codex";
 
 describe("drm-copilot core command behavior", () => {
   beforeEach(() => {
@@ -136,6 +140,62 @@ describe("drm-copilot core command behavior", () => {
 
     expect(() => detectRuntime("powershell")).toThrow(
       "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
+    );
+  });
+
+  it("resolveCodexExecutable finds default codex on PATH", () => {
+    setExecutablePresence({ codex: true });
+
+    expect(resolveCodexExecutable("")).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
+  });
+
+  it("resolveCodexExecutable treats undefined configuration as PATH fallback", () => {
+    setExecutablePresence({ codex: true });
+
+    expect(resolveCodexExecutable(undefined)).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
+  });
+
+  it("resolveCodexExecutable resolves configured command names from PATH", () => {
+    setExecutablePresence({ codex: true });
+
+    expect(resolveCodexExecutable("codex")).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
+  });
+
+  it("resolveCodexExecutable validates configured executable paths", () => {
+    setExecutablePresence({ codex: true });
+
+    expect(resolveCodexExecutable("C:/Tools/Codex/codex.exe")).toBe(
+      "C:/Tools/Codex/codex.exe",
+    );
+  });
+
+  it("resolveCodexExecutable fails when a configured executable path is missing", () => {
+    setExecutablePresence({ codex: false });
+
+    expect(() => resolveCodexExecutable("C:/Tools/Codex/codex.exe")).toThrow(
+      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+    );
+  });
+
+  it("resolveCodexExecutable fails when a configured command name is missing", () => {
+    setExecutablePresence({ codex: false });
+
+    expect(() => resolveCodexExecutable("codex")).toThrow(
+      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+    );
+  });
+
+  it("resolveCodexExecutable fails when default codex cannot be found", () => {
+    setExecutablePresence({ codex: false });
+
+    expect(() => resolveCodexExecutable("")).toThrow(
+      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
     );
   });
 

@@ -30,6 +30,13 @@ describe("buildCodexTrustCommand", () => {
       "Resolve-Path -LiteralPath 'C:/repos/o''connor worktree'",
     );
   });
+
+  it("emits the elseif branch as part of the same PowerShell statement", () => {
+    const command = buildCodexTrustCommand("C:/repos/workspace-wt");
+
+    expect(command).not.toContain("; elseif");
+    expect(command).toContain("} elseif (");
+  });
 });
 
 describe("buildCodexWorktreeSessionCommands", () => {
@@ -39,6 +46,7 @@ describe("buildCodexWorktreeSessionCommands", () => {
     branchName: "workspace-wt-2026-04-20-09-59",
     usePoetry: false,
     objective: undefined,
+    codexExecutablePath: "C:/bin/codex.exe",
     postCodexScriptPath: undefined,
   };
 
@@ -54,7 +62,7 @@ describe("buildCodexWorktreeSessionCommands", () => {
     expect(commands.trustCodexProject).toContain(
       "$codexConfig = Join-Path $HOME '.codex/config.toml'",
     );
-    expect(commands.codex).toBe("codex");
+    expect(commands.codex).toBe("& 'C:/bin/codex.exe'");
   });
 
   it("emits codex with a quoted objective when supplied", () => {
@@ -63,7 +71,34 @@ describe("buildCodexWorktreeSessionCommands", () => {
       objective: "Implement the Codex command.",
     });
 
-    expect(commands.codex).toBe("codex 'Implement the Codex command.'");
+    expect(commands.codex).toBe(
+      "& 'C:/bin/codex.exe' 'Implement the Codex command.'",
+    );
+  });
+
+  it("emits codex through the resolved executable path", () => {
+    const input = {
+      ...baseInput,
+      codexExecutablePath: "C:/Tools/Codex/codex.exe",
+    };
+
+    const commands = buildCodexWorktreeSessionCommands(input);
+
+    expect(commands.codex).toBe("& 'C:/Tools/Codex/codex.exe'");
+  });
+
+  it("preserves the objective argument when using a resolved codex executable", () => {
+    const input = {
+      ...baseInput,
+      codexExecutablePath: "C:/Tools/Codex/codex.exe",
+      objective: "Implement issue 268",
+    };
+
+    const commands = buildCodexWorktreeSessionCommands(input);
+
+    expect(commands.codex).toBe(
+      "& 'C:/Tools/Codex/codex.exe' 'Implement issue 268'",
+    );
   });
 
   it("returns poetry commands when the workspace uses poetry", () => {
@@ -83,7 +118,7 @@ describe("buildCodexWorktreeSessionCommands", () => {
     });
 
     expect(commands.postCodex).toBe(
-      "if (Test-Path -LiteralPath 'scripts/post-codex.ps1') { & 'scripts/post-codex.ps1' }",
+      "if (Test-Path -LiteralPath 'scripts/post-codex.ps1') { & 'scripts/post-codex.ps1' -SourceRoot 'C:/workspace' -WorktreeRoot 'C:/workspace-wt-2026-04-20-09-59' }",
     );
   });
 

@@ -56,6 +56,7 @@ const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
 
 let preClaudeScriptPathConfig: string | undefined = undefined;
 let postCodexScriptPathConfig: string | undefined = undefined;
+let codexExecutablePathConfig: string | undefined = undefined;
 
 const getConfigurationMock = jest.fn((section?: string) => ({
   get: <T>(key: string): T | undefined => {
@@ -70,6 +71,12 @@ const getConfigurationMock = jest.fn((section?: string) => ({
       key === "postCodexScriptPath"
     ) {
       return postCodexScriptPathConfig as T | undefined;
+    }
+    if (
+      section === "drmCopilotExtension.newCodexWorktreeSession" &&
+      key === "codexExecutablePath"
+    ) {
+      return codexExecutablePathConfig as T | undefined;
     }
     return undefined;
   },
@@ -297,6 +304,17 @@ export function setPostCodexScriptPathConfig(value: string | undefined): void {
   postCodexScriptPathConfig = value;
 }
 
+/**
+ * Controls the value returned by
+ * `vscode.workspace.getConfiguration("drmCopilotExtension.newCodexWorktreeSession").get<string>("codexExecutablePath")`.
+ * Pass `undefined` to simulate the setting being unset.
+ *
+ * @param value The configured `codex` executable path, or `undefined`.
+ */
+export function setCodexExecutablePathConfig(value: string | undefined): void {
+  codexExecutablePathConfig = value;
+}
+
 export function resetExtensionHarnessState(): void {
   process.env.PATH = "C:/bin";
   process.env.PATHEXT = ".EXE;.CMD";
@@ -307,6 +325,7 @@ export function resetExtensionHarnessState(): void {
   getConfigurationMock.mockClear();
   preClaudeScriptPathConfig = undefined;
   postCodexScriptPathConfig = undefined;
+  codexExecutablePathConfig = undefined;
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
   fsMock.readFileSync.mockReset();
@@ -328,8 +347,8 @@ export function resetExtensionHarnessState(): void {
   openTextDocumentMock.mockReset();
   showTextDocumentMock.mockReset();
   createTerminalMock.mockReset();
-  createTerminalMock.mockImplementation(
-    (): MockTerminal => buildMockTerminal(),
+  createTerminalMock.mockImplementation((): MockTerminal =>
+    buildMockTerminal(),
   );
   openTextDocumentMock.mockImplementation(async (uri: { fsPath: string }) => ({
     uri,
@@ -383,6 +402,12 @@ export function detectRuntime(
   return getExtensionModule().detectRuntime(runtimeKind);
 }
 
+export function resolveCodexExecutable(
+  configuredExecutable: string | undefined,
+): string {
+  return getExtensionModule().resolveCodexExecutable(configuredExecutable);
+}
+
 export function deactivate(): void {
   getExtensionModule().deactivate();
 }
@@ -400,6 +425,7 @@ export {
   prepareFreshModulesWithPosixPathResolve,
   registerCommandMock,
   registerMcpServerDefinitionProviderMock,
+  resolveCodexExecutable,
   openTextDocumentMock,
   showInputBoxMock,
   showOpenDialogMock,

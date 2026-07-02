@@ -10,6 +10,7 @@ export interface CodexWorktreeSessionCommandInput {
   readonly branchName: string;
   readonly usePoetry: boolean;
   readonly objective: string | undefined;
+  readonly codexExecutablePath: string;
   /**
    * Worktree-relative PowerShell script path to run after Codex trust has been
    * written and before the Codex CLI starts. Empty values emit no post command.
@@ -52,8 +53,7 @@ export function buildCodexTrustCommand(worktreePath: string): string {
     "$content = Get-Content -Raw -LiteralPath $codexConfig",
     "$sectionPattern = '(?s)' + [regex]::Escape($header) + '(?<body>.*?)(?:\\r?\\n\\[|$)'",
     "$sectionMatch = [regex]::Match($content, $sectionPattern)",
-    'if (-not $sectionMatch.Success) { Add-Content -LiteralPath $codexConfig -Value "`r`n$header`r`n$trustedLine" }',
-    "elseif ($sectionMatch.Groups['body'].Value -notmatch 'trust_level\\s*=\\s*\"trusted\"') { throw \"Codex project trust entry exists but is not trusted: $trustedPath\" }",
+    'if (-not $sectionMatch.Success) { Add-Content -LiteralPath $codexConfig -Value "`r`n$header`r`n$trustedLine" } elseif ($sectionMatch.Groups[\'body\'].Value -notmatch \'trust_level\\s*=\\s*\\"trusted\\"\') { throw "Codex project trust entry exists but is not trusted: $trustedPath" }',
   ].join("; ");
 }
 
@@ -75,6 +75,7 @@ export function buildCodexWorktreeSessionCommands(
   const trimmedObjective = input.objective?.trim() ?? "";
   const objectiveSuffix =
     trimmedObjective.length > 0 ? ` ${quoteForPwsh(trimmedObjective)}` : "";
+  const codexCommand = `& ${quoteForPwsh(input.codexExecutablePath)}${objectiveSuffix}`;
 
   const poetryInstall = input.usePoetry
     ? "poetry install --with dev"
@@ -86,7 +87,7 @@ export function buildCodexWorktreeSessionCommands(
   const trimmedPostCodexPath = input.postCodexScriptPath?.trim() ?? "";
   const postCodex =
     trimmedPostCodexPath.length > 0
-      ? `if (Test-Path -LiteralPath ${quoteForPwsh(trimmedPostCodexPath)}) { & ${quoteForPwsh(trimmedPostCodexPath)} }`
+      ? `if (Test-Path -LiteralPath ${quoteForPwsh(trimmedPostCodexPath)}) { & ${quoteForPwsh(trimmedPostCodexPath)} -SourceRoot ${quotedRepoRoot} -WorktreeRoot ${quotedPath} }`
       : undefined;
 
   return {
@@ -96,6 +97,6 @@ export function buildCodexWorktreeSessionCommands(
     poetryInstall,
     activate,
     postCodex,
-    codex: `codex${objectiveSuffix}`,
+    codex: codexCommand,
   };
 }
