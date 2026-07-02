@@ -48,6 +48,16 @@
 - Manual/CLI: ...
 - Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
 
+## Remediation Synchronization
+
+- Issue #269 remediation evidence is stored under
+  `docs/features/active/2026-07-02-codex-push-down-language-packs-269/evidence/`.
+- Issue #269 research context is stored under
+  `docs/features/active/2026-07-02-codex-push-down-language-packs-269/research/`.
+- No placeholder tasks in this original plan were marked complete during remediation;
+  completion status is tracked in
+  `docs/features/active/2026-07-02-codex-push-down-language-packs-269/remediation-plan.2026-07-02T14-06.md`.
+
 ## Open Questions / Notes
 
 - ...

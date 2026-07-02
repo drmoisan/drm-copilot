@@ -153,11 +153,10 @@ function registerPushDownCodexAndAgentsCustomizationsCommand(
         }
         csharpVariant = variantChoice;
       }
-      const translatedPacks = translateSelectedPackNames(packs, csharpVariant);
       await options.service.pushDownCodexAndAgentsCustomizations({
         workspaceRoot: getWorkspaceRoot(),
         invocationId: commandId,
-        packs: translatedPacks,
+        packs,
         ...(csharpVariant === undefined ? {} : { csharpVariant }),
         memoryMode: "overwrite",
       });

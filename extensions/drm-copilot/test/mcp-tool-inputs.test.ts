@@ -298,13 +298,13 @@ describe("resolvePushDownCodexAndAgentsCustomizationsToolInput", () => {
     expect(
       resolvePushDownCodexAndAgentsCustomizationsToolInput({
         workspace_root: "C:/ws",
-        packs: ["typescript", "csharp-legacy"],
+        packs: ["typescript", "csharp"],
         csharp_variant: "legacy",
         memory_mode: "skip",
       }),
     ).toEqual({
       workspaceRoot: "C:/ws",
-      packs: ["typescript", "csharp-legacy"],
+      packs: ["typescript", "csharp"],
       csharpVariant: "legacy",
       memoryMode: "skip",
     });

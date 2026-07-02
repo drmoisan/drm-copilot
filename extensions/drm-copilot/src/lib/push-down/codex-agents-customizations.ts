@@ -24,6 +24,7 @@ import {
   loadPackManifests,
   type MemoryMode,
   type PackManifest,
+  resolveManifestPackNames,
   resolveVariantSourcePath,
 } from "./codex-pack-selection";
 
@@ -161,20 +162,22 @@ class CodexFilteringFileSystem implements PushDownFileSystem {
 
 function resolvePublishedPaths(
   packs: ReadonlySet<string> | null | undefined,
+  csharpVariant: CSharpVariant,
   bundleRoot: string,
   fs: PushDownFileSystem,
 ): ReadonlySet<string> | null {
-  if (packs === undefined || packs === null || packs.size === 0) {
+  const manifestPacks = resolveManifestPackNames(packs ?? null, csharpVariant);
+  if (manifestPacks === null || manifestPacks.size === 0) {
     return null;
   }
   const manifests: Map<string, PackManifest> = loadPackManifests(
     joinPosix(bundleRoot, PACK_MANIFEST_SUBDIR),
-    packs,
+    manifestPacks,
     fs,
   );
   const published =
-    computePublishedPaths(packs, manifests) ?? new Set<string>();
-  assertSingleCsharpToolchain(published, packs);
+    computePublishedPaths(manifestPacks, manifests) ?? new Set<string>();
+  assertSingleCsharpToolchain(published, manifestPacks);
   return published;
 }
 
@@ -193,12 +196,13 @@ export function pushDownCustomizations(
 ): PushDownSummary {
   const sourceRoot = options.sourceRoot ?? options.repoRoot;
   const bundleRoot = options.bundleRoot ?? sourceRoot;
+  const csharpVariant = options.csharpVariant ?? "modern";
   const publishedPaths = resolvePublishedPaths(
     options.packs,
+    csharpVariant,
     bundleRoot,
     options.fs,
   );
-  const csharpVariant = options.csharpVariant ?? "modern";
   const filteringFs = new CodexFilteringFileSystem(options.fs, {
     sourceRoot,
     bundleRoot,

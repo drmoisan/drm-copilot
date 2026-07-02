@@ -110,7 +110,7 @@ describe("dispatchRepoAutomationTool push_down_codex_and_agents_customizations",
       "push_down_codex_and_agents_customizations",
       {
         workspace_root: "/dest",
-        packs: ["core", "csharp-legacy"],
+        packs: ["core", "csharp"],
         csharp_variant: "legacy",
         memory_mode: "skip",
       },
@@ -121,7 +121,7 @@ describe("dispatchRepoAutomationTool push_down_codex_and_agents_customizations",
       mockService.pushDownCodexAndAgentsCustomizations,
     ).toHaveBeenCalledWith({
       workspaceRoot: "/dest",
-      packs: ["core", "csharp-legacy"],
+      packs: ["core", "csharp"],
       csharpVariant: "legacy",
       memoryMode: "skip",
     });

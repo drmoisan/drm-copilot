@@ -6,6 +6,7 @@ import {
   computePublishedPaths,
   loadPackManifests,
   ManifestError,
+  resolveManifestPackNames,
   resolveVariantSourcePath,
   type PackManifest,
 } from "../../../src/lib/push-down/codex-pack-selection";
@@ -62,6 +63,33 @@ describe("Codex loadPackManifests", () => {
       loadPackManifests(MANIFEST_DIR, new Set(["ruby"]), malformedFs),
     ).toThrow("Unknown Codex pack");
   });
+
+  it.each([
+    ["[]", "must be a JSON object"],
+    [manifestJson({ paths: [".codex/config.toml"] }), "name"],
+    [
+      manifestJson({ name: "core", label: "", paths: [".codex/config.toml"] }),
+      "label",
+    ],
+    [manifestJson({ name: "core", paths: [] }), "paths"],
+    [manifestJson({ name: "core", paths: [7] }), "paths"],
+    [
+      manifestJson({
+        name: "core",
+        paths: [".codex/config.toml"],
+        source_prefix: 7,
+      }),
+      "source_prefix",
+    ],
+  ])("rejects invalid manifest shape %#", (payload, message) => {
+    const fs = buildInMemoryFileSystem({
+      [`${MANIFEST_DIR}/core.json`]: payload,
+    });
+
+    expect(() =>
+      loadPackManifests(MANIFEST_DIR, new Set(["core"]), fs),
+    ).toThrow(message);
+  });
 });
 
 describe("Codex computePublishedPaths", () => {
@@ -92,6 +120,34 @@ describe("Codex computePublishedPaths", () => {
     expect([
       ...(computePublishedPaths(new Set(["typescript"]), manifests) ?? []),
     ]).toEqual([".agents/skills/typescript/SKILL.md", ".codex/config.toml"]);
+  });
+});
+
+describe("Codex resolveManifestPackNames", () => {
+  it("maps public csharp selection to the selected variant manifest", () => {
+    expect(
+      resolveManifestPackNames(new Set(["core", "csharp"]), "legacy"),
+    ).toEqual(new Set(["core", "csharp-legacy"]));
+    expect(resolveManifestPackNames(new Set(["csharp"]), "modern")).toEqual(
+      new Set(["csharp-modern"]),
+    );
+  });
+
+  it("returns null for null or empty public selection", () => {
+    expect(resolveManifestPackNames(null, "legacy")).toBeNull();
+    expect(resolveManifestPackNames(new Set(), "modern")).toBeNull();
+  });
+
+  it("rejects variant-specific pack names in public input", () => {
+    expect(() =>
+      resolveManifestPackNames(new Set(["csharp", "csharp-legacy"]), "legacy"),
+    ).toThrow("public Codex pack 'csharp'");
+  });
+
+  it("rejects unknown public pack names", () => {
+    expect(() => resolveManifestPackNames(new Set(["ruby"]), "modern")).toThrow(
+      "Unknown Codex pack",
+    );
   });
 });
 

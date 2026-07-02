@@ -205,7 +205,7 @@ describe("pushDownCustomizations (codex/agents)", () => {
       sourceRoot: "/src",
       artifactRoot: "/dest",
       bundleRoot: "/src",
-      packs: new Set(["core", "csharp-legacy"]),
+      packs: new Set(["core", "csharp"]),
       csharpVariant: "legacy",
       clock: CLOCK,
     });

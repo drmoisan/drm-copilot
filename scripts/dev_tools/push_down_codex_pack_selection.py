@@ -14,7 +14,11 @@ if TYPE_CHECKING:
     )
 
 CORE_PACK_NAME = "core"
+PUBLIC_CSHARP_PACK_NAME = "csharp"
 SUPPORTED_PACK_NAMES: frozenset[str] = frozenset(
+    {"core", "python", "powershell", "typescript", PUBLIC_CSHARP_PACK_NAME}
+)
+MANIFEST_PACK_NAMES: frozenset[str] = frozenset(
     {"core", "python", "powershell", "typescript", "csharp-modern", "csharp-legacy"}
 )
 CSHARP_CANONICAL_PATHS: tuple[str, ...] = (
@@ -52,7 +56,7 @@ def load_pack_manifests(
 ) -> dict[str, PackManifest]:
     """Load selected Codex pack manifests, always including core."""
 
-    unknown = selected_pack_names - SUPPORTED_PACK_NAMES
+    unknown = selected_pack_names - MANIFEST_PACK_NAMES
     if unknown:
         raise ManifestError(f"Unknown Codex pack name(s): {sorted(unknown)}")
 
@@ -67,6 +71,34 @@ def load_pack_manifests(
         raw_text = fs.read_text(manifest_path)
         manifests[name] = _parse_manifest(name, manifest_path, raw_text)
     return manifests
+
+
+def resolve_manifest_pack_names(
+    selected_pack_names: frozenset[str] | None,
+    csharp_variant: CSharpVariant,
+) -> frozenset[str] | None:
+    """Translate public Codex pack names into internal manifest names."""
+
+    if not selected_pack_names:
+        return None
+
+    variant_specific = selected_pack_names & CSHARP_PACK_NAMES
+    if variant_specific:
+        raise ManifestError(
+            "Use public Codex pack 'csharp' with --csharp-variant instead of "
+            f"variant-specific pack name(s): {sorted(variant_specific)}."
+        )
+
+    unknown = selected_pack_names - SUPPORTED_PACK_NAMES
+    if unknown:
+        raise ManifestError(f"Unknown Codex pack name(s): {sorted(unknown)}")
+
+    manifest_names = set(selected_pack_names)
+    if PUBLIC_CSHARP_PACK_NAME in manifest_names:
+        manifest_names.remove(PUBLIC_CSHARP_PACK_NAME)
+        manifest_names.add(f"csharp-{csharp_variant}")
+
+    return frozenset(manifest_names)
 
 
 def _parse_manifest(name: str, manifest_path: Path, raw_text: str) -> PackManifest:

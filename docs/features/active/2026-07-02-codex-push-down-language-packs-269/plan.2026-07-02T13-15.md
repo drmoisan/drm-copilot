@@ -6,7 +6,7 @@
   - `docs/features/active/2026-07-02-codex-push-down-language-packs-269/issue.md`
   - `docs/features/active/2026-07-02-codex-push-down-language-packs-269/spec.md`
   - `docs/features/active/2026-07-02-codex-push-down-language-packs-269/user-story.md`
-  - `artifacts/research/2026-07-02T13-23-codex-push-down-language-packs-269-research.md`
+  - `docs/features/active/2026-07-02-codex-push-down-language-packs-269/research/2026-07-02T13-23-codex-push-down-language-packs-269-research.md`
 - Work mode: `full-feature`
 - Acceptance-criteria sources: `docs/features/active/2026-07-02-codex-push-down-language-packs-269/spec.md` and `docs/features/active/2026-07-02-codex-push-down-language-packs-269/user-story.md`
 - Evidence root: `docs/features/active/2026-07-02-codex-push-down-language-packs-269/evidence`

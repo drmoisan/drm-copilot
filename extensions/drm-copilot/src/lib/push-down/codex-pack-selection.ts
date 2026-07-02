@@ -1,7 +1,15 @@
 import { type PushDownFileSystem } from "./filesystem-adapter";
 
 export const CORE_PACK_NAME = "core";
+export const PUBLIC_CSHARP_PACK_NAME = "csharp";
 export const SUPPORTED_PACK_NAMES: ReadonlySet<string> = new Set([
+  "core",
+  "python",
+  "powershell",
+  "typescript",
+  PUBLIC_CSHARP_PACK_NAME,
+]);
+export const MANIFEST_PACK_NAMES: ReadonlySet<string> = new Set([
   "core",
   "python",
   "powershell",
@@ -52,7 +60,7 @@ export function loadPackManifests(
   fs: PushDownFileSystem,
 ): Map<string, PackManifest> {
   const unknown = [...selectedPackNames].filter(
-    (name) => !SUPPORTED_PACK_NAMES.has(name),
+    (name) => !MANIFEST_PACK_NAMES.has(name),
   );
   if (unknown.length > 0) {
     throw new ManifestError(`Unknown Codex pack name(s): ${unknown.sort()}`);
@@ -73,6 +81,39 @@ export function loadPackManifests(
     );
   }
   return manifests;
+}
+
+export function resolveManifestPackNames(
+  selectedPackNames: ReadonlySet<string> | null,
+  csharpVariant: CSharpVariant,
+): ReadonlySet<string> | null {
+  if (selectedPackNames === null || selectedPackNames.size === 0) {
+    return null;
+  }
+
+  const variantSpecific = [...selectedPackNames].filter((name) =>
+    CSHARP_PACK_NAMES.has(name),
+  );
+  if (variantSpecific.length > 0) {
+    throw new ManifestError(
+      "Use public Codex pack 'csharp' with csharpVariant instead of " +
+        `variant-specific pack name(s): ${variantSpecific.sort().join(", ")}.`,
+    );
+  }
+
+  const unknown = [...selectedPackNames].filter(
+    (name) => !SUPPORTED_PACK_NAMES.has(name),
+  );
+  if (unknown.length > 0) {
+    throw new ManifestError(`Unknown Codex pack name(s): ${unknown.sort()}`);
+  }
+
+  const manifestNames = new Set(selectedPackNames);
+  if (manifestNames.has(PUBLIC_CSHARP_PACK_NAME)) {
+    manifestNames.delete(PUBLIC_CSHARP_PACK_NAME);
+    manifestNames.add(`csharp-${csharpVariant}`);
+  }
+  return manifestNames;
 }
 
 function parseManifest(

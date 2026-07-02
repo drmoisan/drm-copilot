@@ -102,7 +102,7 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
     jest.resetAllMocks();
   });
 
-  it("prompts for packs and C# variant then forwards the translated selection", async () => {
+  it("prompts for packs and C# variant then forwards the public selection", async () => {
     const captured = captureHandlers();
     const pushDownCodexMock = jest.fn(() => Promise.resolve());
     const options = {
@@ -127,7 +127,7 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
     expect(pushDownCodexMock).toHaveBeenCalledWith({
       workspaceRoot: "/fake/workspace",
       invocationId: "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
-      packs: ["csharp-legacy"],
+      packs: ["csharp"],
       csharpVariant: "legacy",
       memoryMode: "overwrite",
     });

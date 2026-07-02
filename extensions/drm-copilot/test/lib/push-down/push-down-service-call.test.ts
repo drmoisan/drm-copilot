@@ -115,7 +115,7 @@ describe("pushDownCodexAndAgentsCustomizationsServiceCall", () => {
       fs,
       extensionRoot: EXT,
       workspaceRoot: WS,
-      packs: ["csharp-legacy"],
+      packs: ["csharp"],
       csharpVariant: "legacy",
       memoryMode: "skip",
       clock: CLOCK,

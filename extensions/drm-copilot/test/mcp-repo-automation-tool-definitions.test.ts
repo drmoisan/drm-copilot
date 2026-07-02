@@ -60,6 +60,23 @@ describe("repo automation MCP tool definitions", () => {
     });
   });
 
+  it("keeps Copilot push-down schemas workspace-root-only", () => {
+    const repoDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "push_down_copilot_customizations",
+    );
+    const baseDefinition = toolDefinitions.find(
+      ({ name }) => name === "push_down_copilot_customizations",
+    );
+
+    for (const definition of [repoDefinition, baseDefinition]) {
+      expect(definition).toBeDefined();
+      const properties = definition?.inputSchema.properties ?? {};
+      expect(Object.keys(properties).sort()).toEqual(["workspace_root"]);
+      expect(definition?.inputSchema.additionalProperties).toBe(false);
+      expect(definition?.inputSchema.required).toBeUndefined();
+    }
+  });
+
   it("keeps both Codex MCP definition files aligned for optional selection fields", () => {
     const repoDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
       ({ name }) => name === "push_down_codex_and_agents_customizations",

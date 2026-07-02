@@ -61,8 +61,8 @@ publish behavior and the existing push-down summary artifact behavior.
   - `--packs <csv>`: optional comma-separated pack names. Supported names are
     `core`, `python`, `powershell`, `typescript`, and `csharp`. Omitted or empty pack
     input means full-tree backward-compatible publish.
-  - `--csharp-variant <modern|legacy>`: optional C# toolchain variant. The default must
-    be documented as the current root Codex C# profile before implementation.
+  - `--csharp-variant <modern|legacy>`: optional C# toolchain variant. The default is
+    `modern`, which uses the current root Codex C# profile.
   - `--memory-mode <overwrite|merge|skip>`: optional parity field. It is inert for the
     current Codex bundle unless Codex memory files are added.
   - Codex pack manifests under
@@ -79,7 +79,7 @@ publish behavior and the existing push-down summary artifact behavior.
 - Config keys and defaults:
   - `packs` default: omitted or empty means full tree.
   - Explicit pack selection default: `core` is added automatically.
-  - `csharp_variant` default: current root Codex C# profile, documented before coding.
+  - `csharp_variant` default: `modern`, which uses the current root Codex C# profile.
   - `memory_mode` default: `overwrite` for schema parity; no effect without Codex memory
     files.
 - Versioning or backward-compatibility constraints:

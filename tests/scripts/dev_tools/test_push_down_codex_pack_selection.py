@@ -182,6 +182,30 @@ def test_load_pack_manifests_raises_for_unknown_pack() -> None:
         )
 
 
+def test_resolve_manifest_pack_names_maps_public_csharp_to_variant_manifest() -> None:
+    """Verify public C# selection maps to the selected variant manifest."""
+
+    module = _selection_module()
+
+    assert module.resolve_manifest_pack_names(
+        frozenset({"core", "csharp"}), "legacy"
+    ) == frozenset({"core", "csharp-legacy"})
+    assert module.resolve_manifest_pack_names(
+        frozenset({"csharp"}), "modern"
+    ) == frozenset({"csharp-modern"})
+
+
+def test_resolve_manifest_pack_names_rejects_variant_specific_public_input() -> None:
+    """Verify variant-specific pack names are not accepted as public input."""
+
+    module = _selection_module()
+
+    with pytest.raises(module.ManifestError, match="public Codex pack 'csharp'"):
+        module.resolve_manifest_pack_names(
+            frozenset({"csharp", "csharp-legacy"}), "legacy"
+        )
+
+
 def test_compute_published_paths_includes_core() -> None:
     """Verify explicit selections always include core."""
 

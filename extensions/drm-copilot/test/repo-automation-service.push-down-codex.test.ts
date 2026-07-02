@@ -54,7 +54,7 @@ describe("repo automation service pushDownCodexAndAgentsCustomizations", () => {
 
     await service.pushDownCodexAndAgentsCustomizations({
       workspaceRoot: WS,
-      packs: ["core", "csharp-legacy"],
+      packs: ["core", "csharp"],
       csharpVariant: "legacy",
       memoryMode: "skip",
     });

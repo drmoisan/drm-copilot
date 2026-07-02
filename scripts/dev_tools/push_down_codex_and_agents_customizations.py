@@ -22,6 +22,7 @@ try:
         assert_single_csharp_toolchain,
         compute_published_paths,
         load_pack_manifests,
+        resolve_manifest_pack_names,
     )
     from scripts.dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
@@ -44,6 +45,7 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         assert_single_csharp_toolchain,
         compute_published_paths,
         load_pack_manifests,
+        resolve_manifest_pack_names,
     )
     from dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
@@ -90,19 +92,23 @@ def _passthrough_rewrite(
 def _resolve_published_paths(
     *,
     packs: frozenset[str] | None,
+    csharp_variant: CSharpVariant,
     bundle_root: Path,
     fs: PushDownFileSystem,
 ) -> frozenset[str] | None:
     """Compute selected Codex destination paths, or None for full-tree mode."""
 
-    if not packs:
+    manifest_packs = resolve_manifest_pack_names(packs, csharp_variant)
+    if not manifest_packs:
         return None
     manifest_dir = bundle_root / PACK_MANIFEST_SUBDIR
-    manifests: dict[str, PackManifest] = load_pack_manifests(manifest_dir, packs, fs)
-    published = compute_published_paths(packs, manifests)
+    manifests: dict[str, PackManifest] = load_pack_manifests(
+        manifest_dir, manifest_packs, fs
+    )
+    published = compute_published_paths(manifest_packs, manifests)
     empty: frozenset[str] = frozenset()
     effective_published = published if published is not None else empty
-    assert_single_csharp_toolchain(effective_published, packs)
+    assert_single_csharp_toolchain(effective_published, manifest_packs)
     return effective_published
 
 
@@ -157,6 +163,7 @@ def push_down_customizations(
     )
     published_paths = _resolve_published_paths(
         packs=packs,
+        csharp_variant=csharp_variant,
         bundle_root=effective_bundle,
         fs=fs,
     )

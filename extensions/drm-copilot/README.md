@@ -231,7 +231,7 @@ The command adapter remains thin by design: it does not implement a second conve
 
 Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The in-process TypeScript publisher uses the extension-packaged payload root at `resources/codex-and-agents-customizations/` and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
 
-The command and MCP tool accept optional Codex language-pack selection. Omitted or empty `packs` publishes the complete `.codex` and `.agents` trees. When `packs` is supplied, `core` is included automatically. Supported pack names are `core`, `python`, `powershell`, `typescript`, `csharp-modern`, and `csharp-legacy`.
+The command and MCP tool accept optional Codex language-pack selection. Omitted or empty `packs` publishes the complete `.codex` and `.agents` trees. When `packs` is supplied, `core` is included automatically. Supported public pack names are `core`, `python`, `powershell`, `typescript`, and `csharp`. Use `csharp_variant` to select the modern or legacy C# content.
 
 The optional `csharp_variant` field accepts `modern` or `legacy`. The `modern` value uses the root Codex C# profile. The `legacy` value reads C# content from the bundle-only `.agents-variants/csharp-legacy/` and `.codex-variants/csharp-legacy/` roots and writes it to the canonical `.agents` and `.codex` destination paths. The variant roots are not destination roots.
 

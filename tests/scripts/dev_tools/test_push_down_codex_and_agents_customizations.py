@@ -98,8 +98,8 @@ def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
     """Verify the new publisher copies `.codex` and `.agents` paths unchanged."""
 
     module = _load_module()
-    repo_root = Path("/repo")
-    destination_root = Path("/dest")
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
     fs = RecordingFileSystem(
         files={
             repo_root / ".codex" / "config.toml": MemoryFile("trusted = true\n"),
@@ -337,11 +337,11 @@ def test_selected_typescript_pack_writes_only_core_and_typescript_paths() -> Non
 
 
 def test_selected_legacy_csharp_writes_variant_content_to_canonical_paths() -> None:
-    """Verify legacy C# reads from variant roots but writes canonical paths."""
+    """Verify public C# selector writes legacy content to canonical paths."""
 
     module = _load_module()
-    repo_root = Path("/repo")
-    destination_root = Path("/dest")
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
     fs = RecordingFileSystem(
         files={
             repo_root / ".codex" / "config.toml": MemoryFile("core\n"),
@@ -415,16 +415,20 @@ def test_selected_legacy_csharp_writes_variant_content_to_canonical_paths() -> N
     _write_manifest(fs, repo_root, "core", [".codex/config.toml"])
     _write_manifest(fs, repo_root, "csharp-legacy", csharp_paths)
 
-    module.push_down_customizations(
+    exit_code = module.main(
+        [
+            "--destination",
+            str(destination_root),
+            "--packs",
+            "core,csharp",
+            "--csharp-variant",
+            "legacy",
+        ],
         repo_root=repo_root,
-        destination_root=destination_root,
         fs=fs,
-        source_root=repo_root,
-        artifact_root=destination_root,
-        packs=frozenset({"core", "csharp-legacy"}),
-        csharp_variant="legacy",
     )
 
+    assert exit_code == 0
     assert (
         fs.read_text(destination_root / ".agents" / "skills" / "csharp" / "SKILL.md")
         == "legacy csharp\n"
@@ -450,3 +454,34 @@ def test_selected_legacy_csharp_writes_variant_content_to_canonical_paths() -> N
         / "agents"
         / "csharp-typed-engineer.toml"
     )
+
+
+def test_invalid_csharp_variant_pack_combination_fails_before_writes() -> None:
+    """Verify variant-specific public input is rejected before destination writes."""
+
+    module = _load_module()
+    repo_root = Path("/repo")
+    destination_root = Path("/dest")
+    fs = RecordingFileSystem(
+        files={
+            repo_root / ".codex" / "config.toml": MemoryFile("core\n"),
+        }
+    )
+    fs.directories.update({repo_root, destination_root})
+
+    try:
+        module.push_down_customizations(
+            repo_root=repo_root,
+            destination_root=destination_root,
+            fs=fs,
+            source_root=repo_root,
+            artifact_root=destination_root,
+            packs=frozenset({"csharp", "csharp-legacy"}),
+            csharp_variant="legacy",
+        )
+    except module.ManifestError as error:
+        assert "public Codex pack 'csharp'" in str(error)
+    else:
+        raise AssertionError("Expected ManifestError for invalid C# pack combination.")
+
+    assert not fs.is_file(destination_root / ".codex" / "config.toml")
