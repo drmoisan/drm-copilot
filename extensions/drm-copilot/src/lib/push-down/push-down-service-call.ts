@@ -23,6 +23,10 @@ import { type Clock } from "./copilot-customizations-engine";
 import { pushDownCustomizations as pushDownCopilot } from "./copilot-customizations";
 import { pushDownCustomizations as pushDownCodexAgents } from "./codex-agents-customizations";
 import {
+  type CSharpVariant as CodexCSharpVariant,
+  type MemoryMode as CodexMemoryMode,
+} from "./codex-pack-selection";
+import {
   type CSharpVariant,
   type MemoryMode,
   pushDownCustomizations as pushDownClaude,
@@ -55,6 +59,13 @@ export interface PushDownClaudeServiceCallInput extends PushDownServiceCallInput
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: CSharpVariant;
   readonly memoryMode?: MemoryMode;
+}
+
+/** Input for the Codex service call (adds pack/variant/memory selection). */
+export interface PushDownCodexServiceCallInput extends PushDownServiceCallInput {
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: CodexCSharpVariant;
+  readonly memoryMode?: CodexMemoryMode;
 }
 
 /**
@@ -107,19 +118,29 @@ export function pushDownCopilotCustomizationsServiceCall(
  * @returns The preserved result record with the normalized artifact path.
  */
 export function pushDownCodexAndAgentsCustomizationsServiceCall(
-  input: PushDownServiceCallInput,
+  input: PushDownCodexServiceCallInput,
 ): PushDownServiceCallResult {
   const sourceRoot = bundledSourceRoot(
     input.extensionRoot,
     "resources/codex-and-agents-customizations",
   );
   const destinationRoot = toPosixPath(input.workspaceRoot);
+  const packs =
+    input.packs === undefined || input.packs.length === 0
+      ? null
+      : new Set(input.packs);
   const summary = pushDownCodexAgents({
     repoRoot: sourceRoot,
     destinationRoot,
     fs: input.fs,
     sourceRoot,
     artifactRoot: destinationRoot,
+    bundleRoot: sourceRoot,
+    packs,
+    ...(input.csharpVariant === undefined
+      ? {}
+      : { csharpVariant: input.csharpVariant }),
+    ...(input.memoryMode === undefined ? {} : { memoryMode: input.memoryMode }),
     ...(input.clock === undefined ? {} : { clock: input.clock }),
   });
   return {

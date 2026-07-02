@@ -60,6 +60,52 @@ describe("repo automation MCP tool definitions", () => {
     });
   });
 
+  it("keeps Copilot push-down schemas workspace-root-only", () => {
+    const repoDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "push_down_copilot_customizations",
+    );
+    const baseDefinition = toolDefinitions.find(
+      ({ name }) => name === "push_down_copilot_customizations",
+    );
+
+    for (const definition of [repoDefinition, baseDefinition]) {
+      expect(definition).toBeDefined();
+      const properties = definition?.inputSchema.properties ?? {};
+      expect(Object.keys(properties).sort()).toEqual(["workspace_root"]);
+      expect(definition?.inputSchema.additionalProperties).toBe(false);
+      expect(definition?.inputSchema.required).toBeUndefined();
+    }
+  });
+
+  it("keeps both Codex MCP definition files aligned for optional selection fields", () => {
+    const repoDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "push_down_codex_and_agents_customizations",
+    );
+    const baseDefinition = toolDefinitions.find(
+      ({ name }) => name === "push_down_codex_and_agents_customizations",
+    );
+
+    for (const definition of [repoDefinition, baseDefinition]) {
+      expect(definition).toMatchObject({
+        inputSchema: {
+          properties: {
+            workspace_root: expect.objectContaining({ type: "string" }),
+            packs: expect.objectContaining({ type: "array" }),
+            csharp_variant: expect.objectContaining({
+              type: "string",
+              enum: ["modern", "legacy"],
+            }),
+            memory_mode: expect.objectContaining({
+              type: "string",
+              enum: ["overwrite", "merge", "skip"],
+            }),
+          },
+          additionalProperties: false,
+        },
+      });
+    }
+  });
+
   it("includes a run_codex_native_converter definition with the required converter fields", () => {
     const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
       ({ name }) => name === "run_codex_native_converter",

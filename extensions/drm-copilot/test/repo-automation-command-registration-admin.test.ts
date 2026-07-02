@@ -96,3 +96,119 @@ describe("registerPushDownClaudeCustomizationsCommand output logging", () => {
     );
   });
 });
+
+describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("prompts for packs and C# variant then forwards the public selection", async () => {
+    const captured = captureHandlers();
+    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const options = {
+      context: {} as unknown,
+      output: { appendLine: jest.fn() },
+      service: {
+        pushDownCodexAndAgentsCustomizations: pushDownCodexMock,
+      },
+    } as unknown as RepoAutomationCommandRegistrationOptions;
+
+    registerRepoAutomationAdminCommands(options);
+    const handler = findHandler(
+      captured,
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+    showQuickPickMock
+      .mockResolvedValueOnce([{ label: "C#", pack: "csharp", picked: true }])
+      .mockResolvedValueOnce("legacy");
+
+    await handler();
+
+    expect(pushDownCodexMock).toHaveBeenCalledWith({
+      workspaceRoot: "/fake/workspace",
+      invocationId: "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+      packs: ["csharp"],
+      csharpVariant: "legacy",
+      memoryMode: "overwrite",
+    });
+  });
+
+  it("does not prompt for a C# variant when C# is not selected", async () => {
+    const captured = captureHandlers();
+    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const options = {
+      context: {} as unknown,
+      output: { appendLine: jest.fn() },
+      service: {
+        pushDownCodexAndAgentsCustomizations: pushDownCodexMock,
+      },
+    } as unknown as RepoAutomationCommandRegistrationOptions;
+
+    registerRepoAutomationAdminCommands(options);
+    const handler = findHandler(
+      captured,
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+    showQuickPickMock.mockResolvedValueOnce([
+      { label: "TypeScript", pack: "typescript", picked: true },
+    ]);
+
+    await handler();
+
+    expect(showQuickPickMock).toHaveBeenCalledTimes(1);
+    expect(pushDownCodexMock).toHaveBeenCalledWith({
+      workspaceRoot: "/fake/workspace",
+      invocationId: "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+      packs: ["typescript"],
+      memoryMode: "overwrite",
+    });
+  });
+
+  it("cancels before service invocation when a selection returns undefined", async () => {
+    const captured = captureHandlers();
+    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const options = {
+      context: {} as unknown,
+      output: { appendLine: jest.fn() },
+      service: {
+        pushDownCodexAndAgentsCustomizations: pushDownCodexMock,
+      },
+    } as unknown as RepoAutomationCommandRegistrationOptions;
+
+    registerRepoAutomationAdminCommands(options);
+    const handler = findHandler(
+      captured,
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+    showQuickPickMock.mockResolvedValueOnce(undefined);
+
+    await handler();
+
+    expect(pushDownCodexMock).not.toHaveBeenCalled();
+  });
+
+  it("cancels before service invocation when the C# variant selection is cancelled", async () => {
+    const captured = captureHandlers();
+    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const options = {
+      context: {} as unknown,
+      output: { appendLine: jest.fn() },
+      service: {
+        pushDownCodexAndAgentsCustomizations: pushDownCodexMock,
+      },
+    } as unknown as RepoAutomationCommandRegistrationOptions;
+
+    registerRepoAutomationAdminCommands(options);
+    const handler = findHandler(
+      captured,
+      "drmCopilotExtension.pushDownCodexAndAgentsCustomizations",
+    );
+    showQuickPickMock
+      .mockResolvedValueOnce([{ label: "C#", pack: "csharp", picked: true }])
+      .mockResolvedValueOnce(undefined);
+
+    await handler();
+
+    expect(pushDownCodexMock).not.toHaveBeenCalled();
+  });
+});

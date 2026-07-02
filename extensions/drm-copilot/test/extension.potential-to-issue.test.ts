@@ -36,8 +36,7 @@ let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
 let activeTextEditorState:
-  | { document: { uri: { fsPath: string } } }
-  | undefined;
+  { document: { uri: { fsPath: string } } } | undefined;
 
 jest.mock(
   "vscode",

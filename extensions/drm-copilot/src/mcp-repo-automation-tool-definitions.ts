@@ -1,6 +1,11 @@
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
+import {
+  claudePushDownSelectionProperties,
+  codexPushDownSelectionProperties,
+  copilotPushDownSelectionProperties,
+  workspaceRootProperty,
+} from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
-
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
   readonly description: string;
@@ -11,11 +16,6 @@ export interface ToolDefinition {
     readonly additionalProperties: false;
   };
 }
-
-const workspaceRootProperty = {
-  type: "string",
-  description: "Target workspace root. Defaults to process.cwd() when omitted.",
-};
 
 export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
   {
@@ -104,6 +104,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
+        ...copilotPushDownSelectionProperties,
       },
       additionalProperties: false,
     },
@@ -116,6 +117,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
+        ...codexPushDownSelectionProperties,
       },
       additionalProperties: false,
     },
@@ -128,26 +130,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
-        packs: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional language pack names to publish (for example 'core', 'typescript'). When omitted, the full tree is published. 'core' is always included.",
-        },
-        csharp_variant: {
-          type: "string",
-          enum: ["modern", "legacy"],
-          description:
-            "Optional C# toolchain variant to source ('modern' default or 'legacy').",
-        },
-        memory_mode: {
-          type: "string",
-          enum: ["overwrite", "merge", "skip"],
-          description:
-            "Optional agent-memory handling mode: 'overwrite' (default), 'merge', or 'skip'.",
-        },
+        ...claudePushDownSelectionProperties,
       },
       additionalProperties: false,
     },

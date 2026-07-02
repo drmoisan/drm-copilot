@@ -1,0 +1,10 @@
+{
+  "name": "csharp-modern",
+  "label": "C# (modern)",
+  "paths": [
+    ".agents/skills/csharp/SKILL.md",
+    ".agents/skills/csharp-qa-gate/SKILL.md",
+    ".agents/skills/invoke-csharp-engineer/SKILL.md",
+    ".codex/agents/csharp-typed-engineer.toml"
+  ]
+}

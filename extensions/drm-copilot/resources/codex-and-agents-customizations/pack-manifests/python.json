@@ -1,0 +1,15 @@
+{
+  "name": "python",
+  "label": "Python",
+  "paths": [
+    ".agents/skills/python/SKILL.md",
+    ".agents/skills/python-suppressions/SKILL.md",
+    ".agents/skills/python-change-budget-router/SKILL.md",
+    ".agents/skills/python-qa-gate/SKILL.md",
+    ".agents/skills/invoke-python-engineer/SKILL.md",
+    ".codex/agents/python-typed-engineer.toml",
+    ".codex/agents/python-orchestrator.toml",
+    ".codex/agents/python-atomic-executor.toml",
+    ".codex/agents/python-atomic-planning.toml"
+  ]
+}

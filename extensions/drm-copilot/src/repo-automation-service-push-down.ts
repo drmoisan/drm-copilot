@@ -1,7 +1,12 @@
 import {
+  type PushDownCodexAndAgentsCustomizationsInput,
   type PushDownClaudeCustomizationsInput,
   type RepoAutomationExecutionResult,
 } from "./repo-automation-service";
+import {
+  type CSharpVariant as CodexCSharpVariant,
+  type MemoryMode as CodexMemoryMode,
+} from "./lib/push-down/codex-pack-selection";
 import {
   type CSharpVariant,
   type MemoryMode,
@@ -32,6 +37,13 @@ export interface PushDownClaudeServiceForwardedOptions {
   readonly memoryMode?: MemoryMode;
 }
 
+export interface PushDownCodexServiceForwardedOptions {
+  readonly workspaceRoot: string;
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: CodexCSharpVariant;
+  readonly memoryMode?: CodexMemoryMode;
+}
+
 /**
  * Build the forwarded options for the in-process Claude push-down call.
  *
@@ -45,6 +57,19 @@ export interface PushDownClaudeServiceForwardedOptions {
 export function buildPushDownClaudeCustomizationsOptions(
   input: PushDownClaudeCustomizationsInput,
 ): PushDownClaudeServiceForwardedOptions {
+  return {
+    workspaceRoot: input.workspaceRoot,
+    ...(input.packs === undefined ? {} : { packs: input.packs }),
+    ...(input.csharpVariant === undefined
+      ? {}
+      : { csharpVariant: input.csharpVariant }),
+    ...(input.memoryMode === undefined ? {} : { memoryMode: input.memoryMode }),
+  };
+}
+
+export function buildPushDownCodexAndAgentsCustomizationsOptions(
+  input: PushDownCodexAndAgentsCustomizationsInput,
+): PushDownCodexServiceForwardedOptions {
   return {
     workspaceRoot: input.workspaceRoot,
     ...(input.packs === undefined ? {} : { packs: input.packs }),
@@ -92,14 +117,22 @@ export function runPushDownCopilotCustomizations(
  * @returns The preserved push-down execution result.
  */
 export function runPushDownCodexAndAgentsCustomizations(
-  workspaceRoot: string,
+  input: PushDownCodexAndAgentsCustomizationsInput,
   deps: PushDownServiceDeps,
 ): RepoAutomationExecutionResult {
+  const forwarded = buildPushDownCodexAndAgentsCustomizationsOptions(input);
   return pushDownCodexAndAgentsCustomizationsServiceCall({
     fs: deps.fs,
     extensionRoot: deps.extensionRoot,
-    workspaceRoot,
+    workspaceRoot: forwarded.workspaceRoot,
     log: deps.log,
+    ...(forwarded.packs === undefined ? {} : { packs: forwarded.packs }),
+    ...(forwarded.csharpVariant === undefined
+      ? {}
+      : { csharpVariant: forwarded.csharpVariant }),
+    ...(forwarded.memoryMode === undefined
+      ? {}
+      : { memoryMode: forwarded.memoryMode }),
   });
 }
 

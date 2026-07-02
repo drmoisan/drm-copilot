@@ -90,6 +90,42 @@ describe("pushDownCodexAndAgentsCustomizationsServiceCall", () => {
       "/workspace/artifacts/codex-and-agents-customizations/push-down-20260626T001500Z.json",
     ]);
   });
+
+  it("threads packs, csharpVariant, and memoryMode into the Codex port", () => {
+    const bundle = `${EXT}/resources/codex-and-agents-customizations`;
+    const fs = buildInMemoryFileSystem(
+      {
+        [`${bundle}/.codex/config.toml`]: "core",
+        [`${bundle}/.agents/skills/csharp/SKILL.md`]: "modern",
+        [`${bundle}/.agents-variants/csharp-legacy/skills/csharp/SKILL.md`]:
+          "legacy",
+        [`${bundle}/pack-manifests/core.json`]: JSON.stringify({
+          name: "core",
+          paths: [".codex/config.toml"],
+        }),
+        [`${bundle}/pack-manifests/csharp-legacy.json`]: JSON.stringify({
+          name: "csharp-legacy",
+          paths: [".agents/skills/csharp/SKILL.md"],
+        }),
+      },
+      [WS],
+    );
+
+    pushDownCodexAndAgentsCustomizationsServiceCall({
+      fs,
+      extensionRoot: EXT,
+      workspaceRoot: WS,
+      packs: ["csharp"],
+      csharpVariant: "legacy",
+      memoryMode: "skip",
+      clock: CLOCK,
+    });
+
+    expect(fs.readTextFile(`${WS}/.agents/skills/csharp/SKILL.md`)).toBe(
+      "legacy",
+    );
+    expect(fs.isFile(`${WS}/.codex/config.toml`)).toBe(true);
+  });
 });
 
 describe("pushDownClaudeCustomizationsServiceCall", () => {

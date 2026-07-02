@@ -13,7 +13,13 @@ export interface PushDownClaudeCustomizationsToolInput extends WorkspaceToolInpu
   readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
-function resolveClaudePacksField(
+export interface PushDownCodexAndAgentsCustomizationsToolInput extends WorkspaceToolInput {
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: "modern" | "legacy";
+  readonly memoryMode?: "overwrite" | "merge" | "skip";
+}
+
+function resolvePacksField(
   rawValue: unknown,
 ): ReadonlyArray<string> | undefined {
   // An absent packs field yields the backward-compatible publish-everything
@@ -65,11 +71,30 @@ export function resolvePushDownClaudeCustomizationsToolInput(
   fallbackWorkspaceRoot?: string,
 ): PushDownClaudeCustomizationsToolInput {
   const args = asToolArgumentObject(rawInput);
-  const packs = resolveClaudePacksField(args["packs"]);
+  const packs = resolvePacksField(args["packs"]);
   const csharpVariant = resolveCsharpVariantField(args["csharp_variant"]);
   const memoryMode = resolveMemoryModeField(args["memory_mode"]);
   // Spread each optional field only when present so a workspace_root-only
   // invocation resolves to an input with every new field left undefined.
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    ...(packs === undefined ? {} : { packs }),
+    ...(csharpVariant === undefined ? {} : { csharpVariant }),
+    ...(memoryMode === undefined ? {} : { memoryMode }),
+  };
+}
+
+export function resolvePushDownCodexAndAgentsCustomizationsToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): PushDownCodexAndAgentsCustomizationsToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const packs = resolvePacksField(args["packs"]);
+  const csharpVariant = resolveCsharpVariantField(args["csharp_variant"]);
+  const memoryMode = resolveMemoryModeField(args["memory_mode"]);
   return {
     workspaceRoot: normalizeWorkspaceRoot(
       args["workspace_root"],
