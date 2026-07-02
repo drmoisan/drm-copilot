@@ -322,4 +322,3 @@ Rejected alternatives:
 - Manual or integration validation:
   - VS Code visual verification should confirm the Codex command presents the same effective flow as Claude.
   - MCP list/call validation should confirm both definition files expose identical Codex schemas and workspace-root-only calls still succeed.
-
