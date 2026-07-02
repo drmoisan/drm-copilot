@@ -86,6 +86,7 @@ function Invoke-CodexCustomizationCopyPlan {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
         [object[]]$CopyOperation,
 
         [scriptblock]$NewDirectory = {

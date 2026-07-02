@@ -9,4 +9,4 @@ Confirmed Work Mode: full-bug
 Scope Source Paths:
 - docs/features/active/2026-07-02-codex-worktree-session-failures-268/issue.md
 - docs/features/active/2026-07-02-codex-worktree-session-failures-268/spec.md
-- artifacts/research/2026-07-02T13-17-codex-worktree-session-failures-268-research.md
+- docs/features/active/2026-07-02-codex-worktree-session-failures-268/research/2026-07-02T13-17-codex-worktree-session-failures-268-research.md

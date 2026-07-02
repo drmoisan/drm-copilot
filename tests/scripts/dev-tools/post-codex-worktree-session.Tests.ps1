@@ -67,3 +67,46 @@ Describe "post-codex-worktree-session.ps1 - Get-CodexCustomizationCopyPlan" {
     }
 }
 
+Describe "post-codex-worktree-session.ps1 - Invoke-CodexCustomizationCopyPlan" {
+    BeforeEach {
+        . (Import-ScriptFunction -Path $script:scriptPath -Name "ConvertTo-NormalizedRootPath")
+        . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-RelativeCustomizationPath")
+        . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-CodexCustomizationCopyPlan")
+        . (Import-ScriptFunction -Path $script:scriptPath -Name "Invoke-CodexCustomizationCopyPlan")
+    }
+
+    It "does not throw when same-root planning produces no copy operations" {
+        $copyOperations = @(
+            Get-CodexCustomizationCopyPlan `
+                -SourceRoot "C:/repo" `
+                -WorktreeRoot "C:/repo" `
+                -TestPath { param([string] $LiteralPath) throw "Unexpected TestPath: $LiteralPath" } `
+                -GetChildItem { param([string] $LiteralPath) throw "Unexpected GetChildItem: $LiteralPath" }
+        )
+
+        {
+            Invoke-CodexCustomizationCopyPlan `
+                -CopyOperation $copyOperations `
+                -NewDirectory { param([string] $LiteralPath) throw "Unexpected NewDirectory: $LiteralPath" } `
+                -CopyFile { param([string] $SourcePath, [string] $DestinationPath) throw "Unexpected CopyFile: $SourcePath -> $DestinationPath" }
+        } | Should -Not -Throw
+    }
+
+    It "does not throw when missing source customization folders produce no copy operations" {
+        $copyOperations = @(
+            Get-CodexCustomizationCopyPlan `
+                -SourceRoot "C:/repo" `
+                -WorktreeRoot "C:/repo-wt" `
+                -TestPath { param([string] $LiteralPath) $null = $LiteralPath; $false } `
+                -GetChildItem { param([string] $LiteralPath) throw "Unexpected GetChildItem: $LiteralPath" }
+        )
+
+        {
+            Invoke-CodexCustomizationCopyPlan `
+                -CopyOperation $copyOperations `
+                -NewDirectory { param([string] $LiteralPath) throw "Unexpected NewDirectory: $LiteralPath" } `
+                -CopyFile { param([string] $SourcePath, [string] $DestinationPath) throw "Unexpected CopyFile: $SourcePath -> $DestinationPath" }
+        } | Should -Not -Throw
+    }
+}
+

@@ -274,5 +274,5 @@ Acceptance criteria:
   - No follow-up issue is required by the current research.
 - Links: issue, PRs, related docs
   - Issue: https://github.com/drmoisan/drm-copilot/issues/268
-  - Research: `artifacts/research/2026-07-02T13-17-codex-worktree-session-failures-268-research.md`
+  - Research: `docs/features/active/2026-07-02-codex-worktree-session-failures-268/research/2026-07-02T13-17-codex-worktree-session-failures-268-research.md`
   - Feature folder: `docs/features/active/2026-07-02-codex-worktree-session-failures-268`
