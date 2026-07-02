@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 BeforeAll {
     $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
     . (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
-    $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../.codex/scripts/post-codex-worktree-session.ps1"
+    $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/post-codex-worktree-session.ps1"
 }
 
 Describe "post-codex-worktree-session.ps1 - Get-CodexCustomizationCopyPlan" {

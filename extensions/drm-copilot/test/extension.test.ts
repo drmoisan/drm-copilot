@@ -32,7 +32,7 @@ import {
 } from "./extension-test-harness";
 
 const expectedPathResolvedCodexExecutable =
-  process.platform === "win32" ? "C:/bin/codex.EXE" : "/bin/codex";
+  process.platform === "win32" ? "C:/bin/codex.EXE" : "C/codex";
 
 describe("drm-copilot core command behavior", () => {
   beforeEach(() => {
