@@ -31,6 +31,9 @@ import {
   showErrorMessageMock,
 } from "./extension-test-harness";
 
+const expectedPathResolvedCodexExecutable =
+  process.platform === "win32" ? "C:/bin/codex.EXE" : "/bin/codex";
+
 describe("drm-copilot core command behavior", () => {
   beforeEach(() => {
     resetExtensionHarnessState();
@@ -143,19 +146,25 @@ describe("drm-copilot core command behavior", () => {
   it("resolveCodexExecutable finds default codex on PATH", () => {
     setExecutablePresence({ codex: true });
 
-    expect(resolveCodexExecutable("")).toBe("C:/bin/codex.EXE");
+    expect(resolveCodexExecutable("")).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
   });
 
   it("resolveCodexExecutable treats undefined configuration as PATH fallback", () => {
     setExecutablePresence({ codex: true });
 
-    expect(resolveCodexExecutable(undefined)).toBe("C:/bin/codex.EXE");
+    expect(resolveCodexExecutable(undefined)).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
   });
 
   it("resolveCodexExecutable resolves configured command names from PATH", () => {
     setExecutablePresence({ codex: true });
 
-    expect(resolveCodexExecutable("codex")).toBe("C:/bin/codex.EXE");
+    expect(resolveCodexExecutable("codex")).toBe(
+      expectedPathResolvedCodexExecutable,
+    );
   });
 
   it("resolveCodexExecutable validates configured executable paths", () => {

@@ -19,6 +19,9 @@ import {
   showInputBoxMock,
 } from "./extension-test-harness";
 
+const expectedPathResolvedCodexExecutable =
+  process.platform === "win32" ? "C:/bin/codex.EXE" : "/bin/codex";
+
 describe("newCodexWorktreeSession", () => {
   beforeEach(() => {
     resetExtensionHarnessState();
@@ -87,7 +90,9 @@ describe("newCodexWorktreeSession", () => {
 
       expect(terminal.sendText).toHaveBeenCalledTimes(5);
       const [codexCmd] = terminal.sendText.mock.calls[4] as [string];
-      expect(codexCmd).toBe("& 'C:/bin/codex.EXE' 'Start the Codex session.'");
+      expect(codexCmd).toBe(
+        `& '${expectedPathResolvedCodexExecutable}' 'Start the Codex session.'`,
+      );
     } finally {
       jest.useRealTimers();
     }
@@ -127,7 +132,9 @@ describe("newCodexWorktreeSession", () => {
 
       expect(terminal.sendText).toHaveBeenCalledTimes(7);
       const [codexCmd] = terminal.sendText.mock.calls[6] as [string];
-      expect(codexCmd).toBe("& 'C:/bin/codex.EXE' 'Start the Codex session.'");
+      expect(codexCmd).toBe(
+        `& '${expectedPathResolvedCodexExecutable}' 'Start the Codex session.'`,
+      );
     } finally {
       jest.useRealTimers();
     }
@@ -215,7 +222,7 @@ describe("newCodexWorktreeSession", () => {
 
       expect(terminal.sendText).toHaveBeenCalledTimes(4);
       const [codexCmd] = terminal.sendText.mock.calls[3] as [string];
-      expect(codexCmd).toBe("& 'C:/bin/codex.EXE'");
+      expect(codexCmd).toBe(`& '${expectedPathResolvedCodexExecutable}'`);
     } finally {
       jest.useRealTimers();
     }
