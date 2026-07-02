@@ -293,6 +293,43 @@ describe("resolvePushDownCodexAndAgentsCustomizationsToolInput", () => {
       }),
     ).toEqual({ workspaceRoot: "C:/ws" });
   });
+
+  it("returns optional packs, csharp variant, and memory mode when provided", () => {
+    expect(
+      resolvePushDownCodexAndAgentsCustomizationsToolInput({
+        workspace_root: "C:/ws",
+        packs: ["typescript", "csharp-legacy"],
+        csharp_variant: "legacy",
+        memory_mode: "skip",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/ws",
+      packs: ["typescript", "csharp-legacy"],
+      csharpVariant: "legacy",
+      memoryMode: "skip",
+    });
+  });
+
+  it("rejects invalid Codex selection fields", () => {
+    expect(() =>
+      resolvePushDownCodexAndAgentsCustomizationsToolInput({
+        workspace_root: "C:/ws",
+        packs: "typescript",
+      }),
+    ).toThrow("Field 'packs' must be an array of strings when provided.");
+    expect(() =>
+      resolvePushDownCodexAndAgentsCustomizationsToolInput({
+        workspace_root: "C:/ws",
+        csharp_variant: "current",
+      }),
+    ).toThrow("Field 'csharp_variant' must be 'modern' or 'legacy'.");
+    expect(() =>
+      resolvePushDownCodexAndAgentsCustomizationsToolInput({
+        workspace_root: "C:/ws",
+        memory_mode: "replace",
+      }),
+    ).toThrow("Field 'memory_mode' must be 'overwrite', 'merge', or 'skip'.");
+  });
 });
 
 describe("resolvePushDownClaudeCustomizationsToolInput", () => {

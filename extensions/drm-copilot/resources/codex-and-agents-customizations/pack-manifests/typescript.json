@@ -1,0 +1,9 @@
+{
+  "name": "typescript",
+  "label": "TypeScript",
+  "paths": [
+    ".agents/skills/typescript/SKILL.md",
+    ".agents/skills/typescript-suppressions/SKILL.md",
+    ".codex/agents/typescript-engineer.toml"
+  ]
+}

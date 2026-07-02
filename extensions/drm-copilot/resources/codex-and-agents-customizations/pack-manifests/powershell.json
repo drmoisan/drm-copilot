@@ -1,0 +1,15 @@
+{
+  "name": "powershell",
+  "label": "PowerShell",
+  "paths": [
+    ".agents/skills/powershell/SKILL.md",
+    ".agents/skills/powershell-change-budget-router/SKILL.md",
+    ".agents/skills/powershell-orchestration-state-machine/SKILL.md",
+    ".agents/skills/powershell-qa-gate/SKILL.md",
+    ".agents/skills/invoke-powershell-engineer/SKILL.md",
+    ".codex/agents/powershell-typed-engineer.toml",
+    ".codex/agents/powershell-orchestrator.toml",
+    ".codex/agents/powershell-atomic-executor.toml",
+    ".codex/agents/powershell-atomic-planning.toml"
+  ]
+}

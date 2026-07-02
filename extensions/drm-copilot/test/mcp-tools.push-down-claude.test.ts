@@ -96,6 +96,38 @@ describe("dispatchRepoAutomationTool push_down_claude_customizations", () => {
   });
 });
 
+describe("dispatchRepoAutomationTool push_down_codex_and_agents_customizations", () => {
+  it("forwards packs, csharp_variant, and memory_mode through dispatch", async () => {
+    const mockService = createMockService();
+    mockService.pushDownCodexAndAgentsCustomizations.mockResolvedValue({
+      tool: "push_down_codex_and_agents_customizations",
+      workspaceRoot: "/dest",
+      artifacts: [],
+      summary: "Pushed bundled Codex and agents customizations.",
+    });
+
+    await dispatchRepoAutomationTool(
+      "push_down_codex_and_agents_customizations",
+      {
+        workspace_root: "/dest",
+        packs: ["core", "csharp-legacy"],
+        csharp_variant: "legacy",
+        memory_mode: "skip",
+      },
+      mockService,
+    );
+
+    expect(
+      mockService.pushDownCodexAndAgentsCustomizations,
+    ).toHaveBeenCalledWith({
+      workspaceRoot: "/dest",
+      packs: ["core", "csharp-legacy"],
+      csharpVariant: "legacy",
+      memoryMode: "skip",
+    });
+  });
+});
+
 describe("push_down_claude_customizations tool schema", () => {
   function findClaudeSchema(definitions: typeof toolDefinitions) {
     const definition = definitions.find(
@@ -128,6 +160,41 @@ describe("push_down_claude_customizations tool schema", () => {
     const repoAutomation = findClaudeSchema(REPO_AUTOMATION_TOOL_DEFINITIONS);
 
     // Both definition files must carry identical schemas to avoid drift.
+    expect(repoAutomation).toStrictEqual(primary);
+  });
+});
+
+describe("push_down_codex_and_agents_customizations tool schema", () => {
+  function findCodexSchema(definitions: typeof toolDefinitions) {
+    const definition = definitions.find(
+      (tool) => tool.name === "push_down_codex_and_agents_customizations",
+    );
+    if (definition === undefined) {
+      throw new Error(
+        "push_down_codex_and_agents_customizations definition missing.",
+      );
+    }
+    return definition.inputSchema;
+  }
+
+  it("adds optional packs, csharp_variant, and memory_mode with no required array", () => {
+    const schema = findCodexSchema(toolDefinitions);
+    const properties = schema.properties as Record<string, unknown>;
+
+    expect(properties["workspace_root"]).toBeDefined();
+    expect(properties["packs"]).toBeDefined();
+    expect(properties["csharp_variant"]).toBeDefined();
+    expect(properties["memory_mode"]).toBeDefined();
+    expect(
+      (schema as { required?: ReadonlyArray<string> }).required,
+    ).toBeUndefined();
+    expect(schema.additionalProperties).toBe(false);
+  });
+
+  it("keeps both MCP tool definition files in sync for this tool", () => {
+    const primary = findCodexSchema(toolDefinitions);
+    const repoAutomation = findCodexSchema(REPO_AUTOMATION_TOOL_DEFINITIONS);
+
     expect(repoAutomation).toStrictEqual(primary);
   });
 });

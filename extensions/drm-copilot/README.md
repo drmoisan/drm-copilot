@@ -152,7 +152,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `collect_pr_context`: optional `workspace_root`, required `base`
 - `run_codex_native_converter`: optional `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
 - `push_down_copilot_customizations`: optional `workspace_root`
-- `push_down_codex_and_agents_customizations`: optional `workspace_root`
+- `push_down_codex_and_agents_customizations`: optional `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`
 - `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
 - `new_potential_entry`: optional `workspace_root`, required `short_name`
 - `link_parent_child`: optional `workspace_root`, required `child_issue_number`, required `parent_issue_number`
@@ -230,6 +230,12 @@ The command adapter remains thin by design: it does not implement a second conve
 ## Push Down Codex and Agents Customizations
 
 Use the `drm-copilot: Push Down Codex and Agents Customizations` command (command ID: `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`) from the Command Palette to copy the bundled `.codex` and `.agents` payload into the active workspace. The in-process TypeScript publisher uses the extension-packaged payload root at `resources/codex-and-agents-customizations/` and writes a JSON summary artifact under `artifacts/codex-and-agents-customizations/` in the destination workspace.
+
+The command and MCP tool accept optional Codex language-pack selection. Omitted or empty `packs` publishes the complete `.codex` and `.agents` trees. When `packs` is supplied, `core` is included automatically. Supported pack names are `core`, `python`, `powershell`, `typescript`, `csharp-modern`, and `csharp-legacy`.
+
+The optional `csharp_variant` field accepts `modern` or `legacy`. The `modern` value uses the root Codex C# profile. The `legacy` value reads C# content from the bundle-only `.agents-variants/csharp-legacy/` and `.codex-variants/csharp-legacy/` roots and writes it to the canonical `.agents` and `.codex` destination paths. The variant roots are not destination roots.
+
+The optional `memory_mode` field accepts `overwrite`, `merge`, or `skip` for schema parity with Claude push-down. It is inert for the current Codex bundle because no Codex memory subtree is present.
 
 ## Run PoshQC Suite
 

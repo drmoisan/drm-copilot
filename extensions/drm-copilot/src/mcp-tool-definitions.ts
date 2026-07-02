@@ -106,6 +106,26 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
+        packs: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional Codex language pack names to publish. When omitted, the full tree is published. 'core' is always included.",
+        },
+        csharp_variant: {
+          type: "string",
+          enum: ["modern", "legacy"],
+          description:
+            "Optional Codex C# toolchain variant to source ('modern' default or 'legacy').",
+        },
+        memory_mode: {
+          type: "string",
+          enum: ["overwrite", "merge", "skip"],
+          description:
+            "Optional inert Codex memory parity field: 'overwrite' (default), 'merge', or 'skip'.",
+        },
       },
       additionalProperties: false,
     },
@@ -118,6 +138,26 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
+        packs: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          description:
+            "Optional Codex language pack names to publish. When omitted, the full tree is published. 'core' is always included.",
+        },
+        csharp_variant: {
+          type: "string",
+          enum: ["modern", "legacy"],
+          description:
+            "Optional Codex C# toolchain variant to source ('modern' default or 'legacy').",
+        },
+        memory_mode: {
+          type: "string",
+          enum: ["overwrite", "merge", "skip"],
+          description:
+            "Optional inert Codex memory parity field: 'overwrite' (default), 'merge', or 'skip'.",
+        },
       },
       additionalProperties: false,
     },

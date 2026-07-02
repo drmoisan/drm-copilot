@@ -1,0 +1,11 @@
+{
+  "name": "csharp-legacy",
+  "label": "C# (legacy)",
+  "source_prefix": ".agents-variants/csharp-legacy;.codex-variants/csharp-legacy",
+  "paths": [
+    ".agents/skills/csharp/SKILL.md",
+    ".agents/skills/csharp-qa-gate/SKILL.md",
+    ".agents/skills/invoke-csharp-engineer/SKILL.md",
+    ".codex/agents/csharp-typed-engineer.toml"
+  ]
+}

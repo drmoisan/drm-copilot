@@ -17,12 +17,22 @@ import {
   pushDownCustomizations as enginePushDown,
   type PushDownSummary,
 } from "./copilot-customizations-engine";
+import {
+  assertSingleCsharpToolchain,
+  type CSharpVariant,
+  computePublishedPaths,
+  loadPackManifests,
+  type MemoryMode,
+  type PackManifest,
+  resolveVariantSourcePath,
+} from "./codex-pack-selection";
 
 /** Artifact directory for the Codex/agents push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
 
 /** Inlined Codex/agents scoped root folders (enumeration-order contract). */
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".codex", ".agents"];
+export const PACK_MANIFEST_SUBDIR = "pack-manifests";
 
 /**
  * Passthrough rewrite for payloads that do not need command rewrites.
@@ -47,6 +57,125 @@ export interface CodexAgentsPushDownOptions {
   readonly sourceRoot?: string;
   readonly artifactRoot?: string;
   readonly clock?: Clock;
+  readonly packs?: ReadonlySet<string> | null;
+  readonly csharpVariant?: CSharpVariant;
+  readonly memoryMode?: MemoryMode;
+  readonly bundleRoot?: string;
+}
+
+function normalizePosix(value: string): string {
+  return value.replace(/\\/g, "/").replace(/\/+$/, "");
+}
+
+function joinPosix(root: string, relative: string): string {
+  const normalizedRoot = normalizePosix(root);
+  const normalizedRelative = relative.replace(/\\/g, "/").replace(/^\/+/, "");
+  return normalizedRoot === ""
+    ? normalizedRelative
+    : `${normalizedRoot}/${normalizedRelative}`;
+}
+
+function relativeToPosix(path: string, root: string): string | null {
+  const normalizedPath = normalizePosix(path);
+  const normalizedRoot = normalizePosix(root);
+  if (normalizedPath === normalizedRoot) {
+    return "";
+  }
+  const prefix = `${normalizedRoot}/`;
+  return normalizedPath.startsWith(prefix)
+    ? normalizedPath.slice(prefix.length)
+    : null;
+}
+
+class CodexFilteringFileSystem implements PushDownFileSystem {
+  private readonly sourceRoot: string;
+  private readonly bundleRoot: string;
+  private readonly publishedPaths: ReadonlySet<string> | null;
+  private readonly csharpVariant: CSharpVariant;
+
+  constructor(
+    private readonly inner: PushDownFileSystem,
+    options: {
+      readonly sourceRoot: string;
+      readonly bundleRoot: string;
+      readonly publishedPaths: ReadonlySet<string> | null;
+      readonly csharpVariant: CSharpVariant;
+    },
+  ) {
+    this.sourceRoot = normalizePosix(options.sourceRoot);
+    this.bundleRoot = normalizePosix(options.bundleRoot);
+    this.publishedPaths = options.publishedPaths;
+    this.csharpVariant = options.csharpVariant;
+  }
+
+  private sourceRelative(path: string): string | null {
+    return relativeToPosix(path, this.sourceRoot);
+  }
+
+  private isPackIncluded(path: string): boolean {
+    if (this.publishedPaths === null) {
+      return true;
+    }
+    const relative = this.sourceRelative(path);
+    return relative === null || this.publishedPaths.has(relative);
+  }
+
+  private resolveReadSource(path: string): string {
+    if (this.csharpVariant !== "legacy") {
+      return path;
+    }
+    const relative = this.sourceRelative(path);
+    if (relative === null) {
+      return path;
+    }
+    const routed = resolveVariantSourcePath(relative, "legacy");
+    return routed === relative ? path : joinPosix(this.bundleRoot, routed);
+  }
+
+  listFiles(root: string): string[] {
+    return this.inner
+      .listFiles(root)
+      .filter((path) => this.isPackIncluded(path));
+  }
+
+  isDir(path: string): boolean {
+    return this.inner.isDir(path);
+  }
+
+  isFile(path: string): boolean {
+    return this.inner.isFile(path);
+  }
+
+  readTextFile(path: string): string {
+    return this.inner.readTextFile(this.resolveReadSource(path));
+  }
+
+  writeTextFile(path: string, content: string): void {
+    this.inner.writeTextFile(path, content);
+  }
+
+  ensureDir(path: string): void {
+    this.inner.ensureDir(path);
+  }
+}
+
+function resolvePublishedPaths(
+  packs: ReadonlySet<string> | null | undefined,
+  bundleRoot: string,
+  fs: PushDownFileSystem,
+): ReadonlySet<string> | null {
+  if (packs === undefined || packs === null || packs.size === 0) {
+    return null;
+  }
+  const manifests: Map<string, PackManifest> = loadPackManifests(
+    joinPosix(bundleRoot, PACK_MANIFEST_SUBDIR),
+    packs,
+    fs,
+  );
+  const published =
+    computePublishedPaths(packs, manifests) ?? new Set<string>();
+  assertSingleCsharpToolchain(published, packs);
+  return published;
 }
 
 /**
@@ -62,13 +191,26 @@ export interface CodexAgentsPushDownOptions {
 export function pushDownCustomizations(
   options: CodexAgentsPushDownOptions,
 ): PushDownSummary {
+  const sourceRoot = options.sourceRoot ?? options.repoRoot;
+  const bundleRoot = options.bundleRoot ?? sourceRoot;
+  const publishedPaths = resolvePublishedPaths(
+    options.packs,
+    bundleRoot,
+    options.fs,
+  );
+  const csharpVariant = options.csharpVariant ?? "modern";
+  const filteringFs = new CodexFilteringFileSystem(options.fs, {
+    sourceRoot,
+    bundleRoot,
+    publishedPaths,
+    csharpVariant,
+  });
+  void options.memoryMode;
   return enginePushDown({
     repoRoot: options.repoRoot,
     destinationRoot: options.destinationRoot,
-    fs: options.fs,
-    ...(options.sourceRoot === undefined
-      ? {}
-      : { sourceRoot: options.sourceRoot }),
+    fs: filteringFs,
+    sourceRoot,
     ...(options.artifactRoot === undefined
       ? {}
       : { artifactRoot: options.artifactRoot }),

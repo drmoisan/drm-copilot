@@ -65,7 +65,7 @@ export interface RepoAutomationService {
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCodexAndAgentsCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCodexAndAgentsCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownClaudeCustomizations(
     input: PushDownClaudeCustomizationsInput,
@@ -153,6 +153,12 @@ export interface WorkspaceExecutionInput {
 }
 
 export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
+  readonly packs?: ReadonlyArray<string>;
+  readonly csharpVariant?: "modern" | "legacy";
+  readonly memoryMode?: "overwrite" | "merge" | "skip";
+}
+
+export interface PushDownCodexAndAgentsCustomizationsInput extends WorkspaceExecutionInput {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
@@ -252,12 +258,9 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     );
   }
   async pushDownCodexAndAgentsCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCodexAndAgentsCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
-    return runPushDownCodexAndAgentsCustomizations(
-      input.workspaceRoot,
-      this.pushDownDeps,
-    );
+    return runPushDownCodexAndAgentsCustomizations(input, this.pushDownDeps);
   }
   async pushDownClaudeCustomizations(
     input: PushDownClaudeCustomizationsInput,

@@ -101,6 +101,19 @@ function registerPushDownCopilotCustomizationsCommand(
   );
 }
 
+const CODEX_PUSH_DOWN_PACK_ITEMS: ReadonlyArray<{
+  readonly label: string;
+  readonly pack: string;
+}> = [
+  { label: "Python", pack: "python" },
+  { label: "PowerShell", pack: "powershell" },
+  { label: "TypeScript", pack: "typescript" },
+  { label: "C#", pack: "csharp" },
+];
+
+const CODEX_PUSH_DOWN_TITLE =
+  "drm-copilot: Push Down Codex and Agents Customizations";
+
 function registerPushDownCodexAndAgentsCustomizationsCommand(
   options: RepoAutomationCommandRegistrationOptions,
 ): vscode.Disposable {
@@ -109,9 +122,44 @@ function registerPushDownCodexAndAgentsCustomizationsCommand(
     async () => {
       const commandId =
         "drmCopilotExtension.pushDownCodexAndAgentsCustomizations";
+      const packSelection = await vscode.window.showQuickPick(
+        CODEX_PUSH_DOWN_PACK_ITEMS.map((item) => ({
+          label: item.label,
+          pack: item.pack,
+          picked: true,
+        })),
+        {
+          title: CODEX_PUSH_DOWN_TITLE,
+          placeHolder:
+            "Select the language packs to publish (core is always included).",
+          canPickMany: true,
+          ignoreFocusOut: true,
+        },
+      );
+      if (packSelection === undefined) {
+        return;
+      }
+      const packs = packSelection.map((item) => item.pack);
+
+      let csharpVariant: "modern" | "legacy" | undefined;
+      if (packs.includes("csharp")) {
+        const variantChoice = await promptForChoice(
+          CODEX_PUSH_DOWN_TITLE,
+          "Choose the C# toolchain variant.",
+          ["modern", "legacy"],
+        );
+        if (!variantChoice) {
+          return;
+        }
+        csharpVariant = variantChoice;
+      }
+      const translatedPacks = translateSelectedPackNames(packs, csharpVariant);
       await options.service.pushDownCodexAndAgentsCustomizations({
         workspaceRoot: getWorkspaceRoot(),
         invocationId: commandId,
+        packs: translatedPacks,
+        ...(csharpVariant === undefined ? {} : { csharpVariant }),
+        memoryMode: "overwrite",
       });
     },
   );

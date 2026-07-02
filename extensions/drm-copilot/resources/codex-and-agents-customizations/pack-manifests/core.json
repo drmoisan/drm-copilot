@@ -1,0 +1,24 @@
+{
+  "name": "core",
+  "label": "Core (always included)",
+  "paths": [
+    ".agents/README.md",
+    ".agents/skills/README.md",
+    ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+    ".agents/skills/atomic-executor/SKILL.md",
+    ".agents/skills/atomic-plan-contract/SKILL.md",
+    ".agents/skills/atomic-planner/SKILL.md",
+    ".agents/skills/evidence-and-timestamp-conventions/SKILL.md",
+    ".agents/skills/orchestrate/SKILL.md",
+    ".agents/skills/orchestrator-workflow/SKILL.md",
+    ".agents/skills/policy-compliance-order/SKILL.md",
+    ".agents/skills/repo-automation-adapter/SKILL.md",
+    ".agents/skills/repo-automation-adapter/agents/openai.yaml",
+    ".codex/config.toml",
+    ".codex/agents/atomic-executor.toml",
+    ".codex/agents/atomic-planner.toml",
+    ".codex/agents/orchestrator.toml",
+    ".codex/prompts/generate-pr.md",
+    ".codex/prompts/orchestrate-work.md"
+  ]
+}

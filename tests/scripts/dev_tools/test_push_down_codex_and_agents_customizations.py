@@ -71,6 +71,29 @@ def _load_module():
     )
 
 
+def _manifest_payload(name: str, paths: list[str]) -> str:
+    """Build a Codex pack manifest JSON payload."""
+
+    return json.dumps({"name": name, "label": name.title(), "paths": paths})
+
+
+def _write_manifest(
+    fs: RecordingFileSystem, repo_root: Path, name: str, paths: list[str]
+) -> None:
+    """Write one Codex manifest into the in-memory bundle."""
+
+    fs.write_text(
+        repo_root
+        / "extensions"
+        / "drm-copilot"
+        / "resources"
+        / "codex-and-agents-customizations"
+        / "pack-manifests"
+        / f"{name}.json",
+        _manifest_payload(name, paths),
+    )
+
+
 def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
     """Verify the new publisher copies `.codex` and `.agents` paths unchanged."""
 
@@ -135,6 +158,52 @@ def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
     ]
 
 
+def test_no_argument_push_down_publishes_full_tree_and_artifact_path() -> None:
+    """Verify omitted packs keeps full `.codex` and `.agents` behavior."""
+
+    module = _load_module()
+    repo_root = Path("/repo")
+    destination_root = Path("/dest")
+    fs = RecordingFileSystem(
+        files={
+            repo_root / ".codex" / "config.toml": MemoryFile("config\n"),
+            repo_root / ".codex" / "agents" / "python.toml": MemoryFile("py\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "python"
+            / "SKILL.md": MemoryFile("python\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "csharp"
+            / "SKILL.md": MemoryFile("csharp\n"),
+        }
+    )
+    fs.directories.update({repo_root, destination_root})
+
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    assert fs.read_text(destination_root / ".codex" / "config.toml") == "config\n"
+    assert (
+        fs.read_text(destination_root / ".agents" / "skills" / "python" / "SKILL.md")
+        == "python\n"
+    )
+    assert (
+        fs.read_text(destination_root / ".agents" / "skills" / "csharp" / "SKILL.md")
+        == "csharp\n"
+    )
+    assert (
+        "artifacts/codex-and-agents-customizations/push-down-" in summary.artifact_path
+    )
+
+
 def test_push_down_customizations_writes_codex_and_agents_artifact() -> None:
     """Verify the new publisher uses its own artifact directory and rewrite counts."""
 
@@ -170,6 +239,12 @@ def test_push_down_customizations_writes_codex_and_agents_artifact() -> None:
     assert artifact_payload["created_count"] == 1
     assert artifact_payload["rewritten_reference_count"] == 0
     assert artifact_payload["placeholder_rewrite_count"] == 0
+    assert artifact_payload["codex_selection"] == {
+        "csharp_variant": "modern",
+        "effective_packs": None,
+        "full_tree": True,
+        "memory_mode": "overwrite",
+    }
 
 
 def test_main_prints_summary_artifact_path_for_codex_and_agents_scope() -> None:
@@ -195,3 +270,183 @@ def test_main_prints_summary_artifact_path_for_codex_and_agents_scope() -> None:
 
     assert exit_code == 0
     assert "artifacts/codex-and-agents-customizations/push-down-" in output.getvalue()
+
+
+def test_selected_typescript_pack_writes_only_core_and_typescript_paths() -> None:
+    """Verify explicit TypeScript selection excludes other language packs."""
+
+    module = _load_module()
+    repo_root = Path("/repo")
+    destination_root = Path("/dest")
+    fs = RecordingFileSystem(
+        files={
+            repo_root / ".codex" / "config.toml": MemoryFile("core\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "typescript"
+            / "SKILL.md": MemoryFile("ts\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "python"
+            / "SKILL.md": MemoryFile("py\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "powershell"
+            / "SKILL.md": MemoryFile("ps\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "csharp"
+            / "SKILL.md": MemoryFile("cs\n"),
+        }
+    )
+    fs.directories.update({repo_root, destination_root})
+    _write_manifest(fs, repo_root, "core", [".codex/config.toml"])
+    _write_manifest(
+        fs,
+        repo_root,
+        "typescript",
+        [".agents/skills/typescript/SKILL.md"],
+    )
+
+    module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+        packs=frozenset({"core", "typescript"}),
+    )
+
+    assert fs.is_file(destination_root / ".codex" / "config.toml")
+    assert fs.is_file(
+        destination_root / ".agents" / "skills" / "typescript" / "SKILL.md"
+    )
+    assert not fs.is_file(
+        destination_root / ".agents" / "skills" / "python" / "SKILL.md"
+    )
+    assert not fs.is_file(
+        destination_root / ".agents" / "skills" / "powershell" / "SKILL.md"
+    )
+    assert not fs.is_file(
+        destination_root / ".agents" / "skills" / "csharp" / "SKILL.md"
+    )
+
+
+def test_selected_legacy_csharp_writes_variant_content_to_canonical_paths() -> None:
+    """Verify legacy C# reads from variant roots but writes canonical paths."""
+
+    module = _load_module()
+    repo_root = Path("/repo")
+    destination_root = Path("/dest")
+    fs = RecordingFileSystem(
+        files={
+            repo_root / ".codex" / "config.toml": MemoryFile("core\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "csharp"
+            / "SKILL.md": MemoryFile("modern csharp\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "csharp-qa-gate"
+            / "SKILL.md": MemoryFile("modern qa\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "invoke-csharp-engineer"
+            / "SKILL.md": MemoryFile("modern invoke\n"),
+            repo_root
+            / ".codex"
+            / "agents"
+            / "csharp-typed-engineer.toml": MemoryFile("modern agent\n"),
+            repo_root
+            / "extensions"
+            / "drm-copilot"
+            / "resources"
+            / "codex-and-agents-customizations"
+            / ".agents-variants"
+            / "csharp-legacy"
+            / "skills"
+            / "csharp"
+            / "SKILL.md": MemoryFile("legacy csharp\n"),
+            repo_root
+            / "extensions"
+            / "drm-copilot"
+            / "resources"
+            / "codex-and-agents-customizations"
+            / ".agents-variants"
+            / "csharp-legacy"
+            / "skills"
+            / "csharp-qa-gate"
+            / "SKILL.md": MemoryFile("legacy qa\n"),
+            repo_root
+            / "extensions"
+            / "drm-copilot"
+            / "resources"
+            / "codex-and-agents-customizations"
+            / ".agents-variants"
+            / "csharp-legacy"
+            / "skills"
+            / "invoke-csharp-engineer"
+            / "SKILL.md": MemoryFile("legacy invoke\n"),
+            repo_root
+            / "extensions"
+            / "drm-copilot"
+            / "resources"
+            / "codex-and-agents-customizations"
+            / ".codex-variants"
+            / "csharp-legacy"
+            / "agents"
+            / "csharp-typed-engineer.toml": MemoryFile("legacy agent\n"),
+        }
+    )
+    fs.directories.update({repo_root, destination_root})
+    csharp_paths = [
+        ".agents/skills/csharp/SKILL.md",
+        ".agents/skills/csharp-qa-gate/SKILL.md",
+        ".agents/skills/invoke-csharp-engineer/SKILL.md",
+        ".codex/agents/csharp-typed-engineer.toml",
+    ]
+    _write_manifest(fs, repo_root, "core", [".codex/config.toml"])
+    _write_manifest(fs, repo_root, "csharp-legacy", csharp_paths)
+
+    module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+        packs=frozenset({"core", "csharp-legacy"}),
+        csharp_variant="legacy",
+    )
+
+    assert (
+        fs.read_text(destination_root / ".agents" / "skills" / "csharp" / "SKILL.md")
+        == "legacy csharp\n"
+    )
+    assert (
+        fs.read_text(
+            destination_root / ".codex" / "agents" / "csharp-typed-engineer.toml"
+        )
+        == "legacy agent\n"
+    )
+    assert not fs.is_file(
+        destination_root
+        / ".agents-variants"
+        / "csharp-legacy"
+        / "skills"
+        / "csharp"
+        / "SKILL.md"
+    )
+    assert not fs.is_file(
+        destination_root
+        / ".codex-variants"
+        / "csharp-legacy"
+        / "agents"
+        / "csharp-typed-engineer.toml"
+    )
