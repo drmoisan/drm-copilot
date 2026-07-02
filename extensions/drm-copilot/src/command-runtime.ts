@@ -145,16 +145,23 @@ export function getWorkspaceRoot(): string {
  * @remarks On Windows the lookup also tries each PATHEXT suffix to mirror shell resolution.
  */
 function executableExists(executable: string): boolean {
+  return findExecutableOnPath(executable) !== undefined;
+}
+
+function getPathExtensions(): ReadonlyArray<string> {
+  return process.platform === "win32"
+    ? (process.env["PATHEXT"] ?? ".COM;.EXE;.BAT;.CMD")
+        .split(";")
+        .filter((part) => part.length > 0)
+    : [""];
+}
+
+function findExecutableOnPath(executable: string): string | undefined {
   const pathValue = process.env["PATH"] ?? "";
   const pathParts = pathValue
     .split(path.delimiter)
     .filter((part) => part.length > 0);
-  const pathExtensions =
-    process.platform === "win32"
-      ? (process.env["PATHEXT"] ?? ".COM;.EXE;.BAT;.CMD")
-          .split(";")
-          .filter((part) => part.length > 0)
-      : [""];
+  const pathExtensions = getPathExtensions();
 
   // Probe each PATH directory against each allowed extension so runtime detection
   // behaves consistently across Windows and non-Windows environments.
@@ -165,12 +172,61 @@ function executableExists(executable: string): boolean {
         process.platform === "win32" ? `${executable}${extension}` : executable,
       );
       if (fs.existsSync(candidate)) {
-        return true;
+        return candidate.replace(/\\/g, "/");
       }
     }
   }
 
-  return false;
+  return undefined;
+}
+
+/**
+ * Resolves the Codex CLI executable before a terminal is created.
+ *
+ * @param configuredExecutable Optional configured command name or executable path.
+ * @returns The resolved command or path to invoke through PowerShell.
+ * @throws Error when the configured executable or PATH fallback cannot be found.
+ */
+export function resolveCodexExecutable(
+  configuredExecutable: string | undefined,
+): string {
+  const trimmedConfiguredExecutable = configuredExecutable?.trim() ?? "";
+  if (trimmedConfiguredExecutable.length > 0) {
+    const normalizedConfiguredExecutable = trimmedConfiguredExecutable.replace(
+      /\\/g,
+      "/",
+    );
+    const isPathLike = /[\\/]/.test(trimmedConfiguredExecutable);
+    if (isPathLike) {
+      if (fs.existsSync(trimmedConfiguredExecutable)) {
+        return normalizedConfiguredExecutable;
+      }
+
+      throw new Error(
+        "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+      );
+    }
+
+    const resolvedConfiguredExecutable = findExecutableOnPath(
+      trimmedConfiguredExecutable,
+    );
+    if (resolvedConfiguredExecutable !== undefined) {
+      return resolvedConfiguredExecutable;
+    }
+
+    throw new Error(
+      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+    );
+  }
+
+  const resolvedCodex = findExecutableOnPath("codex");
+  if (resolvedCodex !== undefined) {
+    return resolvedCodex;
+  }
+
+  throw new Error(
+    "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+  );
 }
 
 /**

@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import { jest } from "@jest/globals";
 
 export interface ExecutablePresence {
+  readonly codex?: boolean;
   readonly python?: boolean;
   readonly py?: boolean;
   readonly pwsh?: boolean;
@@ -27,6 +28,10 @@ export function setExecutablePresenceOnFsMock(
 ): void {
   fsModule.existsSync.mockImplementation((filePath: string) => {
     const lowerPath = filePath.toLowerCase();
+    if (/[\\/]codex(?:\.(?:exe|cmd|bat))?$/.test(lowerPath)) {
+      return presence.codex ?? false;
+    }
+
     if (lowerPath.includes("python")) {
       return presence.python ?? false;
     }

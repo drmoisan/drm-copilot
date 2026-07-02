@@ -50,7 +50,12 @@
         "drmCopilotExtension.newCodexWorktreeSession.postCodexScriptPath": {
           "type": "string",
           "default": ".codex/scripts/post-codex-worktree-session.ps1",
-          "description": "Worktree-relative path to a PowerShell script that the New Codex Worktree Session command runs after adding the worktree to Codex trusted projects and before starting 'codex'. The path is resolved relative to the worktree root. A missing script at this path is not an error; the command proceeds to 'codex'."
+          "description": "Source-root-relative path to a PowerShell script that the New Codex Worktree Session command runs after adding the worktree to Codex trusted projects and before starting 'codex'. The path is resolved relative to the source repository root so first-run Codex worktree sessions can prepare the new worktree. A missing script at this path is not an error; the command proceeds to 'codex'."
+        },
+        "drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Codex CLI executable path or command name. Leave blank to resolve 'codex' from PATH/PATHEXT before the New Codex Worktree Session terminal is created."
         }
       }
     },

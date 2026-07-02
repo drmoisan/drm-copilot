@@ -13,6 +13,7 @@ import {
   detectRuntime,
   executeBundledScript,
   getWorkspaceRoot,
+  resolveCodexExecutable,
 } from "./command-runtime";
 import { registerDocumentWorkflowCommands } from "./document-workflow-commands";
 import { RealFileSystem } from "./lib/file-system";
@@ -33,8 +34,8 @@ import { createRepoAutomationService } from "./repo-automation-service";
 import { registerRepoAutomationCommands } from "./repo-automation-command-registration";
 import { resolveRunPoshQCSuiteInvocation } from "./workflow-command-arguments";
 
-// Re-export detectRuntime so existing test imports from this module keep working.
-export { detectRuntime };
+// Re-export runtime helpers so existing test imports from this module keep working.
+export { detectRuntime, resolveCodexExecutable };
 
 /**
  * Grace period (milliseconds) between sending the pre-claude commands
@@ -66,6 +67,24 @@ function pyprojectHasPoetry(workspaceRoot: string): boolean {
 
   const contents = fs.readFileSync(pyprojectPath, "utf-8");
   return contents.includes("poetry");
+}
+
+function resolveSourceRootPath(
+  sourceRoot: string,
+  configuredPath: string,
+): string {
+  const trimmedPath = configuredPath.trim();
+  if (trimmedPath.length === 0) {
+    return "";
+  }
+
+  const normalizedPath = trimmedPath.replace(/\\/g, "/");
+  if (/^[A-Za-z]:\//.test(normalizedPath) || normalizedPath.startsWith("/")) {
+    return normalizedPath;
+  }
+
+  const normalizedRoot = sourceRoot.replace(/\\/g, "/").replace(/\/+$/, "");
+  return `${normalizedRoot}/${normalizedPath.replace(/^\/+/, "")}`;
 }
 
 /**
@@ -242,18 +261,28 @@ export function activate(context: vscode.ExtensionContext): void {
       );
       const branchName = buildBranchName(timestamp, repoName);
       const usePoetry = pyprojectHasPoetry(workspaceRoot);
+      const codexConfiguration = vscode.workspace.getConfiguration(
+        "drmCopilotExtension.newCodexWorktreeSession",
+      );
       const configuredPostCodexScriptPath =
-        vscode.workspace
-          .getConfiguration("drmCopilotExtension.newCodexWorktreeSession")
-          .get<string>("postCodexScriptPath") ??
+        codexConfiguration.get<string>("postCodexScriptPath") ??
         ".codex/scripts/post-codex-worktree-session.ps1";
+      const configuredCodexExecutablePath =
+        codexConfiguration.get<string>("codexExecutablePath") ?? "";
+      const codexExecutablePath = resolveCodexExecutable(
+        configuredCodexExecutablePath,
+      );
       const commands = buildCodexWorktreeSessionCommands({
         repoRoot: workspaceRoot,
         worktreePath,
         branchName,
         usePoetry,
         objective,
-        postCodexScriptPath: configuredPostCodexScriptPath,
+        codexExecutablePath,
+        postCodexScriptPath: resolveSourceRootPath(
+          workspaceRoot,
+          configuredPostCodexScriptPath,
+        ),
       });
 
       const terminal = vscode.window.createTerminal({
