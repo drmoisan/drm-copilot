@@ -28,6 +28,13 @@ pull request. You are the only agent authorized to run `gh pr create` and `gh pr
 orchestrator and all other agents are blocked from these commands by the
 `enforce-pr-author-skill.ps1` PreToolUse hook.
 
+Precondition: before this agent is invoked, the orchestrator must have already validated the
+orchestrator-state checkpoint (`artifacts/orchestration/orchestrator-state.json --require-complete`)
+and recorded the result under `pr_author_preflight`. This is a local precondition, not a CI gate: the
+`enforce-pr-author-skill.ps1` PreToolUse hook independently re-validates the same checkpoint before
+allowing `gh pr create --body-file`/`gh pr edit --body-file` to proceed, and blocks with
+`ORCHESTRATOR_STATE_PREFLIGHT_FAILED` when the checkpoint is missing or fails `--require-complete`.
+
 ## Skill
 
 Apply the `pr-author` skill (`.claude/skills/pr-author/SKILL.md`) as the canonical workflow for

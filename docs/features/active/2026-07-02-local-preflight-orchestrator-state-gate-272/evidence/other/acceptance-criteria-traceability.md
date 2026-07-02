@@ -1,0 +1,22 @@
+# Acceptance Criteria Traceability — Issue #272
+
+Timestamp: 2026-07-02T19-08
+
+Maps each of spec.md's 12 `## Acceptance Criteria` bullets to the plan task(s)/artifact(s) that verify it.
+
+| # | AC bullet (summary) | Verifying task(s) | Verifying artifact(s) |
+|---|---|---|---|
+| 1 | Two CI workflow files + bundled mirrors deleted; no other reference remains | P3-T1–P3-T5 | `evidence/other/deletion-verification-grep.md` (zero matches after deletion) |
+| 2 | Hook blocks with `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` when checkpoint missing, mocked-`$Invoker` Pester test | P2-T1, P3-T6/T7, P4-T4 | `tests/scripts/claude-hooks/enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1` (`orchestrator-state preflight` Context, first `It`); `evidence/regression-testing/phase4-full-suite-pass.md` |
+| 3 | Hook blocks with `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` when checkpoint exists but fails `--require-complete`, corresponding Pester test | P2-T2, P3-T6/T7, P4-T4 | same test file, second `It` (asserts summarized validator output included) |
+| 4 | Hook allows `--body-file` (subject to five receipt checks) when checkpoint passes, extended `'allowed commands'` tests | P4-T1, P4-T4 | `tests/scripts/claude-hooks/enforce-pr-author-skill.Tests.ps1` `Context 'allowed commands'` (passing-preflight mock added) |
+| 5 | Identical hook edit lands byte-for-byte in `.claude/` mirror, `test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes | P3-T9, P4-T6 | `evidence/qa-gates/pytest-mirror-parity-postchange.md` |
+| 6 | Equivalent edit lands in Codex mirror with 3-line header preserved, body byte-identical | P3-T10, P4-T7/T8 | `evidence/other/codex-mirror-governing-test.md`, `evidence/qa-gates/codex-mirror-verification.md` |
+| 7 | Orchestrator invokes validator before delegating to `Agent(pr-author)`, records `pr_author_preflight` in checkpoint matching Technical Specifications shape | P3-T11, P3-T12 | `.claude/skills/orchestrate/SKILL.md` § "PR Authoring (pr-author Handoff)" step 2, `.claude/agents/orchestrator.md` § "PR Creation Delegation" — both now document the exact `pr_author_preflight` field shape and the required sequencing. **Note:** this AC describes runtime orchestrator behavior for future orchestration sessions; this plan documents the mechanism (mandatory) but does not itself execute a live orchestrator delegation that writes `pr_author_preflight` into a checkpoint, since PR creation/delegation is explicitly out of scope for this executor delegation (see Phase 6 exclusion). |
+| 8 | SKILL.md/orchestrator.md/pr-author.md document local preflight + `pr_author_preflight`; no CI-enforcement claim remains in these three files or `CLAUDE.md` | P3-T11–P3-T14 | Direct diffs to `.claude/skills/orchestrate/SKILL.md`, `.claude/agents/orchestrator.md`, `.claude/agents/pr-author.md`, `CLAUDE.md` (all additive per research's confirmation that no incorrect CI claim existed to remove) |
+| 9 | Hook's existing `exit 0`/JSON-`permissionDecision` contract unchanged for all existing cases; all pre-existing Pester tests continue passing unmodified | P4-T1, P4-T4 | `evidence/regression-testing/phase4-full-suite-pass.md` (53/53 pass, including all pre-existing assertions with only a passing-preflight mock line added, no assertion text changed) |
+| 10 | `enforce-pr-author-skill.ps1` remains under the 500-line cap | P3-T8 | Plan completion note (497 lines, confirmed via `wc -l`) |
+| 11 | Full PowerShell toolchain pass (format→analyze→test) with zero errors and no coverage regression (line >= 85%, branch >= 75%) on changed file | P4-T9–P4-T12 | `evidence/qa-gates/final-poshqc-format.md`, `final-poshqc-analyze.md`, `final-poshqc-test-coverage.md`, `coverage-delta.md` |
+| 12 | Branch-ruleset non-goal documented: no change to `main`'s `required_status_checks` | spec.md `## Scope & Non-Goals` (already independently confirmed via `gh api` per spec's own text, prior to this plan); no plan task modifies branch-ruleset config, confirmed by the CLAUDE.md/plan out-of-scope exclusion list | This delegation's own scope statement (`Do not touch anything the plan/spec marks out of scope: branch-protection/ruleset config...`); no ruleset file exists in-repo to modify |
+
+All 12 AC bullets are traceable to specific plan tasks and artifacts. AC #7 is documentation-complete but runtime-execution-deferred (by design — it describes future orchestrator session behavior, not a one-time artifact this executor delegation produces).

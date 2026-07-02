@@ -56,4 +56,4 @@ This repository uses a four-layer Claude Code runtime architecture that maps the
 
 The `.claude/` directory is the standalone runtime surface for Claude Code. Skills, agents, and rules under `.claude/` are self-contained and do not require reading from `.github/` at runtime. The `.github/` directory contains the parallel Copilot-native customization surface.
 
-The orchestration checkpoint path for this runtime is `artifacts/orchestration/orchestrator-state.json`. The main session reads `artifacts/orchestration/orchestrator-state.json` before worker delegation and updates the same file across phase transitions.
+The orchestration checkpoint path for this runtime is `artifacts/orchestration/orchestrator-state.json`. The main session reads `artifacts/orchestration/orchestrator-state.json` before worker delegation and updates the same file across phase transitions. Orchestrator-state checkpoint enforcement ahead of PR authoring is performed by a local `pwsh` PreToolUse hook (`.claude/hooks/enforce-pr-author-skill.ps1`), not a CI workflow.

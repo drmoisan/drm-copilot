@@ -123,6 +123,9 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'allowed commands' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            # A passing preflight mock so the existing allow assertions remain valid under the
+            # new orchestrator-state check (see 'orchestrator-state preflight' Context above).
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
             # Supply a matching, in-date receipt so the extended --body-file path still allows.
             # Body bytes are a single 0x41 ('A'); the receipt sha256 is its SHA-256; created_at is
             # strictly newer than the mocked context-summary last-write time.
@@ -191,6 +194,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - noncanonical body-file path (PR_BODY_PATH_NONCANONICAL)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'blocks a --body-file artifacts/pr_body.md (no number) with PR_BODY_PATH_NONCANONICAL' {
@@ -206,6 +210,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - missing (PR_AUTHOR_RECEIPT_MISSING)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'blocks with PR_AUTHOR_RECEIPT_MISSING when the receipt read seam returns null' {
@@ -220,6 +225,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - number mismatch (PR_AUTHOR_RECEIPT_NUMBER_MISMATCH)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'blocks with PR_AUTHOR_RECEIPT_NUMBER_MISMATCH when receipt.number does not match the path number' {
@@ -237,6 +243,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - hash mismatch (PR_AUTHOR_RECEIPT_HASH_MISMATCH)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'blocks with PR_AUTHOR_RECEIPT_HASH_MISMATCH when the body SHA-256 does not match receipt.sha256' {
@@ -255,6 +262,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - stale (PR_AUTHOR_RECEIPT_STALE)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'blocks with PR_AUTHOR_RECEIPT_STALE when created_at is not strictly newer than the context last-write' {
@@ -274,6 +282,7 @@ Describe 'enforce-pr-author-skill.ps1' {
     Context 'receipt - all checks pass (allow)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
             # Canonical path, present receipt, matching number, matching inline-computed sha256, and
             # a created_at strictly newer than the context last-write time.
             Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
@@ -292,6 +301,7 @@ Describe 'enforce-pr-author-skill.ps1' {
 
     Context 'Get-PrAuthorBypassReason helper' {
         BeforeEach {
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
             # Matching, in-date receipt so the extended --body-file path still allows.
             Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
             Mock -CommandName Get-PrAuthorReceiptContent -MockWith {
@@ -335,6 +345,7 @@ Describe 'enforce-pr-author-skill.ps1' {
 
     Context 'Test-PrAuthorBypassRequired helper' {
         BeforeEach {
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
             # Matching, in-date receipt so the extended --body-file path still allows.
             Mock -CommandName Get-PrBodyFileBytes -MockWith { [byte[]]@(0x41) }
             Mock -CommandName Get-PrAuthorReceiptContent -MockWith {

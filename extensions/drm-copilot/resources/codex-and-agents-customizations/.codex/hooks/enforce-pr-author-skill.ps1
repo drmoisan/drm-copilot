@@ -23,8 +23,10 @@
       Case A - gh pr create or gh pr edit with --body (inline, no --body-file): blocked.
       Case B - gh pr create with neither --body nor --body-file: blocked.
       Case C - gh pr create or gh pr edit with --body-file but context artifact absent: blocked.
-      Receipt - --body-file present and context artifact present: the SHA-256 receipt is verified
-                in five ordered checks (Section below). The first failing check blocks.
+      Preflight - --body-file/context present: orchestrator-state checkpoint must pass
+                  --require-complete before receipt verification runs, else blocked.
+      Receipt - preflight passed: the SHA-256 receipt is verified in five ordered checks
+                (Section below). The first failing check blocks.
 
     Receipt verification decision order on the --body-file-with-context path:
       PR_BODY_PATH_NONCANONICAL -> PR_AUTHOR_RECEIPT_MISSING -> PR_AUTHOR_RECEIPT_NUMBER_MISMATCH
@@ -45,6 +47,47 @@
 param()
 
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
+$script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+
+function Invoke-OrchestratorStatePreflight {
+    <#
+    .SYNOPSIS
+        Runs the orchestrator-state validator against the checkpoint and reports pass/fail.
+    .DESCRIPTION
+        Mirrors Invoke-RoutingContractValidation (.codex/hooks/validate-orchestrator-output.ps1):
+        an injectable subprocess scriptblock seam defaults to ``python -m
+        scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <CheckpointPath>
+        --require-complete``. A missing checkpoint or --require-complete failure both surface via
+        the validator's non-zero exit/stderr text; no separate file-existence check is made.
+    .OUTPUTS
+        System.Collections.Hashtable with keys HasErrors (bool) and ErrorText (string).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string] $CheckpointPath = $script:OrchestratorStateCheckpointPath,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $Invoker = {
+            param($Path)
+            $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
+                orchestrator-state $Path --require-complete 2>&1
+            [pscustomobject]@{
+                ExitCode = $LASTEXITCODE
+                Output   = ($output | Out-String)
+            }
+        }
+    )
+
+    $result = & $Invoker $CheckpointPath
+    $exitCode = 0
+    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'ExitCode')) { $exitCode = [int]$result.ExitCode }
+    $outputText = ''
+    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'Output')) { $outputText = ([string]$result.Output).Trim() }
+
+    return @{ HasErrors = ($exitCode -ne 0); ErrorText = $outputText }
+}
 
 function Get-PrContextArtifactExistence {
     <#
@@ -305,8 +348,21 @@ function Get-PrAuthorBypassReason {
         return "PR_CONTEXT_MISSING: ``$script:PrContextArtifactPath`` is absent. Run ``mcp__drm-copilot__collect_pr_context`` before creating or editing the PR body."
     }
 
-    # Receipt verification: --body-file present and context artifact exists. Verify the SHA-256
-    # receipt in five ordered checks. This extends, and does not replace, the previously-allowed path.
+    # Orchestrator-state preflight: runs inside this same PreToolUse hook (so it cannot be
+    # bypassed by invoking gh pr create/edit directly) before receipt verification.
+    if ($hasBodyFile -and $ContextExists) {
+        $preflightResult = Invoke-OrchestratorStatePreflight
+        if ($preflightResult.HasErrors) {
+            $preflightSummary = if ([string]::IsNullOrWhiteSpace($preflightResult.ErrorText)) {
+                "checkpoint missing at $script:OrchestratorStateCheckpointPath"
+            } else {
+                $preflightResult.ErrorText
+            }
+            return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary"
+        }
+    }
+
+    # Receipt verification: extends, and does not replace, the previously-allowed path.
     if ($hasBodyFile -and $ContextExists) {
         $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText
         if ($receiptReason) {
