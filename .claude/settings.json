@@ -31,6 +31,8 @@
       "Agent(epic-review)",
       "Agent(status-updater)",
       "Agent(pr-author)",
+      "Agent(commit-message)",
+      "Agent(human-exception-runbook)",
       "Agent(python-typed-engineer)",
       "Agent(powershell-typed-engineer)",
       "Agent(csharp-typed-engineer)",

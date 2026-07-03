@@ -44,7 +44,7 @@ When a step cannot be performed without a human, the orchestrator chooses exactl
 
 ### Exception-runbook requirement
 
-On a permitted `exception`, the orchestrator emits a human-readable runbook at `<FEATURE>/runbooks/<name>.runbook.md` and records its repo-root-relative path in `human_interaction.requirements[].runbook_path`. The runbook contract — canonical path, the five required sections (Cue, Prerequisites, Step-by-step Instructions, Verification, Source and Citation), and the MCP-first / web-second sourcing rule — is defined authoritatively in `.claude/skills/human-exception-runbook/SKILL.md`.
+On a permitted `exception`, the orchestrator delegates runbook authoring to `Agent(human-exception-runbook)`, which emits a human-readable runbook at `<FEATURE>/runbooks/<name>.runbook.md` and returns the `runbook_path`. The orchestrator records the returned repo-root-relative path in `human_interaction.requirements[].runbook_path`. The runbook contract — canonical path, the five required sections (Cue, Prerequisites, Step-by-step Instructions, Verification, Source and Citation), and the MCP-first / web-second sourcing rule — is defined authoritatively in `.claude/skills/human-exception-runbook/SKILL.md`.
 
 ### Enforcement points
 
@@ -64,6 +64,26 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
+
+## Model Selection
+
+Model selection is a second axis, strictly separate from `route`. `route` (`small | large | remediation | epic`) is deterministic and file-count driven; it governs `required_agents`, `required_skills`, and `required_mcp_tools` only. `route` is NOT an input to model selection anywhere. The sole feature-level input to the delegation model tier is a judgment-based `complexity_band` (`C1 | C2 | C3 | C4`). The authoritative values live in the `model_policy` block of `config/orchestration-routing.json`.
+
+The two canonical, tested reference implementations express the formulas the orchestrator applies by judgment:
+
+- `scripts/dev_tools/compute_complexity_floor.py` (`compute_complexity_floor`) — the deterministic complexity-floor formula. Each present `[floor]` signal contributes a candidate band of `C3`; the floor is the maximum triggered candidate band; the floor never exceeds `C3`. C4 is never floor-forced; it is reached only by judgment.
+- `scripts/dev_tools/resolve_delegation_model.py` (`resolve_delegation_model`) — the delegation-model selection formula (base `complexity_to_model` table, the `preferred` overlay, and the `disabled` clamp).
+
+End-to-end procedure:
+
+1. **Parse the kickoff marker.** Read the session `model_budget.fable_policy` value (`disabled | available | preferred`, default `disabled`) from the kickoff marker line. This is the only session-level model-budget switch.
+2. **Assess `complexity_band` and record it.** For each assessed phase, judge the `complexity_band` against the `model_policy.complexity` signal catalog and anchors, then record a `complexity_assessments[]` entry `{ phase, band, floor, signals_present[], rationale, assessed_at }`. The recorded `floor` must equal `compute_complexity_floor(signals_present)`, and the assessed `band` must satisfy `band >= floor`. The floor is a lower bound only; it never raises a judgment or evaluates its merit.
+3. **Run the per-delegation selection order.** For each delegation, resolve the model as `resolve_delegation_model(agent, complexity_band, fable_policy)`: the `table_model` is the `preferred` overlay value when (`fable_policy == "preferred"` and the agent is in the overlay set `{atomic-planner, prd-feature, feature-review, task-researcher}` and `band == "C3"`), otherwise the base `complexity_to_model[band]`. Under `fable_policy == "disabled"`, a `fable` `table_model` clamps to `model = "opus"` with `clamped_from = "fable"`. `atomic-executor` and `pr-author` C3 cells stay `opus` under every policy.
+4. **Emit a routing receipt.** Record a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`. `table_model` is the pre-clamp lookup; `model` is the post-clamp result.
+
+The `complexity_assessments[]` and `model_routing_receipts[]` invariants are enforced by `scripts/dev_tools/validate_orchestrator_state.py` per `.claude/rules/orchestrator-state.md`; both arrays are additive and optional.
+
+**`fork` caveat.** A skill whose frontmatter `context` field holds the value `fork` inherits the parent model and ignores a model override. Model selection therefore applies to agent delegations, not to fork-routed skill invocations.
 
 ## PR Authoring (pr-author Handoff)
 
@@ -112,8 +132,8 @@ The orchestrator must not report completion until:
 Before delegating to the `feature-review` subagent, the orchestrator must:
 
 1. Stage all modified and new files: `git add -A`.
-2. Invoke the `commit-message` skill to generate a conventional commit message from the staged diff.
-3. Commit using the generated message: `git commit -m "<generated message>"`.
+2. Delegate to `Agent(commit-message)` to generate a conventional commit message from the staged diff. The agent is read-only and returns message text only; it does not commit.
+3. Commit using the generated message: `git commit -m "<generated message>"`. The `git add` and `git commit` actions remain on the orchestrator.
 4. Only after a successful commit may the orchestrator proceed to the `feature-review` delegation.
 
 The review subagent compares against a base branch; uncommitted changes are invisible to the diff tool and cannot be audited.
@@ -133,7 +153,7 @@ A bounded loop consisting of five steps. The loop variable `remediation_pass` st
 - **R1 — Remediation planning:** Delegate to `atomic-planner` with `remediation-inputs.<timestamp>.md` path as primary context. Receive `remediation-plan.<timestamp>.md` in the active feature folder.
 - **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 and re-delegate to `atomic-planner` with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
-- **Pre-R4 commit:** Stage all changes (`git add -A`), invoke the `commit-message` skill to generate a commit message from the staged diff, commit with the generated message. Advance to R4 only after a successful commit.
+- **Pre-R4 commit:** Stage all changes (`git add -A`), delegate to `Agent(commit-message)` to generate a commit message from the staged diff (the agent returns message text only and does not commit), then commit with the generated message. The `git commit` action remains on the orchestrator. Advance to R4 only after a successful commit.
 - **R4 — Re-audit:** Delegate to `feature-review` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
 - **R5 — Loop-exit decision:** If the re-audit produces zero blocking findings, exit the loop and advance to the PR creation gate. Otherwise, record `remediation_pass` increment in the checkpoint and return to R1.
 

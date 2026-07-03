@@ -104,6 +104,26 @@ checkpoint write, and on CI-green (S9 step 6) merges its own PR into the integra
 recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
 
+## Model Selection
+
+When `epic-orchestrator` delegates a child feature to `Agent(orchestrator)`, the prompt appends the
+session model-budget kickoff marker line, following the existing kickoff-marker pattern:
+
+> `model_budget.fable_policy: <disabled|available|preferred>.`
+
+The child's own `orchestrator` reads this line and applies the two-axis model-selection mechanism
+documented in `.claude/skills/orchestrate/SKILL.md` (`## Model Selection`): it assesses a
+judgment-based `complexity_band`, records `complexity_assessments[]` and `model_routing_receipts[]`,
+and resolves each delegation's model tier under the given `fable_policy`. The two canonical, tested
+reference implementations are `scripts/dev_tools/compute_complexity_floor.py`
+(`compute_complexity_floor`) and `scripts/dev_tools/resolve_delegation_model.py`
+(`resolve_delegation_model`). Default `fable_policy` is `disabled` when the marker is absent.
+
+`route` is never an input to model selection; `route` remains file-count driven and governs only
+agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
+inherits the parent model and ignores a model override, so model selection applies to agent
+delegations, not to fork-routed skill invocations.
+
 ## Context Handoff to Dependent Features
 
 When `epic-orchestrator` kicks off a feature with a non-empty `depends_on`, the delegation prompt
