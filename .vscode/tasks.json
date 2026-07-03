@@ -176,6 +176,16 @@
 			"yes"
 		],
 		"type": "pickString"
+		},
+		{
+		"default": "no",
+		"description": "Confirm running the automated full release flow: open the release PR, wait for checks, merge, update main, and push release tags.",
+		"id": "AutomatedFullReleaseFlowConfirm",
+		"options": [
+			"no",
+			"yes"
+		],
+		"type": "pickString"
 		}
 	],
 	"tasks": [
@@ -267,6 +277,26 @@
 			"command": "pwsh",
 			"detail": "Post-merge: pushes the v<version> and mcp-server-v<version> release tags from the merged main versions to trigger the CI publish workflows. Performs no version bump and no upload.",
 			"label": "Release: Push Release Tags (post-merge)",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/scripts/dev-tools/Invoke-FullReleaseFlow.ps1",
+				"-ConfirmToken",
+				"${input:AutomatedFullReleaseFlowConfirm}"
+			],
+			"command": "pwsh",
+			"detail": "Automates the guarded full release flow: verifies clean up-to-date main, opens the release PR, waits for gh checks, merges through gh, updates main, and invokes the post-merge release tag-push script.",
+			"label": "Release: Automate Full Release Flow",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
