@@ -167,8 +167,9 @@
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./ && npm run bundle:mcp-server",
-    "build": "tsc -p ./ && npm run bundle:mcp-server",
+    "compile": "tsc -p ./ --noEmit && npm run bundle:extension && npm run bundle:mcp-server",
+    "build": "tsc -p ./ --noEmit && npm run bundle:extension && npm run bundle:mcp-server",
+    "bundle:extension": "node esbuild-extension.cjs",
     "bundle:mcp-server": "node esbuild-mcp-server.cjs",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",

@@ -25,7 +25,7 @@ const vscodeShimPlugin = {
 
 esbuild
   .build({
-    entryPoints: ["out/mcp-server.js"],
+    entryPoints: ["src/mcp-server.ts"],
     bundle: true,
     platform: "node",
     target: "node18",
