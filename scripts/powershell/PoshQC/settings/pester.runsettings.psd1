@@ -39,6 +39,14 @@
             'scripts/dev-tools/Invoke-FullRelease.ps1'
             'scripts/dev-tools/Invoke-MarketplacePublish.ps1'
             'scripts/dev-tools/Invoke-ReleaseTagPush.ps1'
+            # Issue #275 remediation cycle 1 (fix #3): measure the epic-orchestrate hook set and
+            # its dot-sourced sibling module so no production hook is excluded from coverage.
+            '.claude/hooks/enforce-epic-merge-gate.ps1'
+            '.claude/hooks/enforce-epic-wave-barrier.ps1'
+            '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-pr-author-skill.ps1'
+            '.claude/hooks/validate-orchestrator-output.ps1'
+            '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

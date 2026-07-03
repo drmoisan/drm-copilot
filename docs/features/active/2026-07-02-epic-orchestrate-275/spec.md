@@ -355,7 +355,7 @@ Research corrected the scope of this requirement beyond the issue draft's framin
 ## Definition of Done
 
 - [x] AC1: `.claude/agents/epic-orchestrator.md` exists, is distinct from `.claude/agents/orchestrator.md`, and its `tools:` frontmatter includes `Agent(orchestrator)`; `orchestrator.md` does not delegate to itself.
-- [x] AC2: `docs/features/epics/<epic-slug>/epic-plan.md`'s YAML-frontmatter schema (`epic`, `integration_branch`, `features[].{feature_folder,issue_num,depends_on}`) is documented and a wave-computation implementation derives wave numbers via the longest-path-layering function in § 2, rejecting cycles and unresolved `depends_on` references before kickoff.
+- [ ] AC2: `docs/features/epics/<epic-slug>/epic-plan.md`'s YAML-frontmatter schema (`epic`, `integration_branch`, `features[].{feature_folder,issue_num,depends_on}`) is documented and a wave-computation implementation derives wave numbers via the longest-path-layering function in § 2, rejecting cycles and unresolved `depends_on` references before kickoff.
 - [x] AC3: The integration-branch lifecycle in § 3 (create off `main`, per-wave fetch-before-branch, PR base override, final integration-to-`main` PR) is implemented and documented in `.claude/skills/epic-orchestrate/SKILL.md`.
 - [x] AC4: `.claude/skills/orchestrate/SKILL.md` carries S9 step 6, the `epic_merge` checkpoint bullet, and PR Creation Gate condition 7 exactly as specified in § 4; standalone (`epic_mode` absent/`false`) behavior is unchanged.
 - [x] AC5: A fan-in merge conflict is converted to a `remediation-inputs.<timestamp>.md` Blocking finding and processed by the unmodified R1–R5 loop (§ 5); the third unresolved pass records `step9_status: "blocked_conflict_loop_limit"` on the child checkpoint and `merge_status: "blocked_conflict_loop_limit"` on the epic checkpoint, and halts without writing DONE.
@@ -367,13 +367,13 @@ Research corrected the scope of this requirement beyond the issue draft's framin
 - [x] AC11: `.claude/hooks/enforce-epic-merge-gate.ps1` denies any `gh pr merge --merge` unless the epic-mode/CI-green checkpoint conditions in § Hooks item b hold; `.claude/hooks/enforce-pr-author-skill.ps1`'s new `Test-EpicBaseBranchOverride` denies `gh pr create` under `epic_mode: true` unless `--base` matches `epic_context.integration_branch`.
 - [x] AC12: `docs/features/epics/<epic-slug>/epic-status.md` is created at epic kickoff and updated at every wave boundary and merge-status transition, per § Documentation Maintenance.
 - [x] AC13: Every file listed under § Bundled Mirror Parity has a byte-identical copy under `extensions/drm-copilot/resources/claude-customizations/`, verified by `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`; the `packages/mcp-server/resources/claude-customizations/` mirror is verified per file with `cmp` before any npm publish including this change.
-- [x] AC14: All four quality toolchains pass with no coverage regression (Python: Black/Ruff/Pyright/Pytest; PowerShell: PoshQC format/analyze/Pester; TypeScript: Prettier/ESLint/TSC/Vitest), and existing tests continue to pass.
+- [ ] AC14: All four quality toolchains pass with no coverage regression (Python: Black/Ruff/Pyright/Pytest; PowerShell: PoshQC format/analyze/Pester; TypeScript: Prettier/ESLint/TSC/Vitest), and existing tests continue to pass.
 - [x] Acceptance criteria documented and mapped to tests or demos
 - [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
-- [x] Toolchain pass completed (format → lint → type-check → test)
+- [ ] Toolchain pass completed (format → lint → type-check → test)
 
 ## Affected Test Files
 
