@@ -1,0 +1,46 @@
+[95m
+[95mStarting discovery in 18 files.[0m
+[95mDiscovery found 294 tests in 526ms.[0m
+[95mStarting code coverage.[0m
+[95mRunning tests.[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-bash.Tests.ps1[0m[90m 631ms (211ms|314ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1[0m[90m 99ms (38ms|50ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1[0m[90m 89ms (37ms|40ms)[0m
+[-] claude-settings.requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage 18ms (17ms|1ms)
+ at $settings.agent | Should -Be 'orchestrator', C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1:12
+ at <ScriptBlock>, C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1:12
+ Expected 'orchestrator', but got $null.
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\agents-attribution.Tests.ps1[0m[90m 52ms (6ms|35ms)[0m
+What if: Performing the operation "Update section content" on target "## Feature Docs".
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\link-feature-docs.Tests.ps1[0m[90m 499ms (391ms|90ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\link-parent-child.Tests.ps1[0m[90m 681ms (545ms|98ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\new-potential-entry.TemplateRoot.Tests.ps1[0m[90m 308ms (234ms|41ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\new-potential-entry.Tests.ps1[0m[90m 578ms (377ms|171ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\publish-sideloaded-extension.Tests.ps1[0m[90m 204ms (130ms|52ms)[0m
+actionlint not found; downloading local copy into tools/actionlint/bin...
+Downloading https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_windows_amd64.zip ...
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\run-actionlint.Tests.ps1[0m[90m 1.06s (894ms|139ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\sync-agents-from-instructions.Tests.ps1[0m[90m 610ms (472ms|111ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\tree.Tests.ps1[0m[90m 451ms (293ms|126ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\Get-PoshQCFileList.Excludes.Tests.ps1[0m[90m 72ms (25ms|35ms)[0m
+Already formatted: /repo/test.ps1
+Formatted: /repo/test.ps1
+Already formatted: /repo/test.ps1
+PSScriptAnalyzer passed: no findings under /repo
+PSScriptAnalyzer passed: no findings under /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.Comprehensive.Tests.ps1[0m[90m 1.37s (1.14s|187ms)[0m
+PSScriptAnalyzer 1.24.0 already present.
+Pester 5.6.1 already present.
+No PowerShell files found under C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.EntryPoints.Tests.ps1[0m[90m 1.24s (1.17s|57ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.ScanFolders.Tests.ps1[0m[90m 314ms (192ms|102ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.Tests.ps1[0m[90m 398ms (259ms|108ms)[0m
+[97mTests completed in 8.81s[0m
+[97mTests Passed: 286, [0m[91mFailed: 1, [0m[93mSkipped: 7, [0m[90mInconclusive: 0, [0m[37m[0m[90mNotRun: 0[0m
+[95mProcessing code coverage result.[0m
+[32mCovered 20.87% / 0%. 2,252 analyzed Commands in 26 Files.[0m

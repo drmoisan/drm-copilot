@@ -1,0 +1,5 @@
+Timestamp: 2026-07-03T16-09
+Baseline Coverage: 96.88% lines, 88.27% branches from docs/features/active/2026-07-03-update-extension-icon-description-285/evidence/remediation-baseline/remediation-baseline-npm-test-unit-coverage.2026-07-03T16-09.md
+Post-Change Coverage: 96.88% lines, 88.27% branches from docs/features/active/2026-07-03-update-extension-icon-description-285/evidence/qa-gates/remediation-npm-test-unit-coverage.2026-07-03T16-09.md
+Changed-Code Coverage: 100.00% changed executable line coverage from original issue #285 comparison at docs/features/active/2026-07-03-update-extension-icon-description-285/evidence/qa-gates/coverage-comparison.2026-07-03T15-40.md; remediation changed documentation/evidence locations and review artifacts only, with no new executable code.
+Result: PASS. Line coverage remains above 85%, branch coverage remains above 75%, baseline-to-post-change regression is 0.00 percentage points, and changed-code coverage is available from the original issue #285 coverage comparison.

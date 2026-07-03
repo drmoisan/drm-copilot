@@ -158,7 +158,8 @@ describe("repo automation MCP tool definitions", () => {
     );
 
     const properties = definition?.inputSchema.properties as
-      Record<string, { enum?: string[] }> | undefined;
+      | Record<string, { enum?: string[] }>
+      | undefined;
 
     expect(properties?.["artifact_type"]?.enum).toContain(
       "epic-orchestrator-state",

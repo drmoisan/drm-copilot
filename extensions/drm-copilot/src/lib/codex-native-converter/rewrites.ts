@@ -25,7 +25,8 @@ import { buildRewriteRules } from "./rewrites-rules";
 export interface RewriteRule {
   readonly pattern: RegExp;
   readonly replacement:
-    string | ((match: string, ...groups: string[]) => string);
+    | string
+    | ((match: string, ...groups: string[]) => string);
   readonly description: string;
 }
 

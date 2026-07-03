@@ -1,0 +1,44 @@
+[95m
+[95mStarting discovery in 18 files.[0m
+[95mDiscovery found 294 tests in 788ms.[0m
+[95mStarting code coverage.[0m
+[95mRunning tests.[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-hooks\validate-bash.Tests.ps1[0m[90m 853ms (257ms|444ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-architecture-doc.Tests.ps1[0m[90m 164ms (77ms|71ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-runtime-structure.Tests.ps1[0m[90m 138ms (63ms|61ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\claude-runtime\claude-settings.Tests.ps1[0m[90m 121ms (41ms|66ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\agents-attribution.Tests.ps1[0m[90m 70ms (7ms|49ms)[0m
+What if: Performing the operation "Update section content" on target "## Feature Docs".
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\link-feature-docs.Tests.ps1[0m[90m 764ms (575ms|129ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\link-parent-child.Tests.ps1[0m[90m 1.04s (827ms|156ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\new-potential-entry.TemplateRoot.Tests.ps1[0m[90m 406ms (332ms|57ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\new-potential-entry.Tests.ps1[0m[90m 853ms (574ms|224ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\publish-sideloaded-extension.Tests.ps1[0m[90m 246ms (159ms|59ms)[0m
+actionlint not found; downloading local copy into tools/actionlint/bin...
+Downloading https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_windows_amd64.zip ...
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\run-actionlint.Tests.ps1[0m[90m 1.26s (1.03s|181ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\sync-agents-from-instructions.Tests.ps1[0m[90m 734ms (538ms|156ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\dev-tools\tree.Tests.ps1[0m[90m 533ms (344ms|142ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\Get-PoshQCFileList.Excludes.Tests.ps1[0m[90m 99ms (30ms|40ms)[0m
+Already formatted: /repo/test.ps1
+Formatted: /repo/test.ps1
+Already formatted: /repo/test.ps1
+PSScriptAnalyzer passed: no findings under /repo
+PSScriptAnalyzer passed: no findings under /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+No Pester test files found under configured paths for root /repo
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.Comprehensive.Tests.ps1[0m[90m 1.71s (1.4s|248ms)[0m
+PSScriptAnalyzer 1.24.0 already present.
+Pester 5.6.1 already present.
+No PowerShell files found under C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.EntryPoints.Tests.ps1[0m[90m 1.46s (1.34s|95ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.ScanFolders.Tests.ps1[0m[90m 359ms (219ms|108ms)[0m
+[32m[+] C:\Users\DanMoisan\repos\drm-copilot\tests\scripts\powershell\PoshQC\PoshQC.Tests.ps1[0m[90m 481ms (292ms|142ms)[0m
+[97mTests completed in 11.35s[0m
+[32mTests Passed: 287, [0m[90mFailed: 0, [0m[93mSkipped: 7, [0m[90mInconclusive: 0, [0m[37m[0m[90mNotRun: 0[0m
+[95mProcessing code coverage result.[0m
+[32mCovered 20.87% / 0%. 2,252 analyzed Commands in 26 Files.[0m
+Wrote Koverage coverage copy: C:\Users\DanMoisan\repos\drm-copilot\artifacts\pester\powershell-coverage.koverage.xml

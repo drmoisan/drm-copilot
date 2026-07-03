@@ -14,7 +14,8 @@ export interface DirectInvocation<TInput> {
 }
 
 export type WorkflowCommandInvocation<TInput> =
-  InteractiveInvocation | DirectInvocation<TInput>;
+  | InteractiveInvocation
+  | DirectInvocation<TInput>;
 
 export const SHORT_NAME_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export const FEATURE_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;

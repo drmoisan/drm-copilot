@@ -1,0 +1,37 @@
+
+[32;1mRuleName                   [0m[32;1m Severity[0m[32;1m ScriptName                         [0m[32;1m Line[0m[32;1m Message[0m
+[32;1m--------                   [0m [32;1m--------[0m [32;1m----------                         [0m [32;1m----[0m [32;1m-------[0m
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    71   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    72   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    73   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    74   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    75   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    76   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    78   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    79   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    80   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    81   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    82   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    83   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    84   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    85   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    86   Use space after a semicolon.
+PSUseConsistentWhitespace   Warning  check-powershell-test-purity.ps1    87   Use space after a semicolon.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-powershell-batch-budget.ps1 100  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-powershell-batch-budget.ps1 135  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-python-batch-budget.ps1     97   Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-python-batch-budget.ps1     131  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+
+[31;1mException: [0m
+[31;1m[36;1mLine |[0m
+[31;1m[36;1m[36;1m 183 | [0m         [36;1mthrow "PSScriptAnalyzer reported $($results.Count) issue(s)."[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mPSScriptAnalyzer reported 20 issue(s).[0m
