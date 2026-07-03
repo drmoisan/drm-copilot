@@ -83,7 +83,7 @@ End-to-end procedure:
 
 The `complexity_assessments[]` and `model_routing_receipts[]` invariants are enforced by `scripts/dev_tools/validate_orchestrator_state.py` per `.claude/rules/orchestrator-state.md`; both arrays are additive and optional.
 
-**`fork` caveat.** A skill invoked via `context: fork` inherits the parent model and ignores a model override. Model selection therefore applies to agent delegations, not to fork-routed skill invocations.
+**`fork` caveat.** A skill whose frontmatter `context` field holds the value `fork` inherits the parent model and ignores a model override. Model selection therefore applies to agent delegations, not to fork-routed skill invocations.
 
 ## PR Authoring (pr-author Handoff)
 

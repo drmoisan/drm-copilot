@@ -120,9 +120,9 @@ reference implementations are `scripts/dev_tools/compute_complexity_floor.py`
 (`resolve_delegation_model`). Default `fable_policy` is `disabled` when the marker is absent.
 
 `route` is never an input to model selection; `route` remains file-count driven and governs only
-agents, skills, and MCP tools. A skill invoked via `context: fork` inherits the parent model and
-ignores a model override, so model selection applies to agent delegations, not to fork-routed skill
-invocations.
+agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
+inherits the parent model and ignores a model override, so model selection applies to agent
+delegations, not to fork-routed skill invocations.
 
 ## Context Handoff to Dependent Features
 
