@@ -1,27 +1,41 @@
 # Branch-Head Green Run (P4-T8 / AC-6)
 
 - Timestamp: 2026-07-03T22:41:00Z to 2026-07-03T22:45:53Z (initial run); re-verified
-  2026-07-03T23:05:00Z after the branch was rebased onto an updated `main`
+  2026-07-03T23:05:00Z after the branch was rebased onto an updated `main`; re-verified again
+  2026-07-03T23:45:00Z after a remediation cycle (feature-review found the prior evidence
+  stale by one evidence-only commit -- see
+  `remediation-inputs.2026-07-03T23-36.md` / `remediation-plan.2026-07-03T23-36.md`)
 - Command (dispatch): `gh workflow run ci.yml --ref feature/parallel-ci-subworkflows-294`
 - Command (poll): `gh run view <run-id> --json status,conclusion,jobs,headSha,url`
 - Owner: orchestrator (direct `gh` invocation)
 
-## Current (post-rebase) run — authoritative for AC-6
+## Current run — authoritative for AC-6 (post-remediation)
 
-- Run URL: https://github.com/drmoisan/drm-copilot/actions/runs/28687660881
-- Head SHA: `574aaa2a086d77857a5cd7d46723f87e090558c2`
+- Run URL: https://github.com/drmoisan/drm-copilot/actions/runs/28688452090
+- Head SHA: `cb4399749f68a97759cd86f63eb0a44c077921d1`
 - EXIT_CODE: 0
 - Conclusion: **success**, all 11 job runs `success` (`poshqc`, `shell-coverage`, `build-check`,
   `quality-checks7` x4 matrix legs, `security-scan`, `docs-validation`,
   `drm-copilot-extension-tests` x2 matrix legs).
+- This dispatch was run immediately after commit `cb43997` (the feature-review-artifacts /
+  remediation-plan commit) was pushed, and represents the last content-changing commit before
+  this re-audit cycle; per the remediation plan, no further commit is expected before the next
+  feature-review re-audit. If any further commit lands on this branch for any reason, this
+  dispatch-then-verify sequence must repeat against the new final head before the evidence below
+  can be trusted again.
 
-## Superseded (pre-rebase) run — retained for audit trail only
+## Superseded runs — retained for audit trail only
 
+- Run URL: https://github.com/drmoisan/drm-copilot/actions/runs/28687660881
+- Head SHA: `574aaa2a086d77857a5cd7d46723f87e090558c2` (superseded once commit `cb43997` -- an
+  evidence-and-review-artifacts-only commit -- landed afterward; a live `gh api .../check-runs`
+  query at that later head returned zero runs, which is the exact finding that triggered this
+  remediation cycle)
 - Run URL: https://github.com/drmoisan/drm-copilot/actions/runs/28686408104
 - Head SHA: `4125238fcecb5e37ab2c2193e902ed47752e7ccf` (superseded after `git rebase main`
   rewrote this branch's commit history onto an updated `main` tip; the SHA above no longer
   exists as this branch's head)
-- EXIT_CODE: 0
+- EXIT_CODE: 0 for both superseded runs
 
 ## Output Summary
 

@@ -1,17 +1,26 @@
 # Confirmed Post-Extraction Required-Status-Check Names (P4-T9)
 
-- Timestamp: 2026-07-03T22:46:00Z; re-verified 2026-07-03T23:10:00Z after `git rebase main`
+- Timestamp: 2026-07-03T22:46:00Z; re-verified 2026-07-03T23:10:00Z after `git rebase main`;
+  re-verified again 2026-07-03T23:45:00Z after the evidence-staleness remediation cycle (see
+  `remediation-inputs.2026-07-03T23-36.md`)
 - Command: `gh api repos/drmoisan/drm-copilot/commits/<head-sha>/check-runs -q '.check_runs[] | {name, conclusion}'`
 - Owner: orchestrator (direct `gh` invocation)
 - EXIT_CODE: 0
 
-## Current (post-rebase) head SHA
+## Current head SHA (authoritative, post-remediation)
 
-- Head SHA: `574aaa2a086d77857a5cd7d46723f87e090558c2`
+- Head SHA: `cb4399749f68a97759cd86f63eb0a44c077921d1`
 - Re-running the command above against this SHA reproduces the identical set of 11 check-run
-  `name` strings listed below (only the object ordering in the raw response differs, which is
-  immaterial). This confirms the composed check-run names are stable across the rebase, since
-  no job/file name changed -- only the underlying commit history was rewritten.
+  `name` strings listed below. This confirms the composed check-run names remain stable across
+  both the rebase and this remediation cycle, since no job/file name changed -- only the
+  underlying commit history advanced (documentation/evidence commits only).
+
+## Prior head SHAs (superseded, retained for audit trail)
+
+- `574aaa2a086d77857a5cd7d46723f87e090558c2` (post-rebase; superseded once commit `cb43997`
+  landed afterward with no corresponding run)
+- `4125238fcecb5e37ab2c2193e902ed47752e7ccf` (pre-rebase; superseded by the `git rebase main`
+  history rewrite)
 
 ## Output Summary
 
