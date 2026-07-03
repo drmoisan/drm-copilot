@@ -1,0 +1,17 @@
+
+[32;1mRuleName                   [0m[32;1m Severity[0m[32;1m ScriptName                         [0m[32;1m Line[0m[32;1m Message[0m
+[32;1m--------                   [0m [32;1m--------[0m [32;1m----------                         [0m [32;1m----[0m [32;1m-------[0m
+PSAvoidUsingEmptyCatchBlock Warning  enforce-powershell-batch-budget.ps1 100  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-powershell-batch-budget.ps1 135  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-python-batch-budget.ps1     97   Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+PSAvoidUsingEmptyCatchBlock Warning  enforce-python-batch-budget.ps1     131  Empty catch block is used. Please use
+                                                                              Write-Error or throw statements in catch
+                                                                              blocks.
+
+ANALYZE_EXIT: 
