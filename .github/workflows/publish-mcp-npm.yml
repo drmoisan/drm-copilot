@@ -43,6 +43,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@11.18.0
@@ -59,4 +60,4 @@ jobs:
       - name: Publish to npm
         if: github.event_name == 'push'
         working-directory: packages/mcp-server
-        run: npm publish --provenance --access public --registry https://registry.npmjs.org/
+        run: npm publish --provenance --access public
