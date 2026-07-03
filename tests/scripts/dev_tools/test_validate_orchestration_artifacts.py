@@ -6,6 +6,7 @@ import argparse
 import json
 from typing import TYPE_CHECKING, cast
 
+import scripts.dev_tools.validate_epic_orchestrator_state as epic_state_validator
 import scripts.dev_tools.validate_orchestration_artifacts as validator
 import scripts.dev_tools.validate_orchestration_review_artifacts as review_validator
 import scripts.dev_tools.validate_orchestrator_state as state_validator
@@ -404,6 +405,10 @@ def test_entrypoint_reexports_split_validator_functions() -> None:
         validator.validate_orchestrator_state_text
         is state_validator.validate_orchestrator_state_text
     )
+    assert (
+        validator.validate_epic_orchestrator_state_text
+        is epic_state_validator.validate_epic_orchestrator_state_text
+    )
 
 
 def test_validate_orchestrator_state_text_requires_receipts_for_completion() -> None:
@@ -633,3 +638,102 @@ def test_main_orchestrator_state_require_complete_returns_0_for_valid(
     )
 
     assert result == 0
+
+
+def build_valid_epic_orchestrator_state() -> dict[str, object]:
+    """Return a minimally valid epic-orchestrator checkpoint payload."""
+
+    return {
+        "objective": "deliver epic-orchestrate-275",
+        "route_id": "epic",
+        "epic_feature_folder": "epic-orchestrate-275",
+        "integration_branch": "epic/epic-orchestrate-275-integration",
+        "completed_steps": ["epic_manifest_parsed"],
+        "next_step": "wave_1_launch",
+        "last_updated": "2026-07-02T20-00",
+        "waves": [{"wave_number": 0, "feature_folders": ["child-a"]}],
+        "features": [
+            {
+                "feature_folder": "child-a",
+                "depends_on": [],
+                "wave_number": 0,
+                "merge_status": "merged",
+            }
+        ],
+    }
+
+
+def test_build_parser_epic_orchestrator_state_accepts_require_complete() -> None:
+    """Confirm the epic-orchestrator-state subparser accepts --require-complete."""
+
+    parser = validator.build_parser()
+
+    args = parser.parse_args(
+        ["epic-orchestrator-state", "ignored.json", "--require-complete"]
+    )
+
+    assert args.artifact_type == "epic-orchestrator-state"
+    assert args.path == "ignored.json"
+    assert args.require_complete is True
+
+
+def test_validate_from_args_dispatches_epic_orchestrator_state(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Confirm the epic-orchestrator-state branch routes to the epic validator."""
+
+    monkeypatch.setattr(
+        validator,
+        "_read_text",
+        build_read_text_stub(json.dumps(build_valid_epic_orchestrator_state())),
+    )
+    validate_from_args = cast(
+        "Callable[[argparse.Namespace], list[str]]",
+        vars(validator)["_validate_from_args"],
+    )
+
+    errors = validate_from_args(
+        argparse.Namespace(
+            path="ignored.json",
+            artifact_type="epic-orchestrator-state",
+            require_complete=False,
+        )
+    )
+
+    assert errors == []
+
+
+def test_main_epic_orchestrator_state_require_complete_returns_0_for_valid(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Return success for a valid require-complete epic checkpoint via the CLI."""
+
+    state = build_valid_epic_orchestrator_state()
+    state["epic_merge_pr"] = {"merge_commit_sha": "abc123"}
+    monkeypatch.setattr(
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
+    )
+
+    result = validator.main(
+        ["epic-orchestrator-state", "ignored.json", "--require-complete"]
+    )
+
+    assert result == 0
+
+
+def test_main_epic_orchestrator_state_require_complete_returns_1_for_invalid(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Return failure for an invalid require-complete epic checkpoint via the CLI."""
+
+    state = build_valid_epic_orchestrator_state()
+    state["features"][0]["merge_status"] = "pr_open"  # type: ignore[index]
+    monkeypatch.setattr(
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
+    )
+
+    result = validator.main(
+        ["epic-orchestrator-state", "ignored.json", "--require-complete"]
+    )
+
+    assert result == 1

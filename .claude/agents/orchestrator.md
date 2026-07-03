@@ -3,6 +3,7 @@ name: orchestrator
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
 tools:
   - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,pr-author,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
+  - "Agent(epic-orchestrator)"
   - Read
   - Grep
   - Glob
@@ -61,6 +62,7 @@ The first action is always to estimate the change budget by identifying likely a
 
 - **Small path** (1–3 production files + corresponding tests): promotion, active folder, minimal plan, implementation, QC, small-audit review.
 - **Large path** (4+ production files or cross-cutting changes): scope, promotion, research, spec, atomic planning, atomic execution, feature review.
+- **Epic path**: the objective names or references an epic manifest (`docs/features/epics/<epic-slug>/epic-plan.md`) or explicitly requests multi-feature/epic orchestration. On this outcome the orchestrator delegates to `Agent(epic-orchestrator)` with the manifest path, instead of running change-budget/small/large routing itself.
 
 ## Delegation Model
 

@@ -378,7 +378,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
   {
     name: "validate_orchestration_artifacts",
     description:
-      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
+      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, orchestrator-state, or epic-orchestrator-state) against its structural schema.",
     inputSchema: {
       type: "object",
       properties: {
@@ -391,6 +391,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
             "code-review",
             "feature-audit",
             "orchestrator-state",
+            "epic-orchestrator-state",
           ],
           description: "The type of orchestration artifact to validate.",
         },
@@ -402,7 +403,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
         require_complete: {
           type: "boolean",
           description:
-            "When true and artifact_type is 'orchestrator-state', require all phases to be complete.",
+            "When true and artifact_type is 'orchestrator-state' or 'epic-orchestrator-state', require all phases to be complete.",
         },
       },
       required: ["artifact_type", "artifact_path"],

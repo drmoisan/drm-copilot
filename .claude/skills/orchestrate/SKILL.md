@@ -160,6 +160,7 @@ S9 procedure:
 3. Parse the JSON via `scripts/orchestration/Invoke-CiGateParser.ps1`, which emits the `ci_gate` object defined below and derives `ci_gate.conclusion` as `success` when all required checks pass, `failure` when any required check failed, and `pending` when any required check is still in progress.
 4. Poll with a bounded interval and a documented total timeout while `conclusion == "pending"`. When the timeout is exhausted, set `step9_status: "failed_remediation_required"` and enter the remediation-loop CI-failure handling below with a timeout log.
 5. Write the `ci_gate` object and `last_verified_ci_sha` to the checkpoint, and set `step9_status` to `passed` only when `ci_gate.conclusion == "success"` AND `ci_gate.head_sha` equals the current PR head SHA.
+6. If the checkpoint's `epic_mode` is `true`, execute `gh pr merge --merge <PR>` merging the feature branch into `epic_context.integration_branch` (already the PR's base branch per the epic-mode `--base` override applied at S8). On success, record `epic_merge: { merge_commit_sha, target_branch, merged_at }` in the checkpoint. On failure due to merge conflict (non-mergeable PR), do not retry blindly: convert the conflict into a synthetic Blocking finding per "Merge-Conflict Remediation" below and re-enter the standard R1–R5 remediation loop; do not proceed to DONE.
 
 DONE is not written while `step9_status` is anything other than `passed`.
 
@@ -175,6 +176,10 @@ The orchestrator checkpoint (`artifacts/orchestration/orchestrator-state.json`) 
   - `verified_at` — ISO-8601 timestamp of when S9 recorded the result.
 - a top-level `last_verified_ci_sha` — the most recent head SHA for which S9 recorded a result.
 - a top-level `step9_status` — an enumeration with at minimum the values `pending`, `passed`, `failed_remediation_required`, and `blocked_ci_loop_limit`.
+- a top-level `epic_merge` object (populated only in epic mode) containing:
+  - `merge_commit_sha` — the merge commit SHA produced by merging the feature branch into `epic_context.integration_branch`.
+  - `target_branch` — the integration branch the feature branch was merged into.
+  - `merged_at` — ISO-8601 timestamp of when S9 step 6 recorded the merge.
 
 Illustrative shape:
 
@@ -217,8 +222,9 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 4. The checkpoint `next_step` is `S8_create_pr` (precondition to entering S9).
 5. PR body produced via the pr-author handoff: `artifacts/pr_body_<N>.md` exists with a matching `artifacts/pr_body_<N>.receipt.json`, created with `--body-file`.
 6. `ci_gate.conclusion == "success"` AND `ci_gate.head_sha == current head SHA of the PR branch`. DONE is not written while either sub-condition is false.
+7. `epic_mode` is `false`, OR (`epic_mode` is `true` AND the integration-branch merge (`gh pr merge --merge`) has completed and `epic_merge.merge_commit_sha` is recorded in the checkpoint).
 
-This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; condition 5 (receipt handoff) and condition 6 (CI-green gate) are additive.
+This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; conditions 5-7 (receipt handoff, CI-green gate, and epic-mode merge-on-green gate) are additive.
 
 ## Step 6 Delegation — Prohibited Prompt Language
 
