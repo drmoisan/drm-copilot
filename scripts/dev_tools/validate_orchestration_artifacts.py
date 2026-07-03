@@ -170,6 +170,15 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Require all tracked statuses to be complete-state safe.",
     )
+    state_parser.add_argument(
+        "--require-pr-creation-ready",
+        action="store_true",
+        help=(
+            "Validate a checkpoint is ready for the first `gh pr create` of a "
+            "branch. Does not require `ci_gate`, `pr_gate`, or a `pr-author` "
+            "delegation receipt, unlike --require-complete."
+        ),
+    )
     return parser
 
 
@@ -205,7 +214,9 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
         return validate_feature_audit_text(text)
     if args.artifact_type == "orchestrator-state":
         return validate_orchestrator_state_text(
-            text, require_complete=bool(args.require_complete)
+            text,
+            require_complete=bool(args.require_complete),
+            require_pr_creation_ready=bool(args.require_pr_creation_ready),
         )
     return [f"Unsupported artifact type: {args.artifact_type}"]
 

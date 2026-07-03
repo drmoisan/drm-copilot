@@ -387,7 +387,6 @@ The repository uses the following GitHub Actions workflows under [.github/workfl
 - `ci.yml` — Python quality and tests across Python 3.10–3.13, security scanning, documentation validation (README and LICENSE presence), package build/install verification, PowerShell formatting/analysis/tests (PoshQC on Windows), shell coverage (Bats + kcov), and `extensions/drm-copilot` tests on Ubuntu and Windows.
 - `publish-mcp-npm.yml` — tag-driven npm publication of `@danmoisan/drm-copilot-mcp`, gated on the extension test matrix.
 - `publish-extension.yml` — tag-driven publication of the VS Code extension to the Marketplace, gated on the extension test matrix; pull requests that touch the extension build and package without publishing.
-- `validate-orchestrator-state.yml` — validation of the orchestrator-state checkpoint artifact.
 - `npm-audit-gate.yml` — npm dependency audit gate.
 
 ### npm publish release procedure
