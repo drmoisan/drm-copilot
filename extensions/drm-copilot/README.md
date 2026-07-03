@@ -1,6 +1,6 @@
 # drm-copilot
 
-`extensions/drm-copilot` provides two workspace-facing adapter surfaces over the same bundled repo-automation workflows:
+`extensions/drm-copilot` provides repository automation, customization publishing, and MCP bridge for drm-copilot workflows. It exposes two workspace-facing adapter surfaces over the same bundled repo-automation workflows:
 
 - VS Code commands for interactive editor use.
 - A stdio MCP server for Codex and other MCP clients.

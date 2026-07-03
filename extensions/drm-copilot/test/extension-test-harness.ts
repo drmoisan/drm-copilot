@@ -347,8 +347,8 @@ export function resetExtensionHarnessState(): void {
   openTextDocumentMock.mockReset();
   showTextDocumentMock.mockReset();
   createTerminalMock.mockReset();
-  createTerminalMock.mockImplementation((): MockTerminal =>
-    buildMockTerminal(),
+  createTerminalMock.mockImplementation(
+    (): MockTerminal => buildMockTerminal(),
   );
   openTextDocumentMock.mockImplementation(async (uri: { fsPath: string }) => ({
     uri,
