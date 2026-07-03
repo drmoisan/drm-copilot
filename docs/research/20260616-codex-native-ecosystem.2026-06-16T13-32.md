@@ -1,6 +1,6 @@
 # Codex Native Ecosystem Research
 
-**Timestamp:** 2026-06-16T13-32  
+**Timestamp:** 2026-06-16T13-32
 **Purpose:** Map Claude Code customization primitives onto Codex-native equivalents with equivalent enforceability for skill authors.
 
 ---

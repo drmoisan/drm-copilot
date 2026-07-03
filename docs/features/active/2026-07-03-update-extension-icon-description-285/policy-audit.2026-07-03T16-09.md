@@ -2,7 +2,7 @@
 
 ---
 
-**Audit Date:** 2026-07-03  
+**Audit Date:** 2026-07-03
 **Code Under Test:** Full branch diff from `main` merge base `706e4d8b600146133c09a1732bbeb2c4c00b9d8e` to `4bbba5c45f64f997bbddb8fa873f02ee48654c67`.
 
 **Coverage Metrics by Language:**
@@ -375,6 +375,6 @@ npm run test:unit
 python scripts/dev_tools/validate_evidence_locations.py --root .
 ```
 
-**Audit Completed By:** Codex  
-**Audit Date:** 2026-07-03  
+**Audit Completed By:** Codex
+**Audit Date:** 2026-07-03
 **Policy Version:** Current as of audit date

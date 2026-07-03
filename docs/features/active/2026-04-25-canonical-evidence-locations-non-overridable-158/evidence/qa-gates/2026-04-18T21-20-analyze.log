@@ -14,4 +14,4 @@ PSAvoidUsingEmptyCatchBlock Warning  enforce-python-batch-budget.ps1     131  Em
                                                                               Write-Error or throw statements in catch
                                                                               blocks.
 
-ANALYZE_EXIT: 
+ANALYZE_EXIT:

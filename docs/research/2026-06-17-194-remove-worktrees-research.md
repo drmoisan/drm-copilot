@@ -254,7 +254,7 @@ No new runtime dependencies. `node:child_process` is already used by `command-ru
 ## 7. Exact Git Invocations and Their Order
 
 1. **List:** `git worktree list --porcelain` — cwd: `workspaceRoot`. Exit code must be 0. Parses the primary worktree path from block 0.
-2. **Per secondary worktree** (only when not locked and not prunable):  
+2. **Per secondary worktree** (only when not locked and not prunable):
    `git worktree remove <absolutePath>` — no `--force` flag — cwd: `workspaceRoot`. Exit code captured; nonzero = skip with stderr reason.
 
 No `git rev-parse --show-toplevel` call is required — the primary worktree is identified by position in the porcelain output (first block), not by comparing against `--show-toplevel`.

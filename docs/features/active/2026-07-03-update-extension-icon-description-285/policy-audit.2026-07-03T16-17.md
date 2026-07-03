@@ -1,9 +1,9 @@
 # Policy Compliance Audit: update-extension-icon-description (Issue #285)
 
-**Audit Date:** 2026-07-03  
-**Code Under Test:** Branch `feature/update-extension-icon-description-285` after issue #285 evidence-location remediation.  
-**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`  
-**Requirements Source:** `docs/features/active/2026-07-03-update-extension-icon-description-285/issue.md`  
+**Audit Date:** 2026-07-03
+**Code Under Test:** Branch `feature/update-extension-icon-description-285` after issue #285 evidence-location remediation.
+**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`
+**Requirements Source:** `docs/features/active/2026-07-03-update-extension-icon-description-285/issue.md`
 **Prior Audit:** `docs/features/active/2026-07-03-update-extension-icon-description-285/policy-audit.2026-07-03T16-09.md`
 
 ## Executive Summary
@@ -190,6 +190,6 @@ npm run typecheck
 npm run test:unit -- --coverage
 ```
 
-**Audit Completed By:** Codex  
-**Audit Date:** 2026-07-03  
+**Audit Completed By:** Codex
+**Audit Date:** 2026-07-03
 **Policy Version:** Current as of audit date

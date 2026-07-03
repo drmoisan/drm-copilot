@@ -2,11 +2,11 @@
 
 ---
 
-**Audit Date:** 2026-07-03  
-**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`  
-**Base Branch:** `main`  
-**Head Branch:** `feature/update-extension-icon-description-285` at `4bbba5c45f64f997bbddb8fa873f02ee48654c67`  
-**Work Mode:** `minor-audit`  
+**Audit Date:** 2026-07-03
+**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`
+**Base Branch:** `main`
+**Head Branch:** `feature/update-extension-icon-description-285` at `4bbba5c45f64f997bbddb8fa873f02ee48654c67`
+**Work Mode:** `minor-audit`
 **Audit Type:** Initial acceptance review
 
 ## Scope and Baseline

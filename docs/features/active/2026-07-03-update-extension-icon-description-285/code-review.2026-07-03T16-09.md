@@ -2,12 +2,12 @@
 
 ---
 
-**Review Date:** 2026-07-03  
-**Reviewer:** Codex  
-**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`  
-**Feature Folder Selection Rule:** Supplied active feature folder for issue #285; branch name also ends with `285`.  
-**Base Branch:** `main`  
-**Head Branch:** `feature/update-extension-icon-description-285` at `4bbba5c45f64f997bbddb8fa873f02ee48654c67`  
+**Review Date:** 2026-07-03
+**Reviewer:** Codex
+**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`
+**Feature Folder Selection Rule:** Supplied active feature folder for issue #285; branch name also ends with `285`.
+**Base Branch:** `main`
+**Head Branch:** `feature/update-extension-icon-description-285` at `4bbba5c45f64f997bbddb8fa873f02ee48654c67`
 **Review Type:** Initial feature branch review
 
 ## Executive Summary

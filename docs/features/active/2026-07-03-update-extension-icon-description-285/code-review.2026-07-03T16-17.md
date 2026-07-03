@@ -1,10 +1,10 @@
 # Code Review: update-extension-icon-description (Issue #285)
 
-**Review Date:** 2026-07-03  
-**Reviewer:** Codex  
-**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`  
-**Base Branch:** `main` at merge base `706e4d8b600146133c09a1732bbeb2c4c00b9d8e`  
-**Head Branch:** `feature/update-extension-icon-description-285`  
+**Review Date:** 2026-07-03
+**Reviewer:** Codex
+**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`
+**Base Branch:** `main` at merge base `706e4d8b600146133c09a1732bbeb2c4c00b9d8e`
+**Head Branch:** `feature/update-extension-icon-description-285`
 **Review Type:** Post-remediation code review
 
 ## Executive Summary

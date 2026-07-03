@@ -1,10 +1,10 @@
 # Feature Audit: update-extension-icon-description (Issue #285)
 
-**Audit Date:** 2026-07-03  
-**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`  
-**Base Branch:** `main`  
-**Head Branch:** `feature/update-extension-icon-description-285`  
-**Work Mode:** `minor-audit`  
+**Audit Date:** 2026-07-03
+**Feature Folder:** `docs/features/active/2026-07-03-update-extension-icon-description-285`
+**Base Branch:** `main`
+**Head Branch:** `feature/update-extension-icon-description-285`
+**Work Mode:** `minor-audit`
 **Audit Type:** Post-remediation acceptance review
 
 ## Scope and Baseline

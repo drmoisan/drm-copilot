@@ -1,6 +1,6 @@
 # Claude Ecosystem Hardening Audit — SOURCE vs REPO Comparison
 
-**Date:** 2026-06-16  
+**Date:** 2026-06-16
 **Artifact:** `artifacts/research/20260616-tocompare-claude-ecosystem-hardening-audit-research.md`
 
 ---
@@ -162,7 +162,7 @@ The function:
 **Section A: Coverage Exclusion Policy** (after the Coverage Requirements section)
 
 ```
-No production file may be excluded from coverage measurement. Every production source 
+No production file may be excluded from coverage measurement. Every production source
 file is in the denominator of the coverage metric...
 
 Permitted exclude entries (non-production paths only):
@@ -174,17 +174,17 @@ Permitted exclude entries (non-production paths only):
 Prohibited exclude entries:
 - Any path under src/ that contains production runtime code...
 
-Enforcement: Feature-review agents must treat any exclude entry that matches a 
+Enforcement: Feature-review agents must treat any exclude entry that matches a
 production source path as a Blocking finding.
 ```
 
 **Section B: Test File Location** (after External Dependencies section)
 
 ```
-Test files must live in a tests/ directory tree that mirrors the production source 
-structure... 
-Colocation — placing test files alongside production source files in src/ or 
-equivalent — is not permitted. An agent that creates or moves a test file into 
+Test files must live in a tests/ directory tree that mirrors the production source
+structure...
+Colocation — placing test files alongside production source files in src/ or
+equivalent — is not permitted. An agent that creates or moves a test file into
 the production source tree has violated this rule.
 ```
 
