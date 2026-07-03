@@ -22,7 +22,7 @@ Trigger remediation when any of these are true:
 
 ## Required Remediation Inputs
 
-Create `remediation-inputs.<timestamp>.md` with:
+Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; reaudit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder, per the canonical pattern documented in the Claude-side `remediation-handoff-atomic-planner` skill) with:
 - Enumerated fix list with file paths, expected behavior, and verification commands.
 - A “do not do” list (no scope creep, no policy weakening, no silent skips).
 

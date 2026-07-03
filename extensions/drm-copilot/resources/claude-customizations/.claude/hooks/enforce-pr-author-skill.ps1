@@ -21,7 +21,7 @@
       Case B - gh pr create with neither --body nor --body-file: blocked.
       Case C - gh pr create or gh pr edit with --body-file but context artifact absent: blocked.
       Preflight - --body-file/context present: orchestrator-state checkpoint must pass
-                  --require-complete before receipt verification runs, else blocked.
+                  --require-pr-creation-ready before receipt verification runs, else blocked.
       Receipt - preflight passed: the SHA-256 receipt is verified in five ordered checks
                 (Section below). The first failing check blocks.
 
@@ -54,8 +54,9 @@ function Invoke-OrchestratorStatePreflight {
         Mirrors Invoke-RoutingContractValidation (.claude/hooks/validate-orchestrator-output.ps1):
         an injectable subprocess scriptblock seam defaults to ``python -m
         scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <CheckpointPath>
-        --require-complete``. A missing checkpoint or --require-complete failure both surface via
-        the validator's non-zero exit/stderr text; no separate file-existence check is made.
+        --require-pr-creation-ready``. A missing checkpoint or --require-pr-creation-ready failure
+        both surface via the validator's non-zero exit/stderr text; no separate file-existence check
+        is made, validating pre-PR-creation readiness (steps 5-8, blocked_reason) not full completion.
     .OUTPUTS
         System.Collections.Hashtable with keys HasErrors (bool) and ErrorText (string).
     #>
@@ -69,7 +70,7 @@ function Invoke-OrchestratorStatePreflight {
         [scriptblock] $Invoker = {
             param($Path)
             $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                orchestrator-state $Path --require-complete 2>&1
+                orchestrator-state $Path --require-pr-creation-ready 2>&1
             [pscustomobject]@{
                 ExitCode = $LASTEXITCODE
                 Output   = ($output | Out-String)

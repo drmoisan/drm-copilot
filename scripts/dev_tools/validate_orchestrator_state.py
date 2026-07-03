@@ -30,6 +30,9 @@ from scripts.dev_tools._orchestrator_state_human_interaction import (
     HUMAN_INTERACTION_KEY,
     _validate_human_interaction,
 )
+from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
+    validate_orchestrator_state_pr_creation_readiness,
+)
 from scripts.dev_tools._orchestrator_state_routing import (
     validate_completion_pr_gate,
     validate_phase_completeness,
@@ -348,6 +351,7 @@ def validate_orchestrator_state_text(
     *,
     require_complete: bool = False,
     strict_route_membership: bool = False,
+    require_pr_creation_ready: bool = False,
 ) -> list[str]:
     """Validate checkpoint schema and completion-state fields.
 
@@ -364,6 +368,11 @@ def validate_orchestrator_state_text(
             False (default), route-membership errors are not appended, preserving
             backward compatibility for checkpoints without `route_id`/
             `path_selected`.
+        require_pr_creation_ready (bool): When True, append the result of
+            `validate_orchestrator_state_pr_creation_readiness`, a narrower
+            pre-PR-creation check independent of `require_complete` that does
+            not require `ci_gate`, `pr_gate`, or routing-contract delegation
+            receipts. Defaults to False.
 
     Returns:
         list[str]: Validation errors for malformed or incomplete checkpoint
@@ -466,5 +475,10 @@ def validate_orchestrator_state_text(
         errors.extend(_validate_completion_ci_gate(state_map))
         errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
+
+    if require_pr_creation_ready:
+        # Independent of require_complete: the pre-PR-creation readiness gate
+        # never calls the ci_gate/pr_gate/routing-contract checks above.
+        errors.extend(validate_orchestrator_state_pr_creation_readiness(state_map))
 
     return errors

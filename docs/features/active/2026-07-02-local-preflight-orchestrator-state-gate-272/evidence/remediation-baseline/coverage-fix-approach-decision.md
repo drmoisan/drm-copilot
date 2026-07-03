@@ -2,7 +2,7 @@
 
 **Timestamp:** 2026-07-02T20-41
 
-**Selected approach:** Regenerate the canonical coverage artifact by importing the repo-tracked PoshQC module directly (`Import-Module ./scripts/powershell/PoshQC -Force`) and invoking `Invoke-PoshQCTest -Root '.' -ScanFolders @('tests/scripts/claude-hooks')` — bypassing the `mcp__drm-copilot__run_poshqc_test` MCP wrapper's stale bundled settings entirely, per `remediation-inputs.2026-07-02T20-15.md` item 1(b)'s third option.
+**Selected approach:** Regenerate the canonical coverage artifact by importing the repo-tracked PoshQC module directly (`Import-Module ./scripts/powershell/PoshQC -Force`) and invoking `Invoke-PoshQCTest -Root '.' -ScanFolders @('tests/scripts/claude-hooks')` — bypassing the `mcp__drm-copilot__run_poshqc_test` MCP wrapper's stale bundled settings entirely, per `remediation/2026-07-02T20-15/remediation-inputs.md` item 1(b)'s third option.
 
 **Rationale:**
 - P1-T4 confirmed the repo-tracked module import resolves `PoshQC.psm1` under the repository tree, which in turn resolves `$script:PesterSettings` to the repo-tracked `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` (confirmed correct and current in P1-T3).

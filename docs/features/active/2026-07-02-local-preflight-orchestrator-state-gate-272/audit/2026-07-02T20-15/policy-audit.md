@@ -416,7 +416,7 @@ The implementation itself (hook logic, mirror parity, documentation of the four 
 
 ### Recommendation
 
-**Needs revision.** Two items require remediation before this feature can be marked fully compliant: (1) regenerate the canonical `artifacts/pester/powershell-coverage.xml` (and companion `koverage.xml`) via a correctly-configured Pester coverage run so the artifact demonstrably includes `.claude/hooks/enforce-pr-author-skill.ps1` at a coverage level corroborating (or superseding) the claimed 88.49%/85.7% figures; (2) correct or remove the stale CI-enforcement claims in `README.md` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`. See `remediation-inputs.2026-07-02T20-15.md` for the full remediation task list.
+**Needs revision.** Two items require remediation before this feature can be marked fully compliant: (1) regenerate the canonical `artifacts/pester/powershell-coverage.xml` (and companion `koverage.xml`) via a correctly-configured Pester coverage run so the artifact demonstrably includes `.claude/hooks/enforce-pr-author-skill.ps1` at a coverage level corroborating (or superseding) the claimed 88.49%/85.7% figures; (2) correct or remove the stale CI-enforcement claims in `README.md` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`. See `remediation/2026-07-02T20-15/remediation-inputs.md` for the full remediation task list.
 
 ---
 

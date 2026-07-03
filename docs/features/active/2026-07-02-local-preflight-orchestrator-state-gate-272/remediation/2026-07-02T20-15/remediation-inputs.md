@@ -3,9 +3,9 @@
 **Timestamp:** 2026-07-02T20-15
 **Cycle:** 1 (entry)
 **Triggering audit artifacts:**
-- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/policy-audit.2026-07-02T20-15.md`
-- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/code-review.2026-07-02T20-15.md`
-- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/feature-audit.2026-07-02T20-15.md`
+- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/policy-audit.md`
+- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/code-review.md`
+- `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/feature-audit.md`
 
 **Work mode:** `full-bug`. AC source: `spec.md` `## Acceptance Criteria`.
 
@@ -37,7 +37,7 @@ Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root .
 
 **Acceptance for this remediation item:** `artifacts/pester/powershell-coverage.xml` contains a `<class name=".../.claude/hooks/enforce-pr-author-skill.ps1">` entry with a `LINE` counter showing line coverage >= 85% (repo's uniform-tier floor per `.claude/rules/quality-tiers.md`) and no regression on the function's changed lines relative to the pre-feature baseline. Re-run this feature-review's Section 5 coverage inspection against the regenerated artifact.
 
-**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/policy-audit.2026-07-02T20-15.md` Section 5 and Section 8 item 1; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/code-review.2026-07-02T20-15.md` Findings Table row 1.
+**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/policy-audit.md` Section 5 and Section 8 item 1; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/code-review.md` Findings Table row 1.
 
 ---
 
@@ -62,7 +62,7 @@ grep -n "Orchestrator State Gate" extensions/drm-copilot/resources/codex-and-age
 ```
 Both should return no matches (or, for the second file, a corrected claim) after remediation.
 
-**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/policy-audit.2026-07-02T20-15.md` Section 2.6 and Section 8 item 2; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/code-review.2026-07-02T20-15.md` Findings Table rows 2-3.
+**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/policy-audit.md` Section 2.6 and Section 8 item 2; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/code-review.md` Findings Table rows 2-3.
 
 ### 3. [Minor] Consider hardening the new end-to-end Pester test against mutable checkpoint state
 
@@ -74,7 +74,7 @@ Both should return no matches (or, for the second file, a corrected claim) after
 
 **Recommendation:** Optional for this cycle. If addressed, point `Invoke-OrchestratorStatePreflight`'s `-CheckpointPath` parameter at a deliberately-nonexistent, non-temp-file path (e.g., a sibling filename that is guaranteed absent, following the existing "real seam, stand-in existing file" pattern used elsewhere in this file family) rather than relying on the real checkpoint's current content.
 
-**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/policy-audit.2026-07-02T20-15.md` Section 8 item 3; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/code-review.2026-07-02T20-15.md` Findings Table row 4.
+**Evidence pointer:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/policy-audit.md` Section 8 item 3; `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/audit/2026-07-02T20-15/code-review.md` Findings Table row 4.
 
 ---
 
@@ -90,4 +90,4 @@ Both should return no matches (or, for the second file, a corrected claim) after
 
 ## Handoff
 
-Per `remediation-handoff-atomic-planner`, this file is authored at cycle entry alongside a corresponding `remediation-plan.2026-07-02T20-15.md` (to be authored by `atomic-planner`). This feature-review delegation does not author the remediation plan itself; it hands off findings only.
+Per `remediation-handoff-atomic-planner`, this file is authored at cycle entry alongside a corresponding `remediation/2026-07-02T20-15/remediation-plan.md` (to be authored by `atomic-planner`). This feature-review delegation does not author the remediation plan itself; it hands off findings only.

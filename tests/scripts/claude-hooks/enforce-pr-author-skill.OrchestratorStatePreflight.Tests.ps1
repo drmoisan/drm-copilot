@@ -36,10 +36,10 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
         }
 
-        It 'blocks gh pr create --body-file with the summarized output when --require-complete fails' {
+        It 'blocks gh pr create --body-file with the summarized output when --require-pr-creation-ready fails' {
             # Mocks a failing $Invoker seam representing a checkpoint that exists but fails
-            # --require-complete: the validator returns error text that must be summarized into
-            # the block reason for operator diagnosis.
+            # --require-pr-creation-ready: the validator returns error text that must be
+            # summarized into the block reason for operator diagnosis.
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith {
                 @{ HasErrors = $true; ErrorText = 'orchestrator-state: cycle 2 plan_path is empty' }
             }

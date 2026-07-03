@@ -1,8 +1,8 @@
 ## Remediation Cycle 1 Closeout Summary — Issue #272 (local-preflight-orchestrator-state-gate)
 
 **Timestamp:** 2026-07-02T21-25
-**Plan:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/remediation-plan.2026-07-02T20-15.md`
-**Inputs:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/remediation-inputs.2026-07-02T20-15.md`
+**Plan:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/remediation/2026-07-02T20-15/remediation-plan.md`
+**Inputs:** `docs/features/active/2026-07-02-local-preflight-orchestrator-state-gate-272/remediation/2026-07-02T20-15/remediation-inputs.md`
 
 ### Disposition of Findings
 
@@ -79,4 +79,4 @@ Other (`evidence/other/`):
 
 ### Overall Cycle Outcome
 
-All three findings (1 Blocking, 1 Major, 1 Minor-optional) from `remediation-inputs.2026-07-02T20-15.md` are resolved. All 39 plan tasks across Phases 0-4 completed and checked off in `remediation-plan.2026-07-02T20-15.md`. No Do-Not-Do constraint was violated.
+All three findings (1 Blocking, 1 Major, 1 Minor-optional) from `remediation/2026-07-02T20-15/remediation-inputs.md` are resolved. All 39 plan tasks across Phases 0-4 completed and checked off in `remediation/2026-07-02T20-15/remediation-plan.md`. No Do-Not-Do constraint was violated.
