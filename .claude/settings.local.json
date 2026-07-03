@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(git show *)",
+      "Bash(diff /tmp_root_baseline.psd1 /tmp_mirror_baseline.psd1)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(rm -f /tmp_root_baseline.psd1 /tmp_mirror_baseline.psd1)"
     ]
   }
 }

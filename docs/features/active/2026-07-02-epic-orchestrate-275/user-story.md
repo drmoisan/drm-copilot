@@ -43,19 +43,19 @@ Without this capability, delivering an epic (a set of dependent features) requir
 
 ## Acceptance Criteria
 
-- [ ] `.claude/agents/epic-orchestrator.md` exists, is distinct from `orchestrator.md`, and its delegate allowlist includes `Agent(orchestrator)`.
-- [ ] A deterministic epic dependency manifest format (Markdown with YAML frontmatter at `docs/features/epics/<epic-slug>/epic-plan.md`) is defined, and the epic-orchestrator computes wave assignment from it via longest-path-layering topological sort, not ad hoc reasoning, rejecting cyclic or unresolved `depends_on` references before kickoff.
-- [ ] The epic integration branch lifecycle (create off `main`, per-wave branching off the current tip, PR base override to the integration branch, final integration-to-`main` PR) is implemented and documented.
-- [ ] Per-feature orchestration supports an `epic_mode` checkpoint flag that, on CI-green, merges its own PR into the integration branch and records the merge commit SHA in the checkpoint (S9 step 6 and PR Creation Gate condition 7).
-- [ ] Merge-conflict handling during fan-in is resolved by converting the conflict into a synthetic Blocking finding processed by the existing, unmodified R1–R5 remediation loop, sharing the same `remediation_pass` cap of 3.
-- [ ] `artifacts/orchestration/epic-orchestrator-state.json`'s schema is defined, validated by a new `scripts/dev_tools/validate_epic_orchestrator_state.py`, and registered as `epic-orchestrator-state` with `mcp__drm-copilot__validate_orchestration_artifacts`.
-- [ ] Wave-barrier logic is enforced by both a per-call `PreToolUse` deterrent hook and a retrospective `SubagentStop`-time validator, checked against durable checkpoint state, not in-memory notifications.
-- [ ] `config/orchestration-routing.json` (and its byte-identical mirror) has an `epic` route with `required_agents: [orchestrator, pr-author]`, the required skills, and the required MCP tools.
-- [ ] Worktree cleanup after confirmed merge is implemented and gated by a dedicated `PreToolUse` hook (`enforce-epic-worktree-removal-gate.ps1`) that denies removal unless the epic checkpoint shows the feature as merged.
-- [ ] Dependent-feature kickoff prompts cite specific upstream artifact paths (spec, plan, PR number, merge commit) for every `depends_on` entry.
-- [ ] All critical invariants (base-branch override, merge-on-green gating, wave barrier, worktree-removal gating) are hook/validator-enforced, named explicitly by file, not prose the delegate agent might not follow.
-- [ ] `epic-orchestrator` updates `docs/features/epics/<epic-slug>/epic-status.md` at every wave boundary and merge-status transition, not only at final completion.
-- [ ] Both bundled mirrors (`extensions/drm-copilot/resources/claude-customizations/`, test-enforced; `packages/mcp-server/resources/claude-customizations/`, manually `cmp`-verified) are updated and verified byte-for-byte for every new/modified file under the entire `.claude/` tree, not only `.claude/agents/**`/`.claude/skills/**`.
+- [x] `.claude/agents/epic-orchestrator.md` exists, is distinct from `orchestrator.md`, and its delegate allowlist includes `Agent(orchestrator)`.
+- [x] A deterministic epic dependency manifest format (Markdown with YAML frontmatter at `docs/features/epics/<epic-slug>/epic-plan.md`) is defined, and the epic-orchestrator computes wave assignment from it via longest-path-layering topological sort, not ad hoc reasoning, rejecting cyclic or unresolved `depends_on` references before kickoff.
+- [x] The epic integration branch lifecycle (create off `main`, per-wave branching off the current tip, PR base override to the integration branch, final integration-to-`main` PR) is implemented and documented.
+- [x] Per-feature orchestration supports an `epic_mode` checkpoint flag that, on CI-green, merges its own PR into the integration branch and records the merge commit SHA in the checkpoint (S9 step 6 and PR Creation Gate condition 7).
+- [x] Merge-conflict handling during fan-in is resolved by converting the conflict into a synthetic Blocking finding processed by the existing, unmodified R1–R5 remediation loop, sharing the same `remediation_pass` cap of 3.
+- [x] `artifacts/orchestration/epic-orchestrator-state.json`'s schema is defined, validated by a new `scripts/dev_tools/validate_epic_orchestrator_state.py`, and registered as `epic-orchestrator-state` with `mcp__drm-copilot__validate_orchestration_artifacts`.
+- [x] Wave-barrier logic is enforced by both a per-call `PreToolUse` deterrent hook and a retrospective `SubagentStop`-time validator, checked against durable checkpoint state, not in-memory notifications.
+- [x] `config/orchestration-routing.json` (and its byte-identical mirror) has an `epic` route with `required_agents: [orchestrator, pr-author]`, the required skills, and the required MCP tools.
+- [x] Worktree cleanup after confirmed merge is implemented and gated by a dedicated `PreToolUse` hook (`enforce-epic-worktree-removal-gate.ps1`) that denies removal unless the epic checkpoint shows the feature as merged.
+- [x] Dependent-feature kickoff prompts cite specific upstream artifact paths (spec, plan, PR number, merge commit) for every `depends_on` entry.
+- [x] All critical invariants (base-branch override, merge-on-green gating, wave barrier, worktree-removal gating) are hook/validator-enforced, named explicitly by file, not prose the delegate agent might not follow.
+- [x] `epic-orchestrator` updates `docs/features/epics/<epic-slug>/epic-status.md` at every wave boundary and merge-status transition, not only at final completion.
+- [x] Both bundled mirrors (`extensions/drm-copilot/resources/claude-customizations/`, test-enforced; `packages/mcp-server/resources/claude-customizations/`, manually `cmp`-verified) are updated and verified byte-for-byte for every new/modified file under the entire `.claude/` tree, not only `.claude/agents/**`/`.claude/skills/**`.
 
 ## Non-Goals
 
