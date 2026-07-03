@@ -290,9 +290,11 @@ Describe 'enforce-pr-author-skill.ps1' {
                 "{`"number`":12,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
             }
             Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
+            # No checkpoint on disk: the sixth (epic-mode base-branch) check is a no-op.
+            Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }
         }
 
-        It 'allows when all five receipt checks pass' {
+        It 'allows when all six receipt checks pass' {
             $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_12.md"}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -308,6 +310,8 @@ Describe 'enforce-pr-author-skill.ps1' {
                 "{`"number`":1,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
             }
             Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
+            # No checkpoint on disk: the sixth (epic-mode base-branch) check is a no-op.
+            Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }
         }
 
         It 'returns null for allowed command' {
@@ -352,6 +356,8 @@ Describe 'enforce-pr-author-skill.ps1' {
                 "{`"number`":1,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-27T12:00:00Z`"}"
             }
             Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
+            # No checkpoint on disk: the sixth (epic-mode base-branch) check is a no-op.
+            Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }
         }
 
         It 'returns false for an allowed command' {

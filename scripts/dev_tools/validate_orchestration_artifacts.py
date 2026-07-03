@@ -13,6 +13,9 @@ import re
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.validate_epic_orchestrator_state import (
+    validate_epic_orchestrator_state_text,
+)
 from scripts.dev_tools.validate_orchestration_review_artifacts import (
     validate_code_review_text,
     validate_feature_audit_text,
@@ -179,6 +182,14 @@ def build_parser() -> argparse.ArgumentParser:
             "delegation receipt, unlike --require-complete."
         ),
     )
+
+    epic_state_parser = subparsers.add_parser("epic-orchestrator-state")
+    epic_state_parser.add_argument("path")
+    epic_state_parser.add_argument(
+        "--require-complete",
+        action="store_true",
+        help="Require every feature to be merged/removed and the final PR recorded.",
+    )
     return parser
 
 
@@ -217,6 +228,10 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
             text,
             require_complete=bool(args.require_complete),
             require_pr_creation_ready=bool(args.require_pr_creation_ready),
+        )
+    if args.artifact_type == "epic-orchestrator-state":
+        return validate_epic_orchestrator_state_text(
+            text, require_complete=bool(args.require_complete)
         )
     return [f"Unsupported artifact type: {args.artifact_type}"]
 

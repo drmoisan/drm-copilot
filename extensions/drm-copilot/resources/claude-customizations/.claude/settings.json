@@ -35,6 +35,7 @@
       "Agent(powershell-typed-engineer)",
       "Agent(csharp-typed-engineer)",
       "Agent(typescript-engineer)",
+      "Agent(epic-orchestrator)",
       "Skill(orchestrate *)",
       "Skill(commit-message *)",
       "Skill(pr-author *)",
@@ -87,6 +88,14 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-orchestration-preimplementation-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-merge-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-worktree-removal-gate.ps1"
           }
         ]
       },
@@ -141,13 +150,17 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-orchestration-preimplementation-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-wave-barrier.ps1"
           }
         ]
       }
     ],
     "SubagentStop": [
       {
-        "matcher": "atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer",
+        "matcher": "atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer|orchestrator|epic-orchestrator",
         "hooks": [
           {
             "type": "command",
@@ -179,6 +192,24 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/validate-pr-author-output.ps1"
+          }
+        ]
+      },
+      {
+        "matcher": "orchestrator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1"
+          }
+        ]
+      },
+      {
+        "matcher": "epic-orchestrator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1 -CheckpointPath artifacts/orchestration/epic-orchestrator-state.json -ArtifactType epic-orchestrator-state"
           }
         ]
       }

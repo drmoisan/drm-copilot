@@ -1,5 +1,9 @@
 import type { FileSystem } from "../file-system";
 import {
+  validateEpicOrchestratorStateText,
+  type ValidateEpicOrchestratorStateOptions,
+} from "./epic-orchestrator-state-core";
+import {
   validateOrchestratorStateText,
   type ValidateOrchestratorStateOptions,
 } from "./orchestrator-state-core";
@@ -181,6 +185,14 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
           : { routingMatrix: input.routingMatrix }),
       };
       return validateOrchestratorStateText(input.text, options);
+    }
+    case "epic-orchestrator-state": {
+      const options: ValidateEpicOrchestratorStateOptions = {
+        ...(input.requireComplete === undefined
+          ? {}
+          : { requireComplete: input.requireComplete }),
+      };
+      return validateEpicOrchestratorStateText(input.text, options);
     }
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];

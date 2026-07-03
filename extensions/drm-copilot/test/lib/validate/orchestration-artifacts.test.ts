@@ -188,6 +188,42 @@ describe("validateArtifact dispatch", () => {
     expect(errors).toContain("Routing matrix missing routes object.");
   });
 
+  it("routes epic-orchestrator-state to the epic-orchestrator-state validator", () => {
+    // Arrange / Act
+    const errors = validateArtifact({
+      artifactType: "epic-orchestrator-state",
+      text: "[]",
+    });
+
+    // Assert
+    expect(errors).toEqual(["Epic checkpoint root must be a JSON object."]);
+  });
+
+  it("threads requireComplete into epic-orchestrator-state", () => {
+    // Arrange: an epic checkpoint missing epic_merge_pr.merge_commit_sha under
+    // requireComplete surfaces the completion-gate error, proving the wiring.
+    const errors = validateArtifact({
+      artifactType: "epic-orchestrator-state",
+      text: JSON.stringify({
+        objective: "obj",
+        route_id: "epic",
+        epic_feature_folder: "epic-1",
+        integration_branch: "epic/epic-1-integration",
+        completed_steps: [],
+        next_step: "done",
+        last_updated: "2026-07-02T20-00",
+        waves: [],
+        features: [],
+      }),
+      requireComplete: true,
+    });
+
+    // Assert
+    expect(errors).toContain(
+      "Epic checkpoint completion validation failed: epic_merge_pr.merge_commit_sha is missing or empty.",
+    );
+  });
+
   it("falls back for an unsupported artifact type", () => {
     // Arrange / Act
     const errors = validateArtifact({ artifactType: "mystery", text: "" });

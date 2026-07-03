@@ -151,4 +151,17 @@ describe("repo automation MCP tool definitions", () => {
       },
     });
   });
+
+  it("includes epic-orchestrator-state in the validate_orchestration_artifacts artifact_type enum", () => {
+    const definition = toolDefinitions.find(
+      ({ name }) => name === "validate_orchestration_artifacts",
+    );
+
+    const properties = definition?.inputSchema.properties as
+      Record<string, { enum?: string[] }> | undefined;
+
+    expect(properties?.["artifact_type"]?.enum).toContain(
+      "epic-orchestrator-state",
+    );
+  });
 });
