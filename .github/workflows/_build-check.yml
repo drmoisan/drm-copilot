@@ -1,0 +1,35 @@
+name: Build Check (reusable)
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-check:
+    name: Build Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+
+      - name: Build package
+        run: poetry build
+
+      - name: Verify package can be installed
+        run: |
+          python -m venv test-venv
+          source test-venv/bin/activate
+          pip install dist/*.whl
+          atomic-executor --help
+          shell-qc --help
