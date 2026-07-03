@@ -1,9 +1,17 @@
 # Confirmed Post-Extraction Required-Status-Check Names (P4-T9)
 
-- Timestamp: 2026-07-03T22:46:00Z
-- Command: `gh api repos/drmoisan/drm-copilot/commits/4125238fcecb5e37ab2c2193e902ed47752e7ccf/check-runs -q '.check_runs[] | {name, conclusion}'`
+- Timestamp: 2026-07-03T22:46:00Z; re-verified 2026-07-03T23:10:00Z after `git rebase main`
+- Command: `gh api repos/drmoisan/drm-copilot/commits/<head-sha>/check-runs -q '.check_runs[] | {name, conclusion}'`
 - Owner: orchestrator (direct `gh` invocation)
 - EXIT_CODE: 0
+
+## Current (post-rebase) head SHA
+
+- Head SHA: `574aaa2a086d77857a5cd7d46723f87e090558c2`
+- Re-running the command above against this SHA reproduces the identical set of 11 check-run
+  `name` strings listed below (only the object ordering in the raw response differs, which is
+  immaterial). This confirms the composed check-run names are stable across the rebase, since
+  no job/file name changed -- only the underlying commit history was rewritten.
 
 ## Output Summary
 
