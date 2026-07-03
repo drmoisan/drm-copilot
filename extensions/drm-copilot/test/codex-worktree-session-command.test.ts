@@ -72,6 +72,9 @@ describe("newCodexWorktreeSession", () => {
       const [setLocationCmd] = terminal.sendText.mock.calls[1] as [string];
       const [trustCmd] = terminal.sendText.mock.calls[2] as [string];
       const [postCmd] = terminal.sendText.mock.calls[3] as [string];
+      const sentBeforeCodexLaunch = terminal.sendText.mock.calls.map(
+        ([command]) => command as string,
+      );
       expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
       expect(setLocationCmd).toMatch(/^Set-Location '/);
       expect(trustCmd).toContain(
@@ -85,13 +88,36 @@ describe("newCodexWorktreeSession", () => {
       );
       expect(postCmd).toContain("-SourceRoot 'C:/workspace'");
       expect(postCmd).toContain("-WorktreeRoot 'C:/workspace-wt-");
+      expect(
+        sentBeforeCodexLaunch.findIndex((command) => command === postCmd),
+      ).toBeGreaterThan(
+        sentBeforeCodexLaunch.findIndex((command) => command === trustCmd),
+      );
+      expect(
+        sentBeforeCodexLaunch.findIndex((command) => command === postCmd),
+      ).toBeGreaterThan(
+        sentBeforeCodexLaunch.findIndex(
+          (command) => command === setLocationCmd,
+        ),
+      );
 
       jest.advanceTimersByTime(5000);
 
       expect(terminal.sendText).toHaveBeenCalledTimes(5);
       const [codexCmd] = terminal.sendText.mock.calls[4] as [string];
+      expect(codexCmd).not.toBe("codex");
+      expect(codexCmd).not.toMatch(/^codex(?:\s|$)/);
       expect(codexCmd).toBe(
         `& '${expectedPathResolvedCodexExecutable}' 'Start the Codex session.'`,
+      );
+      expect(
+        terminal.sendText.mock.calls.findIndex(
+          ([command]) => command === postCmd,
+        ),
+      ).toBeLessThan(
+        terminal.sendText.mock.calls.findIndex(
+          ([command]) => command === codexCmd,
+        ),
       );
     } finally {
       jest.useRealTimers();
