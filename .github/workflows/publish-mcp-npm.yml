@@ -32,6 +32,9 @@ jobs:
     name: Publish to npm
     needs: drm-copilot-extension-tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -39,8 +42,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "20"
-          registry-url: https://registry.npmjs.org
+          node-version: "24"
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@11.18.0
 
       - name: Install MCP server dependencies
         run: npm --prefix packages/mcp-server ci
@@ -54,6 +59,4 @@ jobs:
       - name: Publish to npm
         if: github.event_name == 'push'
         working-directory: packages/mcp-server
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public --registry https://registry.npmjs.org/
