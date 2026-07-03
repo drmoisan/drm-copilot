@@ -90,12 +90,17 @@ duration claim, which the job-DAG evidence does not support.
 - [x] Any cross-job file dependency uses explicit `actions/upload-artifact` /
       `actions/download-artifact`; no job relies on implicit shared-filesystem state from
       another job.
-- [ ] Required-status-check names referenced by branch protection continue to resolve after the
-      split (renamed or preserved check names are documented).
+- [x] Required-status-check names referenced by branch protection continue to resolve after the
+      split (renamed or preserved check names are documented). See
+      `evidence/other/required-status-check-names.2026-07-03T18-07.md` and
+      `evidence/other/branch-protection-update.2026-07-03T18-07.md` pending executor/reviewer
+      sign-off.
 - [x] `.github/workflows/README.md` documents the new per-stage dispatch and the required-check
       rename procedure.
-- [ ] A green workflow run against the branch head is captured before merge, per the
-      `modified-workflow-needs-green-run` policy rule for workflow-file changes.
+- [x] A green workflow run against the branch head is captured before merge, per the
+      `modified-workflow-needs-green-run` policy rule for workflow-file changes. See
+      `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md` pending executor/reviewer
+      sign-off.
 
 ## Non-Goals
 
