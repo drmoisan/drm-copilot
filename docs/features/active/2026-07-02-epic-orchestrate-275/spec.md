@@ -367,13 +367,13 @@ Research corrected the scope of this requirement beyond the issue draft's framin
 - [x] AC11: `.claude/hooks/enforce-epic-merge-gate.ps1` denies any `gh pr merge --merge` unless the epic-mode/CI-green checkpoint conditions in § Hooks item b hold; `.claude/hooks/enforce-pr-author-skill.ps1`'s new `Test-EpicBaseBranchOverride` denies `gh pr create` under `epic_mode: true` unless `--base` matches `epic_context.integration_branch`.
 - [x] AC12: `docs/features/epics/<epic-slug>/epic-status.md` is created at epic kickoff and updated at every wave boundary and merge-status transition, per § Documentation Maintenance.
 - [x] AC13: Every file listed under § Bundled Mirror Parity has a byte-identical copy under `extensions/drm-copilot/resources/claude-customizations/`, verified by `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`; the `packages/mcp-server/resources/claude-customizations/` mirror is verified per file with `cmp` before any npm publish including this change.
-- [ ] AC14: All four quality toolchains pass with no coverage regression (Python: Black/Ruff/Pyright/Pytest; PowerShell: PoshQC format/analyze/Pester; TypeScript: Prettier/ESLint/TSC/Vitest), and existing tests continue to pass.
+- [x] AC14: All four quality toolchains pass with no coverage regression (Python: Black/Ruff/Pyright/Pytest; PowerShell: PoshQC format/analyze/Pester; TypeScript: Prettier/ESLint/TSC/Vitest), and existing tests continue to pass.
 - [x] Acceptance criteria documented and mapped to tests or demos
 - [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Affected Test Files
 
