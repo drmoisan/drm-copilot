@@ -85,6 +85,10 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
                 '{"number":1,"sha256":"559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd","created_at":"2026-06-27T12:00:00Z"}'
             }
             Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-27T11:00:00Z').ToUniversalTime() }
+            # Neutralize the orchestrator-state preflight check (added independently of the
+            # epic-base-branch check) so these tests isolate check 6's behavior rather than
+            # depending on a real on-disk checkpoint satisfying --require-pr-creation-ready.
+            Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { @{ HasErrors = $false; ErrorText = '' } }
         }
 
         It 'denies EPIC_BASE_BRANCH_MISMATCH end-to-end when epic_mode is true and --base is missing' {
