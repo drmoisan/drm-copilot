@@ -45,7 +45,7 @@ jobs:
           node-version: "24"
 
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.18.0
 
       - name: Install MCP server dependencies
         run: npm --prefix packages/mcp-server ci
@@ -59,4 +59,4 @@ jobs:
       - name: Publish to npm
         if: github.event_name == 'push'
         working-directory: packages/mcp-server
-        run: npm publish --provenance --access public
+        run: npm publish --provenance --access public --registry https://registry.npmjs.org/
