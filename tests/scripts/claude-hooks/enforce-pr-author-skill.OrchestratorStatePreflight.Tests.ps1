@@ -96,17 +96,19 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             # (the hook script itself) so Case C does not intercept first -- the same "real seam,
             # stand-in existing file" pattern used elsewhere in enforce-pr-author-skill.Tests.ps1,
             # so no temporary file is created -- then replays the hook's own entrypoint logic. The
-            # real Invoke-OrchestratorStatePreflight default $Invoker shells out to the real Python
-            # validator against the real, gitignored, per-worktree checkpoint path; that checkpoint
-            # is either absent (fresh checkout) or incomplete relative to --require-complete
-            # outside a fully finished orchestration cycle, so the validator reliably reports a
-            # non-zero exit and the hook blocks with ORCHESTRATOR_STATE_PREFLIGHT_FAILED.
+            # checkpoint seam is also overridden to a deliberately-nonexistent, non-temp-file
+            # sibling path (a filename that is guaranteed absent from a checked-out repository) so
+            # the real Invoke-OrchestratorStatePreflight default $Invoker's Python validator
+            # subprocess deterministically reports a missing-checkpoint failure, independent of the
+            # real, mutable artifacts/orchestration/orchestrator-state.json checkpoint's current
+            # content (which is not structurally guaranteed to remain incomplete/absent).
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
                 $innerScript = @'
 . '{0}'
 $script:PrContextArtifactPath = '{0}'
+$script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
 try {{
     $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
 }} catch {{

@@ -141,9 +141,12 @@ There is no fallback. If the MCP server or validation tool is unavailable, or
 if validation fails, the orchestrator must update blocked state and stop rather
 than reporting completion.
 
-The repository CI gate `Orchestrator State Gate` runs the same validator when a
-checkpoint is present. Branch protection should require this check for branches
-that use orchestrated completion.
+No CI workflow performs this validation. The `artifacts/` directory is gitignored,
+so the orchestrator-state checkpoint is never present in a CI checkout; a prior
+CI gate (`validate-orchestrator-state.yml`) that attempted this check was a
+structural no-op for that reason and has been removed. The MCP-server-based
+validation described above is this ecosystem's enforcement mechanism for the
+orchestrator-state checkpoint.
 
 Completion validation requires the checkpoint to prove mandatory handoffs and
 skill use. The checkpoint must include:
