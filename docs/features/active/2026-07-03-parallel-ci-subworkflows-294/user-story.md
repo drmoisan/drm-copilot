@@ -97,10 +97,13 @@ duration claim, which the job-DAG evidence does not support.
       sign-off.
 - [x] `.github/workflows/README.md` documents the new per-stage dispatch and the required-check
       rename procedure.
-- [x] A green workflow run against the branch head is captured before merge, per the
+- [ ] A green workflow run against the branch head is captured before merge, per the
       `modified-workflow-needs-green-run` policy rule for workflow-file changes. See
-      `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md` pending executor/reviewer
-      sign-off.
+      `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md` — **reviewer correction
+      2026-07-03T23-36:** the recorded run's head SHA (`574aaa2a086d77857a5cd7d46723f87e090558c2`)
+      does not match the current branch head (`5cd712c9d16d86c1f6cd122ab8c818f306c4c9e3`); a live
+      `gh api .../commits/5cd712c.../check-runs` query returns zero runs at the current head. See
+      `policy-audit.2026-07-03T23-36.md` Section 7 and `remediation-inputs.2026-07-03T23-36.md`.
 
 ## Non-Goals
 

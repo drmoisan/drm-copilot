@@ -189,36 +189,53 @@ identical content and identical retention behavior.
       independent gates, no inline `steps:`
 - [x] `.github/workflows/README.md` is created, documenting per-stage dispatch and the
       required-status-check rename procedure
-- [x] Each new `_<name>.yml` file is independently exercised via its own `workflow_dispatch` and
+- [ ] Each new `_<name>.yml` file is independently exercised via its own `workflow_dispatch` and
       completes successfully (see `evidence/other/workflow-dispatch-substitution-note.2026-07-03T18-07.md`
       and `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md` for the orchestrator's
-      substituted verification pending executor/reviewer sign-off)
+      substituted verification) — **reviewer correction 2026-07-03T23-36:** the substitution
+      (dispatching `ci.yml` itself, which exercises all seven callees via `uses:`) is a
+      well-evidenced, reasonable response to a real GitHub platform constraint (a workflow file
+      must exist on the default branch before it can be dispatched by filename), but the literal
+      criterion — standalone per-file `workflow_dispatch` — was not achieved pre-merge. See
+      `code-review.2026-07-03T23-36.md` Findings Table (Minor).
 - [x] `actionlint` and YAML-parse validation pass for all seven new files and the rewritten
       `ci.yml`
-- [x] A green workflow run against the branch head is captured as evidence, satisfying
-      `modified-workflow-needs-green-run` (see `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`
-      pending executor/reviewer sign-off)
+- [ ] A green workflow run against the branch head is captured as evidence, satisfying
+      `modified-workflow-needs-green-run` (see `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`)
+      — **reviewer correction 2026-07-03T23-36:** stale by one commit; see
+      `policy-audit.2026-07-03T23-36.md` Section 7 and `remediation-inputs.2026-07-03T23-36.md`.
 - [x] Required-status-check names are read from the branch-head run's actual check-runs and
       branch protection is updated (or confirmed unchanged) to match, per the rename procedure
       (see `evidence/other/required-status-check-names.2026-07-03T18-07.md` and
-      `evidence/other/branch-protection-update.2026-07-03T18-07.md` pending executor/reviewer
-      sign-off)
+      `evidence/other/branch-protection-update.2026-07-03T18-07.md`) — **reviewer note
+      2026-07-03T23-36:** independently reconfirmed live (`gh api .../branches/main/protection/required_status_checks`
+      → 404 "Branch not protected"); matches both the pre- and post-extraction baseline exactly.
 - [x] No `src/` or `extensions/drm-copilot/src` files are touched; `publish-extension.yml` and
       `publish-mcp-npm.yml` are unmodified
 
 ## Seeded Test Conditions (from potential)
 
-- [x] Each new `_<name>.yml` reusable workflow can be invoked standalone via
+- [ ] Each new `_<name>.yml` reusable workflow can be invoked standalone via
       `gh workflow run _<name>.yml` (`workflow_dispatch`) and completes successfully, confirming
-      the extraction preserved the job's pass/fail behavior byte-for-byte.
-- [ ] The rewritten `ci.yml` orchestrator triggers all seven reusable workflows without any
-      `needs:` chain forcing sequential execution among independent gates.
-- [ ] `actionlint` and a YAML-parse check pass for every new/modified file under
-      `.github/workflows/**`, matching the validation already applied to `_npm-audit-gate.yml`.
-- [x] A workflow run against the branch head confirms all seven gates execute (concurrently, as
+      the extraction preserved the job's pass/fail behavior byte-for-byte. — **reviewer correction
+      2026-07-03T23-36:** not literally achieved pre-merge (HTTP 404; substituted with a `ci.yml`
+      dispatch — see `evidence/other/workflow-dispatch-substitution-note.2026-07-03T18-07.md`).
+- [x] The rewritten `ci.yml` orchestrator triggers all seven reusable workflows without any
+      `needs:` chain forcing sequential execution among independent gates. — **reviewer
+      verification 2026-07-03T23-36:** `grep -n "needs:" .github/workflows/ci.yml` → 0 matches
+      (independently reproduced; checked off by reviewer per feature-audit PASS).
+- [x] `actionlint` and a YAML-parse check pass for every new/modified file under
+      `.github/workflows/**`, matching the validation already applied to `_npm-audit-gate.yml`. —
+      **reviewer verification 2026-07-03T23-36:** independently reproduced, exit code 0, 0 errors
+      across all 8 files (checked off by reviewer per feature-audit PASS).
+- [ ] A workflow run against the branch head confirms all seven gates execute (concurrently, as
       they did before this change) and reach a green (passing) status; this run also serves as
-      the evidence required by `modified-workflow-needs-green-run`.
-- [x] `gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs` against the branch-head run
+      the evidence required by `modified-workflow-needs-green-run`. — **reviewer correction
+      2026-07-03T23-36:** stale by one commit; see `policy-audit.2026-07-03T23-36.md` Section 7.
+- [ ] `gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs` against the branch-head run
       confirms the actual composed check-run names for each of the seven extracted gates, and
       branch protection's required-status-check list is verified (and updated if needed) against
-      those confirmed names.
+      those confirmed names. — **reviewer correction 2026-07-03T23-36:** not re-verified against
+      the exact current head SHA (no run exists there); the underlying branch-protection state
+      (unprotected) was independently reconfirmed live and is unaffected, but the literal
+      per-current-head check-run read has not been performed.
