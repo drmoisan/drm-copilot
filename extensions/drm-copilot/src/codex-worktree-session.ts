@@ -12,7 +12,7 @@ export interface CodexWorktreeSessionCommandInput {
   readonly objective: string | undefined;
   readonly codexExecutablePath: string;
   /**
-   * Worktree-relative PowerShell script path to run after Codex trust has been
+   * Source-root-resolved PowerShell script path to run after Codex trust has been
    * written and before the Codex CLI starts. Empty values emit no post command.
    */
   readonly postCodexScriptPath: string | undefined;

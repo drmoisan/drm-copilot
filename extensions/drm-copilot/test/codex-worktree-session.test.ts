@@ -35,6 +35,7 @@ describe("buildCodexTrustCommand", () => {
     const command = buildCodexTrustCommand("C:/repos/workspace-wt");
 
     expect(command).not.toContain("; elseif");
+    expect(command).not.toMatch(/[;\r\n]\s*elseif\s*\(/);
     expect(command).toContain("} elseif (");
   });
 });
