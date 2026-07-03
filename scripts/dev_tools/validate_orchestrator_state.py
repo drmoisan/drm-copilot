@@ -26,9 +26,17 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools._orchestrator_state_complexity import (
+    COMPLEXITY_ASSESSMENTS_KEY,
+    _validate_complexity_assessments,
+)
 from scripts.dev_tools._orchestrator_state_human_interaction import (
     HUMAN_INTERACTION_KEY,
     _validate_human_interaction,
+)
+from scripts.dev_tools._orchestrator_state_model_routing import (
+    MODEL_ROUTING_RECEIPTS_KEY,
+    _validate_model_routing_receipts,
 )
 from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
     validate_orchestrator_state_pr_creation_readiness,
@@ -434,15 +442,18 @@ def validate_orchestrator_state_text(
                 "Checkpoint delegation_receipts must be a list or object namespace."
             )
 
-    # Apply the additive remediation-cycle invariants only when the checkpoint
-    # carries a remediation_loop; absent the key, behavior is unchanged.
-    if REMEDIATION_LOOP_KEY in state_map:
-        errors.extend(_validate_remediation_loop(state_map.get(REMEDIATION_LOOP_KEY)))
-
-    # Apply the additive human_interaction invariants only when the checkpoint
-    # carries a human_interaction key; absent the key, behavior is unchanged.
-    if HUMAN_INTERACTION_KEY in state_map:
-        errors.extend(_validate_human_interaction(state_map.get(HUMAN_INTERACTION_KEY)))
+    # Each additive optional checkpoint block is validated only when its key is
+    # present; an absent key contributes zero errors, preserving backward
+    # compatibility for checkpoints that predate the block.
+    optional_key_validators = (
+        (REMEDIATION_LOOP_KEY, _validate_remediation_loop),
+        (HUMAN_INTERACTION_KEY, _validate_human_interaction),
+        (COMPLEXITY_ASSESSMENTS_KEY, _validate_complexity_assessments),
+        (MODEL_ROUTING_RECEIPTS_KEY, _validate_model_routing_receipts),
+    )
+    for optional_key, optional_validator in optional_key_validators:
+        if optional_key in state_map:
+            errors.extend(optional_validator(state_map.get(optional_key)))
 
     # Route membership is evaluated unconditionally so the opt-in strict caller
     # (the completion gate) can reject unknown routes; non-strict callers ignore

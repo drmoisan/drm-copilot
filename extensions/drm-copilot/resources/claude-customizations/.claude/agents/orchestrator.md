@@ -2,7 +2,7 @@
 name: orchestrator
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
 tools:
-  - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,pr-author,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
+  - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,pr-author,commit-message,human-exception-runbook,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
   - "Agent(epic-orchestrator)"
   - Read
   - Grep
