@@ -53,12 +53,15 @@
             '.claude/hooks/enforce-completion-helpers.ps1'
             '.codex/hooks/enforce-completion-consistency.ps1'
             '.codex/hooks/enforce-completion-helpers.ps1'
+            # Issue #298 fixed ConvertTo-CommandResult's handling of an empty array Output
+            # parameter in this script; measured here so the change produces real per-file
+            # coverage evidence going forward.
+            'scripts/dev-tools/Invoke-FullReleaseFlow.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
     }
 }
-
 
 
 
