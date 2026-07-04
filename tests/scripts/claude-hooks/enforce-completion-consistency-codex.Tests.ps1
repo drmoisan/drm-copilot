@@ -6,7 +6,7 @@ param()
 
 Describe 'bundled Codex enforce-completion-consistency.ps1' {
     BeforeAll {
-        $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1").Path
+        $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
 
         function ConvertTo-CodexCheckpointToolInput {
             param(
@@ -56,5 +56,24 @@ Describe 'bundled Codex enforce-completion-consistency.ps1' {
 
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'pr_gate'
+    }
+
+    It 'keeps the bundled-mirror enforce-completion-consistency.ps1 byte-identical to the canonical hook' {
+        $bundledPath = (Resolve-Path "$PSScriptRoot/../../../extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1").Path
+
+        $canonicalHash = (Get-FileHash -Path $script:UnderTest -Algorithm SHA256).Hash
+        $bundledHash = (Get-FileHash -Path $bundledPath -Algorithm SHA256).Hash
+
+        $bundledHash | Should -Be $canonicalHash -Because 'the bundled-mirror hook must stay byte-identical to the canonical .codex/hooks/enforce-completion-consistency.ps1 path'
+    }
+
+    It 'keeps the bundled-mirror enforce-completion-helpers.ps1 byte-identical to the canonical helper' {
+        $canonicalHelpersPath = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-helpers.ps1").Path
+        $bundledHelpersPath = (Resolve-Path "$PSScriptRoot/../../../extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1").Path
+
+        $canonicalHash = (Get-FileHash -Path $canonicalHelpersPath -Algorithm SHA256).Hash
+        $bundledHash = (Get-FileHash -Path $bundledHelpersPath -Algorithm SHA256).Hash
+
+        $bundledHash | Should -Be $canonicalHash -Because 'the bundled-mirror helper must stay byte-identical to the canonical .codex/hooks/enforce-completion-helpers.ps1 path'
     }
 }
