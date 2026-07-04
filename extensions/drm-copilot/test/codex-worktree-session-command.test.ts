@@ -14,6 +14,7 @@ import {
   resetExtensionHarnessState,
   setCodexExecutablePathConfig,
   setExecutablePresence,
+  setInstalledCodexExtensionRoots,
   setPostCodexScriptPathConfig,
   setPyprojectFixture,
   showInputBoxMock,
@@ -320,5 +321,57 @@ describe("newCodexWorktreeSession", () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  it("launches installed extension package codex through PowerShell call operator", async () => {
+    jest.useFakeTimers();
+    try {
+      const installedExtensionCodexExecutable =
+        process.platform === "win32"
+          ? "C:/extensions/openai.chatgpt/bin/windows-x86_64/codex.EXE"
+          : "C:/extensions/openai.chatgpt/bin/codex";
+      setExecutablePresence({
+        pwsh: true,
+        powershell: false,
+        codex: false,
+        [installedExtensionCodexExecutable]: true,
+      });
+      setInstalledCodexExtensionRoots(["C:/extensions/openai.chatgpt"]);
+      showInputBoxMock.mockResolvedValueOnce("Implement issue 306");
+
+      const handler = activateAndGetHandler(
+        "drmCopilotExtension.newCodexWorktreeSession",
+      );
+      await handler();
+
+      const terminal = createTerminalMock.mock.results[0]?.value as {
+        sendText: jest.Mock;
+      };
+      jest.advanceTimersByTime(5000);
+
+      const [codexCmd] = terminal.sendText.mock.calls[
+        terminal.sendText.mock.calls.length - 1
+      ] as [string];
+      expect(codexCmd).toBe(
+        `& '${installedExtensionCodexExecutable}' 'Implement issue 306'`,
+      );
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("fails before terminal creation when installed extension package codex is absent", async () => {
+    setExecutablePresence({ pwsh: true, powershell: false, codex: false });
+    setInstalledCodexExtensionRoots([]);
+    showInputBoxMock.mockResolvedValueOnce("Implement issue 306");
+
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.newCodexWorktreeSession",
+    );
+
+    await expect(handler()).rejects.toThrow(
+      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+    );
+    expect(createTerminalMock).not.toHaveBeenCalled();
   });
 });

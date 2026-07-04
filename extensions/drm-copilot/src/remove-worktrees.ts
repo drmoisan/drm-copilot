@@ -49,8 +49,7 @@ export interface WorktreeSummary {
  * `git worktree remove` is attempted.
  */
 export type WorktreeRemovalClassification =
-  | { readonly skip: true; readonly reason: string }
-  | { readonly skip: false };
+  { readonly skip: true; readonly reason: string } | { readonly skip: false };
 
 /**
  * Parses the porcelain output of `git worktree list --porcelain`.

@@ -76,6 +76,8 @@ Every agent named above must exist as a native Codex agent under `.codex/agents/
 - Do not rename, back up, or create sidecar checkpoint files.
 - Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until lifecycle setup succeeds.
 - Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
+- After active folder creation and before planner delegation, resolve `${plan-path}` by enumerating existing `${feature-folder}/plan*.md` files in deterministic filename order. If a scaffolded timestamped plan exists, persist and delegate against that exact file. Do not default to `${feature-folder}/plan.md` and do not create a second plan artifact when a plan already exists.
+- For issue #306, the canonical existing plan path is `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`; reuse that exact file and do not create `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
 
 ## Checkpoint Persistence
 
@@ -133,17 +135,16 @@ The MCP validator and required CI checks are the hard completion boundary. There
 Do not claim mission completion unless all required delegations completed with receipts and the required orchestration artifacts exist on disk.
 '''
 
-[mcp_servers.drm-copilot]
-enabled = true
-
-[skills.config]
-policy-compliance-order = true
-orchestrate = true
-orchestrator-workflow = true
-feature-promotion-lifecycle = true
-repo-automation-adapter = true
-atomic-plan-contract = true
-acceptance-criteria-tracking = true
-evidence-and-timestamp-conventions = true
-pr-context-artifacts = true
-pr-base-branch-merge-base = true
+[skills]
+config = [
+    { name = "policy-compliance-order", enabled = true },
+    { name = "orchestrate", enabled = true },
+    { name = "orchestrator-workflow", enabled = true },
+    { name = "feature-promotion-lifecycle", enabled = true },
+    { name = "repo-automation-adapter", enabled = true },
+    { name = "atomic-plan-contract", enabled = true },
+    { name = "acceptance-criteria-tracking", enabled = true },
+    { name = "evidence-and-timestamp-conventions", enabled = true },
+    { name = "pr-context-artifacts", enabled = true },
+    { name = "pr-base-branch-merge-base", enabled = true },
+]

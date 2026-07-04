@@ -199,6 +199,21 @@ describe("drm-copilot core command behavior", () => {
     );
   });
 
+  it("resolveCodexExecutable resolves installed extension package executable when PATH misses", () => {
+    const installedExtensionCodexExecutable =
+      process.platform === "win32"
+        ? "C:/extensions/openai.chatgpt/bin/windows-x86_64/codex.EXE"
+        : "C:/extensions/openai.chatgpt/bin/codex";
+    setExecutablePresence({
+      codex: false,
+      [installedExtensionCodexExecutable]: true,
+    });
+
+    expect(resolveCodexExecutable("", ["C:/extensions/openai.chatgpt"])).toBe(
+      installedExtensionCodexExecutable,
+    );
+  });
+
   it("helloPython writes artifacts/hello_python.txt in-process without spawning", async () => {
     const handler = activateAndGetHandler("drmCopilotExtension.helloPython");
     await handler();

@@ -180,6 +180,49 @@ function findExecutableOnPath(executable: string): string | undefined {
   return undefined;
 }
 
+function normalizeExecutablePath(executablePath: string): string {
+  return executablePath.replace(/\\/g, "/");
+}
+
+function buildCodexExecutableCandidates(
+  extensionRoot: string,
+): ReadonlyArray<string> {
+  const normalizedRoot = normalizeExecutablePath(extensionRoot).replace(
+    /\/+$/,
+    "",
+  );
+  const pathExtensions = getPathExtensions();
+  const relativeCandidates =
+    process.platform === "win32"
+      ? ["bin/windows-x86_64/codex", "bin/codex", "codex"]
+      : ["bin/codex", "codex"];
+
+  return relativeCandidates.flatMap((relativePath) =>
+    pathExtensions.map(
+      (extension) => `${normalizedRoot}/${relativePath}${extension}`,
+    ),
+  );
+}
+
+function findCodexInInstalledExtensionRoots(
+  installedExtensionCandidateRoots: ReadonlyArray<string>,
+): string | undefined {
+  for (const extensionRoot of installedExtensionCandidateRoots) {
+    const trimmedRoot = extensionRoot.trim();
+    if (trimmedRoot.length === 0) {
+      continue;
+    }
+
+    for (const candidate of buildCodexExecutableCandidates(trimmedRoot)) {
+      if (fs.existsSync(candidate)) {
+        return normalizeExecutablePath(candidate);
+      }
+    }
+  }
+
+  return undefined;
+}
+
 /**
  * Resolves the Codex CLI executable before a terminal is created.
  *
@@ -189,6 +232,7 @@ function findExecutableOnPath(executable: string): string | undefined {
  */
 export function resolveCodexExecutable(
   configuredExecutable: string | undefined,
+  installedExtensionCandidateRoots: ReadonlyArray<string> = [],
 ): string {
   const trimmedConfiguredExecutable = configuredExecutable?.trim() ?? "";
   if (trimmedConfiguredExecutable.length > 0) {
@@ -222,6 +266,13 @@ export function resolveCodexExecutable(
   const resolvedCodex = findExecutableOnPath("codex");
   if (resolvedCodex !== undefined) {
     return resolvedCodex;
+  }
+
+  const resolvedInstalledExtensionCodex = findCodexInInstalledExtensionRoots(
+    installedExtensionCandidateRoots,
+  );
+  if (resolvedInstalledExtensionCodex !== undefined) {
+    return resolvedInstalledExtensionCodex;
   }
 
   throw new Error(

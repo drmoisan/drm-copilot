@@ -101,8 +101,14 @@ Lifecycle guardrails:
 - `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
 
 8a) Resolve and persist `${plan-path}` before delegation:
-- reuse the earliest existing `plan*.md` in `${feature-folder}` when present
-- otherwise create exactly one canonical plan file path and reuse it for all revisions
+- enumerate `${feature-folder}/plan*.md` files in deterministic filename order
+- reuse the first existing `plan*.md` in `${feature-folder}` when present
+- otherwise create exactly one canonical plan file path using the repository's
+  feature-folder plan naming convention and reuse it for all revisions
+- never default to `${feature-folder}/plan.md` when a timestamped scaffolded
+  plan already exists
+- if checkpoint state already contains a different `${plan-path}`, correct the
+  checkpoint before planner delegation instead of creating another plan file
 
 9) Require preflight validation via `atomic_executor` until:
 - `PREFLIGHT: ALL CLEAR`

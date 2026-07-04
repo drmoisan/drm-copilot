@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+from typing import cast
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BUNDLED_ROOT = (
@@ -46,6 +53,30 @@ REQUIRED_BUNDLED_FILES = (
     Path(".codex/prompts/generate-pr.md"),
     Path(".codex/prompts/orchestrate-work.md"),
 )
+CODEX_CONFIG_PATH = Path(".codex/config.toml")
+ORCHESTRATOR_ROLE_PATH = Path(".codex/agents/orchestrator.toml")
+EXPECTED_DRM_COPILOT_TOOLS = (
+    "collect_commit_context",
+    "collect_pr_context",
+    "run_codex_native_converter",
+    "push_down_copilot_customizations",
+    "push_down_codex_and_agents_customizations",
+    "push_down_claude_customizations",
+    "new_potential_bug_entry",
+    "new_potential_entry",
+    "link_parent_child",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "run_poshqc_format",
+    "run_poshqc_analyze",
+    "run_poshqc_test",
+    "run_poshqc_analyze_autofix",
+    "run_poshqc_suite",
+    "resolve_policy_audit_template_asset",
+    "resolve_execute_hard_lock_prompt",
+    "resolve_atomic_plan_prompt",
+    "validate_orchestration_artifacts",
+)
 
 
 def list_scoped_files(root: Path) -> list[Path]:
@@ -76,6 +107,45 @@ def read_text(root: Path, relative_path: Path) -> str:
     """Return UTF-8 text for a bundled or source payload file."""
 
     return (root / relative_path).read_text(encoding="utf-8")
+
+
+def read_toml(root: Path, relative_path: Path) -> dict[str, object]:
+    """Return parsed TOML for a bundled or source payload file."""
+
+    return tomllib.loads(read_text(root, relative_path))
+
+
+def assert_full_drm_copilot_transport(config: dict[str, object]) -> None:
+    """Require the complete drm-copilot MCP transport configuration."""
+
+    mcp_servers = config.get("mcp_servers")
+    assert isinstance(mcp_servers, dict)
+    mcp_servers_by_name = cast("dict[str, object]", mcp_servers)
+    drm_copilot = mcp_servers_by_name.get("drm-copilot")
+    assert isinstance(drm_copilot, dict)
+    transport = cast("dict[str, object]", drm_copilot)
+    assert transport["command"] == "npx"
+    assert transport["args"] == ["-y", "@danmoisan/drm-copilot-mcp"]
+    assert transport["required"] is True
+    enabled_tools = transport["enabled_tools"]
+    assert isinstance(enabled_tools, list)
+    enabled_tool_values = cast("list[object]", enabled_tools)
+    assert all(isinstance(tool, str) for tool in enabled_tool_values)
+    enabled_tool_names = [tool for tool in enabled_tool_values if isinstance(tool, str)]
+    assert tuple(enabled_tool_names) == EXPECTED_DRM_COPILOT_TOOLS
+    tools = transport.get("tools")
+    assert isinstance(tools, dict)
+    tools_by_name = cast("dict[str, object]", tools)
+    validate_artifacts = tools_by_name.get("validate_orchestration_artifacts")
+    assert isinstance(validate_artifacts, dict)
+    validate_artifacts_settings = cast("dict[str, object]", validate_artifacts)
+    assert validate_artifacts_settings["approval_mode"] == "approve"
+
+
+def assert_no_role_local_drm_copilot_transport(role: dict[str, object]) -> None:
+    """Require role TOML files to omit MCP transport configuration."""
+
+    assert "mcp_servers" not in role
 
 
 def test_bundled_codex_and_agents_payload_contains_required_runtime_files() -> None:
@@ -113,3 +183,21 @@ def test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts() 
             REPO_ROOT,
             relative_path,
         )
+
+
+def test_codex_config_files_retain_full_drm_copilot_transport() -> None:
+    """Require root and bundled Codex configs to retain the MCP transport."""
+
+    assert_full_drm_copilot_transport(read_toml(REPO_ROOT, CODEX_CONFIG_PATH))
+    assert_full_drm_copilot_transport(read_toml(BUNDLED_ROOT, CODEX_CONFIG_PATH))
+
+
+def test_codex_role_files_do_not_retain_drm_copilot_transport() -> None:
+    """Require root and bundled Codex roles to omit MCP transport."""
+
+    assert_no_role_local_drm_copilot_transport(
+        read_toml(REPO_ROOT, ORCHESTRATOR_ROLE_PATH),
+    )
+    assert_no_role_local_drm_copilot_transport(
+        read_toml(BUNDLED_ROOT, ORCHESTRATOR_ROLE_PATH),
+    )

@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+from typing import cast
 
 import pytest
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -18,6 +25,19 @@ BUNDLED_ROOT = (
     / "drm-copilot"
     / "resources"
     / "codex-and-agents-customizations"
+)
+ORCHESTRATOR_ROLE_PATH = ".codex/agents/orchestrator.toml"
+REQUIRED_ORCHESTRATOR_SKILLS = (
+    "policy-compliance-order",
+    "orchestrate",
+    "orchestrator-workflow",
+    "feature-promotion-lifecycle",
+    "repo-automation-adapter",
+    "atomic-plan-contract",
+    "acceptance-criteria-tracking",
+    "evidence-and-timestamp-conventions",
+    "pr-context-artifacts",
+    "pr-base-branch-merge-base",
 )
 
 
@@ -38,6 +58,18 @@ def assert_contains_all(text: str, fragments: tuple[str, ...]) -> None:
 
     for fragment in fragments:
         assert fragment in text
+
+
+def read_repo_toml(relative_path: str) -> dict[str, object]:
+    """Return parsed TOML for a repository contract file."""
+
+    return tomllib.loads(read_repo_text(relative_path))
+
+
+def read_bundle_toml(relative_path: str) -> dict[str, object]:
+    """Return parsed TOML for a bundled Codex contract file."""
+
+    return tomllib.loads(read_bundle_text(relative_path))
 
 
 def test_atomic_planner_wrapper_preserves_codex_preflight_handoff_contract() -> None:
@@ -140,3 +172,31 @@ def test_orchestrator_wrapper_preserves_codex_mandatory_delegation_contract() ->
         ),
     )
     assert root_text == codex_text
+
+
+def test_orchestrator_role_uses_skills_config_sequence() -> None:
+    """Require orchestrator roles to use Codex structured skill entries."""
+
+    for role in (
+        read_repo_toml(ORCHESTRATOR_ROLE_PATH),
+        read_bundle_toml(ORCHESTRATOR_ROLE_PATH),
+    ):
+        skills = role.get("skills")
+        assert isinstance(skills, dict)
+        skills_by_name = cast("dict[str, object]", skills)
+        config = skills_by_name.get("config")
+        assert isinstance(config, list)
+        assert config == [
+            {"name": skill_name, "enabled": True}
+            for skill_name in REQUIRED_ORCHESTRATOR_SKILLS
+        ]
+
+
+def test_orchestrator_role_excludes_role_local_mcp_transport() -> None:
+    """Require orchestrator roles to keep MCP transport out of role TOML."""
+
+    for role in (
+        read_repo_toml(ORCHESTRATOR_ROLE_PATH),
+        read_bundle_toml(ORCHESTRATOR_ROLE_PATH),
+    ):
+        assert "mcp_servers" not in role
