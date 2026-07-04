@@ -47,6 +47,12 @@
             '.claude/hooks/enforce-pr-author-skill.ps1'
             '.claude/hooks/validate-orchestrator-output.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
+            # Issue #301 remediation cycle 1 (fix #1): measure the completion-consistency
+            # hook set (Claude and Codex variants) so their Pester coverage is captured.
+            '.claude/hooks/enforce-completion-consistency.ps1'
+            '.claude/hooks/enforce-completion-helpers.ps1'
+            '.codex/hooks/enforce-completion-consistency.ps1'
+            '.codex/hooks/enforce-completion-helpers.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
