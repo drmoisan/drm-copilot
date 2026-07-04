@@ -143,6 +143,7 @@ export interface RepoAutomationService {
       readonly artifactType: string;
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
+      readonly requireModelRouting?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult>;
 }
@@ -447,6 +448,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly artifactType: string;
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
+      readonly requireModelRouting?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
     // Delegate to the extracted helper, which preserves the observable behavior.
@@ -458,6 +460,9 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       ...(input.requireComplete === undefined
         ? {}
         : { requireComplete: input.requireComplete }),
+      ...(input.requireModelRouting === undefined
+        ? {}
+        : { requireModelRouting: input.requireModelRouting }),
     });
   }
 

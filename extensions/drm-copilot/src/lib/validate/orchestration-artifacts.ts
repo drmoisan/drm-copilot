@@ -142,6 +142,8 @@ export interface ValidateArtifactInput {
   readonly text: string;
   /** Require completion-safe state (orchestrator-state route only). */
   readonly requireComplete?: boolean;
+  /** Require model-routing receipts once delegated (orchestrator-state route). */
+  readonly requireModelRouting?: boolean;
   /** Injected filesystem (orchestrator-state route routing-matrix load). */
   readonly fs?: FileSystem;
   /** Repository root (orchestrator-state route routing-matrix load). */
@@ -178,6 +180,9 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
         ...(input.requireComplete === undefined
           ? {}
           : { requireComplete: input.requireComplete }),
+        ...(input.requireModelRouting === undefined
+          ? {}
+          : { requireModelRouting: input.requireModelRouting }),
         ...(input.fs === undefined ? {} : { fs: input.fs }),
         ...(input.root === undefined ? {} : { root: input.root }),
         ...(input.routingMatrix === undefined

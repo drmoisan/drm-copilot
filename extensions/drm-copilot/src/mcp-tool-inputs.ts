@@ -79,6 +79,7 @@ export interface ValidateOrchestrationArtifactsToolInput extends WorkspaceToolIn
   readonly artifactType: string;
   readonly artifactPath: string;
   readonly requireComplete?: boolean;
+  readonly requireModelRouting?: boolean;
 }
 
 export function asToolArgumentObject(
@@ -466,6 +467,7 @@ export function resolveValidateOrchestrationArtifactsToolInput(
   }
 
   const requireComplete = args["require_complete"];
+  const requireModelRouting = args["require_model_routing"];
 
   return {
     workspaceRoot: normalizeWorkspaceRoot(
@@ -475,5 +477,6 @@ export function resolveValidateOrchestrationArtifactsToolInput(
     artifactType,
     artifactPath: normalizeRequiredText(args["artifact_path"], "artifact_path"),
     ...(requireComplete === true ? { requireComplete: true } : {}),
+    ...(requireModelRouting === true ? { requireModelRouting: true } : {}),
   };
 }

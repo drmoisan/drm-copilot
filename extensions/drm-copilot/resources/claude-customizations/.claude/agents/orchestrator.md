@@ -1,5 +1,6 @@
 ---
 name: orchestrator
+model: opus
 description: Deterministic repository orchestrator that estimates change budget, selects small or large workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates proactively.
 tools:
   - "Agent(atomic-planner,atomic-executor,feature-review,task-researcher,prd-feature,staged-review,epic-review,status-updater,pr-author,commit-message,human-exception-runbook,python-typed-engineer,powershell-typed-engineer,csharp-typed-engineer,typescript-engineer)"
@@ -55,6 +56,18 @@ On every invocation:
 3. Read `artifacts/orchestration/orchestrator-state.json` to check for existing checkpoint state.
 4. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 5. If no checkpoint exists or the objective is new, begin from change-budget estimation.
+
+### Model-choice reconciliation on resume
+
+When the resumed `next_step` is a delegating step, repair a missing model choice deterministically before delegating (this mirrors `## Checkpoint Handling` in `.claude/skills/orchestrate/SKILL.md`):
+
+a. Run the orchestrator-state validator with `--require-model-routing` before the first delegation and record a `model_routing_preflight` block `{ status ("pass"|"fail"), checked_at, validator_command, output_summary }`.
+b. Recompute the upcoming phase's floor with `compute_complexity_floor(signals_present)` (no reimplementation).
+c. Record a `complexity_assessments[]` entry `{ phase, band, floor, signals_present[], rationale, assessed_at }` with `floor` equal to the recomputed value and `band >= floor`.
+d. Resolve the model with `resolve_delegation_model(agent, complexity_band, fable_policy)` and record a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`.
+e. Persist the checkpoint, then delegate with `model` equal to the receipt's `model`.
+
+The orchestrator MUST NOT delegate at a delegating `next_step` while `model_routing_preflight` status is `fail`; it repairs the missing choice (steps b-e) and re-preflights until the status is `pass`.
 
 ## Change Budget Routing
 

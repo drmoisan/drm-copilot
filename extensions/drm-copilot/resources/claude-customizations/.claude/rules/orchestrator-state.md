@@ -66,10 +66,27 @@ Each entry records one delegation with the shape `{ agent, phase, complexity_ban
 
 The session `model_budget.fable_policy` switch is a three-way enum `disabled | available | preferred` defined in `config/orchestration-routing.json`, defaulting to `disabled`. It governs only the delegation model tier and is not a route input. `disabled` removes `fable` from the consideration set and clamps `fable` cells to `opus`; `available` applies the base `complexity_to_model` table as-is; `preferred` applies the `preferred_overlay` (which redirects only the C3 cell to `fable` for the overlay agents `atomic-planner`, `prd-feature`, `feature-review`, `task-researcher`) and leaves `atomic-executor` and `pr-author` C3 cells at `opus`. `route` is never an input to model selection.
 
+## Require-Model-Routing Mode Scope and Backward Compatibility
+
+The complexity-assessment and model-routing-receipt invariants above are key-gated: they run only when their key is present, so a checkpoint that omits both arrays passes at every stage. The `require_model_routing` mode adds an existence gate that closes that gap without changing the default behavior. It is an opt-in keyword on `validate_orchestrator_state_text(..., require_model_routing=False)` (CLI flag `--require-model-routing`; MCP parameter `require_model_routing`), defaulting off. Plain, `require_complete`, and `require_pr_creation_ready` calls are unaffected and produce byte-identical results.
+
+## Invariants (require_model_routing mode)
+
+These invariants apply only when a caller passes `require_model_routing=True` and the checkpoint records at least one delegation. A checkpoint with zero delegations (no well-formed `delegation_receipts[]` entry and a `next_step` that names no delegating agent) imposes no requirement, so genuinely old, delegation-free checkpoints stay valid.
+
+1. **Required routing receipt once delegated.** Once the checkpoint records a delegation, the set of `model_routing_receipts[].agent` must be a superset of the delegated-agent set (each well-formed `delegation_receipts[].agent_name` plus a `next_step` that names a delegating agent). A delegated agent with no matching receipt is a violation. The delegating agent set excludes `orchestrator` (the caller, not a delegated subagent).
+
+2. **Required complexity assessment per matched phase.** Each phase named by a routing receipt whose agent is in the delegated-agent set must have a `complexity_assessments[]` entry for that phase.
+
+3. **Per-entry consistency reused, not reimplemented.** Present receipts and assessments must satisfy the model-routing-receipt and complexity-assessment invariants above; the gate reuses `_validate_model_routing_receipts` and `_validate_complexity_assessments` and never reimplements `compute_complexity_floor` or `resolve_delegation_model`. The gate logic lives in `scripts/dev_tools/_orchestrator_state_model_routing_gate.py`; enforcement is the Python validator, not an imported schema.
+
+The completion hook (`.claude/hooks/validate-orchestrator-output.ps1`) passes `--require-model-routing` alongside `--require-complete` and surfaces a gate failure as the `MODEL_ROUTING_BLOCKED:` block reason. The PreToolUse deterrent (`.claude/hooks/enforce-model-routing-receipt.ps1`) performs presence-only gating before a delegation. The MCP TypeScript surface performs the existence check only (delegated-agent set ⊆ routing-receipt-agent set); the Python validator remains authoritative for per-receipt correctness.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated invariant when a `remediation_loop` is present, using the existing validator message style (literal, checkpoint-context prefixed). The validator returns a list of error strings and does not mutate its input.
 - `scripts/dev_tools/validate_orchestrator_state.py` likewise appends one error per violated `human_interaction` invariant when a `human_interaction` key is present, using the same literal, checkpoint-context-prefixed message style. The check does not import or read any schema file.
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated `complexity_assessments` invariant when a `complexity_assessments` key is present, delegating to `scripts/dev_tools/_orchestrator_state_complexity.py`, which recomputes the floor via `compute_complexity_floor`. The check does not import or read any schema file.
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated `model_routing_receipts` invariant when a `model_routing_receipts` key is present, delegating to `scripts/dev_tools/_orchestrator_state_model_routing.py`, which recomputes the resolved model via `resolve_delegation_model`. The check does not import or read any schema file.
+- `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated `require_model_routing` invariant only when the caller passes `require_model_routing=True`, delegating to `scripts/dev_tools/_orchestrator_state_model_routing_gate.py`, which reuses the complexity and model-routing per-entry validators. When the flag is not passed the gate does not run, so existing calls are byte-identical.
 - The validator is consumed by the MCP tool `validate_orchestration_artifacts`; backward compatibility for existing step-based checkpoints is preserved.

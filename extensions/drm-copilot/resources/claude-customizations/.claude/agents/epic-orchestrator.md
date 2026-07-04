@@ -1,5 +1,6 @@
 ---
 name: epic-orchestrator
+model: opus
 description: Deterministic epic-scale orchestrator that schedules a dependency graph of child features across parallel, isolated git worktrees, fans results back into a shared integration branch, and drives the final integration-to-main PR. Distinct from orchestrator; only this agent is authorized to delegate to Agent(orchestrator).
 tools:
   - "Agent(orchestrator)"

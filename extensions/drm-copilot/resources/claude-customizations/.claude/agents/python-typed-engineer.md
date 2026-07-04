@@ -1,5 +1,6 @@
 ---
 name: python-typed-engineer
+model: sonnet
 description: Project-scoped worker that implements and verifies Python changes within typed repository boundaries. Applies the Black -> Ruff -> Pyright -> Pytest toolchain, the 3-production + 3-test per-batch budget, and zero-regression quality gates.
 tools:
   - Read
