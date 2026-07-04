@@ -56,7 +56,7 @@
         "drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath": {
           "type": "string",
           "default": "",
-          "description": "Optional Codex CLI executable path or command name. Leave blank to resolve 'codex' from PATH/PATHEXT before the New Codex Worktree Session terminal is created."
+          "description": "Optional Codex CLI executable path or command name. Leave blank to resolve 'codex' from PATH/PATHEXT first, then installed OpenAI/Codex extension package executable candidates, before explicit failure and before the New Codex Worktree Session terminal is created."
         }
       }
     },

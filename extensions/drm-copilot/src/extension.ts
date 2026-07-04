@@ -47,6 +47,17 @@ export { detectRuntime, resolveCodexExecutable };
  * injected text gets buffered into claude's TUI input.
  */
 const TERMINAL_AUTO_ACTIVATION_GRACE_MS = 5000;
+const INSTALLED_CODEX_EXTENSION_IDS = ["openai.chatgpt", "openai.codex"];
+
+function getInstalledCodexExtensionCandidateRoots(): string[] {
+  return INSTALLED_CODEX_EXTENSION_IDS.map(
+    (extensionId) =>
+      vscode.extensions.getExtension(extensionId)?.extensionUri.fsPath,
+  ).filter(
+    (extensionRoot): extensionRoot is string =>
+      extensionRoot !== undefined && extensionRoot.trim().length > 0,
+  );
+}
 
 /**
  * Detects whether the workspace's `pyproject.toml` declares poetry as the
@@ -271,6 +282,7 @@ export function activate(context: vscode.ExtensionContext): void {
         codexConfiguration.get<string>("codexExecutablePath") ?? "";
       const codexExecutablePath = resolveCodexExecutable(
         configuredCodexExecutablePath,
+        getInstalledCodexExtensionCandidateRoots(),
       );
       const commands = buildCodexWorktreeSessionCommands({
         repoRoot: workspaceRoot,

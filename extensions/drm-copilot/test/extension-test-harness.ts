@@ -57,6 +57,7 @@ const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
 let preClaudeScriptPathConfig: string | undefined = undefined;
 let postCodexScriptPathConfig: string | undefined = undefined;
 let codexExecutablePathConfig: string | undefined = undefined;
+let installedCodexExtensionRoots: ReadonlyArray<string> = [];
 
 const getConfigurationMock = jest.fn((section?: string) => ({
   get: <T>(key: string): T | undefined => {
@@ -108,6 +109,26 @@ jest.mock(
       },
       openTextDocument: openTextDocumentMock,
       getConfiguration: getConfigurationMock,
+    },
+    extensions: {
+      getExtension: jest.fn((extensionId: string) => {
+        const openAiCodexExtensionIds = new Set([
+          "openai.chatgpt",
+          "openai.codex",
+        ]);
+        const extensionRoot = installedCodexExtensionRoots[0];
+        if (
+          !openAiCodexExtensionIds.has(extensionId) ||
+          extensionRoot === undefined
+        ) {
+          return undefined;
+        }
+
+        return {
+          extensionUri: { fsPath: extensionRoot },
+          extensionPath: extensionRoot,
+        };
+      }),
     },
     Uri: {
       joinPath: jest.fn((base: { fsPath: string }, ...segments: string[]) => ({
@@ -315,6 +336,12 @@ export function setCodexExecutablePathConfig(value: string | undefined): void {
   codexExecutablePathConfig = value;
 }
 
+export function setInstalledCodexExtensionRoots(
+  value: ReadonlyArray<string>,
+): void {
+  installedCodexExtensionRoots = [...value];
+}
+
 export function resetExtensionHarnessState(): void {
   process.env.PATH = "C:/bin";
   process.env.PATHEXT = ".EXE;.CMD";
@@ -326,6 +353,7 @@ export function resetExtensionHarnessState(): void {
   preClaudeScriptPathConfig = undefined;
   postCodexScriptPathConfig = undefined;
   codexExecutablePathConfig = undefined;
+  installedCodexExtensionRoots = [];
   childProcessMock.spawn.mockReset();
   childProcessMock.spawnSync.mockReset();
   fsMock.readFileSync.mockReset();
@@ -347,8 +375,8 @@ export function resetExtensionHarnessState(): void {
   openTextDocumentMock.mockReset();
   showTextDocumentMock.mockReset();
   createTerminalMock.mockReset();
-  createTerminalMock.mockImplementation(
-    (): MockTerminal => buildMockTerminal(),
+  createTerminalMock.mockImplementation((): MockTerminal =>
+    buildMockTerminal(),
   );
   openTextDocumentMock.mockImplementation(async (uri: { fsPath: string }) => ({
     uri,
@@ -404,8 +432,12 @@ export function detectRuntime(
 
 export function resolveCodexExecutable(
   configuredExecutable: string | undefined,
+  installedExtensionCandidateRoots: ReadonlyArray<string> = [],
 ): string {
-  return getExtensionModule().resolveCodexExecutable(configuredExecutable);
+  return getExtensionModule().resolveCodexExecutable(
+    configuredExecutable,
+    installedExtensionCandidateRoots,
+  );
 }
 
 export function deactivate(): void {

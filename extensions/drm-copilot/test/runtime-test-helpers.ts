@@ -7,6 +7,7 @@ export interface ExecutablePresence {
   readonly py?: boolean;
   readonly pwsh?: boolean;
   readonly powershell?: boolean;
+  readonly [executablePath: string]: boolean | undefined;
 }
 
 export type MockExistsSync = jest.MockedFunction<(filePath: string) => boolean>;
@@ -28,6 +29,11 @@ export function setExecutablePresenceOnFsMock(
 ): void {
   fsModule.existsSync.mockImplementation((filePath: string) => {
     const lowerPath = filePath.toLowerCase();
+    const normalizedPath = filePath.replace(/\\/g, "/");
+    if (Object.prototype.hasOwnProperty.call(presence, normalizedPath)) {
+      return presence[normalizedPath] ?? false;
+    }
+
     if (/[\\/]codex(?:\.(?:exe|cmd|bat))?$/.test(lowerPath)) {
       return presence.codex ?? false;
     }

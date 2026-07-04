@@ -109,6 +109,31 @@ staging, commits, or implementation delegation. This gate covers edits, formatte
 If any required item is missing, implementation is blocked until the checkpoint
 and lifecycle state are corrected.
 
+## Plan-Path Resolution Gate
+
+After active feature folder creation and before any planning delegation, the
+main session must resolve `${plan-path}` from the active feature folder:
+
+1. Enumerate existing `${feature-folder}/plan*.md` files in deterministic
+   filename order.
+2. If one or more files exist, persist `${plan-path}` as the first existing
+   file and require every planner and executor handoff to use that exact path.
+3. If no `plan*.md` file exists, create exactly one canonical target path using
+   the repository's feature-folder plan naming convention, persist that path,
+   and reuse it for all revisions.
+4. Do not default to `${feature-folder}/plan.md` when a timestamped scaffolded
+   plan already exists.
+5. If checkpoint state names a different plan path than the resolved existing
+   plan file, correct the checkpoint before planner delegation. Do not create a
+   second plan artifact to satisfy an incorrect checkpoint value.
+
+Issue #306 invariant: when `${feature-folder}` is
+`docs/features/active/2026-07-04-codex-agent-role-config-306`, `${plan-path}`
+must be
+`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`;
+do not create or delegate against
+`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
+
 ## Pre-Implementation Violation Handling
 
 If an implementation action is attempted before a required orchestration gate
