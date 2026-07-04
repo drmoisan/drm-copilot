@@ -97,13 +97,16 @@ duration claim, which the job-DAG evidence does not support.
       sign-off.
 - [x] `.github/workflows/README.md` documents the new per-stage dispatch and the required-check
       rename procedure.
-- [ ] A green workflow run against the branch head is captured before merge, per the
-      `modified-workflow-needs-green-run` policy rule for workflow-file changes. See
-      `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md` — **reviewer correction
-      2026-07-03T23-36:** the recorded run's head SHA (`574aaa2a086d77857a5cd7d46723f87e090558c2`)
-      does not match the current branch head (`5cd712c9d16d86c1f6cd122ab8c818f306c4c9e3`); a live
-      `gh api .../commits/5cd712c.../check-runs` query returns zero runs at the current head. See
-      `policy-audit.2026-07-03T23-36.md` Section 7 and `remediation-inputs.2026-07-03T23-36.md`.
+- [x] A green workflow run against the branch head is captured before merge, per the
+      `modified-workflow-needs-green-run` policy rule for workflow-file changes. **Reviewer
+      re-verification 2026-07-04T00-20 (R4):** the current branch head is
+      `da829efc32af6f09a1339bcbfe226d759ddf26cf` (confirmed via `git rev-parse HEAD` and
+      `git log -1`). A live `gh api repos/drmoisan/drm-copilot/commits/da829efc.../check-runs`
+      query, executed directly by this review (not read from a prior evidence file), returns 11
+      check runs, all `conclusion: success`, `head_sha == da829efc32af6f09a1339bcbfe226d759ddf26cf`
+      (workflow run id `28688875940`, cross-confirmed via `gh run view 28688875940`). This
+      satisfies the rule at the literal current head. See `policy-audit.2026-07-04T00-20.md`
+      Section 7 (supersedes the 2026-07-03T23-36 Blocking finding).
 
 ## Non-Goals
 

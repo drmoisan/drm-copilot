@@ -200,10 +200,13 @@ identical content and identical retention behavior.
       `code-review.2026-07-03T23-36.md` Findings Table (Minor).
 - [x] `actionlint` and YAML-parse validation pass for all seven new files and the rewritten
       `ci.yml`
-- [ ] A green workflow run against the branch head is captured as evidence, satisfying
-      `modified-workflow-needs-green-run` (see `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`)
-      — **reviewer correction 2026-07-03T23-36:** stale by one commit; see
-      `policy-audit.2026-07-03T23-36.md` Section 7 and `remediation-inputs.2026-07-03T23-36.md`.
+- [x] A green workflow run against the branch head is captured as evidence, satisfying
+      `modified-workflow-needs-green-run`. **Reviewer re-verification 2026-07-04T00-20 (R4):**
+      current branch head confirmed as `da829efc32af6f09a1339bcbfe226d759ddf26cf` via
+      `git rev-parse HEAD`; a live `gh api repos/drmoisan/drm-copilot/commits/da829efc.../check-runs`
+      query (executed directly by this review) returns 11 check runs, all `conclusion: success`,
+      `head_sha` matching exactly (run id `28688875940`). Supersedes the 2026-07-03T23-36 Blocking
+      finding; see `policy-audit.2026-07-04T00-20.md` Section 7.
 - [x] Required-status-check names are read from the branch-head run's actual check-runs and
       branch protection is updated (or confirmed unchanged) to match, per the rename procedure
       (see `evidence/other/required-status-check-names.2026-07-03T18-07.md` and
@@ -228,14 +231,18 @@ identical content and identical retention behavior.
       `.github/workflows/**`, matching the validation already applied to `_npm-audit-gate.yml`. —
       **reviewer verification 2026-07-03T23-36:** independently reproduced, exit code 0, 0 errors
       across all 8 files (checked off by reviewer per feature-audit PASS).
-- [ ] A workflow run against the branch head confirms all seven gates execute (concurrently, as
+- [x] A workflow run against the branch head confirms all seven gates execute (concurrently, as
       they did before this change) and reach a green (passing) status; this run also serves as
-      the evidence required by `modified-workflow-needs-green-run`. — **reviewer correction
-      2026-07-03T23-36:** stale by one commit; see `policy-audit.2026-07-03T23-36.md` Section 7.
-- [ ] `gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs` against the branch-head run
+      the evidence required by `modified-workflow-needs-green-run`. — **reviewer re-verification
+      2026-07-04T00-20 (R4):** live `gh run view 28688875940` at head `da829efc...` confirms all
+      11 job runs (7 gates, `quality-checks7` x4 matrix legs, `drm-copilot-extension-tests` x2
+      matrix legs) `conclusion: success`. See `policy-audit.2026-07-04T00-20.md` Section 7.
+- [x] `gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs` against the branch-head run
       confirms the actual composed check-run names for each of the seven extracted gates, and
       branch protection's required-status-check list is verified (and updated if needed) against
-      those confirmed names. — **reviewer correction 2026-07-03T23-36:** not re-verified against
-      the exact current head SHA (no run exists there); the underlying branch-protection state
-      (unprotected) was independently reconfirmed live and is unaffected, but the literal
-      per-current-head check-run read has not been performed.
+      those confirmed names. — **reviewer re-verification 2026-07-04T00-20 (R4):** re-run directly
+      against the exact current head `da829efc32af6f09a1339bcbfe226d759ddf26cf`; 11 confirmed
+      check-run `name` strings returned, matching the naming convention documented in
+      `.github/workflows/README.md`. Branch-protection state re-confirmed live
+      (`gh api .../branches/main/protection/required_status_checks` → 404 "Branch not protected"),
+      unchanged from baseline.
