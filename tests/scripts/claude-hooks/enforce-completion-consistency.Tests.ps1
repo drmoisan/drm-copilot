@@ -74,7 +74,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 'feature-folder' = 'docs/features/active/2026-06-19-harden-small-path-completion-gate-207'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
             }
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true }).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'accepts variables.issue-num and variables.feature-folder fallbacks' {
