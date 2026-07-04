@@ -480,6 +480,13 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
         It "returns an empty string when no output line contains text" {
             Get-FirstOutputLine -Output @('', '   ') | Should -Be ''
         }
+
+        It "accepts an empty array as Output without throwing" {
+            { ConvertTo-CommandResult -Output @() -ExitCode 0 } | Should -Not -Throw
+            $result = ConvertTo-CommandResult -Output @() -ExitCode 0
+            $result.Output.Count | Should -Be 0
+            $result.ExitCode | Should -Be 0
+        }
     }
 
     Context "entry point" {

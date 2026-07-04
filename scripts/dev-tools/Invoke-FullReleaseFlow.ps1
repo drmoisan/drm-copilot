@@ -54,6 +54,7 @@ function ConvertTo-CommandResult {
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
+        [AllowEmptyCollection()]
         [Parameter(Mandatory = $true)]
         [object[]]$Output,
 
