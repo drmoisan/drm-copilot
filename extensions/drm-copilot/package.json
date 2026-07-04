@@ -176,7 +176,8 @@
     "lint": "eslint --no-error-on-unmatched-pattern src test",
     "typecheck": "tsc -p ./ --noEmit",
     "test": "node run-jest.cjs",
-    "test:unit": "node run-jest.cjs"
+    "test:unit": "node run-jest.cjs",
+    "test:coverage": "node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary"
   },
   "overrides": {
     "fast-uri": "^3.1.2",
