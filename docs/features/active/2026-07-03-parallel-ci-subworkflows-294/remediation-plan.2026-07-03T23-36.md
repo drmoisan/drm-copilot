@@ -128,33 +128,87 @@ written to any `artifacts/baselines/`, `artifacts/qa/`, or `artifacts/evidence/`
 
 ### Phase 4 — Acceptance-Criteria Check-Off (Delegated, Not Orchestrator)
 
-- [ ] [P4-T1] Verify, per the `acceptance-criteria-tracking` skill's evidence-before-check-off rule, that Phases 1–3 produced a green run whose `headSha` matches the branch's actual final head (P2-T4's recorded value) as confirmed in P3-T2, and that P2-T1/P2-T2's evidence artifacts document that run without deleting prior superseded entries.
+- [x] [P4-T1] Verify, per the `acceptance-criteria-tracking` skill's evidence-before-check-off rule, that Phases 1–3 produced a green run whose `headSha` matches the branch's actual final head (P2-T4's recorded value) as confirmed in P3-T2, and that P2-T1/P2-T2's evidence artifacts document that run without deleting prior superseded entries.
   - Acceptance: A written confirmation (in this task's execution notes) that P3-T2's `headSha` equals P2-T4's recorded head SHA and that P2-T1/P2-T2 were updated (not created new) in place. If this confirmation cannot be made, none of P4-T2..P4-T5 below may check off any box; leave all four unchecked and record the gap instead.
   - Owner: atomic-executor or feature-review (per the `acceptance-criteria-tracking` skill) — the orchestrator must not perform AC check-off directly.
+  - **Execution notes (atomic-executor, 2026-07-03T23-36):** Confirmation **cannot be made** to the
+    standard this task requires. Findings:
+    - P2-T4 was never executed — no `evidence/remediation-baseline/post-evidence-commit-head.*.md`
+      artifact exists. There is no recorded value for "P2-T4's recorded head SHA" to compare
+      against.
+    - Independently (via `git rev-parse HEAD` and `git log --format=%H -3`), the current branch
+      head is `5a428db4d54cb46f2980b9fbdfe8b527a101b391`, whose parent is
+      `cb4399749f68a97759cd86f63eb0a44c077921d1` (the commit that added the review/remediation
+      artifacts). `git show 5a428db --stat` confirms `5a428db` changed only the two P2-T1/P2-T2
+      evidence files (updated in place, not created new) — that sub-fact is confirmed.
+    - However, both refreshed evidence files (`evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`
+      and `evidence/other/required-status-check-names.2026-07-03T18-07.md`) document their
+      "Current (post-remediation)" green run at head SHA `cb4399749f68a97759cd86f63eb0a44c077921d1`
+      — i.e., the current head's **parent**, not the current head `5a428db...` itself. Per the
+      orchestrator's directive, a further dispatch (run `28688561428`) was made against
+      `5a428db...` and reportedly returned `conclusion: success` for all 11 job runs, but **this run
+      is not captured in any evidence artifact in this repository** (an intentional gap, to avoid
+      the self-referential evidence-commit trap of writing that result into a file, which would
+      move the head again). atomic-executor has no `gh` tool access and cannot independently
+      confirm this run.
+    - This is the same class of defect (evidence one commit behind the literal current head) that
+      produced the original Blocking finding in `feature-audit.2026-07-03T23-36.md` (criterion 6/13/19).
+      Per that same rule's strict head-SHA-match standard, and per the acceptance-criteria-tracking
+      skill's "evidence before check-off" rule, an unwritten, unverifiable (by this agent) claim of a
+      run at the literal current head does not constitute audit-grade evidence.
+    - **Conclusion: confirmation cannot be made.** Per this task's own acceptance text, P4-T2
+      through P4-T5 remain unchecked and the gap is recorded (below and in each task's notes).
+      Genuine check-off of AC 6/13/19/20 should occur at the next feature-review re-audit, which has
+      live `gh api` access and can verify the check-runs at `5a428db4d54cb46f2980b9fbdfe8b527a101b391`
+      directly, per the orchestrator's stated design intent.
 - [ ] [P4-T2] If P4-T1's verification succeeds, check off criterion 6 in `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/user-story.md` (the `- [ ] A green workflow run against the branch head is captured before merge...` line under "Acceptance Criteria"), changing `- [ ]` to `- [x]`, citing P3-T2's confirmed head SHA and run URL. If P4-T1's verification did not succeed, leave this box unchecked.
   - Acceptance: The line in `user-story.md` reads `- [x] A green workflow run against the branch head is captured before merge...` only if P4-T1 succeeded; criterion text is otherwise unmodified.
   - Owner: atomic-executor or feature-review (per the `acceptance-criteria-tracking` skill)
+  - **Execution notes:** P4-T1 did not succeed (evidence documents a run one commit behind the
+    literal current head; no artifact confirms a run at `5a428db...` itself). Left unchecked in
+    `user-story.md`.
 - [ ] [P4-T3] If P4-T1's verification succeeds, check off criterion 13 in `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/spec.md` (the `- [ ] A green workflow run against the branch head is captured as evidence...` line), changing `- [ ]` to `- [x]`, citing the same evidence as P4-T2. If P4-T1's verification did not succeed, leave this box unchecked.
   - Acceptance: The corresponding line in `spec.md` reads `- [x] A green workflow run against the branch head is captured as evidence...` only if P4-T1 succeeded; criterion text is otherwise unmodified.
   - Owner: atomic-executor or feature-review (per the `acceptance-criteria-tracking` skill)
+  - **Execution notes:** P4-T1 did not succeed. Left unchecked in `spec.md`, same gap as P4-T2.
 - [ ] [P4-T4] If P4-T1's verification succeeds, check off criterion 19 in `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/spec.md` (the "Seeded Test Conditions" `- [ ] A workflow run against the branch head confirms all seven gates execute...` line), changing `- [ ]` to `- [x]`, citing the same evidence as P4-T2. If P4-T1's verification did not succeed, leave this box unchecked.
   - Acceptance: The corresponding line in `spec.md` reads `- [x] A workflow run against the branch head confirms all seven gates execute...` only if P4-T1 succeeded; criterion text is otherwise unmodified.
   - Owner: atomic-executor or feature-review (per the `acceptance-criteria-tracking` skill)
+  - **Execution notes:** P4-T1 did not succeed. Left unchecked in `spec.md`, same gap as P4-T2.
 - [ ] [P4-T5] If P4-T1's verification succeeds, check off criterion 20 in `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/spec.md` (the `- [ ] gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs against the branch-head run confirms...` line), changing `- [ ]` to `- [x]`, citing P2-T2's refreshed `required-status-check-names.2026-07-03T18-07.md` evidence as support. If P4-T1's verification did not succeed, leave this box unchecked.
   - Acceptance: The corresponding line in `spec.md` reads `- [x] gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs against the branch-head run confirms...` only if P4-T1 succeeded; criterion text is otherwise unmodified.
   - Owner: atomic-executor or feature-review (per the `acceptance-criteria-tracking` skill)
+  - **Execution notes:** P4-T1 did not succeed (the refreshed `required-status-check-names.*.md`
+    file also documents names confirmed against head `cb4399749...`, one commit behind current
+    head). Left unchecked in `spec.md`.
 
 ### Phase 5 — Scope-Guard and Final QA Closure (Evidence-Capture-Only Remediation)
 
-- [ ] [P5-T1] Run `git diff --stat 5cd712c9d16d86c1f6cd122ab8c818f306c4c9e3..HEAD` (the pre-remediation head as base) after Phase 2's commit and Phase 4's AC check-offs, and confirm the only files changed are `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`, `evidence/other/required-status-check-names.2026-07-03T18-07.md`, and (if P4-T1 succeeded) `spec.md`/`user-story.md`; confirm zero `.github/workflows/**` YAML files appear in the diff, zero changes under `src/` or `extensions/drm-copilot/src`, and `.github/workflows/publish-extension.yml`/`.github/workflows/publish-mcp-npm.yml` are absent from the diff. Record the command, `EXIT_CODE:`, and `Output Summary:` to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/scope-guard-remediation.2026-07-03T23-36.md`.
+- [x] [P5-T1] Run `git diff --stat 5cd712c9d16d86c1f6cd122ab8c818f306c4c9e3..HEAD` (the pre-remediation head as base) after Phase 2's commit and Phase 4's AC check-offs, and confirm the only files changed are `evidence/qa-gates/green-run-branch-head.2026-07-03T18-07.md`, `evidence/other/required-status-check-names.2026-07-03T18-07.md`, and (if P4-T1 succeeded) `spec.md`/`user-story.md`; confirm zero `.github/workflows/**` YAML files appear in the diff, zero changes under `src/` or `extensions/drm-copilot/src`, and `.github/workflows/publish-extension.yml`/`.github/workflows/publish-mcp-npm.yml` are absent from the diff. Record the command, `EXIT_CODE:`, and `Output Summary:` to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/scope-guard-remediation.2026-07-03T23-36.md`.
   - Acceptance: Artifact exists; `Output Summary:` confirms the exact file list above with no `.github/workflows/**` YAML content changes, no `src/`/`extensions/drm-copilot/src` changes, and both publish workflow files absent from the diff. This artifact also serves as the explicit statement that branch protection on `main` was not enabled as part of this remediation (no `gh api .../protection` PATCH command appears in any task above).
   - Owner: atomic-executor
-- [ ] [P5-T2] Run a final `actionlint` pass (via `scripts/dev-tools/run-actionlint.ps1` or the repository's documented equivalent) across all 8 workflow files touched by the original feature (`ci.yml` plus the 7 `_<name>.yml` files) to reconfirm zero errors and zero content drift from the pre-remediation state (no workflow YAML was edited by this remediation cycle), and record the result to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/final-qa-loop-actionlint-remediation.2026-07-03T23-36.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+  - **Execution notes:** Artifact written. Ran both the merge-base-with-`main` diff
+    (`9a36e9b3d...`..HEAD) and the remediation-cycle-only diff (`5cd712c9d1...`..HEAD, `EXIT_CODE: 0`
+    both). The remediation-cycle-only diff changed exactly 11 files, all Markdown under this
+    feature's folder (the two P2-T1/P2-T2 evidence files plus `spec.md`/`user-story.md` — the latter
+    two changed by the reviewer's prior correction pass, not by Phase 4 check-offs since P4-T1 did
+    not succeed — plus this cycle's own audit/plan docs). Zero `.github/workflows/**`, zero `src/`
+    or `extensions/drm-copilot/src`, both publish workflow files absent from every range checked. No
+    branch-protection PATCH command appears anywhere in the plan.
+- [x] [P5-T2] Run a final `actionlint` pass (via `scripts/dev-tools/run-actionlint.ps1` or the repository's documented equivalent) across all 8 workflow files touched by the original feature (`ci.yml` plus the 7 `_<name>.yml` files) to reconfirm zero errors and zero content drift from the pre-remediation state (no workflow YAML was edited by this remediation cycle), and record the result to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/final-qa-loop-actionlint-remediation.2026-07-03T23-36.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: Artifact exists; `EXIT_CODE: 0`; `Output Summary:` confirms 0 errors across all 8 files and states these files are unchanged (byte-identical) relative to the pre-remediation head, since no workflow YAML edit was made in this cycle.
   - Owner: atomic-executor
-- [ ] [P5-T3] Write a closing language-applicability statement to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/final-qa-loop-language-applicability-remediation.2026-07-03T23-36.md` stating that the Python (Black/Ruff/Pyright/Pytest), TypeScript (ESLint/TSC/Vitest), PowerShell (PSScriptAnalyzer/Pester), and C# toolchain loops remain N/A for this remediation cycle (no `.py`/`.ts`/`.ps1`/`.cs` production or test file was changed, per P5-T1's confirmed diff scope), and that YAML validity (`actionlint`, P5-T2) plus the two green branch-head runs (P1-T3, P3-T2) constitute this remediation cycle's actual verification surface.
+  - **Execution notes:** Ran `pwsh -NoProfile -File ./scripts/dev-tools/run-actionlint.ps1` against
+    all 8 files. `EXIT_CODE: 0`, 0 errors. Artifact written; confirmed unchanged from the prior clean
+    pass (`evidence/qa-gates/final-qa-loop-actionlint.2026-07-03T18-07.md`) since P5-T1 confirms 0
+    `.github/workflows/**` files changed in this remediation cycle.
+- [x] [P5-T3] Write a closing language-applicability statement to `docs/features/active/2026-07-03-parallel-ci-subworkflows-294/evidence/qa-gates/final-qa-loop-language-applicability-remediation.2026-07-03T23-36.md` stating that the Python (Black/Ruff/Pyright/Pytest), TypeScript (ESLint/TSC/Vitest), PowerShell (PSScriptAnalyzer/Pester), and C# toolchain loops remain N/A for this remediation cycle (no `.py`/`.ts`/`.ps1`/`.cs` production or test file was changed, per P5-T1's confirmed diff scope), and that YAML validity (`actionlint`, P5-T2) plus the two green branch-head runs (P1-T3, P3-T2) constitute this remediation cycle's actual verification surface.
   - Acceptance: Artifact exists and explicitly states N/A for each of the four named language toolchains, citing P5-T1 as the confirming diff-scope evidence.
   - Owner: atomic-executor
+  - **Execution notes:** Artifact written; all four language toolchains stated N/A, citing P5-T1.
+    Also notes (for transparency) that the P2-T1/P2-T2 evidence documents the green run at the
+    current head's parent commit rather than at the literal current head, per the Phase 4 execution
+    notes and gap.
 
 ## Test Plan
 
