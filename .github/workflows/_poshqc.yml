@@ -1,0 +1,52 @@
+name: PoshQC (reusable)
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  poshqc:
+    name: PowerShell QC
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install PoshQC tooling
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Install-PoshQCTools
+
+      - name: Format PowerShell
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Invoke-PoshQCFormat -Root "${{ github.workspace }}"
+          $diff = git status --porcelain
+          if ($diff) {
+            Write-Error "PowerShell files were reformatted. Run Invoke-PoshQCFormat locally and commit the changes."
+          }
+
+      - name: Analyze PowerShell
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Invoke-PoshQCAnalyze -Root "${{ github.workspace }}"
+
+      - name: Test PowerShell
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Invoke-PoshQCTest -Root "${{ github.workspace }}"
+
+      - name: Upload PowerShell test artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: poshqc-test-results
+          path: |
+            artifacts/pester/pester-junit.xml
+            artifacts/pester/powershell-coverage.xml
+            artifacts/pester/powershell-coverage.koverage.xml
+          if-no-files-found: ignore

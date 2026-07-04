@@ -1,0 +1,37 @@
+name: Docs Validation (reusable)
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  docs-validation:
+    name: Documentation Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Validate README exists and is not empty
+        run: |
+          if [ ! -f README.md ] || [ ! -s README.md ]; then
+            echo "ERROR: README.md is missing or empty"
+            exit 1
+          fi
+
+      - name: Check for LICENSE file
+        run: |
+          if [ ! -f LICENSE ]; then
+            echo "ERROR: LICENSE file is missing"
+            exit 1
+          fi
+
+      - name: Validate instruction documents exist
+        run: |
+          if [ ! -f .github/copilot-instructions.md ]; then
+            echo "WARNING: .github/copilot-instructions.md is missing"
+          fi
+          if [ ! -f docs/code-change.instructions.md ]; then
+            echo "WARNING: docs/code-change.instructions.md is missing"
+          fi

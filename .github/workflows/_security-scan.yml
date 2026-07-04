@@ -1,0 +1,30 @@
+name: Security Scan (reusable)
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+
+      - name: Check for security vulnerabilities
+        run: |
+          poetry run pip install safety
+          poetry export -f requirements.txt --without-hashes | poetry run safety check --stdin
+        continue-on-error: true
