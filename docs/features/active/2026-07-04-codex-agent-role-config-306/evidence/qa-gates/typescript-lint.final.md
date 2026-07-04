@@ -8,5 +8,3 @@ Raw Output:
 
 > drm-copilot@1.0.7 lint
 > eslint --no-error-on-unmatched-pattern src test
-
-

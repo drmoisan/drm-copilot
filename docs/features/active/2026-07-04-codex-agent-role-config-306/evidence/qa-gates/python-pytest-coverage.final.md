@@ -312,4 +312,3 @@ scripts\dev_tools\validate_policy_audit_artifact.py                  125     12 
 TOTAL                                                               9179   1242    86%
 Coverage LCOV written to file artifacts/python/lcov.info
 ============================ 1280 passed in 7.13s =============================
-

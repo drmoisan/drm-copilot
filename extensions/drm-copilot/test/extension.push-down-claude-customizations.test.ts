@@ -146,13 +146,11 @@ function queuePushDownPrompts(input: {
     responses.push(undefined);
   } else {
     responses.push(
-      input.packs.map(
-        (pack): PackQuickPickItem => ({
-          label: pack,
-          pack,
-          picked: true,
-        }),
-      ),
+      input.packs.map((pack): PackQuickPickItem => ({
+        label: pack,
+        pack,
+        picked: true,
+      })),
     );
     if (input.packs.includes("csharp")) {
       responses.push(input.csharpVariant);

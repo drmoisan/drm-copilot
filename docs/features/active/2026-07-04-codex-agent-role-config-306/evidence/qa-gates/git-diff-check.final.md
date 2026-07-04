@@ -5,4 +5,3 @@ Output Summary:
 - git diff --check completed successfully.
 
 Raw Output:
-

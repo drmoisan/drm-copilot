@@ -110,13 +110,6 @@ Lifecycle guardrails:
 - if checkpoint state already contains a different `${plan-path}`, correct the
   checkpoint before planner delegation instead of creating another plan file
 
-Issue #306 invariant: when `${feature-folder}` is
-`docs/features/active/2026-07-04-codex-agent-role-config-306`, `${plan-path}`
-must be
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`;
-do not create or delegate against
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
-
 9) Require preflight validation via `atomic_executor` until:
 - `PREFLIGHT: ALL CLEAR`
 

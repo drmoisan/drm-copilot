@@ -7,4 +7,3 @@ Output Summary:
 Raw Output:
 All done! \u2728 \U0001f370 \u2728
 226 files would be left unchanged.
-

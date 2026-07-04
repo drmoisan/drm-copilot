@@ -85,7 +85,7 @@ The extension executable resolver currently supports configured executable paths
 - Manual `codex doctor --json` validation requires a usable Codex executable from PATH, configuration, or installed VS Code extension package discovery.
 
 ### Implementation strategy (what changes, not sequencing):
-	
+
 #### Files/modules to change:
 - `.codex/agents/orchestrator.toml`
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator.toml`

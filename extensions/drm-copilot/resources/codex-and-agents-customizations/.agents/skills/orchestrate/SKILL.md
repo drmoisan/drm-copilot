@@ -127,13 +127,6 @@ main session must resolve `${plan-path}` from the active feature folder:
    plan file, correct the checkpoint before planner delegation. Do not create a
    second plan artifact to satisfy an incorrect checkpoint value.
 
-Issue #306 invariant: when `${feature-folder}` is
-`docs/features/active/2026-07-04-codex-agent-role-config-306`, `${plan-path}`
-must be
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`;
-do not create or delegate against
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
-
 ## Pre-Implementation Violation Handling
 
 If an implementation action is attempted before a required orchestration gate

@@ -111,13 +111,6 @@ Plan-path invariant:
 - If checkpoint state conflicts with the resolved existing plan file, correct
   checkpoint state before delegation and do not create a duplicate plan.
 
-Issue #306 invariant: when `${feature-folder}` is
-`docs/features/active/2026-07-04-codex-agent-role-config-306`, `${plan-path}`
-must be
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`;
-do not create or delegate against
-`docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
-
 For small-path runs, also persist:
 - `bootstrap_mode`
 - `phase0_execution_summary`

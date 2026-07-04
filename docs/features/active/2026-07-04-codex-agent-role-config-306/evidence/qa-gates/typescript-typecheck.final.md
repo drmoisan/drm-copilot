@@ -8,5 +8,3 @@ Raw Output:
 
 > drm-copilot@1.0.7 typecheck
 > tsc -p ./ --noEmit
-
-
