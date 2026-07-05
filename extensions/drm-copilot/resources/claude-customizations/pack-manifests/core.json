@@ -69,6 +69,7 @@
     ".claude/skills/review-staged/SKILL.md",
     ".claude/skills/skill-canonical-location-audit/SKILL.md",
     ".claude/skills/translate-copilot-to-claude/SKILL.md",
-    ".claude/skills/update-status/SKILL.md"
+    ".claude/skills/update-status/SKILL.md",
+    ".claude/lib/model-routing/ModelRouting.psm1"
   ]
 }

@@ -29,9 +29,9 @@ On every invocation, the main session must:
 Because model selection is required once delegation occurs (see `## Model Selection`), a resuming orchestrator must repair a missing model choice deterministically before delegating at a delegating `next_step`. When the resumed `next_step` is a delegating step:
 
 a. **Preflight the checkpoint.** Run the orchestrator-state validator with `--require-model-routing` (via `mcp__drm-copilot__validate_orchestration_artifacts` or the local CLI) against `artifacts/orchestration/orchestrator-state.json` before the first delegation. Record the result in a `model_routing_preflight` block `{ status ("pass"|"fail"), checked_at (ISO-8601 UTC), validator_command, output_summary }`.
-b. **Recompute the floor.** For the upcoming phase, recompute the complexity floor with `compute_complexity_floor(signals_present)` (`scripts/dev_tools/compute_complexity_floor.py`); do not reimplement the formula.
+b. **Recompute the floor.** For the upcoming phase, recompute the complexity floor with `Get-ComplexityFloor -SignalsPresent <names>` (`.claude/lib/model-routing/ModelRouting.psm1`); do not reimplement the formula.
 c. **Record the assessment.** Write a `complexity_assessments[]` entry `{ phase, band, floor, signals_present[], rationale, assessed_at }` with `floor` equal to the recomputed value and `band >= floor`.
-d. **Resolve and record the receipt.** Resolve the model with `resolve_delegation_model(agent, complexity_band, fable_policy)` (`scripts/dev_tools/resolve_delegation_model.py`) and write a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`.
+d. **Resolve and record the receipt.** Resolve the model with `Resolve-DelegationModel -Agent <agent> -Band <complexity_band> -FablePolicy <fable_policy>` (`.claude/lib/model-routing/ModelRouting.psm1`) and write a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`.
 e. **Persist and delegate.** Persist the checkpoint, then delegate with `model` equal to the receipt's `model`.
 
 The orchestrator MUST NOT delegate at a delegating `next_step` while `model_routing_preflight` status is `fail`; it repairs the missing choice (steps b-e) and re-preflights until the status is `pass`.
@@ -83,8 +83,10 @@ Model selection is a second axis, strictly separate from `route`. `route` (`smal
 
 The two canonical, tested reference implementations express the formulas the orchestrator applies by judgment:
 
-- `scripts/dev_tools/compute_complexity_floor.py` (`compute_complexity_floor`) — the deterministic complexity-floor formula. Each present `[floor]` signal contributes a candidate band of `C3`; the floor is the maximum triggered candidate band; the floor never exceeds `C3`. C4 is never floor-forced; it is reached only by judgment.
-- `scripts/dev_tools/resolve_delegation_model.py` (`resolve_delegation_model`) — the delegation-model selection formula (base `complexity_to_model` table, the `preferred` overlay, and the `disabled` clamp).
+- `.claude/lib/model-routing/ModelRouting.psm1` (`Get-ComplexityFloor`) — the deterministic complexity-floor formula. Each present `[floor]` signal contributes a candidate band of `C3`; the floor is the maximum triggered candidate band; the floor never exceeds `C3`. C4 is never floor-forced; it is reached only by judgment.
+- `.claude/lib/model-routing/ModelRouting.psm1` (`Resolve-DelegationModel`) — the delegation-model selection formula (base `complexity_to_model` table, the `preferred` overlay, and the `disabled` clamp).
+
+The runnable reference the destination runtime applies is the `.claude`-resident PowerShell module above; the repository validator remains the Python authority (`scripts/dev_tools/compute_complexity_floor.py` and `scripts/dev_tools/resolve_delegation_model.py`), pinned to the same `config/orchestration-routing.json` truth table by a static config-parity test.
 
 End-to-end procedure:
 

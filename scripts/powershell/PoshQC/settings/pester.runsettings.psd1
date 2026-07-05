@@ -60,6 +60,10 @@
             # Issue #305 added this PreToolUse model-routing-receipt deterrent hook; measured
             # here so the new production hook is not excluded from coverage.
             '.claude/hooks/enforce-model-routing-receipt.ps1'
+            # Issue #312 added the .claude-resident PowerShell model-routing library so the
+            # push-down bundle no longer cites missing scripts/dev_tools references; measured
+            # here so the new production module is not excluded from coverage.
+            '.claude/lib/model-routing/ModelRouting.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
