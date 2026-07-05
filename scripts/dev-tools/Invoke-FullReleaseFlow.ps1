@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Runs the full release flow behind an explicit confirmation token.
 
@@ -119,6 +119,28 @@ function Invoke-ChildPowerShellScript {
     return $LASTEXITCODE
 }
 
+function Invoke-Sleep {
+    <#
+    .SYNOPSIS
+        Wrapper seam for pausing execution.
+    .DESCRIPTION
+        Isolates Start-Sleep behind a mockable function so Pester tests can
+        assert on wait behavior (poll counts, retry intervals) without
+        incurring a real wall-clock delay.
+    .PARAMETER Seconds
+        Number of seconds to sleep.
+    .OUTPUTS
+        None.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$Seconds
+    )
+    Start-Sleep -Seconds $Seconds
+}
+
 function Get-FirstOutputLine {
     [CmdletBinding()]
     [OutputType([string])]
@@ -135,6 +157,104 @@ function Get-FirstOutputLine {
     }
 
     return ''
+}
+
+function Wait-ForPullRequestChecks {
+    <#
+    .SYNOPSIS
+        Waits for a pull request's required checks to register and complete.
+    .DESCRIPTION
+        Polls `gh pr checks <PrNumber> --required --json bucket` through the
+        Invoke-GhExe seam in two bounded phases:
+
+        Phase A (registration): GitHub takes several seconds to register
+        workflow checks after a pull request is opened. While the poll
+        command itself fails (ExitCode -ne 0), the check set has not yet
+        registered; this phase retries up to RegistrationMaxAttempts times,
+        sleeping RegistrationIntervalSeconds between attempts, before
+        declaring a registration timeout.
+
+        Phase B (completion): once the poll succeeds, its JSON output is
+        parsed into an array of check objects with a `bucket` property. If
+        any bucket is 'fail' or 'cancel', this is a genuine check failure and
+        the function returns 1 immediately without further waiting. If every
+        bucket is 'pass' or 'skipping', the function returns 0. If any bucket
+        is 'pending', the function sleeps CompletionIntervalSeconds and
+        re-polls, up to CompletionMaxAttempts times, before declaring a
+        completion timeout.
+    .PARAMETER PrNumber
+        The pull request number to poll checks for.
+    .PARAMETER RegistrationMaxAttempts
+        Maximum number of registration-phase poll attempts before timing out.
+    .PARAMETER RegistrationIntervalSeconds
+        Seconds to sleep between registration-phase poll attempts.
+    .PARAMETER CompletionMaxAttempts
+        Maximum number of completion-phase poll attempts before timing out.
+    .PARAMETER CompletionIntervalSeconds
+        Seconds to sleep between completion-phase poll attempts.
+    .OUTPUTS
+        Integer: 0 on success (every required check bucket is pass or
+        skipping); 1 on registration timeout, completion timeout, or a
+        genuine check failure (bucket fail or cancel).
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'Function name matches the gh CLI concept of a pull request''s set of required checks (plural); the plan contract for issue #310 binds this exact name.')]
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PrNumber,
+
+        [Parameter()]
+        [int]$RegistrationMaxAttempts = 24,
+
+        [Parameter()]
+        [int]$RegistrationIntervalSeconds = 5,
+
+        [Parameter()]
+        [int]$CompletionMaxAttempts = 60,
+
+        [Parameter()]
+        [int]$CompletionIntervalSeconds = 10
+    )
+
+    $ghArgs = @('pr', 'checks', $PrNumber, '--required', '--json', 'bucket')
+    $poll = Invoke-GhExe -GhArgs $ghArgs
+
+    $registrationAttempt = 1
+    while ($poll.ExitCode -ne 0) {
+        if ($registrationAttempt -ge $RegistrationMaxAttempts) {
+            Write-StderrLine -Message "Pull request checks did not register within the timeout for PR #$PrNumber."
+            return 1
+        }
+        Invoke-Sleep -Seconds $RegistrationIntervalSeconds
+        $poll = Invoke-GhExe -GhArgs $ghArgs
+        $registrationAttempt++
+    }
+
+    $buckets = @(($poll.Output -join "`n") | ConvertFrom-Json) | ForEach-Object { $_.bucket }
+
+    $completionAttempt = 1
+    while ($true) {
+        if ($buckets -contains 'fail' -or $buckets -contains 'cancel') {
+            Write-StderrLine -Message "A required check failed for PR #$PrNumber."
+            return 1
+        }
+
+        $stillPending = $buckets | Where-Object { $_ -eq 'pending' }
+        if (-not $stillPending) {
+            return 0
+        }
+
+        if ($completionAttempt -ge $CompletionMaxAttempts) {
+            Write-StderrLine -Message "Pull request checks did not complete within the timeout for PR #$PrNumber."
+            return 1
+        }
+
+        Invoke-Sleep -Seconds $CompletionIntervalSeconds
+        $poll = Invoke-GhExe -GhArgs $ghArgs
+        $buckets = @(($poll.Output -join "`n") | ConvertFrom-Json) | ForEach-Object { $_.bucket }
+        $completionAttempt++
+    }
 }
 
 function Invoke-FullReleaseFlowGuarded {
@@ -241,9 +361,8 @@ function Invoke-FullReleaseFlowGuarded {
         return 1
     }
 
-    $checks = Invoke-GhExe -GhArgs @('pr', 'checks', $prNumber, '--watch')
-    if ($checks.ExitCode -ne 0) {
-        Write-StderrLine -Message "Pull request checks did not pass for PR #$prNumber (gh exit code $($checks.ExitCode)). Stopping before merge and tag push."
+    $checksResult = Wait-ForPullRequestChecks -PrNumber $prNumber
+    if ($checksResult -ne 0) {
         return 1
     }
 
