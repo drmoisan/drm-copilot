@@ -3,7 +3,7 @@
   "displayName": "drm-copilot",
   "description": "Repository automation, customization publishing, and MCP bridge for drm-copilot workflows.",
   "icon": "resources/icon.png",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "publisher": "DanMoisan",
   "license": "MIT",
   "repository": {
