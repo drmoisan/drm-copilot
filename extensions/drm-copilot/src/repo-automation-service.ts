@@ -32,6 +32,7 @@ import {
 import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
+import { buildValidateOrchestrationServiceCallInput } from "./lib/validate/build-validate-orchestration-service-call-input";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
 import { collectPrContextServiceCall } from "./lib/pr-context/pr-context-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
@@ -143,6 +144,7 @@ export interface RepoAutomationService {
       readonly artifactType: string;
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
+      readonly requireModelRouting?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult>;
 }
@@ -447,18 +449,14 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly artifactType: string;
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
+      readonly requireModelRouting?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
     // Delegate to the extracted helper, which preserves the observable behavior.
-    return validateOrchestrationServiceCall({
-      fileSystem: this.fileSystem,
-      workspaceRoot: input.workspaceRoot,
-      artifactType: input.artifactType,
-      artifactPath: input.artifactPath,
-      ...(input.requireComplete === undefined
-        ? {}
-        : { requireComplete: input.requireComplete }),
-    });
+    // Request shaping (optional-field omission) lives in the extracted builder.
+    return validateOrchestrationServiceCall(
+      buildValidateOrchestrationServiceCallInput(this.fileSystem, input),
+    );
   }
 
   private async executeScript(

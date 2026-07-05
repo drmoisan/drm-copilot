@@ -57,6 +57,9 @@
             # parameter in this script; measured here so the change produces real per-file
             # coverage evidence going forward.
             'scripts/dev-tools/Invoke-FullReleaseFlow.ps1'
+            # Issue #305 added this PreToolUse model-routing-receipt deterrent hook; measured
+            # here so the new production hook is not excluded from coverage.
+            '.claude/hooks/enforce-model-routing-receipt.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

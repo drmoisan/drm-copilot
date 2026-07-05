@@ -24,6 +24,18 @@ On every invocation, the main session must:
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
 
+### Model-choice reconciliation on resume
+
+Because model selection is required once delegation occurs (see `## Model Selection`), a resuming orchestrator must repair a missing model choice deterministically before delegating at a delegating `next_step`. When the resumed `next_step` is a delegating step:
+
+a. **Preflight the checkpoint.** Run the orchestrator-state validator with `--require-model-routing` (via `mcp__drm-copilot__validate_orchestration_artifacts` or the local CLI) against `artifacts/orchestration/orchestrator-state.json` before the first delegation. Record the result in a `model_routing_preflight` block `{ status ("pass"|"fail"), checked_at (ISO-8601 UTC), validator_command, output_summary }`.
+b. **Recompute the floor.** For the upcoming phase, recompute the complexity floor with `compute_complexity_floor(signals_present)` (`scripts/dev_tools/compute_complexity_floor.py`); do not reimplement the formula.
+c. **Record the assessment.** Write a `complexity_assessments[]` entry `{ phase, band, floor, signals_present[], rationale, assessed_at }` with `floor` equal to the recomputed value and `band >= floor`.
+d. **Resolve and record the receipt.** Resolve the model with `resolve_delegation_model(agent, complexity_band, fable_policy)` (`scripts/dev_tools/resolve_delegation_model.py`) and write a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`.
+e. **Persist and delegate.** Persist the checkpoint, then delegate with `model` equal to the receipt's `model`.
+
+The orchestrator MUST NOT delegate at a delegating `next_step` while `model_routing_preflight` status is `fail`; it repairs the missing choice (steps b-e) and re-preflights until the status is `pass`.
+
 ## Autonomous-Execution Mandate
 
 The orchestrator must achieve all actions agentically with no human interaction; full autonomy is a hard requirement. A silent manual blocker discovered at the end of a workflow is a defect, not an acceptable outcome. Every unautomatable (human-interaction) requirement must be detected early, resolved by exactly one of three permitted responses, and recorded in orchestrator state.
@@ -81,7 +93,11 @@ End-to-end procedure:
 3. **Run the per-delegation selection order.** For each delegation, resolve the model as `resolve_delegation_model(agent, complexity_band, fable_policy)`: the `table_model` is the `preferred` overlay value when (`fable_policy == "preferred"` and the agent is in the overlay set `{atomic-planner, prd-feature, feature-review, task-researcher}` and `band == "C3"`), otherwise the base `complexity_to_model[band]`. Under `fable_policy == "disabled"`, a `fable` `table_model` clamps to `model = "opus"` with `clamped_from = "fable"`. `atomic-executor` and `pr-author` C3 cells stay `opus` under every policy.
 4. **Emit a routing receipt.** Record a `model_routing_receipts[]` entry `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from | null, model }`. `table_model` is the pre-clamp lookup; `model` is the post-clamp result.
 
-The `complexity_assessments[]` and `model_routing_receipts[]` invariants are enforced by `scripts/dev_tools/validate_orchestrator_state.py` per `.claude/rules/orchestrator-state.md`; both arrays are additive and optional.
+The `complexity_assessments[]` and `model_routing_receipts[]` invariants are enforced by `scripts/dev_tools/validate_orchestrator_state.py` per `.claude/rules/orchestrator-state.md`; both arrays remain additive (a checkpoint that predates model routing stays valid).
+
+### Required-once-delegated invariant (`require_model_routing` mode)
+
+The `validate_orchestrator_state_text(...)` validator accepts a `require_model_routing` mode (CLI flag `--require-model-routing`; MCP parameter `require_model_routing`). Under this mode the arrays stop being merely optional: once the checkpoint records at least one delegation (a well-formed `delegation_receipts[]` entry, or a `next_step` that names a delegating agent), every delegated agent must have a matching `model_routing_receipts[]` entry, each matched receipt's phase must have a `complexity_assessments[]` entry, and every present receipt/assessment must be consistent with the reference formulas. A delegation-free checkpoint imposes no requirement, so old checkpoints stay valid. The gate is implemented in `scripts/dev_tools/_orchestrator_state_model_routing_gate.py`; it reuses the per-entry validators and never reimplements `compute_complexity_floor` or `resolve_delegation_model`. Two enforcement layers consume it: the completion gate (`.claude/hooks/validate-orchestrator-output.ps1` passes `--require-model-routing` and surfaces failures as `MODEL_ROUTING_BLOCKED:`), and the pre-delegation deterrent (`.claude/hooks/enforce-model-routing-receipt.ps1`, presence-only). The MCP TypeScript surface performs the existence check only (delegated-agent set ⊆ routing-receipt-agent set); the Python validator is authoritative for per-receipt correctness.
 
 **`fork` caveat.** A skill whose frontmatter `context` field holds the value `fork` inherits the parent model and ignores a model override. Model selection therefore applies to agent delegations, not to fork-routed skill invocations.
 
@@ -126,6 +142,7 @@ The orchestrator must not report completion until:
 1. All required artifacts for the selected workflow path are present on disk.
 2. All validation gates (toolchain, acceptance criteria, audit artifacts) have passed.
 3. The checkpoint file at `artifacts/orchestration/orchestrator-state.json` reflects the completed state.
+4. The model-routing gate passes: `.claude/hooks/validate-orchestrator-output.ps1` runs the validator with `--require-model-routing` alongside `--require-complete` and refuses DONE with `MODEL_ROUTING_BLOCKED:` when a recorded delegation lacks a matching `model_routing_receipts[]` / `complexity_assessments[]` entry (see the required-once-delegated invariant under `## Model Selection`).
 
 ## Pre-Feature-Review Commit
 

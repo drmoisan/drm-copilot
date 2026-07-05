@@ -182,6 +182,16 @@ def build_parser() -> argparse.ArgumentParser:
             "delegation receipt, unlike --require-complete."
         ),
     )
+    state_parser.add_argument(
+        "--require-model-routing",
+        action="store_true",
+        help=(
+            "Once the checkpoint records a delegation, require a matching "
+            "model_routing_receipts entry per delegated agent and a "
+            "complexity_assessments entry per matched phase. Independent of "
+            "--require-complete; delegation-free checkpoints are unaffected."
+        ),
+    )
 
     epic_state_parser = subparsers.add_parser("epic-orchestrator-state")
     epic_state_parser.add_argument("path")
@@ -228,6 +238,7 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
             text,
             require_complete=bool(args.require_complete),
             require_pr_creation_ready=bool(args.require_pr_creation_ready),
+            require_model_routing=bool(args.require_model_routing),
         )
     if args.artifact_type == "epic-orchestrator-state":
         return validate_epic_orchestrator_state_text(

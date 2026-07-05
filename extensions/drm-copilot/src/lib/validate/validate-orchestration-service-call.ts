@@ -34,6 +34,8 @@ export interface ValidateOrchestrationServiceCallInput {
   readonly artifactPath: string;
   /** Require completion-safe state (orchestrator-state route only). */
   readonly requireComplete?: boolean;
+  /** Require model-routing receipts once delegated (orchestrator-state route). */
+  readonly requireModelRouting?: boolean;
 }
 
 /** Preserved success result of a successful in-process validation. */
@@ -68,6 +70,9 @@ export function validateOrchestrationServiceCall(
     ...(input.requireComplete === undefined
       ? {}
       : { requireComplete: input.requireComplete }),
+    ...(input.requireModelRouting === undefined
+      ? {}
+      : { requireModelRouting: input.requireModelRouting }),
     fs: input.fileSystem,
     root: input.workspaceRoot,
   });

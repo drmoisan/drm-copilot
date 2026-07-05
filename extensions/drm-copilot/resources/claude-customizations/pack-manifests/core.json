@@ -22,6 +22,7 @@
     ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".claude/hooks/enforce-evidence-locations.ps1",
     ".claude/hooks/enforce-feature-folder-order.ps1",
+    ".claude/hooks/enforce-model-routing-receipt.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate.ps1",
     ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
     ".claude/hooks/enforce-pr-author-skill.ps1",

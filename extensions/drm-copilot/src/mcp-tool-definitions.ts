@@ -405,6 +405,11 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
           description:
             "When true and artifact_type is 'orchestrator-state' or 'epic-orchestrator-state', require all phases to be complete.",
         },
+        require_model_routing: {
+          type: "boolean",
+          description:
+            "When true and artifact_type is 'orchestrator-state', require a model_routing_receipts entry per delegated agent once a delegation is recorded. The TypeScript side performs the existence check only; the Python validator is authoritative for full per-receipt correctness.",
+        },
       },
       required: ["artifact_type", "artifact_path"],
       additionalProperties: false,

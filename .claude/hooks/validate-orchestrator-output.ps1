@@ -180,7 +180,7 @@ function Invoke-RoutingContractValidation {
         [scriptblock] $Invoker = {
             param($Path, $Type)
             $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                $Type $Path --require-complete 2>&1
+                $Type $Path --require-complete --require-model-routing 2>&1
             [pscustomobject]@{
                 ExitCode = $LASTEXITCODE
                 Output   = ($output | Out-String)
@@ -293,6 +293,14 @@ function Invoke-OrchestratorOutputValidation {
     }
     $routingResult = Invoke-RoutingContractValidation @routingArgs
     if ($routingResult.HasErrors) {
+        # One subprocess call now covers both --require-complete and
+        # --require-model-routing. Surface a model-routing gate failure under its
+        # own block reason (its errors name model_routing_receipts or
+        # complexity_assessments); otherwise fall back to the routing-contract
+        # block reason for a generic completion/routing failure.
+        if ($routingResult.ErrorText -match 'model_routing_receipts|complexity_assessments') {
+            return @{ Ok = $false; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
+        }
         return @{ Ok = $false; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 

@@ -123,10 +123,31 @@ const STEP_STATUS_KEYS = [
   "step10_status",
 ] as const;
 
+/**
+ * Subagent types delegated via the Agent tool that a delegating `next_step`
+ * may name. Mirrors the gated set in the Python model-routing gate and the
+ * PreToolUse deterrent hook; `orchestrator` is excluded as the calling agent.
+ */
+const DELEGATING_AGENTS: ReadonlySet<string> = new Set([
+  "atomic-planner",
+  "atomic-executor",
+  "feature-review",
+  "task-researcher",
+  "prd-feature",
+  "pr-author",
+]);
+
 /** Options controlling orchestrator-state validation. */
 export interface ValidateOrchestratorStateOptions {
   /** When true, enforce completion-safe lifecycle states and gates. */
   readonly requireComplete?: boolean;
+  /**
+   * When true, run the existence-only model-routing check: once the checkpoint
+   * records a delegation, the routing-receipt-agent set must be a superset of
+   * the delegated-agent set. The authoritative Python validator performs full
+   * per-receipt correctness; this TS side performs the existence check only.
+   */
+  readonly requireModelRouting?: boolean;
   /** Injected filesystem used to load the routing matrix when needed. */
   readonly fs?: FileSystem;
   /** Repository root used with `fs` to locate the routing matrix. */
@@ -250,6 +271,92 @@ function resolveRoutingMatrix(
 }
 
 /**
+ * Derive the set of agents a checkpoint has delegated (or is about to).
+ *
+ * @param stateMap Parsed checkpoint object.
+ * @returns Delegated-agent names from well-formed delegation receipts plus a
+ *   `next_step` that names a recognized delegating agent.
+ */
+function delegatedAgents(stateMap: Record<string, unknown>): Set<string> {
+  const agents = new Set<string>();
+
+  // The list form of delegation_receipts is the authoritative record; collect
+  // each well-formed entry's non-empty agent_name.
+  const receipts = stateMap["delegation_receipts"];
+  if (Array.isArray(receipts)) {
+    receipts.forEach((receipt) => {
+      if (!isObject(receipt)) {
+        return;
+      }
+      const agentName = receipt["agent_name"];
+      if (typeof agentName === "string" && agentName.trim() !== "") {
+        agents.add(agentName);
+      }
+    });
+  }
+
+  // A delegating next_step names an upcoming delegation without a receipt yet;
+  // include it only when it matches a recognized delegating agent.
+  const nextStep = stateMap["next_step"];
+  if (typeof nextStep === "string" && DELEGATING_AGENTS.has(nextStep)) {
+    agents.add(nextStep);
+  }
+
+  return agents;
+}
+
+/**
+ * Existence-only model-routing check (the Python validator is authoritative).
+ *
+ * Purpose:
+ *     When enabled and the checkpoint records at least one delegation, require
+ *     the set of `model_routing_receipts[].agent` to be a superset of the
+ *     delegated-agent set, reporting one error per delegated agent that lacks a
+ *     receipt. Full per-receipt correctness parity (model equals
+ *     `resolveDelegationModel`, disabled-mode clamp) is out of scope for #305.
+ *
+ * @param stateMap Parsed checkpoint object.
+ * @returns One error per delegated agent missing a routing receipt.
+ */
+function validateModelRoutingExistence(
+  stateMap: Record<string, unknown>,
+): string[] {
+  const errors: string[] = [];
+
+  // Backward-compat: fire only when at least one agent was delegated.
+  const delegated = delegatedAgents(stateMap);
+  if (delegated.size === 0) {
+    return errors;
+  }
+
+  // Collect the agents that carry a routing receipt.
+  const receiptAgents = new Set<string>();
+  const receipts = stateMap["model_routing_receipts"];
+  if (Array.isArray(receipts)) {
+    receipts.forEach((receipt) => {
+      if (!isObject(receipt)) {
+        return;
+      }
+      const agent = receipt["agent"];
+      if (typeof agent === "string" && agent.trim() !== "") {
+        receiptAgents.add(agent);
+      }
+    });
+  }
+
+  // Report each delegated agent that has no receipt, sorted for determinism.
+  const missing = [...delegated].filter((a) => !receiptAgents.has(a)).sort();
+  for (const agent of missing) {
+    errors.push(
+      "Checkpoint model_routing_receipts is missing a receipt for " +
+        `delegated agent: ${agent}.`,
+    );
+  }
+
+  return errors;
+}
+
+/**
  * Validate checkpoint schema and completion-state fields.
  *
  * Purpose:
@@ -365,6 +472,12 @@ export function validateOrchestratorStateText(
         routingMatrix: resolveRoutingMatrix(options),
       }),
     );
+  }
+
+  // Existence-only model-routing gate; independent of requireComplete and a
+  // no-op for delegation-free checkpoints, preserving backward compatibility.
+  if (options.requireModelRouting === true) {
+    errors.push(...validateModelRoutingExistence(stateMap));
   }
 
   return errors;

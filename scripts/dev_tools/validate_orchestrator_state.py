@@ -38,6 +38,9 @@ from scripts.dev_tools._orchestrator_state_model_routing import (
     MODEL_ROUTING_RECEIPTS_KEY,
     _validate_model_routing_receipts,
 )
+from scripts.dev_tools._orchestrator_state_model_routing_gate import (
+    validate_model_routing_gate,
+)
 from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
     validate_orchestrator_state_pr_creation_readiness,
 )
@@ -91,6 +94,14 @@ VALID_BLOCKED_REASONS = {
     "validator_failed",
     "user_requested_stop",
 }
+STEP_STATUS_KEYS = (
+    "step5_status",
+    "step6_status",
+    "step7_status",
+    "step8_status",
+    "step9_status",
+    "step10_status",
+)
 REQUIRED_RECEIPT_KEYS = (
     "step",
     "agent_name",
@@ -360,6 +371,7 @@ def validate_orchestrator_state_text(
     require_complete: bool = False,
     strict_route_membership: bool = False,
     require_pr_creation_ready: bool = False,
+    require_model_routing: bool = False,
 ) -> list[str]:
     """Validate checkpoint schema and completion-state fields.
 
@@ -381,6 +393,9 @@ def validate_orchestrator_state_text(
             pre-PR-creation check independent of `require_complete` that does
             not require `ci_gate`, `pr_gate`, or routing-contract delegation
             receipts. Defaults to False.
+        require_model_routing (bool): When True, append
+            `validate_model_routing_gate` results, requiring routing receipts and
+            complexity assessments once a delegation is recorded. Defaults False.
 
     Returns:
         list[str]: Validation errors for malformed or incomplete checkpoint
@@ -409,14 +424,7 @@ def validate_orchestrator_state_text(
         if key not in state_map:
             errors.append(f"Checkpoint missing required key: {key}")
 
-    for key in (
-        "step5_status",
-        "step6_status",
-        "step7_status",
-        "step8_status",
-        "step9_status",
-        "step10_status",
-    ):
+    for key in STEP_STATUS_KEYS:
         value = state_map.get(key)
         if value is not None and value not in VALID_STEP_STATUS:
             errors.append(f"Checkpoint has invalid {key}: {value}")
@@ -465,14 +473,7 @@ def validate_orchestrator_state_text(
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into
         # the stricter completion gate.
-        for key in (
-            "step5_status",
-            "step6_status",
-            "step7_status",
-            "step8_status",
-            "step9_status",
-            "step10_status",
-        ):
+        for key in STEP_STATUS_KEYS:
             value = state_map.get(key)
             if value in {"pending", "blocked"}:
                 errors.append(
@@ -491,5 +492,9 @@ def validate_orchestrator_state_text(
         # Independent of require_complete: the pre-PR-creation readiness gate
         # never calls the ci_gate/pr_gate/routing-contract checks above.
         errors.extend(validate_orchestrator_state_pr_creation_readiness(state_map))
+
+    if require_model_routing:
+        # Fires only once a delegation is recorded; else matches the plain call.
+        errors.extend(validate_model_routing_gate(state_map))
 
     return errors
