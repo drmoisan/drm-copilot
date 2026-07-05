@@ -11,6 +11,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded - additiona
         $script:capturedGhArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedChildCalls = [System.Collections.Generic.List[object]]::new()
         $script:branchReadCount = 0
+        Mock -CommandName Invoke-Sleep -MockWith { param([int]$Seconds) $null = $Seconds }
     }
 
     Context "additional failure paths" {
@@ -76,6 +77,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded - additiona
                 $joined = $GhArgs -join " "
                 if ($joined -match '^pr view ' -and $script:postPrScenario -eq 'EmptyPrNumber') { return @{ Output = @(''); ExitCode = 0 } }
                 if ($joined -match '^pr view ') { return @{ Output = @('291'); ExitCode = 0 } }
+                if ($joined -match '^pr checks ') { return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 } }
                 return @{ Output = @('ok'); ExitCode = 0 }
             }
             Mock -CommandName Invoke-ChildPowerShellScript -MockWith {

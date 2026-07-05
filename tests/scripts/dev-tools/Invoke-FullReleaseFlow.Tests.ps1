@@ -11,6 +11,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
         $script:capturedGhArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedChildCalls = [System.Collections.Generic.List[object]]::new()
         $script:branchReadCount = 0
+        Mock -CommandName Invoke-Sleep -MockWith { param([int]$Seconds) $null = $Seconds }
     }
 
     function script:Initialize-SuccessfulGitFlowMock {
@@ -67,8 +68,8 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
                 return @{ Output = @('291'); ExitCode = 0 }
             }
 
-            if ($joined -eq 'pr checks 291 --watch') {
-                return @{ Output = @('checks passed'); ExitCode = 0 }
+            if ($joined -eq 'pr checks 291 --required --json bucket') {
+                return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 }
             }
 
             if ($joined -eq 'pr merge 291 --merge --delete-branch') {
@@ -166,7 +167,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
             $ghFlat = @($script:capturedGhArgsList | ForEach-Object { $_ -join " " })
             $ghFlat | Should -Be @(
                 'pr view release/full-20260703171500 --json number --jq .number',
-                'pr checks 291 --watch',
+                'pr checks 291 --required --json bucket',
                 'pr merge 291 --merge --delete-branch'
             )
         }
@@ -300,8 +301,8 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
                 if ($joined -eq 'pr view release/full-20260703171500 --json number --jq .number') {
                     return @{ Output = @('291'); ExitCode = 0 }
                 }
-                if ($joined -eq 'pr checks 291 --watch') {
-                    return @{ Output = @('failing check'); ExitCode = 8 }
+                if ($joined -eq 'pr checks 291 --required --json bucket') {
+                    return @{ Output = @('[{"bucket":"fail"}]'); ExitCode = 0 }
                 }
                 return @{ Output = @(); ExitCode = 0 }
             }
@@ -309,7 +310,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
             $result = Invoke-FullReleaseFlowGuarded -ConfirmToken "yes" -RepoRoot "/repo"
 
             $result | Should -Be 1
-            $script:capturedMessage | Should -Match "checks did not pass"
+            $script:capturedMessage | Should -Match "A required check failed for PR #291"
             @($script:capturedChildCalls).Count | Should -Be 1
             (@($script:capturedChildCalls | ForEach-Object { Split-Path -Leaf $_.ScriptPath }) -join "`n") | Should -Not -Match "Invoke-ReleaseTagPush.ps1"
             (@($script:capturedGhArgsList | ForEach-Object { $_ -join " " }) -join "`n") | Should -Not -Match "pr merge"
@@ -331,8 +332,8 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
                 if ($joined -eq 'pr view release/full-20260703171500 --json number --jq .number') {
                     return @{ Output = @('291'); ExitCode = 0 }
                 }
-                if ($joined -eq 'pr checks 291 --watch') {
-                    return @{ Output = @('checks passed'); ExitCode = 0 }
+                if ($joined -eq 'pr checks 291 --required --json bucket') {
+                    return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 }
                 }
                 if ($joined -eq 'pr merge 291 --merge --delete-branch') {
                     return @{ Output = @('merge blocked'); ExitCode = 1 }

@@ -1,0 +1,13 @@
+# Baseline — PoshQC Pester Test Run (Issue #310)
+
+Timestamp: 2026-07-04T22-20
+
+Command: `Import-Module ./scripts/powershell/PoshQC -Force; Invoke-PoshQCTest -Root <repo-root> -ScanFolders @('tests/scripts/dev-tools/Invoke-FullReleaseFlow.Tests.ps1','tests/scripts/dev-tools/Invoke-FullReleaseFlow.AdditionalFailurePaths.Tests.ps1')` (settings: `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`)
+
+EXIT_CODE: 0
+
+Output Summary:
+- Test counts: `Tests Passed: 26, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0` across the two in-scope test files (26 total `It` blocks, 0 failed).
+- Per-file coverage for `scripts/dev-tools/Invoke-FullReleaseFlow.ps1` (from `artifacts/pester/powershell-coverage.koverage.xml`, JaCoCo/CoverageGutters format, `<class name="scripts/dev-tools/Invoke-FullReleaseFlow">` top-level counters): `LINE missed="6" covered="90"`. Line coverage = 90 / (90 + 6) * 100 = **93.75%**. This meets the >= 85% line coverage threshold.
+- Branch coverage: no `BRANCH` counter type is emitted by this repository's JaCoCo exporter (confirmed by `grep -c 'type="BRANCH"'` returning 0 across both the JaCoCo and koverage output files), consistent with the same limitation documented in issue #298's baseline evidence. A branch-coverage percentage is therefore not numerically available from this tool for PowerShell; the repository's existing PowerShell coverage evidence convention (see `docs/features/active/2026-07-03-fix-convertto-commandresult-empty-array-298/evidence/qa-gates/test-final.2026-07-04T02-40.md`) records this same caveat rather than a placeholder branch number.
+- Tooling note: the MCP `mcp__drm-copilot__run_poshqc_test` tool uses the bundled extension copy of the runsettings (`extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`), which is stale and does not include `scripts/dev-tools/Invoke-FullReleaseFlow.ps1` in `CodeCoverage.Path` (confirmed by `diff` against the workspace copy at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and by the MCP tool's own coverage output for this file omitting any `Invoke-FullReleaseFlow` class entry on an initial MCP-tool run). Per prior repository precedent (issue #298 remediation and this repo's `atomic-executor` memory note `new-claude-hook-registration`), per-file coverage for this script is measured by a direct fresh-process `Invoke-PoshQCTest` call against the workspace module (`./scripts/powershell/PoshQC`), which reads the up-to-date, non-bundled settings file. Test pass/fail counts (26/0) are identical between the MCP tool and the direct invocation; only the per-file coverage measurement for this specific script requires the direct-invocation workaround.
