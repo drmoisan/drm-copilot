@@ -7,5 +7,8 @@
       "Bash(echo \"exit: $?\")",
       "Bash(rm -f /tmp_root_baseline.psd1 /tmp_mirror_baseline.psd1)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "drm-copilot"
+  ]
 }
