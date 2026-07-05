@@ -164,6 +164,10 @@
       {
         "command": "drmCopilotExtension.removeSecondaryWorktrees",
         "title": "drm-copilot: Remove Secondary Worktrees"
+      },
+      {
+        "command": "drmCopilotExtension.showSubagentTree",
+        "title": "drm-copilot: Show Subagent Tree"
       }
     ]
   },

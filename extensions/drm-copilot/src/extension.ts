@@ -32,6 +32,7 @@ import {
 } from "./remove-worktrees-runner";
 import { createRepoAutomationService } from "./repo-automation-service";
 import { registerRepoAutomationCommands } from "./repo-automation-command-registration";
+import { registerSubagentTreeCommand } from "./subagent-tree-command";
 import { resolveRunPoshQCSuiteInvocation } from "./workflow-command-arguments";
 
 // Re-export runtime helpers so existing test imports from this module keep working.
@@ -444,6 +445,8 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const mcpDisposables = registerMcpProvider(context);
 
+  const showSubagentTreeDisposable = registerSubagentTreeCommand({ output });
+
   context.subscriptions.push(
     helloPythonDisposable,
     helloPowerShellDisposable,
@@ -458,6 +461,7 @@ export function activate(context: vscode.ExtensionContext): void {
     resolvePolicyAuditTemplateAssetDisposable,
     resolveExecuteHardLockPromptDisposable,
     resolveAtomicPlanPromptDisposable,
+    showSubagentTreeDisposable,
     ...repoAutomationDisposables,
     ...mcpDisposables,
     output,
