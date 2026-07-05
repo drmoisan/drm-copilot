@@ -23,6 +23,12 @@ lib/
 !extensions/drm-copilot/src/lib/**
 !extensions/drm-copilot/test/lib/
 !extensions/drm-copilot/test/lib/**
+# The .claude/lib PowerShell library (and its bundled byte-mirror) is delivered
+# customization content, not a Python build artifact.
+!.claude/lib/
+!.claude/lib/**
+!extensions/drm-copilot/resources/claude-customizations/.claude/lib/
+!extensions/drm-copilot/resources/claude-customizations/.claude/lib/**
 lib64/
 parts/
 sdist/

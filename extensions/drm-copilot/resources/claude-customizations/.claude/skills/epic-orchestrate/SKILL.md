@@ -115,9 +115,9 @@ The child's own `orchestrator` reads this line and applies the two-axis model-se
 documented in `.claude/skills/orchestrate/SKILL.md` (`## Model Selection`): it assesses a
 judgment-based `complexity_band`, records `complexity_assessments[]` and `model_routing_receipts[]`,
 and resolves each delegation's model tier under the given `fable_policy`. The two canonical, tested
-reference implementations are `scripts/dev_tools/compute_complexity_floor.py`
-(`compute_complexity_floor`) and `scripts/dev_tools/resolve_delegation_model.py`
-(`resolve_delegation_model`). Default `fable_policy` is `disabled` when the marker is absent.
+reference implementations are `.claude/lib/model-routing/ModelRouting.psm1`
+(`Get-ComplexityFloor`) and `.claude/lib/model-routing/ModelRouting.psm1`
+(`Resolve-DelegationModel`). Default `fable_policy` is `disabled` when the marker is absent.
 
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
