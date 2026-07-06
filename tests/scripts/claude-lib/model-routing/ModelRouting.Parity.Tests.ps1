@@ -89,17 +89,17 @@ Describe 'ModelRouting config parity' {
         }
     }
 
-    Context 'Disabled default policy' {
-        It 'pins DISABLED_POLICY to model_budget.fable_policy default (disabled)' {
-            # Arrange: the authoritative default policy from the config.
-            $expected = $script:ModelBudget.fable_policy
+    Context 'Disabled policy literal' {
+        It 'pins DISABLED_POLICY to the disabled-policy literal' {
+            # The disabled-policy enum name is a fixed literal, independent of the
+            # session's selected model_budget.fable_policy value.
+            $expected = 'disabled'
 
             # Act: read the module's embedded disabled-policy literal.
             $actual = InModuleScope 'ModelRouting' { $script:DISABLED_POLICY }
 
-            # Assert: the embedded literal equals the config default.
+            # Assert: the embedded literal equals the fixed disabled-policy name.
             $actual | Should -Be $expected
-            $actual | Should -Be 'disabled'
         }
     }
 }
