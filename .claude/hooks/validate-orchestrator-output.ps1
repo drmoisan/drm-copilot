@@ -38,6 +38,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
+
 function Get-CheckpointFileContent {
     <#
     .SYNOPSIS
@@ -145,34 +147,6 @@ function Test-HumanInteractionShape {
     }
 
     return @{ Ok = $true; Message = $null }
-}
-
-function Test-PythonOrchestratorValidatorAvailable {
-    <#
-    .SYNOPSIS
-        Probe whether the authoritative Python orchestrator-state validator is importable.
-    .DESCRIPTION
-        Capability-detection seam. Returns $true only when
-        ``python -c "import scripts.dev_tools.validate_orchestration_artifacts"`` exits 0,
-        indicating the authoritative Python validator ships in this repository (drm-copilot).
-        Returns $false on any non-zero exit or error, so a consumer repository that received
-        only the pushed-down `.claude` pack (no `scripts/dev_tools`) routes to the portable
-        PowerShell completion module. Any probe failure routes to the portable path, which
-        itself fails closed on bad checkpoints, preserving fail-closed semantics in both
-        branches. Tests mock this seam directly; they never mock `python`.
-    .OUTPUTS
-        System.Boolean
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param()
-
-    try {
-        & python -c 'import scripts.dev_tools.validate_orchestration_artifacts' 2>&1 | Out-Null
-        return ($LASTEXITCODE -eq 0)
-    } catch {
-        return $false
-    }
 }
 
 function Invoke-RoutingContractValidation {

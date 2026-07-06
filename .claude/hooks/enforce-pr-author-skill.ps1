@@ -46,91 +46,7 @@ param()
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
 $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
-function Test-PythonOrchestratorValidatorAvailable {
-    <#
-    .SYNOPSIS
-        Probe whether the authoritative Python orchestrator-state validator is importable.
-    .DESCRIPTION
-        Capability-detection seam. Returns $true only when
-        ``python -c "import scripts.dev_tools.validate_orchestration_artifacts"`` exits 0,
-        indicating the authoritative Python validator ships in this repository (drm-copilot).
-        Returns $false on any non-zero exit or error, so a consumer repository that received
-        only the pushed-down `.claude` pack (no `scripts/dev_tools`) routes to the portable
-        PowerShell module. Any probe failure routes to the portable path, which itself fails
-        closed on bad checkpoints, preserving fail-closed semantics in both branches. Tests
-        mock this seam directly; they never mock `python`.
-    .OUTPUTS
-        System.Boolean
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param()
-
-    try {
-        & python -c 'import scripts.dev_tools.validate_orchestration_artifacts' 2>&1 | Out-Null
-        return ($LASTEXITCODE -eq 0)
-    } catch {
-        return $false
-    }
-}
-
-function Invoke-OrchestratorStatePreflight {
-    <#
-    .SYNOPSIS
-        Runs the orchestrator-state validator against the checkpoint and reports pass/fail.
-    .DESCRIPTION
-        Mirrors Invoke-RoutingContractValidation (.claude/hooks/validate-orchestrator-output.ps1):
-        an injectable subprocess scriptblock seam defaults to ``python -m
-        scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <CheckpointPath>
-        --require-pr-creation-ready``. A missing checkpoint or --require-pr-creation-ready failure
-        both surface via the validator's non-zero exit/stderr text; no separate file-existence check
-        is made, validating pre-PR-creation readiness (steps 5-8, blocked_reason) not full completion.
-    .OUTPUTS
-        System.Collections.Hashtable with keys HasErrors (bool) and ErrorText (string).
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [string] $CheckpointPath = $script:OrchestratorStateCheckpointPath,
-
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $Invoker = {
-            param($Path)
-            # Capability detection: use the authoritative Python CLI when
-            # scripts.dev_tools is importable (drm-copilot); otherwise fall back to
-            # the portable PowerShell module that travels with the pushed-down pack.
-            if (Test-PythonOrchestratorValidatorAvailable) {
-                $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                    orchestrator-state $Path --require-pr-creation-ready 2>&1
-                [pscustomobject]@{
-                    ExitCode = $LASTEXITCODE
-                    Output   = ($output | Out-String)
-                }
-            } else {
-                # Import the portable module only when its function is not already
-                # available, so a repeated call (or a test that pre-imports and mocks
-                # the function) does not reload the module and reset the seam.
-                if (-not (Get-Command -Name Test-OrchestratorStatePrCreationReadiness -ErrorAction SilentlyContinue)) {
-                    Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
-                }
-                $portable = Test-OrchestratorStatePrCreationReadiness -CheckpointPath $Path
-                [pscustomobject]@{
-                    ExitCode = $portable.ExitCode
-                    Output   = $portable.Output
-                }
-            }
-        }
-    )
-
-    $result = & $Invoker $CheckpointPath
-    $exitCode = 0
-    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'ExitCode')) { $exitCode = [int]$result.ExitCode }
-    $outputText = ''
-    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'Output')) { $outputText = ([string]$result.Output).Trim() }
-
-    return @{ HasErrors = ($exitCode -ne 0); ErrorText = $outputText }
-}
+Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
 
 function Get-PrContextArtifactExistence {
     <#
@@ -404,7 +320,7 @@ function Get-PrAuthorBypassReason {
     # Orchestrator-state preflight: runs inside this same PreToolUse hook (so it cannot be
     # bypassed by invoking gh pr create/edit directly) before receipt verification.
     if ($hasBodyFile -and $ContextExists) {
-        $preflightResult = Invoke-OrchestratorStatePreflight
+        $preflightResult = Invoke-OrchestratorStatePreflight -CheckpointPath $script:OrchestratorStateCheckpointPath
         if ($preflightResult.HasErrors) {
             $preflightSummary = if ([string]::IsNullOrWhiteSpace($preflightResult.ErrorText)) {
                 "checkpoint missing at $script:OrchestratorStateCheckpointPath"

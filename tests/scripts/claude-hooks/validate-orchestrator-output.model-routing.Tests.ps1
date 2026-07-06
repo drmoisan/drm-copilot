@@ -96,6 +96,17 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
             # default invoker's guarded import reuses and that tests can mock.
             $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
             Import-Module $portableModule -Force
+
+            # OrchestratorStateCompletion.psm1 internally re-imports OrchestratorState.psm1 as
+            # part of its own module load (a nested Import-Module inside a .psm1 file); that
+            # nested re-import removes this scope's global visibility of the sibling
+            # Test-PythonOrchestratorValidatorAvailable probe that now lives in
+            # OrchestratorState.psm1 (moved there per remediation-plan.2026-07-06T15-01.md
+            # P1-T1/R-2). Re-importing OrchestratorState.psm1 directly, after the completion
+            # module, restores that visibility so the unqualified Mock below (matching
+            # Invoke-RoutingContractValidation's own unqualified, non-module call site) resolves.
+            $orchestratorStateModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorState.psm1").Path
+            Import-Module $orchestratorStateModule -Force
         }
 
         BeforeEach {

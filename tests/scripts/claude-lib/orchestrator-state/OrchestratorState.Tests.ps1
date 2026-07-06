@@ -17,6 +17,7 @@
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Fixture builder and helpers are consumed inside It blocks after dot-sourcing in BeforeAll')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Injected $Invoker stubs mirror the production scriptblock signature param($Path) for testing')]
 param()
 
 BeforeAll {
@@ -216,6 +217,97 @@ Describe 'Test-OrchestratorStatePrCreationReadiness' {
             # Assert
             $result.ExitCode | Should -Be 1
             $result.Output | Should -Match 'not valid JSON'
+        }
+    }
+}
+
+Describe 'Invoke-OrchestratorStatePreflight' {
+    <#
+    Relocated from tests/scripts/claude-hooks/enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1
+    per remediation-plan.2026-07-06T15-01.md (P3-T1/P3-T2): Invoke-OrchestratorStatePreflight and
+    Test-PythonOrchestratorValidatorAvailable now live in this module, so tests that mock those
+    sibling functions while exercising Invoke-OrchestratorStatePreflight's default $Invoker must use
+    -ModuleName OrchestratorState (module-internal, unqualified calls resolve in the module's own
+    session state and are invisible to an unqualified Mock issued from outside the module).
+    #>
+    Context 'Invoke-OrchestratorStatePreflight (direct seam tests)' {
+        It 'reports HasErrors when the injected $Invoker returns a non-zero exit code' {
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 1; Output = 'some error' } }
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
+            $result.HasErrors | Should -BeTrue
+            $result.ErrorText | Should -Match 'some error'
+        }
+
+        It 'reports no errors when the injected $Invoker returns exit 0' {
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = 'orchestrator-state validation passed: x.json' } }
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
+            $result.HasErrors | Should -BeFalse
+        }
+
+        It 'reports HasErrors with empty ErrorText when the injected $Invoker returns a non-zero exit with no output' {
+            $stub = { param($Path) [pscustomobject]@{ ExitCode = 1; Output = '' } }
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
+            $result.HasErrors | Should -BeTrue
+            $result.ErrorText | Should -BeNullOrEmpty
+        }
+
+        It 'defaults ExitCode/Output when the injected $Invoker result carries neither property' {
+            $stub = { param($Path) [pscustomobject]@{} }
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
+            $result.HasErrors | Should -BeFalse
+            $result.ErrorText | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'capability detection (portable-path routing)' {
+        BeforeAll {
+            # Dot-source the hook so its own decision-path functions (Invoke-PrAuthorSkillDecision,
+            # Get-PrContextArtifactExistence) are available to the first test below, which exercises
+            # capability-detection routing end-to-end through the hook's call site. The hook's own
+            # Import-Module -Force call re-imports this same module, which is idempotent.
+            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
+            . $script:HookPath
+        }
+
+        It 'routes to the portable module and blocks a not-ready checkpoint with ORCHESTRATOR_STATE_PREFLIGHT_FAILED when the probe reports unavailable' {
+            # The probe reports the Python validator is unavailable, so the default invoker runs the
+            # real portable module function (Test-OrchestratorStatePrCreationReadiness, unmocked)
+            # against a deliberately-nonexistent, non-temp checkpoint path; the portable module fails
+            # closed on the missing file and the hook surfaces ORCHESTRATOR_STATE_PREFLIGHT_FAILED.
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -ModuleName OrchestratorState -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+
+            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
+        }
+
+        It 'selects the Python-CLI branch (portable seam not invoked) when the probe reports available' {
+            # With the probe reporting available, the default invoker must take the Python branch:
+            # the portable seam must not be called. The probe seam is mocked (never python directly);
+            # the portable function is mocked only to detect whether it is invoked.
+            Mock -ModuleName OrchestratorState -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $true }
+            Mock -ModuleName OrchestratorState -CommandName Test-OrchestratorStatePrCreationReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
+
+            $null = Invoke-OrchestratorStatePreflight -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+
+            Should -Invoke -ModuleName OrchestratorState -CommandName Test-OrchestratorStatePrCreationReadiness -Times 0 -Exactly
+        }
+
+        It 'allows the preflight to pass when the portable path reports a ready checkpoint' {
+            # With the probe reporting unavailable and the portable seam reporting a ready checkpoint
+            # (ExitCode 0), the preflight must not block, so PR creation is allowed to proceed to
+            # receipt verification.
+            Mock -ModuleName OrchestratorState -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            Mock -ModuleName OrchestratorState -CommandName Test-OrchestratorStatePrCreationReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
+
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json'
+
+            $result.HasErrors | Should -BeFalse
+            Should -Invoke -ModuleName OrchestratorState -CommandName Test-OrchestratorStatePrCreationReadiness -Times 1 -Exactly
         }
     }
 }
