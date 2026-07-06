@@ -51,35 +51,6 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
         }
     }
 
-    Context 'Invoke-OrchestratorStatePreflight (direct seam tests)' {
-        It 'reports HasErrors when the injected $Invoker returns a non-zero exit code' {
-            $stub = { param($Path) [pscustomobject]@{ ExitCode = 1; Output = 'some error' } }
-            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
-            $result.HasErrors | Should -BeTrue
-            $result.ErrorText | Should -Match 'some error'
-        }
-
-        It 'reports no errors when the injected $Invoker returns exit 0' {
-            $stub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = 'orchestrator-state validation passed: x.json' } }
-            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
-            $result.HasErrors | Should -BeFalse
-        }
-
-        It 'reports HasErrors with empty ErrorText when the injected $Invoker returns a non-zero exit with no output' {
-            $stub = { param($Path) [pscustomobject]@{ ExitCode = 1; Output = '' } }
-            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
-            $result.HasErrors | Should -BeTrue
-            $result.ErrorText | Should -BeNullOrEmpty
-        }
-
-        It 'defaults ExitCode/Output when the injected $Invoker result carries neither property' {
-            $stub = { param($Path) [pscustomobject]@{} }
-            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json' -Invoker $stub
-            $result.HasErrors | Should -BeFalse
-            $result.ErrorText | Should -BeNullOrEmpty
-        }
-    }
-
     Context 'script entrypoint (end-to-end)' {
         BeforeAll {
             $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path

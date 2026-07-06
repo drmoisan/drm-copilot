@@ -70,6 +70,8 @@
     ".claude/skills/skill-canonical-location-audit/SKILL.md",
     ".claude/skills/translate-copilot-to-claude/SKILL.md",
     ".claude/skills/update-status/SKILL.md",
-    ".claude/lib/model-routing/ModelRouting.psm1"
+    ".claude/lib/model-routing/ModelRouting.psm1",
+    ".claude/lib/orchestrator-state/OrchestratorState.psm1",
+    ".claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1"
   ]
 }

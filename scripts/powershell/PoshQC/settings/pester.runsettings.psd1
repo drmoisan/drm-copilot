@@ -64,6 +64,11 @@
             # push-down bundle no longer cites missing scripts/dev_tools references; measured
             # here so the new production module is not excluded from coverage.
             '.claude/lib/model-routing/ModelRouting.psm1'
+            # The portable orchestrator-state modules make the pushed-down enforcement hooks
+            # work in consumer repos without scripts/dev_tools; measured here so the new
+            # production modules are not excluded from coverage.
+            '.claude/lib/orchestrator-state/OrchestratorState.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

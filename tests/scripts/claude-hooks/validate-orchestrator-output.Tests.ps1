@@ -404,110 +404,46 @@ Describe 'validate-orchestrator-output.ps1' {
     }
     # orchestrator-fixture-marker-for-coverage
 
-    Context 'Test-HumanInteractionShape' {
-        It 'passes when human_interaction is absent (backward-compatible)' {
-            # Arrange — null input represents an absent top-level key
-            $humanInteraction = $null
+    # Test-HumanInteractionShape tests moved to
+    # validate-orchestrator-output.human-interaction.Tests.ps1 to keep this
+    # file under the 500-line cap.
 
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction
+    Context 'capability detection (Python-path routing)' {
+        BeforeAll {
+            # Pre-import the portable completion module so its function is a resolvable
+            # command that tests can mock to detect whether the portable branch runs.
+            $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
+            Import-Module $portableModule -Force
 
-            # Assert
-            $result.Ok | Should -BeTrue
-            $result.Message | Should -BeNullOrEmpty
+            # OrchestratorStateCompletion.psm1's own nested Import-Module of OrchestratorState.psm1
+            # (its .psm1-internal load) drops this scope's global visibility of the sibling
+            # Test-PythonOrchestratorValidatorAvailable probe now hosted there; re-importing it here
+            # restores visibility for the unqualified Mock below.
+            $orchestratorStateModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorState.psm1").Path
+            Import-Module $orchestratorStateModule -Force
         }
 
-        It 'blocks when requirements is missing' {
-            # Arrange — human_interaction present but with no requirements array
-            $humanInteraction = [pscustomobject]@{ note = 'no requirements here' }
+        It 'selects the Python-CLI branch (portable completion seam not invoked) when the probe reports available' {
+            # With the probe reporting available, the default routing invoker must take
+            # the Python branch and not call the portable completion seam. The probe is
+            # mocked (never python directly); the portable function is mocked only to
+            # detect invocation.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $true }
+            Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
 
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction
+            $null = Invoke-RoutingContractValidation -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
 
-            # Assert
-            $result.Ok | Should -BeFalse
-            $result.Message | Should -Match "'requirements' array is missing"
+            Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 0 -Exactly
         }
 
-        It 'blocks when a requirement has no response' {
-            # Arrange — a requirement object without a response value
-            $humanInteraction = [pscustomobject]@{
-                requirements = @([pscustomobject]@{ id = 'r1' })
-            }
-
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction
-
-            # Assert
-            $result.Ok | Should -BeFalse
-            $result.Message | Should -Match "has no resolved 'response'"
-        }
-
-        It 'blocks when a requirement response is outside the enum' {
-            # Arrange — response value not in (scope_change, exception, halt)
-            $humanInteraction = [pscustomobject]@{
-                requirements = @([pscustomobject]@{ response = 'maybe' })
-            }
-
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction
-
-            # Assert
-            $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'outside the allowed set'
-        }
-
-        It 'blocks when a requirement response is halt' {
-            # Arrange — an unresolved halt must block DONE
-            $humanInteraction = [pscustomobject]@{
-                requirements = @([pscustomobject]@{ response = 'halt' })
-            }
-
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction
-
-            # Assert
-            $result.Ok | Should -BeFalse
-            $result.Message | Should -Match "'response' == 'halt'"
-        }
-
-        It 'blocks when an exception requirement has no existing runbook (injected FileExistsCheck returns false)' {
-            # Arrange — exception with a runbook_path that does not exist on disk
-            $humanInteraction = [pscustomobject]@{
-                requirements = @([pscustomobject]@{
-                        response     = 'exception'
-                        runbook_path = 'docs/features/active/x/runbooks/missing.runbook.md'
-                    })
-            }
-            $fileExistsStub = { param($Path) $false }
-
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction -FileExistsCheck $fileExistsStub
-
-            # Assert
-            $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'no file exists at that location'
-        }
-
-        It 'passes when an exception requirement has an existing runbook (injected FileExistsCheck returns true)' {
-            # Arrange — exception with a runbook_path the injected seam confirms exists
-            $humanInteraction = [pscustomobject]@{
-                requirements = @(
-                    [pscustomobject]@{ response = 'scope_change' },
-                    [pscustomobject]@{
-                        response     = 'exception'
-                        runbook_path = 'docs/features/active/x/runbooks/admin-consent.runbook.md'
-                    }
-                )
-            }
-            $fileExistsStub = { param($Path) $true }
-
-            # Act
-            $result = Test-HumanInteractionShape -HumanInteraction $humanInteraction -FileExistsCheck $fileExistsStub
-
-            # Assert
-            $result.Ok | Should -BeTrue
-            $result.Message | Should -BeNullOrEmpty
+        It 'preserves the byte-for-byte Python invocation with both completion flags in the default invoker' {
+            # The default invoker's Python branch must still thread --require-complete
+            # and --require-model-routing so existing block reasons and fail-closed
+            # behavior are unchanged.
+            $source = ${function:Invoke-RoutingContractValidation}.Ast.Extent.Text
+            $source | Should -Match 'python -m scripts\.dev_tools\.validate_orchestration_artifacts'
+            $source | Should -Match '--require-complete'
+            $source | Should -Match '--require-model-routing'
         }
     }
 }
