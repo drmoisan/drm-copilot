@@ -510,4 +510,36 @@ Describe 'validate-orchestrator-output.ps1' {
             $result.Message | Should -BeNullOrEmpty
         }
     }
+
+    Context 'capability detection (Python-path routing)' {
+        BeforeAll {
+            # Pre-import the portable completion module so its function is a resolvable
+            # command that tests can mock to detect whether the portable branch runs.
+            $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
+            Import-Module $portableModule -Force
+        }
+
+        It 'selects the Python-CLI branch (portable completion seam not invoked) when the probe reports available' {
+            # With the probe reporting available, the default routing invoker must take
+            # the Python branch and not call the portable completion seam. The probe is
+            # mocked (never python directly); the portable function is mocked only to
+            # detect invocation.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $true }
+            Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
+
+            $null = Invoke-RoutingContractValidation -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+
+            Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 0 -Exactly
+        }
+
+        It 'preserves the byte-for-byte Python invocation with both completion flags in the default invoker' {
+            # The default invoker's Python branch must still thread --require-complete
+            # and --require-model-routing so existing block reasons and fail-closed
+            # behavior are unchanged.
+            $source = ${function:Invoke-RoutingContractValidation}.Ast.Extent.Text
+            $source | Should -Match 'python -m scripts\.dev_tools\.validate_orchestration_artifacts'
+            $source | Should -Match '--require-complete'
+            $source | Should -Match '--require-model-routing'
+        }
+    }
 }

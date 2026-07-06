@@ -80,6 +80,58 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
         }
     }
 
+    Context 'capability detection (portable-path routing)' {
+        BeforeAll {
+            # Pre-import the portable module so Test-OrchestratorStatePrCreationReadiness
+            # is a resolvable command that the default invoker's guarded import will
+            # reuse and that individual tests can mock as the portable seam.
+            $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorState.psm1").Path
+            Import-Module $portableModule -Force
+        }
+
+        It 'routes to the portable module and blocks a not-ready checkpoint with ORCHESTRATOR_STATE_PREFLIGHT_FAILED when the probe reports unavailable' {
+            # The probe reports the Python validator is unavailable, so the default
+            # invoker runs the real portable module against a deliberately-nonexistent,
+            # non-temp checkpoint path; the portable module fails closed on the missing
+            # file and the hook surfaces ORCHESTRATOR_STATE_PREFLIGHT_FAILED.
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+
+            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
+        }
+
+        It 'selects the Python-CLI branch (portable seam not invoked) when the probe reports available' {
+            # With the probe reporting available, the default invoker must take the
+            # Python branch: the portable seam must not be called. The probe seam is
+            # mocked (never python directly); the portable function is mocked only to
+            # detect whether it is invoked.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $true }
+            Mock -CommandName Test-OrchestratorStatePrCreationReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
+
+            $null = Invoke-OrchestratorStatePreflight -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+
+            Should -Invoke -CommandName Test-OrchestratorStatePrCreationReadiness -Times 0 -Exactly
+        }
+
+        It 'allows the preflight to pass when the portable path reports a ready checkpoint' {
+            # With the probe reporting unavailable and the portable seam reporting a
+            # ready checkpoint (ExitCode 0), the preflight must not block, so PR
+            # creation is allowed to proceed to receipt verification.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            Mock -CommandName Test-OrchestratorStatePrCreationReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
+
+            $result = Invoke-OrchestratorStatePreflight -CheckpointPath 'x.json'
+
+            $result.HasErrors | Should -BeFalse
+            Should -Invoke -CommandName Test-OrchestratorStatePrCreationReadiness -Times 1 -Exactly
+        }
+    }
+
     Context 'script entrypoint (end-to-end)' {
         BeforeAll {
             $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path

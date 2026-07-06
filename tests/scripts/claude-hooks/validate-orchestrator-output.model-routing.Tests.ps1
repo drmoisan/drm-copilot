@@ -88,4 +88,56 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
             $result.Message | Should -Match '^ROUTING_CONTRACT_BLOCKED:'
         }
     }
+
+    Context 'capability detection (portable-path routing)' {
+        BeforeAll {
+            # Pre-import the portable completion module so
+            # Test-OrchestratorStateCompletionReadiness is a resolvable command that the
+            # default invoker's guarded import reuses and that tests can mock.
+            $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
+            Import-Module $portableModule -Force
+        }
+
+        BeforeEach {
+            # A structurally valid checkpoint so the routing seam is the deciding factor
+            # for the hook's own base validation.
+            Mock -CommandName Get-CheckpointFileContent -MockWith {
+                @{
+                    Exists  = $true
+                    Content = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"complete","last_updated":"2026-07-04T00-00"}'
+                }
+            }
+        }
+
+        It 'surfaces MODEL_ROUTING_BLOCKED via the portable path for an uncovered delegated agent when the probe reports unavailable' {
+            # Probe reports the Python validator unavailable, so the default invoker
+            # routes to the portable completion seam, which reports a missing routing
+            # receipt; the hook maps it to MODEL_ROUTING_BLOCKED.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith {
+                @{ ExitCode = 1; Output = 'Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.' }
+            }
+
+            $result = Invoke-OrchestratorOutputValidation -RawPayload '{"output":"Final summary."}'
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match '^MODEL_ROUTING_BLOCKED:'
+            $result.Message | Should -Match 'atomic-executor'
+            Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 1 -Exactly
+        }
+
+        It 'does not block a covered checkpoint on the portable path when the probe reports unavailable' {
+            # Probe reports unavailable and the portable completion seam reports a clean
+            # checkpoint (ExitCode 0, no output), so DONE is not blocked.
+            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+            Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith {
+                @{ ExitCode = 0; Output = '' }
+            }
+
+            $result = Invoke-OrchestratorOutputValidation -RawPayload '{"output":"Final summary."}'
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+    }
 }
