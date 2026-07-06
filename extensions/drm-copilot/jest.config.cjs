@@ -55,5 +55,38 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // No entry for "./src/lib/subagent-tree/types.ts": the file consists
+    // solely of `interface` declarations with no executable behavior. Per
+    // `.claude/rules/general-unit-test.md` ("Interface/type-only files with
+    // no executable behavior... may be omitted from coverage measurement"),
+    // this file legitimately reports 0% line/branch coverage under the v8
+    // coverage provider (confirmed via `coverage/lcov.info`) and cannot be
+    // brought above threshold by any test, since there is no runtime code to
+    // exercise. It remains included in `collectCoverageFrom` (not excluded
+    // from measurement) and is omitted only from the per-file threshold gate.
+    "./src/lib/subagent-tree/transcript-parser.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/transcript-scanner.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/tree-assembler.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/tree-formatter.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/index.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/subagent-tree-command.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
