@@ -130,7 +130,7 @@ drm-copilot itself. Both code paths fail closed.
   reason. Inside drm-copilot, behavior is unchanged.
 - [x] AC6: Full PowerShell toolchain passes (PoshQC format → PSScriptAnalyzer → Pester) with coverage
   >= 85% line / >= 75% branch on changed files; no coverage regression.
-- [ ] AC7: Local feature-review (policy-audit, code-review, feature-audit) is clean of blocking findings.
+- [x] AC7: Local feature-review (policy-audit, code-review, feature-audit) is clean of blocking findings.
 
 ## Definition of Done
 
