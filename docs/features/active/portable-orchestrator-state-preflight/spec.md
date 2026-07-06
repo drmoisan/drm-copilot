@@ -1,9 +1,9 @@
 # portable-orchestrator-state-preflight - Refactor Spec
 
-- **Issue:** none (tracked locally; no GitHub issue by scope decision)
+- **Issue:** [#321](https://github.com/drmoisan/drm-copilot/issues/321)
 - **Parent (optional):** none
 - **Owner:** orchestrator
-- **Last Updated:** 2026-07-06T13-54
+- **Last Updated:** 2026-07-06T18-05
 - **Status:** Approved (Option A)
 - **Version:** 0.2
 
