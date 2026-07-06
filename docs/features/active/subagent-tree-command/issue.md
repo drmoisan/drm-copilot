@@ -1,6 +1,7 @@
 # subagent-tree-command
 
 - Work Mode: minor-audit
+- Issue: [#320](https://github.com/drmoisan/drm-copilot/issues/320)
 
 ## Problem / Why
 
