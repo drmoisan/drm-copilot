@@ -63,7 +63,6 @@ drm-copilot itself. Both code paths fail closed.
 - No full PowerShell port of the entire `validate_orchestrator_state.py` validator (Option C rejected).
 - No change to the MCP validator or the Python validator logic.
 - No change to which checks are required by branch protection or CI.
-- No GitHub issue creation, no PR, no push (unless the user later requests them).
 - Fixing the repository-wide "no MCP documentation-retrieval tool" limitation noted in the runbook is
   out of scope.
 
