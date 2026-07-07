@@ -2,7 +2,9 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   buildRemovalSummaryMessage,
+  classifyParentDirectoryForCleanup,
   classifyWorktreeForRemoval,
+  deriveParentDirectoryPath,
   parseWorktreePorcelain,
   selectSecondaryWorktrees,
   type WorktreeEntry,
@@ -295,7 +297,11 @@ describe("classifyWorktreeForRemoval", () => {
 describe("buildRemovalSummaryMessage", () => {
   it("reports no secondary worktrees when both lists are empty", () => {
     // Arrange
-    const summary: WorktreeSummary = { removed: [], skipped: [] };
+    const summary: WorktreeSummary = {
+      removed: [],
+      skipped: [],
+      removedEmptyParents: [],
+    };
 
     // Act
     const message = buildRemovalSummaryMessage(summary);
@@ -309,6 +315,7 @@ describe("buildRemovalSummaryMessage", () => {
     const summary: WorktreeSummary = {
       removed: ["/repo/wt-1", "/repo/wt-2"],
       skipped: [],
+      removedEmptyParents: [],
     };
 
     // Act
@@ -323,6 +330,7 @@ describe("buildRemovalSummaryMessage", () => {
     const summary: WorktreeSummary = {
       removed: ["/repo/wt-1"],
       skipped: [{ path: "/repo/wt-2", reason: "locked" }],
+      removedEmptyParents: [],
     };
 
     // Act
@@ -332,5 +340,146 @@ describe("buildRemovalSummaryMessage", () => {
     expect(message).toContain("Removed 1 worktree(s).");
     expect(message).toContain("Skipped 1");
     expect(message).toContain("/repo/wt-2");
+  });
+
+  it("reports a single removed empty grouping directory", () => {
+    // Arrange
+    const summary: WorktreeSummary = {
+      removed: ["/repo/auth-wt/2026-04-20T09-59"],
+      skipped: [],
+      removedEmptyParents: ["/repo/auth-wt"],
+    };
+
+    // Act
+    const message = buildRemovalSummaryMessage(summary);
+
+    // Assert
+    expect(message).toContain("Removed 1 worktree(s).");
+    expect(message).toContain("Removed 1 empty grouping directory:");
+    expect(message).toContain("/repo/auth-wt");
+  });
+
+  it("reports multiple removed empty grouping directories", () => {
+    // Arrange
+    const summary: WorktreeSummary = {
+      removed: [],
+      skipped: [],
+      removedEmptyParents: ["/repo/auth-wt", "/repo/api-wt"],
+    };
+
+    // Act
+    const message = buildRemovalSummaryMessage(summary);
+
+    // Assert
+    expect(message).toContain("No secondary worktrees found.");
+    expect(message).toContain("Removed 2 empty grouping directories:");
+    expect(message).toContain("/repo/auth-wt");
+    expect(message).toContain("/repo/api-wt");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// [P4-T1] deriveParentDirectoryPath
+// ---------------------------------------------------------------------------
+
+describe("deriveParentDirectoryPath", () => {
+  it("strips the timestamp leaf of a forward-slash nested worktree path", () => {
+    // Arrange / Act
+    const result = deriveParentDirectoryPath("/repo/auth-wt/2026-04-20T09-59");
+
+    // Assert
+    expect(result).toBe("/repo/auth-wt");
+  });
+
+  it("normalizes backslash separators before stripping the leaf", () => {
+    // Arrange / Act
+    const result = deriveParentDirectoryPath(
+      "C:\\repos\\auth-wt\\2026-04-20T09-59",
+    );
+
+    // Assert
+    expect(result).toBe("C:/repos/auth-wt");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// [P4-T1] classifyParentDirectoryForCleanup
+// ---------------------------------------------------------------------------
+
+describe("classifyParentDirectoryForCleanup", () => {
+  it("marks an empty -wt grouping directory as removable", () => {
+    // Arrange / Act
+    const decision = classifyParentDirectoryForCleanup({
+      parentPath: "/repo/auth-wt",
+      entries: [],
+      primaryWorktreePath: "/repo/main",
+    });
+
+    // Assert
+    expect(decision.remove).toBe(true);
+    if (decision.remove) {
+      expect(decision.path).toBe("/repo/auth-wt");
+    }
+  });
+
+  it("leaves a non-empty grouping directory in place", () => {
+    // Arrange / Act
+    const decision = classifyParentDirectoryForCleanup({
+      parentPath: "/repo/auth-wt",
+      entries: ["2026-04-20T10-00"],
+      primaryWorktreePath: "/repo/main",
+    });
+
+    // Assert
+    expect(decision.remove).toBe(false);
+    if (!decision.remove) {
+      expect(decision.reason).toContain("not empty");
+    }
+  });
+
+  it("leaves a directory whose basename does not end with -wt", () => {
+    // Arrange / Act
+    const decision = classifyParentDirectoryForCleanup({
+      parentPath: "/repo/custom-parent",
+      entries: [],
+      primaryWorktreePath: "/repo/main",
+    });
+
+    // Assert
+    expect(decision.remove).toBe(false);
+    if (!decision.remove) {
+      expect(decision.reason).toContain('not a "-wt"');
+    }
+  });
+
+  it("never removes a directory equal to the primary worktree path", () => {
+    // Arrange / Act
+    const decision = classifyParentDirectoryForCleanup({
+      parentPath: "/repo/primary-wt",
+      entries: [],
+      primaryWorktreePath: "/repo/primary-wt",
+    });
+
+    // Assert
+    expect(decision.remove).toBe(false);
+    if (!decision.remove) {
+      expect(decision.reason).toContain("primary");
+    }
+  });
+
+  it("never removes a directory equal to the primary worktree's parent", () => {
+    // Arrange: primary is /parent-wt/main, so its parent /parent-wt ends with
+    // -wt and is empty, but it must still be protected as the primary's parent.
+    const decision = classifyParentDirectoryForCleanup({
+      parentPath: "/parent-wt",
+      entries: [],
+      primaryWorktreePath: "/parent-wt/main",
+    });
+
+    // Assert
+    expect(decision.remove).toBe(false);
+    if (!decision.remove) {
+      expect(decision.reason).toContain("primary");
+    }
   });
 });

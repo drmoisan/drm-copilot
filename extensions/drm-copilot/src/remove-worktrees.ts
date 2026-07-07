@@ -42,7 +42,21 @@ export interface WorktreeSummary {
     readonly path: string;
     readonly reason: string;
   }>;
+  /**
+   * Emptied `<repoName>-wt` grouping directories that were removed after their
+   * last secondary worktree was removed. Empty when no grouping directory was
+   * cleaned up.
+   */
+  readonly removedEmptyParents: ReadonlyArray<string>;
 }
+
+/**
+ * Decision returned by {@link classifyParentDirectoryForCleanup}: either remove
+ * the grouping directory or leave it in place with a reason.
+ */
+export type ParentDirectoryCleanupDecision =
+  | { readonly remove: true; readonly path: string }
+  | { readonly remove: false; readonly reason: string };
 
 /**
  * Discriminated union describing whether a worktree should be skipped before a
@@ -165,25 +179,122 @@ export function classifyWorktreeForRemoval(
 }
 
 /**
+ * Normalizes a path to forward slashes with no trailing separator. Pure
+ * string transform; performs no filesystem access and imports no `node:path`.
+ *
+ * @param rawPath A filesystem path using `/` or `\` separators.
+ * @returns The forward-slash path with any trailing separators removed.
+ */
+function normalizePathSeparators(rawPath: string): string {
+  return rawPath.replace(/\\/g, "/").replace(/\/+$/, "");
+}
+
+/**
+ * Derives the parent directory of a removed worktree path by stripping its last
+ * path segment. Handles both `/` and `\` separators without importing
+ * `node:path`.
+ *
+ * @param worktreePath A worktree path (for the nested scheme,
+ *                     `<parent>/<repoName>-wt/<timestamp>`).
+ * @returns The parent directory path (the `<repoName>-wt` grouping directory
+ *          for a nested-scheme worktree), forward-slash normalized.
+ */
+export function deriveParentDirectoryPath(worktreePath: string): string {
+  const normalized = normalizePathSeparators(worktreePath);
+  const lastSlash = normalized.lastIndexOf("/");
+  return lastSlash > 0 ? normalized.slice(0, lastSlash) : normalized;
+}
+
+/**
+ * Extracts the final path segment (basename) of a path without importing
+ * `node:path`.
+ *
+ * @param rawPath A filesystem path.
+ * @returns The basename, forward-slash normalized.
+ */
+function deriveBasename(rawPath: string): string {
+  const normalized = normalizePathSeparators(rawPath);
+  const lastSlash = normalized.lastIndexOf("/");
+  return lastSlash >= 0 ? normalized.slice(lastSlash + 1) : normalized;
+}
+
+/**
+ * Pure decision for whether a candidate grouping directory should be removed
+ * after its secondary worktrees have been removed. The caller supplies the
+ * directory listing so this function performs no filesystem access.
+ *
+ * A parent is eligible only when all of the following hold:
+ * - its basename ends with `-wt` (a `<repoName>-wt` grouping directory);
+ * - the supplied directory listing is empty;
+ * - it is neither the primary worktree path nor the primary worktree's parent.
+ *
+ * @param input The candidate parent path, its directory listing, and the
+ *              primary worktree path used for the safety checks.
+ * @returns A discriminated decision to remove or to leave the directory.
+ */
+export function classifyParentDirectoryForCleanup(input: {
+  readonly parentPath: string;
+  readonly entries: ReadonlyArray<string>;
+  readonly primaryWorktreePath: string;
+}): ParentDirectoryCleanupDecision {
+  const parent = normalizePathSeparators(input.parentPath);
+  const basename = deriveBasename(parent);
+
+  if (!basename.endsWith("-wt")) {
+    return {
+      remove: false,
+      reason: `not a "-wt" grouping directory: ${input.parentPath}`,
+    };
+  }
+
+  const primary = normalizePathSeparators(input.primaryWorktreePath);
+  const primaryParent = deriveParentDirectoryPath(input.primaryWorktreePath);
+  if (parent === primary || parent === primaryParent) {
+    return {
+      remove: false,
+      reason: `refusing to remove the primary worktree or its parent: ${input.parentPath}`,
+    };
+  }
+
+  if (input.entries.length > 0) {
+    return {
+      remove: false,
+      reason: `directory not empty: ${input.parentPath}`,
+    };
+  }
+
+  return { remove: true, path: input.parentPath };
+}
+
+/**
  * Builds the user-facing summary message for a completed removal operation.
  *
  * @param summary The aggregated removal summary.
- * @returns A single-line report of removed and skipped worktrees.
+ * @returns A single-line report of removed and skipped worktrees, plus any
+ *          removed empty grouping directories.
  */
 export function buildRemovalSummaryMessage(summary: WorktreeSummary): string {
   const removedCount = summary.removed.length;
   const skippedCount = summary.skipped.length;
+  const removedParents = summary.removedEmptyParents;
+
+  const parentSuffix =
+    removedParents.length > 0
+      ? ` Removed ${String(removedParents.length)} empty grouping ${
+          removedParents.length === 1 ? "directory" : "directories"
+        }: ${removedParents.join(", ")}.`
+      : "";
 
   if (removedCount === 0 && skippedCount === 0) {
-    return "No secondary worktrees found.";
+    return `No secondary worktrees found.${parentSuffix}`;
   }
 
   if (skippedCount === 0) {
-    return `Removed ${String(removedCount)} worktree(s).`;
+    return `Removed ${String(removedCount)} worktree(s).${parentSuffix}`;
   }
 
   const skippedPaths = summary.skipped.map((entry) => entry.path).join(", ");
   return `Removed ${String(removedCount)} worktree(s). Skipped ${String(
     skippedCount,
-  )}: ${skippedPaths}. See output channel for details.`;
+  )}: ${skippedPaths}. See output channel for details.${parentSuffix}`;
 }

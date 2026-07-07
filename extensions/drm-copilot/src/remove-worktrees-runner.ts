@@ -1,8 +1,11 @@
 import * as cp from "node:child_process";
+import * as fs from "node:fs";
 import type { CommandOutput } from "./command-runtime";
 import {
   buildRemovalSummaryMessage,
+  classifyParentDirectoryForCleanup,
   classifyWorktreeForRemoval,
+  deriveParentDirectoryPath,
   parseWorktreePorcelain,
   selectSecondaryWorktrees,
   type WorktreeSummary,
@@ -40,6 +43,40 @@ export interface GitRunner {
  *
  * @returns A `GitRunner` that invokes the `git` executable on PATH.
  */
+/**
+ * Injectable filesystem seam for empty grouping-directory cleanup, mirroring
+ * the {@link GitRunner} injection pattern so the decision logic stays pure and
+ * no unit test touches the real filesystem.
+ */
+export interface ParentDirectoryFileSystem {
+  directoryExists(path: string): boolean;
+  listDirectoryEntries(path: string): ReadonlyArray<string>;
+  removeEmptyDirectory(path: string): void;
+}
+
+/**
+ * Creates the production {@link ParentDirectoryFileSystem} backed by `node:fs`.
+ *
+ * `removeEmptyDirectory` uses `fs.rmdirSync`, which refuses to remove a
+ * non-empty directory, providing defense in depth beyond the pure emptiness
+ * check in `classifyParentDirectoryForCleanup`.
+ *
+ * @returns A filesystem seam that operates on the real filesystem.
+ */
+export function createParentDirectoryFileSystem(): ParentDirectoryFileSystem {
+  return {
+    directoryExists(path: string): boolean {
+      return fs.existsSync(path) && fs.statSync(path).isDirectory();
+    },
+    listDirectoryEntries(path: string): ReadonlyArray<string> {
+      return fs.readdirSync(path);
+    },
+    removeEmptyDirectory(path: string): void {
+      fs.rmdirSync(path);
+    },
+  };
+}
+
 export function createGitRunner(): GitRunner {
   return {
     run(args: ReadonlyArray<string>, cwd: string): Promise<GitRunResult> {
@@ -90,9 +127,17 @@ export function createGitRunner(): GitRunner {
  *   as skipped with the stderr reason; the batch continues with the remainder.
  * - Per-worktree progress is appended to the supplied output sink.
  *
+ * After all removals, any emptied `<repoName>-wt` grouping directory of a
+ * successfully removed worktree is removed via the injected filesystem seam and
+ * reported in `summary.removedEmptyParents`. A non-empty directory, a
+ * non-`-wt` parent, or the primary worktree / its parent is never removed.
+ * Cleanup failures are logged and never fail the overall command.
+ *
  * @param workspaceRoot The repository root used as the git working directory.
  * @param git The injectable git runner.
  * @param output The output sink for per-worktree progress lines.
+ * @param fileSystem The injectable filesystem seam for grouping-directory
+ *                   cleanup.
  * @returns The aggregated removal summary.
  * @throws Error when `git worktree list --porcelain` exits non-zero.
  */
@@ -100,6 +145,7 @@ export async function removeAllSecondaryWorktrees(
   workspaceRoot: string,
   git: GitRunner,
   output: CommandOutput,
+  fileSystem: ParentDirectoryFileSystem,
 ): Promise<WorktreeSummary> {
   const listResult = await git.run(
     ["worktree", "list", "--porcelain"],
@@ -115,6 +161,8 @@ export async function removeAllSecondaryWorktrees(
   }
 
   const entries = parseWorktreePorcelain(listResult.stdout);
+  const primaryEntry = entries.find((entry) => entry.isPrimary);
+  const primaryWorktreePath = primaryEntry ? primaryEntry.path : "";
   const secondary = selectSecondaryWorktrees(entries);
 
   const removed: string[] = [];
@@ -152,7 +200,51 @@ export async function removeAllSecondaryWorktrees(
     );
   }
 
-  const summary: WorktreeSummary = { removed, skipped };
+  // Empty grouping-directory cleanup. Derive the unique parents of the
+  // successfully removed worktrees, then — for each — take a fresh listing via
+  // the seam immediately before removal and let the pure classifier decide.
+  const removedEmptyParents: string[] = [];
+  const candidateParents: string[] = [];
+  for (const removedPath of removed) {
+    const parent = deriveParentDirectoryPath(removedPath);
+    if (!candidateParents.includes(parent)) {
+      candidateParents.push(parent);
+    }
+  }
+
+  for (const parent of candidateParents) {
+    try {
+      if (!fileSystem.directoryExists(parent)) {
+        continue;
+      }
+      const entriesInParent = fileSystem.listDirectoryEntries(parent);
+      const decision = classifyParentDirectoryForCleanup({
+        parentPath: parent,
+        entries: entriesInParent,
+        primaryWorktreePath,
+      });
+      if (!decision.remove) {
+        output.appendLine(
+          `[removeSecondaryWorktrees] left grouping directory ${parent}: ${decision.reason}`,
+        );
+        continue;
+      }
+      fileSystem.removeEmptyDirectory(parent);
+      removedEmptyParents.push(parent);
+      output.appendLine(
+        `[removeSecondaryWorktrees] removed empty grouping directory ${parent}`,
+      );
+    } catch (error: unknown) {
+      // Cleanup is best-effort; a failure here must not fail the overall
+      // command, so it is logged with context and the batch continues.
+      const detail = error instanceof Error ? error.message : "unknown error";
+      output.appendLine(
+        `[removeSecondaryWorktrees] grouping-directory cleanup skipped for ${parent}: ${detail}`,
+      );
+    }
+  }
+
+  const summary: WorktreeSummary = { removed, skipped, removedEmptyParents };
   output.appendLine(
     `[removeSecondaryWorktrees] ${buildRemovalSummaryMessage(summary)}`,
   );

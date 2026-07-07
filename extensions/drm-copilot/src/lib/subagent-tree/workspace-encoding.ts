@@ -42,6 +42,15 @@ export function encodeWorkspacePath(workspacePath: string): string {
  * by Claude Code: both `c--Users-...` and `C--Users-...` are observed on disk
  * for encodings of the same underlying path prefix.
  *
+ * Under the nested worktree scheme the on-disk path is
+ * `<parent>/<repoName>-wt/<timestamp>`. Because {@link encodeWorkspacePath}
+ * replaces the `/` between `<repoName>-wt` and the timestamp with `-`, the
+ * encoded directory name still contains the `-wt-` infix
+ * (`...-<repoName>-wt-<timestamp>`) exactly as the previous flat scheme did.
+ * The prefix match therefore resolves new-scheme directories with no change to
+ * the matching logic below; the `-wt-` infix arises from `-wt` plus the encoded
+ * `/`, rather than from a flat `<repoName>-wt-<timestamp>` sibling name.
+ *
  * @param directoryNames Candidate directory names present on disk.
  * @param encodedWorkspaceName The encoded name produced by
  *   {@link encodeWorkspacePath} for the current workspace root.

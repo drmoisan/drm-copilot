@@ -6,6 +6,7 @@ import {
   removeAllSecondaryWorktrees,
   type GitRunResult,
   type GitRunner,
+  type ParentDirectoryFileSystem,
 } from "../src/remove-worktrees-runner";
 import {
   createMockProcess,
@@ -70,6 +71,49 @@ function fail(stderr: string): GitRunResult {
   return { exitCode: 1, stdout: "", stderr };
 }
 
+/**
+ * In-memory ParentDirectoryFileSystem seam. Records every listing and removal
+ * so tests can assert cleanup behavior without touching the real filesystem.
+ * A directory "exists" only when it is present in the supplied map.
+ */
+class FakeParentDirectoryFileSystem implements ParentDirectoryFileSystem {
+  readonly listedPaths: string[] = [];
+  readonly removedPaths: string[] = [];
+  private readonly dirs: Map<string, string[]>;
+
+  constructor(dirs: Record<string, string[]> = {}) {
+    this.dirs = new Map(Object.entries(dirs));
+  }
+
+  directoryExists(path: string): boolean {
+    return this.dirs.has(path);
+  }
+
+  listDirectoryEntries(path: string): ReadonlyArray<string> {
+    this.listedPaths.push(path);
+    return this.dirs.get(path) ?? [];
+  }
+
+  removeEmptyDirectory(path: string): void {
+    this.removedPaths.push(path);
+    this.dirs.delete(path);
+  }
+}
+
+/**
+ * A filesystem seam for tests that do not exercise grouping-directory cleanup:
+ * every directory reports as non-existent, so no cleanup is attempted.
+ */
+function noopFileSystem(): FakeParentDirectoryFileSystem {
+  return new FakeParentDirectoryFileSystem();
+}
+
+const NESTED_TWO_SECONDARIES = [
+  "worktree /repo/main\nHEAD aaa\nbranch refs/heads/main",
+  "worktree /parent/auth-wt/2026-04-20T09-59\nHEAD bbb\nbranch refs/heads/auth-wt-2026-04-20T09-59",
+  "worktree /parent/auth-wt/2026-04-20T10-05\nHEAD ccc\nbranch refs/heads/auth-wt-2026-04-20T10-05",
+].join("\n\n");
+
 const TWO_CLEAN_SECONDARIES = [
   "worktree /repo/main\nHEAD aaa\nbranch refs/heads/main",
   "worktree /repo/wt-1\nHEAD bbb\nbranch refs/heads/feature-1",
@@ -87,7 +131,12 @@ describe("removeAllSecondaryWorktrees — positive flow", () => {
     const { output } = createBufferedOutput();
 
     // Act
-    const summary = await removeAllSecondaryWorktrees("/repo", git, output);
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      noopFileSystem(),
+    );
 
     // Assert
     expect(summary.removed).toEqual(["/repo/wt-1", "/repo/wt-2"]);
@@ -118,7 +167,12 @@ describe("removeAllSecondaryWorktrees — skip on failure", () => {
     const { output } = createBufferedOutput();
 
     // Act
-    const summary = await removeAllSecondaryWorktrees("/repo", git, output);
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      noopFileSystem(),
+    );
 
     // Assert
     expect(summary.removed).toEqual(["/repo/wt-2"]);
@@ -144,7 +198,12 @@ describe("removeAllSecondaryWorktrees — locked and prunable skip", () => {
     const { output } = createBufferedOutput();
 
     // Act
-    const summary = await removeAllSecondaryWorktrees("/repo", git, output);
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      noopFileSystem(),
+    );
 
     // Assert
     expect(summary.removed).toEqual([]);
@@ -172,7 +231,12 @@ describe("removeAllSecondaryWorktrees — edge cases", () => {
     const { output } = createBufferedOutput();
 
     // Act
-    const summary = await removeAllSecondaryWorktrees("/repo", git, output);
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      noopFileSystem(),
+    );
 
     // Assert
     expect(summary.removed).toEqual([]);
@@ -187,7 +251,7 @@ describe("removeAllSecondaryWorktrees — edge cases", () => {
     const { output } = createBufferedOutput();
 
     // Act
-    await removeAllSecondaryWorktrees("/repo", git, output);
+    await removeAllSecondaryWorktrees("/repo", git, output, noopFileSystem());
 
     // Assert
     const removeTargets = git.calls
@@ -203,8 +267,117 @@ describe("removeAllSecondaryWorktrees — edge cases", () => {
 
     // Act / Assert
     await expect(
-      removeAllSecondaryWorktrees("/repo", git, output),
+      removeAllSecondaryWorktrees("/repo", git, output, noopFileSystem()),
     ).rejects.toThrow(/not a git repository/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// [P4-T7] nested-scheme discovery + empty grouping-directory cleanup
+// ---------------------------------------------------------------------------
+
+describe("removeAllSecondaryWorktrees — nested scheme and empty-parent cleanup", () => {
+  it("discovers and removes nested-scheme secondary worktrees unchanged (AC5)", async () => {
+    // Arrange: nested porcelain paths <parent>/<repo>-wt/<timestamp>.
+    const git = new FakeGitRunner([ok(NESTED_TWO_SECONDARIES), ok(""), ok("")]);
+    const { output } = createBufferedOutput();
+    // The grouping directory still has one worktree left on disk, so it is not
+    // eligible for cleanup here; discovery/removal must work regardless.
+    const fileSystem = new FakeParentDirectoryFileSystem({
+      "/parent/auth-wt": ["2026-04-20T10-05"],
+    });
+
+    // Act
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      fileSystem,
+    );
+
+    // Assert
+    expect(summary.removed).toEqual([
+      "/parent/auth-wt/2026-04-20T09-59",
+      "/parent/auth-wt/2026-04-20T10-05",
+    ]);
+    const removeTargets = git.calls
+      .filter((call) => call.args[1] === "remove")
+      .map((call) => call.args[2]);
+    expect(removeTargets).toEqual([
+      "/parent/auth-wt/2026-04-20T09-59",
+      "/parent/auth-wt/2026-04-20T10-05",
+    ]);
+  });
+
+  it("removes an emptied -wt grouping directory via the seam and reports it", async () => {
+    // Arrange
+    const git = new FakeGitRunner([ok(NESTED_TWO_SECONDARIES), ok(""), ok("")]);
+    const { output } = createBufferedOutput();
+    // The grouping directory is empty after both worktrees are removed.
+    const fileSystem = new FakeParentDirectoryFileSystem({
+      "/parent/auth-wt": [],
+    });
+
+    // Act
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      fileSystem,
+    );
+
+    // Assert
+    expect(summary.removed).toHaveLength(2);
+    expect(summary.removedEmptyParents).toEqual(["/parent/auth-wt"]);
+    expect(fileSystem.removedPaths).toEqual(["/parent/auth-wt"]);
+    // The listing is taken exactly once, immediately before removal.
+    expect(fileSystem.listedPaths).toEqual(["/parent/auth-wt"]);
+  });
+
+  it("preserves a non-empty grouping directory", async () => {
+    // Arrange
+    const git = new FakeGitRunner([ok(NESTED_TWO_SECONDARIES), ok(""), ok("")]);
+    const { output } = createBufferedOutput();
+    const fileSystem = new FakeParentDirectoryFileSystem({
+      "/parent/auth-wt": ["stray-file.txt"],
+    });
+
+    // Act
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      fileSystem,
+    );
+
+    // Assert
+    expect(summary.removedEmptyParents).toEqual([]);
+    expect(fileSystem.removedPaths).toEqual([]);
+  });
+
+  it("never invokes the seam when no worktree was removed", async () => {
+    // Arrange: only the primary is present, so nothing is removed.
+    const git = new FakeGitRunner([
+      ok("worktree /repo/main\nHEAD aaa\nbranch refs/heads/main\n"),
+    ]);
+    const { output } = createBufferedOutput();
+    const fileSystem = new FakeParentDirectoryFileSystem({
+      "/parent/auth-wt": [],
+    });
+
+    // Act
+    const summary = await removeAllSecondaryWorktrees(
+      "/repo",
+      git,
+      output,
+      fileSystem,
+    );
+
+    // Assert
+    expect(summary.removed).toEqual([]);
+    expect(summary.removedEmptyParents).toEqual([]);
+    expect(fileSystem.listedPaths).toEqual([]);
+    expect(fileSystem.removedPaths).toEqual([]);
   });
 });
 

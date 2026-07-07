@@ -2,14 +2,16 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   buildBranchName,
+  buildWorktreeGroupDirectory,
   buildWorktreePath,
   buildWorktreeSessionCommands,
+  deriveWorktreeGroupDirectory,
   formatWorktreeTimestamp,
   quoteForPwsh,
 } from "../src/claude-worktree-session";
 
 describe("formatWorktreeTimestamp", () => {
-  it("formats a fixed local-time date as a 16-character yyyy-MM-dd-HH-mm string", () => {
+  it("formats a fixed local-time date as a 16-character yyyy-MM-ddTHH-mm string", () => {
     // Arrange
     const fixedDate = new Date(2026, 3, 20, 9, 59, 37);
 
@@ -17,10 +19,10 @@ describe("formatWorktreeTimestamp", () => {
     const result = formatWorktreeTimestamp(fixedDate);
 
     // Assert
-    expect(result).toBe("2026-04-20-09-59");
+    expect(result).toBe("2026-04-20T09-59");
   });
 
-  it("zero-pads single-digit calendar fields", () => {
+  it("zero-pads single-digit calendar fields with the T separator", () => {
     // Arrange
     const fixedDate = new Date(2026, 0, 1, 0, 0, 0);
 
@@ -28,23 +30,38 @@ describe("formatWorktreeTimestamp", () => {
     const result = formatWorktreeTimestamp(fixedDate);
 
     // Assert
-    expect(result).toBe("2026-01-01-00-00");
+    expect(result).toBe("2026-01-01T00-00");
     expect(result).toHaveLength(16);
+  });
+
+  it("produces the same string as the PowerShell formatter for the shared fixed fixture", () => {
+    // Cross-toolchain parity. The matching PowerShell counterpart is the Pester
+    // "returns correct yyyy-MM-ddTHH-mm format for injected fixed datetime" test
+    // (P1-T7) in tests/scripts/dev-tools/new-claude-worktree-session.Tests.ps1,
+    // which asserts the byte-identical string for local 2026-04-20 09:59.
+    // Arrange
+    const fixedDate = new Date(2026, 3, 20, 9, 59, 37);
+
+    // Act
+    const result = formatWorktreeTimestamp(fixedDate);
+
+    // Assert
+    expect(result).toBe("2026-04-20T09-59");
   });
 });
 
 describe("buildWorktreePath", () => {
-  it("composes the canonical repoName-wt path with forward slashes", () => {
+  it("composes the nested repoName-wt/timestamp path with forward slashes", () => {
     // Arrange
     const parent = "/parent";
-    const timestamp = "2026-04-20-09-59";
+    const timestamp = "2026-04-20T09-59";
     const repoName = "auth";
 
     // Act
     const result = buildWorktreePath(parent, timestamp, repoName);
 
     // Assert
-    expect(result).toBe("/parent/auth-wt-2026-04-20-09-59");
+    expect(result).toBe("/parent/auth-wt/2026-04-20T09-59");
   });
 
   it("normalizes Windows-style backslashes in the parent directory to forward slashes", () => {
@@ -52,10 +69,10 @@ describe("buildWorktreePath", () => {
     const parent = "C:\\repos";
 
     // Act
-    const result = buildWorktreePath(parent, "2026-04-20-09-59", "auth");
+    const result = buildWorktreePath(parent, "2026-04-20T09-59", "auth");
 
     // Assert
-    expect(result).toBe("C:/repos/auth-wt-2026-04-20-09-59");
+    expect(result).toBe("C:/repos/auth-wt/2026-04-20T09-59");
   });
 
   it("strips trailing slashes from the parent directory", () => {
@@ -63,20 +80,71 @@ describe("buildWorktreePath", () => {
     const parent = "/parent/";
 
     // Act
-    const result = buildWorktreePath(parent, "2026-04-20-09-59", "auth");
+    const result = buildWorktreePath(parent, "2026-04-20T09-59", "auth");
 
     // Assert
-    expect(result).toBe("/parent/auth-wt-2026-04-20-09-59");
+    expect(result).toBe("/parent/auth-wt/2026-04-20T09-59");
+  });
+});
+
+describe("buildWorktreeGroupDirectory", () => {
+  it("composes the <parent>/<repoName>-wt grouping directory", () => {
+    // Arrange / Act
+    const result = buildWorktreeGroupDirectory("/parent", "auth");
+
+    // Assert
+    expect(result).toBe("/parent/auth-wt");
+  });
+
+  it("is the leading segment of buildWorktreePath for the same inputs (no drift)", () => {
+    // Arrange
+    const group = buildWorktreeGroupDirectory("/parent", "auth");
+
+    // Act
+    const path = buildWorktreePath("/parent", "2026-04-20T09-59", "auth");
+
+    // Assert
+    expect(path.startsWith(`${group}/`)).toBe(true);
+  });
+});
+
+describe("deriveWorktreeGroupDirectory", () => {
+  it("strips the timestamp leaf to recover the grouping directory", () => {
+    // Arrange / Act
+    const result = deriveWorktreeGroupDirectory(
+      "/parent/auth-wt/2026-04-20T09-59",
+    );
+
+    // Assert
+    expect(result).toBe("/parent/auth-wt");
+  });
+
+  it("normalizes backslashes before stripping the leaf", () => {
+    // Arrange / Act
+    const result = deriveWorktreeGroupDirectory(
+      "C:\\repos\\auth-wt\\2026-04-20T09-59",
+    );
+
+    // Assert
+    expect(result).toBe("C:/repos/auth-wt");
   });
 });
 
 describe("buildBranchName", () => {
-  it("composes a <repoName>-wt-<timestamp> branch name", () => {
+  it("composes a flat <repoName>-wt-<timestamp> branch name", () => {
     // Arrange / Act
-    const result = buildBranchName("2026-04-20-09-59", "auth");
+    const result = buildBranchName("2026-04-20T09-59", "auth");
 
     // Assert
-    expect(result).toBe("auth-wt-2026-04-20-09-59");
+    expect(result).toBe("auth-wt-2026-04-20T09-59");
+  });
+
+  it("produces a flat branch name that contains no path separator", () => {
+    // Arrange / Act
+    const result = buildBranchName("2026-04-20T09-59", "auth");
+
+    // Assert
+    expect(result).not.toContain("/");
   });
 });
 
@@ -117,8 +185,8 @@ describe("quoteForPwsh", () => {
 describe("buildWorktreeSessionCommands", () => {
   const baseInput = {
     repoRoot: "/parent/drm-copilot",
-    worktreePath: "/parent/auth-wt-2026-04-20-09-59",
-    branchName: "auth-wt-2026-04-20-09-59",
+    worktreePath: "/parent/auth-wt/2026-04-20T09-59",
+    branchName: "auth-wt-2026-04-20T09-59",
     usePoetry: false,
     preClaudeScriptPath: undefined,
   };
@@ -132,7 +200,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.git).toBe(
-      "git -C '/parent/drm-copilot' worktree add '/parent/auth-wt-2026-04-20-09-59' -b 'auth-wt-2026-04-20-09-59'",
+      "git -C '/parent/drm-copilot' worktree add '/parent/auth-wt/2026-04-20T09-59' -b 'auth-wt-2026-04-20T09-59'",
     );
   });
 
@@ -145,8 +213,44 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent/auth-wt-2026-04-20-09-59'",
+      "Set-Location '/parent/auth-wt/2026-04-20T09-59'",
     );
+  });
+
+  it("emits an idempotent ensureParentDirectory command quoted with quoteForPwsh", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.ensureParentDirectory).toBe(
+      "New-Item -ItemType Directory -Force -Path '/parent/auth-wt' | Out-Null",
+    );
+  });
+
+  it("guards the grouping directory that is the leading segment of the worktree path (no drift)", () => {
+    // Arrange
+    const worktreePath = buildWorktreePath(
+      "/parent",
+      "2026-04-20T09-59",
+      "auth",
+    );
+    const group = buildWorktreeGroupDirectory("/parent", "auth");
+
+    // Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      worktreePath,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.ensureParentDirectory).toBe(
+      `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(group)} | Out-Null`,
+    );
+    expect(worktreePath.startsWith(`${group}/`)).toBe(true);
   });
 
   it("returns undefined poetryInstall and activate when usePoetry is false", () => {

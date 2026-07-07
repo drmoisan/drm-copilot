@@ -43,22 +43,25 @@ describe("buildCodexTrustCommand", () => {
 describe("buildCodexWorktreeSessionCommands", () => {
   const baseInput = {
     repoRoot: "C:/workspace",
-    worktreePath: "C:/workspace-wt-2026-04-20-09-59",
-    branchName: "workspace-wt-2026-04-20-09-59",
+    worktreePath: "C:/workspace-wt/2026-04-20T09-59",
+    branchName: "workspace-wt-2026-04-20T09-59",
     usePoetry: false,
     objective: undefined,
     codexExecutablePath: "C:/bin/codex.exe",
     postCodexScriptPath: undefined,
   };
 
-  it("emits git, Set-Location, trust, and codex commands", () => {
+  it("emits ensureParentDirectory, git, Set-Location, trust, and codex commands", () => {
     const commands = buildCodexWorktreeSessionCommands(baseInput);
 
+    expect(commands.ensureParentDirectory).toBe(
+      "New-Item -ItemType Directory -Force -Path 'C:/workspace-wt' | Out-Null",
+    );
     expect(commands.git).toBe(
-      "git -C 'C:/workspace' worktree add 'C:/workspace-wt-2026-04-20-09-59' -b 'workspace-wt-2026-04-20-09-59'",
+      "git -C 'C:/workspace' worktree add 'C:/workspace-wt/2026-04-20T09-59' -b 'workspace-wt-2026-04-20T09-59'",
     );
     expect(commands.setLocation).toBe(
-      "Set-Location 'C:/workspace-wt-2026-04-20-09-59'",
+      "Set-Location 'C:/workspace-wt/2026-04-20T09-59'",
     );
     expect(commands.trustCodexProject).toContain(
       "$codexConfig = Join-Path $HOME '.codex/config.toml'",
@@ -119,7 +122,7 @@ describe("buildCodexWorktreeSessionCommands", () => {
     });
 
     expect(commands.postCodex).toBe(
-      "if (Test-Path -LiteralPath 'scripts/post-codex.ps1') { & 'scripts/post-codex.ps1' -SourceRoot 'C:/workspace' -WorktreeRoot 'C:/workspace-wt-2026-04-20-09-59' }",
+      "if (Test-Path -LiteralPath 'scripts/post-codex.ps1') { & 'scripts/post-codex.ps1' -SourceRoot 'C:/workspace' -WorktreeRoot 'C:/workspace-wt/2026-04-20T09-59' }",
     );
   });
 

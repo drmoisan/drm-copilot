@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
+<report name="Pester (07/07/2026 13:46:13)">
+  <sessioninfo id="this" start="1783431972686" dump="1783431973801" />
+  <package name="dev-tools">
+    <class name="dev-tools/new-claude-worktree-session" sourcefilename="new-claude-worktree-session.ps1">
+      <method name="&lt;script&gt;" desc="()" line="35">
+        <counter type="INSTRUCTION" missed="25" covered="1" />
+        <counter type="LINE" missed="22" covered="1" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-WorktreeTimestamp" desc="()" line="41">
+        <counter type="INSTRUCTION" missed="0" covered="3" />
+        <counter type="LINE" missed="0" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-WorktreeGroupDirectory" desc="()" line="59">
+        <counter type="INSTRUCTION" missed="1" covered="0" />
+        <counter type="LINE" missed="1" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Build-WorktreePath" desc="()" line="76">
+        <counter type="INSTRUCTION" missed="2" covered="0" />
+        <counter type="LINE" missed="2" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Build-BranchName" desc="()" line="93">
+        <counter type="INSTRUCTION" missed="3" covered="0" />
+        <counter type="LINE" missed="3" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="New-WorktreeParentDirectory" desc="()" line="106">
+        <counter type="INSTRUCTION" missed="4" covered="0" />
+        <counter type="LINE" missed="3" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Test-PreconditionsMet" desc="()" line="123">
+        <counter type="INSTRUCTION" missed="11" covered="0" />
+        <counter type="LINE" missed="11" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Invoke-GitWorktreeAdd" desc="()" line="153">
+        <counter type="INSTRUCTION" missed="3" covered="0" />
+        <counter type="LINE" missed="2" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Start-ClaudeBackground" desc="()" line="169">
+        <counter type="INSTRUCTION" missed="25" covered="0" />
+        <counter type="LINE" missed="22" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Write-LaunchResult" desc="()" line="226">
+        <counter type="INSTRUCTION" missed="4" covered="0" />
+        <counter type="LINE" missed="4" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <counter type="INSTRUCTION" missed="78" covered="4" />
+      <counter type="LINE" missed="70" covered="4" />
+      <counter type="METHOD" missed="8" covered="2" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </class>
+    <sourcefile name="new-claude-worktree-session.ps1">
+      <line nr="35" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="36" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="41" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="44" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="45" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="59" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="76" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="77" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="93" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="94" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="97" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="106" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="112" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="113" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="123" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="125" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="128" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="129" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="130" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="133" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="134" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="135" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="138" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="139" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="140" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="153" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="156" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="169" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="173" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="174" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="176" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="177" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="178" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="186" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="187" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="188" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="189" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="190" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="192" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="193" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="195" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="196" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="199" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="200" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="201" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="202" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="203" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="204" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="207" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="226" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="227" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="228" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="229" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="237" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="238" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="239" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="241" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="243" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="244" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="245" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="248" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="251" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="252" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="257" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="258" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="260" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="261" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="264" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="265" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="266" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="269" mi="3" ci="0" mb="0" cb="0" />
+      <line nr="270" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="271" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="273" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="78" covered="4" />
+      <counter type="LINE" missed="70" covered="4" />
+      <counter type="METHOD" missed="8" covered="2" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="78" covered="4" />
+    <counter type="LINE" missed="70" covered="4" />
+    <counter type="METHOD" missed="8" covered="2" />
+    <counter type="CLASS" missed="0" covered="1" />
+  </package>
+  <counter type="INSTRUCTION" missed="78" covered="4" />
+  <counter type="LINE" missed="70" covered="4" />
+  <counter type="METHOD" missed="8" covered="2" />
+  <counter type="CLASS" missed="0" covered="1" />
+</report>
