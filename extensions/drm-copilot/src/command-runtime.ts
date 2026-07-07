@@ -1,23 +1,14 @@
 import * as cp from "node:child_process";
-import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import {
+  detectRuntime,
+  type RuntimeKind,
+  type RuntimeResolution,
+} from "./runtime-detection";
 
-/**
- * Identifies which interpreter family is required to launch a bundled script.
- *
- * Only PowerShell remains: all formerly-interpreted commands run in-process in
- * TypeScript, so no interpreter is detected or spawned beyond PowerShell.
- */
-export type RuntimeKind = "powershell";
-
-/**
- * Describes the executable and fixed argument prefix needed to launch a script.
- */
-export interface RuntimeResolution {
-  readonly executable: string;
-  readonly argsPrefix: ReadonlyArray<string>;
-}
+export { detectRuntime, resolveCodexExecutable } from "./runtime-detection";
+export type { RuntimeKind, RuntimeResolution } from "./runtime-detection";
 
 /**
  * Minimal output sink used by command adapters and the MCP bridge.
@@ -138,196 +129,42 @@ export function getWorkspaceRoot(): string {
 }
 
 /**
- * Determines whether an executable can be resolved from the current process PATH.
+ * Resolves the user-global Claude projects directory (`~/.claude/projects`).
  *
- * @param executable The executable name to probe, without a file extension.
- * @returns True when a matching file exists in one of the PATH directories.
- * @remarks On Windows the lookup also tries each PATHEXT suffix to mirror shell resolution.
- */
-function executableExists(executable: string): boolean {
-  return findExecutableOnPath(executable) !== undefined;
-}
-
-function getPathExtensions(): ReadonlyArray<string> {
-  return process.platform === "win32"
-    ? (process.env["PATHEXT"] ?? ".COM;.EXE;.BAT;.CMD")
-        .split(";")
-        .filter((part) => part.length > 0)
-    : [""];
-}
-
-function findExecutableOnPath(executable: string): string | undefined {
-  const pathValue = process.env["PATH"] ?? "";
-  const pathParts = pathValue
-    .split(path.delimiter)
-    .filter((part) => part.length > 0);
-  const pathExtensions = getPathExtensions();
-
-  // Probe each PATH directory against each allowed extension so runtime detection
-  // behaves consistently across Windows and non-Windows environments.
-  for (const directory of pathParts) {
-    for (const extension of pathExtensions) {
-      const candidate = path.join(
-        directory,
-        process.platform === "win32" ? `${executable}${extension}` : executable,
-      );
-      if (fs.existsSync(candidate)) {
-        return candidate.replace(/\\/g, "/");
-      }
-    }
-  }
-
-  return undefined;
-}
-
-function normalizeExecutablePath(executablePath: string): string {
-  return executablePath.replace(/\\/g, "/");
-}
-
-function buildCodexExecutableCandidates(
-  extensionRoot: string,
-): ReadonlyArray<string> {
-  const normalizedRoot = normalizeExecutablePath(extensionRoot).replace(
-    /\/+$/,
-    "",
-  );
-  const pathExtensions = getPathExtensions();
-  const relativeCandidates =
-    process.platform === "win32"
-      ? ["bin/windows-x86_64/codex", "bin/codex", "codex"]
-      : ["bin/codex", "codex"];
-
-  return relativeCandidates.flatMap((relativePath) =>
-    pathExtensions.map(
-      (extension) => `${normalizedRoot}/${relativePath}${extension}`,
-    ),
-  );
-}
-
-function findCodexInInstalledExtensionRoots(
-  installedExtensionCandidateRoots: ReadonlyArray<string>,
-): string | undefined {
-  for (const extensionRoot of installedExtensionCandidateRoots) {
-    const trimmedRoot = extensionRoot.trim();
-    if (trimmedRoot.length === 0) {
-      continue;
-    }
-
-    for (const candidate of buildCodexExecutableCandidates(trimmedRoot)) {
-      if (fs.existsSync(candidate)) {
-        return normalizeExecutablePath(candidate);
-      }
-    }
-  }
-
-  return undefined;
-}
-
-/**
- * Resolves the Codex CLI executable before a terminal is created.
+ * Claude Code writes session transcripts to a per-user global directory, not
+ * inside the open workspace. Resolution order:
+ * 1. `env.CLAUDE_CONFIG_DIR` when set (non-empty after trimming) — the
+ *    directory's `projects` subfolder is used directly, mirroring Claude
+ *    Code's own config-dir override.
+ * 2. Otherwise the user's home directory (`env.HOME`, then
+ *    `env.USERPROFILE`) plus `.claude/projects`.
  *
- * @param configuredExecutable Optional configured command name or executable path.
- * @returns The resolved command or path to invoke through PowerShell.
- * @throws Error when the configured executable or PATH fallback cannot be found.
+ * The `env` parameter defaults to `process.env` but accepts an injected
+ * override so unit tests can resolve a fake root without depending on the
+ * real `HOME`/`USERPROFILE`/`CLAUDE_CONFIG_DIR` values of the host running
+ * the tests.
+ *
+ * @param env Environment variables to resolve from; defaults to `process.env`.
+ * @returns The absolute, forward-slash-normalized path to the user-global
+ *   Claude projects directory.
+ * @throws Error when neither `CLAUDE_CONFIG_DIR` nor `HOME`/`USERPROFILE` is set.
  */
-export function resolveCodexExecutable(
-  configuredExecutable: string | undefined,
-  installedExtensionCandidateRoots: ReadonlyArray<string> = [],
+export function getClaudeProjectsRoot(
+  env: NodeJS.ProcessEnv = process.env,
 ): string {
-  const trimmedConfiguredExecutable = configuredExecutable?.trim() ?? "";
-  if (trimmedConfiguredExecutable.length > 0) {
-    const normalizedConfiguredExecutable = trimmedConfiguredExecutable.replace(
-      /\\/g,
-      "/",
-    );
-    const isPathLike = /[\\/]/.test(trimmedConfiguredExecutable);
-    if (isPathLike) {
-      if (fs.existsSync(trimmedConfiguredExecutable)) {
-        return normalizedConfiguredExecutable;
-      }
+  const configDirOverride = env["CLAUDE_CONFIG_DIR"]?.trim();
+  if (configDirOverride !== undefined && configDirOverride.length > 0) {
+    return path.join(configDirOverride, "projects").replace(/\\/g, "/");
+  }
 
-      throw new Error(
-        "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
-      );
-    }
-
-    const resolvedConfiguredExecutable = findExecutableOnPath(
-      trimmedConfiguredExecutable,
-    );
-    if (resolvedConfiguredExecutable !== undefined) {
-      return resolvedConfiguredExecutable;
-    }
-
+  const home = env["HOME"]?.trim() || env["USERPROFILE"]?.trim();
+  if (home === undefined || home.length === 0) {
     throw new Error(
-      "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
+      "Cannot resolve the user-global Claude projects directory: none of CLAUDE_CONFIG_DIR, HOME, or USERPROFILE is set.",
     );
   }
 
-  const resolvedCodex = findExecutableOnPath("codex");
-  if (resolvedCodex !== undefined) {
-    return resolvedCodex;
-  }
-
-  const resolvedInstalledExtensionCodex = findCodexInInstalledExtensionRoots(
-    installedExtensionCandidateRoots,
-  );
-  if (resolvedInstalledExtensionCodex !== undefined) {
-    return resolvedInstalledExtensionCodex;
-  }
-
-  throw new Error(
-    "Codex CLI not found. Configure drmCopilotExtension.newCodexWorktreeSession.codexExecutablePath or install codex on PATH.",
-  );
-}
-
-/**
- * Resolves the PowerShell interpreter required to execute a bundled script.
- *
- * PowerShell is the only supported runtime: every formerly-Python command now
- * runs in-process in TypeScript, so this function resolves only PowerShell and
- * never probes a Python interpreter.
- *
- * @param runtimeKind The runtime family requested by the command (always
- *   `"powershell"`).
- * @returns The executable name and fixed argument prefix needed to launch the script.
- * @throws Error when neither `pwsh` nor `powershell` can be found on PATH.
- */
-export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
-  // The parameter is retained so call sites remain explicit about the runtime
-  // they request; only the PowerShell family is supported.
-  void runtimeKind;
-
-  // Prefer PowerShell Core when available, then fall back to Windows PowerShell
-  // so the extension works across newer and older developer environments.
-  if (executableExists("pwsh")) {
-    return {
-      executable: "pwsh",
-      argsPrefix: [
-        "-NoLogo",
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-      ],
-    };
-  }
-
-  if (executableExists("powershell")) {
-    return {
-      executable: "powershell",
-      argsPrefix: [
-        "-NoLogo",
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-      ],
-    };
-  }
-
-  throw new Error(
-    "PowerShell runtime not found. Expected 'pwsh' or 'powershell' on PATH.",
-  );
+  return path.join(home, ".claude", "projects").replace(/\\/g, "/");
 }
 
 /**
