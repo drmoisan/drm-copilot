@@ -69,6 +69,10 @@
             # production modules are not excluded from coverage.
             '.claude/lib/orchestrator-state/OrchestratorState.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1'
+            # Issue #328 added this dev-tools worktree launcher script; measured here so the
+            # changed production file is in the coverage denominator (R1). The test suite
+            # dot-sources the file (guarded body) so line attribution is valid.
+            'scripts/dev-tools/new-claude-worktree-session.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

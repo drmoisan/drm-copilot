@@ -1,17 +1,16 @@
 Set-StrictMode -Version Latest
 
 BeforeAll {
-    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-    . (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
+    # Dot-source the whole script file so its functions are resolved from the original
+    # file. The script's dot-source guard defines the functions but does not execute the
+    # top-level body, and dot-sourcing (rather than an AST re-parse via Import-ScriptFunction)
+    # preserves original line numbers so Pester code-coverage breakpoints attribute correctly.
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/new-claude-worktree-session.ps1"
+    . $script:scriptPath
 }
 
 Describe "new-claude-worktree-session.ps1 - Get-WorktreeTimestamp" {
     Context "Default timestamp generation" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-WorktreeTimestamp")
-        }
-
         It "returns a non-empty string" {
             $result = Get-WorktreeTimestamp
             $result | Should -Not -BeNullOrEmpty
@@ -29,11 +28,6 @@ Describe "new-claude-worktree-session.ps1 - Get-WorktreeTimestamp" {
 
 Describe "new-claude-worktree-session.ps1 - Build-WorktreePath" {
     Context "Path construction" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-WorktreePath")
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-WorktreeGroupDirectory")
-        }
-
         It "output contains the nested repoName-wt/ grouping segment" {
             $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20T09-59" -RepoName "auth"
             $result | Should -Match "auth-wt/"
@@ -53,11 +47,6 @@ Describe "new-claude-worktree-session.ps1 - Build-WorktreePath" {
 
 Describe "new-claude-worktree-session.ps1 - Get-WorktreeGroupDirectory" {
     Context "Grouping directory derivation" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-WorktreeGroupDirectory")
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-WorktreePath")
-        }
-
         It "returns <parent>/<repoName>-wt" {
             $result = Get-WorktreeGroupDirectory -WorktreeParentPath "/parent" -RepoName "auth"
             $result | Should -Be "/parent/auth-wt"
@@ -73,10 +62,6 @@ Describe "new-claude-worktree-session.ps1 - Get-WorktreeGroupDirectory" {
 
 Describe "new-claude-worktree-session.ps1 - Build-BranchName" {
     Context "Branch name derivation" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-BranchName")
-        }
-
         It "returns flat repoName-wt-timestamp branch when BranchName is empty" {
             $result = Build-BranchName -Timestamp "2026-04-20T09-59" -RepoName "auth" -BranchName ""
             $result | Should -Be "auth-wt-2026-04-20T09-59"
@@ -96,10 +81,6 @@ Describe "new-claude-worktree-session.ps1 - Build-BranchName" {
 
 Describe "new-claude-worktree-session.ps1 - Test-PreconditionsMet" {
     Context "Precondition failures" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Test-PreconditionsMet")
-        }
-
         It "throws when git is not on PATH" {
             {
                 Test-PreconditionsMet `
@@ -144,10 +125,36 @@ Describe "new-claude-worktree-session.ps1 - Test-PreconditionsMet" {
     }
 }
 
+Describe "new-claude-worktree-session.ps1 - Invoke-GitWorktreeAdd" {
+    Context "Git worktree add composition via injected scriptblock seam" {
+        It "composes 'worktree add <path> -b <branch>' through the InvokeGit seam" {
+            $script:capturedGitArgs = $null
+            Invoke-GitWorktreeAdd `
+                -WorktreePath "/parent/auth-wt/2026-04-20T09-59" `
+                -BranchName "auth-wt-2026-04-20T09-59" `
+                -InvokeGit { param([string[]] $GitArgs) $script:capturedGitArgs = $GitArgs }
+            $captured = @($script:capturedGitArgs)
+            $captured[0] | Should -Be 'worktree'
+            $captured[1] | Should -Be 'add'
+            $captured[2] | Should -Be '/parent/auth-wt/2026-04-20T09-59'
+            $captured[3] | Should -Be '-b'
+            $captured[4] | Should -Be 'auth-wt-2026-04-20T09-59'
+        }
+
+        It "passes exactly five arguments to the InvokeGit seam" {
+            $script:capturedGitArgs = $null
+            Invoke-GitWorktreeAdd `
+                -WorktreePath "/work/path" `
+                -BranchName "feature-branch" `
+                -InvokeGit { param([string[]] $GitArgs) $script:capturedGitArgs = $GitArgs }
+            @($script:capturedGitArgs).Count | Should -Be 5
+        }
+    }
+}
+
 Describe "new-claude-worktree-session.ps1 - Start-ClaudeBackground" {
     Context "Process launch behavior" {
         BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Start-ClaudeBackground")
             $script:capturedStartArgs = $null
         }
 
@@ -265,10 +272,6 @@ Describe "new-claude-worktree-session.ps1 - Start-ClaudeBackground" {
 
 Describe "new-claude-worktree-session.ps1 - Write-LaunchResult" {
     Context "Output format" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "Write-LaunchResult")
-        }
-
         It "output contains a line starting with WorktreePath:" {
             $output = (Write-LaunchResult -WorktreePath "/some/path" -ProcessId "123" -StdoutLog "/some/path/claude-session.stdout.log" -StderrLog "/some/path/claude-session.stderr.log") -join "`n"
             $output | Should -Match "WorktreePath:"
@@ -320,10 +323,6 @@ Describe "new-claude-worktree-session.ps1 - Integration Validation" {
 
 Describe "new-claude-worktree-session.ps1 - New-WorktreeParentDirectory" {
     Context "Grouping-directory creation seam" {
-        BeforeEach {
-            . (Import-ScriptFunction -Path $script:scriptPath -Name "New-WorktreeParentDirectory")
-        }
-
         It "invokes the seam with the grouping-directory path" {
             $script:capturedPath = $null
             New-WorktreeParentDirectory `

@@ -229,6 +229,14 @@ function Write-LaunchResult {
     Write-Output "StderrLog: $StderrLog"
 }
 
+# When dot-sourced (for example by the Pester test suite, to resolve the functions
+# above for coverage attribution), define the functions but do not execute the
+# top-level script body. Direct invocation leaves $MyInvocation.InvocationName as the
+# script name (not '.'), so the body runs unchanged and production behavior is preserved.
+if ($MyInvocation.InvocationName -eq '.') {
+    return
+}
+
 # ---------------------------------------------------------------------------
 # Script body
 # ---------------------------------------------------------------------------
