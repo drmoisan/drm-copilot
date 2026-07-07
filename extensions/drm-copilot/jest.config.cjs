@@ -88,5 +88,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/subagent-tree/workspace-encoding.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/command-runtime.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
