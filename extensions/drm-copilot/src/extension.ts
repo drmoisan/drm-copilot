@@ -28,6 +28,7 @@ import { registerPoshQcCommands } from "./poshqc-command-registration";
 import { buildRemovalSummaryMessage } from "./remove-worktrees";
 import {
   createGitRunner,
+  createParentDirectoryFileSystem,
   removeAllSecondaryWorktrees,
 } from "./remove-worktrees-runner";
 import { createRepoAutomationService } from "./repo-automation-service";
@@ -199,11 +200,13 @@ export function activate(context: vscode.ExtensionContext): void {
       terminal.show();
 
       // Send the pre-claude commands as separate sendText calls so each is
-      // processed at its own PowerShell prompt: git worktree add, then
-      // Set-Location into the new worktree, then (when the workspace uses
-      // poetry) install dependencies and activate the resulting venv.
-      // PowerShell's stdin is line-buffered, so queued lines are read one at
-      // a time once each prior command finishes.
+      // processed at its own PowerShell prompt: ensure the <repoName>-wt
+      // grouping directory exists, then git worktree add, then Set-Location
+      // into the new worktree, then (when the workspace uses poetry) install
+      // dependencies and activate the resulting venv. PowerShell's stdin is
+      // line-buffered, so queued lines are read one at a time once each prior
+      // command finishes.
+      terminal.sendText(commands.ensureParentDirectory, true);
       terminal.sendText(commands.git, true);
       terminal.sendText(commands.setLocation, true);
       if (commands.poetryInstall !== undefined) {
@@ -306,6 +309,7 @@ export function activate(context: vscode.ExtensionContext): void {
       });
       terminal.show();
 
+      terminal.sendText(commands.ensureParentDirectory, true);
       terminal.sendText(commands.git, true);
       terminal.sendText(commands.setLocation, true);
       terminal.sendText(commands.trustCodexProject, true);
@@ -357,6 +361,7 @@ export function activate(context: vscode.ExtensionContext): void {
           workspaceRoot,
           createGitRunner(),
           output,
+          createParentDirectoryFileSystem(),
         );
         const message = buildRemovalSummaryMessage(summary);
         output.appendLine(`[${commandId}] ${message}`);

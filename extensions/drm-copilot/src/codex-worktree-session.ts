@@ -1,4 +1,7 @@
-import { quoteForPwsh } from "./claude-worktree-session";
+import {
+  deriveWorktreeGroupDirectory,
+  quoteForPwsh,
+} from "./claude-worktree-session";
 
 /**
  * Inputs required to build the PowerShell commands that start a Codex worktree
@@ -22,6 +25,13 @@ export interface CodexWorktreeSessionCommandInput {
  * Ordered PowerShell commands that constitute a Codex worktree session.
  */
 export interface CodexWorktreeSessionCommands {
+  /**
+   * Idempotent guard that creates the `<repoName>-wt` grouping directory before
+   * `git worktree add` runs. The handler must send this via its own
+   * `terminal.sendText` immediately before
+   * {@link CodexWorktreeSessionCommands.git}.
+   */
+  readonly ensureParentDirectory: string;
   readonly git: string;
   readonly setLocation: string;
   readonly trustCodexProject: string;
@@ -72,6 +82,13 @@ export function buildCodexWorktreeSessionCommands(
   const quotedPath = quoteForPwsh(input.worktreePath);
   const quotedBranch = quoteForPwsh(input.branchName);
 
+  // Derive the grouping directory from the pre-built nested worktree path using
+  // the shared helper so the Codex guard matches the worktree path exactly.
+  const groupDirectory = deriveWorktreeGroupDirectory(input.worktreePath);
+  const ensureParentDirectory = `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(
+    groupDirectory,
+  )} | Out-Null`;
+
   const trimmedObjective = input.objective?.trim() ?? "";
   const objectiveSuffix =
     trimmedObjective.length > 0 ? ` ${quoteForPwsh(trimmedObjective)}` : "";
@@ -91,6 +108,7 @@ export function buildCodexWorktreeSessionCommands(
       : undefined;
 
   return {
+    ensureParentDirectory,
     git: `git -C ${quotedRepoRoot} worktree add ${quotedPath} -b ${quotedBranch}`,
     setLocation: `Set-Location ${quotedPath}`,
     trustCodexProject: buildCodexTrustCommand(input.worktreePath),

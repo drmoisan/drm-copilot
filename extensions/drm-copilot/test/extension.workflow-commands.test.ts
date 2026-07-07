@@ -304,31 +304,47 @@ describe("drm-copilot workflow command behavior", () => {
       };
       expect(terminal.show).toHaveBeenCalledTimes(1);
 
-      // No poetry => exactly two pre-claude sendText calls: git, Set-Location.
-      expect(terminal.sendText).toHaveBeenCalledTimes(2);
-      const [gitCmd, gitNewline] = terminal.sendText.mock.calls[0] as [
+      // No poetry => three pre-claude sendText calls: ensureParentDirectory,
+      // git, Set-Location.
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      const [ensureParentCmd, ensureParentNewline] = terminal.sendText.mock
+        .calls[0] as [string, boolean];
+      const [gitCmd, gitNewline] = terminal.sendText.mock.calls[1] as [
         string,
         boolean,
       ];
       const [setLocationCmd, setLocationNewline] = terminal.sendText.mock
-        .calls[1] as [string, boolean];
+        .calls[2] as [string, boolean];
+      expect(ensureParentNewline).toBe(true);
       expect(gitNewline).toBe(true);
       expect(setLocationNewline).toBe(true);
+      // The grouping-directory guard is created before the git command runs.
+      expect(ensureParentCmd).toBe(
+        "New-Item -ItemType Directory -Force -Path 'C:/workspace-wt' | Out-Null",
+      );
+      // The ensureParentDirectory send must precede the git send.
+      const ensureParentIndex = terminal.sendText.mock.calls.findIndex(
+        ([command]) => command === ensureParentCmd,
+      );
+      const gitSendIndex = terminal.sendText.mock.calls.findIndex(([command]) =>
+        (command as string).includes("git -C 'C:/workspace' worktree add"),
+      );
+      expect(ensureParentIndex).toBeLessThan(gitSendIndex);
       // The git command uses `git -C <repoRoot>` so it works regardless of
       // the terminal's actual current working directory at launch time.
       expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
       expect(gitCmd).toMatch(
-        /-b 'workspace-wt-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}'$/,
+        /-b 'workspace-wt-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}'$/,
       );
       expect(setLocationCmd).toMatch(
-        /^Set-Location 'C:\/workspace-wt-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}'$/,
+        /^Set-Location 'C:\/workspace-wt\/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}'$/,
       );
 
       // The deferred claude sendText fires after the grace period.
       jest.advanceTimersByTime(5000);
 
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
-      const [claudeCmd, claudeNewline] = terminal.sendText.mock.calls[2] as [
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [claudeCmd, claudeNewline] = terminal.sendText.mock.calls[3] as [
         string,
         boolean,
       ];
@@ -363,13 +379,17 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // With poetry: four pre-claude sendText calls (git, Set-Location,
-      // poetry install, activate), then the deferred claude.
-      expect(terminal.sendText).toHaveBeenCalledTimes(4);
-      const [gitCmd] = terminal.sendText.mock.calls[0] as [string];
-      const [setLocationCmd] = terminal.sendText.mock.calls[1] as [string];
-      const [poetryInstallCmd] = terminal.sendText.mock.calls[2] as [string];
-      const [activateCmd] = terminal.sendText.mock.calls[3] as [string];
+      // With poetry: five pre-claude sendText calls (ensureParentDirectory,
+      // git, Set-Location, poetry install, activate), then the deferred claude.
+      expect(terminal.sendText).toHaveBeenCalledTimes(5);
+      const [ensureParentCmd] = terminal.sendText.mock.calls[0] as [string];
+      const [gitCmd] = terminal.sendText.mock.calls[1] as [string];
+      const [setLocationCmd] = terminal.sendText.mock.calls[2] as [string];
+      const [poetryInstallCmd] = terminal.sendText.mock.calls[3] as [string];
+      const [activateCmd] = terminal.sendText.mock.calls[4] as [string];
+      expect(ensureParentCmd).toBe(
+        "New-Item -ItemType Directory -Force -Path 'C:/workspace-wt' | Out-Null",
+      );
       expect(gitCmd).toContain("git -C 'C:/workspace' worktree add");
       expect(setLocationCmd).toMatch(/^Set-Location '/);
       expect(poetryInstallCmd).toBe("poetry install --with dev");
@@ -377,8 +397,8 @@ describe("drm-copilot workflow command behavior", () => {
 
       jest.advanceTimersByTime(5000);
 
-      expect(terminal.sendText).toHaveBeenCalledTimes(5);
-      const [claudeCmd] = terminal.sendText.mock.calls[4] as [string];
+      expect(terminal.sendText).toHaveBeenCalledTimes(6);
+      const [claudeCmd] = terminal.sendText.mock.calls[5] as [string];
       expect(claudeCmd).toBe(
         "claude --dangerously-skip-permissions 'Refactor the auth module.'",
       );
@@ -409,9 +429,10 @@ describe("drm-copilot workflow command behavior", () => {
       };
 
       // Pyproject exists but does not mention poetry => no install/activate.
-      expect(terminal.sendText).toHaveBeenCalledTimes(2);
-      jest.advanceTimersByTime(5000);
+      // ensureParentDirectory, git, Set-Location fire synchronously.
       expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      jest.advanceTimersByTime(5000);
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
     } finally {
       jest.useRealTimers();
     }
@@ -438,9 +459,10 @@ describe("drm-copilot workflow command behavior", () => {
 
       jest.advanceTimersByTime(5000);
 
-      // Three sendText calls: git, Set-Location, claude (no poetry).
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
-      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      // Four sendText calls: ensureParentDirectory, git, Set-Location, claude
+      // (no poetry).
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [claudeCmd] = terminal.sendText.mock.calls[3] as [string];
       expect(claudeCmd).toBe("claude --dangerously-skip-permissions");
     } finally {
       jest.useRealTimers();
@@ -468,17 +490,18 @@ describe("drm-copilot workflow command behavior", () => {
       };
 
       // Immediately after the handler resolves the pre-claude commands have
-      // fired (git + Set-Location, no poetry), but claude has not.
-      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+      // fired (ensureParentDirectory + git + Set-Location, no poetry), but
+      // claude has not.
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
 
       // Even after most of the grace window elapses, the timer has not fired.
       jest.advanceTimersByTime(4999);
-      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
 
       // At the configured grace boundary, the claude sendText fires.
       jest.advanceTimersByTime(1);
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
-      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [claudeCmd] = terminal.sendText.mock.calls[3] as [string];
       expect(claudeCmd).toContain("claude --dangerously-skip-permissions");
     } finally {
       jest.useRealTimers();
@@ -502,17 +525,18 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // No poetry => synchronous order is git, Set-Location, preClaude.
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
+      // No poetry => synchronous order is ensureParentDirectory, git,
+      // Set-Location, preClaude.
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
       const [preClaudeCmd, preClaudeNewline] = terminal.sendText.mock
-        .calls[2] as [string, boolean];
+        .calls[3] as [string, boolean];
       expect(preClaudeNewline).toBe(true);
       expect(preClaudeCmd).toBe(
         "if (Test-Path -LiteralPath '.claude/hooks/pre-claude-session.ps1') { & '.claude/hooks/pre-claude-session.ps1' }",
       );
 
       jest.advanceTimersByTime(5000);
-      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      expect(terminal.sendText).toHaveBeenCalledTimes(5);
     } finally {
       jest.useRealTimers();
     }
@@ -537,12 +561,12 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // Synchronous order: git, Set-Location, poetry install, activate,
-      // preClaude (five calls). claude is deferred.
-      expect(terminal.sendText).toHaveBeenCalledTimes(5);
-      const [poetryInstallCmd] = terminal.sendText.mock.calls[2] as [string];
-      const [activateCmd] = terminal.sendText.mock.calls[3] as [string];
-      const [preClaudeCmd] = terminal.sendText.mock.calls[4] as [string];
+      // Synchronous order: ensureParentDirectory, git, Set-Location, poetry
+      // install, activate, preClaude (six calls). claude is deferred.
+      expect(terminal.sendText).toHaveBeenCalledTimes(6);
+      const [poetryInstallCmd] = terminal.sendText.mock.calls[3] as [string];
+      const [activateCmd] = terminal.sendText.mock.calls[4] as [string];
+      const [preClaudeCmd] = terminal.sendText.mock.calls[5] as [string];
       expect(poetryInstallCmd).toBe("poetry install --with dev");
       expect(activateCmd).toBe("& './.venv/Scripts/Activate.ps1'");
       expect(preClaudeCmd).toBe(
@@ -552,8 +576,8 @@ describe("drm-copilot workflow command behavior", () => {
       jest.advanceTimersByTime(5000);
 
       // claude is the last call.
-      expect(terminal.sendText).toHaveBeenCalledTimes(6);
-      const [claudeCmd] = terminal.sendText.mock.calls[5] as [string];
+      expect(terminal.sendText).toHaveBeenCalledTimes(7);
+      const [claudeCmd] = terminal.sendText.mock.calls[6] as [string];
       expect(claudeCmd).toBe(
         "claude --dangerously-skip-permissions 'Refactor the auth module.'",
       );
@@ -579,10 +603,11 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // Synchronous order: git, Set-Location, preClaude (three calls).
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
-      const [setLocationCmd] = terminal.sendText.mock.calls[1] as [string];
-      const [preClaudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      // Synchronous order: ensureParentDirectory, git, Set-Location, preClaude
+      // (four calls).
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [setLocationCmd] = terminal.sendText.mock.calls[2] as [string];
+      const [preClaudeCmd] = terminal.sendText.mock.calls[3] as [string];
       expect(setLocationCmd).toMatch(/^Set-Location '/);
       expect(preClaudeCmd).toBe(
         "if (Test-Path -LiteralPath 'scripts/bootstrap.ps1') { & 'scripts/bootstrap.ps1' }",
@@ -590,8 +615,8 @@ describe("drm-copilot workflow command behavior", () => {
 
       jest.advanceTimersByTime(5000);
 
-      expect(terminal.sendText).toHaveBeenCalledTimes(4);
-      const [claudeCmd] = terminal.sendText.mock.calls[3] as [string];
+      expect(terminal.sendText).toHaveBeenCalledTimes(5);
+      const [claudeCmd] = terminal.sendText.mock.calls[4] as [string];
       expect(claudeCmd).toBe(
         "claude --dangerously-skip-permissions 'Refactor the auth module.'",
       );
@@ -617,14 +642,15 @@ describe("drm-copilot workflow command behavior", () => {
         sendText: jest.Mock;
       };
 
-      // No poetry, no preClaude => only git and Set-Location synchronously.
-      expect(terminal.sendText).toHaveBeenCalledTimes(2);
+      // No poetry, no preClaude => ensureParentDirectory, git, Set-Location
+      // synchronously.
+      expect(terminal.sendText).toHaveBeenCalledTimes(3);
 
       jest.advanceTimersByTime(5000);
 
       // Only the deferred claude send is added; no preClaude send.
-      expect(terminal.sendText).toHaveBeenCalledTimes(3);
-      const [claudeCmd] = terminal.sendText.mock.calls[2] as [string];
+      expect(terminal.sendText).toHaveBeenCalledTimes(4);
+      const [claudeCmd] = terminal.sendText.mock.calls[3] as [string];
       expect(claudeCmd).toContain("claude --dangerously-skip-permissions");
     } finally {
       jest.useRealTimers();

@@ -117,4 +117,76 @@ describe("matchEncodedDirectories", () => {
     // Assert
     expect(matches).toEqual([]);
   });
+
+  it("matches a new-scheme nested worktree sibling encoded name", () => {
+    // Arrange: under the nested scheme the on-disk worktree is
+    // C:/Users/DanMoisan/repos/drm-copilot-wt/2026-07-07T12-00; encoding the
+    // `/` between `drm-copilot-wt` and the timestamp to `-` yields the same
+    // `-wt-` infix the flat scheme produced, so the prefix match still resolves
+    // it with no logic change.
+    const encodedWorkspaceName = encodeWorkspacePath(
+      "C:\\Users\\DanMoisan\\repos\\drm-copilot",
+    );
+    const directoryNames = [
+      "C--Users-DanMoisan-repos-drm-copilot",
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00",
+    ];
+
+    // Act
+    const matches = matchEncodedDirectories(
+      directoryNames,
+      encodedWorkspaceName,
+    );
+
+    // Assert
+    expect(matches).toEqual([
+      "C--Users-DanMoisan-repos-drm-copilot",
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00",
+    ]);
+  });
+
+  it("matches a new-scheme worktree-of-a-worktree encoded name", () => {
+    // Arrange: the workspace root is itself a nested-scheme leaf; a worktree of
+    // that worktree appends another `-wt/<timestamp>` segment, which encodes to
+    // a further `-wt-<timestamp>` suffix on the already `-wt-`-suffixed base.
+    const encodedWorkspaceName = encodeWorkspacePath(
+      "C:/Users/DanMoisan/repos/drm-copilot-wt/2026-07-07T12-00",
+    );
+    const directoryNames = [
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00",
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00-wt-2026-07-07T18-00",
+    ];
+
+    // Act
+    const matches = matchEncodedDirectories(
+      directoryNames,
+      encodedWorkspaceName,
+    );
+
+    // Assert
+    expect(matches).toEqual(directoryNames);
+  });
+
+  it("matches by exact equality when the workspace root is the nested leaf", () => {
+    // Arrange: encoding the nested-leaf workspace root produces a name that is
+    // matched by the equality branch (no `-wt-` sibling suffix required).
+    const encodedWorkspaceName = encodeWorkspacePath(
+      "C:/Users/DanMoisan/repos/drm-copilot-wt/2026-07-07T12-00",
+    );
+    const directoryNames = [
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00",
+      "C--Users-DanMoisan-repos-some-other-repo",
+    ];
+
+    // Act
+    const matches = matchEncodedDirectories(
+      directoryNames,
+      encodedWorkspaceName,
+    );
+
+    // Assert
+    expect(matches).toEqual([
+      "C--Users-DanMoisan-repos-drm-copilot-wt-2026-07-07T12-00",
+    ]);
+  });
 });

@@ -17,10 +17,12 @@ Describe "new-claude-worktree-session.ps1 - Get-WorktreeTimestamp" {
             $result | Should -Not -BeNullOrEmpty
         }
 
-        It "returns correct yyyy-MM-dd-HH-mm format for injected fixed datetime" {
+        It "returns correct yyyy-MM-ddTHH-mm format for injected fixed datetime" {
+            # Shared cross-toolchain fixture: local 2026-04-20 09:59 -> 2026-04-20T09-59.
+            # The TypeScript counterpart is the formatWorktreeTimestamp Jest test (P2-T9).
             $fixedDate = [datetime]::new(2026, 4, 20, 9, 59, 37)
             $result = Get-WorktreeTimestamp -GetDateTime { $fixedDate }
-            $result | Should -Be "2026-04-20-09-59"
+            $result | Should -Be "2026-04-20T09-59"
         }
     }
 }
@@ -29,21 +31,42 @@ Describe "new-claude-worktree-session.ps1 - Build-WorktreePath" {
     Context "Path construction" {
         BeforeEach {
             . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-WorktreePath")
+            . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-WorktreeGroupDirectory")
         }
 
-        It "output contains the repoName-wt- segment" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
-            $result | Should -Match "auth-wt-"
+        It "output contains the nested repoName-wt/ grouping segment" {
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20T09-59" -RepoName "auth"
+            $result | Should -Match "auth-wt/"
         }
 
-        It "output ends with the timestamp" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
-            $result | Should -Match "-2026-04-20-09-59$"
+        It "output ends with the timestamp leaf" {
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20T09-59" -RepoName "auth"
+            $result | Should -Match "/2026-04-20T09-59$"
         }
 
-        It "full path matches expected format" {
-            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20-09-59" -RepoName "auth"
-            $result | Should -Be "/parent/auth-wt-2026-04-20-09-59"
+        It "full path matches expected nested format" {
+            $result = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20T09-59" -RepoName "auth"
+            $result | Should -Be "/parent/auth-wt/2026-04-20T09-59"
+        }
+    }
+}
+
+Describe "new-claude-worktree-session.ps1 - Get-WorktreeGroupDirectory" {
+    Context "Grouping directory derivation" {
+        BeforeEach {
+            . (Import-ScriptFunction -Path $script:scriptPath -Name "Get-WorktreeGroupDirectory")
+            . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-WorktreePath")
+        }
+
+        It "returns <parent>/<repoName>-wt" {
+            $result = Get-WorktreeGroupDirectory -WorktreeParentPath "/parent" -RepoName "auth"
+            $result | Should -Be "/parent/auth-wt"
+        }
+
+        It "Build-WorktreePath output starts with the grouping directory (no drift)" {
+            $group = Get-WorktreeGroupDirectory -WorktreeParentPath "/parent" -RepoName "auth"
+            $path = Build-WorktreePath -WorktreeParentPath "/parent" -Timestamp "2026-04-20T09-59" -RepoName "auth"
+            $path.StartsWith("$group/") | Should -BeTrue
         }
     }
 }
@@ -54,13 +77,18 @@ Describe "new-claude-worktree-session.ps1 - Build-BranchName" {
             . (Import-ScriptFunction -Path $script:scriptPath -Name "Build-BranchName")
         }
 
-        It "returns default repoName-wt-timestamp branch when BranchName is empty" {
-            $result = Build-BranchName -Timestamp "2026-04-20-09-59" -RepoName "auth" -BranchName ""
-            $result | Should -Be "auth-wt-2026-04-20-09-59"
+        It "returns flat repoName-wt-timestamp branch when BranchName is empty" {
+            $result = Build-BranchName -Timestamp "2026-04-20T09-59" -RepoName "auth" -BranchName ""
+            $result | Should -Be "auth-wt-2026-04-20T09-59"
+        }
+
+        It "returns a flat default branch containing no path separator" {
+            $result = Build-BranchName -Timestamp "2026-04-20T09-59" -RepoName "auth" -BranchName ""
+            $result | Should -Not -Match "/"
         }
 
         It "returns custom BranchName unchanged when supplied" {
-            $result = Build-BranchName -Timestamp "2026-04-20-09-59" -RepoName "auth" -BranchName "fix/my-custom-branch"
+            $result = Build-BranchName -Timestamp "2026-04-20T09-59" -RepoName "auth" -BranchName "fix/my-custom-branch"
             $result | Should -Be "fix/my-custom-branch"
         }
     }
@@ -265,16 +293,71 @@ Describe "new-claude-worktree-session.ps1 - Write-LaunchResult" {
 
 Describe "new-claude-worktree-session.ps1 - Integration Validation" {
     Context "Script structure" {
-        It "contains all seven expected function definitions" {
+        It "contains all nine expected function definitions" {
             $scriptContent = Get-Content -Path $script:scriptPath -Raw
 
             $scriptContent | Should -Match "function Get-WorktreeTimestamp"
+            $scriptContent | Should -Match "function Get-WorktreeGroupDirectory"
             $scriptContent | Should -Match "function Build-WorktreePath"
             $scriptContent | Should -Match "function Build-BranchName"
+            $scriptContent | Should -Match "function New-WorktreeParentDirectory"
             $scriptContent | Should -Match "function Test-PreconditionsMet"
             $scriptContent | Should -Match "function Invoke-GitWorktreeAdd"
             $scriptContent | Should -Match "function Start-ClaudeBackground"
             $scriptContent | Should -Match "function Write-LaunchResult"
+        }
+
+        It "invokes New-WorktreeParentDirectory before Invoke-GitWorktreeAdd in the script body" {
+            $scriptContent = Get-Content -Path $script:scriptPath -Raw
+            $parentInvokeIdx = $scriptContent.IndexOf('New-WorktreeParentDirectory -GroupDirectory $groupDirectory')
+            $gitAddInvokeIdx = $scriptContent.IndexOf('Invoke-GitWorktreeAdd -WorktreePath $worktreePath')
+            $parentInvokeIdx | Should -BeGreaterThan -1
+            $gitAddInvokeIdx | Should -BeGreaterThan -1
+            $parentInvokeIdx | Should -BeLessThan $gitAddInvokeIdx
+        }
+    }
+}
+
+Describe "new-claude-worktree-session.ps1 - New-WorktreeParentDirectory" {
+    Context "Grouping-directory creation seam" {
+        BeforeEach {
+            . (Import-ScriptFunction -Path $script:scriptPath -Name "New-WorktreeParentDirectory")
+        }
+
+        It "invokes the seam with the grouping-directory path" {
+            $script:capturedPath = $null
+            New-WorktreeParentDirectory `
+                -GroupDirectory "/parent/auth-wt" `
+                -NewDirectory { param([string] $Path) $script:capturedPath = $Path }
+            $script:capturedPath | Should -Be "/parent/auth-wt"
+        }
+
+        It "succeeds without error when invoked twice for the same path (idempotent via seam)" {
+            $script:seamCallCount = 0
+            $seam = { param([string] $Path) $null = $Path; $script:seamCallCount++ }
+            { New-WorktreeParentDirectory -GroupDirectory "/parent/auth-wt" -NewDirectory $seam } | Should -Not -Throw
+            { New-WorktreeParentDirectory -GroupDirectory "/parent/auth-wt" -NewDirectory $seam } | Should -Not -Throw
+            $script:seamCallCount | Should -Be 2
+        }
+
+        It "does not invoke the seam under -WhatIf" {
+            $script:whatIfInvoked = $false
+            New-WorktreeParentDirectory `
+                -GroupDirectory "/parent/auth-wt" `
+                -NewDirectory { param([string] $Path) $null = $Path; $script:whatIfInvoked = $true } `
+                -WhatIf
+            $script:whatIfInvoked | Should -BeFalse
+        }
+    }
+}
+
+Describe "new-claude-worktree-session.ps1 - Template parity" {
+    Context "Script and bundled template are content-identical" {
+        It "bundled template content equals the script content" {
+            $templatePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../extensions/drm-copilot/resources/templates/new-claude-worktree-session.ps1"
+            $scriptContent = Get-Content -Path $script:scriptPath -Raw
+            $templateContent = Get-Content -Path $templatePath -Raw
+            $templateContent | Should -Be $scriptContent
         }
     }
 }
