@@ -6,7 +6,7 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import type { TerminalWriter } from "../src/command-runtime";
+import type { TerminalWriter } from "../src/terminal-writer";
 import { InMemoryFileSystem } from "./lib/subagent-tree/in-memory-file-system";
 
 type CommandHandler = () => Promise<void> | void;
@@ -53,6 +53,9 @@ jest.mock("../src/command-runtime", () => ({
   getWorkspaceRoot: (...args: unknown[]) => getWorkspaceRootMock(...args),
   getClaudeProjectsRoot: (...args: unknown[]) =>
     getClaudeProjectsRootMock(...args),
+}));
+
+jest.mock("../src/terminal-writer", () => ({
   // Every test injects its own `createTerminalWriter`; the real factory
   // should never be reached, so a call here indicates a wiring regression.
   createSubagentTreeTerminalWriter: jest.fn(() => {
@@ -95,6 +98,16 @@ function activateAndGetHandler(
     );
   }
   return handler;
+}
+
+/** Build a root transcript line containing one `Agent` tool-use block. */
+function agentToolUseLine(model: string, toolUseId: string): string {
+  return JSON.stringify({
+    message: {
+      model,
+      content: [{ type: "tool_use", name: "Agent", id: toolUseId }],
+    },
+  });
 }
 
 /** Register one root-session transcript file under a matched Claude projects directory. */
@@ -237,6 +250,48 @@ describe("drm-copilot showSubagentTree command", () => {
     );
     expect(write?.body).toContain("root ·");
     expect(terminalWriter.revealCallCount).toBe(1);
+  });
+
+  it("writes a multi-line formatTree body (root plus a subagent child) to the terminal seam", async () => {
+    // Arrange: a root session transcript spawning one subagent, registered
+    // under a `/subagents/` path segment (mirroring the fixture-construction
+    // pattern in test/lib/subagent-tree/tree-assembler.test.ts and
+    // test/lib/subagent-tree/index.test.ts), so formatTree renders more than
+    // one line.
+    const fileSystem = new InMemoryFileSystem();
+    const sessionPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/session-multi.jsonl`;
+    fileSystem.addFile(
+      sessionPath,
+      agentToolUseLine("claude-sonnet-5", "toolu_child"),
+    );
+    fileSystem.addFile(
+      `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/session-multi/subagents/agent-child.meta.json`,
+      JSON.stringify({
+        agentType: "atomic-executor",
+        description: "Execute plan",
+        toolUseId: "toolu_child",
+        spawnDepth: 1,
+      }),
+    );
+    fileSystem.addFile(
+      `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/session-multi/subagents/agent-child.jsonl`,
+      JSON.stringify({ message: { model: "claude-sonnet-5" } }),
+    );
+    const terminalWriter = new FakeTerminalWriter();
+    const handler = activateAndGetHandler(fileSystem, terminalWriter);
+
+    // Act
+    await handler();
+
+    // Assert: the captured body is multi-line (embeds a `\n`) and matches
+    // the exact joined string formatTree produces for this fixture: the
+    // root line followed by the indented subagent-child line.
+    expect(terminalWriter.writes).toHaveLength(1);
+    const [write] = terminalWriter.writes;
+    expect(write?.body).toContain("\n");
+    expect(write?.body).toBe(
+      "root · [claude-sonnet-5] · 0 · \n  atomic-executor · [claude-sonnet-5] · 1 · Execute plan",
+    );
   });
 
   it("reuses the same terminal-writer instance across two consecutive invocations", async () => {

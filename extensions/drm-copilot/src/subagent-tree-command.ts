@@ -1,10 +1,5 @@
 import * as vscode from "vscode";
-import {
-  createSubagentTreeTerminalWriter,
-  getClaudeProjectsRoot,
-  getWorkspaceRoot,
-  type TerminalWriter,
-} from "./command-runtime";
+import { getClaudeProjectsRoot, getWorkspaceRoot } from "./command-runtime";
 import {
   RealFileSystem,
   toPosixPath,
@@ -15,6 +10,10 @@ import {
   encodeWorkspacePath,
   matchEncodedDirectories,
 } from "./lib/subagent-tree/workspace-encoding";
+import {
+  createSubagentTreeTerminalWriter,
+  type TerminalWriter,
+} from "./terminal-writer";
 
 /** Command id contributed to `package.json`'s `contributes.commands`. */
 const COMMAND_ID = "drmCopilotExtension.showSubagentTree";

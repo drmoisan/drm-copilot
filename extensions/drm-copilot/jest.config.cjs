@@ -96,5 +96,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/terminal-writer.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/runtime-detection.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
