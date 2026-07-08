@@ -1,0 +1,43 @@
+# Baseline — Legacy Epic-Manifest Test Reference (byte-identical guarantee) (#331)
+
+Timestamp: 2026-07-07T21-08
+Command: poetry run pytest tests/scripts/dev_tools/test_validate_epic_orchestrator_state.py tests/scripts/dev_tools/test_epic_wave_computation.py -v
+EXIT_CODE: 0
+Output Summary: 31 passed, 0 failed. This is the reference the byte-identical guarantee (P3-T8, P3-T12) is compared against.
+
+Full test-id list (23 validator + 8 wave-computation):
+
+test_validate_epic_orchestrator_state.py:
+- test_validate_rejects_json_root_that_is_not_an_object
+- test_validate_rejects_invalid_json
+- test_validate_accepts_a_wave_barrier_clean_valid_checkpoint
+- test_validate_reports_missing_baseline_fields
+- test_validate_reports_missing_route_id
+- test_validate_reports_missing_epic_feature_folder
+- test_validate_reports_missing_integration_branch
+- test_validate_reports_missing_waves
+- test_validate_reports_missing_features
+- test_validate_rejects_wrong_route_id
+- test_validate_rejects_duplicate_feature_folder
+- test_validate_rejects_unresolved_depends_on_reference
+- test_validate_rejects_dependency_cycle
+- test_validate_accepts_all_valid_merge_status_values
+- test_validate_rejects_invalid_merge_status_value
+- test_validate_wave_barrier_ordering_passes_when_dependency_merged_first
+- test_validate_wave_barrier_ordering_rejects_unmerged_dependency
+- test_validate_wave_barrier_ordering_rejects_out_of_order_timestamps
+- test_validate_rejects_waves_wave_number_inconsistency
+- test_validate_require_complete_rejects_unmerged_feature
+- test_validate_require_complete_rejects_missing_merge_commit_sha
+- test_validate_require_complete_accepts_a_fully_complete_checkpoint
+- test_validate_ignores_require_complete_by_default
+
+test_epic_wave_computation.py:
+- test_compute_wave_numbers_diamond_dag_matches_user_story_scenario
+- test_compute_wave_numbers_linear_chain
+- test_compute_wave_numbers_raises_on_cycle
+- test_compute_wave_numbers_empty_manifest_returns_empty_mapping
+- test_compute_wave_numbers_disconnected_features_each_resolve_independently
+- test_compute_wave_numbers_self_referential_cycle_raises
+- test_compute_wave_numbers_three_node_cycle_raises
+- test_epic_wave_cycle_error_message_names_the_feature_folder

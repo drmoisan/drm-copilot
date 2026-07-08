@@ -25,6 +25,13 @@
  *     None; pure text-in, errors-out validation.
  */
 
+import {
+  buildFeatureReferenceIndex,
+  detectDependencyCycle,
+  resolveFeatureReference,
+  validateIntentBlock,
+} from "./epic-orchestrator-state-resolution";
+
 const REQUIRED_BASELINE_KEYS = [
   "objective",
   "completed_steps",
@@ -136,15 +143,11 @@ function validateFeatureFolderUniquenessAndDependencies(
   const seen = new Set<string>();
   const duplicates = new Set<string>();
 
-  // Walk once to collect the full set of defined feature_folder values before
-  // checking depends_on resolution, so forward references are not misreported.
-  const allFolders = new Set<string>();
-  for (const feature of features) {
-    const folder = feature["feature_folder"];
-    if (typeof folder === "string" && folder) {
-      allFolders.add(folder);
-    }
-  }
+  // Build the union index once so depends_on resolution accepts either an
+  // issue_num reference or a (possibly lifecycle-prefixed) feature_folder hint.
+  // On the legacy bare-basename shape this resolves identically to a plain
+  // membership test, keeping the error output byte-identical.
+  const index = buildFeatureReferenceIndex(features);
 
   for (const feature of features) {
     const folder = feature["feature_folder"];
@@ -160,10 +163,10 @@ function validateFeatureFolderUniquenessAndDependencies(
     if (!Array.isArray(dependsOn)) {
       continue;
     }
-    // Every declared dependency must resolve to a defined feature_folder; an
-    // unresolved reference is a malformed manifest, rejected up front.
+    // Every declared dependency must resolve to a defined feature via the union
+    // index; an unresolved reference is a malformed manifest, rejected up front.
     for (const dependency of dependsOn as unknown[]) {
-      if (!allFolders.has(dependency as string)) {
+      if (resolveFeatureReference(dependency, index) === null) {
         errors.push(
           `Epic checkpoint feature '${folder}' depends_on unresolved feature_folder: ${JSON.stringify(dependency)}`,
         );
@@ -177,65 +180,6 @@ function validateFeatureFolderUniquenessAndDependencies(
     );
   }
   return errors;
-}
-
-/**
- * Detect a cycle in the depends_on dependency graph via DFS.
- *
- * @param features Object-shaped `features[]` entries.
- * @returns An error string naming the cycle, or null when acyclic.
- */
-function detectDependencyCycle(
-  features: Record<string, unknown>[],
-): string | null {
-  const graph = new Map<string, string[]>();
-  for (const feature of features) {
-    const folder = feature["feature_folder"];
-    if (typeof folder !== "string" || !folder) {
-      continue;
-    }
-    const dependsOn = feature["depends_on"];
-    graph.set(
-      folder,
-      Array.isArray(dependsOn)
-        ? (dependsOn as unknown[]).filter(
-            (d): d is string => typeof d === "string",
-          )
-        : [],
-    );
-  }
-
-  const visiting = new Set<string>();
-  const visited = new Set<string>();
-
-  function visit(node: string): string | null {
-    if (visiting.has(node)) {
-      return node;
-    }
-    if (visited.has(node) || !graph.has(node)) {
-      return null;
-    }
-    visiting.add(node);
-    // Depth-first traversal of this node's dependencies; a revisit of a node
-    // still on the current path (in `visiting`) indicates a cycle.
-    for (const dependency of graph.get(node) ?? []) {
-      const cycleNode = visit(dependency);
-      if (cycleNode !== null) {
-        return cycleNode;
-      }
-    }
-    visiting.delete(node);
-    visited.add(node);
-    return null;
-  }
-
-  for (const start of graph.keys()) {
-    const cycleNode = visit(start);
-    if (cycleNode !== null) {
-      return `Epic checkpoint depends_on graph contains a cycle involving feature_folder: ${cycleNode}`;
-    }
-  }
-  return null;
 }
 
 /**
@@ -281,6 +225,10 @@ function validateWaveBarrierOrdering(
       byFolder.set(folder, feature);
     }
   }
+  // Resolve dependencies through the union index so a barrier edge is found
+  // whether the reference is an issue_num or a folder-basename hint; on legacy
+  // folder strings the resolved key equals the reference, so lookups match.
+  const index = buildFeatureReferenceIndex(features);
 
   for (const feature of features) {
     const folder = feature["feature_folder"];
@@ -293,7 +241,9 @@ function validateWaveBarrierOrdering(
     // Every dependency edge must be durably confirmed merged before this
     // feature is considered to have safely started its own wave.
     for (const dependency of dependsOn as unknown[]) {
-      const dependencyFeature = byFolder.get(dependency as string);
+      const resolved = resolveFeatureReference(dependency, index);
+      const dependencyFeature =
+        resolved !== null ? byFolder.get(resolved) : undefined;
       if (dependencyFeature === undefined) {
         continue;
       }
@@ -329,13 +279,18 @@ function validateWavesConsistency(state: Record<string, unknown>): string[] {
   if (!Array.isArray(waves)) {
     return errors;
   }
+  const features = extractFeatures(state);
   const featuresByFolder = new Map<string, Record<string, unknown>>();
-  for (const feature of extractFeatures(state)) {
+  for (const feature of features) {
     const folder = feature["feature_folder"];
     if (typeof folder === "string") {
       featuresByFolder.set(folder, feature);
     }
   }
+  // Resolve each waves[] entry through the union index so a wave listed by
+  // issue_num or lifecycle-prefixed hint maps to its feature; on legacy folder
+  // strings the resolved key equals the entry, so lookups are byte-identical.
+  const index = buildFeatureReferenceIndex(features);
 
   for (const waveItem of waves as unknown[]) {
     if (!isObject(waveItem)) {
@@ -349,7 +304,9 @@ function validateWavesConsistency(state: Record<string, unknown>): string[] {
     // Every feature listed under this wave must record the same wave_number
     // on its own features[] entry.
     for (const folder of folders as unknown[]) {
-      const feature = featuresByFolder.get(folder as string);
+      const resolved = resolveFeatureReference(folder, index);
+      const feature =
+        resolved !== null ? featuresByFolder.get(resolved) : undefined;
       if (feature === undefined) {
         continue;
       }
@@ -442,6 +399,9 @@ export function validateEpicOrchestratorStateText(
   errors.push(...validateMergeStatusEnum(features));
   errors.push(...validateWaveBarrierOrdering(features));
   errors.push(...validateWavesConsistency(stateMap));
+  // Presence-gated: only runs when the checkpoint carries a top-level intent
+  // object, so an intent-free checkpoint stays byte-identical.
+  errors.push(...validateIntentBlock(stateMap));
 
   if (options.requireComplete === true) {
     errors.push(...validateCompletion(features, stateMap));

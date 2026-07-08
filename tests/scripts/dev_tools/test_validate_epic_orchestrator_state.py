@@ -335,3 +335,198 @@ def test_validate_ignores_require_complete_by_default() -> None:
     errors = validate_epic_orchestrator_state_text(json.dumps(build_valid_epic_state()))
 
     assert errors == []
+
+
+# --- issue_num-keyed DAG resolution (added alongside legacy fixtures) ---
+
+
+def test_validate_accepts_dependency_expressed_by_issue_num() -> None:
+    """Resolve a depends_on entry given as a stable issue_num, not a folder name."""
+
+    # Arrange: child-b depends on child-a via its issue_num (300) instead of the
+    # folder basename; the union index must resolve the reference.
+    state = build_valid_epic_state()
+    state["features"][1]["depends_on"] = [300]  # type: ignore[index]
+
+    # Act
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    # Assert
+    assert errors == []
+
+
+def test_validate_rejects_unresolved_issue_num_reference() -> None:
+    """Report an issue_num depends_on entry that matches no defined feature."""
+
+    # Arrange: 999 is not a defined issue_num.
+    state = build_valid_epic_state()
+    state["features"][1]["depends_on"] = [999]  # type: ignore[index]
+
+    # Act
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    # Assert
+    assert (
+        "Epic checkpoint feature '2026-07-02-child-b-301' depends_on unresolved "
+        "feature_folder: 999" in errors
+    )
+
+
+# --- feature_folder hint resolving into active/ or completed/ ---
+
+
+def test_validate_accepts_completed_lifecycle_hint_dependency() -> None:
+    """Resolve a depends_on hint that points into completed/ to its basename."""
+
+    # Arrange: child-b depends on child-a expressed as a completed/ lifecycle
+    # path; stripping the prefix must resolve it to the defined feature.
+    state = build_valid_epic_state()
+    state["features"][1]["depends_on"] = [  # type: ignore[index]
+        "docs/features/completed/2026-07-02-child-a-300"
+    ]
+
+    # Act
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    # Assert
+    assert errors == []
+
+
+def test_validate_accepts_active_lifecycle_hint_dependency() -> None:
+    """Resolve a depends_on hint that points into active/ to its basename."""
+
+    # Arrange
+    state = build_valid_epic_state()
+    state["features"][1]["depends_on"] = [  # type: ignore[index]
+        "active/2026-07-02-child-a-300"
+    ]
+
+    # Act
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    # Assert
+    assert errors == []
+
+
+# --- presence-gated intent-block validation ---
+
+
+def _state_with_intent(intent: object) -> dict[str, object]:
+    """Return a valid epic checkpoint carrying the supplied intent value."""
+
+    state = build_valid_epic_state()
+    state["intent"] = intent
+    return state
+
+
+def test_validate_accepts_a_valid_intent_block() -> None:
+    """Allow a well-formed intent block with all fields present."""
+
+    state = _state_with_intent(
+        {
+            "epic_type": "business",
+            "business_outcome_hypothesis": "reduce store lockups by 90%",
+            "leading_indicators": ["lockup rate", "retry rate"],
+            "nfrs": ["p99 < 200ms"],
+        }
+    )
+
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    assert errors == []
+
+
+def test_validate_absent_intent_block_adds_no_errors() -> None:
+    """Confirm a checkpoint without an intent key validates byte-identically."""
+
+    errors = validate_epic_orchestrator_state_text(json.dumps(build_valid_epic_state()))
+
+    assert errors == []
+
+
+def test_validate_rejects_non_object_intent() -> None:
+    """Reject an intent value that is not an object."""
+
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(_state_with_intent("not-an-object"))
+    )
+
+    assert errors == ["Epic checkpoint intent must be an object."]
+
+
+def test_validate_rejects_bad_epic_type() -> None:
+    """Reject an epic_type outside the business/enabler enum."""
+
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(
+            _state_with_intent(
+                {
+                    "epic_type": "marketing",
+                    "business_outcome_hypothesis": "some outcome",
+                }
+            )
+        )
+    )
+
+    assert (
+        "Epic checkpoint intent.epic_type must be 'business' or 'enabler', "
+        "found: 'marketing'" in errors
+    )
+
+
+def test_validate_rejects_empty_business_outcome_hypothesis() -> None:
+    """Reject a whitespace-only business_outcome_hypothesis."""
+
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(
+            _state_with_intent(
+                {
+                    "epic_type": "enabler",
+                    "business_outcome_hypothesis": "   ",
+                }
+            )
+        )
+    )
+
+    assert (
+        "Epic checkpoint intent.business_outcome_hypothesis must be a "
+        "non-empty string." in errors
+    )
+
+
+def test_validate_rejects_non_list_leading_indicators() -> None:
+    """Reject a leading_indicators value that is not a list."""
+
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(
+            _state_with_intent(
+                {
+                    "epic_type": "business",
+                    "business_outcome_hypothesis": "some outcome",
+                    "leading_indicators": "not-a-list",
+                }
+            )
+        )
+    )
+
+    assert (
+        "Epic checkpoint intent.leading_indicators must be a list of strings." in errors
+    )
+
+
+def test_validate_rejects_non_string_element_in_nfrs() -> None:
+    """Reject an nfrs list whose element is not a string."""
+
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(
+            _state_with_intent(
+                {
+                    "epic_type": "business",
+                    "business_outcome_hypothesis": "some outcome",
+                    "nfrs": ["ok", 5],
+                }
+            )
+        )
+    )
+
+    assert "Epic checkpoint intent.nfrs must be a list of strings." in errors

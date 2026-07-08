@@ -182,7 +182,8 @@ export function buildFolderSlug(
  * Mirrors Python `copy_template`. For `bug`, iterates
  * `(spec.md, <timestamped-plan>, plan.md)` copying each that exists and BREAKS
  * immediately after copying the timestamped plan template (so `plan.md` is only
- * copied when the timestamped template is absent). For all other types,
+ * copied when the timestamped template is absent). For `epic`, copies only the
+ * single-home file set (`epic.md` + `epic-status.md`). For all other types,
  * recursively copies the template tree.
  *
  * @param featureType Feature type.
@@ -206,6 +207,15 @@ export function copyTemplate(
         if (name === PLAN_TIMESTAMP_TEMPLATE_NAME) {
           break;
         }
+      }
+    }
+  } else if (featureType === "epic") {
+    // Epic scaffolding copies only the single-home file set (epic.md +
+    // epic-status.md); it never recursively copies a legacy initiative.md tree.
+    for (const name of ["epic.md", "epic-status.md"]) {
+      const src = joinPosix(templateDir, name);
+      if (fs.exists(src)) {
+        fs.copyFile(src, joinPosix(targetDir, name));
       }
     }
   } else {

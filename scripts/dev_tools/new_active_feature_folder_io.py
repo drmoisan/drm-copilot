@@ -88,7 +88,15 @@ def copy_template(
     target_dir: Path,
     fs: FileSystem,
 ) -> None:
-    """Copy template files for the selected feature type."""
+    """Copy template files for the selected feature type.
+
+    For ``bug``, iterate ``(spec.md, <timestamped-plan>, plan.md)`` copying each
+    that exists and break immediately after copying the timestamped plan
+    template. For ``epic``, copy only the single-home file set (``epic.md`` +
+    ``epic-status.md``). For all other types, recursively copy the template tree.
+    """
+    # Route by feature type. Bug and epic copy a curated file set; every other
+    # type recursively copies the whole template tree.
     if feature_type == "bug":
         for name in ("spec.md", PLAN_TIMESTAMP_TEMPLATE_NAME, "plan.md"):
             src = template_dir / name
@@ -96,6 +104,13 @@ def copy_template(
                 fs.copy_file(src, target_dir / name)
                 if name == PLAN_TIMESTAMP_TEMPLATE_NAME:
                     break
+    elif feature_type == "epic":
+        # Epic scaffolding copies only the single-home file set; it never
+        # recursively copies a legacy initiative.md tree.
+        for name in ("epic.md", "epic-status.md"):
+            src = template_dir / name
+            if fs.exists(src):
+                fs.copy_file(src, target_dir / name)
     else:
         fs.copy_tree(template_dir, target_dir)
 

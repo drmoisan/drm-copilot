@@ -190,15 +190,21 @@ export function createActiveFolder(
     normalizedIssueNumber = parseIssueNumber(potentialContent);
   }
 
-  const folderSlug = buildFolderSlug(
-    resolvedFeatureName,
-    potentialFile,
-    normalizedIssueNumber,
-  );
-  const targetDir = joinPosix(
-    workspacePath,
-    `docs/features/active/${folderSlug}`,
-  );
+  // Epic scaffolding uses a single stable home under docs/features/epics/ keyed
+  // by the bare epic slug, not the date/issue-stamped active-folder basename;
+  // this is the single-home layout. All other types keep active/<folder-slug>.
+  let targetDir: string;
+  if (featureType === "epic") {
+    const epicSlug = buildFolderSlug(resolvedFeatureName, null, null);
+    targetDir = joinPosix(workspacePath, `docs/features/epics/${epicSlug}`);
+  } else {
+    const folderSlug = buildFolderSlug(
+      resolvedFeatureName,
+      potentialFile,
+      normalizedIssueNumber,
+    );
+    targetDir = joinPosix(workspacePath, `docs/features/active/${folderSlug}`);
+  }
 
   if (filesystem.exists(targetDir) && !force) {
     throw new Error(

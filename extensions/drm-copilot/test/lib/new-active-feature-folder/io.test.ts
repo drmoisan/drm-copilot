@@ -168,6 +168,22 @@ describe("copyTemplate", () => {
     expect(fs.files.has("/ws/out/spec.md")).toBe(true);
     expect(fs.files.has("/ws/out/nested/user-story.md")).toBe(true);
   });
+
+  it("for epic copies only epic.md and epic-status.md, never initiative.md", () => {
+    // Arrange: epic template dir carries the single-home file set only.
+    const fs = new FakeFolderFileSystem();
+    const tpl = "/ws/templates/epic";
+    fs.seed(`${tpl}/epic.md`, "epic");
+    fs.seed(`${tpl}/epic-status.md`, "status");
+
+    // Act
+    copyTemplate("epic", tpl, "/ws/out", fs);
+
+    // Assert: only the two single-home files are copied.
+    expect(fs.files.has("/ws/out/epic.md")).toBe(true);
+    expect(fs.files.has("/ws/out/epic-status.md")).toBe(true);
+    expect(fs.files.has("/ws/out/initiative.md")).toBe(false);
+  });
 });
 
 describe("copyFeatureTemplateForMinorAudit", () => {
