@@ -155,9 +155,12 @@ def update_feature_docs(
         )
         files_to_open.extend([spec, plan])
     elif feature_type == "epic":
-        initiative = target_dir / "initiative.md"
+        # Epic scaffolding stamps the merged epic.md source of truth and opens it.
+        # epic-status.md is a generated-only projection seeded by the template
+        # copy; it is never stamped or opened here, and initiative.md is retired.
+        epic = target_dir / "epic.md"
         _apply_header_and_sections(
-            initiative,
+            epic,
             feature_name,
             issue_field,
             owner_field,
@@ -168,7 +171,7 @@ def update_feature_docs(
             fs,
             [],
         )
-        files_to_open.append(initiative)
+        files_to_open.append(epic)
     elif feature_type == "bug":
         spec = target_dir / "spec.md"
         plan = plan_path or target_dir / "plan.md"

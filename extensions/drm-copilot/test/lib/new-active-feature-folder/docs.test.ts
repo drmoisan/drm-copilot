@@ -125,18 +125,25 @@ describe("updateFeatureDocs refactor", () => {
 });
 
 describe("updateFeatureDocs epic", () => {
-  it("writes initiative.md and returns [initiative]", () => {
+  it("stamps epic.md and returns [epic], never initiative.md", () => {
     // Arrange
     const fs = new FakeFolderFileSystem();
-    const dir = "/ws/active/notes-feature";
-    fs.seed(`${dir}/initiative.md`, "# <feature-name>\n");
+    const dir = "/ws/epics/notes-feature";
+    fs.seed(`${dir}/epic.md`, "# <epic-name> - Epic\n");
+    fs.seed(
+      `${dir}/epic-status.md`,
+      "# <epic-name> - Epic Status (generated)\n",
+    );
 
     // Act
     const files = run(fs, "epic", dir, {});
 
     // Assert
-    expect(files).toEqual([`${dir}/initiative.md`]);
-    expect(fs.files.get(`${dir}/initiative.md`)).toContain("# notes-feature");
+    expect(files).toEqual([`${dir}/epic.md`]);
+    expect(fs.files.get(`${dir}/epic.md`)).toContain("# notes-feature");
+    // epic-status.md is generated-only: it is not stamped and not opened.
+    expect(files).not.toContain(`${dir}/epic-status.md`);
+    expect(fs.files.has(`${dir}/initiative.md`)).toBe(false);
   });
 });
 

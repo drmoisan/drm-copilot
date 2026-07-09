@@ -31,6 +31,13 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools._epic_orchestrator_state_resolution import (
+    build_feature_reference_index,
+    detect_dependency_cycle,
+    resolve_feature_reference,
+    validate_intent_block,
+)
+
 REQUIRED_BASELINE_KEYS = (
     "objective",
     "completed_steps",
@@ -164,13 +171,11 @@ def _validate_feature_folder_uniqueness_and_dependencies(
     errors: list[str] = []
     seen: set[str] = set()
     duplicates: set[str] = set()
-    # Walk once to collect the full set of defined feature_folder values before
-    # checking depends_on resolution, so forward references are not misreported.
-    all_folders: set[str] = set()
-    for feature in features:
-        folder = feature.get("feature_folder")
-        if isinstance(folder, str) and folder:
-            all_folders.add(folder)
+    # Build the union index once so depends_on resolution accepts either an
+    # issue_num reference or a (possibly lifecycle-prefixed) feature_folder hint.
+    # On the legacy bare-basename shape this resolves identically to a plain
+    # membership test, keeping the error output byte-identical.
+    by_folder_hint, by_issue_num = build_feature_reference_index(features)
 
     for feature in features:
         folder = feature.get("feature_folder")
@@ -183,10 +188,13 @@ def _validate_feature_folder_uniqueness_and_dependencies(
         depends_on = feature.get("depends_on")
         if not isinstance(depends_on, list):
             continue
-        # Every declared dependency must resolve to a defined feature_folder;
-        # an unresolved reference is a malformed manifest, rejected up front.
+        # Every declared dependency must resolve to a defined feature via the
+        # union index; an unresolved reference is a malformed manifest.
         for dependency in cast("list[Any]", depends_on):
-            if dependency not in all_folders:
+            if (
+                resolve_feature_reference(dependency, by_folder_hint, by_issue_num)
+                is None
+            ):
                 errors.append(
                     f"Epic checkpoint feature '{folder}' depends_on unresolved "
                     f"feature_folder: {dependency!r}"
@@ -197,63 +205,6 @@ def _validate_feature_folder_uniqueness_and_dependencies(
             f"Epic checkpoint has duplicate features[].feature_folder: {folder}"
         )
     return errors
-
-
-def _detect_dependency_cycle(features: list[dict[str, Any]]) -> str | None:
-    """Detect a cycle in the depends_on dependency graph via DFS.
-
-    Args:
-        features (list[dict[str, Any]]): Object-shaped features[] entries.
-
-    Returns:
-        str | None: An error string naming the cycle, or None when acyclic.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    graph: dict[str, list[str]] = {}
-    for feature in features:
-        folder = feature.get("feature_folder")
-        if not isinstance(folder, str) or not folder:
-            continue
-        depends_on = feature.get("depends_on")
-        graph[folder] = (
-            [d for d in cast("list[Any]", depends_on) if isinstance(d, str)]
-            if isinstance(depends_on, list)
-            else []
-        )
-
-    visiting: set[str] = set()
-    visited: set[str] = set()
-
-    def visit(node: str) -> str | None:
-        if node in visiting:
-            return node
-        if node in visited or node not in graph:
-            return None
-        visiting.add(node)
-        # Depth-first traversal of this node's dependencies; a revisit of a node
-        # still on the current path (in `visiting`) indicates a cycle.
-        for dependency in graph[node]:
-            cycle_node = visit(dependency)
-            if cycle_node is not None:
-                return cycle_node
-        visiting.discard(node)
-        visited.add(node)
-        return None
-
-    for start in list(graph):
-        cycle_node = visit(start)
-        if cycle_node is not None:
-            return (
-                "Epic checkpoint depends_on graph contains a cycle involving "
-                f"feature_folder: {cycle_node}"
-            )
-    return None
 
 
 def _validate_merge_status_enum(features: list[dict[str, Any]]) -> list[str]:
@@ -312,6 +263,10 @@ def _validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]
         for f in features
         if isinstance(f.get("feature_folder"), str)
     }
+    # Resolve dependencies through the union index so a barrier edge is found
+    # whether the reference is an issue_num or a folder-basename hint; on legacy
+    # folder strings the resolved key equals the reference, so lookups match.
+    by_folder_hint, by_issue_num = build_feature_reference_index(features)
 
     for feature in features:
         folder = feature.get("feature_folder")
@@ -323,7 +278,12 @@ def _validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]
         # Every dependency edge must be durably confirmed merged before this
         # feature is considered to have safely started its own wave.
         for dependency in cast("list[Any]", depends_on):
-            dependency_feature = by_folder.get(dependency)
+            resolved = resolve_feature_reference(
+                dependency, by_folder_hint, by_issue_num
+            )
+            dependency_feature = (
+                by_folder.get(resolved) if resolved is not None else None
+            )
             if dependency_feature is None:
                 continue
             dep_merge_status = dependency_feature.get("merge_status")
@@ -363,7 +323,12 @@ def _validate_waves_consistency(state: dict[str, Any]) -> list[str]:
     waves = state.get("waves")
     if not isinstance(waves, list):
         return errors
-    features_by_folder = {f.get("feature_folder"): f for f in _extract_features(state)}
+    features = _extract_features(state)
+    features_by_folder = {f.get("feature_folder"): f for f in features}
+    # Resolve each waves[] entry through the union index so a wave listed by
+    # issue_num or lifecycle-prefixed hint maps to its feature; on legacy folder
+    # strings the resolved key equals the entry, so lookups are byte-identical.
+    by_folder_hint, by_issue_num = build_feature_reference_index(features)
 
     for wave_item in cast("list[Any]", waves):
         if not isinstance(wave_item, dict):
@@ -376,7 +341,8 @@ def _validate_waves_consistency(state: dict[str, Any]) -> list[str]:
         # Every feature listed under this wave must record the same
         # wave_number on its own features[] entry.
         for folder in cast("list[Any]", folders):
-            feature = features_by_folder.get(folder)
+            resolved = resolve_feature_reference(folder, by_folder_hint, by_issue_num)
+            feature = features_by_folder.get(resolved) if resolved is not None else None
             if feature is None:
                 continue
             if feature.get("wave_number") != wave_number:
@@ -475,12 +441,15 @@ def validate_epic_orchestrator_state_text(
 
     features = _extract_features(state_map)
     errors.extend(_validate_feature_folder_uniqueness_and_dependencies(features))
-    cycle_error = _detect_dependency_cycle(features)
+    cycle_error = detect_dependency_cycle(features)
     if cycle_error is not None:
         errors.append(cycle_error)
     errors.extend(_validate_merge_status_enum(features))
     errors.extend(_validate_wave_barrier_ordering(features))
     errors.extend(_validate_waves_consistency(state_map))
+    # Presence-gated: only runs when the checkpoint carries a top-level intent
+    # object, so an intent-free checkpoint stays byte-identical.
+    errors.extend(validate_intent_block(state_map))
 
     if require_complete:
         errors.extend(_validate_completion(features, state_map))

@@ -198,6 +198,58 @@ describe("createActiveFolder feature creation (no potential file)", () => {
   });
 });
 
+describe("createActiveFolder epic creation (single home)", () => {
+  it("scaffolds only epics/<slug>/{epic.md, epic-status.md}, no active/ folder and no initiative.md", () => {
+    // Arrange: the epic template set carries only the single-home files.
+    const fs = new FakeFolderFileSystem();
+    const epicTemplate = `${TEMPLATE_ROOT}/epic`;
+    fs.seed(
+      `${epicTemplate}/epic.md`,
+      "# <epic-name> - Epic\n\n- Issue: #<tracking-issue>\n- Owner: <name>\n- Last Updated: YYYY-MM-DD\n",
+    );
+    fs.seed(
+      `${epicTemplate}/epic-status.md`,
+      "# <epic-name> - Epic Status (generated)\n",
+    );
+    const emitted: string[] = [];
+    const launched: Array<readonly string[]> = [];
+
+    // Act
+    const result = createActiveFolder({
+      featureName: "store-lockup-resilience",
+      featureType: "epic",
+      templateRoot: TEMPLATE_ROOT,
+      fs,
+      workspace: WORKSPACE,
+      nowProvider: () => FIXED_INSTANT,
+      codeLauncher: (files) => {
+        launched.push(files);
+        return true;
+      },
+      emit: (line) => emitted.push(line),
+    });
+
+    // Assert: the single epic home is created under docs/features/epics/.
+    const target = `${WORKSPACE}/docs/features/epics/store-lockup-resilience`;
+    expect(result).toEqual({ target, potentialIssuePath: null });
+    expect(fs.files.has(`${target}/epic.md`)).toBe(true);
+    expect(fs.files.has(`${target}/epic-status.md`)).toBe(true);
+    // No initiative.md, and no active/ epic folder is created.
+    expect(fs.files.has(`${target}/initiative.md`)).toBe(false);
+    expect(
+      [...fs.files.keys()].some((path) =>
+        path.startsWith(`${WORKSPACE}/docs/features/active/`),
+      ),
+    ).toBe(false);
+    // Only epic.md is opened; the generated-only epic-status.md is not stamped.
+    expect(launched[0]).toEqual([`${target}/epic.md`]);
+    expect(fs.files.get(`${target}/epic.md`)).toContain(
+      "# store-lockup-resilience",
+    );
+    expect(emitted).toContain(`Created/updated: ${target}`);
+  });
+});
+
 describe("createActiveFolder full mode with a potential file", () => {
   it("moves the potential file to issue.md, marks the work mode, and emits seeding lines", () => {
     // Arrange

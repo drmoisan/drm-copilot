@@ -167,12 +167,12 @@ def test_update_feature_docs_for_refactor_type() -> None:
 
 
 def test_update_feature_docs_for_epic_type() -> None:
-    """Test that update_feature_docs creates and populates epic docs correctly."""
-    # Arrange
+    """Verify update_feature_docs stamps epic.md and never returns initiative.md."""
+    # Arrange: seed the merged epic.md source and the generated-only epic-status.md.
     fs = FakeFileSystem()
     target_dir = Path("/target")
     fs.write_text(
-        target_dir / "initiative.md",
+        target_dir / "epic.md",
         "\n".join(
             [
                 "- **Issue:** <issue>",
@@ -185,6 +185,7 @@ def test_update_feature_docs_for_epic_type() -> None:
             ]
         ),
     )
+    fs.write_text(target_dir / "epic-status.md", "# <epic-name> - Epic Status")
 
     sections: dict[str, str] = {}
 
@@ -204,15 +205,15 @@ def test_update_feature_docs_for_epic_type() -> None:
         sections=sections,
     )
 
-    # Assert
-    assert len(result) == 1
-    assert result[0] == target_dir / "initiative.md"
+    # Assert: only epic.md is stamped and opened; epic-status.md is generated-only.
+    assert result == [target_dir / "epic.md"]
+    assert target_dir / "initiative.md" not in result
 
-    initiative_content = fs.read_text(target_dir / "initiative.md")
-    assert "my-epic" in initiative_content
-    assert "#100" in initiative_content
-    assert "epic-owner" in initiative_content
-    assert "2024-03-20" in initiative_content
+    epic_content = fs.read_text(target_dir / "epic.md")
+    assert "my-epic" in epic_content
+    assert "#100" in epic_content
+    assert "epic-owner" in epic_content
+    assert "2024-03-20" in epic_content
 
 
 def test_create_refactor_folder_seeds_refactor_docs() -> None:
@@ -289,13 +290,14 @@ def test_create_refactor_folder_seeds_refactor_docs() -> None:
     assert "#88" in spec_content
 
 
-def test_create_epic_folder_seeds_epic_docs() -> None:
-    """Verify epic-folder creation materializes initiative metadata."""
+def test_create_epic_folder_scaffolds_single_home() -> None:
+    """Verify epic creation scaffolds only epics/<slug>/{epic.md, epic-status.md}."""
+    # Arrange: the epic template set carries only the single-home files.
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     template_dir = workspace / "docs" / "features" / "templates" / "epic"
     fs.write_text(
-        template_dir / "initiative.md",
+        template_dir / "epic.md",
         "\n".join(
             [
                 "- **Issue:** <issue>",
@@ -308,32 +310,33 @@ def test_create_epic_folder_seeds_epic_docs() -> None:
             ]
         ),
     )
-
-    potential_path = workspace / "docs" / "features" / "potential" / "epic-test.md"
     fs.write_text(
-        potential_path,
-        "\n".join(
-            [
-                "- Issue: #99",
-                "## Problem / Why",
-                "epic content",
-            ]
-        ),
+        template_dir / "epic-status.md",
+        "# <epic-name> - Epic Status (generated)",
     )
 
     code_launcher = FakeCodeLauncher()
     result = mod.create_active_folder(
-        feature_name="epic-test",
+        feature_name="store-lockup-resilience",
         feature_type="epic",
         workspace=workspace,
         fs=fs,
         code_launcher=code_launcher,
     )
 
-    expected_folder = workspace / "docs" / "features" / "active" / "epic-test-99"
+    # Assert: the single epic home is created under docs/features/epics/.
+    expected_folder = (
+        workspace / "docs" / "features" / "epics" / "store-lockup-resilience"
+    )
     assert result.target == expected_folder
-    initiative_content = fs.read_text(expected_folder / "initiative.md")
-    assert "#99" in initiative_content
+    assert fs.exists(expected_folder / "epic.md")
+    assert fs.exists(expected_folder / "epic-status.md")
+    # No initiative.md, and no active/ epic folder is created.
+    assert not fs.exists(expected_folder / "initiative.md")
+    active_root = workspace / "docs" / "features" / "active"
+    assert not any(active_root in path.parents for path in fs.files)
+    epic_content = fs.read_text(expected_folder / "epic.md")
+    assert "store-lockup-resilience" in epic_content
 
 
 def test_guard_blocks_unmocked_code_launcher_invocation() -> None:

@@ -275,3 +275,155 @@ describe("validateEpicOrchestratorStateText", () => {
     expect(errors).toEqual([]);
   });
 });
+
+/**
+ * Return a valid epic checkpoint carrying the supplied intent value.
+ *
+ * Mirrors the Python test helper `_state_with_intent`.
+ *
+ * @param intent The intent value to attach to the checkpoint.
+ * @returns The checkpoint payload with `intent` set.
+ */
+function stateWithIntent(intent: unknown): Record<string, unknown> {
+  const state = buildValidEpicState();
+  state["intent"] = intent;
+  return state;
+}
+
+describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
+  it("resolves a depends_on entry expressed by issue_num", () => {
+    // Arrange: child-b depends on child-a via its issue_num (300).
+    const state = buildValidEpicState();
+    const features = state["features"] as Record<string, unknown>[];
+    features[1]["depends_on"] = [300];
+    // Act
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("reports an unresolved issue_num reference, byte-identical to Python", () => {
+    // Arrange: 999 is not a defined issue_num.
+    const state = buildValidEpicState();
+    const features = state["features"] as Record<string, unknown>[];
+    features[1]["depends_on"] = [999];
+    // Act
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
+    // Assert
+    expect(errors).toContain(
+      "Epic checkpoint feature '2026-07-02-child-b-301' depends_on unresolved feature_folder: 999",
+    );
+  });
+
+  it("resolves a depends_on hint that points into completed/", () => {
+    // Arrange
+    const state = buildValidEpicState();
+    const features = state["features"] as Record<string, unknown>[];
+    features[1]["depends_on"] = [
+      "docs/features/completed/2026-07-02-child-a-300",
+    ];
+    // Act
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("resolves a depends_on hint that points into active/", () => {
+    // Arrange
+    const state = buildValidEpicState();
+    const features = state["features"] as Record<string, unknown>[];
+    features[1]["depends_on"] = ["active/2026-07-02-child-a-300"];
+    // Act
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
+    // Assert
+    expect(errors).toEqual([]);
+  });
+});
+
+describe("validateEpicOrchestratorStateText presence-gated intent block", () => {
+  it("accepts a valid intent block", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(
+        stateWithIntent({
+          epic_type: "business",
+          business_outcome_hypothesis: "reduce store lockups by 90%",
+          leading_indicators: ["lockup rate", "retry rate"],
+          nfrs: ["p99 < 200ms"],
+        }),
+      ),
+    );
+    expect(errors).toEqual([]);
+  });
+
+  it("adds no errors when the intent block is absent", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(buildValidEpicState()),
+    );
+    expect(errors).toEqual([]);
+  });
+
+  it("rejects a non-object intent, byte-identical to Python", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(stateWithIntent("not-an-object")),
+    );
+    expect(errors).toEqual(["Epic checkpoint intent must be an object."]);
+  });
+
+  it("rejects a bad epic_type, byte-identical to Python", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(
+        stateWithIntent({
+          epic_type: "marketing",
+          business_outcome_hypothesis: "some outcome",
+        }),
+      ),
+    );
+    expect(errors).toContain(
+      "Epic checkpoint intent.epic_type must be 'business' or 'enabler', found: 'marketing'",
+    );
+  });
+
+  it("rejects an empty business_outcome_hypothesis, byte-identical to Python", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(
+        stateWithIntent({
+          epic_type: "enabler",
+          business_outcome_hypothesis: "   ",
+        }),
+      ),
+    );
+    expect(errors).toContain(
+      "Epic checkpoint intent.business_outcome_hypothesis must be a non-empty string.",
+    );
+  });
+
+  it("rejects a non-list leading_indicators, byte-identical to Python", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(
+        stateWithIntent({
+          epic_type: "business",
+          business_outcome_hypothesis: "some outcome",
+          leading_indicators: "not-a-list",
+        }),
+      ),
+    );
+    expect(errors).toContain(
+      "Epic checkpoint intent.leading_indicators must be a list of strings.",
+    );
+  });
+
+  it("rejects a non-string element in nfrs, byte-identical to Python", () => {
+    const errors = validateEpicOrchestratorStateText(
+      JSON.stringify(
+        stateWithIntent({
+          epic_type: "business",
+          business_outcome_hypothesis: "some outcome",
+          nfrs: ["ok", 5],
+        }),
+      ),
+    );
+    expect(errors).toContain(
+      "Epic checkpoint intent.nfrs must be a list of strings.",
+    );
+  });
+});

@@ -203,9 +203,12 @@ export function updateFeatureDocs(
     );
     filesToOpen.push(spec, plan);
   } else if (featureType === "epic") {
-    const initiative = joinPosix(targetDir, "initiative.md");
+    // Epic scaffolding stamps the merged epic.md source of truth and opens it.
+    // epic-status.md is a generated-only projection seeded by the template copy;
+    // it is never stamped or opened here, and initiative.md is retired.
+    const epic = joinPosix(targetDir, "epic.md");
     applyHeaderAndSections(
-      initiative,
+      epic,
       featureName,
       issueField,
       ownerField,
@@ -216,7 +219,7 @@ export function updateFeatureDocs(
       fs,
       [],
     );
-    filesToOpen.push(initiative);
+    filesToOpen.push(epic);
   } else if (featureType === "bug") {
     const spec = joinPosix(targetDir, "spec.md");
     const plan = planPath ?? joinPosix(targetDir, "plan.md");

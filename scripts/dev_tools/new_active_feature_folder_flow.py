@@ -125,12 +125,19 @@ def create_active_folder(
     if not normalized_issue_number:
         normalized_issue_number = parse_issue_number(potential_content)
 
-    folder_slug = build_folder_slug(
-        resolved_feature_name,
-        potential_file,
-        normalized_issue_number,
-    )
-    target_dir = workspace_path / "docs" / "features" / "active" / folder_slug
+    # Epic scaffolding uses a single stable home under docs/features/epics/ keyed
+    # by the bare epic slug, not the date/issue-stamped active-folder basename;
+    # this is the single-home layout. All other types keep active/<folder-slug>.
+    if feature_type == "epic":
+        epic_slug = build_folder_slug(resolved_feature_name, None, None)
+        target_dir = workspace_path / "docs" / "features" / "epics" / epic_slug
+    else:
+        folder_slug = build_folder_slug(
+            resolved_feature_name,
+            potential_file,
+            normalized_issue_number,
+        )
+        target_dir = workspace_path / "docs" / "features" / "active" / folder_slug
 
     if filesystem.exists(target_dir) and not force:
         raise FileExistsError(
