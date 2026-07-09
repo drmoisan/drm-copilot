@@ -152,6 +152,24 @@ describe("repo automation MCP tool definitions", () => {
     });
   });
 
+  it("includes a render_subagent_tree definition with required session_id and optional workspace_root", () => {
+    const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+      ({ name }) => name === "render_subagent_tree",
+    );
+
+    expect(definition).toMatchObject({
+      name: "render_subagent_tree",
+      inputSchema: {
+        required: ["session_id"],
+        properties: {
+          workspace_root: expect.objectContaining({ type: "string" }),
+          session_id: expect.objectContaining({ type: "string" }),
+        },
+        additionalProperties: false,
+      },
+    });
+  });
+
   it("includes epic-orchestrator-state in the validate_orchestration_artifacts artifact_type enum", () => {
     const definition = toolDefinitions.find(
       ({ name }) => name === "validate_orchestration_artifacts",

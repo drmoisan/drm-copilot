@@ -1,12 +1,9 @@
+import { type CommandOutput } from "./command-runtime";
 import {
-  type CommandOutput,
-  executeBundledScriptFromExtensionRoot,
-} from "./command-runtime";
-import {
-  parseFirstArtifactPath,
   runCollectCommitContext,
   type ScriptExecutionOptions,
 } from "./repo-automation-service-support";
+import { executeScriptServiceCall } from "./repo-automation-execute-script";
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
 import { buildPoshQcWorkflowArguments } from "./repo-automation-args";
 import {
@@ -41,6 +38,10 @@ import {
   type PushDownFileSystem,
   RealPushDownFileSystem,
 } from "./lib/push-down/filesystem-adapter";
+import {
+  type RenderSubagentTreeServiceInput,
+  renderSubagentTreeServiceCall,
+} from "./repo-automation-service-subagent-tree";
 
 export interface RepoAutomationExecutionResult {
   readonly tool: RepoAutomationToolName;
@@ -50,6 +51,7 @@ export interface RepoAutomationExecutionResult {
   readonly assetId?: string;
   readonly bundledSourcePath?: string;
   readonly destinationPath?: string;
+  readonly renderedTree?: string;
 }
 
 export interface RepoAutomationService {
@@ -146,6 +148,9 @@ export interface RepoAutomationService {
       readonly requireComplete?: boolean;
       readonly requireModelRouting?: boolean;
     },
+  ): Promise<RepoAutomationExecutionResult>;
+  renderSubagentTree(
+    input: RenderSubagentTreeServiceInput,
   ): Promise<RepoAutomationExecutionResult>;
 }
 
@@ -459,32 +464,19 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     );
   }
 
+  async renderSubagentTree(
+    input: RenderSubagentTreeServiceInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return renderSubagentTreeServiceCall({
+      ...input,
+      fileSystem: this.fileSystem,
+    });
+  }
+
   private async executeScript(
     options: ScriptExecutionOptions & { readonly tool: RepoAutomationToolName },
   ): Promise<RepoAutomationExecutionResult> {
-    const execution = await executeBundledScriptFromExtensionRoot(this.output, {
-      runtimeKind: options.runtimeKind,
-      bundledRelativePath: options.bundledRelativePath,
-      commandId: options.invocationId,
-      args: options.args,
-      extensionRoot: this.extensionRoot,
-      workspaceRoot: options.workspaceRoot,
-    });
-
-    const parsedArtifactPath =
-      options.stdoutArtifactPattern === undefined
-        ? undefined
-        : parseFirstArtifactPath(execution, options.stdoutArtifactPattern);
-    const artifacts =
-      options.artifactPaths ??
-      (parsedArtifactPath === undefined ? undefined : [parsedArtifactPath]);
-
-    return {
-      tool: options.tool,
-      workspaceRoot: options.workspaceRoot,
-      summary: options.summary,
-      ...(artifacts === undefined ? {} : { artifacts }),
-    };
+    return executeScriptServiceCall(this.output, this.extensionRoot, options);
   }
 }
 

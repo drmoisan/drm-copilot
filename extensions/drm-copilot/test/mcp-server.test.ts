@@ -96,6 +96,7 @@ describe("repo automation MCP server", () => {
       "resolve_execute_hard_lock_prompt",
       "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
+      "render_subagent_tree",
     ]);
   });
 

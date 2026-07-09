@@ -2,10 +2,16 @@ import * as vscode from "vscode";
 import { getClaudeProjectsRoot, getWorkspaceRoot } from "./command-runtime";
 import {
   RealFileSystem,
+  RealFileTimes,
   toPosixPath,
   type FileSystem,
+  type FileTimes,
 } from "./lib/file-system";
 import { buildSubagentTree, formatTree } from "./lib/subagent-tree";
+import {
+  buildRootSessionPickEntries,
+  MAX_PATH_LABEL_LENGTH,
+} from "./lib/subagent-tree/quick-pick-labels";
 import {
   encodeWorkspacePath,
   matchEncodedDirectories,
@@ -21,6 +27,16 @@ const COMMAND_ID = "drmCopilotExtension.showSubagentTree";
 const ROOT_SESSION_GLOB = "**/*.jsonl";
 /** Path segment identifying a flattened subagent transcript, not a root session. */
 const SUBAGENTS_SEGMENT = "/subagents/";
+
+/**
+ * A discovered root-session candidate: its transcript path plus the
+ * last-activity timestamp read from the transcript file's mtime (`undefined`
+ * when the mtime could not be read).
+ */
+interface RootSessionCandidate {
+  readonly path: string;
+  readonly lastActivityMs: number | undefined;
+}
 
 /**
  * Register the `drmCopilotExtension.showSubagentTree` command.
@@ -46,10 +62,13 @@ const SUBAGENTS_SEGMENT = "/subagents/";
 export function registerSubagentTreeCommand(options: {
   readonly output: vscode.OutputChannel;
   readonly createFileSystem?: () => FileSystem;
+  readonly createFileTimes?: () => FileTimes;
   readonly createTerminalWriter?: () => TerminalWriter;
 }): vscode.Disposable {
   const createFileSystem =
     options.createFileSystem ?? ((): FileSystem => new RealFileSystem());
+  const createFileTimes =
+    options.createFileTimes ?? ((): FileTimes => new RealFileTimes());
   const createTerminalWriter =
     options.createTerminalWriter ?? createSubagentTreeTerminalWriter;
   // Constructed once at registration time so repeated command invocations
@@ -64,10 +83,12 @@ export function registerSubagentTreeCommand(options: {
       const workspaceRoot = getWorkspaceRoot();
       const claudeProjectsRoot = getClaudeProjectsRoot();
       const fileSystem = createFileSystem();
+      const fileTimes = createFileTimes();
       const candidates = discoverRootSessionCandidates(
         claudeProjectsRoot,
         workspaceRoot,
         fileSystem,
+        fileTimes,
       );
 
       const selected = await selectRootSession(
@@ -105,14 +126,18 @@ export function registerSubagentTreeCommand(options: {
  * @param workspaceRoot Absolute path to the open workspace root.
  * @param fileSystem Filesystem seam used to list matching directories and
  *   glob for `.jsonl` files within them.
- * @returns Root-session candidate paths, sorted for deterministic prompting,
- *   excluding any path under a `subagents` directory.
+ * @param fileTimes Narrow seam used to read each candidate transcript's
+ *   last-modified time for display and ordering.
+ * @returns Root-session candidates (path plus read mtime), excluding any path
+ *   under a `subagents` directory. Ordering is deferred to
+ *   `buildRootSessionPickEntries`, so no sort is applied here.
  */
 function discoverRootSessionCandidates(
   claudeProjectsRoot: string,
   workspaceRoot: string,
   fileSystem: FileSystem,
-): string[] {
+  fileTimes: FileTimes,
+): RootSessionCandidate[] {
   const encodedWorkspaceName = encodeWorkspacePath(workspaceRoot);
   const directoryNames = fileSystem.listDirectory(claudeProjectsRoot);
   const matchingDirectories = matchEncodedDirectories(
@@ -129,14 +154,17 @@ function discoverRootSessionCandidates(
 
   return candidates
     .filter((path) => !toPosixPath(path).includes(SUBAGENTS_SEGMENT))
-    .sort((left, right) => left.localeCompare(right));
+    .map((path) => ({
+      path,
+      lastActivityMs: fileTimes.getModifiedTimeMs(path),
+    }));
 }
 
 /**
  * Resolve which root session to render: auto-select a single candidate,
  * prompt among multiple, or report an error when there are none.
  *
- * @param candidates The discovered root-session candidates.
+ * @param candidates The discovered root-session candidates (path plus mtime).
  * @param output The output channel used for logging and error reporting.
  * @param claudeProjectsRoot The resolved user-global Claude projects
  *   directory, named in the zero-candidates error message so it reflects the
@@ -145,7 +173,7 @@ function discoverRootSessionCandidates(
  *   to select (zero candidates) or the user cancels the prompt.
  */
 async function selectRootSession(
-  candidates: readonly string[],
+  candidates: readonly RootSessionCandidate[],
   output: vscode.OutputChannel,
   claudeProjectsRoot: string,
 ): Promise<string | undefined> {
@@ -159,13 +187,18 @@ async function selectRootSession(
   if (candidates.length === 1) {
     const [onlyCandidate] = candidates;
     if (onlyCandidate !== undefined) {
-      return onlyCandidate;
+      return onlyCandidate.path;
     }
   }
 
-  const selectedItem = await vscode.window.showQuickPick([...candidates], {
+  const entries = buildRootSessionPickEntries(
+    candidates,
+    MAX_PATH_LABEL_LENGTH,
+  );
+  const selectedItem = await vscode.window.showQuickPick(entries, {
     title: "drm-copilot: Show Subagent Tree",
     placeHolder: "Choose the root session to render",
+    matchOnDetail: true,
     ignoreFocusOut: true,
   });
 
@@ -174,5 +207,5 @@ async function selectRootSession(
     return undefined;
   }
 
-  return selectedItem;
+  return selectedItem.path;
 }

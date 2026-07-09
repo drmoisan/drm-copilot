@@ -39,6 +39,7 @@ import {
   handlePushDownCopilotCustomizations,
 } from "./mcp-handlers/push-down-handlers";
 import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
+import { handleRenderSubagentTree } from "./mcp-handlers/render-subagent-tree-handler";
 import {
   handleResolvePolicyAuditTemplateAsset,
   handleValidateOrchestrationArtifacts,
@@ -55,6 +56,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly asset_id?: string;
   readonly bundled_source_path?: string;
   readonly destination_path?: string;
+  readonly rendered_tree?: string;
   readonly summary: string;
   readonly stderr_excerpt?: string;
 }
@@ -90,6 +92,9 @@ function toMcpToolResult(
     ...(result.destinationPath === undefined
       ? {}
       : { destination_path: result.destinationPath }),
+    ...(result.renderedTree === undefined
+      ? {}
+      : { rendered_tree: result.renderedTree }),
   };
 }
 
@@ -237,6 +242,12 @@ export async function dispatchRepoAutomationTool(
       case "validate_orchestration_artifacts": {
         return toMcpToolResult(
           await handleValidateOrchestrationArtifacts(rawInput, service),
+        );
+      }
+
+      case "render_subagent_tree": {
+        return toMcpToolResult(
+          await handleRenderSubagentTree(rawInput, service),
         );
       }
     }

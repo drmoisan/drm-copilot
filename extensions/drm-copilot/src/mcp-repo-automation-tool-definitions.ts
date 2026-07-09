@@ -449,4 +449,22 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
+  {
+    name: "render_subagent_tree",
+    description:
+      "Render the subagent call tree for a root session id. The session id is a transcript filename stem; the transcript is resolved under the user-global Claude projects directory, searching the encoded workspace directory plus its '-wt-' worktree siblings (case-insensitive) and returning the first match deterministically.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        workspace_root: workspaceRootProperty,
+        session_id: {
+          type: "string",
+          description:
+            "Root session identifier (transcript filename stem under ~/.claude/projects/<encoded-workspace>/, e.g. a UUIDv4).",
+        },
+      },
+      required: ["session_id"],
+      additionalProperties: false,
+    },
+  },
 ];

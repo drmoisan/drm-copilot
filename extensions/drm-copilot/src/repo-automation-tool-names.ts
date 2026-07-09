@@ -19,6 +19,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "resolve_execute_hard_lock_prompt",
   "resolve_atomic_plan_prompt",
   "validate_orchestration_artifacts",
+  "render_subagent_tree",
 ] as const;
 
 export type RepoAutomationToolName = (typeof REPO_AUTOMATION_TOOLS)[number];

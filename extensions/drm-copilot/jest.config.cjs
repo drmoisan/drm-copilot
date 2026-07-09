@@ -43,6 +43,22 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/repo-automation-service-subagent-tree.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-execute-script.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-tool-inputs-subagent-tree.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-handlers/render-subagent-tree-handler.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/mcp-repo-automation-tool-definitions.ts": {
       lines: 85,
       branches: 75,
@@ -81,6 +97,14 @@ module.exports = {
       branches: 75,
     },
     "./src/lib/subagent-tree/index.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/quick-pick-labels.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/subagent-tree/session-transcript-resolver.ts": {
       lines: 85,
       branches: 75,
     },
