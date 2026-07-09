@@ -504,7 +504,7 @@ Risks (from research §Open Risks):
 - [x] New `src/lib/**` modules import neither `vscode` nor `node:fs` (I/O
   only via injected seams, with `RealFileTimes` living in `file-system.ts`);
   the MCP bundle builds without esbuild changes.
-- [ ] Local feature-review reports no blocking findings.
+- [x] Local feature-review reports no blocking findings.
 
 ## Test Conditions
 

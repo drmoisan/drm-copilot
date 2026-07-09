@@ -140,7 +140,7 @@ reasons:
   coverage; all touched files under 500 lines; no new runtime dependencies;
   new `src/lib/**` modules remain host-neutral (no `vscode`/`node:fs`
   imports).
-- [ ] Local feature-review clean of blocking findings.
+- [x] Local feature-review clean of blocking findings.
 
 ## Non-Goals
 
