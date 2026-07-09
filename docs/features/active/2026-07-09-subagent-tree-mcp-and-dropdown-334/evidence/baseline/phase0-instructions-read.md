@@ -1,37 +1,44 @@
-# Phase 0 — Instructions Read
+# Phase 0 — Instructions Read (Remediation Cycle 1, 2026-07-09T15-35)
 
-Timestamp: 2026-07-09T09-59
+Timestamp: 2026-07-09T15-40
 
 Policy Order:
-1. CLAUDE.md (standing instructions; loaded via project context)
-2. .claude/rules/general-code-change.md (cross-language code change policy)
-3. .claude/rules/general-unit-test.md (cross-language unit test policy)
-4. Language/domain-specific rules for files in scope:
-   - TypeScript: .claude/rules/typescript.md, .claude/rules/typescript-suppressions.md
-   - PowerShell: .claude/rules/powershell.md
-   - Supporting: .claude/rules/quality-tiers.md, .claude/rules/architecture-boundaries.md, .claude/rules/tonality.md
+1. `CLAUDE.md`
+2. `.claude/rules/general-code-change.md`
+3. `.claude/rules/general-unit-test.md`
+4. `.claude/rules/python.md`
+5. `.claude/rules/python-suppressions.md`
 
 Files Read:
-- CLAUDE.md (project instructions block)
-- .claude/rules/general-code-change.md
-- .claude/rules/general-unit-test.md
-- .claude/rules/quality-tiers.md
-- .claude/rules/tonality.md
-- .claude/rules/typescript.md
-- .claude/rules/typescript-suppressions.md
-- .claude/rules/architecture-boundaries.md
-- .claude/rules/powershell.md
-- .claude/rules/benchmark-baselines.md
-- .claude/rules/ci-workflows.md
-- .claude/rules/orchestrator-state.md
+1. `CLAUDE.md` — NOT FOUND at repo root. Confirmed absence with a filesystem
+   existence check (`test -f`). This repository's root-level standing
+   instructions file is `AGENTS.md`, not `CLAUDE.md`; no `CLAUDE.md` file
+   exists anywhere in the repository root. Recorded here as a factual
+   observation, not a plan deviation — the remaining four files were read in
+   full as stated below.
+2. `.claude/rules/general-code-change.md` — read in full. Key points:
+   seven-stage mandatory toolchain loop (format, lint, type-check,
+   architecture-boundary tests, unit tests, contract/schema checks,
+   integration tests), 500-line file size limit, fail-fast error handling,
+   naming conventions, dependency constraints, I/O boundary isolation.
+3. `.claude/rules/general-unit-test.md` — read in full. Key points: five core
+   test principles (independence, isolation, fast execution, determinism,
+   readability), >= 85% line / >= 75% branch coverage uniformly across
+   tiers, coverage exclusion policy (no production file may be excluded),
+   scenario completeness requirements, Arrange-Act-Assert structure, test
+   file location mirroring production source tree.
+4. `.claude/rules/python.md` — read in full. Key points: Black -> Ruff ->
+   Pyright -> Pytest toolchain in order, restart from step 1 on any failure
+   or file change, PEP 8 naming, strong typing, dataclass/Protocol usage
+   guidance, pytest rules.
+5. `.claude/rules/python-suppressions.md` — read in full. Key points:
+   pre-authorized `# noqa` / `# type: ignore` suppression patterns and their
+   required comment formats; escalation path before requesting new
+   suppression approval.
 
-Key constraints acknowledged for this feature:
-- No production file may exceed 500 lines.
-- No new runtime dependency may be added (only @modelcontextprotocol/sdk today).
-- New src/lib/subagent-tree/** modules must import neither `vscode` nor `node:fs`
-  (RealFileTimes in src/lib/file-system.ts is the sanctioned exception).
-- Coverage: >= 85% line / >= 75% branch on new files; no production file excluded
-  from coverage measurement.
-- Extension toolchain is Jest (recorded deviation from typescript.md Vitest/`tests/`);
-  tests live under extensions/drm-copilot/test/** mirroring src/.
-- Evidence artifacts are written only under <FEATURE>/evidence/<kind>/.
+Output Summary: Four of the five listed policy files were read in full;
+`CLAUDE.md` does not exist at the repo root in this working tree and its
+absence was verified with a direct filesystem check rather than assumed.
+This is a pre-existing repository condition unrelated to the remediation
+scope of this plan (mirroring four `.claude/**` files into the bundled
+extension payload) and does not block execution of Phase 0 through Phase 4.
