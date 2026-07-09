@@ -90,6 +90,26 @@ export interface FileSystem {
 }
 
 /**
+ * Narrow filesystem seam exposing only a file's last-modified time.
+ *
+ * Purpose:
+ *     Supply last-activity timestamps for the subagent-tree quick-pick without
+ *     widening {@link FileSystem} (which would force edits to its in-memory
+ *     fakes for a single consumer). Tests inject a fake that returns fixed
+ *     epochs; production wiring injects {@link RealFileTimes}.
+ */
+export interface FileTimes {
+  /**
+   * Return the last-modified time of `path` in milliseconds since the Unix
+   * epoch, or `undefined` when the time cannot be read (missing file,
+   * permission error, or any stat failure).
+   *
+   * @param path Path whose modified time is requested.
+   */
+  getModifiedTimeMs(path: string): number | undefined;
+}
+
+/**
  * Normalize a path to forward-slash separators.
  *
  * @param value A path that may contain OS-specific separators.
@@ -320,5 +340,25 @@ export class RealFileSystem implements FileSystem {
    */
   ensureDir(path: string): void {
     fs.mkdirSync(path, { recursive: true });
+  }
+}
+
+/**
+ * Production {@link FileTimes} backed by `node:fs`.
+ *
+ * Side effects:
+ *     Reads file metadata from the local filesystem.
+ */
+export class RealFileTimes implements FileTimes {
+  /**
+   * @param path Path whose modified time is requested.
+   * @returns The file's `mtimeMs`, or `undefined` on any stat failure.
+   */
+  getModifiedTimeMs(path: string): number | undefined {
+    try {
+      return fs.statSync(path).mtimeMs;
+    } catch {
+      return undefined;
+    }
   }
 }

@@ -73,6 +73,10 @@
             # changed production file is in the coverage denominator (R1). The test suite
             # dot-sources the file (guarded body) so line attribution is valid.
             'scripts/dev-tools/new-claude-worktree-session.ps1'
+            # Issue #334 added this SessionStart hook that persists the current session id;
+            # measured here so the new production hook is not excluded from coverage. The
+            # test suite dot-sources the file (guarded body) so line attribution is valid.
+            '.claude/hooks/persist-session-id.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
