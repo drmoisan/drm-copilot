@@ -19,7 +19,7 @@ The repository contains four primary deliverables:
 - [.github/](.github/) — GitHub Copilot customization surface: `copilot-instructions.md`, `instructions/`, `prompts/`, `skills/`, `agents/`, `codex/`, and CI workflows.
 - [.claude/](.claude/) — the Claude Code runtime surface: `rules/`, `skills/`, `agents/`, `hooks/`, `agent-memory/`, and `settings.json`.
 - [.codex/](.codex/) and [.agents/](.agents/) — the Codex-native runtime surface: prompts and skills.
-- [docs/features/](docs/features/) — feature, backlog, and planning documents.
+- [docs/features/](docs/features/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `docs/features/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
 - [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) — generated standing-instruction roots for Claude Code and Codex respectively.
 
 ## Agentic runtime architecture
@@ -27,8 +27,8 @@ The repository contains four primary deliverables:
 The repository maintains parallel customization surfaces for three coding-agent ecosystems, derived from one canonical policy set. The Claude Code surface ([.claude/](.claude/), documented in [CLAUDE.md](CLAUDE.md)) is the primary runtime and follows a four-layer architecture.
 
 1. **Standing instructions** — [CLAUDE.md](CLAUDE.md) and [.claude/rules/](.claude/rules/) provide persistent policy context. `CLAUDE.md` carries repository-wide tone, the policy-compliance reading order, and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path through YAML frontmatter (for example `python.md`, `typescript.md`, `powershell.md`, `csharp.md`, `quality-tiers.md`, `architecture-boundaries.md`, `orchestrator-state.md`, `ci-workflows.md`, `benchmark-baselines.md`).
-2. **Skills** — [.claude/skills/](.claude/skills/) define reusable, user-invocable workflows. Each `SKILL.md` declares its own `allowed-tools`, `context`, and `agent` routing. The catalog includes `orchestrate`, `feature-promotion-lifecycle`, `atomic-plan-contract`, `execute-hard-lock`, `feature-review-workflow`, `pr-author`, `pr-context-artifacts`, `commit-message`, `research-issue`, `acceptance-criteria-tracking`, `policy-compliance-order`, the per-language change-budget routers and QA gates (`python-`, `powershell-`, `csharp-`), the orchestration state machines, `remediation-handoff-atomic-planner`, `human-exception-runbook`, and the cross-ecosystem translators (`translate-copilot-to-claude`, `translate-claude-to-codex`).
-3. **Subagents** — [.claude/agents/](.claude/agents/) define named specialist personas, each declaring its tool allowlist, model, preloaded skills, hooks, and memory scope. The current roster is `orchestrator`, `atomic-planner`, `atomic-executor`, `feature-review`, `epic-review`, `staged-review`, `task-researcher`, `prd-feature`, `status-updater`, `pr-author`, and the language engineers `python-typed-engineer`, `typescript-engineer`, `powershell-typed-engineer`, and `csharp-typed-engineer`.
+2. **Skills** — [.claude/skills/](.claude/skills/) define reusable, user-invocable workflows. Each `SKILL.md` declares its own `allowed-tools`, `context`, and `agent` routing. The catalog includes `orchestrate`, `epic-orchestrate`, `feature-promotion-lifecycle`, `atomic-plan-contract`, `execute-hard-lock`, `feature-review-workflow`, `pr-author`, `pr-context-artifacts`, `pr-base-branch-merge-base`, `commit-message`, `research-issue`, `acceptance-criteria-tracking`, `policy-compliance-order`, `evidence-and-timestamp-conventions`, the per-language change-budget routers and QA gates (`python-`, `powershell-`, `csharp-`), the orchestration state machines, `remediation-handoff-atomic-planner`, `human-exception-runbook`, the review skills (`review-feature`, `review-epic`, `review-staged`), and the cross-ecosystem translator `translate-copilot-to-claude` (Claude-to-Codex conversion is handled by the Codex-native converter described below, not a separate translator skill).
+3. **Subagents** — [.claude/agents/](.claude/agents/) define named specialist personas, each declaring its tool allowlist, model, preloaded skills, hooks, and memory scope. The current roster is `orchestrator`, `epic-orchestrator`, `atomic-planner`, `atomic-executor`, `feature-review`, `epic-review`, `staged-review`, `task-researcher`, `prd-feature`, `status-updater`, `pr-author`, `commit-message`, `human-exception-runbook`, and the language engineers `python-typed-engineer`, `typescript-engineer`, `powershell-typed-engineer`, and `csharp-typed-engineer`.
 4. **Enforcement** — [.claude/settings.json](.claude/settings.json) defines tool/path permissions, and [.claude/hooks/](.claude/hooks/) contains `PreToolUse` and `SubagentStop` scripts that block dangerous commands and validate completion gates (for example `enforce-pr-author-skill.ps1`, `enforce-promotion-mcp-only.ps1`, `enforce-orchestration-preimplementation-gate.ps1`, `enforce-checkpoint-monotonic.ps1`, the per-language batch-budget and test-purity checks, and the `validate-*-output.ps1` gates for each subagent).
 
 ### Orchestration model
@@ -40,6 +40,10 @@ The runtime is orchestrator-driven. The `orchestrator` agent runs in the main th
 - **Delegation** — planning goes to `atomic-planner`, task-by-task execution to `atomic-executor`, audits to `feature-review`/`epic-review`/`staged-review`, investigation to `task-researcher`, and PR creation exclusively to `pr-author` (the only authorized caller of `gh pr create`/`gh pr edit --body`, gated by the `enforce-pr-author-skill.ps1` hook, which verifies a SHA-256 receipt that binds the `--body-file` body bytes to a sibling `artifacts/pr_body_<N>.receipt.json`).
 - **Checkpointing** — the orchestrator persists `artifacts/orchestration/orchestrator-state.json` after every completed step, including the selected path, workflow variables, per-step statuses, delegation receipts, and any blocked reason. The structural invariants are enforced by `validate_orchestration_artifacts` and `scripts/dev_tools/validate_orchestrator_state.py`.
 - **Memory** — agents maintain persistent, file-based, project-scoped memory under [.claude/agent-memory/](.claude/agent-memory/), indexed per agent in a `MEMORY.md`.
+
+### Epic orchestration
+
+The `epic-orchestrate` skill and the `epic-orchestrator` agent schedule a multi-feature epic as a dependency graph of child features, run each child through the standard `orchestrator` lifecycle in parallel, isolated git worktrees, and fan the results back into a shared integration branch before driving the final integration-to-main PR. An epic's dependency manifest and free-text narrative (goal, scope, non-goals, shared design, decomposition) live together in a single home, `docs/features/epics/<epic-slug>/epic.md`, whose YAML frontmatter is the machine-parsed source of truth and whose body is the human-readable narrative and the source for the epic's GitHub issue body.
 
 ### Other ecosystem surfaces
 
@@ -156,6 +160,7 @@ Diagnostics:
 - `drmCopilotExtension.helloPython`
 - `drmCopilotExtension.helloPowerShell`
 - `drmCopilotExtension.listMcpTools`
+- `drmCopilotExtension.showSubagentTree`
 
 ### Worktree session commands
 
