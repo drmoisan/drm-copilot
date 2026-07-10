@@ -72,6 +72,27 @@
         "validate_orchestration_artifacts"
       ]
     },
+    "preparation": {
+      "description": "Epic preparation path driven by epic-planner: promotion, research, feature documents, atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope and deferred to the epic execution phase, so this route requires no CI gate at completion.",
+      "requires_ci_gate": false,
+      "required_agents": [
+        "task-researcher",
+        "prd-feature",
+        "atomic-planner",
+        "atomic-executor"
+      ],
+      "required_skills": [
+        "orchestrate",
+        "feature-promotion-lifecycle",
+        "atomic-plan-contract"
+      ],
+      "required_mcp_tools": [
+        "new_potential_entry",
+        "potential_to_issue",
+        "new_active_feature_folder",
+        "validate_orchestration_artifacts"
+      ]
+    },
     "epic": {
       "description": "Epic path for scheduling a dependency graph of child features across parallel worktrees with fan-in via a shared integration branch.",
       "requires_pr_gate": true,

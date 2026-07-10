@@ -15,6 +15,7 @@ PR_GATE_KEYS = ("pr_number", "pr_url", "head_branch", "head_sha")
 # requirement, preserving backward compatibility for routes without a defined set.
 MANDATORY_ROUTE_PHASES: dict[str, tuple[str, ...]] = {
     "small": ("S3_promotion", "S4_atomic_planning"),
+    "preparation": ("S3_promotion", "S4_atomic_planning"),
 }
 
 
@@ -94,6 +95,55 @@ def route_requires_pr_gate(
         return False
     route_map = cast("dict[str, Any]", raw_route)
     return route_map.get("requires_pr_gate") is True
+
+
+def route_requires_ci_gate(
+    state: dict[str, Any], *, routing_matrix: dict[str, Any] | None = None
+) -> bool:
+    """Report whether the checkpoint's route requires a CI gate at completion.
+
+    Purpose:
+        Let a route opt out of the completion `ci_gate` requirement via a
+        per-route `requires_ci_gate: false` field, so preparation-scope routes
+        that never open a PR (and therefore never run CI) can complete cleanly.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint state. The selected route is
+            read from `route_id`, falling back to `path_selected`.
+        routing_matrix (dict[str, Any] | None): Optional pre-loaded routing
+            matrix. When None, the repository routing matrix is loaded from disk.
+
+    Returns:
+        bool: False only when the selected route exists in the matrix and its
+        `requires_ci_gate` value is exactly the boolean False. A missing route
+        id, an unknown route, a malformed matrix, or an absent flag returns
+        True, preserving the historical unconditional CI-gate requirement for
+        every existing route.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads the routing matrix from disk when `routing_matrix` is None.
+    """
+
+    route_id = _selected_route_id(state)
+    if route_id is None:
+        return True
+
+    matrix = routing_matrix if routing_matrix is not None else load_routing_matrix()
+    raw_routes = matrix.get("routes")
+    if not isinstance(raw_routes, dict):
+        return True
+    routes = cast("dict[str, object]", raw_routes)
+
+    raw_route = routes.get(route_id)
+    if not isinstance(raw_route, dict):
+        return True
+    route_map = cast("dict[str, Any]", raw_route)
+    # Only an explicit boolean False opts a route out; any other value keeps
+    # the CI gate required so the exemption cannot be enabled by accident.
+    return route_map.get("requires_ci_gate") is not False
 
 
 def validate_route_membership(
