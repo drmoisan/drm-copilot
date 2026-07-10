@@ -3,7 +3,7 @@
 
 <#
 .SYNOPSIS
-    PreToolUse deny-schema contract test for all 13 PreToolUse hooks.
+    PreToolUse deny-schema contract test for all 14 PreToolUse hooks.
 
 .DESCRIPTION
     For each PreToolUse-registered hook this test dot-sources the hook (using its
@@ -17,7 +17,7 @@
 
     This is the in-repo proving artifact for the root-cause invariant: Claude
     honors a PreToolUse deny only when the hook emits the hookSpecificOutput
-    schema. The contract is enforced once per hook (13 assertion blocks).
+    schema. The contract is enforced once per hook (14 assertion blocks).
 
     Each hook is dot-sourced inside its own It block so the imported functions
     are scoped to that test and do not collide across hooks (several hooks define
@@ -29,7 +29,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Injected seam stubs mirror the production scriptblock signatures for testing')]
 param()
 
-Describe 'PreToolUse deny-schema contract (all 13 hooks)' {
+Describe 'PreToolUse deny-schema contract (all 14 hooks)' {
     BeforeAll {
         $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
 
@@ -131,6 +131,12 @@ Describe 'PreToolUse deny-schema contract (all 13 hooks)' {
         Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
         $toolInput = (@{ subagent_type = 'atomic-planner'; prompt = 'plan something generic' } | ConvertTo-Json -Compress)
         $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $toolInput
+        Assert-PreToolUseDenyShape -Decision $decision
+    }
+
+    It 'enforce-epic-invocation-origin.ps1 emits a PreToolUse deny shape' {
+        . (Join-Path $script:HookRoot 'enforce-epic-invocation-origin.ps1')
+        $decision = Get-EpicInvocationOriginBlockDecision -Reason 'EPIC_INVOCATION_ORIGIN_BLOCKED: test reason'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 }

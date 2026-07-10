@@ -45,6 +45,7 @@ from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
     validate_orchestrator_state_pr_creation_readiness,
 )
 from scripts.dev_tools._orchestrator_state_routing import (
+    route_requires_ci_gate,
     validate_completion_pr_gate,
     validate_phase_completeness,
     validate_route_membership,
@@ -484,7 +485,12 @@ def validate_orchestrator_state_text(
                 "Checkpoint completion validation failed: blocked_reason is not `none`."
             )
         errors.extend(validate_completion_pr_gate(state_map))
-        errors.extend(_validate_completion_ci_gate(state_map))
+        # The CI gate is route-driven: a route may opt out via
+        # requires_ci_gate: false in the routing matrix (preparation-scope
+        # routes never open a PR, so no CI run exists to verify). An absent
+        # flag keeps the gate required, preserving prior behavior.
+        if route_requires_ci_gate(state_map):
+            errors.extend(_validate_completion_ci_gate(state_map))
         errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
 

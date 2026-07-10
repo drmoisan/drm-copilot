@@ -5,11 +5,13 @@ Describe "claude-settings" {
         $script:RepoRoot = (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..')).Path
     }
 
-    It "requires .claude/settings.json to declare orchestrator routing and canonical worker hook coverage" {
+    It "requires .claude/settings.json to omit a default agent and declare canonical worker hook coverage" {
         $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
         $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
 
-        $settings.agent | Should -Be 'orchestrator'
+        # Commit ecc9ced5 removed orchestrator as the session default agent;
+        # the key must stay absent so sessions do not silently re-acquire one.
+        @($settings.PSObject.Properties.Name) | Should -Not -Contain 'agent'
         $settings.hooks.PreToolUse | Should -Not -BeNullOrEmpty
         $settings.hooks.SubagentStop | Should -Not -BeNullOrEmpty
 
