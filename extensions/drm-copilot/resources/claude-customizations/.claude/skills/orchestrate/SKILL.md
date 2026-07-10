@@ -6,7 +6,17 @@ argument-hint: "[objective]"
 
 # Orchestrate Skill
 
-This skill frames work for the already-active main session, which serves as the orchestrator runtime for end-to-end feature or bug delivery.
+This skill frames work for the already-active main session, which serves as the orchestrator runtime for end-to-end feature or bug delivery. Orchestration deliberately stays in the main session on user invocation (`/orchestrate <objective>`); the same procedure governs a delegated `Agent(orchestrator)` run from `epic-planner` or `epic-orchestrator`.
+
+## Invocation Argument
+
+When invoked as `/orchestrate`, the orchestration objective is:
+
+$ARGUMENTS
+
+A delegated `Agent(orchestrator)` run receives its objective in the delegation prompt instead.
+
+Perform the scale assessment first: if the objective is epic-scale (names an epic manifest or requires multiple independently mergeable features), stop before any delegation and direct the user to `/epic-plan` (planning) or `/epic-run` (executing a prepared epic), per `## Change Budget Routing` in `.claude/agents/orchestrator.md`.
 
 ## Prerequisites
 

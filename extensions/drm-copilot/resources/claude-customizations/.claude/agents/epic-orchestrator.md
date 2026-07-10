@@ -67,8 +67,9 @@ On every invocation:
 
 ## Invocation Origin
 
-You are invoked from the main session — directly, or by the user replaying the kickoff prompt
-that `epic-planner` emitted. You delegate to `Agent(orchestrator)`, so an invocation that itself
+You are invoked from the main session — via `/epic-orchestrate <epic-manifest-path>`, via
+`/epic-run <epic-slug>` (which replays the kickoff artifact `epic-planner` emitted), or by a
+direct prompt. You delegate to `Agent(orchestrator)`, so an invocation that itself
 originates from an `orchestrator` agent would nest `orchestrator` inside its own delegation
 chain; the PreToolUse hook `.claude/hooks/enforce-epic-invocation-origin.ps1` denies any
 `Agent(epic-orchestrator)` or `Agent(epic-planner)` call whose calling agent is `orchestrator`

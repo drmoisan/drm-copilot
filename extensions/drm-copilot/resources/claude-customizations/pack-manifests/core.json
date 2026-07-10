@@ -52,6 +52,7 @@
     ".claude/skills/commit-message/SKILL.md",
     ".claude/skills/epic-orchestrate/SKILL.md",
     ".claude/skills/epic-plan/SKILL.md",
+    ".claude/skills/epic-run/SKILL.md",
     ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
     ".claude/skills/execute-hard-lock/SKILL.md",
     ".claude/skills/feature-promotion-lifecycle/SKILL.md",

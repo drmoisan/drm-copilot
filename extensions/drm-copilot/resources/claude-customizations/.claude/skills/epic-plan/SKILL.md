@@ -2,9 +2,16 @@
 name: epic-plan
 description: Scope and prepare a multi-feature epic end-to-end before execution for the epic-planner agent - epic-worthiness gate, decomposition, dependency-wave design, complexity assessment, preparation-mode child orchestrator delegations, integration-branch fan-in, and the epic-orchestrator kickoff prompt artifact.
 argument-hint: "[epic objective or epic-manifest-path]"
+context: fork
+agent: epic-planner
 ---
 
 # Epic Plan Skill
+
+A user invocation (`/epic-plan <objective>`) forks the `epic-planner` agent with this procedure
+in context. The epic objective (or an existing epic-manifest path) for this run is:
+
+$ARGUMENTS
 
 This skill frames work for the `epic-planner` agent, parallel to how
 `.claude/skills/epic-orchestrate/SKILL.md` frames work for `epic-orchestrator`. It documents the
@@ -146,6 +153,8 @@ epic/<epic-slug>-integration).
 
 ## Invocation Prompt
 
+Run `/epic-run <epic-slug>` to execute this epic, or paste the prompt below.
+
 Use the epic-orchestrator subagent to execute the prepared epic at
 docs/features/epics/<epic-slug>/epic.md. The integration branch
 epic/<epic-slug>-integration already contains every prepared feature folder and approved atomic
@@ -176,5 +185,5 @@ pointer, not as a substitute for on-disk state.
 
 The final report to the user must include: the epic manifest path, one `plan-path:` line plus
 preflight status per feature, the integration branch name, and the kickoff artifact paths. End
-with the statement that execution has NOT started and will begin only when the user replays the
-kickoff prompt.
+with the statement that execution has NOT started and will begin only when the user runs
+`/epic-run <epic-slug>` or replays the kickoff prompt.

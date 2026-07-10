@@ -41,6 +41,8 @@
       "Agent(epic-planner)",
       "Skill(orchestrate *)",
       "Skill(epic-plan *)",
+      "Skill(epic-orchestrate *)",
+      "Skill(epic-run *)",
       "Skill(commit-message *)",
       "Skill(pr-author *)",
       "Skill(research-issue *)",
