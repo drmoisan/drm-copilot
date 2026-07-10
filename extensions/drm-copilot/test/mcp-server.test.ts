@@ -10,7 +10,15 @@ import process from "node:process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
-jest.mock("vscode", () => ({}), { virtual: true });
+// Spy on terminal creation so the MCP dispatch path can be asserted to never
+// create a terminal (it uses the buffered in-memory sink). The `mock` prefix is
+// required for jest.mock factory references.
+const mockCreateTerminal = jest.fn();
+jest.mock(
+  "vscode",
+  () => ({ window: { createTerminal: mockCreateTerminal } }),
+  { virtual: true },
+);
 
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
@@ -349,6 +357,25 @@ describe("repo automation MCP server", () => {
       tool: "run_poshqc_test",
       workspace_root: "C:/workspace",
     });
+  });
+
+  it("creates no terminal on the MCP run_poshqc_test path (buffered sink only)", async () => {
+    // Arrange
+    service.runPoshQCTest.mockResolvedValue({
+      tool: "run_poshqc_test",
+      workspaceRoot: "C:/workspace",
+      summary: "Ran bundled PoshQC test against 'C:/workspace'.",
+    });
+
+    // Act
+    await client.callTool({
+      name: "run_poshqc_test",
+      arguments: { workspace_root: "C:/workspace" },
+    });
+
+    // Assert: the MCP dispatch path never creates an integrated terminal.
+    expect(mockCreateTerminal).not.toHaveBeenCalled();
+    expect(service.runPoshQCTest).toHaveBeenCalledTimes(1);
   });
 
   it("dispatches run_poshqc_analyze_autofix through the shared service with scan folders", async () => {

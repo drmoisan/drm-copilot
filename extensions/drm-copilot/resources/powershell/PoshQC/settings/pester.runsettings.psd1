@@ -21,6 +21,9 @@
         OutputFormat          = 'CoverageGutters'
         OutputPath            = 'artifacts/pester/powershell-coverage.xml'
         Path                  = @(
+            # Scope coverage to hook files with deterministic Pester coverage in this branch.
+            # Broader script/module globs include bootstrap and one-shot automation paths that
+            # are validated by their own suites but not meaningfully covered by this hook batch.
             '.claude/hooks/validate-bash.ps1'
             '.claude/hooks/check-python-test-purity.ps1'
             '.claude/hooks/check-powershell-test-purity.ps1'
@@ -44,33 +47,41 @@
             '.claude/hooks/enforce-pr-author-skill.ps1'
             '.claude/hooks/validate-orchestrator-output.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
+            # Issue #301 remediation cycle 1 (fix #1): measure the completion-consistency
+            # hook set (Claude and Codex variants) so their Pester coverage is captured.
+            '.claude/hooks/enforce-completion-consistency.ps1'
+            '.claude/hooks/enforce-completion-helpers.ps1'
+            '.codex/hooks/enforce-completion-consistency.ps1'
+            '.codex/hooks/enforce-completion-helpers.ps1'
+            # Issue #298 fixed ConvertTo-CommandResult's handling of an empty array Output
+            # parameter in this script; measured here so the change produces real per-file
+            # coverage evidence going forward.
+            'scripts/dev-tools/Invoke-FullReleaseFlow.ps1'
+            # Issue #305 added this PreToolUse model-routing-receipt deterrent hook; measured
+            # here so the new production hook is not excluded from coverage.
+            '.claude/hooks/enforce-model-routing-receipt.ps1'
+            # Issue #312 added the .claude-resident PowerShell model-routing library so the
+            # push-down bundle no longer cites missing scripts/dev_tools references; measured
+            # here so the new production module is not excluded from coverage.
+            '.claude/lib/model-routing/ModelRouting.psm1'
+            # The portable orchestrator-state modules make the pushed-down enforcement hooks
+            # work in consumer repos without scripts/dev_tools; measured here so the new
+            # production modules are not excluded from coverage.
+            '.claude/lib/orchestrator-state/OrchestratorState.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1'
+            # Issue #328 added this dev-tools worktree launcher script; measured here so the
+            # changed production file is in the coverage denominator (R1). The test suite
+            # dot-sources the file (guarded body) so line attribution is valid.
+            'scripts/dev-tools/new-claude-worktree-session.ps1'
             # Issue #334 added this SessionStart hook that persists the current session id;
             # measured here so the new production hook is not excluded from coverage. The
             # test suite dot-sources the file (guarded body) so line attribution is valid.
             '.claude/hooks/persist-session-id.ps1'
         )
-        ExcludedPath          = @(
-            '.claude/hooks/validate-feature-review-coverage.ps1' # Feature-review wrapper around repository evidence; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/bootstrap-host.ps1' # Host bootstrap entrypoint for external setup; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/bootstrap-host.helpers.ps1' # Bootstrap helper for host setup; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/format-powershell.ps1' # Thin formatter wrapper around external tooling; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/load-openai-key.ps1' # Local secret-loading wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/publish-sideloaded-extension.ps1' # VS Code extension publication wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/run-actionlint.ps1' # External actionlint wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/run-pester.ps1' # Pester CLI wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/run-poshqc-suite.ps1' # PoshQC CLI wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/run-psscriptanalyzer.ps1' # PSScriptAnalyzer CLI wrapper; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/verify-host.ps1' # Host verification wrapper for local tools; not deterministic in normal unit-test execution.
-            'scripts/dev-tools/vscode-cli.helpers.ps1' # VS Code CLI helper around external processes; not deterministic in normal unit-test execution.
-            'scripts/powershell/PoshQC/PoshQC.Analyzer.psm1' # Analyzer orchestration module over external tooling; not deterministic in normal unit-test execution.
-            'scripts/powershell/PoshQC/PoshQC.FileDiscovery.psm1' # File-discovery module coupled to workspace traversal; not deterministic in normal unit-test execution.
-            'scripts/powershell/PoshQC/PoshQC.Testing.psm1' # Pester orchestration module over external tooling; not deterministic in normal unit-test execution.
-        )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
     }
 }
-
 
 
 

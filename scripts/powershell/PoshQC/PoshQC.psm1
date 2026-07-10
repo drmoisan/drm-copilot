@@ -83,6 +83,7 @@ function Install-PoshQCTool {
 # functions defined in them do not enter the parent module scope.  Loading the
 # file content as a scriptblock bypasses that behaviour.
 . ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.FileDiscovery.psm1') -Raw)))
+. ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.ScanConfig.psm1') -Raw)))
 . ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.Analyzer.psm1') -Raw)))
 . ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.Testing.psm1') -Raw)))
 
@@ -96,6 +97,7 @@ Export-ModuleMember -Function @(
     'Invoke-PoshQCAnalyzeAutofix',
     'Invoke-PoshQCSuite',
     'Invoke-PoshQCTest',
-    'Convert-PoshQCCoverageToRelative'
+    'Convert-PoshQCCoverageToRelative',
+    'Get-PoshQCScanConfigFolder'
 ) -Alias @('Install-PoshQCTools')
 

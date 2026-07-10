@@ -206,6 +206,10 @@ function Invoke-PoshQCTest {
             param([string] $RootPath, [string[]] $Folders)
             Resolve-PoshQCScanFolder -Root $RootPath -ScanFolders $Folders
         },
+        [scriptblock] $ResolveScanConfig = {
+            param([string] $RootPath)
+            Get-PoshQCScanConfigFolder -Root $RootPath
+        },
         [scriptblock] $ExpandCoveragePaths = {
             param($Config, [string] $RootPath)
             if (-not $Config.CodeCoverage) { return $Config }
@@ -276,8 +280,16 @@ function Invoke-PoshQCTest {
     $config = & $ExpandRunPaths $config $Root $ExcludeDirs
     $config = & $EnsureResultPath $config $Root
     $config = & $ExpandCoveragePaths $config $Root
-    if ($ScanFolders -and $ScanFolders.Count -gt 0) {
-        $resolvedScanFolders = @(& $ResolveScanFolders $Root $ScanFolders)
+    # Scan-folder precedence: explicit -ScanFolders always wins; otherwise the
+    # persisted scan configuration is consulted; an absent or empty configuration
+    # leaves the settings Run.Path defaults in place.
+    $effectiveScanFolders = if ($ScanFolders -and $ScanFolders.Count -gt 0) {
+        @($ScanFolders)
+    } else {
+        @(& $ResolveScanConfig $Root)
+    }
+    if ($effectiveScanFolders -and $effectiveScanFolders.Count -gt 0) {
+        $resolvedScanFolders = @(& $ResolveScanFolders $Root $effectiveScanFolders)
         if ($resolvedScanFolders.Count -gt 0) {
             $config.Run.Path = $resolvedScanFolders
         }

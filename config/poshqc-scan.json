@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "test": {
+    "scanFolders": ["scripts", "tests/powershell", "tests/scripts"]
+  }
+}
