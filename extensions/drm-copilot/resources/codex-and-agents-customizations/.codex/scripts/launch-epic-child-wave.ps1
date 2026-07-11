@@ -94,27 +94,27 @@ function Get-CodexChildLaunchReceipt {
         delegation_id = [string]$Entry.delegation_id; deployment_agent = [string]$Entry.deployment_agent
         model = [string]$Entry.model; model_reasoning_effort = [string]$Entry.model_reasoning_effort
         permissions = [string]$Entry.permissions; runtime_permissions = 'epic-child-workspace'
-        execution_context = [string]$Entry.execution_context
+        execution_context             = [string]$Entry.execution_context
         worktree_path = [string]$AgentProfile.worktree_path; branch_name = [string]$Entry.branch_name
         integration_branch = [string]$Spec.integration_branch; integration_head = [string]$AgentProfile.integration_head
-        child_head = [string]$AgentProfile.child_head
-        trusted_repository_root = [string]$AgentProfile.trusted_repository_root
-        trusted_repository_head = [string]$AgentProfile.trusted_repository_head
-        git_common_directory = [string]$AgentProfile.git_common_directory
-        trusted_surface_objects = $AgentProfile.trusted_surface_objects
-        trusted_surface_sha256 = [string]$AgentProfile.trusted_surface_sha256
-        prompt_sha256 = Get-CodexChildSha256 -Value ([string]$Entry.prompt)
-        profile_path = [string]$AgentProfile.profile_path
-        profile_sha256 = [string]$AgentProfile.profile_sha256
+        child_head                    = [string]$AgentProfile.child_head
+        trusted_repository_root       = [string]$AgentProfile.trusted_repository_root
+        trusted_repository_head       = [string]$AgentProfile.trusted_repository_head
+        git_common_directory          = [string]$AgentProfile.git_common_directory
+        trusted_surface_objects       = $AgentProfile.trusted_surface_objects
+        trusted_surface_sha256        = [string]$AgentProfile.trusted_surface_sha256
+        prompt_sha256                 = Get-CodexChildSha256 -Value ([string]$Entry.prompt)
+        profile_path                  = [string]$AgentProfile.profile_path
+        profile_sha256                = [string]$AgentProfile.profile_sha256
         developer_instructions_sha256 = Get-CodexChildSha256 -Value ([string]$AgentProfile.developer_instructions)
-        skills_config_sha256 = Get-CodexChildSha256 -Value ([string]$AgentProfile.skills_config)
+        skills_config_sha256          = Get-CodexChildSha256 -Value ([string]$AgentProfile.skills_config)
         spec_path = $SpecPath; spec_sha256 = $SpecSha256
         checkpoint_path = $CheckpointPath; checkpoint_sha256 = $CheckpointSha256
         receipt_path = $ReceiptPath; status_path = $StatusPath; codex_home_path = $CodexHomePath
-        codex_command_path = [string]$CodexRuntime.CommandPath
-        codex_denied_paths = [string[]]$CodexRuntime.DeniedPaths
+        codex_command_path            = [string]$CodexRuntime.CommandPath
+        codex_denied_paths            = [string[]]$CodexRuntime.DeniedPaths
         authorized_at = $authorizedAt.ToString('o'); session_bound_at = ''
-        expires_at = $authorizedAt.AddDays(7).ToString('o')
+        expires_at                    = $authorizedAt.AddDays(7).ToString('o')
     }
 }
 
@@ -219,11 +219,11 @@ function Get-CodexChildTerminalStatusEntry {
     $quotedWrapper = "'" + $wrapper.Replace("'", "''") + "'"
     $quotedReceipt = "'" + $ReceiptPath.Replace("'", "''") + "'"
     $status = [ordered]@{
-        state = $(if ($Child.Process.ExitCode -eq 0) { 'completed' } else { 'failed' })
+        state              = $(if ($Child.Process.ExitCode -eq 0) { 'completed' } else { 'failed' })
         pid = $Child.Process.Id; exit_code = $Child.Process.ExitCode
         codex_session_id = $Child.SessionId; receipt_path = $ReceiptPath
         resume_script_path = $wrapper
-        resume_command = "& $quotedWrapper -ReceiptPath $quotedReceipt"
+        resume_command     = "& $quotedWrapper -ReceiptPath $quotedReceipt"
         stdout_path = "$($Child.BasePath).stdout.jsonl"; stderr_path = "$($Child.BasePath).stderr.log"
     }
     if ($Child.Process.ExitCode -eq 0) {
@@ -467,5 +467,5 @@ if ($null -eq $supervisorProcess) { throw 'EPIC_CHILD_LAUNCH_BLOCKED: failed to 
 [ordered]@{
     wave_id = [string]$spec.wave_id; supervisor_pid = $supervisorProcess.Id
     effective_max_parallel = $effectiveMaximum
-    status_path = Join-Path $artifactRoot "wave.$($spec.wave_id).status.json"
+    status_path            = Join-Path $artifactRoot "wave.$($spec.wave_id).status.json"
 } | ConvertTo-Json -Compress | Write-Output

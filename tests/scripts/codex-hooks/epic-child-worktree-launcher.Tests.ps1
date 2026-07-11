@@ -167,14 +167,14 @@ Describe 'Codex epic-child worktree launcher and guard' {
             $checkpoint = [pscustomobject]@{
                 integration_branch = 'epic/sample-integration'; max_parallel_features = 4
                 epic_feature_folder = 'sample-epic'
-                features = @($featureA, $featureB)
+                features            = @($featureA, $featureB)
             }
             $spec = [pscustomobject]@{
                 schema_version = 1; checkpoint_kind = 'epic-planner'
                 wave_id = 'preparation-batch'; wave_number = 0; max_parallel_features = 4
                 integration_branch = 'epic/sample-integration'
-                checkpoint_path = 'artifacts/orchestration/epic-planner-state.json'
-                launches = @($entryA, $entryB)
+                checkpoint_path    = 'artifacts/orchestration/epic-planner-state.json'
+                launches           = @($entryA, $entryB)
             }
             $branches = @{ $worktreeA = 'feature/child-a'; $worktreeB = 'feature/child-b' }
             $profileA = $script:Profile.PSObject.Copy(); $profileA.worktree_path = $worktreeA

@@ -16,7 +16,7 @@ Describe 'Codex epic-child launcher hardening' {
             return [pscustomobject]@{
                 issue_num = $Issue; feature_folder = $featureFolder; wave_number = $Wave
                 worktree_path = $Worktree; branch_name = "feature/$Name"; merge_status = 'not_started'
-                delegation_receipt = [pscustomobject]@{
+                delegation_receipt    = [pscustomobject]@{
                     delegation_id = $delegationId; feature_folder = $featureFolder
                     issue_num = $Issue; agent_name = $agent
                 }
@@ -31,14 +31,14 @@ Describe 'Codex epic-child launcher hardening' {
         function Get-TestLaunchEntry {
             param([Parameter(Mandatory)] $Feature, [string] $Context = 'epic_execution_child')
             return [pscustomobject]@{
-                launch_id = "launch-$(Split-Path ([string]$Feature.feature_folder) -Leaf)"
+                launch_id     = "launch-$(Split-Path ([string]$Feature.feature_folder) -Leaf)"
                 delegation_id = [string]$Feature.delegation_receipt.delegation_id
                 feature_folder = [string]$Feature.feature_folder; issue_num = $Feature.issue_num
                 deployment_agent = 'orchestrator-c3-elevated'; model = 'gpt-5.6-sol'
                 model_reasoning_effort = 'high'; permissions = 'orchestrator-workspace'
                 execution_context = $Context; worktree_path = [string]$Feature.worktree_path
-                branch_name = [string]$Feature.branch_name
-                prompt = $(if ($Context -eq 'epic_preparation_child') {
+                branch_name   = [string]$Feature.branch_name
+                prompt        = $(if ($Context -eq 'epic_preparation_child') {
                         'Preparation mode: true. Prepare the feature.'
                     } else {
                         'Epic mode: true. epic_feature_folder: sample-epic. integration_branch: epic/sample-integration. PR base branch MUST be epic/sample-integration, not main; pass --base epic/sample-integration to gh pr create.'
@@ -52,7 +52,7 @@ Describe 'Codex epic-child launcher hardening' {
                 name = 'orchestrator-c3-elevated'; model = 'gpt-5.6-sol'
                 model_reasoning_effort = 'high'; default_permissions = 'orchestrator-workspace'
                 developer_instructions = 'exact'; skills_config = '[]'; worktree_path = $Worktree
-                profile_path = Join-Path $Worktree '.codex/agents/orchestrator-c3-elevated.toml'
+                profile_path   = Join-Path $Worktree '.codex/agents/orchestrator-c3-elevated.toml'
                 profile_sha256 = ('a' * 64)
             }
         }
@@ -71,7 +71,7 @@ Describe 'Codex epic-child launcher hardening' {
             schema_version = 1; checkpoint_kind = 'epic-orchestrator'; wave_id = 'wave-1'
             wave_number = 1; max_parallel_features = 4; integration_branch = 'epic/sample-integration'
             checkpoint_path = 'artifacts/orchestration/epic-orchestrator-state.json'
-            launches = @($script:EntryA, $script:EntryB)
+            launches        = @($script:EntryA, $script:EntryB)
         }
         $script:Profiles = @{}
         foreach ($item in @(@($script:WorktreeA, (Get-TestProfile $script:WorktreeA)),
@@ -233,7 +233,7 @@ Describe 'Codex epic-child launcher hardening' {
             model_reasoning_effort = 'high'; execution_context = 'epic_execution_child'
             profile_sha256 = ('a' * 64); codex_command_path = 'codex.exe'
             codex_denied_paths = @('C:\Tools\codex.exe', 'C:\Tools\node_modules\@openai\codex')
-            codex_home_path = 'C:\isolated'
+            codex_home_path    = 'C:\isolated'
         }
         $info = Get-CodexChildProcessStartInfo -Entry $script:EntryA `
             -AgentProfile $script:Profiles[(Get-CodexChildProfileKey -WorktreePath $script:WorktreeA `
@@ -424,7 +424,7 @@ Describe 'Codex epic-child launcher hardening' {
     It 'repeats the exact terminal receipt timestamp under the matching status key' {
         $child = [pscustomobject]@{
             Process = [pscustomobject]@{ ExitCode = 0; Id = 123 }
-            Entry = [pscustomobject]@{ worktree_path = 'C:\worktree' }
+            Entry   = [pscustomobject]@{ worktree_path = 'C:\worktree' }
             SessionId = 'session-a'; BasePath = 'C:\artifacts\launch-a'
             Receipt = [pscustomobject]@{ completed_at = '2026-07-10T12:00:00Z'; failed_at = '' }
         }

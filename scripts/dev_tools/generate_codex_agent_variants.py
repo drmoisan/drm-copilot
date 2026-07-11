@@ -9,7 +9,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 from scripts.dev_tools.resolve_codex_deployment import (
     BASE_PROFILES,
