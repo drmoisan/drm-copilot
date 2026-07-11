@@ -77,6 +77,11 @@
             # measured here so the new production hook is not excluded from coverage. The
             # test suite dot-sources the file (guarded body) so line attribution is valid.
             '.claude/hooks/persist-session-id.ps1'
+            # Issue #344 remediation cycle 1 (R2): measure the new production ScanConfig module
+            # so it is not excluded from coverage; PoshQC.psm1 sub-module loading was refactored
+            # to AST-based scriptblocks (Parser::ParseFile(...).GetScriptBlock()) so Pester
+            # coverage breakpoints bind to the on-disk source file.
+            'scripts/powershell/PoshQC/PoshQC.ScanConfig.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

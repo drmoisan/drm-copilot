@@ -284,6 +284,105 @@ Describe 'Invoke-PoshQCTest scan-folder support' {
     }
 }
 
+Describe 'Invoke-PoshQCTest scan-config precedence' {
+    BeforeEach {
+        $script:capturedRunPaths = $null
+        $script:configConsulted = $false
+
+        # Minimal settings table with three default Run.Path entries, a
+        # configuration builder that boxes Run.Path in a Value wrapper (mirroring
+        # New-PesterConfiguration), and no-op expanders so only scan-folder
+        # precedence is exercised.
+        $script:loadSettings = { @{ Run = @{ Path = @('scripts', 'tests/powershell', 'tests/scripts') } } }
+        $script:buildConfiguration = {
+            param($Table)
+            [pscustomobject]@{
+                Run          = @{ Path = @{ Value = $Table.Run.Path }; ExcludePath = @{ Value = @() }; PassThru = $false }
+                TestResult   = @{ Enabled = @{ Value = $false }; OutputPath = @{ Value = $null } }
+                CodeCoverage = $null
+                Output       = @{ Verbosity = 'Normal' }
+            }
+        }
+        $script:enumerateTests = {
+            param([string[]] $Paths, [string[]] $Excluded, [scriptblock] $TestPathFn)
+            [void] $Excluded
+            [void] $TestPathFn
+            $script:capturedRunPaths = $Paths
+            @([pscustomobject]@{ FullName = '/repo/tests/scripts/x.Tests.ps1' })
+        }
+        $script:invokePester = {
+            param($Config)
+            [void] $Config
+            [pscustomobject]@{
+                Duration          = [timespan]::Zero
+                PassedCount       = 1
+                FailedCount       = 0
+                SkippedCount      = 0
+                InconclusiveCount = 0
+                NotRunCount       = 0
+                CodeCoverage      = $null
+            }
+        }
+        $script:noopResult = { param($cfg, [string] $RootPath) [void] $RootPath; $cfg }
+        $script:noopExpandRun = { param($cfg, [string] $RootPath, [string[]] $Excluded) [void] $RootPath; [void] $Excluded; $cfg }
+        $script:noopExpandCoverage = { param($cfg, [string] $RootPath) [void] $RootPath; $cfg }
+        $script:noopLogger = { param([string] $Message) [void] $Message }
+    }
+
+    It 'uses explicit -ScanFolders and never consults the configuration seam' {
+        Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/src') -SettingsPath '/settings.psd1' `
+            -EnsureModule { } -TestPathExists { $true } -LoadSettings $script:loadSettings `
+            -BuildConfiguration $script:buildConfiguration -EnsureResultPath $script:noopResult `
+            -ExpandRunPaths $script:noopExpandRun -ExpandCoveragePaths $script:noopExpandCoverage `
+            -ResolveScanFolders { param([string] $RootPath, [string[]] $Folders) [void] $RootPath; $Folders } `
+            -ResolveScanConfig { param([string] $RootPath) [void] $RootPath; $script:configConsulted = $true; @('scripts') } `
+            -EnumerateTests $script:enumerateTests -InvokePester $script:invokePester `
+            -CopyCoverage { } -Logger $script:noopLogger | Out-Null
+
+        $script:configConsulted | Should -BeFalse
+        $script:capturedRunPaths | Should -Be @('/repo/src')
+    }
+
+    It 'resolves scan folders from the configuration when -ScanFolders is absent' {
+        Invoke-PoshQCTest -Root '/repo' -SettingsPath '/settings.psd1' `
+            -EnsureModule { } -TestPathExists { $true } -LoadSettings $script:loadSettings `
+            -BuildConfiguration $script:buildConfiguration -EnsureResultPath $script:noopResult `
+            -ExpandRunPaths $script:noopExpandRun -ExpandCoveragePaths $script:noopExpandCoverage `
+            -ResolveScanFolders { param([string] $RootPath, [string[]] $Folders) [void] $RootPath; $Folders | ForEach-Object { "/repo/$_" } } `
+            -ResolveScanConfig { param([string] $RootPath) [void] $RootPath; @('scripts', 'tests/scripts') } `
+            -EnumerateTests $script:enumerateTests -InvokePester $script:invokePester `
+            -CopyCoverage { } -Logger $script:noopLogger | Out-Null
+
+        $script:capturedRunPaths | Should -Be @('/repo/scripts', '/repo/tests/scripts')
+    }
+
+    It 'falls back to the settings Run.Path defaults when the configuration yields no folders' {
+        Invoke-PoshQCTest -Root '/repo' -SettingsPath '/settings.psd1' `
+            -EnsureModule { } -TestPathExists { $true } -LoadSettings $script:loadSettings `
+            -BuildConfiguration $script:buildConfiguration -EnsureResultPath $script:noopResult `
+            -ExpandRunPaths $script:noopExpandRun -ExpandCoveragePaths $script:noopExpandCoverage `
+            -ResolveScanFolders { param([string] $RootPath, [string[]] $Folders) [void] $RootPath; [void] $Folders; throw 'should not resolve when config is empty' } `
+            -ResolveScanConfig { param([string] $RootPath) [void] $RootPath; @() } `
+            -EnumerateTests $script:enumerateTests -InvokePester $script:invokePester `
+            -CopyCoverage { } -Logger $script:noopLogger | Out-Null
+
+        $script:capturedRunPaths | Should -Be @('scripts', 'tests/powershell', 'tests/scripts')
+    }
+
+    It 'still throws for an explicitly supplied nonexistent scan folder' {
+        {
+            Invoke-PoshQCTest -Root '/repo' -ScanFolders @('/repo/missing') -SettingsPath '/settings.psd1' `
+                -EnsureModule { } -TestPathExists { $true } -LoadSettings $script:loadSettings `
+                -BuildConfiguration $script:buildConfiguration -EnsureResultPath $script:noopResult `
+                -ExpandRunPaths $script:noopExpandRun -ExpandCoveragePaths $script:noopExpandCoverage `
+                -ResolveScanFolders { param([string] $RootPath, [string[]] $Folders) [void] $RootPath; throw "Failed to resolve scan folder '$($Folders[0])'." } `
+                -ResolveScanConfig { param([string] $RootPath) [void] $RootPath; @('scripts') } `
+                -EnumerateTests $script:enumerateTests -InvokePester $script:invokePester `
+                -CopyCoverage { } -Logger $script:noopLogger | Out-Null
+        } | Should -Throw "*Failed to resolve scan folder*"
+    }
+}
+
 Describe 'Invoke-PoshQCAnalyze scan-folder support' {
     It 'honors ScanFolders when requesting the file list' {
         $script:capturedAnalyzeRoot = $null

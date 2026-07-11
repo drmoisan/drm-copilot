@@ -80,11 +80,30 @@ function Install-PoshQCTool {
 }
 
 # PowerShell 7.6+ treats dot-sourced .psm1 files as isolated modules, so
-# functions defined in them do not enter the parent module scope.  Loading the
-# file content as a scriptblock bypasses that behaviour.
-. ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.FileDiscovery.psm1') -Raw)))
-. ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.Analyzer.psm1') -Raw)))
-. ([scriptblock]::Create((Get-Content (Join-Path $script:ModuleRoot 'PoshQC.Testing.psm1') -Raw)))
+# functions defined in them do not enter the parent module scope.  A scriptblock
+# obtained from [Parser]::ParseFile(...).GetScriptBlock() still executes in the
+# caller's (module) scope when dot-sourced, preserving that workaround, while
+# also retaining the on-disk file association.  The file association is required
+# so Pester code-coverage breakpoints can bind to the sub-module source files
+# (issue #344 remediation cycle 1, R2); the previous fileless
+# [scriptblock]::Create((Get-Content -Raw)) approach produced scriptblocks with
+# no source file, so breakpoints never bound and PoshQC.ScanConfig.psm1 fell
+# outside the coverage denominator.  Parse errors fail module import fast.
+foreach ($subModuleName in @(
+        'PoshQC.FileDiscovery.psm1',
+        'PoshQC.ScanConfig.psm1',
+        'PoshQC.Analyzer.psm1',
+        'PoshQC.Testing.psm1'
+    )) {
+    $subModulePath = Join-Path $script:ModuleRoot $subModuleName
+    $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile(
+        $subModulePath, [ref]$null, [ref]$parseErrors)
+    if ($parseErrors) {
+        throw "Failed to parse sub-module '$subModuleName': $($parseErrors -join '; ')"
+    }
+    . ($ast.GetScriptBlock())
+}
 
 Set-Alias -Name Install-PoshQCTools -Value Install-PoshQCTool
 
@@ -96,6 +115,7 @@ Export-ModuleMember -Function @(
     'Invoke-PoshQCAnalyzeAutofix',
     'Invoke-PoshQCSuite',
     'Invoke-PoshQCTest',
-    'Convert-PoshQCCoverageToRelative'
+    'Convert-PoshQCCoverageToRelative',
+    'Get-PoshQCScanConfigFolder'
 ) -Alias @('Install-PoshQCTools')
 

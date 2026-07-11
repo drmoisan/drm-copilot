@@ -277,7 +277,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
   {
     name: "run_poshqc_test",
     description:
-      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources.",
+      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources. When scan_folders is omitted, the scan set is resolved from config/poshqc-scan.json (test.scanFolders); an explicit scan_folders argument overrides the configuration.",
     inputSchema: {
       type: "object",
       properties: {

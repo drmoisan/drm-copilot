@@ -437,6 +437,11 @@ export function activate(context: vscode.ExtensionContext): void {
   ] = registerPoshQcCommands({
     output,
     service,
+    createService: (commandOutput) =>
+      createRepoAutomationService({
+        extensionRoot: context.extensionUri.fsPath,
+        output: commandOutput,
+      }),
   });
 
   const [
