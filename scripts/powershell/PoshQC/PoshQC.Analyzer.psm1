@@ -27,7 +27,7 @@ function Invoke-PoshQCFormat {
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path $Path },
         [scriptblock] $GetFileList = { param([string] $RootPath, [string[]] $ScanFoldersPath, [string[]] $Excluded) Get-PoshQCFileList -Root $RootPath -ScanFolders $ScanFoldersPath -ExcludeDirs $Excluded },
         [scriptblock] $ReadFile = { param([string] $Path) Get-Content -Raw -Path $Path },
-        [scriptblock] $WriteFile = { param([string] $Path, [string] $Content) Set-Content -Path $Path -Value $Content -Encoding UTF8 },
+        [scriptblock] $WriteFile = { param([string] $Path, [string] $Content) Set-Content -Path $Path -Value $Content -Encoding UTF8 -NoNewline },
         [scriptblock] $FormatContent = { param([string] $Content, [string] $Settings) Invoke-Formatter -ScriptDefinition $Content -Settings $Settings },
         [scriptblock] $Logger = {
             param([string] $Message)

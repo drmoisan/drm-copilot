@@ -107,6 +107,44 @@ describe("validateOrchestrationServiceCall", () => {
     ).toThrow("Checkpoint root must be a JSON object.");
   });
 
+  it("routes require-ready-for-execution to the epic-planner validator", () => {
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/artifacts/orchestration/epic-planner-state.json": "{}",
+    });
+
+    expect(() =>
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "C:/workspace",
+        artifactType: "epic-planner-state",
+        artifactPath: "artifacts/orchestration/epic-planner-state.json",
+        requireReadyForExecution: true,
+      }),
+    ).toThrow(
+      "Execution-ready planner checkpoint next_step must be 'EPIC_EXECUTION_READY'.",
+    );
+  });
+
+  it("routes require-codex-topology to the checkpoint validator", () => {
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/state.json": JSON.stringify({
+        delegation_receipts: [{ agent_name: "orchestrator" }],
+      }),
+    });
+
+    expect(() =>
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "C:/workspace",
+        artifactType: "orchestrator-state",
+        artifactPath: "docs/state.json",
+        requireCodexTopology: true,
+      }),
+    ).toThrow(
+      "Checkpoint codex_topology_receipts must be a list when present.",
+    );
+  });
+
   it("throws with the aggregated error text when validation errors are present", () => {
     // Arrange: a policy-audit document missing required headings.
     const fileSystem = new VirtualFileSystem({

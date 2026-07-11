@@ -315,3 +315,30 @@ This repository uses a four-layer Claude Code runtime architecture that maps the
 The `.claude/` directory is the standalone runtime surface for Claude Code. Skills, agents, and rules under `.claude/` are self-contained and do not require reading from `.github/` at runtime. The `.github/` directory contains the parallel Copilot-native customization surface.
 
 The orchestration checkpoint path for this runtime is `artifacts/orchestration/orchestrator-state.json`. The main session reads `artifacts/orchestration/orchestrator-state.json` before worker delegation and updates the same file across phase transitions.
+
+## Codex Epic Planning and Model Routing
+
+The Codex main session has no default orchestrator agent. Use the native skills
+as explicit entry points:
+
+- `epic-plan` delegates master scoping and complete preparation through preflight
+  to the `epic-planner` agent.
+- `epic-run` executes a prepared epic from the committed
+  `docs/features/epics/<slug>/epic-kickoff.md` artifact.
+- `epic-orchestrate` executes a valid manually authored epic manifest.
+
+The ordinary `orchestrator` must not invoke either epic persona. Both epic
+personas delegate to child orchestrators, so epic entry requires main-session
+provenance and is enforced by Codex hooks and completion validators.
+
+Production-file count selects the engineer/orchestrator topology. C1-C4
+complexity, execution context, and the monotonic orchestration ceiling select an
+exact generated Codex agent profile through `codex-model-routing`. The canonical
+policy is `config/orchestration-routing.json`; deterministic topology receipts,
+exact model slugs, and model-routing receipts must be persisted before
+delegation. Silent model fallback is prohibited.
+
+Planning and execution use separate durable checkpoints:
+
+- `artifacts/orchestration/epic-planner-state.json`
+- `artifacts/orchestration/epic-orchestrator-state.json`

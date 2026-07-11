@@ -4,7 +4,6 @@ description: Architecture boundary enforcement rules for the No-COM architecture
 paths:
   - "**/*.ts"
   - "**/*.cs"
-description: Architecture boundary enforcement rules for the No-COM architecture.
 ---
 
 # Converted rule

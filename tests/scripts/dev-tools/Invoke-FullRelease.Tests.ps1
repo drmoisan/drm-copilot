@@ -15,6 +15,8 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
         $script:capturedNpmArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedGitArgsList = [System.Collections.Generic.List[object]]::new()
         $script:capturedGhArgsList = [System.Collections.Generic.List[object]]::new()
+        $script:capturedConfigPaths = @()
+        $script:capturedMcpVersion = $null
         $script:ghInvokedAfterGitCount = -1
     }
 
@@ -83,6 +85,11 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
                 $script:ghInvokedAfterGitCount = $script:capturedGitArgsList.Count
                 return 0
             }
+            Mock -CommandName Set-CodexMcpVersionPin -MockWith {
+                param([string[]]$ConfigPaths, [string]$Version)
+                $script:capturedConfigPaths = $ConfigPaths
+                $script:capturedMcpVersion = $Version
+            }
 
             $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
 
@@ -96,6 +103,10 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             $ghFlat = @($script:capturedGhArgsList | ForEach-Object { $_ }) -join " "
             $ghFlat | Should -Match "pr create"
             $ghFlat | Should -Match "--base main"
+            Should -Invoke -CommandName Set-CodexMcpVersionPin -Times 1 -Exactly
+            $script:capturedMcpVersion | Should -Be "0.0.2"
+            ($script:capturedConfigPaths -join "`n") | Should -Match "[\\/]\.codex[\\/]config\.toml"
+            ($script:capturedConfigPaths -join "`n") | Should -Match "codex-and-agents-customizations[\\/]\.codex[\\/]config\.toml"
 
             # The 'git add' staging call must include both package.json manifests
             # and both package-lock.json lockfiles. npm version (npm 7+) updates
@@ -108,6 +119,8 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             $addFlat | Should -Match "packages[\\/]mcp-server[\\/]package\.json"
             $addFlat | Should -Match "extensions[\\/]drm-copilot[\\/]package-lock\.json"
             $addFlat | Should -Match "packages[\\/]mcp-server[\\/]package-lock\.json"
+            $addFlat | Should -Match "[\\/]\.codex[\\/]config\.toml"
+            $addFlat | Should -Match "codex-and-agents-customizations[\\/]\.codex[\\/]config\.toml"
 
             # The release branch must be pushed to origin before the PR is opened.
             $gitFlat = @($script:capturedGitArgsList | ForEach-Object { $_ -join " " })
@@ -196,6 +209,11 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
                 if ($ManifestPath -match 'mcp-server') { return "0.0.2" }
                 return "0.0.3"
             }
+            Mock -CommandName Set-CodexMcpVersionPin -MockWith {
+                param([string[]]$ConfigPaths, [string]$Version)
+                $null = $ConfigPaths
+                $null = $Version
+            }
         }
 
         It "returns 1 when 'git status --porcelain' fails" {
@@ -264,6 +282,26 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             $script:capturedMessage | Should -Match "Failed to stage bumped manifests"
         }
 
+        It "returns 1 before staging when the Codex MCP pin cannot be synchronized" {
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                if (($GitArgs -join " ") -match "^add ") { throw "git add should not be invoked" }
+                return @{ Output = @(); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-NpmExe -MockWith { param([string[]]$NpmArgs) $null = $NpmArgs; return 0 }
+            Mock -CommandName Set-CodexMcpVersionPin -MockWith {
+                param([string[]]$ConfigPaths, [string]$Version)
+                $null = $ConfigPaths
+                $null = $Version
+                throw "invalid transport"
+            }
+
+            $result = Invoke-FullReleaseGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Failed to synchronize the Codex MCP package pin: invalid transport"
+        }
+
         It "returns 1 when committing the bumped manifests fails" {
             Mock -CommandName Invoke-GitExe -MockWith {
                 param([string[]]$GitArgs)
@@ -325,6 +363,56 @@ Describe "Invoke-FullRelease.ps1 - Invoke-FullReleaseGuarded" {
             Mock -CommandName Get-Content -MockWith { param($LiteralPath, [switch]$Raw) $null = $LiteralPath; $null = $Raw; return '{ "name": "no-version" }' }
 
             { Get-NpmVersion -ManifestPath "/repo/extensions/drm-copilot/package.json" } | Should -Throw "*no 'version' field*"
+        }
+    }
+
+    Context "Set-CodexMcpVersionPin (real updater)" {
+        It "validates both configurations before writing the exact new package pin" {
+            $writtenContent = @{}
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Get-Content -MockWith {
+                param($LiteralPath, [switch]$Raw)
+                $null = $LiteralPath
+                $null = $Raw
+                return "[mcp_servers.drm-copilot]`ncommand = `"npx`"`nargs = [`"-y`", `"@danmoisan/drm-copilot-mcp@1.0.14`"]`nrequired = true`n"
+            }
+            Mock -CommandName Set-Content -MockWith {
+                param($LiteralPath, $Value, $Encoding, [switch]$NoNewline)
+                $null = $Encoding
+                $null = $NoNewline
+                $writtenContent[$LiteralPath] = $Value
+            }
+
+            Set-CodexMcpVersionPin -ConfigPaths @('/repo/.codex/config.toml', '/repo/bundle/.codex/config.toml') -Version '1.0.15' -Confirm:$false
+
+            Should -Invoke -CommandName Set-Content -Times 2 -Exactly
+            $writtenContent.Count | Should -Be 2
+            foreach ($content in $writtenContent.Values) {
+                $content | Should -Match 'args = \["-y", "@danmoisan/drm-copilot-mcp@1\.0\.15"\]'
+                $content | Should -Not -Match '@danmoisan/drm-copilot-mcp@1\.0\.14'
+            }
+        }
+
+        It "writes no configuration when any transport entry is missing" {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Get-Content -MockWith {
+                param($LiteralPath, [switch]$Raw)
+                $null = $Raw
+                if ($LiteralPath -match 'bundle') { return '[mcp_servers.other]' }
+                return 'args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.14"]'
+            }
+            Mock -CommandName Set-Content -MockWith {
+                param($LiteralPath, $Value, $Encoding, [switch]$NoNewline)
+                $null = $LiteralPath
+                $null = $Value
+                $null = $Encoding
+                $null = $NoNewline
+                throw "Set-Content should not be invoked"
+            }
+
+            { Set-CodexMcpVersionPin -ConfigPaths @('/repo/.codex/config.toml', '/repo/bundle/.codex/config.toml') -Version '1.0.15' -Confirm:$false } |
+                Should -Throw "*must contain exactly one drm-copilot MCP args entry; found 0*"
+            Should -Invoke -CommandName Set-Content -Times 0 -Exactly
         }
     }
 

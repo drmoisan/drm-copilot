@@ -80,6 +80,9 @@ export interface ValidateOrchestrationArtifactsToolInput extends WorkspaceToolIn
   readonly artifactPath: string;
   readonly requireComplete?: boolean;
   readonly requireModelRouting?: boolean;
+  readonly requireCodexModelRouting?: boolean;
+  readonly requireCodexTopology?: boolean;
+  readonly requireReadyForExecution?: boolean;
 }
 
 export function asToolArgumentObject(
@@ -448,6 +451,9 @@ const VALID_ARTIFACT_TYPES = new Set([
   "code-review",
   "feature-audit",
   "orchestrator-state",
+  "epic-orchestrator-state",
+  "epic-planner-state",
+  "epic-kickoff",
 ]);
 
 export function resolveValidateOrchestrationArtifactsToolInput(
@@ -468,6 +474,9 @@ export function resolveValidateOrchestrationArtifactsToolInput(
 
   const requireComplete = args["require_complete"];
   const requireModelRouting = args["require_model_routing"];
+  const requireCodexModelRouting = args["require_codex_model_routing"];
+  const requireCodexTopology = args["require_codex_topology"];
+  const requireReadyForExecution = args["require_ready_for_execution"];
 
   return {
     workspaceRoot: normalizeWorkspaceRoot(
@@ -478,5 +487,12 @@ export function resolveValidateOrchestrationArtifactsToolInput(
     artifactPath: normalizeRequiredText(args["artifact_path"], "artifact_path"),
     ...(requireComplete === true ? { requireComplete: true } : {}),
     ...(requireModelRouting === true ? { requireModelRouting: true } : {}),
+    ...(requireCodexModelRouting === true
+      ? { requireCodexModelRouting: true }
+      : {}),
+    ...(requireCodexTopology === true ? { requireCodexTopology: true } : {}),
+    ...(requireReadyForExecution === true
+      ? { requireReadyForExecution: true }
+      : {}),
   };
 }

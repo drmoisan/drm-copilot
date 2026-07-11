@@ -15,6 +15,7 @@ function buildValidEpicState(): Record<string, unknown> {
     epic_feature_folder: "epic-orchestrate-275",
     epic_manifest_path: "docs/features/epics/epic-orchestrate-275/epic-plan.md",
     integration_branch: "epic/epic-orchestrate-275-integration",
+    max_parallel_features: 4,
     completed_steps: ["epic_manifest_parsed"],
     next_step: "wave_1_launch",
     last_updated: "2026-07-02T20-00",
@@ -105,6 +106,17 @@ describe("validateEpicOrchestratorStateText", () => {
         errors.some((e) => e.includes(`missing required key: ${key}`)),
       ).toBe(true);
     }
+  });
+
+  it("rejects a concurrency cap outside the bounded range", () => {
+    const state = buildValidEpicState();
+    state["max_parallel_features"] = 9;
+
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
+
+    expect(
+      errors.some((error) => error.includes("max_parallel_features")),
+    ).toBe(true);
   });
 
   it("rejects a wrong route_id", () => {
@@ -261,6 +273,28 @@ describe("validateEpicOrchestratorStateText", () => {
     const features = state["features"] as Record<string, unknown>[];
     features[1]["merge_status"] = "worktree_removed";
     features[1]["merge_confirmed_at"] = "2026-07-02T18-30";
+    for (const feature of features) {
+      const folder = String(feature["feature_folder"]);
+      const issueNum = feature["issue_num"];
+      const delegationId = `delegate-${String(issueNum)}`;
+      const agent = "orchestrator-c3-elevated";
+      feature["branch_name"] = `feature/${folder}`;
+      feature["delegation_receipt"] = {
+        delegation_id: delegationId,
+        feature_folder: folder,
+        issue_num: issueNum,
+        agent_name: agent,
+      };
+      feature["model_routing_receipt"] = {
+        delegation_id: delegationId,
+        deployment_agent: agent,
+        execution_context: "epic_execution_child",
+      };
+      feature["launch_receipt_path"] =
+        `artifacts/orchestration/epic-child-launches/${folder}.receipt.json`;
+      feature["launch_status_path"] =
+        `artifacts/orchestration/epic-child-launches/${folder}.status.json`;
+    }
     state["epic_merge_pr"] = { merge_commit_sha: "abc123def456" };
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state), {
       requireComplete: true,

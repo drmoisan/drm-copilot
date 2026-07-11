@@ -2,9 +2,9 @@
  * Completion-gate helpers for the orchestrator-state validator.
  *
  * Purpose:
- *     Hold the PR-gate, CI-gate, and Issue #232 promotion-receipt completion
- *     checks ported from `scripts/dev_tools/validate_orchestrator_state.py` so
- *     the core validator module stays within the 500-line file limit.
+ *     Hold the route-aware PR gate and CI-gate completion checks ported from
+ *     `scripts/dev_tools/validate_orchestrator_state.py` so the core validator
+ *     module stays within the 500-line file limit.
  *
  * Invariants / Constraints:
  *     - Error-message strings are identical to the Python source.
@@ -12,12 +12,10 @@
  * Side Effects:
  *     None.
  */
-
-/** Issue number used by the Issue #232 completion gates. */
-export const ISSUE_232 = "232";
-
-/** Branch name required for the Issue #232 completion gate. */
-export const ISSUE_232_BRANCH = "feature/harden-orchestrate-skill-232";
+import {
+  routeRequiresPrGate,
+  type ValidateRoutingContractOptions,
+} from "./orchestrator-state-routing";
 
 /** Keys required on the completion PR gate. */
 export const PR_GATE_KEYS = [
@@ -89,7 +87,11 @@ export function missingObjectKeys(
  */
 export function validateCompletionPrGate(
   state: Record<string, unknown>,
+  options: ValidateRoutingContractOptions = {},
 ): string[] {
+  if (!routeRequiresPrGate(state, options)) {
+    return [];
+  }
   const prGate = state["pr_gate"];
   const missing = missingObjectKeys(prGate, PR_GATE_KEYS);
   if (!isObject(prGate)) {
@@ -104,15 +106,6 @@ export function validateCompletionPrGate(
       "Checkpoint completion validation failed: pr_gate missing required " +
         `fields: ${missing.join(", ")}.`,
     );
-  }
-  // Issue #232 additionally pins the PR head branch.
-  if (state["issue-num"] === ISSUE_232) {
-    if (prGate["head_branch"] !== ISSUE_232_BRANCH) {
-      errors.push(
-        "Checkpoint completion validation failed: pr_gate.head_branch " +
-          `must be ${ISSUE_232_BRANCH} for Issue #232.`,
-      );
-    }
   }
   return errors;
 }
@@ -161,38 +154,4 @@ export function validateCompletionCiGate(
     );
   }
   return errors;
-}
-
-/**
- * Validate the Issue #232 promotion receipts.
- *
- * @param state Checkpoint state object.
- * @returns Validation errors for missing Issue #232 promotion receipt keys.
- */
-export function validateIssue232PromotionReceipts(
-  state: Record<string, unknown>,
-): string[] {
-  if (state["issue-num"] !== ISSUE_232) {
-    return [];
-  }
-  const receipts = state["delegation_receipts"];
-  let promotionSource = "promotion_receipts";
-  let promotion: unknown = state["promotion_receipts"];
-  // Prefer the namespaced promotion receipts when present in the object form.
-  if (isObject(receipts)) {
-    const namespacedPromotion = receipts[PROMOTION_RECEIPT_NAMESPACE_KEY];
-    if (namespacedPromotion !== undefined && namespacedPromotion !== null) {
-      promotionSource = "delegation_receipts.promotion";
-      promotion = namespacedPromotion;
-    }
-  }
-  const missing = missingObjectKeys(promotion, PROMOTION_RECEIPT_KEYS);
-  if (missing.length > 0) {
-    return [
-      "Checkpoint completion validation failed: " +
-        `${promotionSource} missing required Issue #232 ` +
-        `receipt keys: ${missing.join(", ")}.`,
-    ];
-  }
-  return [];
 }

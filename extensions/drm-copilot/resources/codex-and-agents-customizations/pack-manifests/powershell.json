@@ -10,6 +10,11 @@
     ".codex/agents/powershell-typed-engineer.toml",
     ".codex/agents/powershell-orchestrator.toml",
     ".codex/agents/powershell-atomic-executor.toml",
-    ".codex/agents/powershell-atomic-planning.toml"
+    ".codex/agents/powershell-atomic-planning.toml",
+    ".codex/agents/powershell-typed-engineer-c1.toml",
+    ".codex/agents/powershell-typed-engineer-c2.toml",
+    ".codex/agents/powershell-typed-engineer-c3.toml",
+    ".codex/agents/powershell-typed-engineer-c3-elevated.toml",
+    ".codex/agents/powershell-typed-engineer-c4.toml"
   ]
 }

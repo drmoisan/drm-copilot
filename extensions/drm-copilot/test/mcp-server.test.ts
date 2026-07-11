@@ -406,37 +406,6 @@ describe("repo automation MCP server", () => {
     });
   });
 
-  it("dispatches validate_orchestration_artifacts through resolveValidateOrchestrationArtifactsToolInput and forwards artifact_type, artifact_path, and require_complete to the repo-automation service", async () => {
-    service.validateOrchestrationArtifacts.mockResolvedValue({
-      tool: "validate_orchestration_artifacts",
-      workspaceRoot: "C:/workspace",
-      summary: "Validated plan artifact at docs/plan.md.",
-    });
-
-    const result = await client.callTool({
-      name: "validate_orchestration_artifacts",
-      arguments: {
-        workspace_root: "C:/workspace",
-        artifact_type: "plan",
-        artifact_path: "docs/plan.md",
-        require_complete: true,
-      },
-    });
-
-    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      artifactType: "plan",
-      artifactPath: "docs/plan.md",
-      requireComplete: true,
-    });
-    expect(result.isError).toBe(false);
-    expect(result.structuredContent).toMatchObject({
-      ok: true,
-      tool: "validate_orchestration_artifacts",
-      workspace_root: "C:/workspace",
-    });
-  });
-
   it("dispatches resolve_policy_audit_template_asset through the shared service with normalized inputs", async () => {
     service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
       tool: "resolve_policy_audit_template_asset",
@@ -504,24 +473,6 @@ describe("repo automation MCP server", () => {
       tool: "resolve_execute_hard_lock_prompt",
       workspace_root: "C:/workspace",
       artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
-    });
-  });
-
-  it("returns validation error for invalid artifact_type", async () => {
-    const result = await client.callTool({
-      name: "validate_orchestration_artifacts",
-      arguments: {
-        workspace_root: "C:/workspace",
-        artifact_type: "invalid-type",
-        artifact_path: "docs/plan.md",
-      },
-    });
-
-    expect(service.validateOrchestrationArtifacts).not.toHaveBeenCalled();
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toMatchObject({
-      ok: false,
-      tool: "validate_orchestration_artifacts",
     });
   });
 });

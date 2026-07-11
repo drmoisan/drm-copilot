@@ -1,9 +1,9 @@
-"""Publish bundled `.codex` and `.agents` content into a destination workspace.
+"""Publish bundled Codex resources into a destination workspace.
 
 Purpose:
     Provide a dedicated public entry point for the Codex/agents push-down
-    workflow while reusing the shared publisher engine behind the existing
-    `.github` customization flow.
+    workflow, including the shared routing config, while reusing the publisher
+    engine behind the existing `.github` customization flow.
 """
 
 from __future__ import annotations
@@ -64,6 +64,11 @@ BUNDLE_ROOT_RELATIVE_DIR = Path(
 PACK_MANIFEST_SUBDIR = "pack-manifests"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
+ROUTING_CONFIG_RELATIVE_PATH = Path("config/orchestration-routing.json")
+PUBLISHED_ROOT_FOLDERS: tuple[Path, ...] = (
+    *ROOT_FOLDERS,
+    ROUTING_CONFIG_RELATIVE_PATH.parent,
+)
 CSHARP_VARIANT_CHOICES: tuple[str, ...] = ("modern", "legacy")
 MEMORY_MODE_CHOICES: tuple[str, ...] = ("overwrite", "merge", "skip")
 
@@ -87,6 +92,60 @@ def _passthrough_rewrite(
     """Return unmodified text for payloads that do not need command rewrites."""
 
     return text, 0, 0, []
+
+
+class _RoutingConfigFileSystem:
+    """Expose the shared routing config at its destination-relative path."""
+
+    def __init__(
+        self,
+        inner: PushDownFileSystem,
+        *,
+        source_root: Path,
+        bundle_root: Path,
+    ) -> None:
+        self._inner = inner
+        self._virtual_path = source_root / ROUTING_CONFIG_RELATIVE_PATH
+        self._virtual_root = self._virtual_path.parent
+        self._resource_path = bundle_root.parent / ROUTING_CONFIG_RELATIVE_PATH
+
+    def list_files(self, root: Path) -> list[Path]:
+        """Return the virtual routing config only for the config root."""
+
+        if root == self._virtual_root:
+            return (
+                [self._virtual_path] if self._inner.is_file(self._resource_path) else []
+            )
+        return self._inner.list_files(root)
+
+    def is_dir(self, path: Path) -> bool:
+        """Delegate directory checks."""
+
+        return self._inner.is_dir(path)
+
+    def is_file(self, path: Path) -> bool:
+        """Resolve virtual routing-config file checks to the shared resource."""
+
+        if path == self._virtual_path:
+            return self._inner.is_file(self._resource_path)
+        return self._inner.is_file(path)
+
+    def read_text(self, path: Path) -> str:
+        """Read the virtual routing config from the shared resource."""
+
+        if path == self._virtual_path:
+            return self._inner.read_text(self._resource_path)
+        return self._inner.read_text(path)
+
+    def write_text(self, path: Path, content: str) -> None:
+        """Delegate writes."""
+
+        self._inner.write_text(path, content)
+
+    def ensure_dir(self, path: Path) -> None:
+        """Delegate directory creation."""
+
+        self._inner.ensure_dir(path)
 
 
 def _resolve_published_paths(
@@ -153,7 +212,7 @@ def push_down_customizations(
     memory_mode: MemoryMode = "overwrite",
     bundle_root: Path | None = None,
 ) -> PushDownSummary:
-    """Copy bundled `.codex` and `.agents` trees into the destination workspace."""
+    """Copy Codex trees and the shared routing config into the destination."""
 
     effective_source = source_root if source_root is not None else repo_root
     effective_bundle = (
@@ -174,13 +233,18 @@ def push_down_customizations(
         csharp_variant=csharp_variant,
         variant_root=effective_bundle,
     )
+    publishing_fs = _RoutingConfigFileSystem(
+        excluding_fs,
+        source_root=effective_source,
+        bundle_root=effective_bundle,
+    )
     summary = push_down_scoped_customizations(
         repo_root=repo_root,
         destination_root=destination_root,
-        fs=excluding_fs,
+        fs=publishing_fs,
         source_root=source_root,
         artifact_root=artifact_root,
-        root_folders=ROOT_FOLDERS,
+        root_folders=PUBLISHED_ROOT_FOLDERS,
         artifact_directory=ARTIFACT_DIRECTORY,
         rewrite_references=_passthrough_rewrite,
     )

@@ -41,28 +41,42 @@ function buildValidState(): Record<string, unknown> {
   };
 }
 
-const ISSUE_232_PR_GATE = {
+const PR_GATE = {
   pr_number: 232,
   pr_url: "https://github.com/drmoisan/drm-copilot/pull/232",
-  head_branch: "feature/harden-orchestrate-skill-232",
+  head_branch: "feature/example",
   head_sha: "current-head-sha",
 };
-const ISSUE_232_CI_GATE = {
+const CI_GATE = {
   conclusion: "success",
   head_sha: "current-head-sha",
   verified_at: "2026-06-25T07:45:00Z",
 };
 
+const ROUTING_MATRIX = {
+  routes: {
+    large: {
+      requires_pr_gate: true,
+      required_agents: [],
+      required_skills: [],
+      required_mcp_tools: [],
+    },
+    small: {
+      required_agents: [],
+      required_skills: [],
+      required_mcp_tools: [],
+    },
+  },
+};
+
 /**
- * Validate in completion mode with an empty routing matrix. The routing-contract
- * check is exercised separately in orchestrator-state-routing.test.ts; an empty
- * matrix yields a single deterministic routing error that does not collide with
- * the completion-gate substrings asserted here.
+ * Validate in completion mode with a focused routing matrix. The routing
+ * contract is exercised separately in orchestrator-state-routing.test.ts.
  */
 function validateComplete(state: Record<string, unknown>): string[] {
   return validateOrchestratorStateText(JSON.stringify(state), {
     requireComplete: true,
-    routingMatrix: {},
+    routingMatrix: ROUTING_MATRIX,
   });
 }
 
@@ -95,7 +109,7 @@ describe("validateOrchestratorStateText completion gates", () => {
     );
   });
 
-  it("rejects a missing pr_gate", () => {
+  it("rejects a missing pr_gate for a route that requires it", () => {
     // Arrange / Act
     const errors = validateComplete(buildValidState());
 
@@ -106,7 +120,7 @@ describe("validateOrchestratorStateText completion gates", () => {
   it("rejects a missing ci_gate when pr_gate is present", () => {
     // Arrange
     const state = buildValidState();
-    state["pr_gate"] = ISSUE_232_PR_GATE;
+    state["pr_gate"] = PR_GATE;
 
     // Act
     const errors = validateComplete(state);
@@ -118,8 +132,8 @@ describe("validateOrchestratorStateText completion gates", () => {
   it("rejects a ci_gate whose conclusion is not success", () => {
     // Arrange
     const state = buildValidState();
-    state["pr_gate"] = ISSUE_232_PR_GATE;
-    state["ci_gate"] = { ...ISSUE_232_CI_GATE, conclusion: "failure" };
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = { ...CI_GATE, conclusion: "failure" };
 
     // Act
     const errors = validateComplete(state);
@@ -133,9 +147,8 @@ describe("validateOrchestratorStateText completion gates", () => {
   it("rejects a ci_gate head_sha that does not match pr_gate", () => {
     // Arrange
     const state = buildValidState();
-    state["issue-num"] = "232";
-    state["pr_gate"] = ISSUE_232_PR_GATE;
-    state["ci_gate"] = { ...ISSUE_232_CI_GATE, head_sha: "stale-head-sha" };
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = { ...CI_GATE, head_sha: "stale-head-sha" };
 
     // Act
     const errors = validateComplete(state);
@@ -150,56 +163,31 @@ describe("validateOrchestratorStateText completion gates", () => {
     ).toBe(true);
   });
 
-  it("rejects an Issue #232 pr_gate with the wrong head branch", () => {
+  it("skips the PR gate for a route that does not require it", () => {
     // Arrange
     const state = buildValidState();
-    state["issue-num"] = "232";
-    state["pr_gate"] = { ...ISSUE_232_PR_GATE, head_branch: "feature/wrong" };
+    state["path_selected"] = "small";
+    state["ci_gate"] = CI_GATE;
 
     // Act
     const errors = validateComplete(state);
 
     // Assert
-    expect(errors.some((error) => error.includes("pr_gate.head_branch"))).toBe(
-      true,
-    );
+    expect(errors.some((error) => error.includes("pr_gate"))).toBe(false);
   });
 
-  it("rejects Issue #232 completion with missing promotion receipts", () => {
+  it("does not apply issue-specific branch or promotion requirements", () => {
     // Arrange
     const state = buildValidState();
     state["issue-num"] = "232";
-    state["pr_gate"] = ISSUE_232_PR_GATE;
-    state["ci_gate"] = ISSUE_232_CI_GATE;
-    state["delegation_receipts"] = { promotion: { issue: "#232" } };
+    state["pr_gate"] = { ...PR_GATE, head_branch: "feature/arbitrary" };
+    state["ci_gate"] = CI_GATE;
 
     // Act
     const errors = validateComplete(state);
 
     // Assert
-    expect(
-      errors.some((error) => error.includes("delegation_receipts.promotion")),
-    ).toBe(true);
-  });
-
-  it("accepts Issue #232 top-level promotion receipts", () => {
-    // Arrange
-    const state = buildValidState();
-    state["issue-num"] = "232";
-    state["pr_gate"] = ISSUE_232_PR_GATE;
-    state["ci_gate"] = ISSUE_232_CI_GATE;
-    state["promotion_receipts"] = {
-      potential_entry: { path: "docs/features/potential/demo.md" },
-      issue: { number: 232 },
-      feature_folder: {
-        path: "docs/features/active/2026-06-24-harden-orchestrate-skill-232",
-      },
-    };
-
-    // Act
-    const errors = validateComplete(state);
-
-    // Assert: no promotion-receipt error remains (routing errors are unrelated).
+    expect(errors.some((error) => error.includes("head_branch"))).toBe(false);
     expect(errors.some((error) => error.includes("promotion_receipts"))).toBe(
       false,
     );
@@ -208,13 +196,15 @@ describe("validateOrchestratorStateText completion gates", () => {
   it("invokes the routing contract under requireComplete with an injected matrix", () => {
     // Arrange: an empty routing matrix yields the routes-missing error.
     const state = buildValidState();
-    state["pr_gate"] = ISSUE_232_PR_GATE;
-    state["ci_gate"] = ISSUE_232_CI_GATE;
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = CI_GATE;
 
     // Act
     const errors = validateComplete(state);
 
     // Assert
-    expect(errors).toContain("Routing matrix missing routes object.");
+    expect(errors.some((error) => error.includes("required_agents"))).toBe(
+      true,
+    );
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
 import { validateOrchestratorStateText } from "../../../src/lib/validate/orchestrator-state-core";
+import { validateModelRoutingExistence } from "../../../src/lib/validate/orchestrator-state-model-routing-existence";
 
 /**
  * Return a minimally valid orchestrator-state payload with one atomic-planner
@@ -130,5 +131,19 @@ describe("validateOrchestratorStateText model-routing existence check", () => {
 
     // Assert
     expect(errors).toEqual([]);
+  });
+
+  it("uses a recognized next step and ignores malformed receipt entries", () => {
+    expect(
+      validateModelRoutingExistence({
+        next_step: "atomic-executor",
+        delegation_receipts: [null, { agent_name: " " }],
+        model_routing_receipts: [
+          null,
+          { agent: " " },
+          receipt("atomic-executor"),
+        ],
+      }),
+    ).toEqual([]);
   });
 });

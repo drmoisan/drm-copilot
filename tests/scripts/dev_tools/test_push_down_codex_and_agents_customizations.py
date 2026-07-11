@@ -9,6 +9,10 @@ from contextlib import redirect_stdout
 from dataclasses import dataclass
 from pathlib import Path
 
+ROUTING_CONFIG_RESOURCE = Path(
+    "extensions/drm-copilot/resources/config/orchestration-routing.json"
+)
+
 
 @dataclass
 class MemoryFile:
@@ -102,6 +106,7 @@ def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
     destination_root = Path("C:/dest")
     fs = RecordingFileSystem(
         files={
+            repo_root / ROUTING_CONFIG_RESOURCE: MemoryFile('{"version": 1}\n'),
             repo_root / ".codex" / "config.toml": MemoryFile("trusted = true\n"),
             repo_root
             / ".codex"
@@ -151,10 +156,15 @@ def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
         )
         == "# Policy\n"
     )
+    assert (
+        fs.read_text(destination_root / "config" / "orchestration-routing.json")
+        == '{"version": 1}\n'
+    )
     assert [result.relative_path for result in summary.files] == [
         ".codex/agents/orchestrator.toml",
         ".codex/config.toml",
         ".agents/skills/policy-compliance-order/SKILL.md",
+        "config/orchestration-routing.json",
     ]
 
 

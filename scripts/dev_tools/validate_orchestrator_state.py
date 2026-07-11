@@ -26,6 +26,12 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools import _orchestrator_state_codex_topology as codex_topology
+from scripts.dev_tools._orchestrator_state_codex_model_routing import (
+    CODEX_MODEL_ROUTING_RECEIPTS_KEY,
+    validate_codex_model_routing_gate,
+    validate_codex_model_routing_receipts,
+)
 from scripts.dev_tools._orchestrator_state_complexity import (
     COMPLEXITY_ASSESSMENTS_KEY,
     _validate_complexity_assessments,
@@ -43,6 +49,9 @@ from scripts.dev_tools._orchestrator_state_model_routing_gate import (
 )
 from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
     validate_orchestrator_state_pr_creation_readiness,
+)
+from scripts.dev_tools._orchestrator_state_preparation_terminal import (
+    validate_preparation_terminal_contract,
 )
 from scripts.dev_tools._orchestrator_state_routing import (
     route_requires_ci_gate,
@@ -373,40 +382,14 @@ def validate_orchestrator_state_text(
     strict_route_membership: bool = False,
     require_pr_creation_ready: bool = False,
     require_model_routing: bool = False,
+    require_codex_model_routing: bool = False,
+    require_codex_topology: bool = False,
 ) -> list[str]:
-    """Validate checkpoint schema and completion-state fields.
+    """Validate checkpoint structure and opt-in completion/routing gates.
 
-    Purpose:
-        Enforce the repository contract for orchestrator-state artifacts before
-        resume or review workflows rely on the checkpoint contents.
-
-    Args:
-        text (str): Raw checkpoint JSON text.
-        require_complete (bool): When True, require all tracked lifecycle states
-            to be completion-safe and verify route phase completeness.
-        strict_route_membership (bool): When True, append route-membership
-            errors so a checkpoint selecting an unknown route is rejected. When
-            False (default), route-membership errors are not appended, preserving
-            backward compatibility for checkpoints without `route_id`/
-            `path_selected`.
-        require_pr_creation_ready (bool): When True, append the result of
-            `validate_orchestrator_state_pr_creation_readiness`, a narrower
-            pre-PR-creation check independent of `require_complete` that does
-            not require `ci_gate`, `pr_gate`, or routing-contract delegation
-            receipts. Defaults to False.
-        require_model_routing (bool): When True, append
-            `validate_model_routing_gate` results, requiring routing receipts and
-            complexity assessments once a delegation is recorded. Defaults False.
-
-    Returns:
-        list[str]: Validation errors for malformed or incomplete checkpoint
-        state.
-
-    Raises:
-        None.
-
-    Side Effects:
-        Reads the routing matrix from disk when completion/route checks run.
+    The Codex flag requires deployment receipts once a delegation is recorded;
+    the existing model-routing flag preserves the independent Claude policy.
+    Route checks may read the central routing matrix. The input is never mutated.
     """
 
     errors: list[str] = []
@@ -451,14 +434,19 @@ def validate_orchestrator_state_text(
                 "Checkpoint delegation_receipts must be a list or object namespace."
             )
 
-    # Each additive optional checkpoint block is validated only when its key is
-    # present; an absent key contributes zero errors, preserving backward
-    # compatibility for checkpoints that predate the block.
     optional_key_validators = (
         (REMEDIATION_LOOP_KEY, _validate_remediation_loop),
         (HUMAN_INTERACTION_KEY, _validate_human_interaction),
         (COMPLEXITY_ASSESSMENTS_KEY, _validate_complexity_assessments),
         (MODEL_ROUTING_RECEIPTS_KEY, _validate_model_routing_receipts),
+        (
+            CODEX_MODEL_ROUTING_RECEIPTS_KEY,
+            validate_codex_model_routing_receipts,
+        ),
+        (
+            codex_topology.CODEX_TOPOLOGY_RECEIPTS_KEY,
+            codex_topology.validate_codex_topology_receipts,
+        ),
     )
     for optional_key, optional_validator in optional_key_validators:
         if optional_key in state_map:
@@ -493,6 +481,7 @@ def validate_orchestrator_state_text(
             errors.extend(_validate_completion_ci_gate(state_map))
         errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
+        errors.extend(validate_preparation_terminal_contract(state_map))
 
     if require_pr_creation_ready:
         # Independent of require_complete: the pre-PR-creation readiness gate
@@ -502,5 +491,10 @@ def validate_orchestrator_state_text(
     if require_model_routing:
         # Fires only once a delegation is recorded; else matches the plain call.
         errors.extend(validate_model_routing_gate(state_map))
+
+    if require_codex_model_routing:
+        errors.extend(validate_codex_model_routing_gate(state_map))
+    if require_codex_topology:
+        errors.extend(codex_topology.validate_codex_topology_gate(state_map))
 
     return errors

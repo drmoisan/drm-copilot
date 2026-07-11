@@ -14,9 +14,12 @@
       3. Patch-bumps both manifests (extensions/drm-copilot/package.json and
          packages/mcp-server/package.json) via npm with --no-git-tag-version
          (smallest increment; npm does not create a tag).
-      4. Commits the bumped manifests on the release branch.
-      5. Pushes the release branch to origin so the PR has a remote ref.
-      6. Opens a PR against main via gh pr create.
+      4. Pins the root and bundled Codex MCP transports to the newly bumped
+         mcp-server package version.
+      5. Commits the bumped manifests, lockfiles, and Codex configurations on
+         the release branch.
+      6. Pushes the release branch to origin so the PR has a remote ref.
+      7. Opens a PR against main via gh pr create.
 
     This task never publishes and never pushes a release tag. Marketplace
     upload and npm publish are performed by CI after the bump PR merges and the
@@ -139,6 +142,56 @@ function Get-NpmVersion {
     return [string]$version
 }
 
+function Set-CodexMcpVersionPin {
+    <#
+    .SYNOPSIS
+        Rewrites each Codex configuration to use one exact drm-copilot MCP
+        package version.
+    .DESCRIPTION
+        Validates every supplied configuration before writing any of them. A
+        configuration must contain exactly one npx argument entry for the
+        drm-copilot MCP package. Unpinned and previously pinned entries are
+        both accepted so the initial migration and later releases use the same
+        deterministic update path.
+    #>
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$ConfigPaths,
+        [Parameter(Mandatory = $true)]
+        [ValidatePattern('^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$')]
+        [string]$Version
+    )
+
+    $pinPattern = '(?m)^(?<prefix>\s*args\s*=\s*\[\s*"-y"\s*,\s*")@danmoisan/drm-copilot-mcp(?:@[^"\r\n]+)?(?<suffix>"\s*\]\s*)$'
+    $replacement = '${prefix}@danmoisan/drm-copilot-mcp@' + $Version + '${suffix}'
+    $pendingUpdates = @()
+
+    foreach ($configPath in $ConfigPaths) {
+        if (-not (Test-Path -LiteralPath $configPath)) {
+            throw "Codex configuration not found at '$configPath'."
+        }
+
+        $rawConfig = Get-Content -LiteralPath $configPath -Raw
+        $pinMatches = [regex]::Matches($rawConfig, $pinPattern)
+        if ($pinMatches.Count -ne 1) {
+            throw "Codex configuration '$configPath' must contain exactly one drm-copilot MCP args entry; found $($pinMatches.Count)."
+        }
+
+        $pendingUpdates += [pscustomobject]@{
+            Path    = $configPath
+            Content = [regex]::Replace($rawConfig, $pinPattern, $replacement)
+        }
+    }
+
+    foreach ($update in $pendingUpdates) {
+        if ($PSCmdlet.ShouldProcess($update.Path, "Pin drm-copilot MCP package to $Version")) {
+            Set-Content -LiteralPath $update.Path -Value $update.Content -Encoding utf8NoBOM -NoNewline
+        }
+    }
+}
+
 function Get-ReleaseBranchName {
     <#
     .SYNOPSIS
@@ -187,6 +240,8 @@ function Invoke-FullReleaseGuarded {
     $mcpManifest = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package.json'
     $extensionLockfile = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot/package-lock.json'
     $mcpLockfile = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server/package-lock.json'
+    $rootCodexConfig = Join-Path -Path $RepoRoot -ChildPath '.codex/config.toml'
+    $bundledCodexConfig = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml'
     $extensionDir = Join-Path -Path $RepoRoot -ChildPath 'extensions/drm-copilot'
     $mcpServerDir = Join-Path -Path $RepoRoot -ChildPath 'packages/mcp-server'
 
@@ -197,6 +252,12 @@ function Invoke-FullReleaseGuarded {
     if (-not (Test-Path -LiteralPath $mcpManifest)) {
         Write-StderrLine -Message "mcp-server manifest not found at '$mcpManifest'."
         return 1
+    }
+    foreach ($codexConfig in @($rootCodexConfig, $bundledCodexConfig)) {
+        if (-not (Test-Path -LiteralPath $codexConfig)) {
+            Write-StderrLine -Message "Codex configuration not found at '$codexConfig'."
+            return 1
+        }
     }
 
     # Step 1: verify a clean working tree. Non-empty porcelain output blocks.
@@ -234,10 +295,29 @@ function Invoke-FullReleaseGuarded {
     $newExtVersion = Get-NpmVersion -ManifestPath $extensionManifest
     $newMcpVersion = Get-NpmVersion -ManifestPath $mcpManifest
 
-    # Step 4: commit the bumped manifests and their lockfiles. npm version
-    # (npm 7+) updates both package.json and package-lock.json, so all four
-    # files must be staged or the lockfile changes are left uncommitted.
-    $add = Invoke-GitExe -GitArgs @('add', $extensionManifest, $mcpManifest, $extensionLockfile, $mcpLockfile)
+    # Step 4: keep the exact Codex MCP package pin synchronized with the
+    # package version produced by npm. Both runtime surfaces are updated
+    # together so the checked-in root and published bundle remain identical.
+    try {
+        Set-CodexMcpVersionPin -ConfigPaths @($rootCodexConfig, $bundledCodexConfig) -Version $newMcpVersion -Confirm:$false
+    }
+    catch {
+        Write-StderrLine -Message "Failed to synchronize the Codex MCP package pin: $($_.Exception.Message)"
+        return 1
+    }
+
+    # Step 5: commit the bumped manifests, their lockfiles, and synchronized
+    # Codex configurations. npm version (npm 7+) updates both package.json and
+    # package-lock.json, so all six files must be staged.
+    $add = Invoke-GitExe -GitArgs @(
+        'add',
+        $extensionManifest,
+        $mcpManifest,
+        $extensionLockfile,
+        $mcpLockfile,
+        $rootCodexConfig,
+        $bundledCodexConfig
+    )
     if ($add.ExitCode -ne 0) {
         Write-StderrLine -Message "Failed to stage bumped manifests (git exit code $($add.ExitCode))."
         return 1
@@ -249,14 +329,14 @@ function Invoke-FullReleaseGuarded {
         return 1
     }
 
-    # Step 5: publish the release branch so gh pr create has a remote ref.
+    # Step 6: publish the release branch so gh pr create has a remote ref.
     $push = Invoke-GitExe -GitArgs @('push', '-u', 'origin', $branchName)
     if ($push.ExitCode -ne 0) {
         Write-StderrLine -Message "Failed to push release branch '$branchName' to origin (git exit code $($push.ExitCode))."
         return 1
     }
 
-    # Step 6: open a PR against main.
+    # Step 7: open a PR against main.
     $prTitle = "release: bump extension $newExtVersion and mcp-server $newMcpVersion"
     $prBody = "Automated full release version-bump PR. Extension -> $newExtVersion, mcp-server -> $newMcpVersion. Merge to main, then run the post-merge tag-push task to publish."
     $prExit = Invoke-GhExe -GhArgs @('pr', 'create', '--base', 'main', '--head', $branchName, '--title', $prTitle, '--body', $prBody)

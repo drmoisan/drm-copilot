@@ -65,6 +65,9 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
     // Assert: keys are absent, not present-with-undefined.
     expect("requireComplete" in result).toBe(false);
     expect("requireModelRouting" in result).toBe(false);
+    expect("requireCodexModelRouting" in result).toBe(false);
+    expect("requireCodexTopology" in result).toBe(false);
+    expect("requireReadyForExecution" in result).toBe(false);
   });
 
   it("omits an optional key when its value is explicitly undefined", () => {
@@ -75,6 +78,9 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
       artifactPath: "docs/state.json",
       requireComplete: undefined,
       requireModelRouting: undefined,
+      requireCodexModelRouting: undefined,
+      requireCodexTopology: undefined,
+      requireReadyForExecution: undefined,
     };
 
     // Act
@@ -86,6 +92,9 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
     // Assert
     expect("requireComplete" in result).toBe(false);
     expect("requireModelRouting" in result).toBe(false);
+    expect("requireCodexModelRouting" in result).toBe(false);
+    expect("requireCodexTopology" in result).toBe(false);
+    expect("requireReadyForExecution" in result).toBe(false);
   });
 
   it("includes both optional keys when both values are defined", () => {
@@ -96,6 +105,9 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
       artifactPath: "docs/state.json",
       requireComplete: true,
       requireModelRouting: false,
+      requireCodexModelRouting: true,
+      requireCodexTopology: true,
+      requireReadyForExecution: false,
     };
 
     // Act
@@ -107,6 +119,9 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
     // Assert
     expect(result.requireComplete).toBe(true);
     expect(result.requireModelRouting).toBe(false);
+    expect(result.requireCodexModelRouting).toBe(true);
+    expect(result.requireCodexTopology).toBe(true);
+    expect(result.requireReadyForExecution).toBe(false);
   });
 
   it("includes only the defined optional key when the other is absent", () => {

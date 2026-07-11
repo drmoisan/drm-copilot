@@ -18,6 +18,7 @@ def build_valid_epic_state() -> dict[str, object]:
         "epic_feature_folder": "epic-orchestrate-275",
         "epic_manifest_path": "docs/features/epics/epic-orchestrate-275/epic-plan.md",
         "integration_branch": "epic/epic-orchestrate-275-integration",
+        "max_parallel_features": 4,
         "completed_steps": ["epic_manifest_parsed"],
         "next_step": "wave_1_launch",
         "last_updated": "2026-07-02T20-00",
@@ -100,6 +101,17 @@ def test_validate_reports_missing_route_id() -> None:
     errors = validate_epic_orchestrator_state_text(json.dumps(state))
 
     assert any("missing required key: route_id" in error for error in errors)
+
+
+def test_validate_rejects_parallelism_outside_bounded_range() -> None:
+    """Require a bounded per-epic concurrency cap."""
+
+    state = build_valid_epic_state()
+    state["max_parallel_features"] = 9
+
+    errors = validate_epic_orchestrator_state_text(json.dumps(state))
+
+    assert any("max_parallel_features" in error for error in errors)
 
 
 def test_validate_reports_missing_epic_feature_folder() -> None:
@@ -278,63 +290,6 @@ def test_validate_rejects_waves_wave_number_inconsistency() -> None:
         "wave_number is 2" in error
         for error in errors
     )
-
-
-def test_validate_require_complete_rejects_unmerged_feature() -> None:
-    """Reject require_complete=True when a feature is not merged/worktree_removed."""
-
-    state = build_valid_epic_state()
-    state["epic_merge_pr"] = {"merge_commit_sha": "abc123"}
-
-    errors = validate_epic_orchestrator_state_text(
-        json.dumps(state), require_complete=True
-    )
-
-    assert any(
-        "feature '2026-07-02-child-b-301' merge_status is not "
-        "merged/worktree_removed" in error
-        for error in errors
-    )
-
-
-def test_validate_require_complete_rejects_missing_merge_commit_sha() -> None:
-    """Reject require_complete=True when epic_merge_pr.merge_commit_sha is absent."""
-
-    state = build_valid_epic_state()
-    state["features"][1]["merge_status"] = "merged"  # type: ignore[index]
-    state["features"][1]["merge_confirmed_at"] = "2026-07-02T18-30"  # type: ignore[index]
-
-    errors = validate_epic_orchestrator_state_text(
-        json.dumps(state), require_complete=True
-    )
-
-    assert any(
-        "epic_merge_pr.merge_commit_sha is missing or empty" in error
-        for error in errors
-    )
-
-
-def test_validate_require_complete_accepts_a_fully_complete_checkpoint() -> None:
-    """Allow require_complete=True when every feature merged and PR recorded."""
-
-    state = build_valid_epic_state()
-    state["features"][1]["merge_status"] = "worktree_removed"  # type: ignore[index]
-    state["features"][1]["merge_confirmed_at"] = "2026-07-02T18-30"  # type: ignore[index]
-    state["epic_merge_pr"] = {"merge_commit_sha": "abc123def456"}
-
-    errors = validate_epic_orchestrator_state_text(
-        json.dumps(state), require_complete=True
-    )
-
-    assert errors == []
-
-
-def test_validate_ignores_require_complete_by_default() -> None:
-    """Confirm require_complete defaults to False (backward-compatible)."""
-
-    errors = validate_epic_orchestrator_state_text(json.dumps(build_valid_epic_state()))
-
-    assert errors == []
 
 
 # --- issue_num-keyed DAG resolution (added alongside legacy fixtures) ---

@@ -1,18 +1,5 @@
 """Validate epic-orchestrator checkpoint state artifacts.
 
-Purpose:
-    Hold the epic-checkpoint validation logic as a sibling module to
-    ``validate_orchestrator_state.py``, following the existing sibling-module
-    convention (``validate_orchestrator_state.py``,
-    ``validate_policy_audit_artifact.py``,
-    ``validate_orchestration_review_artifacts.py``) rather than folding the
-    epic-checkpoint's structurally different required-key/status shape into the
-    per-feature validator.
-
-Usage:
-    Import ``validate_epic_orchestrator_state_text`` from this module, or via
-    the dispatch branch in ``scripts.dev_tools.validate_orchestration_artifacts``.
-
 Flow:
     Parse the epic checkpoint JSON, validate the baseline and epic-specific
     required fields, validate ``features[]`` shape (uniqueness, ``depends_on``
@@ -31,11 +18,18 @@ from __future__ import annotations
 import json
 from typing import Any, cast
 
+from scripts.dev_tools import _epic_orchestrator_state_launch_binding as launch_binding
+from scripts.dev_tools import _orchestrator_state_codex_topology as codex_topology
 from scripts.dev_tools._epic_orchestrator_state_resolution import (
     build_feature_reference_index,
     detect_dependency_cycle,
     resolve_feature_reference,
     validate_intent_block,
+)
+from scripts.dev_tools._orchestrator_state_codex_model_routing import (
+    CODEX_MODEL_ROUTING_RECEIPTS_KEY,
+    validate_codex_model_routing_gate,
+    validate_codex_model_routing_receipts,
 )
 
 REQUIRED_BASELINE_KEYS = (
@@ -48,6 +42,7 @@ REQUIRED_EPIC_KEYS = (
     "route_id",
     "epic_feature_folder",
     "integration_branch",
+    "max_parallel_features",
     "waves",
     "features",
 )
@@ -110,12 +105,22 @@ def _validate_route_id(state: dict[str, Any]) -> list[str]:
         None.
     """
 
+    errors: list[str] = []
     if "route_id" in state and state.get("route_id") != EXPECTED_ROUTE_ID:
-        return [
+        errors.append(
             "Epic checkpoint route_id must be 'epic', found: "
             f"{state.get('route_id')!r}"
-        ]
-    return []
+        )
+    parallelism = state.get("max_parallel_features")
+    if (
+        not isinstance(parallelism, int)
+        or isinstance(parallelism, bool)
+        or not 1 <= parallelism <= 8
+    ):
+        errors.append(
+            "Epic checkpoint max_parallel_features must be an integer from 1 through 8."
+        )
+    return errors
 
 
 def _extract_features(state: dict[str, Any]) -> list[dict[str, Any]]:
@@ -401,6 +406,8 @@ def validate_epic_orchestrator_state_text(
     text: str,
     *,
     require_complete: bool = False,
+    require_codex_model_routing: bool = False,
+    require_codex_topology: bool = False,
 ) -> list[str]:
     """Validate epic checkpoint schema and wave-barrier/completion invariants.
 
@@ -450,8 +457,36 @@ def validate_epic_orchestrator_state_text(
     # Presence-gated: only runs when the checkpoint carries a top-level intent
     # object, so an intent-free checkpoint stays byte-identical.
     errors.extend(validate_intent_block(state_map))
+    errors.extend(
+        launch_binding.validate_epic_child_launch_bindings(
+            state_map,
+            require_complete=require_complete,
+            require_codex_model_routing=require_codex_model_routing,
+            require_codex_topology=require_codex_topology,
+        )
+    )
+    if CODEX_MODEL_ROUTING_RECEIPTS_KEY in state_map:
+        errors.extend(
+            validate_codex_model_routing_receipts(
+                state_map.get(CODEX_MODEL_ROUTING_RECEIPTS_KEY)
+            )
+        )
+    if codex_topology.CODEX_TOPOLOGY_RECEIPTS_KEY in state_map:
+        errors.extend(
+            codex_topology.validate_codex_topology_receipts(
+                state_map.get(codex_topology.CODEX_TOPOLOGY_RECEIPTS_KEY)
+            )
+        )
 
     if require_complete:
         errors.extend(_validate_completion(features, state_map))
+    if require_codex_model_routing:
+        errors.extend(validate_codex_model_routing_gate(state_map))
+    if require_codex_topology:
+        errors.extend(
+            codex_topology.validate_codex_topology_gate(
+                state_map, required_root_persona="epic-orchestrator"
+            )
+        )
 
     return errors

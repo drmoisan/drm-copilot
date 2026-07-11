@@ -5,8 +5,8 @@
     evidence.
 
 .DESCRIPTION
-    Invoked by the Claude Code PreToolUse hook on Write or Edit operations. The
-    hook activates only when the target file_path normalizes to
+    Invoked by the Codex PreToolUse hook on apply_patch operations. The hook
+    reads one JSON object from stdin and activates only when the target path normalizes to
     artifacts/orchestration/orchestrator-state.json.
 
     A written checkpoint asserts completion when any of the following hold:
@@ -40,6 +40,9 @@
 #>
 [CmdletBinding()]
 param()
+
+# Reuse the adjacent hook's read-only Codex apply_patch adapter.
+. (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1')
 
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
@@ -314,7 +317,7 @@ function Resolve-EditedCheckpointContent {
 function Invoke-CompletionConsistencyDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision based on
+        Parses mapped Codex tool_input JSON and returns an allow-or-deny decision based on
         completion-evidence consistency.
     #>
     [CmdletBinding()]
@@ -340,7 +343,7 @@ function Invoke-CompletionConsistencyDecision {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        throw "enforce-completion-consistency hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
+        throw "enforce-completion-consistency received malformed mapped tool_input JSON: $_"
     }
 
     $filePath = $toolInput.file_path
@@ -360,9 +363,10 @@ function Invoke-CompletionConsistencyDecision {
     if (-not $content) {
         $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
         if (-not $content) {
-            # No content, and the Edit could not be resolved against on-disk
-            # state (missing file or non-matching patch): defer and allow.
-            return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+            return [ordered]@{ hookSpecificOutput = [ordered]@{
+                    hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                    permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint cannot be deleted, emptied, or replaced through an unresolved patch.'
+                } }
         }
     }
 
@@ -370,9 +374,10 @@ function Invoke-CompletionConsistencyDecision {
         $payload = ConvertFrom-CheckpointJson -Json $content
     }
     catch {
-        # The content itself is not valid JSON. Let downstream tools surface the
-        # error rather than blocking with a misleading reason here.
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{
+                hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint must remain valid JSON.'
+            } }
     }
 
     if (-not (Test-CompletionAsserted -Payload $payload)) {
@@ -404,13 +409,17 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 try {
-    $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+    $payload = ConvertFrom-CodexCheckpointHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    foreach ($toolInput in @(ConvertTo-CodexApplyPatchCheckpointInput -Payload $payload)) {
+        $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
+        $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $toolInputRaw
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0

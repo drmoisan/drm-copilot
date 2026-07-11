@@ -155,6 +155,12 @@ Describe 'Install-PoshQCTool' {
 }
 
 Describe 'Invoke-PoshQCFormat' {
+    It 'writes formatter output without appending another newline' {
+        $definition = (Get-Command Invoke-PoshQCFormat).Definition
+
+        $definition | Should -Match 'Set-Content[^\r\n]+-NoNewline'
+    }
+
     It 'throws when PSScriptAnalyzer is missing' {
         { Invoke-PoshQCFormat -EnsureModule { param([string] $Name, [string] $ErrorMessage) [void] $Name; throw $ErrorMessage } } |
             Should -Throw '*PSScriptAnalyzer is not installed*'

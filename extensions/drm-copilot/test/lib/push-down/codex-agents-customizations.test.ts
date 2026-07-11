@@ -31,6 +31,8 @@ describe("pushDownCustomizations (codex/agents)", () => {
     // Arrange
     const fs = buildInMemoryFileSystem(
       {
+        "C:/extension/resources/config/orchestration-routing.json":
+          '{"version":1}\n',
         "/src/.agents/z.md": "agents z",
         "/src/.agents/a.md": "agents a",
         "/src/.codex/config.md": "codex config",
@@ -45,6 +47,7 @@ describe("pushDownCustomizations (codex/agents)", () => {
       fs,
       sourceRoot: "/src",
       artifactRoot: "/dest",
+      bundleRoot: "C:/extension/resources/codex-and-agents-customizations",
       clock: CLOCK,
     });
 
@@ -53,7 +56,11 @@ describe("pushDownCustomizations (codex/agents)", () => {
       ".codex/config.md",
       ".agents/a.md",
       ".agents/z.md",
+      "config/orchestration-routing.json",
     ]);
+    expect(fs.readTextFile("/dest/config/orchestration-routing.json")).toBe(
+      '{"version":1}\n',
+    );
   });
 
   it("leaves content byte-identical and yields zero rewrite counts", () => {

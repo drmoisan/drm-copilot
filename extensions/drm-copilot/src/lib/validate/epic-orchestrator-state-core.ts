@@ -31,6 +31,13 @@ import {
   resolveFeatureReference,
   validateIntentBlock,
 } from "./epic-orchestrator-state-resolution";
+import { validateEpicChildLaunchBindings } from "./epic-orchestrator-state-launch-binding";
+import {
+  CODEX_MODEL_ROUTING_RECEIPTS_KEY,
+  validateCodexModelRoutingGate,
+  validateCodexModelRoutingReceipts,
+} from "./orchestrator-state-codex-model-routing";
+import { validateCodexTopologyState } from "./orchestrator-state-codex-topology";
 
 const REQUIRED_BASELINE_KEYS = [
   "objective",
@@ -43,6 +50,7 @@ const REQUIRED_EPIC_KEYS = [
   "route_id",
   "epic_feature_folder",
   "integration_branch",
+  "max_parallel_features",
   "waves",
   "features",
 ] as const;
@@ -69,6 +77,10 @@ const MERGED_STATUSES: ReadonlySet<string> = new Set([
 export interface ValidateEpicOrchestratorStateOptions {
   /** When true, enforce completion-safe feature/merge state. */
   readonly requireComplete?: boolean;
+  /** Require deterministic Codex deployment receipts once delegated. */
+  readonly requireCodexModelRouting?: boolean;
+  /** Require deterministic Codex topology and root-persona receipts. */
+  readonly requireCodexTopology?: boolean;
 }
 
 /**
@@ -122,12 +134,24 @@ function missingBaselineAndEpicKeys(state: Record<string, unknown>): string[] {
  * @returns An error when route_id is present but not 'epic'.
  */
 function validateRouteId(state: Record<string, unknown>): string[] {
+  const errors: string[] = [];
   if ("route_id" in state && state["route_id"] !== EXPECTED_ROUTE_ID) {
-    return [
+    errors.push(
       `Epic checkpoint route_id must be 'epic', found: ${JSON.stringify(state["route_id"])}`,
-    ];
+    );
   }
-  return [];
+  const parallelism = state["max_parallel_features"];
+  if (
+    typeof parallelism !== "number" ||
+    !Number.isInteger(parallelism) ||
+    parallelism < 1 ||
+    parallelism > 8
+  ) {
+    errors.push(
+      "Epic checkpoint max_parallel_features must be an integer from 1 through 8.",
+    );
+  }
+  return errors;
 }
 
 /**
@@ -402,10 +426,28 @@ export function validateEpicOrchestratorStateText(
   // Presence-gated: only runs when the checkpoint carries a top-level intent
   // object, so an intent-free checkpoint stays byte-identical.
   errors.push(...validateIntentBlock(stateMap));
+  errors.push(...validateEpicChildLaunchBindings(stateMap, options));
+  if (CODEX_MODEL_ROUTING_RECEIPTS_KEY in stateMap) {
+    errors.push(
+      ...validateCodexModelRoutingReceipts(
+        stateMap[CODEX_MODEL_ROUTING_RECEIPTS_KEY],
+      ),
+    );
+  }
 
   if (options.requireComplete === true) {
     errors.push(...validateCompletion(features, stateMap));
   }
+  if (options.requireCodexModelRouting === true) {
+    errors.push(...validateCodexModelRoutingGate(stateMap));
+  }
+  errors.push(
+    ...validateCodexTopologyState(
+      stateMap,
+      options.requireCodexTopology === true,
+      { requiredRootPersona: "epic-orchestrator" },
+    ),
+  );
 
   return errors;
 }

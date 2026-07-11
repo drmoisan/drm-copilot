@@ -1,14 +1,12 @@
-# Converted hook
-# Review the generated hook behavior before enabling it.
 
 <#
 .SYNOPSIS
-    Pre-tool-use hook for Claude Code that blocks forbidden patterns in Python unit tests.
+    Pre-tool-use hook for Codex that blocks forbidden patterns in Python unit tests.
 
 .DESCRIPTION
-    This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
+    This script is invoked by the Codex PreToolUse hook before any Write or Edit
     operation on a file path matching tests/**/*.py. It reads the tool input from the
-    CLAUDE_TOOL_INPUT environment variable (JSON with 'file_path' and a content field:
+    Codex tool_input environment variable (JSON with 'file_path' and a content field:
     'content' for Write, 'new_string' for Edit) and rejects the operation when the
     proposed content introduces forbidden runtime dependencies.
 
@@ -21,7 +19,7 @@
       - real database drivers (psycopg2, pymysql, sqlite3.connect on real files)
 
     If the content contains any forbidden pattern, the script writes a JSON response
-    to stdout with 'decision': 'block' and exits with code 0 to let Claude Code surface
+    to stdout with 'decision': 'block' and exits with code 0 to let Codex surface
     the reason.
 
 .NOTES
@@ -41,8 +39,11 @@ function Get-PythonTestPurityBlockDecision {
     )
 
     [ordered]@{
-        decision = 'block'
-        reason   = $Reason
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
     }
 }
 
@@ -66,22 +67,22 @@ function Invoke-PythonTestPurityDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return Get-PythonTestPurityBlockDecision -Reason 'Python unit test purity hook received malformed JSON in CLAUDE_TOOL_INPUT.'
+        return Get-PythonTestPurityBlockDecision -Reason 'Python unit test purity hook received malformed JSON in Codex tool_input.'
     }
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     if (-not (Test-PythonTestFilePath -FilePath $filePath)) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $content = $null
@@ -92,7 +93,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $forbiddenPatterns = @(
@@ -128,7 +129,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if ($violations.Count -eq 0) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $uniqueViolations = $violations | Select-Object -Unique
@@ -137,13 +138,85 @@ function Invoke-PythonTestPurityDecision {
     return Get-PythonTestPurityBlockDecision -Reason $reason
 }
 
+function ConvertFrom-CodexPythonPurityPayload {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $PayloadRaw)
+
+    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
+        throw 'check-python-test-purity hook input is empty.'
+    }
+    try {
+        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "check-python-test-purity hook input is malformed JSON: $_"
+    }
+    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
+        throw 'check-python-test-purity hook input is missing tool_input.'
+    }
+    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
+        throw 'check-python-test-purity requires a PreToolUse apply_patch payload.'
+    }
+    return $payload
+}
+
+function ConvertTo-CodexPythonPurityInput {
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param([Parameter(Mandatory)] $Payload)
+
+    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
+        return , $Payload.tool_input
+    }
+
+    $command = [string]$Payload.tool_input.command
+    if ([string]::IsNullOrWhiteSpace($command)) {
+        throw 'check-python-test-purity cannot map tool_input to a file edit.'
+    }
+
+    $fileMatches = [regex]::Matches(
+        $command,
+        '(?ms)^\*\*\* (?:Add|Update|Delete) File:\s*(?<path>.+?)\r?\n(?<body>.*?)(?=^\*\*\* (?:(?:Add|Update|Delete) File:|End Patch)\s*|\z)'
+    )
+    if ($fileMatches.Count -eq 0) {
+        throw 'check-python-test-purity received an unrecognized apply_patch command.'
+    }
+
+    $inputs = [System.Collections.Generic.List[object]]::new()
+    foreach ($match in $fileMatches) {
+        $filePath = ([string]$match.Groups['path'].Value).Trim()
+        $moveMatch = [regex]::Match([string]$match.Groups['body'].Value, '(?m)^\*\*\* Move to:\s*(?<path>.+?)\s*$')
+        if ($moveMatch.Success) {
+            $filePath = ([string]$moveMatch.Groups['path'].Value).Trim()
+        }
+        $addedLines = foreach ($line in ([string]$match.Groups['body'].Value -split '\r?\n')) {
+            if ($line.StartsWith('+') -and -not $line.StartsWith('+++')) {
+                $line.Substring(1)
+            }
+        }
+        $inputs.Add([pscustomobject]@{
+                file_path = $filePath
+                content   = $addedLines -join [Environment]::NewLine
+            })
+    }
+    return $inputs.ToArray()
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$decision = Invoke-PythonTestPurityDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-if ($decision.decision -eq 'block') {
-    $decision | ConvertTo-Json -Compress | Write-Output
+try {
+    $payload = ConvertFrom-CodexPythonPurityPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    foreach ($toolInput in @(ConvertTo-CodexPythonPurityInput -Payload $payload)) {
+        $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
+        $decision = Invoke-PythonTestPurityDecision -ToolInputRaw $toolInputRaw
+        if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-
-exit 0

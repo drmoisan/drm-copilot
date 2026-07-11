@@ -61,6 +61,11 @@ WRAPPER_REQUIRED_FRAGMENTS = (
         "or evidence requirements that exist in the source agent."
     ),
 )
+GENERATED_PROFILE_SUFFIXES = ("-c1", "-c2", "-c3", "-c3-elevated", "-c4")
+NATIVE_EPIC_AGENT_SKILLS = {
+    "epic-planner": "epic-plan",
+    "epic-orchestrator": "epic-orchestrate",
+}
 
 
 def read_repo_text(relative_path: str) -> str:
@@ -118,6 +123,18 @@ def test_codex_agent_contracts_follow_expected_wrapper_or_native_patterns() -> N
 
     for codex_file in codex_agents:
         target_name = codex_file.removesuffix(".toml")
+        if target_name.endswith(GENERATED_PROFILE_SUFFIXES):
+            # Deterministic content/model parity is enforced by the dedicated
+            # Codex agent variant generator tests.
+            continue
+        if target_name in NATIVE_EPIC_AGENT_SKILLS:
+            agent_text = read_bundle_text(f".codex/agents/{codex_file}")
+            assert f'name = "{target_name}"' in agent_text
+            assert 'model = "gpt-5.6-sol"' in agent_text
+            assert 'model_reasoning_effort = "ultra"' in agent_text
+            assert NATIVE_EPIC_AGENT_SKILLS[target_name] in agent_text
+            assert "## Root Invocation" in agent_text
+            continue
         if target_name in BESPOKE_AGENT_WRAPPERS:
             wrapper_text = read_bundle_text(f".codex/agents/{codex_file}")
             assert (

@@ -1,10 +1,11 @@
 import type { FileSystem } from "../file-system";
+import { validateCodexModelRoutingState } from "./orchestrator-state-codex-model-routing";
+import { validateCodexTopologyState } from "./orchestrator-state-codex-topology";
 import {
   PROMOTION_RECEIPT_KEYS,
   PROMOTION_RECEIPT_NAMESPACE_KEY,
   validateCompletionCiGate,
   validateCompletionPrGate,
-  validateIssue232PromotionReceipts,
 } from "./orchestrator-state-completion";
 import {
   HUMAN_INTERACTION_KEY,
@@ -14,19 +15,18 @@ import {
   REMEDIATION_LOOP_KEY,
   validateRemediationLoop,
 } from "./orchestrator-state-remediation";
+import { validatePreparationTerminalContract } from "./orchestrator-state-preparation-terminal";
+import { validateModelRoutingExistence } from "./orchestrator-state-model-routing-existence";
 import {
   loadRoutingMatrix,
+  routeRequiresCiGate,
+  validatePhaseCompleteness,
   validateRoutingContract,
 } from "./orchestrator-state-routing";
 
 // Re-export the completion-gate constants the core ports historically carried so
 // callers and tests can continue to import them from this module.
-export {
-  CI_GATE_KEYS,
-  ISSUE_232,
-  ISSUE_232_BRANCH,
-  PR_GATE_KEYS,
-} from "./orchestrator-state-completion";
+export { CI_GATE_KEYS, PR_GATE_KEYS } from "./orchestrator-state-completion";
 export { PROMOTION_RECEIPT_KEYS, PROMOTION_RECEIPT_NAMESPACE_KEY };
 
 /**
@@ -42,7 +42,8 @@ export { PROMOTION_RECEIPT_KEYS, PROMOTION_RECEIPT_NAMESPACE_KEY };
  *       statuses, blocked-reason, and delegation receipts (list or namespace).
  *     - Delegate the optional remediation and human-interaction blocks.
  *     - Under `requireComplete`, enforce completion-safe statuses, the PR/CI
- *       gates, the Issue #232 promotion receipts, and the routing contract.
+ *       route-aware PR/CI gates, mandatory phases, the preparation terminal
+ *       contract, and the routing contract.
  *
  * Invariants / Constraints:
  *     - Error-message strings are identical to the Python source.
@@ -123,20 +124,6 @@ const STEP_STATUS_KEYS = [
   "step10_status",
 ] as const;
 
-/**
- * Subagent types delegated via the Agent tool that a delegating `next_step`
- * may name. Mirrors the gated set in the Python model-routing gate and the
- * PreToolUse deterrent hook; `orchestrator` is excluded as the calling agent.
- */
-const DELEGATING_AGENTS: ReadonlySet<string> = new Set([
-  "atomic-planner",
-  "atomic-executor",
-  "feature-review",
-  "task-researcher",
-  "prd-feature",
-  "pr-author",
-]);
-
 /** Options controlling orchestrator-state validation. */
 export interface ValidateOrchestratorStateOptions {
   /** When true, enforce completion-safe lifecycle states and gates. */
@@ -148,6 +135,10 @@ export interface ValidateOrchestratorStateOptions {
    * per-receipt correctness; this TS side performs the existence check only.
    */
   readonly requireModelRouting?: boolean;
+  /** Require deterministic Codex deployment receipts once delegated. */
+  readonly requireCodexModelRouting?: boolean;
+  /** Require deterministic Codex topology receipts once delegated. */
+  readonly requireCodexTopology?: boolean;
   /** Injected filesystem used to load the routing matrix when needed. */
   readonly fs?: FileSystem;
   /** Repository root used with `fs` to locate the routing matrix. */
@@ -271,92 +262,6 @@ function resolveRoutingMatrix(
 }
 
 /**
- * Derive the set of agents a checkpoint has delegated (or is about to).
- *
- * @param stateMap Parsed checkpoint object.
- * @returns Delegated-agent names from well-formed delegation receipts plus a
- *   `next_step` that names a recognized delegating agent.
- */
-function delegatedAgents(stateMap: Record<string, unknown>): Set<string> {
-  const agents = new Set<string>();
-
-  // The list form of delegation_receipts is the authoritative record; collect
-  // each well-formed entry's non-empty agent_name.
-  const receipts = stateMap["delegation_receipts"];
-  if (Array.isArray(receipts)) {
-    receipts.forEach((receipt) => {
-      if (!isObject(receipt)) {
-        return;
-      }
-      const agentName = receipt["agent_name"];
-      if (typeof agentName === "string" && agentName.trim() !== "") {
-        agents.add(agentName);
-      }
-    });
-  }
-
-  // A delegating next_step names an upcoming delegation without a receipt yet;
-  // include it only when it matches a recognized delegating agent.
-  const nextStep = stateMap["next_step"];
-  if (typeof nextStep === "string" && DELEGATING_AGENTS.has(nextStep)) {
-    agents.add(nextStep);
-  }
-
-  return agents;
-}
-
-/**
- * Existence-only model-routing check (the Python validator is authoritative).
- *
- * Purpose:
- *     When enabled and the checkpoint records at least one delegation, require
- *     the set of `model_routing_receipts[].agent` to be a superset of the
- *     delegated-agent set, reporting one error per delegated agent that lacks a
- *     receipt. Full per-receipt correctness parity (model equals
- *     `resolveDelegationModel`, disabled-mode clamp) is out of scope for #305.
- *
- * @param stateMap Parsed checkpoint object.
- * @returns One error per delegated agent missing a routing receipt.
- */
-function validateModelRoutingExistence(
-  stateMap: Record<string, unknown>,
-): string[] {
-  const errors: string[] = [];
-
-  // Backward-compat: fire only when at least one agent was delegated.
-  const delegated = delegatedAgents(stateMap);
-  if (delegated.size === 0) {
-    return errors;
-  }
-
-  // Collect the agents that carry a routing receipt.
-  const receiptAgents = new Set<string>();
-  const receipts = stateMap["model_routing_receipts"];
-  if (Array.isArray(receipts)) {
-    receipts.forEach((receipt) => {
-      if (!isObject(receipt)) {
-        return;
-      }
-      const agent = receipt["agent"];
-      if (typeof agent === "string" && agent.trim() !== "") {
-        receiptAgents.add(agent);
-      }
-    });
-  }
-
-  // Report each delegated agent that has no receipt, sorted for determinism.
-  const missing = [...delegated].filter((a) => !receiptAgents.has(a)).sort();
-  for (const agent of missing) {
-    errors.push(
-      "Checkpoint model_routing_receipts is missing a receipt for " +
-        `delegated agent: ${agent}.`,
-    );
-  }
-
-  return errors;
-}
-
-/**
  * Validate checkpoint schema and completion-state fields.
  *
  * Purpose:
@@ -464,12 +369,16 @@ export function validateOrchestratorStateText(
         "Checkpoint completion validation failed: blocked_reason is not `none`.",
       );
     }
-    errors.push(...validateCompletionPrGate(stateMap));
-    errors.push(...validateCompletionCiGate(stateMap));
-    errors.push(...validateIssue232PromotionReceipts(stateMap));
+    const routingMatrix = resolveRoutingMatrix(options);
+    errors.push(...validateCompletionPrGate(stateMap, { routingMatrix }));
+    if (routeRequiresCiGate(stateMap, { routingMatrix })) {
+      errors.push(...validateCompletionCiGate(stateMap));
+    }
+    errors.push(...validatePhaseCompleteness(stateMap));
+    errors.push(...validatePreparationTerminalContract(stateMap));
     errors.push(
       ...validateRoutingContract(stateMap, {
-        routingMatrix: resolveRoutingMatrix(options),
+        routingMatrix,
       }),
     );
   }
@@ -479,6 +388,19 @@ export function validateOrchestratorStateText(
   if (options.requireModelRouting === true) {
     errors.push(...validateModelRoutingExistence(stateMap));
   }
+
+  errors.push(
+    ...validateCodexModelRoutingState(
+      stateMap,
+      options.requireCodexModelRouting === true,
+    ),
+  );
+  errors.push(
+    ...validateCodexTopologyState(
+      stateMap,
+      options.requireCodexTopology === true,
+    ),
+  );
 
   return errors;
 }

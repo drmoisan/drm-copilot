@@ -111,6 +111,23 @@ def test_require_model_routing_absent_forwards_false(monkeypatch: MonkeyPatch) -
 
     assert result == 0
     assert captured["require_model_routing"] is False
+    assert captured["require_codex_model_routing"] is False
+
+
+def test_require_codex_model_routing_flag_forwards_true(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Forward the independent Codex deployment-receipt gate flag."""
+
+    captured = _install_spy(monkeypatch)
+
+    result = validator.main(
+        ["orchestrator-state", "ignored.json", "--require-codex-model-routing"]
+    )
+
+    assert result == 0
+    assert captured["require_codex_model_routing"] is True
+    assert captured["require_model_routing"] is False
 
 
 def test_flag_independence_model_routing_only(monkeypatch: MonkeyPatch) -> None:

@@ -3,7 +3,6 @@ name: general-unit-test
 description: Cross-language unit test policy for all files.
 paths:
   - "**"
-description: Cross-language unit test policy. Applies to all files.
 ---
 
 # Converted rule

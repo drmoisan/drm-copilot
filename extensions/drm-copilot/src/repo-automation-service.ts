@@ -147,6 +147,9 @@ export interface RepoAutomationService {
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
       readonly requireModelRouting?: boolean;
+      readonly requireCodexModelRouting?: boolean;
+      readonly requireCodexTopology?: boolean;
+      readonly requireReadyForExecution?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult>;
   renderSubagentTree(
@@ -455,12 +458,19 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
       readonly requireModelRouting?: boolean;
+      readonly requireCodexModelRouting?: boolean;
+      readonly requireCodexTopology?: boolean;
+      readonly requireReadyForExecution?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult> {
     // Delegate to the extracted helper, which preserves the observable behavior.
     // Request shaping (optional-field omission) lives in the extracted builder.
     return validateOrchestrationServiceCall(
-      buildValidateOrchestrationServiceCallInput(this.fileSystem, input),
+      buildValidateOrchestrationServiceCallInput(
+        this.fileSystem,
+        input,
+        this.runner,
+      ),
     );
   }
 
