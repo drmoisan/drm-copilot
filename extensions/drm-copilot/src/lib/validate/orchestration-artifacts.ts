@@ -1,8 +1,15 @@
 import type { FileSystem } from "../file-system";
+import type { CommandRunner } from "../subprocess-runner";
+import { validateEpicKickoffText } from "./epic-kickoff-artifact";
 import {
   validateEpicOrchestratorStateText,
   type ValidateEpicOrchestratorStateOptions,
 } from "./epic-orchestrator-state-core";
+import {
+  validateEpicPlannerStateText,
+  type ValidateEpicPlannerStateOptions,
+} from "./epic-planner-state-core";
+import { CommandRunnerGitRepository } from "./epic-planner-git-integrity";
 import {
   validateOrchestratorStateText,
   type ValidateOrchestratorStateOptions,
@@ -24,8 +31,8 @@ import {
  * Responsibilities:
  *     - `validatePlanText`: enforce the phase/task structure of atomic plans.
  *     - `validateArtifact`: route `plan`, `policy-audit`, `code-review`,
- *       `feature-audit`, and `orchestrator-state` artifact types, with an
- *       unsupported-type fallback.
+ *       `feature-audit`, orchestration checkpoint, and epic-kickoff artifact
+ *       types, with an unsupported-type fallback.
  *
  * Invariants / Constraints:
  *     - Phase/task regexes and error-message strings are identical to the Python
@@ -144,6 +151,16 @@ export interface ValidateArtifactInput {
   readonly requireComplete?: boolean;
   /** Require model-routing receipts once delegated (orchestrator-state route). */
   readonly requireModelRouting?: boolean;
+  /** Require canonical Codex deployment receipts for delegated agents. */
+  readonly requireCodexModelRouting?: boolean;
+  /** Require canonical Codex topology receipts for delegated agents. */
+  readonly requireCodexTopology?: boolean;
+  /** Require a fully prepared epic plan (epic-planner-state route only). */
+  readonly requireReadyForExecution?: boolean;
+  /** Artifact path used to bind repository-aware planner validation. */
+  readonly artifactPath?: string;
+  /** Injected Git command runner used by planner readiness validation. */
+  readonly runner?: CommandRunner;
   /** Injected filesystem (orchestrator-state route routing-matrix load). */
   readonly fs?: FileSystem;
   /** Repository root (orchestrator-state route routing-matrix load). */
@@ -183,6 +200,12 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
         ...(input.requireModelRouting === undefined
           ? {}
           : { requireModelRouting: input.requireModelRouting }),
+        ...(input.requireCodexModelRouting === undefined
+          ? {}
+          : { requireCodexModelRouting: input.requireCodexModelRouting }),
+        ...(input.requireCodexTopology === undefined
+          ? {}
+          : { requireCodexTopology: input.requireCodexTopology }),
         ...(input.fs === undefined ? {} : { fs: input.fs }),
         ...(input.root === undefined ? {} : { root: input.root }),
         ...(input.routingMatrix === undefined
@@ -196,9 +219,38 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
         ...(input.requireComplete === undefined
           ? {}
           : { requireComplete: input.requireComplete }),
+        ...(input.requireCodexModelRouting === undefined
+          ? {}
+          : { requireCodexModelRouting: input.requireCodexModelRouting }),
+        ...(input.requireCodexTopology === undefined
+          ? {}
+          : { requireCodexTopology: input.requireCodexTopology }),
       };
       return validateEpicOrchestratorStateText(input.text, options);
     }
+    case "epic-planner-state": {
+      const options: ValidateEpicPlannerStateOptions = {
+        ...(input.requireReadyForExecution === undefined
+          ? {}
+          : { requireReadyForExecution: input.requireReadyForExecution }),
+        ...(input.fs === undefined ||
+        input.root === undefined ||
+        input.artifactPath === undefined ||
+        input.runner === undefined
+          ? {}
+          : {
+              readinessContext: {
+                workspaceRoot: input.root,
+                artifactPath: input.artifactPath,
+                fileSystem: input.fs,
+                git: new CommandRunnerGitRepository(input.root, input.runner),
+              },
+            }),
+      };
+      return validateEpicPlannerStateText(input.text, options);
+    }
+    case "epic-kickoff":
+      return validateEpicKickoffText(input.text);
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];
   }

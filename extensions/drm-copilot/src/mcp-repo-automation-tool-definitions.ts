@@ -413,7 +413,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
   {
     name: "validate_orchestration_artifacts",
     description:
-      "Validate an orchestration artifact (plan, policy-audit, code-review, feature-audit, or orchestrator-state) against its structural schema.",
+      "Validate an orchestration artifact, including epic planner, kickoff, and execution checkpoints, against its structural schema.",
     inputSchema: {
       type: "object",
       properties: {
@@ -426,6 +426,9 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "code-review",
             "feature-audit",
             "orchestrator-state",
+            "epic-orchestrator-state",
+            "epic-planner-state",
+            "epic-kickoff",
           ],
           description: "The type of orchestration artifact to validate.",
         },
@@ -437,12 +440,27 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         require_complete: {
           type: "boolean",
           description:
-            "When true and artifact_type is 'orchestrator-state', require all phases to be complete.",
+            "When true and artifact_type is 'orchestrator-state' or 'epic-orchestrator-state', require all phases to be complete.",
         },
         require_model_routing: {
           type: "boolean",
           description:
             "When true and artifact_type is 'orchestrator-state', require a model_routing_receipts entry per delegated agent once a delegation is recorded. The TypeScript side performs the existence check only; the Python validator is authoritative for full per-receipt correctness.",
+        },
+        require_codex_model_routing: {
+          type: "boolean",
+          description:
+            "When true for an orchestrator checkpoint, require canonical Codex deployment receipts for delegated agents.",
+        },
+        require_codex_topology: {
+          type: "boolean",
+          description:
+            "When true for an orchestrator checkpoint, require canonical Codex topology receipts for delegated agents and epic roots.",
+        },
+        require_ready_for_execution: {
+          type: "boolean",
+          description:
+            "When true and artifact_type is 'epic-planner-state', require every child to be prepared and preflight-cleared.",
         },
       },
       required: ["artifact_type", "artifact_path"],

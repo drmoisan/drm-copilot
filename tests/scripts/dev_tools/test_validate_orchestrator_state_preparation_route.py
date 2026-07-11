@@ -245,3 +245,25 @@ def test_preparation_route_pending_step_status_rejected() -> None:
     errors = _validate(state)
 
     assert any("step5_status is pending" in error for error in errors)
+
+
+def test_preparation_route_requires_atomic_execution_resume_pointer() -> None:
+    """Reject preparation state that does not stop at atomic execution."""
+
+    state = _build_complete_state("preparation")
+    state["next_step"] = "complete"
+
+    errors = _validate(state)
+
+    assert any("next_step must be 'S5_atomic_execution'" in error for error in errors)
+
+
+def test_preparation_route_requires_exact_out_of_scope_statuses() -> None:
+    """Reject completion-like statuses for work deferred to epic execution."""
+
+    state = _build_complete_state("preparation")
+    state["step8_status"] = "completed"
+
+    errors = _validate(state)
+
+    assert any("step8_status must be 'not-applicable'" in error for error in errors)

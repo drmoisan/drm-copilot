@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import { type FileSystem, toPosixPath } from "../file-system";
+import type { CommandRunner } from "../subprocess-runner";
 import { validateArtifact } from "./orchestration-artifacts";
 
 /**
@@ -26,6 +27,8 @@ import { validateArtifact } from "./orchestration-artifacts";
 export interface ValidateOrchestrationServiceCallInput {
   /** Injected filesystem used to read the artifact and route orchestrator-state. */
   readonly fileSystem: FileSystem;
+  /** Injected runner used for readiness Git integrity checks. */
+  readonly runner?: CommandRunner;
   /** Repository/workspace root the artifact path is resolved against. */
   readonly workspaceRoot: string;
   /** Artifact type selecting the validator route. */
@@ -36,6 +39,12 @@ export interface ValidateOrchestrationServiceCallInput {
   readonly requireComplete?: boolean;
   /** Require model-routing receipts once delegated (orchestrator-state route). */
   readonly requireModelRouting?: boolean;
+  /** Require canonical Codex deployment receipts for delegated agents. */
+  readonly requireCodexModelRouting?: boolean;
+  /** Require canonical Codex topology receipts for delegated agents. */
+  readonly requireCodexTopology?: boolean;
+  /** Require every planned epic child to be execution-ready. */
+  readonly requireReadyForExecution?: boolean;
 }
 
 /** Preserved success result of a successful in-process validation. */
@@ -73,6 +82,17 @@ export function validateOrchestrationServiceCall(
     ...(input.requireModelRouting === undefined
       ? {}
       : { requireModelRouting: input.requireModelRouting }),
+    ...(input.requireCodexModelRouting === undefined
+      ? {}
+      : { requireCodexModelRouting: input.requireCodexModelRouting }),
+    ...(input.requireCodexTopology === undefined
+      ? {}
+      : { requireCodexTopology: input.requireCodexTopology }),
+    ...(input.requireReadyForExecution === undefined
+      ? {}
+      : { requireReadyForExecution: input.requireReadyForExecution }),
+    artifactPath: artifactFullPath,
+    ...(input.runner === undefined ? {} : { runner: input.runner }),
     fs: input.fileSystem,
     root: input.workspaceRoot,
   });

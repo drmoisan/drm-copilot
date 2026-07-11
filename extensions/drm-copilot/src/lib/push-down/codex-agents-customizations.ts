@@ -3,8 +3,8 @@
  *
  * Purpose:
  *     Port `push_down_codex_and_agents_customizations.py`. Provides a dedicated
- *     entry point for publishing the bundled `.codex` and `.agents` trees while
- *     reusing the shared copilot push-down engine.
+ *     entry point for publishing the bundled `.codex` and `.agents` trees plus
+ *     the shared routing config while reusing the copilot push-down engine.
  *
  * Side effects:
  *     Delegates all filesystem I/O to the injected {@link PushDownFileSystem}
@@ -34,6 +34,11 @@ export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
 /** Inlined Codex/agents scoped root folders (enumeration-order contract). */
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".codex", ".agents"];
 export const PACK_MANIFEST_SUBDIR = "pack-manifests";
+export const ROUTING_CONFIG_RELATIVE_PATH = "config/orchestration-routing.json";
+const PUBLISHED_ROOT_FOLDERS: ReadonlyArray<string> = [
+  ...ROOT_FOLDERS,
+  "config",
+];
 
 /**
  * Passthrough rewrite for payloads that do not need command rewrites.
@@ -74,6 +79,15 @@ function joinPosix(root: string, relative: string): string {
   return normalizedRoot === ""
     ? normalizedRelative
     : `${normalizedRoot}/${normalizedRelative}`;
+}
+
+function parentPosix(path: string): string {
+  const normalized = normalizePosix(path);
+  const separatorIndex = normalized.lastIndexOf("/");
+  if (separatorIndex < 0) {
+    return "";
+  }
+  return separatorIndex === 0 ? "/" : normalized.slice(0, separatorIndex);
 }
 
 function relativeToPosix(path: string, root: string): string | null {
@@ -160,6 +174,58 @@ class CodexFilteringFileSystem implements PushDownFileSystem {
   }
 }
 
+class RoutingConfigFileSystem implements PushDownFileSystem {
+  private readonly virtualPath: string;
+  private readonly virtualRoot: string;
+  private readonly resourcePath: string;
+
+  constructor(
+    private readonly inner: PushDownFileSystem,
+    options: { readonly sourceRoot: string; readonly bundleRoot: string },
+  ) {
+    this.virtualPath = joinPosix(
+      options.sourceRoot,
+      ROUTING_CONFIG_RELATIVE_PATH,
+    );
+    this.virtualRoot = joinPosix(options.sourceRoot, "config");
+    this.resourcePath = joinPosix(
+      parentPosix(options.bundleRoot),
+      ROUTING_CONFIG_RELATIVE_PATH,
+    );
+  }
+
+  listFiles(root: string): string[] {
+    if (normalizePosix(root) === this.virtualRoot) {
+      return this.inner.isFile(this.resourcePath) ? [this.virtualPath] : [];
+    }
+    return this.inner.listFiles(root);
+  }
+
+  isDir(path: string): boolean {
+    return this.inner.isDir(path);
+  }
+
+  isFile(path: string): boolean {
+    return normalizePosix(path) === this.virtualPath
+      ? this.inner.isFile(this.resourcePath)
+      : this.inner.isFile(path);
+  }
+
+  readTextFile(path: string): string {
+    return this.inner.readTextFile(
+      normalizePosix(path) === this.virtualPath ? this.resourcePath : path,
+    );
+  }
+
+  writeTextFile(path: string, content: string): void {
+    this.inner.writeTextFile(path, content);
+  }
+
+  ensureDir(path: string): void {
+    this.inner.ensureDir(path);
+  }
+}
+
 function resolvePublishedPaths(
   packs: ReadonlySet<string> | null | undefined,
   csharpVariant: CSharpVariant,
@@ -182,7 +248,7 @@ function resolvePublishedPaths(
 }
 
 /**
- * Copy the bundled `.codex` and `.agents` trees into the destination workspace.
+ * Copy Codex trees and the shared routing config into the destination workspace.
  *
  * Delegates to the shared engine with the Codex/agents root folders, artifact
  * directory, and the passthrough rewrite (no command-reference rewriting).
@@ -209,16 +275,20 @@ export function pushDownCustomizations(
     publishedPaths,
     csharpVariant,
   });
+  const publishingFs = new RoutingConfigFileSystem(filteringFs, {
+    sourceRoot,
+    bundleRoot,
+  });
   void options.memoryMode;
   return enginePushDown({
     repoRoot: options.repoRoot,
     destinationRoot: options.destinationRoot,
-    fs: filteringFs,
+    fs: publishingFs,
     sourceRoot,
     ...(options.artifactRoot === undefined
       ? {}
       : { artifactRoot: options.artifactRoot }),
-    rootFolders: ROOT_FOLDERS,
+    rootFolders: PUBLISHED_ROOT_FOLDERS,
     artifactDirectory: ARTIFACT_DIRECTORY,
     rewriteReferences: passthroughRewrite,
     ...(options.clock === undefined ? {} : { clock: options.clock }),

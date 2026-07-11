@@ -13,8 +13,13 @@ import re
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.epic_planner_readiness import build_epic_readiness_context
 from scripts.dev_tools.validate_epic_orchestrator_state import (
     validate_epic_orchestrator_state_text,
+)
+from scripts.dev_tools.validate_epic_planner_state import (
+    validate_epic_kickoff_text,
+    validate_epic_planner_state_text,
 )
 from scripts.dev_tools.validate_orchestration_review_artifacts import (
     validate_code_review_text,
@@ -162,7 +167,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="artifact_type", required=True)
 
-    for artifact_type in ("plan", "policy-audit", "code-review", "feature-audit"):
+    for artifact_type in (
+        "plan",
+        "policy-audit",
+        "code-review",
+        "feature-audit",
+        "epic-kickoff",
+    ):
         artifact_parser = subparsers.add_parser(artifact_type)
         artifact_parser.add_argument("path")
 
@@ -192,6 +203,22 @@ def build_parser() -> argparse.ArgumentParser:
             "--require-complete; delegation-free checkpoints are unaffected."
         ),
     )
+    state_parser.add_argument(
+        "--require-codex-model-routing",
+        action="store_true",
+        help=(
+            "Once the checkpoint records a delegation, require a deterministic "
+            "codex_model_routing_receipts entry for each delegated agent."
+        ),
+    )
+    state_parser.add_argument(
+        "--require-codex-topology",
+        action="store_true",
+        help=(
+            "Require a deterministic codex_topology_receipts decision and "
+            "the exact resolved initial-agent delegation."
+        ),
+    )
 
     epic_state_parser = subparsers.add_parser("epic-orchestrator-state")
     epic_state_parser.add_argument("path")
@@ -199,6 +226,28 @@ def build_parser() -> argparse.ArgumentParser:
         "--require-complete",
         action="store_true",
         help="Require every feature to be merged/removed and the final PR recorded.",
+    )
+    epic_state_parser.add_argument(
+        "--require-codex-model-routing",
+        action="store_true",
+        help="Require a Codex deployment receipt for each epic delegation.",
+    )
+    epic_state_parser.add_argument(
+        "--require-codex-topology",
+        action="store_true",
+        help="Require the epic root and child-orchestrator topology receipts.",
+    )
+    planner_state_parser = subparsers.add_parser("epic-planner-state")
+    planner_state_parser.add_argument("path")
+    planner_state_parser.add_argument(
+        "--workspace-root",
+        default=".",
+        help="Repository root used for readiness artifact and Git integrity checks.",
+    )
+    planner_state_parser.add_argument(
+        "--require-ready-for-execution",
+        action="store_true",
+        help="Require every child to be prepared and preflight-cleared.",
     )
     return parser
 
@@ -224,6 +273,8 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
     """
 
     path = Path(args.path)
+    if args.artifact_type == "epic-planner-state" and not path.is_absolute():
+        path = Path(args.workspace_root) / path
     text = _read_text(path)
     if args.artifact_type == "plan":
         return validate_plan_text(text)
@@ -233,16 +284,38 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
         return validate_code_review_text(text)
     if args.artifact_type == "feature-audit":
         return validate_feature_audit_text(text)
+    if args.artifact_type == "epic-kickoff":
+        return validate_epic_kickoff_text(text)
     if args.artifact_type == "orchestrator-state":
         return validate_orchestrator_state_text(
             text,
             require_complete=bool(args.require_complete),
             require_pr_creation_ready=bool(args.require_pr_creation_ready),
             require_model_routing=bool(args.require_model_routing),
+            require_codex_model_routing=bool(
+                getattr(args, "require_codex_model_routing", False)
+            ),
+            require_codex_topology=bool(getattr(args, "require_codex_topology", False)),
         )
     if args.artifact_type == "epic-orchestrator-state":
         return validate_epic_orchestrator_state_text(
-            text, require_complete=bool(args.require_complete)
+            text,
+            require_complete=bool(args.require_complete),
+            require_codex_model_routing=bool(
+                getattr(args, "require_codex_model_routing", False)
+            ),
+            require_codex_topology=bool(getattr(args, "require_codex_topology", False)),
+        )
+    if args.artifact_type == "epic-planner-state":
+        readiness_context = None
+        if bool(args.require_ready_for_execution):
+            readiness_context = build_epic_readiness_context(
+                Path(args.workspace_root), Path(args.path)
+            )
+        return validate_epic_planner_state_text(
+            text,
+            require_ready_for_execution=bool(args.require_ready_for_execution),
+            readiness_context=readiness_context,
         )
     return [f"Unsupported artifact type: {args.artifact_type}"]
 

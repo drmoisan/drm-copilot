@@ -224,6 +224,73 @@ describe("validateArtifact dispatch", () => {
     );
   });
 
+  it("routes epic-planner-state to the planner validator", () => {
+    expect(
+      validateArtifact({ artifactType: "epic-planner-state", text: "[]" }),
+    ).toEqual(["Epic planner checkpoint root must be a JSON object."]);
+  });
+
+  it("threads requireReadyForExecution into epic-planner-state", () => {
+    const errors = validateArtifact({
+      artifactType: "epic-planner-state",
+      text: "{}",
+      requireReadyForExecution: true,
+    });
+
+    expect(errors).toContain(
+      "Execution-ready planner checkpoint next_step must be 'EPIC_EXECUTION_READY'.",
+    );
+  });
+
+  it("routes epic-kickoff to the kickoff validator", () => {
+    const errors = validateArtifact({
+      artifactType: "epic-kickoff",
+      text: "# Epic Kickoff: incomplete",
+    });
+
+    expect(errors).toContain(
+      "Epic kickoff is missing required section: ## Invocation Prompt",
+    );
+  });
+
+  it("threads requireCodexModelRouting into orchestrator-state", () => {
+    const errors = validateArtifact({
+      artifactType: "orchestrator-state",
+      text: JSON.stringify({
+        delegation_receipts: [{ agent_name: "atomic-planner" }],
+      }),
+      requireCodexModelRouting: true,
+      routingMatrix: {},
+    });
+
+    expect(errors).toContain(
+      "Checkpoint codex_model_routing_receipts must be a list when present.",
+    );
+  });
+
+  it("threads requireCodexTopology into ordinary and epic checkpoints", () => {
+    const ordinaryErrors = validateArtifact({
+      artifactType: "orchestrator-state",
+      text: JSON.stringify({
+        delegation_receipts: [{ agent_name: "orchestrator" }],
+      }),
+      requireCodexTopology: true,
+      routingMatrix: {},
+    });
+    const epicErrors = validateArtifact({
+      artifactType: "epic-orchestrator-state",
+      text: JSON.stringify({ delegation_receipts: [] }),
+      requireCodexTopology: true,
+    });
+
+    expect(ordinaryErrors).toContain(
+      "Checkpoint codex_topology_receipts must be a list when present.",
+    );
+    expect(epicErrors).toContain(
+      "Checkpoint codex_topology_receipts must be a list when present.",
+    );
+  });
+
   it("falls back for an unsupported artifact type", () => {
     // Arrange / Act
     const errors = validateArtifact({ artifactType: "mystery", text: "" });

@@ -1,72 +1,185 @@
-# Converted hook
-# Review the generated hook behavior before enabling it.
 
 <#
 .SYNOPSIS
-    Pre-tool-use hook for Claude Code that blocks dangerous Bash commands.
+    Codex PreToolUse hook that blocks dangerous shell commands.
 
 .DESCRIPTION
-    This script is invoked by the Claude Code PreToolUse hook before any Bash
-    command is executed. It reads the proposed command string from the
-    CLAUDE_TOOL_INPUT environment variable (JSON with a 'command' field) or
-    falls back to the first positional argument. If the command matches any
-    blocked pattern (destructive operations such as forced deletions, forced
-    pushes, or hard resets), the script exits with code 1 to prevent execution.
-    Safe commands exit with code 0.
+    Reads one Codex hook payload from stdin, validates tool_input.command, and emits the current
+    PreToolUse deny envelope for destructive operations. Malformed hook input fails closed with
+    exit code 2 and the reason on stderr. Safe commands emit no output and exit 0.
 
 .NOTES
-    Compatible with PowerShell 7+.
-    This script must not modify any state; it is a read-only validation gate.
+    Compatible with PowerShell 7+. This hook is read-only.
 #>
 [CmdletBinding()]
-param(
-    [Parameter(Position = 0, Mandatory = $false)]
-    [string]$CommandInput
-)
+param()
 
-# Blocked patterns that represent destructive or irreversible operations.
-$blockedPatterns = @(
-    'rm -rf',
-    'git push --force',
-    'git push origin --force',
-    'Remove-Item -Recurse -Force',
-    'git reset --hard',
-    'git push -f'
-)
+function Get-BlockedBashPattern {
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param()
 
-# Resolve the command string from CLAUDE_TOOL_INPUT JSON or positional argument.
-$commandToCheck = ''
+    return [string[]]@(
+        'rm -rf',
+        'git push --force',
+        'git push origin --force',
+        'Remove-Item -Recurse -Force',
+        'git reset --hard',
+        'git push -f'
+    )
+}
 
-if ($env:CLAUDE_TOOL_INPUT) {
-    try {
-        $parsed = $env:CLAUDE_TOOL_INPUT | ConvertFrom-Json
-        if ($parsed.command) {
-            $commandToCheck = $parsed.command
+function Get-BlockedPatternMatch {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $Command
+    )
+
+    if (-not $Command) {
+        return $null
+    }
+
+    foreach ($pattern in (Get-BlockedBashPattern)) {
+        if ($Command.Contains($pattern)) {
+            return $pattern
         }
     }
-    catch {
-        # If JSON parsing fails, treat the raw environment variable as the command.
-        $commandToCheck = $env:CLAUDE_TOOL_INPUT
+
+    return $null
+}
+
+function Get-BashBlockReason {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $Command
+    )
+
+    $pattern = Get-BlockedPatternMatch -Command $Command
+    if (-not $pattern) {
+        return $null
+    }
+
+    return "Blocked dangerous command pattern detected: '$pattern'"
+}
+
+function Get-BashDenyDecision {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
     }
 }
 
-# Fall back to positional argument when the environment variable is absent or empty.
-if (-not $commandToCheck -and $CommandInput) {
-    $commandToCheck = $CommandInput
+function Get-BashCommandToCheck {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $ToolInputRaw,
+
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $PositionalInput
+    )
+
+    if ($ToolInputRaw) {
+        try {
+            $parsed = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
+            if ($parsed.command) {
+                return [string]$parsed.command
+            }
+        } catch {
+            # If JSON parsing fails, treat the raw input as the command.
+            return $ToolInputRaw
+        }
+    }
+
+    if ($PositionalInput) {
+        return $PositionalInput
+    }
+
+    return ''
 }
 
-# When no command is provided, allow execution (nothing to validate).
-if (-not $commandToCheck) {
+function Invoke-ValidateBashDecision {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $ToolInputRaw,
+
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $PositionalInput
+    )
+
+    $commandToCheck = Get-BashCommandToCheck -ToolInputRaw $ToolInputRaw -PositionalInput $PositionalInput
+
+    $reason = Get-BashBlockReason -Command $commandToCheck
+    if ($reason) {
+        return Get-BashDenyDecision -Reason $reason
+    }
+
+    return $null
+}
+
+function ConvertFrom-CodexBashHookPayload {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $PayloadRaw)
+
+    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
+        throw 'validate-bash hook input is empty.'
+    }
+    try {
+        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "validate-bash hook input is malformed JSON: $_"
+    }
+    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
+        throw 'validate-bash hook input is missing tool_input.'
+    }
+    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'Bash') {
+        throw 'validate-bash requires a PreToolUse Bash payload.'
+    }
+    return $payload
+}
+
+if ($MyInvocation.InvocationName -eq '.') {
+    return
+}
+
+try {
+    $payload = ConvertFrom-CodexBashHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    $toolInputRaw = $payload.tool_input | ConvertTo-Json -Compress -Depth 20
+    $decision = Invoke-ValidateBashDecision -ToolInputRaw $toolInputRaw
+    if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+        $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    }
     exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-
-# Check the command against each blocked pattern.
-foreach ($pattern in $blockedPatterns) {
-    if ($commandToCheck.Contains($pattern)) {
-        Write-Error "Blocked dangerous command pattern detected: '$pattern'"
-        exit 1
-    }
-}
-
-# Command passed all checks.
-exit 0

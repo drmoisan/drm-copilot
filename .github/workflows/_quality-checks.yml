@@ -66,6 +66,11 @@ jobs:
           poetry run pyright
         continue-on-error: false
 
+      - name: Verify Codex agent deployment profiles
+        run: |
+          poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check
+        continue-on-error: false
+
       - name: Run tests with Pytest
         run: |
           poetry run pytest --cov=src/lexile_corpus_tuner --cov-report=xml --cov-report=term-missing

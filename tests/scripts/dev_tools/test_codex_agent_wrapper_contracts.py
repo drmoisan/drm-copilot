@@ -29,6 +29,7 @@ BUNDLED_ROOT = (
 ORCHESTRATOR_ROLE_PATH = ".codex/agents/orchestrator.toml"
 REQUIRED_ORCHESTRATOR_SKILLS = (
     "policy-compliance-order",
+    "codex-model-routing",
     "orchestrate",
     "orchestrator-workflow",
     "feature-promotion-lifecycle",

@@ -23,6 +23,13 @@ import { toPosixPath } from "../file-system";
 /** Relative path of the repository routing matrix consumed by production. */
 export const ROUTING_MATRIX_RELATIVE_PATH = "config/orchestration-routing.json";
 
+/** Mandatory canonical phases that selected routes must complete. */
+const MANDATORY_ROUTE_PHASES: Readonly<Record<string, ReadonlyArray<string>>> =
+  {
+    small: ["S3_promotion", "S4_atomic_planning"],
+    preparation: ["S3_promotion", "S4_atomic_planning"],
+  };
+
 /**
  * Type guard for a plain object (non-null, non-array).
  *
@@ -31,6 +38,93 @@ export const ROUTING_MATRIX_RELATIVE_PATH = "config/orchestration-routing.json";
  */
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Resolve the selected route, preferring route_id over path_selected.
+ *
+ * @param state Checkpoint state object.
+ * @returns The selected non-empty route id, or null when none is valid.
+ */
+function selectedRouteId(state: Record<string, unknown>): string | null {
+  const value =
+    state["route_id"] !== undefined
+      ? state["route_id"]
+      : state["path_selected"];
+  return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
+/**
+ * Report whether the selected route explicitly requires a PR gate.
+ *
+ * A PR gate is required only when the selected route exists and its
+ * `requires_pr_gate` value is the literal Boolean true.
+ *
+ * @param state Checkpoint state object.
+ * @param options Routing matrix injection.
+ * @returns True only for a route that explicitly opts into the PR gate.
+ */
+export function routeRequiresPrGate(
+  state: Record<string, unknown>,
+  options: ValidateRoutingContractOptions = {},
+): boolean {
+  const routeId = selectedRouteId(state);
+  const matrix = options.routingMatrix;
+  if (routeId === null || !isObject(matrix) || !isObject(matrix["routes"])) {
+    return false;
+  }
+  const route = matrix["routes"][routeId];
+  return isObject(route) && route["requires_pr_gate"] === true;
+}
+
+/**
+ * Report whether the selected route requires a CI gate.
+ *
+ * Only the literal Boolean false opts out. Missing or unknown routes,
+ * malformed matrices, absent flags, and non-Boolean values fail closed.
+ *
+ * @param state Checkpoint state object.
+ * @param options Routing matrix injection.
+ * @returns False only for an explicit `requires_ci_gate: false` route.
+ */
+export function routeRequiresCiGate(
+  state: Record<string, unknown>,
+  options: ValidateRoutingContractOptions = {},
+): boolean {
+  const routeId = selectedRouteId(state);
+  const matrix = options.routingMatrix;
+  if (routeId === null || !isObject(matrix) || !isObject(matrix["routes"])) {
+    return true;
+  }
+  const route = matrix["routes"][routeId];
+  return !isObject(route) || route["requires_ci_gate"] !== false;
+}
+
+/**
+ * Validate mandatory canonical phases for the selected route.
+ *
+ * @param state Checkpoint state object.
+ * @returns One error per mandatory phase absent from completed_steps.
+ */
+export function validatePhaseCompleteness(
+  state: Record<string, unknown>,
+): string[] {
+  const routeId = selectedRouteId(state);
+  if (routeId === null) {
+    return [];
+  }
+  const mandatory = MANDATORY_ROUTE_PHASES[routeId];
+  if (mandatory === undefined) {
+    return [];
+  }
+  const completed = new Set(stringList(state["completed_steps"]) ?? []);
+  return mandatory
+    .filter((phase) => !completed.has(phase))
+    .map(
+      (phase) =>
+        "Checkpoint completion validation failed: route " +
+        `${routeId} is missing mandatory phase ${phase}.`,
+    );
 }
 
 /**
@@ -294,14 +388,10 @@ export function validateRoutingContract(
   }
 
   // Resolve the selected route id, falling back from route_id to path_selected.
-  const routeIdValue =
-    state["route_id"] !== undefined
-      ? state["route_id"]
-      : state["path_selected"];
-  if (typeof routeIdValue !== "string" || routeIdValue.trim() === "") {
+  const routeId = selectedRouteId(state);
+  if (routeId === null) {
     return ["Checkpoint route_id or path_selected must select a route."];
   }
-  const routeId = routeIdValue;
   const rawRoute = rawRoutes[routeId];
   if (!isObject(rawRoute)) {
     return [

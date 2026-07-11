@@ -164,16 +164,38 @@ def build_valid_epic_orchestrator_state() -> dict[str, object]:
         "route_id": "epic",
         "epic_feature_folder": "epic-orchestrate-275",
         "integration_branch": "epic/epic-orchestrate-275-integration",
+        "max_parallel_features": 4,
         "completed_steps": ["epic_manifest_parsed"],
         "next_step": "wave_1_launch",
         "last_updated": "2026-07-02T20-00",
         "waves": [{"wave_number": 0, "feature_folders": ["child-a"]}],
         "features": [
             {
+                "issue_num": 101,
                 "feature_folder": "child-a",
                 "depends_on": [],
                 "wave_number": 0,
                 "merge_status": "merged",
+                "branch_name": "feature/child-a",
+                "worktree_path": r"C:\worktrees\child-a",
+                "delegation_receipt": {
+                    "delegation_id": "delegate-child-a",
+                    "feature_folder": "child-a",
+                    "issue_num": 101,
+                    "agent_name": "orchestrator-c3-elevated",
+                },
+                "model_routing_receipt": {
+                    "delegation_id": "delegate-child-a",
+                    "deployment_agent": "orchestrator-c3-elevated",
+                    "execution_context": "epic_execution_child",
+                },
+                "launch_receipt_path": (
+                    "artifacts/orchestration/epic-child-launches/"
+                    "child-a.receipt.json"
+                ),
+                "launch_status_path": (
+                    "artifacts/orchestration/epic-child-launches/" "child-a.status.json"
+                ),
             }
         ],
     }

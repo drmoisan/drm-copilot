@@ -1,4 +1,5 @@
 import { type FileSystem } from "../file-system";
+import type { CommandRunner } from "../subprocess-runner";
 import { type ValidateOrchestrationServiceCallInput } from "./validate-orchestration-service-call";
 
 /**
@@ -9,9 +10,8 @@ import { type ValidateOrchestrationServiceCallInput } from "./validate-orchestra
  *     Extracted from `RepoAutomationService.validateOrchestrationArtifacts` to
  *     keep the service file within the 500-line limit while preserving the
  *     request-shaping behavior exactly. The optional `requireComplete` and
- *     `requireModelRouting` keys are omitted entirely when their source value is
- *     `undefined`, matching the prior inline spread semantics so downstream
- *     `exactOptionalPropertyTypes` behavior is unchanged.
+ *     validation-option keys are omitted entirely when their source value is
+ *     `undefined`, preserving downstream `exactOptionalPropertyTypes` behavior.
  *
  * Side effects:
  *     None. Pure object construction.
@@ -29,10 +29,15 @@ export function buildValidateOrchestrationServiceCallInput(
     readonly artifactPath: string;
     readonly requireComplete?: boolean;
     readonly requireModelRouting?: boolean;
+    readonly requireCodexModelRouting?: boolean;
+    readonly requireCodexTopology?: boolean;
+    readonly requireReadyForExecution?: boolean;
   },
+  runner?: CommandRunner,
 ): ValidateOrchestrationServiceCallInput {
   return {
     fileSystem,
+    ...(runner === undefined ? {} : { runner }),
     workspaceRoot: input.workspaceRoot,
     artifactType: input.artifactType,
     artifactPath: input.artifactPath,
@@ -42,5 +47,14 @@ export function buildValidateOrchestrationServiceCallInput(
     ...(input.requireModelRouting === undefined
       ? {}
       : { requireModelRouting: input.requireModelRouting }),
+    ...(input.requireCodexModelRouting === undefined
+      ? {}
+      : { requireCodexModelRouting: input.requireCodexModelRouting }),
+    ...(input.requireCodexTopology === undefined
+      ? {}
+      : { requireCodexTopology: input.requireCodexTopology }),
+    ...(input.requireReadyForExecution === undefined
+      ? {}
+      : { requireReadyForExecution: input.requireReadyForExecution }),
   };
 }

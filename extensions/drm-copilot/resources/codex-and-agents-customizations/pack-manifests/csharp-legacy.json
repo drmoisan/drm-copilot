@@ -6,6 +6,11 @@
     ".agents/skills/csharp/SKILL.md",
     ".agents/skills/csharp-qa-gate/SKILL.md",
     ".agents/skills/invoke-csharp-engineer/SKILL.md",
-    ".codex/agents/csharp-typed-engineer.toml"
+    ".codex/agents/csharp-typed-engineer.toml",
+    ".codex/agents/csharp-typed-engineer-c1.toml",
+    ".codex/agents/csharp-typed-engineer-c2.toml",
+    ".codex/agents/csharp-typed-engineer-c3.toml",
+    ".codex/agents/csharp-typed-engineer-c3-elevated.toml",
+    ".codex/agents/csharp-typed-engineer-c4.toml"
   ]
 }

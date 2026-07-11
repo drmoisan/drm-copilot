@@ -1,20 +1,18 @@
-# Converted hook
-# Review the generated hook behavior before enabling it.
 
 <#
 .SYNOPSIS
     Pre-tool-use hook that enforces the PowerShell per-batch change budget.
 
 .DESCRIPTION
-    This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
+    This script is invoked by the Codex PreToolUse hook before any Write or Edit
     operation. When the target file is a PowerShell source file (.ps1, .psm1, .psd1),
     it classifies the file as either production or test and checks the running count
     against the per-batch cap:
       - 3 production PowerShell files per batch
       - 3 test PowerShell files per batch
 
-    A "batch" is scoped to the current Claude Code session. The running count is
-    persisted under .claude/state/powershell-batch-budget.<session_id>.json. Only
+    A "batch" is scoped to the current Codex session. The running count is
+    persisted under .codex/state/powershell-batch-budget.<session_id>.json. Only
     distinct file paths are counted; repeated edits to the same file consume one slot.
 
     Test files are those matching:
@@ -24,15 +22,13 @@
     All other .ps1/.psm1/.psd1 files are treated as production files. Non-PowerShell
     paths pass through.
 
-    The cap may be overridden per session by setting the environment variable
-    CLAUDE_POWERSHELL_BUDGET_PROD or CLAUDE_POWERSHELL_BUDGET_TEST to a positive integer
-    before the session starts, or by writing {"prodCap": N, "testCap": M} into the
-    state file.
+    An approved per-session override is recorded by writing
+    {"prodCap": N, "testCap": M} into the Codex state file.
 
-    When the cap would be exceeded by a new file, the script emits a JSON response with
-    'decision': 'block' and exits 0. The session must explicitly reset the counter by
-    deleting the state file before starting a new batch. Files already counted are
-    always allowed through.
+    When the cap would be exceeded by a new file, the script emits a PreToolUse JSON
+    response with hookSpecificOutput.permissionDecision = 'deny' and exits 0. The session
+    must explicitly reset the counter by deleting the state file before starting a new
+    batch. Files already counted are always allowed through.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -93,8 +89,11 @@ function Get-PowerShellBatchBudgetBlockDecision {
     )
 
     $decision = [ordered]@{
-        decision = 'block'
-        reason   = $Reason
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
     }
     if ($State) {
         $decision.state = $State
@@ -119,7 +118,7 @@ function Invoke-PowerShellBatchBudgetDecision {
 
     $normalized = $FilePath -replace '\\', '/'
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
-        return [ordered]@{ decision = 'allow'; state = $State; shouldWriteState = $false }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
     $isTestFile = ($normalized -match '(^|/)tests/.*\.ps1$') -or ($normalized -match '\.Tests\.ps1$')
@@ -128,13 +127,12 @@ function Invoke-PowerShellBatchBudgetDecision {
     $kind = if ($isTestFile) { 'test' } else { 'production' }
 
     if ($targetList -contains $normalized) {
-        return [ordered]@{ decision = 'allow'; state = $State; shouldWriteState = $false }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
     if ($targetList.Count -ge $cap) {
         $currentFiles = ($targetList -join ', ')
-        $kindUpper = $kind.ToUpperInvariant()
-        $reason = "PowerShell per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, raise the cap via CLAUDE_POWERSHELL_BUDGET_$kindUpper environment variable with approved scope, or reset the batch by deleting $StateFile."
+        $reason = "PowerShell per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, record an approved cap in $StateFile, or reset the batch by deleting that state file."
         return Get-PowerShellBatchBudgetBlockDecision -Reason $reason -State $State
     }
 
@@ -144,7 +142,7 @@ function Invoke-PowerShellBatchBudgetDecision {
         $State.prodFiles = @($State.prodFiles) + @($normalized)
     }
 
-    return [ordered]@{ decision = 'allow'; state = $State; shouldWriteState = $true }
+    return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $true }
 }
 
 function Invoke-PowerShellBatchBudgetHook {
@@ -166,26 +164,26 @@ function Invoke-PowerShellBatchBudgetHook {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return Get-PowerShellBatchBudgetBlockDecision -Reason 'PowerShell batch-budget hook received malformed JSON in CLAUDE_TOOL_INPUT.'
+        return Get-PowerShellBatchBudgetBlockDecision -Reason 'PowerShell batch-budget hook received malformed JSON in Codex tool_input.'
     }
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $normalized = $filePath -replace '\\', '/'
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $stateDir = Join-Path -Path $Root -ChildPath '.claude/state'
+    $stateDir = Join-Path -Path $Root -ChildPath '.codex/state'
     if (-not (& $TestPathExists $stateDir)) {
         & $EnsureDirectory $stateDir
     }
@@ -214,28 +212,75 @@ function Invoke-PowerShellBatchBudgetHook {
     return $decision
 }
 
+function ConvertFrom-CodexPowerShellBudgetPayload {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $PayloadRaw)
+
+    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
+        throw 'enforce-powershell-batch-budget hook input is empty.'
+    }
+    try {
+        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "enforce-powershell-batch-budget hook input is malformed JSON: $_"
+    }
+    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
+        throw 'enforce-powershell-batch-budget hook input is missing tool_input.'
+    }
+    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
+        throw 'enforce-powershell-batch-budget requires a PreToolUse apply_patch payload.'
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$payload.session_id)) {
+        throw 'enforce-powershell-batch-budget hook input is missing session_id.'
+    }
+    return $payload
+}
+
+function Get-CodexPowerShellBudgetPath {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)] $Payload)
+
+    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
+        return [string]$Payload.tool_input.file_path
+    }
+    $command = [string]$Payload.tool_input.command
+    if ([string]::IsNullOrWhiteSpace($command)) {
+        throw 'enforce-powershell-batch-budget cannot map tool_input to a file edit.'
+    }
+    [string[]] $paths = @(
+        [regex]::Matches($command, '(?m)^\*\*\* (?:(?:Add|Update|Delete) File|Move to):\s*(?<path>.+?)\s*$') |
+            ForEach-Object { ([string]$_.Groups['path'].Value).Trim() }
+    )
+    $paths = @($paths | Select-Object -Unique)
+    if ($paths.Count -eq 0) {
+        throw 'enforce-powershell-batch-budget received an unrecognized apply_patch command.'
+    }
+    return $paths
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$sessionId = $env:CLAUDE_SESSION_ID
-if (-not $sessionId) {
-    $sessionId = 'default'
-}
+try {
+    $payload = ConvertFrom-CodexPowerShellBudgetPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    $sessionId = ([string]$payload.session_id) -replace '[^A-Za-z0-9._-]', '_'
+    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $prodCap = 3
+    $testCap = 3
 
-$prodCap = 3
-$testCap = 3
-if ($env:CLAUDE_POWERSHELL_BUDGET_PROD -match '^\d+$') {
-    $prodCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_PROD
+    foreach ($path in @(Get-CodexPowerShellBudgetPath -Payload $payload)) {
+        $toolInputRaw = @{ file_path = $path } | ConvertTo-Json -Compress
+        $decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $toolInputRaw -SessionId $sessionId -Root $repositoryRoot -ProdCap $prodCap -TestCap $testCap
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision.Remove('state')
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-if ($env:CLAUDE_POWERSHELL_BUDGET_TEST -match '^\d+$') {
-    $testCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_TEST
-}
-
-$decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $env:CLAUDE_TOOL_INPUT -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
-if ($decision.decision -eq 'block') {
-    $decision.Remove('state')
-    $decision | ConvertTo-Json -Compress | Write-Output
-}
-
-exit 0

@@ -4,6 +4,11 @@
   "paths": [
     ".agents/skills/typescript/SKILL.md",
     ".agents/skills/typescript-suppressions/SKILL.md",
-    ".codex/agents/typescript-engineer.toml"
+    ".codex/agents/typescript-engineer.toml",
+    ".codex/agents/typescript-engineer-c1.toml",
+    ".codex/agents/typescript-engineer-c2.toml",
+    ".codex/agents/typescript-engineer-c3.toml",
+    ".codex/agents/typescript-engineer-c3-elevated.toml",
+    ".codex/agents/typescript-engineer-c4.toml"
   ]
 }

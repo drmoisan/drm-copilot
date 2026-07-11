@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import cast
@@ -19,6 +20,17 @@ BUNDLED_ROOT = (
     / "resources"
     / "codex-and-agents-customizations"
 )
+CANONICAL_ROUTING_CONFIG = REPO_ROOT / "config" / "orchestration-routing.json"
+SHARED_ROUTING_CONFIG = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "config"
+    / "orchestration-routing.json"
+)
+BUNDLE_ROUTING_CONFIG = BUNDLED_ROOT / "config" / "orchestration-routing.json"
+MCP_SERVER_MANIFEST = REPO_ROOT / "packages" / "mcp-server" / "package.json"
 SCOPED_ROOTS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
 PACK_MANIFEST_ROOT = Path("pack-manifests")
 VARIANT_ROOTS: tuple[Path, ...] = (
@@ -77,6 +89,17 @@ EXPECTED_DRM_COPILOT_TOOLS = (
     "resolve_atomic_plan_prompt",
     "validate_orchestration_artifacts",
 )
+APPROVED_DRM_COPILOT_TOOLS = tuple(
+    tool
+    for tool in EXPECTED_DRM_COPILOT_TOOLS
+    if tool
+    not in {
+        "run_codex_native_converter",
+        "push_down_copilot_customizations",
+        "push_down_codex_and_agents_customizations",
+        "push_down_claude_customizations",
+    }
+)
 
 
 def list_scoped_files(root: Path) -> list[Path]:
@@ -118,6 +141,8 @@ def read_toml(root: Path, relative_path: Path) -> dict[str, object]:
 def assert_full_drm_copilot_transport(config: dict[str, object]) -> None:
     """Require the complete drm-copilot MCP transport configuration."""
 
+    mcp_version = json.loads(MCP_SERVER_MANIFEST.read_text(encoding="utf-8"))["version"]
+    expected_package_spec = f"@danmoisan/drm-copilot-mcp@{mcp_version}"
     mcp_servers = config.get("mcp_servers")
     assert isinstance(mcp_servers, dict)
     mcp_servers_by_name = cast("dict[str, object]", mcp_servers)
@@ -125,7 +150,7 @@ def assert_full_drm_copilot_transport(config: dict[str, object]) -> None:
     assert isinstance(drm_copilot, dict)
     transport = cast("dict[str, object]", drm_copilot)
     assert transport["command"] == "npx"
-    assert transport["args"] == ["-y", "@danmoisan/drm-copilot-mcp"]
+    assert transport["args"] == ["-y", expected_package_spec]
     assert transport["required"] is True
     enabled_tools = transport["enabled_tools"]
     assert isinstance(enabled_tools, list)
@@ -136,10 +161,12 @@ def assert_full_drm_copilot_transport(config: dict[str, object]) -> None:
     tools = transport.get("tools")
     assert isinstance(tools, dict)
     tools_by_name = cast("dict[str, object]", tools)
-    validate_artifacts = tools_by_name.get("validate_orchestration_artifacts")
-    assert isinstance(validate_artifacts, dict)
-    validate_artifacts_settings = cast("dict[str, object]", validate_artifacts)
-    assert validate_artifacts_settings["approval_mode"] == "approve"
+    assert tuple(sorted(tools_by_name)) == tuple(sorted(APPROVED_DRM_COPILOT_TOOLS))
+    for tool_name in APPROVED_DRM_COPILOT_TOOLS:
+        tool_settings = tools_by_name.get(tool_name)
+        assert isinstance(tool_settings, dict)
+        typed_settings = cast("dict[str, object]", tool_settings)
+        assert typed_settings["approval_mode"] == "approve"
 
 
 def assert_no_role_local_drm_copilot_transport(role: dict[str, object]) -> None:
@@ -167,6 +194,13 @@ def test_bundled_codex_pack_manifests_and_variants_exist() -> None:
         assert relative_path in bundled_files
     for relative_path in REQUIRED_VARIANT_FILES:
         assert relative_path in bundled_files
+
+
+def test_routing_config_remains_a_shared_resource_outside_codex_bundle() -> None:
+    """Require one extension resource source and no Codex-bundle duplicate."""
+
+    assert SHARED_ROUTING_CONFIG.read_bytes() == CANONICAL_ROUTING_CONFIG.read_bytes()
+    assert not BUNDLE_ROUTING_CONFIG.exists()
 
 
 def test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts() -> None:

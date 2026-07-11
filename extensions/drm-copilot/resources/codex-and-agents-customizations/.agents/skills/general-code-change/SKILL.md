@@ -3,7 +3,6 @@ name: general-code-change
 description: Cross-language code change policy for all files.
 paths:
   - "**"
-description: Cross-language code change policy. Applies to all files.
 ---
 
 # Converted rule

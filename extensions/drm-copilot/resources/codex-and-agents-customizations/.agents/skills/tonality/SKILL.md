@@ -3,7 +3,6 @@ name: tonality
 description: Required communication tone policy for all files and responses.
 paths:
   - "**"
-description: Required communication tone policy. Applies to all files and responses.
 ---
 
 # Converted rule
