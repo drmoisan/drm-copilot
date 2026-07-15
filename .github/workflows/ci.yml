@@ -30,6 +30,8 @@ jobs:
     uses: ./.github/workflows/_drm-copilot-extension-tests.yml
 
   npm-audit-gate:
+    permissions:
+      contents: read
     uses: ./.github/workflows/_npm-audit-gate.yml
     with:
       audit-level: moderate
