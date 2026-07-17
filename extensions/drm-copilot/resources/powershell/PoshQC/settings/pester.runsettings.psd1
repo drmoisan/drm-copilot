@@ -82,6 +82,9 @@
             # to AST-based scriptblocks (Parser::ParseFile(...).GetScriptBlock()) so Pester
             # coverage breakpoints bind to the on-disk source file.
             'scripts/powershell/PoshQC/PoshQC.ScanConfig.psm1'
+            # Issue #357 remediation cycle 1 (fix #1): measure the atomic-planner SubagentStop
+            # hook so its Pester coverage is captured in the canonical artifact.
+            '.claude/hooks/validate-planner-output.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
