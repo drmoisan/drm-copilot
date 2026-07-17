@@ -245,7 +245,7 @@ function Invoke-PlannerOutputValidation {
     }
 
     $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
+    if ($null -ne $payload.PSObject.Properties['output']) {
         $agentOutput = $payload.output
     }
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
