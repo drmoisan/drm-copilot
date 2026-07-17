@@ -2,10 +2,10 @@
 epic: legacy-discovery-and-parity
 integration_branch: epic/legacy-discovery-and-parity-integration
 created_at: 2026-07-17T10:10:00Z
-# issue_num values below are PLACEHOLDERS (9001-9014) assigned at planning time.
-# They are back-filled with real GitHub issue numbers from each child's promotion
-# receipt as preparation completes. depends_on uses stable feature_folder basenames
-# (resolved via the manifest union index), so it does not drift during back-fill.
+# Resolved manifest. issue_num values are the real GitHub issue numbers from each
+# child's promotion; feature_folder values are the concrete active-folder basenames
+# (docs/features/active/<basename>); depends_on uses issue_num values (the canonical
+# primary-key form). The DAG is cycle-free and every depends_on entry resolves.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A domain-neutral discovery-and-parity capability lets migrating repositories (TaskMaster to TMW first) inventory legacy behavior, define source-to-target parity, and generate acceptance scenarios without bespoke per-repo tooling.
@@ -16,48 +16,48 @@ intent:
     - Core framework is domain-neutral; all domain specificity is runtime configuration.
     - Deterministic validators and schemas; line coverage >= 85%, branch coverage >= 75%.
 features:
-  - issue_num: 9001
-    feature_folder: legacy-discovery-config-contract
+  - issue_num: 360
+    feature_folder: 2026-07-17-legacy-discovery-config-contract-360
     depends_on: []
-  - issue_num: 9002
-    feature_folder: legacy-discovery-schemas
+  - issue_num: 359
+    feature_folder: 2026-07-17-legacy-discovery-schemas-359
     depends_on: []
-  - issue_num: 9003
-    feature_folder: legacy-discovery-validators
-    depends_on: [legacy-discovery-config-contract, legacy-discovery-schemas]
-  - issue_num: 9004
-    feature_folder: legacy-discovery-hooks
-    depends_on: [legacy-discovery-validators]
-  - issue_num: 9005
-    feature_folder: legacy-discovery-init-templates
-    depends_on: [legacy-discovery-config-contract, legacy-discovery-schemas]
-  - issue_num: 9006
-    feature_folder: legacy-discovery-analyzer-framework
-    depends_on: [legacy-discovery-config-contract, legacy-discovery-schemas]
-  - issue_num: 9007
-    feature_folder: legacy-discovery-agent-roles
-    depends_on: [legacy-discovery-config-contract, legacy-discovery-schemas]
-  - issue_num: 9008
-    feature_folder: legacy-discovery-skills
-    depends_on: [legacy-discovery-analyzer-framework, legacy-discovery-agent-roles]
-  - issue_num: 9009
-    feature_folder: legacy-discovery-acceptance-scenarios
-    depends_on: [legacy-discovery-schemas]
-  - issue_num: 9010
-    feature_folder: legacy-discovery-reports
-    depends_on: [legacy-discovery-schemas, legacy-discovery-validators]
-  - issue_num: 9014
-    feature_folder: legacy-discovery-dotnet-vsto-analyzers
-    depends_on: [legacy-discovery-analyzer-framework]
-  - issue_num: 9011
-    feature_folder: legacy-discovery-mcp-vscode
-    depends_on: [legacy-discovery-validators, legacy-discovery-init-templates, legacy-discovery-analyzer-framework, legacy-discovery-dotnet-vsto-analyzers, legacy-discovery-acceptance-scenarios, legacy-discovery-reports]
-  - issue_num: 9012
-    feature_folder: legacy-discovery-publishing
-    depends_on: [legacy-discovery-schemas, legacy-discovery-hooks, legacy-discovery-init-templates, legacy-discovery-agent-roles, legacy-discovery-skills]
-  - issue_num: 9013
-    feature_folder: legacy-discovery-documentation
-    depends_on: [legacy-discovery-skills, legacy-discovery-mcp-vscode, legacy-discovery-publishing]
+  - issue_num: 361
+    feature_folder: 2026-07-17-legacy-discovery-validators-361
+    depends_on: [360, 359]
+  - issue_num: 366
+    feature_folder: 2026-07-17-legacy-discovery-hooks-366
+    depends_on: [361]
+  - issue_num: 362
+    feature_folder: 2026-07-17-legacy-discovery-init-templates-362
+    depends_on: [360, 359]
+  - issue_num: 363
+    feature_folder: 2026-07-17-legacy-discovery-analyzer-framework-363
+    depends_on: [360, 359]
+  - issue_num: 365
+    feature_folder: 2026-07-17-legacy-discovery-agent-roles-365
+    depends_on: [360, 359]
+  - issue_num: 367
+    feature_folder: 2026-07-17-legacy-discovery-skills-367
+    depends_on: [363, 365]
+  - issue_num: 364
+    feature_folder: 2026-07-17-legacy-discovery-acceptance-scenarios-364
+    depends_on: [359]
+  - issue_num: 368
+    feature_folder: 2026-07-17-legacy-discovery-reports-368
+    depends_on: [359, 361]
+  - issue_num: 369
+    feature_folder: 2026-07-17-legacy-discovery-dotnet-vsto-analyzers-369
+    depends_on: [363]
+  - issue_num: 370
+    feature_folder: 2026-07-17-legacy-discovery-mcp-vscode-370
+    depends_on: [361, 362, 363, 369, 364, 368]
+  - issue_num: 372
+    feature_folder: 2026-07-17-legacy-discovery-publishing-372
+    depends_on: [359, 366, 362, 365, 367]
+  - issue_num: 371
+    feature_folder: 2026-07-17-legacy-discovery-documentation-371
+    depends_on: [367, 370, 372]
 ---
 
 # Legacy Discovery and Parity - Epic
@@ -79,14 +79,14 @@ full objective is recorded in `objective-source.md` in this directory.
 ## Scope
 
 In scope: the fourteen child features enumerated in `## Decomposition` — the domain-profile
-configuration contract (#9001), versioned JSON schemas (#9002), validators (#9003),
-completion-gate hooks (#9004), initialization and templates (#9005), the analyzer framework
-and repository inventory (#9006), generic agent roles (#9007), generic skills (#9008),
-acceptance-scenario generation (#9009), reports (#9010), MCP and VS Code integration (#9011),
-cross-ecosystem publishing (#9012), documentation (#9013), and the .NET/VSTO analyzers
-(#9014). Python CLI (`dev.discovery.*`) commands are delivered inside each owning functional
+configuration contract (#360), versioned JSON schemas (#359), validators (#361),
+completion-gate hooks (#366), initialization and templates (#362), the analyzer framework
+and repository inventory (#363), generic agent roles (#365), generic skills (#367),
+acceptance-scenario generation (#364), reports (#368), MCP and VS Code integration (#370),
+cross-ecosystem publishing (#372), documentation (#371), and the .NET/VSTO analyzers
+(#369). Python CLI (`dev.discovery.*`) commands are delivered inside each owning functional
 feature (each command is a module plus one `pyproject.toml` script line), and the MCP/VS Code
-exposure layer (#9011) wraps those commands.
+exposure layer (#370) wraps those commands.
 
 ## Non-Goals
 
@@ -131,39 +131,39 @@ Waves are computed by longest-path layering over the `depends_on` DAG
 in `config/orchestration-routing.json`.
 
 - Wave 0
-  - **legacy-discovery-config-contract** (#9001, C3) — repository-local domain-profile
+  - **legacy-discovery-config-contract** (#360, C3) — repository-local domain-profile
     configuration contract and its parser. Foundational cross-module contract.
-  - **legacy-discovery-schemas** (#9002, C3) — seven versioned JSON schemas plus the
+  - **legacy-discovery-schemas** (#359, C3) — seven versioned JSON schemas plus the
     schema-versioning convention. Foundational cross-module contract.
 - Wave 1
-  - **legacy-discovery-validators** (#9003, C2) — deterministic validators for the config and
-    schemas. Depends on #9001, #9002.
-  - **legacy-discovery-init-templates** (#9005, C2) — initialization command and artifact
-    templates. Depends on #9001, #9002.
-  - **legacy-discovery-analyzer-framework** (#9006, C3) — language-neutral analyzer framework
-    and repository/project inventory. Depends on #9001, #9002.
-  - **legacy-discovery-agent-roles** (#9007, C3) — four generic agent personas. Depends on
-    #9001, #9002.
-  - **legacy-discovery-acceptance-scenarios** (#9009, C3) — executable acceptance-scenario
-    generation. Depends on #9002.
+  - **legacy-discovery-validators** (#361, C2) — deterministic validators for the config and
+    schemas. Depends on #360, #359.
+  - **legacy-discovery-init-templates** (#362, C2) — initialization command and artifact
+    templates. Depends on #360, #359.
+  - **legacy-discovery-analyzer-framework** (#363, C3) — language-neutral analyzer framework
+    and repository/project inventory. Depends on #360, #359.
+  - **legacy-discovery-agent-roles** (#365, C3) — four generic agent personas. Depends on
+    #360, #359.
+  - **legacy-discovery-acceptance-scenarios** (#364, C3) — executable acceptance-scenario
+    generation. Depends on #359.
 - Wave 2
-  - **legacy-discovery-hooks** (#9004, C2) — completion-gate hooks invoking the validators.
-    Depends on #9003.
-  - **legacy-discovery-skills** (#9008, C3) — generic discovery/parity workflow skills.
-    Depends on #9006, #9007.
-  - **legacy-discovery-reports** (#9010, C2) — coverage, parity, and completion reports.
-    Depends on #9002, #9003.
-  - **legacy-discovery-dotnet-vsto-analyzers** (#9014, C4) — .NET/C# inventory and VSTO/Office
-    analyzers. Research-heavy, novel; depends on #9006.
+  - **legacy-discovery-hooks** (#366, C2) — completion-gate hooks invoking the validators.
+    Depends on #361.
+  - **legacy-discovery-skills** (#367, C3) — generic discovery/parity workflow skills.
+    Depends on #363, #365.
+  - **legacy-discovery-reports** (#368, C2) — coverage, parity, and completion reports.
+    Depends on #359, #361.
+  - **legacy-discovery-dotnet-vsto-analyzers** (#369, C4) — .NET/C# inventory and VSTO/Office
+    analyzers. Research-heavy, novel; depends on #363.
 - Wave 3
-  - **legacy-discovery-mcp-vscode** (#9011, C3) — MCP tool and VS Code command exposure of the
-    discovery CLI commands. Depends on #9003, #9005, #9006, #9014, #9009, #9010.
-  - **legacy-discovery-publishing** (#9012, C2) — cross-ecosystem publishing (resources/
-    mirrors, Codex converter registration, pack-manifest selection). Depends on #9002, #9004,
-    #9005, #9007, #9008.
+  - **legacy-discovery-mcp-vscode** (#370, C3) — MCP tool and VS Code command exposure of the
+    discovery CLI commands. Depends on #361, #362, #363, #369, #364, #368.
+  - **legacy-discovery-publishing** (#372, C2) — cross-ecosystem publishing (resources/
+    mirrors, Codex converter registration, pack-manifest selection). Depends on #359, #366,
+    #362, #365, #367.
 - Wave 4
-  - **legacy-discovery-documentation** (#9013, C2) — capability-level end-to-end documentation
-    and consumer onboarding. Depends on #9008, #9011, #9012.
+  - **legacy-discovery-documentation** (#371, C2) — capability-level end-to-end documentation
+    and consumer onboarding. Depends on #367, #370, #372.
 
 Each child keeps its own git branch/worktree and its own independent active/ -> completed/
 lifecycle. `epic-status.md` in this directory is a generated projection of the epic checkpoint;
