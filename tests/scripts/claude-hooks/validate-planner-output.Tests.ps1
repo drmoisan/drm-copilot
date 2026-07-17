@@ -45,9 +45,9 @@ Describe 'validate-planner-output.ps1' {
                 @{
                     Exists = $true
                     Lines  = @(
-                        '### Phase 1 - Implement',
+                        "### Phase 1 `u{2014} Implement",
                         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1',
-                        '### Phase 2 - QA',
+                        "### Phase 2 `u{2014} QA",
                         '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
@@ -65,10 +65,10 @@ Describe 'validate-planner-output.ps1' {
                 @{
                     Exists = $true
                     Lines  = @(
-                        '### Phase 0 - Baseline',
+                        "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read policy files',
                         '- [ ] [P0-T2] Capture baseline for docs/features/active/foo/issue.md',
-                        '### Phase 1 - QA',
+                        "### Phase 1 `u{2014} QA",
                         '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
@@ -86,12 +86,35 @@ Describe 'validate-planner-output.ps1' {
                 @{
                     Exists = $true
                     Lines  = @(
-                        '### Phase 0 - Baseline',
+                        "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
                         '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
-                        '### Phase 1 - Implement',
+                        "### Phase 1 `u{2014} Implement",
                         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
-                        '### Phase 2 - Final QA',
+                        "### Phase 2 `u{2014} Final QA",
+                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                    )
+                }
+            }
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+
+            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'allows termination when phase headings use the canonical em dash (U+2014)' {
+            Mock -CommandName Get-PlanFileContent -MockWith {
+                @{
+                    Exists = $true
+                    Lines  = @(
+                        "### Phase 0 `u{2014} Baseline",
+                        '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
+                        '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                        "### Phase 1 `u{2014} Implement",
+                        '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
+                        "### Phase 2 `u{2014} Final QA",
                         '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
