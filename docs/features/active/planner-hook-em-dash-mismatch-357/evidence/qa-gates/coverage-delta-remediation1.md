@@ -1,0 +1,17 @@
+# Coverage Delta — Baseline vs. Post-Change (Issue #357, Remediation Cycle 1)
+
+Timestamp: 2026-07-17T15-08
+
+Baseline line coverage (from `evidence/remediation-baseline/poshqc-test-baseline.md`, restated from the prior cycle's `evidence/baseline/poshqc-test-baseline.md`): **69.87%** (109 of 156 analyzed commands), obtained via an ad hoc `Invoke-Pester` run since the canonical `artifacts/pester/powershell-coverage.xml` did not measure this file at all pre-remediation.
+
+Post-change line coverage: the canonical `artifacts/pester/powershell-coverage.xml` still does not measure `.claude/hooks/validate-planner-output.ps1` after this cycle's changes (see `evidence/qa-gates/coverage-xml-post-check-remediation1.md`), because the MCP `run_poshqc_test` tool resolves settings from the bundled `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, which is outside this cycle's change budget and was not edited. The best available post-change measurement is an ad hoc, non-repo-modifying `Invoke-Pester` run (identical methodology to the baseline) scoped to `.claude/hooks/validate-planner-output.ps1`: **73.72%** (115 of 156 analyzed commands).
+
+**Numeric delta: +3.85 percentage points (69.87% -> 73.72%; 6 additional commands covered, 109 -> 115 of 156).**
+
+Coverage status of the changed lines targeted by this cycle (`.claude/hooks/validate-planner-output.ps1` lines 136-140, the `-not $phaseMatch.Success` branch): lines 137 and 138 are now covered by the new `It 'blocks when a phase heading is malformed (missing the em dash separator)'` test case added in P1-T2. Lines 167, 195, and 196 also became covered as a side effect of the same new test case (the "task appears before the first canonical phase heading" and "Plan does not contain any canonical phase headings" branches it also triggers as the malformed-heading fixture has no subsequent valid phase heading).
+
+Remaining uncovered lines after this cycle: 45, 46, 49, 50, 51, 53, 54, 57, 75, 78, 81, 162, 176, 180, 184, 200, 209, 212, 217, 223, 244, 252, 261, 282, 283, 284, 285, 288 (28 unique lines, down from 33 at baseline). Lines 45-57 comprise the entire body of `Get-PlanFileContent`, which every existing test (before and after this cycle) mocks out via `Mock -CommandName Get-PlanFileContent` rather than exercises directly; closing that gap requires additional tests beyond this cycle's authorized one-test-case budget.
+
+**Explicit pass/fail statement against the 85% uniform line-coverage threshold in `.claude/rules/quality-tiers.md`: FAIL.** Both the canonical-artifact measurement (file not measured at all, effectively 0% in the canonical artifact) and the best-available ad hoc measurement (73.72%) are below the 85% threshold. This cycle's Enumerated Fix List items 1-4 close part of the gap (a real, verified +3.85 percentage-point improvement and full coverage of the originally-targeted lines 136-140) but do not close it fully. Per the "Do Not Do" list in `remediation-inputs.2026-07-17T14-38.md`, AC 4 in `issue.md` is NOT claimed as satisfied.
+
+Branch coverage: not evaluated for delta purposes. Confirmed via both this and the prior cycle's ad hoc runs that Pester 5.6.1's built-in code-coverage engine emits no `BRANCH` JaCoCo counter for any file in this repository's toolchain configuration; this is an accepted tooling limitation (see `.claude/agent-memory/atomic-executor/project_powershell_coverage_gotchas.md`), not a regression introduced or resolved by this cycle.
