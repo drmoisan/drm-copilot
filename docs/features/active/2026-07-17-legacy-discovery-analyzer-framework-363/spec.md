@@ -377,58 +377,58 @@ revisited before it is frozen; this is recorded as an assumption, not a resolved
 
 ## Acceptance Criteria
 
-- [ ] A language-neutral analyzer base abstraction/pipeline (`parse -> classify -> map -> emit`)
+- [x] A language-neutral analyzer base abstraction/pipeline (`parse -> classify -> map -> emit`)
       exists as a `typing.Protocol` `Analyzer` with a thin `run_analyzer` runner, and a concrete
       analyzer implementing the protocol plugs into the runner.
-- [ ] Frozen dataclass value objects (`AnalyzerContext`, `ParseResult`, `ClassifyResult`,
+- [x] Frozen dataclass value objects (`AnalyzerContext`, `ParseResult`, `ClassifyResult`,
       `EvidenceRecord`, `AnalyzerRunResult`) flow between the stages, and `run_analyzer` invokes
       the four stages in the fixed order and threads each stage's output to the next.
-- [ ] The repository/project inventory analyzer enumerates solutions/projects and file inventory
+- [x] The repository/project inventory analyzer enumerates solutions/projects and file inventory
       for a consumer repository located via the domain profile `legacy_source.root`.
-- [ ] Enumeration honors `include`/`exclude` globs applied with `fnmatch` against
+- [x] Enumeration honors `include`/`exclude` globs applied with `fnmatch` against
       consumer-relative POSIX paths (match at least one include or empty-include = all, and no
       exclude), with deterministic POSIX ordering.
-- [ ] Project/solution units are classified by a neutral, profile-supplied marker pattern set
+- [x] Project/solution units are classified by a neutral, profile-supplied marker pattern set
       with no hardcoded stack-specific literals.
-- [ ] An unreachable or missing `legacy_source.root` fails fast with a domain-neutral
+- [x] An unreachable or missing `legacy_source.root` fails fast with a domain-neutral
       `AnalyzerError` naming the path, distinct from a malformed-profile `DomainProfileError`.
-- [ ] Each emitted artifact is an Evidence Reference v1 instance with `schema_version` matching
+- [x] Each emitted artifact is an Evidence Reference v1 instance with `schema_version` matching
       `^1\.\d+\.\d+$`, a scheme-less relative `$schema` path (no drive letter, no leading `/`),
       an `id` matching `^[a-z0-9][a-z0-9._-]*$`, and the required fields
       `id`/`kind`/`location`/`captured_at`/`description`, with `location` a consumer-relative
       POSIX path and inventory extras only under `metadata`.
-- [ ] The `dev.discovery.inventory` console script maps to
+- [x] The `dev.discovery.inventory` console script maps to
       `scripts.dev_tools.discovery.analyzer.cli:main`, runs the inventory analyzer end-to-end,
       and returns exit codes `0` (success), `1` (domain/analyzer error), and `2` (usage error).
-- [ ] The parsing-strategy decision (regex/plain-text, stdlib only, no AST/Roslyn/tree-sitter)
+- [x] The parsing-strategy decision (regex/plain-text, stdlib only, no AST/Roslyn/tree-sitter)
       is recorded and justified in the Specification Decision section of this spec.
-- [ ] Framework and inventory production modules contain no domain-specific identifiers,
+- [x] Framework and inventory production modules contain no domain-specific identifiers,
       verified by a domain-neutrality contract test.
-- [ ] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
+- [x] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
       coverage >= 75%, test tree mirrors production at
       `tests/scripts/dev_tools/discovery/analyzer/`, no temporary files (in-memory `mem_fs_path`
       fixture), and `captured_at` supplied by an injected clock.
-- [ ] No production or test file exceeds 500 lines, and no production analyzer module is
+- [x] No production or test file exceeds 500 lines, and no production analyzer module is
       excluded from coverage measurement.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit and integration as applicable)
-- [ ] Edge cases and error handling covered by tests (unreachable root, malformed profile,
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit and integration as applicable)
+- [x] Edge cases and error handling covered by tests (unreachable root, malformed profile,
       empty include, glob exclusion, usage error)
-- [ ] Docs updated (this spec, user-story, and feature-folder links)
-- [ ] Domain-neutrality contract test present and passing
-- [ ] Toolchain pass completed (Black -> Ruff -> Pyright strict -> pytest with coverage) in a
+- [x] Docs updated (this spec, user-story, and feature-folder links)
+- [x] Domain-neutrality contract test present and passing
+- [x] Toolchain pass completed (Black -> Ruff -> Pyright strict -> pytest with coverage) in a
       single clean pass
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: pipeline stage sequencing; inventory enumeration over an in-memory fixture
+- [x] Unit coverage: pipeline stage sequencing; inventory enumeration over an in-memory fixture
       tree; include/exclude glob handling; marker classification; artifact emission conforms to
       schema; CLI success and error exit codes.
-- [ ] Integration scenarios: inventory analyzer end-to-end from a domain profile to a
+- [x] Integration scenarios: inventory analyzer end-to-end from a domain profile to a
       schema-conforming collection of artifacts.
-- [ ] CLI/API examples: `dev.discovery.inventory` load-and-emit; non-zero exit on malformed
+- [x] CLI/API examples: `dev.discovery.inventory` load-and-emit; non-zero exit on malformed
       profile or unreachable source root; `--json` run summary.

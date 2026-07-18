@@ -57,6 +57,7 @@ shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
 "dev.clean-devcontainer" = "scripts.dev_tools.clean_devcontainer:main"
 "dev.collect-commit-context" = "scripts.dev_tools.collect_commit_context:main"
 "dev.discovery.generate-acceptance-scenarios" = "scripts.dev_tools.generate_acceptance_scenarios:main"
+"dev.discovery.inventory" = "scripts.dev_tools.discovery.analyzer.cli:main"
 "dev.discovery.profile" = "scripts.dev_tools.discovery.profile_cli:main"
 "dev.discovery.validate-profile" = "scripts.dev_tools.validate_discovery_artifacts:main_profile"
 "dev.discovery.validate-feature-contract" = "scripts.dev_tools.validate_discovery_artifacts:main_feature_contract"
@@ -130,6 +131,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@abstractmethod",
     "@abc.abstractmethod",
+    "^\\s*\\.\\.\\.\\s*$",
 ]
 
 [tool.pyright]
