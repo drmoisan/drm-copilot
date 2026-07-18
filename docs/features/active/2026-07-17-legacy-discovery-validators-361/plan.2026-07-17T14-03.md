@@ -95,17 +95,17 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 0 — Baseline Capture & Policy Compliance
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full.
+- [x] [P0-T1] Read `CLAUDE.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T4] Read `.claude/rules/python.md` in full.
+- [x] [P0-T4] Read `.claude/rules/python.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
+- [x] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T6] Write
+- [x] [P0-T6] Write
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/other/phase0-instructions-read.md`
   containing `Timestamp:`, `Policy Order:` (listing CLAUDE.md,
   general-code-change.md, general-unit-test.md, python.md,
@@ -113,24 +113,24 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   P0-T1..P0-T5.
   - Acceptance: file exists with all four required fields populated (no
     placeholder text).
-- [ ] [P0-T7] Run `poetry run black --check .` at current HEAD and record the
+- [x] [P0-T7] Run `poetry run black --check .` at current HEAD and record the
   result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-black.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: artifact exists with all four fields populated; `EXIT_CODE` is
     the literal integer the command returned (no `SKIPPED`).
-- [ ] [P0-T8] Run `poetry run ruff check .` at current HEAD and record the
+- [x] [P0-T8] Run `poetry run ruff check .` at current HEAD and record the
   result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-ruff.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (including
   the reported violation count).
   - Acceptance: artifact exists with all four fields populated; no `SKIPPED`.
-- [ ] [P0-T9] Run `poetry run pyright` at current HEAD and record the result at
+- [x] [P0-T9] Run `poetry run pyright` at current HEAD and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-pyright.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (including
   the reported error/warning counts).
   - Acceptance: artifact exists with all four fields populated; no `SKIPPED`.
-- [ ] [P0-T10] Run
+- [x] [P0-T10] Run
   `poetry run pytest --cov --cov-branch --cov-report=term-missing` at current
   HEAD and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-pytest.<TS>.md`
