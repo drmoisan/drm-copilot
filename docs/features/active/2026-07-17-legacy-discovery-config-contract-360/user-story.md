@@ -94,13 +94,13 @@ reintroducing domain coupling into a framework that must remain domain-neutral.
 
 ## Acceptance Criteria
 
-- [ ] The domain-profile configuration contract is documented with all required and optional fields.
-- [ ] A dataclass-based typed loader parses a valid profile into a typed object.
-- [ ] The loader fails fast with specific errors on malformed input and missing required fields.
-- [ ] The parser-technology decision (PyYAML vs hand-rolled regex) is made and justified in spec.md.
-- [ ] A `dev.discovery.*` CLI entry point loads and displays a resolved profile.
-- [ ] The core loader contains no domain-specific (TaskMaster/TMW/Outlook/VSTO/email/task) identifiers.
-- [ ] Tests satisfy repository quality-tier policy (Python pytest, line >= 85%, branch >= 75%).
+- [x] The domain-profile configuration contract is documented with all required and optional fields.
+- [x] A dataclass-based typed loader parses a valid profile into a typed object.
+- [x] The loader fails fast with specific errors on malformed input and missing required fields.
+- [x] The parser-technology decision (PyYAML vs hand-rolled regex) is made and justified in spec.md.
+- [x] A `dev.discovery.*` CLI entry point loads and displays a resolved profile.
+- [x] The core loader contains no domain-specific (TaskMaster/TMW/Outlook/VSTO/email/task) identifiers.
+- [x] Tests satisfy repository quality-tier policy (Python pytest, line >= 85%, branch >= 75%).
 
 ## Non-Goals
 
