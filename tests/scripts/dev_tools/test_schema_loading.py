@@ -97,7 +97,7 @@ def test_load_schema_file_scheme_missing_raises_file_not_found(
 def test_load_schema_relative_path_missing_raises_file_not_found(
     mem_fs_path: Path,
 ) -> None:
-    """load_schema should raise FileNotFoundError for a missing scheme-less relative path."""
+    """load_schema should raise FileNotFoundError for a missing relative path."""
     cache_dir = mem_fs_path / "cache"
     source_path = mem_fs_path / "data.json"
 
