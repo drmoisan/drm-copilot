@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../schemas/discovery/v1/parity-matrix.schema.json",
+  "generated_at": "2026-07-18T10:12:00Z",
+  "id": "parity-matrix-alpha",
+  "rows": [
+    {
+      "criterion_id": "criterion-alpha-1",
+      "decision_refs": [
+        "decision-alpha-001"
+      ],
+      "evidence_refs": [
+        "evidence-alpha-001"
+      ],
+      "feature_id": "feature-alpha",
+      "notes": "Observed behavior matches between source and target.",
+      "parity_status": "behavioral_parity",
+      "verification": "automated"
+    },
+    {
+      "feature_id": "feature-beta",
+      "parity_status": "intentional_divergence",
+      "verification": "manual"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_label": "legacy baseline",
+  "summary": {
+    "at_parity": 1,
+    "total_rows": 2
+  },
+  "target_label": "modern target"
+}

@@ -356,50 +356,50 @@ machinery here.
 
 ## Acceptance Criteria
 
-- [ ] Seven versioned JSON schemas exist at `schemas/discovery/v1/<artifact>.schema.json`, one per
+- [x] Seven versioned JSON schemas exist at `schemas/discovery/v1/<artifact>.schema.json`, one per
       artifact (Feature Contract, Coverage Ledger, Runtime Characterization Scenario, Parity Matrix,
       Unspecified Behavior Record, Product Decision Record, Evidence Reference).
-- [ ] The schema-versioning convention is documented precisely in this spec as the shared contract:
+- [x] The schema-versioning convention is documented precisely in this spec as the shared contract:
       the `schemas/<family>/v<N>/<artifact>.schema.json` layout, the in-schema `version` field
       (semver, major equals `N`), the instance-level `schema_version` field and its `^1\.\d+\.\d+$`
       pattern, the `$schema` Draft 2020-12 meta-schema self-reference, and the `$id` identifier-only
       strategy.
-- [ ] The no-cross-file-`$ref` / self-contained-`$defs` rule is stated with its reason
+- [x] The no-cross-file-`$ref` / self-contained-`$defs` rule is stated with its reason
       (`validate_json.py` loads a single schema dict and cannot resolve cross-file `$ref`).
-- [ ] Each schema is `"type": "object"` with top-level `"additionalProperties": false` plus a single
+- [x] Each schema is `"type": "object"` with top-level `"additionalProperties": false` plus a single
       optional free-form `metadata` object, and expresses generic, domain-neutral shapes with no
       TaskMaster/TMW/Outlook/VSTO/email/task-management-specific fields, enum values, or descriptions.
-- [ ] Cross-references between schemas use generic string identifiers only (never JSON Schema
+- [x] Cross-references between schemas use generic string identifiers only (never JSON Schema
       `$ref`), and timestamps use explicit regex patterns rather than `format: date-time`.
-- [ ] Schema files are placed at repo-root `schemas/discovery/v1/`, intentionally outside the
+- [x] Schema files are placed at repo-root `schemas/discovery/v1/`, intentionally outside the
       `validate_json.py` governed globs, so no meta-schema network fetch or `.cache/` dirt is
       produced.
-- [ ] A conforming fixture and a non-conforming fixture exist for each of the seven schemas.
-- [ ] Conforming fixtures are placed at `examples/discovery/v1/<artifact>.example.json` (governed by
+- [x] A conforming fixture and a non-conforming fixture exist for each of the seven schemas.
+- [x] Conforming fixtures are placed at `examples/discovery/v1/<artifact>.example.json` (governed by
       the existing `examples/**/*.json` glob, no machinery change), are authored with sorted keys, and
       validate cleanly through `validate_json.py`.
-- [ ] Non-conforming fixtures are placed at
+- [x] Non-conforming fixtures are placed at
       `tests/fixtures/discovery_schemas/v1/<artifact>.invalid.json`, intentionally outside the
       governed globs, and are exercised by tests that assert rejection via `validate_file`. (This
       feature does not claim that all fixture locations fall under governed globs and validate
       cleanly; a governed failing fixture would make `dev.validate-json` permanently fail.)
-- [ ] Each non-conforming fixture exercises a distinct violation class per the Fixture Design table
+- [x] Each non-conforming fixture exercises a distinct violation class per the Fixture Design table
       (missing required property; wrong type; enum violation; array-item violation; pattern violation;
       `additionalProperties` violation; `schema_version` major mismatch).
-- [ ] Instance `$schema` references are scheme-less relative paths compatible with `_load_schema`
+- [x] Instance `$schema` references are scheme-less relative paths compatible with `_load_schema`
       (three ascents from `examples/discovery/v1/`, four ascents from
       `tests/fixtures/discovery_schemas/v1/`), touching neither the cache nor the network.
-- [ ] No new production Python is added and no change is made to `validate_json.py` or
+- [x] No new production Python is added and no change is made to `validate_json.py` or
       `json_config.py`; tests under `tests/schemas/discovery/` drive
       `Draft202012Validator.check_schema` for offline meta-conformance and `validate_json.py`'s
       `validate_file` for conformance and non-conformance.
-- [ ] Tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%) and are deterministic
+- [x] Tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%) and are deterministic
       and offline.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Each schema validates its conforming fixture and rejects its non-conforming fixture.
-- [ ] Governed-glob discovery includes the conforming fixtures and excludes the non-conforming
+- [x] Each schema validates its conforming fixture and rejects its non-conforming fixture.
+- [x] Governed-glob discovery includes the conforming fixtures and excludes the non-conforming
       fixtures.
-- [ ] Versioning-convention edge cases are covered (`schema_version` major mismatch, missing
+- [x] Versioning-convention edge cases are covered (`schema_version` major mismatch, missing
       `$schema`).

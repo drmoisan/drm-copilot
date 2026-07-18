@@ -104,27 +104,27 @@ The schema-versioning convention is itself a user-visible contract that every co
 
 ## Acceptance Criteria
 
-- [ ] A downstream feature can load any of the seven `schemas/discovery/v1/` schemas and validate a
+- [x] A downstream feature can load any of the seven `schemas/discovery/v1/` schemas and validate a
       conforming instance through the existing `validate_json.py` machinery, offline and without a
       remote meta-schema fetch.
-- [ ] The schema-versioning convention (directory layout, in-schema `version`, instance-level
+- [x] The schema-versioning convention (directory layout, in-schema `version`, instance-level
       `schema_version` pattern, `$schema` self-reference, `$id` identifier-only strategy,
       self-containment rule) is documented as the user-visible contract every consumer reuses.
-- [ ] Each schema expresses generic, domain-neutral shapes with no TaskMaster/TMW/Outlook/VSTO/email/
+- [x] Each schema expresses generic, domain-neutral shapes with no TaskMaster/TMW/Outlook/VSTO/email/
       task-management-specific fields, enum values, or descriptions; real source/target names are
       supplied at runtime by the domain profile (#9001).
-- [ ] Cross-references between artifacts are plain string identifiers a consumer can populate without
+- [x] Cross-references between artifacts are plain string identifiers a consumer can populate without
       JSON Schema `$ref`.
-- [ ] A conforming fixture and a distinct-violation non-conforming fixture exist for each schema,
+- [x] A conforming fixture and a distinct-violation non-conforming fixture exist for each schema,
       giving downstream features a positive and a varied negative corpus.
-- [ ] Conforming fixtures at `examples/discovery/v1/` are governed and validate cleanly; non-conforming
+- [x] Conforming fixtures at `examples/discovery/v1/` are governed and validate cleanly; non-conforming
       fixtures at `tests/fixtures/discovery_schemas/v1/` are intentionally ungoverned and are exercised
       by tests that assert rejection via `validate_file`. (Not all fixture locations fall under
       governed globs and validate cleanly; a governed failing fixture would make `dev.validate-json`
       permanently fail.)
-- [ ] An additive minor schema change does not break an existing conforming instance, and a
+- [x] An additive minor schema change does not break an existing conforming instance, and a
       cross-major `schema_version` mismatch is rejected at validation time.
-- [ ] Tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%) and add no new
+- [x] Tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%) and add no new
       production code.
 
 ## Non-Goals

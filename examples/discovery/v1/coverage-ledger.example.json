@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../schemas/discovery/v1/coverage-ledger.schema.json",
+  "entries": [
+    {
+      "evidence_refs": [
+        "evidence-alpha-001"
+      ],
+      "feature_ids": [
+        "feature-alpha"
+      ],
+      "notes": "Behavior characterized against the captured runtime log.",
+      "status": "characterized",
+      "unit_id": "unit-alpha",
+      "unit_kind": "module"
+    },
+    {
+      "notes": "Unit deferred pending further discovery.",
+      "status": "in_discovery",
+      "unit_id": "unit-beta",
+      "unit_kind": "component"
+    }
+  ],
+  "generated_at": "2026-07-18T10:12:00Z",
+  "id": "coverage-ledger-alpha",
+  "schema_version": "1.0.0",
+  "subject": "legacy core corpus",
+  "summary": {
+    "covered_units": 1,
+    "total_units": 2
+  }
+}

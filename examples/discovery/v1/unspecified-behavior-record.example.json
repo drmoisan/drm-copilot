@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../schemas/discovery/v1/unspecified-behavior-record.schema.json",
+  "category": "ambiguous",
+  "decision_ref": "decision-alpha-001",
+  "description": "The covered unit produces two different outputs for the same input across runs.",
+  "discovery_context": "Observed while replaying the captured runtime log during discovery.",
+  "evidence_refs": [
+    "evidence-alpha-001"
+  ],
+  "feature_id": "feature-alpha",
+  "id": "behavior-alpha-001",
+  "resolution_status": "resolved",
+  "schema_version": "1.0.0",
+  "title": "Ambiguous output for repeated primary input"
+}

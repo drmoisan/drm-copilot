@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/parity-matrix.schema.json",
+  "schema_version": "1.0.0",
+  "id": "parity-matrix-alpha",
+  "generated_at": "2026-07-18T10:12:00Z",
+  "source_label": "legacy baseline",
+  "target_label": "modern target",
+  "rows": [
+    {
+      "feature_id": "feature-alpha",
+      "parity_status": "behavioral_parity",
+      "verification": "automated"
+    },
+    {
+      "feature_id": "feature-beta",
+      "verification": "manual"
+    }
+  ]
+}
