@@ -317,32 +317,32 @@ complexity band C3; coverage uniform across tiers: line >= 85%, branch >= 75%).
 
 ## Acceptance Criteria
 
-- [ ] A Python module `scripts/dev_tools/generate_acceptance_scenarios.py` generates
+- [x] A Python module `scripts/dev_tools/generate_acceptance_scenarios.py` generates
       acceptance scenarios from the Feature Contract, Parity Matrix, and Runtime
       Characterization Scenario inputs.
-- [ ] The output is a single JSON acceptance-scenario-set document with the top-level fields
+- [x] The output is a single JSON acceptance-scenario-set document with the top-level fields
       `$schema`, `schema_version`, `generator`, `source_digest`, and `scenarios`, and scenario
       objects with `id`, `title`, `feature_ref`, `parity_ref`, `characterization_ref`,
       `given`, `when`, `then`, and `evidence_refs`.
-- [ ] Given/When/Then are emitted as structured string arrays, not free Gherkin text.
-- [ ] Output is serialized with `json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False)`
+- [x] Given/When/Then are emitted as structured string arrays, not free Gherkin text.
+- [x] Output is serialized with `json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False)`
       plus a trailing newline, and generation is byte-identical for identical inputs.
-- [ ] Output is invariant to input ordering: the `scenarios` array is sorted by a stable
+- [x] Output is invariant to input ordering: the `scenarios` array is sorted by a stable
       total-order key and input paths are sorted before processing.
-- [ ] The generator uses no seeded RNG and no injected clock; `source_digest` is a SHA-256 over
+- [x] The generator uses no seeded RNG and no injected clock; `source_digest` is a SHA-256 over
       the canonicalized inputs and no wall-clock value appears in output.
-- [ ] Each input schema is read through a named projection/adapter so a #9002 field-name change
+- [x] Each input schema is read through a named projection/adapter so a #9002 field-name change
       touches only the adapter, not the generation logic.
-- [ ] A single `resolve_discovery_schema(schema_name, *, root, version=None) -> Path` function
+- [x] A single `resolve_discovery_schema(schema_name, *, root, version=None) -> Path` function
       isolates schema location, raises a clear error naming the expected `schemas/vN/`
       convention before #9002 lands, and allows the generator to run against caller-supplied
       input paths in the interim.
-- [ ] A `dev.discovery.generate-acceptance-scenarios` Poetry console-script maps to
+- [x] A `dev.discovery.generate-acceptance-scenarios` Poetry console-script maps to
       `scripts.dev_tools.generate_acceptance_scenarios:main`, and the module exposes
       `def main(argv=None) -> int` with its own argparse parser.
-- [ ] The CLI uses the `0`/`1` exit-code convention: `0` on success, `1` on any failure
+- [x] The CLI uses the `0`/`1` exit-code convention: `0` on success, `1` on any failure
       including missing/malformed input and `--check` mismatch.
-- [ ] The generator contains no TaskMaster/TMW/Outlook/VSTO/email/task-management identifiers.
-- [ ] Tests cover positive generation, determinism, negative/malformed input, the
+- [x] The generator contains no TaskMaster/TMW/Outlook/VSTO/email/task-management identifiers.
+- [x] Tests cover positive generation, determinism, negative/malformed input, the
       schema-location seam, and the CLI; use no temporary files (use `mem_fs_path`); and meet
       line coverage >= 85% and branch coverage >= 75%.
