@@ -89,7 +89,7 @@ can rely on a single authoritative conformance check.
 - [x] Each validator accepts its conforming fixtures and rejects its non-conforming fixtures with human-readable error strings.
 - [x] Per-schema validators locate schemas via the #9002 versioning convention rather than a hardcoded layout.
 - [x] No domain-specific identifier appears in the validator source.
-- [x] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%), co-located in the mirrored `tests/` tree.
+- [x] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%), co-located in the mirrored `tests/` tree. **Gap (feature-review 2026-07-18T16-04):** aggregate/repo-wide coverage meets the policy, but `schema_loading.py`'s own branch coverage (71.43%) does not; see `code-review.2026-07-18T16-04.md` Finding 1. Test co-location itself is fully compliant. **Gap closed (remediation 2026-07-18T16-04):** three test functions added to `tests/scripts/dev_tools/test_schema_loading.py` (no production code change) closed the branch-coverage gap; `schema_loading.py` now measures 92.86% branch coverage and 85.71% line coverage in the test-file-scoped rerun. Verified in `evidence/qa-gates/schema-loading-branch-coverage-fix.2026-07-18T16-30.md`.
 
 
 ## Non-Goals

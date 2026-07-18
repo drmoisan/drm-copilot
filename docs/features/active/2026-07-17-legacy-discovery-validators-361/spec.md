@@ -256,7 +256,21 @@ email/task-management specifics).
 - [x] Toolchain pass completed (format → lint → type-check →
       architecture-boundary → unit tests → contract/schema checks →
       integration tests) with line coverage >= 85% and branch coverage
-      >= 75% on all new/changed files.
+      >= 75% on all new/changed files. **Gap (feature-review
+      2026-07-18T16-04):** `schema_loading.py` (a new file) has branch
+      coverage 71.43% (10/14), below the 75% threshold; its `file://`
+      scheme branch and both `FileNotFoundError` branches are untested. All
+      other new/modified files meet the threshold, and repo-wide/aggregate
+      coverage passes with no regression. See `code-review.2026-07-18T16-04.md`
+      Finding 1 and `remediation-inputs.2026-07-18T16-04.md`.
+      **Gap closed (remediation 2026-07-18T16-04):** three test functions
+      were added to `tests/scripts/dev_tools/test_schema_loading.py`
+      (no production code change) covering the `file://` success path and
+      the two previously-untested `FileNotFoundError` branches.
+      `schema_loading.py` branch coverage now measures 92.86% (13/14) and
+      line coverage 85.71% (30/35) in the test-file-scoped rerun, both
+      above threshold. Verified in
+      `evidence/qa-gates/schema-loading-branch-coverage-fix.2026-07-18T16-30.md`.
 
 ## Seeded Test Conditions (from potential)
 - [x] Conforming fixture accepted (empty error list) for each artifact type.
