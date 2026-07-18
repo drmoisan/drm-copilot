@@ -16,7 +16,7 @@ Constraints:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -53,7 +53,7 @@ def _parse_profile_mapping(text: str) -> tuple[dict[str, Any] | None, list[str]]
     if not isinstance(parsed, dict):
         return None, ["Profile document root must be a mapping."]
 
-    return parsed, []
+    return cast("dict[str, Any]", parsed), []
 
 
 def _check_required_profile_fields(mapping: dict[str, Any]) -> list[str]:

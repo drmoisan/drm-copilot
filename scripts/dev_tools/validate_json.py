@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 from scripts.dev_tools.json_config import iter_governed_files
 from scripts.dev_tools.schema_loading import cache_path, load_schema
 
+__all__ = ["_cache_path"]
+
 _jsonschema_spec = importlib.util.find_spec("jsonschema")
 if _jsonschema_spec is None:
     _jsonschema_module = None

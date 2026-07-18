@@ -253,7 +253,7 @@ email/task-management specifics).
       missing `$schema`, missing required profile fields).
 - [ ] Docs updated (this spec and user-story, `docs/features/active/...`
       links).
-- [ ] Toolchain pass completed (format → lint → type-check →
+- [x] Toolchain pass completed (format → lint → type-check →
       architecture-boundary → unit tests → contract/schema checks →
       integration tests) with line coverage >= 85% and branch coverage
       >= 75% on all new/changed files.

@@ -44,7 +44,9 @@ def test_load_schema_from_cache(mem_fs_path: Path) -> None:
 def test_load_schema_unsupported_scheme(mem_fs_path: Path) -> None:
     """load_schema should reject unsupported URI schemes."""
     with pytest.raises(ValueError, match="Unsupported schema URI scheme"):
-        schema_loading.load_schema("ftp://example.com/schema.json", mem_fs_path / "cache")
+        schema_loading.load_schema(
+            "ftp://example.com/schema.json", mem_fs_path / "cache"
+        )
 
 
 def test_load_schema_relative_path(mem_fs_path: Path) -> None:

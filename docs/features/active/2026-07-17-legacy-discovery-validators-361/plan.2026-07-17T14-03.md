@@ -561,26 +561,26 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 7 — Final QA Loop (Full Python Toolchain)
 
-- [ ] [P7-T1] Run `poetry run black --check .` and record the result at
+- [x] [P7-T1] Run `poetry run black --check .` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-black.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports reformatting or exits non-zero, run `poetry run black .` and
   restart the loop from this task.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T2] Run `poetry run ruff check .` and record the result at
+- [x] [P7-T2] Run `poetry run ruff check .` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-ruff.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports violations or auto-fixes files, restart the loop from P7-T1.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T3] Run `poetry run pyright` and record the result at
+- [x] [P7-T3] Run `poetry run pyright` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pyright.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports errors, restart the loop from P7-T1 after fixing them.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T4] Run
+- [x] [P7-T4] Run
   `poetry run pytest --cov --cov-branch --cov-report=term-missing` and record
   the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pytest.<TS>.md`
@@ -590,7 +590,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   after fixing the regression.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` and two explicit numeric
     percentages in `Output Summary:`; no `SKIPPED`.
-- [ ] [P7-T5] Run
+- [x] [P7-T5] Run
   `poetry run pytest --cov=scripts.dev_tools.schema_loading --cov=scripts.dev_tools.validate_discovery_profile --cov=scripts.dev_tools.validate_discovery_schema_artifacts --cov=scripts.dev_tools.validate_discovery_artifacts --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_schema_loading.py tests/scripts/dev_tools/test_validate_discovery_profile.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pytest-new-code.<TS>.md`
@@ -599,7 +599,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   scoped to exactly these four new modules.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` and two explicit numeric
     percentages in `Output Summary:`; no `SKIPPED`.
-- [ ] [P7-T6] Record the Phase 7 rerun-loop outcome at
+- [x] [P7-T6] Record the Phase 7 rerun-loop outcome at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-rerun-log.<TS>.md`
   with `Timestamp:` and an `Output Summary:` stating either that P7-T1 through
   P7-T5 completed in one uninterrupted clean pass with no restart, or
@@ -608,7 +608,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: artifact exists and its `Output Summary:` matches the actual
     sequence of P7-T1..P7-T5 executions (verifiable against their individual
     `EXIT_CODE` and `Timestamp` fields).
-- [ ] [P7-T7] Produce the coverage delta/threshold verification artifact at
+- [x] [P7-T7] Produce the coverage delta/threshold verification artifact at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/coverage-delta-verification.<TS>.md`
   reporting three numeric pairs — baseline line/branch % (from P0-T10's
   artifact), post-change aggregate line/branch % (from P7-T4's artifact), and

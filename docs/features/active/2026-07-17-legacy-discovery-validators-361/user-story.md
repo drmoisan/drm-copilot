@@ -89,7 +89,7 @@ can rely on a single authoritative conformance check.
 - [x] Each validator accepts its conforming fixtures and rejects its non-conforming fixtures with human-readable error strings.
 - [x] Per-schema validators locate schemas via the #9002 versioning convention rather than a hardcoded layout.
 - [x] No domain-specific identifier appears in the validator source.
-- [ ] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%), co-located in the mirrored `tests/` tree.
+- [x] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%), co-located in the mirrored `tests/` tree.
 
 
 ## Non-Goals
