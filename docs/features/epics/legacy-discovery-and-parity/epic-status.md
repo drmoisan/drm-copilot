@@ -4,13 +4,13 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 
 - Integration branch: `epic/legacy-discovery-and-parity-integration`
 - Current wave: 0
-- Last updated: 2026-07-18T00:00:00Z
+- Last updated: 2026-07-18T00:15:00Z
 - fable_policy: preferred
 
 | issue | feature_folder | wave | complexity | merge_status | PR | merge_commit | worktree_created | pr_opened | merge_confirmed | worktree_removed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 360 | 2026-07-17-legacy-discovery-config-contract-360 | 0 | C3 | not_started |  |  |  |  |  |  |
-| 359 | 2026-07-17-legacy-discovery-schemas-359 | 0 | C3 | not_started |  |  |  |  |  |  |
+| 360 | 2026-07-17-legacy-discovery-config-contract-360 | 0 | C3 | worktree_created |  |  | 2026-07-18T00:10:00Z |  |  |  |
+| 359 | 2026-07-17-legacy-discovery-schemas-359 | 0 | C3 | worktree_created |  |  | 2026-07-18T00:10:00Z |  |  |  |
 | 364 | 2026-07-17-legacy-discovery-acceptance-scenarios-364 | 1 | C3 | not_started |  |  |  |  |  |  |
 | 365 | 2026-07-17-legacy-discovery-agent-roles-365 | 1 | C3 | not_started |  |  |  |  |  |  |
 | 363 | 2026-07-17-legacy-discovery-analyzer-framework-363 | 1 | C3 | not_started |  |  |  |  |  |  |
