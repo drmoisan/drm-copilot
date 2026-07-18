@@ -95,17 +95,17 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 0 — Baseline Capture & Policy Compliance
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full.
+- [x] [P0-T1] Read `CLAUDE.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T4] Read `.claude/rules/python.md` in full.
+- [x] [P0-T4] Read `.claude/rules/python.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
+- [x] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
   - Acceptance: file contents reviewed; no edits made to the file.
-- [ ] [P0-T6] Write
+- [x] [P0-T6] Write
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/other/phase0-instructions-read.md`
   containing `Timestamp:`, `Policy Order:` (listing CLAUDE.md,
   general-code-change.md, general-unit-test.md, python.md,
@@ -113,24 +113,24 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   P0-T1..P0-T5.
   - Acceptance: file exists with all four required fields populated (no
     placeholder text).
-- [ ] [P0-T7] Run `poetry run black --check .` at current HEAD and record the
+- [x] [P0-T7] Run `poetry run black --check .` at current HEAD and record the
   result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-black.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: artifact exists with all four fields populated; `EXIT_CODE` is
     the literal integer the command returned (no `SKIPPED`).
-- [ ] [P0-T8] Run `poetry run ruff check .` at current HEAD and record the
+- [x] [P0-T8] Run `poetry run ruff check .` at current HEAD and record the
   result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-ruff.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (including
   the reported violation count).
   - Acceptance: artifact exists with all four fields populated; no `SKIPPED`.
-- [ ] [P0-T9] Run `poetry run pyright` at current HEAD and record the result at
+- [x] [P0-T9] Run `poetry run pyright` at current HEAD and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-pyright.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (including
   the reported error/warning counts).
   - Acceptance: artifact exists with all four fields populated; no `SKIPPED`.
-- [ ] [P0-T10] Run
+- [x] [P0-T10] Run
   `poetry run pytest --cov --cov-branch --cov-report=term-missing` at current
   HEAD and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/baseline/baseline-pytest.<TS>.md`
@@ -143,20 +143,20 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 1 — Shared Schema-Loading Extraction (modifies `validate_json.py`)
 
-- [ ] [P1-T1] Create `scripts/dev_tools/schema_loading.py` with a module
+- [x] [P1-T1] Create `scripts/dev_tools/schema_loading.py` with a module
   docstring citing the epic Shared Design's schema-loading reuse requirement
   (`docs/features/epics/legacy-discovery-and-parity/epic.md`), importing
   `hashlib`, `json`, `urllib.request`, `Path` from `pathlib`, `Any` from
   `typing`, and `urlparse` from `urllib.parse`.
   - Acceptance: file exists, imports resolve, module has no other content yet.
-- [ ] [P1-T2] Implement public `cache_path(cache_dir: Path, uri: str) -> Path`
+- [x] [P1-T2] Implement public `cache_path(cache_dir: Path, uri: str) -> Path`
   in `scripts/dev_tools/schema_loading.py`, moving the SHA-256-keyed
   cache-filename logic currently in `scripts/dev_tools/validate_json.py::_cache_path`
   verbatim (no behavior change).
   - Acceptance: `cache_path(cache_dir, uri)` returns
     `cache_dir / f"{hashlib.sha256(uri.encode('utf-8')).hexdigest()}.json"` for
     any `uri`.
-- [ ] [P1-T3] Implement public
+- [x] [P1-T3] Implement public
   `load_schema(uri: str, cache_dir: Path, base_path: Path | None = None) -> dict[str, Any]`
   in `scripts/dev_tools/schema_loading.py`, moving the scheme-resolution logic
   currently in `scripts/dev_tools/validate_json.py::_load_schema` verbatim (no
@@ -165,20 +165,20 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: function signature and scheme-branch behavior (no-scheme
     relative to `base_path.parent`, `file://` absolute, `http(s)://` fetched and
     cached, else `ValueError`) match the moved-from logic exactly.
-- [ ] [P1-T4] Modify `scripts/dev_tools/validate_json.py`: add
+- [x] [P1-T4] Modify `scripts/dev_tools/validate_json.py`: add
   `from scripts.dev_tools.schema_loading import cache_path, load_schema` and
   replace the body of `_cache_path` with `return cache_path(cache_dir, uri)`,
   preserving the private `_cache_path` name and signature as a thin wrapper.
   - Acceptance: `validate_json.py` still exposes a callable `_cache_path` with
     the same signature; `grep -n "def _cache_path" scripts/dev_tools/validate_json.py`
     returns exactly one match.
-- [ ] [P1-T5] Modify `scripts/dev_tools/validate_json.py`: replace the body of
+- [x] [P1-T5] Modify `scripts/dev_tools/validate_json.py`: replace the body of
   `_load_schema` with `return load_schema(uri, cache_dir, base_path)`, preserving
   the private `_load_schema` name and signature as a thin wrapper.
   - Acceptance: `validate_json.py` still exposes a callable `_load_schema` with
     the same signature; `grep -n "def _load_schema" scripts/dev_tools/validate_json.py`
     returns exactly one match.
-- [ ] [P1-T6] Run
+- [x] [P1-T6] Run
   `poetry run pytest tests/scripts/dev_tools/test_validate_json.py -q` and
   record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/regression-testing/validate-json-regression.<TS>.md`
@@ -187,31 +187,31 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   edits made in this task).
   - Acceptance: `EXIT_CODE: 0` recorded; `Output Summary:` states the passed
     test count with zero failures.
-- [ ] [P1-T7] Create `tests/scripts/dev_tools/test_schema_loading.py` with
+- [x] [P1-T7] Create `tests/scripts/dev_tools/test_schema_loading.py` with
   `test_cache_path_generates_deterministic_hash`, asserting
   `schema_loading.cache_path(cache_dir, uri)` returns the same `Path` for two
   calls with the same `uri` and that the result's parent is `cache_dir` and
   suffix is `.json`.
   - Acceptance: test passes via `poetry run pytest tests/scripts/dev_tools/test_schema_loading.py::test_cache_path_generates_deterministic_hash -q`.
-- [ ] [P1-T8] Add `test_load_schema_from_cache` to
+- [x] [P1-T8] Add `test_load_schema_from_cache` to
   `tests/scripts/dev_tools/test_schema_loading.py`, using the `mem_fs_path`
   fixture to write a cached schema file at the path returned by `cache_path`
   and asserting `schema_loading.load_schema(uri, cache_dir)` returns the parsed
   cached content without a network call.
   - Acceptance: test passes; no temporary files created on real disk.
-- [ ] [P1-T9] Add `test_load_schema_unsupported_scheme` to
+- [x] [P1-T9] Add `test_load_schema_unsupported_scheme` to
   `tests/scripts/dev_tools/test_schema_loading.py`, asserting
   `schema_loading.load_schema("ftp://example.com/schema.json", cache_dir)`
   raises `ValueError` matching `"Unsupported schema URI scheme"`.
   - Acceptance: test passes.
-- [ ] [P1-T10] Add `test_load_schema_relative_path` to
+- [x] [P1-T10] Add `test_load_schema_relative_path` to
   `tests/scripts/dev_tools/test_schema_loading.py`, using the `mem_fs_path`
   fixture to write a schema file and asserting
   `schema_loading.load_schema("./schema.json", cache_dir, source_path)`
   resolves the schema relative to `source_path.parent` and returns its parsed
   content.
   - Acceptance: test passes; no temporary files created on real disk.
-- [ ] [P1-T11] Add `test_load_schema_missing_scheme` to
+- [x] [P1-T11] Add `test_load_schema_missing_scheme` to
   `tests/scripts/dev_tools/test_schema_loading.py`, asserting
   `schema_loading.load_schema("no-scheme-here", cache_dir)` (no `base_path`
   supplied) raises `ValueError` matching `"Unsupported schema URI scheme"`.
@@ -219,7 +219,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 2 — Domain-Profile Validator (#9001 seam)
 
-- [ ] [P2-T1] Create `scripts/dev_tools/validate_discovery_profile.py` with a
+- [x] [P2-T1] Create `scripts/dev_tools/validate_discovery_profile.py` with a
   module docstring citing #9001 (`legacy-discovery-config-contract`) as the
   upstream contract this validator checks against, and define
   `_PLACEHOLDER_REQUIRED_FIELDS: tuple[str, ...] = ("legacy_source_path",)`
@@ -227,7 +227,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   once #9001 ships.` comment.
   - Acceptance: file exists; `_PLACEHOLDER_REQUIRED_FIELDS` is defined with
     exactly one element, `"legacy_source_path"`.
-- [ ] [P2-T2] Implement
+- [x] [P2-T2] Implement
   `_parse_profile_mapping(text: str) -> tuple[dict[str, Any] | None, list[str]]`
   in `scripts/dev_tools/validate_discovery_profile.py`, calling
   `yaml.safe_load(text)` inside `try/except yaml.YAMLError` (importing `yaml`
@@ -236,7 +236,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   when the parsed value is not a `dict`, and `(mapping, [])` on success.
   - Acceptance: function exists with the documented signature and three
     documented return branches.
-- [ ] [P2-T3] Implement
+- [x] [P2-T3] Implement
   `_check_required_profile_fields(mapping: dict[str, Any]) -> list[str]` in
   `scripts/dev_tools/validate_discovery_profile.py`, appending
   `f"Missing required field: {field}."` for each field in
@@ -245,33 +245,33 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: function returns `[]` when `mapping` contains
     `legacy_source_path` and `["Missing required field: legacy_source_path."]`
     when it does not.
-- [ ] [P2-T4] Implement `validate_profile_text(text: str) -> list[str]` in
+- [x] [P2-T4] Implement `validate_profile_text(text: str) -> list[str]` in
   `scripts/dev_tools/validate_discovery_profile.py`, returning
   `["Profile document is empty."]` for empty/whitespace-only `text`,
   otherwise composing `_parse_profile_mapping` and, only when parsing succeeds,
   `_check_required_profile_fields`.
   - Acceptance: function exists with the documented signature and
     short-circuit behavior (field checks skipped when parsing fails).
-- [ ] [P2-T5] Create `tests/scripts/dev_tools/test_validate_discovery_profile.py`
+- [x] [P2-T5] Create `tests/scripts/dev_tools/test_validate_discovery_profile.py`
   with `test_validate_profile_text_rejects_empty_document`, asserting
   `validate_profile_text("")` returns `["Profile document is empty."]`.
   - Acceptance: test passes.
-- [ ] [P2-T6] Add `test_validate_profile_text_rejects_malformed_yaml` to
+- [x] [P2-T6] Add `test_validate_profile_text_rejects_malformed_yaml` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("key: [unterminated")` returns a list with exactly one
   error string and raises no exception.
   - Acceptance: test passes.
-- [ ] [P2-T7] Add `test_validate_profile_text_rejects_non_mapping_root` to
+- [x] [P2-T7] Add `test_validate_profile_text_rejects_non_mapping_root` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("- one\n- two\n")` returns
   `["Profile document root must be a mapping."]`.
   - Acceptance: test passes.
-- [ ] [P2-T8] Add `test_validate_profile_text_reports_missing_legacy_source_path`
+- [x] [P2-T8] Add `test_validate_profile_text_reports_missing_legacy_source_path`
   to `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("some_other_key: value\n")` returns
   `["Missing required field: legacy_source_path."]`.
   - Acceptance: test passes.
-- [ ] [P2-T9] Add
+- [x] [P2-T9] Add
   `test_validate_profile_text_accepts_conforming_minimal_profile` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("legacy_source_path: /path/to/legacy\n")` returns `[]`.
@@ -279,7 +279,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 3 — Discovery Schema Validators (#9002 seam)
 
-- [ ] [P3-T1] Create `scripts/dev_tools/validate_discovery_schema_artifacts.py`
+- [x] [P3-T1] Create `scripts/dev_tools/validate_discovery_schema_artifacts.py`
   with a module docstring citing #9002 (`legacy-discovery-schemas`) as the
   upstream schema/versioning contract and documenting the schema-location
   constraint from Design Decision 6; import `json`, `Path` from `pathlib`,
@@ -287,7 +287,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   from `jsonschema`, and `load_schema` from `scripts.dev_tools.schema_loading`;
   define `_DEFAULT_CACHE_DIR: Path = Path(".cache/schemas")`.
   - Acceptance: file exists, imports resolve, `_DEFAULT_CACHE_DIR` is defined.
-- [ ] [P3-T2] Implement `_extract_schema_uri(data: Mapping[str, Any]) -> str` in
+- [x] [P3-T2] Implement `_extract_schema_uri(data: Mapping[str, Any]) -> str` in
   `scripts/dev_tools/validate_discovery_schema_artifacts.py` — the
   `_resolve_schema_path`-equivalent seam cited in spec.md's Constraints &
   Risks — raising `ValueError("missing $schema")` when `data.get("$schema")` is
@@ -295,7 +295,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `_extract_schema_uri({})` raises `ValueError`;
     `_extract_schema_uri({"$schema": "https://x/y.json"})` returns
     `"https://x/y.json"`.
-- [ ] [P3-T3] Implement
+- [x] [P3-T3] Implement
   `_validate_against_schema(text: str, artifact_type: str, *, cache_dir: Path = _DEFAULT_CACHE_DIR) -> list[str]`
   in `scripts/dev_tools/validate_discovery_schema_artifacts.py`: parse `text`
   as JSON inside `try/except json.JSONDecodeError` returning
@@ -310,51 +310,51 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   prefix).
   - Acceptance: function exists with the documented signature and all four
     documented branches; no branch raises an uncaught exception.
-- [ ] [P3-T4] Implement
+- [x] [P3-T4] Implement
   `validate_feature_contract_text(text: str, *, cache_dir: Path = _DEFAULT_CACHE_DIR) -> list[str]`
   in `scripts/dev_tools/validate_discovery_schema_artifacts.py` as
   `return _validate_against_schema(text, "feature-contract", cache_dir=cache_dir)`.
   - Acceptance: function exists and delegates with `artifact_type="feature-contract"`.
-- [ ] [P3-T5] Implement `validate_coverage_ledger_text(...)` in the same file,
+- [x] [P3-T5] Implement `validate_coverage_ledger_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="coverage-ledger"`.
   - Acceptance: function exists and delegates with `artifact_type="coverage-ledger"`.
-- [ ] [P3-T6] Implement `validate_runtime_scenario_text(...)` in the same file,
+- [x] [P3-T6] Implement `validate_runtime_scenario_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="runtime-scenario"`.
   - Acceptance: function exists and delegates with `artifact_type="runtime-scenario"`.
-- [ ] [P3-T7] Implement `validate_parity_matrix_text(...)` in the same file,
+- [x] [P3-T7] Implement `validate_parity_matrix_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="parity-matrix"`.
   - Acceptance: function exists and delegates with `artifact_type="parity-matrix"`.
-- [ ] [P3-T8] Implement `validate_unspecified_behavior_text(...)` in the same
+- [x] [P3-T8] Implement `validate_unspecified_behavior_text(...)` in the same
   file, delegating to `_validate_against_schema` with
   `artifact_type="unspecified-behavior"`.
   - Acceptance: function exists and delegates with
     `artifact_type="unspecified-behavior"`.
-- [ ] [P3-T9] Implement `validate_product_decision_text(...)` in the same file,
+- [x] [P3-T9] Implement `validate_product_decision_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="product-decision"`.
   - Acceptance: function exists and delegates with `artifact_type="product-decision"`.
-- [ ] [P3-T10] Implement `validate_evidence_reference_text(...)` in the same
+- [x] [P3-T10] Implement `validate_evidence_reference_text(...)` in the same
   file, delegating to `_validate_against_schema` with
   `artifact_type="evidence-reference"`.
   - Acceptance: function exists and delegates with `artifact_type="evidence-reference"`.
-- [ ] [P3-T11] Create
+- [x] [P3-T11] Create
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py` with
   `test_extract_schema_uri_raises_for_missing_schema_field`, asserting
   `_extract_schema_uri({})` raises `ValueError`.
   - Acceptance: test passes.
-- [ ] [P3-T12] Add `test_validate_against_schema_rejects_malformed_json` to
+- [x] [P3-T12] Add `test_validate_against_schema_rejects_malformed_json` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   asserting `_validate_against_schema("{not json", "feature-contract")` returns
   a single-element list containing the substring `"invalid JSON"`, without
   raising.
   - Acceptance: test passes.
-- [ ] [P3-T13] Add
+- [x] [P3-T13] Add
   `test_validate_against_schema_reports_missing_schema_field_as_error_string`
   to `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   asserting `_validate_against_schema(json.dumps({"acceptance_criteria": []}), "feature-contract")`
   returns a single-element list containing the substring
   `"schema resolution failed"`, without raising.
   - Acceptance: test passes.
-- [ ] [P3-T14] Add
+- [x] [P3-T14] Add
   `test_validate_feature_contract_text_accepts_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   monkeypatching
@@ -364,7 +364,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `validate_feature_contract_text(json.dumps({"$schema": "https://example.test/feature-contract.schema.json", "acceptance_criteria": []}))`
   returns `[]`.
   - Acceptance: test passes; no real network or disk schema fetch occurs.
-- [ ] [P3-T15] Add
+- [x] [P3-T15] Add
   `test_validate_feature_contract_text_rejects_non_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py` (same
   monkeypatch as P3-T14), asserting
@@ -372,7 +372,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns a list whose sole element contains the substring
   `"['acceptance_criteria']"`.
   - Acceptance: test passes.
-- [ ] [P3-T16] Add a parametrized test
+- [x] [P3-T16] Add a parametrized test
   `test_first_three_remaining_schema_validators_accept_conforming_fixtures` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   covering `validate_coverage_ledger_text`, `validate_runtime_scenario_text`,
@@ -381,7 +381,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns `[]` for a conforming inline-literal artifact carrying a `$schema`
   key.
   - Acceptance: test passes for all three parametrized cases.
-- [ ] [P3-T17] Create
+- [x] [P3-T17] Create
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py`
   with a parametrized test
   `test_final_three_schema_validators_accept_and_reject_fixtures` covering
@@ -395,19 +395,19 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 4 — CLI Umbrella & `all` Semantics
 
-- [ ] [P4-T1] Create `scripts/dev_tools/validate_discovery_artifacts.py` with a
+- [x] [P4-T1] Create `scripts/dev_tools/validate_discovery_artifacts.py` with a
   module docstring describing the umbrella CLI's role per spec.md's API/CLI
   Surface section, importing `argparse`, `sys`, `Path` from `pathlib`,
   `validate_profile_text` from `scripts.dev_tools.validate_discovery_profile`,
   and the seven `validate_<schema>_text` functions plus `load_schema` from
   `scripts.dev_tools.validate_discovery_schema_artifacts`.
   - Acceptance: file exists, all imports resolve.
-- [ ] [P4-T2] Implement `_read_text(path: Path) -> str` in
+- [x] [P4-T2] Implement `_read_text(path: Path) -> str` in
   `scripts/dev_tools/validate_discovery_artifacts.py` as
   `return path.read_text(encoding="utf-8")`, mirroring
   `validate_orchestration_artifacts.py::_read_text`.
   - Acceptance: function exists with the documented signature and body.
-- [ ] [P4-T3] Implement `build_parser() -> argparse.ArgumentParser` in
+- [x] [P4-T3] Implement `build_parser() -> argparse.ArgumentParser` in
   `scripts/dev_tools/validate_discovery_artifacts.py`, adding one subparser per
   artifact type (`profile`, `feature-contract`, `coverage-ledger`,
   `runtime-scenario`, `parity-matrix`, `unspecified-behavior`,
@@ -418,7 +418,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `build_parser().parse_args(["feature-contract", "x.json"])` and
     `build_parser().parse_args(["all", "x.json"])` both succeed and populate
     `args.path`.
-- [ ] [P4-T4] Implement module-level
+- [x] [P4-T4] Implement module-level
   `_ARTIFACT_VALIDATORS: tuple[tuple[str, Callable[[str], list[str]]], ...]` in
   `scripts/dev_tools/validate_discovery_artifacts.py` in the fixed order from
   Design Decision 1, and implement
@@ -428,7 +428,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `_validate_all_text` returns `[]` when any one entry's
     validator returns `[]`, and returns a non-empty aggregated, prefixed list
     only when every entry's validator returns errors.
-- [ ] [P4-T5] Implement `_validate_from_args(args: argparse.Namespace) -> list[str]`
+- [x] [P4-T5] Implement `_validate_from_args(args: argparse.Namespace) -> list[str]`
   in `scripts/dev_tools/validate_discovery_artifacts.py`, reading the target
   file once via `_read_text(Path(args.path))`, dispatching to the matching
   `validate_<artifact>_text` function for each of the eight non-`all` artifact
@@ -436,7 +436,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `[f"Unsupported artifact type: {args.artifact_type}"]` for any other value.
   - Acceptance: dispatch covers all nine recognized `artifact_type` values plus
     the unsupported-type fallback.
-- [ ] [P4-T6] Implement `main(argv: list[str] | None = None) -> int` in
+- [x] [P4-T6] Implement `main(argv: list[str] | None = None) -> int` in
   `scripts/dev_tools/validate_discovery_artifacts.py` per the canonical
   contract: parse args via `build_parser()`, call `_validate_from_args`, print
   each error to `stderr` and return `1` when errors is non-empty, otherwise
@@ -446,7 +446,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `main(["profile", "<conforming path>"])`-style invocation (with
     `_read_text` stubbed in tests) returns `0` on success and `1` on failure,
     matching the documented stdout/stderr contract.
-- [ ] [P4-T7] Implement eight thin wrapper functions in
+- [x] [P4-T7] Implement eight thin wrapper functions in
   `scripts/dev_tools/validate_discovery_artifacts.py` — `main_profile`,
   `main_feature_contract`, `main_coverage_ledger`, `main_runtime_scenario`,
   `main_parity_matrix`, `main_unspecified_behavior`, `main_product_decision`,
@@ -454,7 +454,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `main(["<artifact-type>", *sys.argv[1:]])` with its literal artifact-type
   string.
   - Acceptance: all eight functions exist with the documented one-line bodies.
-- [ ] [P4-T8] Create
+- [x] [P4-T8] Create
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` with
   a local `_stub_read_text(text: str) -> Callable[[Path], str]` helper
   (mirroring the `build_read_text_stub` pattern in
@@ -462,26 +462,26 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns a callable ignoring its `path` argument and returning `text`.
   - Acceptance: helper exists and is used by at least one test in the same
     file (verified by the tasks below).
-- [ ] [P4-T9] Add `test_validate_from_args_returns_unsupported_artifact_type`
+- [x] [P4-T9] Add `test_validate_from_args_returns_unsupported_artifact_type`
   to `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   asserting `_validate_from_args(argparse.Namespace(path="ignored", artifact_type="bogus"))`
   returns `["Unsupported artifact type: bogus"]`.
   - Acceptance: test passes.
-- [ ] [P4-T10] Add `test_main_profile_returns_zero_for_conforming_fixture` to
+- [x] [P4-T10] Add `test_main_profile_returns_zero_for_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("legacy_source_path: /x\n")`,
   asserting `main(["profile", "ignored.yaml"])` returns `0` and `capsys`
   captures exactly one stdout line matching
   `"profile validation passed: ignored.yaml"`.
   - Acceptance: test passes.
-- [ ] [P4-T11] Add
+- [x] [P4-T11] Add
   `test_main_profile_returns_one_for_missing_legacy_source_path` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("other_key: value\n")`,
   asserting `main(["profile", "ignored.yaml"])` returns `1` and `capsys`
   captures a stderr line containing `"legacy_source_path"`.
   - Acceptance: test passes.
-- [ ] [P4-T12] Add
+- [x] [P4-T12] Add
   `test_main_feature_contract_returns_zero_for_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` and monkeypatching
@@ -489,21 +489,21 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   schema `{"type": "object", "required": ["acceptance_criteria"]}`, asserting
   `main(["feature-contract", "ignored.json"])` returns `0`.
   - Acceptance: test passes; no real schema fetch occurs.
-- [ ] [P4-T13] Add
+- [x] [P4-T13] Add
   `test_main_feature_contract_returns_one_for_non_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` (same
   monkeypatch as P4-T12, with the fixture missing `acceptance_criteria`),
   asserting `main(["feature-contract", "ignored.json"])` returns `1` and
   `capsys` captures a stderr line containing `"acceptance_criteria"`.
   - Acceptance: test passes.
-- [ ] [P4-T14] Add
+- [x] [P4-T14] Add
   `test_main_all_returns_zero_when_path_conforms_to_at_least_one_type` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("legacy_source_path: /x\n")`
   (conforms to `profile`, the first entry in `_ARTIFACT_VALIDATORS`), asserting
   `main(["all", "ignored.yaml"])` returns `0`.
   - Acceptance: test passes.
-- [ ] [P4-T15] Add
+- [x] [P4-T15] Add
   `test_main_all_returns_one_with_aggregated_per_type_errors_when_path_conforms_to_none`
   to `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("")` (empty text fails every
@@ -511,7 +511,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   captures stderr containing both a `"profile: "`-prefixed line and a
   `"feature-contract: "`-prefixed line.
   - Acceptance: test passes.
-- [ ] [P4-T16] Add a parametrized test
+- [x] [P4-T16] Add a parametrized test
   `test_main_artifact_wrappers_dispatch_with_correct_argv_prefix` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   covering all eight `main_<artifact>()` wrappers, monkeypatching `sys.argv`
@@ -521,7 +521,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 5 — Poetry Console-Script Entries
 
-- [ ] [P5-T1] Add the nine `dev.discovery.validate-*` console-script entries
+- [x] [P5-T1] Add the nine `dev.discovery.validate-*` console-script entries
   to `[tool.poetry.scripts]` in `pyproject.toml`, exactly as enumerated in
   spec.md's API/CLI Surface section: `dev.discovery.validate-profile`,
   `dev.discovery.validate-feature-contract`,
@@ -536,7 +536,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `scripts.dev_tools.validate_discovery_artifacts:main`).
   - Acceptance: all nine dotted keys are present in `pyproject.toml` under
     `[tool.poetry.scripts]` with the exact target strings from spec.md.
-- [ ] [P5-T2] Verify `pyproject.toml` remains syntactically valid TOML after
+- [x] [P5-T2] Verify `pyproject.toml` remains syntactically valid TOML after
   the P5-T1 edit by running
   `python -c "import tomllib, pathlib; tomllib.loads(pathlib.Path('pyproject.toml').read_text())"`
   and record the result at
@@ -546,7 +546,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 6 — Domain-Neutrality Verification
 
-- [ ] [P6-T1] Run
+- [x] [P6-T1] Run
   `rg -i -l "TaskMaster|TMW|Outlook|VSTO|task-management" scripts/dev_tools/schema_loading.py scripts/dev_tools/validate_discovery_profile.py scripts/dev_tools/validate_discovery_schema_artifacts.py scripts/dev_tools/validate_discovery_artifacts.py scripts/dev_tools/validate_json.py tests/scripts/dev_tools/test_schema_loading.py tests/scripts/dev_tools/test_validate_discovery_profile.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/domain-neutrality-grep.<TS>.md`
@@ -561,26 +561,26 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 7 — Final QA Loop (Full Python Toolchain)
 
-- [ ] [P7-T1] Run `poetry run black --check .` and record the result at
+- [x] [P7-T1] Run `poetry run black --check .` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-black.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports reformatting or exits non-zero, run `poetry run black .` and
   restart the loop from this task.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T2] Run `poetry run ruff check .` and record the result at
+- [x] [P7-T2] Run `poetry run ruff check .` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-ruff.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports violations or auto-fixes files, restart the loop from P7-T1.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T3] Run `poetry run pyright` and record the result at
+- [x] [P7-T3] Run `poetry run pyright` and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pyright.<TS>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this
   command reports errors, restart the loop from P7-T1 after fixing them.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` on the final run; no
     `SKIPPED`.
-- [ ] [P7-T4] Run
+- [x] [P7-T4] Run
   `poetry run pytest --cov --cov-branch --cov-report=term-missing` and record
   the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pytest.<TS>.md`
@@ -590,7 +590,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   after fixing the regression.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` and two explicit numeric
     percentages in `Output Summary:`; no `SKIPPED`.
-- [ ] [P7-T5] Run
+- [x] [P7-T5] Run
   `poetry run pytest --cov=scripts.dev_tools.schema_loading --cov=scripts.dev_tools.validate_discovery_profile --cov=scripts.dev_tools.validate_discovery_schema_artifacts --cov=scripts.dev_tools.validate_discovery_artifacts --cov-branch --cov-report=term-missing tests/scripts/dev_tools/test_schema_loading.py tests/scripts/dev_tools/test_validate_discovery_profile.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-pytest-new-code.<TS>.md`
@@ -599,7 +599,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   scoped to exactly these four new modules.
   - Acceptance: artifact recorded with `EXIT_CODE: 0` and two explicit numeric
     percentages in `Output Summary:`; no `SKIPPED`.
-- [ ] [P7-T6] Record the Phase 7 rerun-loop outcome at
+- [x] [P7-T6] Record the Phase 7 rerun-loop outcome at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/final-qc-rerun-log.<TS>.md`
   with `Timestamp:` and an `Output Summary:` stating either that P7-T1 through
   P7-T5 completed in one uninterrupted clean pass with no restart, or
@@ -608,7 +608,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: artifact exists and its `Output Summary:` matches the actual
     sequence of P7-T1..P7-T5 executions (verifiable against their individual
     `EXIT_CODE` and `Timestamp` fields).
-- [ ] [P7-T7] Produce the coverage delta/threshold verification artifact at
+- [x] [P7-T7] Produce the coverage delta/threshold verification artifact at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/coverage-delta-verification.<TS>.md`
   reporting three numeric pairs — baseline line/branch % (from P0-T10's
   artifact), post-change aggregate line/branch % (from P7-T4's artifact), and

@@ -233,39 +233,53 @@ email/task-management specifics).
 
 ## Definition of Done
 
-- [ ] A pure `validate_<artifact>_text(text: str, ...) -> list[str]` function
+- [x] A pure `validate_<artifact>_text(text: str, ...) -> list[str]` function
       exists for the domain-profile config and for each of the seven schemas.
-- [ ] A single argparse CLI (`validate_discovery_artifacts.py`) exposes one
+- [x] A single argparse CLI (`validate_discovery_artifacts.py`) exposes one
       subparser per artifact type plus `all`, following the canonical
       pattern (errors to stderr, one success line to stdout, `main() -> int`
       returning 0/1).
-- [ ] `dev.discovery.validate-*` Poetry console-script entries are
+- [x] `dev.discovery.validate-*` Poetry console-script entries are
       registered in `pyproject.toml` for every artifact type and `all`.
-- [ ] Schema-location resolution for the seven schema validators goes
+- [x] Schema-location resolution for the seven schema validators goes
       through the shared loader keyed off each artifact's `$schema` field,
       with no hardcoded schema directory or version string.
-- [ ] No TaskMaster/TMW/Outlook/VSTO/email/task-management identifier
+- [x] No TaskMaster/TMW/Outlook/VSTO/email/task-management identifier
       appears in the new validator source, docstrings, error messages, or
       comments.
-- [ ] Tests updated/added (pure-function tests with inline literals now;
+- [x] Tests updated/added (pure-function tests with inline literals now;
       fixture-based tests wired to #9002's fixtures once they ship).
-- [ ] Edge cases and error handling covered by tests (malformed JSON,
+- [x] Edge cases and error handling covered by tests (malformed JSON,
       missing `$schema`, missing required profile fields).
 - [ ] Docs updated (this spec and user-story, `docs/features/active/...`
       links).
-- [ ] Toolchain pass completed (format → lint → type-check →
+- [x] Toolchain pass completed (format → lint → type-check →
       architecture-boundary → unit tests → contract/schema checks →
       integration tests) with line coverage >= 85% and branch coverage
-      >= 75% on all new/changed files.
+      >= 75% on all new/changed files. **Gap (feature-review
+      2026-07-18T16-04):** `schema_loading.py` (a new file) has branch
+      coverage 71.43% (10/14), below the 75% threshold; its `file://`
+      scheme branch and both `FileNotFoundError` branches are untested. All
+      other new/modified files meet the threshold, and repo-wide/aggregate
+      coverage passes with no regression. See `code-review.2026-07-18T16-04.md`
+      Finding 1 and `remediation-inputs.2026-07-18T16-04.md`.
+      **Gap closed (remediation 2026-07-18T16-04):** three test functions
+      were added to `tests/scripts/dev_tools/test_schema_loading.py`
+      (no production code change) covering the `file://` success path and
+      the two previously-untested `FileNotFoundError` branches.
+      `schema_loading.py` branch coverage now measures 92.86% (13/14) and
+      line coverage 85.71% (30/35) in the test-file-scoped rerun, both
+      above threshold. Verified in
+      `evidence/qa-gates/schema-loading-branch-coverage-fix.2026-07-18T16-30.md`.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Conforming fixture accepted (empty error list) for each artifact type.
-- [ ] Non-conforming fixture rejected with specific error strings for each type.
-- [ ] CLI subparser dispatch for each artifact type and `all`.
-- [ ] CLI exit codes: 0 on success, 1 on validation failure.
-- [ ] Schema-location resolution follows the #9002 versioning convention.
-- [ ] `all` subcommand: succeeds when the path conforms to at least one
+- [x] Conforming fixture accepted (empty error list) for each artifact type.
+- [x] Non-conforming fixture rejected with specific error strings for each type.
+- [x] CLI subparser dispatch for each artifact type and `all`.
+- [x] CLI exit codes: 0 on success, 1 on validation failure.
+- [x] Schema-location resolution follows the #9002 versioning convention.
+- [x] `all` subcommand: succeeds when the path conforms to at least one
       artifact type and reports per-type-prefixed errors when it conforms to
       none.
-- [ ] Domain-neutrality grep gate: no TaskMaster/TMW/Outlook/VSTO/
+- [x] Domain-neutrality grep gate: no TaskMaster/TMW/Outlook/VSTO/
       task-management token in new source files.
