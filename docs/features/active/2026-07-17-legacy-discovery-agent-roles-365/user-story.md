@@ -79,24 +79,24 @@ For full-feature work mode, `spec.md` and `user-story.md` are both acceptance-cr
 Checkboxes remain unchecked; delivery occurs in the execution phase, which is out of scope for
 this preparation run.
 
-- [ ] Four domain-neutral agent `.md` personas exist under `.claude/agents/`
+- [x] Four domain-neutral agent `.md` personas exist under `.claude/agents/`
       (`legacy-parity-analyst.md`, `runtime-characterization-analyst.md`,
       `requirements-reconciler.md`, `migration-coverage-reviewer.md`), each with valid YAML
       frontmatter containing `name`, `description`, `model`, `tools`, and `memory`.
-- [ ] Each persona uses `model: sonnet`, `tools` of exactly `Read`, `Grep`, `Glob`, and
+- [x] Each persona uses `model: sonnet`, `tools` of exactly `Read`, `Grep`, `Glob`, and
       `"Write(discovery/**)"`, `memory: project`, and carries no `skills:` field and no
       `hooks:` field.
-- [ ] Persona names do not collide with the installed `code-modernization` plugin agents
+- [x] Persona names do not collide with the installed `code-modernization` plugin agents
       (`legacy-analyst`, `business-rules-extractor`, `architecture-critic`, `scaffolder`,
       `security-auditor`, `test-engineer`, `version-delta-analyst`) or with existing
       `.claude/agents/` basenames.
-- [ ] Each persona is domain-neutral: no `taskmaster`, `tmw`, `outlook`, `vsto`, `email`,
+- [x] Each persona is domain-neutral: no `taskmaster`, `tmw`, `outlook`, `vsto`, `email`,
       `task-management`, or `task management` identifiers appear in the persona body or
       frontmatter (case-insensitive).
-- [ ] Each persona documents which discovery schemas (#9002) and which domain-profile fields
+- [x] Each persona documents which discovery schemas (#9002) and which domain-profile fields
       (#9001) it consumes and which discovery artifact it produces, per the confirmed mapping;
       this is machine-checked by the AC4 body-content assertion in the structural test.
-- [ ] A PowerShell Pester structural test at
+- [x] A PowerShell Pester structural test at
       `tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1` validates the four
       persona definitions (existence, frontmatter validity, name-equals-slug, model membership,
       naming non-collision, banned-substring domain-neutrality scan, and the AC4 body-content
