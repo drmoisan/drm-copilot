@@ -67,25 +67,25 @@ parity/characterization evidence into executable acceptance scenarios.
 
 ## Acceptance Criteria
 
-- [ ] A Python module `scripts/dev_tools/generate_acceptance_scenarios.py` generates
+- [x] A Python module `scripts/dev_tools/generate_acceptance_scenarios.py` generates
       acceptance scenarios from the Feature Contract, Parity Matrix, and Runtime
       Characterization Scenario inputs.
-- [ ] The output is a single JSON acceptance-scenario-set document with the top-level fields
+- [x] The output is a single JSON acceptance-scenario-set document with the top-level fields
       `$schema`, `schema_version`, `generator`, `source_digest`, and `scenarios`, and scenario
       objects carry structured `given`, `when`, and `then` string arrays.
-- [ ] Generation is deterministic: identical inputs produce byte-identical output, and output
+- [x] Generation is deterministic: identical inputs produce byte-identical output, and output
       is invariant to input ordering.
-- [ ] The output scenario format is defined in spec.md and is domain-neutral (no
+- [x] The output scenario format is defined in spec.md and is domain-neutral (no
       TaskMaster/TMW/Outlook/VSTO/email/task-management identifiers).
-- [ ] A `dev.discovery.generate-acceptance-scenarios` Poetry console-script exposes the
+- [x] A `dev.discovery.generate-acceptance-scenarios` Poetry console-script exposes the
       generator with a `def main(argv=None) -> int` entry point and its own argparse parser,
       using the `0`/`1` exit-code convention.
-- [ ] The schema-location seam is isolated behind a single
+- [x] The schema-location seam is isolated behind a single
       `resolve_discovery_schema(...)` function so execution can proceed before feature #9002
       lands, raising a clear error naming the expected `schemas/vN/` convention in the interim.
-- [ ] Each input schema is read through a named projection/adapter so a #9002 field-name change
+- [x] Each input schema is read through a named projection/adapter so a #9002 field-name change
       touches only the adapter, not the generation logic.
-- [ ] Tests cover positive generation, determinism, negative/malformed input, the
+- [x] Tests cover positive generation, determinism, negative/malformed input, the
       schema-location seam, and the CLI; use no temporary files; and satisfy the repository
       quality-tier policy (line >= 85%, branch >= 75%).
 
