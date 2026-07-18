@@ -279,7 +279,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 3 — Discovery Schema Validators (#9002 seam)
 
-- [ ] [P3-T1] Create `scripts/dev_tools/validate_discovery_schema_artifacts.py`
+- [x] [P3-T1] Create `scripts/dev_tools/validate_discovery_schema_artifacts.py`
   with a module docstring citing #9002 (`legacy-discovery-schemas`) as the
   upstream schema/versioning contract and documenting the schema-location
   constraint from Design Decision 6; import `json`, `Path` from `pathlib`,
@@ -287,7 +287,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   from `jsonschema`, and `load_schema` from `scripts.dev_tools.schema_loading`;
   define `_DEFAULT_CACHE_DIR: Path = Path(".cache/schemas")`.
   - Acceptance: file exists, imports resolve, `_DEFAULT_CACHE_DIR` is defined.
-- [ ] [P3-T2] Implement `_extract_schema_uri(data: Mapping[str, Any]) -> str` in
+- [x] [P3-T2] Implement `_extract_schema_uri(data: Mapping[str, Any]) -> str` in
   `scripts/dev_tools/validate_discovery_schema_artifacts.py` — the
   `_resolve_schema_path`-equivalent seam cited in spec.md's Constraints &
   Risks — raising `ValueError("missing $schema")` when `data.get("$schema")` is
@@ -295,7 +295,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `_extract_schema_uri({})` raises `ValueError`;
     `_extract_schema_uri({"$schema": "https://x/y.json"})` returns
     `"https://x/y.json"`.
-- [ ] [P3-T3] Implement
+- [x] [P3-T3] Implement
   `_validate_against_schema(text: str, artifact_type: str, *, cache_dir: Path = _DEFAULT_CACHE_DIR) -> list[str]`
   in `scripts/dev_tools/validate_discovery_schema_artifacts.py`: parse `text`
   as JSON inside `try/except json.JSONDecodeError` returning
@@ -310,51 +310,51 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   prefix).
   - Acceptance: function exists with the documented signature and all four
     documented branches; no branch raises an uncaught exception.
-- [ ] [P3-T4] Implement
+- [x] [P3-T4] Implement
   `validate_feature_contract_text(text: str, *, cache_dir: Path = _DEFAULT_CACHE_DIR) -> list[str]`
   in `scripts/dev_tools/validate_discovery_schema_artifacts.py` as
   `return _validate_against_schema(text, "feature-contract", cache_dir=cache_dir)`.
   - Acceptance: function exists and delegates with `artifact_type="feature-contract"`.
-- [ ] [P3-T5] Implement `validate_coverage_ledger_text(...)` in the same file,
+- [x] [P3-T5] Implement `validate_coverage_ledger_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="coverage-ledger"`.
   - Acceptance: function exists and delegates with `artifact_type="coverage-ledger"`.
-- [ ] [P3-T6] Implement `validate_runtime_scenario_text(...)` in the same file,
+- [x] [P3-T6] Implement `validate_runtime_scenario_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="runtime-scenario"`.
   - Acceptance: function exists and delegates with `artifact_type="runtime-scenario"`.
-- [ ] [P3-T7] Implement `validate_parity_matrix_text(...)` in the same file,
+- [x] [P3-T7] Implement `validate_parity_matrix_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="parity-matrix"`.
   - Acceptance: function exists and delegates with `artifact_type="parity-matrix"`.
-- [ ] [P3-T8] Implement `validate_unspecified_behavior_text(...)` in the same
+- [x] [P3-T8] Implement `validate_unspecified_behavior_text(...)` in the same
   file, delegating to `_validate_against_schema` with
   `artifact_type="unspecified-behavior"`.
   - Acceptance: function exists and delegates with
     `artifact_type="unspecified-behavior"`.
-- [ ] [P3-T9] Implement `validate_product_decision_text(...)` in the same file,
+- [x] [P3-T9] Implement `validate_product_decision_text(...)` in the same file,
   delegating to `_validate_against_schema` with `artifact_type="product-decision"`.
   - Acceptance: function exists and delegates with `artifact_type="product-decision"`.
-- [ ] [P3-T10] Implement `validate_evidence_reference_text(...)` in the same
+- [x] [P3-T10] Implement `validate_evidence_reference_text(...)` in the same
   file, delegating to `_validate_against_schema` with
   `artifact_type="evidence-reference"`.
   - Acceptance: function exists and delegates with `artifact_type="evidence-reference"`.
-- [ ] [P3-T11] Create
+- [x] [P3-T11] Create
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py` with
   `test_extract_schema_uri_raises_for_missing_schema_field`, asserting
   `_extract_schema_uri({})` raises `ValueError`.
   - Acceptance: test passes.
-- [ ] [P3-T12] Add `test_validate_against_schema_rejects_malformed_json` to
+- [x] [P3-T12] Add `test_validate_against_schema_rejects_malformed_json` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   asserting `_validate_against_schema("{not json", "feature-contract")` returns
   a single-element list containing the substring `"invalid JSON"`, without
   raising.
   - Acceptance: test passes.
-- [ ] [P3-T13] Add
+- [x] [P3-T13] Add
   `test_validate_against_schema_reports_missing_schema_field_as_error_string`
   to `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   asserting `_validate_against_schema(json.dumps({"acceptance_criteria": []}), "feature-contract")`
   returns a single-element list containing the substring
   `"schema resolution failed"`, without raising.
   - Acceptance: test passes.
-- [ ] [P3-T14] Add
+- [x] [P3-T14] Add
   `test_validate_feature_contract_text_accepts_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   monkeypatching
@@ -364,7 +364,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `validate_feature_contract_text(json.dumps({"$schema": "https://example.test/feature-contract.schema.json", "acceptance_criteria": []}))`
   returns `[]`.
   - Acceptance: test passes; no real network or disk schema fetch occurs.
-- [ ] [P3-T15] Add
+- [x] [P3-T15] Add
   `test_validate_feature_contract_text_rejects_non_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py` (same
   monkeypatch as P3-T14), asserting
@@ -372,7 +372,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns a list whose sole element contains the substring
   `"['acceptance_criteria']"`.
   - Acceptance: test passes.
-- [ ] [P3-T16] Add a parametrized test
+- [x] [P3-T16] Add a parametrized test
   `test_first_three_remaining_schema_validators_accept_conforming_fixtures` to
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py`,
   covering `validate_coverage_ledger_text`, `validate_runtime_scenario_text`,
@@ -381,7 +381,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns `[]` for a conforming inline-literal artifact carrying a `$schema`
   key.
   - Acceptance: test passes for all three parametrized cases.
-- [ ] [P3-T17] Create
+- [x] [P3-T17] Create
   `tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py`
   with a parametrized test
   `test_final_three_schema_validators_accept_and_reject_fixtures` covering
