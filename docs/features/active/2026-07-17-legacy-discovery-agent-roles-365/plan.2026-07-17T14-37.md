@@ -96,12 +96,12 @@ assertion in the structural test.
 
 ## Definition of Done (from spec)
 
-- [ ] Acceptance criteria documented and mapped to Pester assertions (this plan's AC map).
-- [ ] Persona definitions match acceptance criteria.
-- [ ] Pester structural test added and passing.
-- [ ] Edge cases and negative fixtures covered by the structural test.
-- [ ] Docs linked from the feature folder (spec and user-story present).
-- [ ] Toolchain pass completed for the changed files (format, lint, test).
+- [x] Acceptance criteria documented and mapped to Pester assertions (this plan's AC map).
+- [x] Persona definitions match acceptance criteria.
+- [x] Pester structural test added and passing.
+- [x] Edge cases and negative fixtures covered by the structural test.
+- [x] Docs linked from the feature folder (spec and user-story present).
+- [x] Toolchain pass completed for the changed files (format, lint, test).
 
 ---
 
@@ -109,73 +109,73 @@ assertion in the structural test.
 
 ### Phase 0 — Policy Compliance and Baseline Capture
 
-- [ ] [P0-T1] Read the repository policy files in the mandated policy-compliance order and record a Phase 0 policy-read evidence artifact.
+- [x] [P0-T1] Read the repository policy files in the mandated policy-compliance order and record a Phase 0 policy-read evidence artifact.
   - Order to read: (1) `CLAUDE.md`; (2) `.claude/rules/general-code-change.md`; (3) `.claude/rules/general-unit-test.md`; (4) PowerShell rule `.claude/rules/powershell.md`; (5) `.claude/rules/quality-tiers.md`; (6) `.claude/rules/tonality.md`.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/baseline/phase0-instructions-read.md` exists and contains `Timestamp:`, `Policy Order:`, and an explicit list of the files read. No policy file is modified.
 
-- [ ] [P0-T2] Capture the PowerShell formatting baseline before any change, using the PoshQC formatter check over the in-scope test directory `tests/scripts/claude-runtime/`.
+- [x] [P0-T2] Capture the PowerShell formatting baseline before any change, using the PoshQC formatter check over the in-scope test directory `tests/scripts/claude-runtime/`.
   - Command: `mcp__drm-copilot__run_poshqc_format` (check/report mode; no file rewrite committed as a baseline change).
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/baseline/format-baseline.md` exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (pass/fail and count of files that would be reformatted).
 
-- [ ] [P0-T3] Capture the PSScriptAnalyzer (lint) baseline before any change.
+- [x] [P0-T3] Capture the PSScriptAnalyzer (lint) baseline before any change.
   - Command: `mcp__drm-copilot__run_poshqc_analyze`.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/baseline/analyze-baseline.md` exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (error/warning counts).
 
-- [ ] [P0-T4] Capture the Pester test baseline before any change, run in coverage mode to record the repository coverage headline as an audit reference.
+- [x] [P0-T4] Capture the Pester test baseline before any change, run in coverage mode to record the repository coverage headline as an audit reference.
   - Command: `mcp__drm-copilot__run_poshqc_test` using the repo config `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, coverage enabled.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/baseline/pester-baseline.md` exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with numeric passed/failed counts and the numeric repository line and branch coverage headline. The artifact records that the changed-file coverage gate is N/A for this feature because no executable production files are changed.
 
 ### Phase 1 — Author the Four Domain-Neutral Persona Files
 
-- [ ] [P1-T1] Create `.claude/agents/legacy-parity-analyst.md` (Legacy Parity Analyst).
+- [x] [P1-T1] Create `.claude/agents/legacy-parity-analyst.md` (Legacy Parity Analyst).
   - Frontmatter: `name: legacy-parity-analyst`; `description` (domain-neutral role + write scope); `model: sonnet`; `tools: [Read, Grep, Glob, "Write(discovery/**)"]`; `memory: project`. No `skills:` field. No `hooks:` field.
   - Body: domain-neutral; explicitly names schemas consumed (Feature Contract, Parity Matrix, Evidence Reference), schema produced/updated (Parity Matrix), the domain profile, and consumed domain-profile fields (`legacy_source`, `target`, `technology_stack`, `artifacts.root`). Body documents that the true artifact root is the runtime-configured `artifacts.root` from the domain profile (static default `discovery/`) and that exact-path enforcement is deferred to #9004 hooks.
   - Acceptance: file exists at `.claude/agents/legacy-parity-analyst.md`; `name` equals basename `legacy-parity-analyst`; contains no banned substring (`taskmaster`, `tmw`, `outlook`, `vsto`, `email`, `task-management`, `task management`, case-insensitive); file is under 500 lines (Markdown exemption noted, still kept minimal).
 
-- [ ] [P1-T2] Create `.claude/agents/runtime-characterization-analyst.md` (Runtime Characterization Analyst).
+- [x] [P1-T2] Create `.claude/agents/runtime-characterization-analyst.md` (Runtime Characterization Analyst).
   - Frontmatter: same contract as P1-T1 with `name: runtime-characterization-analyst`.
   - Body: domain-neutral; explicitly names schemas consumed (Runtime Characterization Scenario, Evidence Reference, Feature Contract), schema produced/updated (Runtime Characterization Scenario), the domain profile, and consumed domain-profile fields (`legacy_source`, `technology_stack.legacy`, `artifacts.root`). Documents runtime-configured `artifacts.root` and deferred enforcement as in P1-T1.
   - Acceptance: file exists at `.claude/agents/runtime-characterization-analyst.md`; `name` equals basename; no banned substring; under 500 lines.
 
-- [ ] [P1-T3] Create `.claude/agents/requirements-reconciler.md` (Requirements Reconciler).
+- [x] [P1-T3] Create `.claude/agents/requirements-reconciler.md` (Requirements Reconciler).
   - Frontmatter: same contract as P1-T1 with `name: requirements-reconciler`.
   - Body: domain-neutral; explicitly names schemas consumed (Unspecified Behavior Record, Evidence Reference, Feature Contract), schema produced/updated (Product Decision Record), the domain profile, and consumed domain-profile fields (`legacy_source`, `target`, `artifacts.root`). Documents runtime-configured `artifacts.root` and deferred enforcement as in P1-T1.
   - Acceptance: file exists at `.claude/agents/requirements-reconciler.md`; `name` equals basename; no banned substring; under 500 lines.
 
-- [ ] [P1-T4] Create `.claude/agents/migration-coverage-reviewer.md` (Migration Coverage Reviewer).
+- [x] [P1-T4] Create `.claude/agents/migration-coverage-reviewer.md` (Migration Coverage Reviewer).
   - Frontmatter: same contract as P1-T1 with `name: migration-coverage-reviewer`.
   - Body: domain-neutral; explicitly names schemas consumed (Coverage Ledger, Feature Contract, Evidence Reference), schema produced/updated (Coverage Ledger review findings / updated review status), the domain profile, and consumed domain-profile fields (`legacy_source`, `technology_stack.legacy`, `artifacts.root` / `artifacts.conventions`). Documents runtime-configured `artifacts.root` and deferred enforcement as in P1-T1.
   - Acceptance: file exists at `.claude/agents/migration-coverage-reviewer.md`; `name` equals basename; no banned substring; under 500 lines.
 
-- [ ] [P1-T5] Verify implementation scope boundary: confirm no out-of-scope assets were created.
+- [x] [P1-T5] Verify implementation scope boundary: confirm no out-of-scope assets were created.
   - Acceptance: no `skills:` or `hooks:` frontmatter key appears in any of the four persona files; no new discovery skill file, validator, or hook was added; no file was added under `extensions/drm-copilot/resources/claude-customizations/`; no `settings.json` worker-matcher entry was added for the four personas. Record the confirmation for AC8 verification in Phase 3.
 
 ### Phase 2 — Author the PowerShell Pester Structural Test
 
-- [ ] [P2-T1] Create the test file scaffold at `tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1` with `Set-StrictMode -Version Latest`, a `BeforeAll` that resolves the repository root by walking up from `$PSScriptRoot` (CWD-independent, per `test-name-uniqueness.Tests.ps1` precedent), the four expected slugs, the `code-modernization` plugin name set, the banned-substring list, and reusable helper functions for frontmatter extraction (hand-rolled `---`-delimited regex convention) and the case-insensitive banned-substring scan.
+- [x] [P2-T1] Create the test file scaffold at `tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1` with `Set-StrictMode -Version Latest`, a `BeforeAll` that resolves the repository root by walking up from `$PSScriptRoot` (CWD-independent, per `test-name-uniqueness.Tests.ps1` precedent), the four expected slugs, the `code-modernization` plugin name set, the banned-substring list, and reusable helper functions for frontmatter extraction (hand-rolled `---`-delimited regex convention) and the case-insensitive banned-substring scan.
   - Acceptance: file exists; helpers are defined in `BeforeAll`; the file parses without syntax error; file is under 500 lines.
 
-- [ ] [P2-T2] Add the in-memory positive and negative fixtures that exercise the helper functions independently of the repository files.
+- [x] [P2-T2] Add the in-memory positive and negative fixtures that exercise the helper functions independently of the repository files.
   - Positive fixture: a synthetic compliant persona string (valid frontmatter, `name` = slug, `model: sonnet`, correct `tools`, `memory: project`, domain-neutral body naming schemas and the domain profile).
   - Negative fixtures: (a) a synthetic persona containing a banned substring; (b) a synthetic persona whose slug collides with a plugin/agent name; (c) a synthetic persona body missing the required schema/profile references.
   - Acceptance: fixtures are declared as in-memory string variables (no temporary files created, per general-unit-test policy); `It` names avoid case-only collisions per the `test-name-uniqueness` precedent.
 
-- [ ] [P2-T3] Add assertion 1 (existence): assert each of the four `.claude/agents/<slug>.md` files exists via `Test-Path -PathType Leaf`, enumerated over the four expected slugs.
+- [x] [P2-T3] Add assertion 1 (existence): assert each of the four `.claude/agents/<slug>.md` files exists via `Test-Path -PathType Leaf`, enumerated over the four expected slugs.
   - Acceptance: the assertion block is present and passes against the four real persona files (AC1).
 
-- [ ] [P2-T4] Add assertion 2 (frontmatter validity): for each real file, extract the `---`-delimited frontmatter block and assert presence of `name:`, `description:`, `model:`, `tools:`, and `memory:`. Exercise the extraction helper with the positive fixture (present) and a negative fixture (missing field).
+- [x] [P2-T4] Add assertion 2 (frontmatter validity): for each real file, extract the `---`-delimited frontmatter block and assert presence of `name:`, `description:`, `model:`, `tools:`, and `memory:`. Exercise the extraction helper with the positive fixture (present) and a negative fixture (missing field).
   - Acceptance: the assertion block is present and passes for the four real files; the negative fixture is detected as invalid (AC1, AC3).
 
-- [ ] [P2-T5] Add assertion 3 (name equals slug) and assertion 4 (model membership): assert each file's `name:` value equals the expected slug and the file basename, and assert `model:` is one of `haiku|sonnet|opus` (and specifically `sonnet` for these four).
+- [x] [P2-T5] Add assertion 3 (name equals slug) and assertion 4 (model membership): assert each file's `name:` value equals the expected slug and the file basename, and assert `model:` is one of `haiku|sonnet|opus` (and specifically `sonnet` for these four).
   - Acceptance: the assertion blocks are present and pass for the four real files (AC2).
 
-- [ ] [P2-T6] Add assertion 5 (naming non-collision): assert the four slugs are disjoint from the `code-modernization` plugin name set (`legacy-analyst`, `business-rules-extractor`, `architecture-critic`, `scaffolder`, `security-auditor`, `test-engineer`, `version-delta-analyst`) and from all other existing `.claude/agents/` basenames. Exercise with the colliding-slug negative fixture.
+- [x] [P2-T6] Add assertion 5 (naming non-collision): assert the four slugs are disjoint from the `code-modernization` plugin name set (`legacy-analyst`, `business-rules-extractor`, `architecture-critic`, `scaffolder`, `security-auditor`, `test-engineer`, `version-delta-analyst`) and from all other existing `.claude/agents/` basenames. Exercise with the colliding-slug negative fixture.
   - Acceptance: the assertion block is present and passes for the four real files; the colliding-slug fixture is detected (AC4).
 
-- [ ] [P2-T7] Add assertion 6 (domain-neutral banned-substring scan): for each real file's full text (frontmatter and body), assert no case-insensitive match against the banned-substring list (`taskmaster`, `tmw`, `outlook`, `vsto`, `email`, `task-management`, `task management`). Exercise the scan helper with the positive fixture (clean) and the banned-substring negative fixture (flagged).
+- [x] [P2-T7] Add assertion 6 (domain-neutral banned-substring scan): for each real file's full text (frontmatter and body), assert no case-insensitive match against the banned-substring list (`taskmaster`, `tmw`, `outlook`, `vsto`, `email`, `task-management`, `task management`). Exercise the scan helper with the positive fixture (clean) and the banned-substring negative fixture (flagged).
   - Acceptance: the assertion block is present and passes for the four real files; the banned-substring fixture is detected as a failure (AC5).
 
-- [ ] [P2-T8] Add assertion 7 (AC4 body-content): assert each persona body explicitly names its consumed discovery schema(s), its produced discovery artifact/schema, and the domain profile, per the confirmed per-persona mapping. Exercise with the positive fixture (present) and the missing-references negative fixture (flagged).
+- [x] [P2-T8] Add assertion 7 (AC4 body-content): assert each persona body explicitly names its consumed discovery schema(s), its produced discovery artifact/schema, and the domain profile, per the confirmed per-persona mapping. Exercise with the positive fixture (present) and the missing-references negative fixture (flagged).
   - Acceptance: the assertion block is present and passes for the four real files; the missing-references fixture is detected as a failure (AC6, AC7).
 
 ### Phase 3 — Final QC Loop (PowerShell)
@@ -185,22 +185,22 @@ files or fails, restart the loop from the format step until a single clean pass 
 command-step task below is unconditional and must be executed and recorded; `SKIPPED` is not a
 valid passing outcome.
 
-- [ ] [P3-T1] Run the PoshQC formatter over the changed PowerShell test file and confirm no formatting changes remain.
+- [x] [P3-T1] Run the PoshQC formatter over the changed PowerShell test file and confirm no formatting changes remain.
   - Command: `mcp__drm-copilot__run_poshqc_format`.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/qa-gates/format-final.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (pass; zero files require reformatting). If files changed, restart the loop from this step.
 
-- [ ] [P3-T2] Run PSScriptAnalyzer over the changed PowerShell test file and confirm zero errors.
+- [x] [P3-T2] Run PSScriptAnalyzer over the changed PowerShell test file and confirm zero errors.
   - Command: `mcp__drm-copilot__run_poshqc_analyze`.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/qa-gates/analyze-final.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (zero errors; warning count recorded). If any error is found, remediate and restart the loop from P3-T1.
 
-- [ ] [P3-T3] Run the Pester suite in coverage mode and confirm the new structural test passes with all seven assertions green.
+- [x] [P3-T3] Run the Pester suite in coverage mode and confirm the new structural test passes with all seven assertions green.
   - Command: `mcp__drm-copilot__run_poshqc_test` using `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, coverage enabled.
   - Acceptance: `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/qa-gates/pester-final.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` including numeric passed/failed counts, confirmation that `legacy-discovery-agent-roles.Tests.ps1` passed, and the numeric post-change repository line and branch coverage headline. The artifact restates that the changed-file coverage gate is N/A because no executable production files are changed.
 
-- [ ] [P3-T4] Confirm the final QC loop completed in a single clean pass (no step changed files or failed on the last iteration).
+- [x] [P3-T4] Confirm the final QC loop completed in a single clean pass (no step changed files or failed on the last iteration).
   - Acceptance: a note in `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/qa-gates/pester-final.md` (or a sibling `qc-loop-summary.md` under `evidence/qa-gates/`) records that format, analyze, and test all passed in the same iteration; the restart-on-change behavior was observed and satisfied.
 
-- [ ] [P3-T5] Verify acceptance-criteria closure and scope compliance for the audit record.
+- [x] [P3-T5] Verify acceptance-criteria closure and scope compliance for the audit record.
   - Acceptance: each AC in the Acceptance Criteria Map is confirmed satisfied by the referenced tasks and Pester assertions; AC8 confirmed (no #9008 skills, no #9003/#9004 validators/hooks, no #9012 `resources/` mirror added); coverage-gate N/A rationale is recorded. Record the closure summary under `docs/features/active/2026-07-17-legacy-discovery-agent-roles-365/evidence/qa-gates/`.
 
 ## Test Plan

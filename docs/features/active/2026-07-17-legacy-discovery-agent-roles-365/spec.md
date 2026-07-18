@@ -270,30 +270,30 @@ For full-feature work mode, `spec.md` and `user-story.md` are both acceptance-cr
 Checkboxes remain unchecked; delivery occurs in the execution phase, which is out of scope for
 this preparation run.
 
-- [ ] Four domain-neutral agent `.md` personas exist under `.claude/agents/`
+- [x] Four domain-neutral agent `.md` personas exist under `.claude/agents/`
       (`legacy-parity-analyst.md`, `runtime-characterization-analyst.md`,
       `requirements-reconciler.md`, `migration-coverage-reviewer.md`), each with valid YAML
       frontmatter containing `name`, `description`, `model`, `tools`, and `memory`.
-- [ ] Each persona's `name` equals its slug and file basename; `model` is one of
+- [x] Each persona's `name` equals its slug and file basename; `model` is one of
       `haiku|sonnet|opus` (specifically `sonnet` per Decision 2); `tools` is exactly `Read`,
       `Grep`, `Glob`, `"Write(discovery/**)"`; `memory` is `project`.
-- [ ] No persona carries a `skills:` field or a `hooks:` field (Decisions 3 and 4).
-- [ ] The four slugs do not collide with the `code-modernization` plugin agent names
+- [x] No persona carries a `skills:` field or a `hooks:` field (Decisions 3 and 4).
+- [x] The four slugs do not collide with the `code-modernization` plugin agent names
       (`legacy-analyst`, `business-rules-extractor`, `architecture-critic`, `scaffolder`,
       `security-auditor`, `test-engineer`, `version-delta-analyst`) or with existing
       `.claude/agents/` basenames.
-- [ ] Each persona is domain-neutral: the case-insensitive banned-substring scan
+- [x] Each persona is domain-neutral: the case-insensitive banned-substring scan
       (`taskmaster`, `tmw`, `outlook`, `vsto`, `email`, `task-management`, `task management`)
       finds no match in any persona's frontmatter or body.
-- [ ] Each persona body explicitly names its consumed discovery schema(s), its produced
+- [x] Each persona body explicitly names its consumed discovery schema(s), its produced
       discovery artifact/schema, and the domain profile, per the confirmed mapping in the
       per-persona design (machine-checked by the AC4 body-content assertion).
-- [ ] A PowerShell Pester structural test exists at
+- [x] A PowerShell Pester structural test exists at
       `tests/scripts/claude-runtime/legacy-discovery-agent-roles.Tests.ps1` with in-memory
       positive and negative fixtures, covering existence, frontmatter validity,
       name-equals-slug, model membership, naming non-collision, banned-substring
       domain-neutrality scan, and the AC4 body-content assertion; the test passes.
-- [ ] No discovery-workflow skills (#9008), completion-gate validators/hooks (#9003/#9004), or
+- [x] No discovery-workflow skills (#9008), completion-gate validators/hooks (#9003/#9004), or
       `resources/` mirror copies (#9012) are added by this feature.
 
 ## Definition of Done
