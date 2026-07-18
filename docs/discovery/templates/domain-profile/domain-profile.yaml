@@ -1,0 +1,4 @@
+legacy_source_path: "<legacy-source-path>"
+target_path: "<target-path>"
+technology_stack: "<technology-stack>"
+artifact_output_dir: "<artifact-output-dir>"
