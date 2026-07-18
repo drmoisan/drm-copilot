@@ -83,12 +83,12 @@ can rely on a single authoritative conformance check.
 
 ## Acceptance Criteria
 
-- [ ] A pure `validate_<artifact>_text` function exists for the domain-profile config and for each of the seven schemas, returning `list[str]`.
-- [ ] A single argparse CLI exposes one subparser per artifact type plus `all`, matching the canonical pattern (errors to stderr, one success line to stdout, `main() -> int` returning 0/1).
-- [ ] `dev.discovery.validate-*` Poetry console-script entry points are registered.
-- [ ] Each validator accepts its conforming fixtures and rejects its non-conforming fixtures with human-readable error strings.
-- [ ] Per-schema validators locate schemas via the #9002 versioning convention rather than a hardcoded layout.
-- [ ] No domain-specific identifier appears in the validator source.
+- [x] A pure `validate_<artifact>_text` function exists for the domain-profile config and for each of the seven schemas, returning `list[str]`.
+- [x] A single argparse CLI exposes one subparser per artifact type plus `all`, matching the canonical pattern (errors to stderr, one success line to stdout, `main() -> int` returning 0/1).
+- [x] `dev.discovery.validate-*` Poetry console-script entry points are registered.
+- [x] Each validator accepts its conforming fixtures and rejects its non-conforming fixtures with human-readable error strings.
+- [x] Per-schema validators locate schemas via the #9002 versioning convention rather than a hardcoded layout.
+- [x] No domain-specific identifier appears in the validator source.
 - [ ] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%), co-located in the mirrored `tests/` tree.
 
 

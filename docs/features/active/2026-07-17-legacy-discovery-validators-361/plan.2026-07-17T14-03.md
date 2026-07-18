@@ -521,7 +521,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 5 — Poetry Console-Script Entries
 
-- [ ] [P5-T1] Add the nine `dev.discovery.validate-*` console-script entries
+- [x] [P5-T1] Add the nine `dev.discovery.validate-*` console-script entries
   to `[tool.poetry.scripts]` in `pyproject.toml`, exactly as enumerated in
   spec.md's API/CLI Surface section: `dev.discovery.validate-profile`,
   `dev.discovery.validate-feature-contract`,
@@ -536,7 +536,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `scripts.dev_tools.validate_discovery_artifacts:main`).
   - Acceptance: all nine dotted keys are present in `pyproject.toml` under
     `[tool.poetry.scripts]` with the exact target strings from spec.md.
-- [ ] [P5-T2] Verify `pyproject.toml` remains syntactically valid TOML after
+- [x] [P5-T2] Verify `pyproject.toml` remains syntactically valid TOML after
   the P5-T1 edit by running
   `python -c "import tomllib, pathlib; tomllib.loads(pathlib.Path('pyproject.toml').read_text())"`
   and record the result at
@@ -546,7 +546,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 6 — Domain-Neutrality Verification
 
-- [ ] [P6-T1] Run
+- [x] [P6-T1] Run
   `rg -i -l "TaskMaster|TMW|Outlook|VSTO|task-management" scripts/dev_tools/schema_loading.py scripts/dev_tools/validate_discovery_profile.py scripts/dev_tools/validate_discovery_schema_artifacts.py scripts/dev_tools/validate_discovery_artifacts.py scripts/dev_tools/validate_json.py tests/scripts/dev_tools/test_schema_loading.py tests/scripts/dev_tools/test_validate_discovery_profile.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts.py tests/scripts/dev_tools/test_validate_discovery_schema_artifacts_more.py tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   and record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/qa-gates/domain-neutrality-grep.<TS>.md`
