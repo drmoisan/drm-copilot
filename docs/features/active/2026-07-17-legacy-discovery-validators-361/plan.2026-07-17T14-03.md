@@ -395,19 +395,19 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 4 — CLI Umbrella & `all` Semantics
 
-- [ ] [P4-T1] Create `scripts/dev_tools/validate_discovery_artifacts.py` with a
+- [x] [P4-T1] Create `scripts/dev_tools/validate_discovery_artifacts.py` with a
   module docstring describing the umbrella CLI's role per spec.md's API/CLI
   Surface section, importing `argparse`, `sys`, `Path` from `pathlib`,
   `validate_profile_text` from `scripts.dev_tools.validate_discovery_profile`,
   and the seven `validate_<schema>_text` functions plus `load_schema` from
   `scripts.dev_tools.validate_discovery_schema_artifacts`.
   - Acceptance: file exists, all imports resolve.
-- [ ] [P4-T2] Implement `_read_text(path: Path) -> str` in
+- [x] [P4-T2] Implement `_read_text(path: Path) -> str` in
   `scripts/dev_tools/validate_discovery_artifacts.py` as
   `return path.read_text(encoding="utf-8")`, mirroring
   `validate_orchestration_artifacts.py::_read_text`.
   - Acceptance: function exists with the documented signature and body.
-- [ ] [P4-T3] Implement `build_parser() -> argparse.ArgumentParser` in
+- [x] [P4-T3] Implement `build_parser() -> argparse.ArgumentParser` in
   `scripts/dev_tools/validate_discovery_artifacts.py`, adding one subparser per
   artifact type (`profile`, `feature-contract`, `coverage-ledger`,
   `runtime-scenario`, `parity-matrix`, `unspecified-behavior`,
@@ -418,7 +418,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `build_parser().parse_args(["feature-contract", "x.json"])` and
     `build_parser().parse_args(["all", "x.json"])` both succeed and populate
     `args.path`.
-- [ ] [P4-T4] Implement module-level
+- [x] [P4-T4] Implement module-level
   `_ARTIFACT_VALIDATORS: tuple[tuple[str, Callable[[str], list[str]]], ...]` in
   `scripts/dev_tools/validate_discovery_artifacts.py` in the fixed order from
   Design Decision 1, and implement
@@ -428,7 +428,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `_validate_all_text` returns `[]` when any one entry's
     validator returns `[]`, and returns a non-empty aggregated, prefixed list
     only when every entry's validator returns errors.
-- [ ] [P4-T5] Implement `_validate_from_args(args: argparse.Namespace) -> list[str]`
+- [x] [P4-T5] Implement `_validate_from_args(args: argparse.Namespace) -> list[str]`
   in `scripts/dev_tools/validate_discovery_artifacts.py`, reading the target
   file once via `_read_text(Path(args.path))`, dispatching to the matching
   `validate_<artifact>_text` function for each of the eight non-`all` artifact
@@ -436,7 +436,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `[f"Unsupported artifact type: {args.artifact_type}"]` for any other value.
   - Acceptance: dispatch covers all nine recognized `artifact_type` values plus
     the unsupported-type fallback.
-- [ ] [P4-T6] Implement `main(argv: list[str] | None = None) -> int` in
+- [x] [P4-T6] Implement `main(argv: list[str] | None = None) -> int` in
   `scripts/dev_tools/validate_discovery_artifacts.py` per the canonical
   contract: parse args via `build_parser()`, call `_validate_from_args`, print
   each error to `stderr` and return `1` when errors is non-empty, otherwise
@@ -446,7 +446,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: `main(["profile", "<conforming path>"])`-style invocation (with
     `_read_text` stubbed in tests) returns `0` on success and `1` on failure,
     matching the documented stdout/stderr contract.
-- [ ] [P4-T7] Implement eight thin wrapper functions in
+- [x] [P4-T7] Implement eight thin wrapper functions in
   `scripts/dev_tools/validate_discovery_artifacts.py` — `main_profile`,
   `main_feature_contract`, `main_coverage_ledger`, `main_runtime_scenario`,
   `main_parity_matrix`, `main_unspecified_behavior`, `main_product_decision`,
@@ -454,7 +454,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   `main(["<artifact-type>", *sys.argv[1:]])` with its literal artifact-type
   string.
   - Acceptance: all eight functions exist with the documented one-line bodies.
-- [ ] [P4-T8] Create
+- [x] [P4-T8] Create
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` with
   a local `_stub_read_text(text: str) -> Callable[[Path], str]` helper
   (mirroring the `build_read_text_stub` pattern in
@@ -462,26 +462,26 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   returns a callable ignoring its `path` argument and returning `text`.
   - Acceptance: helper exists and is used by at least one test in the same
     file (verified by the tasks below).
-- [ ] [P4-T9] Add `test_validate_from_args_returns_unsupported_artifact_type`
+- [x] [P4-T9] Add `test_validate_from_args_returns_unsupported_artifact_type`
   to `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   asserting `_validate_from_args(argparse.Namespace(path="ignored", artifact_type="bogus"))`
   returns `["Unsupported artifact type: bogus"]`.
   - Acceptance: test passes.
-- [ ] [P4-T10] Add `test_main_profile_returns_zero_for_conforming_fixture` to
+- [x] [P4-T10] Add `test_main_profile_returns_zero_for_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("legacy_source_path: /x\n")`,
   asserting `main(["profile", "ignored.yaml"])` returns `0` and `capsys`
   captures exactly one stdout line matching
   `"profile validation passed: ignored.yaml"`.
   - Acceptance: test passes.
-- [ ] [P4-T11] Add
+- [x] [P4-T11] Add
   `test_main_profile_returns_one_for_missing_legacy_source_path` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("other_key: value\n")`,
   asserting `main(["profile", "ignored.yaml"])` returns `1` and `capsys`
   captures a stderr line containing `"legacy_source_path"`.
   - Acceptance: test passes.
-- [ ] [P4-T12] Add
+- [x] [P4-T12] Add
   `test_main_feature_contract_returns_zero_for_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` and monkeypatching
@@ -489,21 +489,21 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   schema `{"type": "object", "required": ["acceptance_criteria"]}`, asserting
   `main(["feature-contract", "ignored.json"])` returns `0`.
   - Acceptance: test passes; no real schema fetch occurs.
-- [ ] [P4-T13] Add
+- [x] [P4-T13] Add
   `test_main_feature_contract_returns_one_for_non_conforming_fixture` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` (same
   monkeypatch as P4-T12, with the fixture missing `acceptance_criteria`),
   asserting `main(["feature-contract", "ignored.json"])` returns `1` and
   `capsys` captures a stderr line containing `"acceptance_criteria"`.
   - Acceptance: test passes.
-- [ ] [P4-T14] Add
+- [x] [P4-T14] Add
   `test_main_all_returns_zero_when_path_conforms_to_at_least_one_type` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("legacy_source_path: /x\n")`
   (conforms to `profile`, the first entry in `_ARTIFACT_VALIDATORS`), asserting
   `main(["all", "ignored.yaml"])` returns `0`.
   - Acceptance: test passes.
-- [ ] [P4-T15] Add
+- [x] [P4-T15] Add
   `test_main_all_returns_one_with_aggregated_per_type_errors_when_path_conforms_to_none`
   to `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`,
   monkeypatching `_read_text` via `_stub_read_text("")` (empty text fails every
@@ -511,7 +511,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   captures stderr containing both a `"profile: "`-prefixed line and a
   `"feature-contract: "`-prefixed line.
   - Acceptance: test passes.
-- [ ] [P4-T16] Add a parametrized test
+- [x] [P4-T16] Add a parametrized test
   `test_main_artifact_wrappers_dispatch_with_correct_argv_prefix` to
   `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py`
   covering all eight `main_<artifact>()` wrappers, monkeypatching `sys.argv`
