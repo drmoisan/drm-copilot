@@ -56,6 +56,7 @@ shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
 "dev.atomic-executor" = "scripts.dev_tools.atomic_executor.cli:main"
 "dev.clean-devcontainer" = "scripts.dev_tools.clean_devcontainer:main"
 "dev.collect-commit-context" = "scripts.dev_tools.collect_commit_context:main"
+"dev.discovery.inventory" = "scripts.dev_tools.discovery.analyzer.cli:main"
 "dev.discovery.profile" = "scripts.dev_tools.discovery.profile_cli:main"
 "dev.fix-all" = "scripts.dev_tools.fix_all:main"
 "dev.format-json" = "scripts.dev_tools.format_json:main"
@@ -120,6 +121,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@abstractmethod",
     "@abc.abstractmethod",
+    "^\\s*\\.\\.\\.\\s*$",
 ]
 
 [tool.pyright]
