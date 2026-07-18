@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../schemas/discovery/v1/feature-contract.schema.json",
+  "acceptance_criteria": [
+    {
+      "id": "criterion-alpha-1",
+      "statement": "The covered unit produces the recorded output for the primary input.",
+      "verification": "automated"
+    },
+    {
+      "id": "criterion-alpha-2",
+      "statement": "The covered unit rejects an out-of-range input.",
+      "verification": "characterization"
+    }
+  ],
+  "description": "Contracted behavior of the primary covered unit observed during discovery.",
+  "evidence_refs": [
+    "evidence-alpha-001"
+  ],
+  "id": "feature-alpha",
+  "schema_version": "1.0.0",
+  "source_refs": [
+    {
+      "line_end": 42,
+      "line_start": 10,
+      "path": "src/component-a/handler.ext",
+      "symbol": "primary_handler"
+    }
+  ],
+  "status": "approved",
+  "title": "Primary Covered Unit",
+  "workflows": [
+    {
+      "id": "workflow-primary",
+      "name": "Primary observation workflow",
+      "steps": [
+        "apply the recorded stimulus",
+        "record the observed behavior"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "../../../schemas/discovery/v1/evidence-reference.schema.json",
+  "captured_at": "2026-07-18T10:12:00Z",
+  "content_hash": {
+    "algorithm": "sha256",
+    "value": "9f2c1a7b4d6e8f0a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899"
+  },
+  "description": "Captured runtime log demonstrating the observed behavior of the covered unit.",
+  "id": "evidence-alpha-001",
+  "kind": "log",
+  "location": "logs/run-alpha.log",
+  "schema_version": "1.0.0",
+  "tool": "capture-runner"
+}

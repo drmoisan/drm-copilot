@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/discovery/v1/parity-matrix.schema.json",
+  "version": "1.0.0",
+  "title": "Parity Matrix",
+  "description": "Source-to-target parity status. Source and target labels are generic strings; the domain profile supplies real names at runtime. Domain-neutral: no source or target technology is named in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "generated_at",
+    "source_label",
+    "target_label",
+    "rows"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Scheme-less relative path from the instance file to its schema file."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Instance schema version. Major component pinned to the v1 directory; minor and patch are free."
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "generated_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "source_label": {
+      "type": "string",
+      "description": "Generic label for the source side. Real names are supplied at runtime, never encoded here."
+    },
+    "target_label": {
+      "type": "string",
+      "description": "Generic label for the target side. Real names are supplied at runtime, never encoded here."
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "feature_id",
+          "parity_status",
+          "verification"
+        ],
+        "properties": {
+          "feature_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "parity_status": {
+            "type": "string",
+            "enum": [
+              "not_started",
+              "in_progress",
+              "behavioral_parity",
+              "intentional_divergence",
+              "deferred",
+              "out_of_scope"
+            ],
+            "description": "Parity state of the referenced feature."
+          },
+          "verification": {
+            "type": "string",
+            "enum": [
+              "none",
+              "manual",
+              "automated"
+            ],
+            "description": "How parity was verified."
+          },
+          "criterion_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "description": "Evidence Reference id values grounding this row."
+          },
+          "decision_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "description": "Product Decision Record id values relevant to this row."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional free-form notes about this row."
+          }
+        }
+      },
+      "description": "The per-feature parity rows."
+    },
+    "summary": {
+      "type": "object",
+      "description": "Optional free-form aggregate summary."
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Shared identifier grammar. Lowercase alphanumeric start; dots, underscores, and hyphens permitted."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO-8601 timestamp enforced by regex because the validator runs without a FormatChecker."
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Free-form consumer metadata",
+      "description": "Sanctioned extension point. Additional properties are permitted here only."
+    }
+  }
+}

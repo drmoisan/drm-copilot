@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+  "determinism": "deterministic",
+  "evidence_refs": [
+    "evidence-alpha-001"
+  ],
+  "feature_id": "feature-alpha",
+  "id": "scenario-alpha-001",
+  "observation_method": "log",
+  "observed_behavior": {
+    "description": "The unit produced the recorded output and returned a success status.",
+    "outputs": {
+      "status": "ok"
+    }
+  },
+  "preconditions": [
+    "the covered unit is initialized",
+    "the primary input is available"
+  ],
+  "schema_version": "1.0.0",
+  "stimulus": {
+    "description": "The recorded primary input was applied to the covered unit.",
+    "inputs": {
+      "primary": "generic-value"
+    }
+  },
+  "title": "Primary input observation",
+  "variations": [
+    {
+      "description": "An out-of-range input was applied instead of the primary input.",
+      "observed_behavior": "The unit rejected the input and returned an error status."
+    }
+  ]
+}

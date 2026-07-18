@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/feature-contract.schema.json",
+  "schema_version": "1.0.0",
+  "id": "feature-alpha",
+  "title": "Primary Covered Unit",
+  "description": "Missing the required acceptance_criteria property to exercise a required-property violation.",
+  "status": "approved"
+}

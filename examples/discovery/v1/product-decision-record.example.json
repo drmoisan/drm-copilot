@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../schemas/discovery/v1/product-decision-record.schema.json",
+  "alternatives": [
+    {
+      "description": "Preserve the ambiguous behavior unchanged.",
+      "reason_rejected": "The ambiguity blocks deterministic verification."
+    }
+  ],
+  "decided_at": "2026-07-18T10:12:00Z",
+  "decision": "Adopt the deterministic output as the contracted behavior for the primary input.",
+  "id": "decision-alpha-001",
+  "rationale": "Determinism is required for automated verification of the covered unit.",
+  "schema_version": "1.0.0",
+  "status": "superseded",
+  "superseded_by": "decision-alpha-002",
+  "title": "Contract the deterministic primary-input output"
+}

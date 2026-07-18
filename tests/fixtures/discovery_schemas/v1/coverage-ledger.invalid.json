@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/coverage-ledger.schema.json",
+  "schema_version": "1.0.0",
+  "id": "coverage-ledger-alpha",
+  "generated_at": "2026-07-18T10:12:00Z",
+  "subject": "legacy core corpus",
+  "entries": [
+    {
+      "unit_id": "unit-alpha",
+      "unit_kind": "module",
+      "status": "characterized"
+    }
+  ],
+  "summary": {
+    "total_units": "ten",
+    "covered_units": 1
+  }
+}

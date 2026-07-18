@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/evidence-reference.schema.json",
+  "schema_version": "2.0.0",
+  "id": "evidence-alpha-001",
+  "kind": "log",
+  "location": "logs/run-alpha.log",
+  "captured_at": "2026-07-18T10:12:00Z",
+  "description": "The schema_version major component is 2, mismatching the v1 pattern to exercise a pattern violation."
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/unspecified-behavior-record.schema.json",
+  "schema_version": "1.0.0",
+  "id": "Behavior Record #1",
+  "title": "Ambiguous output for repeated primary input",
+  "description": "The identifier uses uppercase letters and spaces to exercise a pattern violation.",
+  "category": "ambiguous",
+  "discovery_context": "Observed while replaying the captured runtime log during discovery.",
+  "resolution_status": "open",
+  "evidence_refs": [
+    "evidence-alpha-001"
+  ]
+}
