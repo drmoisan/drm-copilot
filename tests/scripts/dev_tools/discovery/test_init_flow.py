@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import jsonschema
 import pytest
 
 from scripts.dev_tools.discovery import init_flow as mod
+from scripts.dev_tools.discovery.domain_profile import parse_domain_profile_text
 from scripts.dev_tools.discovery.init_models import (
+    DOMAIN_PROFILE_RELATIVE_PATH,
     EXPECTED_TEMPLATE_RELATIVE_PATHS,
     OUTPUT_RELATIVE_PATHS,
+    resolve_default_template_root,
 )
 
 if TYPE_CHECKING:
@@ -213,31 +218,58 @@ def test_partial_template_set_raises() -> None:
     assert set(fs.files) == pre_seeded_files
 
 
-@pytest.mark.skip(
-    reason=(
-        "blocked pending legacy-discovery-schemas issue 9002: no schema files "
-        "exist in the repository yet"
-    )
-)
-def test_schema_conformance_pending_issue_9002() -> None:
-    """Each generated starter artifact should validate against its 9002 schema.
+def test_domain_profile_template_parses_with_real_loader() -> None:
+    """The bundled domain-profile template parses under the real #360 loader.
 
-    This test is intentionally skipped until issue 9002 lands the seven versioned
-    JSON schema files. Once available, this test should load each schema under
-    `docs/discovery/schemas/v1/` and assert `jsonschema.validate(...)` succeeds
-    for each of the 8 generated starter artifacts produced by
-    `create_discovery_workspace(...)`, per 9002's planned schema-versioning shape.
+    Reads the in-repo domain-profile template, renders it both with no tokens and
+    with a representative domain-neutral token mapping, and asserts the real
+    ``parse_domain_profile_text`` returns a ``DomainProfile`` with
+    ``profile_version == 1`` in each case. The only filesystem access is reading
+    the in-repo template file.
     """
+    template_path = resolve_default_template_root() / DOMAIN_PROFILE_RELATIVE_PATH
+    template_text = template_path.read_text(encoding="utf-8")
+    tokens = {
+        "<legacy-source-path>": "legacy/src",
+        "<target-path>": "modern/src",
+        "<technology-stack>": "example-runtime",
+        "<artifact-output-dir>": "discovery/artifacts",
+    }
+
+    for rendered in (
+        mod.substitute_placeholders(template_text),
+        mod.substitute_placeholders(template_text, tokens),
+    ):
+        profile = parse_domain_profile_text(rendered)
+        assert profile.profile_version == 1
+
+
+def test_generated_artifacts_conform_to_real_schemas() -> None:
+    """Each generated artifact validates against its merged v1 JSON schema.
+
+    Seeds an in-memory filesystem with the real bundled template texts, scaffolds
+    a workspace via `create_discovery_workspace`, then loads each of the seven
+    rendered artifact instances and validates it against the corresponding merged
+    schema file under `schemas/discovery/v1/`. The only filesystem access is
+    reading the in-repo template and schema files.
+    """
+    template_root = resolve_default_template_root()
+    schema_root = template_root.parents[2] / "schemas" / "discovery" / "v1"
     fs = FakeFileSystem()
-    template_root = Path("/templates")
+    fs.dirs.add(template_root)
+    for relative_path in EXPECTED_TEMPLATE_RELATIVE_PATHS:
+        fs.files[template_root / relative_path] = (
+            template_root / relative_path
+        ).read_text(encoding="utf-8")
     target_dir = Path("/consumer/discovery")
     fs.dirs.add(target_dir.parent)
-    _seed_template_root(fs, template_root)
 
     mod.create_discovery_workspace(target_dir, template_root, fs)
 
-    # Intended assertion body (pending issue 9002 schema files):
-    # for output_relative in OUTPUT_RELATIVE_PATHS[1:]:
-    #     instance = json.loads(fs.files[target_dir / output_relative])
-    #     schema = load_schema_for(instance["$schema"])
-    #     jsonschema.validate(instance=instance, schema=schema)
+    # OUTPUT_RELATIVE_PATHS[0] is the non-JSON domain-profile.yaml; the remaining
+    # seven entries are the artifact JSON instances validated here.
+    for output_relative in OUTPUT_RELATIVE_PATHS[1:]:
+        instance = json.loads(fs.files[target_dir / output_relative])
+        schema_name = output_relative.stem + ".schema.json"
+        schema = json.loads((schema_root / schema_name).read_text(encoding="utf-8"))
+        jsonschema.validate(instance=instance, schema=schema)

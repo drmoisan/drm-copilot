@@ -60,19 +60,21 @@ whether the parser is real PyYAML or the repository's existing hand-rolled
 frontmatter regex convention (`objective-source.md` line 140; confirmed unresolved
 by research).
 
-To remain valid under either outcome, the starter domain-profile template this
-feature scaffolds is authored as a **flat, single-level `key: value` YAML-syntax
-document** — no nested maps, no lists — because the repository's hand-rolled parser
-(`scripts/dev_tools/codex_native_converter/parser.py:76-98`, `_parse_frontmatter()`)
-only supports flat `key: value` lines, while `yaml.safe_load` accepts the same
-document as a strict subset of full YAML. Placeholder token values are used in
-place of real paths/stack names.
+The domain-profile config contract has since been merged as feature #360
+(`scripts/dev_tools/discovery/domain_profile.py`,
+`scripts/dev_tools/discovery/domain_profile_models.py`), which supersedes the
+earlier flat-document assumption. The starter domain-profile template this feature
+scaffolds is authored to the merged **nested** shape required by that loader:
+`profile_version`, a `legacy_source` map with `root`, a `target` map with `root`, a
+`technology_stack` map whose `legacy` is a non-empty list, and an `artifacts` map
+with `root`. Placeholder token values are used in place of real paths/stack names,
+and the rendered template parses cleanly under the loader's
+`parse_domain_profile_text`.
 
-**Forward dependency (recorded, not resolved by this feature):** if feature 9001's
-final config contract requires a nested structure (for example a list of stack
-identifiers), the starter template will need a follow-up edit once 9001's contract
-is finalized. This feature's plan and acceptance criteria do not attempt to guess
-9001's final schema.
+**Resolved dependency:** feature #360's nested config contract is merged and
+adopted; the earlier forward dependency on a then-unresolved flat-versus-nested
+parser decision no longer applies. The template and its regression test are pinned
+to the merged loader's nested contract.
 
 ### `legacy-discovery-schemas` (issue 9002)
 
@@ -152,7 +154,7 @@ external repositories):
 ```
 docs/discovery/templates/
   domain-profile/
-    domain-profile.yaml            # starter profile, flat key:value, placeholder tokens
+    domain-profile.yaml            # starter profile, nested #360 shape, placeholder tokens
   artifacts/
     feature-contract.template.json
     coverage-ledger.template.json
@@ -418,10 +420,12 @@ not be used for evidence.
       the drm-copilot workspace root) and an optional `--template-root` override
       consistent with the `new_active_feature_folder`/`new_potential_bug_entry`
       precedent.
-- [x] Initialization writes a starter domain-profile config, authored as a flat
-      single-level `key: value` YAML document with placeholder tokens, of the
-      shape anticipated for feature 9001 (with the nested-structure forward
-      dependency explicitly recorded, not resolved, by this feature).
+- [x] Initialization writes a starter domain-profile config, authored as a nested
+      YAML document (`profile_version`, `legacy_source.root`, `target.root`,
+      `technology_stack.legacy[]`, `artifacts.root`) with placeholder tokens, in the
+      shape required by the merged domain-profile loader (feature #360,
+      `scripts/dev_tools/discovery/domain_profile.py`), and parses cleanly under
+      that loader's `parse_domain_profile_text`.
 - [x] Initialization writes starter instances of each of the seven discovery
       artifacts (Feature Contract, Coverage Ledger, Runtime Characterization
       Scenario, Parity Matrix, Unspecified Behavior Record, Product Decision
@@ -445,4 +449,5 @@ not be used for evidence.
 - [x] Tests under `tests/scripts/dev_tools/discovery/` satisfy repository
       quality-tier policy (line coverage >= 85%, branch coverage >= 75%), use an
       injected fake `FileSystem` with no real filesystem/temp-file I/O, and
-      include the schema-conformance test tracked as dependent on feature 9002.
+      include the schema-conformance test implemented against the merged
+      `schemas/discovery/v1/` files (no longer tracked as dependent on feature 9002).

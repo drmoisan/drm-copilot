@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/coverage-ledger.schema.json",
+  "schema_version": "1.0.0",
+  "id": "placeholder-coverage-ledger",
+  "generated_at": "1970-01-01T00:00:00Z",
+  "subject": "Placeholder covered-corpus label",
+  "entries": [
+    {
+      "unit_id": "placeholder-unit",
+      "unit_kind": "module",
+      "status": "not_started"
+    }
+  ],
+  "summary": {
+    "total_units": 0,
+    "covered_units": 0
+  }
+}

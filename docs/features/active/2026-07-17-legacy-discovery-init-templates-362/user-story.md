@@ -94,10 +94,12 @@ invocation.
       the drm-copilot workspace root) and an optional `--template-root` override
       consistent with the `new_active_feature_folder`/`new_potential_bug_entry`
       precedent.
-- [x] Initialization writes a starter domain-profile config, authored as a flat
-      single-level `key: value` YAML document with placeholder tokens, of the
-      shape anticipated for feature 9001 (with the nested-structure forward
-      dependency explicitly recorded, not resolved, by this feature).
+- [x] Initialization writes a starter domain-profile config, authored as a nested
+      YAML document (`profile_version`, `legacy_source.root`, `target.root`,
+      `technology_stack.legacy[]`, `artifacts.root`) with placeholder tokens, in the
+      shape required by the merged domain-profile loader (feature #360,
+      `scripts/dev_tools/discovery/domain_profile.py`), and parses cleanly under
+      that loader's `parse_domain_profile_text`.
 - [x] Initialization writes starter instances of each of the seven discovery
       artifacts (Feature Contract, Coverage Ledger, Runtime Characterization
       Scenario, Parity Matrix, Unspecified Behavior Record, Product Decision
@@ -121,7 +123,8 @@ invocation.
 - [x] Tests under `tests/scripts/dev_tools/discovery/` satisfy repository
       quality-tier policy (line coverage >= 85%, branch coverage >= 75%), use an
       injected fake `FileSystem` with no real filesystem/temp-file I/O, and
-      include the schema-conformance test tracked as dependent on feature 9002.
+      include the schema-conformance test implemented against the merged
+      `schemas/discovery/v1/` files (no longer tracked as dependent on feature 9002).
 
 ## Non-Goals
 

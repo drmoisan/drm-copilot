@@ -1,4 +1,10 @@
-legacy_source_path: "<legacy-source-path>"
-target_path: "<target-path>"
-technology_stack: "<technology-stack>"
-artifact_output_dir: "<artifact-output-dir>"
+profile_version: 1
+legacy_source:
+  root: "<legacy-source-path>"
+target:
+  root: "<target-path>"
+technology_stack:
+  legacy:
+    - "<technology-stack>"
+artifacts:
+  root: "<artifact-output-dir>"

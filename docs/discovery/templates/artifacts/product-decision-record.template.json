@@ -1,0 +1,9 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/product-decision-record.schema.json",
+  "schema_version": "1.0.0",
+  "id": "placeholder-product-decision-record",
+  "title": "Placeholder decision title",
+  "decision": "Placeholder description of the decision that was made.",
+  "status": "proposed",
+  "rationale": "Placeholder rationale for why the decision was made."
+}
