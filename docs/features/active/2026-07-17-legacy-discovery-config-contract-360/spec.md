@@ -322,34 +322,34 @@ the production module sources for banned substrings (`taskmaster`, `tmw`, `outlo
 
 ## Acceptance Criteria
 
-- [ ] The domain-profile configuration contract is documented in this spec with all
+- [x] The domain-profile configuration contract is documented in this spec with all
       required fields (`profile_version`, `legacy_source.root`, `target.root`,
       `technology_stack.legacy`, `artifacts.root`) and all optional fields with their
       defaults, using domain-neutral names.
-- [ ] A dataclass-based typed loader (`parse_domain_profile_text` /
+- [x] A dataclass-based typed loader (`parse_domain_profile_text` /
       `load_domain_profile` in `scripts/dev_tools/discovery/domain_profile.py`) parses a
       valid profile into a frozen `DomainProfile` instance.
-- [ ] The loader raises `DomainProfileError` for each missing required field, naming the
+- [x] The loader raises `DomainProfileError` for each missing required field, naming the
       field's dotted path in the error message.
-- [ ] The loader raises `DomainProfileError` on malformed input: YAML syntax errors (with
+- [x] The loader raises `DomainProfileError` on malformed input: YAML syntax errors (with
       source label), non-mapping documents, type mismatches, empty required strings/lists,
       unsupported `profile_version`, and unknown keys.
-- [ ] A single invalid profile with multiple defects produces one `DomainProfileError`
+- [x] A single invalid profile with multiple defects produces one `DomainProfileError`
       enumerating every defect.
-- [ ] The parser-technology decision is recorded and justified in this spec: PyYAML via
+- [x] The parser-technology decision is recorded and justified in this spec: PyYAML via
       `yaml.safe_load`, citing the already-declared unused Poetry dependency, the
       structural inability of both regex precedents (`push_down_claude_filesystem.py`
       `_FRONTMATTER_PATTERN`, `codex_native_converter/parser.py` `_parse_frontmatter`) to
       express nested maps/lists, and `safe_load` safety.
-- [ ] The `dev.discovery.profile` console script exists as one `[tool.poetry.scripts]`
+- [x] The `dev.discovery.profile` console script exists as one `[tool.poetry.scripts]`
       line targeting `scripts.dev_tools.discovery.profile_cli:main`.
-- [ ] The CLI loads and displays a resolved profile (declared values plus applied
+- [x] The CLI loads and displays a resolved profile (declared values plus applied
       defaults) with exit code 0, supports `--json` output, and exits 1 with the full
       error message on stderr for a missing, unreadable, or invalid profile.
-- [ ] The loader and CLI production modules contain no domain-specific
+- [x] The loader and CLI production modules contain no domain-specific
       (TaskMaster/TMW/Outlook/VSTO/email/task-management) identifiers, verified by a
       domain-neutrality contract test.
-- [ ] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
+- [x] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
       coverage >= 75%, no temporary files (in-memory filesystem fixture only), test tree
       mirroring the production tree.
 
