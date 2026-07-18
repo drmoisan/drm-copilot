@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import importlib
 import importlib.util
 import json
 import sys
-import urllib.request
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
-from urllib.parse import urlparse
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
 
 from scripts.dev_tools.json_config import iter_governed_files
+from scripts.dev_tools.schema_loading import cache_path, load_schema
 
 _jsonschema_spec = importlib.util.find_spec("jsonschema")
 if _jsonschema_spec is None:
@@ -75,8 +73,7 @@ class ValidateResult:
 
 
 def _cache_path(cache_dir: Path, uri: str) -> Path:
-    digest = hashlib.sha256(uri.encode("utf-8")).hexdigest()
-    return cache_dir / f"{digest}.json"
+    return cache_path(cache_dir, uri)
 
 
 def _collect_schema_errors(
@@ -130,38 +127,7 @@ def _collect_schema_errors(
 def _load_schema(
     uri: str, cache_dir: Path, base_path: Path | None = None
 ) -> dict[str, Any]:
-    parsed = urlparse(uri)
-
-    if not parsed.scheme:
-        if base_path is None:
-            raise ValueError("Unsupported schema URI scheme: missing")
-
-        local_path = (base_path.parent / uri).resolve()
-        if not local_path.is_file():
-            raise FileNotFoundError(f"Schema file not found: {local_path}")
-
-        return json.loads(local_path.read_text())
-
-    if parsed.scheme == "file":
-        local_path = Path(parsed.path)
-        if not local_path.is_file():
-            raise FileNotFoundError(f"Schema file not found: {local_path}")
-
-        return json.loads(local_path.read_text())
-
-    if parsed.scheme not in {"http", "https"}:
-        raise ValueError(f"Unsupported schema URI scheme: {parsed.scheme or 'missing'}")
-
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = _cache_path(cache_dir, uri)
-    if cache_file.exists():
-        return json.loads(cache_file.read_text())
-
-    resp = urllib.request.urlopen(uri)  # noqa: S310 - fetching trusted schema URL
-    with resp:
-        content = resp.read().decode("utf-8")
-    cache_file.write_text(content)
-    return json.loads(content)
+    return load_schema(uri, cache_dir, base_path)
 
 
 def validate_file(path: Path, cache_dir: Path) -> tuple[bool, str]:

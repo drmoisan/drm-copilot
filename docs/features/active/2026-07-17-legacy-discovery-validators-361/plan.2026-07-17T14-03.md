@@ -143,20 +143,20 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 1 — Shared Schema-Loading Extraction (modifies `validate_json.py`)
 
-- [ ] [P1-T1] Create `scripts/dev_tools/schema_loading.py` with a module
+- [x] [P1-T1] Create `scripts/dev_tools/schema_loading.py` with a module
   docstring citing the epic Shared Design's schema-loading reuse requirement
   (`docs/features/epics/legacy-discovery-and-parity/epic.md`), importing
   `hashlib`, `json`, `urllib.request`, `Path` from `pathlib`, `Any` from
   `typing`, and `urlparse` from `urllib.parse`.
   - Acceptance: file exists, imports resolve, module has no other content yet.
-- [ ] [P1-T2] Implement public `cache_path(cache_dir: Path, uri: str) -> Path`
+- [x] [P1-T2] Implement public `cache_path(cache_dir: Path, uri: str) -> Path`
   in `scripts/dev_tools/schema_loading.py`, moving the SHA-256-keyed
   cache-filename logic currently in `scripts/dev_tools/validate_json.py::_cache_path`
   verbatim (no behavior change).
   - Acceptance: `cache_path(cache_dir, uri)` returns
     `cache_dir / f"{hashlib.sha256(uri.encode('utf-8')).hexdigest()}.json"` for
     any `uri`.
-- [ ] [P1-T3] Implement public
+- [x] [P1-T3] Implement public
   `load_schema(uri: str, cache_dir: Path, base_path: Path | None = None) -> dict[str, Any]`
   in `scripts/dev_tools/schema_loading.py`, moving the scheme-resolution logic
   currently in `scripts/dev_tools/validate_json.py::_load_schema` verbatim (no
@@ -165,20 +165,20 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: function signature and scheme-branch behavior (no-scheme
     relative to `base_path.parent`, `file://` absolute, `http(s)://` fetched and
     cached, else `ValueError`) match the moved-from logic exactly.
-- [ ] [P1-T4] Modify `scripts/dev_tools/validate_json.py`: add
+- [x] [P1-T4] Modify `scripts/dev_tools/validate_json.py`: add
   `from scripts.dev_tools.schema_loading import cache_path, load_schema` and
   replace the body of `_cache_path` with `return cache_path(cache_dir, uri)`,
   preserving the private `_cache_path` name and signature as a thin wrapper.
   - Acceptance: `validate_json.py` still exposes a callable `_cache_path` with
     the same signature; `grep -n "def _cache_path" scripts/dev_tools/validate_json.py`
     returns exactly one match.
-- [ ] [P1-T5] Modify `scripts/dev_tools/validate_json.py`: replace the body of
+- [x] [P1-T5] Modify `scripts/dev_tools/validate_json.py`: replace the body of
   `_load_schema` with `return load_schema(uri, cache_dir, base_path)`, preserving
   the private `_load_schema` name and signature as a thin wrapper.
   - Acceptance: `validate_json.py` still exposes a callable `_load_schema` with
     the same signature; `grep -n "def _load_schema" scripts/dev_tools/validate_json.py`
     returns exactly one match.
-- [ ] [P1-T6] Run
+- [x] [P1-T6] Run
   `poetry run pytest tests/scripts/dev_tools/test_validate_json.py -q` and
   record the result at
   `docs/features/active/2026-07-17-legacy-discovery-validators-361/evidence/regression-testing/validate-json-regression.<TS>.md`
@@ -187,31 +187,31 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   edits made in this task).
   - Acceptance: `EXIT_CODE: 0` recorded; `Output Summary:` states the passed
     test count with zero failures.
-- [ ] [P1-T7] Create `tests/scripts/dev_tools/test_schema_loading.py` with
+- [x] [P1-T7] Create `tests/scripts/dev_tools/test_schema_loading.py` with
   `test_cache_path_generates_deterministic_hash`, asserting
   `schema_loading.cache_path(cache_dir, uri)` returns the same `Path` for two
   calls with the same `uri` and that the result's parent is `cache_dir` and
   suffix is `.json`.
   - Acceptance: test passes via `poetry run pytest tests/scripts/dev_tools/test_schema_loading.py::test_cache_path_generates_deterministic_hash -q`.
-- [ ] [P1-T8] Add `test_load_schema_from_cache` to
+- [x] [P1-T8] Add `test_load_schema_from_cache` to
   `tests/scripts/dev_tools/test_schema_loading.py`, using the `mem_fs_path`
   fixture to write a cached schema file at the path returned by `cache_path`
   and asserting `schema_loading.load_schema(uri, cache_dir)` returns the parsed
   cached content without a network call.
   - Acceptance: test passes; no temporary files created on real disk.
-- [ ] [P1-T9] Add `test_load_schema_unsupported_scheme` to
+- [x] [P1-T9] Add `test_load_schema_unsupported_scheme` to
   `tests/scripts/dev_tools/test_schema_loading.py`, asserting
   `schema_loading.load_schema("ftp://example.com/schema.json", cache_dir)`
   raises `ValueError` matching `"Unsupported schema URI scheme"`.
   - Acceptance: test passes.
-- [ ] [P1-T10] Add `test_load_schema_relative_path` to
+- [x] [P1-T10] Add `test_load_schema_relative_path` to
   `tests/scripts/dev_tools/test_schema_loading.py`, using the `mem_fs_path`
   fixture to write a schema file and asserting
   `schema_loading.load_schema("./schema.json", cache_dir, source_path)`
   resolves the schema relative to `source_path.parent` and returns its parsed
   content.
   - Acceptance: test passes; no temporary files created on real disk.
-- [ ] [P1-T11] Add `test_load_schema_missing_scheme` to
+- [x] [P1-T11] Add `test_load_schema_missing_scheme` to
   `tests/scripts/dev_tools/test_schema_loading.py`, asserting
   `schema_loading.load_schema("no-scheme-here", cache_dir)` (no `base_path`
   supplied) raises `ValueError` matching `"Unsupported schema URI scheme"`.
@@ -219,7 +219,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
 
 ### Phase 2 — Domain-Profile Validator (#9001 seam)
 
-- [ ] [P2-T1] Create `scripts/dev_tools/validate_discovery_profile.py` with a
+- [x] [P2-T1] Create `scripts/dev_tools/validate_discovery_profile.py` with a
   module docstring citing #9001 (`legacy-discovery-config-contract`) as the
   upstream contract this validator checks against, and define
   `_PLACEHOLDER_REQUIRED_FIELDS: tuple[str, ...] = ("legacy_source_path",)`
@@ -227,7 +227,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   once #9001 ships.` comment.
   - Acceptance: file exists; `_PLACEHOLDER_REQUIRED_FIELDS` is defined with
     exactly one element, `"legacy_source_path"`.
-- [ ] [P2-T2] Implement
+- [x] [P2-T2] Implement
   `_parse_profile_mapping(text: str) -> tuple[dict[str, Any] | None, list[str]]`
   in `scripts/dev_tools/validate_discovery_profile.py`, calling
   `yaml.safe_load(text)` inside `try/except yaml.YAMLError` (importing `yaml`
@@ -236,7 +236,7 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   when the parsed value is not a `dict`, and `(mapping, [])` on success.
   - Acceptance: function exists with the documented signature and three
     documented return branches.
-- [ ] [P2-T3] Implement
+- [x] [P2-T3] Implement
   `_check_required_profile_fields(mapping: dict[str, Any]) -> list[str]` in
   `scripts/dev_tools/validate_discovery_profile.py`, appending
   `f"Missing required field: {field}."` for each field in
@@ -245,33 +245,33 @@ section 9 and are binding for the tasks below; they are not re-litigated per tas
   - Acceptance: function returns `[]` when `mapping` contains
     `legacy_source_path` and `["Missing required field: legacy_source_path."]`
     when it does not.
-- [ ] [P2-T4] Implement `validate_profile_text(text: str) -> list[str]` in
+- [x] [P2-T4] Implement `validate_profile_text(text: str) -> list[str]` in
   `scripts/dev_tools/validate_discovery_profile.py`, returning
   `["Profile document is empty."]` for empty/whitespace-only `text`,
   otherwise composing `_parse_profile_mapping` and, only when parsing succeeds,
   `_check_required_profile_fields`.
   - Acceptance: function exists with the documented signature and
     short-circuit behavior (field checks skipped when parsing fails).
-- [ ] [P2-T5] Create `tests/scripts/dev_tools/test_validate_discovery_profile.py`
+- [x] [P2-T5] Create `tests/scripts/dev_tools/test_validate_discovery_profile.py`
   with `test_validate_profile_text_rejects_empty_document`, asserting
   `validate_profile_text("")` returns `["Profile document is empty."]`.
   - Acceptance: test passes.
-- [ ] [P2-T6] Add `test_validate_profile_text_rejects_malformed_yaml` to
+- [x] [P2-T6] Add `test_validate_profile_text_rejects_malformed_yaml` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("key: [unterminated")` returns a list with exactly one
   error string and raises no exception.
   - Acceptance: test passes.
-- [ ] [P2-T7] Add `test_validate_profile_text_rejects_non_mapping_root` to
+- [x] [P2-T7] Add `test_validate_profile_text_rejects_non_mapping_root` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("- one\n- two\n")` returns
   `["Profile document root must be a mapping."]`.
   - Acceptance: test passes.
-- [ ] [P2-T8] Add `test_validate_profile_text_reports_missing_legacy_source_path`
+- [x] [P2-T8] Add `test_validate_profile_text_reports_missing_legacy_source_path`
   to `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("some_other_key: value\n")` returns
   `["Missing required field: legacy_source_path."]`.
   - Acceptance: test passes.
-- [ ] [P2-T9] Add
+- [x] [P2-T9] Add
   `test_validate_profile_text_accepts_conforming_minimal_profile` to
   `tests/scripts/dev_tools/test_validate_discovery_profile.py`, asserting
   `validate_profile_text("legacy_source_path: /path/to/legacy\n")` returns `[]`.
