@@ -76,27 +76,27 @@ analyzers produce artifacts of the same shape.
 
 ## Acceptance Criteria
 
-- [ ] A migration engineer can run the `dev.discovery.inventory` command with a domain profile
+- [x] A migration engineer can run the `dev.discovery.inventory` command with a domain profile
       and produce a machine-readable inventory of their legacy source tree.
-- [ ] The command reads the legacy source location and include/exclude rules from the engineer's
+- [x] The command reads the legacy source location and include/exclude rules from the engineer's
       domain profile (`legacy_source.root`, `legacy_source.include`, `legacy_source.exclude`);
       no repository-specific detail is hardcoded in the tool.
-- [ ] The inventory enumerates the engineer's solutions/projects and files, honoring their
+- [x] The inventory enumerates the engineer's solutions/projects and files, honoring their
       include/exclude globs, with deterministic (repeatable) results for the same source tree and
       profile.
-- [ ] When the configured source location cannot be reached (missing or not a directory), the
+- [x] When the configured source location cannot be reached (missing or not a directory), the
       command stops immediately and reports the unreachable path, distinct from a
       malformed-profile error, and does not emit a partial inventory.
-- [ ] Each produced artifact is a discovery Evidence Reference (v1) instance whose `location` is
+- [x] Each produced artifact is a discovery Evidence Reference (v1) instance whose `location` is
       expressed in the engineer's own repository-relative terms, with a schema version, a
       relative schema reference, and the required identifying fields, so downstream discovery
       tooling can consume it.
-- [ ] The command returns predictable exit codes: `0` on success, `1` on a configuration or
+- [x] The command returns predictable exit codes: `0` on success, `1` on a configuration or
       source-location error, and `2` on a command-usage error; with `--json` it prints a summary
       of what was written.
-- [ ] The command and its artifacts are domain-neutral: they contain no application- or
+- [x] The command and its artifacts are domain-neutral: they contain no application- or
       stack-specific identifiers, so any migrating repository can use them unchanged.
-- [ ] An analyzer author can implement the shared framework contract and plug a new analyzer into
+- [x] An analyzer author can implement the shared framework contract and plug a new analyzer into
       the same pipeline and artifact-emission conventions without re-implementing them.
 
 ## Non-Goals
