@@ -1,0 +1,190 @@
+#Requires -Version 7.0
+#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
+
+Describe 'enforce-discovery-artifact-gate.ps1' {
+    BeforeAll {
+        $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-discovery-artifact-gate.ps1").Path
+        . $script:UnderTest
+
+        # Builds a Write-style CLAUDE_TOOL_INPUT JSON string for a discovery
+        # artifact write.
+        function ConvertTo-DiscoveryToolInput {
+            param(
+                [string] $FilePath,
+                [string] $Content = '{}'
+            )
+            return (@{ file_path = $FilePath; content = $Content } | ConvertTo-Json -Compress -Depth 8)
+        }
+
+        # A required-artifact reader stub that reports the domain-profile
+        # declaration as present, so the validator seam is invoked.
+        $script:PresentReader = { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
+    }
+
+    Context 'recognized, conforming artifact' {
+        It 'allows the write and invokes the validator exactly once' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 1 -Exactly
+        }
+    }
+
+    Context 'recognized, non-conforming artifact' {
+        It 'denies the write with the validator text embedded verbatim' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match ([regex]::Escape('schema violation: missing field x'))
+        }
+    }
+
+    Context 'unrecognized artifact path' {
+        It 'allows without invoking the validator when file_path does not resolve to a discovery-artifact type' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'src/unrelated/module.ps1'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+
+        It 'Get-DiscoveryArtifactType returns $null for an unrecognized path' {
+            Get-DiscoveryArtifactType -Path 'src/unrelated/module.ps1' | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'fail-open when the domain profile is absent' {
+        It 'allows without invoking the validator when the required-artifact-declaration seam reports absent' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            # No -RequiredArtifactReader override: exercises the default seam,
+            # which reports the domain profile absent (Present = $false).
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'malformed CLAUDE_TOOL_INPUT' {
+        It 'throws so the entrypoint surfaces Write-Error and a non-zero exit code' {
+            { Invoke-DiscoveryArtifactGateDecision -ToolInputRaw '{not-json' } | Should -Throw
+        }
+    }
+
+    Context 'empty or absent CLAUDE_TOOL_INPUT' {
+        It 'produces a default-allow decision without invoking the validator for an empty string' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw ''
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+
+        It 'produces a default-allow decision without invoking the validator for $null' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $null
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'validator-not-found-style failure' {
+        It 'denies identically to any other non-conforming result (not silently allowed)' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'ModuleNotFoundError: No module named scripts.dev_tools.validate_discovery_artifacts' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+    }
+
+    Context 'Edit tool calls (no full content)' {
+        It 'allows unconditionally without invoking the validator' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = '{"file_path":"discovery/coverage-ledger/coverage-ledger.json","old_string":"a","new_string":"b"}'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'domain neutrality' {
+        It 'contains no TaskMaster/TMW/Outlook/VSTO token in its own source text' {
+            $sourceText = Get-Content -LiteralPath $script:UnderTest -Raw
+            $sourceText | Should -Not -Match 'TaskMaster|TMW|Outlook|VSTO'
+        }
+    }
+
+    Context 'missing file_path' {
+        It 'allows without invoking the validator when content is present but file_path is absent' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = '{"content":"{}"}'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+    }
+
+    Context 'Get-RequiredDiscoveryArtifactDeclaration seam' {
+        It 'reports Present = $true with the declaration when the profile reader returns a value' {
+            $reader = { @{ types = @('coverage-ledger') } }
+
+            $result = Get-RequiredDiscoveryArtifactDeclaration -ProfileReader $reader
+
+            $result.Present | Should -Be $true
+            $result.Declaration | Should -Not -BeNullOrEmpty
+        }
+    }
+
+    Context 'script entrypoint (end-to-end)' {
+        BeforeAll {
+            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
+                (Get-Process -Id $PID).Path
+            } else {
+                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+            }
+        }
+
+        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
+            $prev = $env:CLAUDE_TOOL_INPUT
+            try {
+                $env:CLAUDE_TOOL_INPUT = ''
+                $out = & $script:PwshExe -NoProfile -File $script:UnderTest
+                $LASTEXITCODE | Should -Be 0
+                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            } finally {
+                $env:CLAUDE_TOOL_INPUT = $prev
+            }
+        }
+
+        It 'exits 1 on malformed JSON' {
+            $prev = $env:CLAUDE_TOOL_INPUT
+            try {
+                $env:CLAUDE_TOOL_INPUT = '{not-json'
+                $null = & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
+                $LASTEXITCODE | Should -Be 1
+            } finally {
+                $env:CLAUDE_TOOL_INPUT = $prev
+            }
+        }
+    }
+}

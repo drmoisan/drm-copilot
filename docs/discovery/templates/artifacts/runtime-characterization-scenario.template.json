@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+  "schema_version": "1.0.0",
+  "id": "placeholder-runtime-characterization-scenario",
+  "feature_id": "placeholder-feature-contract",
+  "title": "Placeholder scenario title",
+  "preconditions": [
+    "Placeholder precondition that holds before the stimulus is applied."
+  ],
+  "stimulus": {
+    "description": "Placeholder description of what was done to the system."
+  },
+  "observed_behavior": {
+    "description": "Placeholder description of what the system did in response."
+  },
+  "observation_method": "manual",
+  "evidence_refs": [
+    "placeholder-evidence-reference"
+  ]
+}

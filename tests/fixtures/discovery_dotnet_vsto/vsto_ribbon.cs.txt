@@ -1,0 +1,41 @@
+// Raw C# VSTO ribbon fixture. The .txt suffix keeps tooling from treating it as
+// real C# source. Named ribbon-extensibility cases plus a comment trap are
+// included. No consumer identifiers appear.
+
+using System;
+using Microsoft.Office.Core;
+
+namespace Sample.Ribbon
+{
+    // Trap: ribbon-shaped text inside a comment must NOT match after stripping.
+    // This class pretends to implement IRibbonExtensibility and GetCustomUI.
+
+    // Bare interface implementation.
+    public class BareRibbon : IRibbonExtensibility
+    {
+        // GetCustomUI is the single method of IRibbonExtensibility.
+        public string GetCustomUI(string ribbonId)
+        {
+            return LoadResource(ribbonId);
+        }
+
+        private string LoadResource(string ribbonId)
+        {
+            return string.Empty;
+        }
+    }
+
+    // Namespace-qualified interface implementation.
+    public class QualifiedRibbon : Microsoft.Office.Core.IRibbonExtensibility
+    {
+        public string GetCustomUI(string ribbonId)
+        {
+            return string.Empty;
+        }
+    }
+
+    // Designer-generated ribbon model usage (bypasses GetCustomUI at runtime).
+    public partial class DesignerRibbon : Microsoft.Office.Tools.Ribbon.RibbonBase
+    {
+    }
+}

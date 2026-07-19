@@ -15,6 +15,7 @@ import {
   getWorkspaceRoot,
   resolveCodexExecutable,
 } from "./command-runtime";
+import { registerDiscoveryCommands } from "./discovery-command-registration";
 import { registerDocumentWorkflowCommands } from "./document-workflow-commands";
 import { RealFileSystem } from "./lib/file-system";
 import { writeHelloMessage } from "./lib/hello-message";
@@ -455,6 +456,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const mcpDisposables = registerMcpProvider(context);
 
+  const discoveryDisposables = registerDiscoveryCommands({
+    context,
+    output,
+    service,
+  });
+
   const showSubagentTreeDisposable = registerSubagentTreeCommand({ output });
 
   context.subscriptions.push(
@@ -474,6 +481,7 @@ export function activate(context: vscode.ExtensionContext): void {
     showSubagentTreeDisposable,
     ...repoAutomationDisposables,
     ...mcpDisposables,
+    ...discoveryDisposables,
     output,
   );
 }

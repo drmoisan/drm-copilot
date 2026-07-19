@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/discovery/v1/evidence-reference.schema.json",
+  "version": "1.0.0",
+  "title": "Evidence Reference",
+  "description": "A pointer to a captured artifact that grounds a discovery claim. This is the shared leaf that every other discovery artifact references by plain string id. Domain-neutral: no source or target technology is named in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "kind",
+    "location",
+    "captured_at",
+    "description"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Scheme-less relative path from the instance file to its schema file."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Instance schema version. Major component pinned to the v1 directory; minor and patch are free."
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "file",
+        "log",
+        "trace",
+        "test_run",
+        "screenshot",
+        "recording",
+        "document",
+        "dataset",
+        "url",
+        "other"
+      ],
+      "description": "The generic category of the captured artifact."
+    },
+    "location": {
+      "type": "string",
+      "description": "A path or URI expressed in the consumer repository's own terms."
+    },
+    "captured_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable summary of what the evidence shows."
+    },
+    "content_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "description": "Hash algorithm label, for example sha256."
+        },
+        "value": {
+          "type": "string",
+          "description": "Hash digest value."
+        }
+      },
+      "description": "Optional integrity digest of the referenced artifact."
+    },
+    "tool": {
+      "type": "string",
+      "description": "Optional label for the tool that produced the evidence."
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Shared identifier grammar. Lowercase alphanumeric start; dots, underscores, and hyphens permitted."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO-8601 timestamp enforced by regex because the validator runs without a FormatChecker."
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Free-form consumer metadata",
+      "description": "Sanctioned extension point. Additional properties are permitted here only."
+    }
+  }
+}

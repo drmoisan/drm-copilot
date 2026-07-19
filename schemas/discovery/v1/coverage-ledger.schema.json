@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/discovery/v1/coverage-ledger.schema.json",
+  "version": "1.0.0",
+  "title": "Coverage Ledger",
+  "description": "Legacy implementation coverage of the discovery effort. Domain-neutral: no source or target technology is named in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "generated_at",
+    "subject",
+    "entries",
+    "summary"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Scheme-less relative path from the instance file to its schema file."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "description": "Instance schema version. Major component pinned to the v1 directory; minor and patch are free."
+    },
+    "id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "generated_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Generic label for the covered corpus."
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "unit_id",
+          "unit_kind",
+          "status"
+        ],
+        "properties": {
+          "unit_id": {
+            "$ref": "#/$defs/identifier"
+          },
+          "unit_kind": {
+            "type": "string",
+            "enum": [
+              "module",
+              "namespace",
+              "type",
+              "file",
+              "component",
+              "other"
+            ],
+            "description": "Generic classification of the covered unit."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_started",
+              "in_discovery",
+              "contracted",
+              "characterized",
+              "excluded"
+            ],
+            "description": "Discovery progress state of the unit."
+          },
+          "feature_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "description": "Feature Contract id values associated with this unit."
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/identifier"
+            },
+            "description": "Evidence Reference id values grounding this entry."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional free-form notes about this entry."
+          }
+        }
+      },
+      "description": "The per-unit coverage entries."
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_units",
+        "covered_units"
+      ],
+      "properties": {
+        "total_units": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of units in the corpus."
+        },
+        "covered_units": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of units that have been covered."
+        }
+      },
+      "description": "Aggregate coverage counts."
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "description": "Shared identifier grammar. Lowercase alphanumeric start; dots, underscores, and hyphens permitted."
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO-8601 timestamp enforced by regex because the validator runs without a FormatChecker."
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Free-form consumer metadata",
+      "description": "Sanctioned extension point. Additional properties are permitted here only."
+    }
+  }
+}

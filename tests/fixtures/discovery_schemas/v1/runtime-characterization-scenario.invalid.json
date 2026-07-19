@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/runtime-characterization-scenario.schema.json",
+  "schema_version": "1.0.0",
+  "id": "scenario-alpha-001",
+  "feature_id": "feature-alpha",
+  "title": "Primary input observation",
+  "preconditions": [
+    "the covered unit is initialized"
+  ],
+  "stimulus": {
+    "description": "The recorded primary input was applied to the covered unit."
+  },
+  "observed_behavior": {
+    "description": "The unit produced the recorded output."
+  },
+  "observation_method": "guesswork",
+  "evidence_refs": [
+    "evidence-alpha-001"
+  ]
+}

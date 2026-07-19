@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Raw project-file fixture for COM-reference detection. The .txt suffix keeps
+     tooling from treating it as a real project file. Named COMReference,
+     EmbedInteropTypes, and interop assembly reference cases are included. No
+     consumer identifiers appear; the Office application name is generic data. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <COMReference Include="GenericComLibrary">
+      <Guid>{11112222-3333-4444-5555-666677778888}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Word">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+</Project>

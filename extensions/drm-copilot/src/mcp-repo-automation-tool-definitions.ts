@@ -6,6 +6,7 @@ import {
   workspaceRootProperty,
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
+import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
   readonly description: string;
@@ -485,4 +486,5 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
+  ...DISCOVERY_TOOL_DEFINITIONS,
 ];

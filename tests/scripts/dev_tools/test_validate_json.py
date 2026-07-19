@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 import pytest
 
+import scripts.dev_tools.schema_loading as schema_loading
 import scripts.dev_tools.validate_json as val
 
 
@@ -94,7 +95,10 @@ def test_load_schema_fetch_and_cache(
     def mock_urlopen(url: str) -> MagicMock:
         return mock_response
 
-    monkeypatch.setattr(val.urllib.request, "urlopen", mock_urlopen)
+    # The real urlopen call now lives in schema_loading.py after the shared
+    # schema-loading extraction (Phase 1); validate_json.py no longer holds
+    # its own `urllib.request` import.
+    monkeypatch.setattr(schema_loading.urllib.request, "urlopen", mock_urlopen)
 
     schema = val._load_schema(uri, cache_dir)  # type: ignore[reportPrivateUsage]
     assert schema == {"type": "object", "properties": {}}

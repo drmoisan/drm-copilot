@@ -1,0 +1,47 @@
+// Raw C# COM-interop fixture. The .txt suffix keeps tooling from treating it as
+// real C# source. Named interop attribute, marshal, ProgID, and interop-using
+// cases plus a string-literal trap are included. No consumer identifiers and no
+// per-application special-casing appear; the Office application name is data.
+
+using System;
+using System.Runtime.InteropServices;
+using static Microsoft.Office.Interop.Excel.XlDirection;
+using GenericApp = Microsoft.Office.Interop.Word;
+
+namespace Sample.Interop
+{
+    // Interop attributes: ComImport, Guid, InterfaceType, DispId.
+    [ComImport]
+    [Guid("1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IGenericComContract
+    {
+        [DispId(1)]
+        void Invoke();
+    }
+
+    // ComVisible attribute on a class.
+    [ComVisible(true)]
+    public class GenericComClass
+    {
+        public void Release(object comObject)
+        {
+            // Marshal member calls with different members (no fixed member list).
+            Marshal.ReleaseComObject(comObject);
+            var count = Marshal.AddRef(IntPtr.Zero);
+        }
+
+        public object Activate(string progId)
+        {
+            // ProgID activation.
+            var type = Type.GetTypeFromProgID(progId);
+            return Activator.CreateInstance(type);
+        }
+
+        public void Trap()
+        {
+            // Trap: attribute-shaped text inside a string literal must NOT match.
+            var pretend = "[Guid(\"00000000-0000-0000-0000-000000000000\")] Marshal.Foo(";
+        }
+    }
+}

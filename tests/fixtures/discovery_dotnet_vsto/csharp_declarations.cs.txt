@@ -1,0 +1,91 @@
+// Raw C# declaration fixture for the .NET inventory analyzer.
+// This file uses the .txt suffix so no tooling treats it as real C# source.
+// It contains named positive cases for namespace and type detection plus
+// false-positive traps. No consumer identifiers appear anywhere.
+
+// Trap: a declaration-shaped line inside a line comment must NOT match.
+// namespace Fake
+
+using System;
+using System.Collections.Generic;
+
+// Block-form namespace with a dotted name and an opening brace on the same line.
+namespace Alpha.Beta
+{
+    // Trap: declaration-shaped text inside a string literal must NOT match.
+    public static class LiteralTrap
+    {
+        private const string Sample = "class InString and namespace AlsoFake";
+    }
+
+    // Plain class with a modifier stack.
+    public sealed class WidgetContainer
+    {
+    }
+
+    // Struct declaration.
+    public struct PointValue
+    {
+    }
+
+    // Interface declaration.
+    public interface IProcessor
+    {
+    }
+
+    // Enum declaration.
+    public enum StatusCode
+    {
+        Ready,
+        Busy,
+    }
+
+    // Record declaration (normalizes to record).
+    public record PersonInfo(string Name);
+
+    // Record class declaration (normalizes to record).
+    public record class AccountInfo(int Id);
+
+    // Record struct declaration (normalizes to record_struct).
+    public readonly record struct Measurement(double Amount);
+
+    // Attribute line preceding a generic type declaration.
+    [Serializable]
+    public class Repository<TEntity>
+    {
+        // Nested type inside a generic type.
+        public class Cursor
+        {
+        }
+    }
+
+    // Generic type with two type parameters.
+    public class Pair<TFirst, TSecond>
+    {
+    }
+
+    // Partial type: two declaration sites for the same logical type.
+    public partial class SplitService
+    {
+    }
+
+    public partial class SplitService
+    {
+    }
+}
+
+// Nested block namespace: an independent namespace declaration line.
+namespace Alpha.Beta.Gamma
+{
+    internal abstract class BaseHandler
+    {
+    }
+}
+
+// File-scoped namespace form (C# 10) would normally be file-terminal; it is
+// placed last here so the block forms above remain well-formed for the fixture.
+namespace Delta.Epsilon;
+
+public class FileScopedResident
+{
+}
