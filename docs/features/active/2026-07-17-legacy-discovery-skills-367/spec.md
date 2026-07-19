@@ -323,13 +323,13 @@ Scope item 2 (Generic Skills), the domain-neutrality architectural boundary, and
 the capability-level criterion "the core framework contains no domain-specific
 identifiers."
 
-- [ ] AC-1: Seven reusable workflow-mechanics skills exist at
+- [x] AC-1: Seven reusable workflow-mechanics skills exist at
       `.claude/skills/discovery-*/SKILL.md` (per the decomposition table) and
       together sequence the discovery and parity-definition workflow: analyzer
       CLI invocation, agent-role routing, and artifact production/validation in
       the stage order profile -> inventory -> coverage -> runtime -> parity ->
       reconciliation -> validation gate. (issue AC 1)
-- [ ] AC-2: Each skill carries valid frontmatter per the repository SKILL.md
+- [x] AC-2: Each skill carries valid frontmatter per the repository SKILL.md
       contract — `name` (matching the folder) and single-quoted `description`
       required; `allowed-tools` only on `discovery-repo-inventory` and
       `discovery-validate-artifacts`; `context`/`agent` frontmatter not used
@@ -337,61 +337,61 @@ identifiers."
       discovery agents, schemas, validators, and analyzer CLI commands by plain
       string name, with agent routing in body-level `## Worker Routing`
       sections. (issue AC 2, restated per research Q1)
-- [ ] AC-3: No new skill name collides with any existing `.claude/skills/` name,
+- [x] AC-3: No new skill name collides with any existing `.claude/skills/` name,
       any `code-modernization` `/modernize-*` command name, or any
       `code-modernization` agent name; the contract test asserts non-collision
       against a frozen name set. (issue AC 3)
-- [ ] AC-4: All new skill files and their bundle mirrors contain none of the
+- [x] AC-4: All new skill files and their bundle mirrors contain none of the
       banned domain substrings (case-insensitive), and no skill names a
       stack-specific analyzer literally; domain specificity is read from the
       domain profile at runtime via `dev.discovery.profile`. (issue AC 4)
-- [ ] AC-5: Upstream references (#9006 analyzer framework, #9007 agent roles)
+- [x] AC-5: Upstream references (#9006 analyzer framework, #9007 agent roles)
       are isolated as plain string names concentrated in the
       `discovery-workflow` `## Referenced Contracts` registry; the two assumed
       names (#9006 inventory command `dev.discovery.inventory`; the four #9007
       agent slugs) are explicitly flagged as fan-in reconciliation assumptions;
       no skill or test asserts the existence of #9006/#9007 artifacts.
       (issue AC 5)
-- [ ] AC-6: `tests/scripts/dev_tools/test_legacy_discovery_skills_contracts.py`
+- [x] AC-6: `tests/scripts/dev_tools/test_legacy_discovery_skills_contracts.py`
       exists and passes, covering: SKILL.md existence, frontmatter
       well-formedness, required reference fragments, banned-substring absence,
       plugin-name non-collision, and bundle byte-parity — asserting only on this
       feature's own files. (issue AC 6)
-- [ ] AC-7: Each new `SKILL.md` exists byte-identically at
+- [x] AC-7: Each new `SKILL.md` exists byte-identically at
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/<name>/SKILL.md`,
       and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
       passes on the feature branch. (epic mirror contract; Scope
       Clarification 1)
-- [ ] AC-8: The scope clarification is recorded in this spec: broader
+- [x] AC-8: The scope clarification is recorded in this spec: broader
       `resources/` publishing (pack manifests, converter registration,
       `.github`/`.agents` mirrors) remains #9012, while the byte-identical
       bundle copy of this feature's skills is a mandatory in-feature step.
       (Scope Clarification 1)
-- [ ] AC-9: Every new `SKILL.md` and the pytest module are under 500 lines, and
+- [x] AC-9: Every new `SKILL.md` and the pytest module are under 500 lines, and
       the Python toolchain (Black, Ruff, Pyright, Pytest) passes for the test
       module with no reduction in coverage. (repository policy)
 
 ## Definition of Done
 
-- [ ] All acceptance criteria above checked off with evidence
-- [ ] Structural contract tests pass (`test_legacy_discovery_skills_contracts.py`)
-- [ ] Push-down parity gate passes (`test_push_down_claude_resource_contracts.py`)
-- [ ] Toolchain pass completed for the Python test module (format -> lint ->
+- [x] All acceptance criteria above checked off with evidence
+- [x] Structural contract tests pass (`test_legacy_discovery_skills_contracts.py`)
+- [x] Push-down parity gate passes (`test_push_down_claude_resource_contracts.py`)
+- [x] Toolchain pass completed for the Python test module (format -> lint ->
       type-check -> test)
-- [ ] Evidence recorded under
+- [x] Evidence recorded under
       `docs/features/active/2026-07-17-legacy-discovery-skills-367/evidence/<kind>/`
-- [ ] Feature docs (spec, user story) current
+- [x] Feature docs (spec, user story) current
 
 ## Seeded Test Conditions (from issue)
 
-- [ ] Skill structural checks: each new SKILL.md has valid YAML frontmatter with
+- [x] Skill structural checks: each new SKILL.md has valid YAML frontmatter with
       the required fields per repository precedent (`name` matching folder;
       non-empty `description`).
-- [ ] Skill names do not collide with the `code-modernization` plugin
+- [x] Skill names do not collide with the `code-modernization` plugin
       command/agent names.
-- [ ] Domain-neutrality: no banned domain substrings in skill sources or bundle
+- [x] Domain-neutrality: no banned domain substrings in skill sources or bundle
       mirrors (case-insensitive).
-- [ ] Referenced agent, schema, validator, and analyzer CLI names match the
+- [x] Referenced agent, schema, validator, and analyzer CLI names match the
       planned upstream contracts as recorded in the `discovery-workflow`
       registry, with the two assumed names flagged for fan-in reconciliation.
-- [ ] Bundle parity: each new skill byte-identical in the bundled payload.
+- [x] Bundle parity: each new skill byte-identical in the bundled payload.
