@@ -1,4 +1,4 @@
-"""Discovery package: domain-neutral configuration contract and typed loader.
+"""Discovery package: the `dev.discovery.*` command namespace package.
 
 This package hosts the repository-local domain-profile configuration contract and its
 typed, fail-fast loader. Domain specificity is supplied at runtime by the profile file,

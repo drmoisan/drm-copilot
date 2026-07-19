@@ -88,40 +88,43 @@ invocation.
 
 ## Acceptance Criteria
 
-- [ ] `dev.discovery.init <target-dir>` scaffolds the discovery workspace directory
+- [x] `dev.discovery.init <target-dir>` scaffolds the discovery workspace directory
       layout at the given target consumer path in a single invocation.
-- [ ] `dev.discovery.init` accepts an explicit target-directory CLI argument (not
+- [x] `dev.discovery.init` accepts an explicit target-directory CLI argument (not
       the drm-copilot workspace root) and an optional `--template-root` override
       consistent with the `new_active_feature_folder`/`new_potential_bug_entry`
       precedent.
-- [ ] Initialization writes a starter domain-profile config, authored as a flat
-      single-level `key: value` YAML document with placeholder tokens, of the
-      shape anticipated for feature 9001 (with the nested-structure forward
-      dependency explicitly recorded, not resolved, by this feature).
-- [ ] Initialization writes starter instances of each of the seven discovery
+- [x] Initialization writes a starter domain-profile config, authored as a nested
+      YAML document (`profile_version`, `legacy_source.root`, `target.root`,
+      `technology_stack.legacy[]`, `artifacts.root`) with placeholder tokens, in the
+      shape required by the merged domain-profile loader (feature #360,
+      `scripts/dev_tools/discovery/domain_profile.py`), and parses cleanly under
+      that loader's `parse_domain_profile_text`.
+- [x] Initialization writes starter instances of each of the seven discovery
       artifacts (Feature Contract, Coverage Ledger, Runtime Characterization
       Scenario, Parity Matrix, Unspecified Behavior Record, Product Decision
       Record, Evidence Reference) from the templates under
       `docs/discovery/templates/artifacts/`, in the same invocation as the
       domain profile.
-- [ ] Each artifact template's `$schema` field is a relative, scheme-less path
+- [x] Each artifact template's `$schema` field is a relative, scheme-less path
       resolvable by `validate_json.py`'s existing no-scheme `_load_schema` branch,
       per feature 9002's planned schema-versioning convention; the open question
       about resolving `$schema` from inside an external consumer repository is
       recorded in the spec and left to feature 9002, not resolved here.
-- [ ] Templates and generated artifacts contain no domain-specific identifiers
+- [x] Templates and generated artifacts contain no domain-specific identifiers
       (verified by the domain-neutrality regression test).
-- [ ] `dev.discovery.init` fails fast, before writing any file, when: the target
+- [x] `dev.discovery.init` fails fast, before writing any file, when: the target
       path exists and is not a directory; the target path's parent does not
       exist; or the resolved template root is missing or has a partial template
       set.
-- [ ] `dev.discovery.init` is registered and invocable as a Poetry console-script
+- [x] `dev.discovery.init` is registered and invocable as a Poetry console-script
       (`"dev.discovery.init" = "scripts.dev_tools.discovery.init_cli:main"` in root
       `pyproject.toml`).
-- [ ] Tests under `tests/scripts/dev_tools/discovery/` satisfy repository
+- [x] Tests under `tests/scripts/dev_tools/discovery/` satisfy repository
       quality-tier policy (line coverage >= 85%, branch coverage >= 75%), use an
       injected fake `FileSystem` with no real filesystem/temp-file I/O, and
-      include the schema-conformance test tracked as dependent on feature 9002.
+      include the schema-conformance test implemented against the merged
+      `schemas/discovery/v1/` files (no longer tracked as dependent on feature 9002).
 
 ## Non-Goals
 

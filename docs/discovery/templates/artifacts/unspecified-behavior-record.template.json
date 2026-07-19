@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../../schemas/discovery/v1/unspecified-behavior-record.schema.json",
+  "schema_version": "1.0.0",
+  "id": "placeholder-unspecified-behavior-record",
+  "title": "Placeholder record title",
+  "description": "Placeholder description of the unspecified behavior.",
+  "category": "undocumented",
+  "discovery_context": "Placeholder description of how and where the behavior was discovered.",
+  "resolution_status": "open",
+  "evidence_refs": [
+    "placeholder-evidence-reference"
+  ]
+}
