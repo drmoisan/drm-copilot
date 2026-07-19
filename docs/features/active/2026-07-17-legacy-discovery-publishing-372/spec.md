@@ -129,6 +129,37 @@ with the repository's one existing multi-file dev-tools subpackage precedent
   not assume an outcome; it documents both branches of the decision so execution can select
   the correct one without re-deriving the analysis.
 
+## Schema/Init-Template Placement — Resolved
+
+Resolved at plan-execution time per
+`docs/features/active/2026-07-17-legacy-discovery-publishing-372/evidence/other/schema-init-template-placement-decision.2026-07-19T05-40.md`
+(`Decision: scripts-non-mirrored`).
+
+The seven `legacy-discovery-schemas` (#359) JSON Schema files were verified present at
+`schemas/discovery/v1/coverage-ledger.schema.json`,
+`schemas/discovery/v1/evidence-reference.schema.json`,
+`schemas/discovery/v1/feature-contract.schema.json`,
+`schemas/discovery/v1/parity-matrix.schema.json`,
+`schemas/discovery/v1/product-decision-record.schema.json`,
+`schemas/discovery/v1/runtime-characterization-scenario.schema.json`, and
+`schemas/discovery/v1/unspecified-behavior-record.schema.json` — a repo-root `schemas/`
+directory, not `.claude/`, `.codex/`, or `.agents/`.
+
+The `legacy-discovery-init-templates` (#362) assets were verified present at two locations:
+Python source implementing the init-workspace flow at `scripts/dev_tools/discovery/init_cli.py`,
+`init_flow.py`, and `init_models.py` (a `scripts/`-relative path), and the template data files
+themselves under a repo-root `docs/discovery/templates/` tree (`domain-profile/domain-profile.yaml`
+and seven `artifacts/*.template.json` files), resolved at runtime by
+`init_models.resolve_default_template_root()`.
+
+Neither `schemas/` nor `docs/discovery/templates/` is a mirrored root (`.claude/`, `.codex/`,
+`.agents/`). Both are outside the byte-identical mirror contract enforced by
+`test_push_down_claude_resource_contracts.py` and
+`test_push_down_codex_and_agents_resource_contracts.py`. Per this section's original conditional
+rule, they are Python source/data distributed to consumers through the MCP-server npm package,
+not through the `.claude`/`.codex` push-down publishers: no mirror copy into `resources/` and no
+`core.json` manifest entry is made for these assets by this feature.
+
 ## Inputs / Outputs
 
 - Inputs: the merged upstream epic-child branches contributing agent-persona files under
@@ -229,49 +260,62 @@ surfaces are exercised as-is against the newly mirrored files:
 
 ## Acceptance Criteria
 
-- [ ] Every new `.claude/agents/*.md` persona file introduced by `legacy-discovery-agent-roles`
+- [x] Every new `.claude/agents/*.md` persona file introduced by `legacy-discovery-agent-roles`
       is present byte-identically at the matching path under
-      `extensions/drm-copilot/resources/claude-customizations/.claude/agents/`.
-- [ ] Every new `.claude/skills/<name>/SKILL.md` skill introduced by `legacy-discovery-skills`
+      `extensions/drm-copilot/resources/claude-customizations/.claude/agents/`. (Verified
+      zero-count gap per `claude-mirror-gap-inventory.2026-07-19T05-35.md`: all such personas were
+      already fully mirrored by an earlier wave.)
+- [x] Every new `.claude/skills/<name>/SKILL.md` skill introduced by `legacy-discovery-skills`
       is present byte-identically at the matching path under
-      `extensions/drm-copilot/resources/claude-customizations/.claude/skills/`.
-- [ ] Every new `.claude/hooks/*` file introduced by `legacy-discovery-hooks` is present
+      `extensions/drm-copilot/resources/claude-customizations/.claude/skills/`. (Verified
+      zero-count gap per the same inventory.)
+- [x] Every new `.claude/hooks/*` file introduced by `legacy-discovery-hooks` is present
       byte-identically at the matching path under
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, and any
-      corresponding `.claude/settings.json` hook-registration change is mirrored.
-- [ ] `test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes with all newly
+      corresponding `.claude/settings.json` hook-registration change is mirrored. (Verified
+      zero-count gap per the same inventory; `.claude/settings.json` not listed as a gap.)
+- [x] `test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes with all newly
       mirrored `.claude/**` assets present, with no modification to that test's enumeration
-      logic (data-driven, full-tree coverage per the research determination).
-- [ ] Each mirrored asset's Codex-native converted equivalent is present byte-identically under
+      logic (data-driven, full-tree coverage per the research determination). (Confirmed via
+      P0-T12, P2-T5, P7-T1; no edit made to `test_push_down_claude_resource_contracts.py`'s
+      enumeration logic.)
+- [x] Each mirrored asset's Codex-native converted equivalent is present byte-identically under
       `extensions/drm-copilot/resources/codex-and-agents-customizations/`, and
       `test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] This spec documents the Codex-native converter registration determination (purely
+      (Confirmed via P0-T13, P3-T5, P7-T1.)
+- [x] This spec documents the Codex-native converter registration determination (purely
       structural; no `mapping.py`/`classifier.py`/`inventory.py` edits), and no such edits are
       present in the change set for name-based registration of the new agent/skill/hook
       categories.
-- [ ] Every new agent-persona path and every new skill `SKILL.md` path is added as an
+- [x] Every new agent-persona path and every new skill `SKILL.md` path is added as an
       individual path-string entry to the `paths` array of both
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and
       `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`
-      (using the converted `.codex`/`.agents` destination path on the Codex side).
-- [ ] Every new hook path is added as an individual path-string entry to both `core.json`
-      manifests.
-- [ ] A real-filesystem manifest-completeness test exists on the Python side or the Codex side
+      (using the converted `.codex`/`.agents` destination path on the Codex side). (Zero new
+      paths to add; verified via P5-T1/T2/T4 no-op plus JSON-parse checks.)
+- [x] Every new hook path is added as an individual path-string entry to both `core.json`
+      manifests. (Zero new hook paths to add; verified via P5-T3/T4 no-op.)
+- [x] A real-filesystem manifest-completeness test exists on the Python side or the Codex side
       (a functional twin of `claude-pack-manifest-completeness.test.ts`), asserting every
       bundled `.claude/agents/*.md`, `.claude/hooks/*`, and `.claude/skills/*/SKILL.md` file
       appears in the union of every manifest's `paths` array, and that test passes.
-- [ ] The schema (`legacy-discovery-schemas`) and init-template (`legacy-discovery-init-templates`)
+      (`tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` and
+      `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`
+      both added and passing.)
+- [x] The schema (`legacy-discovery-schemas`) and init-template (`legacy-discovery-init-templates`)
       mirror obligation is resolved per the conditional rule in "Schema/Init-Template
       Placement": mirrored into `resources/` with a `core.json` entry if landed under a
       mirrored root, or explicitly documented as out of mirror-contract scope if landed under
       `scripts/`.
-- [ ] `pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and
+- [x] `pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and
       `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` pass.
+      (Confirmed via P2-T5, P3-T5, P7-T1, P8-T4.)
 - [ ] The TypeScript twin push-down tests under `extensions/drm-copilot/test/lib/push-down/`,
       including `claude-pack-manifest-completeness.test.ts` and its new Python/Codex-side
       counterpart, pass.
-- [ ] No TaskMaster/TMW/Outlook/VSTO/email/task-management-specific identifier is introduced by
+- [x] No TaskMaster/TMW/Outlook/VSTO/email/task-management-specific identifier is introduced by
       any file, manifest entry, or test added by this feature (domain-neutrality invariant).
+      (Confirmed via P7-T4: zero matches.)
 
 This section is traceable to the epic's capability-level acceptance criterion: "New
 customization assets are mirrored into `resources/` subtrees and pass the push-down contract

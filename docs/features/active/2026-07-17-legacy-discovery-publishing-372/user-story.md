@@ -74,23 +74,34 @@ Research basis: `docs/features/active/2026-07-17-legacy-discovery-publishing-372
 
 ## Acceptance Criteria
 
-- [ ] A consumer repository's existing, unmodified push-down invocation (including a
+- [x] A consumer repository's existing, unmodified push-down invocation (including a
       language-scoped `--packs` selection such as `csharp-modern` or `typescript`) receives
       every new discovery-framework agent persona, skill, and hook because those assets are
       placed in the `core` pack, which is unconditionally unioned into every `--packs`
-      selection.
-- [ ] No consumer repository is required to add a new pack name, flag, or manual file-copy step
-      to receive the discovery capability.
+      selection. (Verified: the four discovery personas from #365 (commit `5335075c`) already
+      present in `.claude/agents/` — `legacy-parity-analyst.md`,
+      `migration-coverage-reviewer.md`, `runtime-characterization-analyst.md`,
+      `requirements-reconciler.md` — are already registered in `core.json`; P7-T3 confirms the
+      always-union-`core` mechanism is intact.)
+- [x] No consumer repository is required to add a new pack name, flag, or manual file-copy step
+      to receive the discovery capability. (Same basis as above; zero new packs introduced.)
 - [ ] The push-down contract tests (`test_push_down_claude_resource_contracts.py`,
       `test_push_down_codex_and_agents_resource_contracts.py`, and their TypeScript twins) pass
       with the mirrored discovery assets present, so a maintainer pulling from a green
-      drm-copilot build never observes a missing or corrupted mirrored file.
-- [ ] A manifest-completeness check (existing on the Claude/TypeScript side; extended to the
+      drm-copilot build never observes a missing or corrupted mirrored file. (PARTIAL: the two
+      Python contract-test modules pass — P2-T5, P3-T5, P7-T1, P8-T4. The TypeScript twins could
+      not be verified locally in this worktree due to a pre-existing Jest test-discovery
+      environment defect; see P0-T18/P7-T2/P8-T8 evidence. Left unchecked pending re-verification
+      from an unaffected worktree path.)
+- [x] A manifest-completeness check (existing on the Claude/TypeScript side; extended to the
       Python/Codex side by this feature) prevents a bundled discovery asset from being present
-      in the mirror but silently absent from a scoped `--packs` pull.
-- [ ] The Codex-native converter requires no per-consumer or per-asset registration step: a
+      in the mirror but silently absent from a scoped `--packs` pull. (New
+      `test_push_down_claude_pack_manifest_completeness.py` and
+      `test_push_down_codex_and_agents_pack_manifest_completeness.py` added and passing, P6-T1–T10.)
+- [x] The Codex-native converter requires no per-consumer or per-asset registration step: a
       consumer relying on the Codex/`.agents` surface receives the same discovery capability
       through the existing path-prefix classification, with no additional configuration.
+      (Confirmed via P4-T1: zero diff to `mapping.py`/`classifier.py`/`inventory.py`.)
 
 ## Non-Goals
 
