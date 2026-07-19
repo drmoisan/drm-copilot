@@ -20,6 +20,13 @@ export const REPO_AUTOMATION_TOOLS = [
   "resolve_atomic_plan_prompt",
   "validate_orchestration_artifacts",
   "render_subagent_tree",
+  "validate_discovery_artifacts",
+  "run_discovery_init",
+  "run_discovery_repo_inventory",
+  "run_discovery_dotnet_analyzer",
+  "run_discovery_vsto_analyzer",
+  "run_discovery_scenario_generation",
+  "run_discovery_report",
 ] as const;
 
 export type RepoAutomationToolName = (typeof REPO_AUTOMATION_TOOLS)[number];

@@ -3,6 +3,30 @@ import { describe, expect, it } from "@jest/globals";
 import { toolDefinitions } from "../src/mcp-tool-definitions";
 import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
 import { REPO_AUTOMATION_TOOLS } from "../src/repo-automation-tool-names";
+import {
+  DISCOVERY_ARTIFACT_TYPES,
+  DISCOVERY_REPORT_TYPES,
+} from "../src/mcp-tool-inputs-discovery";
+
+const DISCOVERY_TOOL_NAMES = [
+  "validate_discovery_artifacts",
+  "run_discovery_init",
+  "run_discovery_repo_inventory",
+  "run_discovery_dotnet_analyzer",
+  "run_discovery_vsto_analyzer",
+  "run_discovery_scenario_generation",
+  "run_discovery_report",
+] as const;
+
+function findRepoDefinition(name: string) {
+  return REPO_AUTOMATION_TOOL_DEFINITIONS.find(
+    (definition) => definition.name === name,
+  );
+}
+
+function findBaseDefinition(name: string) {
+  return toolDefinitions.find((definition) => definition.name === name);
+}
 
 describe("repo automation MCP tool definitions", () => {
   it("exports resolve_policy_audit_template_asset as a repo automation tool", () => {
@@ -182,4 +206,101 @@ describe("repo automation MCP tool definitions", () => {
       "epic-orchestrator-state",
     );
   });
+});
+
+describe("discovery MCP tool definitions", () => {
+  it("keeps the definition list aligned with the widened union order", () => {
+    const definitionNames = REPO_AUTOMATION_TOOL_DEFINITIONS.map(
+      (definition) => definition.name,
+    );
+
+    expect(definitionNames).toEqual([...REPO_AUTOMATION_TOOLS]);
+    expect(definitionNames.slice(-7)).toEqual([...DISCOVERY_TOOL_NAMES]);
+  });
+
+  it.each(DISCOVERY_TOOL_NAMES)(
+    "defines %s in both definition files with additionalProperties:false and workspace_root",
+    (toolName) => {
+      for (const definition of [
+        findRepoDefinition(toolName),
+        findBaseDefinition(toolName),
+      ]) {
+        expect(definition).toBeDefined();
+        expect(definition?.inputSchema.additionalProperties).toBe(false);
+        expect(definition?.inputSchema.properties).toHaveProperty(
+          "workspace_root",
+        );
+      }
+    },
+  );
+
+  it("requires artifact_type and artifact_path for validate_discovery_artifacts and matches the resolver enum", () => {
+    const definition = findRepoDefinition("validate_discovery_artifacts");
+    expect(definition?.inputSchema.required).toEqual([
+      "artifact_type",
+      "artifact_path",
+    ]);
+    const properties = definition?.inputSchema.properties as Record<
+      string,
+      { enum?: string[] }
+    >;
+    expect(properties["artifact_type"]?.enum).toEqual([
+      ...DISCOVERY_ARTIFACT_TYPES,
+    ]);
+  });
+
+  it("requires only target_dir for run_discovery_init", () => {
+    expect(
+      findRepoDefinition("run_discovery_init")?.inputSchema.required,
+    ).toEqual(["target_dir"]);
+  });
+
+  it.each([
+    "run_discovery_repo_inventory",
+    "run_discovery_dotnet_analyzer",
+    "run_discovery_vsto_analyzer",
+  ])("declares no required tool-specific field for %s", (toolName) => {
+    expect(findRepoDefinition(toolName)?.inputSchema.required).toBeUndefined();
+  });
+
+  it("requires the three scenario-generation inputs", () => {
+    expect(
+      findRepoDefinition("run_discovery_scenario_generation")?.inputSchema
+        .required,
+    ).toEqual([
+      "feature_contract",
+      "parity_matrix",
+      "runtime_characterization",
+    ]);
+  });
+
+  it("requires only report_type for run_discovery_report and matches the resolver report enum", () => {
+    const definition = findRepoDefinition("run_discovery_report");
+    expect(definition?.inputSchema.required).toEqual(["report_type"]);
+    const properties = definition?.inputSchema.properties as Record<
+      string,
+      { enum?: string[] }
+    >;
+    expect(properties["report_type"]?.enum).toEqual([
+      ...DISCOVERY_REPORT_TYPES,
+    ]);
+    expect(properties["report_type"]?.enum).toEqual([
+      "coverage",
+      "parity",
+      "completion",
+    ]);
+    // The per-report_type conditional inputs are declared as properties.
+    expect(definition?.inputSchema.properties).toHaveProperty("input_path");
+    expect(definition?.inputSchema.properties).toHaveProperty("coverage_input");
+    expect(definition?.inputSchema.properties).toHaveProperty("parity_input");
+  });
+
+  it.each(DISCOVERY_TOOL_NAMES)(
+    "keeps the base and repo-automation definitions aligned for %s",
+    (toolName) => {
+      expect(findBaseDefinition(toolName)).toEqual(
+        findRepoDefinition(toolName),
+      );
+    },
+  );
 });

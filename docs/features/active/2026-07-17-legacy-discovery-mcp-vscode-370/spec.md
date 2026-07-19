@@ -3,9 +3,9 @@
 - **Issue:** #370
 - **Parent (optional):** epic `legacy-discovery-and-parity` (child #9011 placeholder)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-07-17
+- **Last Updated:** 2026-07-19 (reconciled against the landed discovery CLI)
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 
 ## Overview
 
@@ -26,19 +26,25 @@ discovery commands and contains no TaskMaster/TMW/Outlook/VSTO/email/task-manage
 specific behavior. All domain specificity (which repository, which paths) is supplied at
 runtime through the domain-profile argument.
 
-**Substrate correction (authoritative, from feature research
-`research/2026-07-17T16-30-legacy-discovery-mcp-vscode-370-research.md`):** the prior
+**Substrate correction (authoritative, reconciled against the landed CLI):** the prior
 assumption that new tools "shell out to the bundled Python script" is stale and
 unsatisfiable. The MCP server no longer bundles or shells out to Python: feature #240
 ported the former Python tools in-process, `RuntimeKind` is PowerShell-only
 (`extensions/drm-copilot/src/runtime-detection.ts`), and `.vscodeignore` excludes
 `**/*.py` from the VSIX (no `.py` exists under extension resources). The corrected
-design, verified by research, is to extend the runtime with a `python` kind and spawn
-the **workspace** discovery CLI as a Python subprocess (`python -m
-scripts.discovery.<module>`) with `cwd = workspace_root`, reusing the existing
-`runCommandWithOutput` / `CommandExecutionError` semantics. This feature introduces no
-VSIX bundling; `resources/` asset mirroring remains the publishing feature's (#9012)
-responsibility.
+design is to extend the runtime with a `python` kind and spawn the **workspace**
+discovery CLI as a Python subprocess with `cwd = workspace_root`, reusing the existing
+`runCommandWithOutput` / `CommandExecutionError` semantics. The landed `dev.discovery.*`
+commands are Poetry console scripts in `pyproject.toml` `[tool.poetry.scripts]`, each
+mapping a console name to `module:function` under the `scripts.dev_tools` /
+`scripts.dev_tools.discovery` package roots. Because `dev.discovery.dotnet`,
+`dev.discovery.vsto`, and `dev.discovery.init` have no `if __name__ == "__main__"`
+guard and no dedicated `__main__.py`, uniform `python -m` invocation is not viable;
+the wrapper instead spawns the interpreter with `-c` importing the exact entry —
+argv `[pythonExe, "-c", "import sys; from <module> import <function>;
+sys.exit(<function>())", ...cliArgs]` — which reaches every wrapped entry uniformly
+without a Poetry-on-PATH dependency. This feature introduces no VSIX bundling;
+`resources/` asset mirroring remains the publishing feature's (#9012) responsibility.
 
 ## Behavior
 
@@ -80,9 +86,12 @@ Wrapper contract semantics:
   `resolveWorkflowInvocation` idiom.
 - **Outputs:** `RepoAutomationExecutionResult` mapped to the MCP structured result
   (`ok`, `tool`, `workspace_root`, `summary`, optional `artifacts`). Artifact paths
-  (ledger/matrix/report files) are parsed from CLI stdout via a
-  `stdoutArtifactPattern`-style regex once the upstream stdout contract is fixed
-  (design-against-planned assumption; confirm at implementation time).
+  are parsed from CLI stdout only where the landed CLI emits them: the three analyzers
+  (inventory/dotnet/vsto) emit JSON containing `written_paths` when `--json` is passed
+  (the wrapper always passes `--json`); scenario generation prints `ok: wrote <path>`
+  when `--output` is given. The validate entries and the three report scripts print no
+  artifact path to stdout, so those tools return no parsed `artifacts` (documented
+  limitation).
 - **Logs:** all subprocess stdout/stderr streams through the injected `CommandOutput`
   sink; the MCP path uses a per-call buffered output (no terminal is created on the MCP
   path — existing invariant, must be preserved).
@@ -96,30 +105,36 @@ Wrapper contract semantics:
 
 ## API / CLI Surface
 
-### Exposed tool set (design baseline)
+### Exposed tool set (reconciled against the landed CLI)
 
-Seven MCP tools and seven VS Code commands. Tool names, wrapped CLI modules, and flags
-are designed against the **planned** upstream contracts (upstream specs
-#361/#362/#363/#364 and placeholder children #9010/#9014 are not yet on the integration
-branch); the tool-name-to-CLI mapping is centralized in one table module so an upstream
-rename is a one-line change.
+Seven MCP tools and seven VS Code commands. Tool names, wrapped modules, entry
+functions, and flags are reconciled against the **landed** upstream contracts (all
+upstream discovery waves 0/1/2 are merged on the integration branch; console-script
+entries verified in `pyproject.toml` `[tool.poetry.scripts]`). The
+tool-name-to-`module:function` mapping is centralized in one table module so any
+future upstream rename is a one-line change. Every wrapped invocation is spawned as
+`[pythonExe, "-c", "import sys; from <module> import <function>;
+sys.exit(<function>())", ...cliArgs]` with `cwd = workspace_root`.
 
-| MCP tool | VS Code command | Wrapped workspace CLI invocation (assumed shape) | Tool-specific input fields |
+| MCP tool | VS Code command | Wrapped workspace entry (landed `module:function` + CLI args) | Tool-specific input fields |
 |---|---|---|---|
-| `validate_discovery_artifacts` | `drmCopilotExtension.validateDiscoveryArtifacts` | `python -m scripts.discovery.validate <artifact_type> --path <artifact_path>` | `artifact_type` (required, enum: domain profile + the seven schema artifact kinds), `artifact_path` (required string) |
-| `run_discovery_init` | `drmCopilotExtension.runDiscoveryInit` | `python -m scripts.discovery.init [--profile <path>] [--force]` | `profile_path` (optional string), `force` (optional boolean) |
-| `run_discovery_repo_inventory` | `drmCopilotExtension.runDiscoveryRepoInventory` | `python -m scripts.discovery.analyze_repo --profile <path> [--output-root <path>]` | `profile_path` (required string), `output_root` (optional string) |
-| `run_discovery_dotnet_analyzer` | `drmCopilotExtension.runDiscoveryDotnetAnalyzer` | `python -m scripts.discovery.analyze_dotnet --profile <path> [--output-root <path>]` | `profile_path` (required string), `output_root` (optional string) |
-| `run_discovery_vsto_analyzer` | `drmCopilotExtension.runDiscoveryVstoAnalyzer` | `python -m scripts.discovery.analyze_vsto --profile <path> [--output-root <path>]` | `profile_path` (required string), `output_root` (optional string) |
-| `run_discovery_scenario_generation` | `drmCopilotExtension.runDiscoveryScenarioGeneration` | `python -m scripts.discovery.generate_scenarios --profile <path> [selectors]` | `profile_path` (required string), optional contract/scenario selector fields (fixed at planning against #9009's contract) |
-| `run_discovery_report` | `drmCopilotExtension.runDiscoveryReport` | `python -m scripts.discovery.report <report_type> --profile <path> [--output <path>]` | `report_type` (required, enum `["coverage", "parity", "completion"]`), `profile_path` (required string), `output_path` (optional string) |
+| `validate_discovery_artifacts` | `drmCopilotExtension.validateDiscoveryArtifacts` | `scripts.dev_tools.validate_discovery_artifacts` — per-kind entry (`main_profile`, `main_feature_contract`, `main_coverage_ledger`, `main_runtime_scenario`, `main_parity_matrix`, `main_unspecified_behavior`, `main_product_decision`, `main_evidence_reference`, `main` for `all`); each takes exactly one positional `path` | `artifact_type` (required, enum `["profile", "feature-contract", "coverage-ledger", "runtime-scenario", "parity-matrix", "unspecified-behavior", "product-decision", "evidence-reference", "all"]`), `artifact_path` (required string) |
+| `run_discovery_init` | `drmCopilotExtension.runDiscoveryInit` | `scripts.dev_tools.discovery.init_cli:main` — positional `target_dir` (required), `--template-root <path>`, `--force` | `target_dir` (required string), `template_root` (optional string), `force` (optional boolean) |
+| `run_discovery_repo_inventory` | `drmCopilotExtension.runDiscoveryRepoInventory` | `scripts.dev_tools.discovery.analyzer.cli:main` — positional `profile` (optional), `--output-dir <path>`, `--json` (wrapper always passes `--json`) | `profile_path` (optional string), `output_dir` (optional string) |
+| `run_discovery_dotnet_analyzer` | `drmCopilotExtension.runDiscoveryDotnetAnalyzer` | `scripts.dev_tools.discovery.analyzer.stack_cli:main_dotnet` — same args as inventory | `profile_path` (optional string), `output_dir` (optional string) |
+| `run_discovery_vsto_analyzer` | `drmCopilotExtension.runDiscoveryVstoAnalyzer` | `scripts.dev_tools.discovery.analyzer.stack_cli:main_vsto` — same args as inventory | `profile_path` (optional string), `output_dir` (optional string) |
+| `run_discovery_scenario_generation` | `drmCopilotExtension.runDiscoveryScenarioGeneration` | `scripts.dev_tools.generate_acceptance_scenarios:main` — `--feature-contract <path>`, `--parity-matrix <path>`, `--runtime-characterization <path>` (all required), `--output <path>` (optional; stdout prints `ok: wrote <path>`), `--check` (optional) | `feature_contract` (required string), `parity_matrix` (required string), `runtime_characterization` (required string), `output_path` (optional string), `check` (optional boolean) |
+| `run_discovery_report` | `drmCopilotExtension.runDiscoveryReport` | `report_type`-dispatched: `coverage` → `scripts.dev_tools.discovery.coverage_report:main` (`--input <path>` required, `--output <path>` optional); `parity` → `scripts.dev_tools.discovery.parity_report:main` (same args); `completion` → `scripts.dev_tools.discovery.completion_report:main` (`--coverage-input <path>` and `--parity-input <path>` both required, `--output <path>` optional) | `report_type` (required, enum `["coverage", "parity", "completion"]`); for `coverage`/`parity`: `input_path` (required string); for `completion`: `coverage_input` (required string) and `parity_input` (required string); `output_path` (optional string) |
 
 Every tool additionally accepts optional `workspace_root`. All schemas are
 JSON-Schema-shaped objects with `additionalProperties: false`. `run_discovery_report`
-folds the three report kinds into one enum-dispatched tool (mirroring the
+folds the three landed report scripts into one enum-dispatched tool (mirroring the
 `validate_orchestration_artifacts` enum pattern) rather than triplicating touch-points;
-if upstream ships three separate report commands and per-command fidelity is preferred,
-the planner may split it (9 tools instead of 7).
+the per-`report_type` required-input differences are validated by the input resolver
+before any spawn (flat JSON Schema `required` lists only `report_type`; the conditional
+inputs are documented in the tool description and enforced by the resolver). None of
+the report scripts print the output artifact path to stdout, so the report tool returns
+no parsed `artifacts`.
 
 Domain-neutrality of names: "dotnet"/"vsto" name the analyzed technology stack declared
 by the epic's own domain-neutral feature naming, not a consumer domain. No
@@ -170,21 +185,27 @@ existing `findExecutableOnPath` helper).
 ## Data & State
 
 - **Invocation model (Python subprocess, no bundling):** each service method builds
-  argv `[pythonExe, "-m", "scripts.discovery.<module>", ...flags]` and spawns via the
-  existing `runCommandWithOutput` with `cwd = workspace_root`. The discovery code lives
-  in the target workspace (the `dev.discovery.*` commands are Poetry console scripts
-  mapping to `scripts.discovery.<module>:main`), not in the extension, so
-  extension-root script resolution and VSIX bundling are unnecessary; `python -m`
-  avoids requiring the Poetry venv's script shims on PATH.
+  argv `[pythonExe, "-c", "import sys; from <module> import <function>;
+  sys.exit(<function>())", ...cliArgs]` and spawns via the existing
+  `runCommandWithOutput` with `cwd = workspace_root`. The discovery code lives in the
+  target workspace (the `dev.discovery.*` commands are Poetry console scripts mapping
+  console names to `module:function` under `scripts.dev_tools` /
+  `scripts.dev_tools.discovery`), not in the extension, so extension-root script
+  resolution and VSIX bundling are unnecessary. Uniform `python -m` is not viable —
+  the dotnet/vsto/init entries have no `__main__` guard and no dedicated
+  `__main__.py` — and `poetry run` would require Poetry's shims on PATH; the `-c`
+  mechanism reaches every landed entry uniformly.
 - **Service-call helper:** a discovery-specific sibling of
   `repo-automation-execute-script.ts` forwards `{ runtimeKind: "python", args,
-  workspaceRoot, invocationId }`, optionally parses one artifact path from stdout, and
-  returns `RepoAutomationExecutionResult`. Failure is signaled by throwing
+  workspaceRoot, invocationId }`, parses artifact paths from stdout where the landed
+  CLI emits them (`written_paths` JSON under `--json` for the analyzers; `ok: wrote
+  <path>` for scenario generation; none for validate/reports), and returns
+  `RepoAutomationExecutionResult`. Failure is signaled by throwing
   `CommandExecutionError` (which carries `executable, args, cwd, exitCode, stdout,
   stderr`) so the dispatch layer can attach `stderr_excerpt`.
-- **Central mapping table:** one module maps tool name -> Python module path + flag
-  composition, so upstream CLI renames are single-line changes and no discovery logic
-  leaks into TypeScript.
+- **Central mapping table:** one module maps tool name -> dotted module path + entry
+  function + CLI-arg composition, so upstream CLI renames are single-line changes and
+  no discovery logic leaks into TypeScript.
 - **State changes:** none in the extension. All artifacts produced (ledgers, matrices,
   reports, scaffolds) are written by the wrapped CLI into the target workspace per the
   domain profile. No caching, persistence, migration, or backfill is introduced.
@@ -203,14 +224,16 @@ existing `findExecutableOnPath` helper).
 - **Lockstep requirement:** the five MCP touch-points (plus base-definitions parity and
   per-file coverage thresholds) must change together or the contract tests fail; the
   exhaustive dispatch switch turns a missing case into a compile error.
-- **Upstream-dependency assumption (design-against-planned):** none of the wrapped
-  `dev.discovery.*` commands exist on the integration branch today. Upstream specs
-  (#361/#362/#363/#364, and placeholder children #9009/#9010/#9014) define the planned
-  contracts this layer wraps. Command names, module paths, flags, and the stdout
-  artifact pattern are assumptions to confirm; the central mapping table localizes the
-  churn. Live end-to-end execution of a wrapped tool requires the upstream features to
-  be merged (epic Wave 3 ordering); implementation and automated testing are unaffected
-  because the spawn boundary is faked in tests.
+- **Upstream substrate status (reconciled):** all upstream discovery waves (0/1/2)
+  are merged on the integration branch. The wrapped command names, module paths,
+  entry functions, flags, and stdout contracts in this spec are the landed ground
+  truth verified in `pyproject.toml` `[tool.poetry.scripts]` and the entry modules;
+  the central mapping table still localizes any future rename. Automated testing
+  continues to fake the spawn boundary (no real subprocess in tests). Schemas live in
+  `schemas/discovery/v1/` and artifacts self-declare their `$schema` URI, so the
+  wrapper hardcodes no schema path. #369's `TextParseResult` is an internal analyzer
+  decision and #367/#369 pack-manifest registration is Claude-pack-only; neither
+  affects this exposure layer.
 - **Runtime interpreter dependency:** at runtime the target workspace must have the
   drm-copilot Python package (with the merged discovery modules) importable by the
   resolved interpreter. A missing interpreter or missing package surfaces as a probe
@@ -220,7 +243,7 @@ existing `findExecutableOnPath` helper).
   `resources/` assets and reverts no `.vscodeignore` exclusion.
 - **Domain neutrality:** no TaskMaster/TMW/Outlook/email/task-management-specific
   identifier or behavior may appear in the exposure layer; domain specificity arrives
-  only via the `--profile` runtime argument.
+  only via runtime arguments (e.g. the domain-profile path).
 - **File-size cap:** `extension.ts` is near the 500-line limit; command registration
   must live in a new module.
 
@@ -252,8 +275,8 @@ existing `findExecutableOnPath` helper).
   runtime-probe start/failure logging mirrors the existing PowerShell pattern. No new
   telemetry.
 - **Rollout / fallback:** additive tool surface; no feature flag. If an upstream CLI
-  contract shifts before merge, only the mapping table and the affected input resolver
-  change.
+  contract shifts in a future change, only the mapping table and the affected input
+  resolver change.
 - **Testing (Jest 30 + ts-jest, mirrored under `test/`):**
   - Definitions contract: extend the union-order/definition-parity test and add
     per-tool schema assertions in both definition files (including
@@ -261,9 +284,11 @@ existing `findExecutableOnPath` helper).
   - Input resolvers: valid / missing / wrong-type / normalization cases per resolver.
   - Dispatch + handlers: `dispatchRepoAutomationTool` with a mocked service per tool
     (success; thrown-error mapping to `ok: false` + `stderr_excerpt`).
-  - Service calls: fake the spawn boundary; assert argv composition
-    (`python -m scripts.discovery.<module>` + flags), `cwd = workspaceRoot`, artifact
-    parsing, summary strings. No real subprocess, no temporary files.
+  - Service calls: fake the spawn boundary; assert the `-c` argv composition
+    (`module:function` per the landed mapping, including `main_dotnet`/`main_vsto`,
+    the two-input completion report, and the per-kind validate positional path),
+    `cwd = workspaceRoot`, artifact parsing (analyzer `written_paths` JSON, scenario
+    `ok: wrote <path>`), summary strings. No real subprocess, no temporary files.
   - Runtime detection: Python probe found/not-found and PATHEXT behavior.
   - End-to-end MCP: extend `mcp-server.test.ts` mock service, `listTools` expectation,
     and one dispatch round-trip per tool; preserve the no-terminal invariant.
@@ -275,30 +300,30 @@ existing `findExecutableOnPath` helper).
 
 ## Acceptance Criteria
 
-- [ ] Seven discovery MCP tools are exposed — `validate_discovery_artifacts`, `run_discovery_init`, `run_discovery_repo_inventory`, `run_discovery_dotnet_analyzer`, `run_discovery_vsto_analyzer`, `run_discovery_scenario_generation`, `run_discovery_report` — and each satisfies all five touch-points: a `REPO_AUTOMATION_TOOLS` union entry in `repo-automation-tool-names.ts`; a tool definition with JSON-Schema-shaped `inputSchema` and `additionalProperties: false` in `mcp-repo-automation-tool-definitions.ts` plus an aligned base entry in `mcp-tool-definitions.ts`; a dispatch-switch case in `mcp-tools.ts`; a handler in `mcp-handlers/` paired with a `resolve<X>ToolInput` input resolver; and a service method on both the `RepoAutomationService` interface and `DefaultRepoAutomationService`.
-- [ ] Each service call invokes the workspace discovery CLI via a Python subprocess (`python -m scripts.discovery.<module>` argv shape) with `cwd = workspace_root`, reusing the existing `runCommandWithOutput` / `CommandExecutionError` semantics; no Python is bundled into the VSIX and no `.vscodeignore` or packaging change is made.
-- [ ] `RuntimeKind` in `runtime-detection.ts` is extended with a `"python"` kind and `detectRuntime` gains a Python interpreter probe, covered by tests for found and not-found cases.
-- [ ] The tool-name-to-CLI mapping (module path and flag composition per tool) is centralized in a single table module; no `dev.discovery.*` command logic is re-authored in TypeScript.
-- [ ] `run_discovery_report` exposes a required `report_type` enum exactly `["coverage", "parity", "completion"]`, and `validate_discovery_artifacts` exposes a required `artifact_type` enum covering the domain profile and the seven discovery schema artifact kinds; both enums are duplicated in the input resolvers and rejected values fail before any spawn.
-- [ ] Each of the seven tools is registered as a VS Code command: a `contributes.commands` entry in `extensions/drm-copilot/package.json` and a registration function in a dedicated discovery registration module called from `extension.ts` `activate`, with disposables pushed to `context.subscriptions`, supporting both direct-argument and interactive invocation.
-- [ ] The exposure layer is domain-neutral: no TaskMaster/TMW/Outlook/email/task-management-specific identifier appears in any tool name, command id, schema field, description, or implementation; domain specificity is supplied only via runtime arguments (e.g. `--profile`).
-- [ ] The design-against-planned status is preserved in the implementation: assumed upstream command names/flags are confined to the mapping table, and live end-to-end execution is documented as dependent on the upstream `dev.discovery.*` merges per epic wave ordering.
-- [ ] TypeScript Jest tests are mirrored under `extensions/drm-copilot/test/`, covering: definitions contract (union order, cross-file alignment, `additionalProperties: false`, enums), input resolvers, dispatch/handler routing per tool, service-call argv/cwd/error mapping with a faked spawn boundary, runtime detection, `mcp-server.test.ts` list/dispatch round-trips, and VS Code command harness tests.
-- [ ] Every new production file has a per-file `coverageThreshold` entry of `{ lines: 85, branches: 75 }` in `jest.config.cjs`, and `npm run test:coverage` passes with line coverage >= 85% and branch coverage >= 75% on all new files.
-- [ ] The full extension toolchain passes in `extensions/drm-copilot/`: `npm run format`, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:coverage` (Jest 30 + ts-jest, v8 coverage).
+- [x] Seven discovery MCP tools are exposed — `validate_discovery_artifacts`, `run_discovery_init`, `run_discovery_repo_inventory`, `run_discovery_dotnet_analyzer`, `run_discovery_vsto_analyzer`, `run_discovery_scenario_generation`, `run_discovery_report` — and each satisfies all five touch-points: a `REPO_AUTOMATION_TOOLS` union entry in `repo-automation-tool-names.ts`; a tool definition with JSON-Schema-shaped `inputSchema` and `additionalProperties: false` in `mcp-repo-automation-tool-definitions.ts` plus an aligned base entry in `mcp-tool-definitions.ts`; a dispatch-switch case in `mcp-tools.ts`; a handler in `mcp-handlers/` paired with a `resolve<X>ToolInput` input resolver; and a service method on both the `RepoAutomationService` interface and `DefaultRepoAutomationService`.
+- [x] Each service call invokes the workspace discovery CLI via a Python subprocess with the interpreter `-c` `module:function` argv shape — `[pythonExe, "-c", "import sys; from <module> import <function>; sys.exit(<function>())", ...cliArgs]` targeting the landed console-script entries — with `cwd = workspace_root`, reusing the existing `runCommandWithOutput` / `CommandExecutionError` semantics; no Python is bundled into the VSIX and no `.vscodeignore` or packaging change is made.
+- [x] `RuntimeKind` in `runtime-detection.ts` is extended with a `"python"` kind and `detectRuntime` gains a Python interpreter probe, covered by tests for found and not-found cases.
+- [x] The tool-name-to-CLI mapping (dotted module path, entry-function name, and CLI-arg composition per wrapped invocation, including the per-kind validate entries and the per-`report_type` report entries) is centralized in a single table module; no `dev.discovery.*` command logic is re-authored in TypeScript.
+- [x] `run_discovery_report` exposes a required `report_type` enum exactly `["coverage", "parity", "completion"]` with report_type-aware required inputs validated by the resolver before any spawn (`input_path` for `coverage`/`parity`; `coverage_input` and `parity_input` for `completion`), and `validate_discovery_artifacts` exposes a required `artifact_type` enum exactly `["profile", "feature-contract", "coverage-ledger", "runtime-scenario", "parity-matrix", "unspecified-behavior", "product-decision", "evidence-reference", "all"]`; both enums are duplicated in the input resolvers and rejected values fail before any spawn.
+- [x] Each of the seven tools is registered as a VS Code command: a `contributes.commands` entry in `extensions/drm-copilot/package.json` and a registration function in a dedicated discovery registration module called from `extension.ts` `activate`, with disposables pushed to `context.subscriptions`, supporting both direct-argument and interactive invocation.
+- [x] The exposure layer is domain-neutral: no TaskMaster/TMW/Outlook/email/task-management-specific identifier appears in any tool name, command id, schema field, description, or implementation; domain specificity is supplied only via runtime arguments (e.g. the domain-profile path).
+- [x] The landed-contract reconciliation is preserved in the implementation: the landed module/function names and flags are confined to the mapping table and enum constants module, and the helper's header doc comment records that the mapping targets the merged `dev.discovery.*` console-script entries and justifies the `-c` invocation mechanism (dotnet/vsto/init entries are not `python -m`-runnable; no Poetry-on-PATH dependency).
+- [x] TypeScript Jest tests are mirrored under `extensions/drm-copilot/test/`, covering: definitions contract (union order, cross-file alignment, `additionalProperties: false`, enums), input resolvers, dispatch/handler routing per tool, service-call argv/cwd/error mapping with a faked spawn boundary, runtime detection, `mcp-server.test.ts` list/dispatch round-trips, and VS Code command harness tests.
+- [x] Every new production file has a per-file `coverageThreshold` entry of `{ lines: 85, branches: 75 }` in `jest.config.cjs`, and `npm run test:coverage` passes with line coverage >= 85% and branch coverage >= 75% on all new files.
+- [x] The full extension toolchain passes in `extensions/drm-copilot/`: `npm run format`, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:coverage` (Jest 30 + ts-jest, v8 coverage).
 
 ## Definition of Done
 
-- [ ] All acceptance criteria above are implemented, verified, and checked off with evidence.
-- [ ] Behavior matches the wrapper contract semantics (success, failure, invalid-input, ordering invariant, edge cases) documented in `## Behavior`.
-- [ ] Edge cases and error handling are covered by tests (missing interpreter, missing discovery package, omitted `workspace_root`, out-of-range enums).
-- [ ] Docs updated: this spec and `user-story.md` remain consistent with the delivered surface; feature folder cross-references use issue #370.
-- [ ] Logging via the existing `CommandOutput` sink verified on both the MCP (buffered, no terminal) and VS Code (output channel) paths.
-- [ ] Toolchain pass completed in `extensions/drm-copilot/`: `npm run format` -> `npm run lint` -> `npm run typecheck` -> `npm run test` -> `npm run test:coverage`, all clean in a single pass.
-- [ ] QC and coverage evidence stored under `docs/features/active/2026-07-17-legacy-discovery-mcp-vscode-370/evidence/<kind>/`.
+- [x] All acceptance criteria above are implemented, verified, and checked off with evidence.
+- [x] Behavior matches the wrapper contract semantics (success, failure, invalid-input, ordering invariant, edge cases) documented in `## Behavior`.
+- [x] Edge cases and error handling are covered by tests (missing interpreter, missing discovery package, omitted `workspace_root`, out-of-range enums).
+- [x] Docs updated: this spec and `user-story.md` remain consistent with the delivered surface; feature folder cross-references use issue #370.
+- [x] Logging via the existing `CommandOutput` sink verified on both the MCP (buffered, no terminal) and VS Code (output channel) paths.
+- [x] Toolchain pass completed in `extensions/drm-copilot/`: `npm run format` -> `npm run lint` -> `npm run typecheck` -> `npm run test` -> `npm run test:coverage`, all clean in a single pass.
+- [x] QC and coverage evidence stored under `docs/features/active/2026-07-17-legacy-discovery-mcp-vscode-370/evidence/<kind>/`.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: each handler, each service call, dispatch-switch routing per tool.
-- [ ] Integration scenarios: MCP contract tests validating tool-definition schema shape.
-- [ ] CLI/API examples: each exposed tool maps to its `dev.discovery.*` command invocation.
+- [x] Unit coverage: each handler, each service call, dispatch-switch routing per tool.
+- [x] Integration scenarios: MCP contract tests validating tool-definition schema shape.
+- [x] CLI/API examples: each exposed tool maps to its `dev.discovery.*` command invocation.

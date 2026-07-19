@@ -46,6 +46,14 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     resolveExecuteHardLockPrompt: jest.fn(),
     resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
+    renderSubagentTree: jest.fn(),
+    validateDiscoveryArtifacts: jest.fn(),
+    runDiscoveryInit: jest.fn(),
+    runDiscoveryRepoInventory: jest.fn(),
+    runDiscoveryDotnetAnalyzer: jest.fn(),
+    runDiscoveryVstoAnalyzer: jest.fn(),
+    runDiscoveryScenarioGeneration: jest.fn(),
+    runDiscoveryReport: jest.fn(),
   };
 }
 
@@ -105,6 +113,13 @@ describe("repo automation MCP server", () => {
       "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
       "render_subagent_tree",
+      "validate_discovery_artifacts",
+      "run_discovery_init",
+      "run_discovery_repo_inventory",
+      "run_discovery_dotnet_analyzer",
+      "run_discovery_vsto_analyzer",
+      "run_discovery_scenario_generation",
+      "run_discovery_report",
     ]);
   });
 

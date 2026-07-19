@@ -128,5 +128,36 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/repo-automation-execute-discovery.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-tool-inputs-discovery.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-handlers/discovery-handlers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-discovery-tool-definitions.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/discovery-command-registration.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-tools.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // No entry for "./src/repo-automation-service-contract.ts": the file
+    // consists solely of `interface` and re-exported `type` declarations with
+    // no executable behavior. Per `.claude/rules/general-unit-test.md`
+    // ("Interface/type-only files with no executable behavior... may be omitted
+    // from coverage measurement"), it legitimately reports 0% executable
+    // coverage under the v8 provider and is omitted only from the per-file
+    // threshold gate; it remains included in `collectCoverageFrom`.
   },
 };

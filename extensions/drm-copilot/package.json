@@ -168,6 +168,34 @@
       {
         "command": "drmCopilotExtension.showSubagentTree",
         "title": "drm-copilot: Show Subagent Tree"
+      },
+      {
+        "command": "drmCopilotExtension.validateDiscoveryArtifacts",
+        "title": "drm-copilot: Validate Discovery Artifacts"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryInit",
+        "title": "drm-copilot: Run Discovery Init"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryRepoInventory",
+        "title": "drm-copilot: Run Discovery Repo Inventory"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryDotnetAnalyzer",
+        "title": "drm-copilot: Run Discovery .NET Analyzer"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryVstoAnalyzer",
+        "title": "drm-copilot: Run Discovery VSTO Analyzer"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryScenarioGeneration",
+        "title": "drm-copilot: Run Discovery Scenario Generation"
+      },
+      {
+        "command": "drmCopilotExtension.runDiscoveryReport",
+        "title": "drm-copilot: Run Discovery Report"
       }
     ]
   },

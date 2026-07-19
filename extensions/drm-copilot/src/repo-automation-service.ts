@@ -42,137 +42,35 @@ import {
   type RenderSubagentTreeServiceInput,
   renderSubagentTreeServiceCall,
 } from "./repo-automation-service-subagent-tree";
+import type {
+  PushDownClaudeCustomizationsInput,
+  PushDownCodexAndAgentsCustomizationsInput,
+  RepoAutomationExecutionResult,
+  RepoAutomationService,
+  WorkspaceExecutionInput,
+} from "./repo-automation-service-contract";
+import {
+  runDiscoveryDotnetAnalyzer,
+  runDiscoveryInit,
+  runDiscoveryRepoInventory,
+  runDiscoveryReport,
+  runDiscoveryScenarioGeneration,
+  runDiscoveryVstoAnalyzer,
+  runValidateDiscoveryArtifacts,
+  type RunDiscoveryAnalyzerInput,
+  type RunDiscoveryInitInput,
+  type RunDiscoveryReportInput,
+  type RunDiscoveryScenarioGenerationInput,
+  type ValidateDiscoveryArtifactsInput,
+} from "./repo-automation-execute-discovery";
 
-export interface RepoAutomationExecutionResult {
-  readonly tool: RepoAutomationToolName;
-  readonly workspaceRoot: string;
-  readonly summary: string;
-  readonly artifacts?: ReadonlyArray<string>;
-  readonly assetId?: string;
-  readonly bundledSourcePath?: string;
-  readonly destinationPath?: string;
-  readonly renderedTree?: string;
-}
-
-export interface RepoAutomationService {
-  collectCommitContext(
-    input: WorkspaceExecutionInput,
-  ): Promise<RepoAutomationExecutionResult>;
-  collectPrContext(
-    input: WorkspaceExecutionInput & { readonly base: string },
-  ): Promise<RepoAutomationExecutionResult>;
-  runCodexNativeConverter(
-    input: RunCodexNativeConverterInput,
-  ): Promise<RepoAutomationExecutionResult>;
-  pushDownCopilotCustomizations(
-    input: WorkspaceExecutionInput,
-  ): Promise<RepoAutomationExecutionResult>;
-  pushDownCodexAndAgentsCustomizations(
-    input: PushDownCodexAndAgentsCustomizationsInput,
-  ): Promise<RepoAutomationExecutionResult>;
-  pushDownClaudeCustomizations(
-    input: PushDownClaudeCustomizationsInput,
-  ): Promise<RepoAutomationExecutionResult>;
-  newPotentialBugEntry(
-    input: WorkspaceExecutionInput & { readonly shortName: string },
-  ): Promise<RepoAutomationExecutionResult>;
-  newPotentialEntry(
-    input: WorkspaceExecutionInput & { readonly shortName: string },
-  ): Promise<RepoAutomationExecutionResult>;
-  linkParentChild(
-    input: WorkspaceExecutionInput & {
-      readonly parentIssueNumber: string;
-      readonly childIssueNumber: string;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  potentialToIssue(
-    input: WorkspaceExecutionInput & {
-      readonly potentialPath: string;
-      readonly promotionType: PotentialPromotionType;
-      readonly workMode: WorkModeOption;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  newActiveFeatureFolder(
-    input: WorkspaceExecutionInput & {
-      readonly featureName: string;
-      readonly type: PotentialPromotionType;
-      readonly issueNumber?: string;
-      readonly workMode: WorkModeOption;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  runPoshQCFormat(
-    input: WorkspaceExecutionInput & {
-      readonly scanFolders?: ReadonlyArray<string>;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  runPoshQCAnalyze(
-    input: WorkspaceExecutionInput & {
-      readonly scanFolders?: ReadonlyArray<string>;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  runPoshQCTest(
-    input: WorkspaceExecutionInput & {
-      readonly scanFolders?: ReadonlyArray<string>;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  runPoshQCAnalyzeAutofix(
-    input: WorkspaceExecutionInput & {
-      readonly scanFolders?: ReadonlyArray<string>;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  runPoshQCSuite(
-    input: WorkspaceExecutionInput & {
-      readonly scanFolders?: ReadonlyArray<string>;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  resolvePolicyAuditTemplateAsset(
-    input: WorkspaceExecutionInput & {
-      readonly asset: PolicyAuditTemplateAssetSelector;
-      readonly targetPath?: string;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  resolveExecuteHardLockPrompt(
-    input: WorkspaceExecutionInput & {
-      readonly target: string;
-      readonly output?: string;
-      readonly quiet?: boolean;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  resolveAtomicPlanPrompt(
-    input: WorkspaceExecutionInput & { readonly target: string },
-  ): Promise<RepoAutomationExecutionResult>;
-  validateOrchestrationArtifacts(
-    input: WorkspaceExecutionInput & {
-      readonly artifactType: string;
-      readonly artifactPath: string;
-      readonly requireComplete?: boolean;
-      readonly requireModelRouting?: boolean;
-      readonly requireCodexModelRouting?: boolean;
-      readonly requireCodexTopology?: boolean;
-      readonly requireReadyForExecution?: boolean;
-    },
-  ): Promise<RepoAutomationExecutionResult>;
-  renderSubagentTree(
-    input: RenderSubagentTreeServiceInput,
-  ): Promise<RepoAutomationExecutionResult>;
-}
-
-export interface WorkspaceExecutionInput {
-  readonly workspaceRoot: string;
-  readonly invocationId?: string;
-}
-
-export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
-  readonly packs?: ReadonlyArray<string>;
-  readonly csharpVariant?: "modern" | "legacy";
-  readonly memoryMode?: "overwrite" | "merge" | "skip";
-}
-
-export interface PushDownCodexAndAgentsCustomizationsInput extends WorkspaceExecutionInput {
-  readonly packs?: ReadonlyArray<string>;
-  readonly csharpVariant?: "modern" | "legacy";
-  readonly memoryMode?: "overwrite" | "merge" | "skip";
-}
+export type {
+  RepoAutomationExecutionResult,
+  RepoAutomationService,
+  WorkspaceExecutionInput,
+  PushDownClaudeCustomizationsInput,
+  PushDownCodexAndAgentsCustomizationsInput,
+} from "./repo-automation-service-contract";
 
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
@@ -481,6 +379,50 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       ...input,
       fileSystem: this.fileSystem,
     });
+  }
+
+  async validateDiscoveryArtifacts(
+    input: ValidateDiscoveryArtifactsInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    // Thin delegation to the central discovery mapping + Python subprocess
+    // helper; no dev.discovery.* logic is re-authored here.
+    return runValidateDiscoveryArtifacts(this.output, input);
+  }
+
+  async runDiscoveryInit(
+    input: RunDiscoveryInitInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryInit(this.output, input);
+  }
+
+  async runDiscoveryRepoInventory(
+    input: RunDiscoveryAnalyzerInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryRepoInventory(this.output, input);
+  }
+
+  async runDiscoveryDotnetAnalyzer(
+    input: RunDiscoveryAnalyzerInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryDotnetAnalyzer(this.output, input);
+  }
+
+  async runDiscoveryVstoAnalyzer(
+    input: RunDiscoveryAnalyzerInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryVstoAnalyzer(this.output, input);
+  }
+
+  async runDiscoveryScenarioGeneration(
+    input: RunDiscoveryScenarioGenerationInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryScenarioGeneration(this.output, input);
+  }
+
+  async runDiscoveryReport(
+    input: RunDiscoveryReportInput,
+  ): Promise<RepoAutomationExecutionResult> {
+    return runDiscoveryReport(this.output, input);
   }
 
   private async executeScript(
