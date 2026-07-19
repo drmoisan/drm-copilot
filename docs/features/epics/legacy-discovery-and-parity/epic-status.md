@@ -4,7 +4,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 
 - Integration branch: `epic/legacy-discovery-and-parity-integration`
 - Current wave: 3
-- Last updated: 2026-07-19T05:01:00Z
+- Last updated: 2026-07-19T06:16:30Z
 - fable_policy: preferred
 
 | issue | feature_folder | wave | complexity | merge_status | PR | merge_commit | worktree_created | pr_opened | merge_confirmed | worktree_removed |
@@ -21,7 +21,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 368 | 2026-07-17-legacy-discovery-reports-368 | 2 | C2 | worktree_removed | [#382](https://github.com/drmoisan/drm-copilot/pull/382) | 26c24f861594922902b43fd8e04637304f210690 | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T01:59:05Z | 2026-07-19T02:03:00Z |
 | 369 | 2026-07-17-legacy-discovery-dotnet-vsto-analyzers-369 | 2 | C4 | worktree_removed | [#384](https://github.com/drmoisan/drm-copilot/pull/384) | 5ba4f9aa60749632b1779e970fdfca21af34da68 | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T04:54:44Z | 2026-07-19T04:57:30Z |
 | 370 | 2026-07-17-legacy-discovery-mcp-vscode-370 | 3 | C3 | worktree_created |  |  | 2026-07-19T05:01:00Z |  |  |  |
-| 372 | 2026-07-17-legacy-discovery-publishing-372 | 3 | C2 | worktree_created |  |  | 2026-07-19T05:01:00Z |  |  |  |
+| 372 | 2026-07-17-legacy-discovery-publishing-372 | 3 | C2 | worktree_removed | [#385](https://github.com/drmoisan/drm-copilot/pull/385) | cba1038fc47f34988d7fdd4ea2d399ce263bffde | 2026-07-19T05:01:00Z | 2026-07-19T05:01:00Z | 2026-07-19T06:13:04Z | 2026-07-19T06:16:30Z |
 | 371 | 2026-07-17-legacy-discovery-documentation-371 | 4 | C2 | not_started |  |  |  |  |  |  |
 
 ## Final Integration PR
