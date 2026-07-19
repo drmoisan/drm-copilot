@@ -3,8 +3,8 @@
 Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `features[]`. Do not hand-edit; regenerated at each merge_status/wave transition. `epic.md` is the DAG source of truth.
 
 - Integration branch: `epic/legacy-discovery-and-parity-integration`
-- Current wave: 2
-- Last updated: 2026-07-19T02:23:30Z
+- Current wave: 3
+- Last updated: 2026-07-19T05:00:00Z
 - fable_policy: preferred
 
 | issue | feature_folder | wave | complexity | merge_status | PR | merge_commit | worktree_created | pr_opened | merge_confirmed | worktree_removed |
@@ -19,7 +19,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 366 | 2026-07-17-legacy-discovery-hooks-366 | 2 | C2 | worktree_removed | [#383](https://github.com/drmoisan/drm-copilot/pull/383) | 63da9ce3cbe1a182befc3b6fd12c19848d7aa32d | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T02:20:46Z | 2026-07-19T02:23:30Z |
 | 367 | 2026-07-17-legacy-discovery-skills-367 | 2 | C3 | worktree_removed | [#381](https://github.com/drmoisan/drm-copilot/pull/381) | 1329b6f80949a22bcd4bc2e3437c5fb0f93c2d89 | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T02:09:32Z | 2026-07-19T02:12:30Z |
 | 368 | 2026-07-17-legacy-discovery-reports-368 | 2 | C2 | worktree_removed | [#382](https://github.com/drmoisan/drm-copilot/pull/382) | 26c24f861594922902b43fd8e04637304f210690 | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T01:59:05Z | 2026-07-19T02:03:00Z |
-| 369 | 2026-07-17-legacy-discovery-dotnet-vsto-analyzers-369 | 2 | C4 | worktree_created |  |  | 2026-07-19T01:20:00Z |  |  |  |
+| 369 | 2026-07-17-legacy-discovery-dotnet-vsto-analyzers-369 | 2 | C4 | worktree_removed | [#384](https://github.com/drmoisan/drm-copilot/pull/384) | 5ba4f9aa60749632b1779e970fdfca21af34da68 | 2026-07-19T01:20:00Z | 2026-07-19T01:20:00Z | 2026-07-19T04:54:44Z | 2026-07-19T04:57:30Z |
 | 370 | 2026-07-17-legacy-discovery-mcp-vscode-370 | 3 | C3 | not_started |  |  |  |  |  |  |
 | 372 | 2026-07-17-legacy-discovery-publishing-372 | 3 | C2 | not_started |  |  |  |  |  |  |
 | 371 | 2026-07-17-legacy-discovery-documentation-371 | 4 | C2 | not_started |  |  |  |  |  |  |
