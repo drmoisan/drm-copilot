@@ -416,84 +416,84 @@ Every detection from both analyzers is emitted as one Evidence Reference v1 inst
 
 ## Acceptance Criteria
 
-- [ ] `DotnetInventoryAnalyzer` implements the #363 `Analyzer` protocol
+- [x] `DotnetInventoryAnalyzer` implements the #363 `Analyzer` protocol
       (`name = "dotnet-inventory"`) and enumerates namespace declarations (block and
       file-scoped, with `metadata.declaration_form`) and type declarations (class/struct/
       interface/enum/record/record struct, with normalized `metadata.symbol_kind`) over C#
       source, one file-and-line-anchored detection per match.
-- [ ] The .NET/C# analyzer detects event declarations, delegate type declarations, and
+- [x] The .NET/C# analyzer detects event declarations, delegate type declarations, and
       `+=`/`-=` handler subscriptions; subscription detections apply the documented
       literal-rejection filter and carry `metadata.confidence = "heuristic"`.
-- [ ] `VstoOfficeAnalyzer` implements the #363 `Analyzer` protocol (`name = "vsto-office"`)
+- [x] `VstoOfficeAnalyzer` implements the #363 `Analyzer` protocol (`name = "vsto-office"`)
       and detects Ribbon-XML customization: 2006/2009 customUI namespace URIs and the
       `<customUI` root element in XML files; `IRibbonExtensibility`, `GetCustomUI`, and
       `Microsoft.Office.Tools.Ribbon` in C# files.
-- [ ] The VSTO/Office analyzer detects COM-interop patterns: `[ComImport]`, `[ComVisible]`,
+- [x] The VSTO/Office analyzer detects COM-interop patterns: `[ComImport]`, `[ComVisible]`,
       `[Guid]` (captured to `metadata.com_guid`), `[InterfaceType]`, `[DispId]`, `Marshal.*`
       calls (member captured to `metadata.symbol`), `Type.GetTypeFromProgID`, Office interop
       usings (application name captured as data to `metadata.interop_target`, never branched
       on), and project-file `COMReference`/`EmbedInteropTypes`/interop assembly references.
-- [ ] Both analyzers read the consumer repository at `profile.legacy_source.root`, honor
+- [x] Both analyzers read the consumer repository at `profile.legacy_source.root`, honor
       `include`/`exclude` globs with `fnmatch` over consumer-relative POSIX paths, and fail
       fast with `AnalyzerError` on an unreachable root, distinct from `DomainProfileError`.
-- [ ] The parsing-strategy decision (regex/plain-text, Python stdlib only, no
+- [x] The parsing-strategy decision (regex/plain-text, Python stdlib only, no
       AST/Roslyn/tree-sitter) is recorded and justified in this spec's Specification Decision
       section, including the stated regex limitations and the heuristic claim-scoping rule,
       citing the research artifact.
-- [ ] A shared pure comment/string stripper in `source_text.py` blanks non-code spans while
+- [x] A shared pure comment/string stripper in `source_text.py` blanks non-code spans while
       preserving line and column numbers; all C# detection patterns run over stripped text;
       Ribbon/project XML is scanned unstripped.
-- [ ] `parse` acquires file text behind the `AnalyzerFileSystem` seam and returns a frozen
+- [x] `parse` acquires file text behind the `AnalyzerFileSystem` seam and returns a frozen
       `TextParseResult` of ordered `(path, text)` pairs; `classify` isinstance-narrows and
       raises `AnalyzerError` on a plain `ParseResult`; no #363 change is required, and the
       ParseResult-payload reconciliation with #363 is recorded as an open coordination item.
-- [ ] Every emitted artifact is an Evidence Reference v1 instance with `kind` `"file"`,
+- [x] Every emitted artifact is an Evidence Reference v1 instance with `kind` `"file"`,
       `location` a consumer-relative POSIX path (no line number appended), `id` matching
       `^[a-z0-9][a-z0-9._-]*$` and deterministic across runs, a scheme-less relative
       `$schema` path (no drive letter, no leading `/`) computed by the reused #363 emitter,
       `schema_version` matching `^1\.\d+\.\d+$`, and all detection specifics exclusively
       inside `metadata`; instances validate against the v1 schema via `jsonschema` in tests.
-- [ ] `metadata.detection_kind` values are drawn only from the twelve-value normative
+- [x] `metadata.detection_kind` values are drawn only from the twelve-value normative
       vocabulary enumerated in the Evidence Reference emission contract of this spec.
-- [ ] Console scripts `dev.discovery.dotnet` and `dev.discovery.vsto` exist as two
+- [x] Console scripts `dev.discovery.dotnet` and `dev.discovery.vsto` exist as two
       `[tool.poetry.scripts]` lines targeting
       `scripts.dev_tools.discovery.analyzer.stack_cli:main_dotnet` / `:main_vsto`, expose the
       argparse surface (positional `profile` defaulting to `DEFAULT_PROFILE_FILENAME`,
       `--output-dir`, `--json`), and return exit codes `0`/`1`/`2` identical to
       `dev.discovery.inventory`.
-- [ ] Production modules contain no consumer identifiers (`taskmaster`, `tmw`) and no
+- [x] Production modules contain no consumer identifiers (`taskmaster`, `tmw`) and no
       consumer-specific or per-Office-application hardcoding, verified by a domain-neutrality
       contract test whose banned list is feature-scoped: generic stack literals (`csharp`,
       `vsto`, `Microsoft.Office.*`, `.csproj`, `.sln`, customUI namespace URIs) are permitted
       as pattern data.
-- [ ] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
+- [x] Tests satisfy repository quality-tier policy: pytest, line coverage >= 85%, branch
       coverage >= 75%, test tree mirroring production at
       `tests/scripts/dev_tools/discovery/analyzer/`, no temporary files (inline strings and
       the in-memory `mem_fs_path` fixture), `captured_at` from an injected clock with
       byte-identical repeat emission, raw C#/VSTO text-snippet fixtures with false-positive
       traps, and parametrized matrices in place of property-based tests (`hypothesis` is not
       a dev dependency).
-- [ ] No production or test file exceeds 500 lines (raw text fixtures exempt), no new runtime
+- [x] No production or test file exceeds 500 lines (raw text fixtures exempt), no new runtime
       dependency is added, and no coverage exclusion is added for the new analyzer modules.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit and integration as applicable)
-- [ ] Edge cases and error handling covered by tests (false-positive traps, narrowing
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit and integration as applicable)
+- [x] Edge cases and error handling covered by tests (false-positive traps, narrowing
       failure, unreachable root, malformed profile, usage error)
-- [ ] Docs updated (this spec, user-story, and feature-folder links)
-- [ ] Domain-neutrality contract test present and passing with the feature-scoped list
-- [ ] Toolchain pass (Black -> Ruff -> Pyright strict -> pytest with coverage) in one clean
+- [x] Docs updated (this spec, user-story, and feature-folder links)
+- [x] Domain-neutrality contract test present and passing with the feature-scoped list
+- [x] Toolchain pass (Black -> Ruff -> Pyright strict -> pytest with coverage) in one clean
       pass
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: namespace/type enumeration; event-subscription detection; Ribbon-XML
+- [x] Unit coverage: namespace/type enumeration; event-subscription detection; Ribbon-XML
       detection; COM-interop detection; include/exclude glob handling; Evidence Reference
       emission conformance; CLI success and error exit codes.
-- [ ] Integration scenarios: each analyzer end-to-end from a domain profile to a
+- [x] Integration scenarios: each analyzer end-to-end from a domain profile to a
       schema-conforming collection of artifacts over an in-memory fixture tree.
-- [ ] CLI/API examples: `dev.discovery.dotnet` / `dev.discovery.vsto` load-and-emit;
+- [x] CLI/API examples: `dev.discovery.dotnet` / `dev.discovery.vsto` load-and-emit;
       non-zero exit on malformed profile or unreachable source root; `--json` run summary.
