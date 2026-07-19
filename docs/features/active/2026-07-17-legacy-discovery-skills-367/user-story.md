@@ -100,11 +100,11 @@ sequencing logic.
 Traceability: these criteria restate the issue #367 acceptance criteria from
 the consumer perspective and align with spec.md AC-1 through AC-9.
 
-- [ ] A repository author can sequence the full discovery and parity-definition
+- [x] A repository author can sequence the full discovery and parity-definition
       workflow (analyzer invocation, agent-role routing, artifact
       production/validation) using only the seven `discovery-*` skills, in the
       documented stage order, with no hand-orchestration.
-- [ ] Each skill follows the repository SKILL.md conventions: `name` and
+- [x] Each skill follows the repository SKILL.md conventions: `name` and
       `description` frontmatter on every skill; `allowed-tools` only on the two
       CLI-driving skills; `context`/`agent` are optional keys per the repository
       SKILL.md contract and are not used; agent routing appears in body-level
@@ -112,7 +112,7 @@ the consumer perspective and align with spec.md AC-1 through AC-9.
       Runtime Characterization Analyst, Requirements Reconciler, Migration
       Coverage Reviewer) by slug; schemas, validators, and analyzer CLI
       commands are referenced by name.
-- [ ] Skill names do not collide with or duplicate the installed
+- [x] Skill names do not collide with or duplicate the installed
       `code-modernization` plugin's `/modernize-*` command names
       (modernize-assess, modernize-brief, modernize-extract-rules,
       modernize-harden, modernize-map, modernize-preflight, modernize-reimagine,
@@ -120,21 +120,21 @@ the consumer perspective and align with spec.md AC-1 through AC-9.
       names (legacy-analyst, business-rules-extractor, architecture-critic,
       scaffolder, security-auditor, test-engineer, version-delta-analyst), nor
       with any existing `.claude/skills/` name.
-- [ ] The skills are domain-neutral: none of the banned domain substrings
+- [x] The skills are domain-neutral: none of the banned domain substrings
       appears in any new skill file or bundle mirror (case-insensitive), no
       stack-specific analyzer is named literally, and all domain specificity is
       read from the domain profile at runtime.
-- [ ] Upstream references to #9006 and #9007 are isolated behind stable string
+- [x] Upstream references to #9006 and #9007 are isolated behind stable string
       names in the `discovery-workflow` registry, with the two assumed names
       (the #9006 inventory command; the four #9007 agent slugs) flagged as
       fan-in reconciliation assumptions, so the skills remain correct as those
       dependencies land.
-- [ ] Structural skill checks per repository precedent pass:
+- [x] Structural skill checks per repository precedent pass:
       `tests/scripts/dev_tools/test_legacy_discovery_skills_contracts.py`
       verifies existence, frontmatter, required fragments, banned-substring
       absence, name non-collision, and bundle byte-parity, asserting only on
       this feature's own files.
-- [ ] The always-on push-down parity gate passes: every new skill exists
+- [x] The always-on push-down parity gate passes: every new skill exists
       byte-identically under
       `extensions/drm-copilot/resources/claude-customizations/`.
 
