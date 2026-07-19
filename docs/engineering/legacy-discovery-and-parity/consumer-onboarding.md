@@ -9,9 +9,13 @@ first consumers, not framework behavior.
 
 ## What Is Delivered, and How
 
-The capability's assets are distributed to a consumer repository through two different
-mechanisms, depending on the asset's kind. A maintainer onboarding a consumer repository
-needs both, not just one:
+The capability's assets reach a consumer repository through two different mechanisms,
+and the two are not at the same stage of delivery today. Item 1 below is delivered: a
+maintainer distributes those assets through the push-down tooling described later on
+this page. Item 2 below is not delivered: no consumer-facing distribution mechanism
+currently exists for the schemas and initialization templates, as detailed below. A
+maintainer onboarding a consumer repository needs to understand both, including the gap
+in item 2:
 
 1. **Agent personas, skills, and hooks — pushed down as `.claude`/`.codex`+`.agents` assets.**
    The four discovery agent personas, the seven discovery skills, and the two
@@ -21,18 +25,25 @@ needs both, not just one:
    pack-manifest, which is unconditionally included in every `--packs`-scoped push-down —
    a consumer selecting only its own language pack (for example a C# pack or a TypeScript
    pack) still receives the full discovery agent/skill/hook set without a separate opt-in.
-2. **Schemas and initialization templates — distributed as Python package data via the
-   MCP-server npm package, not pushed down.** The seven discovery JSON schemas
+2. **Schemas and initialization templates — no consumer-facing distribution mechanism
+   today (open gap).** The seven discovery JSON schemas
    (`schemas/discovery/v1/*.schema.json`) and the initialization templates
    (`docs/discovery/templates/`) live under repository-root trees that are outside the
-   byte-identical `.claude`/`.codex` mirror contract. They reach a consumer repository as
-   Python source/data through the `@danmoisan/drm-copilot-mcp` npm package (the same
-   package that exposes the MCP tools in [`running-the-workflow.md`](running-the-workflow.md)),
-   not through `push_down_claude_customizations.py` or
-   `push_down_codex_and_agents_customizations.py`. This is a deliberate scope boundary, not
-   an omission: an asset under `scripts/` or `docs/discovery/templates/` is Python source
-   the consumer's own toolchain resolves at runtime, not a customization asset the push-down
-   publishers mirror.
+   byte-identical `.claude`/`.codex` mirror contract, and today they exist only inside the
+   `drm-copilot` repository itself, at `schemas/discovery/v1/` and
+   `docs/discovery/templates/`. No package or tool currently delivers either asset kind to
+   a consumer repository: the `@danmoisan/drm-copilot-mcp` npm package does not ship them
+   (its packaged contents are limited to the compiled MCP server and a `.claude`/`.codex`
+   resource mirror that explicitly excludes every `.py` file and every `scripts/`-segment
+   path), and neither `push_down_claude_customizations.py` nor
+   `push_down_codex_and_agents_customizations.py` mirrors them either. This absence
+   reflects a classification decision, not an oversight:
+   `legacy-discovery-publishing-372`'s spec.md, section "Schema/Init-Template Placement —
+   Resolved," documents `Decision: scripts-non-mirrored`, classifying these two asset
+   kinds as outside the byte-identical mirror contract. That decision explains why the
+   assets are not pushed down; it does not itself deliver a distribution mechanism, and no
+   feature in the merged epic has implemented one. Closing this gap is an open, planned
+   item, not delivered behavior.
 
 ## The Push-Down Tool
 
@@ -61,9 +72,11 @@ regardless of which packs are selected.
    consumer workspace. The consumer repository receives the discovery agent personas,
    skills, and completion-gate hooks under its own native `.claude/`, `.codex/`, or
    `.github/` tree.
-2. The consumer repository adds `@danmoisan/drm-copilot-mcp` (or an equivalent workspace
-   dependency resolving the discovery schemas and templates) so its own tooling can reach
-   the discovery schemas and initialization templates.
+2. There is currently no automated step by which the consumer repository receives the
+   discovery schemas and initialization templates — see item 2 of "What Is Delivered, and
+   How" above for the gap and its status. Until a distribution mechanism is delivered, an
+   engineer retrieves the seven schemas and the initialization templates manually from the
+   `drm-copilot` repository, at `schemas/discovery/v1/` and `docs/discovery/templates/`.
 3. The maintainer points the consumer-repository engineer at
    [`domain-profile.md`](domain-profile.md) to begin authoring the repository's domain
    profile, and at [`workflow.md`](workflow.md) and
