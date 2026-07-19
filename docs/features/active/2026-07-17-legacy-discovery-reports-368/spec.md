@@ -211,40 +211,40 @@ Data flow, storage, or state changes introduced by this feature.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
 - [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
 
 Mapping of each seeded test condition to acceptance criteria and design elements
 (`research/research.2026-07-17T15-10.md` Section 8):
 
-- [ ] Unit coverage: rendering each report type from conforming artifacts. Maps to AC "A
+- [x] Unit coverage: rendering each report type from conforming artifacts. Maps to AC "A
   coverage report is rendered deterministically...", "A parity report is rendered
   deterministically...", "A completion report presents aggregate readiness..." via the
   `parse -> build_rows (sorted) -> render` pure pipeline in each of `coverage_report.py`,
   `parity_report.py`, `completion_report.py`.
-- [ ] Determinism: repeated runs on identical input produce byte-identical output. Maps to AC
+- [x] Determinism: repeated runs on identical input produce byte-identical output. Maps to AC
   "Given identical input artifacts, report output is byte-identical across runs." Verified by
   calling `render_<report>` twice on the same parsed dict and asserting string equality
   (property-style, not merely "renders without error").
-- [ ] Negative: malformed / non-conforming artifact fails fast before rendering. Maps to AC
+- [x] Negative: malformed / non-conforming artifact fails fast before rendering. Maps to AC
   "Input artifacts are validated ... before rendering; a malformed artifact fails fast...".
   Verified by injecting a fake `ArtifactValidator` returning non-empty errors and asserting
   `main()` returns `1` without the write function ever being called.
-  - [ ] Edge case: empty ledger/matrix (zero entries) renders a header/summary only, without
+  - [x] Edge case: empty ledger/matrix (zero entries) renders a header/summary only, without
     raising.
-- [ ] CLI: `dev.discovery.*` entry points return correct exit codes for success and failure.
+- [x] CLI: `dev.discovery.*` entry points return correct exit codes for success and failure.
   Maps to AC "Report generation is exposed as `dev.discovery.*` Poetry console-script CLI entry
   point(s)...". Verified by calling each `main(argv=[...])` directly with a monkeypatched
   validator/I-O seam and asserting the returned exit code, mirroring
   `validate_orchestration_artifacts.py`'s `main` test style rather than spawning a subprocess.
-- [ ] Domain-neutrality: no test fixture or renderer emits a hardcoded domain-specific label.
+- [x] Domain-neutrality: no test fixture or renderer emits a hardcoded domain-specific label.
   Maps to AC "The reporting framework contains no domain-specific identifiers."
-- [ ] Coverage-tooling: no new `omit` entry is added for `scripts/dev_tools/discovery/**`. Maps
+- [x] Coverage-tooling: no new `omit` entry is added for `scripts/dev_tools/discovery/**`. Maps
   to AC "Tests satisfy quality-tier policy (line >= 85%, branch >= 75%)."
