@@ -85,21 +85,21 @@ onboarding examples.
 
 ## Acceptance Criteria
 
-- [ ] From the documentation set (plus the per-feature reference docs it links to), a
+- [x] From the documentation set (plus the per-feature reference docs it links to), a
       consumer-repository engineer can author a domain profile: the doc set explains the
       contract fields (legacy source location, target location, technology stack,
       artifact conventions) and domain-neutral authoring guidance.
-- [ ] From the documentation set, a consumer-repository engineer can run the discovery/
+- [x] From the documentation set, a consumer-repository engineer can run the discovery/
       parity workflow end to end via any one of the three documented surfaces (CLI
       `dev.discovery.*`, MCP tools, VS Code commands), and the docs state that the three
       surfaces are lockstep equivalents.
-- [ ] From the documentation set, a reader can identify the seven discovery artifacts by
+- [x] From the documentation set, a reader can identify the seven discovery artifacts by
       name, how each is validated, and how completion gates block progression until
       validation passes.
-- [ ] The consumer-onboarding path is documented: a maintainer can follow the doc set to
+- [x] The consumer-onboarding path is documented: a maintainer can follow the doc set to
       deliver the capability to a consumer repository via the push-down tooling, with
       TaskMaster and TMW presented strictly as onboarding examples.
-- [ ] The documentation presents the capability as domain-neutral throughout: no
+- [x] The documentation presents the capability as domain-neutral throughout: no
       domain-specific (TaskMaster/TMW/Outlook/VSTO/email/task-management) behavior is
       described as framework behavior.
 
