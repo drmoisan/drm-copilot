@@ -85,6 +85,11 @@
             # Issue #357 remediation cycle 1 (fix #1): measure the atomic-planner SubagentStop
             # hook so its Pester coverage is captured in the canonical artifact.
             '.claude/hooks/validate-planner-output.ps1'
+            # Issue #366 added the discovery-artifact completion-gate hooks (PreToolUse and
+            # SubagentStop); measured here so the new production hooks are not excluded from
+            # coverage.
+            '.claude/hooks/enforce-discovery-artifact-gate.ps1'
+            '.claude/hooks/validate-discovery-artifact-gate.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
