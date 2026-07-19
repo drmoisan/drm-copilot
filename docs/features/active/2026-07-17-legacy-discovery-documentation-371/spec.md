@@ -203,77 +203,77 @@ docs/engineering/legacy-discovery-and-parity/
 
 ## Acceptance Criteria
 
-- [ ] A README-indexed documentation directory exists at
+- [x] A README-indexed documentation directory exists at
       `docs/engineering/legacy-discovery-and-parity/` with kebab-case filenames;
       `README.md` states the domain-neutrality invariant and links every topic page via
       relative paths.
-- [ ] A workflow page documents the discovery/parity workflow end to end — from
+- [x] A workflow page documents the discovery/parity workflow end to end — from
       workspace initialization through validated artifacts to rendered reports and
       generated acceptance scenarios — without duplicating per-feature reference docs.
-- [ ] A domain-profile page documents domain-neutral authoring of the domain-profile
+- [x] A domain-profile page documents domain-neutral authoring of the domain-profile
       configuration, covering the contract fields (legacy source location, target
       location, technology stack, artifact conventions), and defers parser internals to
       the #9001 reference docs.
-- [ ] An artifacts-and-schemas page documents the artifact/schema lifecycle: the seven
+- [x] An artifacts-and-schemas page documents the artifact/schema lifecycle: the seven
       versioned JSON schemas by name (Feature Contract, Coverage Ledger, Runtime
       Characterization Scenario, Parity Matrix, Unspecified Behavior Record, Product
       Decision Record, Evidence Reference), the schema-versioning convention, validation
       (validator CLI and `$schema`/governed-glob checking), and completion-gate hook
       enforcement.
-- [ ] A running-the-workflow page documents the three lockstep invocation surfaces —
+- [x] A running-the-workflow page documents the three lockstep invocation surfaces —
       CLI (`poetry run dev.discovery.<command>`), MCP tools, and VS Code commands — in
       the order CLI before MCP before VS Code.
-- [ ] A consumer-onboarding page documents how consumer repositories receive the
+- [x] A consumer-onboarding page documents how consumer repositories receive the
       capability via the push-down tooling
       (`scripts/dev_tools/push_down_*_customizations.py` CLIs and MCP `push_down_*`
       tools), with TaskMaster and TMW framed strictly as onboarding examples.
-- [ ] Domain-neutrality invariant holds across the doc set: the capability is described
+- [x] Domain-neutrality invariant holds across the doc set: the capability is described
       as domain-neutral; no TaskMaster/TMW/Outlook/VSTO/email/task-management behavior
       is presented as framework behavior; consumer specifics appear only in the
       onboarding examples.
-- [ ] No per-feature reference documentation is duplicated: the doc set links to (or
+- [x] No per-feature reference documentation is duplicated: the doc set links to (or
       names as planned) each functional feature's own reference docs instead of
       restating their content.
-- [ ] Provisional content is handled per the upstream-presence constraint: content is
+- [x] Provisional content is handled per the upstream-presence constraint: content is
       authored against planned scope from `objective-source.md` where an upstream spec
       is absent and against the delivered spec where present, and forward references to
       not-yet-delivered files are explicitly marked as planned.
-- [ ] A reconciliation pass against the integration branch
+- [x] A reconciliation pass against the integration branch
       (`epic/legacy-discovery-and-parity-integration`) is completed before the PR: every
       documented command name, path, schema name, and pack decision is verified against
       the integration branch or corrected/re-marked as planned.
-- [ ] The doc set introduces no name that collides with the installed
+- [x] The doc set introduces no name that collides with the installed
       `code-modernization` plugin's `/modernize-*` commands or agent names.
 
 ## Definition of Done
 
-- [ ] All Acceptance Criteria in this spec and in `user-story.md` are satisfied and
+- [x] All Acceptance Criteria in this spec and in `user-story.md` are satisfied and
       checked off with evidence.
-- [ ] The six documentation files exist under
+- [x] The six documentation files exist under
       `docs/engineering/legacy-discovery-and-parity/` and cover the five capability
       areas plus the README index.
-- [ ] Domain-neutrality review completed: no domain-specific behavior presented as
+- [x] Domain-neutrality review completed: no domain-specific behavior presented as
       framework behavior; TaskMaster/TMW confined to onboarding examples.
-- [ ] Pre-PR reconciliation pass against
+- [x] Pre-PR reconciliation pass against
       `epic/legacy-discovery-and-parity-integration` completed; documented command
       names, paths, and pack decisions verified, corrected, or explicitly marked as
       planned.
-- [ ] All relative links in the doc set resolve to files present on the branch, or the
+- [x] All relative links in the doc set resolve to files present on the branch, or the
       target is explicitly marked as planned.
-- [ ] Optional structural content-contract test: authored under `tests/docs/` in the
+- [x] Optional structural content-contract test: authored under `tests/docs/` in the
       existing contract-test style, or explicitly recorded as declined (no docs-lint
       convention mandates it).
-- [ ] Tone policy satisfied: professional, factual, neutral wording throughout the doc
+- [x] Tone policy satisfied: professional, factual, neutral wording throughout the doc
       set.
-- [ ] Toolchain pass completed for any code authored (only applicable if the optional
+- [x] Toolchain pass completed for any code authored (only applicable if the optional
       contract test is included; otherwise no code stages apply to Markdown-only
       changes).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Structural link/section checks — optional only: no docs-lint convention exists in
+- [x] Structural link/section checks — optional only: no docs-lint convention exists in
       this repository (verified by research); if implemented, use a pytest
       content-contract test under `tests/docs/`.
-- [ ] Cross-references to schema, CLI, MCP, and VS Code surfaces resolve correctly —
+- [x] Cross-references to schema, CLI, MCP, and VS Code surfaces resolve correctly —
       verified manually during the pre-PR reconciliation pass against the integration
       branch.
