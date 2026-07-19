@@ -2,12 +2,16 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 /**
- * Identifies which interpreter family is required to launch a bundled script.
+ * Identifies which interpreter family is required to launch a script.
  *
- * Only PowerShell remains: all formerly-interpreted commands run in-process in
- * TypeScript, so no interpreter is detected or spawned beyond PowerShell.
+ * `"powershell"` launches bundled PowerShell scripts; all formerly-interpreted
+ * commands otherwise run in-process in TypeScript. `"python"` resolves a Python
+ * interpreter used to invoke the workspace discovery CLI via an interpreter
+ * `-c` entry-point call (the extension bundles no Python; the discovery code
+ * lives in the target workspace). The Python probe resolution order is the
+ * workspace `.venv` interpreter, then `py`, then `python` on PATH.
  */
-export type RuntimeKind = "powershell";
+export type RuntimeKind = "powershell" | "python";
 
 /**
  * Describes the executable and fixed argument prefix needed to launch a script.
@@ -161,21 +165,89 @@ export function resolveCodexExecutable(
 }
 
 /**
- * Resolves the PowerShell interpreter required to execute a bundled script.
+ * Builds the workspace `.venv` interpreter candidate path for the current platform.
  *
- * PowerShell is the only supported runtime: every formerly-Python command now
- * runs in-process in TypeScript, so this function resolves only PowerShell and
- * never probes a Python interpreter.
- *
- * @param runtimeKind The runtime family requested by the command (always
- *   `"powershell"`).
- * @returns The executable name and fixed argument prefix needed to launch the script.
- * @throws Error when neither `pwsh` nor `powershell` can be found on PATH.
+ * @param workspaceRoot The workspace root that may contain a `.venv` directory.
+ * @returns The forward-slash-normalized candidate interpreter path.
  */
-export function detectRuntime(runtimeKind: RuntimeKind): RuntimeResolution {
-  // The parameter is retained so call sites remain explicit about the runtime
-  // they request; only the PowerShell family is supported.
-  void runtimeKind;
+function buildVenvInterpreterCandidate(workspaceRoot: string): string {
+  const normalizedRoot = workspaceRoot.replace(/\\/g, "/").replace(/\/+$/, "");
+  const relativeInterpreter =
+    process.platform === "win32"
+      ? ".venv/Scripts/python.exe"
+      : ".venv/bin/python";
+  return `${normalizedRoot}/${relativeInterpreter}`;
+}
+
+/**
+ * Resolves a Python interpreter used to invoke the workspace discovery CLI.
+ *
+ * Resolution order: the workspace `.venv` interpreter (when a workspace root is
+ * supplied), then `py`, then `python` on PATH via {@link findExecutableOnPath}.
+ * The returned `argsPrefix` is empty because the discovery service-call helper
+ * composes the interpreter argv itself (`[pythonExe, "-c", ...]`).
+ *
+ * @param workspaceRoot Optional workspace root probed for a `.venv` interpreter.
+ * @returns The resolved interpreter path and an empty argument prefix.
+ * @throws Error when no workspace `.venv` interpreter and neither `py` nor
+ *   `python` can be found.
+ */
+function detectPythonRuntime(workspaceRoot?: string): RuntimeResolution {
+  if (workspaceRoot !== undefined && workspaceRoot.trim().length > 0) {
+    const venvInterpreter = buildVenvInterpreterCandidate(workspaceRoot);
+    if (fs.existsSync(venvInterpreter)) {
+      return {
+        executable: venvInterpreter,
+        argsPrefix: [],
+      };
+    }
+  }
+
+  // Prefer the Windows `py` launcher, then a plain `python` on PATH, mirroring
+  // the PowerShell probe's ordered fallback across developer environments.
+  const resolvedPy = findExecutableOnPath("py");
+  if (resolvedPy !== undefined) {
+    return {
+      executable: resolvedPy,
+      argsPrefix: [],
+    };
+  }
+
+  const resolvedPython = findExecutableOnPath("python");
+  if (resolvedPython !== undefined) {
+    return {
+      executable: resolvedPython,
+      argsPrefix: [],
+    };
+  }
+
+  throw new Error(
+    "Python runtime not found. Expected a workspace '.venv' interpreter or 'py' or 'python' on PATH.",
+  );
+}
+
+/**
+ * Resolves the interpreter required to launch a script for the requested runtime.
+ *
+ * `"powershell"` resolves PowerShell Core (`pwsh`) then Windows PowerShell
+ * (`powershell`); every formerly-Python in-process command still uses this
+ * family. `"python"` resolves a Python interpreter (workspace `.venv`, then
+ * `py`, then `python`) used to invoke the workspace discovery CLI via an
+ * interpreter `-c` entry-point call.
+ *
+ * @param runtimeKind The runtime family requested by the command.
+ * @param workspaceRoot Optional workspace root probed for a `.venv` interpreter
+ *   when `runtimeKind` is `"python"`; ignored for PowerShell.
+ * @returns The executable name and fixed argument prefix needed to launch the script.
+ * @throws Error when the requested runtime cannot be resolved.
+ */
+export function detectRuntime(
+  runtimeKind: RuntimeKind,
+  workspaceRoot?: string,
+): RuntimeResolution {
+  if (runtimeKind === "python") {
+    return detectPythonRuntime(workspaceRoot);
+  }
 
   // Prefer PowerShell Core when available, then fall back to Windows PowerShell
   // so the extension works across newer and older developer environments.

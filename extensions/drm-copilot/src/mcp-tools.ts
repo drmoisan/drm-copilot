@@ -39,6 +39,15 @@ import {
   handlePushDownCopilotCustomizations,
 } from "./mcp-handlers/push-down-handlers";
 import { handleResolveExecuteHardLockPrompt } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
+import {
+  handleRunDiscoveryDotnetAnalyzer,
+  handleRunDiscoveryInit,
+  handleRunDiscoveryReport,
+  handleRunDiscoveryRepoInventory,
+  handleRunDiscoveryScenarioGeneration,
+  handleRunDiscoveryVstoAnalyzer,
+  handleValidateDiscoveryArtifacts,
+} from "./mcp-handlers/discovery-handlers";
 import { handleRenderSubagentTree } from "./mcp-handlers/render-subagent-tree-handler";
 import {
   handleResolvePolicyAuditTemplateAsset,
@@ -248,6 +257,46 @@ export async function dispatchRepoAutomationTool(
       case "render_subagent_tree": {
         return toMcpToolResult(
           await handleRenderSubagentTree(rawInput, service),
+        );
+      }
+
+      case "validate_discovery_artifacts": {
+        return toMcpToolResult(
+          await handleValidateDiscoveryArtifacts(rawInput, service),
+        );
+      }
+
+      case "run_discovery_init": {
+        return toMcpToolResult(await handleRunDiscoveryInit(rawInput, service));
+      }
+
+      case "run_discovery_repo_inventory": {
+        return toMcpToolResult(
+          await handleRunDiscoveryRepoInventory(rawInput, service),
+        );
+      }
+
+      case "run_discovery_dotnet_analyzer": {
+        return toMcpToolResult(
+          await handleRunDiscoveryDotnetAnalyzer(rawInput, service),
+        );
+      }
+
+      case "run_discovery_vsto_analyzer": {
+        return toMcpToolResult(
+          await handleRunDiscoveryVstoAnalyzer(rawInput, service),
+        );
+      }
+
+      case "run_discovery_scenario_generation": {
+        return toMcpToolResult(
+          await handleRunDiscoveryScenarioGeneration(rawInput, service),
+        );
+      }
+
+      case "run_discovery_report": {
+        return toMcpToolResult(
+          await handleRunDiscoveryReport(rawInput, service),
         );
       }
     }

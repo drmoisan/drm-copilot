@@ -38,6 +38,14 @@ function createMockService(): jest.Mocked<RepoAutomationService> {
     resolveExecuteHardLockPrompt: jest.fn(),
     resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
+    renderSubagentTree: jest.fn(),
+    validateDiscoveryArtifacts: jest.fn(),
+    runDiscoveryInit: jest.fn(),
+    runDiscoveryRepoInventory: jest.fn(),
+    runDiscoveryDotnetAnalyzer: jest.fn(),
+    runDiscoveryVstoAnalyzer: jest.fn(),
+    runDiscoveryScenarioGeneration: jest.fn(),
+    runDiscoveryReport: jest.fn(),
   };
 }
 
