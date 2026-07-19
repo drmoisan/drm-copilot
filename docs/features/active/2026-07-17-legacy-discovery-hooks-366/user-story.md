@@ -124,11 +124,11 @@ feature supplies those PowerShell completion-gate hooks.
 
 ## Acceptance Criteria
 
-- [ ] One or more PowerShell completion-gate hooks enforce discovery-artifact completion gates by invoking the discovery validators.
-- [ ] Hooks follow canonical PreToolUse/SubagentStop I/O conventions and the dot-source guard.
-- [ ] Hooks are registered in `.claude/settings.json` under the appropriate event with the standard command form.
-- [ ] Hooks are domain-neutral (no domain-specific identifiers in source, comments, or messages).
-- [ ] Pester tests are mirrored at `tests/scripts/claude-hooks/<name>.Tests.ps1`.
+- [x] One or more PowerShell completion-gate hooks enforce discovery-artifact completion gates by invoking the discovery validators.
+- [x] Hooks follow canonical PreToolUse/SubagentStop I/O conventions and the dot-source guard.
+- [x] Hooks are registered in `.claude/settings.json` under the appropriate event with the standard command form.
+- [x] Hooks are domain-neutral (no domain-specific identifiers in source, comments, or messages).
+- [x] Pester tests are mirrored at `tests/scripts/claude-hooks/<name>.Tests.ps1`.
 
 ## Non-Goals
 

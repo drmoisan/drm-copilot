@@ -291,27 +291,27 @@ directly; production tests must never mock `python`.
 Traced 1:1 to `issue.md`'s Acceptance Criteria and mapped to the design
 elements above:
 
-- [ ] One or more PowerShell completion-gate hooks enforce discovery-artifact
+- [x] One or more PowerShell completion-gate hooks enforce discovery-artifact
   completion gates by invoking the discovery validators. — Design:
   `enforce-discovery-artifact-gate.ps1` (PreToolUse) and
   `validate-discovery-artifact-gate.ps1` (SubagentStop), both calling
   `Invoke-DiscoveryValidatorExe` → `python -m scripts.dev_tools.validate_discovery_artifacts <type> <path>`.
-- [ ] Hooks follow canonical PreToolUse/SubagentStop I/O conventions and the
+- [x] Hooks follow canonical PreToolUse/SubagentStop I/O conventions and the
   dot-source guard. — Design: Inputs/Outputs section above; dot-source guard
   `if ($MyInvocation.InvocationName -eq '.') { return }`; thin-entrypoint
   decision functions `Invoke-DiscoveryArtifactGateDecision` /
   `Invoke-DiscoveryArtifactGateValidation`.
-- [ ] Hooks are registered in `.claude/settings.json` under the appropriate
+- [x] Hooks are registered in `.claude/settings.json` under the appropriate
   event with the standard command form. — Design: Implementation Strategy —
   register under the existing `"Write|Edit"` PreToolUse matcher group and the
   existing broad generic-agent `SubagentStop` matcher group, not a new
   agent-specific matcher.
-- [ ] Hooks are domain-neutral (no domain-specific identifiers in source,
+- [x] Hooks are domain-neutral (no domain-specific identifiers in source,
   comments, or messages). — Design: Constraints & Risks — static artifact-type
   lookup names only schema-kind tokens; domain-profile seam is a narrow
   injectable reader with a `# TODO(#9001)` marker; domain-neutrality grep test
   (Seeded Test Conditions).
-- [ ] Pester tests are mirrored at `tests/scripts/claude-hooks/<name>.Tests.ps1`.
+- [x] Pester tests are mirrored at `tests/scripts/claude-hooks/<name>.Tests.ps1`.
   — Design: `tests/scripts/claude-hooks/enforce-discovery-artifact-gate.Tests.ps1`,
   `tests/scripts/claude-hooks/validate-discovery-artifact-gate.Tests.ps1`.
 
