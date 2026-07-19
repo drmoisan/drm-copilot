@@ -1,0 +1,60 @@
+// Raw C# event/delegate/subscription fixture for the .NET inventory analyzer.
+// The .txt suffix keeps tooling from treating it as real C# source. Named
+// positive cases and false-positive traps are included. No consumer identifiers.
+
+namespace Sample.Events
+{
+    // Delegate type declaration.
+    public delegate void MessageHandler(object sender, int payload);
+
+    public class Publisher
+    {
+        // Field-like event declaration.
+        public event MessageHandler Started;
+
+        // Field-like event using the framework EventHandler type.
+        public event EventHandler Completed;
+
+        // Custom-accessor event declaration (add/remove form).
+        public event EventHandler Custom
+        {
+            add { }
+            remove { }
+        }
+    }
+
+    public class Subscriber
+    {
+        public void Wire(Publisher publisher, int total)
+        {
+            // Subscription using a lambda handler.
+            publisher.Started += (sender, payload) => Handle(payload);
+
+            // Subscription using a method-group handler (bare dotted identifier).
+            publisher.Completed += this.OnCompleted;
+
+            // Subscription using a new EventHandler delegate construction.
+            publisher.Completed += new EventHandler(this.OnCompleted);
+
+            // Unsubscription using a method group.
+            publisher.Completed -= this.OnCompleted;
+
+            // Trap: arithmetic compound assignment must NOT be detected.
+            total += 3;
+
+            // Trap: verbatim string containing subscription-shaped text.
+            var verbatimTrap = @"handler += SomeHandler";
+
+            // Trap: interpolated string containing subscription-shaped text.
+            var interpolatedTrap = $"count {total} += Other";
+        }
+
+        private void OnCompleted(object sender, EventArgs args)
+        {
+        }
+
+        private void Handle(int payload)
+        {
+        }
+    }
+}

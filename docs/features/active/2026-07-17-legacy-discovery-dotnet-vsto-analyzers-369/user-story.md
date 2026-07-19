@@ -69,37 +69,37 @@ lives in event wiring, ribbon customization, and COM boundaries.
 
 ## Acceptance Criteria
 
-- [ ] Given a valid domain profile whose `legacy_source.root` points at a .NET/C# repository,
+- [x] Given a valid domain profile whose `legacy_source.root` points at a .NET/C# repository,
       when the maintainer runs `dev.discovery.dotnet`, then namespace declarations (block and
       file-scoped), type declarations (class/struct/interface/enum/record/record struct),
       event and delegate declarations, and `+=`/`-=` event subscriptions are each emitted as
       Evidence Reference v1 instances anchored to a consumer-relative file path and line.
-- [ ] Given the same profile over a VSTO/Office repository, when the maintainer runs
+- [x] Given the same profile over a VSTO/Office repository, when the maintainer runs
       `dev.discovery.vsto`, then Ribbon-XML customization (2006/2009 customUI URIs,
       `<customUI` root, `IRibbonExtensibility`, `GetCustomUI`,
       `Microsoft.Office.Tools.Ribbon`) and COM-interop usage (`[ComImport]`/`[Guid]` and
       related attributes, `Marshal.*`, `GetTypeFromProgID`, Office interop usings, project
       `COMReference`/`EmbedInteropTypes`) are each emitted as Evidence Reference v1
       instances.
-- [ ] Both analyzers honor the profile's `include`/`exclude` globs and fail fast with a clear
+- [x] Both analyzers honor the profile's `include`/`exclude` globs and fail fast with a clear
       error and exit code `1` when the profile is malformed or `legacy_source.root` is
       unreachable; usage errors exit `2`; successful runs exit `0` and support `--json`.
-- [ ] Every emitted artifact validates against
+- [x] Every emitted artifact validates against
       `schemas/discovery/v1/evidence-reference.schema.json`: `kind` is `"file"`, the id is a
       stable slug, `$schema` is a scheme-less relative path, and all detection specifics
       (`detection_kind`, `symbol`, `symbol_kind`, `line`, `confidence`) appear only inside
       `metadata`.
-- [ ] Event-subscription detections are explicitly marked heuristic
+- [x] Event-subscription detections are explicitly marked heuristic
       (`metadata.confidence = "heuristic"`), and analyzer output and documentation describe
       detections as textual pattern evidence, not compiler-verified symbols.
-- [ ] Re-running an analyzer over an unchanged tree with a pinned clock produces
+- [x] Re-running an analyzer over an unchanged tree with a pinned clock produces
       byte-identical artifacts, so the maintainer can diff discovery runs meaningfully.
-- [ ] The analyzers work unmodified for any consumer .NET/VSTO repository: production modules
+- [x] The analyzers work unmodified for any consumer .NET/VSTO repository: production modules
       contain no consumer identifiers and no per-Office-application special-casing (the
       interop application name is captured as data), verified by a domain-neutrality contract
       test that permits generic stack literals (`csharp`, `vsto`, `Microsoft.Office.*`,
       `.csproj`, `.sln`, customUI URIs).
-- [ ] The delivered tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%,
+- [x] The delivered tests satisfy repository quality-tier policy (line >= 85%, branch >= 75%,
       mirrored test tree, no temporary files, injected clock) and include raw C#/VSTO
       text-snippet fixtures with false-positive traps (comment/string declaration look-alikes,
       arithmetic `+=`), demonstrating the maintainer-facing accuracy claims.
