@@ -69,14 +69,14 @@ the machine-readable artifacts are not directly consumable by reviewers.
 
 ## Acceptance Criteria
 
-- [ ] A coverage report is rendered deterministically from a Coverage Ledger artifact.
-- [ ] A parity report is rendered deterministically from a Parity Matrix artifact.
-- [ ] A completion report presents aggregate readiness across the discovery artifacts.
-- [ ] Given identical input artifacts, report output is byte-identical across runs.
-- [ ] Input artifacts are validated (via the validators) before rendering; a malformed artifact fails fast with a clear error and non-zero exit code.
-- [ ] Report generation is exposed as `dev.discovery.*` Poetry console-script CLI entry point(s) following the repository substrate convention.
-- [ ] The reporting framework contains no domain-specific identifiers.
-- [ ] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%).
+- [x] A coverage report is rendered deterministically from a Coverage Ledger artifact.
+- [x] A parity report is rendered deterministically from a Parity Matrix artifact.
+- [x] A completion report presents aggregate readiness across the discovery artifacts.
+- [x] Given identical input artifacts, report output is byte-identical across runs.
+- [x] Input artifacts are validated (via the validators) before rendering; a malformed artifact fails fast with a clear error and non-zero exit code.
+- [x] Report generation is exposed as `dev.discovery.*` Poetry console-script CLI entry point(s) following the repository substrate convention.
+- [x] The reporting framework contains no domain-specific identifiers.
+- [x] Tests satisfy quality-tier policy (line >= 85%, branch >= 75%).
 
 
 ## Non-Goals
