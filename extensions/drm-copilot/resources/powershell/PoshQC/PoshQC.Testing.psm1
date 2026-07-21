@@ -160,7 +160,9 @@ function Invoke-PoshQCTest {
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage)
             if (-not (Get-Module -ListAvailable -Name $Name)) { throw $ErrorMessage }
-            Import-Module $Name -ErrorAction Stop
+            # Import globally so Pester's Describe/It/Mock resolve in test containers that the
+            # default $InvokePester trampoline now hosts in the global session state (issue #392).
+            Import-Module $Name -Global -ErrorAction Stop
         },
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path $Path },
         [scriptblock] $LoadSettings = { param([string] $Path) Import-PowerShellDataFile -Path $Path },
@@ -256,7 +258,27 @@ function Invoke-PoshQCTest {
             # Use Write-Information so the replayed summary stays visible while respecting approved verbs.
             Write-Information $Message -InformationAction Continue
         },
-        [scriptblock] $InvokePester = { param($Config) Invoke-Pester -Configuration $Config },
+        [scriptblock] $InvokePester = {
+            param($Config)
+            # Host the Pester run in the global session state so discovered test containers do
+            # not execute inside this module's session state. This makes the bundled entry path
+            # (module pre-imported, then Invoke-PoshQCTest -> Invoke-Pester) match the passing
+            # direct run, and lets BeforeAll module guards in test files safely remove/re-import
+            # same-named modules mid-run without orphaning the run's hosting session state
+            # (issue #392). [scriptblock]::Create builds an unbound scriptblock so the installed
+            # global function is not bound to this module's session state; the try/finally pair
+            # removes the temporary global function so no state leaks between suite invocations.
+            $trampoline = [scriptblock]::Create('param($c) Invoke-Pester -Configuration $c')
+            $null = New-Item -Path 'function:global:Invoke-PoshQCPesterRun' -Value $trampoline -Force
+            try {
+                Invoke-PoshQCPesterRun $Config
+            } finally {
+                # Remove by the 'Function:\' provider path; a 'function:global:'-qualified path
+                # is honored by New-Item but silently no-ops on Remove-Item, which would leak the
+                # trampoline between suite invocations in a persistent host (issue #392).
+                Remove-Item -Path 'Function:\Invoke-PoshQCPesterRun' -Force -ErrorAction SilentlyContinue
+            }
+        },
         [scriptblock] $CopyCoverage = {
             param([string] $CoveragePath, [string] $RepoRoot, [string] $KoveragePath)
             Convert-PoshQCCoverageToRelative -InputPath $CoveragePath -OutputPath $KoveragePath -RepoRoot $RepoRoot

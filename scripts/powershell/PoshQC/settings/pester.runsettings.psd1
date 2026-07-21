@@ -90,6 +90,11 @@
             # coverage.
             '.claude/hooks/enforce-discovery-artifact-gate.ps1'
             '.claude/hooks/validate-discovery-artifact-gate.ps1'
+            # Issue #392 changed the Invoke-PoshQCTest default seams ($EnsureModule -Global
+            # import and the global-session-state $InvokePester trampoline) so the bundled
+            # entry path hosts the Pester run in the global session state; measured here so
+            # the fix produces real per-file changed-line coverage evidence.
+            'scripts/powershell/PoshQC/PoshQC.Testing.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
