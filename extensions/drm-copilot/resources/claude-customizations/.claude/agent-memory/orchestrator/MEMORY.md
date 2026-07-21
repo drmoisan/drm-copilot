@@ -13,3 +13,4 @@ metadata:
 - [branch-base-check-unmerged-pr-deps](feedback_branch_base_check_unmerged_pr_deps.md) — verify required symbols/files exist on the chosen branch base; if they only exist in an open PR, stack or merge first.
 - [potential-to-issue-creates-github-issue](feedback_potential_to_issue_creates_github_issue.md) — potential-to-issue creates the GitHub issue as a side effect; do not also run gh issue create.
 - [small-bug-uses-minor-audit](feedback_small_bug_uses_minor_audit.md) — a ~1-3 production-file bug fix uses the small path with Work Mode minor-audit, not full-bug.
+- [commit-and-push-agent-memory-before-pr](feedback_commit_push_memory_before_pr.md) — commit/push .claude/agent-memory/ changes before opening the PR, and again before merge if the CI/remediation cycle adds more.
