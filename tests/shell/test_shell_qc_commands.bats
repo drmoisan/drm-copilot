@@ -122,7 +122,10 @@ teardown() {
         SHELL_QC_KCOV_OUT_DIR="${KCOV_OUT}" \
         bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test --coverage"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"kcov --cobertura-only"* ]]
+    # Per-run kcov must NOT pass --cobertura-only: that flag suppresses the coverage
+    # database that `kcov --merge` needs, yielding an empty merged report (issue #393).
+    [[ "$output" != *"--cobertura-only"* ]]
+    [[ "$output" == *"kcov --include-pattern="* ]]
     [[ "$output" == *"--include-pattern="*"/tools,"*"/scripts"* ]]
     [[ "$output" == *"--exclude-pattern="*"/tests"* ]]
     [[ "$output" == *"tests/shell"* ]]

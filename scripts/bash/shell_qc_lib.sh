@@ -329,7 +329,10 @@ run_test_coverage() {
 		local run_dir="$runs_dir/${test_dir##*/}"
 		run_dirs+=("$run_dir")
 		rc=0
-		"$kcov_bin" --cobertura-only \
+		# Do not pass --cobertura-only here: that flag suppresses the per-run coverage
+		# database that `kcov --merge` consumes, producing an empty merged report. kcov
+		# still emits Cobertura output in the merged directory without it.
+		"$kcov_bin" \
 			"--include-pattern=$include_pattern" \
 			"--exclude-pattern=$exclude_pattern" \
 			"$run_dir" "$bats_bin" "$test_dir" || rc=$?
@@ -343,6 +346,12 @@ run_test_coverage() {
 		rc=0
 		"$kcov_bin" --merge "$out_dir" "${run_dirs[@]}" || rc=$?
 		((rc > exit_code)) && exit_code=$rc || true
+		# kcov --merge writes the combined Cobertura report to <out_dir>/kcov-merged/cov.xml.
+		# Copy it to the canonical <out_dir>/cov.xml so the summary parse below and
+		# downstream tooling (Coverage Gutters) find a single cov.xml at the documented path.
+		if [[ -f "$out_dir/kcov-merged/cov.xml" ]]; then
+			cp -f "$out_dir/kcov-merged/cov.xml" "$out_dir/cov.xml" || true
+		fi
 	fi
 	# Always remove the intermediate run directories, on success or failure.
 	rm -rf "$runs_dir"

@@ -46,21 +46,21 @@ Python at all:
 - [x] AC1: A native bash wrapper `scripts/bash/shell-qc.sh` provides `check`, `format`, and
       `test` subcommands that invoke `shfmt`, `shellcheck`, and `bats` directly, with no
       Python and no Poetry involved.
-- [ ] AC2: The `test` subcommand supports a coverage mode that runs `bats` under `kcov` and
+- [x] AC2: The `test` subcommand supports a coverage mode that runs `bats` under `kcov` and
       emits a Cobertura `cov.xml`, preserving the prior behavior.
-- [ ] AC3: The wrapper reproduces the prior discovery rules: searches `tools/` and
+- [x] AC3: The wrapper reproduces the prior discovery rules: searches `tools/` and
       `scripts/`; recognizes `.sh` suffix or bash/sh shebang; excludes `.venv`, `.git`,
       `node_modules`, `dist`, `build`; runs bats against `tests/shell` and `tests/bash` when
       present.
 - [x] AC4: `scripts/dev_tools/shell_qc.py` is removed and all five Poetry console-script
       entries referencing it are removed from `pyproject.toml`.
 - [x] AC5: No component of the shell toolchain (local or CI) invokes Python or Poetry.
-- [ ] AC6: `.github/workflows/_shell-coverage.yml` and `.github/workflows/_build-check.yml`
+- [x] AC6: `.github/workflows/_shell-coverage.yml` and `.github/workflows/_build-check.yml`
       invoke the native bash wrapper with no Poetry install or `poetry run`.
 - [x] AC7: `.claude/rules/shell.md` exists, is path-scoped to shell files, and documents the
       native toolchain, invocation, and coverage policy.
-- [ ] AC8: The native wrapper is covered by bats tests under `tests/shell/`.
-- [ ] AC9: A green CI run against the branch head verifies the modified workflows
+- [x] AC8: The native wrapper is covered by bats tests under `tests/shell/`.
+- [x] AC9: A green CI run against the branch head verifies the modified workflows
       (`modified-workflow-needs-green-run`).
 
 ## Constraints & Risks
