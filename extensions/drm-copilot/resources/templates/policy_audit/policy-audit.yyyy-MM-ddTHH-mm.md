@@ -275,9 +275,9 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Formatting with shfmt** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc format`<br>**Result:** [Describe result] |
-| **Linting with shellcheck** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc check`<br>**Result:** [Describe result] |
-| **Testing with bats** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run shell-qc test`<br>**Result:** [Describe result or N/A if no tests] |
+| **Formatting with shfmt** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `bash scripts/bash/shell-qc.sh format`<br>**Result:** [Describe result] |
+| **Linting with shellcheck** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `bash scripts/bash/shell-qc.sh check`<br>**Result:** [Describe result] |
+| **Testing with bats** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `bash scripts/bash/shell-qc.sh test`<br>**Result:** [Describe result or N/A if no tests] |
 
 #### 3C.2 Bash Script Design
 

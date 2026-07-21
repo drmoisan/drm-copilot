@@ -433,11 +433,10 @@
 		},
 		{
 			"args": [
-				"run",
-				"shell-qc",
+				"scripts/bash/shell-qc.sh",
 				"format"
 			],
-			"command": "poetry",
+			"command": "bash",
 			"detail": "Formats repository shell scripts with shfmt (write mode).",
 			"group": {
 				"isDefault": false,
@@ -455,11 +454,10 @@
 		},
 		{
 			"args": [
-				"run",
-				"shell-qc",
+				"scripts/bash/shell-qc.sh",
 				"check"
 			],
-			"command": "poetry",
+			"command": "bash",
 			"detail": "Runs shell QC checks: shfmt -d + shellcheck over discovered scripts.",
 			"group": {
 				"isDefault": false,
@@ -498,11 +496,10 @@
 		},
 		{
 			"args": [
-				"run",
-				"shell-qc",
+				"scripts/bash/shell-qc.sh",
 				"test"
 			],
-			"command": "poetry",
+			"command": "bash",
 			"detail": "Runs bats tests under tests/shell or tests/bash when present.",
 			"group": {
 				"isDefault": false,

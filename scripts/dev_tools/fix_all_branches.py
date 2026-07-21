@@ -179,11 +179,8 @@ def run_shell_branch(
         success_message="Shell formatting completed",
         failure_message="Shell formatting failed. Please review errors above.",
         command=[
-            "poetry",
-            "run",
-            "python",
-            "-m",
-            "scripts.dev_tools.shell_qc",
+            "bash",
+            "scripts/bash/shell-qc.sh",
             "format",
         ],
         runner=branch_runner,
@@ -203,11 +200,8 @@ def run_shell_branch(
         success_message="Shell linting passed",
         failure_message="Shell linting failed. Please review errors above.",
         command=[
-            "poetry",
-            "run",
-            "python",
-            "-m",
-            "scripts.dev_tools.shell_qc",
+            "bash",
+            "scripts/bash/shell-qc.sh",
             "check",
         ],
         runner=branch_runner,
@@ -223,11 +217,8 @@ def run_shell_branch(
     branch_logger.step("Step 3: Running shell tests (bats)...")
     test_result = branch_runner.run(
         [
-            "poetry",
-            "run",
-            "python",
-            "-m",
-            "scripts.dev_tools.shell_qc",
+            "bash",
+            "scripts/bash/shell-qc.sh",
             "test",
         ],
         step_name="Shell: test",

@@ -13,7 +13,7 @@ The repository contains four primary deliverables:
 
 - [scripts/dev_tools/](scripts/dev_tools/) — Python developer tools and CLI entrypoints.
 - [scripts/powershell/](scripts/powershell/) — PowerShell tooling, including the PoshQC quality module.
-- [scripts/bash/](scripts/bash/) — shell tooling validated by `shell-qc`.
+- [scripts/bash/](scripts/bash/) — shell tooling validated by `bash scripts/bash/shell-qc.sh`.
 - [extensions/drm-copilot/](extensions/drm-copilot/) — the VS Code extension that bundles and executes workspace-facing helpers and hosts the MCP server.
 - [packages/mcp-server/](packages/mcp-server/) — the standalone npm package for the `drm-copilot` stdio MCP server.
 - [.github/](.github/) — GitHub Copilot customization surface: `copilot-instructions.md`, `instructions/`, `prompts/`, `skills/`, `agents/`, `codex/`, and CI workflows.
@@ -65,7 +65,6 @@ Selected CLI entrypoints exposed by Poetry:
 
 - `atomic-executor` (also `dev.atomic-executor`)
 - `codex-native-converter`
-- `shell-qc`, `shell-qc-check`, `shell-qc-format`, `shell-qc-test`
 - `dev.collect-commit-context`
 - `dev.pr-context`
 - `dev.new-active-feature`
@@ -363,11 +362,12 @@ The legacy variant uses the `IClock` clock seam rather than `TimeProvider`, refl
 
 ### Bash / shell (shfmt → shellcheck → Bats + kcov)
 
-Validated through the `shell-qc` CLI ([scripts/dev_tools/shell_qc.py](scripts/dev_tools/shell_qc.py)) and the `shell-qc-*` entrypoints:
+Validated through the native bash wrapper [scripts/bash/shell-qc.sh](scripts/bash/shell-qc.sh)
+(no Python, no Poetry):
 
-- format: `poetry run shell-qc-format` (shfmt write mode)
-- check (format + lint): `poetry run shell-qc-check` (shfmt diff mode + shellcheck)
-- test: `poetry run shell-qc-test` or `poetry run shell-qc test --coverage` (Bats with kcov coverage)
+- format: `bash scripts/bash/shell-qc.sh format` (shfmt write mode)
+- check (format + lint): `bash scripts/bash/shell-qc.sh check` (shfmt diff mode + shellcheck)
+- test: `bash scripts/bash/shell-qc.sh test` or `bash scripts/bash/shell-qc.sh test --coverage` (Bats with kcov coverage)
 
 CI builds `kcov` from source and uploads the Bash coverage artifacts.
 

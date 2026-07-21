@@ -47,10 +47,6 @@ types-requests = ">=2.31.0.6"
 [tool.poetry.scripts]
 atomic-executor = "scripts.dev_tools.atomic_executor.cli:main"
 codex-native-converter = "scripts.dev_tools.codex_native_converter.cli:main"
-shell-qc = "scripts.dev_tools.shell_qc:main"
-shell-qc-check = "scripts.dev_tools.shell_qc:main_check"
-shell-qc-format = "scripts.dev_tools.shell_qc:main_format"
-shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
 
 # Dev Tools Aliases
 "dev.atomic-executor" = "scripts.dev_tools.atomic_executor.cli:main"
@@ -83,7 +79,6 @@ shell-qc-test = "scripts.dev_tools.shell_qc:main_test"
 "dev.pr-context" = "scripts.dev_tools.pr_context.collector:main"
 "dev.resolve-execute-plan" = "scripts.dev_tools.resolve_execute_plan_prompt:main"
 "dev.resolve-file-prompt" = "scripts.dev_tools.resolve_file_prompt:main"
-"dev.shell-qc" = "scripts.dev_tools.shell_qc:main"
 "dev.validate-json" = "scripts.dev_tools.validate_json:main"
 
 [tool.black]

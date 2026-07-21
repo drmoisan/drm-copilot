@@ -32,4 +32,6 @@ jobs:
           source test-venv/bin/activate
           pip install dist/*.whl
           atomic-executor --help
-          shell-qc --help
+
+      - name: Shell QC smoke (native)
+        run: bash scripts/bash/shell-qc.sh --help
