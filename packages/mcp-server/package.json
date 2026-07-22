@@ -38,10 +38,11 @@
     "prepack": "node prepack.cjs"
   },
   "overrides": {
-    "fast-uri": "^3.1.2",
-    "hono": "^4.12.25",
+    "fast-uri": "^3.1.4",
+    "hono": "^4.12.27",
     "ip-address": "^10.2.0",
-    "qs": "^6.15.2"
+    "qs": "^6.15.2",
+    "@hono/node-server": "^2.0.5"
   },
   "devDependencies": {
     "esbuild": "^0.28.0"
