@@ -3,9 +3,9 @@
 - **Issue:** #397
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-07-22T08-15
-- **Status:** Approved
-- **Version:** 0.2
+- **Last Updated:** 2026-07-22T13-30
+- **Status:** Ready for Merge
+- **Version:** 0.3
 
 ## Context
 - The `NPM Audit Gate` required CI check (`.github/workflows/_npm-audit-gate.yml`, `npm audit --audit-level=moderate`) fails on `main` for all three npm manifests: root (`.`), `extensions/drm-copilot/`, and `packages/mcp-server/`. This blocks any PR that requires a green `NPM Audit Gate` check.
@@ -95,7 +95,7 @@ N/A.
 - [x] `@modelcontextprotocol/sdk` remains at `^1.29.0` in all three manifests (no SDK downgrade/upgrade); no source files are modified.
 - [x] Existing build/compile steps (`npm run compile` in root and `extensions/drm-copilot/`; `npm run build` in `packages/mcp-server/`) succeed unchanged.
 - [x] Existing unit test suites (Jest, per each manifest's actual `npm run test:unit` script) pass unchanged.
-- [ ] `NPM Audit Gate` required check is green on the PR head SHA.
+- [x] `NPM Audit Gate` required check is green on the PR head SHA.
 - [x] No unintended behavior changes outside the 6 in-scope manifest files.
 
 ## Risks & Mitigations
@@ -103,6 +103,6 @@ N/A.
 - Risk: `EBADENGINE` warning on Node < 18 installs for `@hono/node-server` 2.x (requires Node >= 20). Mitigation: cosmetic only (no `engine-strict`); CI already runs Node 20.
 
 ## Rollout & Follow-up
-- Release/rollout: standard PR merge once `NPM Audit Gate` is green; no phased rollout needed.
+- Release/rollout: PR #398 is open with all required checks, including all three `NPM Audit Gate` legs, confirmed green on the PR head SHA (verified via `gh pr checks 398 --required`). Awaiting merge. No phased rollout needed once merged.
 - Follow-up: track `modelcontextprotocol/typescript-sdk` upstream for a release that removes or bumps its unused `@hono/node-server`/`hono` dependencies, then drop the local `overrides` pins.
-- Links: issue #397; research artifact `docs/features/active/2026-07-22-npm-audit-vulnerabilities-ci-gate-397/research/2026-07-22-npm-audit-fix-strategy.md`.
+- Links: issue #397; PR #398; research artifact `docs/features/active/2026-07-22-npm-audit-vulnerabilities-ci-gate-397/research/2026-07-22-npm-audit-fix-strategy.md`.
