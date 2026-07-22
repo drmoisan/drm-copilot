@@ -1,0 +1,14 @@
+Timestamp: 2026-07-21T20-35
+
+Command: pwsh -NoProfile -File scripts/dev-tools/run-poshqc-suite.ps1
+EXIT_CODE: 0
+
+Output Summary:
+- Test stage: `Tests Passed: 1341, Failed: 0, Skipped: 9, Inconclusive: 0, NotRun: 0` (1332 baseline + 9 new tests across the three touched/created files; 0 failed).
+- Coverage stage (parsed from artifacts/pester/powershell-coverage.xml):
+  - Per-file `PoshQC.Testing.psm1` LINE: missed=64, covered=131, total=195, **67.18%** — DOES NOT MEET the >= 85% acceptance threshold, and is WORSE than the 76.41% (149/195) Phase-0 baseline.
+  - Repo measured-set aggregate LINE: missed=297, covered=2079, total=2376, **87.50%** — meets the >= 85% floor at the aggregate level.
+
+ACCEPTANCE CRITERION NOT MET: per-file `PoshQC.Testing.psm1` LINE coverage is 67.18%, below the required >= 85% floor, and below the pre-change baseline of 76.41%. This task's stated acceptance ("EXIT_CODE: 0; 0 failed; per-file PoshQC.Testing.psm1 LINE >= 85%; repo measured-set LINE >= 85%") is only partially satisfied (exit code, 0 failed, and repo aggregate all pass; the per-file threshold fails). Per `atomic-plan-contract`'s fail-closed evidence rule, this task is left UNCHECKED on the plan checklist pending the delta-verification finding recorded in `remediation-coverage-delta`.
+
+Root cause (discovered during execution, not present in the original plan): each new test's target lines were independently verified to become COVERED when the specific new/modified test file (or a small 2-3 file combination containing it) is run in isolation via a standalone `Invoke-Pester -CodeCoverage` invocation (see `evidence/regression-testing/remediation-new-tests` and inline verification performed during Phase 1). However, when measured through the full 8-test-file bundled suite (`scripts/dev-tools/run-poshqc-suite.ps1`), a pre-existing Pester/PowerShell code-coverage-instrumentation defect causes coverage credit to be lost for lines/branches of a function whenever an EARLIER-running test file becomes the first caller of that function within the whole suite and a LATER-running file (specifically `PoshQC.Tests.ps1`, which always sorts last alphabetically and therefore always performs the final `Import-Module -Force` reimport of the `PoshQC` module) also independently exercises other branches of that same function. This is reproducible and was isolated down to a minimal 2-file case (`PoshQC.TestingSeamDefaults.Tests.ps1` + `PoshQC.Tests.ps1`). The regression affects not only the newly targeted lines (291, 309, 314-316, 322, 332, 340-342, 346, 350-354, 356-357, 359, 368-369, 401-403, 410-415, 417-420, 423-424, 427-428, 433-439 — all still missed) but also previously-baseline-covered lines of `Convert-PoshQCCoverageToRelative` (75, 79, 91, 102-128), which regressed specifically because the new P1-T1 test introduced the first cross-file call to that function from an earlier-running file. Full detail in `remediation-coverage-delta`.

@@ -632,7 +632,7 @@ Describe 'Invoke-PoshQCTest' {
                     @([PSCustomObject]@{ FullName = "$testRoot/tests/test.Tests.ps1" })
                 }
 
-                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -InformationAction SilentlyContinue } | Should -Not -Throw
+                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -InvokePester { param($Config) Invoke-Pester -Configuration $Config } -InformationAction SilentlyContinue } | Should -Not -Throw
 
                 Should -Invoke -CommandName Invoke-Pester -Times 1 -Exactly
                 Should -Invoke -CommandName Convert-PoshQCCoverageToRelative -Times 1 -Exactly
@@ -688,7 +688,7 @@ Describe 'Invoke-PoshQCTest' {
                     @([PSCustomObject]@{ FullName = "$testRoot/tests/test.Tests.ps1" })
                 }
 
-                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -DisableKoverageCopy -InformationAction SilentlyContinue } | Should -Not -Throw
+                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -InvokePester { param($Config) Invoke-Pester -Configuration $Config } -DisableKoverageCopy -InformationAction SilentlyContinue } | Should -Not -Throw
 
                 Should -Invoke -CommandName Invoke-Pester -Times 1 -Exactly
                 Should -Invoke -CommandName Convert-PoshQCCoverageToRelative -Times 0 -Exactly
@@ -756,7 +756,7 @@ Describe 'Invoke-PoshQCTest' {
                     @([PSCustomObject]@{ FullName = "$testRoot/tests/test.Tests.ps1" })
                 }
 
-                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -KoverageOutputPath $customKoveragePath -InformationAction SilentlyContinue } | Should -Not -Throw
+                { Invoke-PoshQCTest -Root $testRoot -SettingsPath $testSettings -ResolveScanConfig { @() } -EnumerateTests $enumerateTestsStub -InvokePester { param($Config) Invoke-Pester -Configuration $Config } -KoverageOutputPath $customKoveragePath -InformationAction SilentlyContinue } | Should -Not -Throw
 
                 Should -Invoke -CommandName Invoke-Pester -Times 1 -Exactly
                 Should -Invoke -CommandName Convert-PoshQCCoverageToRelative -ParameterFilter { $OutputPath -eq $customKoveragePath } -Times 1 -Exactly
