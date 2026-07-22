@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Recording stub for shfmt used by the shell-qc bats command suite via the
+# SHELL_QC_SHFMT_BIN seam. Echoes its argv (prefixed with the tool name for
+# attribution) and exits with the code named by STUB_SHFMT_EXIT (default 0).
+# Writes no files.
+echo "shfmt $*"
+exit "${STUB_SHFMT_EXIT:-0}"

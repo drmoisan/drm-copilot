@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Recording stub for bats used by the shell-qc bats command suite via the
+# SHELL_QC_BATS_BIN seam. Echoes its argv (prefixed with the tool name) and exits
+# with the code named by STUB_BATS_EXIT (default 0). Writes no files.
+echo "bats $*"
+exit "${STUB_BATS_EXIT:-0}"

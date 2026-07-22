@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Recording stub for shellcheck used by the shell-qc bats command suite via the
+# SHELL_QC_SHELLCHECK_BIN seam. Echoes its argv (prefixed with the tool name) and
+# exits with the code named by STUB_SHELLCHECK_EXIT (default 0). Writes no files.
+echo "shellcheck $*"
+exit "${STUB_SHELLCHECK_EXIT:-0}"

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Recording stub for kcov used by the shell-qc bats command suite via the
+# SHELL_QC_KCOV_BIN seam. Echoes its argv (prefixed with the tool name) and exits
+# with the code named by STUB_KCOV_EXIT (default 0). Writes no coverage files, so
+# the wrapper's cov.xml parse finds nothing and prints no summary (exit still 0).
+echo "kcov $*"
+exit "${STUB_KCOV_EXIT:-0}"
