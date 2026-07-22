@@ -55,6 +55,7 @@
     ".claude/rules/tonality.md",
     ".claude/skills/acceptance-criteria-tracking/SKILL.md",
     ".claude/skills/atomic-plan-contract/SKILL.md",
+    ".claude/skills/cleanup-merged-worktrees/SKILL.md",
     ".claude/skills/commit-message/SKILL.md",
     ".claude/skills/discovery-behavior-reconciliation/SKILL.md",
     ".claude/skills/discovery-coverage-ledger/SKILL.md",

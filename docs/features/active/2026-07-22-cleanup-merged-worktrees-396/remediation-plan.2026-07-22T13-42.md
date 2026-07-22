@@ -1,0 +1,28 @@
+# Remediation Plan — 2026-07-22T13-42 (cycle 1)
+
+Canonical issue number for this feature is 396. Remediates the single Blocking finding in `docs/features/active/2026-07-22-cleanup-merged-worktrees-396/remediation-inputs.2026-07-22T13-42.md`: PR #400 CI required check `quality-checks7 / Code Quality & Tests (3.12)` fails because `.claude/skills/cleanup-merged-worktrees/SKILL.md` was never mirrored into the bundled payload at `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+
+## Mechanism Decision
+
+- The `mcp__drm-copilot__push_down_claude_customizations` tool (engine: `scripts/dev_tools/push_down_claude_customizations.py`) publishes bundled `.claude` content outward into a destination consumer workspace. It does not write into `extensions/drm-copilot/resources/claude-customizations/` and is therefore not the mechanism for the repo-to-bundle mirror. The correct minimal fix is a direct byte-identical file copy.
+- `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py::test_bundled_claude_files_are_listed_in_some_pack_manifest` requires every bundled `skills/<name>/SKILL.md` to appear in the union of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/*.json`. Registering the new skill in `pack-manifests/core.json` is therefore part of this remediation (same pattern as commit bab8d604). Copying the file without the manifest entry would replace the current CI failure with a manifest-completeness failure.
+
+## Scope Constraint
+
+- Only two files change: the new bundled `SKILL.md` copy and `pack-manifests/core.json`. Do not modify `.claude/settings.json`, other bundled anchor files, the contract tests, or any unrelated file.
+- No Python production or test source changes are made, so no Python coverage delta attaches to this cycle. The targeted contract test files are the verification gate.
+
+### Phase 0 — Baseline capture
+
+- [x] [P0-T1] Read policy files in the required order (`CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`) and write `docs/features/active/2026-07-22-cleanup-merged-worktrees-396/evidence/remediation-baseline/phase0-instructions-read.2026-07-22T13-42.md` containing `Timestamp:`, `Policy Order:`, and the explicit list of files read. Acceptance: artifact exists with all three fields populated.
+- [x] [P0-T2] [expect-fail] Capture the fail-before baseline: run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` from the repo root and write `docs/features/active/2026-07-22-cleanup-merged-worktrees-396/evidence/regression-testing/bundle-contracts.fail-before.2026-07-22T13-42.md` containing `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: artifact records a non-zero exit code with `test_bundled_claude_payload_contains_all_repo_runtime_contracts` failing on `.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+
+### Phase 1 — Mirror skill into bundled payload and register manifest entry
+
+- [x] [P1-T1] Copy `.claude/skills/cleanup-merged-worktrees/SKILL.md` to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`, byte-identical (same content and encoding, no re-wrapping or line-ending changes). Acceptance: `git diff --no-index .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md` exits 0 with empty output.
+- [x] [P1-T2] Add the entry `".claude/skills/cleanup-merged-worktrees/SKILL.md"` to the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, inserted in existing alphabetical order (after `".claude/skills/atomic-plan-contract/SKILL.md"`, before `".claude/skills/commit-message/SKILL.md"`). Acceptance: `core.json` parses as valid JSON and contains exactly one occurrence of the new entry at the alphabetical position; no other manifest lines change.
+
+### Phase 2 — Final verification, commit, and push
+
+- [x] [P2-T1] Re-run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` from the repo root and write `docs/features/active/2026-07-22-cleanup-merged-worktrees-396/evidence/regression-testing/bundle-contracts.pass-after.2026-07-22T13-42.md` containing `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. This full-file rerun also confirms no other branch-added `.claude/**` file is missing from the bundle. Acceptance: `EXIT_CODE: 0` with all tests in both files passing. `SKIPPED` is not a valid outcome.
+- [ ] [P2-T2] Stage exactly the two changed files (`extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`) plus the remediation-plan and evidence artifacts from this cycle, commit with a conventional message referencing issue #396 (for example `fix(claude): mirror cleanup-merged-worktrees skill into bundled payload and core pack manifest (#396)`), and push to branch `drm-copilot-wt-2026-07-21T21-57`. Acceptance: `git status` is clean for the listed paths after push and the new commit SHA is recorded in the pass-after evidence artifact or commit output captured in `docs/features/active/2026-07-22-cleanup-merged-worktrees-396/evidence/regression-testing/bundle-contracts.pass-after.2026-07-22T13-42.md`.
