@@ -1,0 +1,18 @@
+worktree /repo/main
+HEAD aaaa0000
+branch refs/heads/main
+
+worktree /repo-wt/onbranch
+HEAD bbbb1111
+branch refs/heads/some-branch
+
+worktree /repo-wt/detachedlocked
+HEAD cccc2222
+detached
+locked reason here
+
+worktree /repo-wt/pruned
+HEAD dddd3333
+branch refs/heads/gonebranch
+prunable gitdir file points to a non-existent location
+

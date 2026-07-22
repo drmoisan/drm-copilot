@@ -1,0 +1,499 @@
+#!/usr/bin/env bash
+# cleanup_worktrees_lib.sh: sourceable function library for the cleanup-worktrees
+# tool. Provides the git-binary test seam, branch/worktree enumeration, the
+# current-worktree/branch exclusion, main-freshness warning, and the full
+# classification ladder (ancestry -> content-neutral -> cherry-equivalence ->
+# rename-aware blob fallback -> unique-residual selection). Consolidation,
+# deletion, and the CLI live in sibling files (cleanup_worktrees_actions_lib.sh
+# and cleanup-worktrees.sh) to keep every file within the 500-line cap.
+#
+# Sourcing contract: this library defines functions only; it never runs work at
+# source time, so the wrapper and the bats suites can source it without side effects.
+# All git commands go through cleanup_wt_git so tests can stub the git binary via
+# CLEANUP_WT_GIT_BIN. git commands that legitimately return non-zero (merge-base
+# --is-ancestor, diff --quiet, cherry) are captured with `|| rc=$?` so an intended
+# non-zero exit does not abort under set -euo pipefail.
+#
+# Report line contract (LC_ALL=C ordered, pipe-delimited, one record per line):
+#   BRANCH|<name>|<state>
+#   COMMIT|<branch>|<sha>|<state>|<paths-csv>|<author>|<author-date>
+#   WORKTREE|<path>|<branch-or-DETACHED>|<flags>
+#   WARN|main-divergence|<local-sha>|<origin-sha>
+#   DIRTY|<worktree-path>|<status-porcelain-line>
+#   ACTION|<verb>|<target>|<result>   (apply mode only; emitted by the actions lib)
+# Branch states: NOT_MERGED | MERGED_CLEAN | MERGED_CONTENT_NEUTRAL |
+#   MERGED_EQUIVALENT | HAS_UNIQUE_RESIDUALS | PROTECTED_CURRENT; ANCESTRY_ERROR is a
+#   hard failure. Per-commit states: EQUIVALENT | CONTENT_ON_MAIN | EMPTY | UNIQUE |
+#   CONFLICT.
+
+cleanup_wt_git() {
+	# Resolve the git binary honoring the CLEANUP_WT_GIT_BIN override seam, then
+	# execute it with the caller's arguments.
+	#
+	# When CLEANUP_WT_GIT_BIN is set to a non-empty value it must point to an
+	# existing executable; an empty or nonexistent value is treated as missing and
+	# falls back to `command -v git`. This mirrors the SHELL_QC_<TOOL>_BIN seam in
+	# scripts/bash/shell_qc_lib.sh so the bats suites can stub git deterministically.
+	#
+	# Args: the git subcommand and its arguments.
+	# Returns git's exit code, or 127 when no git binary can be resolved.
+	local override=${CLEANUP_WT_GIT_BIN:-}
+	local git_bin=""
+	if [[ -n $override && -x $override ]]; then
+		git_bin=$override
+	else
+		git_bin=$(command -v git 2>/dev/null) || git_bin=""
+	fi
+	if [[ -z $git_bin ]]; then
+		printf 'cleanup-worktrees: no git binary resolved (CLEANUP_WT_GIT_BIN=%s)\n' "$override" >&2
+		return 127
+	fi
+	"$git_bin" "$@"
+}
+
+enumerate_branches() {
+	# Enumerate local branches via plumbing, one "name sha" pair per line.
+	#
+	# Uses `git for-each-ref` rather than `git branch` so loose refs and packed-refs
+	# are read uniformly and the output carries no decoration markers (`*`, `+`) or
+	# column padding. Output is LC_ALL=C sorted for deterministic ordering and
+	# deterministic cross-branch cherry-pick order.
+	#
+	# Returns git's exit code from for-each-ref (0 on success).
+	local rc=0
+	cleanup_wt_git for-each-ref \
+		--format='%(refname:short) %(objectname)' refs/heads/ |
+		LC_ALL=C sort || rc=$?
+	return "$rc"
+}
+
+parse_worktree_list() {
+	# Parse `git worktree list --porcelain` stanza-wise into pipe-delimited records.
+	#
+	# Emits one record per worktree: `path|head|branch-or-DETACHED|flags`. A new
+	# stanza begins at each `worktree ` line; a blank line closes the current stanza.
+	# The branch field carries the short branch name (refs/heads/ stripped) or the
+	# literal DETACHED when the stanza had a `detached` line. flags is a
+	# comma-separated set drawn from main,detached,bare,locked,prunable; the first
+	# stanza always carries the `main` flag (the main worktree is never a candidate).
+	#
+	# Returns 0 on success.
+	local rc=0 line
+	local path="" head="" branch="" detached=0 bare=0 locked=0 prunable=0
+	local first=1 have=0
+	emit_record() {
+		# Flush the accumulated stanza as one record; no-op when none accumulated.
+		((have == 0)) && return 0
+		local -a flag_parts=()
+		((first == 1)) && flag_parts+=("main")
+		((detached == 1)) && flag_parts+=("detached")
+		((bare == 1)) && flag_parts+=("bare")
+		((locked == 1)) && flag_parts+=("locked")
+		((prunable == 1)) && flag_parts+=("prunable")
+		local flags=""
+		local IFS=,
+		flags="${flag_parts[*]}"
+		local branch_field="DETACHED"
+		[[ -n $branch ]] && branch_field=$branch
+		printf '%s|%s|%s|%s\n' "$path" "$head" "$branch_field" "$flags"
+		first=0
+	}
+	while IFS= read -r line || [[ -n $line ]]; do
+		case "$line" in
+		"worktree "*)
+			emit_record
+			path=${line#worktree }
+			head="" branch="" detached=0 bare=0 locked=0 prunable=0
+			have=1
+			;;
+		"HEAD "*) head=${line#HEAD } ;;
+		"branch "*) branch=${line#branch refs/heads/} ;;
+		detached) detached=1 ;;
+		bare) bare=1 ;;
+		"locked"*) locked=1 ;;
+		"prunable"*) prunable=1 ;;
+		"") ;; # stanza separator; the next `worktree ` flushes the record
+		esac
+	done < <(cleanup_wt_git worktree list --porcelain || rc=$?)
+	emit_record
+	return "$rc"
+}
+
+normalize_wt_path() {
+	# Normalize a worktree path for comparison across Windows/WSL and git output.
+	#
+	# Converts backslashes to forward slashes, lowercases (case-insensitive match on
+	# Windows), and strips a single trailing slash. Echoes the normalized value;
+	# echoes nothing for an empty input.
+	#
+	# Args: $1 = path.
+	local p=${1:-}
+	[[ -z $p ]] && return 0
+	p=${p//\\//}
+	p=${p,,}
+	p=${p%/}
+	printf '%s\n' "$p"
+}
+
+compute_protected() {
+	# Compute the protected branch and protected worktree paths (PROTECTED_CURRENT).
+	#
+	# Dual exclusion, both checks required:
+	#   1. Current branch via `git rev-parse --abbrev-ref HEAD`. A `HEAD` result means
+	#      detached: no branch name to protect (only the worktree path is protected).
+	#   2. Current worktree path via `git rev-parse --show-toplevel`, compared after
+	#      slash/case normalization against each porcelain worktree path.
+	# The main worktree (first porcelain stanza) is always protected regardless of the
+	# above. Emits `protected-branch|<name>` (omitted when detached) and one
+	# `protected-path|<normalized-path>` line per protected worktree.
+	#
+	# Returns 0 on success.
+	local rc=0 current_branch current_top norm_cur
+	current_branch=$(cleanup_wt_git rev-parse --abbrev-ref HEAD 2>/dev/null) || current_branch=""
+	current_top=$(cleanup_wt_git rev-parse --show-toplevel 2>/dev/null) || current_top=""
+	norm_cur=$(normalize_wt_path "$current_top")
+	if [[ -n $current_branch && $current_branch != HEAD ]]; then
+		printf 'protected-branch|%s\n' "$current_branch"
+	fi
+	local first=1 record path norm
+	# Compare the current toplevel against each porcelain worktree path; the first
+	# stanza (main worktree) is always protected.
+	while IFS= read -r record; do
+		[[ -z $record ]] && continue
+		path=${record%%|*}
+		norm=$(normalize_wt_path "$path")
+		if ((first == 1)); then
+			printf 'protected-path|%s\n' "$norm"
+		elif [[ -n $norm_cur && $norm == "$norm_cur" ]]; then
+			printf 'protected-path|%s\n' "$norm"
+		fi
+		first=0
+	done < <(parse_worktree_list)
+	return "$rc"
+}
+
+check_main_freshness() {
+	# Warn when local `main` diverges from `origin/main`; never block classification.
+	#
+	# Compares `git rev-parse main` with `git rev-parse origin/main`. On mismatch it
+	# emits the report line `WARN|main-divergence|<local-sha>|<origin-sha>`. A stale
+	# local `main` can only produce a false "not merged" (the safe direction), so this
+	# is advisory only and always returns 0. If either rev-parse fails (e.g. no
+	# origin/main configured), the check is skipped without error.
+	local local_sha origin_sha
+	local_sha=$(cleanup_wt_git rev-parse main 2>/dev/null) || return 0
+	origin_sha=$(cleanup_wt_git rev-parse origin/main 2>/dev/null) || return 0
+	if [[ -n $local_sha && -n $origin_sha && $local_sha != "$origin_sha" ]]; then
+		printf 'WARN|main-divergence|%s|%s\n' "$local_sha" "$origin_sha"
+	fi
+	return 0
+}
+
+classify_ancestry() {
+	# First ladder rung: is <tip> an ancestor of main?
+	#
+	# Wraps `git merge-base --is-ancestor <tip> main`, capturing the exit code with
+	# `|| rc=$?` so set -e does not abort on the expected non-zero. Echoes exactly one
+	# verdict token and always returns 0:
+	#   exit 0   -> MERGED_CLEAN   (delete-eligible; zero residual commits)
+	#   exit 1   -> NOT_ANCESTOR   (continue the ladder)
+	#   exit > 1 -> ANCESTRY_ERROR (hard failure for the branch; never "not merged")
+	#
+	# Args: $1 = branch tip (name or sha).
+	local tip="$1" rc=0
+	cleanup_wt_git merge-base --is-ancestor "$tip" main >/dev/null 2>&1 || rc=$?
+	if ((rc == 0)); then
+		printf 'MERGED_CLEAN\n'
+	elif ((rc == 1)); then
+		printf 'NOT_ANCESTOR\n'
+	else
+		printf 'ANCESTRY_ERROR\n'
+	fi
+	return 0
+}
+
+classify_content_neutral() {
+	# Second ladder rung: does the branch add no net content versus main?
+	#
+	# Runs `git diff --quiet main...<branch>` (three-dot: merge-base(main,branch) ->
+	# branch tip) with `|| rc=$?`. This short-circuit runs BEFORE any per-commit
+	# `git cherry` analysis and catches revert-pairs (a commit and its later revert
+	# on the same branch net to nothing). Echoes exactly one verdict token and always
+	# returns 0:
+	#   exit 0   -> MERGED_CONTENT_NEUTRAL (delete-eligible)
+	#   exit 1   -> NOT_NEUTRAL            (continue the ladder)
+	#   exit > 1 -> CONTENT_NEUTRAL_ERROR  (hard failure for the branch)
+	#
+	# Args: $1 = branch name.
+	local branch="$1" rc=0
+	cleanup_wt_git diff --quiet "main...$branch" >/dev/null 2>&1 || rc=$?
+	if ((rc == 0)); then
+		printf 'MERGED_CONTENT_NEUTRAL\n'
+	elif ((rc == 1)); then
+		printf 'NOT_NEUTRAL\n'
+	else
+		printf 'CONTENT_NEUTRAL_ERROR\n'
+	fi
+	return 0
+}
+
+classify_cherry_equivalent() {
+	# Third ladder rung: patch-id equivalence via `git cherry main <branch>`.
+	#
+	# `git cherry` emits `- <sha>` when an equivalent patch already exists on main and
+	# `+ <sha>` when none does. A `+` commit whose diff is empty (verified with
+	# `git diff-tree --no-commit-id -r <sha>` producing no output) is also counted as
+	# equivalent (droppable empty commit). When every residual is equivalent the branch
+	# is content-equivalent-merged.
+	#
+	# Output contract (one token per line; always returns 0):
+	#   - if all residuals are equivalent: a single line `MERGED_EQUIVALENT`
+	#   - otherwise: one `RESIDUAL <sha>` line per remaining `+` commit for the
+	#     blob-level tier (classify_residual_commit).
+	#
+	# Args: $1 = branch name.
+	local branch="$1" rc=0 line marker sha
+	local -a residuals=()
+	while IFS= read -r line || [[ -n $line ]]; do
+		[[ -z $line ]] && continue
+		marker=${line%% *}
+		sha=${line#* }
+		# `-` lines are patch-id equivalent: nothing to carry forward.
+		[[ $marker == "-" ]] && continue
+		if [[ $marker == "+" ]]; then
+			local dt=""
+			dt=$(cleanup_wt_git diff-tree --no-commit-id -r "$sha" 2>/dev/null) || true
+			# An empty-diff residual commit is droppable; treat as equivalent.
+			[[ -z $dt ]] && continue
+			residuals+=("$sha")
+		fi
+	done < <(cleanup_wt_git cherry main "$branch" || rc=$?)
+	if ((${#residuals[@]} == 0)); then
+		printf 'MERGED_EQUIVALENT\n'
+	else
+		for sha in "${residuals[@]}"; do
+			printf 'RESIDUAL %s\n' "$sha"
+		done
+	fi
+	return 0
+}
+
+_blob_equal() {
+	# Return 0 iff <ref-a>:<path> and <ref-b>:<path> resolve to the same blob OID.
+	#
+	# A rev-parse failure for either side (e.g. the path is absent on that ref) is
+	# treated as "not equal" (return 1) so an added/removed path is never mistaken for
+	# equivalent content.
+	#
+	# Args: $1 = ref-a, $2 = ref-b, $3 = path.
+	local ref_a="$1" ref_b="$2" path="$3" oid_a oid_b
+	oid_a=$(cleanup_wt_git rev-parse "$ref_a:$path" 2>/dev/null) || return 1
+	oid_b=$(cleanup_wt_git rev-parse "$ref_b:$path" 2>/dev/null) || return 1
+	[[ -n $oid_a && $oid_a == "$oid_b" ]]
+}
+
+classify_residual_commit() {
+	# Fourth ladder rung: rename-aware blob-OID comparison for one `+` commit.
+	#
+	# Enumerates touched paths via
+	#   git diff-tree --no-commit-id --name-status -r -M <sha>
+	# and decides per path whether the branch's content already exists on main:
+	#   A / M : compare blob OIDs of <branch>:<path> vs main:<path>; differ or absent
+	#           on main -> unique.
+	#   D     : droppable iff the path is ALSO absent on main; still present on main
+	#           means the branch's deletion is unique work.
+	#   Rnnn  : compare blob OIDs at the NEW path (rename target).
+	# All touched paths equivalent -> CONTENT_ON_MAIN; any unique path -> UNIQUE with
+	# the comma-separated unique path list.
+	#
+	# Output contract (single line; always returns 0):
+	#   CONTENT_ON_MAIN
+	#   UNIQUE|<path1,path2,...>
+	#
+	# Args: $1 = branch name, $2 = commit sha.
+	local branch="$1" sha="$2" status p1 p2 relpath
+	local -a unique_paths=()
+	while IFS=$'\t' read -r status p1 p2 || [[ -n $status ]]; do
+		[[ -z $status ]] && continue
+		case "$status" in
+		A | M)
+			relpath="$p1"
+			_blob_equal "$branch" main "$relpath" || unique_paths+=("$relpath")
+			;;
+		D)
+			relpath="$p1"
+			# Present on main means the deletion is unique work; absent means droppable.
+			if cleanup_wt_git rev-parse "main:$relpath" >/dev/null 2>&1; then
+				unique_paths+=("$relpath")
+			fi
+			;;
+		R*)
+			relpath="$p2"
+			_blob_equal "$branch" main "$relpath" || unique_paths+=("$relpath")
+			;;
+		esac
+	done < <(cleanup_wt_git diff-tree --no-commit-id --name-status -r -M "$sha" 2>/dev/null)
+	if ((${#unique_paths[@]} == 0)); then
+		printf 'CONTENT_ON_MAIN\n'
+	else
+		local IFS=,
+		printf 'UNIQUE|%s\n' "${unique_paths[*]}"
+	fi
+	return 0
+}
+
+select_cherry_pick_candidates() {
+	# Emit one COMMIT record per UNIQUE residual commit, oldest-first.
+	#
+	# The non-equivalent `+` residual set comes from classify_cherry_equivalent; the
+	# oldest-first order and per-commit author/author-date come from
+	#   git rev-list --reverse --no-merges --format='%H|%an|%aI' main..<branch>
+	# (`--reverse` = application order for cherry-picking; `--no-merges` excludes merge
+	# commits; the `commit <sha>` header lines from --format are dropped). Emits, per
+	# UNIQUE residual: COMMIT|<branch>|<sha>|UNIQUE|<paths-csv>|<author>|<author-date>.
+	#
+	# Args: $1 = branch name.
+	local branch="$1" line sha author date verdict paths restline rc=0
+	local -A is_residual=()
+	while IFS= read -r line; do
+		[[ $line == RESIDUAL\ * ]] || continue
+		is_residual[${line#RESIDUAL }]=1
+	done < <(classify_cherry_equivalent "$branch")
+	while IFS= read -r line || [[ -n $line ]]; do
+		[[ $line == commit\ * ]] && continue
+		[[ -z $line ]] && continue
+		sha=${line%%|*}
+		restline=${line#*|}
+		author=${restline%%|*}
+		date=${restline#*|}
+		[[ -n ${is_residual[$sha]:-} ]] || continue
+		verdict=$(classify_residual_commit "$branch" "$sha")
+		if [[ $verdict == UNIQUE\|* ]]; then
+			paths=${verdict#UNIQUE|}
+			printf 'COMMIT|%s|%s|UNIQUE|%s|%s|%s\n' "$branch" "$sha" "$paths" "$author" "$date"
+		fi
+	done < <(cleanup_wt_git rev-list --reverse --no-merges --format='%H|%an|%aI' "main..$branch" || rc=$?)
+	return "$rc"
+}
+
+classify_branch() {
+	# Orchestrate the full classification ladder for one branch and emit its pinned
+	# report lines (BRANCH first, then COMMIT records for unique residuals oldest-first).
+	# No commit-message text is ever consulted. Ladder order (spec):
+	#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main
+	#      worktree always protected).
+	#   2. ancestry -> MERGED_CLEAN, or ANCESTRY_ERROR (hard fail).
+	#   3. content-neutral short-circuit -> MERGED_CONTENT_NEUTRAL.
+	#   4. cherry patch-id equivalence -> MERGED_EQUIVALENT when all residuals equiv.
+	#   5. rename-aware blob fallback: residuals all CONTENT_ON_MAIN -> MERGED_EQUIVALENT.
+	#   6. remaining unique residuals -> HAS_UNIQUE_RESIDUALS when the branch was
+	#      partially incorporated on main (a cherry `-` line or a CONTENT_ON_MAIN
+	#      residual), else NOT_MERGED (purely unmerged code).
+	#
+	# Args: $1 = branch name. Returns 0 normally; 2 on an ancestry/diff hard error.
+	local name="$1"
+	local -A prot_branch=() prot_path=()
+	local pline
+	while IFS= read -r pline; do
+		case "$pline" in
+		protected-branch\|*) prot_branch[${pline#protected-branch|}]=1 ;;
+		protected-path\|*) prot_path[${pline#protected-path|}]=1 ;;
+		esac
+	done < <(compute_protected)
+	# Locate this branch's worktree path (normalized), if any.
+	local wt_norm="" record wpath wbranch
+	while IFS= read -r record; do
+		[[ -z $record ]] && continue
+		IFS='|' read -r wpath _ wbranch _ <<<"$record"
+		if [[ $wbranch == "$name" ]]; then
+			wt_norm=$(normalize_wt_path "$wpath")
+			break
+		fi
+	done < <(parse_worktree_list)
+	if [[ -n ${prot_branch[$name]:-} ]] || { [[ -n $wt_norm && -n ${prot_path[$wt_norm]:-} ]]; }; then
+		printf 'BRANCH|%s|PROTECTED_CURRENT\n' "$name"
+		return 0
+	fi
+	local v
+	v=$(classify_ancestry "$name")
+	case "$v" in
+	MERGED_CLEAN)
+		printf 'BRANCH|%s|MERGED_CLEAN\n' "$name"
+		return 0
+		;;
+	ANCESTRY_ERROR)
+		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+		return 2
+		;;
+	esac
+	v=$(classify_content_neutral "$name")
+	case "$v" in
+	MERGED_CONTENT_NEUTRAL)
+		printf 'BRANCH|%s|MERGED_CONTENT_NEUTRAL\n' "$name"
+		return 0
+		;;
+	CONTENT_NEUTRAL_ERROR)
+		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+		return 2
+		;;
+	esac
+	local ce
+	ce=$(classify_cherry_equivalent "$name")
+	if [[ $ce == "MERGED_EQUIVALENT" ]]; then
+		printf 'BRANCH|%s|MERGED_EQUIVALENT\n' "$name"
+		return 0
+	fi
+	# Residual `+` commits exist; resolve each via the blob tier.
+	local sha verdict unique_count=0 content_count=0
+	while IFS= read -r pline; do
+		[[ $pline == RESIDUAL\ * ]] || continue
+		sha=${pline#RESIDUAL }
+		verdict=$(classify_residual_commit "$name" "$sha")
+		if [[ $verdict == UNIQUE\|* ]]; then
+			unique_count=$((unique_count + 1))
+		elif [[ $verdict == "CONTENT_ON_MAIN" ]]; then
+			content_count=$((content_count + 1))
+		fi
+	done < <(printf '%s\n' "$ce")
+	if ((unique_count == 0)); then
+		# Every residual was content-on-main; the branch is content-equivalent-merged.
+		printf 'BRANCH|%s|MERGED_EQUIVALENT\n' "$name"
+		return 0
+	fi
+	# Partial-merge signal: was any part of this branch already incorporated on main?
+	local minus_present=0
+	if cleanup_wt_git cherry main "$name" 2>/dev/null | grep -q '^- '; then
+		minus_present=1
+	fi
+	local state="NOT_MERGED"
+	if ((minus_present == 1)) || ((content_count > 0)); then
+		state="HAS_UNIQUE_RESIDUALS"
+	fi
+	printf 'BRANCH|%s|%s\n' "$name" "$state"
+	if [[ $state == "HAS_UNIQUE_RESIDUALS" ]]; then
+		select_cherry_pick_candidates "$name"
+	fi
+	return 0
+}
+
+run_report() {
+	# Report-mode driver: emit the deterministic report with no mutation of any kind.
+	# Emission order: WARN (freshness) first, then WORKTREE registrations, then the
+	# per-branch BRANCH/COMMIT lines with branches taken in enumerate_branches'
+	# LC_ALL=C order. Returns the maximum classify_branch return code (non-zero when
+	# any branch reported ANCESTRY_ERROR).
+	local rc=0 crc name record wpath wbranch wflags
+	check_main_freshness
+	while IFS= read -r record; do
+		[[ -z $record ]] && continue
+		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
+		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
+	done < <(parse_worktree_list)
+	while read -r name _; do
+		[[ -z $name ]] && continue
+		crc=0
+		classify_branch "$name" || crc=$?
+		((crc > rc)) && rc=$crc || true
+	done < <(enumerate_branches)
+	return "$rc"
+}
