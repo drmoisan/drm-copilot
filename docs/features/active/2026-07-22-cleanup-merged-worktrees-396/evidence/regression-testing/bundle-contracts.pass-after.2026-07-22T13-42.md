@@ -20,5 +20,10 @@ Output Summary:
   from the bundle.
 
 Commit:
-- Commit output (SHA) is recorded below after staging the two changed payload
-  files plus the remediation-plan and evidence artifacts for this cycle.
+- Remediation commit SHA: 8c1a026684280ad6f7a0f61401394d1c60102173
+- Commit output: `[drm-copilot-wt-2026-07-21T21-57 8c1a0266] fix(claude):
+  mirror cleanup-merged-worktrees skill into bundled payload and core pack
+  manifest (#396)` — 6 files changed, 230 insertions(+).
+- Staged paths (exactly the scoped set): the two changed bundled-payload files
+  (`.claude/skills/cleanup-merged-worktrees/SKILL.md`, `pack-manifests/core.json`),
+  the remediation-plan, and this cycle's evidence artifacts.
