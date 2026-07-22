@@ -14,13 +14,15 @@ setup() {
 }
 
 cb() { # cb <scenario> <branch>  -> run classify_branch under that scenario
+    # The git stub logs its argv to stderr; discard it so $output is the function's
+    # stdout report lines only (bats `run` otherwise merges stderr into $output).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${LIB}' && classify_branch '$2'"
+        bash -c "source '${LIB}' && classify_branch '$2' 2>/dev/null"
 }
 
 report() { # report <scenario> -> run the full report driver under that scenario
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${LIB}' && run_report"
+        bash -c "source '${LIB}' && run_report 2>/dev/null"
 }
 
 @test "merged_no_worktree: MERGED_CLEAN and no worktree record for the branch" {

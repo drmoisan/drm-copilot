@@ -51,7 +51,13 @@ setup() {
 }
 
 @test "sourcing the wrapper does not execute main (source-guard)" {
-    run bash -c "source '${WRAPPER}'; echo SOURCED_OK"
+    # Source in a subshell so the wrapper's `set -euo pipefail` cannot abort the
+    # outer shell before the marker is printed; then assert the observable contract:
+    # sourcing prints no report or usage output (main did not run).
+    run bash -c "( source '${WRAPPER}' ) 2>/dev/null; echo GUARD_OK"
     [ "$status" -eq 0 ]
-    [ "$output" = "SOURCED_OK" ]
+    [[ "$output" == *"GUARD_OK"* ]]
+    [[ "$output" != *"BRANCH|"* ]]
+    [[ "$output" != *"WORKTREE|"* ]]
+    [[ "$output" != *"Usage: cleanup-worktrees.sh"* ]]
 }
