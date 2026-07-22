@@ -98,3 +98,25 @@ Describe 'Invoke-PoshQCTest default $EnsureModule seam (issue #392)' {
         }
     }
 }
+
+Describe 'Convert-PoshQCCoverageToRelative default $TestPathExists/$Logger seam (issue #392)' {
+    It 'returns without writing an output file and without throwing when the coverage input file does not exist on disk (line 98)' {
+        # Arrange: invoke the real exported function with its real default $ResolvePath,
+        # $JoinPath, $TestPathExists, $ReadContent, $WriteContent, $EnsureDirectory,
+        # $GetDefaultOutputPath, and $Logger scriptblocks (none injected/mocked), and an
+        # -InputPath naming a file that never exists on disk under $PSScriptRoot, so the
+        # real Test-Path-backed $TestPathExists default reports false and the early-return
+        # branch at line 98 fires.
+        $missingInputFileName = 'poshqc-testing-line98-missing-coverage-392.xml'
+        $derivedOutputPath = Join-Path $PSScriptRoot 'poshqc-testing-line98-missing-coverage-392.koverage.xml'
+
+        # Act: an uncaught exception here would fail the test, so the passing assertions below
+        # also demonstrate the call completed without throwing.
+        $result = Convert-PoshQCCoverageToRelative -RepoRoot $PSScriptRoot -InputPath $missingInputFileName
+
+        # Assert: the function returned nothing (the early `return` on the not-found branch)
+        # and never reached the write-output codepath.
+        $result | Should -BeNullOrEmpty
+        Test-Path -Path $derivedOutputPath | Should -BeFalse
+    }
+}
