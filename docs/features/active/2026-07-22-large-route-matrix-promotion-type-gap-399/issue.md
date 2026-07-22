@@ -42,11 +42,11 @@ The `"large"` route entry in `config/orchestration-routing.json` lists two `requ
 
 ## Acceptance Criteria
 
-- [ ] `config/orchestration-routing.json`'s `routes.large.required_skills` no longer names `orchestrator-workflow` or `repo-automation-adapter` unless a corresponding skill file is created under `.claude/skills/` for each.
-- [ ] `config/orchestration-routing.json`'s `routes.large.required_mcp_tools` reflects the correct promotion tool per `promotion_type`: `new_potential_entry` for `feature`, `new_potential_bug_entry` for `bug` (either by promotion-type-aware branching in the matrix, or by corresponding promotion-type-aware handling in `validate_routing_contract`).
-- [ ] `scripts/dev_tools/_orchestrator_state_routing.py`'s `validate_routing_contract` passes cleanly (zero errors) for a synthetic large-route, bug-type checkpoint that records a truthful `new_potential_bug_entry` MCP receipt and no fabricated `orchestrator-workflow` / `repo-automation-adapter` skill receipts.
-- [ ] `validate_routing_contract` continues to pass cleanly for the existing large-route, feature-type case (no regression).
-- [ ] Unit test coverage added for `scripts/dev_tools/_orchestrator_state_routing.py` (or its test module) asserting both fixed behaviors above.
+- [x] `config/orchestration-routing.json`'s `routes.large.required_skills` no longer names `orchestrator-workflow` or `repo-automation-adapter` unless a corresponding skill file is created under `.claude/skills/` for each.
+- [x] `config/orchestration-routing.json`'s `routes.large.required_mcp_tools` reflects the correct promotion tool per `promotion_type`: `new_potential_entry` for `feature`, `new_potential_bug_entry` for `bug` (either by promotion-type-aware branching in the matrix, or by corresponding promotion-type-aware handling in `validate_routing_contract`).
+- [x] `scripts/dev_tools/_orchestrator_state_routing.py`'s `validate_routing_contract` passes cleanly (zero errors) for a synthetic large-route, bug-type checkpoint that records a truthful `new_potential_bug_entry` MCP receipt and no fabricated `orchestrator-workflow` / `repo-automation-adapter` skill receipts.
+- [x] `validate_routing_contract` continues to pass cleanly for the existing large-route, feature-type case (no regression).
+- [x] Unit test coverage added for `scripts/dev_tools/_orchestrator_state_routing.py` (or its test module) asserting both fixed behaviors above.
 
 ## Logs / Screenshots
 
