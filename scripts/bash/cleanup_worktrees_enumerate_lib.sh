@@ -16,9 +16,14 @@
 # defined here.
 #
 # All git commands go through cleanup_wt_git so tests can stub the git binary via
-# CLEANUP_WT_GIT_BIN. git commands that legitimately return non-zero (merge-base
-# --is-ancestor, diff --quiet, cherry) are captured with `|| rc=$?` so an intended
-# non-zero exit does not abort under set -euo pipefail.
+# CLEANUP_WT_GIT_BIN. Git exit-code capture rule: the `git worktree list --porcelain`
+# output consumed by parse_worktree_list is captured in the PARENT shell
+# (`out=$(cmd) || rc=$?`, then iterated over `<<<"$out"`) so a non-zero exit is
+# observed here rather than lost inside a process substitution. On a hard failure
+# parse_worktree_list emits no records and returns git's non-zero exit code, and
+# compute_protected propagates that failure rather than degrading to an empty
+# (weakened) protected set. An empty porcelain output with exit 0 remains a valid
+# empty list.
 
 cleanup_wt_git() {
 	# Resolve the git binary honoring the CLEANUP_WT_GIT_BIN override seam, then
@@ -71,8 +76,12 @@ parse_worktree_list() {
 	# comma-separated set drawn from main,detached,bare,locked,prunable; the first
 	# stanza always carries the `main` flag (the main worktree is never a candidate).
 	#
-	# Returns 0 on success.
-	local rc=0 line
+	# The porcelain listing is captured in the parent shell (`out=$(...) || rc=$?`) so
+	# a non-zero git exit is observed here rather than being lost inside a process
+	# substitution. Returns 0 on success (including an empty porcelain output with exit
+	# 0, which is a valid empty list); on a hard git failure it prints a diagnostic to
+	# stderr, emits no records, and returns git's non-zero exit code.
+	local rc=0 line out
 	local path="" head="" branch="" detached=0 bare=0 locked=0 prunable=0
 	local first=1 have=0
 	emit_record() {
@@ -92,6 +101,15 @@ parse_worktree_list() {
 		printf '%s|%s|%s|%s\n' "$path" "$head" "$branch_field" "$flags"
 		first=0
 	}
+	# Guarded parent-shell capture: a non-zero git exit is observed here (an unguarded
+	# `out=$(...)` would abort under the wrapper's set -euo pipefail). On a hard
+	# failure, return before emitting any record so the caller cannot mistake a git
+	# failure for an empty worktree list.
+	out=$(cleanup_wt_git worktree list --porcelain) || rc=$?
+	if ((rc != 0)); then
+		printf 'cleanup-worktrees: git worktree list --porcelain failed (rc=%s)\n' "$rc" >&2
+		return "$rc"
+	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		case "$line" in
 		"worktree "*)
@@ -108,7 +126,7 @@ parse_worktree_list() {
 		"prunable"*) prunable=1 ;;
 		"") ;; # stanza separator; the next `worktree ` flushes the record
 		esac
-	done < <(cleanup_wt_git worktree list --porcelain || rc=$?)
+	done <<<"$out"
 	emit_record
 	return "$rc"
 }
@@ -141,7 +159,9 @@ compute_protected() {
 	# above. Emits `protected-branch|<name>` (omitted when detached) and one
 	# `protected-path|<normalized-path>` line per protected worktree.
 	#
-	# Returns 0 on success.
+	# Returns 0 on success. A parse_worktree_list hard failure propagates as its
+	# non-zero return; the caller must treat that as fatal, not as an empty (weakened)
+	# protected set.
 	local rc=0 current_branch current_top norm_cur
 	current_branch=$(cleanup_wt_git rev-parse --abbrev-ref HEAD 2>/dev/null) || current_branch=""
 	current_top=$(cleanup_wt_git rev-parse --show-toplevel 2>/dev/null) || current_top=""
@@ -149,9 +169,14 @@ compute_protected() {
 	if [[ -n $current_branch && $current_branch != HEAD ]]; then
 		printf 'protected-branch|%s\n' "$current_branch"
 	fi
-	local first=1 record path norm
-	# Compare the current toplevel against each porcelain worktree path; the first
-	# stanza (main worktree) is always protected.
+	local first=1 record path norm pout prc=0
+	# Guarded parent-shell capture: a parse_worktree_list hard failure must abort here,
+	# not degrade to an empty protected set. Compare the current toplevel against each
+	# porcelain worktree path; the first stanza (main worktree) is always protected.
+	pout=$(parse_worktree_list) || prc=$?
+	if ((prc != 0)); then
+		return "$prc"
+	fi
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		path=${record%%|*}
@@ -162,7 +187,7 @@ compute_protected() {
 			printf 'protected-path|%s\n' "$norm"
 		fi
 		first=0
-	done < <(parse_worktree_list)
+	done <<<"$pout"
 	return "$rc"
 }
 

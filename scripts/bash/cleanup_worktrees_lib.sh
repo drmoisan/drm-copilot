@@ -14,9 +14,18 @@
 # source time, so the wrapper and the bats suites can source it without side effects.
 # It depends on cleanup_worktrees_enumerate_lib.sh (source that first). All git
 # commands go through cleanup_wt_git so tests can stub the git binary via
-# CLEANUP_WT_GIT_BIN. git commands that legitimately return non-zero (merge-base
-# --is-ancestor, diff --quiet, cherry) are captured with `|| rc=$?` so an intended
-# non-zero exit does not abort under set -euo pipefail.
+# CLEANUP_WT_GIT_BIN.
+#
+# Git exit-code capture rule: a git command with an EXPECTED non-zero exit in the
+# ladder (merge-base --is-ancestor, diff --quiet) is captured at the function-body
+# level with `|| rc=$?` and mapped to a verdict token. A git command whose output is
+# ITERATED (cherry, rev-list) is captured in the PARENT shell
+# (`out=$(cmd) || rc=$?`, then iterated over `<<<"$out"`) so a non-zero exit is
+# observed rather than lost inside a process substitution. Hard-error semantics: a
+# non-zero `git cherry` exit yields the internal verdict token CHERRY_ERROR; a hard
+# failure of any enumeration/protection/cherry/rev-list read maps to the
+# BRANCH|<name>|ANCESTRY_ERROR report state and a non-zero return. A hard git failure
+# never resolves to a MERGED_* verdict.
 #
 # Report line contract (LC_ALL=C ordered, pipe-delimited, one record per line):
 #   BRANCH|<name>|<state>
@@ -91,10 +100,22 @@ classify_cherry_equivalent() {
 	#   - if all residuals are equivalent: a single line `MERGED_EQUIVALENT`
 	#   - otherwise: one `RESIDUAL <sha>` line per remaining `+` commit for the
 	#     blob-level tier (classify_residual_commit).
+	#   - on a hard `git cherry` failure (non-zero exit): a single line `CHERRY_ERROR`.
+	#     `git cherry` has no expected non-zero in this ladder, so any non-zero exit is
+	#     a hard failure; the caller (classify_branch) maps CHERRY_ERROR to the
+	#     ANCESTRY_ERROR report state and never to MERGED_EQUIVALENT.
 	#
 	# Args: $1 = branch name.
-	local branch="$1" rc=0 line marker sha
+	local branch="$1" rc=0 line marker sha out
 	local -a residuals=()
+	# Guarded parent-shell capture: a non-zero `git cherry` exit is observed here and
+	# reported as CHERRY_ERROR before any residual processing, so an empty/failed cherry
+	# result cannot be mistaken for "all residuals equivalent".
+	out=$(cleanup_wt_git cherry main "$branch") || rc=$?
+	if ((rc != 0)); then
+		printf 'CHERRY_ERROR\n'
+		return 0
+	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		[[ -z $line ]] && continue
 		marker=${line%% *}
@@ -108,7 +129,7 @@ classify_cherry_equivalent() {
 			[[ -z $dt ]] && continue
 			residuals+=("$sha")
 		fi
-	done < <(cleanup_wt_git cherry main "$branch" || rc=$?)
+	done <<<"$out"
 	if ((${#residuals[@]} == 0)); then
 		printf 'MERGED_EQUIVALENT\n'
 	else
@@ -195,11 +216,26 @@ select_cherry_pick_candidates() {
 	#
 	# Args: $1 = branch name.
 	local branch="$1" line sha author date verdict paths restline rc=0
+	local ceout cerc=0 rlout
 	local -A is_residual=()
+	# Defensive re-check of the cherry verdict: a CHERRY_ERROR (or a non-zero return)
+	# must abort with a non-zero status rather than proceed with an empty residual map.
+	ceout=$(classify_cherry_equivalent "$branch") || cerc=$?
+	if ((cerc != 0)) || [[ $ceout == "CHERRY_ERROR" ]]; then
+		return 2
+	fi
 	while IFS= read -r line; do
 		[[ $line == RESIDUAL\ * ]] || continue
 		is_residual[${line#RESIDUAL }]=1
-	done < <(classify_cherry_equivalent "$branch")
+	done <<<"$ceout"
+	# Guarded parent-shell capture: a rev-list hard failure returns git's exit code
+	# with no COMMIT line emitted, so a candidate is never silently fabricated or
+	# dropped as a success.
+	rlout=$(cleanup_wt_git rev-list --reverse --no-merges --format='%H|%an|%aI' "main..$branch") || rc=$?
+	if ((rc != 0)); then
+		printf 'cleanup-worktrees: git rev-list failed for %s (rc=%s)\n' "$branch" "$rc" >&2
+		return "$rc"
+	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		[[ $line == commit\ * ]] && continue
 		[[ -z $line ]] && continue
@@ -213,7 +249,7 @@ select_cherry_pick_candidates() {
 			paths=${verdict#UNIQUE|}
 			printf 'COMMIT|%s|%s|UNIQUE|%s|%s|%s\n' "$branch" "$sha" "$paths" "$author" "$date"
 		fi
-	done < <(cleanup_wt_git rev-list --reverse --no-merges --format='%H|%an|%aI' "main..$branch" || rc=$?)
+	done <<<"$rlout"
 	return "$rc"
 }
 
@@ -231,18 +267,35 @@ classify_branch() {
 	#      partially incorporated on main (a cherry `-` line or a CONTENT_ON_MAIN
 	#      residual), else NOT_MERGED (purely unmerged code).
 	#
-	# Args: $1 = branch name. Returns 0 normally; 2 on an ancestry/diff hard error.
+	# Args: $1 = branch name. Returns 0 normally; 2 on any hard error surfaced by the
+	# enumeration/protection reads (worktree-list, protected-set), the cherry rung
+	# (CHERRY_ERROR), or rev-list candidate selection. A hard git failure always maps to
+	# the ANCESTRY_ERROR report state and a non-zero return, never a MERGED verdict.
 	local name="$1"
 	local -A prot_branch=() prot_path=()
-	local pline
+	local pline cpout cprc=0
+	# Guarded parent-shell capture of the protected set: a compute_protected hard
+	# failure (a git worktree-list failure underneath) must map to ANCESTRY_ERROR, not
+	# a weakened/empty protected set that could let a real branch reach a MERGED verdict.
+	cpout=$(compute_protected) || cprc=$?
+	if ((cprc != 0)); then
+		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+		return 2
+	fi
 	while IFS= read -r pline; do
 		case "$pline" in
 		protected-branch\|*) prot_branch[${pline#protected-branch|}]=1 ;;
 		protected-path\|*) prot_path[${pline#protected-path|}]=1 ;;
 		esac
-	done < <(compute_protected)
-	# Locate this branch's worktree path (normalized), if any.
-	local wt_norm="" record wpath wbranch
+	done <<<"$cpout"
+	# Locate this branch's worktree path (normalized), if any, from a guarded capture
+	# of the worktree list; a hard failure here likewise maps to ANCESTRY_ERROR.
+	local wt_norm="" record wpath wbranch wlout wlrc=0
+	wlout=$(parse_worktree_list) || wlrc=$?
+	if ((wlrc != 0)); then
+		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+		return 2
+	fi
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch _ <<<"$record"
@@ -250,7 +303,7 @@ classify_branch() {
 			wt_norm=$(normalize_wt_path "$wpath")
 			break
 		fi
-	done < <(parse_worktree_list)
+	done <<<"$wlout"
 	if [[ -n ${prot_branch[$name]:-} ]] || { [[ -n $wt_norm && -n ${prot_path[$wt_norm]:-} ]]; }; then
 		printf 'BRANCH|%s|PROTECTED_CURRENT\n' "$name"
 		return 0
@@ -280,6 +333,11 @@ classify_branch() {
 	esac
 	local ce
 	ce=$(classify_cherry_equivalent "$name")
+	if [[ $ce == "CHERRY_ERROR" ]]; then
+		# Hard `git cherry` failure: same mapping as CONTENT_NEUTRAL_ERROR.
+		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+		return 2
+	fi
 	if [[ $ce == "MERGED_EQUIVALENT" ]]; then
 		printf 'BRANCH|%s|MERGED_EQUIVALENT\n' "$name"
 		return 0
@@ -312,7 +370,13 @@ classify_branch() {
 	fi
 	printf 'BRANCH|%s|%s\n' "$name" "$state"
 	if [[ $state == "HAS_UNIQUE_RESIDUALS" ]]; then
-		select_cherry_pick_candidates "$name"
+		# Propagate a rev-list/cherry hard failure: the BRANCH line already names a
+		# non-delete-eligible state, and the non-zero return signals the hard error.
+		local scrc=0
+		select_cherry_pick_candidates "$name" || scrc=$?
+		if ((scrc != 0)); then
+			return 2
+		fi
 	fi
 	return 0
 }
@@ -323,13 +387,20 @@ run_report() {
 	# per-branch BRANCH/COMMIT lines with branches taken in enumerate_branches'
 	# LC_ALL=C order. Returns the maximum classify_branch return code (non-zero when
 	# any branch reported ANCESTRY_ERROR).
-	local rc=0 crc name record wpath wbranch wflags
+	local rc=0 crc name record wpath wbranch wflags wlout wlrc=0
 	check_main_freshness
+	# Guarded parent-shell capture: a worktree-list hard failure aborts the report
+	# before any WORKTREE line or branch classification, so a git failure never
+	# resolves to a partial, misleading report.
+	wlout=$(parse_worktree_list) || wlrc=$?
+	if ((wlrc != 0)); then
+		return "$wlrc"
+	fi
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
-	done < <(parse_worktree_list)
+	done <<<"$wlout"
 	while read -r name _; do
 		[[ -z $name ]] && continue
 		crc=0
