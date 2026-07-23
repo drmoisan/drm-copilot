@@ -19,13 +19,22 @@
 # Git exit-code capture rule: a git command with an EXPECTED non-zero exit in the
 # ladder (merge-base --is-ancestor, diff --quiet) is captured at the function-body
 # level with `|| rc=$?` and mapped to a verdict token. A git command whose output is
-# ITERATED (cherry, rev-list) is captured in the PARENT shell
-# (`out=$(cmd) || rc=$?`, then iterated over `<<<"$out"`) so a non-zero exit is
-# observed rather than lost inside a process substitution. Hard-error semantics: a
-# non-zero `git cherry` exit yields the internal verdict token CHERRY_ERROR; a hard
-# failure of any enumeration/protection/cherry/rev-list read maps to the
-# BRANCH|<name>|ANCESTRY_ERROR report state and a non-zero return. A hard git failure
-# never resolves to a MERGED_* verdict.
+# ITERATED or whose exit code is authoritative (cherry, diff-tree, ls-tree, rev-list)
+# is captured in the PARENT shell (`out=$(cmd) || rc=$?`, then iterated over
+# `<<<"$out"`) so a non-zero exit is observed rather than lost inside a process
+# substitution or a pipeline. Internal hard-error verdict tokens (echo-verdict
+# contract, the callee returns 0; classify_branch maps each to the report state):
+#   CHERRY_ERROR    - non-zero `git cherry` exit (classify_cherry_equivalent).
+#   DIFF_TREE_ERROR - non-zero `git diff-tree` exit while probing a `+` commit's diff
+#                     for the empty-residual case (classify_cherry_equivalent).
+#   RESIDUAL_ERROR  - non-zero exit of the name-status `git diff-tree` read or the
+#                     D-rung `git ls-tree` probe (classify_residual_commit).
+#   MINUS_PRESENT   - a `- <sha>` cherry line was seen (partial-merge signal); read by
+#                     classify_branch from the captured verdict instead of a second
+#                     `git cherry` invocation whose exit code would be discarded.
+# A hard failure of any enumeration/protection/cherry/diff-tree/ls-tree/rev-list read
+# maps to the BRANCH|<name>|ANCESTRY_ERROR report state and a non-zero return. A hard
+# git failure never resolves to a MERGED_* verdict.
 #
 # Report line contract (LC_ALL=C ordered, pipe-delimited, one record per line):
 #   BRANCH|<name>|<state>
@@ -98,15 +107,22 @@ classify_cherry_equivalent() {
 	#
 	# Output contract (one token per line; always returns 0):
 	#   - if all residuals are equivalent: a single line `MERGED_EQUIVALENT`
-	#   - otherwise: one `RESIDUAL <sha>` line per remaining `+` commit for the
-	#     blob-level tier (classify_residual_commit).
+	#   - otherwise: a `MINUS_PRESENT` line first (only when any `- <sha>` cherry line
+	#     was seen), then one `RESIDUAL <sha>` line per remaining `+` commit for the
+	#     blob-level tier (classify_residual_commit). classify_branch reads MINUS_PRESENT
+	#     from this captured verdict instead of re-invoking `git cherry`.
 	#   - on a hard `git cherry` failure (non-zero exit): a single line `CHERRY_ERROR`.
 	#     `git cherry` has no expected non-zero in this ladder, so any non-zero exit is
 	#     a hard failure; the caller (classify_branch) maps CHERRY_ERROR to the
 	#     ANCESTRY_ERROR report state and never to MERGED_EQUIVALENT.
+	#   - on a hard `git diff-tree` failure while probing a `+` commit's diff (non-zero
+	#     exit): a single line `DIFF_TREE_ERROR`. diff-tree has no expected non-zero
+	#     here, so any non-zero exit is a hard failure; the caller maps DIFF_TREE_ERROR
+	#     to ANCESTRY_ERROR and never to MERGED_EQUIVALENT. An empty diff-tree output
+	#     with exit 0 remains the legitimate droppable empty-commit case.
 	#
 	# Args: $1 = branch name.
-	local branch="$1" rc=0 line marker sha out
+	local branch="$1" rc=0 line marker sha out minus_seen=0
 	local -a residuals=()
 	# Guarded parent-shell capture: a non-zero `git cherry` exit is observed here and
 	# reported as CHERRY_ERROR before any residual processing, so an empty/failed cherry
@@ -120,11 +136,21 @@ classify_cherry_equivalent() {
 		[[ -z $line ]] && continue
 		marker=${line%% *}
 		sha=${line#* }
-		# `-` lines are patch-id equivalent: nothing to carry forward.
-		[[ $marker == "-" ]] && continue
+		# `-` lines are patch-id equivalent: nothing to carry forward, but record that a
+		# partial-merge signal exists so classify_branch need not re-invoke `git cherry`.
+		if [[ $marker == "-" ]]; then
+			minus_seen=1
+			continue
+		fi
 		if [[ $marker == "+" ]]; then
-			local dt=""
-			dt=$(cleanup_wt_git diff-tree --no-commit-id -r "$sha" 2>/dev/null) || true
+			local dt="" dtrc=0
+			# Guarded parent-shell capture: a non-zero diff-tree exit is a hard failure
+			# reported as DIFF_TREE_ERROR, never mistaken for an empty (droppable) diff.
+			dt=$(cleanup_wt_git diff-tree --no-commit-id -r "$sha") || dtrc=$?
+			if ((dtrc != 0)); then
+				printf 'DIFF_TREE_ERROR\n'
+				return 0
+			fi
 			# An empty-diff residual commit is droppable; treat as equivalent.
 			[[ -z $dt ]] && continue
 			residuals+=("$sha")
@@ -133,6 +159,7 @@ classify_cherry_equivalent() {
 	if ((${#residuals[@]} == 0)); then
 		printf 'MERGED_EQUIVALENT\n'
 	else
+		((minus_seen == 1)) && printf 'MINUS_PRESENT\n'
 		for sha in "${residuals[@]}"; do
 			printf 'RESIDUAL %s\n' "$sha"
 		done
@@ -162,8 +189,10 @@ classify_residual_commit() {
 	# and decides per path whether the branch's content already exists on main:
 	#   A / M : compare blob OIDs of <branch>:<path> vs main:<path>; differ or absent
 	#           on main -> unique.
-	#   D     : droppable iff the path is ALSO absent on main; still present on main
-	#           means the branch's deletion is unique work.
+	#   D     : probe `git ls-tree main -- <path>` (guarded capture). Non-empty output
+	#           means the path is still present on main -> the branch's deletion is
+	#           unique work; empty output (exit 0) means the path is also absent on main
+	#           -> droppable. A non-zero ls-tree exit is a hard failure -> RESIDUAL_ERROR.
 	#   Rnnn  : compare blob OIDs at the NEW path (rename target).
 	# All touched paths equivalent -> CONTENT_ON_MAIN; any unique path -> UNIQUE with
 	# the comma-separated unique path list.
@@ -171,10 +200,20 @@ classify_residual_commit() {
 	# Output contract (single line; always returns 0):
 	#   CONTENT_ON_MAIN
 	#   UNIQUE|<path1,path2,...>
+	#   RESIDUAL_ERROR   (hard git failure of the name-status diff-tree read or the
+	#                     D-rung ls-tree probe; never resolved to CONTENT_ON_MAIN/UNIQUE)
 	#
 	# Args: $1 = branch name, $2 = commit sha.
-	local branch="$1" sha="$2" status p1 p2 relpath
+	local branch="$1" sha="$2" status p1 p2 relpath out dtrc=0
 	local -a unique_paths=()
+	# Guarded parent-shell capture: a non-zero name-status diff-tree exit is a hard
+	# failure reported as RESIDUAL_ERROR before any path processing, never resolved to
+	# CONTENT_ON_MAIN or UNIQUE.
+	out=$(cleanup_wt_git diff-tree --no-commit-id --name-status -r -M "$sha") || dtrc=$?
+	if ((dtrc != 0)); then
+		printf 'RESIDUAL_ERROR\n'
+		return 0
+	fi
 	while IFS=$'\t' read -r status p1 p2 || [[ -n $status ]]; do
 		[[ -z $status ]] && continue
 		case "$status" in
@@ -184,17 +223,24 @@ classify_residual_commit() {
 			;;
 		D)
 			relpath="$p1"
-			# Present on main means the deletion is unique work; absent means droppable.
-			if cleanup_wt_git rev-parse "main:$relpath" >/dev/null 2>&1; then
-				unique_paths+=("$relpath")
+			# Guarded ls-tree probe: a hard git failure (RESIDUAL_ERROR) is distinct from a
+			# path legitimately absent on main (droppable). rev-parse's exit code cannot
+			# make this distinction, so use ls-tree's stdout: non-empty -> present on main
+			# (the deletion is unique work); empty with exit 0 -> absent (droppable).
+			local lsout="" lsrc=0
+			lsout=$(cleanup_wt_git ls-tree main -- "$relpath") || lsrc=$?
+			if ((lsrc != 0)); then
+				printf 'RESIDUAL_ERROR\n'
+				return 0
 			fi
+			[[ -n $lsout ]] && unique_paths+=("$relpath")
 			;;
 		R*)
 			relpath="$p2"
 			_blob_equal "$branch" main "$relpath" || unique_paths+=("$relpath")
 			;;
 		esac
-	done < <(cleanup_wt_git diff-tree --no-commit-id --name-status -r -M "$sha" 2>/dev/null)
+	done <<<"$out"
 	if ((${#unique_paths[@]} == 0)); then
 		printf 'CONTENT_ON_MAIN\n'
 	else
@@ -221,7 +267,7 @@ select_cherry_pick_candidates() {
 	# Defensive re-check of the cherry verdict: a CHERRY_ERROR (or a non-zero return)
 	# must abort with a non-zero status rather than proceed with an empty residual map.
 	ceout=$(classify_cherry_equivalent "$branch") || cerc=$?
-	if ((cerc != 0)) || [[ $ceout == "CHERRY_ERROR" ]]; then
+	if ((cerc != 0)) || [[ $ceout == "CHERRY_ERROR" || $ceout == "DIFF_TREE_ERROR" ]]; then
 		return 2
 	fi
 	while IFS= read -r line; do
@@ -245,6 +291,11 @@ select_cherry_pick_candidates() {
 		date=${restline#*|}
 		[[ -n ${is_residual[$sha]:-} ]] || continue
 		verdict=$(classify_residual_commit "$branch" "$sha")
+		if [[ $verdict == "RESIDUAL_ERROR" ]]; then
+			# A residual hard error must abort candidate selection with a non-zero status
+			# rather than silently drop or fabricate a COMMIT record.
+			return 2
+		fi
 		if [[ $verdict == UNIQUE\|* ]]; then
 			paths=${verdict#UNIQUE|}
 			printf 'COMMIT|%s|%s|UNIQUE|%s|%s|%s\n' "$branch" "$sha" "$paths" "$author" "$date"
@@ -269,8 +320,10 @@ classify_branch() {
 	#
 	# Args: $1 = branch name. Returns 0 normally; 2 on any hard error surfaced by the
 	# enumeration/protection reads (worktree-list, protected-set), the cherry rung
-	# (CHERRY_ERROR), or rev-list candidate selection. A hard git failure always maps to
-	# the ANCESTRY_ERROR report state and a non-zero return, never a MERGED verdict.
+	# (CHERRY_ERROR), the empty-residual diff-tree probe (DIFF_TREE_ERROR), the
+	# name-status/ls-tree residual reads (RESIDUAL_ERROR), or rev-list candidate
+	# selection. A hard git failure always maps to the ANCESTRY_ERROR report state and a
+	# non-zero return, never a MERGED verdict.
 	local name="$1"
 	local -A prot_branch=() prot_path=()
 	local pline cpout cprc=0
@@ -333,8 +386,9 @@ classify_branch() {
 	esac
 	local ce
 	ce=$(classify_cherry_equivalent "$name")
-	if [[ $ce == "CHERRY_ERROR" ]]; then
-		# Hard `git cherry` failure: same mapping as CONTENT_NEUTRAL_ERROR.
+	if [[ $ce == "CHERRY_ERROR" || $ce == "DIFF_TREE_ERROR" ]]; then
+		# Hard `git cherry` or `git diff-tree` failure: same mapping as
+		# CONTENT_NEUTRAL_ERROR (ANCESTRY_ERROR report state, hard-fail return 2).
 		printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
 		return 2
 	fi
@@ -348,6 +402,12 @@ classify_branch() {
 		[[ $pline == RESIDUAL\ * ]] || continue
 		sha=${pline#RESIDUAL }
 		verdict=$(classify_residual_commit "$name" "$sha")
+		if [[ $verdict == "RESIDUAL_ERROR" ]]; then
+			# Hard failure of the name-status diff-tree read or the D-rung ls-tree probe:
+			# map to ANCESTRY_ERROR before any state line is emitted.
+			printf 'BRANCH|%s|ANCESTRY_ERROR\n' "$name"
+			return 2
+		fi
 		if [[ $verdict == UNIQUE\|* ]]; then
 			unique_count=$((unique_count + 1))
 		elif [[ $verdict == "CONTENT_ON_MAIN" ]]; then
@@ -360,10 +420,10 @@ classify_branch() {
 		return 0
 	fi
 	# Partial-merge signal: was any part of this branch already incorporated on main?
+	# Derived from the already-captured cherry verdict (MINUS_PRESENT token) instead of a
+	# second `git cherry` invocation whose exit code would be discarded in a pipeline.
 	local minus_present=0
-	if cleanup_wt_git cherry main "$name" 2>/dev/null | grep -q '^- '; then
-		minus_present=1
-	fi
+	[[ $ce == *MINUS_PRESENT* ]] && minus_present=1
 	local state="NOT_MERGED"
 	if ((minus_present == 1)) || ((content_count > 0)); then
 		state="HAS_UNIQUE_RESIDUALS"
@@ -386,16 +446,21 @@ run_report() {
 	# Emission order: WARN (freshness) first, then WORKTREE registrations, then the
 	# per-branch BRANCH/COMMIT lines with branches taken in enumerate_branches'
 	# LC_ALL=C order. Returns the maximum classify_branch return code (non-zero when
-	# any branch reported ANCESTRY_ERROR).
-	local rc=0 crc name record wpath wbranch wflags wlout wlrc=0
-	check_main_freshness
-	# Guarded parent-shell capture: a worktree-list hard failure aborts the report
-	# before any WORKTREE line or branch classification, so a git failure never
-	# resolves to a partial, misleading report.
+	# any branch reported ANCESTRY_ERROR). A worktree-list OR enumerate-branches hard
+	# failure aborts the report before any line is emitted and returns git's non-zero
+	# exit code, so a git failure never resolves to a partial, misleading report.
+	local rc=0 crc name record wpath wbranch wflags wlout wlrc=0 ebout ebrc=0
+	# Guarded parent-shell captures up front, before any output: a hard failure of either
+	# read aborts the report before any WARN/WORKTREE/BRANCH line.
 	wlout=$(parse_worktree_list) || wlrc=$?
 	if ((wlrc != 0)); then
 		return "$wlrc"
 	fi
+	ebout=$(enumerate_branches) || ebrc=$?
+	if ((ebrc != 0)); then
+		return "$ebrc"
+	fi
+	check_main_freshness
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
@@ -406,6 +471,6 @@ run_report() {
 		crc=0
 		classify_branch "$name" || crc=$?
 		((crc > rc)) && rc=$crc || true
-	done < <(enumerate_branches)
+	done <<<"$ebout"
 	return "$rc"
 }

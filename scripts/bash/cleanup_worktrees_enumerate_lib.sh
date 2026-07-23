@@ -23,7 +23,13 @@
 # parse_worktree_list emits no records and returns git's non-zero exit code, and
 # compute_protected propagates that failure rather than degrading to an empty
 # (weakened) protected set. An empty porcelain output with exit 0 remains a valid
-# empty list.
+# empty list. enumerate_branches captures `git for-each-ref` in the parent shell
+# (`out=$(...) || rc=$?`) BEFORE sorting, so a for-each-ref hard failure is observed
+# even when the caller lacks pipefail; it returns git's exit code with no stdout rather
+# than an empty branch list. compute_protected captures `git rev-parse --abbrev-ref
+# HEAD` and `git rev-parse --show-toplevel`; a hard failure of either is fatal (returns
+# git's exit code), never a weakened protection fallback. The detached-HEAD case
+# (rev-parse succeeds printing HEAD) is unaffected.
 
 cleanup_wt_git() {
 	# Resolve the git binary honoring the CLEANUP_WT_GIT_BIN override seam, then
@@ -58,12 +64,22 @@ enumerate_branches() {
 	# column padding. Output is LC_ALL=C sorted for deterministic ordering and
 	# deterministic cross-branch cherry-pick order.
 	#
-	# Returns git's exit code from for-each-ref (0 on success).
-	local rc=0
-	cleanup_wt_git for-each-ref \
-		--format='%(refname:short) %(objectname)' refs/heads/ |
-		LC_ALL=C sort || rc=$?
-	return "$rc"
+	# The for-each-ref result is captured in the parent shell (`out=$(...) || rc=$?`) so
+	# a non-zero for-each-ref exit is observed here even when the caller lacks pipefail
+	# (the bats harness); piping straight into sort would attribute only sort's exit to
+	# rc and lose the for-each-ref failure. On a hard failure it prints a diagnostic to
+	# stderr, emits no stdout, and returns git's non-zero exit code. Returns git's exit
+	# code from for-each-ref (0 on success).
+	local rc=0 out
+	out=$(cleanup_wt_git for-each-ref \
+		--format='%(refname:short) %(objectname)' refs/heads/) || rc=$?
+	if ((rc != 0)); then
+		printf 'cleanup-worktrees: git for-each-ref refs/heads/ failed (rc=%s)\n' "$rc" >&2
+		return "$rc"
+	fi
+	# printf-pipe (not a herestring) so an empty ref list emits nothing rather than one
+	# empty line.
+	printf '%s' "$out" | LC_ALL=C sort
 }
 
 parse_worktree_list() {
@@ -161,10 +177,21 @@ compute_protected() {
 	#
 	# Returns 0 on success. A parse_worktree_list hard failure propagates as its
 	# non-zero return; the caller must treat that as fatal, not as an empty (weakened)
-	# protected set.
-	local rc=0 current_branch current_top norm_cur
-	current_branch=$(cleanup_wt_git rev-parse --abbrev-ref HEAD 2>/dev/null) || current_branch=""
-	current_top=$(cleanup_wt_git rev-parse --show-toplevel 2>/dev/null) || current_top=""
+	# protected set. A hard failure of `git rev-parse --abbrev-ref HEAD` or
+	# `git rev-parse --show-toplevel` is likewise fatal (return git's exit code), never a
+	# weakened protection fallback; the detached-HEAD case (rev-parse succeeds printing
+	# HEAD) is unaffected and keeps its branch-name omission.
+	local rc=0 current_branch current_top norm_cur cbrc=0 ctrc=0
+	current_branch=$(cleanup_wt_git rev-parse --abbrev-ref HEAD) || cbrc=$?
+	if ((cbrc != 0)); then
+		printf 'cleanup-worktrees: git rev-parse --abbrev-ref HEAD failed (rc=%s)\n' "$cbrc" >&2
+		return "$cbrc"
+	fi
+	current_top=$(cleanup_wt_git rev-parse --show-toplevel) || ctrc=$?
+	if ((ctrc != 0)); then
+		printf 'cleanup-worktrees: git rev-parse --show-toplevel failed (rc=%s)\n' "$ctrc" >&2
+		return "$ctrc"
+	fi
 	norm_cur=$(normalize_wt_path "$current_top")
 	if [[ -n $current_branch && $current_branch != HEAD ]]; then
 		printf 'protected-branch|%s\n' "$current_branch"

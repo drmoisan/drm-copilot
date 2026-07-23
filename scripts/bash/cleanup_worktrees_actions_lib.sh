@@ -15,6 +15,24 @@
 # remove on a dirty tree, merge-base --is-ancestor) are captured with `|| rc=$?` so
 # an intended non-zero exit does not abort under set -euo pipefail. All consolidation
 # git commands target the dedicated worktree via `git -C`, never the caller's tree.
+#
+# Guarded-read invariant: every git-backed read whose output or exit code is
+# authoritative is captured in the parent shell (`out=$(cmd) || rc=$?`, iterated over
+# `<<<"$out"`), never via `mapfile`/`< <(...)`. consolidation_worktree_path fails
+# (non-zero, empty stdout) on a parse_worktree_list hard failure or an empty main path,
+# so the malformed `-wt/documentationandmemories` derivation is impossible; both
+# consumers (create_consolidation_worktree, cleanup_consolidation_on_abort) guard the
+# capture. run_apply captures parse_worktree_list, enumerate_branches, and each
+# classify_branch with rc up front and returns non-zero on any hard failure without
+# mutating. reverify_delete_eligible and remove_worktree_safe capture their git-backed
+# reads and fail closed (BLOCKED-REVERIFY / BLOCKED-DIRTY). Accepted best-effort sites
+# (Design Decision 9), intentionally left as `|| true` because every failure direction
+# is already fail-closed: `git fetch origin main` in verify_consolidation_merged (a
+# stale main can only block deletion, never fabricate ancestry), `cherry-pick
+# --skip`/`--abort` in cherry_pick_candidates (a failed skip/abort surfaces on the next
+# pick as rc=1), the CHERRY_PICK_HEAD and ref-exists probes, and
+# `vout=$(verify_consolidation_merged) || true` in run_apply (only the exact token
+# MERGED_CLEAN unlocks deletion).
 
 CLEANUP_WT_CONSOLIDATION_BRANCH="documentationandmemories"
 
@@ -22,15 +40,30 @@ consolidation_worktree_path() {
 	# Echo the consolidation worktree path. CLEANUP_WT_CONSOLIDATION_PATH overrides;
 	# otherwise the path is <main-worktree-path>-wt/documentationandmemories, where the
 	# main worktree path is the first `git worktree list --porcelain` stanza.
+	#
+	# A parse_worktree_list hard failure aborts with git's exit code and no stdout; an
+	# empty main worktree path aborts with return 1 and no stdout. Either way the
+	# malformed `-wt/documentationandmemories` derivation from an empty main path is
+	# impossible.
 	local override=${CLEANUP_WT_CONSOLIDATION_PATH:-}
 	if [[ -n $override ]]; then
 		printf '%s\n' "$override"
 		return 0
 	fi
-	local -a records=()
-	mapfile -t records < <(parse_worktree_list)
-	local main_wt=""
-	((${#records[@]} > 0)) && main_wt=${records[0]%%|*}
+	local out rc=0 first_record main_wt=""
+	# Guarded parent-shell capture instead of `mapfile < <(...)`, which would swallow a
+	# git hard failure and yield a malformed path.
+	out=$(parse_worktree_list) || rc=$?
+	if ((rc != 0)); then
+		printf 'cleanup-worktrees: cannot derive consolidation path: git worktree list failed (rc=%s)\n' "$rc" >&2
+		return "$rc"
+	fi
+	first_record=${out%%$'\n'*}
+	main_wt=${first_record%%|*}
+	if [[ -z $main_wt ]]; then
+		printf 'cleanup-worktrees: cannot derive consolidation path: empty main worktree path\n' >&2
+		return 1
+	fi
 	printf '%s-wt/%s\n' "$main_wt" "$CLEANUP_WT_CONSOLIDATION_BRANCH"
 }
 
@@ -42,10 +75,16 @@ create_consolidation_worktree() {
 	# Otherwise run `git worktree add <path> -b documentationandmemories main` with the
 	# path derived by consolidation_worktree_path.
 	#
-	# Returns 0 on success (emits ACTION|worktree-add|<path>|OK); non-zero on the
-	# pre-existing-branch guard or a failed worktree add.
-	local path rc=0
-	path=$(consolidation_worktree_path)
+	# Returns 0 on success (emits ACTION|worktree-add|<path>|OK); non-zero on a
+	# consolidation-path derivation failure, the pre-existing-branch guard, or a failed
+	# worktree add.
+	local path rc=0 prc=0
+	# Guarded capture: a consolidation-path derivation failure aborts before the ref
+	# probe and before any git mutation.
+	path=$(consolidation_worktree_path) || prc=$?
+	if ((prc != 0)); then
+		return "$prc"
+	fi
 	if cleanup_wt_git rev-parse --verify --quiet \
 		"refs/heads/$CLEANUP_WT_CONSOLIDATION_BRANCH" >/dev/null 2>&1; then
 		printf 'cleanup-worktrees: refs/heads/%s already exists; refusing to reuse a prior consolidation branch. Remove it or resume the prior run.\n' \
@@ -130,13 +169,22 @@ cleanup_consolidation_on_abort() {
 	# used (that policy is global to this library); a failed removal is reported.
 	#
 	# Returns 0 (best-effort cleanup; each step's result is reported via ACTION lines).
-	local path wrc=0 brc=0
-	path=$(consolidation_worktree_path)
-	cleanup_wt_git worktree remove "$path" >/dev/null || wrc=$?
-	if ((wrc == 0)); then
-		printf 'ACTION|worktree-remove|%s|OK\n' "$path"
+	# When the consolidation path cannot be derived (a parse_worktree_list hard failure),
+	# the worktree removal is skipped and reported as ACTION|worktree-remove||FAILED (path
+	# unknown), and the branch deletion is still attempted (best-effort contract).
+	local path wrc=0 brc=0 prc=0
+	# Guarded capture: on a path-derivation failure, skip the removal (path unknown) and
+	# continue to the branch-deletion step.
+	path=$(consolidation_worktree_path) || prc=$?
+	if ((prc != 0)); then
+		printf 'ACTION|worktree-remove||FAILED\n'
 	else
-		printf 'ACTION|worktree-remove|%s|FAILED\n' "$path"
+		cleanup_wt_git worktree remove "$path" >/dev/null || wrc=$?
+		if ((wrc == 0)); then
+			printf 'ACTION|worktree-remove|%s|OK\n' "$path"
+		else
+			printf 'ACTION|worktree-remove|%s|FAILED\n' "$path"
+		fi
 	fi
 	cleanup_wt_git branch -D "$CLEANUP_WT_CONSOLIDATION_BRANCH" >/dev/null || brc=$?
 	if ((brc == 0)); then
@@ -177,12 +225,19 @@ reverify_delete_eligible() {
 	# holds) emits ACTION|delete|<name>|BLOCKED-REVERIFY and returns 1; otherwise 0.
 	#
 	# Args: $1 = branch name; $2 = recorded state (advisory, for callers' context).
-	local name="$1" line state=""
+	local name="$1" line state="" out crc=0
+	# Guarded parent-shell capture: a classify_branch hard failure (non-zero rc) maps
+	# explicitly to BLOCKED-REVERIFY/return 1, in addition to the state-token allowlist.
+	out=$(classify_branch "$name") || crc=$?
+	if ((crc != 0)); then
+		printf 'ACTION|delete|%s|BLOCKED-REVERIFY\n' "$name"
+		return 1
+	fi
 	while IFS= read -r line; do
 		[[ $line == BRANCH\|* ]] || continue
 		IFS='|' read -r _ _ state <<<"$line"
 		break
-	done < <(classify_branch "$name")
+	done <<<"$out"
 	case "$state" in
 	MERGED_CLEAN | MERGED_CONTENT_NEUTRAL | MERGED_EQUIVALENT)
 		return 0
@@ -203,17 +258,22 @@ remove_worktree_safe() {
 	#
 	# Args: $1 = worktree path (may be empty).
 	# Returns 0 on successful removal or no-worktree; 1 when a dirty worktree blocks it.
-	local path="$1" rc=0 line
+	local path="$1" rc=0 line sout srrc=0
 	[[ -z $path ]] && return 0
 	cleanup_wt_git worktree remove "$path" >/dev/null || rc=$?
 	if ((rc == 0)); then
 		printf 'ACTION|worktree-remove|%s|OK\n' "$path"
 		return 0
 	fi
-	while IFS= read -r line; do
-		[[ -z $line ]] && continue
-		printf 'DIRTY|%s|%s\n' "$path" "$line"
-	done < <(cleanup_wt_git -C "$path" status --porcelain 2>/dev/null)
+	# Guarded parent-shell capture of the diagnostic status read: a hard failure emits no
+	# DIRTY lines (the removal failure is already reported) but still blocks removal.
+	sout=$(cleanup_wt_git -C "$path" status --porcelain) || srrc=$?
+	if ((srrc == 0)) && [[ -n $sout ]]; then
+		while IFS= read -r line; do
+			[[ -z $line ]] && continue
+			printf 'DIRTY|%s|%s\n' "$path" "$line"
+		done <<<"$sout"
+	fi
 	printf 'ACTION|worktree-remove|%s|BLOCKED-DIRTY\n' "$path"
 	return 1
 }
@@ -262,8 +322,22 @@ run_apply() {
 	# a candidate (classify_branch marks it PROTECTED_CURRENT). Deletion of the
 	# consolidation branch (whose unique content was consolidated) is gated on
 	# verify_consolidation_merged() returning MERGED_CLEAN. Returns non-zero if any
-	# candidate's deletion failed or was blocked.
+	# candidate's deletion failed or was blocked, or when the worktree listing, branch
+	# enumeration, or any branch classification hard-fails (in which case no mutation is
+	# performed for that failure).
 	local rc=0 name record wpath wbranch wflags cb_out state
+	local wlout wlrc=0 ebout ebrc=0
+	# Guarded parent-shell captures up front, before check_main_freshness and any output:
+	# a hard failure of the worktree listing or branch enumeration aborts apply with git's
+	# exit code and performs no mutation.
+	wlout=$(parse_worktree_list) || wlrc=$?
+	if ((wlrc != 0)); then
+		return "$wlrc"
+	fi
+	ebout=$(enumerate_branches) || ebrc=$?
+	if ((ebrc != 0)); then
+		return "$ebrc"
+	fi
 	check_main_freshness
 	local -A wt_of=()
 	while IFS= read -r record; do
@@ -271,7 +345,7 @@ run_apply() {
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
 		[[ -n $wbranch && $wbranch != DETACHED ]] && wt_of[$wbranch]=$wpath
-	done < <(parse_worktree_list)
+	done <<<"$wlout"
 	# Consolidation merge gate: unlock the consolidation branch's own deletion only
 	# when documentationandmemories is merged into main.
 	local consolidation_ok=1 vout
@@ -280,14 +354,22 @@ run_apply() {
 		vout=$(verify_consolidation_merged) || true
 		[[ $vout == MERGED_CLEAN ]] && consolidation_ok=0
 	fi
+	local crc
 	while read -r name _; do
 		[[ -z $name ]] && continue
 		if [[ $name == "$CLEANUP_WT_CONSOLIDATION_BRANCH" ]] && ((consolidation_ok != 0)); then
 			printf 'ACTION|delete|%s|BLOCKED-CONSOLIDATION-UNMERGED\n' "$name"
 			continue
 		fi
-		cb_out=$(classify_branch "$name")
+		crc=0
+		cb_out=$(classify_branch "$name") || crc=$?
 		printf '%s\n' "$cb_out"
+		if ((crc != 0)); then
+			# A branch classification hard failure never triggers deletion (its state is an
+			# error state, not on the allowlist) and propagates a non-zero driver rc.
+			rc=1
+			continue
+		fi
 		state=$(printf '%s\n' "$cb_out" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
 		case "$state" in
 		MERGED_CLEAN | MERGED_CONTENT_NEUTRAL | MERGED_EQUIVALENT)
@@ -295,6 +377,6 @@ run_apply() {
 			;;
 		*) : ;;
 		esac
-	done < <(enumerate_branches)
+	done <<<"$ebout"
 	return "$rc"
 }
