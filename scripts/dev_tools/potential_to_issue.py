@@ -433,8 +433,19 @@ def promote_potential(
         raise PromotionError(str(exc)) from exc
     fallback_reason = ""
 
-    # Route issue-body generation based on promotion type and eligible work mode.
-    if selected_mode == "minor-audit":
+    # Route issue-body generation by promotion type first, then work mode. Bug
+    # promotions render the canonical bug headings regardless of work mode, so a
+    # bug potential promoted in minor-audit mode still carries the real bug
+    # sections rather than the minor-audit/feature sections (whose heading reads
+    # the bug template does not contain). The `- Work Mode:` first line emitted
+    # by build_bug_body still records the selected mode.
+    if promotion_type == "bug":
+        bug_sections = {
+            heading: get_section(content, heading) or PLACEHOLDER
+            for heading in BUG_SECTION_HEADINGS
+        }
+        body = build_bug_body(selected_mode, bug_sections, relative_path)
+    elif selected_mode == "minor-audit":
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         implementation_intent = get_section(content, "Proposed Behavior") or PLACEHOLDER
         acceptance_criteria = (
@@ -459,12 +470,6 @@ def promote_potential(
             evidence_checklist,
             relative_path,
         )
-    elif promotion_type == "bug":
-        bug_sections = {
-            heading: get_section(content, heading) or PLACEHOLDER
-            for heading in BUG_SECTION_HEADINGS
-        }
-        body = build_bug_body(selected_mode, bug_sections, relative_path)
     else:
         problem = get_section(content, "Problem / Why") or PLACEHOLDER
         behavior = get_section(content, "Proposed Behavior") or PLACEHOLDER

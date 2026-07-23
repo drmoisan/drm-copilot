@@ -123,3 +123,49 @@ export function buildFeatureContent(featureName: string): string {
     "tests",
   ].join("\n");
 }
+
+/** Canonical bug-template headings in render order (mirrors BUG_SECTION_HEADINGS). */
+export const BUG_HEADINGS: readonly string[] = [
+  "Summary",
+  "Environment",
+  "Steps to Reproduce",
+  "Expected Behavior",
+  "Actual Behavior",
+  "Logs / Screenshots",
+  "Impact / Severity",
+];
+
+/** Default populated body for each canonical bug heading. */
+export const BUG_DEFAULT_BODIES: Readonly<Record<string, string>> = {
+  Summary: "summary details",
+  Environment: "- OS: Linux",
+  "Steps to Reproduce": "1. step one",
+  "Expected Behavior": "expected results",
+  "Actual Behavior": "actual results",
+  "Logs / Screenshots": "screenshot attached",
+  "Impact / Severity": "medium",
+};
+
+/**
+ * Build bug potential content with all canonical bug-template sections.
+ *
+ * @param featureName Heading used for the potential entry.
+ * @param overrides Optional per-heading body overrides. A heading mapped to an
+ *   empty string is rendered as an empty section; omitted headings keep their
+ *   default populated body.
+ * @returns Markdown accepted by the promotion workflow for a bug potential.
+ */
+export function buildBugContent(
+  featureName: string,
+  overrides: Readonly<Record<string, string>> = {},
+): string {
+  const lines: string[] = [`# ${featureName}`];
+  for (const heading of BUG_HEADINGS) {
+    const body =
+      heading in overrides
+        ? (overrides[heading] ?? "")
+        : (BUG_DEFAULT_BODIES[heading] ?? "");
+    lines.push(`## ${heading}`, body);
+  }
+  return lines.join("\n");
+}

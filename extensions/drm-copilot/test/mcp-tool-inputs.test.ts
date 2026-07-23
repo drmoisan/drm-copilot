@@ -416,7 +416,7 @@ describe("resolveLinkParentChildToolInput", () => {
 });
 
 describe("resolvePotentialToIssueToolInput", () => {
-  it("returns all fields for valid input", () => {
+  it("returns all fields for valid input, resolving a relative potential_path against workspace_root", () => {
     expect(
       resolvePotentialToIssueToolInput({
         workspace_root: "C:/ws",
@@ -426,7 +426,9 @@ describe("resolvePotentialToIssueToolInput", () => {
       }),
     ).toEqual({
       workspaceRoot: "C:/ws",
-      potentialPath: "docs/potential/entry.md",
+      // A workspace-relative potential_path is now joined against workspace_root
+      // (AC-6) instead of being echoed verbatim.
+      potentialPath: "C:/ws/docs/potential/entry.md",
       promotionType: "feature",
       workMode: "full-feature",
     });

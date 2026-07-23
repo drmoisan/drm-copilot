@@ -35,18 +35,20 @@ describe("drm-copilot listMcpTools command", () => {
         }),
         expect.objectContaining({
           label: "collect_pr_context",
-          detail: "Required inputs: base",
+          detail: "Required inputs: workspace_root, base",
         }),
         expect.objectContaining({
           label: "run_codex_native_converter",
-          detail: "Required inputs: mode, source_ecosystem, source_root",
+          detail:
+            "Required inputs: workspace_root, mode, source_ecosystem, source_root",
         }),
         expect.objectContaining({
           label: "run_poshqc_suite",
         }),
         expect.objectContaining({
           label: "validate_orchestration_artifacts",
-          detail: "Required inputs: artifact_type, artifact_path",
+          detail:
+            "Required inputs: workspace_root, artifact_type, artifact_path",
         }),
       ]),
       expect.objectContaining({

@@ -793,9 +793,68 @@ def test_promote_potential_bug_honors_explicit_minor_audit() -> None:
     )
     assert outcome.exit_code == 0
     body = gh.calls[0][1][1]
-    assert "## Implementation Intent" in body
+    # After the branch reorder a bug promotion routes to the bug body even in
+    # minor-audit mode, so the body carries bug headings (not the minor-audit
+    # "Implementation Intent" section) while still recording the selected mode.
+    assert "## Summary" in body
+    assert "## Implementation Intent" not in body
     assert any("Selected mode: minor-audit" in m for m in messages)
     assert not any("Fallback reason:" in m for m in messages)
+
+
+def test_promote_potential_bug_minor_audit_uses_bug_body() -> None:
+    """Verify a bug potential in minor-audit mode renders the bug-headed body (AC-3)."""
+    workspace = Path("/workspace")
+    potential = workspace / "docs/features/potential/minor-bug.md"
+    fs = FakeFileSystem()
+    fs.files[potential] = "\n".join(
+        [
+            "# Minor Audit Bug",
+            "## Summary",
+            "summary details",
+            "## Environment",
+            "- OS: Linux",
+            "## Steps to Reproduce",
+            "1. step one",
+            "## Expected Behavior",
+            "expected results",
+            "## Actual Behavior",
+            "actual results",
+            "## Logs / Screenshots",
+            "screenshot attached",
+            "## Impact / Severity",
+            "medium",
+        ]
+    )
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/401"], 0),
+        mod.GhResult([], 0),
+    )
+
+    outcome = mod.promote_potential(
+        potential_path=str(potential),
+        promotion_type="bug",
+        fs=fs,
+        gh=gh,
+        workspace=workspace,
+        work_mode="minor-audit",
+    )
+
+    assert outcome.exit_code == 0
+    body = gh.calls[0][1][1]
+    # The bug body must lead with the minor-audit marker and carry authored
+    # bug-section content, not the minor-audit/feature-oriented placeholders.
+    assert body.splitlines()[0] == "- Work Mode: minor-audit"
+    assert "## Summary\nsummary details" in body
+    assert "## Environment\n- OS: Linux" in body
+    assert "## Steps to Reproduce\n1. step one" in body
+    assert "## Expected Behavior\nexpected results" in body
+    assert "## Actual Behavior\nactual results" in body
+    assert "## Logs / Screenshots\nscreenshot attached" in body
+    assert "## Impact / Severity\nmedium" in body
+    assert "## Implementation Intent" not in body
+    assert "## Verification Steps" not in body
+    assert "(not provided in potential file)" not in body
 
 
 def test_work_mode_marker_minor_audit() -> None:

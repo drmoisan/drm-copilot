@@ -5,6 +5,7 @@ import {
   type CommandRunner,
 } from "../../../src/lib/subprocess-runner";
 import { potentialToIssueServiceCall } from "../../../src/lib/potential-to-issue/potential-to-issue-service-call";
+import { resolvePotentialToIssueToolInput } from "../../../src/mcp-tool-inputs";
 import {
   FakeGhClient,
   FakePotentialFileSystem,
@@ -144,6 +145,43 @@ describe("potentialToIssueServiceCall — success", () => {
     expect(createCall[1][2]).toBe("refactor");
     expect(result.summary).toBe(
       `Promoted '${POTENTIAL}' as a refactor workflow in full mode.`,
+    );
+  });
+});
+
+describe("potentialToIssueServiceCall — relative potential_path summary (AC-6)", () => {
+  it("pins the summary form to the workspace-resolved absolute path for a relative input", () => {
+    // Arrange: a workspace-relative potential_path is normalized by the resolver
+    // against WORKSPACE, then handed to the service call. The summary must echo
+    // the resolved absolute path, not the original relative text.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/7"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const resolved = resolvePotentialToIssueToolInput({
+      workspace_root: WORKSPACE,
+      potential_path: "docs/features/potential/sample.md",
+      promotion_type: "feature",
+      work_mode: "full",
+    });
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: resolved.workspaceRoot,
+      potentialPath: resolved.potentialPath,
+      promotionType: resolved.promotionType,
+      workMode: resolved.workMode,
+    });
+
+    // Assert: the resolved absolute path equals POTENTIAL and the summary pins it.
+    expect(resolved.potentialPath).toBe(POTENTIAL);
+    expect(result.summary).toBe(
+      `Promoted '${POTENTIAL}' as a feature workflow in full mode.`,
     );
   });
 });

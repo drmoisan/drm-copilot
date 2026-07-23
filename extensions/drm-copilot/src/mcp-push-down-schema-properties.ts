@@ -1,6 +1,7 @@
 export const workspaceRootProperty = {
   type: "string",
-  description: "Target workspace root. Defaults to process.cwd() when omitted.",
+  description:
+    "Required absolute path to the root of the target checkout or worktree. The MCP server cannot infer the calling agent's checkout, so this value must be supplied explicitly.",
 } as const;
 
 const codexPacksProperty = {

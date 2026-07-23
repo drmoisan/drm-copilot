@@ -175,7 +175,7 @@ describe("render_subagent_tree service + dispatch", () => {
 });
 
 describe("listRepoAutomationTools advertisement", () => {
-  it("advertises render_subagent_tree with required session_id and optional workspace_root", () => {
+  it("advertises render_subagent_tree with required session_id and workspace_root", () => {
     // Act
     const definition = listRepoAutomationTools().find(
       (tool) => tool.name === "render_subagent_tree",
@@ -183,7 +183,10 @@ describe("listRepoAutomationTools advertisement", () => {
 
     // Assert
     expect(definition).toBeDefined();
-    expect(definition?.inputSchema.required).toEqual(["session_id"]);
+    expect(definition?.inputSchema.required).toEqual([
+      "workspace_root",
+      "session_id",
+    ]);
     expect(definition?.inputSchema.additionalProperties).toBe(false);
     expect(
       Object.keys(definition?.inputSchema.properties ?? {}).sort(),

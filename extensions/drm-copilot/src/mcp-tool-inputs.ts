@@ -27,6 +27,7 @@ export {
   resolvePushDownClaudeCustomizationsToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
 } from "./mcp-tool-inputs-push-down";
+export { resolvePotentialToIssueToolInput } from "./mcp-tool-inputs-potential-to-issue";
 export type {
   PushDownClaudeCustomizationsToolInput,
   PushDownCodexAndAgentsCustomizationsToolInput,
@@ -310,28 +311,6 @@ export function resolveLinkParentChildToolInput(
       normalizeRequiredText(args["parent_issue_number"], "parent_issue_number"),
       "parent_issue_number",
     ),
-  };
-}
-
-export function resolvePotentialToIssueToolInput(
-  rawInput: unknown,
-  fallbackWorkspaceRoot?: string,
-): PotentialToIssueToolInput {
-  const args = asToolArgumentObject(rawInput);
-  return {
-    workspaceRoot: normalizeWorkspaceRoot(
-      args["workspace_root"],
-      fallbackWorkspaceRoot,
-    ),
-    potentialPath: normalizeRequiredText(
-      args["potential_path"],
-      "potential_path",
-    ),
-    promotionType: resolvePromotionTypeField(
-      args["promotion_type"],
-      "promotion_type",
-    ),
-    workMode: resolveWorkModeField(args["work_mode"], "work_mode"),
   };
 }
 

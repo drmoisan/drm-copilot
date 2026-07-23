@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import { toolDefinitions } from "../src/mcp-tool-definitions";
 import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
+import { workspaceRootProperty } from "../src/mcp-push-down-schema-properties";
 import { REPO_AUTOMATION_TOOLS } from "../src/repo-automation-tool-names";
 import {
   DISCOVERY_ARTIFACT_TYPES,
@@ -54,7 +55,7 @@ describe("repo automation MCP tool definitions", () => {
     for (const definition of [repoAutomationDefinition, baseDefinition]) {
       expect(definition).toMatchObject({
         inputSchema: {
-          required: ["asset"],
+          required: ["workspace_root", "asset"],
           properties: {
             asset: {
               type: "string",
@@ -97,7 +98,7 @@ describe("repo automation MCP tool definitions", () => {
       const properties = definition?.inputSchema.properties ?? {};
       expect(Object.keys(properties).sort()).toEqual(["workspace_root"]);
       expect(definition?.inputSchema.additionalProperties).toBe(false);
-      expect(definition?.inputSchema.required).toBeUndefined();
+      expect(definition?.inputSchema.required).toEqual(["workspace_root"]);
     }
   });
 
@@ -138,7 +139,7 @@ describe("repo automation MCP tool definitions", () => {
     expect(definition).toMatchObject({
       name: "run_codex_native_converter",
       inputSchema: {
-        required: ["mode", "source_ecosystem", "source_root"],
+        required: ["workspace_root", "mode", "source_ecosystem", "source_root"],
         properties: {
           mode: expect.objectContaining({ type: "string" }),
           source_ecosystem: expect.objectContaining({ type: "string" }),
@@ -161,7 +162,7 @@ describe("repo automation MCP tool definitions", () => {
     expect(definition).toMatchObject({
       name: "run_codex_native_converter",
       inputSchema: {
-        required: ["mode", "source_ecosystem", "source_root"],
+        required: ["workspace_root", "mode", "source_ecosystem", "source_root"],
         properties: {
           mode: expect.objectContaining({ type: "string" }),
           source_ecosystem: expect.objectContaining({ type: "string" }),
@@ -176,7 +177,7 @@ describe("repo automation MCP tool definitions", () => {
     });
   });
 
-  it("includes a render_subagent_tree definition with required session_id and optional workspace_root", () => {
+  it("includes a render_subagent_tree definition with required session_id and workspace_root", () => {
     const definition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
       ({ name }) => name === "render_subagent_tree",
     );
@@ -184,7 +185,7 @@ describe("repo automation MCP tool definitions", () => {
     expect(definition).toMatchObject({
       name: "render_subagent_tree",
       inputSchema: {
-        required: ["session_id"],
+        required: ["workspace_root", "session_id"],
         properties: {
           workspace_root: expect.objectContaining({ type: "string" }),
           session_id: expect.objectContaining({ type: "string" }),
@@ -205,6 +206,24 @@ describe("repo automation MCP tool definitions", () => {
     expect(properties?.["artifact_type"]?.enum).toContain(
       "epic-orchestrator-state",
     );
+  });
+});
+
+describe("workspace_root required contract (AC-5)", () => {
+  it("lists workspace_root in inputSchema.required for every repo automation tool (all 28)", () => {
+    // The authoritative runtime array must cover every advertised tool and each
+    // must require workspace_root so an omitted value is rejected at the MCP
+    // boundary rather than silently defaulting to the server process CWD.
+    expect(REPO_AUTOMATION_TOOL_DEFINITIONS).toHaveLength(
+      REPO_AUTOMATION_TOOLS.length,
+    );
+    for (const definition of REPO_AUTOMATION_TOOL_DEFINITIONS) {
+      expect(definition.inputSchema.required ?? []).toContain("workspace_root");
+    }
+  });
+
+  it("does not advertise a process.cwd() default in the workspace_root description", () => {
+    expect(workspaceRootProperty.description).not.toContain("process.cwd()");
   });
 });
 
@@ -237,6 +256,7 @@ describe("discovery MCP tool definitions", () => {
   it("requires artifact_type and artifact_path for validate_discovery_artifacts and matches the resolver enum", () => {
     const definition = findRepoDefinition("validate_discovery_artifacts");
     expect(definition?.inputSchema.required).toEqual([
+      "workspace_root",
       "artifact_type",
       "artifact_path",
     ]);
@@ -249,18 +269,20 @@ describe("discovery MCP tool definitions", () => {
     ]);
   });
 
-  it("requires only target_dir for run_discovery_init", () => {
+  it("requires workspace_root and target_dir for run_discovery_init", () => {
     expect(
       findRepoDefinition("run_discovery_init")?.inputSchema.required,
-    ).toEqual(["target_dir"]);
+    ).toEqual(["workspace_root", "target_dir"]);
   });
 
   it.each([
     "run_discovery_repo_inventory",
     "run_discovery_dotnet_analyzer",
     "run_discovery_vsto_analyzer",
-  ])("declares no required tool-specific field for %s", (toolName) => {
-    expect(findRepoDefinition(toolName)?.inputSchema.required).toBeUndefined();
+  ])("requires only workspace_root for %s", (toolName) => {
+    expect(findRepoDefinition(toolName)?.inputSchema.required).toEqual([
+      "workspace_root",
+    ]);
   });
 
   it("requires the three scenario-generation inputs", () => {
@@ -268,15 +290,19 @@ describe("discovery MCP tool definitions", () => {
       findRepoDefinition("run_discovery_scenario_generation")?.inputSchema
         .required,
     ).toEqual([
+      "workspace_root",
       "feature_contract",
       "parity_matrix",
       "runtime_characterization",
     ]);
   });
 
-  it("requires only report_type for run_discovery_report and matches the resolver report enum", () => {
+  it("requires workspace_root and report_type for run_discovery_report and matches the resolver report enum", () => {
     const definition = findRepoDefinition("run_discovery_report");
-    expect(definition?.inputSchema.required).toEqual(["report_type"]);
+    expect(definition?.inputSchema.required).toEqual([
+      "workspace_root",
+      "report_type",
+    ]);
     const properties = definition?.inputSchema.properties as Record<
       string,
       { enum?: string[] }

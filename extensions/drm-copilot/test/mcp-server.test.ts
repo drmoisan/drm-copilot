@@ -6,7 +6,6 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import process from "node:process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
@@ -176,28 +175,23 @@ describe("repo automation MCP server", () => {
     });
   });
 
-  it("defaults workspace_root to process.cwd() when omitted", async () => {
-    service.collectCommitContext.mockResolvedValue({
-      tool: "collect_commit_context",
-      workspaceRoot: process.cwd(),
-      artifacts: [`${process.cwd()}/artifacts/commit_context.txt`],
-      summary: "Collected commit context into artifacts/commit_context.txt.",
-    });
-
+  it("fails closed with a structured error when workspace_root is omitted", async () => {
     const result = await client.callTool({
       name: "collect_commit_context",
       arguments: {},
     });
 
-    expect(service.collectCommitContext).toHaveBeenCalledWith({
-      workspaceRoot: process.cwd(),
-    });
-    expect(result.isError).toBe(false);
+    // The service handler is never invoked because the resolver fails closed
+    // rather than silently defaulting to the server's process.cwd().
+    expect(service.collectCommitContext).not.toHaveBeenCalled();
+    expect(result.isError).toBe(true);
     expect(result.structuredContent).toMatchObject({
-      ok: true,
+      ok: false,
       tool: "collect_commit_context",
-      workspace_root: process.cwd(),
     });
+    expect((result.structuredContent as { summary: string }).summary).toContain(
+      "workspace_root is required",
+    );
   });
 
   it("dispatches push_down_codex_and_agents_customizations through the shared service", async () => {
