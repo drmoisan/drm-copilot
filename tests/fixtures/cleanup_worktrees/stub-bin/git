@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# Recording git stub for the cleanup-worktrees bats suites, wired through the
+# CLEANUP_WT_GIT_BIN seam. It never touches a real repository and writes nothing to
+# disk: it replays canned stdout and exit codes from the scenario directory named by
+# CLEANUP_WT_STUB_SCENARIO, and echoes each invocation as a `stub-git: <argv>` line
+# to STDERR so tests can assert which commands ran. The invocation log is on stderr
+# (not stdout) so a caller capturing git stdout via command substitution receives
+# only the canned data; under bats `run` the stderr log still merges into $output.
+#
+# Lookup contract (documented so scenario fixtures under
+# tests/fixtures/cleanup_worktrees/scenarios/<name>/ match exactly):
+#   For each invocation the stub derives a KEY from the (global-option-stripped)
+#   argv, then:
+#     - if <scenario>/<KEY>.out exists, its bytes are written to stdout;
+#     - if <scenario>/<KEY>.rc  exists, the stub exits with that integer;
+#     - otherwise stdout is empty and the exit code is 0.
+#   Path/ref characters outside [A-Za-z0-9._-] are replaced with `_` when forming a
+#   KEY (so refs/heads/x -> refs_heads_x, branch:path -> branch_path).
+#
+# KEY scheme by subcommand:
+#   for-each-ref ...                         -> for-each-ref
+#   worktree list --porcelain                -> worktree-list
+#   worktree add ...                         -> worktree-add
+#   worktree remove <path>                   -> worktree-remove
+#   merge-base --is-ancestor <tip> <up>      -> merge-base.<tip>
+#   rev-list ... main..<branch>              -> rev-list.<branch>
+#   diff --quiet main...<branch>             -> diff-quiet.<branch>
+#   diff --quiet main <branch> -- <path>     -> diff-quiet.<branch>.<path>
+#   cherry main <branch>                     -> cherry.<branch>
+#   diff-tree ... <sha>                      -> diff-tree.<sha>
+#   ls-tree <ref> -- <path>                  -> ls-tree.<ref>_<path>
+#   rev-parse --abbrev-ref HEAD              -> rev-parse.abbrev-ref-HEAD
+#   rev-parse --show-toplevel                -> rev-parse.show-toplevel
+#   rev-parse --verify --quiet <ref>         -> rev-parse.verify.<ref>
+#   rev-parse <rev>                          -> rev-parse.<rev>
+#   status --porcelain (with -C <path>)      -> status.<path>  (else status)
+#   cherry-pick -x <sha>                     -> cherry-pick.<sha>
+#   cherry-pick --abort                      -> cherry-pick-abort
+#   cherry-pick --skip                       -> cherry-pick-skip
+#   branch -D <name>                         -> branch-D.<name>
+#   fetch ...                                -> fetch
+set -uo pipefail
+
+# Echo the full invocation to stderr for argv assertions.
+printf 'stub-git: %s\n' "$*" >&2
+
+scenario=${CLEANUP_WT_STUB_SCENARIO:-}
+
+sanitize() {
+	# Replace every character outside [A-Za-z0-9._-] with an underscore.
+	local s=${1:-}
+	printf '%s' "${s//[^A-Za-z0-9._-]/_}"
+}
+
+respond() {
+	# Replay <scenario>/<key>.out to stdout (if present) and exit <scenario>/<key>.rc
+	# (default 0). With no scenario configured, emit nothing and exit 0.
+	local key="$1"
+	local rc=0
+	if [[ -n $scenario ]]; then
+		if [[ -f "$scenario/$key.out" ]]; then
+			cat "$scenario/$key.out"
+		fi
+		if [[ -f "$scenario/$key.rc" ]]; then
+			rc=$(cat "$scenario/$key.rc")
+		fi
+	fi
+	exit "$rc"
+}
+
+# Strip leading global options that precede the subcommand. Only the forms this tool
+# emits are handled: `-C <path>` and `-c <name>=<value>`. The last `-C <path>` value
+# is retained so status/other per-worktree keys can incorporate it.
+dash_c_path=""
+args=("$@")
+i=0
+while ((i < ${#args[@]})); do
+	case "${args[$i]}" in
+	-C)
+		dash_c_path="${args[$((i + 1))]:-}"
+		i=$((i + 2))
+		;;
+	-c)
+		i=$((i + 2))
+		;;
+	*)
+		break
+		;;
+	esac
+done
+# Rebuild the positional list without the consumed global options.
+rest=("${args[@]:$i}")
+set -- "${rest[@]:-}"
+
+subcmd=${1:-}
+case "$subcmd" in
+for-each-ref)
+	respond "for-each-ref"
+	;;
+worktree)
+	case "${2:-}" in
+	list) respond "worktree-list" ;;
+	add) respond "worktree-add" ;;
+	remove) respond "worktree-remove" ;;
+	*) exit 0 ;;
+	esac
+	;;
+merge-base)
+	# merge-base --is-ancestor <tip> <upstream>
+	if [[ ${2:-} == "--is-ancestor" ]]; then
+		respond "merge-base.$(sanitize "${3:-}")"
+	fi
+	exit 0
+	;;
+rev-list)
+	# Find the range argument (contains ..) and key on the branch after the dots.
+	range=""
+	for a in "$@"; do
+		[[ $a == *".."* ]] && range=$a
+	done
+	branch=${range##*..}
+	respond "rev-list.$(sanitize "$branch")"
+	;;
+diff)
+	# diff --quiet main...<branch> [-- <path>]
+	spec=""
+	path=""
+	seen_dashdash=0
+	for a in "$@"; do
+		if ((seen_dashdash == 1)); then
+			path=$a
+			break
+		fi
+		[[ $a == "--" ]] && seen_dashdash=1
+		[[ $a == *"..."* ]] && spec=${a##*...}
+		[[ $a == *".."* && $a != *"..."* ]] && spec=${a##*..}
+	done
+	if [[ -n $path ]]; then
+		respond "diff-quiet.$(sanitize "$spec").$(sanitize "$path")"
+	fi
+	respond "diff-quiet.$(sanitize "$spec")"
+	;;
+cherry)
+	# cherry main <branch>
+	respond "cherry.$(sanitize "${3:-}")"
+	;;
+diff-tree)
+	# Last argument is the commit SHA.
+	sha=""
+	for a in "$@"; do sha=$a; done
+	respond "diff-tree.$(sanitize "$sha")"
+	;;
+ls-tree)
+	# ls-tree <ref> -- <path>: KEY is ls-tree.<sanitized-ref>_<sanitized-path>.
+	ref=${2:-}
+	lspath=""
+	seen_dashdash=0
+	for a in "$@"; do
+		if ((seen_dashdash == 1)); then
+			lspath=$a
+			break
+		fi
+		[[ $a == "--" ]] && seen_dashdash=1
+	done
+	respond "ls-tree.$(sanitize "$ref")_$(sanitize "$lspath")"
+	;;
+rev-parse)
+	if [[ ${2:-} == "--abbrev-ref" ]]; then
+		respond "rev-parse.abbrev-ref-HEAD"
+	elif [[ ${2:-} == "--show-toplevel" ]]; then
+		respond "rev-parse.show-toplevel"
+	elif [[ ${2:-} == "--verify" && ${3:-} == "--quiet" ]]; then
+		respond "rev-parse.verify.$(sanitize "${4:-}")"
+	else
+		respond "rev-parse.$(sanitize "${2:-}")"
+	fi
+	;;
+status)
+	if [[ -n $dash_c_path ]]; then
+		respond "status.$(sanitize "$dash_c_path")"
+	fi
+	respond "status"
+	;;
+cherry-pick)
+	case "${2:-}" in
+	--abort) respond "cherry-pick-abort" ;;
+	--skip) respond "cherry-pick-skip" ;;
+	*)
+		# cherry-pick [-x] <sha>: the SHA is the last argument.
+		sha=""
+		for a in "$@"; do sha=$a; done
+		respond "cherry-pick.$(sanitize "$sha")"
+		;;
+	esac
+	;;
+branch)
+	if [[ ${2:-} == "-D" ]]; then
+		respond "branch-D.$(sanitize "${3:-}")"
+	fi
+	exit 0
+	;;
+fetch)
+	respond "fetch"
+	;;
+*)
+	exit 0
+	;;
+esac

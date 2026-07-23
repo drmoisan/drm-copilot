@@ -1,0 +1,8 @@
+worktree /repo/main
+HEAD aaaa0000
+branch refs/heads/main
+
+worktree /repo-wt/current
+HEAD 99990000
+branch refs/heads/current-branch
+
