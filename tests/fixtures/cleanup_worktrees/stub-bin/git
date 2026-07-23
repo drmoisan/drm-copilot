@@ -28,6 +28,7 @@
 #   diff --quiet main <branch> -- <path>     -> diff-quiet.<branch>.<path>
 #   cherry main <branch>                     -> cherry.<branch>
 #   diff-tree ... <sha>                      -> diff-tree.<sha>
+#   ls-tree <ref> -- <path>                  -> ls-tree.<ref>_<path>
 #   rev-parse --abbrev-ref HEAD              -> rev-parse.abbrev-ref-HEAD
 #   rev-parse --show-toplevel                -> rev-parse.show-toplevel
 #   rev-parse --verify --quiet <ref>         -> rev-parse.verify.<ref>
@@ -148,6 +149,20 @@ diff-tree)
 	sha=""
 	for a in "$@"; do sha=$a; done
 	respond "diff-tree.$(sanitize "$sha")"
+	;;
+ls-tree)
+	# ls-tree <ref> -- <path>: KEY is ls-tree.<sanitized-ref>_<sanitized-path>.
+	ref=${2:-}
+	lspath=""
+	seen_dashdash=0
+	for a in "$@"; do
+		if ((seen_dashdash == 1)); then
+			lspath=$a
+			break
+		fi
+		[[ $a == "--" ]] && seen_dashdash=1
+	done
+	respond "ls-tree.$(sanitize "$ref")_$(sanitize "$lspath")"
 	;;
 rev-parse)
 	if [[ ${2:-} == "--abbrev-ref" ]]; then
