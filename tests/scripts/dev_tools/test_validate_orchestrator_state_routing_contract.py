@@ -102,6 +102,50 @@ def _build_complete_large_state() -> dict[str, object]:
     }
 
 
+def _build_complete_large_bug_state() -> dict[str, object]:
+    """Return a completion-safe bug-type large-path checkpoint for validation.
+
+    The feature-type baseline state is transformed into a truthful bug-type
+    promotion: the hyphenated ``promotion-type`` is set to ``"bug"`` and every
+    occurrence of the feature-type promotion-entry tool ``new_potential_entry``
+    is replaced with the bug-type tool ``new_potential_bug_entry`` across the
+    recorded ``required_mcp_tools`` list, the successful ``mcp_call_receipts``,
+    and the ``lifecycle_operations``. No fabricated ``orchestrator-workflow`` or
+    ``repo-automation-adapter`` skill receipts are added; the skill set is
+    derived from the corrected routing matrix.
+    """
+
+    state = _build_complete_large_state()
+    state["promotion-type"] = "bug"
+    state["work-mode"] = "full-bug"
+
+    # Swap the feature-type promotion-entry tool for the bug-type tool in the
+    # recorded required tool list so it matches what a bug promotion exercises.
+    required_mcp_tools = cast("list[str]", state["required_mcp_tools"])
+    state["required_mcp_tools"] = [
+        "new_potential_bug_entry" if tool == "new_potential_entry" else tool
+        for tool in required_mcp_tools
+    ]
+
+    # Mirror the substitution in the successful MCP receipts so the bug-type
+    # promotion records a truthful new_potential_bug_entry receipt.
+    mcp_receipts = cast("list[dict[str, object]]", state["mcp_call_receipts"])
+    for receipt in mcp_receipts:
+        if receipt.get("tool") == "new_potential_entry":
+            receipt["tool"] = "new_potential_bug_entry"
+            receipt["evidence"] = "mcp_call:new_potential_bug_entry"
+
+    # Mirror the substitution in the lifecycle operations for consistency.
+    lifecycle_operations = cast(
+        "list[dict[str, object]]", state["lifecycle_operations"]
+    )
+    for operation in lifecycle_operations:
+        if operation.get("name") == "new_potential_entry":
+            operation["name"] = "new_potential_bug_entry"
+
+    return state
+
+
 def _validate(state: dict[str, object]) -> list[str]:
     """Run completion validation against a serialized checkpoint."""
 
@@ -230,3 +274,79 @@ def test_validate_route_membership_rejects_blank_route_id() -> None:
     errors = validate_route_membership({"route_id": "   "})
 
     assert errors == ["Checkpoint route_id or path_selected must select a route."]
+
+
+def test_complete_state_accepts_bug_type_large_route_with_bug_promotion_tool() -> None:
+    """Accept a bug-type large-route checkpoint using new_potential_bug_entry.
+
+    Verifies the promotion-type-aware resolution: a bug-type promotion that
+    records a truthful `new_potential_bug_entry` MCP receipt (and no fabricated
+    `orchestrator-workflow` / `repo-automation-adapter` skill receipts) passes
+    `validate_routing_contract` with zero errors.
+    """
+
+    # Arrange: a completion-safe bug-type large-route checkpoint.
+    state = _build_complete_large_bug_state()
+
+    # Act: run completion validation.
+    errors = _validate(state)
+
+    # Assert: the bug-type promotion validates cleanly.
+    assert errors == []
+
+
+def test_complete_state_accepts_feature_type_large_route_with_feature_tool() -> None:
+    """Accept the feature-type large-route case with new_potential_entry.
+
+    Regression guard: feature-type behavior is unchanged and still requires the
+    feature-type promotion-entry tool `new_potential_entry`.
+    """
+
+    # Arrange: the feature-type baseline large-route checkpoint.
+    state = _build_complete_large_state()
+
+    # Act: run completion validation.
+    errors = _validate(state)
+
+    # Assert: the feature-type promotion validates cleanly.
+    assert errors == []
+    assert state["promotion-type"] == "feature"
+    assert "new_potential_entry" in cast("list[str]", state["required_mcp_tools"])
+
+
+def test_large_route_required_skills_excludes_removed_dead_names() -> None:
+    """Assert the dead skill names are gone from routes.large.required_skills.
+
+    The routing matrix's `routes.large.required_skills` must no longer name
+    `orchestrator-workflow` or `repo-automation-adapter`, neither of which has a
+    corresponding skill file under `.claude/skills/`.
+    """
+
+    # Arrange: read the large-route entry from the repository routing matrix.
+    required_skills = cast("list[str]", _large_route()["required_skills"])
+
+    # Act / Assert: the removed dead names are absent.
+    assert "orchestrator-workflow" not in required_skills
+    assert "repo-automation-adapter" not in required_skills
+
+
+def test_complete_state_rejects_bug_type_recording_only_feature_tool() -> None:
+    """Reject a bug-type checkpoint that records only new_potential_entry.
+
+    A bug-type promotion must exercise `new_potential_bug_entry`. A bug-type
+    checkpoint that still records the feature-type `new_potential_entry` fails
+    completion because the resolved expected tool is `new_potential_bug_entry`.
+    """
+
+    # Arrange: mark the feature-type baseline as a bug promotion without
+    # substituting the promotion-entry tool in the recorded evidence.
+    state = _build_complete_large_state()
+    state["promotion-type"] = "bug"
+
+    # Act: run completion validation.
+    errors = _validate(state)
+
+    # Assert: the missing bug-type receipt is reported.
+    assert (
+        "Checkpoint missing successful MCP receipt: new_potential_bug_entry." in errors
+    )

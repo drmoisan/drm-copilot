@@ -44,9 +44,7 @@
       ],
       "required_skills": [
         "orchestrate",
-        "orchestrator-workflow",
         "feature-promotion-lifecycle",
-        "repo-automation-adapter",
         "atomic-plan-contract",
         "acceptance-criteria-tracking",
         "pr-context-artifacts",
