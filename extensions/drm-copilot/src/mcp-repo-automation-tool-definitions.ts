@@ -7,6 +7,8 @@ import {
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
+import { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
+export { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
   readonly description: string;
@@ -262,111 +264,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
-  {
-    name: "run_poshqc_format",
-    description:
-      "Run bundled PoshQC formatting against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      required: ["workspace_root"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze",
-    description:
-      "Run bundled PoshQC analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      required: ["workspace_root"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_test",
-    description:
-      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources. When scan_folders is omitted, the scan set is resolved from config/poshqc-scan.json (test.scanFolders); an explicit scan_folders argument overrides the configuration.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      required: ["workspace_root"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze_autofix",
-    description:
-      "Apply bundled PoshQC analyzer autofixes, then rerun analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      required: ["workspace_root"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_suite",
-    description:
-      "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      required: ["workspace_root"],
-      additionalProperties: false,
-    },
-  },
+  ...POSHQC_TOOL_DEFINITIONS,
   {
     name: "resolve_policy_audit_template_asset",
     description:
