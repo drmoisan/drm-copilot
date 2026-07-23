@@ -9,6 +9,7 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
+    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
@@ -19,7 +20,7 @@ setup() {
 
 apply() { # apply <scenario-dir>
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${LIB}'; source '${ALIB}'; run_apply"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
@@ -34,7 +35,7 @@ apply() { # apply <scenario-dir>
 
 @test "a candidate whose re-verification flips is blocked before any branch delete" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/unmerged" \
-        bash -c "source '${LIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
     [ "$status" -ne 0 ]
     [[ "$output" == *"ACTION|delete|feature-unmerged|BLOCKED-REVERIFY"* ]]
     [[ "$output" != *"branch -D feature-unmerged"* ]]

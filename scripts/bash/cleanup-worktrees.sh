@@ -9,7 +9,13 @@ set -euo pipefail
 # Resolve this script's own directory so the libraries source regardless of cwd.
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 # The library paths are resolved at runtime from SCRIPT_DIR, so shellcheck cannot load
-# them as static inputs without -x; SC1091 is the expected, benign result.
+# them as static inputs without -x; SC1091 is the expected, benign result. The
+# enumeration/protection library is sourced first because cleanup_worktrees_lib.sh's
+# classification functions call cleanup_wt_git, parse_worktree_list, compute_protected,
+# and normalize_wt_path defined there.
+# shellcheck source=scripts/bash/cleanup_worktrees_enumerate_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_enumerate_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_lib.sh"

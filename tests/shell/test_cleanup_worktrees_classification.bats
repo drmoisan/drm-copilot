@@ -7,6 +7,7 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
+    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -17,12 +18,12 @@ cb() { # cb <scenario> <branch>  -> run classify_branch under that scenario
     # The git stub logs its argv to stderr; discard it so $output is the function's
     # stdout report lines only (bats `run` otherwise merges stderr into $output).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${LIB}' && classify_branch '$2' 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && classify_branch '$2' 2>/dev/null"
 }
 
 report() { # report <scenario> -> run the full report driver under that scenario
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${LIB}' && run_report 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && run_report 2>/dev/null"
 }
 
 @test "merged_no_worktree: MERGED_CLEAN and no worktree record for the branch" {
@@ -86,4 +87,43 @@ report() { # report <scenario> -> run the full report driver under that scenario
     cb current_exclusion main
     [ "$status" -eq 0 ]
     [ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]
+}
+
+@test "worktree_list_error: classify_branch reports ANCESTRY_ERROR, never a delete-eligible verdict" {
+    # A `git worktree list --porcelain` hard failure weakens the protected set under the
+    # fail-open bug, letting feature-x reach MERGED_EQUIVALENT (delete-eligible). The fix
+    # must map the hard failure to ANCESTRY_ERROR and return 2, never a MERGED verdict.
+    cb worktree_list_error feature-x
+    [ "$status" -eq 2 ]
+    [ "$output" = "BRANCH|feature-x|ANCESTRY_ERROR" ]
+    [[ "$output" != *"MERGED_EQUIVALENT"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+    [[ "$output" != *"MERGED_CONTENT_NEUTRAL"* ]]
+}
+
+@test "worktree_list_error: run_report returns non-zero and emits no MERGED or WORKTREE lines" {
+    report worktree_list_error
+    [ "$status" -ne 0 ]
+    [[ "$output" != *"MERGED"* ]]
+    [[ "$output" != *"WORKTREE|"* ]]
+}
+
+@test "cherry_error: classify_branch reports ANCESTRY_ERROR on a git cherry hard failure" {
+    # `git cherry` exits 128 with empty output. The fail-open bug treats an empty cherry
+    # result as "all residuals equivalent" -> MERGED_EQUIVALENT. The fix emits the internal
+    # CHERRY_ERROR verdict, which classify_branch maps to ANCESTRY_ERROR and return 2.
+    cb cherry_error feature-cherryfail
+    [ "$status" -eq 2 ]
+    [ "$output" = "BRANCH|feature-cherryfail|ANCESTRY_ERROR" ]
+    [[ "$output" != *"MERGED_EQUIVALENT"* ]]
+}
+
+@test "rev_list_error: classify_branch returns non-zero with no fabricated COMMIT record" {
+    # `git rev-list` exits 128 during cherry-pick candidate selection. The fail-open bug
+    # loses the rc and returns 0 with the branch left at HAS_UNIQUE_RESIDUALS but no COMMIT
+    # record. The fix propagates the hard failure as a non-zero classify_branch return.
+    cb rev_list_error feature-revfail
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"BRANCH|feature-revfail|HAS_UNIQUE_RESIDUALS"* ]]
+    [[ "$output" != *"COMMIT|"* ]]
 }
