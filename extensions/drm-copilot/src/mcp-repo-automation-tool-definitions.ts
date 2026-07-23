@@ -7,6 +7,8 @@ import {
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
+import { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
+export { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
   readonly description: string;
@@ -28,6 +30,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       properties: {
         workspace_root: workspaceRootProperty,
       },
+      required: ["workspace_root"],
       additionalProperties: false,
     },
   },
@@ -45,7 +48,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "Explicit base branch or ref used for PR context collection.",
         },
       },
-      required: ["base"],
+      required: ["workspace_root", "base"],
       additionalProperties: false,
     },
   },
@@ -93,7 +96,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "When true, allow repository-convention .codex/prompts outputs.",
         },
       },
-      required: ["mode", "source_ecosystem", "source_root"],
+      required: ["workspace_root", "mode", "source_ecosystem", "source_root"],
       additionalProperties: false,
     },
   },
@@ -107,6 +110,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         workspace_root: workspaceRootProperty,
         ...copilotPushDownSelectionProperties,
       },
+      required: ["workspace_root"],
       additionalProperties: false,
     },
   },
@@ -120,6 +124,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         workspace_root: workspaceRootProperty,
         ...codexPushDownSelectionProperties,
       },
+      required: ["workspace_root"],
       additionalProperties: false,
     },
   },
@@ -133,6 +138,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         workspace_root: workspaceRootProperty,
         ...claudePushDownSelectionProperties,
       },
+      required: ["workspace_root"],
       additionalProperties: false,
     },
   },
@@ -149,7 +155,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Kebab-case short name for the potential bug entry.",
         },
       },
-      required: ["short_name"],
+      required: ["workspace_root", "short_name"],
       additionalProperties: false,
     },
   },
@@ -166,7 +172,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Kebab-case short name for the potential entry.",
         },
       },
-      required: ["short_name"],
+      required: ["workspace_root", "short_name"],
       additionalProperties: false,
     },
   },
@@ -187,7 +193,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Numeric issue number of the child issue.",
         },
       },
-      required: ["parent_issue_number", "child_issue_number"],
+      required: ["workspace_root", "parent_issue_number", "child_issue_number"],
       additionalProperties: false,
     },
   },
@@ -216,7 +222,12 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "Work mode marker applied to the resulting issue workflow.",
         },
       },
-      required: ["potential_path", "promotion_type", "work_mode"],
+      required: [
+        "workspace_root",
+        "potential_path",
+        "promotion_type",
+        "work_mode",
+      ],
       additionalProperties: false,
     },
   },
@@ -249,110 +260,11 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Work mode marker applied to the feature folder.",
         },
       },
-      required: ["feature_name", "type", "work_mode"],
+      required: ["workspace_root", "feature_name", "type", "work_mode"],
       additionalProperties: false,
     },
   },
-  {
-    name: "run_poshqc_format",
-    description:
-      "Run bundled PoshQC formatting against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze",
-    description:
-      "Run bundled PoshQC analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_test",
-    description:
-      "Run bundled PoshQC Pester checks against the target workspace using bundled extension resources. When scan_folders is omitted, the scan set is resolved from config/poshqc-scan.json (test.scanFolders); an explicit scan_folders argument overrides the configuration.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_analyze_autofix",
-    description:
-      "Apply bundled PoshQC analyzer autofixes, then rerun analysis against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "run_poshqc_suite",
-    description:
-      "Run the bundled PoshQC suite against the target workspace using bundled extension resources.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        workspace_root: workspaceRootProperty,
-        scan_folders: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-          description:
-            "Optional workspace-relative or workspace-contained folders to scan.",
-        },
-      },
-      additionalProperties: false,
-    },
-  },
+  ...POSHQC_TOOL_DEFINITIONS,
   {
     name: "resolve_policy_audit_template_asset",
     description:
@@ -373,7 +285,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "Optional workspace-relative or absolute destination path for a copied asset.",
         },
       },
-      required: ["asset"],
+      required: ["workspace_root", "asset"],
       additionalProperties: false,
     },
   },
@@ -390,7 +302,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Target Markdown plan path to resolve.",
         },
       },
-      required: ["target"],
+      required: ["workspace_root", "target"],
       additionalProperties: false,
     },
   },
@@ -407,7 +319,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           description: "Target Markdown plan path to resolve.",
         },
       },
-      required: ["target"],
+      required: ["workspace_root", "target"],
       additionalProperties: false,
     },
   },
@@ -464,7 +376,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "When true and artifact_type is 'epic-planner-state', require every child to be prepared and preflight-cleared.",
         },
       },
-      required: ["artifact_type", "artifact_path"],
+      required: ["workspace_root", "artifact_type", "artifact_path"],
       additionalProperties: false,
     },
   },
@@ -482,7 +394,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "Root session identifier (transcript filename stem under ~/.claude/projects/<encoded-workspace>/, e.g. a UUIDv4).",
         },
       },
-      required: ["session_id"],
+      required: ["workspace_root", "session_id"],
       additionalProperties: false,
     },
   },

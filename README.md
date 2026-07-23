@@ -192,7 +192,7 @@ The `drm-copilot` MCP server exposes the following repo-automation tools (tool p
 - `resolve_atomic_plan_prompt`
 - `validate_orchestration_artifacts`
 
-Every tool accepts an optional `workspace_root` argument and defaults to `process.cwd()` when it is omitted. Downstream skills should depend on the MCP server name `drm-copilot` rather than on raw VS Code command IDs. The same tool surface is available through the published npm package `@danmoisan/drm-copilot-mcp`.
+Every tool requires a `workspace_root` argument. The MCP server cannot infer the calling agent's checkout, so callers must pass the absolute worktree/checkout root explicitly; an omitted value returns a structured `ok: false` error rather than silently defaulting. Downstream skills should depend on the MCP server name `drm-copilot` rather than on raw VS Code command IDs. The same tool surface is available through the published npm package `@danmoisan/drm-copilot-mcp`.
 
 ## Standalone npm MCP package
 
@@ -220,7 +220,7 @@ Add the following to an MCP client configuration file such as `claude_desktop_co
 }
 ```
 
-Set `cwd` to the absolute path of the destination workspace root. The MCP server uses `process.cwd()` as the default workspace root when the tool caller does not provide one.
+Set `cwd` to the absolute path of the destination workspace root. Tool callers must still pass `workspace_root` explicitly on each call; it is a required argument and the server does not infer a default workspace root.
 
 ### Package behavior and contents
 

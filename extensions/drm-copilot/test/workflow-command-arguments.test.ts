@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   normalizeWorkspaceDestinationPath,
+  normalizeWorkspaceRoot,
   resolveLinkParentChildInvocation,
   resolvePolicyAuditTemplateAssetInvocation,
   resolveRunPoshQCAnalyzeAutofixInvocation,
@@ -184,5 +185,39 @@ describe("policy-audit helper validation", () => {
         "target_path",
       ),
     ).toBe("D:/exports/policy-audit.md");
+  });
+});
+
+describe("normalizeWorkspaceRoot (AC-4 fail-closed)", () => {
+  // Omitted value with no explicit fallback must fail closed rather than
+  // silently defaulting to the MCP server's process.cwd().
+  it("throws an actionable error when the value is omitted and no fallback is supplied", () => {
+    expect(() => normalizeWorkspaceRoot(undefined)).toThrow(
+      /workspace_root is required/,
+    );
+  });
+
+  // The VS Code command surface passes an explicit fallback; that path must be
+  // preserved unchanged.
+  it("returns the explicit fallback when the value is omitted", () => {
+    expect(normalizeWorkspaceRoot(undefined, "C:/workspace")).toBe(
+      "C:/workspace",
+    );
+  });
+
+  it("normalizes a valid string value unchanged", () => {
+    expect(normalizeWorkspaceRoot("C:/worktree")).toBe("C:/worktree");
+  });
+
+  it("preserves the existing invalid-type error", () => {
+    expect(() => normalizeWorkspaceRoot(42)).toThrow();
+  });
+
+  it("rejects an empty-string workspace_root", () => {
+    expect(() => normalizeWorkspaceRoot("")).toThrow();
+  });
+
+  it("rejects a whitespace-only workspace_root", () => {
+    expect(() => normalizeWorkspaceRoot("   ")).toThrow();
   });
 });

@@ -42,13 +42,17 @@ describe("resolveValidateDiscoveryArtifactsToolInput", () => {
 
   it("rejects a missing artifact_path", () => {
     expect(() =>
-      resolveValidateDiscoveryArtifactsToolInput({ artifact_type: "profile" }),
+      resolveValidateDiscoveryArtifactsToolInput({
+        workspace_root: "C:/ws",
+        artifact_type: "profile",
+      }),
     ).toThrow(/artifact_path/);
   });
 
   it("rejects a non-string artifact_path", () => {
     expect(() =>
       resolveValidateDiscoveryArtifactsToolInput({
+        workspace_root: "C:/ws",
         artifact_type: "profile",
         artifact_path: 5,
       }),
@@ -101,7 +105,9 @@ describe("resolveRunDiscoveryInitToolInput", () => {
   });
 
   it("rejects a missing target_dir", () => {
-    expect(() => resolveRunDiscoveryInitToolInput({})).toThrow(/target_dir/);
+    expect(() =>
+      resolveRunDiscoveryInitToolInput({ workspace_root: "C:/ws" }),
+    ).toThrow(/target_dir/);
   });
 
   it("rejects a non-boolean force", () => {
@@ -165,15 +171,23 @@ describe("resolveRunDiscoveryScenarioGenerationToolInput", () => {
   it.each([
     [
       "feature_contract",
-      { parity_matrix: "pm", runtime_characterization: "rc" },
+      {
+        workspace_root: "C:/ws",
+        parity_matrix: "pm",
+        runtime_characterization: "rc",
+      },
     ],
     [
       "parity_matrix",
-      { feature_contract: "fc", runtime_characterization: "rc" },
+      {
+        workspace_root: "C:/ws",
+        feature_contract: "fc",
+        runtime_characterization: "rc",
+      },
     ],
     [
       "runtime_characterization",
-      { feature_contract: "fc", parity_matrix: "pm" },
+      { workspace_root: "C:/ws", feature_contract: "fc", parity_matrix: "pm" },
     ],
   ])("rejects a missing %s", (missingField, args) => {
     expect(() => resolveRunDiscoveryScenarioGenerationToolInput(args)).toThrow(
@@ -219,6 +233,7 @@ describe("resolveRunDiscoveryReportToolInput", () => {
 
   it("normalizes a parity report requiring input_path", () => {
     const input = resolveRunDiscoveryReportToolInput({
+      workspace_root: "C:/ws",
       report_type: "parity",
       input_path: "matrix.yaml",
     });
@@ -228,12 +243,13 @@ describe("resolveRunDiscoveryReportToolInput", () => {
 
   it("normalizes a completion report requiring both pair inputs", () => {
     const input = resolveRunDiscoveryReportToolInput({
+      workspace_root: "C:/ws",
       report_type: "completion",
       coverage_input: "cov.json",
       parity_input: "par.yaml",
     });
     expect(input).toEqual({
-      workspaceRoot: expect.any(String),
+      workspaceRoot: "C:/ws",
       reportType: "completion",
       coverageInput: "cov.json",
       parityInput: "par.yaml",
@@ -242,13 +258,17 @@ describe("resolveRunDiscoveryReportToolInput", () => {
 
   it("rejects a coverage/parity report missing input_path", () => {
     expect(() =>
-      resolveRunDiscoveryReportToolInput({ report_type: "coverage" }),
+      resolveRunDiscoveryReportToolInput({
+        workspace_root: "C:/ws",
+        report_type: "coverage",
+      }),
     ).toThrow(/input_path/);
   });
 
   it("rejects a completion report missing coverage_input", () => {
     expect(() =>
       resolveRunDiscoveryReportToolInput({
+        workspace_root: "C:/ws",
         report_type: "completion",
         parity_input: "par.yaml",
       }),
@@ -258,6 +278,7 @@ describe("resolveRunDiscoveryReportToolInput", () => {
   it("rejects a completion report missing parity_input", () => {
     expect(() =>
       resolveRunDiscoveryReportToolInput({
+        workspace_root: "C:/ws",
         report_type: "completion",
         coverage_input: "cov.json",
       }),

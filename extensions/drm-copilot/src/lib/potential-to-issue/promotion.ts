@@ -3,7 +3,7 @@
  *
  * Purpose:
  *     In-process TypeScript port of the `promote_potential` workflow in the
- *     bundled `resources/scripts/dev_tools/potential_to_issue.py`. Drives the
+ *     bundled `scripts/dev_tools/potential_to_issue.py`. Drives the
  *     end-to-end promotion: validate inputs, check gh auth, parse the potential
  *     file, build the issue body, create the issue (with a single missing-label
  *     recovery), update the potential-file metadata, and move the file into the
@@ -187,9 +187,10 @@ function posixBasename(pathStr: string): string {
  * Build the issue body for the selected mode and promotion type.
  *
  * Routing table (decision order MUST match the Python source):
- * - minor-audit -> {@link buildMinorAuditBody} (with the default Evidence
- *   Checklist when the section is absent).
- * - bug promotion -> {@link buildBugBody} over the canonical bug headings.
+ * - bug promotion -> {@link buildBugBody} over the canonical bug headings,
+ *   regardless of work mode (so a minor-audit bug renders the bug headings).
+ * - non-bug minor-audit -> {@link buildMinorAuditBody} (with the default
+ *   Evidence Checklist when the section is absent).
  * - otherwise -> {@link buildBody} (standard full-feature body).
  *
  * @param content Potential-file content.
@@ -204,7 +205,23 @@ function buildIssueBody(
   promotionType: string,
   relativePath: string,
 ): string {
-  // minor-audit routes to the audit body with audit-specific sections.
+  // Bug promotions route through the canonical bug-section body FIRST, before
+  // the work-mode branch. This ordering is required so a bug potential promoted
+  // in minor-audit mode still renders the real bug headings (Summary,
+  // Environment, ...) from the bug template rather than the minor-audit/feature
+  // sections, which read headings the bug template does not contain. The
+  // `- Work Mode:` first line emitted by buildBugBody still records the selected
+  // mode, so a minor-audit bug issue records `- Work Mode: minor-audit`.
+  if (promotionType === "bug") {
+    const bugSections: Record<string, string> = {};
+    for (const heading of BUG_SECTION_HEADINGS) {
+      bugSections[heading] = getSection(content, heading) || PLACEHOLDER;
+    }
+    return buildBugBody(selectedMode, bugSections, relativePath);
+  }
+
+  // Non-bug minor-audit promotions route to the audit body with audit-specific
+  // sections (defaulting the Evidence Checklist when the section is absent).
   if (selectedMode === "minor-audit") {
     const problem = getSection(content, "Problem / Why") || PLACEHOLDER;
     const implementationIntent =
@@ -231,15 +248,6 @@ function buildIssueBody(
       evidenceChecklist,
       relativePath,
     );
-  }
-
-  // Bug promotions route through the canonical bug-section body.
-  if (promotionType === "bug") {
-    const bugSections: Record<string, string> = {};
-    for (const heading of BUG_SECTION_HEADINGS) {
-      bugSections[heading] = getSection(content, heading) || PLACEHOLDER;
-    }
-    return buildBugBody(selectedMode, bugSections, relativePath);
   }
 
   // Default: the standard full-feature body.

@@ -5,6 +5,7 @@ import {
   PromotionError,
 } from "../../../src/lib/potential-to-issue/promotion";
 import {
+  buildBugContent,
   buildFeatureContent,
   FakeGhClient,
   FakePotentialFileSystem,
@@ -377,6 +378,46 @@ describe("promotePotential — minor-audit routing", () => {
     const firstSection = lines.indexOf("## Problem / Why");
     expect(firstSection).toBeGreaterThan(0);
     expect(lines[firstSection - 1]).toBe("- Work Mode: minor-audit");
+  });
+});
+
+describe("promotePotential — bug promotion in minor-audit mode (AC-1)", () => {
+  it("routes a populated bug potential to the bug body under minor-audit with the minor-audit marker", () => {
+    // Arrange: a bug potential with every canonical bug section populated.
+    const fs = new FakePotentialFileSystem();
+    const potential = "/workspace/docs/features/potential/minor-bug.md";
+    fs.files.set(potential, buildBugContent("Minor Audit Bug"));
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/401"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+
+    // Act
+    const outcome = promotePotential({
+      potentialPath: potential,
+      promotionType: "bug",
+      fs,
+      gh,
+      workspace: WORKSPACE,
+      workMode: "minor-audit",
+    });
+
+    // Assert: bug-headed body with authored content and the minor-audit marker.
+    expect(outcome.exitCode).toBe(0);
+    const body = (gh.calls[0] as RecordedGhCall)[1][1] ?? "";
+    expect(body.split("\n")[0]).toBe("- Work Mode: minor-audit");
+    expect(body).toContain("## Summary\nsummary details");
+    expect(body).toContain("## Environment\n- OS: Linux");
+    expect(body).toContain("## Steps to Reproduce\n1. step one");
+    expect(body).toContain("## Expected Behavior\nexpected results");
+    expect(body).toContain("## Actual Behavior\nactual results");
+    expect(body).toContain("## Logs / Screenshots\nscreenshot attached");
+    expect(body).toContain("## Impact / Severity\nmedium");
+    // No minor-audit/feature-oriented sections leak into the bug body.
+    expect(body).not.toContain("## Implementation Intent");
+    expect(body).not.toContain("## Verification Steps");
+    // No placeholder for the populated sections.
+    expect(body).not.toContain("(not provided in potential file)");
   });
 });
 

@@ -272,11 +272,35 @@ export function getFeatureNameValidationMessage(
   }
 }
 
+/**
+ * Normalizes a caller-supplied `workspace_root` value, failing closed when it
+ * is omitted and no explicit fallback is supplied.
+ *
+ * The MCP server is a single long-running process shared across concurrent
+ * worktree-isolated agents, so it cannot infer which checkout a given call
+ * originated from. Returning `process.cwd()` for an omitted value silently
+ * misdirects writes to the server's own checkout. To prevent that, an omitted
+ * value with no explicit fallback now throws. Callers that legitimately have a
+ * workspace context (the VS Code command surface) pass it explicitly via
+ * `fallbackWorkspaceRoot` and retain their previous behavior.
+ *
+ * @param value The caller-supplied workspace root (string), or `undefined`.
+ * @param fallbackWorkspaceRoot Optional explicit fallback. When omitted and
+ *   `value` is `undefined`, the function throws instead of defaulting.
+ * @returns The normalized absolute workspace root.
+ * @throws Error when `value` is `undefined` and no explicit fallback is
+ *   supplied, or when `value` is present but not a valid non-empty string.
+ */
 export function normalizeWorkspaceRoot(
   value: unknown,
-  fallbackWorkspaceRoot: string = process.cwd(),
+  fallbackWorkspaceRoot?: string,
 ): string {
   if (value === undefined) {
+    if (fallbackWorkspaceRoot === undefined) {
+      throw new Error(
+        "workspace_root is required. The MCP server cannot infer the calling agent's checkout; pass the absolute worktree root explicitly.",
+      );
+    }
     return fallbackWorkspaceRoot;
   }
 

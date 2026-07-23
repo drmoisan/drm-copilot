@@ -117,7 +117,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 ### MCP Runtime Expectations
 
 - MCP tools are fully non-interactive.
-- `workspace_root` is accepted by all workspace-targeted tools and defaults to `process.cwd()` when omitted.
+- `workspace_root` is required by all workspace-targeted tools; the MCP server cannot infer the calling agent's checkout, so callers must pass the absolute worktree/checkout root explicitly. An omitted value returns a structured `ok: false` error rather than silently defaulting.
 - `collect_pr_context` requires an explicit `base` branch/ref in MCP mode.
 - `resolve_policy_audit_template_asset` requires `asset` and optionally accepts `target_path`; valid selectors are `template`, `code-review-template`, `feature-audit-template`, and `agents`. When `target_path` is omitted, callers receive the bundled source path for the requested asset.
 - Bundled scripts are resolved from `extensions/drm-copilot/resources/...` at runtime.
@@ -148,25 +148,25 @@ If the server is launched from a different working directory, pass `workspace_ro
 
 ### MCP Input Summary
 
-- `collect_commit_context`: optional `workspace_root`
-- `collect_pr_context`: optional `workspace_root`, required `base`
-- `run_codex_native_converter`: optional `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
-- `push_down_copilot_customizations`: optional `workspace_root`
-- `push_down_codex_and_agents_customizations`: optional `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`
-- `new_potential_bug_entry`: optional `workspace_root`, required `short_name`
-- `new_potential_entry`: optional `workspace_root`, required `short_name`
-- `link_parent_child`: optional `workspace_root`, required `child_issue_number`, required `parent_issue_number`
-- `potential_to_issue`: optional `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
-- `new_active_feature_folder`: optional `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
-- `resolve_policy_audit_template_asset`: optional `workspace_root`, required `asset` (`template` | `code-review-template` | `feature-audit-template` | `agents`), optional `target_path`
-- `resolve_atomic_plan_prompt`: optional `workspace_root`, required `target`
-- `resolve_execute_hard_lock_prompt`: optional `workspace_root`, required `target`
-- run_poshqc_format: optional `workspace_root`, optional `scan_folders`
-- run_poshqc_analyze: optional `workspace_root`, optional `scan_folders`
-- run_poshqc_test: optional `workspace_root`, optional `scan_folders`
-- run_poshqc_analyze_autofix: optional `workspace_root`, optional `scan_folders`
-- run_poshqc_suite: optional `workspace_root`, optional `scan_folders`
-- validate_orchestration_artifacts: optional `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
+- `collect_commit_context`: required `workspace_root`
+- `collect_pr_context`: required `workspace_root`, required `base`
+- `run_codex_native_converter`: required `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
+- `push_down_copilot_customizations`: required `workspace_root`
+- `push_down_codex_and_agents_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`
+- `new_potential_bug_entry`: required `workspace_root`, required `short_name`
+- `new_potential_entry`: required `workspace_root`, required `short_name`
+- `link_parent_child`: required `workspace_root`, required `child_issue_number`, required `parent_issue_number`
+- `potential_to_issue`: required `workspace_root`, required `potential_path`, `promotion_type`, `work_mode`
+- `new_active_feature_folder`: required `workspace_root`, required `feature_name`, `type`, `work_mode`, optional `issue_number`
+- `resolve_policy_audit_template_asset`: required `workspace_root`, required `asset` (`template` | `code-review-template` | `feature-audit-template` | `agents`), optional `target_path`
+- `resolve_atomic_plan_prompt`: required `workspace_root`, required `target`
+- `resolve_execute_hard_lock_prompt`: required `workspace_root`, required `target`
+- run_poshqc_format: required `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze: required `workspace_root`, optional `scan_folders`
+- run_poshqc_test: required `workspace_root`, optional `scan_folders`
+- run_poshqc_analyze_autofix: required `workspace_root`, optional `scan_folders`
+- run_poshqc_suite: required `workspace_root`, optional `scan_folders`
+- validate_orchestration_artifacts: required `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
 
 ### MCP Result Shape
 

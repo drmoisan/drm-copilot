@@ -147,7 +147,7 @@ describe("push_down_claude_customizations tool schema", () => {
     return definition.inputSchema;
   }
 
-  it("adds optional packs, csharp_variant, and memory_mode without a required array", () => {
+  it("adds optional packs, csharp_variant, and memory_mode with workspace_root required", () => {
     const schema = findClaudeSchema(toolDefinitions);
     const properties = schema.properties as Record<string, unknown>;
 
@@ -155,10 +155,11 @@ describe("push_down_claude_customizations tool schema", () => {
     expect(properties["packs"]).toBeDefined();
     expect(properties["csharp_variant"]).toBeDefined();
     expect(properties["memory_mode"]).toBeDefined();
-    // No field is required; a workspace_root-only invocation stays valid.
-    expect(
-      (schema as { required?: ReadonlyArray<string> }).required,
-    ).toBeUndefined();
+    // workspace_root is required so an omitted value is rejected at the MCP
+    // boundary; the selection fields remain optional.
+    expect((schema as { required?: ReadonlyArray<string> }).required).toEqual([
+      "workspace_root",
+    ]);
     // additionalProperties is retained as false.
     expect(schema.additionalProperties).toBe(false);
   });
@@ -185,7 +186,7 @@ describe("push_down_codex_and_agents_customizations tool schema", () => {
     return definition.inputSchema;
   }
 
-  it("adds optional packs, csharp_variant, and memory_mode with no required array", () => {
+  it("adds optional packs, csharp_variant, and memory_mode with workspace_root required", () => {
     const schema = findCodexSchema(toolDefinitions);
     const properties = schema.properties as Record<string, unknown>;
 
@@ -193,9 +194,9 @@ describe("push_down_codex_and_agents_customizations tool schema", () => {
     expect(properties["packs"]).toBeDefined();
     expect(properties["csharp_variant"]).toBeDefined();
     expect(properties["memory_mode"]).toBeDefined();
-    expect(
-      (schema as { required?: ReadonlyArray<string> }).required,
-    ).toBeUndefined();
+    expect((schema as { required?: ReadonlyArray<string> }).required).toEqual([
+      "workspace_root",
+    ]);
     expect(schema.additionalProperties).toBe(false);
   });
 
