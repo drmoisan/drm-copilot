@@ -251,7 +251,7 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 - [x] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
 - [x] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
 - [x] A checkpoint with `epic_mode: true` and `step9_status: "passed"` passes plain validation and satisfies `.claude/hooks/enforce-epic-merge-gate.ps1` with zero edits to that hook (regression scenario).
-- [ ] All pre-existing step-status validator tests (Python, Pester, Jest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.
+- [x] All pre-existing step-status validator tests (Python, Pester, Jest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.
 
 ### Divergence 2 — complexity-floor semantics
 
@@ -268,9 +268,9 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 
 ### Cross-cutting
 
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes, confirming the root `.claude/lib` modules and their `extensions/drm-copilot/resources/claude-customizations` mirrors are content-identical.
-- [ ] The full per-language toolchain (format, lint, type-check where applicable, tests) passes for every batch.
-- [ ] Line coverage >= 85% and branch coverage >= 75% are maintained on changed files.
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes, confirming the root `.claude/lib` modules and their `extensions/drm-copilot/resources/claude-customizations` mirrors are content-identical.
+- [x] The full per-language toolchain (format, lint, type-check where applicable, tests) passes for every batch.
+- [x] Line coverage >= 85% and branch coverage >= 75% are maintained on changed files.
 
 ## Risks & Mitigations
 - Technical or operational risks:
