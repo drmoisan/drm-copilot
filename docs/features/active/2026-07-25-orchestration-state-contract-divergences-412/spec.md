@@ -247,8 +247,8 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 - [x] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_remediation_loop_limit`.
 - [x] The Python `--require-complete` gate does not fail on `step9_status: "passed"` in an otherwise-complete checkpoint.
 - [x] The Python `--require-pr-creation-ready` gate fails when `step6_status` is `blocked_remediation_loop_limit`.
-- [ ] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Jest cases.
-- [ ] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
+- [x] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Jest cases.
+- [x] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
 - [x] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
 - [x] A checkpoint with `epic_mode: true` and `step9_status: "passed"` passes plain validation and satisfies `.claude/hooks/enforce-epic-merge-gate.ps1` with zero edits to that hook (regression scenario).
 - [ ] All pre-existing step-status validator tests (Python, Pester, Jest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.

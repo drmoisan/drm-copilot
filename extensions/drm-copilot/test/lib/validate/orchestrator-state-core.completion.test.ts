@@ -193,6 +193,43 @@ describe("validateOrchestratorStateText completion gates", () => {
     );
   });
 
+  it("rejects each documented failure step status under requireComplete", () => {
+    // Arrange / Act / Assert: each failure value on its owning step key blocks
+    // completion with the byte-identical Python message form.
+    const failureStatuses: ReadonlyArray<readonly [string, string]> = [
+      ["step9_status", "failed_remediation_required"],
+      ["step9_status", "blocked_ci_loop_limit"],
+      ["step6_status", "blocked_remediation_loop_limit"],
+    ];
+    for (const [key, value] of failureStatuses) {
+      const state = buildValidState();
+      state[key] = value;
+      expect(validateComplete(state)).toContain(
+        `Checkpoint completion validation failed: ${key} is ${value}.`,
+      );
+    }
+  });
+
+  it("does not block completion on step9_status passed", () => {
+    // Arrange: an otherwise-complete checkpoint recording CI green.
+    const state = buildValidState();
+    state["step9_status"] = "passed";
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = CI_GATE;
+
+    // Act
+    const errors = validateComplete(state);
+
+    // Assert
+    expect(
+      errors.some((error) =>
+        error.startsWith(
+          "Checkpoint completion validation failed: step9_status",
+        ),
+      ),
+    ).toBe(false);
+  });
+
   it("invokes the routing contract under requireComplete with an injected matrix", () => {
     // Arrange: an empty routing matrix yields the routes-missing error.
     const state = buildValidState();

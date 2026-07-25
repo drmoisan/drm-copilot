@@ -124,6 +124,52 @@ const STEP_STATUS_KEYS = [
   "step10_status",
 ] as const;
 
+/**
+ * Per-key additive vocabulary layered on the shared `VALID_STEP_STATUS` set. A
+ * value listed here is valid only on its owning key; the same value on any
+ * other step key is still rejected. Ported from Python
+ * `scripts/dev_tools/_orchestrator_state_step_status.py`.
+ */
+const STEP_SPECIFIC_EXTRA_STATUS: ReadonlyMap<
+  string,
+  ReadonlySet<string>
+> = new Map([
+  ["step6_status", new Set(["blocked_remediation_loop_limit"])],
+  [
+    "step9_status",
+    new Set(["passed", "failed_remediation_required", "blocked_ci_loop_limit"]),
+  ],
+]);
+
+/**
+ * Step statuses that must never appear in a checkpoint written as DONE. The
+ * documented S9 success value `passed` is deliberately absent: it records CI
+ * green and must not block completion. Typed over `unknown` so membership is
+ * tested on the raw checkpoint value, matching the Python `in` check.
+ */
+const COMPLETION_BLOCKING_STEP_STATUS: ReadonlySet<unknown> = new Set([
+  "pending",
+  "blocked",
+  "failed_remediation_required",
+  "blocked_ci_loop_limit",
+  "blocked_remediation_loop_limit",
+]);
+
+/**
+ * Report whether a step-status value is valid for its own step key.
+ *
+ * @param key Checkpoint step-status key the value was written to.
+ * @param value String value read from the checkpoint.
+ * @returns True when the value is in the shared vocabulary or in the extra set
+ * owned by `key`.
+ */
+function isValidStepStatus(key: string, value: string): boolean {
+  if (VALID_STEP_STATUS.has(value)) {
+    return true;
+  }
+  return STEP_SPECIFIC_EXTRA_STATUS.get(key)?.has(value) === true;
+}
+
 /** Options controlling orchestrator-state validation. */
 export interface ValidateOrchestratorStateOptions {
   /** When true, enforce completion-safe lifecycle states and gates. */
@@ -299,13 +345,14 @@ export function validateOrchestratorStateText(
     }
   }
 
-  // Validate each tracked step status against the permitted set.
+  // Validate each tracked step status against the shared permitted set plus
+  // that key's additive extra vocabulary.
   for (const key of STEP_STATUS_KEYS) {
     const value = stateMap[key];
     if (
       value !== undefined &&
       value !== null &&
-      !(typeof value === "string" && VALID_STEP_STATUS.has(value))
+      !(typeof value === "string" && isValidStepStatus(key, value))
     ) {
       errors.push(`Checkpoint has invalid ${key}: ${String(value)}`);
     }
@@ -353,7 +400,7 @@ export function validateOrchestratorStateText(
     // the stricter completion gate.
     for (const key of STEP_STATUS_KEYS) {
       const value = stateMap[key];
-      if (value === "pending" || value === "blocked") {
+      if (COMPLETION_BLOCKING_STEP_STATUS.has(value)) {
         errors.push(
           `Checkpoint completion validation failed: ${key} is ${String(value)}.`,
         );
