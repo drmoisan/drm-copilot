@@ -68,7 +68,7 @@ Decision justification (research RQ2.1):
   - Divergence 1: per-step-key additive extra-status vocabulary in the Python validator, its TypeScript mirror, and `OrchestratorState.psm1` (plus the resources byte mirror), including completion-gate and PR-creation-readiness closure.
   - Divergence 1 adjacent finding: `step6_status: "blocked_remediation_loop_limit"` (`.claude/skills/orchestrate/SKILL.md` line 200) is included in scope by explicit decision; the per-key mechanism covers it.
   - Divergence 2: floor-signal filtering in `compute_complexity_floor.py` and `ModelRouting.psm1` (plus the resources byte mirror), pinned to the config by static parity tests.
-  - Test additions in the Python, Pester, and Vitest suites listed in the File Surface section.
+  - Test additions in the Python, Pester, and Jest suites listed in the File Surface section.
 - Out of scope / non-goals:
   - `config/orchestration-routing.json` and its bundled mirror `extensions/drm-copilot/resources/config/orchestration-routing.json` — unchanged.
   - `.claude/skills/orchestrate/SKILL.md`, `.claude/rules/orchestrator-state.md`, and all documentation mirrors — unchanged; documentation is the authoritative side for both divergences.
@@ -189,7 +189,7 @@ Ordering constraints: Batch 1 precedes Batch 5 (the TS mirror must copy the fina
 #### Backward-compatibility expectations:
 
 Divergence 2, concretely:
-- **Stored assessments invalidated: zero.** The single runtime checkpoint at `artifacts/orchestration/orchestrator-state.json` records one `complexity_assessments` entry with `signals_present: ["cross_module_contract_change"]`, a `"floor": true` signal, so its recomputed floor is `C3` before and after the change.
+- **Stored assessments invalidated: zero.** Every `complexity_assessments` entry in the runtime checkpoint at `artifacts/orchestration/orchestrator-state.json` records only the floor-flagged signal `cross_module_contract_change`, a `"floor": true` signal, so each entry's recomputed floor is `C3` before and after the change and no stored entry's recomputed floor changes.
 - **Committed JSON files carrying `complexity_assessments`: zero** (repo-wide search).
 - **Test fixtures asserting the any-non-empty behavior: zero.** Existing Python and Pester floor tests derive inputs exclusively from `floor: true` catalog names and remain green; new cases are additive.
 - **Decision: accept the break with no grace/legacy-acceptance rule.** A rule accepting `floor: C3` where the recompute yields `C1` would permanently weaken invariant 3 of `.claude/rules/orchestrator-state.md`, be indistinguishable from the bug it excuses, and add dead code once fleets roll forward.
@@ -221,7 +221,7 @@ Seeded from issue:
 - Regression tests to add or update: per-key acceptance/rejection matrix for the extra statuses; completion blocklist for the three failure values; PR-creation-readiness rejection for step6; epic-merge-gate regression scenario (`epic_mode: true`, `step9_status: "passed"`, hook unchanged); non-floor/unknown/mixed floor cases; validator acceptance of `floor: C1` with non-floor-only signals.
 - Unit tests (pytest) for the fixed behavior and boundaries: extended `test_validate_orchestrator_state.py`, `test_validate_orchestrator_state_pr_creation_readiness.py`, `test_compute_complexity_floor.py` (including the floor-set parity assertion against `load_routing_matrix()`), `test_validate_orchestrator_state_complexity.py`.
 - Edge cases and negative scenarios (invalid inputs, missing data, boundary values): per-key values on non-owning keys rejected; unknown signal names contribute nothing; empty signal list yields `C1`; absent `step9_status` treated as `pending` (blocks completion).
-- Error handling and logging verification: Vitest cases assert TypeScript error strings byte-identical to Python; the validator remains a non-raising error-string collector.
+- Error handling and logging verification: Jest cases assert TypeScript error strings byte-identical to Python; the validator remains a non-raising error-string collector.
 - Coverage impact and targets for changed lines/modules: line >= 85%, branch >= 75% maintained on changed files.
 - Toolchain commands to run (format → lint → type-check → test): full per-language toolchain for every batch; baseline fail-before commands run first (below).
 - Manual validation steps (if required): none; no human-interaction requirement identified.
@@ -247,11 +247,11 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 - [ ] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_remediation_loop_limit`.
 - [ ] The Python `--require-complete` gate does not fail on `step9_status: "passed"` in an otherwise-complete checkpoint.
 - [ ] The Python `--require-pr-creation-ready` gate fails when `step6_status` is `blocked_remediation_loop_limit`.
-- [ ] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Vitest cases.
+- [ ] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Jest cases.
 - [ ] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
 - [ ] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
 - [ ] A checkpoint with `epic_mode: true` and `step9_status: "passed"` passes plain validation and satisfies `.claude/hooks/enforce-epic-merge-gate.ps1` with zero edits to that hook (regression scenario).
-- [ ] All pre-existing step-status validator tests (Python, Pester, Vitest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.
+- [ ] All pre-existing step-status validator tests (Python, Pester, Jest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.
 
 ### Divergence 2 — complexity-floor semantics
 
@@ -275,7 +275,7 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 ## Risks & Mitigations
 - Technical or operational risks:
   - Divergence-2 formula change invalidates pre-change checkpoints in other worktrees whose assessments recorded only non-floor signals (residual nonzero risk outside this repository's search scope). Mitigation: the documented resume reconciliation recomputes and rewrites the entry; the PR body states the consequence and repair step.
-  - Error-string drift between the Python validator and the TypeScript mirror. Mitigation: Batch 1 precedes Batch 5; Vitest cases assert byte-identical strings.
+  - Error-string drift between the Python validator and the TypeScript mirror. Mitigation: Batch 1 precedes Batch 5; Jest cases assert byte-identical strings.
   - Root/mirror `.psm1` divergence. Mitigation: mirror copies land in the same batch; `test_push_down_claude_resource_contracts.py` enforces byte identity.
   - Typoed floor-signal names silently compute `C1` under the ignore-unknowns policy. Mitigation: `band >= floor` and band-enum membership still validate; catalog-membership validation is recorded as a follow-up.
 - Mitigations and rollbacks: revert the batches; no data migration or flag cleanup is required.
