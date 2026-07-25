@@ -312,3 +312,88 @@ Describe 'Invoke-OrchestratorStatePreflight' {
     }
 }
 
+Describe 'Get-OrchestratorStateBasePresenceError per-step-key status vocabulary' {
+    <#
+    Mirrors the Python per-step-key additive vocabulary in
+    scripts/dev_tools/_orchestrator_state_step_status.py: the shared
+    VALID_STEP_STATUS set is unchanged, and each extra value is valid only on its
+    owning step key. The base-presence function is exercised directly with an
+    in-memory parsed checkpoint object, so no filesystem boundary is involved.
+    #>
+    BeforeAll {
+        # Materialize the in-memory fixture as the parsed PSCustomObject shape the
+        # base-presence check consumes, applying any per-test field overrides.
+        function script:New-CheckpointObject {
+            param([hashtable] $Overrides = @{})
+            $checkpoint = New-ReadyCheckpoint
+            foreach ($name in $Overrides.Keys) { $checkpoint[$name] = $Overrides[$name] }
+            return ($checkpoint | ConvertTo-Json -Depth 5 | ConvertFrom-Json)
+        }
+    }
+
+    Context 'per-key extra statuses accepted on their owning key' {
+        It 'accepts step9_status value <_>' -ForEach @(
+            'passed',
+            'failed_remediation_required',
+            'blocked_ci_loop_limit'
+        ) {
+            # Arrange: an otherwise-valid checkpoint carrying a documented S9 value.
+            $state = New-CheckpointObject -Overrides @{ step9_status = $_ }
+
+            # Act
+            $errors = @(Get-OrchestratorStateBasePresenceError -State $state)
+
+            # Assert: the documented S9 vocabulary is valid on its owning key.
+            $errors | Should -BeNullOrEmpty
+        }
+
+        It 'accepts step6_status value blocked_remediation_loop_limit' {
+            # Arrange: the documented third-remediation-pass halt value on step6.
+            $state = New-CheckpointObject -Overrides @{ step6_status = 'blocked_remediation_loop_limit' }
+
+            # Act
+            $errors = @(Get-OrchestratorStateBasePresenceError -State $state)
+
+            # Assert: the value is valid on its owning key.
+            $errors | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'per-key extra statuses rejected on every non-owning key' {
+        It 'rejects <value> on <key>' -ForEach @(
+            foreach ($extra in @('passed', 'failed_remediation_required', 'blocked_ci_loop_limit')) {
+                foreach ($stepKey in @('step5_status', 'step6_status', 'step7_status', 'step8_status', 'step10_status')) {
+                    @{ key = $stepKey; value = $extra }
+                }
+            }
+            foreach ($stepKey in @('step5_status', 'step7_status', 'step8_status', 'step9_status', 'step10_status')) {
+                @{ key = $stepKey; value = 'blocked_remediation_loop_limit' }
+            }
+        ) {
+            # Arrange: write an extra value to a step key that does not own it.
+            $state = New-CheckpointObject -Overrides @{ $key = $value }
+
+            # Act
+            $errors = @(Get-OrchestratorStateBasePresenceError -State $state)
+
+            # Assert: the exact primary-validator message form is emitted.
+            $errors | Should -Contain "Checkpoint has invalid ${key}: $value"
+        }
+    }
+
+    Context 'epic-merge-gate regression scenario' {
+        It 'passes base validation for an epic_mode checkpoint recording step9_status passed' {
+            # Arrange: the checkpoint shape .claude/hooks/enforce-epic-merge-gate.ps1
+            # requires (epic_mode plus step9_status 'passed'), which the validator
+            # previously rejected.
+            $state = New-CheckpointObject -Overrides @{ epic_mode = $true; step9_status = 'passed' }
+
+            # Act
+            $errors = @(Get-OrchestratorStateBasePresenceError -State $state)
+
+            # Assert: no base-presence error is produced.
+            $errors | Should -BeNullOrEmpty
+        }
+    }
+}
+

@@ -14,7 +14,7 @@
     checkpoint-presence checks (required keys, step-status validity, blocked_reason
     validity) from `scripts/dev_tools/validate_orchestrator_state.py`. The base
     constants below are pinned to `REQUIRED_STATE_KEYS`, `STEP_STATUS_KEYS`,
-    `VALID_STEP_STATUS`, and `VALID_BLOCKED_REASONS` in that validator.
+    `VALID_STEP_STATUS`, `VALID_BLOCKED_REASONS`, and `STEP_SPECIFIC_EXTRA_STATUS`.
 
     Every public function FAILS CLOSED: a missing checkpoint file, invalid JSON, a
     missing required key, an invalid step status, or an unmet readiness condition all
@@ -82,6 +82,15 @@ $script:VALID_STEP_STATUS = @(
     'in_progress',
     'completed'
 )
+
+# Per-key additive step-status vocabulary layered on VALID_STEP_STATUS: each value
+# below is valid only on its owning key and is still rejected on every other step
+# key. Pinned to STEP_SPECIFIC_EXTRA_STATUS in
+# scripts/dev_tools/_orchestrator_state_step_status.py.
+$script:STEP_SPECIFIC_EXTRA_STATUS = @{
+    step6_status = @('blocked_remediation_loop_limit')
+    step9_status = @('passed', 'failed_remediation_required', 'blocked_ci_loop_limit')
+}
 
 # The allowed blocked_reason vocabulary. Pinned to VALID_BLOCKED_REASONS in the
 # primary validator.
@@ -226,11 +235,11 @@ function Get-OrchestratorStateBasePresenceError {
         Return the base checkpoint-presence errors, mirroring the primary validator.
     .DESCRIPTION
         Private base check. Emits one error string per missing required key, one per
-        step5_status..step10_status value outside VALID_STEP_STATUS, and one when
-        blocked_reason is present with a value outside VALID_BLOCKED_REASONS. This
-        mirrors the base block of scripts/dev_tools/validate_orchestrator_state.py
-        (required keys, step-status validity, blocked_reason validity) that runs
-        before any mode-specific gate.
+        step5_status..step10_status value outside VALID_STEP_STATUS and that key's
+        STEP_SPECIFIC_EXTRA_STATUS set, and one when blocked_reason is present with a
+        value outside VALID_BLOCKED_REASONS. This mirrors the base block of
+        scripts/dev_tools/validate_orchestrator_state.py (required keys, step-status
+        validity, blocked_reason validity) that runs before any mode-specific gate.
     .PARAMETER State
         The parsed checkpoint PSCustomObject.
     .OUTPUTS
@@ -254,12 +263,16 @@ function Get-OrchestratorStateBasePresenceError {
         }
     }
 
-    # Every present step status must be a member of the allowed vocabulary; an absent
-    # step key contributes no error (mirrors the primary validator's None guard).
+    # Every present step status must be a member of the shared vocabulary or of that
+    # key's additive extra set; an absent step key contributes no error (mirrors the
+    # primary validator's None guard).
     foreach ($key in $script:STEP_STATUS_KEYS) {
         $field = Get-OrchestratorStateField -State $State -Name $key
+        $extra = @()
+        if ($script:STEP_SPECIFIC_EXTRA_STATUS.ContainsKey($key)) { $extra = @($script:STEP_SPECIFIC_EXTRA_STATUS[$key]) }
         if ($field.Present -and $null -ne $field.Value -and
-            ($script:VALID_STEP_STATUS -notcontains [string]$field.Value)) {
+            ($script:VALID_STEP_STATUS -notcontains [string]$field.Value) -and
+            ($extra -notcontains [string]$field.Value)) {
             $errors.Add("Checkpoint has invalid $key`: $($field.Value)")
         }
     }

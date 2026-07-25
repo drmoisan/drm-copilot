@@ -249,21 +249,21 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 - [x] The Python `--require-pr-creation-ready` gate fails when `step6_status` is `blocked_remediation_loop_limit`.
 - [ ] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Jest cases.
 - [ ] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
-- [ ] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
-- [ ] A checkpoint with `epic_mode: true` and `step9_status: "passed"` passes plain validation and satisfies `.claude/hooks/enforce-epic-merge-gate.ps1` with zero edits to that hook (regression scenario).
+- [x] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
+- [x] A checkpoint with `epic_mode: true` and `step9_status: "passed"` passes plain validation and satisfies `.claude/hooks/enforce-epic-merge-gate.ps1` with zero edits to that hook (regression scenario).
 - [ ] All pre-existing step-status validator tests (Python, Pester, Jest) pass without fixture modification, demonstrating that no previously valid checkpoint is newly rejected in plain mode.
 
 ### Divergence 2 — complexity-floor semantics
 
 - [x] `compute_complexity_floor` returns `C1` for each single-element list containing a `"floor": false` signal (`single_file_localized_edit`, `mechanical_rename_or_move`, `docs_or_comment_only`) and for a single-element list containing an unknown signal name.
 - [x] `compute_complexity_floor` returns `C3` for each single-element list containing a `"floor": true` signal and for any mixed list containing at least one floor signal, returns `C1` for `[]`, and never returns `C4`.
-- [ ] `Get-ComplexityFloor` in `.claude/lib/model-routing/ModelRouting.psm1` produces outputs identical to `compute_complexity_floor` for the same truth table, verified by Pester cases in `tests/scripts/claude-lib/model-routing/Get-ComplexityFloor.Tests.ps1`.
+- [x] `Get-ComplexityFloor` in `.claude/lib/model-routing/ModelRouting.psm1` produces outputs identical to `compute_complexity_floor` for the same truth table, verified by Pester cases in `tests/scripts/claude-lib/model-routing/Get-ComplexityFloor.Tests.ps1`.
 - [x] `tests/scripts/dev_tools/test_compute_complexity_floor.py` contains a static parity assertion that the embedded `FLOOR_SIGNAL_NAMES` set equals the set of names flagged `"floor": true` in `config/orchestration-routing.json`.
-- [ ] `tests/scripts/claude-lib/model-routing/ModelRouting.Parity.Tests.ps1` contains a static parity assertion pinning `$script:FLOOR_SIGNAL_NAMES` to the config's `"floor": true` names.
+- [x] `tests/scripts/claude-lib/model-routing/ModelRouting.Parity.Tests.ps1` contains a static parity assertion pinning `$script:FLOOR_SIGNAL_NAMES` to the config's `"floor": true` names.
 - [x] The complexity validator accepts a recorded `complexity_assessments` entry whose `signals_present` contains only non-floor signals and whose `floor` is `"C1"`.
 - [x] The complexity validator rejects the same entry with `floor: "C3"`, producing a floor-mismatch error that names the recomputed value `C1`.
 - [x] `scripts/dev_tools/compute_complexity_floor.py` docstrings no longer claim caller pre-filtering, the module performs no file I/O, and the file remains under 500 lines.
-- [ ] `.claude/lib/model-routing/ModelRouting.psm1` performs no file reads at runtime.
+- [x] `.claude/lib/model-routing/ModelRouting.psm1` performs no file reads at runtime.
 - [ ] The PR body records the divergence-2 backward-compatibility statement: zero stored assessments invalidated (paths and counts per the research), and pre-change checkpoints with non-floor-only assessments require re-recording via the documented resume reconciliation.
 
 ### Cross-cutting
