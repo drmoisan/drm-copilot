@@ -211,6 +211,26 @@ Describe 'validate-orchestrator-output.ps1' {
             $result.Message | Should -BeNullOrEmpty
         }
 
+        It 'allows DONE when the validator exits 0 and prints its success line (issue #413)' {
+            # Arrange — the live validator path: exit 0 with the success line on stdout,
+            # folded into Output by the default invoker's 2>&1 capture. This must ALLOW.
+            $raw = '{"output":"Final summary."}'
+            $routingStub = {
+                param($Path, $Type)
+                [pscustomobject]@{
+                    ExitCode = 0
+                    Output   = 'orchestrator-state validation passed: artifacts/orchestration/orchestrator-state.json'
+                }
+            }
+
+            # Act
+            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+
+            # Assert
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
         It 'is mockable without invoking Python (the injected scriptblock is used)' {
             # Arrange — a tracking seam that records it was called; if the hook
             # invoked Python instead, the tracker would not flip.
@@ -263,16 +283,33 @@ Describe 'validate-orchestrator-output.ps1' {
             $result.HasErrors | Should -BeTrue
         }
 
-        It 'reports HasErrors when the seam returns error text with exit 0' {
+        It 'reports HasErrors when the seam returns exit code 2 (argparse misuse / crash path stays fail-closed)' {
             # Arrange
-            $stub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = 'some error' } }
+            $stub = { param($Path, $Type) [pscustomobject]@{ ExitCode = 2; Output = 'usage: validate_orchestration_artifacts ...' } }
 
             # Act
             $result = Invoke-RoutingContractValidation -CheckpointPath 'x.json' -Invoker $stub
 
             # Assert
             $result.HasErrors | Should -BeTrue
-            $result.ErrorText | Should -Match 'some error'
+        }
+
+        It 'reports no errors when the seam returns exit 0 with the validator success line (issue #413)' {
+            # Arrange — the authoritative validator prints this line to stdout and exits 0;
+            # the 2>&1 capture folds it into Output, so exit 0 with text is the success shape.
+            $stub = {
+                param($Path, $Type)
+                [pscustomobject]@{
+                    ExitCode = 0
+                    Output   = 'orchestrator-state validation passed: artifacts/orchestration/orchestrator-state.json'
+                }
+            }
+
+            # Act
+            $result = Invoke-RoutingContractValidation -CheckpointPath 'x.json' -Invoker $stub
+
+            # Assert
+            $result.HasErrors | Should -BeFalse
         }
 
         It 'reports no errors when the seam returns exit 0 and empty output' {
