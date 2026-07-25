@@ -343,7 +343,27 @@ function Invoke-PoshQCTest {
                         if ([IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path $Root $_ }
                     }
             )
-            $config.CodeCoverage.Path = $resolvedCoveragePaths
+
+            # Prune coverage paths that do not exist under the resolved root before Pester sees
+            # them. Pester's Resolve-CoverageInfo discards the whole set and raises a terminating
+            # error on the first unresolvable entry, which aborts the run at RunStart in any
+            # workspace that does not contain this repository's coverage layout (issue #409).
+            # Rooted entries are tested as-is; they are never re-joined to $Root.
+            $survivingCoveragePaths = @($resolvedCoveragePaths | Where-Object { & $TestPathExists $_ })
+            foreach ($prunedPath in @($resolvedCoveragePaths | Where-Object { $survivingCoveragePaths -notcontains $_ })) {
+                # Log every prune individually so coverage removal is never silent.
+                & $Logger "Pruned nonexistent code coverage path: $prunedPath"
+            }
+
+            if ($survivingCoveragePaths.Count -gt 0) {
+                $config.CodeCoverage.Path = $survivingCoveragePaths
+            } else {
+                # An enabled-but-empty path set makes Pester instrument every Run.Path directory,
+                # so disable coverage for this invocation instead and continue with the test run.
+                $config.CodeCoverage.Enabled = $false
+                $coverageEnabled = $false
+                & $Logger "Code coverage disabled for this invocation: no configured coverage path exists under root '$Root'."
+            }
         }
 
         if ($config.CodeCoverage.OutputPath.Value) {
