@@ -44,6 +44,51 @@ def _floor_signal() -> str:
     return next(str(entry["name"]) for entry in signals if entry.get("floor") is True)
 
 
+def _non_floor_signals() -> tuple[str, ...]:
+    """Return the ``"floor": false`` signal names from the live routing matrix.
+
+    Returns:
+        tuple[str, ...]: The names of catalog signals explicitly flagged
+        ``floor: false``, in catalog order.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads the routing matrix from disk.
+    """
+
+    matrix = load_routing_matrix()
+    model_policy = cast("dict[str, Any]", matrix["model_policy"])
+    signals = cast("list[dict[str, Any]]", model_policy["complexity"]["signals"])
+    # Select the names of catalog signals explicitly flagged as non-floor.
+    return tuple(str(entry["name"]) for entry in signals if entry.get("floor") is False)
+
+
+def _non_floor_only_assessment() -> dict[str, Any]:
+    """Build an assessment whose ``signals_present`` holds only non-floor names.
+
+    Returns:
+        dict[str, Any]: An assessment recording every ``"floor": false`` catalog
+        signal, with ``floor`` and ``band`` both set to ``C1``.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads the routing matrix from disk.
+    """
+
+    return {
+        "phase": "P2",
+        "band": "C1",
+        "floor": "C1",
+        "signals_present": list(_non_floor_signals()),
+        "rationale": "Localized documentation edit with no floor signal present.",
+        "assessed_at": "2026-07-25T17-45",
+    }
+
+
 def _well_formed_assessment() -> dict[str, Any]:
     """Build one well-formed assessment entry driven by the live catalog.
 
@@ -278,6 +323,57 @@ def test_present_malformed_complexity_caught_by_public_validator() -> None:
     # Assert: the malformed data is reported via the wired block.
     assert any(
         "complexity_assessments #0 rationale must be a non-empty string." in error
+        for error in errors
+    )
+
+
+def test_non_floor_only_assessment_with_floor_c1_accepted() -> None:
+    """An assessment recording only non-floor signals validates with ``floor: C1``."""
+
+    # Arrange: an assessment whose signals_present holds only non-floor names.
+    assessment = _non_floor_only_assessment()
+
+    # Act: validate the array.
+    errors = _validate_complexity_assessments([assessment])
+
+    # Assert: the recomputed floor is C1, so the entry is well formed.
+    assert errors == []
+
+
+def test_non_floor_only_assessment_with_floor_c3_rejected() -> None:
+    """The same non-floor-only entry claiming ``floor: C3`` is rejected.
+
+    Purpose:
+        Cover the documented backward-compatibility consequence: a pre-change
+        checkpoint whose assessment recorded only non-floor signals necessarily
+        recorded `floor: "C3"`, and must now fail with a floor-mismatch error
+        naming the recomputed value `C1`.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify the literal floor-mismatch message.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads the routing matrix from disk.
+    """
+
+    # Arrange: the same entry with the stale pre-change floor and band.
+    assessment = _non_floor_only_assessment()
+    assessment["floor"] = "C3"
+    assessment["band"] = "C3"
+
+    # Act: validate the array.
+    errors = _validate_complexity_assessments([assessment])
+
+    # Assert: the floor-equality message names the recomputed floor C1.
+    assert any(
+        "complexity_assessments #0 floor C3 does not equal "
+        "compute_complexity_floor(signals_present) C1." in error
         for error in errors
     )
 

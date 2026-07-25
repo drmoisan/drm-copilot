@@ -60,6 +60,11 @@ from scripts.dev_tools._orchestrator_state_routing import (
     validate_route_membership,
     validate_routing_contract,
 )
+from scripts.dev_tools._orchestrator_state_step_status import (
+    STEP_STATUS_KEYS,
+    collect_completion_blocking_step_errors,
+    collect_step_status_errors,
+)
 
 REQUIRED_STATE_KEYS = (
     "objective",
@@ -104,14 +109,6 @@ VALID_BLOCKED_REASONS = {
     "validator_failed",
     "user_requested_stop",
 }
-STEP_STATUS_KEYS = (
-    "step5_status",
-    "step6_status",
-    "step7_status",
-    "step8_status",
-    "step9_status",
-    "step10_status",
-)
 REQUIRED_RECEIPT_KEYS = (
     "step",
     "agent_name",
@@ -408,10 +405,11 @@ def validate_orchestrator_state_text(
         if key not in state_map:
             errors.append(f"Checkpoint missing required key: {key}")
 
-    for key in STEP_STATUS_KEYS:
-        value = state_map.get(key)
-        if value is not None and value not in VALID_STEP_STATUS:
-            errors.append(f"Checkpoint has invalid {key}: {value}")
+    errors.extend(
+        collect_step_status_errors(
+            state_map, STEP_STATUS_KEYS, shared=VALID_STEP_STATUS
+        )
+    )
 
     blocked_reason = state_map.get("blocked_reason")
     if blocked_reason is not None and blocked_reason not in VALID_BLOCKED_REASONS:
@@ -462,12 +460,9 @@ def validate_orchestrator_state_text(
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into
         # the stricter completion gate.
-        for key in STEP_STATUS_KEYS:
-            value = state_map.get(key)
-            if value in {"pending", "blocked"}:
-                errors.append(
-                    f"Checkpoint completion validation failed: {key} is {value}."
-                )
+        errors.extend(
+            collect_completion_blocking_step_errors(state_map, STEP_STATUS_KEYS)
+        )
         if state_map.get("blocked_reason") not in {None, "none"}:
             errors.append(
                 "Checkpoint completion validation failed: blocked_reason is not `none`."

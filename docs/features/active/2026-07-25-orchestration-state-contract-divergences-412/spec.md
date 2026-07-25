@@ -238,15 +238,15 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 
 ### Divergence 1 — step-status vocabulary
 
-- [ ] The Python validator (`scripts/dev_tools/validate_orchestrator_state.py`) accepts `step9_status` values `passed`, `failed_remediation_required`, and `blocked_ci_loop_limit` in plain validation mode.
-- [ ] The Python validator accepts `step6_status: "blocked_remediation_loop_limit"` in plain validation mode.
-- [ ] The Python validator rejects each per-key extra value when written to any step-status key other than its owning key, with the error `Checkpoint has invalid <key>: <value>`.
-- [ ] The shared `VALID_STEP_STATUS` set in `scripts/dev_tools/validate_orchestrator_state.py` is unchanged; the new values are carried in a per-step-key additive map.
-- [ ] The Python `--require-complete` gate fails with a completion-validation error when any step status is `failed_remediation_required`.
-- [ ] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_ci_loop_limit`.
-- [ ] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_remediation_loop_limit`.
-- [ ] The Python `--require-complete` gate does not fail on `step9_status: "passed"` in an otherwise-complete checkpoint.
-- [ ] The Python `--require-pr-creation-ready` gate fails when `step6_status` is `blocked_remediation_loop_limit`.
+- [x] The Python validator (`scripts/dev_tools/validate_orchestrator_state.py`) accepts `step9_status` values `passed`, `failed_remediation_required`, and `blocked_ci_loop_limit` in plain validation mode.
+- [x] The Python validator accepts `step6_status: "blocked_remediation_loop_limit"` in plain validation mode.
+- [x] The Python validator rejects each per-key extra value when written to any step-status key other than its owning key, with the error `Checkpoint has invalid <key>: <value>`.
+- [x] The shared `VALID_STEP_STATUS` set in `scripts/dev_tools/validate_orchestrator_state.py` is unchanged; the new values are carried in a per-step-key additive map.
+- [x] The Python `--require-complete` gate fails with a completion-validation error when any step status is `failed_remediation_required`.
+- [x] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_ci_loop_limit`.
+- [x] The Python `--require-complete` gate fails with a completion-validation error when any step status is `blocked_remediation_loop_limit`.
+- [x] The Python `--require-complete` gate does not fail on `step9_status: "passed"` in an otherwise-complete checkpoint.
+- [x] The Python `--require-pr-creation-ready` gate fails when `step6_status` is `blocked_remediation_loop_limit`.
 - [ ] The TypeScript mirror (`extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`) implements the same per-key acceptance and rejection behavior with error strings byte-identical to the Python validator, verified by Jest cases.
 - [ ] The TypeScript completion check rejects `failed_remediation_required`, `blocked_ci_loop_limit`, and `blocked_remediation_loop_limit` with error strings byte-identical to the Python validator, and does not reject `step9_status: "passed"`.
 - [ ] `.claude/lib/orchestrator-state/OrchestratorState.psm1` implements the same per-key acceptance and rejection behavior, verified by Pester cases in `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1`.
@@ -255,14 +255,14 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 
 ### Divergence 2 — complexity-floor semantics
 
-- [ ] `compute_complexity_floor` returns `C1` for each single-element list containing a `"floor": false` signal (`single_file_localized_edit`, `mechanical_rename_or_move`, `docs_or_comment_only`) and for a single-element list containing an unknown signal name.
-- [ ] `compute_complexity_floor` returns `C3` for each single-element list containing a `"floor": true` signal and for any mixed list containing at least one floor signal, returns `C1` for `[]`, and never returns `C4`.
+- [x] `compute_complexity_floor` returns `C1` for each single-element list containing a `"floor": false` signal (`single_file_localized_edit`, `mechanical_rename_or_move`, `docs_or_comment_only`) and for a single-element list containing an unknown signal name.
+- [x] `compute_complexity_floor` returns `C3` for each single-element list containing a `"floor": true` signal and for any mixed list containing at least one floor signal, returns `C1` for `[]`, and never returns `C4`.
 - [ ] `Get-ComplexityFloor` in `.claude/lib/model-routing/ModelRouting.psm1` produces outputs identical to `compute_complexity_floor` for the same truth table, verified by Pester cases in `tests/scripts/claude-lib/model-routing/Get-ComplexityFloor.Tests.ps1`.
-- [ ] `tests/scripts/dev_tools/test_compute_complexity_floor.py` contains a static parity assertion that the embedded `FLOOR_SIGNAL_NAMES` set equals the set of names flagged `"floor": true` in `config/orchestration-routing.json`.
+- [x] `tests/scripts/dev_tools/test_compute_complexity_floor.py` contains a static parity assertion that the embedded `FLOOR_SIGNAL_NAMES` set equals the set of names flagged `"floor": true` in `config/orchestration-routing.json`.
 - [ ] `tests/scripts/claude-lib/model-routing/ModelRouting.Parity.Tests.ps1` contains a static parity assertion pinning `$script:FLOOR_SIGNAL_NAMES` to the config's `"floor": true` names.
-- [ ] The complexity validator accepts a recorded `complexity_assessments` entry whose `signals_present` contains only non-floor signals and whose `floor` is `"C1"`.
-- [ ] The complexity validator rejects the same entry with `floor: "C3"`, producing a floor-mismatch error that names the recomputed value `C1`.
-- [ ] `scripts/dev_tools/compute_complexity_floor.py` docstrings no longer claim caller pre-filtering, the module performs no file I/O, and the file remains under 500 lines.
+- [x] The complexity validator accepts a recorded `complexity_assessments` entry whose `signals_present` contains only non-floor signals and whose `floor` is `"C1"`.
+- [x] The complexity validator rejects the same entry with `floor: "C3"`, producing a floor-mismatch error that names the recomputed value `C1`.
+- [x] `scripts/dev_tools/compute_complexity_floor.py` docstrings no longer claim caller pre-filtering, the module performs no file I/O, and the file remains under 500 lines.
 - [ ] `.claude/lib/model-routing/ModelRouting.psm1` performs no file reads at runtime.
 - [ ] The PR body records the divergence-2 backward-compatibility statement: zero stored assessments invalidated (paths and counts per the research), and pre-change checkpoints with non-floor-only assessments require re-recording via the documented resume reconciliation.
 
