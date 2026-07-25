@@ -85,14 +85,16 @@ Research basis: `docs/features/active/2026-07-17-legacy-discovery-publishing-372
       always-union-`core` mechanism is intact.)
 - [x] No consumer repository is required to add a new pack name, flag, or manual file-copy step
       to receive the discovery capability. (Same basis as above; zero new packs introduced.)
-- [ ] The push-down contract tests (`test_push_down_claude_resource_contracts.py`,
+- [x] The push-down contract tests (`test_push_down_claude_resource_contracts.py`,
       `test_push_down_codex_and_agents_resource_contracts.py`, and their TypeScript twins) pass
       with the mirrored discovery assets present, so a maintainer pulling from a green
-      drm-copilot build never observes a missing or corrupted mirrored file. (PARTIAL: the two
-      Python contract-test modules pass — P2-T5, P3-T5, P7-T1, P8-T4. The TypeScript twins could
-      not be verified locally in this worktree due to a pre-existing Jest test-discovery
-      environment defect; see P0-T18/P7-T2/P8-T8 evidence. Left unchecked pending re-verification
-      from an unaffected worktree path.)
+      drm-copilot build never observes a missing or corrupted mirrored file. (Verified 2026-07-25
+      directly from PR #388's CI run 29680433905 on merge commit `c30b3d81`: both Python
+      contract-test modules pass (P2-T5, P3-T5, P7-T1, P8-T4), and the TypeScript twins —
+      including `claude-pack-manifest-completeness.test.ts` — pass on both `windows-latest` and
+      `ubuntu-latest`. The earlier "left unchecked" note referred to a Jest `testMatch`
+      path-discovery defect specific to dot-prefixed worktree checkout paths, which does not
+      affect the plain-path CI checkout that actually gated the merge to `main`.)
 - [x] A manifest-completeness check (existing on the Claude/TypeScript side; extended to the
       Python/Codex side by this feature) prevents a bundled discovery asset from being present
       in the mirror but silently absent from a scoped `--packs` pull. (New
