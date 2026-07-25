@@ -310,9 +310,16 @@ surfaces are exercised as-is against the newly mirrored files:
 - [x] `pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and
       `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` pass.
       (Confirmed via P2-T5, P3-T5, P7-T1, P8-T4.)
-- [ ] The TypeScript twin push-down tests under `extensions/drm-copilot/test/lib/push-down/`,
+- [x] The TypeScript twin push-down tests under `extensions/drm-copilot/test/lib/push-down/`,
       including `claude-pack-manifest-completeness.test.ts` and its new Python/Codex-side
-      counterpart, pass.
+      counterpart, pass. (Verified 2026-07-25 directly from PR #388's CI run 29680433905 on
+      merge commit `c30b3d81`: `PASS test/lib/push-down/claude-pack-manifest-completeness.test.ts`
+      on both `windows-latest` and `ubuntu-latest` extension-test jobs, plus
+      `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` and
+      `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`
+      passing across Python 3.10-3.13. The prior "left unchecked" note referred to a Jest
+      `testMatch` path-discovery defect specific to dot-prefixed worktree checkout paths, which
+      does not affect the plain-path CI checkout.)
 - [x] No TaskMaster/TMW/Outlook/VSTO/email/task-management-specific identifier is introduced by
       any file, manifest entry, or test added by this feature (domain-neutrality invariant).
       (Confirmed via P7-T4: zero matches.)
