@@ -1,0 +1,220 @@
+{
+  "objective": "obj",
+  "change_budget_estimate": "small",
+  "route_id": "small",
+  "path_selected": "small",
+  "promotion-type": "feature",
+  "short-name": "short",
+  "relativeFile": "docs/features/potential/x.md",
+  "long-name": "feature-1",
+  "issue-num": "1",
+  "feature-folder": "docs/features/active/feature-1",
+  "work-mode": "minor-audit",
+  "plan-path": "docs/features/active/feature-1/plan.md",
+  "completed_steps": [
+    "S3_promotion",
+    "S4_atomic_planning"
+  ],
+  "next_step": "done",
+  "last_updated": "2026-04-07T10:00:00-04:00",
+  "step5_status": "not-applicable",
+  "step6_status": "not-applicable",
+  "step7_status": "verified",
+  "step8_status": "verified",
+  "step9_status": "verified",
+  "step10_status": "not-applicable",
+  "required_agents": [
+    "atomic-planner",
+    "atomic-executor",
+    "feature-review"
+  ],
+  "required_skills": [
+    "orchestrate",
+    "feature-promotion-lifecycle",
+    "atomic-plan-contract",
+    "acceptance-criteria-tracking",
+    "pr-context-artifacts",
+    "pr-base-branch-merge-base"
+  ],
+  "required_mcp_tools": [
+    "new_potential_entry",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "collect_pr_context",
+    "validate_orchestration_artifacts"
+  ],
+  "delegation_receipts": [
+    {
+      "step": "handoff-1",
+      "agent_name": "atomic-planner",
+      "agent_id": "atomic-planner-1",
+      "skill_source": "orchestrate",
+      "started_at": "2026-04-07T09:00:00-04:00",
+      "completed_at": "2026-04-07T09:05:00-04:00",
+      "result_signal": "COMPLETE",
+      "artifact_paths": [
+        "artifacts/orchestration/atomic-planner.receipt.json"
+      ]
+    },
+    {
+      "step": "handoff-2",
+      "agent_name": "atomic-executor",
+      "agent_id": "atomic-executor-1",
+      "skill_source": "orchestrate",
+      "started_at": "2026-04-07T09:00:00-04:00",
+      "completed_at": "2026-04-07T09:05:00-04:00",
+      "result_signal": "COMPLETE",
+      "artifact_paths": [
+        "artifacts/orchestration/atomic-executor.receipt.json"
+      ]
+    },
+    {
+      "step": "handoff-3",
+      "agent_name": "feature-review",
+      "agent_id": "feature-review-1",
+      "skill_source": "orchestrate",
+      "started_at": "2026-04-07T09:00:00-04:00",
+      "completed_at": "2026-04-07T09:05:00-04:00",
+      "result_signal": "COMPLETE",
+      "artifact_paths": [
+        "artifacts/orchestration/feature-review.receipt.json"
+      ]
+    }
+  ],
+  "skill_receipts": [
+    {
+      "skill": "orchestrate",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:orchestrate"
+    },
+    {
+      "skill": "feature-promotion-lifecycle",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:feature-promotion-lifecycle"
+    },
+    {
+      "skill": "atomic-plan-contract",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:atomic-plan-contract"
+    },
+    {
+      "skill": "acceptance-criteria-tracking",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:acceptance-criteria-tracking"
+    },
+    {
+      "skill": "pr-context-artifacts",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:pr-context-artifacts"
+    },
+    {
+      "skill": "pr-base-branch-merge-base",
+      "required": true,
+      "acknowledged_at_phase": "completion",
+      "evidence": "artifact:pr-base-branch-merge-base"
+    }
+  ],
+  "mcp_call_receipts": [
+    {
+      "tool": "new_potential_entry",
+      "ok": true,
+      "evidence": "mcp_call:new_potential_entry"
+    },
+    {
+      "tool": "potential_to_issue",
+      "ok": true,
+      "evidence": "mcp_call:potential_to_issue"
+    },
+    {
+      "tool": "new_active_feature_folder",
+      "ok": true,
+      "evidence": "mcp_call:new_active_feature_folder"
+    },
+    {
+      "tool": "collect_pr_context",
+      "ok": true,
+      "evidence": "mcp_call:collect_pr_context"
+    },
+    {
+      "tool": "validate_orchestration_artifacts",
+      "ok": true,
+      "evidence": "mcp_call:validate_orchestration_artifacts"
+    }
+  ],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "lifecycle_operations": [
+    {
+      "name": "new_potential_entry",
+      "surface": "mcp"
+    },
+    {
+      "name": "potential_to_issue",
+      "surface": "mcp"
+    },
+    {
+      "name": "new_active_feature_folder",
+      "surface": "mcp"
+    },
+    {
+      "name": "collect_pr_context",
+      "surface": "mcp"
+    },
+    {
+      "name": "validate_orchestration_artifacts",
+      "surface": "mcp"
+    }
+  ],
+  "blocked_reason": "none",
+  "ci_gate": {
+    "conclusion": "success",
+    "head_sha": "a587c0c6b677c94a2c18556a523f3aba82021186",
+    "verified_at": "2026-07-25T17:19:00-04:00"
+  },
+  "model_routing_receipts": [
+    {
+      "agent": "atomic-planner",
+      "phase": "7",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "7",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "feature-review",
+      "phase": "7",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "complexity_assessments": [
+    {
+      "phase": "7",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "cross-module contract change",
+      "assessed_at": "2026-07-04T09:00:00-04:00"
+    }
+  ]
+}

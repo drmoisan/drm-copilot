@@ -3,8 +3,8 @@
 - **Issue:** #413
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-07-25
-- **Status:** Draft
+- **Last Updated:** 2026-07-25T17-36
+- **Status:** Implemented — awaiting feature review. All 35 plan tasks in `plan.2026-07-25T15-37.md` are complete; 12 of 13 acceptance criteria are checked off (AC11 is blocked only by the toolchain's absent branch-coverage metric — see Outcome below).
 - **Version:** 1.0
 - **Work Mode:** full-bug (this spec is the sole acceptance-criteria source; no user-story.md exists for this feature)
 
@@ -157,19 +157,68 @@ All stubs are in-memory scriptblocks injected via the `-Invoker` / `-RoutingInvo
 
 ## Acceptance Criteria
 
-- [ ] The hook ALLOWS a DONE claim when the validator exits 0 and prints its success line: a regression test exists at the `Invoke-RoutingContractValidation` unit level in `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` stubbing `ExitCode = 0` with `Output = 'orchestrator-state validation passed: artifacts/orchestration/orchestrator-state.json'` and asserting `HasErrors` is `$false`, and it passes.
-- [ ] The hook ALLOWS a DONE claim end-to-end: a regression test exists in `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` exercising `Invoke-OrchestratorOutputValidation` with a `-RoutingInvoker` stub returning `ExitCode = 0` and the success-line output, asserting `Ok` is `$true` and `Message` is null or empty, and it passes.
-- [ ] The hook still BLOCKS when the validator exits non-zero: the existing non-zero-exit regression tests (unit test at approximately lines 255-264 and end-to-end `ROUTING_CONTRACT_BLOCKED` test at approximately lines 180-199 of `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1`) pass unmodified.
-- [ ] The gate still fails closed with no weakening: no existing test assertion that a genuine validator failure (non-zero exit) blocks DONE is removed or relaxed, and the fixed decision blocks on every non-zero exit code including exit 2 and crash paths.
-- [ ] The `MODEL_ROUTING_BLOCKED:` block reason still fires for model-routing/complexity errors and `ROUTING_CONTRACT_BLOCKED:` for other failures: `tests/scripts/claude-hooks/validate-orchestrator-output.model-routing.Tests.ps1` passes unmodified, and the `model_routing_receipts|complexity_assessments` discrimination logic in `Invoke-OrchestratorOutputValidation` is unchanged in the diff.
-- [ ] The existing test `'reports HasErrors when the seam returns error text with exit 0'` (approximately lines 266-276 of `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1`) is revised, because it asserts the defect; the exit-0-with-text-blocks assertion no longer exists in the suite.
-- [ ] The `{ HasErrors, ErrorText }` return contract and the `$Invoker` seam signature of `Invoke-RoutingContractValidation` are unchanged, `ErrorText` still carries the captured output, and the `.DESCRIPTION` docstring is corrected to document exit-code-only discrimination.
-- [ ] The bundled pushed-down copy `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output.ps1` is byte-identical to `.claude/hooks/validate-orchestrator-output.ps1`, and `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q` passes.
-- [ ] The portable fallback path is verified unchanged and still fails closed: no diff touches `OrchestratorStateCompletion.psm1` (either copy), and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCompletion.Tests.ps1` passes unmodified.
-- [ ] `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` remains at or under the 500-line cap; if a sibling test file was required, it lives under `tests/scripts/claude-hooks/` per the test-location rule.
+- [x] The hook ALLOWS a DONE claim when the validator exits 0 and prints its success line: a regression test exists at the `Invoke-RoutingContractValidation` unit level in `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` stubbing `ExitCode = 0` with `Output = 'orchestrator-state validation passed: artifacts/orchestration/orchestrator-state.json'` and asserting `HasErrors` is `$false`, and it passes.
+- [x] The hook ALLOWS a DONE claim end-to-end: a regression test exists in `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` exercising `Invoke-OrchestratorOutputValidation` with a `-RoutingInvoker` stub returning `ExitCode = 0` and the success-line output, asserting `Ok` is `$true` and `Message` is null or empty, and it passes.
+- [x] The hook still BLOCKS when the validator exits non-zero: the existing non-zero-exit regression tests (unit test at approximately lines 255-264 and end-to-end `ROUTING_CONTRACT_BLOCKED` test at approximately lines 180-199 of `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1`) pass unmodified.
+- [x] The gate still fails closed with no weakening: no existing test assertion that a genuine validator failure (non-zero exit) blocks DONE is removed or relaxed, and the fixed decision blocks on every non-zero exit code including exit 2 and crash paths.
+- [x] The `MODEL_ROUTING_BLOCKED:` block reason still fires for model-routing/complexity errors and `ROUTING_CONTRACT_BLOCKED:` for other failures: `tests/scripts/claude-hooks/validate-orchestrator-output.model-routing.Tests.ps1` passes unmodified, and the `model_routing_receipts|complexity_assessments` discrimination logic in `Invoke-OrchestratorOutputValidation` is unchanged in the diff.
+- [x] The existing test `'reports HasErrors when the seam returns error text with exit 0'` (approximately lines 266-276 of `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1`) is revised, because it asserts the defect; the exit-0-with-text-blocks assertion no longer exists in the suite.
+- [x] The `{ HasErrors, ErrorText }` return contract and the `$Invoker` seam signature of `Invoke-RoutingContractValidation` are unchanged, `ErrorText` still carries the captured output, and the `.DESCRIPTION` docstring is corrected to document exit-code-only discrimination.
+- [x] The bundled pushed-down copy `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output.ps1` is byte-identical to `.claude/hooks/validate-orchestrator-output.ps1`, and `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q` passes.
+- [x] The portable fallback path is verified unchanged and still fails closed: no diff touches `OrchestratorStateCompletion.psm1` (either copy), and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCompletion.Tests.ps1` passes unmodified.
+- [x] `tests/scripts/claude-hooks/validate-orchestrator-output.Tests.ps1` remains at or under the 500-line cap; if a sibling test file was required, it lives under `tests/scripts/claude-hooks/` per the test-location rule.
 - [ ] The PowerShell toolchain loop passes cleanly in a single pass: PoshQC format, PSScriptAnalyzer analyze, and Pester test all succeed, with line coverage >= 85% and branch coverage >= 75% and no coverage regression on changed lines.
-- [ ] Primary acceptance evidence: the hook itself is exercised end-to-end after the fix — `pwsh -File .claude/hooks/validate-orchestrator-output.ps1` with a DONE-claiming `CLAUDE_HOOK_INPUT` against a real completion-passing `artifacts/orchestration/orchestrator-state.json` — and exits 0.
-- [ ] No unintended changes outside the defined scope: the diff touches only the three files in the Files In Scope table, and no Python validator, complexity-floor, or `.codex/` file is modified.
+- [x] Primary acceptance evidence: the hook itself is exercised end-to-end after the fix — `pwsh -File .claude/hooks/validate-orchestrator-output.ps1` with a DONE-claiming `CLAUDE_HOOK_INPUT` against a real completion-passing `artifacts/orchestration/orchestrator-state.json` — and exits 0.
+- [x] No unintended changes outside the defined scope: the diff touches only the three files in the Files In Scope table, and no Python validator, complexity-floor, or `.codex/` file is modified.
+
+## Outcome (recorded at implementation handoff, 2026-07-25T17-36)
+
+Implementation is complete and matches the approved design with **no deviations from scope**.
+The three files in the Files In Scope table are the only code/test files changed; the
+diff-scope audit found no out-of-scope path.
+
+Result: `Invoke-RoutingContractValidation` now decides on the exit code alone
+(`$hasErrors = ($exitCode -ne 0)`), with `ErrorText = $outputText` retained, the
+`.DESCRIPTION` docstring and the inline decision comment corrected, and the bundled copy
+resynced byte-identically (both hash to
+`5E4BFA47C748C4E2E44262141E1F543B1ADE1A19ED43005855735AB422D3183B`).
+
+Verification headline:
+
+- Fail-before: 25 passed / **2 failed** — exactly the two issue-413 ALLOW tests.
+- Pass-after: **27 passed / 0 failed**.
+- Full PowerShell suite: **1,347 passed / 0 failed / 9 skipped**; PoshQC format clean (no files
+  changed), PSScriptAnalyzer 0 findings; overall line/instruction coverage **89.68%** (>= 85%).
+- End-to-end: the fixed hook exits **0** against a completion-passing checkpoint and still
+  exits **1** with `ROUTING_CONTRACT_BLOCKED:` against a genuinely failing one.
+
+Two recorded conditions for the reviewer:
+
+1. **AC11 left unchecked.** Every clause is verified except branch coverage >= 75%, which this
+   repository's Pester CoverageGutters/JaCoCo output cannot measure (INSTRUCTION/LINE/METHOD/CLASS
+   counters only; no BRANCH counter). Pre-existing tooling limitation with precedent at
+   `docs/features/completed/2026-07-02-local-preflight-orchestrator-state-gate-272/evidence/baseline/poshqc-test-baseline.md`;
+   not caused by this change. Accepting the clause as not-measurable is a reviewer decision.
+2. **Primary acceptance evidence used a fixture checkpoint**, as the approved plan's [P5-T2]
+   fixture branch directs. The live `artifacts/orchestration/orchestrator-state.json` is owned by
+   the enclosing orchestration, is mid-run, and fails the DONE gate for unrelated reasons; it was
+   read only and never written.
+
+Key artifacts (all paths relative to this feature folder; all verified to exist):
+
+| Purpose | Artifact |
+|---|---|
+| Fail-before | `evidence/regression-testing/fail-before.2026-07-25T17-14.md` |
+| Pass-after | `evidence/regression-testing/pass-after.2026-07-25T17-17.md` |
+| Primary acceptance (hook exit 0) | `evidence/qa-gates/hook-e2e-allow.2026-07-25T17-19.md` |
+| Live-checkpoint verification (skip branch + fail-closed proof) | `evidence/qa-gates/hook-e2e-live-checkpoint.2026-07-25T17-36.md` |
+| Block-reason discrimination | `evidence/regression-testing/model-routing-discrimination.2026-07-25T17-17.md` |
+| Portable fallback unchanged | `evidence/regression-testing/portable-fallback-tests.2026-07-25T17-17.md` |
+| Bundle byte parity | `evidence/qa-gates/bundle-byte-parity.2026-07-25T17-16.md` |
+| Final QA (format / analyze / test / parity) | `evidence/qa-gates/final-poshqc-format.2026-07-25T17-24.md`, `evidence/qa-gates/final-poshqc-analyze.2026-07-25T17-24.md`, `evidence/qa-gates/final-poshqc-test.2026-07-25T17-24.md`, `evidence/qa-gates/final-parity-pytest.2026-07-25T17-24.md` |
+| Coverage delta and verdicts | `evidence/qa-gates/coverage-delta.2026-07-25T17-24.md` |
+| Diff-scope audit | `evidence/qa-gates/diff-scope-audit.2026-07-25T17-36.md` |
+| AC status summary | `evidence/qa-gates/ac-status-summary.2026-07-25T17-36.md` |
 
 ## Rollout & Follow-up
 
