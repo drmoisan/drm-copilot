@@ -4,9 +4,7 @@
   "id": "scenario-alpha-001",
   "feature_id": "feature-alpha",
   "title": "Primary input observation",
-  "preconditions": [
-    "the covered unit is initialized"
-  ],
+  "preconditions": ["the covered unit is initialized"],
   "stimulus": {
     "description": "The recorded primary input was applied to the covered unit."
   },
@@ -14,7 +12,5 @@
     "description": "The unit produced the recorded output."
   },
   "observation_method": "guesswork",
-  "evidence_refs": [
-    "evidence-alpha-001"
-  ]
+  "evidence_refs": ["evidence-alpha-001"]
 }
