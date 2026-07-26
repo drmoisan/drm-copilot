@@ -89,6 +89,35 @@ Describe 'ModelRouting config parity' {
         }
     }
 
+    Context 'Floor-signal name set' {
+        It 'pins FLOOR_SIGNAL_NAMES to the model_policy.complexity signals flagged floor true' {
+            # Arrange: the authoritative floor-signal names read from the config by the
+            # test (never by the module, which must remain file-read-free at runtime).
+            $floorSignals = @($script:ModelPolicy.complexity.signals | Where-Object { $_.floor -eq $true })
+            $expected = @($floorSignals | ForEach-Object { $_.name }) | Sort-Object
+
+            # Act: read the module's embedded floor-signal name set.
+            $actual = @(InModuleScope 'ModelRouting' { $script:FLOOR_SIGNAL_NAMES }) | Sort-Object
+
+            # Assert: the embedded set equals the config's "floor": true names exactly.
+            $actual | Should -Be $expected
+            $expected.Count | Should -Be 4
+        }
+
+        It 'excludes every model_policy.complexity signal flagged floor false' {
+            # Arrange: the config's non-floor signal names.
+            $nonFloorSignals = @($script:ModelPolicy.complexity.signals | Where-Object { $_.floor -ne $true })
+            $nonFloor = @($nonFloorSignals | ForEach-Object { $_.name })
+
+            # Act: read the module's embedded floor-signal name set.
+            $actual = @(InModuleScope 'ModelRouting' { $script:FLOOR_SIGNAL_NAMES })
+
+            # Assert: no non-floor name is carried in the embedded set.
+            $nonFloor.Count | Should -Be 3
+            foreach ($name in $nonFloor) { $actual | Should -Not -Contain $name }
+        }
+    }
+
     Context 'Disabled policy literal' {
         It 'pins DISABLED_POLICY to the disabled-policy literal' {
             # The disabled-policy enum name is a fixed literal, independent of the

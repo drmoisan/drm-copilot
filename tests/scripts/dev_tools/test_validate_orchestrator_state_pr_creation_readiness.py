@@ -135,6 +135,40 @@ def test_pr_creation_readiness_rejects_blocked_step8() -> None:
     assert any("step8_status is blocked" in error for error in errors)
 
 
+def test_pr_creation_readiness_rejects_step6_blocked_remediation_loop_limit() -> None:
+    """A step6_status of `blocked_remediation_loop_limit` is rejected.
+
+    Purpose:
+        Cover the additive readiness blocklist entry: the third-remediation-pass
+        halt value documented for `step6_status` is valid in plain mode on its
+        owning key but must block the first `gh pr create` of a branch.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify the readiness error names the key and value.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    state = build_pr_creation_ready_state()
+    state["step6_status"] = "blocked_remediation_loop_limit"
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_pr_creation_ready=True
+    )
+
+    assert (
+        "Checkpoint PR-creation readiness validation failed: step6_status is "
+        "blocked_remediation_loop_limit." in errors
+    )
+
+
 def test_pr_creation_readiness_rejects_non_none_blocked_reason() -> None:
     """A non-`none` blocked_reason is rejected by the readiness check."""
 

@@ -5,31 +5,35 @@ Purpose:
     complexity-floor formula documented in
     `.claude/skills/orchestrate/SKILL.md` (`## Model Selection`) and
     `config/orchestration-routing.json` (`model_policy.complexity`). Each
-    signal flagged ``[floor]`` in the `model_policy.complexity` signal catalog
-    contributes a candidate band of ``C3``; the floor is the maximum triggered
-    candidate band across all present floor signals. Floors never exceed
-    ``C3``: ``C4`` is a judgment-only band and is never floor-forced.
+    signal flagged ``"floor": true`` in the `model_policy.complexity` signal
+    catalog contributes a candidate band of ``C3``; the floor is the maximum
+    triggered candidate band across all present floor signals. Floors never
+    exceed ``C3``: ``C4`` is a judgment-only band and is never floor-forced.
 
 Responsibilities:
-    Given the sequence of present floor signals (the caller consults the
-    `model_policy.complexity` catalog to select which present signals carry the
-    ``[floor]`` flag), return the deterministic lower-bound band. This module
-    does not read the routing config or any other file; it operates purely on
-    the sequence passed in by the caller and encodes only the fixed band
-    ordering and the uniform floor-candidate band.
+    Given the full sequence of signals recorded as present for an assessed
+    phase, filter it internally against the embedded floor-signal name set and
+    return the deterministic lower-bound band. This module does not read the
+    routing config or any other file; the floor-signal names are embedded here
+    as ``FLOOR_SIGNAL_NAMES`` and pinned to the config's ``"floor": true``
+    entries by a static parity test in
+    ``tests/scripts/dev_tools/test_compute_complexity_floor.py``.
 
 Usage:
     Callers (for example the orchestrator or atomic-planner at model-selection
-    time) filter the assessed phase's present signals to those flagged
-    ``[floor]`` in the catalog, then pass those signal names to
-    ``compute_complexity_floor``. The returned band is the lower bound the
-    assessed ``band`` must satisfy (``band >= floor``). The complexity
-    validator (`scripts.dev_tools._orchestrator_state_complexity`) recomputes
-    this floor to check checkpoint receipts.
+    time) pass the assessed phase's full ``signals_present`` list to
+    ``compute_complexity_floor``; no caller-side pre-filtering is required or
+    expected. The returned band is the lower bound the assessed ``band`` must
+    satisfy (``band >= floor``). The complexity validator
+    (`scripts.dev_tools._orchestrator_state_complexity`) recomputes this floor
+    over the full recorded array to check checkpoint receipts.
 
 Invariants / Constraints:
-    - Each present floor signal contributes the candidate band ``C3``.
-    - The floor is the maximum triggered candidate band; with no floor signals
+    - Each present signal named in ``FLOOR_SIGNAL_NAMES`` contributes the
+      candidate band ``C3``.
+    - A signal flagged ``"floor": false`` in the catalog, and any name outside
+      the catalog entirely, contributes no floor candidate.
+    - The floor is the maximum triggered candidate band; with no floor signal
       present the floor is the lowest band ``C1``.
     - The floor never exceeds ``C3``; ``C4`` is never returned.
     - The function is pure and deterministic: identical ``signals_present``
@@ -60,6 +64,19 @@ FLOOR_CANDIDATE_BAND: ComplexityBand = "C3"
 # Floors never exceed this ceiling; ``C4`` is judgment-only and never
 # floor-forced, so the computed floor is clamped to at most ``C3``.
 FLOOR_CEILING_BAND: ComplexityBand = "C3"
+# The catalog signals flagged ``"floor": true`` in
+# ``config/orchestration-routing.json`` (`model_policy.complexity.signals`).
+# Embedded rather than read at runtime because this module must stay pure and
+# is consumed where the config file may not exist; a static parity test pins
+# this set to the committed catalog so the two cannot drift apart.
+FLOOR_SIGNAL_NAMES: frozenset[str] = frozenset(
+    {
+        "classifier_or_model_logic",
+        "auth_or_token_handling",
+        "concurrency_or_ordering",
+        "cross_module_contract_change",
+    }
+)
 
 
 def compute_complexity_floor(signals_present: Sequence[str]) -> ComplexityBand:
@@ -67,17 +84,19 @@ def compute_complexity_floor(signals_present: Sequence[str]) -> ComplexityBand:
 
     Purpose:
         Return the deterministic lower-bound complexity band implied by the
-        set of present floor signals, per the `model_policy.complexity`
-        contract: each present floor signal contributes a candidate band of
-        ``C3``, the floor is the maximum triggered candidate band, and the
-        floor never exceeds ``C3``.
+        recorded present signals, per the `model_policy.complexity` contract:
+        each present signal flagged ``"floor": true`` contributes a candidate
+        band of ``C3``, the floor is the maximum triggered candidate band, and
+        the floor never exceeds ``C3``.
 
     Args:
-        signals_present (Sequence[str]): The names of the present signals that
-            are flagged ``[floor]`` in the `model_policy.complexity` catalog.
-            The caller consults the catalog to select these; every element is
-            treated as a triggered floor signal contributing the candidate
-            band ``C3``. An empty sequence means no floor signal is present.
+        signals_present (Sequence[str]): The full list of signal names recorded
+            as present for the assessed phase. No caller-side pre-filtering is
+            required: this function selects the floor signals itself by
+            intersecting the input with ``FLOOR_SIGNAL_NAMES``. Names flagged
+            ``"floor": false`` in the catalog, and names outside the catalog,
+            contribute no floor candidate. An empty sequence, and a sequence
+            holding no floor signal, both mean no floor signal is present.
 
     Returns:
         ComplexityBand: The floor band. ``C1`` when no floor signal is present;
@@ -92,15 +111,21 @@ def compute_complexity_floor(signals_present: Sequence[str]) -> ComplexityBand:
         input ``signals_present``.
     """
 
+    # Select the recorded signals that actually carry the floor flag; a
+    # non-floor or unknown name contributes nothing.
+    triggered_floor_signals = [
+        signal for signal in signals_present if signal in FLOOR_SIGNAL_NAMES
+    ]
+
     # With no present floor signal there is no candidate band to raise the
     # floor above the lowest band, so the floor is C1.
-    if not signals_present:
+    if not triggered_floor_signals:
         return LOWEST_BAND
 
     # Each present floor signal contributes the uniform candidate band; the
     # floor is the maximum triggered candidate rank across all of them.
     candidate_rank = BAND_ORDER.index(FLOOR_CANDIDATE_BAND)
-    highest_rank = max(candidate_rank for _ in signals_present)
+    highest_rank = max(candidate_rank for _ in triggered_floor_signals)
 
     # Clamp with min so the floor can never exceed C3; this is what keeps C4
     # from ever being floor-forced regardless of how many signals are present.
