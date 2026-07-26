@@ -89,3 +89,40 @@ context and no Python production change is made.
 EXIT_CODE: 0
 
 Output Summary: All five cycle-2 policy files read in the prescribed order. No policy file was modified. Execution proceeds under the constraints listed above.
+
+---
+
+# Phase 0 — Policy Instructions RE-READ (Remediation Cycle 2, post-rebase)
+
+- **Issue:** #415
+- **Task:** [P0-T1] (re-read after the branch was rebased onto `origin/main`)
+- **Plan:** `docs/features/active/2026-07-25-codex-pretooluse-hook-transport-415/remediation-plan.2026-07-26T18-10.md`
+
+Timestamp: 2026-07-26T15-17
+
+Policy Order: the same five files named by cycle-2 [P0-T1] were re-read in order against the
+**rebased** tree, because 21 upstream `main` commits (issues #421, #422, #423, #426) landed between
+the earlier session's read and this one, and two of those files changed.
+
+## Files Re-Read (in order)
+
+| # | Path | Re-read | Post-rebase delta relevant to this plan |
+|---|---|---|---|
+| 1 | `CLAUDE.md` | yes | none |
+| 2 | `.claude/rules/general-code-change.md` | yes | the toolchain examples now name Jest (`jest.config.cjs`) where they previously named Vitest; the seven-stage loop, 500-line limit, and restart-from-step-1 semantics are unchanged |
+| 3 | `.claude/rules/general-unit-test.md` | yes | determinism infrastructure now names `jest.useFakeTimers()` in place of `vi.useFakeTimers()`; coverage thresholds (line >= 85%, branch >= 75%), the no-production-file-excluded rule, the temp-file prohibition, and the `tests/` layout requirement are unchanged |
+| 4 | `.claude/rules/powershell.md` | yes | none — PoshQC order, per-batch cap of 3 production / 3 test files, wrapper-seam design rule, and the signature-parity mocking rule (`param([string[]]$GitArgs)`) are unchanged |
+| 5 | `.claude/rules/quality-tiers.md` | yes | none |
+
+## Effect on This Plan
+
+The Vitest → Jest migration does not alter any cycle-2 obligation. RD-6 scopes the cycle-2 delta to
+PowerShell only (two hooks plus bundle mirrors, the mirrored `pester.runsettings.psd1` pair, and
+test files under `tests/scripts/codex-hooks/`), so no TypeScript test runner is invoked by any task
+in this plan. The PowerShell rule file, which governs every implementation task here, is unchanged.
+
+All binding constraints recorded in the cycle-2 section above remain in force verbatim.
+
+EXIT_CODE: 0
+
+Output Summary: All five cycle-2 policy files re-read in the prescribed order against the rebased tree. Two files changed upstream (Vitest → Jest naming in `general-code-change.md` and `general-unit-test.md`); neither change affects a cycle-2 obligation. No policy file was modified.

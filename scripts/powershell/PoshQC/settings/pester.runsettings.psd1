@@ -108,6 +108,12 @@
             '.codex/hooks/enforce-evidence-locations.ps1'
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
+            # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
+            # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
+            # production surface was outside the coverage denominator. Measured here so the
+            # changed production surface is not excluded from coverage.
+            '.codex/hooks/enforce-epic-child-worktree-binding.ps1'
+            '.codex/hooks/enforce-epic-planning-only.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
