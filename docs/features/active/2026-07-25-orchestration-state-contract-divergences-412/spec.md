@@ -264,7 +264,7 @@ No fixture repair is needed anywhere; existing tests pin rejection behavior with
 - [x] The complexity validator rejects the same entry with `floor: "C3"`, producing a floor-mismatch error that names the recomputed value `C1`.
 - [x] `scripts/dev_tools/compute_complexity_floor.py` docstrings no longer claim caller pre-filtering, the module performs no file I/O, and the file remains under 500 lines.
 - [x] `.claude/lib/model-routing/ModelRouting.psm1` performs no file reads at runtime.
-- [ ] The PR body records the divergence-2 backward-compatibility statement: zero stored assessments invalidated (paths and counts per the research), and pre-change checkpoints with non-floor-only assessments require re-recording via the documented resume reconciliation.
+- [x] The PR body records the divergence-2 backward-compatibility statement: zero stored assessments invalidated (paths and counts per the research), and pre-change checkpoints with non-floor-only assessments require re-recording via the documented resume reconciliation.
 
 ### Cross-cutting
 
