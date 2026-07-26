@@ -1,7 +1,7 @@
 # GitHub Actions Workflows
 
 This directory contains the repository's GitHub Actions workflows. `ci.yml` is a thin
-orchestrator that composes seven reusable per-stage workflows (the `_<name>.yml` files
+orchestrator that composes eight reusable per-stage workflows (the `_<name>.yml` files
 below) via `workflow_call`. Each reusable workflow can also be dispatched independently
 via `workflow_dispatch` for targeted re-runs without triggering the full `ci.yml` suite.
 
@@ -16,6 +16,7 @@ via `workflow_dispatch` for targeted re-runs without triggering the full `ci.yml
 | `_poshqc.yml` | `workflow_call`, `workflow_dispatch` | `gh workflow run _poshqc.yml` |
 | `_shell-coverage.yml` | `workflow_call`, `workflow_dispatch` | `gh workflow run _shell-coverage.yml` |
 | `_drm-copilot-extension-tests.yml` | `workflow_call`, `workflow_dispatch` | `gh workflow run _drm-copilot-extension-tests.yml` |
+| `_root-typescript-tests.yml` | `workflow_call`, `workflow_dispatch` | `gh workflow run _root-typescript-tests.yml` |
 
 Add `--ref <branch>` to any of the above commands to dispatch against a branch other
 than the repository's default branch.

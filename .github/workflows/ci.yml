@@ -29,6 +29,9 @@ jobs:
   drm-copilot-extension-tests:
     uses: ./.github/workflows/_drm-copilot-extension-tests.yml
 
+  root-typescript-tests:
+    uses: ./.github/workflows/_root-typescript-tests.yml
+
   npm-audit-gate:
     name: NPM Audit Gate
     permissions:
