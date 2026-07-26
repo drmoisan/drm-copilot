@@ -7,7 +7,5 @@
   "category": "ambiguous",
   "discovery_context": "Observed while replaying the captured runtime log during discovery.",
   "resolution_status": "open",
-  "evidence_refs": [
-    "evidence-alpha-001"
-  ]
+  "evidence_refs": ["evidence-alpha-001"]
 }
