@@ -30,6 +30,10 @@
 [CmdletBinding()]
 param()
 
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
 function Get-PythonTestPurityBlockDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -138,76 +142,16 @@ function Invoke-PythonTestPurityDecision {
     return Get-PythonTestPurityBlockDecision -Reason $reason
 }
 
-function ConvertFrom-CodexPythonPurityPayload {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
-
-    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
-        throw 'check-python-test-purity hook input is empty.'
-    }
-    try {
-        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "check-python-test-purity hook input is malformed JSON: $_"
-    }
-    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
-        throw 'check-python-test-purity hook input is missing tool_input.'
-    }
-    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
-        throw 'check-python-test-purity requires a PreToolUse apply_patch payload.'
-    }
-    return $payload
-}
-
-function ConvertTo-CodexPythonPurityInput {
-    [CmdletBinding()]
-    [OutputType([object[]])]
-    param([Parameter(Mandatory)] $Payload)
-
-    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
-        return , $Payload.tool_input
-    }
-
-    $command = [string]$Payload.tool_input.command
-    if ([string]::IsNullOrWhiteSpace($command)) {
-        throw 'check-python-test-purity cannot map tool_input to a file edit.'
-    }
-
-    $fileMatches = [regex]::Matches(
-        $command,
-        '(?ms)^\*\*\* (?:Add|Update|Delete) File:\s*(?<path>.+?)\r?\n(?<body>.*?)(?=^\*\*\* (?:(?:Add|Update|Delete) File:|End Patch)\s*|\z)'
-    )
-    if ($fileMatches.Count -eq 0) {
-        throw 'check-python-test-purity received an unrecognized apply_patch command.'
-    }
-
-    $inputs = [System.Collections.Generic.List[object]]::new()
-    foreach ($match in $fileMatches) {
-        $filePath = ([string]$match.Groups['path'].Value).Trim()
-        $moveMatch = [regex]::Match([string]$match.Groups['body'].Value, '(?m)^\*\*\* Move to:\s*(?<path>.+?)\s*$')
-        if ($moveMatch.Success) {
-            $filePath = ([string]$moveMatch.Groups['path'].Value).Trim()
-        }
-        $addedLines = foreach ($line in ([string]$match.Groups['body'].Value -split '\r?\n')) {
-            if ($line.StartsWith('+') -and -not $line.StartsWith('+++')) {
-                $line.Substring(1)
-            }
-        }
-        $inputs.Add([pscustomobject]@{
-                file_path = $filePath
-                content   = $addedLines -join [Environment]::NewLine
-            })
-    }
-    return $inputs.ToArray()
-}
-
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
 try {
-    $payload = ConvertFrom-CodexPythonPurityPayload -PayloadRaw ([Console]::In.ReadToEnd())
-    foreach ($toolInput in @(ConvertTo-CodexPythonPurityInput -Payload $payload)) {
+    # Transport and mapping come from the shared module. A well-formed payload
+    # that maps to no file edit produces an empty record set, so the loop body
+    # never runs and the hook allows silently.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'check-python-test-purity'
+    foreach ($toolInput in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
         $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
         $decision = Invoke-PythonTestPurityDecision -ToolInputRaw $toolInputRaw
         if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {

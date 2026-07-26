@@ -44,6 +44,15 @@
 [CmdletBinding()]
 param()
 
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
+# The only path this hook governs. On-disk reconstruction of an apply_patch
+# Update is requested for this path alone, so a patch that merely happens to
+# touch other files can never fail the hook.
+$script:GovernedCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+
 $script:CanonicalStepPrefixes = @(
     'S0_startup_checks',
     'S1_change_budget_estimation',
@@ -300,112 +309,22 @@ function Invoke-CheckpointMonotonicDecision {
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.
-function ConvertFrom-CodexCheckpointHookPayload {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
-
-    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
-        throw 'enforce-checkpoint-monotonic hook input is empty.'
-    }
-    try {
-        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-checkpoint-monotonic hook input is malformed JSON: $_"
-    }
-    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
-        throw 'enforce-checkpoint-monotonic hook input is missing tool_input.'
-    }
-    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
-        throw 'enforce-checkpoint-monotonic requires a PreToolUse apply_patch payload.'
-    }
-    return $payload
-}
-
-function ConvertTo-CodexApplyPatchCheckpointInput {
-    [CmdletBinding()]
-    [OutputType([object[]])]
-    param([Parameter(Mandatory)] $Payload)
-
-    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
-        return , $Payload.tool_input
-    }
-    $command = [string]$Payload.tool_input.command
-    if ([string]::IsNullOrWhiteSpace($command)) {
-        throw 'enforce-checkpoint-monotonic cannot map tool_input to a file edit.'
-    }
-
-    $fileMatches = [regex]::Matches(
-        $command,
-        '(?ms)^\*\*\* (?<operation>Add|Update|Delete) File:\s*(?<path>.+?)\r?\n(?<body>.*?)(?=^\*\*\* (?:(?:Add|Update|Delete) File:|End Patch)\s*|\z)'
-    )
-    if ($fileMatches.Count -eq 0) {
-        throw 'enforce-checkpoint-monotonic received an unrecognized apply_patch command.'
-    }
-
-    $inputs = [System.Collections.Generic.List[object]]::new()
-    foreach ($match in $fileMatches) {
-        $sourcePath = ([string]$match.Groups['path'].Value).Trim()
-        $path = $sourcePath
-        $operation = [string]$match.Groups['operation'].Value
-        $body = ([string]$match.Groups['body'].Value) -replace '\r\n', "`n"
-        $moveMatch = [regex]::Match($body, '(?m)^\*\*\* Move to:\s*(?<path>.+?)\s*$')
-        if ($moveMatch.Success) {
-            $path = ([string]$moveMatch.Groups['path'].Value).Trim()
-        }
-        if ($operation -eq 'Delete') {
-            $content = ''
-        } elseif ($operation -eq 'Add') {
-            $content = (($body -split "`n") | ForEach-Object {
-                    if ($_.StartsWith('+') -and -not $_.StartsWith('+++')) {
-                        $_.Substring(1)
-                    }
-                }) -join "`n"
-        } else {
-            if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
-                throw "enforce-checkpoint-monotonic cannot read update source '$sourcePath'."
-            }
-            $content = (Get-Content -Raw -LiteralPath $sourcePath) -replace '\r\n', "`n"
-            $hunks = @([regex]::Split($body, '(?m)^@@[^\r\n]*\r?\n') | Where-Object { $_ -match '\S' })
-            foreach ($hunk in $hunks) {
-                $oldLines = [System.Collections.Generic.List[string]]::new()
-                $newLines = [System.Collections.Generic.List[string]]::new()
-                foreach ($line in ($hunk -split "`n")) {
-                    if ($line -match '^\*\*\* (?:Move to|End of File)') {
-                        continue
-                    }
-                    if ($line.StartsWith('+') -and -not $line.StartsWith('+++')) {
-                        $newLines.Add($line.Substring(1))
-                    } elseif ($line.StartsWith('-') -and -not $line.StartsWith('---')) {
-                        $oldLines.Add($line.Substring(1))
-                    } elseif ($line.StartsWith(' ')) {
-                        $oldLines.Add($line.Substring(1))
-                        $newLines.Add($line.Substring(1))
-                    } else {
-                        $oldLines.Add($line)
-                        $newLines.Add($line)
-                    }
-                }
-                $oldText = $oldLines -join "`n"
-                $newText = $newLines -join "`n"
-                $index = $content.IndexOf($oldText, [System.StringComparison]::Ordinal)
-                if ($index -lt 0) {
-                    throw "enforce-checkpoint-monotonic could not apply an in-memory patch hunk for '$path'."
-                }
-                $content = $content.Substring(0, $index) + $newText + $content.Substring($index + $oldText.Length)
-            }
-        }
-        $inputs.Add([pscustomobject]@{ file_path = $path; content = $content })
-    }
-    return $inputs.ToArray()
-}
-
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
 try {
-    $payload = ConvertFrom-CodexCheckpointHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
-    foreach ($toolInput in @(ConvertTo-CodexApplyPatchCheckpointInput -Payload $payload)) {
+    # Transport and mapping come from the shared module. Update reconstruction is
+    # requested for the governed checkpoint path only: an Update touching any
+    # other file yields no record and therefore allows, instead of failing the
+    # whole invocation because an unrelated source could not be read. A governed
+    # reconstruction failure yields empty content, which routes into the existing
+    # fail-closed deny below rather than exit 2.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-checkpoint-monotonic'
+    $mappedInputs = @(
+        ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath
+    )
+    foreach ($toolInput in $mappedInputs) {
         $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
         $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $toolInputRaw
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {

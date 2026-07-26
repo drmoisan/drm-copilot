@@ -6,6 +6,10 @@
 [CmdletBinding()]
 param()
 
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
 function ConvertFrom-CheckpointJson {
@@ -224,38 +228,35 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
 }
 
-function ConvertFrom-CodexPreimplementationHookPayload {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
-
-    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
-        throw 'enforce-orchestration-preimplementation-gate hook input is empty.'
-    }
-    try {
-        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-orchestration-preimplementation-gate hook input is malformed JSON: $_"
-    }
-    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
-        throw 'enforce-orchestration-preimplementation-gate hook input is missing tool_input.'
-    }
-    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or
-        @('Bash', 'apply_patch') -notcontains [string]$payload.tool_name) {
-        throw 'enforce-orchestration-preimplementation-gate requires a supported PreToolUse payload.'
-    }
-    return $payload
-}
-
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
 try {
-    $payload = ConvertFrom-CodexPreimplementationHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
-    $toolInputRaw = $payload.tool_input | ConvertTo-Json -Compress -Depth 20
-    $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $toolInputRaw
-    if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
-        $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-orchestration-preimplementation-gate'
+    $toolName = [string]$payload.tool_name
+
+    # Bash and apply_patch take the pre-fix path unchanged: the raw tool_input is
+    # serialized and evaluated by the untouched decision function, so every
+    # allow/deny outcome those two tool names produce today is preserved exactly.
+    if (@('Bash', 'apply_patch') -contains $toolName) {
+        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw ($payload.tool_input | ConvertTo-Json -Compress -Depth 20)
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+        }
+        exit 0
+    }
+
+    # Edit and Write map to file paths through the shared module; each mapped
+    # path enters the same untouched Test-ImplementationPath decision flow. Any
+    # other well-formed tool name maps to no records, so the hook allows.
+    foreach ($toolInput in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
+        $mappedRaw = @{ file_path = [string]$toolInput.file_path } | ConvertTo-Json -Compress
+        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $mappedRaw
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
     }
     exit 0
 } catch {

@@ -41,8 +41,15 @@
 [CmdletBinding()]
 param()
 
-# Reuse the adjacent hook's read-only Codex apply_patch adapter.
+# Reuse the adjacent hook's shared checkpoint policy logic. This dot-source is by
+# design, not a copy-paste defect, so the hook is not renamed.
 . (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1')
+
+# Shared Codex PreToolUse transport. Dot-sourced explicitly rather than relying on
+# the transitive load above, so this hook's transport does not depend on its
+# neighbour's internals. Every transport error it raises names this hook, because
+# the shared parser is called with -HookName 'enforce-completion-consistency'.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
 
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
@@ -409,8 +416,14 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 try {
-    $payload = ConvertFrom-CodexCheckpointHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
-    foreach ($toolInput in @(ConvertTo-CodexApplyPatchCheckpointInput -Payload $payload)) {
+    # -HookName makes every transport error name this hook rather than the
+    # neighbour it dot-sources. Update reconstruction is scoped to the governed
+    # checkpoint path for the same reason as in enforce-checkpoint-monotonic.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-completion-consistency'
+    $mappedInputs = @(
+        ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath
+    )
+    foreach ($toolInput in $mappedInputs) {
         $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
         $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $toolInputRaw
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
