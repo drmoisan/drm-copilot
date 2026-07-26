@@ -44,6 +44,28 @@ function buildValidState(): Record<string, unknown> {
   };
 }
 
+/**
+ * Per-key additive step-status vocabulary, mirrored from the Python source
+ * `scripts/dev_tools/_orchestrator_state_step_status.py`. Each pair is the
+ * owning step-status key and a value that is valid only on that key.
+ */
+const STEP_SPECIFIC_EXTRA_STATUS: ReadonlyArray<readonly [string, string]> = [
+  ["step9_status", "passed"],
+  ["step9_status", "failed_remediation_required"],
+  ["step9_status", "blocked_ci_loop_limit"],
+  ["step6_status", "blocked_remediation_loop_limit"],
+];
+
+/** Every tracked step-status key, used to prove per-key scoping. */
+const STEP_STATUS_KEYS: readonly string[] = [
+  "step5_status",
+  "step6_status",
+  "step7_status",
+  "step8_status",
+  "step9_status",
+  "step10_status",
+];
+
 describe("validateOrchestratorStateText parsing and schema", () => {
   it("returns no errors for a minimally valid checkpoint", () => {
     // Arrange / Act / Assert
@@ -105,6 +127,33 @@ describe("validateOrchestratorStateText parsing and schema", () => {
     expect(errors).toContain(
       "Checkpoint has invalid blocked_reason: unknown-reason",
     );
+  });
+});
+
+describe("validateOrchestratorStateText per-step-key status vocabulary", () => {
+  it("accepts each per-key extra status on its owning step key", () => {
+    // Arrange / Act / Assert: one owning-key placement at a time.
+    for (const [owningKey, value] of STEP_SPECIFIC_EXTRA_STATUS) {
+      const state = buildValidState();
+      state[owningKey] = value;
+      expect(validateOrchestratorStateText(JSON.stringify(state))).toEqual([]);
+    }
+  });
+
+  it("rejects each per-key extra status on every non-owning step key", () => {
+    // Arrange / Act / Assert: the same value on a foreign key stays invalid.
+    for (const [owningKey, value] of STEP_SPECIFIC_EXTRA_STATUS) {
+      for (const key of STEP_STATUS_KEYS) {
+        if (key === owningKey) {
+          continue;
+        }
+        const state = buildValidState();
+        state[key] = value;
+        expect(validateOrchestratorStateText(JSON.stringify(state))).toContain(
+          `Checkpoint has invalid ${key}: ${value}`,
+        );
+      }
+    }
   });
 });
 

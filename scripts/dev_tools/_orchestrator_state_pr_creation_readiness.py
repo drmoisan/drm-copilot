@@ -56,6 +56,15 @@ PR_CREATION_READY_STEP_KEYS = (
 # creation of a branch, mirroring the completion-gate override checks without
 # requiring the full routing-contract receipt set those checks also enforce.
 PR_CREATION_READY_EMPTY_LIST_KEYS = ("local_execution_overrides", "delegation_bypasses")
+# Step statuses that must not appear on steps 5-8 before the first PR creation
+# of a branch. `blocked_remediation_loop_limit` is valid on `step6_status` in
+# plain mode (per-key additive vocabulary) but records a halted remediation
+# loop, so it blocks PR creation exactly as `pending` and `blocked` do.
+PR_CREATION_BLOCKING_STEP_STATUS = {
+    "pending",
+    "blocked",
+    "blocked_remediation_loop_limit",
+}
 
 
 def validate_orchestrator_state_pr_creation_readiness(
@@ -90,11 +99,12 @@ def validate_orchestrator_state_pr_creation_readiness(
     errors: list[str] = []
 
     # Reject a checkpoint that recorded an upstream step (promotion, planning,
-    # execution, review) as pending or blocked; those steps must have finished
-    # before the first PR of a branch is created.
+    # execution, review) as pending, blocked, or halted at the remediation-loop
+    # limit; those steps must have finished before the first PR of a branch is
+    # created.
     for key in PR_CREATION_READY_STEP_KEYS:
         value = state.get(key)
-        if value in {"pending", "blocked"}:
+        if value in PR_CREATION_BLOCKING_STEP_STATUS:
             errors.append(
                 f"Checkpoint PR-creation readiness validation failed: {key} is {value}."
             )

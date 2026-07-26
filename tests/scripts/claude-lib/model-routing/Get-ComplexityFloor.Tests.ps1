@@ -83,6 +83,83 @@ Describe 'Get-ComplexityFloor' {
         }
     }
 
+    Context 'Non-floor and unknown signals' {
+        It 'returns C1 for the single non-floor signal <_>' -ForEach @(
+            'single_file_localized_edit',
+            'mechanical_rename_or_move',
+            'docs_or_comment_only'
+        ) {
+            # Arrange: a single catalog signal flagged "floor": false.
+            $signalsPresent = @($_)
+
+            # Act: compute the floor.
+            $floor = Get-ComplexityFloor -SignalsPresent $signalsPresent
+
+            # Assert: a non-floor signal contributes no candidate band.
+            $floor | Should -Be 'C1'
+        }
+
+        It 'returns C1 for a single unknown signal name' {
+            # Arrange: a name that is not in the model_policy.complexity catalog.
+            $signalsPresent = @('not_a_real_signal')
+
+            # Act: compute the floor.
+            $floor = Get-ComplexityFloor -SignalsPresent $signalsPresent
+
+            # Assert: unknown names are treated as non-floor and contribute nothing.
+            $floor | Should -Be 'C1'
+        }
+
+        It 'returns C1 for a list containing only non-floor and unknown signals' {
+            # Arrange: several non-contributing names together.
+            $signalsPresent = @('docs_or_comment_only', 'mechanical_rename_or_move', 'not_a_real_signal')
+
+            # Act: compute the floor.
+            $floor = Get-ComplexityFloor -SignalsPresent $signalsPresent
+
+            # Assert: no floor signal is present, so the floor stays at the lowest band.
+            $floor | Should -Be 'C1'
+        }
+    }
+
+    Context 'Mixed floor and non-floor signals' {
+        It 'returns C3 for a mixed list whose only floor signal is <_>' -ForEach @(
+            'classifier_or_model_logic',
+            'auth_or_token_handling',
+            'concurrency_or_ordering',
+            'cross_module_contract_change'
+        ) {
+            # Arrange: one floor signal alongside non-floor and unknown names.
+            $signalsPresent = @('docs_or_comment_only', $_, 'not_a_real_signal')
+
+            # Act: compute the floor.
+            $floor = Get-ComplexityFloor -SignalsPresent $signalsPresent
+
+            # Assert: a single present floor signal raises the floor to C3.
+            $floor | Should -Be 'C3'
+        }
+
+        It 'never returns C4 across the full truth table' {
+            # Arrange: every catalog name plus an unknown, in one call and singly.
+            $allNames = @(
+                'classifier_or_model_logic', 'auth_or_token_handling',
+                'concurrency_or_ordering', 'cross_module_contract_change',
+                'single_file_localized_edit', 'mechanical_rename_or_move',
+                'docs_or_comment_only', 'not_a_real_signal'
+            )
+
+            # Act: compute the floor for the combined list, each single name, and the
+            # empty list.
+            $results = @(Get-ComplexityFloor -SignalsPresent $allNames)
+            $results += @($allNames | ForEach-Object { Get-ComplexityFloor -SignalsPresent @($_) })
+            $results += @(Get-ComplexityFloor -SignalsPresent @())
+
+            # Assert: C4 is never floor-forced; every result is C1 or C3.
+            $results | Should -Not -Contain 'C4'
+            ($results | Where-Object { $_ -notin @('C1', 'C3') }) | Should -BeNullOrEmpty
+        }
+    }
+
     Context 'Determinism' {
         It 'returns an identical band across repeated calls with the same input' {
             # Arrange: a fixed present-signal sequence.
