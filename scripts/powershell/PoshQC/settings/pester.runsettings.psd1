@@ -95,6 +95,19 @@
             # entry path hosts the Pester run in the global session state; measured here so
             # the fix produces real per-file changed-line coverage evidence.
             'scripts/powershell/PoshQC/PoshQC.Testing.psm1'
+            # Issue #415 remediation cycle 1 (R1): the PreToolUse hook transport fix added the
+            # shared payload-parsing module and rewired seven Codex hooks to consume it. Those
+            # production files were absent from this list, so the changed surface was outside
+            # the coverage denominator. Measured here so the changed production surface is not
+            # excluded from coverage.
+            '.codex/hooks/codex-pretooluse-file-mapping.ps1'
+            '.codex/hooks/check-python-test-purity.ps1'
+            '.codex/hooks/check-powershell-test-purity.ps1'
+            '.codex/hooks/enforce-python-batch-budget.ps1'
+            '.codex/hooks/enforce-powershell-batch-budget.ps1'
+            '.codex/hooks/enforce-evidence-locations.ps1'
+            '.codex/hooks/enforce-checkpoint-monotonic.ps1'
+            '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

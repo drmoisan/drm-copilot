@@ -266,4 +266,224 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
             $result.Stderr | Should -Match 'tool_input'
         }
     }
+
+    Context 'enforce-completion-consistency in-process behaviour (issue #415 R1)' {
+        BeforeAll {
+            $script:ConsistencyHookPath = Join-Path $script:HookRoot 'enforce-completion-consistency.ps1'
+            $script:CheckpointRelativePath = 'artifacts/orchestration/orchestrator-state.json'
+
+            . $script:ConsistencyHookPath
+
+            function ConvertTo-CompletionCheckpointJson {
+                param([hashtable] $Overrides = @{})
+
+                $base = [ordered]@{
+                    next_step        = 'complete'
+                    'issue-num'      = '415'
+                    'feature-folder' = 'docs/features/active/sample'
+                    ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = 'abc123' }
+                }
+                foreach ($key in $Overrides.Keys) {
+                    $base[$key] = $Overrides[$key]
+                }
+                return ($base | ConvertTo-Json -Compress -Depth 10)
+            }
+
+            function Invoke-ConsistencyEntrypoint {
+                <#
+                    Drives the hook's own entrypoint in-process with a StringReader on
+                    stdin. No temporary file is used and both console readers are
+                    restored in finally.
+                #>
+                param([Parameter(Mandatory)][AllowEmptyString()][string] $PayloadRaw)
+
+                $originalIn = [System.Console]::In
+                $originalError = [System.Console]::Error
+                $errorWriter = [System.IO.StringWriter]::new()
+                try {
+                    [System.Console]::SetIn([System.IO.StringReader]::new($PayloadRaw))
+                    [System.Console]::SetError($errorWriter)
+                    $stdout = & $script:ConsistencyHookPath
+                    return [pscustomobject]@{
+                        ExitCode = $LASTEXITCODE
+                        Stdout   = ($stdout -join "`n")
+                        Stderr   = $errorWriter.ToString()
+                    }
+                } finally {
+                    [System.Console]::SetIn($originalIn)
+                    [System.Console]::SetError($originalError)
+                }
+            }
+        }
+
+        It 'returns null checkpoint content when the path is not a file' {
+            Get-CheckpointFileContent -Path (Join-Path $script:RepoRoot 'no-such-checkpoint.json') |
+                Should -BeNullOrEmpty
+        }
+
+        It 'returns the file text when the checkpoint path resolves to a file' {
+            $content = Get-CheckpointFileContent -Path $script:ConsistencyHookPath
+
+            $content | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
+        }
+
+        It 'returns an empty string for a null checkpoint payload property lookup' {
+            Get-CheckpointStringValue -Payload $null -Name 'next_step' | Should -Be ''
+        }
+
+        It 'returns an empty string when the checkpoint property value is null' {
+            $payload = '{"next_step":null}' | ConvertFrom-Json
+
+            Get-CheckpointStringValue -Payload $payload -Name 'next_step' | Should -Be ''
+        }
+
+        It 'treats a null payload as asserting no completion' {
+            Test-CompletionAsserted -Payload $null | Should -BeFalse
+        }
+
+        It 'detects completion asserted by <Label>' -ForEach @(
+            @{ Label = 'next_step'; Json = '{"next_step":"complete"}' }
+            @{ Label = 'completed_steps'; Json = '{"completed_steps":["S11","S12_complete"]}' }
+            @{ Label = 'step8_status'; Json = '{"step8_status":"completed"}' }
+            @{ Label = 'step9_status'; Json = '{"step9_status":"completed"}' }
+            @{ Label = 'step10_status'; Json = '{"step10_status":"completed"}' }
+        ) {
+            Test-CompletionAsserted -Payload ($Json | ConvertFrom-Json) | Should -BeTrue
+        }
+
+        It 'detects no completion assertion for <Label>' -ForEach @(
+            @{ Label = 'an in-progress next_step'; Json = '{"next_step":"S07_review"}' }
+            @{ Label = 'completed_steps without the terminal step'; Json = '{"completed_steps":["S11"]}' }
+            @{ Label = 'an empty completed_steps list'; Json = '{"completed_steps":[]}' }
+            @{ Label = 'an in-progress step8_status'; Json = '{"step8_status":"in_progress"}' }
+        ) {
+            Test-CompletionAsserted -Payload ($Json | ConvertFrom-Json) | Should -BeFalse
+        }
+
+        It 'returns null edited content when the tool input carries no old_string' {
+            $toolInput = [pscustomobject]@{ file_path = $script:CheckpointRelativePath }
+
+            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { 'ignored' } } |
+                Should -BeNullOrEmpty
+        }
+
+        It 'returns null edited content when the on-disk checkpoint is empty' {
+            $toolInput = [pscustomobject]@{ old_string = 'a'; new_string = 'b' }
+
+            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '' } } |
+                Should -BeNullOrEmpty
+        }
+
+        It 'returns null edited content when the old_string is absent from the checkpoint' {
+            $toolInput = [pscustomobject]@{ old_string = 'absent'; new_string = 'b' }
+
+            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '{"next_step":"S07"}' } } |
+                Should -BeNullOrEmpty
+        }
+
+        It 'applies the old_string to new_string replacement in memory' {
+            $toolInput = [pscustomobject]@{ old_string = 'S07'; new_string = 'complete' }
+
+            $patched = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '{"next_step":"S07"}' } }
+
+            $patched | Should -Be '{"next_step":"complete"}'
+        }
+
+        It 'reads the governed checkpoint path through the injected reader' {
+            $script:ObservedReaderPath = ''
+            $toolInput = [pscustomobject]@{ old_string = 'S07'; new_string = 'complete' }
+
+            $null = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader {
+                param($Path)
+                $script:ObservedReaderPath = $Path
+                return '{"next_step":"S07"}'
+            }
+
+            $script:ObservedReaderPath | Should -Be 'artifacts/orchestration/orchestrator-state.json'
+        }
+
+        It 'allows when no mapped tool_input is supplied' {
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw ''
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'throws a hook-named error for malformed mapped tool_input JSON' {
+            { Invoke-CompletionConsistencyDecision -ToolInputRaw 'not json' } |
+                Should -Throw -ExpectedMessage 'enforce-completion-consistency received malformed mapped tool_input JSON: *'
+        }
+
+        It 'allows mapped tool_input that carries no file_path' {
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw '{"content":"{}"}'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows a file path that is not the governed checkpoint' {
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw '{"file_path":"docs/notes.md","content":"{}"}'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'denies a checkpoint edit whose patch cannot be resolved' {
+            $raw = @{ file_path = $script:CheckpointRelativePath; old_string = 'absent-marker' } | ConvertTo-Json -Compress
+
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $raw -CheckpointReader { param($Path) if ($Path) { '{"next_step":"S07"}' } }
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'unresolved patch'
+        }
+
+        It 'allows a checkpoint write that does not assert completion' {
+            $raw = @{ file_path = $script:CheckpointRelativePath; content = '{"next_step":"S07_review"}' } | ConvertTo-Json -Compress
+
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $raw
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'denies a completion-asserting checkpoint write through its own entrypoint' {
+            $content = ConvertTo-CompletionCheckpointJson -Overrides @{ 'issue-num' = '' }
+            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{
+                file_path = $script:CheckpointRelativePath
+                content   = $content
+            }
+
+            $result = Invoke-ConsistencyEntrypoint -PayloadRaw $payload
+
+            $result.ExitCode | Should -Be 0
+            $result.Stdout | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
+            $result.Stderr | Should -BeNullOrEmpty
+        }
+
+        It 'allows an unrelated mapped write through its own entrypoint' {
+            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{
+                file_path = 'docs/notes.md'
+                content   = 'body'
+            }
+
+            $result = Invoke-ConsistencyEntrypoint -PayloadRaw $payload
+
+            $result.ExitCode | Should -Be 0
+            $result.Stdout | Should -BeNullOrEmpty
+        }
+
+        It 'fails closed with exit 2 when its entrypoint receives empty stdin' {
+            $result = Invoke-ConsistencyEntrypoint -PayloadRaw ''
+
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'enforce-completion-consistency hook input is empty'
+        }
+
+        It 'reads issue-num and feature-folder from variables and reports ci_gate gaps' {
+            $payload = '{"variables":{"issue-num":"415","feature-folder":"docs/features/active/absent"},"ci_gate":{"conclusion":"failure"}}' |
+                ConvertFrom-Json
+
+            $missing = @(Get-MissingCompletionEvidence -Payload $payload)
+
+            $missing | Should -Not -Contain "issue-num value '415' is not a valid issue number (must be digits-only)"
+            $missing | Should -Contain 'ci_gate.conclusion == "success"'
+            $missing | Should -Contain 'ci_gate.head_sha'
+        }
+    }
 }
