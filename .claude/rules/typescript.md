@@ -13,7 +13,7 @@ This rule file summarizes the TypeScript-specific policies for this repository.
 1. **Formatting — Prettier**: All TypeScript must be formatted with the repository Prettier configuration. Command: `npm run format`
 2. **Linting — ESLint**: TypeScript must pass ESLint using the repository configuration. Command: `npm run lint`
 3. **Type Checking — TSC**: TypeScript must pass the compiler type-check. Avoid `any`; prefer `unknown` plus narrowing. Command: `npm run typecheck`
-4. **Testing — Vitest**: All TypeScript unit tests must use Vitest. Command: `npm run test`
+4. **Testing — Jest**: All TypeScript unit tests must use Jest. Command: `npm run test:unit`
 
 Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.
 
@@ -39,16 +39,16 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 
 ## Testing Standards
 
-- Use **Vitest** as the test framework.
+- Use **Jest** as the test framework.
 - Name test files `*.test.ts`.
 - Unit tests must not require the Outlook host runtime.
 - Follow Arrange–Act–Assert structure.
 - Each test targets one behavior.
-- Use `vi.spyOn` or `vi.mock` for targeted mocking; reset mocks with `afterEach(() => { vi.resetAllMocks(); })`.
+- Use `jest.spyOn` or `jest.mock` for targeted mocking; reset mocks with `afterEach(() => { jest.resetAllMocks(); })`.
 - No external dependencies (network, filesystem temp files, external processes) in unit tests.
 - Avoid snapshot tests unless stable and intentional.
 - Coverage thresholds follow the uniform tier rule defined in `.claude/rules/quality-tiers.md`: line coverage >= 85% and branch coverage >= 75% across all tiers (T1–T4).
-- Coverage command: `npm run test:coverage` (the script is wired in Prompt B1 alongside the Vitest dependency).
+- Coverage command: `npm run test:unit:coverage` (the root `package.json` script runs `node run-jest.cjs --coverage`).
 - Coverage regression on changed lines is a blocking finding.
 - Interface/type-only files with no executable behavior — files consisting solely of `interface` or `type` declarations — may be omitted from coverage measurement. Such files legitimately report 0% executable coverage. This is a clarification only; it does not lower any coverage threshold.
 
@@ -70,5 +70,5 @@ Layer rules and the No-COM architecture assertions are defined in `.claude/rules
 ## Runtime Determinism
 
 - `Date`, `Math.random`, and `setTimeout` access must flow through an injected `Clock` / `Random` interface.
-- Tests use Vitest fake timers (`vi.useFakeTimers()`).
+- Tests use Jest fake timers (`jest.useFakeTimers()`).
 - Prefer `await flushPromises()` over `setTimeout(0)` for awaiting micro-tasks.
