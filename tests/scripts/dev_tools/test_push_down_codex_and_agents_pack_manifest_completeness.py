@@ -97,7 +97,6 @@ PRE_EXISTING_UNRELATED_HOOK_EXCEPTIONS: frozenset[str] = frozenset(
         ".codex/hooks/enforce-evidence-locations.ps1",
         ".codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
         ".codex/hooks/enforce-powershell-batch-budget.ps1",
-        ".codex/hooks/enforce-pr-author-skill.ps1",
         ".codex/hooks/enforce-promotion-mcp-only.ps1",
         ".codex/hooks/enforce-python-batch-budget.ps1",
         ".codex/hooks/validate-bash.ps1",

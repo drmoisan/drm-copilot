@@ -34,6 +34,10 @@
 [CmdletBinding()]
 param()
 
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
 function Get-PythonBatchBudgetState {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -210,65 +214,31 @@ function Invoke-PythonBatchBudgetHook {
     return $decision
 }
 
-function ConvertFrom-CodexPythonBudgetPayload {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
-
-    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
-        throw 'enforce-python-batch-budget hook input is empty.'
-    }
-    try {
-        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-python-batch-budget hook input is malformed JSON: $_"
-    }
-    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
-        throw 'enforce-python-batch-budget hook input is missing tool_input.'
-    }
-    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
-        throw 'enforce-python-batch-budget requires a PreToolUse apply_patch payload.'
-    }
-    if ([string]::IsNullOrWhiteSpace([string]$payload.session_id)) {
-        throw 'enforce-python-batch-budget hook input is missing session_id.'
-    }
-    return $payload
-}
-
-function Get-CodexPythonBudgetPath {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory)] $Payload)
-
-    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
-        return [string]$Payload.tool_input.file_path
-    }
-    $command = [string]$Payload.tool_input.command
-    if ([string]::IsNullOrWhiteSpace($command)) {
-        throw 'enforce-python-batch-budget cannot map tool_input to a file edit.'
-    }
-    [string[]] $paths = @(
-        [regex]::Matches($command, '(?m)^\*\*\* (?:(?:Add|Update|Delete) File|Move to):\s*(?<path>.+?)\s*$') |
-            ForEach-Object { ([string]$_.Groups['path'].Value).Trim() }
-    )
-    $paths = @($paths | Select-Object -Unique)
-    if ($paths.Count -eq 0) {
-        throw 'enforce-python-batch-budget received an unrecognized apply_patch command.'
-    }
-    return $paths
-}
-
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
 try {
-    $payload = ConvertFrom-CodexPythonBudgetPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    # Transport and mapping come from the shared module. session_id is still
+    # required because the batch counter is keyed by it.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-python-batch-budget' -RequireSessionId
     $sessionId = ([string]$payload.session_id) -replace '[^A-Za-z0-9._-]', '_'
     $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     $prodCap = 3
     $testCap = 3
 
-    foreach ($path in @(Get-CodexPythonBudgetPath -Payload $payload)) {
+    # Both sides of a rename consume budget, matching the pre-fix path scan that
+    # collected Add/Update/Delete targets and Move destinations alike. Ordering
+    # and de-duplication are preserved. A well-formed payload that maps to no
+    # file yields no paths, so no state is written and the hook allows silently.
+    $budgetPaths = @(
+        @(ConvertTo-CodexFileEditInput -Payload $payload) |
+            ForEach-Object { $_.source_path; $_.file_path } |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                    Select-Object -Unique
+    )
+
+    foreach ($path in $budgetPaths) {
         $toolInputRaw = @{ file_path = $path } | ConvertTo-Json -Compress
         $decision = Invoke-PythonBatchBudgetHook -ToolInputRaw $toolInputRaw -SessionId $sessionId -Root $repositoryRoot -ProdCap $prodCap -TestCap $testCap
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {

@@ -30,9 +30,9 @@
 
     If the file_path resolves to a forbidden prefix, the script writes a PreToolUse JSON
     response to stdout with hookSpecificOutput.permissionDecision = 'deny' and exits with
-    code 0 so Codex surfaces the reason. For allowed paths, a PreToolUse response
-    with permissionDecision = 'allow' is written to stdout and the script exits 0. On hard
-    failure (malformed JSON input), the script exits 2.
+    code 0 so Codex surfaces the reason. Allowed paths produce NO stdout at all: the
+    script allows silently and exits 0. On hard failure (empty, malformed, or
+    tool_input-less stdin) the script writes the reason to stderr and exits 2.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -40,6 +40,10 @@
 #>
 [CmdletBinding()]
 param()
+
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
 
 function Test-EvidenceLocationForbidden {
     <#
@@ -142,60 +146,34 @@ function Invoke-EvidenceLocationDecision {
     return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
 }
 
-function ConvertFrom-CodexEvidenceLocationPayload {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
-
-    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
-        throw 'enforce-evidence-locations hook input is empty.'
-    }
-    try {
-        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-evidence-locations hook input is malformed JSON: $_"
-    }
-    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
-        throw 'enforce-evidence-locations hook input is missing tool_input.'
-    }
-    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'apply_patch') {
-        throw 'enforce-evidence-locations requires a PreToolUse apply_patch payload.'
-    }
-    return $payload
-}
-
-function Get-CodexEvidenceLocationPath {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory)] $Payload)
-
-    if ($Payload.tool_input.PSObject.Properties.Name -contains 'file_path') {
-        return [string]$Payload.tool_input.file_path
-    }
-    $command = [string]$Payload.tool_input.command
-    if ([string]::IsNullOrWhiteSpace($command)) {
-        throw 'enforce-evidence-locations cannot map tool_input to a file edit.'
-    }
-    [string[]] $paths = @(
-        [regex]::Matches($command, '(?m)^\*\*\* (?:(?:Add|Update|Delete) File|Move to):\s*(?<path>.+?)\s*$') |
-            ForEach-Object { ([string]$_.Groups['path'].Value).Trim() }
-    )
-    $paths = @($paths | Select-Object -Unique)
-    if ($paths.Count -eq 0) {
-        throw 'enforce-evidence-locations received an unrecognized apply_patch command.'
-    }
-    foreach ($path in $paths) {
-        Write-Output ([string]$path)
-    }
-}
-
 function Invoke-EvidenceLocationEntryPoint {
+    <#
+    .SYNOPSIS
+        Reads one Codex PreToolUse payload and returns the process exit code.
+    .PARAMETER PayloadRaw
+        The raw stdin text. AllowEmptyString is required so empty input reaches
+        the shared parser and fails closed with exit 2, rather than raising a
+        parameter-binding error that would skip the exit and allow silently.
+    #>
     [CmdletBinding()]
     [OutputType([int])]
-    param([Parameter(Mandatory)][string] $PayloadRaw)
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $PayloadRaw)
 
     try {
-        $payload = ConvertFrom-CodexEvidenceLocationPayload -PayloadRaw $PayloadRaw
-        foreach ($path in @(Get-CodexEvidenceLocationPath -Payload $payload)) {
+        $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw $PayloadRaw -HookName 'enforce-evidence-locations'
+
+        # Both sides of a rename are evaluated, matching the pre-fix path scan
+        # that collected Add/Update/Delete targets and Move destinations alike.
+        # A well-formed payload that maps to no file yields no paths, so the loop
+        # body never runs and the hook allows silently.
+        $paths = @(
+            @(ConvertTo-CodexFileEditInput -Payload $payload) |
+                ForEach-Object { $_.source_path; $_.file_path } |
+                    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                        Select-Object -Unique
+        )
+
+        foreach ($path in $paths) {
             $toolInputRaw = @{ file_path = $path } | ConvertTo-Json -Compress
             $decision = Invoke-EvidenceLocationDecision -ToolInputRaw $toolInputRaw
             if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {

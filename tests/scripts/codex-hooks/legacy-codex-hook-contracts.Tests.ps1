@@ -21,6 +21,16 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         )
         $script:AllHookNames = @($script:PreToolHookNames) + @('validate-feature-review-coverage.ps1')
 
+        # Shared, entrypoint-free modules that the hooks dot-source. They are
+        # subject to the same static checks (parse, 500-line cap, root/bundle
+        # byte-identity, no legacy Claude environment reads) but are deliberately
+        # excluded from the stdin-read assertion and from every process-level
+        # invocation loop, because they define functions only and are never
+        # executed as a hook process.
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1')
+        $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
+        $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
+
         function ConvertTo-CodexPreToolPayload {
             param(
                 [Parameter(Mandatory)][string] $ToolName,
@@ -81,7 +91,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
     }
 
     It 'parse-checks each root and bundled hook and keeps every file within 500 lines' {
-        foreach ($name in $script:AllHookNames) {
+        foreach ($name in $script:StaticCheckNames) {
             foreach ($root in @($script:HookRoot, $script:BundleHookRoot)) {
                 $path = Join-Path $root $name
                 $tokens = $null
@@ -99,18 +109,32 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
     }
 
     It 'keeps the canonical hooks byte-identical to their bundled copies' {
-        foreach ($name in $script:AllHookNames) {
+        foreach ($name in $script:StaticCheckNames) {
             $rootHash = (Get-FileHash -LiteralPath (Join-Path $script:HookRoot $name)).Hash
             $bundleHash = (Get-FileHash -LiteralPath (Join-Path $script:BundleHookRoot $name)).Hash
             $bundleHash | Should -Be $rootHash -Because "$name must publish without drift"
         }
     }
 
-    It 'reads stdin and contains no legacy Claude environment-variable dependency' {
+    It 'reads stdin in every hook entrypoint' {
+        # Entrypoint hooks only. Shared dot-sourced modules never read stdin.
         foreach ($name in $script:AllHookNames) {
             $content = Get-Content -Raw -LiteralPath (Join-Path $script:HookRoot $name)
-            $content | Should -Match '\[Console\]::In\.ReadToEnd\(\)'
-            $content | Should -Not -Match '\$env:CLAUDE_'
+            $content | Should -Match '\[Console\]::In\.ReadToEnd\(\)' -Because "$name must read its payload from stdin"
+        }
+    }
+
+    It 'contains no legacy Claude environment-variable dependency in hooks or shared modules' {
+        foreach ($name in $script:StaticCheckNames) {
+            $content = Get-Content -Raw -LiteralPath (Join-Path $script:HookRoot $name)
+            $content | Should -Not -Match '\$env:CLAUDE_' -Because "$name must not read legacy Claude variables"
+        }
+    }
+
+    It 'lists every shared hook module in the core pack manifest' {
+        $manifest = Get-Content -Raw -LiteralPath $script:CorePackManifestPath | ConvertFrom-Json
+        foreach ($name in $script:SharedModuleNames) {
+            @($manifest.paths) | Should -Contain ".codex/hooks/$name" -Because "$name must publish with the bundle"
         }
     }
 
@@ -211,19 +235,30 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
     }
 
     It 'reconstructs update patches in memory and includes move destinations' {
-        . (Join-Path $script:HookRoot 'enforce-checkpoint-monotonic.ps1')
+        # Update reconstruction now comes from the shared module and runs only for
+        # the governed path, so the governed path is supplied explicitly here.
+        . (Join-Path $script:HookRoot 'codex-pretooluse-file-mapping.ps1')
         $updatePatch = "*** Begin Patch`n*** Update File: config/orchestration-routing.json`n@@`n-{`n+{`n*** End Patch"
         $updatePayload = (ConvertTo-CodexPatchPayload -Patch $updatePatch) | ConvertFrom-Json
-        $toolInput = @(ConvertTo-CodexApplyPatchCheckpointInput -Payload $updatePayload) | Select-Object -First 1
+        $toolInput = @(
+            ConvertTo-CodexFileEditInput -Payload $updatePayload -ResolveUpdateContent -GovernedPath 'config/orchestration-routing.json'
+        ) | Select-Object -First 1
         $expected = (Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot 'config/orchestration-routing.json')) -replace "`r`n", "`n"
 
         $toolInput.file_path | Should -Be 'config/orchestration-routing.json'
         $toolInput.content | Should -BeExactly $expected
 
-        . (Join-Path $script:HookRoot 'enforce-evidence-locations.ps1')
+        # Rename mapping now comes from the shared module. Both sides of the move
+        # must still be produced, because enforce-evidence-locations evaluates the
+        # source and the destination.
+        . (Join-Path $script:HookRoot 'codex-pretooluse-file-mapping.ps1')
         $movePatch = "*** Begin Patch`n*** Update File: README.md`n*** Move to: artifacts/research/moved.md`n@@`n-old`n+new`n*** End Patch"
         $movePayload = (ConvertTo-CodexPatchPayload -Patch $movePatch) | ConvertFrom-Json
-        $paths = @(Get-CodexEvidenceLocationPath -Payload $movePayload)
+        $paths = @(
+            @(ConvertTo-CodexFileEditInput -Payload $movePayload) |
+                ForEach-Object { $_.source_path; $_.file_path } |
+                    Select-Object -Unique
+        )
         $paths | Should -Contain 'README.md'
         $paths | Should -Contain 'artifacts/research/moved.md'
     }

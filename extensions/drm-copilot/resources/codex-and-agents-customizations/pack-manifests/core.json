@@ -29,6 +29,7 @@
     ".codex/hooks/codex-agent-profile-attestation.ps1",
     ".codex/hooks/codex-authority-store.ps1",
     ".codex/hooks/codex-epic-child-launch-attestation.ps1",
+    ".codex/hooks/codex-pretooluse-file-mapping.ps1",
     ".codex/hooks/enforce-codex-model-routing.ps1",
     ".codex/hooks/enforce-epic-child-worktree-binding.ps1",
     ".codex/hooks/enforce-epic-merge-gate.ps1",
