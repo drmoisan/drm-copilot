@@ -292,12 +292,11 @@ function Get-OrchestratorStatePrCreationReadinessError {
     .SYNOPSIS
         Return the PR-creation-readiness errors, parity with the Python reference.
     .DESCRIPTION
-        Private readiness check mirroring
-        validate_orchestrator_state_pr_creation_readiness in
-        _orchestrator_state_pr_creation_readiness.py: steps 5-8 must not be
-        pending/blocked; blocked_reason must be `none` or absent; and the
-        local_execution_overrides / delegation_bypasses lists must be empty when
-        present. It does not enforce completion, CI, PR, or routing-contract gates.
+        Private readiness check mirroring validate_orchestrator_state_pr_creation_readiness in
+        _orchestrator_state_pr_creation_readiness.py: steps 5-8 must not be pending, blocked, or
+        blocked_remediation_loop_limit; blocked_reason must be `none` or absent; and the
+        local_execution_overrides / delegation_bypasses lists must be empty when present. It does
+        not enforce completion, CI, PR, or routing-contract gates.
     .PARAMETER State
         The parsed checkpoint PSCustomObject.
     .OUTPUTS
@@ -312,11 +311,11 @@ function Get-OrchestratorStatePrCreationReadinessError {
 
     $errors = [System.Collections.Generic.List[string]]::new()
 
-    # Reject an upstream step recorded as pending or blocked; steps 5-8 must have
-    # finished before the first PR of a branch is created.
+    # Reject an upstream step recorded as pending, blocked, or blocked_remediation_loop_limit; steps
+    # 5-8 must have finished before the first PR of a branch is created.
     foreach ($key in $script:PR_CREATION_READY_STEP_KEYS) {
         $field = Get-OrchestratorStateField -State $State -Name $key
-        if ($field.Present -and ($field.Value -eq 'pending' -or $field.Value -eq 'blocked')) {
+        if ($field.Present -and (@('pending', 'blocked', 'blocked_remediation_loop_limit') -contains $field.Value)) {
             $errors.Add("Checkpoint PR-creation readiness validation failed: $key is $($field.Value).")
         }
     }

@@ -127,6 +127,23 @@ Describe 'Test-OrchestratorStatePrCreationReadiness' {
             $result.Output | Should -Match 'step6_status is blocked'
         }
 
+        It 'returns ExitCode 1 when a readiness step is blocked_remediation_loop_limit' {
+            # Arrange: step6 records a halted remediation loop. The value is plain-valid on
+            # step6_status (base validation accepts it) but must still block PR creation, matching
+            # validate_orchestrator_state_pr_creation_readiness in the Python reference.
+            $checkpoint = New-ReadyCheckpoint
+            $checkpoint.step6_status = 'blocked_remediation_loop_limit'
+            Set-CheckpointFixture -Json ($checkpoint | ConvertTo-Json -Depth 5)
+
+            # Act
+            $result = Test-OrchestratorStatePrCreationReadiness -CheckpointPath 'x.json'
+
+            # Assert: -BeLike, not -Match, so the trailing period is compared literally rather than
+            # as a regex wildcard; the message must be byte-identical to the Python gate's string.
+            $result.ExitCode | Should -Be 1
+            $result.Output | Should -BeLike '*Checkpoint PR-creation readiness validation failed: step6_status is blocked_remediation_loop_limit.*'
+        }
+
         It 'returns ExitCode 1 when blocked_reason is set to a non-none value' {
             # Arrange: a valid-but-non-none blocked_reason (base check passes, readiness fails).
             $checkpoint = New-ReadyCheckpoint
