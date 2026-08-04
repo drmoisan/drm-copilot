@@ -124,10 +124,12 @@ def validate_codex_topology_receipts(value: object) -> list[str]:
 
 
 def _delegated_agent_names(state: dict[str, Any]) -> set[str]:
-    """Collect exact agent names from list-form delegation receipts."""
+    """Collect exact names from legacy or object-form delegation receipts."""
 
     result: set[str] = set()
     receipts = state.get("delegation_receipts")
+    if isinstance(receipts, dict):
+        receipts = cast("dict[str, object]", receipts).get("agents")
     if not isinstance(receipts, list):
         return result
     for item in cast("list[object]", receipts):

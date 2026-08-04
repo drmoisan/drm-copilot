@@ -123,6 +123,7 @@ const STEP_STATUS_KEYS = [
   "step9_status",
   "step10_status",
 ] as const;
+const AGENT_RECEIPT_NAMESPACE_KEY = "agents";
 
 /**
  * Per-key additive vocabulary layered on the shared `VALID_STEP_STATUS` set. A
@@ -251,14 +252,27 @@ function validateNamespacedDelegationReceipts(
   receipts: Record<string, unknown>,
 ): string[] {
   const errors: string[] = [];
-  // Reject any top-level key other than the promotion namespace, sorted.
+  // Reject any top-level key outside the documented receipt namespaces, sorted.
   const unsupportedKeys = Object.keys(receipts)
-    .filter((key) => key !== PROMOTION_RECEIPT_NAMESPACE_KEY)
+    .filter(
+      (key) =>
+        key !== AGENT_RECEIPT_NAMESPACE_KEY &&
+        key !== PROMOTION_RECEIPT_NAMESPACE_KEY,
+    )
     .sort();
   for (const key of unsupportedKeys) {
     errors.push(
       `Checkpoint delegation_receipts object contains unsupported key: ${key}`,
     );
+  }
+
+  if (AGENT_RECEIPT_NAMESPACE_KEY in receipts) {
+    const agentReceipts = receipts[AGENT_RECEIPT_NAMESPACE_KEY];
+    if (!Array.isArray(agentReceipts)) {
+      errors.push("Checkpoint delegation_receipts.agents must be a list.");
+    } else {
+      errors.push(...validateListDelegationReceipts(agentReceipts));
+    }
   }
 
   const promotionReceipts = receipts[PROMOTION_RECEIPT_NAMESPACE_KEY];

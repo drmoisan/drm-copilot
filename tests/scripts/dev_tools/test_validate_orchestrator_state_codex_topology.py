@@ -106,6 +106,21 @@ def test_small_standalone_receipt_requires_exact_typed_engineer() -> None:
     assert _validate(state) == []
 
 
+def test_mixed_receipts_require_codex_topology_evidence() -> None:
+    """Enforce topology receipts for canonical object-form agent delegations."""
+
+    state = _base_state()
+    state["delegation_receipts"] = {
+        "agents": [_delegation_receipt("python-typed-engineer")],
+        "promotion": {"issue": {"opaque": "payload"}},
+    }
+    state["codex_topology_receipts"] = [_topology_receipt()]
+    assert _validate(state) == []
+
+    state["codex_topology_receipts"] = []
+    assert any("child topology receipt" in error for error in _validate(state))
+
+
 def test_generated_deployment_name_satisfies_topology_gate() -> None:
     """Accept an exact generated profile backed by a valid model receipt."""
 

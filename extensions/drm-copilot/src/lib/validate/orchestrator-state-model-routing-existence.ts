@@ -15,7 +15,10 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 function delegatedAgents(state: Record<string, unknown>): Set<string> {
   const agents = new Set<string>();
-  const receipts = state["delegation_receipts"];
+  let receipts = state["delegation_receipts"];
+  if (isObject(receipts)) {
+    receipts = receipts["agents"];
+  }
   if (Array.isArray(receipts)) {
     for (const receipt of receipts) {
       if (!isObject(receipt)) {

@@ -137,6 +137,8 @@ def _delegated_agent_names(state: dict[str, Any]) -> set[str]:
 
     result: set[str] = set()
     receipts = state.get("delegation_receipts")
+    if isinstance(receipts, dict):
+        receipts = cast("dict[str, object]", receipts).get("agents")
     if not isinstance(receipts, list):
         return result
     for item in cast("list[object]", receipts):

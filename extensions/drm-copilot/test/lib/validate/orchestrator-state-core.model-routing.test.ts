@@ -146,4 +146,44 @@ describe("validateOrchestratorStateText model-routing existence check", () => {
       }),
     ).toEqual([]);
   });
+
+  it("requires a legacy routing receipt for a canonical mixed agent", () => {
+    // Arrange
+    const state = buildValidState();
+    state["delegation_receipts"] = {
+      agents: state["delegation_receipts"],
+      promotion: { issue: { opaque: "payload" } },
+    };
+
+    // Act
+    const missing = validateOrchestratorStateText(JSON.stringify(state), {
+      requireModelRouting: true,
+    });
+
+    // Assert
+    expect(missing).toContain(
+      "Checkpoint model_routing_receipts is missing a receipt for " +
+        "delegated agent: atomic-planner.",
+    );
+    state["model_routing_receipts"] = [receipt("atomic-planner")];
+    expect(
+      validateOrchestratorStateText(JSON.stringify(state), {
+        requireModelRouting: true,
+      }),
+    ).toEqual([]);
+  });
+
+  it("keeps promotion-only checkpoints delegation-free", () => {
+    // Arrange
+    const state = buildValidState();
+    state["delegation_receipts"] = { promotion: { issue: {} } };
+    state["next_step"] = "done";
+
+    // Act / Assert
+    expect(
+      validateOrchestratorStateText(JSON.stringify(state), {
+        requireModelRouting: true,
+      }),
+    ).toEqual([]);
+  });
 });

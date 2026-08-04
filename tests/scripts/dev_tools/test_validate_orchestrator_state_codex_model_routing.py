@@ -90,6 +90,21 @@ def test_valid_codex_receipt_satisfies_opt_in_gate() -> None:
     assert _validate(state) == []
 
 
+def test_mixed_receipts_require_codex_model_routing_evidence() -> None:
+    """Enforce Codex routing receipts for object-form agent delegations."""
+
+    state = _base_state()
+    state["delegation_receipts"] = {
+        "agents": [_delegation_receipt("atomic-executor")],
+        "promotion": {"issue": {"opaque": "payload"}},
+    }
+    state["codex_model_routing_receipts"] = [_codex_receipt()]
+    assert _validate(state) == []
+
+    state["codex_model_routing_receipts"] = []
+    assert any("atomic-executor" in error for error in _validate(state))
+
+
 def test_variant_agent_name_matches_deployment_agent() -> None:
     """Allow delegation receipts to name the generated deployment profile."""
 

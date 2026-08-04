@@ -79,6 +79,23 @@ describe("Codex model-routing checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
+  it("requires Codex routing evidence for canonical mixed agents", () => {
+    // Arrange
+    const state = baseState();
+    state["delegation_receipts"] = {
+      agents: [delegationReceipt("atomic-executor")],
+      promotion: { issue: { opaque: "payload" } },
+    };
+    state["codex_model_routing_receipts"] = [codexReceipt()];
+
+    // Act / Assert
+    expect(validate(state)).toEqual([]);
+    state["codex_model_routing_receipts"] = [];
+    expect(
+      validate(state).some((error) => error.includes("atomic-executor")),
+    ).toBe(true);
+  });
+
   it("accepts a delegation named by its generated deployment agent", () => {
     // Arrange
     const state = baseState("atomic-executor-c3");
