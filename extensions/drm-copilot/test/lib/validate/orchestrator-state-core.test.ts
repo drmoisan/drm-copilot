@@ -320,3 +320,62 @@ describe("validateOrchestratorStateText optional blocks", () => {
     );
   });
 });
+
+describe("validateOrchestratorStateText mixed delegation receipts", () => {
+  it("accepts canonical agents and opaque promotion payloads", () => {
+    // Arrange
+    const state = buildValidState();
+    state["delegation_receipts"] = {
+      agents: state["delegation_receipts"],
+      promotion: {
+        potential_entry: { opaque: "potential" },
+        issue: "opaque issue value",
+        feature_folder: ["opaque", "folder", "value"],
+      },
+    };
+
+    // Act / Assert
+    expect(validateOrchestratorStateText(JSON.stringify(state))).toEqual([]);
+  });
+
+  it("retains legacy-list and promotion-only compatibility", () => {
+    // Arrange
+    const legacy = buildValidState();
+    const promotionOnly = buildValidState();
+    promotionOnly["delegation_receipts"] = { promotion: { issue: {} } };
+
+    // Act / Assert
+    expect(validateOrchestratorStateText(JSON.stringify(legacy))).toEqual([]);
+    expect(
+      validateOrchestratorStateText(JSON.stringify(promotionOnly)),
+    ).toEqual([]);
+  });
+
+  it.each([
+    [
+      { agents: "not-a-list" },
+      "Checkpoint delegation_receipts.agents must be a list.",
+    ],
+    [
+      { agents: [{ agent_name: "atomic-planner" }] },
+      "Checkpoint delegation receipt #0 missing key: step",
+    ],
+    [
+      { agents: [], unexpected: {} },
+      "Checkpoint delegation_receipts object contains unsupported key: unexpected",
+    ],
+    [
+      { promotion: { unexpected: {} } },
+      "Checkpoint delegation_receipts.promotion contains unsupported key: unexpected",
+    ],
+  ])("rejects invalid canonical shape %#", (receipts, expected) => {
+    // Arrange
+    const state = buildValidState();
+    state["delegation_receipts"] = receipts;
+
+    // Act / Assert
+    expect(validateOrchestratorStateText(JSON.stringify(state))).toContain(
+      expected,
+    );
+  });
+});

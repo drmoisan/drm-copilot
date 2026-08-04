@@ -101,6 +101,23 @@ describe("Codex topology checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
+  it("requires topology evidence for canonical mixed agents", () => {
+    // Arrange
+    const state = baseState();
+    state["delegation_receipts"] = {
+      agents: [delegationReceipt("python-typed-engineer")],
+      promotion: { issue: { opaque: "payload" } },
+    };
+    state["codex_topology_receipts"] = [topologyReceipt()];
+
+    // Act / Assert
+    expect(validate(state)).toEqual([]);
+    state["codex_topology_receipts"] = [];
+    expect(
+      validate(state).some((error) => error.includes("child topology receipt")),
+    ).toBe(true);
+  });
+
   it("accepts a generated deployment backed by exact model evidence", () => {
     const model = modelReceipt();
     const state = baseState(String(model["deployment_agent"]));

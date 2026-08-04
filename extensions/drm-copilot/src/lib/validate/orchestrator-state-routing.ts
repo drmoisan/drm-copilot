@@ -205,12 +205,15 @@ export function stateList(
 }
 
 /**
- * Return legacy list delegation receipts as typed objects.
+ * Return legacy or canonical object-form delegation receipts as typed objects.
  *
  * @param receipts Raw delegation-receipts value from state.
  * @returns The receipt objects, dropping any non-object entries.
  */
 export function listReceipts(receipts: unknown): Record<string, unknown>[] {
+  if (isObject(receipts)) {
+    receipts = receipts["agents"];
+  }
   if (!Array.isArray(receipts)) {
     return [];
   }

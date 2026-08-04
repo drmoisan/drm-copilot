@@ -107,11 +107,9 @@ def _delegated_agents(state_map: dict[str, Any]) -> set[str]:
 
     agents: set[str] = set()
 
-    # The list form of delegation_receipts is the authoritative "a delegation
-    # happened" record; collect each well-formed entry's non-empty agent_name.
-    # The namespaced (promotion) object form carries no agent_name list, so it
-    # contributes no delegated agents here.
     receipts = state_map.get(_DELEGATION_RECEIPTS_KEY)
+    if isinstance(receipts, dict):
+        receipts = cast("dict[str, object]", receipts).get("agents")
     if isinstance(receipts, list):
         receipt_list = cast("list[object]", receipts)
         for receipt in receipt_list:

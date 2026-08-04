@@ -4,6 +4,8 @@ import {
   validateArtifact,
   validatePlanText,
 } from "../../../src/lib/validate/orchestration-artifacts";
+import { resolveCodexDeployment } from "../../../src/lib/validate/orchestrator-state-codex-model-routing";
+import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
 
 const VALID_PLAN = [
   "# Plan",
@@ -301,6 +303,93 @@ describe("validateArtifact dispatch", () => {
 });
 
 describe("validateArtifact combined orchestrator-state acceptance", () => {
+  it("accepts a complete mixed checkpoint with every strict gate", () => {
+    // Arrange
+    const agent = "python-typed-engineer";
+    const state = {
+      objective: "obj",
+      change_budget_estimate: "small",
+      route_id: "small",
+      path_selected: "small",
+      "promotion-type": "feature",
+      "short-name": "short",
+      relativeFile: "docs/features/potential/x.md",
+      "long-name": "feature-1",
+      "issue-num": "1",
+      "feature-folder": "docs/features/active/feature-1",
+      "work-mode": "minor-audit",
+      "plan-path": "docs/features/active/feature-1/plan.md",
+      completed_steps: ["S3_promotion", "S4_atomic_planning"],
+      next_step: "done",
+      last_updated: "2026-08-04T10:00:00Z",
+      step5_status: "completed",
+      step6_status: "completed",
+      step7_status: "completed",
+      step8_status: "completed",
+      step9_status: "completed",
+      step10_status: "completed",
+      blocked_reason: "none",
+      required_agents: [],
+      required_skills: [],
+      required_mcp_tools: [],
+      delegation_receipts: {
+        agents: [
+          {
+            step: "S5",
+            agent_name: agent,
+            agent_id: "a1",
+            skill_source: "orchestrate",
+            started_at: "2026-08-04T10:00:00Z",
+            completed_at: "2026-08-04T10:01:00Z",
+            result_signal: "COMPLETE",
+            artifact_paths: ["docs/features/active/feature-1/plan.md"],
+          },
+        ],
+        promotion: { issue: { opaque: "payload" } },
+      },
+      model_routing_receipts: [{ agent }],
+      local_execution_overrides: [],
+      delegation_bypasses: [],
+      lifecycle_operations: [],
+      codex_topology_receipts: [
+        {
+          ...resolveCodexTopology(["python"], 2, 2, "standalone"),
+          phase: "S5",
+        },
+      ],
+      codex_model_routing_receipts: [
+        {
+          ...resolveCodexDeployment(agent, "C3", "standalone", "C3"),
+          phase: "S5",
+        },
+      ],
+    };
+    const routingMatrix = {
+      routes: {
+        small: {
+          required_agents: [],
+          required_skills: [],
+          required_mcp_tools: [],
+          requires_pr_gate: false,
+          requires_ci_gate: false,
+        },
+      },
+    };
+
+    // Act / Assert
+    expect(
+      validateArtifact({
+        artifactType: "orchestrator-state",
+        text: JSON.stringify(state),
+        requireComplete: true,
+        requireModelRouting: true,
+        requireCodexTopology: true,
+        requireCodexModelRouting: true,
+        routingMatrix,
+      }),
+    ).toEqual([]);
+  });
+
   it("accepts completed statuses with promotion, human_interaction, and remediation", () => {
     // Arrange: a checkpoint exercising the additive blocks with no completion
     // gate (requireComplete omitted) must produce no errors.

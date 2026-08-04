@@ -120,6 +120,7 @@ REQUIRED_RECEIPT_KEYS = (
     "artifact_paths",
 )
 PROMOTION_RECEIPT_NAMESPACE_KEY = "promotion"
+AGENT_RECEIPT_NAMESPACE_KEY = "agents"
 PROMOTION_RECEIPT_KEYS = (
     "potential_entry",
     "issue",
@@ -340,12 +341,23 @@ def _validate_namespaced_delegation_receipts(receipts: dict[str, Any]) -> list[s
 
     errors: list[str] = []
     unsupported_keys = sorted(
-        key for key in receipts if key != PROMOTION_RECEIPT_NAMESPACE_KEY
+        key
+        for key in receipts
+        if key not in {AGENT_RECEIPT_NAMESPACE_KEY, PROMOTION_RECEIPT_NAMESPACE_KEY}
     )
     for key in unsupported_keys:
         errors.append(
             f"Checkpoint delegation_receipts object contains unsupported key: {key}"
         )
+
+    if AGENT_RECEIPT_NAMESPACE_KEY in receipts:
+        agent_receipts = receipts[AGENT_RECEIPT_NAMESPACE_KEY]
+        if not isinstance(agent_receipts, list):
+            errors.append("Checkpoint delegation_receipts.agents must be a list.")
+        else:
+            errors.extend(
+                _validate_list_delegation_receipts(cast("list[object]", agent_receipts))
+            )
 
     promotion_receipts = receipts.get(PROMOTION_RECEIPT_NAMESPACE_KEY)
     if promotion_receipts is None:

@@ -344,11 +344,11 @@ def test_next_step_naming_delegating_agent_requires_receipt() -> None:
     assert satisfied == []
 
 
-def test_namespaced_delegation_receipts_impose_no_requirement() -> None:
-    """A promotion-namespace `delegation_receipts` yields no delegated agents.
+def test_promotion_only_delegation_receipts_impose_no_requirement() -> None:
+    """A promotion-only `delegation_receipts` yields no delegated agents.
 
     Purpose:
-        Verify the object (namespace) form of `delegation_receipts` contributes
+        Verify the promotion-only object form of `delegation_receipts` contributes
         no delegated agents, so with a non-delegating `next_step` the gate does
         not fire.
 
@@ -377,6 +377,31 @@ def test_namespaced_delegation_receipts_impose_no_requirement() -> None:
 
     # Assert: the gate produces no missing-receipt error.
     assert not any("delegated agent" in error for error in errors)
+
+
+def test_mixed_receipts_require_legacy_model_routing_evidence() -> None:
+    """Require matching legacy routing evidence for object-form agents."""
+
+    # Arrange: the mixed object has one valid strict agent receipt.
+    state = build_valid_orchestrator_state()
+    state["delegation_receipts"] = {
+        "agents": [_delegation("atomic-planner", "7")],
+        "promotion": {"issue": {"opaque": "payload"}},
+    }
+    state["complexity_assessments"] = [_assessment("7")]
+
+    # Act / Assert: missing evidence fails, then matching evidence succeeds.
+    missing = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_model_routing=True
+    )
+    assert any("delegated agent: atomic-planner" in error for error in missing)
+    state["model_routing_receipts"] = [_receipt("atomic-planner", "7")]
+    assert (
+        state_validator.validate_orchestrator_state_text(
+            json.dumps(state), require_model_routing=True
+        )
+        == []
+    )
 
 
 def test_malformed_delegation_and_receipt_entries_are_skipped_by_gate() -> None:

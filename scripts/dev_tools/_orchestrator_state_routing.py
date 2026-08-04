@@ -420,8 +420,10 @@ def _state_list(
 
 
 def _list_receipts(receipts: object) -> list[dict[str, Any]]:
-    """Return legacy list delegation receipts as typed dictionaries."""
+    """Return legacy or namespaced strict receipts as typed dictionaries."""
 
+    if isinstance(receipts, dict):
+        receipts = cast("dict[str, object]", receipts).get("agents")
     if not isinstance(receipts, list):
         return []
     receipt_list = cast("list[object]", receipts)

@@ -187,7 +187,10 @@ export function validateCodexTopologyReceipts(value: unknown): string[] {
 
 function delegatedAgentNames(state: Record<string, unknown>): Set<string> {
   const result = new Set<string>();
-  const receipts = state["delegation_receipts"];
+  let receipts = state["delegation_receipts"];
+  if (isObject(receipts)) {
+    receipts = receipts["agents"];
+  }
   if (!Array.isArray(receipts)) {
     return result;
   }

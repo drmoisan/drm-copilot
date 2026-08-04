@@ -1,0 +1,85 @@
+{
+  "objective": "obj",
+  "change_budget_estimate": "large",
+  "route_id": "large",
+  "path_selected": "large",
+  "promotion-type": "feature",
+  "short-name": "short",
+  "relativeFile": "docs/features/potential/x.md",
+  "long-name": "feature-1",
+  "issue-num": "1",
+  "feature-folder": "docs/features/active/feature-1",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/feature-1/plan.md",
+  "completed_steps": ["S7", "S8", "S9"],
+  "next_step": "done",
+  "last_updated": "2026-04-07T10:00:00-04:00",
+  "step5_status": "not-applicable",
+  "step6_status": "not-applicable",
+  "step7_status": "verified",
+  "step8_status": "verified",
+  "step9_status": "verified",
+  "step10_status": "not-applicable",
+  "pr_gate": {"pr_number": 1, "pr_url": "https://github.com/drmoisan/drm-copilot/pull/1", "head_branch": "feature-1", "head_sha": "current-head-sha"},
+  "ci_gate": {"conclusion": "success", "head_sha": "current-head-sha", "verified_at": "2026-04-07T10:00:00Z"},
+  "required_agents": ["task-researcher", "prd-feature", "atomic-planner", "atomic-executor", "feature-review", "pr-author"],
+  "required_skills": ["orchestrate", "feature-promotion-lifecycle", "atomic-plan-contract", "acceptance-criteria-tracking", "pr-context-artifacts", "pr-base-branch-merge-base"],
+  "required_mcp_tools": ["new_potential_entry", "potential_to_issue", "new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"],
+  "delegation_receipts": {
+    "agents": [
+      {"step": "handoff-1", "agent_name": "task-researcher", "agent_id": "task-researcher-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/task-researcher.receipt.json"]},
+      {"step": "handoff-2", "agent_name": "prd-feature", "agent_id": "prd-feature-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/prd-feature.receipt.json"]},
+      {"step": "handoff-3", "agent_name": "atomic-planner", "agent_id": "atomic-planner-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/atomic-planner.receipt.json"]},
+      {"step": "handoff-4", "agent_name": "atomic-executor", "agent_id": "atomic-executor-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/atomic-executor.receipt.json"]},
+      {"step": "handoff-5", "agent_name": "feature-review", "agent_id": "feature-review-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/feature-review.receipt.json"]},
+      {"step": "handoff-6", "agent_name": "pr-author", "agent_id": "pr-author-1", "skill_source": "orchestrate", "started_at": "2026-04-07T09:00:00-04:00", "completed_at": "2026-04-07T09:05:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/pr-author.receipt.json"]},
+      {"step": "handoff-7", "agent_name": "orchestrator", "agent_id": "orchestrator-1", "skill_source": "orchestrate", "started_at": "2026-08-04T10:45:00-04:00", "completed_at": "2026-08-04T10:46:00-04:00", "result_signal": "COMPLETE", "artifact_paths": ["artifacts/orchestration/orchestrator.receipt.json"]}
+    ],
+    "promotion": {"issue": {"opaque": "preserved"}}
+  },
+  "skill_receipts": [
+    {"skill": "orchestrate", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:orchestrate"},
+    {"skill": "feature-promotion-lifecycle", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:feature-promotion-lifecycle"},
+    {"skill": "atomic-plan-contract", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:atomic-plan-contract"},
+    {"skill": "acceptance-criteria-tracking", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:acceptance-criteria-tracking"},
+    {"skill": "pr-context-artifacts", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:pr-context-artifacts"},
+    {"skill": "pr-base-branch-merge-base", "required": true, "acknowledged_at_phase": "completion", "evidence": "artifact:pr-base-branch-merge-base"}
+  ],
+  "mcp_call_receipts": [
+    {"tool": "new_potential_entry", "ok": true, "evidence": "mcp_call:new_potential_entry"},
+    {"tool": "potential_to_issue", "ok": true, "evidence": "mcp_call:potential_to_issue"},
+    {"tool": "new_active_feature_folder", "ok": true, "evidence": "mcp_call:new_active_feature_folder"},
+    {"tool": "collect_pr_context", "ok": true, "evidence": "mcp_call:collect_pr_context"},
+    {"tool": "validate_orchestration_artifacts", "ok": true, "evidence": "mcp_call:validate_orchestration_artifacts"}
+  ],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "lifecycle_operations": [
+    {"name": "new_potential_entry", "surface": "mcp"},
+    {"name": "potential_to_issue", "surface": "mcp"},
+    {"name": "new_active_feature_folder", "surface": "mcp"},
+    {"name": "collect_pr_context", "surface": "mcp"},
+    {"name": "validate_orchestration_artifacts", "surface": "mcp"}
+  ],
+  "blocked_reason": "none",
+  "model_routing_receipts": [
+    {"agent": "task-researcher", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "prd-feature", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "feature-review", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "pr-author", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "orchestrator", "phase": "P1", "complexity_band": "C3", "fable_policy": "available", "table_model": "opus", "clamped_from": null, "model": "opus"}
+  ],
+  "complexity_assessments": [{"phase": "P1", "band": "C3", "floor": "C3", "signals_present": ["classifier_or_model_logic"], "rationale": "Cross-module contract change touches an invariant.", "assessed_at": "2026-07-03T16-43"}],
+  "codex_model_routing_receipts": [
+    {"logical_agent": "task-researcher", "deployment_agent": "task-researcher-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "prd-feature", "deployment_agent": "prd-feature-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "atomic-planner", "deployment_agent": "atomic-planner-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "atomic-executor", "deployment_agent": "atomic-executor-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "feature-review", "deployment_agent": "feature-reviewer-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "pr-author", "deployment_agent": "pr-author-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"},
+    {"logical_agent": "orchestrator", "deployment_agent": "orchestrator-c3", "complexity_band": "C3", "execution_context": "standalone", "orchestration_complexity_ceiling": "C3", "c3_overlay_applied": false, "c3_overlay_reason": null, "model": "gpt-5.6-terra", "model_reasoning_effort": "high", "phase": "S5_atomic_execution"}
+  ],
+  "codex_topology_receipts": [{"execution_context": "standalone", "languages": ["typescript"], "production_file_count": 1, "test_file_count": 1, "cross_cutting": false, "root_persona": null, "route": "large", "topology": "orchestrator", "logical_agent": "orchestrator", "routing_reason": "direct_mode_disabled", "max_production_files": 0, "max_test_files": 0, "phase": "S5_atomic_execution"}]
+}

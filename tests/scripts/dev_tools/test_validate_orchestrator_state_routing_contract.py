@@ -350,3 +350,17 @@ def test_complete_state_rejects_bug_type_recording_only_feature_tool() -> None:
     assert (
         "Checkpoint missing successful MCP receipt: new_potential_bug_entry." in errors
     )
+
+
+def test_complete_state_reads_agents_from_mixed_receipt_namespace() -> None:
+    """Accept canonical object-form delegation receipts during completion."""
+
+    # Arrange: preserve all route evidence while namespacing strict receipts.
+    state = _build_complete_large_state()
+    state["delegation_receipts"] = {
+        "agents": state["delegation_receipts"],
+        "promotion": {"issue": {"opaque": "payload"}},
+    }
+
+    # Act / Assert: named strict receipts satisfy every required agent.
+    assert _validate(state) == []

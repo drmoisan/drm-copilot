@@ -286,4 +286,16 @@ describe("validateRoutingContract", () => {
       "Checkpoint lifecycle_operations must be a list when present.",
     );
   });
+
+  it("accepts required agents from the canonical mixed receipt object", () => {
+    // Arrange
+    const state = buildCompleteLargeState();
+    state["delegation_receipts"] = {
+      agents: state["delegation_receipts"],
+      promotion: { issue: { opaque: "payload" } },
+    };
+
+    // Act / Assert
+    expect(validate(state)).toEqual([]);
+  });
 });
