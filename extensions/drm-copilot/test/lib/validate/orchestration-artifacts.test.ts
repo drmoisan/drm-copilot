@@ -22,6 +22,17 @@ describe("validatePlanText", () => {
     expect(validatePlanText(VALID_PLAN)).toEqual([]);
   });
 
+  it.each(["\n", "\r\n", "\r"])(
+    "accepts a valid plan with LF, CRLF, or CR line endings",
+    (lineEnding) => {
+      // Arrange
+      const text = VALID_PLAN.split("\n").join(lineEnding);
+
+      // Act / Assert
+      expect(validatePlanText(text)).toEqual([]);
+    },
+  );
+
   it("reports a malformed phase heading", () => {
     // Arrange: a phase heading without the em-dash/title contract.
     const text = ["### Phase 0 Setup", "- [ ] [P0-T1] Task"].join("\n");

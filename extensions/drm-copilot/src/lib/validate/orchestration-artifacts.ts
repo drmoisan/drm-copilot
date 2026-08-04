@@ -70,7 +70,7 @@ export function validatePlanText(text: string): string[] {
 
   // Walk the document in source order so numbering and phase mismatches are
   // reported against the same line numbers a maintainer sees in the plan.
-  const lines = text.split("\n");
+  const lines = text.split(/\r\n|\n|\r/);
   lines.forEach((line, lineIndex) => {
     const lineNumber = lineIndex + 1;
 
