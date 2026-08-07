@@ -2,12 +2,10 @@
 epic: parallel-orchestration
 integration_branch: epic/parallel-orchestration-integration
 created_at: 2026-08-07T00:00:00Z
-# Authoring-time manifest. issue_num values -1 through -8 are placeholders that are
-# back-filled with the real GitHub issue numbers from each child's promotion receipt
-# as preparation completes. feature_folder values are placeholder hints that resolve
-# to concrete docs/features/active/<basename> paths after promotion. depends_on uses
-# issue_num values (the canonical primary-key form). The DAG is cycle-free and every
-# depends_on entry resolves.
+# Resolved manifest. issue_num values are the real GitHub issue numbers from each
+# child's promotion; feature_folder values are the concrete active-folder basenames
+# (docs/features/active/<basename>); depends_on uses issue_num values (the canonical
+# primary-key form). The DAG is cycle-free and every depends_on entry resolves.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A parallel-orchestration mechanism lets the repository execute multiple thematically unrelated bugs and features concurrently, scheduled by computed blast-radius contention rather than a hand-authored dependency graph, raising delivery throughput without relaxing the merge-safety guarantees the epic surfaces already enforce.
@@ -20,30 +18,30 @@ intent:
     - The contention relation fails closed; an unmodeled overlap must serialize rather than parallelize.
     - Line coverage >= 85%, branch coverage >= 75% for every new module.
 features:
-  - issue_num: -1
-    feature_folder: parallel-blast-radius
+  - issue_num: 447
+    feature_folder: 2026-08-07-parallel-blast-radius-447
     depends_on: []
-  - issue_num: -2
-    feature_folder: parallel-cohort-scheduler
+  - issue_num: 445
+    feature_folder: 2026-08-07-parallel-cohort-scheduler-445
     depends_on: []
-  - issue_num: -3
-    feature_folder: parallel-schema-validators
-    depends_on: [-1, -2]
-  - issue_num: -4
-    feature_folder: parallel-planner-surface
-    depends_on: [-1, -2, -3]
-  - issue_num: -5
-    feature_folder: parallel-orchestrator-surface
-    depends_on: [-3, -4]
-  - issue_num: -6
-    feature_folder: parallel-mutation-protocol
-    depends_on: [-5]
-  - issue_num: -7
-    feature_folder: parallel-enforcement-hooks
-    depends_on: [-3, -5]
-  - issue_num: -8
-    feature_folder: parallel-drift-detection
-    depends_on: [-1, -3, -5]
+  - issue_num: 444
+    feature_folder: 2026-08-07-parallel-schema-validators-444
+    depends_on: [447, 445]
+  - issue_num: 443
+    feature_folder: 2026-08-07-parallel-planner-surface-443
+    depends_on: [447, 445, 444]
+  - issue_num: 441
+    feature_folder: 2026-08-07-parallel-orchestrator-surface-441
+    depends_on: [444, 443]
+  - issue_num: 442
+    feature_folder: 2026-08-07-parallel-mutation-protocol-442
+    depends_on: [441]
+  - issue_num: 440
+    feature_folder: 2026-08-07-parallel-enforcement-hooks-440
+    depends_on: [444, 441]
+  - issue_num: 446
+    feature_folder: 2026-08-07-parallel-drift-detection-446
+    depends_on: [447, 444, 441]
 ---
 
 # Epic: Parallel Orchestration (`parallel-plan` / `parallel-run`)
@@ -141,13 +139,13 @@ Dependency edges are derived from real upstream contracts only:
 
 Longest-path layering over the DAG above yields five waves:
 
-| Wave | Features |
+| Wave | Features (issue) |
 | --- | --- |
-| 0 | F1 blast-radius library, F2 cohort scheduler |
-| 1 | F3 schema and validators |
-| 2 | F4 `parallel-planner` surface |
-| 3 | F5 `parallel-orchestrator` surface |
-| 4 | F6 mutation protocol, F7 enforcement hooks, F8 drift detection |
+| 0 | F1 blast-radius library (#447), F2 cohort scheduler (#445) |
+| 1 | F3 schema and validators (#444) |
+| 2 | F4 `parallel-planner` surface (#443) |
+| 3 | F5 `parallel-orchestrator` surface (#441) |
+| 4 | F6 mutation protocol (#442), F7 enforcement hooks (#440), F8 drift detection (#446) |
 
 ### Wave-4 Contention Note
 
