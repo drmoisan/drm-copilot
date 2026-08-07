@@ -158,6 +158,31 @@ sections. F3 owns the complete checkpoint schema — including `mutations[]`, `d
 This is a decomposition constraint, not a suggestion: it is what keeps wave-4 fan-in merges
 mechanical.
 
+### Planner Adjudication: the kickoff-contract boundary (F3 / F4)
+
+During preparation, F3 (#444) and F4 (#443) reached the boundary of
+`scripts/dev_tools/parallel_kickoff_contract.py` and the MCP `artifact_type: "parallel-kickoff"`
+wiring from opposite directions:
+
+- **F3** records Decision 3.2-A: the MCP surface grows by **exactly the two promised
+  `artifact_type` values** (`parallel-orchestrator-state`, `parallel-planner-state`). F3 explicitly
+  excludes kickoff-contract cross-checks, leaving them to F4. F3's `require_ready_for_execution`
+  gate is structural only and includes the P9 kickoff-*path* invariant
+  (`artifacts/orchestration/parallel-kickoff-<slug>.md`), not kickoff-*content* parsing.
+- **F4** recommends the module as an F3 deliverable but carries an **explicit contingency**: if F3
+  lands without `parallel_kickoff_contract.py`, F4 delivers that module and the minimal additive
+  `artifact_type: "parallel-kickoff"` wiring itself and records the deviation.
+
+**Adjudication: F4 owns it.** F3's Decision 3.2-A is a deliberate, AC-pinned scope boundary, so F3
+will land without the module by design and F4's contingency is the operative path. This is
+consistent with ownership by producer: F4 emits the kickoff artifact, so F4 owns the parser that
+validates its own output. F3 retains the two state `artifact_type` values and the structural
+kickoff-path invariant. The epic analogue `scripts/dev_tools/epic_kickoff_contract.py` and the
+`epic-kickoff` `artifact_type` are the patterns to mirror.
+
+No action is required of F3. F4 should treat its contingency branch as the selected path rather
+than re-checking whether F3 delivered the module.
+
 ## Per-Feature Scope and Complexity
 
 ### F1 — Blast-radius library (`C4`)
