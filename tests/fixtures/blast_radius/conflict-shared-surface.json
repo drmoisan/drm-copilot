@@ -1,0 +1,37 @@
+{
+  "description": "shared_surface_overlap in isolation: distinct paths, distinct modules, empty contracts, and one shared high-contention artifact enumerated by both radii.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_tools/a.py"],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["tests/scripts/b.py"],
+      "modules": ["tests"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [{ "kind": "shared_surface_overlap", "detail": "poetry.lock" }]
+  }
+}

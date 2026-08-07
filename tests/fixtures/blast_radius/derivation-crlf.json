@@ -1,0 +1,37 @@
+{
+  "description": "CRLF plan text: every line terminator is a literal \\r\\n inside the JSON string, so the two implementations must agree that CRLF normalization yields the same task lines as LF.",
+  "input": {
+    "plan_text": "### Phase 1 — Library\r\n- [ ] [P1-T1] Create `scripts/dev_tools/compute_blast_radius.py`.\r\n- [ ] [P1-T2] Update `config/orchestration-routing.json`.\r\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-crlf-fixture-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "config/orchestration-routing.json",
+        "docs/features/active/2026-08-07-crlf-fixture-447/**",
+        "scripts/dev_tools/compute_blast_radius.py"
+      ],
+      "modules": ["config", "docs", "python-dev-tools"],
+      "shared_surfaces": ["config/orchestration-routing.json"],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

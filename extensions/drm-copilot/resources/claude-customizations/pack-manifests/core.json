@@ -93,6 +93,11 @@
     ".claude/skills/update-status/SKILL.md",
     ".claude/lib/model-routing/ModelRouting.psm1",
     ".claude/lib/orchestrator-state/OrchestratorState.psm1",
-    ".claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1"
+    ".claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1",
+    ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+    ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+    ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+    ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+    ".claude/lib/blast-radius/BlastRadius.psm1"
   ]
 }

@@ -1,0 +1,37 @@
+{
+  "description": "Empty versus empty: two radii with every level empty do not conflict. Under-reporting via emptiness is validation rule V1's problem at plan time and drift detection's at run time, not the contention relation's.",
+  "input": {
+    "radius_a": {
+      "paths": [],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": [],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "observed",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": false,
+    "reasons": []
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "description": "Empty versus non-empty: an empty radius has no overlap at any level against a fully populated one, including against a ** glob, so the verdict is false.",
+  "input": {
+    "radius_a": {
+      "paths": [],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["scripts/**"],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": ["Gamma"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": false,
+    "reasons": []
+  }
+}

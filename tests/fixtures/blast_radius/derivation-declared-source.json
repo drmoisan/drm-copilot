@@ -1,0 +1,37 @@
+{
+  "description": "Explicit declared confidence source plus contract extraction from an Interface heading; the identifiers are ordinally sorted, so the uppercase name precedes the lowercase one.",
+  "input": {
+    "plan_text": "### Phase 1 — Declared\n- [ ] [P1-T1] Edit `scripts/dev_tools/declared.py`.\n",
+    "spec_text": "## Interface\n\nThe module exports `Get-Declared` and `derive_declared`.\n",
+    "feature_folder": "2026-08-07-declared-source-447",
+    "source": "declared",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-07-declared-source-447/**",
+        "scripts/dev_tools/declared.py"
+      ],
+      "modules": ["docs", "python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": ["Get-Declared", "derive_declared"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

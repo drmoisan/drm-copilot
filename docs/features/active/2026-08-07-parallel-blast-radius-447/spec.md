@@ -271,33 +271,33 @@ Risks:
 
 ## Acceptance Criteria
 
-- [ ] `scripts/dev_tools/compute_blast_radius.py` implements the four-level radius model (`paths`, `modules`, `shared_surfaces`, `contracts`) and the three confidence sources (`derived`, `declared`, `observed`) exactly as defined in `## Public API Contract`, exposing `derive_blast_radius`, `radius_from_observed_paths`, `extract_plan_paths`, `validate_blast_radius`, and `conflicts` with the documented signatures and frozen contract literals.
-- [ ] Radius derivation follows design §5.3: paths parsed from plan task bodies and `spec.md` inline-code spans, the feature folder appended, modules resolved via the config `modules` map, shared surfaces expanded from the config list and globs, contract identifiers extracted from spec interface-section headings; line handling uses `splitlines()`-equivalent CRLF/CR normalization and the plan-contract task regexes.
-- [ ] `validate_blast_radius` implements V1 (coverage, Blocking, one finding per uncovered concrete path), V2 (shared-surface enumeration, Blocking, one finding per touched-but-unenumerated concrete surface; glob coverage insufficient), and V3 (over-breadth, Advisory, at most one finding when concrete coverage exceeds `over_breadth_fraction` of `tracked_file_count`), with findings sorted by (rule, subject).
-- [ ] `conflicts(a, b)` implements the four §5.4 disjuncts (`path_overlap`, `module_overlap`, `shared_surface_overlap`, `contract_dependency`), fails closed (glob×glob pairs not provably disjoint count as overlap), and returns the verdict plus all triggered reason kinds in fixed order.
-- [ ] Derivation and V1 share a single extraction function per language, and a radius produced by `derive_blast_radius` from plan P passes V1 against P (proved by an invariant test in both languages).
-- [ ] `.claude/lib/blast-radius/BlastRadius.psm1` provides the parity surface `Get-BlastRadius`, `Get-BlastRadiusFromObservedPaths`, `Get-PlanPaths`, `Test-BlastRadius`, `Test-BlastRadiusConflict` with output keys and values identical to the Python reference, ordinal sorting, and the authoritative-reference header statement.
-- [ ] `config/blast-radius.json` exists with the documented shape: `shared_surfaces` truth table (including the forward-looking `quality-tiers.yml` entry), `shared_surface_globs`, the `modules` map, and `over_breadth_fraction`; both test suites pin its shape.
-- [ ] Module resolution uses the `modules` map in `config/blast-radius.json`, and the deviation from design §5.1 is recorded in this spec under `### Deviation from design §5.1 — module-resolution source`.
-- [ ] A shared JSON fixture corpus exists at `tests/fixtures/blast_radius/` (including a CRLF fixture and a glob-undecidable conflict fixture), and both the Python parity test and `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` iterate every fixture and assert identical radii, findings, and conflict results, following the ModelRouting parity pattern.
-- [ ] Parametrized invariant tests pass in both languages: conflict symmetry, monotonicity (fail-closed direction), self-conflict, determinism and input-order independence, and V1 self-consistency; `hypothesis` is not added as a dependency.
-- [ ] Line coverage >= 85% and branch coverage >= 75% for every new module in both languages; `BlastRadius.psm1` (and any sibling PowerShell module) is appended to the `CodeCoverage.Path` list in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` with an issue #447 comment.
-- [ ] No production, test, or reusable script file exceeds 500 lines; the facade + `_blast_radius_extraction.py` split (and contingent `_blast_radius_validation.py` / `BlastRadiusExtraction.psm1` splits) is used as needed.
-- [ ] `.claude/skills/atomic-plan-contract/SKILL.md` is unchanged; no existing epic implementation is modified or refactored; the only edits to existing files are the append-only Pester coverage-path entry, applied identically to `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and its byte-parity bundled mirror, and the append-only `core.json` pack-manifest entry publishing the new module; new `.claude/**` files are additionally created as byte-identical bundled mirrors, which are file creations rather than edits.
-- [ ] The library is pure: no filesystem reads/writes, no subprocess, no network, and no wall-clock reads at runtime; `computed_at`, `tracked_file_count`, and observed paths are caller-supplied.
+- [x] `scripts/dev_tools/compute_blast_radius.py` implements the four-level radius model (`paths`, `modules`, `shared_surfaces`, `contracts`) and the three confidence sources (`derived`, `declared`, `observed`) exactly as defined in `## Public API Contract`, exposing `derive_blast_radius`, `radius_from_observed_paths`, `extract_plan_paths`, `validate_blast_radius`, and `conflicts` with the documented signatures and frozen contract literals.
+- [x] Radius derivation follows design §5.3: paths parsed from plan task bodies and `spec.md` inline-code spans, the feature folder appended, modules resolved via the config `modules` map, shared surfaces expanded from the config list and globs, contract identifiers extracted from spec interface-section headings; line handling uses `splitlines()`-equivalent CRLF/CR normalization and the plan-contract task regexes.
+- [x] `validate_blast_radius` implements V1 (coverage, Blocking, one finding per uncovered concrete path), V2 (shared-surface enumeration, Blocking, one finding per touched-but-unenumerated concrete surface; glob coverage insufficient), and V3 (over-breadth, Advisory, at most one finding when concrete coverage exceeds `over_breadth_fraction` of `tracked_file_count`), with findings sorted by (rule, subject).
+- [x] `conflicts(a, b)` implements the four §5.4 disjuncts (`path_overlap`, `module_overlap`, `shared_surface_overlap`, `contract_dependency`), fails closed (glob×glob pairs not provably disjoint count as overlap), and returns the verdict plus all triggered reason kinds in fixed order.
+- [x] Derivation and V1 share a single extraction function per language, and a radius produced by `derive_blast_radius` from plan P passes V1 against P (proved by an invariant test in both languages).
+- [x] `.claude/lib/blast-radius/BlastRadius.psm1` provides the parity surface `Get-BlastRadius`, `Get-BlastRadiusFromObservedPaths`, `Get-PlanPaths`, `Test-BlastRadius`, `Test-BlastRadiusConflict` with output keys and values identical to the Python reference, ordinal sorting, and the authoritative-reference header statement.
+- [x] `config/blast-radius.json` exists with the documented shape: `shared_surfaces` truth table (including the forward-looking `quality-tiers.yml` entry), `shared_surface_globs`, the `modules` map, and `over_breadth_fraction`; both test suites pin its shape.
+- [x] Module resolution uses the `modules` map in `config/blast-radius.json`, and the deviation from design §5.1 is recorded in this spec under `### Deviation from design §5.1 — module-resolution source`.
+- [x] A shared JSON fixture corpus exists at `tests/fixtures/blast_radius/` (including a CRLF fixture and a glob-undecidable conflict fixture), and both the Python parity test and `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` iterate every fixture and assert identical radii, findings, and conflict results, following the ModelRouting parity pattern.
+- [x] Parametrized invariant tests pass in both languages: conflict symmetry, monotonicity (fail-closed direction), self-conflict, determinism and input-order independence, and V1 self-consistency; `hypothesis` is not added as a dependency.
+- [x] Line coverage >= 85% and branch coverage >= 75% for every new module in both languages; `BlastRadius.psm1` (and any sibling PowerShell module) is appended to the `CodeCoverage.Path` list in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` with an issue #447 comment.
+- [x] No production, test, or reusable script file exceeds 500 lines; the facade + `_blast_radius_extraction.py` split (and contingent `_blast_radius_validation.py` / `BlastRadiusExtraction.psm1` splits) is used as needed.
+- [x] `.claude/skills/atomic-plan-contract/SKILL.md` is unchanged; no existing epic implementation is modified or refactored; the only edits to existing files are the append-only Pester coverage-path entry, applied identically to `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and its byte-parity bundled mirror, and the append-only `core.json` pack-manifest entry publishing the new module; new `.claude/**` files are additionally created as byte-identical bundled mirrors, which are file creations rather than edits.
+- [x] The library is pure: no filesystem reads/writes, no subprocess, no network, and no wall-clock reads at runtime; `computed_at`, `tracked_file_count`, and observed paths are caller-supplied.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: derivation from plan/spec text, path-to-module mapping, shared-surface intersection, contract extraction, each of V1/V2/V3, each of the four `conflicts` disjuncts, fail-closed behavior.
-- [ ] Property/edge cases: empty radius, glob subsumption, whitespace and CRLF handling in plan parsing, over-breadth threshold boundary.
-- [ ] Cross-language parity: identical fixture inputs produce identical radii, validation verdicts, and conflict edges in Python and PowerShell.
+- [x] Unit coverage: derivation from plan/spec text, path-to-module mapping, shared-surface intersection, contract extraction, each of V1/V2/V3, each of the four `conflicts` disjuncts, fail-closed behavior.
+- [x] Property/edge cases: empty radius, glob subsumption, whitespace and CRLF handling in plan parsing, over-breadth threshold boundary.
+- [x] Cross-language parity: identical fixture inputs produce identical radii, validation verdicts, and conflict edges in Python and PowerShell.

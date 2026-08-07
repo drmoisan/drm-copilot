@@ -1,0 +1,45 @@
+{
+  "description": "All four disjuncts trigger at once, so the relation must report every triggered reason in the fixed kind order path_overlap, module_overlap, shared_surface_overlap, contract_dependency rather than stopping at the first.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_tools/shared.py"],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": ["derive_blast_radius"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["scripts/dev_tools/shared.py"],
+      "modules": ["python-dev-tools", "tests"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": ["derive_blast_radius"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [
+      {
+        "kind": "path_overlap",
+        "detail": "scripts/dev_tools/shared.py ~ scripts/dev_tools/shared.py"
+      },
+      { "kind": "module_overlap", "detail": "python-dev-tools" },
+      { "kind": "shared_surface_overlap", "detail": "poetry.lock" },
+      { "kind": "contract_dependency", "detail": "derive_blast_radius" }
+    ]
+  }
+}

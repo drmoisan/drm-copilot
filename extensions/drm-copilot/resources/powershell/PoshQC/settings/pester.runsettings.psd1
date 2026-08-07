@@ -114,6 +114,16 @@
             # changed production surface is not excluded from coverage.
             '.codex/hooks/enforce-epic-child-worktree-binding.ps1'
             '.codex/hooks/enforce-epic-planning-only.ps1'
+            # Issue #447 added the .claude-resident PowerShell blast-radius library, the
+            # two-language mirror of scripts/dev_tools/compute_blast_radius.py and its
+            # helper modules. The set is split across five files only to satisfy the
+            # 500-line limit; measured here so no new production module is excluded from
+            # coverage.
+            '.claude/lib/blast-radius/BlastRadiusExtraction.psm1'
+            '.claude/lib/blast-radius/BlastRadiusGlob.psm1'
+            '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
+            '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
+            '.claude/lib/blast-radius/BlastRadius.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
