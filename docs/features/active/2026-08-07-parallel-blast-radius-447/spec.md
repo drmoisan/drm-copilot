@@ -214,6 +214,18 @@ Rationale (research §2, recommendation accepted):
 
 `quality-tiers.yml` remains enumerated in the `shared_surfaces` truth table as a forward-looking entry. If a dedicated quality-gates feature later creates it, the module map can be re-pointed without changing the F1 API, because the map is a config input, not code.
 
+The absent `quality-tiers.yml` is already tracked independently as open issue
+[#336](https://github.com/drmoisan/drm-copilot/issues/336) (`Bug: quality-tiers-yml-missing-at-repo-root`),
+whose body is unpopulated and therefore records no chosen resolution. This deviation deliberately
+leaves #336 independently resolvable: F1 neither creates the file nor closes the issue, and nothing
+in F1's API depends on which way #336 is eventually settled.
+
+Two further gaps were observed while evaluating option 2 and are recorded here because they bear on
+any future attempt to resolve #336: the `tier-classification` CI stage cited by
+`.claude/rules/quality-tiers.md` does not exist in any workflow under `.github/workflows/`, and
+`docs/ci.research.md`, named by that rule file as the tier system's source of truth, does not exist
+either. Both are outside this epic's scope.
+
 ## Data & State
 
 - **Data flow:** caller-supplied text/config in → immutable radius, finding, and conflict values out. No storage, no persistence, no caching, no state.
