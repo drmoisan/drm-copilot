@@ -108,58 +108,58 @@ not the objective; determinism and explainability are (design §13.3).
 
 ## Acceptance Criteria
 
-- [ ] `scripts/dev_tools/parallel_cohort_computation.py` exists and exports
+- [x] `scripts/dev_tools/parallel_cohort_computation.py` exists and exports
       `compute_cohorts(item_keys: Iterable[int], conflict_edges: Iterable[tuple[int, int]]) -> list[list[int]]`
       implementing deterministic greedy coloring in Welsh-Powell order: vertices sorted by the
       composite key `(-degree, item_key)` ascending (descending distinct-neighbor degree, ties by
       ascending item key), each vertex assigned the lowest cohort index not used by any
       already-assigned neighbor.
-- [ ] The module accepts an already-computed conflict graph (item-key set plus undirected edge
+- [x] The module accepts an already-computed conflict graph (item-key set plus undirected edge
       list) as input, does not compute blast radii, and never evaluates `conflicts(a, b)`; the
       module docstring records the one-line reduction from F3's
       `conflict_edges[] = { a, b, reason }` checkpoint records to the accepted
       `Iterable[tuple[int, int]]` shape.
-- [ ] Edge symmetry is guaranteed by internal normalization: an edge supplied as `(a, b)`, as
+- [x] Edge symmetry is guaranteed by internal normalization: an edge supplied as `(a, b)`, as
       `(b, a)`, or duplicated yields the same conflict, verified by a test asserting identical
       output for direction-flipped and duplicated edge lists.
-- [ ] `compute_cohorts` output satisfies the structural invariants: every cohort is an independent
+- [x] `compute_cohorts` output satisfies the structural invariants: every cohort is an independent
       set of the input graph; each cohort's item keys are sorted ascending; the concatenation of
       all cohorts covers `item_keys` exactly once; empty input returns `[]`; all-isolated input
       returns one cohort; a complete graph on `n` vertices returns `n` singleton cohorts — each
       verified by a dedicated test with exact-output assertions.
-- [ ] `compute_concurrency_batches(cohort_item_keys: Sequence[int], max_concurrency: int) -> list[list[int]]`
+- [x] `compute_concurrency_batches(cohort_item_keys: Sequence[int], max_concurrency: int) -> list[list[int]]`
       implements the slot-filling rule: it sorts the cohort's keys ascending itself, then chunks
       into consecutive batches of at most `max_concurrency`; tests cover the exact-multiple case
       (12 items at `max_concurrency = 4` → three batches of four), the remainder case (10 items at
       `max_concurrency = 4` → batches of 4, 4, 2), `max_concurrency = 1` (singleton batches), and
       `max_concurrency >= cohort size` (one batch), and assert that batch concatenation equals
       the ascending-sorted cohort.
-- [ ] Determinism is verified by explicit tests using fixed literal permutations: repeated
+- [x] Determinism is verified by explicit tests using fixed literal permutations: repeated
       invocation with identical input, permuted `item_keys`, and permuted plus direction-flipped
       `conflict_edges` all produce identical cohort assignments.
-- [ ] A dedicated tie-break test with equal-degree vertices verifies ascending item-key ordering
+- [x] A dedicated tie-break test with equal-degree vertices verifies ascending item-key ordering
       (the test fails under an accidental descending tie-break), and a dedicated test shows
       Welsh-Powell degree ordering producing a different result than insertion order.
-- [ ] `ParallelCohortInputError(ValueError)` is the single dedicated exception, raised for all
+- [x] `ParallelCohortInputError(ValueError)` is the single dedicated exception, raised for all
       four malformed-input modes — unknown edge endpoint, self-loop, duplicate item key,
       non-positive `max_concurrency` — carrying an attribute identifying the offending value;
       tests assert the exception type per mode and that the message names the offending value.
-- [ ] Both public functions are pure: no file I/O, no network, no clock or RNG access, no
+- [x] Both public functions are pure: no file I/O, no network, no clock or RNG access, no
       mutation of input arguments; the module docstring documents that `generation` /
       `recolor_generation` and `current_cohort` are caller-owned, and that recoloring over a
       mutated set is performed by invoking `compute_cohorts` on the induced not-yet-started
       subgraph with in-flight items excluded by the caller (no pinned-set parameter).
-- [ ] The parity test suite exists at
+- [x] The parity test suite exists at
       `tests/scripts/dev_tools/test_parallel_cohort_computation.py` (with
       `tests/scripts/dev_tools/test_parallel_cohort_computation_errors.py` as the only permitted
       split fallback), in the manner of `tests/scripts/dev_tools/test_epic_wave_computation.py`:
       deterministic scenario tests with exact-output assertions, `pytest.raises` error paths, and
       replicable scenario fixtures; no PowerShell module is created (research §7 scope decision).
-- [ ] Line coverage >= 85% and branch coverage >= 75% for
+- [x] Line coverage >= 85% and branch coverage >= 75% for
       `scripts/dev_tools/parallel_cohort_computation.py`, measured by
       `poetry run pytest --cov --cov-branch`; Black, Ruff, and Pyright (strict) each pass with
       zero errors.
-- [ ] The change is additive only: no existing epic implementation (including
+- [x] The change is additive only: no existing epic implementation (including
       `epic_wave_computation.py`) is modified or refactored; `quality-tiers.yml` is neither
       created nor modified; no new Python dependency is added (no `hypothesis`); both new files
       are each under 500 lines.
