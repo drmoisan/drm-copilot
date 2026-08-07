@@ -1,0 +1,40 @@
+{
+  "description": "LF plan and spec: plan-task paths, non-task-line paths, spec inline-code paths, feature-folder append, module resolution, shared-surface expansion, and contract extraction from a qualifying API heading.",
+  "input": {
+    "plan_text": "### Phase 1 — Library\n- [ ] [P1-T1] Create `scripts/dev_tools/compute_blast_radius.py` and update `config/orchestration-routing.json`.\n- [x] [P1-T2] Add tests in `tests/scripts/dev_tools/test_compute_blast_radius.py`.\n\nGuardrail: do not touch `docs/research/design.md`.\n",
+    "spec_text": "# Feature Spec\n\n## Public API Contract\n\nThe module exposes `derive_blast_radius` and `conflicts` and reads `config/blast-radius.json`.\n\n## Notes\n\nUnrelated helper `internal_helper` is not part of the contract.\n",
+    "feature_folder": "2026-08-07-parallel-blast-radius-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "config/blast-radius.json",
+        "config/orchestration-routing.json",
+        "docs/features/active/2026-08-07-parallel-blast-radius-447/**",
+        "docs/research/design.md",
+        "scripts/dev_tools/compute_blast_radius.py",
+        "tests/scripts/dev_tools/test_compute_blast_radius.py"
+      ],
+      "modules": ["config", "docs", "python-dev-tools", "tests"],
+      "shared_surfaces": ["config/orchestration-routing.json"],
+      "contracts": ["conflicts", "derive_blast_radius"],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

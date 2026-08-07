@@ -38,14 +38,14 @@ The epic's leading indicators depend directly on this library: "Blast-radius V1 
 
 ## Acceptance Criteria
 
-- [ ] V1 rejects (Blocking) a radius when the plan's task bodies name a concrete repository path not subsumed by `blast_radius.paths`, naming the uncovered path — satisfying the epic leading indicator.
-- [ ] V2 rejects (Blocking) a radius that touches a configured shared surface without enumerating it explicitly by concrete path; glob coverage alone does not pass.
-- [ ] V3 reports (Advisory, never Blocking) a radius whose concrete coverage exceeds the configured fraction of tracked files; the item remains schedulable.
-- [ ] `conflicts(a, b)` fails closed: any shared-surface overlap conflicts by default, glob pairs that cannot be proven disjoint count as overlap, and the result carries every triggered reason kind for auditability; key-level partitioning of shared surfaces is not attempted (design §13.2).
-- [ ] A radius derived by the library from a plan always passes V1 against that same plan, so the Blocking gate targets hand-edited, stale, or drifted radii rather than the library's own output.
-- [ ] Identical inputs produce identical radii, validation findings, and conflict results in the Python reference and the PowerShell mirror, proven by both test suites asserting the shared fixture corpus at `tests/fixtures/blast_radius/` — satisfying the epic NFR at the radius layer.
-- [ ] The public API documented in `spec.md` (`## Public API Contract`) is sufficient for the downstream consumers as specified: F3 serializes the radius shape and the `ConflictReason.kind` strings, F4 calls derivation plus V1–V3 validation, and F8 computes `observed` radii and recomputes conflicts.
-- [ ] The feature is delivered without modifying the atomic-plan contract, without modifying existing epic implementations, and without adding dependencies; coverage meets the uniform gates (line >= 85%, branch >= 75%) for every new module.
+- [x] V1 rejects (Blocking) a radius when the plan's task bodies name a concrete repository path not subsumed by `blast_radius.paths`, naming the uncovered path — satisfying the epic leading indicator.
+- [x] V2 rejects (Blocking) a radius that touches a configured shared surface without enumerating it explicitly by concrete path; glob coverage alone does not pass.
+- [x] V3 reports (Advisory, never Blocking) a radius whose concrete coverage exceeds the configured fraction of tracked files; the item remains schedulable.
+- [x] `conflicts(a, b)` fails closed: any shared-surface overlap conflicts by default, glob pairs that cannot be proven disjoint count as overlap, and the result carries every triggered reason kind for auditability; key-level partitioning of shared surfaces is not attempted (design §13.2).
+- [x] A radius derived by the library from a plan always passes V1 against that same plan, so the Blocking gate targets hand-edited, stale, or drifted radii rather than the library's own output.
+- [x] Identical inputs produce identical radii, validation findings, and conflict results in the Python reference and the PowerShell mirror, proven by both test suites asserting the shared fixture corpus at `tests/fixtures/blast_radius/` — satisfying the epic NFR at the radius layer.
+- [x] The public API documented in `spec.md` (`## Public API Contract`) is sufficient for the downstream consumers as specified: F3 serializes the radius shape and the `ConflictReason.kind` strings, F4 calls derivation plus V1–V3 validation, and F8 computes `observed` radii and recomputes conflicts.
+- [x] The feature is delivered without modifying the atomic-plan contract, without modifying existing epic implementations, and without adding dependencies; coverage meets the uniform gates (line >= 85%, branch >= 75%) for every new module.
 
 ## Non-Goals
 

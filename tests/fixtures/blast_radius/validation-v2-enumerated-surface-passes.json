@@ -1,0 +1,51 @@
+{
+  "description": "V2 negative case. The same plan as validation-v2-unenumerated-surface, but the declared radius names both touched surfaces explicitly by concrete path, so explicit enumeration passes where glob coverage failed.",
+  "input": {
+    "plan_text": "### Phase 1 — Routing\n- [ ] [P1-T1] Update `config/orchestration-routing.json` and `scripts/dev_tools/validate_orchestration_artifacts.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-v2-pass-fixture-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "radius": {
+      "paths": ["config/**", "scripts/dev_tools/**"],
+      "modules": ["config", "python-dev-tools"],
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "scripts/dev_tools/validate_orchestration_artifacts.py"
+      ],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "config/orchestration-routing.json",
+        "docs/features/active/2026-08-07-v2-pass-fixture-447/**",
+        "scripts/dev_tools/validate_orchestration_artifacts.py"
+      ],
+      "modules": ["config", "docs", "python-dev-tools"],
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "scripts/dev_tools/validate_orchestration_artifacts.py"
+      ],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

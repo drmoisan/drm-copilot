@@ -1,0 +1,37 @@
+{
+  "description": "No contention: every one of the four levels is populated on both sides and every one of them is disjoint, so the verdict is false and the reason list is empty.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_tools/alpha.py"],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": ["Alpha"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["docs/notes.md"],
+      "modules": ["docs"],
+      "shared_surfaces": ["package-lock.json"],
+      "contracts": ["Beta"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": false,
+    "reasons": []
+  }
+}

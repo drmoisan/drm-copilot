@@ -1,0 +1,33 @@
+{
+  "description": "Zero-path plan: an empty plan and an empty spec still yield a radius containing only the feature-folder glob, per the documented behavior that derivation never fails on well-formed text.",
+  "input": {
+    "plan_text": "",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-empty-plan-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": ["docs/features/active/2026-08-07-empty-plan-447/**"],
+      "modules": ["docs"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

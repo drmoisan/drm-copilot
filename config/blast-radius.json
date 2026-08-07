@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "shared_surfaces": [
+    "config/orchestration-routing.json",
+    "extensions/drm-copilot/resources/config/orchestration-routing.json",
+    ".claude/settings.json",
+    "poetry.lock",
+    "package-lock.json",
+    "extensions/drm-copilot/package-lock.json",
+    "packages/mcp-server/package-lock.json",
+    "quality-tiers.yml",
+    "config/blast-radius.json",
+    "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+  ],
+  "shared_surface_globs": [
+    "scripts/dev_tools/validate_*.py",
+    "scripts/dev_tools/_orchestrator_state_*.py",
+    "scripts/dev_tools/_epic_orchestrator_state_*.py"
+  ],
+  "modules": {
+    "python-dev-tools": ["scripts/dev_tools/**"],
+    "powershell-dev-tools": ["scripts/dev-tools/**"],
+    "poshqc": ["scripts/powershell/**"],
+    "benchmarks": ["scripts/benchmarks/**"],
+    "claude-runtime": [".claude/**"],
+    "codex-runtime": [".codex/**"],
+    "copilot-surface": [".github/**"],
+    "agents-surface": [".agents/**"],
+    "mcp-server": ["packages/mcp-server/**"],
+    "vscode-extension": ["extensions/drm-copilot/**"],
+    "config": ["config/**"],
+    "schemas": ["schemas/**"],
+    "tests": ["tests/**"],
+    "docs": ["docs/**"]
+  },
+  "over_breadth_fraction": 0.25
+}
