@@ -7,10 +7,26 @@
 
 Timestamp: 2026-08-08T17-58
 
+> **Correction note (2026-08-08, remediation cycle 1).** The post-change BRANCH figures originally
+> recorded in this artifact (`percent_branches_covered` 83.82, `covered_branches` 4191,
+> `missing_branches` 809, `num_partial_branches` 555) were not reproducible. They have been replaced
+> throughout with the values re-measured at the same HEAD and recorded in
+> `docs/features/active/2026-08-07-parallel-orchestrator-surface-441/evidence/remediation-baseline/branch-coverage-remeasure.2026-08-08T19-18.md`,
+> taken at HEAD `41633ad5e867070853e3e4501c3457b6641d1efc`. The attribution sentence that credited the
+> single-destination movement to this branch's new `.claude` files and `pack-manifests/core.json`
+> entries has also been replaced. The correction responds to code-review finding **CR-05**
+> (`docs/features/active/2026-08-07-parallel-orchestrator-surface-441/code-review.2026-08-08T18-12.md`).
+> No line-coverage figure, no changed-code analysis, and no threshold arithmetic other than the
+> branch-derived deltas is altered, and the verdict is unchanged at PASS: both the original and the
+> corrected branch figures clear the 75% floor by more than 8 pp and neither is a regression.
+
 Sources:
 
 - Baseline: `evidence/baseline/baseline-pytest-coverage.2026-08-08T16-47.md` (P0-T5)
 - Post-change: `evidence/qa-gates/final-qc-pytest-coverage.2026-08-08T17-57.md` (P6-T4)
+- Post-change branch figures (corrected, authoritative):
+  `evidence/remediation-baseline/branch-coverage-remeasure.2026-08-08T19-18.md` (remediation cycle 1,
+  P0-T7)
 
 Both figures come from the same command (`poetry run pytest --cov --cov-branch
 --cov-report=term-missing`) run from the repository root under the same coverage configuration
@@ -22,12 +38,12 @@ Both figures come from the same command (`poetry run pytest --cov --cov-branch
 | Metric | Baseline (P0-T5) | Post-change (P6-T4) | Delta | Threshold | Verdict |
 | --- | --- | --- | --- | --- | --- |
 | Line (statement) coverage | 91.82% (12432 / 13539) | 91.82% (12432 / 13539) | 0.00 pp | >= 85% | PASS |
-| Branch coverage | 83.80% (4190 / 5000) | 83.82% (4191 / 5000) | +0.02 pp | >= 75% | PASS |
-| Combined coverage.py headline | 89.66% (89.65963644209505) | 89.67% (89.66503047629323) | +0.0054 pp | n/a (informational) | PASS |
+| Branch coverage | 83.80% (4190 / 5000) | 83.80% (4190 / 5000) | 0.00 pp | >= 75% | PASS |
+| Combined coverage.py headline | 89.66% (89.65963644209505) | 89.66% (89.65963644209505) | 0.0000 pp | n/a (informational) | PASS |
 | Statements missing | 1107 | 1107 | 0 | n/a | no regression |
 | Statements excluded | 387 | 387 | 0 | n/a | no regression |
-| Branch destinations missing | 810 | 809 | -1 | n/a | improvement |
-| Partial branches | 556 | 555 | -1 | n/a | improvement |
+| Branch destinations missing | 810 | 810 | 0 | n/a | no regression |
+| Partial branches | 556 | 556 | 0 | n/a | no regression |
 | Tests passed | 2968 | 3004 | +36 | n/a | improvement |
 | Tests failed | 0 | 0 | 0 | must be 0 | PASS |
 
@@ -41,11 +57,11 @@ Precise underlying values (from `coverage json` `totals`, not hand-derived):
 | `excluded_lines` | 387 | 387 |
 | `percent_statements_covered` | 91.82362065145136 | 91.82362065145136 |
 | `num_branches` | 5000 | 5000 |
-| `covered_branches` | 4190 | 4191 |
-| `missing_branches` | 810 | 809 |
-| `num_partial_branches` | 556 | 555 |
-| `percent_branches_covered` | 83.8 | 83.82 |
-| `percent_covered` | 89.65963644209505 | 89.66503047629323 |
+| `covered_branches` | 4190 | 4190 |
+| `missing_branches` | 810 | 810 |
+| `num_partial_branches` | 556 | 556 |
+| `percent_branches_covered` | 83.8 | 83.8 |
+| `percent_covered` | 89.65963644209505 | 89.65963644209505 |
 
 ## New / Changed-Code Coverage for This Feature's Diff
 
@@ -76,22 +92,28 @@ production line whose coverage could have regressed. The identical baseline and 
 statement figures (12432 / 13539, 1107 missing, 387 excluded) confirm this arithmetically: the
 denominator, the numerator, and the missing count are all unchanged.
 
-The branch metric moved by exactly one destination in the favourable direction (`covered_branches`
-4190 to 4191; `missing_branches` 810 to 809; `num_partial_branches` 556 to 555) with the
-denominator held at 5000. This is an improvement, not a regression. The most likely mechanism is
-that the newly added `.claude` runtime files and the three new `pack-manifests/core.json` entries
-changed the inputs traversed by existing production helpers under `scripts/dev_tools` when the
-pre-existing bundle-parity suites run, so one previously-partial branch destination in that
-traversal is now taken. That attribution is an inference from the unchanged denominator rather
-than a directly measured per-branch attribution; the verified facts are the totals above.
+The branch metric is unchanged: `covered_branches` 4190 both sides, `missing_branches` 810 both sides,
+`num_partial_branches` 556 both sides, with the denominator held at 5000. There is no movement to
+attribute.
+
+An earlier revision of this artifact recorded a one-destination post-change difference
+(`covered_branches` 4191, `missing_branches` 809, `num_partial_branches` 555) and attributed it to the
+newly added `.claude` runtime files and the three new `pack-manifests/core.json` entries changing the
+inputs traversed by existing production helpers under `scripts/dev_tools`. Two independent re-runs at
+the same HEAD (`41633ad5e867070853e3e4501c3457b6641d1efc`) both produced 4190 / 810 / 556, so that
+one-destination difference did not reproduce. A single-destination difference between runs at the same
+HEAD is environment-dependent and is not a reproducible property of the branch content; no causal
+attribution to the branch's `.claude` files or `core.json` entries is supported by the evidence, and
+none is asserted. The verified facts are the totals above, which the re-measurement in
+`evidence/remediation-baseline/branch-coverage-remeasure.2026-08-08T19-18.md` reproduces exactly.
 
 ## Threshold Verification
 
 1. Post-change line coverage 91.82% >= 85% required. **PASS** (margin +6.82 pp.)
-2. Post-change branch coverage 83.82% >= 75% required. **PASS** (margin +8.82 pp.)
+2. Post-change branch coverage 83.80% >= 75% required. **PASS** (margin +8.80 pp.)
 3. No regression versus baseline: line coverage is exactly equal (91.82362065145136% both sides,
-   identical covered/total/missing counts), and branch coverage increased by 0.02 pp. Neither
-   metric decreased. **PASS**
+   identical covered/total/missing counts), and branch coverage is exactly equal (83.8% both sides,
+   identical covered/total/missing/partial counts). Neither metric decreased. **PASS**
 4. All required numeric values are available; no placeholder or `UNVERIFIED` value appears in the
    baseline artifact, the post-change artifact, or this comparison. **PASS**
 5. Test outcome: 3004 passed, 0 failed, exit code 0, with the test count reconciling exactly as

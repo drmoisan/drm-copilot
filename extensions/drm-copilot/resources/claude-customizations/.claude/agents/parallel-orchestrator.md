@@ -13,6 +13,8 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
+  - "Bash(poetry run python -c *)"
+  - "Bash(poetry run python -m *)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -63,6 +65,17 @@ cleanup, `parallel-status.md` maintenance, checkpoint persistence, and completio
 frames the *who* and *when*; the skill documents the *how* in full. The manifest schema, the
 checkpoint schema, and the parallel enums are defined once in
 `.claude/rules/parallel-orchestration.md` and are consumed here, never redefined.
+
+Two of that procedure's steps are reached through a Python interpreter rather than through a
+dedicated command, so the `tools` allowlist grants exactly two invocation prefixes for them.
+`scripts/dev_tools/parallel_manifest_contract.py` is an import-only library with no CLI entry point,
+so the manifest gate's `validate_parallel_manifest_text` check is invoked as
+`poetry run python -c`; the checkpoint-validator CLI fallback the skill names in its
+`## Parallel-Level Checkpoint` section is invoked as `poetry run python -m`. Both grants are scoped
+to those two invocation forms only — not to `poetry run` as a whole — so `pytest`, `black`, `ruff`,
+and every other `poetry run` subcommand remain outside the allowlist. The sibling persona
+`.claude/agents/parallel-planner.md` records the same rationale for the same class of import-only
+upstream library.
 
 ## Startup Protocol
 

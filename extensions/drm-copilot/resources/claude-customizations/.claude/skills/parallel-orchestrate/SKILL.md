@@ -74,7 +74,11 @@ Consumption rules:
   the checkpoint. Do not guess a repair, do not silently skip the offending item, and do not launch
   a partial cohort. Validate by calling `validate_parallel_manifest_text` from
   `scripts/dev_tools/parallel_manifest_contract.py`, which is a library call and deliberately not
-  an MCP artifact type.
+  an MCP artifact type. That module exposes no CLI entry point, so the permitted mechanism for the
+  call is the granted interpreter invocation
+  `poetry run python -c "import pathlib, sys; from scripts.dev_tools.parallel_manifest_contract import validate_parallel_manifest_text; errors = validate_parallel_manifest_text(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')); print(errors); sys.exit(1 if errors else 0)" docs/features/parallel/<slug>/parallel.md`,
+  whose non-zero exit is the rejection signal and whose printed error list is the content of the
+  Blocking finding.
 
 ## Cohort Consumption and Ordering
 
@@ -274,13 +278,18 @@ Remediation is child-owned and parent-initiated. The conflict is always between 
 branch and `origin/main`; there is no integration branch and therefore no fan-in conflict path on
 this surface.
 
-1. On a conflicted `gh pr merge --merge`, the parent converts the conflict into a synthetic Blocking
-   finding written to that item's own `remediation-inputs.<timestamp>.md` in the item's active
-   feature folder under `docs/features/active/`, not to the run's parallel folder. The finding
-   instructs resolution against `origin/main`: run `git fetch origin main`, then
-   `git merge --no-commit origin/main`, and on non-zero exit capture
-   `git diff --name-only --diff-filter=U` for the conflicted-file list together with the raw
-   conflict-marker content of each conflicted file.
+1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates that item's
+   child orchestration, passing the conflict signal and the instruction to resolve against
+   `origin/main`. The conflict capture and the finding write both belong to the child's
+   `atomic-executor`, which works inside the item's own worktree, the only working tree holding the
+   item's branch. It runs `git fetch origin main`, then `git merge --no-commit origin/main`, and on
+   non-zero exit captures `git diff --name-only --diff-filter=U` for the conflicted-file list
+   together with the raw conflict-marker content of each conflicted file. The child's
+   `atomic-executor` then writes that evidence as a synthetic Blocking finding to the item's own
+   `remediation-inputs.<timestamp>.md` in the item's active feature folder under
+   `docs/features/active/`, not to the run's parallel folder. Assigning both the capture and the
+   finding write to the child's chain matches `.claude/skills/epic-orchestrate/SKILL.md`, whose
+   equivalent capture and finding write also belong to the child's `atomic-executor`.
 2. The parent re-delegates that item's child orchestration. The child processes the finding through
    its unmodified R1 through R5 remediation loop exactly as it processes any local Blocking
    finding. No new remediation loop is introduced by this procedure.
@@ -395,7 +404,7 @@ commands, the commands win and the checkpoint is rewritten from them.
 
 Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "parallel-orchestrator-state"`, or the equivalent CLI invocation
-`python -m scripts.dev_tools.validate_orchestration_artifacts parallel-orchestrator-state <path>`,
+`poetry run python -m scripts.dev_tools.validate_orchestration_artifacts parallel-orchestrator-state <path>`,
 adding `--require-complete` at the completion gate.
 
 ## Completion Requirements

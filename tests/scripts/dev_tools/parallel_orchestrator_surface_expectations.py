@@ -251,3 +251,46 @@ RUN_PROCEDURE_FRAGMENTS: tuple[str, ...] = (
     "resumes at atomic execution from that item's committed `plan-path` "
     "rather than re-running promotion, research, or planning",
 )
+
+# Verbs that mark a sentence of the delivered procedure as prescribing a
+# filesystem write. "generate" and "generated" are deliberately excluded: the
+# skill uses them for read-from-template sentences ("Generate it from the
+# template ...") and for describing the status document as a projection ("is a
+# generated projection of ..."), neither of which names a write destination.
+WRITE_VERBS: tuple[str, ...] = (
+    "write",
+    "writes",
+    "written",
+    "rewrite",
+    "rewritten",
+    "record",
+    "records",
+    "recorded",
+    "regenerate",
+    "regenerates",
+    "regenerated",
+)
+
+# The closed set of non-parent actors named on this surface, drawn from the
+# surface's own actor model. The delivered skill is addressed to
+# ``parallel-orchestrator``, so an unattributed write sentence is a parent write;
+# a sentence naming one of these actors describes that actor's write instead and
+# is therefore not a parent write target.
+NON_PARENT_ACTOR_MARKERS: tuple[str, ...] = (
+    "child",
+    "atomic-executor",
+    "parallel-planner",
+    "item's own `orchestrator`",
+    "hook",
+    "F6",
+    "F7",
+    "F8",
+)
+
+# The closed set of prepositions that place a path token in a write-destination
+# position on this surface. "from", "of", "as", "at", "in", and "per" are
+# deliberately absent: on this surface each of them introduces a read source
+# ("populated with ... from `config/orchestration-routing.json`") or a
+# textual-appearance description ("written literally as
+# `docs/features/active/<basename>`") rather than a write destination.
+WRITE_DESTINATION_PREPOSITIONS: tuple[str, ...] = ("to", "into", "under")

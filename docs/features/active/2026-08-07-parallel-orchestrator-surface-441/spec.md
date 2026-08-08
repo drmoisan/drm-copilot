@@ -286,11 +286,20 @@ exists in the child contract.
 Child-owned remediation, parent-initiated — adapted from the epic fan-in section with
 `origin/main` substituted for the integration branch (research C.3):
 
-1. On a conflicted `gh pr merge --merge`, the parent converts the conflict into a synthetic
-   Blocking finding written to the item's own `remediation-inputs.<timestamp>.md` (in the
-   item's active feature folder), instructing conflict resolution against `origin/main`
-   (`git fetch origin main`; `git merge --no-commit origin/main`; capture
-   `git diff --name-only --diff-filter=U` plus conflict markers).
+1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates the
+   item's child orchestration, passing the conflict signal and the instruction to resolve
+   against `origin/main`. The conflict capture and the finding write both belong to the
+   child's `atomic-executor`, working inside the item's own worktree — the only working tree
+   holding the item's branch: `git fetch origin main`; `git merge --no-commit origin/main`;
+   on non-zero exit capture `git diff --name-only --diff-filter=U` plus the conflict markers;
+   then write the synthetic Blocking finding to the item's own
+   `remediation-inputs.<timestamp>.md` in the item's active feature folder. **Correction
+   (remediation cycle 1, 2026-08-08):** the original wording of this item assigned the
+   capture and the finding write to the parent, which contradicted both the frozen epic
+   precedent at `.claude/skills/epic-orchestrate/SKILL.md:187-194` and the
+   `parallel-orchestrator` persona's `Write` grants (`docs/features/parallel/**` and
+   `artifacts/orchestration/**` only); the actor was corrected to the child for parity with
+   that precedent and with those grants.
 2. The parent re-delegates the child orchestration, which processes the finding through its
    unmodified R1–R5 remediation loop (shared `remediation_pass` cap of 3).
 3. Each remediated pass ends again at child DONE with CI green; the parent then retries the
