@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 1
-- Last updated: 2026-08-07T22:10:00Z
+- Current wave: 1 complete; wave 2 held pending the open decision below
+- Last updated: 2026-08-08T01:50:00Z
 
 ## Feature Status
 
@@ -19,7 +19,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-08-07-parallel-blast-radius-447 | 447 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/450 | ae6331f7693fb7c05e2c5c7f8416c46c469929fa | 2026-08-07T18:10:20Z | 2026-08-07T21:48:57Z | 2026-08-07T21:52:41Z | 2026-08-07T22:06:00Z |
 | 2026-08-07-parallel-cohort-scheduler-445 | 445 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/449 | 3db6b13bfcd720536ba1d9090f21698e6af229df | 2026-08-07T18:10:20Z | 2026-08-07T19:06:50Z | 2026-08-07T19:09:08Z | 2026-08-07T19:28:00Z |
-| 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_created | — | — | 2026-08-07T22:09:00Z | — | — | — |
+| 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/451 | 12174c418e304755fac707817abcd44bd13eb708 | 2026-08-07T22:09:00Z | 2026-08-08T01:29:26Z | 2026-08-08T01:32:05Z | 2026-08-08T01:46:00Z |
 | 2026-08-07-parallel-planner-surface-443 | 443 | 2 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-drift-detection-446 | 446 | 4 | not_started | — | — | — | — | — | — |
@@ -34,8 +34,8 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | Wave | Features (issue) | Status |
 | --- | --- | --- |
 | 0 | 447 blast-radius library, 445 cohort scheduler | complete |
-| 1 | 444 schema and validators | in_progress |
-| 2 | 443 parallel-planner surface | blocked pending F1 follow-up adjudication |
+| 1 | 444 schema and validators | complete |
+| 2 | 443 parallel-planner surface | held pending F1 follow-up adjudication |
 | 3 | 441 parallel-orchestrator surface | not_started |
 | 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | not_started |
 
@@ -59,8 +59,22 @@ F1, because both match F1's approved specification.
 The follow-up recommends resolution **before F4 (#443, wave 2) executes**, because design section
 5.2 makes the `declared` radius authoritative for scheduling and F4 computes it by calling
 `derive_blast_radius`. Correcting F1 is outside F4's approved, preflight-cleared plan, so this is a
-scope decision rather than something a child can absorb silently. Wave 1 (#444) is unaffected and
-is proceeding.
+scope decision rather than something a child can absorb silently. Wave 1 (#444) was unaffected and
+is now complete.
+
+Wave 2 is **held**. `epic-orchestrator` recorded this under `human_interaction.requirements` with
+`response: halt` rather than launching #443 unilaterally. The three options on the table:
+
+1. Correct F1 first as new work, then launch wave 2 with F4's approved plan unchanged.
+2. Widen F4's scope so its own orchestrator re-plans to compensate for both gaps.
+3. Accept the gap for this epic and launch wave 2 unchanged, tracking the potential entry as
+   deferred work. The epic already lists shared-surface serialization as an open risk.
+
+A second, lower-severity follow-up was raised by F3 and is not gating:
+`docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md` records a repo-wide
+`pythonRepr` quote-selection divergence affecting four pre-existing epic/codex validator pairs.
+F3 recorded rather than fixed it, because fixing it requires editing epic validators F3 was not
+permitted to touch.
 
 ## Standing Notes
 
