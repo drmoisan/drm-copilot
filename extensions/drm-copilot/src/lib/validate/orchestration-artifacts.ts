@@ -14,6 +14,7 @@ import {
   validateOrchestratorStateText,
   type ValidateOrchestratorStateOptions,
 } from "./orchestrator-state-core";
+import { validateParallelKickoffText } from "./parallel-kickoff-artifact";
 import {
   validateParallelOrchestratorStateText,
   type ValidateParallelOrchestratorStateOptions,
@@ -275,6 +276,8 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
       };
       return validateParallelPlannerStateText(input.text, options);
     }
+    case "parallel-kickoff":
+      return validateParallelKickoffText(input.text);
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];
   }

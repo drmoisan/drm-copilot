@@ -189,15 +189,69 @@ def test_validate_from_args_dispatches_parallel_planner_state(
     assert errors == []
 
 
+def test_validate_from_args_routes_parallel_kickoff_to_its_validator(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The `parallel-kickoff` branch routes to the parallel kickoff validator.
+
+    Purpose:
+        This case previously asserted that `parallel-kickoff` was an unsupported
+        artifact type. That expectation became false by design: the epic
+        manifest `docs/features/epics/parallel-orchestration/epic.md`, section
+        "Planner Adjudication: the kickoff-contract boundary (F3 / F4)", assigns
+        the kickoff-contract module and the `parallel-kickoff` artifact type to
+        the parallel-planner-surface feature by producer ownership, and
+        `.claude/rules/parallel-orchestration.md`, section "F3 Scope Boundary —
+        kickoff contract deferred to F4", records the same boundary. The
+        schema-and-validator feature therefore landed without them on purpose.
+        The case is inverted here to assert the adjudicated routing instead.
+
+    Args:
+        monkeypatch (MonkeyPatch): Pytest fixture used to inject artifact text
+            in memory and to observe the validator call, so no real file is
+            required.
+
+    Returns:
+        None: Assertions verify the dispatched text and the propagated result.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub("kickoff text"))
+    received: list[str] = []
+
+    def record(text: str) -> list[str]:
+        """Stand in for the kickoff validator and capture its argument."""
+
+        received.append(text)
+        return ["sentinel error"]
+
+    monkeypatch.setattr(validator, "validate_parallel_kickoff_text", record)
+
+    errors = dispatch(
+        argparse.Namespace(path="ignored.md", artifact_type="parallel-kickoff")
+    )
+
+    assert received == ["kickoff text"]
+    assert errors == ["sentinel error"]
+
+
 def test_validate_from_args_returns_unsupported_for_an_unknown_parallel_type(
     monkeypatch: MonkeyPatch,
 ) -> None:
     """An unknown artifact type still falls through to the unchanged fallback.
 
     Purpose:
-        Confirm the two additive dispatch branches did not shadow or replace
-        the terminal `Unsupported artifact type: {type}` message, which callers
-        rely on for unrecognized input.
+        Confirm the additive dispatch branches did not shadow or replace the
+        terminal `Unsupported artifact type: {type}` message, which callers rely
+        on for unrecognized input. The probe name is `parallel-status-doc`,
+        which is deliberately absent from every registered subparser; the former
+        probe `parallel-kickoff` is now a registered type per the epic-manifest
+        adjudication cited above, so it can no longer exercise this branch.
 
     Args:
         monkeypatch (MonkeyPatch): Pytest fixture used to inject artifact text
@@ -216,10 +270,10 @@ def test_validate_from_args_returns_unsupported_for_an_unknown_parallel_type(
     monkeypatch.setattr(validator, "_read_text", build_read_text_stub("ignored"))
 
     errors = dispatch(
-        argparse.Namespace(path="ignored.json", artifact_type="parallel-kickoff")
+        argparse.Namespace(path="ignored.json", artifact_type="parallel-status-doc")
     )
 
-    assert errors == ["Unsupported artifact type: parallel-kickoff"]
+    assert errors == ["Unsupported artifact type: parallel-status-doc"]
 
 
 def test_main_parallel_orchestrator_state_returns_0_for_valid(

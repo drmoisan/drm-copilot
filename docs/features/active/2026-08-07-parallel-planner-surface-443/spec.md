@@ -485,31 +485,31 @@ Technical and contract criteria. Outcome and behavioral criteria from the operat
 are in `user-story.md`; together the two files are the authoritative acceptance-criteria source
 for this `full-feature` work mode.
 
-- [ ] `.claude/agents/parallel-planner.md` exists with frontmatter `name: parallel-planner`,
+- [x] `.claude/agents/parallel-planner.md` exists with frontmatter `name: parallel-planner`,
       `model: opus`, `memory: project`, no `hooks` block, and the exact tool allowlist in
       Deliverable 1, including `"Bash(poetry run *)"` and the
       `docs/features/parallel/**` write/edit scoping; it declares no `docs/features/epics/**`
       and no `docs/features/active/**` write scope.
-- [ ] `.claude/agents/parallel-planner.md` preloads exactly the skills `policy-compliance-order`,
+- [x] `.claude/agents/parallel-planner.md` preloads exactly the skills `policy-compliance-order`,
       `parallel-plan`, `feature-promotion-lifecycle`, `atomic-plan-contract`, and
       `evidence-and-timestamp-conventions`, and does not preload `parallel-orchestrate`.
-- [ ] `.claude/agents/parallel-planner.md` contains an `## Invocation Origin` section that
+- [x] `.claude/agents/parallel-planner.md` contains an `## Invocation Origin` section that
       documents the F7-owned extension of `.claude/hooks/enforce-epic-invocation-origin.ps1`
       (adding `'parallel-planner'` and `'parallel-orchestrator'` to
       `$script:GatedSubagentTypes`) and states that the constraint is documented-but-unenforced
       until F7 lands.
-- [ ] `.claude/skills/parallel-plan/SKILL.md` exists with frontmatter `context: fork`,
+- [x] `.claude/skills/parallel-plan/SKILL.md` exists with frontmatter `context: fork`,
       `agent: parallel-planner`, and an argument hint accepting issue numbers and/or
       potential-entry paths.
-- [ ] The skill's preparation kickoff line contains the verbatim markers
+- [x] The skill's preparation kickoff line contains the verbatim markers
       `Preparation mode: true.` and `route_id: preparation.`, the field
       `parallel_slug: <slug>`, an explicit push-to-origin instruction, downstream attribution to
       `parallel-orchestrator`, and the appended `model_budget.fable_policy` marker line; it
       contains no `Epic mode: true` and no `Parallel mode: true`.
-- [ ] The skill instructs creating each preparation worktree's branch from `origin/main`, and the
+- [x] The skill instructs creating each preparation worktree's branch from `origin/main`, and the
       F4 diff contains no change to `.claude/skills/orchestrate/SKILL.md` and no change to
       `config/orchestration-routing.json` (including the `preparation` route).
-- [ ] The skill states the R1 artifact-home decision: per-item prepared artifacts on the item's
+- [x] The skill states the R1 artifact-home decision: per-item prepared artifacts on the item's
       own feature branch created from `origin/main`, pushed before worktree removal, and reused
       at execution; run-level artifacts (`parallel.md`, `parallel-kickoff.md`) on the
       planner-owned, never-merged-into branch `parallel/<slug>-plan`; readers use
@@ -520,7 +520,7 @@ for this `full-feature` work mode.
       `Bash(poetry run *)` against each item's approved atomic plan, labelled as an upstream
       contract (§5.1-§5.4) pending F1; it contains no reimplementation of derivation, V1-V3, or
       `conflicts(a, b)`.
-- [ ] The skill documents V1/V2 Blocking semantics (item stays un-`prepared`; findings recorded
+- [x] The skill documents V1/V2 Blocking semantics (item stays un-`prepared`; findings recorded
       in `radius_validation`; item re-planned via a follow-up preparation delegation, not
       rejected) and V3 Advisory semantics (recorded and surfaced, no state effect).
 - [ ] The skill documents one cohort-seeding invocation of F2's Welsh-Powell reference over the
@@ -529,7 +529,7 @@ for this `full-feature` work mode.
       `recolor_generation: 0`, and `current_cohort: 0`; it states that `max_concurrency`
       (default 4, slots filled in ascending item key) is recorded but not enforced by F4, and
       that recoloring is F6/F8 scope.
-- [ ] The skill specifies the kickoff artifact per R5: heading `# Parallel Kickoff: <slug>`;
+- [x] The skill specifies the kickoff artifact per R5: heading `# Parallel Kickoff: <slug>`;
       `## Invocation Prompt` naming `/parallel-run <slug>`, the manifest path, and the
       per-item-branch resume-boundary sentence; `## Item Summary` with exact ordered headers
       `issue_num | feature_folder | cohort | complexity | branch | plan-path`; optional
@@ -543,22 +543,22 @@ for this `full-feature` work mode.
       `parallel_kickoff_contract.py` / `artifact_type: "parallel-kickoff"` recommendation and
       its contingency are recorded; the single-item-run floor question is flagged for F3, not
       decided.
-- [ ] The skill documents the checkpoint instance contract per R6, including the
+- [x] The skill documents the checkpoint instance contract per R6, including the
       `PARALLEL_EXECUTION_READY` ready sentinel and the deliberate absence of any
       `epic_worthiness`, `depends_on`, or `wave` field; the manifest section documents that
       `parallel.md` carries no `depends_on` field and is committed fully resolved (no negative
       `issue_num`) before kickoff emission.
-- [ ] The skill documents item intake per R8: mixed issue-number / potential-entry intake,
+- [x] The skill documents item intake per R8: mixed issue-number / potential-entry intake,
       negative-placeholder `issue_num` values back-filled from promotion receipts, and the
       `kind` default-to-`feature` rule.
-- [ ] The delivered skill contains no epic-worthiness gate analogue, no dependency-graph
+- [x] The delivered skill contains no epic-worthiness gate analogue, no dependency-graph
       authoring instruction, and no integration-branch creation instruction.
 - [ ] `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` exists, follows the
       `test_epic_run_kickoff_discovery_contract.py` precedent, contains the positive and
       negative assertions listed under "Testing", and passes.
 - [ ] The F4 diff contains no change to `.claude/skills/atomic-plan-contract/SKILL.md`,
       `.claude/agents/epic-planner.md`, or `.claude/skills/epic-plan/SKILL.md`.
-- [ ] `.claude/agents/parallel-planner.md` and `.claude/skills/parallel-plan/SKILL.md` are each
+- [x] `.claude/agents/parallel-planner.md` and `.claude/skills/parallel-plan/SKILL.md` are each
       under 500 lines.
 - [ ] The atomic plan re-verifies the F1/F2/F3 landing status recorded in this spec at planning
       time and reconciles any landed upstream spec against the corresponding `[ASSUMPTION]`

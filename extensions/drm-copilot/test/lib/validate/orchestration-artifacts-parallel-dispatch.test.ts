@@ -131,7 +131,15 @@ describe("validateArtifact parallel dispatch", () => {
     expect(errors).not.toContain(PLANNER_READY_SENTINEL_ERROR);
   });
 
-  it("keeps the unsupported-artifact-type fallback unchanged", () => {
+  // This case previously asserted that `parallel-kickoff` fell through to the
+  // unsupported-artifact-type branch. That expectation became false by design:
+  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // Adjudication: the kickoff-contract boundary (F3 / F4)", assigns the
+  // kickoff-contract module and the `parallel-kickoff` artifact type to the
+  // parallel-planner-surface feature, and this repository's
+  // `.claude/rules/parallel-orchestration.md`, section "F3 Scope Boundary —
+  // kickoff contract deferred to F4", records the same boundary.
+  it("routes the parallel kickoff type to the kickoff validator", () => {
     // Arrange / Act
     const errors = validateArtifact({
       artifactType: "parallel-kickoff",
@@ -139,6 +147,17 @@ describe("validateArtifact parallel dispatch", () => {
     });
 
     // Assert
-    expect(errors).toEqual(["Unsupported artifact type: parallel-kickoff"]);
+    expect(errors).toEqual(["Parallel kickoff is empty."]);
+  });
+
+  it("keeps the unsupported-artifact-type fallback unchanged", () => {
+    // Arrange / Act
+    const errors = validateArtifact({
+      artifactType: "parallel-status-doc",
+      text: "",
+    });
+
+    // Assert
+    expect(errors).toEqual(["Unsupported artifact type: parallel-status-doc"]);
   });
 });

@@ -95,29 +95,29 @@ this `full-feature` work mode. Criteria over live upstream tooling hold to the e
 have landed; until then they are verified against the documented procedure in the delivered
 skill text (the `[ASSUMPTION]` regime defined in `spec.md`).
 
-- [ ] An operator can invoke the delivered skill with a slug plus any mix of GitHub issue
+- [x] An operator can invoke the delivered skill with a slug plus any mix of GitHub issue
       numbers and potential-entry paths in one command, and unpromoted items are promoted by
       their own preparation-mode child without a separate manual promotion step.
-- [ ] At no point does the documented planning procedure ask the operator for `depends_on`
+- [x] At no point does the documented planning procedure ask the operator for `depends_on`
       edges, wave assignments, or an epic-worthiness verdict; planning proceeds directly from
       intake to preparation.
-- [ ] Every item is prepared through the same preparation-mode child contract an epic child
+- [x] Every item is prepared through the same preparation-mode child contract an epic child
       uses — promotion, research, `spec.md`, `user-story.md`, approved atomic plan,
       `PREFLIGHT: ALL CLEAR` — and the operator can locate each item's prepared feature folder
       and plan on that item's own pushed feature branch afterward.
-- [ ] An item whose plan fails V1 or V2 is visibly iterated (findings recorded, plan revised via
+- [x] An item whose plan fails V1 or V2 is visibly iterated (findings recorded, plan revised via
       a follow-up preparation delegation) rather than silently dropped or auto-withdrawn; an
       over-broad radius (V3) appears in the completion report as an Advisory finding on an item
       that still completes planning.
-- [ ] The planner's completion report gives the operator, per item: plan-path, branch name,
+- [x] The planner's completion report gives the operator, per item: plan-path, branch name,
       preflight status, and radius-validation result; plus the generation-0 cohort table, the
       manifest path, and both kickoff artifact paths — and states that execution has NOT
       started.
-- [ ] After planning completes, the operator can start execution from a fresh session by
+- [x] After planning completes, the operator can start execution from a fresh session by
       discovering the kickoff via the `parallel/<slug>-plan` branch (fetch plus `git show`,
       without checking the branch out), replaying `/parallel-run <slug>` at a time of their
       choosing.
-- [ ] After a planning run, the repository contains only per-item feature branches and the
+- [x] After a planning run, the repository contains only per-item feature branches and the
       single `parallel/<slug>-plan` run branch as new refs; no `parallel` integration branch
       exists and no prepared item folder has been pushed to `main` by the planner.
 - [ ] Existing epic workflows are unaffected: `/epic-plan` and `/epic-run` behave exactly as

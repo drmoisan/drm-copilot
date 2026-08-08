@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from scripts.dev_tools.epic_planner_readiness import build_epic_readiness_context
+from scripts.dev_tools.parallel_kickoff_contract import validate_parallel_kickoff_text
 from scripts.dev_tools.validate_epic_orchestrator_state import (
     validate_epic_orchestrator_state_text,
 )
@@ -179,6 +180,7 @@ def build_parser() -> argparse.ArgumentParser:
         "code-review",
         "feature-audit",
         "epic-kickoff",
+        "parallel-kickoff",
     ):
         artifact_parser = subparsers.add_parser(artifact_type)
         artifact_parser.add_argument("path")
@@ -355,6 +357,8 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
             text,
             require_ready_for_execution=bool(args.require_ready_for_execution),
         )
+    if args.artifact_type == "parallel-kickoff":
+        return validate_parallel_kickoff_text(text)
     return [f"Unsupported artifact type: {args.artifact_type}"]
 
 
