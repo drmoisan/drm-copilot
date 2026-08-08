@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 2
-- Last updated: 2026-08-08T17:58:00Z
+- Current wave: 3
+- Last updated: 2026-08-08T20:55:00Z
 
 ## Feature Status
 
@@ -21,8 +21,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-parallel-cohort-scheduler-445 | 445 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/449 | 3db6b13bfcd720536ba1d9090f21698e6af229df | 2026-08-07T18:10:20Z | 2026-08-07T19:06:50Z | 2026-08-07T19:09:08Z | 2026-08-07T19:28:00Z |
 | 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/451 | 12174c418e304755fac707817abcd44bd13eb708 | 2026-08-07T22:09:00Z | 2026-08-08T01:29:26Z | 2026-08-08T01:32:05Z | 2026-08-08T01:46:00Z |
 | 2026-08-07-blast-radius-under-reporting-gaps-452 (F1a) | 452 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/453 | b086cf6958ee4b628f60309cda80aac772304bc8 | 2026-08-08T02:10:00Z | 2026-08-08T17:41:02Z | 2026-08-08T17:42:58Z | 2026-08-08T17:56:00Z |
-| 2026-08-07-parallel-planner-surface-443 | 443 | 2 | worktree_created | — | — | 2026-08-08T17:58:00Z | — | — | — |
-| 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | not_started | — | — | — | — | — | — |
+| 2026-08-07-parallel-planner-surface-443 | 443 | 2 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/454 | ee0626e838109fe8d3fe3904fb4631c71879baa3 | 2026-08-08T17:58:00Z | 2026-08-08T20:34:31Z | 2026-08-08T20:37:53Z | 2026-08-08T20:52:00Z |
+| 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | worktree_created | — | — | 2026-08-08T20:55:00Z | — | — | — |
 | 2026-08-07-parallel-drift-detection-446 | 446 | 4 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | not_started | — | — | — | — | — | — |
@@ -36,8 +36,8 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | --- | --- | --- |
 | 0 | 447 blast-radius library, 445 cohort scheduler | complete |
 | 1 | 444 schema and validators; 452 F1a blast-radius correction (added) | complete |
-| 2 | 443 parallel-planner surface | in_progress |
-| 3 | 441 parallel-orchestrator surface | not_started |
+| 2 | 443 parallel-planner surface | complete |
+| 3 | 441 parallel-orchestrator surface | in_progress |
 | 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | not_started |
 
 ## Resolved Decision: F1a Correction Authorized (was blocking wave 2)
@@ -134,7 +134,20 @@ permitted to touch.
   from the invoking worktree's HEAD. Child prompts must re-base onto the integration branch
   explicitly.
 - **Agent memory does not survive a worktree.** `.claude/agent-memory/` is gitignored, so a child's
-  memory files must be copied out before its worktree is removed.
+  memory files must be copied out before its worktree is removed. `artifacts/` is gitignored too, so
+  the epic checkpoint and per-child launch artifacts are local-only by design.
+- **The bare validator module is not a gate.** `python -m scripts.dev_tools.validate_orchestrator_state`
+  exits 0 silently because that module has no CLI. Validate through the
+  `validate_orchestration_artifacts` dispatcher (MCP tool or its CLI). One child was misled into
+  believing a PR-readiness gate had passed when nothing had been checked.
+- **Two hook suites are not isolated from orchestrator state.** `enforce-pr-author-skill.Tests.ps1`
+  and `codex-pretooluse-integration.Tests.ps1` read the real gitignored
+  `artifacts/orchestration/orchestrator-state.json` rather than a mocked seam, so they fail whenever
+  an orchestrated run is live. Pre-existing, out of scope for every child that has hit it.
+- **Verify producer/consumer seams explicitly.** F4 shipped a kickoff-contract validator and the
+  skill template that feeds it, both at 100% line and branch coverage, while the template emitted
+  documents the validator rejected on two independent counts. Per-side coverage says nothing about
+  the seam; bind them with a test that exercises producer output through the consumer.
 
 ## Integration PR
 
