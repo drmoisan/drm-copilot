@@ -14,6 +14,14 @@ import {
   validateOrchestratorStateText,
   type ValidateOrchestratorStateOptions,
 } from "./orchestrator-state-core";
+import {
+  validateParallelOrchestratorStateText,
+  type ValidateParallelOrchestratorStateOptions,
+} from "./parallel-orchestrator-state-core";
+import {
+  validateParallelPlannerStateText,
+  type ValidateParallelPlannerStateOptions,
+} from "./parallel-planner-state-core";
 import { validatePolicyAuditText } from "./policy-audit-artifact";
 import {
   validateCodeReviewText,
@@ -251,6 +259,22 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
     }
     case "epic-kickoff":
       return validateEpicKickoffText(input.text);
+    case "parallel-orchestrator-state": {
+      const options: ValidateParallelOrchestratorStateOptions = {
+        ...(input.requireComplete === undefined
+          ? {}
+          : { requireComplete: input.requireComplete }),
+      };
+      return validateParallelOrchestratorStateText(input.text, options);
+    }
+    case "parallel-planner-state": {
+      const options: ValidateParallelPlannerStateOptions = {
+        ...(input.requireReadyForExecution === undefined
+          ? {}
+          : { requireReadyForExecution: input.requireReadyForExecution }),
+      };
+      return validateParallelPlannerStateText(input.text, options);
+    }
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];
   }
