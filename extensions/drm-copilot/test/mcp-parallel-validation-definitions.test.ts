@@ -101,12 +101,18 @@ describe("parallel validation MCP definitions", () => {
     );
   });
 
-  it("does not advertise an unplanned parallel kickoff artifact type", () => {
+  // This case previously asserted that neither tool definition advertised a
+  // `parallel-kickoff` artifact type. That expectation became false by design:
+  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // Adjudication: the kickoff-contract boundary (F3 / F4)", assigns the
+  // `parallel-kickoff` artifact type to the parallel-planner-surface feature by
+  // producer ownership, so both surfaces must now advertise it.
+  it("advertises the adjudicated parallel kickoff artifact type", () => {
     // Arrange / Act / Assert
-    expect(extensionProperties?.["artifact_type"]?.enum).not.toContain(
+    expect(extensionProperties?.["artifact_type"]?.enum).toContain(
       "parallel-kickoff",
     );
-    expect(repoAutomationProperties?.["artifact_type"]?.enum).not.toContain(
+    expect(repoAutomationProperties?.["artifact_type"]?.enum).toContain(
       "parallel-kickoff",
     );
   });

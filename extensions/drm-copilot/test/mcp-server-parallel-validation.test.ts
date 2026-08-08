@@ -157,8 +157,42 @@ describe("repo automation MCP parallel validation", () => {
     });
   });
 
+  // The rejection probe below was `parallel-kickoff` until that type was
+  // added to the allow-list. The addition is adjudicated in
+  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // Adjudication: the kickoff-contract boundary (F3 / F4)", which assigns the
+  // `parallel-kickoff` artifact type to the parallel-planner-surface feature.
+  // `parallel-status-doc` is a genuinely unregistered name, so the rejection
+  // path stays covered.
   it("returns a validation error for a parallel artifact type outside the allow-list", async () => {
     // Arrange / Act
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "parallel-status-doc",
+        artifact_path: "docs/features/parallel/demo/status.md",
+      },
+    });
+
+    // Assert
+    expect(service.validateOrchestrationArtifacts).not.toHaveBeenCalled();
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({
+      ok: false,
+      tool: "validate_orchestration_artifacts",
+    });
+  });
+
+  it("forwards parallel kickoff validation through MCP", async () => {
+    // Arrange
+    service.validateOrchestrationArtifacts.mockResolvedValue({
+      tool: "validate_orchestration_artifacts",
+      workspaceRoot: "C:/workspace",
+      summary: "Validated parallel kickoff.",
+    });
+
+    // Act
     const result = await client.callTool({
       name: "validate_orchestration_artifacts",
       arguments: {
@@ -169,11 +203,16 @@ describe("repo automation MCP parallel validation", () => {
     });
 
     // Assert
-    expect(service.validateOrchestrationArtifacts).not.toHaveBeenCalled();
-    expect(result.isError).toBe(true);
+    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      artifactType: "parallel-kickoff",
+      artifactPath: "artifacts/orchestration/parallel-kickoff-demo.md",
+    });
+    expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
-      ok: false,
+      ok: true,
       tool: "validate_orchestration_artifacts",
+      workspace_root: "C:/workspace",
     });
   });
 });

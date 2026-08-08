@@ -116,23 +116,40 @@ describe("parallel validation MCP tool input", () => {
     },
   );
 
+  // The probe name below was `parallel-kickoff` until that type was added to
+  // the allow-list. The addition is adjudicated in
+  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // Adjudication: the kickoff-contract boundary (F3 / F4)", which assigns the
+  // `parallel-kickoff` artifact type to the parallel-planner-surface feature;
+  // `parallel-status-doc` is a genuinely unregistered name that still
+  // exercises the rejection path.
   it("rejects an artifact type outside the allow-list", () => {
     // Arrange / Act / Assert
     expect(() =>
       resolveValidateOrchestrationArtifactsToolInput(
-        input({ artifact_type: "parallel-kickoff" }),
+        input({ artifact_type: "parallel-status-doc" }),
       ),
     ).toThrow(/^Field 'artifact_type' must be one of: /);
   });
 
-  it("names both parallel types in the rejection message", () => {
+  it("accepts the adjudicated parallel kickoff artifact type", () => {
+    // Arrange / Act
+    const resolved = resolveValidateOrchestrationArtifactsToolInput(
+      input({ artifact_type: "parallel-kickoff" }),
+    );
+
+    // Assert
+    expect(resolved.artifactType).toBe("parallel-kickoff");
+  });
+
+  it("names every parallel type in the rejection message", () => {
     // Arrange / Act / Assert
     expect(() =>
       resolveValidateOrchestrationArtifactsToolInput(
         input({ artifact_type: "not-an-artifact" }),
       ),
     ).toThrow(
-      "Field 'artifact_type' must be one of: plan, policy-audit, code-review, feature-audit, orchestrator-state, epic-orchestrator-state, epic-planner-state, epic-kickoff, parallel-orchestrator-state, parallel-planner-state. Got 'not-an-artifact'.",
+      "Field 'artifact_type' must be one of: plan, policy-audit, code-review, feature-audit, orchestrator-state, epic-orchestrator-state, epic-planner-state, epic-kickoff, parallel-orchestrator-state, parallel-planner-state, parallel-kickoff. Got 'not-an-artifact'.",
     );
   });
 });

@@ -411,6 +411,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
             "epic-kickoff",
             "parallel-orchestrator-state",
             "parallel-planner-state",
+            "parallel-kickoff",
           ],
           description: "The type of orchestration artifact to validate.",
         },
