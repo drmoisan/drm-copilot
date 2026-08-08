@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 1 complete; wave 2 held pending the open decision below
-- Last updated: 2026-08-08T01:50:00Z
+- Current wave: 1 reopened for the authorized F1a correction; wave 2 gated on its merge
+- Last updated: 2026-08-08T02:10:00Z
 
 ## Feature Status
 
@@ -20,6 +20,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-parallel-blast-radius-447 | 447 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/450 | ae6331f7693fb7c05e2c5c7f8416c46c469929fa | 2026-08-07T18:10:20Z | 2026-08-07T21:48:57Z | 2026-08-07T21:52:41Z | 2026-08-07T22:06:00Z |
 | 2026-08-07-parallel-cohort-scheduler-445 | 445 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/449 | 3db6b13bfcd720536ba1d9090f21698e6af229df | 2026-08-07T18:10:20Z | 2026-08-07T19:06:50Z | 2026-08-07T19:09:08Z | 2026-08-07T19:28:00Z |
 | 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/451 | 12174c418e304755fac707817abcd44bd13eb708 | 2026-08-07T22:09:00Z | 2026-08-08T01:29:26Z | 2026-08-08T01:32:05Z | 2026-08-08T01:46:00Z |
+| 2026-08-07-blast-radius-under-reporting-gaps (F1a) | pending promotion | 1 | worktree_created | — | — | 2026-08-08T02:10:00Z | — | — | — |
 | 2026-08-07-parallel-planner-surface-443 | 443 | 2 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-drift-detection-446 | 446 | 4 | not_started | — | — | — | — | — | — |
@@ -34,12 +35,40 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | Wave | Features (issue) | Status |
 | --- | --- | --- |
 | 0 | 447 blast-radius library, 445 cohort scheduler | complete |
-| 1 | 444 schema and validators | complete |
-| 2 | 443 parallel-planner surface | held pending F1 follow-up adjudication |
+| 1 | 444 schema and validators; F1a blast-radius correction (added) | 444 complete, F1a in progress |
+| 2 | 443 parallel-planner surface | gated on F1a merging into the integration branch |
 | 3 | 441 parallel-orchestrator surface | not_started |
 | 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | not_started |
 
-## Open Decision Blocking Wave 2
+## Resolved Decision: F1a Correction Authorized (was blocking wave 2)
+
+**Resolved 2026-08-08.** A human selected option 1 and explicitly authorized adding exactly one new
+child feature — labelled **F1a** — to this epic, scheduled at wave 1 so it merges into
+`epic/parallel-orchestration-integration` before wave 2 launches. The checkpoint records this under
+`human_interaction.requirements[id=f1-under-reporting-before-f4]` with `response: scope_change`.
+
+F1a resolves both recorded gaps by applying the follow-up's own candidate resolutions 1, 2, and 3:
+
+1. Source the separator-free root-surface set from the `shared_surfaces` list itself, not a second
+   hardcoded list.
+2. Align the `conflicts` path comparison with `is_path_subsumed` so listed-directory prefixes are
+   honoured on both sides, preserving fail-closed semantics.
+3. Amend the F1 spec and the parity fixture corpus in the same change so both language
+   implementations and the shared corpus move together. Because both behaviours are spec-conformant
+   today, the spec amendment is required rather than optional.
+
+The two implementations must stay behaviourally byte-equivalent, and `tests/fixtures/blast_radius/`
+must be extended rather than have existing expectations weakened.
+
+`wave(F1a) = 1 + wave(447) = 1`, so inserting it leaves #443 at wave 2. #443's `depends_on` now
+includes F1a, so the Layer 1 wave-barrier hook will deny #443 until F1a's merge is durably
+confirmed. Wave 1 is therefore reopened even though #444 is already complete.
+
+The correction runs the full large-path lifecycle rather than resuming from a prepared plan, because
+it is the one child in this epic that `epic-planner` did not prepare. It performs its own MCP
+promotion of the existing potential entry; `epic-orchestrator` holds no promotion tools.
+
+## Original Decision Record (for provenance)
 
 `docs/features/potential/2026-08-07-blast-radius-under-reporting-gaps.md`, raised by F1's
 feature-review and merged with F1, records two **spec-conformant** under-reporting gaps in the
@@ -62,13 +91,8 @@ The follow-up recommends resolution **before F4 (#443, wave 2) executes**, becau
 scope decision rather than something a child can absorb silently. Wave 1 (#444) was unaffected and
 is now complete.
 
-Wave 2 is **held**. `epic-orchestrator` recorded this under `human_interaction.requirements` with
-`response: halt` rather than launching #443 unilaterally. The three options on the table:
-
-1. Correct F1 first as new work, then launch wave 2 with F4's approved plan unchanged.
-2. Widen F4's scope so its own orchestrator re-plans to compensate for both gaps.
-3. Accept the gap for this epic and launch wave 2 unchanged, tracking the potential entry as
-   deferred work. The epic already lists shared-surface serialization as an open risk.
+Wave 2 was held rather than launched unilaterally, and the decision was escalated. Option 1 was
+selected; see the resolved-decision section above.
 
 A second, lower-severity follow-up was raised by F3 and is not gating:
 `docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md` records a repo-wide
