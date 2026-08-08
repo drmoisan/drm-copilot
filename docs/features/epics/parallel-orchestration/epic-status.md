@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 1 reopened for the authorized F1a correction; wave 2 gated on its merge
-- Last updated: 2026-08-08T02:10:00Z
+- Current wave: 2
+- Last updated: 2026-08-08T17:58:00Z
 
 ## Feature Status
 
@@ -20,8 +20,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-parallel-blast-radius-447 | 447 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/450 | ae6331f7693fb7c05e2c5c7f8416c46c469929fa | 2026-08-07T18:10:20Z | 2026-08-07T21:48:57Z | 2026-08-07T21:52:41Z | 2026-08-07T22:06:00Z |
 | 2026-08-07-parallel-cohort-scheduler-445 | 445 | 0 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/449 | 3db6b13bfcd720536ba1d9090f21698e6af229df | 2026-08-07T18:10:20Z | 2026-08-07T19:06:50Z | 2026-08-07T19:09:08Z | 2026-08-07T19:28:00Z |
 | 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/451 | 12174c418e304755fac707817abcd44bd13eb708 | 2026-08-07T22:09:00Z | 2026-08-08T01:29:26Z | 2026-08-08T01:32:05Z | 2026-08-08T01:46:00Z |
-| 2026-08-07-blast-radius-under-reporting-gaps (F1a) | pending promotion | 1 | worktree_created | — | — | 2026-08-08T02:10:00Z | — | — | — |
-| 2026-08-07-parallel-planner-surface-443 | 443 | 2 | not_started | — | — | — | — | — | — |
+| 2026-08-07-blast-radius-under-reporting-gaps-452 (F1a) | 452 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/453 | b086cf6958ee4b628f60309cda80aac772304bc8 | 2026-08-08T02:10:00Z | 2026-08-08T17:41:02Z | 2026-08-08T17:42:58Z | 2026-08-08T17:56:00Z |
+| 2026-08-07-parallel-planner-surface-443 | 443 | 2 | worktree_created | — | — | 2026-08-08T17:58:00Z | — | — | — |
 | 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-drift-detection-446 | 446 | 4 | not_started | — | — | — | — | — | — |
 | 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | not_started | — | — | — | — | — | — |
@@ -35,8 +35,8 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | Wave | Features (issue) | Status |
 | --- | --- | --- |
 | 0 | 447 blast-radius library, 445 cohort scheduler | complete |
-| 1 | 444 schema and validators; F1a blast-radius correction (added) | 444 complete, F1a in progress |
-| 2 | 443 parallel-planner surface | gated on F1a merging into the integration branch |
+| 1 | 444 schema and validators; 452 F1a blast-radius correction (added) | complete |
+| 2 | 443 parallel-planner surface | in_progress |
 | 3 | 441 parallel-orchestrator surface | not_started |
 | 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | not_started |
 
@@ -64,9 +64,30 @@ must be extended rather than have existing expectations weakened.
 includes F1a, so the Layer 1 wave-barrier hook will deny #443 until F1a's merge is durably
 confirmed. Wave 1 is therefore reopened even though #444 is already complete.
 
-The correction runs the full large-path lifecycle rather than resuming from a prepared plan, because
-it is the one child in this epic that `epic-planner` did not prepare. It performs its own MCP
+The correction ran the full large-path lifecycle rather than resuming from a prepared plan, because
+it is the one child in this epic that `epic-planner` did not prepare. It performed its own MCP
 promotion of the existing potential entry; `epic-orchestrator` holds no promotion tools.
+
+**Delivered 2026-08-08 as issue #452, PR #453, merge commit `b086cf69`.** Both gaps are resolved in
+both languages in the fail-closed direction, the F1 spec was amended at both cited lines with issue
+attribution, and the fixture corpus was extended add-only (5 new, 0 modified, 0 deleted; anti-vacuity
+floors raised 12 to 26). Feature review re-derived the load-bearing claims rather than reading the
+executor's evidence: across 164,025 ordered pairs there were 0 True-to-False transitions and 0
+two-language mismatches, and `is_path_subsumed` now implies `_entries_overlap` in 100% of cases.
+Wave 2 was released only after this merge was durably confirmed on the integration branch.
+
+### Follow-ups raised by F1a (not gating, not yet tracked as issues)
+
+1. **The MCP promotion surface lost a source document.** `potential_to_issue` returned `ok: true`
+   with a `destination_path`, deleted the source, and never wrote the destination. The child
+   restored the source byte-identically from `git show HEAD:` and continued. This is a defect in
+   the promotion tool, not agent drift, and warrants its own potential entry.
+2. **Two hook test suites are not isolated from orchestrator state.**
+   `enforce-pr-author-skill.Tests.ps1` and `codex-pretooluse-integration.Tests.ps1` read the real
+   gitignored `artifacts/orchestration/orchestrator-state.json` instead of a mocked seam, so they
+   fail whenever an orchestrated run is in progress. They fail identically at baseline and cannot
+   reproduce on a clean checkout. Three separate children have now hit this. It will affect any
+   future orchestrated run and deserves a follow-up issue.
 
 ## Original Decision Record (for provenance)
 

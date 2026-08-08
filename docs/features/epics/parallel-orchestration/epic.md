@@ -27,9 +27,16 @@ features:
   - issue_num: 444
     feature_folder: 2026-08-07-parallel-schema-validators-444
     depends_on: [447, 445]
+  # F1a. Added 2026-08-08 by explicit human authorization after F1's feature review
+  # recorded two spec-conformant blast-radius under-reporting gaps. Scheduled at wave 1
+  # (1 + wave(447)) so it merges before F4, which computes the authoritative declared
+  # radius by calling derive_blast_radius. See "F1a Correction" in the narrative below.
+  - issue_num: 452
+    feature_folder: 2026-08-07-blast-radius-under-reporting-gaps-452
+    depends_on: [447]
   - issue_num: 443
     feature_folder: 2026-08-07-parallel-planner-surface-443
-    depends_on: [447, 445, 444]
+    depends_on: [447, 445, 444, 452]
   - issue_num: 441
     feature_folder: 2026-08-07-parallel-orchestrator-surface-441
     depends_on: [444, 443]
@@ -135,14 +142,34 @@ Dependency edges are derived from real upstream contracts only:
 | F7 enforcement hooks | F3, F5 | Layer 2 adds an invariant to F3's orchestrator-state validator; Layer 1 gates F5's child delegations. |
 | F8 drift detection | F1, F3, F5 | Compares an observed radius against a declared one (F1), records `drift_events[]` (F3), and requeues in-flight items (F5). |
 
+### F1a Correction (added 2026-08-08, human-authorized)
+
+F1's feature review recorded two **spec-conformant** under-reporting gaps in the shipped
+blast-radius library, published as a potential entry rather than fixed inside F1: `conflicts()`
+treated a listed directory and a glob beneath it as disjoint while `is_path_subsumed` treated a
+file under that directory as covered, and separator-free repository-root shared surfaces
+(`poetry.lock`, `package-lock.json`, `quality-tiers.yml`) could not be extracted from plan or spec
+text so V2 could not fire for them at plan time. Both weakened Shared Design item 7, and design
+section 13.1 names radius under-reporting the dominant failure mode of the whole design.
+
+Because design section 5.2 makes the `declared` radius authoritative for scheduling and F4 computes
+it by calling `derive_blast_radius`, the gaps would have propagated into the authoritative radius.
+A human therefore authorized exactly one additional child feature, issue #452, scheduled at wave 1.
+It sources the separator-free root-surface set from the `shared_surfaces` list itself rather than a
+second hardcoded list, aligns the `conflicts` path comparison with `is_path_subsumed` on both sides,
+and amends the F1 spec plus the parity fixture corpus in the same change. Both corrections move
+behaviour in the fail-closed direction. The F1 spec amendment was required rather than optional,
+precisely because both behaviours were spec-conformant beforehand.
+
 ### Computed Waves
 
-Longest-path layering over the DAG above yields five waves:
+Longest-path layering over the DAG above yields five waves. F1a (#452) joins wave 1 because
+`wave(452) = 1 + wave(447) = 1`, which leaves every later feature's wave unchanged:
 
 | Wave | Features (issue) |
 | --- | --- |
 | 0 | F1 blast-radius library (#447), F2 cohort scheduler (#445) |
-| 1 | F3 schema and validators (#444) |
+| 1 | F3 schema and validators (#444), F1a blast-radius correction (#452) |
 | 2 | F4 `parallel-planner` surface (#443) |
 | 3 | F5 `parallel-orchestrator` surface (#441) |
 | 4 | F6 mutation protocol (#442), F7 enforcement hooks (#440), F8 drift detection (#446) |
