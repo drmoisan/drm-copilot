@@ -245,7 +245,7 @@ Describe 'Get-BlastRadius module and surface resolution' {
             @($radius['shared_surfaces']) | Should -Be @('config/orchestration-routing.json')
         }
 
-        It 'cannot reach a separator-free repository-root surface from plan text' {
+        It 'reaches a configured separator-free repository-root surface from plan text' {
             # Arrange: a plan citing a repository-root shared surface that carries
             # no path separator.
             $plan = '- [ ] [P1-T1] Touch `poetry.lock`.'
@@ -254,11 +254,14 @@ Describe 'Get-BlastRadius module and surface resolution' {
             $radius = Get-BlastRadius -PlanText $plan -SpecText '' -FeatureFolder 'f' `
                 -Config $script:TestConfig -ComputedAt 't'
 
-            # Assert: token classification requires a separator, so a root-level
-            # file is never extracted from plan text. This mirrors the Python
-            # reference exactly; such surfaces reach a radius only through
-            # Get-BlastRadiusFromObservedPaths, which takes paths verbatim.
-            @($radius['shared_surfaces']).Count | Should -Be 0
+            # Assert: issue #452 amends this behaviour. Token classification admits a
+            # separator-free token that is an exact ordinal member of the configured
+            # shared_surfaces list, so a root-level file cited in plan text now reaches
+            # the surfaces level. This mirrors the Python reference exactly. The prior
+            # assertion of an unreachable surface encoded the Gap 1 defect as intended
+            # behaviour; it is one of the two authorized assertion inversions.
+            @($radius['shared_surfaces']).Count | Should -Be 1
+            @($radius['shared_surfaces'])[0] | Should -Be 'poetry.lock'
         }
 
         It 'expands a surface matched only by a shared-surface glob' {

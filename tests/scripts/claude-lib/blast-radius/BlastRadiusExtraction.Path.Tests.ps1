@@ -135,6 +135,55 @@ Describe 'Get-PathTokenKind' {
             $kind | Should -BeNullOrEmpty
         }
     }
+
+    Context 'Configured separator-free root surfaces' {
+        # Mirrors the Python matrix in
+        # tests/scripts/dev_tools/test_blast_radius_extraction.py for Gap 1
+        # (issue #452). The three tokens are the separator-free entries of the
+        # committed shared_surfaces list.
+        BeforeAll {
+            $script:RootSurface = @('package-lock.json', 'poetry.lock', 'quality-tiers.yml')
+        }
+
+        It 'accepts the configured separator-free root surface <_>' -ForEach @(
+            'package-lock.json', 'poetry.lock', 'quality-tiers.yml'
+        ) {
+            # Arrange / Act: classify a configured surface with the set supplied.
+            $kind = Get-PathTokenKind -Token $_ -RootSurface $script:RootSurface
+
+            # Assert: an exact ordinal member classifies as a concrete path.
+            $kind | Should -BeExactly 'concrete'
+        }
+
+        It 'rejects the separator-free token <_> outside the configured set' -ForEach @(
+            'README.md', 'pyproject.toml', 'derive_blast_radius'
+        ) {
+            # Arrange / Act: classify a non-member with the same set supplied.
+            $kind = Get-PathTokenKind -Token $_ -RootSurface $script:RootSurface
+
+            # Assert: only exact members are admitted; a recognized extension
+            # alone must never admit a bare filename.
+            $kind | Should -BeNullOrEmpty
+        }
+
+        It 'rejects a case variant because membership is ordinal' {
+            # Arrange / Act: a case variant of a configured surface.
+            $kind = Get-PathTokenKind -Token 'Poetry.Lock' -RootSurface @('poetry.lock')
+
+            # Assert: ordinal membership matches resolve_shared_surfaces; any
+            # looser comparison would desynchronize the two.
+            $kind | Should -BeNullOrEmpty
+        }
+
+        It 'rejects a configured surface when the parameter is omitted' {
+            # Arrange / Act: the same token with no -RootSurface argument.
+            $kind = Get-PathTokenKind -Token 'poetry.lock'
+
+            # Assert: the empty default reproduces pre-change behavior, so every
+            # existing call site stays byte-identical.
+            $kind | Should -BeNullOrEmpty
+        }
+    }
 }
 
 Describe 'Get-PathFromLine and Get-PlanPaths' {

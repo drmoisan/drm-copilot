@@ -214,3 +214,32 @@ def test_every_shared_surface_glob_contains_a_wildcard(pattern: str) -> None:
         f"Shared-surface glob {pattern!r} must contain '*'; a concrete path "
         "belongs in the shared_surfaces list instead."
     )
+
+
+# The separator-free subset of the committed shared_surfaces list. These are the
+# entries Gap 1 (issue #452) made reachable through `config_root_surfaces`, and the
+# only entries a bare inline-code token can match exactly.
+SEPARATOR_FREE_SHARED_SURFACES: tuple[str, ...] = tuple(
+    surface for surface in SHARED_SURFACES if "/" not in surface
+)
+
+
+@pytest.mark.parametrize("surface", SEPARATOR_FREE_SHARED_SURFACES)
+def test_every_separator_free_shared_surface_is_wildcard_free(surface: str) -> None:
+    """Require each separator-free shared surface to carry no wildcard.
+
+    `config_root_surfaces` admits a separator-free entry as a concrete path
+    token. A wildcard-bearing entry would classify as a glob instead, so the
+    configured root surface would never be recognized as concrete and V2 could
+    not enumerate it.
+    """
+    # Arrange / Act: the surface is supplied by parametrization.
+    # Assert: neither supported wildcard may appear in a configured root surface.
+    assert "*" not in surface, (
+        f"Separator-free shared surface {surface!r} must not contain '*'; a "
+        "wildcard entry belongs in the shared_surface_globs list instead."
+    )
+    assert "?" not in surface, (
+        f"Separator-free shared surface {surface!r} must not contain '?'; a "
+        "wildcard entry belongs in the shared_surface_globs list instead."
+    )

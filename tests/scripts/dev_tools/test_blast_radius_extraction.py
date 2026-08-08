@@ -20,10 +20,12 @@ from scripts.dev_tools._blast_radius_extraction import (
     extract_inline_code_tokens,
     extract_paths_from_lines,
     extract_plan_paths,
-    is_path_subsumed,
-    matches_glob,
     normalize_lines,
     scan_plan_lines,
+)
+from scripts.dev_tools._blast_radius_glob import (
+    is_path_subsumed,
+    matches_glob,
 )
 
 # A spec fragment whose interface section carries a nested subsection, used by
@@ -228,6 +230,64 @@ def test_classify_path_token_records_wildcard_tokens_as_globs(token: str) -> Non
 def test_classify_path_token_rejects_non_path_tokens(token: str) -> None:
     """Reject bare identifiers, URLs, absolute paths, and unrecognized shapes."""
     assert classify_path_token(token) is None
+
+
+# The three separator-free entries of the committed ``shared_surfaces`` list. Gap 1
+# (issue #452) made them unreachable from plan or spec text because the classifier
+# rejected any token without a separator before any other acceptance rule ran.
+CONFIGURED_ROOT_SURFACES: tuple[str, ...] = (
+    "package-lock.json",
+    "poetry.lock",
+    "quality-tiers.yml",
+)
+
+
+@pytest.mark.parametrize("token", CONFIGURED_ROOT_SURFACES)
+def test_classify_path_token_accepts_a_configured_separator_free_root_surface(
+    token: str,
+) -> None:
+    """Accept a separator-free token that is an exact member of ``root_surfaces``."""
+    assert (
+        classify_path_token(token, root_surfaces=CONFIGURED_ROOT_SURFACES)
+        == PATH_KIND_CONCRETE
+    )
+
+
+def test_classify_path_token_rejects_a_readme_outside_the_configured_set() -> None:
+    """Reject a separator-free token that is not a configured root surface."""
+    assert (
+        classify_path_token("README.md", root_surfaces=CONFIGURED_ROOT_SURFACES) is None
+    )
+
+
+def test_classify_path_token_rejects_a_pyproject_outside_the_configured_set() -> None:
+    """Reject `pyproject.toml`: a recognized extension alone must not admit a token."""
+    assert (
+        classify_path_token("pyproject.toml", root_surfaces=CONFIGURED_ROOT_SURFACES)
+        is None
+    )
+
+
+def test_classify_path_token_rejects_a_bare_identifier_against_root_surfaces() -> None:
+    """Reject a bare identifier: it is a contract identifier, never a path."""
+    assert (
+        classify_path_token(
+            "derive_blast_radius", root_surfaces=CONFIGURED_ROOT_SURFACES
+        )
+        is None
+    )
+
+
+def test_classify_path_token_root_surface_membership_is_ordinal() -> None:
+    """Reject a case variant: membership is exact and case-sensitive, never folded."""
+    assert classify_path_token("Poetry.Lock", root_surfaces=("poetry.lock",)) is None
+
+
+def test_classify_path_token_without_root_surfaces_still_rejects_a_root_surface() -> (
+    None
+):
+    """Preserve pre-change behaviour when the new keyword-only argument is omitted."""
+    assert classify_path_token("poetry.lock") is None
 
 
 def test_extract_plan_paths_collects_paths_from_a_crlf_plan() -> None:

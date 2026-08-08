@@ -118,6 +118,10 @@ PLANS: tuple[str, ...] = (
     PLAN_B,
     "- [ ] [P1-T1] Touch `docs/a.md` and `tests/scripts/dev_tools/test_a.py`.",
     "Prose only, citing `scripts/dev_tools/validate_json.py`.",
+    # A plan citing the configured separator-free surface `poetry.lock`, so the
+    # existing V1/V2 self-consistency and determinism suites exercise the Gap 1
+    # path (issue #452) without any new test body.
+    "- [ ] [P1-T1] Touch `poetry.lock` and `scripts/dev_tools/alpha.py`.",
 )
 
 

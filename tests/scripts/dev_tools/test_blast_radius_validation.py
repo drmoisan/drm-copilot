@@ -106,6 +106,32 @@ def test_v2_reports_a_surface_matched_by_a_membership_glob() -> None:
     ]
 
 
+def test_v2_reports_a_separator_free_root_surface_the_radius_omits() -> None:
+    """Fire V2 for a configured separator-free surface the declared radius omits.
+
+    Before the Gap 1 fix (issue #452) the classifier rejected `poetry.lock`
+    outright, so the plan citation was invisible and V2 could not fire at plan
+    time. The radius lists the surface under `paths` so V1 is satisfied and the
+    finding isolates V2.
+    """
+    plan = "- [ ] [P1-T1] Touch `poetry.lock`."
+    radius = make_radius(paths=["poetry.lock"])
+
+    findings = validate_blast_radius(radius, plan, CONFIG, tracked_file_count=100)
+
+    assert [(f.rule, f.severity, f.subject) for f in findings] == [
+        ("V2", "Blocking", "poetry.lock")
+    ]
+
+
+def test_v2_accepts_an_explicitly_enumerated_separator_free_root_surface() -> None:
+    """Accept a radius that enumerates the configured separator-free surface."""
+    plan = "- [ ] [P1-T1] Touch `poetry.lock`."
+    radius = make_radius(paths=["poetry.lock"], shared_surfaces=["poetry.lock"])
+
+    assert validate_blast_radius(radius, plan, CONFIG, tracked_file_count=100) == []
+
+
 def test_v2_accepts_an_explicitly_enumerated_shared_surface() -> None:
     """Accept a radius that names the touched surface by concrete path."""
     plan = "- [ ] [P1-T1] Edit `config/orchestration-routing.json`."

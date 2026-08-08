@@ -204,6 +204,49 @@ Describe 'Get-ConfigStringList' {
     }
 }
 
+Describe 'Get-ConfigRootSurface' {
+    Context 'Reading the separator-free subset' {
+        It 'returns exactly the separator-free entries in ordinal sort order' {
+            # Arrange: a truth table mixing separator-bearing and separator-free
+            # surfaces, supplied out of order so the sort is observable.
+            $config = @{
+                shared_surfaces = @(
+                    'quality-tiers.yml',
+                    'config/orchestration-routing.json',
+                    'poetry.lock',
+                    'scripts/dev_tools/compute_blast_radius.py',
+                    'package-lock.json'
+                )
+            }
+
+            # Act: read the root-surface set.
+            $rootSurface = @(Get-ConfigRootSurface -Config $config)
+
+            # Assert: only the three separator-free entries survive, ordinally
+            # sorted, so a bare inline-code token can match one exactly.
+            $rootSurface | Should -Be @('package-lock.json', 'poetry.lock', 'quality-tiers.yml')
+        }
+
+        It 'returns an empty collection for a config with no shared_surfaces' {
+            # Arrange / Act: a minimal truth table with no shared_surfaces key.
+            $rootSurface = @(Get-ConfigRootSurface -Config @{ version = 1 })
+
+            # Assert: an empty set reproduces pre-change behavior exactly.
+            $rootSurface.Count | Should -Be 0
+        }
+
+        It 'returns an empty collection when every surface carries a separator' {
+            # Arrange / Act: every entry is already reachable by path shape.
+            $rootSurface = @(Get-ConfigRootSurface -Config @{
+                    shared_surfaces = @('config/orchestration-routing.json', 'docs/ci.research.md')
+                })
+
+            # Assert: a separator-bearing surface is never a root surface.
+            $rootSurface.Count | Should -Be 0
+        }
+    }
+}
+
 Describe 'Get-ConfigModuleEntry' {
     Context 'Reading the module map' {
         It 'returns name and glob pairs ordered by module name' {

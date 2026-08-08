@@ -227,6 +227,58 @@ function Get-ConfigStringList {
     return @(Get-RequiredStringList -Value $mapping[$Key] -FieldName "config[""$Key""]")
 }
 
+function Get-ConfigRootSurface {
+    <#
+    .SYNOPSIS
+        Read the separator-free subset of the configured shared surfaces.
+
+    .DESCRIPTION
+        Port of config_root_surfaces. This is the sole source of separator-free
+        path acceptance (issue #452). The extraction module has no access to the
+        truth table, so both entry points that must agree, Get-BlastRadius and
+        Test-BlastRadius, call this reader on the same -Config value and forward
+        the result as -RootSurface. Deriving the set from the shared_surfaces
+        list rather than a second hardcoded list is what keeps extraction and
+        surface resolution from desynchronizing.
+
+        shared_surface_globs is deliberately not a source: a glob can never be an
+        exact token match, and admitting one would classify as a glob rather than
+        a concrete path.
+
+    .PARAMETER Config
+        Parsed config/blast-radius.json. Only the shared_surfaces key is read.
+
+    .OUTPUTS
+        System.Object[]. The shared_surfaces entries carrying no '/', ordinally
+        sorted and deduplicated by the underlying reader. A config with no
+        shared_surfaces key yields an empty array, which reproduces pre-change
+        behavior.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Config
+    )
+
+    $listed = @(Get-ConfigStringList -Config $Config -Key $script:ConfigSharedSurfaceKey)
+
+    # Keep only the entries a bare inline-code token could match exactly. A
+    # surface carrying a separator is already reachable through the ordinary
+    # path-shape rules, so admitting it here would widen nothing; a
+    # separator-free surface is the only kind the classifier's separator test
+    # made unreachable.
+    $rootSurface = [System.Collections.Generic.List[string]]::new()
+    foreach ($surface in $listed) {
+        if (-not $surface.Contains('/')) {
+            $rootSurface.Add($surface)
+        }
+    }
+
+    return @($rootSurface.ToArray())
+}
+
 function Get-ConfigModuleEntry {
     <#
     .SYNOPSIS
@@ -432,6 +484,7 @@ Export-ModuleMember -Function `
     Get-RequiredStringList, `
     Get-RequiredMapping, `
     Get-ConfigStringList, `
+    Get-ConfigRootSurface, `
     Get-ConfigModuleEntry, `
     Get-ConfigOverBreadthFraction, `
     Resolve-BlastRadiusModule, `

@@ -275,9 +275,13 @@ function Test-EntryOverlap {
 
     .DESCRIPTION
         Port of _entries_overlap. The cases are decided by how many sides are
-        patterns: two concrete entries overlap only when equal, a mixed pair is a
-        plain pattern match, and a pattern pair falls back to a conservative
-        literal-prefix proof. Glob-versus-glob containment is undecidable in
+        patterns: two concrete entries overlap when equal or when either names a
+        directory containing the other, a mixed pair overlaps on a pattern match
+        or on a two-way nest between the glob's literal prefix and the concrete
+        entry's directory, and a pattern pair falls back to a conservative
+        literal-prefix proof. The two directory rules were added by issue #452 to
+        align this relation with Test-PathSubsumed, which already honoured them.
+        Glob-versus-glob containment is undecidable in
         general, so that pair overlaps unless the prefixes diverge, which no
         single path could satisfy. Any pair the test cannot separate is reported
         as overlapping, the fail-closed direction.
@@ -306,19 +310,76 @@ function Test-EntryOverlap {
     $bIsGlob = Test-GlobEntry -Entry $EntryB
 
     if (-not $aIsGlob -and -not $bIsGlob) {
-        return [string]::Equals($EntryA, $EntryB, [System.StringComparison]::Ordinal)
+        # Anchoring each entry with a trailing separator before the prefix test is
+        # what keeps the containment sound: without the anchor, scripts/dev_tools
+        # would appear to contain scripts/dev_toolsX/a.py. Trimming first makes a
+        # trailing separator on either entry immaterial.
+        $directoryA = $EntryA.TrimEnd('/') + '/'
+        $directoryB = $EntryB.TrimEnd('/') + '/'
+        return ([string]::Equals($EntryA, $EntryB, [System.StringComparison]::Ordinal) -or
+            $EntryA.StartsWith($directoryB, [System.StringComparison]::Ordinal) -or
+            $EntryB.StartsWith($directoryA, [System.StringComparison]::Ordinal))
     }
+    # A mixed pair also overlaps when the glob's literal prefix and the concrete
+    # entry's directory prefix nest. The nest is tested in both directions because
+    # the glob may be rooted above the directory (scripts/ above
+    # scripts/dev_tools/) or below it, and either arrangement admits a common file.
     if ($aIsGlob -and -not $bIsGlob) {
-        return (Test-GlobMatch -Pattern $EntryA -Candidate $EntryB)
+        $prefixGlob = Get-LiteralPrefix -Entry $EntryA
+        $directoryConcrete = $EntryB.TrimEnd('/') + '/'
+        return ((Test-GlobMatch -Pattern $EntryA -Candidate $EntryB) -or
+            $prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
+            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal))
     }
     if ($bIsGlob -and -not $aIsGlob) {
-        return (Test-GlobMatch -Pattern $EntryB -Candidate $EntryA)
+        $prefixGlob = Get-LiteralPrefix -Entry $EntryB
+        $directoryConcrete = $EntryA.TrimEnd('/') + '/'
+        return ((Test-GlobMatch -Pattern $EntryB -Candidate $EntryA) -or
+            $prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
+            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal))
     }
 
     $prefixA = Get-LiteralPrefix -Entry $EntryA
     $prefixB = Get-LiteralPrefix -Entry $EntryB
     return ($prefixA.StartsWith($prefixB, [System.StringComparison]::Ordinal) -or
         $prefixB.StartsWith($prefixA, [System.StringComparison]::Ordinal))
+}
+
+function Get-OrdinalSortedEntry {
+    <#
+    .SYNOPSIS
+        Deduplicate and ordinally sort a string collection.
+
+    .DESCRIPTION
+        Port of the tuple(sorted(set(...))) idiom the Python reference applies to
+        every collection it returns. Ordinal comparison is mandatory: PowerShell's
+        default Sort-Object is culture sensitive and would order entries
+        differently from Python's code-point ordering on some hosts.
+
+    .PARAMETER Entry
+        The entries to normalize. An empty collection is accepted and yields an
+        empty array.
+
+    .OUTPUTS
+        System.Object[]. The distinct entries in ordinal order.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [string[]] $Entry
+    )
+
+    $unique = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($item in $Entry) {
+        [void]$unique.Add($item)
+    }
+
+    $sorted = [System.Collections.Generic.List[string]]::new($unique)
+    $sorted.Sort([StringComparer]::Ordinal)
+    return @($sorted.ToArray())
 }
 
 function Get-OrdinalSmallestEntry {
@@ -364,4 +425,5 @@ Export-ModuleMember -Function `
     Test-PathSubsumed, `
     Get-LiteralPrefix, `
     Test-EntryOverlap, `
-    Get-OrdinalSmallestEntry
+    Get-OrdinalSmallestEntry, `
+    Get-OrdinalSortedEntry

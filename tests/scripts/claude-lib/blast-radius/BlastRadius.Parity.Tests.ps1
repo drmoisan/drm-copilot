@@ -54,7 +54,7 @@ $conflictCase = @($fixtureCase | Where-Object { $_['IsConflict'] })
 # suite. An empty or partially matched glob would make every case below disappear
 # and the suite would pass vacuously, so the count is asserted twice: against
 # this floor and against the files on disk.
-$minimumFixtureCount = 12
+$minimumFixtureCount = 26
 
 BeforeAll {
     # Resolve the modules four levels up: blast-radius -> claude-lib -> scripts ->
@@ -372,6 +372,23 @@ Describe 'Committed blast-radius truth table shape' {
             )
 
             # Assert: every membership glob must carry a wildcard.
+            $offending | Should -BeNullOrEmpty
+        }
+
+        It 'gives every separator-free shared surface no wildcard' {
+            # Arrange: Get-ConfigRootSurface admits a separator-free entry as a
+            # concrete path token (issue #452). A wildcard-bearing entry would
+            # classify as a glob instead, so the configured root surface would
+            # never be recognized as concrete and V2 could not enumerate it.
+            # Mirrors test_every_separator_free_shared_surface_is_wildcard_free
+            # in tests/scripts/dev_tools/test_blast_radius_config.py.
+            $offending = @(
+                $script:CommittedConfig['shared_surfaces'] |
+                    Where-Object { -not $_.Contains('/') } |
+                        Where-Object { $_.Contains('*') -or $_.Contains('?') }
+            )
+
+            # Assert: no separator-free surface may carry either wildcard.
             $offending | Should -BeNullOrEmpty
         }
     }

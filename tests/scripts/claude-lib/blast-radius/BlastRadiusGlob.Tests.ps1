@@ -306,13 +306,17 @@ Describe 'Test-EntryOverlap' {
             (Test-EntryOverlap -EntryA 'a/1.py' -EntryB 'a/2.py') | Should -BeFalse
         }
 
-        It 'does not treat a directory entry as overlapping a file beneath it' {
+        It 'treats a directory entry as overlapping a file beneath it' {
             # Arrange / Act: two wildcard-free entries in a prefix relationship.
             $overlap = Test-EntryOverlap -EntryA 'scripts/dev_tools' -EntryB 'scripts/dev_tools/a.py'
 
-            # Assert: the contention relation compares entries, not coverage; the
-            # prefix rule belongs to subsumption only.
-            $overlap | Should -BeFalse
+            # Assert: issue #452 amends this behaviour. The contention relation now
+            # honours the same anchored listed-directory rule that Test-PathSubsumed
+            # already applied, so a plan citing a directory contends with a plan
+            # citing a file inside it. The prior assertion of disjointness encoded
+            # the Gap 2 defect as intended behaviour; it is one of the two
+            # authorized assertion inversions.
+            $overlap | Should -BeTrue
         }
     }
 
@@ -367,6 +371,59 @@ Describe 'Test-EntryOverlap' {
 
             # Assert: prefix containment cannot prove disjointness.
             $overlap | Should -BeTrue
+        }
+    }
+
+    Context 'Directory containment, added by issue #452' {
+        # Each case mirrors a Python case in
+        # tests/scripts/dev_tools/test_blast_radius_conflicts.py one for one, so a
+        # divergence between the two implementations fails a test in both languages.
+        It 'reports overlap for <EntryA> against <EntryB>' -TestCases @(
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/dev_tools/a.py' }
+            @{ EntryA = 'scripts/dev_tools/'; EntryB = 'scripts/dev_tools/a.py' }
+            @{ EntryA = 'docs'; EntryB = 'docs/features/active/x/spec.md' }
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/dev_tools/**' }
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/dev_tools/*.py' }
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/*/a.py' }
+        ) {
+            param([string]$EntryA, [string]$EntryB)
+
+            # Arrange / Act / Assert: a listed directory contends with anything
+            # beneath it, in both argument orders.
+            (Test-EntryOverlap -EntryA $EntryA -EntryB $EntryB) | Should -BeTrue
+            (Test-EntryOverlap -EntryA $EntryB -EntryB $EntryA) | Should -BeTrue
+        }
+
+        It 'reports no overlap for <EntryA> against <EntryB>' -TestCases @(
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/dev_toolsX/a.py' }
+            @{ EntryA = 'scripts/dev_tools/a.py'; EntryB = 'scripts/dev_tools/b.py' }
+            @{ EntryA = 'docs/features/active/alpha'; EntryB = 'docs/features/active/beta/**' }
+            @{ EntryA = 'scripts/a.py'; EntryB = 'tests/**' }
+        ) {
+            param([string]$EntryA, [string]$EntryB)
+
+            # Arrange / Act / Assert: widening the relation must not reach a sibling
+            # prefix, two peer files, or a pair whose roots diverge.
+            (Test-EntryOverlap -EntryA $EntryA -EntryB $EntryB) | Should -BeFalse
+            (Test-EntryOverlap -EntryA $EntryB -EntryB $EntryA) | Should -BeFalse
+        }
+    }
+
+    Context 'Monotonicity, the fail-closed invariant' {
+        # Every pair the pre-change baseline recorded as overlapping. Widening the
+        # relation must never drop one, because reporting LESS contention is a
+        # regression rather than a fix. The pair set matches
+        # PREVIOUSLY_OVERLAPPING_ENTRY_PAIRS in the Python suite one for one.
+        It 'still reports overlap for <EntryA> against <EntryB>' -TestCases @(
+            @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/**' }
+            @{ EntryA = 'scripts/dev_tools/**'; EntryB = 'scripts/dev_tools/compute_blast_radius.py' }
+            @{ EntryA = 'shared.py'; EntryB = 'shared.py' }
+            @{ EntryA = 'scripts/*/alpha.py'; EntryB = 'scripts/*/beta.py' }
+        ) {
+            param([string]$EntryA, [string]$EntryB)
+
+            # Arrange / Act / Assert: a prior overlap must survive the widening.
+            (Test-EntryOverlap -EntryA $EntryA -EntryB $EntryB) | Should -BeTrue
         }
     }
 }

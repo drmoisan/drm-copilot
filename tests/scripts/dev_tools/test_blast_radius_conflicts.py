@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools._blast_radius_glob import _entries_overlap
 from scripts.dev_tools.compute_blast_radius import (
     BlastRadius,
     ConflictReason,
@@ -240,3 +241,89 @@ def test_conflicts_rejects_a_non_mapping_config() -> None:
     """Fail fast when the truth table is not a mapping."""
     with pytest.raises(TypeError, match="config must be a mapping"):
         conflicts(make_radius(), make_radius(), cast("Mapping[str, object]", []))
+
+
+# Direct coverage of the entry-level relation, added by issue #452. Before that
+# issue the relation was reachable only through ``conflicts``, so the Gap 2
+# under-reporting was invisible to the Python suite.
+
+OVERLAPPING_ENTRY_PAIRS = [
+    ("scripts/dev_tools", "scripts/dev_tools/a.py"),
+    ("scripts/dev_tools/", "scripts/dev_tools/a.py"),
+    ("docs", "docs/features/active/x/spec.md"),
+    ("scripts/dev_tools", "scripts/dev_tools/**"),
+    ("scripts/dev_tools", "scripts/dev_tools/*.py"),
+    ("scripts/dev_tools", "scripts/*/a.py"),
+]
+
+
+@pytest.mark.parametrize(("entry_a", "entry_b"), OVERLAPPING_ENTRY_PAIRS)
+def test_a_listed_directory_overlaps_what_lies_beneath_it(
+    entry_a: str, entry_b: str
+) -> None:
+    """Report overlap when one entry names a directory containing the other."""
+    assert _entries_overlap(entry_a, entry_b) is True
+
+
+@pytest.mark.parametrize(("entry_a", "entry_b"), OVERLAPPING_ENTRY_PAIRS)
+def test_the_entry_relation_is_symmetric_for_overlapping_pairs(
+    entry_a: str, entry_b: str
+) -> None:
+    """Return the same verdict regardless of the argument order."""
+    assert _entries_overlap(entry_b, entry_a) is True
+
+
+def test_a_directory_entry_overlaps_a_file_beneath_it() -> None:
+    """Mirror the inverted Pester assertion in ``BlastRadiusGlob.Tests.ps1``.
+
+    The PowerShell suite previously asserted the Gap 2 defect as intended
+    behaviour. This is the Python counterpart of the corrected assertion.
+    """
+    assert _entries_overlap("scripts/dev_tools", "scripts/dev_tools/a.py") is True
+
+
+# Regression guards. These pairs are disjoint today and must stay disjoint: the
+# Gap 2 correction widens the relation, and widening past these pairs would make
+# unrelated work items contend.
+
+DISJOINT_ENTRY_PAIRS = [
+    ("scripts/dev_tools", "scripts/dev_toolsX/a.py"),
+    ("scripts/dev_tools/a.py", "scripts/dev_tools/b.py"),
+    ("docs/features/active/alpha", "docs/features/active/beta/**"),
+    ("scripts/a.py", "tests/**"),
+]
+
+
+@pytest.mark.parametrize(("entry_a", "entry_b"), DISJOINT_ENTRY_PAIRS)
+def test_unrelated_entries_do_not_overlap(entry_a: str, entry_b: str) -> None:
+    """Keep a sibling prefix, two peer files, and diverging roots disjoint."""
+    assert _entries_overlap(entry_a, entry_b) is False
+
+
+@pytest.mark.parametrize(("entry_a", "entry_b"), DISJOINT_ENTRY_PAIRS)
+def test_the_entry_relation_is_symmetric_for_disjoint_pairs(
+    entry_a: str, entry_b: str
+) -> None:
+    """Return the same disjoint verdict regardless of the argument order."""
+    assert _entries_overlap(entry_b, entry_a) is False
+
+
+# Monotonicity guard for the fail-closed invariant O_old subset-of O_new. These
+# are every pair the pre-change baseline recorded as overlapping. Widening the
+# relation must never drop one of them, because reporting LESS contention is a
+# regression rather than a fix. The PowerShell mirror asserts the identical set.
+
+PREVIOUSLY_OVERLAPPING_ENTRY_PAIRS = [
+    ("scripts/dev_tools", "scripts/**"),
+    ("scripts/dev_tools/**", "scripts/dev_tools/compute_blast_radius.py"),
+    ("shared.py", "shared.py"),
+    ("scripts/*/alpha.py", "scripts/*/beta.py"),
+]
+
+
+@pytest.mark.parametrize(("entry_a", "entry_b"), PREVIOUSLY_OVERLAPPING_ENTRY_PAIRS)
+def test_widening_the_relation_never_drops_a_prior_overlap(
+    entry_a: str, entry_b: str
+) -> None:
+    """Keep every pre-change overlapping pair overlapping after the widening."""
+    assert _entries_overlap(entry_a, entry_b) is True
