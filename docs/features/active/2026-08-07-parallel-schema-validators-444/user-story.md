@@ -100,19 +100,19 @@ landed F1/F2 specs is possible.
 
 ## Acceptance Criteria
 
-- [ ] The manifest schema is defined and validated per design section 11, with `mode` defaulting to `closed` and `max_concurrency` defaulting to 4, via `scripts/dev_tools/parallel_manifest_contract.py` and its default-resolving accessors.
-- [ ] The checkpoint schema is defined and validated per design section 12, including `current_cohort`, `recolor_generation`, `cohorts[]`, `items[]`, `conflict_edges[]`, `mutations[]`, `drift_events[]`, and the three receipt arrays.
-- [ ] `scripts/dev_tools/validate_parallel_orchestrator_state.py` exists and enforces the checkpoint invariants, with completion gating (closed and open mode) only under `require_complete`.
-- [ ] `scripts/dev_tools/validate_parallel_planner_state.py` exists and enforces the planner-checkpoint invariants, with the readiness gate (including the `PARALLEL_EXECUTION_READY` sentinel and kickoff path) only under `require_ready_for_execution`.
-- [ ] `validate_orchestration_artifacts` accepts `parallel-orchestrator-state` and `parallel-planner-state` as `artifact_type` values on both the Python CLI and the MCP TypeScript surface, and unknown artifact types still fail.
-- [ ] The TypeScript validator cores produce error strings byte-identical to the Python validators (full-parity port, epic precedent).
-- [ ] `.claude/rules/parallel-orchestration.md` records the invariants as numbered prose in the manner of `.claude/rules/orchestrator-state.md`, including the cache-not-source-of-truth doctrine and the omitted-epic-fields table.
-- [ ] `route_id: parallel` is present in `config/orchestration-routing.json` and its byte-identical bundled mirror under `extensions/drm-copilot/resources/config/`.
-- [ ] No `depends_on` field exists anywhere in the manifest or checkpoint schema; the validators explicitly reject its presence.
-- [ ] No integration-branch or final-integration-PR field exists anywhere in the schemas; the validators explicitly reject `integration_branch` and `epic_merge_pr`.
-- [ ] `mutations[]`, `drift_events[]`, and `conflict_edges[]` are fully shaped by this feature per spec sections S5–S7, so F6, F7, and F8 need no schema additions.
-- [ ] The existing epic validators (`validate_epic_orchestrator_state.py`, `validate_epic_planner_state.py`, their helpers, TS cores, and tests) are unmodified.
-- [ ] Line coverage >= 85% and branch coverage >= 75% for every new module, with tests under `tests/scripts/dev_tools/` (Pytest) and `extensions/drm-copilot/test/` (Jest).
+- [x] The manifest schema is defined and validated per design section 11, with `mode` defaulting to `closed` and `max_concurrency` defaulting to 4, via `scripts/dev_tools/parallel_manifest_contract.py` and its default-resolving accessors.
+- [x] The checkpoint schema is defined and validated per design section 12, including `current_cohort`, `recolor_generation`, `cohorts[]`, `items[]`, `conflict_edges[]`, `mutations[]`, `drift_events[]`, and the three receipt arrays.
+- [x] `scripts/dev_tools/validate_parallel_orchestrator_state.py` exists and enforces the checkpoint invariants, with completion gating (closed and open mode) only under `require_complete`.
+- [x] `scripts/dev_tools/validate_parallel_planner_state.py` exists and enforces the planner-checkpoint invariants, with the readiness gate (including the `PARALLEL_EXECUTION_READY` sentinel and kickoff path) only under `require_ready_for_execution`.
+- [x] `validate_orchestration_artifacts` accepts `parallel-orchestrator-state` and `parallel-planner-state` as `artifact_type` values on both the Python CLI and the MCP TypeScript surface, and unknown artifact types still fail.
+- [x] The TypeScript validator cores produce error strings byte-identical to the Python validators (full-parity port, epic precedent).
+- [x] `.claude/rules/parallel-orchestration.md` records the invariants as numbered prose in the manner of `.claude/rules/orchestrator-state.md`, including the cache-not-source-of-truth doctrine and the omitted-epic-fields table.
+- [x] `route_id: parallel` is present in `config/orchestration-routing.json` and its byte-identical bundled mirror under `extensions/drm-copilot/resources/config/`.
+- [x] No `depends_on` field exists anywhere in the manifest or checkpoint schema; the validators explicitly reject its presence.
+- [x] No integration-branch or final-integration-PR field exists anywhere in the schemas; the validators explicitly reject `integration_branch` and `epic_merge_pr`.
+- [x] `mutations[]`, `drift_events[]`, and `conflict_edges[]` are fully shaped by this feature per spec sections S5–S7, so F6, F7, and F8 need no schema additions.
+- [x] The existing epic validators (`validate_epic_orchestrator_state.py`, `validate_epic_planner_state.py`, their helpers, TS cores, and tests) are unmodified.
+- [x] Line coverage >= 85% and branch coverage >= 75% for every new module, with tests under `tests/scripts/dev_tools/` (Pytest) and `extensions/drm-copilot/test/` (Jest).
 
 ## Non-Goals
 

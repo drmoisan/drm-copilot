@@ -97,6 +97,28 @@
         "validate_orchestration_artifacts"
       ]
     },
+    "parallel": {
+      "description": "Parallel path for scheduling independent items into blast-radius cohorts across parallel worktrees; each item PRs to main independently with no integration branch.",
+      "requires_pr_gate": false,
+      "required_agents": [
+        "orchestrator",
+        "pr-author"
+      ],
+      "required_skills": [
+        "parallel-orchestrate",
+        "orchestrate",
+        "feature-promotion-lifecycle",
+        "atomic-plan-contract",
+        "acceptance-criteria-tracking",
+        "evidence-and-timestamp-conventions",
+        "pr-context-artifacts",
+        "pr-base-branch-merge-base"
+      ],
+      "required_mcp_tools": [
+        "collect_pr_context",
+        "validate_orchestration_artifacts"
+      ]
+    },
     "epic": {
       "description": "Epic path for scheduling a dependency graph of child features across parallel worktrees with fan-in via a shared integration branch.",
       "requires_pr_gate": true,

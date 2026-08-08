@@ -28,6 +28,12 @@ from scripts.dev_tools.validate_orchestration_review_artifacts import (
 from scripts.dev_tools.validate_orchestrator_state import (
     validate_orchestrator_state_text,
 )
+from scripts.dev_tools.validate_parallel_orchestrator_state import (
+    validate_parallel_orchestrator_state_text,
+)
+from scripts.dev_tools.validate_parallel_planner_state import (
+    validate_parallel_planner_state_text,
+)
 from scripts.dev_tools.validate_policy_audit_artifact import validate_policy_audit_text
 
 PLAN_PHASE_RE = re.compile(r"^### Phase (?P<phase>\d+) — (?P<title>.+)$")
@@ -249,6 +255,28 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Require every child to be prepared and preflight-cleared.",
     )
+
+    parallel_state_parser = subparsers.add_parser("parallel-orchestrator-state")
+    parallel_state_parser.add_argument("path")
+    parallel_state_parser.add_argument(
+        "--require-complete",
+        action="store_true",
+        help=(
+            "Require the mode-dependent completion gate: every non-withdrawn "
+            "item merged or worktree-removed, plus a close mutation in open mode."
+        ),
+    )
+
+    parallel_planner_parser = subparsers.add_parser("parallel-planner-state")
+    parallel_planner_parser.add_argument("path")
+    parallel_planner_parser.add_argument(
+        "--require-ready-for-execution",
+        action="store_true",
+        help=(
+            "Require the structural readiness gate: every item prepared and "
+            "preflight-cleared, with the execution-ready sentinel recorded."
+        ),
+    )
     return parser
 
 
@@ -316,6 +344,16 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
             text,
             require_ready_for_execution=bool(args.require_ready_for_execution),
             readiness_context=readiness_context,
+        )
+    if args.artifact_type == "parallel-orchestrator-state":
+        return validate_parallel_orchestrator_state_text(
+            text,
+            require_complete=bool(args.require_complete),
+        )
+    if args.artifact_type == "parallel-planner-state":
+        return validate_parallel_planner_state_text(
+            text,
+            require_ready_for_execution=bool(args.require_ready_for_execution),
         )
     return [f"Unsupported artifact type: {args.artifact_type}"]
 
