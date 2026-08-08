@@ -120,7 +120,7 @@ skill text (the `[ASSUMPTION]` regime defined in `spec.md`).
 - [x] After a planning run, the repository contains only per-item feature branches and the
       single `parallel/<slug>-plan` run branch as new refs; no `parallel` integration branch
       exists and no prepared item folder has been pushed to `main` by the planner.
-- [ ] Existing epic workflows are unaffected: `/epic-plan` and `/epic-run` behave exactly as
+- [x] Existing epic workflows are unaffected: `/epic-plan` and `/epic-run` behave exactly as
       before F4, with no observable change from this feature's diff.
 
 ## Non-Goals

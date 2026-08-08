@@ -32,15 +32,65 @@ modifies none of them.
 
 ## Deliverables
 
+Base scope, as specified at authoring time:
+
 1. `.claude/agents/parallel-planner.md` — new agent persona (contract in
    "Deliverable 1" below).
 2. `.claude/skills/parallel-plan/SKILL.md` — new planning skill (contract in
    "Deliverable 2" below).
 3. `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` — pytest contract test
-   (contract in "Testing" below).
+   (contract in "Testing" below), delivered as two modules —
+   `test_parallel_planner_surface_contracts.py` and
+   `test_parallel_planner_surface_contracts_landed.py` — so that each stays under the 500-line
+   test-file limit.
 
-No other file is created or modified in the base scope. One contingency can add a Python module;
-see "Kickoff parser/validator boundary" below.
+Added by the fired R5 contingency (see "Boundary Deviation Record — Kickoff Contract" below):
+
+4. `scripts/dev_tools/parallel_kickoff_contract.py`, with the helper module
+   `scripts/dev_tools/_parallel_kickoff_tables.py` — the kickoff-prompt contract module.
+5. `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` — the TypeScript parity
+   core module, required because the MCP tool dispatches through TypeScript rather than shelling
+   out to the Python CLI.
+6. The minimal additive `artifact_type: "parallel-kickoff"` registration on five surfaces:
+   `scripts/dev_tools/validate_orchestration_artifacts.py`,
+   `extensions/drm-copilot/src/mcp-tool-inputs.ts`,
+   `extensions/drm-copilot/src/mcp-tool-definitions.ts`,
+   `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts`, and
+   `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts`.
+7. Tests and fixtures for deliverables 4 through 6:
+   `tests/scripts/dev_tools/test_parallel_kickoff_contract.py`,
+   `tests/scripts/dev_tools/test_parallel_kickoff_contract_tables.py`,
+   `extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts`,
+   `extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact-tables.test.ts`, the
+   non-test fixture helper
+   `extensions/drm-copilot/test/lib/validate/parallel-kickoff-fixtures.ts`, the committed fixture
+   `tests/fixtures/parallel_kickoff/valid-kickoff.md`, and updates to the five pre-existing tests
+   that asserted `parallel-kickoff` was unsupported
+   (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_parallel_dispatch.py`,
+   `extensions/drm-copilot/test/lib/validate/orchestration-artifacts-parallel-dispatch.test.ts`,
+   `extensions/drm-copilot/test/mcp-tool-inputs-parallel-validation.test.ts`,
+   `extensions/drm-copilot/test/mcp-parallel-validation-definitions.test.ts`,
+   `extensions/drm-copilot/test/mcp-server-parallel-validation.test.ts`).
+
+Required by enforced repository gates (bundled-payload mirror deviation):
+
+8. Byte-identical bundled copies of deliverables 1 and 2 at
+   `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`
+   and
+   `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`,
+   plus registration of both `.claude`-relative paths in
+   `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`. This
+   addition is required by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
+   and `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, which
+   enforce the bundled mirror and pack-manifest completeness for every new `.claude` file. The
+   epic precedent conforms: `.claude/agents/epic-planner.md` and
+   `.claude/skills/epic-plan/SKILL.md` are registered in the same manifest.
+
+No file outside the list above is created or modified, excluding this feature's own planning
+documents and evidence artifacts under
+`docs/features/active/2026-08-07-parallel-planner-surface-443/`. The contingency named in
+"Kickoff parser/validator boundary" below has fired; deliverables 4 through 7 are its
+consequence.
 
 ## Non-Negotiable Constraints
 
@@ -422,11 +472,20 @@ It ends with the statement that execution has NOT started and begins only when t
 
 ## Testing (Resolution R9)
 
-**Coverage position.** In the base scope F4 delivers two Markdown runtime surfaces plus tests:
-no executable production code is introduced. Markdown files are in no coverage denominator and
-test files are excluded from coverage by policy (`.claude/rules/general-unit-test.md`,
-"Coverage Requirements"), so the >= 85% line / >= 75% branch thresholds impose no new obligation
-beyond not regressing existing suites. The actual test obligation is the contract test below.
+**Coverage position (amended — R5 contingency fired).** The base-scope premise that no
+executable production code is introduced no longer holds. F4 delivers two Markdown runtime
+surfaces plus production Python (`scripts/dev_tools/parallel_kickoff_contract.py` and
+`scripts/dev_tools/_parallel_kickoff_tables.py`) and production TypeScript
+(`extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts`, plus the five additive
+registration edits). Markdown files remain in no coverage denominator and test files remain
+excluded from coverage by policy (`.claude/rules/general-unit-test.md`, "Coverage
+Requirements"), but every production module named above is in the coverage denominator. Each
+carries the full toolchain loop — Black / Ruff / Pyright / pytest for Python per
+`.claude/rules/python.md`, Prettier / ESLint / tsc / Jest for TypeScript per
+`.claude/rules/typescript.md` — and the uniform >= 85% line and >= 75% branch thresholds of
+`.claude/rules/quality-tiers.md`, plus no regression against the recorded baseline and
+new/changed-code coverage meeting the same thresholds. No production file is excluded from
+coverage measurement. The contract test below remains a required deliverable.
 
 **Required test.** `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py`,
 following the `tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py` precedent
@@ -469,6 +528,21 @@ Both F4 deliverables must target well under the 500-line limit of
 epic-plan sections (worthiness gate, dependency/wave design) and adds three (radius validation,
 cohort seeding, item intake), so the epic-plan length is a realistic envelope.
 
+**Amended — R5 contingency fired.** The production modules added by the fired contingency are
+subject to the same 500-line limit of `.claude/rules/general-code-change.md`, with no Markdown
+documentation exception available to them. `scripts/dev_tools/parallel_kickoff_contract.py`,
+`scripts/dev_tools/_parallel_kickoff_tables.py`, and
+`extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` must each be under 500
+lines, as must every test module delivered with them
+(`tests/scripts/dev_tools/test_parallel_kickoff_contract.py`,
+`tests/scripts/dev_tools/test_parallel_kickoff_contract_tables.py`,
+`extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts`,
+`extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact-tables.test.ts`) and the two
+contract-test modules named in "Deliverables" item 3. Where a single-module form would have
+reached the limit, the module is split along a documented boundary — the Python contract module
+along the Markdown-table-primitive boundary, the test modules by scenario class — and the
+measured line counts are recorded in the feature's evidence artifacts.
+
 ## Non-Modification Guarantees (Resolution R11)
 
 Acceptance-verifiable facts about the F4 diff: no change to
@@ -478,6 +552,55 @@ Acceptance-verifiable facts about the F4 diff: no change to
 - `.claude/skills/epic-plan/SKILL.md`
 - `.claude/skills/orchestrate/SKILL.md`
 - `config/orchestration-routing.json`
+
+## Boundary Deviation Record — Kickoff Contract (R5 contingency fired)
+
+The contingency stated in "Kickoff parser/validator boundary" above has FIRED. F3
+(`parallel-schema-validators`, issue #444) landed without
+`scripts/dev_tools/parallel_kickoff_contract.py` and without the
+`artifact_type: "parallel-kickoff"` wiring. The verdict and its file-existence evidence, taken
+against both the worktree and `origin/epic/parallel-orchestration-integration`, are recorded in
+`docs/features/active/2026-08-07-parallel-planner-surface-443/evidence/other/upstream-reconciliation.2026-08-08T13-56.md`.
+
+This is the adjudicated outcome, not a defect.
+`docs/features/epics/parallel-orchestration/epic.md` section "Planner Adjudication: the
+kickoff-contract boundary (F3 / F4)" assigns the module and the wiring to F4 by producer
+ownership, and `.claude/rules/parallel-orchestration.md` section "F3 Scope Boundary — kickoff
+contract deferred to F4" records the same boundary from F3's side, pinning F3's MCP surface to
+exactly two `artifact_type` values.
+
+Deviation recorded, per this spec's own contingency text: F4 delivers
+`scripts/dev_tools/parallel_kickoff_contract.py` (with the helper module
+`scripts/dev_tools/_parallel_kickoff_tables.py`), the TypeScript parity core module
+`extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts`, and the minimal additive
+`artifact_type: "parallel-kickoff"` wiring across the five registration surfaces enumerated in
+"Deliverables" item 6. The epic's wave-4 confinement discipline applies to each wiring edit:
+one distinct named addition per surface, with no reflow, reordering, or reformatting of existing
+entries. The delivered modules are production code and carry the obligations recorded in the
+amended "Coverage position" and "File-Size Constraint (Resolution R10)" sections above.
+
+### Superseded assumption-labelled clauses
+
+The Phase 1 reconciliation recorded in the artifact cited above found F1
+(`parallel-blast-radius`, including the F1a correction), F2 (`parallel-cohort-scheduler`), and F3
+all implementation-landed. The `[ASSUMPTION]` regime declared in "Upstream Dependency Status and
+Assumptions" is therefore superseded by the landed contracts, and the delivered skill text cites
+those landed contracts rather than the assumption labels. Three acceptance-criterion clauses
+below are superseded in consequence; their criterion text is left byte-identical and the
+supersession is recorded here rather than by editing the criteria:
+
+- The F1 invocation criterion's clause "labelled as an upstream contract (§5.1-§5.4) pending F1"
+  is superseded: F1 has landed, and the skill documents the landed import-only calling
+  convention.
+- The cohort-seeding criterion's clause "labelled as an upstream contract (§6) pending F2" is
+  superseded: F2 has landed, and the skill documents the landed
+  `compute_cohorts(item_keys, conflict_edges)` signature.
+- The F3-boundary criterion's clauses "the `parallel_kickoff_contract.py` /
+  `artifact_type: "parallel-kickoff"` recommendation and its contingency are recorded" and "the
+  single-item-run floor question is flagged for F3, not decided" are superseded by this deviation
+  record and by F3's landed planner invariant P6. The skill states F4 ownership and delivery of
+  the kickoff-contract module and artifact type, and records the single-item-run question as
+  resolved by F3's landed ready-gate cardinality requirement of at least two items.
 
 ## Acceptance Criteria
 
@@ -516,14 +639,14 @@ for this `full-feature` work mode.
       `git fetch` + `git show <ref>:<path>` per the `.claude/skills/epic-run/SKILL.md`
       precedent. The three residual risks (stale execution base, branch accumulation on
       withdrawal, F3 per-branch git-integrity requirement) are recorded.
-- [ ] The skill documents invoking F1's radius derivation and V1-V3 validation via
+- [x] The skill documents invoking F1's radius derivation and V1-V3 validation via
       `Bash(poetry run *)` against each item's approved atomic plan, labelled as an upstream
       contract (§5.1-§5.4) pending F1; it contains no reimplementation of derivation, V1-V3, or
       `conflicts(a, b)`.
 - [x] The skill documents V1/V2 Blocking semantics (item stays un-`prepared`; findings recorded
       in `radius_validation`; item re-planned via a follow-up preparation delegation, not
       rejected) and V3 Advisory semantics (recorded and surfaced, no state effect).
-- [ ] The skill documents one cohort-seeding invocation of F2's Welsh-Powell reference over the
+- [x] The skill documents one cohort-seeding invocation of F2's Welsh-Powell reference over the
       full conflict graph after all items are `prepared`, labelled as an upstream contract (§6)
       pending F2, recording `cohorts[]` at `generation: 0`, `conflict_edges[]`,
       `recolor_generation: 0`, and `current_cohort: 0`; it states that `max_concurrency`
@@ -535,7 +658,7 @@ for this `full-feature` work mode.
       `issue_num | feature_folder | cohort | complexity | branch | plan-path`; optional
       `## Integrity`; working copy at `artifacts/orchestration/parallel-kickoff-<slug>.md` and
       durable copy at `docs/features/parallel/<slug>/parallel-kickoff.md`.
-- [ ] The spec's F3 boundary is stated in the delivered skill: manifest and checkpoint schemas,
+- [x] The spec's F3 boundary is stated in the delivered skill: manifest and checkpoint schemas,
       `validate_parallel_planner_state.py`, MCP `artifact_type` wiring,
       `.claude/rules/parallel-orchestration.md`, and `route_id: parallel` are F3-owned; F4
       writes conforming instances and validates via
@@ -553,13 +676,24 @@ for this `full-feature` work mode.
       `kind` default-to-`feature` rule.
 - [x] The delivered skill contains no epic-worthiness gate analogue, no dependency-graph
       authoring instruction, and no integration-branch creation instruction.
-- [ ] `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` exists, follows the
+- [x] `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` exists, follows the
       `test_epic_run_kickoff_discovery_contract.py` precedent, contains the positive and
       negative assertions listed under "Testing", and passes.
-- [ ] The F4 diff contains no change to `.claude/skills/atomic-plan-contract/SKILL.md`,
+- [x] The F4 diff contains no change to `.claude/skills/atomic-plan-contract/SKILL.md`,
       `.claude/agents/epic-planner.md`, or `.claude/skills/epic-plan/SKILL.md`.
 - [x] `.claude/agents/parallel-planner.md` and `.claude/skills/parallel-plan/SKILL.md` are each
       under 500 lines.
-- [ ] The atomic plan re-verifies the F1/F2/F3 landing status recorded in this spec at planning
+- [x] The atomic plan re-verifies the F1/F2/F3 landing status recorded in this spec at planning
       time and reconciles any landed upstream spec against the corresponding `[ASSUMPTION]`
       entries before execution.
+- [x] `scripts/dev_tools/parallel_kickoff_contract.py` exists, validates the R5 kickoff shape
+      (heading `# Parallel Kickoff: <slug>`, `## Invocation Prompt`, the six-column
+      `## Item Summary` table, and the optional `## Integrity` section), is under 500 lines, and
+      passes `tests/scripts/dev_tools/test_parallel_kickoff_contract.py`.
+- [x] The `artifact_type: "parallel-kickoff"` wiring is registered additively on the Python CLI,
+      on `VALID_ARTIFACT_TYPES`, on both MCP tool-definition enums, and on the TypeScript
+      dispatcher, with no reflow of existing entries, and the TypeScript parity core module
+      `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` exists and is
+      dispatched.
+- [x] The delivered skill documents the F4-owned cohort recomputation-parity obligation (F3
+      planner invariant P5) and the F4-owned per-branch git-integrity verification.
