@@ -43,9 +43,10 @@ from scripts.dev_tools._blast_radius_extraction import (
     extract_plan_paths,
     normalize_lines,
 )
+from scripts.dev_tools._blast_radius_glob import concrete_entries
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
-    concrete_entries,
+    config_root_surfaces,
     require_str_tuple,
     require_text,
     resolve_modules,
@@ -245,11 +246,22 @@ def derive_blast_radius(
     require_text(plan_text, "plan_text", allow_empty=True)
     require_text(spec_text, "spec_text", allow_empty=True)
 
+    # Both extraction calls read the separator-free root-surface set from the
+    # same ``config`` mapping that resolves modules and shared surfaces below.
+    # Sharing one reader with ``validate_blast_radius`` is what preserves the
+    # invariant that a derived radius always passes V1 and V2 against its own
+    # plan (issue #452).
+    root_surfaces = config_root_surfaces(config)
+
     # Plan task bodies are the primary signal, the spec contributes the paths it
     # cites in inline code, and the feature folder is always present because
     # every item writes its own documents and evidence.
-    entries: set[str] = set(extract_plan_paths(plan_text))
-    entries.update(extract_paths_from_lines(normalize_lines(spec_text)))
+    entries: set[str] = set(extract_plan_paths(plan_text, root_surfaces=root_surfaces))
+    entries.update(
+        extract_paths_from_lines(
+            normalize_lines(spec_text), root_surfaces=root_surfaces
+        )
+    )
     entries.add(_feature_folder_glob(require_text(feature_folder, "feature_folder")))
     paths = tuple(sorted(entries))
 

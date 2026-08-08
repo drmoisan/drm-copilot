@@ -157,10 +157,16 @@ function Get-BlastRadius {
     [void](Get-RequiredText -Value $PlanText -FieldName 'plan_text' -AllowEmpty)
     [void](Get-RequiredText -Value $SpecText -FieldName 'spec_text' -AllowEmpty)
 
+    # Both extraction calls read the separator-free root-surface set from the
+    # same -Config value that resolves modules and shared surfaces below. Sharing
+    # one reader with Test-BlastRadius is what preserves the invariant that a
+    # derived radius always passes V1 and V2 against its own plan (issue #452).
+    $rootSurface = [string[]]@(Get-ConfigRootSurface -Config $Config)
+
     $specLine = [string[]]@(ConvertTo-NormalizedLine -Text $SpecText)
     $entry = [System.Collections.Generic.List[string]]::new()
-    $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText))
-    $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine))
+    $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
+    $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
     $entry.Add((Get-FeatureFolderGlob -FeatureFolder (
                 Get-RequiredText -Value $FeatureFolder -FieldName 'feature_folder')))
 

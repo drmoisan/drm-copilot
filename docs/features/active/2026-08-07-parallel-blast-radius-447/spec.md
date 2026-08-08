@@ -39,7 +39,7 @@ The library implements:
 
 - **Line handling.** Normalize with `text.splitlines()` in Python and the equivalent `\r\n|\r|\n` split in PowerShell, matching the plan-validator CRLF fix (commit `b845c505`, PR #437). Strip trailing carriage returns from extracted tokens defensively.
 - **Task-line parsing.** Reuse the exact regex text of `PLAN_PHASE_RE` and `PLAN_TASK_RE` from `scripts/dev_tools/validate_orchestration_artifacts.py` in both languages so the derivation parser and the plan validator agree on what a task line is. Non-task plan lines are also scanned; task bodies are the primary signal.
-- **Path extraction.** Extract backtick-delimited inline-code spans first; accept a token as a concrete repository path when it contains `/` and starts with a known top-level segment (`scripts/`, `tests/`, `docs/`, `config/`, `schemas/`, `packages/`, `extensions/`, `.claude/`, `.codex/`, `.github/`, `.agents/`, `artifacts/`) or matches `<segment>/.../<name>.<ext>` for a recognized extension set. Tokens containing `*` are recorded as globs in `paths`.
+- **Path extraction.** Extract backtick-delimited inline-code spans first; accept a token as a concrete repository path when it contains `/` and starts with a known top-level segment (`scripts/`, `tests/`, `docs/`, `config/`, `schemas/`, `packages/`, `extensions/`, `.claude/`, `.codex/`, `.github/`, `.agents/`, `artifacts/`) or matches `<segment>/.../<name>.<ext>` for a recognized extension set. **Amended by issue #452:** additionally accept a separator-free token when it is an exact ordinal member of the configured `shared_surfaces` list, so a repository-root shared surface such as `poetry.lock` is reachable from plan or spec text; that configured list is the sole source of separator-free acceptance, and no second hardcoded list of surface names exists in any production module. Tokens containing `*` are recorded as globs in `paths`.
 - **False-positive posture.** Over-inclusion of read-only path references is accepted; no ignore list in v1. Over-inclusion widens the radius, which errs in the fail-closed direction and is surfaced by V3 (Advisory). An ignore list is an under-reporting mechanism and under-reporting is the dominant design risk (§13.1).
 - **V1 consistency.** Derivation and V1 share one extraction function per language (`extract_plan_paths` / `Get-PlanPaths`), so a radius produced by `derive_blast_radius` from plan P always passes V1 against P. V1's force is against hand-edited or stale `declared` radii and planner drift.
 
@@ -50,6 +50,7 @@ The library implements:
 - `conflicts` returns all triggered reasons, not just the first, ordered `path_overlap`, `module_overlap`, `shared_surface_overlap`, `contract_dependency`.
 - All collections are sorted and deduplicated at construction using ordinal string comparison in both languages (PowerShell must use `[StringComparer]::Ordinal`, not culture-sensitive default sorting).
 - Fail-closed edges: undecidable glob×glob comparison counts as overlap; a path matching a `shared_surface_globs` pattern is a shared surface even if not in the literal `shared_surfaces` list.
+- Listed-directory semantics are honoured symmetrically by V1 (`is_path_subsumed` / `Test-PathSubsumed`) and by `conflicts` (`_entries_overlap` / `Test-EntryOverlap`), which is what issue #452 corrected. Comparing a concrete entry as a possible directory can over-report when the entry is in fact a file, because the entry text alone does not distinguish the two; that over-report is the fail-closed direction and is accepted.
 
 ## Inputs / Outputs
 
@@ -90,7 +91,9 @@ def radius_from_observed_paths(          # F8: wrap `git diff --name-only` outpu
     computed_at: str,
 ) -> BlastRadius: ...                    # source == "observed"; modules/shared_surfaces resolved
 
-def extract_plan_paths(plan_text: str) -> tuple[str, ...]: ...   # shared by derivation and V1
+def extract_plan_paths(                  # shared by derivation and V1
+    plan_text: str, *, root_surfaces: Sequence[str] = (),   # root_surfaces added by issue #452
+) -> tuple[str, ...]: ...
 
 def validate_blast_radius(
     radius: BlastRadius, plan_text: str, config: Mapping[str, object], *,
@@ -115,7 +118,7 @@ def conflicts(
 
 `conflicts` semantics (§5.4, fails closed):
 
-- `path_overlap`: any pair from `a.paths × b.paths` overlaps. Concrete×concrete: equality. Glob×concrete: fnmatch. Glob×glob: **any pair not provably disjoint counts as overlapping** — the implementation may use a conservative shared-literal-prefix test, and when it cannot decide, it returns overlap. This is the fail-closed clause made concrete.
+- `path_overlap`: any pair from `a.paths × b.paths` overlaps. Concrete×concrete: equality **or** listed-directory prefix, where either entry, read as a directory anchored with a trailing `/`, contains the other (**amended by issue #452**; equality alone under-reported a plan citing a directory against a plan citing a file inside it). Glob×concrete: fnmatch **or** literal-prefix nest, where the glob's literal prefix and the concrete entry's anchored directory prefix nest in either direction (**amended by issue #452**; the nest must be two-way because `("scripts/dev_tools", "scripts/*/a.py")` genuinely overlaps). Glob×glob: **any pair not provably disjoint counts as overlapping** — the implementation may use a conservative shared-literal-prefix test, and when it cannot decide, it returns overlap. This is the fail-closed clause made concrete.
 - `module_overlap`, `shared_surface_overlap`: non-empty set intersection.
 - `contract_dependency`: non-empty intersection of `contracts` sets (v1 scope: identifier equality; a richer provides/consumes distinction is a future refinement that would only narrow, never widen, so deferring it is fail-closed).
 - Empty-versus-empty radii do not conflict; an empty radius against a non-empty one has no overlap at any level. Under-reporting via emptiness is V1's problem at plan time and F8's at run time, not the relation's.
@@ -127,7 +130,7 @@ Approved-verb mirrors with identical output keys (hashtables):
 
 - `Get-BlastRadius -PlanText -SpecText -FeatureFolder -Config -Source -ComputedAt`
 - `Get-BlastRadiusFromObservedPaths -ObservedPaths -Config -ComputedAt`
-- `Get-PlanPaths -PlanText`
+- `Get-PlanPaths -PlanText [-RootSurface]` (`-RootSurface` added by issue #452, `[string[]]` defaulting to `@()`)
 - `Test-BlastRadius -Radius -PlanText -Config -TrackedFileCount` → array of finding hashtables (`rule`, `severity`, `subject`, `message`)
 - `Test-BlastRadiusConflict -RadiusA -RadiusB -Config` → `@{ conflict = <bool>; reasons = @(@{ kind; detail }) }`
 

@@ -4,8 +4,9 @@ Purpose and responsibilities:
     Carry the contention half of the facade
     ``scripts/dev_tools/compute_blast_radius.py`` so every production module
     stays inside the 500-line limit. This module owns the ``ConflictReason`` and
-    ``ConflictResult`` records, the four-disjunct ``conflicts`` relation, and
-    the path-overlap primitives it needs. Building radius objects and emitting
+    ``ConflictResult`` records and the four-disjunct ``conflicts`` relation; the
+    entry-pair overlap primitive it needs lives in
+    ``scripts/dev_tools/_blast_radius_glob.py``. Building radius objects and emitting
     validation findings belong to the facade and to
     ``scripts/dev_tools/_blast_radius_validation.py``.
 
@@ -27,9 +28,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools._blast_radius_extraction import matches_glob
+from scripts.dev_tools._blast_radius_glob import _entries_overlap
 from scripts.dev_tools._blast_radius_validation import (
-    is_glob_entry,
     require_mapping,
     require_text,
 )
@@ -175,57 +175,6 @@ def conflicts(
             reasons.append(ConflictReason(kind=kind, detail=shared))
 
     return ConflictResult(conflict=bool(reasons), reasons=tuple(reasons))
-
-
-def _literal_prefix(entry: str) -> str:
-    """Return the leading portion of a path entry before its first wildcard.
-
-    Args:
-        entry (str): A path entry that may contain wildcards.
-
-    Returns:
-        str: The literal prefix; the whole entry when it has no wildcard.
-    """
-    # Scanning for the earliest wildcard of any kind keeps the prefix a true
-    # literal, which is what makes the disjointness test sound.
-    for index, character in enumerate(entry):
-        if is_glob_entry(character):
-            return entry[:index]
-
-    return entry
-
-
-def _entries_overlap(entry_a: str, entry_b: str) -> bool:
-    """Report whether two path entries can name a common file.
-
-    Glob-versus-glob containment is undecidable in general, so that case is
-    decided conservatively from literal prefixes: the pair overlaps unless the
-    prefixes diverge, which no single path could satisfy. Any pair the test
-    cannot separate is reported as overlapping, the fail-closed direction.
-
-    Args:
-        entry_a (str): First path entry, concrete or glob.
-        entry_b (str): Second path entry, concrete or glob.
-
-    Returns:
-        bool: ``True`` when the entries overlap; the relation is symmetric.
-    """
-    a_is_glob = is_glob_entry(entry_a)
-    b_is_glob = is_glob_entry(entry_b)
-
-    # The cases are decided by how many sides are patterns: two concrete entries
-    # overlap only when equal, a mixed pair is a plain pattern match, and a
-    # pattern pair falls back to the conservative prefix proof.
-    if not a_is_glob and not b_is_glob:
-        return entry_a == entry_b
-    if a_is_glob and not b_is_glob:
-        return matches_glob(entry_a, entry_b)
-    if b_is_glob and not a_is_glob:
-        return matches_glob(entry_b, entry_a)
-
-    prefix_a = _literal_prefix(entry_a)
-    prefix_b = _literal_prefix(entry_b)
-    return prefix_a.startswith(prefix_b) or prefix_b.startswith(prefix_a)
 
 
 def _smallest_path_overlap(

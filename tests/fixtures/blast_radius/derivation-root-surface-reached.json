@@ -1,0 +1,37 @@
+{
+  "description": "Gap 1 positive (issue #452). Separator-free repository-root shared surface: a plan citing `poetry.lock` in inline code is admitted as a concrete path because the token is an exact member of the config shared_surfaces list, so the derived radius enumerates the surface and V2 has force at plan time.",
+  "input": {
+    "plan_text": "### Phase 1 — Dependencies\n- [ ] [P1-T1] Regenerate `poetry.lock` and edit `scripts/dev_tools/a.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-example-452",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-07-example-452/**",
+        "poetry.lock",
+        "scripts/dev_tools/a.py"
+      ],
+      "modules": ["docs", "python-dev-tools"],
+      "shared_surfaces": ["poetry.lock"],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

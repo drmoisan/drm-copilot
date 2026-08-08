@@ -345,7 +345,12 @@ function Test-BlastRadius {
 
     $normalized = ConvertTo-NormalizedBlastRadius -Radius $Radius
     [void](Get-RequiredText -Value $PlanText -FieldName 'plan_text' -AllowEmpty)
-    $planPath = [string[]]@(Get-PlanPaths -PlanText $PlanText)
+    # The root-surface set comes from the same -Config value that V1 and V2 use
+    # below to resolve modules and shared surfaces, and from the same reader
+    # Get-BlastRadius calls. That shared source is what keeps a derived radius
+    # passing V1 and V2 against its own plan (issue #452).
+    $planPath = [string[]]@(Get-PlanPaths -PlanText $PlanText `
+            -RootSurface ([string[]]@(Get-ConfigRootSurface -Config $Config)))
     $planConcrete = [string[]]@(Get-ConcreteEntry -Entry $planPath)
 
     $finding = [System.Collections.Generic.List[hashtable]]::new()

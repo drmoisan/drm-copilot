@@ -34,6 +34,13 @@
 
 Set-StrictMode -Version Latest
 
+# Get-OrdinalSortedEntry moved to BlastRadiusGlob.psm1, where its sibling ordinal
+# primitive Get-OrdinalSmallestEntry already lives, so this module stays within
+# the 500-line limit (issue #452). The import keeps every pre-existing call site
+# and test source-compatible, and introduces no cycle because the Glob module
+# imports no sibling.
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
+
 # Plan-structure patterns. The regex text mirrors the Python constants so radius
 # derivation and the plan validator can never disagree about which lines are
 # phase headings and which are tasks.
@@ -80,43 +87,6 @@ $script:PathKindGlob = 'glob'
 # state: markdown heading levels are 1..6, so 0 can never be a real level.
 $script:NoQualifyingHeadingDepth = 0
 
-
-function Get-OrdinalSortedEntry {
-    <#
-    .SYNOPSIS
-        Deduplicate and ordinally sort a string collection.
-
-    .DESCRIPTION
-        Port of the tuple(sorted(set(...))) idiom the Python reference applies to
-        every collection it returns. Ordinal comparison is mandatory: PowerShell's
-        default Sort-Object is culture sensitive and would order entries
-        differently from Python's code-point ordering on some hosts.
-
-    .PARAMETER Entry
-        The entries to normalize. An empty collection is accepted and yields an
-        empty array.
-
-    .OUTPUTS
-        System.Object[]. The distinct entries in ordinal order.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $Entry
-    )
-
-    $unique = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    foreach ($item in $Entry) {
-        [void]$unique.Add($item)
-    }
-
-    $sorted = [System.Collections.Generic.List[string]]::new($unique)
-    $sorted.Sort([StringComparer]::Ordinal)
-    return @($sorted.ToArray())
-}
 
 function ConvertTo-NormalizedLine {
     <#
@@ -274,6 +244,12 @@ function Get-PathTokenKind {
     .PARAMETER Token
         A single whitespace-free inline-code token.
 
+    .PARAMETER RootSurface
+        Configured separator-free repository-root shared surfaces, supplied by
+        the caller from Get-ConfigRootSurface. Membership is exact and ordinal.
+        The empty default reproduces pre-change behavior for every existing call
+        site that omits it.
+
     .OUTPUTS
         System.String. 'glob' for an accepted token containing an asterisk,
         'concrete' for an accepted token without one, and $null when the token is
@@ -284,8 +260,23 @@ function Get-PathTokenKind {
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string] $Token
+        [string] $Token,
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyCollection()]
+        [string[]] $RootSurface = @()
     )
+
+    # A separator-free token is admitted only as an exact ordinal member of the
+    # configured root-surface set (issue #452). Substring, suffix, and
+    # case-insensitive comparison are all rejected: anything looser would
+    # desynchronize this classifier from Resolve-BlastRadiusSharedSurface, whose
+    # HashSet uses [StringComparer]::Ordinal. This runs before the separator
+    # guard because a configured root surface has no separator by construction.
+    foreach ($surface in $RootSurface) {
+        if ([string]::Equals($Token, $surface, [System.StringComparison]::Ordinal)) {
+            return $script:PathKindConcrete
+        }
+    }
 
     $separatorIndex = $Token.IndexOf('/')
     if ($separatorIndex -lt 0 -or $separatorIndex -eq 0) {
@@ -339,6 +330,10 @@ function Get-PathFromLine {
     .PARAMETER Line
         Normalized document lines to scan. An empty collection is accepted.
 
+    .PARAMETER RootSurface
+        Configured separator-free root surfaces, forwarded unchanged to
+        Get-PathTokenKind. The empty default reproduces pre-change behavior.
+
     .OUTPUTS
         System.Object[]. Accepted tokens, deduplicated and ordinally sorted.
     #>
@@ -348,13 +343,16 @@ function Get-PathFromLine {
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
         [AllowEmptyString()]
-        [string[]] $Line
+        [string[]] $Line,
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyCollection()]
+        [string[]] $RootSurface = @()
     )
 
     $accepted = [System.Collections.Generic.List[string]]::new()
     foreach ($single in $Line) {
         foreach ($token in @(Get-InlineCodeToken -Line $single)) {
-            if ($null -ne (Get-PathTokenKind -Token $token)) {
+            if ($null -ne (Get-PathTokenKind -Token $token -RootSurface $RootSurface)) {
                 $accepted.Add($token)
             }
         }
@@ -380,6 +378,10 @@ function Get-PlanPaths {
     .PARAMETER PlanText
         Full atomic-plan document text; may be empty.
 
+    .PARAMETER RootSurface
+        Configured separator-free root surfaces, forwarded unchanged to
+        Get-PathFromLine. The empty default reproduces pre-change behavior.
+
     .OUTPUTS
         System.Object[]. Concrete paths and globs cited in inline code,
         deduplicated and ordinally sorted.
@@ -390,7 +392,10 @@ function Get-PlanPaths {
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string] $PlanText
+        [string] $PlanText,
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyCollection()]
+        [string[]] $RootSurface = @()
     )
 
     $scan = Get-PlanLineScan -PlanText $PlanText
@@ -399,7 +404,7 @@ function Get-PlanPaths {
     $allLine.AddRange([string[]]$scan['phase_titles'])
     $allLine.AddRange([string[]]$scan['other_lines'])
 
-    return @(Get-PathFromLine -Line $allLine.ToArray())
+    return @(Get-PathFromLine -Line $allLine.ToArray() -RootSurface $RootSurface)
 }
 
 function Get-ContractIdentifier {

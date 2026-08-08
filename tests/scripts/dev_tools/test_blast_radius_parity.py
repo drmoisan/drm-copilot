@@ -53,7 +53,7 @@ FIXTURE_SUFFIX = ".json"
 # Floor on corpus size. An empty or partially matched glob would make every
 # parametrized case below disappear and the suite would pass vacuously, so the
 # count is asserted twice: against this floor and against the files on disk.
-MINIMUM_FIXTURE_COUNT = 12
+MINIMUM_FIXTURE_COUNT = 26
 
 # Presence of this input key marks a contention fixture; its absence marks a
 # derivation or validation fixture.

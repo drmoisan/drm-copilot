@@ -27,11 +27,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
-from scripts.dev_tools._blast_radius_extraction import (
-    extract_plan_paths,
+from scripts.dev_tools._blast_radius_extraction import extract_plan_paths
+from scripts.dev_tools._blast_radius_glob import (
+    concrete_entries,
     is_path_subsumed,
     matches_glob,
 )
+from scripts.dev_tools._blast_radius_thresholds import config_over_breadth_fraction
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -52,12 +54,6 @@ FINDING_SEVERITIES: tuple[str, ...] = (SEVERITY_BLOCKING, SEVERITY_ADVISORY)
 CONFIG_SHARED_SURFACES = "shared_surfaces"
 CONFIG_SHARED_SURFACE_GLOBS = "shared_surface_globs"
 CONFIG_MODULES = "modules"
-CONFIG_OVER_BREADTH_FRACTION = "over_breadth_fraction"
-
-# Wildcards that make a path entry a pattern rather than a file. ``?`` is
-# included because the subsumption helper treats it as a pattern; admitting it
-# here keeps every comparison in the fail-closed direction.
-GLOB_WILDCARDS: tuple[str, ...] = ("*", "?")
 
 
 @dataclass(frozen=True)
@@ -174,34 +170,6 @@ def require_mapping(value: object, field_name: str) -> Mapping[str, object]:
     return cast("Mapping[str, object]", value)
 
 
-def is_glob_entry(entry: str) -> bool:
-    """Report whether a path entry is a wildcard pattern rather than a file.
-
-    Args:
-        entry (str): A ``paths`` entry from a radius or an extraction.
-
-    Returns:
-        bool: ``True`` when the entry carries any wildcard character.
-    """
-    return any(wildcard in entry for wildcard in GLOB_WILDCARDS)
-
-
-def concrete_entries(entries: Sequence[str]) -> tuple[str, ...]:
-    """Select the wildcard-free entries of a path collection.
-
-    Only concrete entries can be compared for equality, so the rules that count
-    files or enumerate surfaces use this subset.
-
-    Args:
-        entries (Sequence[str]): Entries mixing concrete paths and globs.
-
-    Returns:
-        tuple[str, ...]: Concrete entries in input order, already ordinal for
-        any radius or extraction result.
-    """
-    return tuple(entry for entry in entries if not is_glob_entry(entry))
-
-
 def config_string_list(config: Mapping[str, object], key: str) -> tuple[str, ...]:
     """Read an optional list-of-strings entry from the truth table.
 
@@ -221,6 +189,44 @@ def config_string_list(config: Mapping[str, object], key: str) -> tuple[str, ...
     if value is None:
         return ()
     return require_str_tuple(value, f'config["{key}"]')
+
+
+def config_root_surfaces(config: Mapping[str, object]) -> tuple[str, ...]:
+    """Read the separator-free subset of the configured shared surfaces.
+
+    This is the sole source of separator-free path acceptance (issue #452). The
+    extraction layer has no access to the truth table, so both entry points that
+    must agree — ``derive_blast_radius`` and ``validate_blast_radius`` — call
+    this reader on the same ``config`` mapping and forward the result. Deriving
+    the set from ``config["shared_surfaces"]`` rather than a second hardcoded
+    list is what keeps extraction and surface resolution from desynchronizing.
+
+    Args:
+        config (Mapping[str, object]): Parsed ``config/blast-radius.json``.
+            Only the ``shared_surfaces`` key is read; ``shared_surface_globs``
+            is deliberately not a source, because a glob can never be an exact
+            token match.
+
+    Returns:
+        tuple[str, ...]: The entries of ``config["shared_surfaces"]`` that carry
+        no ``/``, sorted and deduplicated. A config with no ``shared_surfaces``
+        key yields an empty tuple, which reproduces pre-change behaviour.
+
+    Raises:
+        TypeError: If ``shared_surfaces`` is present but is not a list of
+            strings.
+        ValueError: If a ``shared_surfaces`` entry is blank.
+
+    Side Effects:
+        None; the input mapping is not mutated.
+    """
+    listed = config_string_list(config, CONFIG_SHARED_SURFACES)
+
+    # Keep only the entries a token could match exactly. A surface carrying a
+    # separator is already reachable through the ordinary path-shape rules, so
+    # admitting it here would widen nothing; a separator-free surface is the
+    # only kind the classifier's separator test made unreachable.
+    return tuple(surface for surface in listed if "/" not in surface)
 
 
 def config_modules(
@@ -252,32 +258,6 @@ def config_modules(
         pairs.append((module, require_str_tuple(globs, f'config["modules"][{module}]')))
 
     return tuple(sorted(pairs))
-
-
-def config_over_breadth_fraction(config: Mapping[str, object]) -> float:
-    """Read the V3 over-breadth threshold from the truth table.
-
-    Args:
-        config (Mapping[str, object]): Parsed ``config/blast-radius.json``.
-
-    Returns:
-        float: The fraction of tracked files above which a radius is over-broad.
-
-    Raises:
-        TypeError: If the entry is absent or is not a real number.
-        ValueError: If the entry is outside ``(0, 1]``.
-    """
-    # Booleans are rejected explicitly because Python treats them as integers.
-    value = config.get(CONFIG_OVER_BREADTH_FRACTION)
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise TypeError(
-            f'config["{CONFIG_OVER_BREADTH_FRACTION}"] must be a number in (0, 1].'
-        )
-    if not 0 < value <= 1:
-        raise ValueError(
-            f'config["{CONFIG_OVER_BREADTH_FRACTION}"] must be within (0, 1].'
-        )
-    return float(value)
 
 
 def resolve_modules(
@@ -365,7 +345,14 @@ def validate_blast_radius(
         ValueError: If ``tracked_file_count`` is not positive.
     """
     require_text(plan_text, "plan_text", allow_empty=True)
-    plan_concrete = concrete_entries(extract_plan_paths(plan_text))
+
+    # The root-surface set comes from the same ``config`` mapping that V1 and V2
+    # use below to resolve modules and shared surfaces, and from the same reader
+    # ``derive_blast_radius`` calls. That shared source is what keeps a derived
+    # radius passing V1 and V2 against its own plan (issue #452).
+    plan_concrete = concrete_entries(
+        extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config))
+    )
 
     findings: list[RadiusFinding] = list(_coverage_findings(radius, plan_concrete))
     findings.extend(_shared_surface_findings(radius, plan_concrete, config))

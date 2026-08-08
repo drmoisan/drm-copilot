@@ -1,0 +1,42 @@
+{
+  "description": "Gap 2 concrete×concrete (issue #452). One radius names a directory and the other a file inside it. Both entries are wildcard-free, so the pair is decided by the concrete×concrete branch: equality alone reported them disjoint, while the anchored listed-directory rule reports the genuine overlap. Both radii declare empty modules so the coarse module map cannot mask the path level.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_tools"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["scripts/dev_tools/a.py"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [
+      {
+        "kind": "path_overlap",
+        "detail": "scripts/dev_tools ~ scripts/dev_tools/a.py"
+      }
+    ]
+  }
+}

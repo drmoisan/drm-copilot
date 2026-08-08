@@ -8,9 +8,10 @@ Purpose:
 
 Responsibilities:
     Normalize line endings, partition plan lines, extract inline-code tokens,
-    classify tokens as concrete repository paths or globs, extract contract
-    identifiers from a spec's interface sections, and decide whether a concrete
-    path is subsumed by a collection of path entries. Building radius objects,
+    classify tokens as concrete repository paths or globs, and extract contract
+    identifiers from a spec's interface sections. Glob translation, subsumption,
+    and entry-pair overlap belong to
+    ``scripts/dev_tools/_blast_radius_glob.py``. Building radius objects,
     resolving modules and shared surfaces, and emitting findings belong to the
     facade, not here.
 
@@ -219,11 +220,18 @@ def extract_inline_code_tokens(line: str) -> tuple[str, ...]:
     return tuple(tokens)
 
 
-def classify_path_token(token: str) -> PathTokenKind | None:
+def classify_path_token(
+    token: str, *, root_surfaces: Sequence[str] = ()
+) -> PathTokenKind | None:
     """Classify an inline-code token as a concrete repository path or a glob.
 
     Args:
         token (str): A single whitespace-free inline-code token.
+        root_surfaces (Sequence[str]): Configured separator-free repository-root
+            shared surfaces, supplied by the caller from
+            ``config_root_surfaces``. Membership is exact and ordinal. The empty
+            default reproduces pre-change behaviour for every caller that omits
+            it.
 
     Returns:
         PathTokenKind | None: ``"glob"`` for an accepted token containing
@@ -234,8 +242,19 @@ def classify_path_token(token: str) -> PathTokenKind | None:
         None.
 
     Side Effects:
-        None.
+        None; the input sequence is not mutated.
     """
+    # A separator-free token is admitted only as an exact ordinal member of the
+    # configured root-surface set (issue #452). Substring, suffix, and
+    # case-insensitive comparison are all rejected: anything looser would
+    # desynchronize this classifier from ``resolve_shared_surfaces``, which
+    # tests plain membership. This runs before the separator guard because a
+    # configured root surface has no separator by construction. The explicit
+    # equality comparison is deliberate: a plain ``in`` test would fall back to
+    # substring semantics if a caller ever passed a bare string.
+    if any(token == surface for surface in root_surfaces):
+        return PATH_KIND_CONCRETE
+
     # A path reference must name a separator; a bare word such as a function
     # name is a contract identifier, not a path. It must also be
     # repository-relative: a leading separator marks an absolute path and a
@@ -268,12 +287,17 @@ def classify_path_token(token: str) -> PathTokenKind | None:
     return PATH_KIND_CONCRETE
 
 
-def extract_paths_from_lines(lines: Sequence[str]) -> tuple[str, ...]:
+def extract_paths_from_lines(
+    lines: Sequence[str], *, root_surfaces: Sequence[str] = ()
+) -> tuple[str, ...]:
     """Collect accepted path and glob tokens from already-normalized lines.
 
     Args:
         lines (Sequence[str]): Normalized document lines to scan. Shared by plan
             and spec extraction so both apply identical acceptance rules.
+        root_surfaces (Sequence[str]): Configured separator-free root surfaces,
+            forwarded unchanged to ``classify_path_token``. The empty default
+            reproduces pre-change behaviour.
 
     Returns:
         tuple[str, ...]: Accepted tokens, deduplicated and ordinally sorted.
@@ -291,13 +315,15 @@ def extract_paths_from_lines(lines: Sequence[str]) -> tuple[str, ...]:
     # before the ordinal sort fixes the deterministic output order.
     for line in lines:
         for token in extract_inline_code_tokens(line):
-            if classify_path_token(token) is not None:
+            if classify_path_token(token, root_surfaces=root_surfaces) is not None:
                 accepted.add(token)
 
     return tuple(sorted(accepted))
 
 
-def extract_plan_paths(plan_text: str) -> tuple[str, ...]:
+def extract_plan_paths(
+    plan_text: str, *, root_surfaces: Sequence[str] = ()
+) -> tuple[str, ...]:
     """Extract repository path references from an atomic plan.
 
     This is the single extraction function shared by radius derivation and
@@ -307,6 +333,9 @@ def extract_plan_paths(plan_text: str) -> tuple[str, ...]:
 
     Args:
         plan_text (str): Full atomic-plan document text.
+        root_surfaces (Sequence[str]): Configured separator-free root surfaces,
+            forwarded unchanged to ``extract_paths_from_lines``. The empty
+            default reproduces pre-change behaviour.
 
     Returns:
         tuple[str, ...]: Concrete paths and globs cited in inline code,
@@ -317,7 +346,7 @@ def extract_plan_paths(plan_text: str) -> tuple[str, ...]:
         None.
 
     Side Effects:
-        None.
+        None; the input sequence is not mutated.
     """
     scan = scan_plan_lines(plan_text)
 
@@ -325,7 +354,8 @@ def extract_plan_paths(plan_text: str) -> tuple[str, ...]:
     # are scanned too because plans cite paths in phase preambles, guardrail
     # clauses, and evidence clauses.
     return extract_paths_from_lines(
-        scan.task_titles + scan.phase_titles + scan.other_lines
+        scan.task_titles + scan.phase_titles + scan.other_lines,
+        root_surfaces=root_surfaces,
     )
 
 
@@ -387,108 +417,3 @@ def extract_contract_identifiers(spec_text: str) -> tuple[str, ...]:
                 identifiers.add(token)
 
     return tuple(sorted(identifiers))
-
-
-def _glob_to_regex_text(pattern: str) -> str:
-    """Translate the supported glob subset into equivalent regex text.
-
-    Defining the fnmatch subset explicitly lets the PowerShell mirror reproduce
-    it exactly; that mirror must not use ``-like``, whose character-class
-    semantics differ from fnmatch.
-
-    Args:
-        pattern (str): Glob pattern. ``**`` matches any run of characters
-            including separators, ``*`` matches any run excluding separators,
-            ``?`` matches one non-separator character, and every other
-            character, including ``[`` and ``]``, is literal.
-
-    Returns:
-        str: Regex source text matching the same strings as the pattern when
-        applied as a full match.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    parts: list[str] = []
-    index = 0
-
-    # Scan one character at a time so the two-character ``**`` token is
-    # recognized before the single-character ``*`` rule applies; the order
-    # matters because only ``**`` may cross directory separators.
-    while index < len(pattern):
-        if pattern.startswith("**", index):
-            parts.append(".*")
-            index += 2
-            continue
-
-        character = pattern[index]
-        if character == "*":
-            parts.append("[^/]*")
-        elif character == "?":
-            parts.append("[^/]")
-        else:
-            parts.append(re.escape(character))
-        index += 1
-
-    return "".join(parts)
-
-
-def matches_glob(pattern: str, candidate: str) -> bool:
-    """Report whether a candidate path matches a glob pattern.
-
-    Args:
-        pattern (str): Glob using the supported ``**``, ``*``, ``?`` vocabulary.
-        candidate (str): Concrete repository-relative path to test.
-
-    Returns:
-        bool: ``True`` when the whole candidate matches the whole pattern.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    return re.fullmatch(_glob_to_regex_text(pattern), candidate) is not None
-
-
-def is_path_subsumed(path: str, covering_paths: Sequence[str]) -> bool:
-    """Report whether a concrete path is covered by a collection of entries.
-
-    Implements the coverage relation validation rule V1 applies: exact match,
-    listed-directory prefix, or glob match.
-
-    Args:
-        path (str): Concrete repository-relative path to test.
-        covering_paths (Sequence[str]): Declared path entries, which may mix
-            concrete paths, directory names, and glob patterns.
-
-    Returns:
-        bool: ``True`` when at least one entry covers the path. An empty
-        collection covers nothing, so the result is ``False``.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None; the input sequence is not mutated.
-    """
-    # Test entries in order and return on the first cover; the three rules are
-    # independent, so traversal order affects speed only, never the verdict.
-    for entry in covering_paths:
-        if entry == path:
-            return True
-
-        # A wildcard entry is a pattern matched with the shared glob subset. A
-        # wildcard-free entry cannot be a pattern, so it is treated as a listed
-        # directory covering everything beneath it.
-        if "*" in entry or "?" in entry:
-            if matches_glob(entry, path):
-                return True
-        elif path.startswith(entry.rstrip("/") + "/"):
-            return True
-
-    return False
