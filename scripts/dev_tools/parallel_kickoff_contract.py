@@ -69,8 +69,14 @@ PLAN_BRANCH_RE = re.compile(r"parallel/[a-z0-9][a-z0-9-]*-plan")
 # its committed plan-path on its own pushed feature branch. That per-item
 # branch clause is what distinguishes the parallel resume contract from the
 # epic surface's single shared integration branch, so it is matched explicitly.
+# The leading alternation admits three documented subject spellings --
+# "Every item", "Each item", and "items" -- because the governing spec states
+# the requirement as "each item", and the kickoff template that
+# `.claude/skills/parallel-plan/SKILL.md` publishes uses that same "Each item"
+# wording. A narrower alternation would reject a spec-conformant document, so
+# the alternation is deliberately wider than any single producer's phrasing.
 RESUME_RE = re.compile(
-    r"(?:Every item|items)\s+resumes?\s+at atomic execution\s+"
+    r"(?:Every item|Each item|items)\s+resumes?\s+at atomic execution\s+"
     r"from\s+(?:its|their)\s+committed plan-path\s+"
     r"on\s+(?:its|their)\s+own\s+(?:pushed\s+)?feature branch",
     flags=re.IGNORECASE,

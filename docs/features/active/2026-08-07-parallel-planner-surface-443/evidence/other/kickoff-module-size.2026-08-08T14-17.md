@@ -100,3 +100,48 @@ non-pipe-delimited-row test to close the last uncovered branch in
 `scripts/dev_tools/_parallel_kickoff_tables.py`; only
 `test_parallel_kickoff_contract_tables.py` changed, from 298 to 312 lines. Both
 test modules remain under 500 lines.
+
+## Command-Step Fields (N1 correction, remediation cycle 1, task [P6-T1])
+
+Fields corrected at: 2026-08-08T15-25
+
+This artifact was originally written without the `Command:`, `EXIT_CODE:`, and
+`Output Summary:` fields that `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`
+requires of a command-step evidence artifact. Feature review raised that omission
+as Non-blocking finding N1. The fields are supplied below against a fresh
+measurement. The original `Timestamp: 2026-08-08T14-17` is retained because it
+records when the original measurement was taken, and all split-rationale prose
+above is preserved unchanged.
+
+Command: `wc -l scripts/dev_tools/parallel_kickoff_contract.py scripts/dev_tools/_parallel_kickoff_tables.py tests/scripts/dev_tools/test_parallel_kickoff_contract.py tests/scripts/dev_tools/test_parallel_kickoff_contract_tables.py`
+
+EXIT_CODE: 0
+
+Output Summary: All four modules are strictly under the 500-line hard limit. The
+largest is `tests/scripts/dev_tools/test_parallel_kickoff_contract.py` at 449
+lines. One count changed against the values recorded above:
+`scripts/dev_tools/parallel_kickoff_contract.py` moved from 380 to 386 lines
+because remediation task [P1-T3] added a six-line decision-logic comment above
+`RESUME_RE`. The other three counts are unchanged.
+
+### Freshly Measured Counts (2026-08-08T15-25)
+
+| Module | Kind | Lines | Under 500 | Change vs. 2026-08-08T14-20 |
+| --- | --- | --- | --- | --- |
+| `scripts/dev_tools/parallel_kickoff_contract.py` | production | 386 | yes | +6 ([P1-T3] comment) |
+| `scripts/dev_tools/_parallel_kickoff_tables.py` | production | 261 | yes | unchanged |
+| `tests/scripts/dev_tools/test_parallel_kickoff_contract.py` | test | 449 | yes | unchanged |
+| `tests/scripts/dev_tools/test_parallel_kickoff_contract_tables.py` | test | 312 | yes | unchanged |
+
+Counts are total physical lines as reported by `wc -l`, not non-blank lines,
+matching the basis used in [P2-T5], [P3-T10], [P4-T10], and [P8-T10].
+
+Raw output:
+
+```
+  386 scripts/dev_tools/parallel_kickoff_contract.py
+  261 scripts/dev_tools/_parallel_kickoff_tables.py
+  449 tests/scripts/dev_tools/test_parallel_kickoff_contract.py
+  312 tests/scripts/dev_tools/test_parallel_kickoff_contract_tables.py
+ 1408 total
+```

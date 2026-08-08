@@ -378,7 +378,7 @@ than re-planning, and each item opens its own pull request against main.
 
 ## Integrity
 
-parallel/<slug>-plan head commit: <hex>
+planning_commit: <hex>
 
 | plan-path | plan-hash |
 | --- | --- |
@@ -396,9 +396,9 @@ Structural requirements enforced by the contract module:
 - `## Item Summary` is a strict pipe table with the exact ordered headers
   `issue_num | feature_folder | cohort | complexity | branch | plan-path` and at least one data row.
   `issue_num` and `cohort` are integers; `complexity` is one of `C1`, `C2`, `C3`, `C4`.
-- `## Integrity` is optional. When present it carries the head commit of `parallel/<slug>-plan` as
-  run-level provenance and a per-item `plan-path | plan-hash` table whose hashes are 40 to 64 hex
-  characters with no repeated plan path.
+- `## Integrity` is optional. When present it carries a `planning_commit:` field holding the head
+  commit of `parallel/<slug>-plan` as run-level provenance and a per-item `plan-path | plan-hash`
+  table whose hashes are 40 to 64 hex characters with no repeated plan path.
 
 Validate the artifact through `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "parallel-kickoff"`. That artifact type dispatches to

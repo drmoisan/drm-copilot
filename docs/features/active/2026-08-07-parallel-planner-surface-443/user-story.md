@@ -132,7 +132,7 @@ skill text (the `[ASSUMPTION]` regime defined in `spec.md`).
 - Enforcement: the cohort-barrier hook, the worktree-removal gate, and the invocation-origin
   hook extension are F7 scope; F4 documents the extension point only.
 - Drift detection (§7) is F8 scope.
-- Implementing radius derivation, V1-V3 validation, `conflicts(a, b)`, Welsh-Powell coloring, or
+- Implementing radius derivation, V1-V3 validation, `conflicts(a, b, config)`, Welsh-Powell coloring, or
   any schema/validator: F1, F2, and F3 own these; F4 calls and conforms.
 - Key-level partitioning of shared surfaces and optimal graph coloring (epic non-goals).
 - Modifying or refactoring any epic surface.

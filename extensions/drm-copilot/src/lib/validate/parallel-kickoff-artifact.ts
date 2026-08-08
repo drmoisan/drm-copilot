@@ -9,6 +9,14 @@
  *
  * Ownership is recorded in `docs/features/epics/parallel-orchestration/epic.md`,
  * section "Planner Adjudication: the kickoff-contract boundary (F3 / F4)".
+ *
+ * Decision rationale for the shared algorithm is documented on the Python side
+ * rather than duplicated here, so the two ports cannot drift into inconsistent
+ * explanations of the same behavior. Read
+ * `scripts/dev_tools/parallel_kickoff_contract.py` for the section-splitting,
+ * invocation-grammar, and resume-boundary reasoning, and
+ * `scripts/dev_tools/_parallel_kickoff_tables.py` for the table and integrity
+ * parsing reasoning.
  */
 
 const KICKOFF_HEADING_RE = /^# Parallel Kickoff: (?<slug>[a-z0-9][a-z0-9-]*)$/;
@@ -17,7 +25,7 @@ const MANIFEST_RE =
   /docs\/features\/parallel\/[a-z0-9][a-z0-9-]*\/parallel\.md/;
 const PLAN_BRANCH_RE = /parallel\/[a-z0-9][a-z0-9-]*-plan/;
 const RESUME_RE =
-  /(?:Every item|items)\s+resumes?\s+at atomic execution\s+from\s+(?:its|their)\s+committed plan-path\s+on\s+(?:its|their)\s+own\s+(?:pushed\s+)?feature branch/i;
+  /(?:Every item|Each item|items)\s+resumes?\s+at atomic execution\s+from\s+(?:its|their)\s+committed plan-path\s+on\s+(?:its|their)\s+own\s+(?:pushed\s+)?feature branch/i;
 const INTEGRITY_COMMIT_RE =
   /^(?:-\s*)?planning_commit:\s*`?(?<commit>[0-9a-fA-F]{7,64})`?\s*$/;
 const LINE_SPLIT_RE = /\r\n|\r|\n/u;
