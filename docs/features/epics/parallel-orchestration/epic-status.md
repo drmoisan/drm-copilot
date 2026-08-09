@@ -184,9 +184,49 @@ is path-filtered on `extensions/drm-copilot/**` with no branch filter, so any ch
 path gets checks. The marketplace publish step is gated on `refs/tags/v*`, so a PR run builds and
 packages but cannot publish.
 
+## BLOCKED: the integration-to-`main` PR cannot be opened
+
+All nine child features are merged and every child worktree is removed, but `gh pr create` for the
+integration PR is **denied** by `.claude/hooks/enforce-pr-author-skill.ps1` with
+`ORCHESTRATOR_STATE_PREFLIGHT_FAILED`. The PR body and receipt are authored and ready:
+`artifacts/pr_body_459.md` (29,807 bytes), receipt SHA-256
+`968d91cb64fcc47a72600dcaa4a31e47fa83e81f623319a1a3a3a52b0e4dbe42`.
+
+The hook hardcodes `artifacts/orchestration/orchestrator-state.json` and never reads
+`artifacts/orchestration/epic-orchestrator-state.json`, where this epic's state lives. That file in
+the main checkout still holds an unrelated **aborted duplicate** record from 2026-08-07.
+
+Neither `pr-author` nor `epic-orchestrator` cleared the deny, for two reasons. Passing requires
+asserting ~17 required keys describing a single-feature workflow this integration merge never
+performed, which is fabrication regardless of write permission, and would destroy another run's audit
+trail. And decisively, the gate's check 6 keys off `epic_mode`: with `epic_mode: true` it *requires*
+`--base <integration_branch>`, which is wrong here because the base is `main`. Passing would mean
+recording `epic_mode` as false while it is true — falsifying the very field the gate uses to reason
+about epic runs.
+
+This is a contract gap: `epic-orchestrate` assigns this PR to `epic-orchestrator` via
+`Agent(pr-author)`, but the hook only understands a single-feature run. The documented epic completion
+path cannot execute as designed.
+
 ## Open Items For The Integration PR Review
 
-### 1. Layer 1 PreToolUse gates may not be enforcing
+### 0. Two dual-runtime parity divergences SHIP in this diff, deferred not fixed
+
+Corrected by `pr-author` and independently verified. Item 5 below originally claimed all instances of
+this defect class were caught and fixed; that was wrong. Two remain open **in the merged code**:
+
+- `docs/features/potential/2026-08-09-parallel-drift-gate-typescript-parity-divergence.md` — the
+  Layer-2 drift-gate dispatch exists only in the Python validator. `validate_parallel_orchestrator_state.py`
+  dispatches `validate_drift_gate` at line 325; the TypeScript core
+  `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` has no counterpart.
+- `docs/features/potential/2026-08-09-parallel-f6-typescript-parity-gap.md` — three families of F6
+  mutation-protocol invariants are absent from the TypeScript parity core.
+
+**Consequence: a parallel-orchestrator checkpoint can validate clean through the MCP TypeScript
+surface and fail the authoritative Python validator.** The class therefore stands at five instances:
+three fixed (F3, F4, F7) and two shipping open.
+
+### 1. Layer 1 PreToolUse enforcement is inconsistent, not uniformly inert
 
 On 2026-08-09, `git worktree remove` for the #446 child worktree **succeeded** while the epic
 checkpoint still recorded `worktree_path: null` and `merge_status: worktree_created` for that
@@ -198,10 +238,13 @@ the exact 446 path. The hook logic is sound; the deny did not take effect. The c
 diagnosed, to avoid stalling the epic.
 
 This matters to this epic's own deliverables: F7 cloned this gate design as
-`enforce-parallel-worktree-removal-gate.ps1` and the two-layer cohort barrier. If the epic original
-is inert in this runtime, the parallel clones inherit that. Across the whole run the epic wave
-barrier was only ever observed to *allow*, never to deny, so there is no positive evidence any Layer 1
-gate enforced. Layer 2 retrospective validation may be the only live enforcement.
+`enforce-parallel-worktree-removal-gate.ps1` and the two-layer cohort barrier.
+
+**Do not read this as "PreToolUse hooks do not fire."** Later in the same run
+`enforce-pr-author-skill.ps1` fired decisively and denied `gh pr create` for the integration PR. So
+enforcement is live for at least that hook. The accurate and stranger statement is that some
+registered gates enforce and at least one did not, and the difference is unexplained. The epic wave
+barrier remains in the unknown column: it was only ever observed to allow, never to deny.
 
 No harm resulted. Every worktree removal in this run followed durable merge confirmation via
 `gh pr view`, a clean-tree check, an ancestry check, and content rescue.

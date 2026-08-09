@@ -1,6 +1,6 @@
 ---
 name: layer1-pretooluse-gates-may-be-inert
-description: A registered PreToolUse gate that denies correctly when run directly did not actually block the matching Bash call, so Layer 1 enforcement cannot be assumed; verify guardrails by observing a real denial.
+description: PreToolUse enforcement is inconsistent — the pr-author gate denied decisively while the worktree-removal gate did not block a call it correctly denies in isolation; never assume a gate is protecting you.
 metadata:
   type: project
 ---
@@ -19,10 +19,14 @@ the specific 446 path. So the hook logic is sound and the registration is presen
 did not take effect. The cause was not diagnosed, because diagnosing it mid-epic was not worth
 stalling eight merged features.
 
-The same doubt extends to the sibling gates that share the design — `enforce-epic-merge-gate.ps1`
-and `enforce-epic-wave-barrier.ps1`. Across the whole epic the wave barrier was only ever observed
-to *allow*; it was never observed to actually deny, so there is no positive evidence any of these
-Layer 1 gates enforce in this runtime.
+**Do not generalize this into "Layer 1 hooks do not fire."** That would be wrong. Later in the same
+run, `enforce-pr-author-skill.ps1` fired decisively and *denied* `gh pr create` for the epic
+integration PR, with a `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` reason. So PreToolUse enforcement is
+live in this runtime for at least that hook. The accurate statement is narrower and stranger: some
+registered gates enforce and at least one did not, and the difference is not yet explained.
+
+`enforce-epic-wave-barrier.ps1` sits in the unknown column: across the whole epic it was only ever
+observed to *allow*, never to deny, so its enforcement was never positively demonstrated either way.
 
 **How to apply:**
 - Do not treat a Layer 1 `PreToolUse` gate as the thing that keeps an epic safe. Treat it as a
