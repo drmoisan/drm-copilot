@@ -75,6 +75,13 @@ RESERVED_HEADINGS: tuple[str, ...] = (
     "## Radius Drift Detection (F8)",
 )
 
+# Reserved headings whose owning wave-4 feature has landed its content, so the
+# section body is no longer the one-line placeholder. Each wave-4 feature appends
+# its own heading here as it populates its section; the heading itself stays in
+# RESERVED_HEADINGS above, because the final-headings and uniqueness obligations
+# continue to apply to a populated section.
+POPULATED_RESERVED_HEADINGS: tuple[str, ...] = ("## Mutation Protocol (F6)",)
+
 # Baseline SHA-256 digests of the frozen epic surface, captured before any Phase
 # 1 edit. This feature must modify neither file, so the digests are pinned as
 # constants and compared without any git dependency in-test.

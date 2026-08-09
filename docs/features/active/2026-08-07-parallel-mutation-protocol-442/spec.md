@@ -3,9 +3,9 @@
 - **Issue:** #442
 - **Parent (optional):** Epic `parallel-orchestration` (`docs/features/epics/parallel-orchestration/epic.md`, child feature F6, wave 4)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-07T11-11
+- **Last Updated:** 2026-08-08T00-00
 - **Status:** Ready for planning
-- **Version:** 1.0
+- **Version:** 1.1 (per-op entry-contents table reconciled to F3's landed `mutations[]` nullability rule)
 - **Work Mode:** full-feature
 - **Design source:** `docs/research/2026-08-07-parallel-orchestration-design-research.md` (§8 in full, §9 abandon gate; consumed structures §5.4, §6, §11, §12)
 - **Research artifact:** `docs/features/active/2026-08-07-parallel-mutation-protocol-442/research/2026-08-07-parallel-mutation-protocol-research.md`
@@ -226,8 +226,8 @@ Non-recompute operations still append exactly one `mutations[]` entry, stamping 
 
 | Op case | `op` | `item_key` | `prior_state` | `new_state` | `disposition` | `recolor_generation` |
 | --- | --- | --- | --- | --- | --- | --- |
-| Add, no-conflict admit | `add` | item key | `prepared` | `scheduled` | null | `g` (unchanged) |
-| Add, deferred | `add` | item key | `prepared` | `scheduled` | null | `g + 1` |
+| Add, no-conflict admit | `add` | item key | null | `scheduled` | null | `g` (unchanged) |
+| Add, deferred | `add` | item key | null | `scheduled` | null | `g + 1` |
 | Remove, unstarted | `remove` | item key | prior state (`proposed`/`admitted`/`prepared`/`scheduled`) | `withdrawn` | null | `g + 1` |
 | Remove, `detach` | `remove` | item key | `in_flight` | `withdrawn` | `detach` | `g` (unchanged) |
 | Remove, `abandon` | `remove` | item key | `in_flight` | `withdrawn` | `abandon` | `g` (unchanged) |
@@ -240,11 +240,26 @@ Notes:
   item is in flight) append no entry and make no state change.
 - The add op appends its single entry at admission-decision time; the earlier lifecycle
   transitions (`proposed -> admitted -> prepared`) are recorded as item-state updates with
-  lifecycle timestamps in `items[]` (F3 fields), not as separate mutation entries.
+  lifecycle timestamps in `items[]` (F3 fields), not as separate mutation entries. The
+  `prepared -> scheduled` transition that accompanies the admission decision is recorded the same
+  way — as an item-state update in `items[]` with lifecycle timestamps — and NOT in the mutation
+  entry's `prior_state`. The reason is F3's landed rule: `prior_state` must be null for `add`
+  because `add` denotes item introduction, so an added item has no prior state to record. The add
+  entry therefore carries `prior_state: null` and `new_state: scheduled`, and the transition's
+  origin state is read from `items[]`, not from the mutation log.
 - The `op` value vocabulary (`add | remove | close | requeue`) and the nullability of
-  `item_key`, `prior_state`, `new_state`, and `disposition` must be re-verified against F3's
-  landed `mutations[]` schema; if F3 constrains these differently, the landed shape wins and
-  this table is updated at plan time.
+  `item_key`, `prior_state`, `new_state`, and `disposition` were re-verified against F3's landed
+  `mutations[]` schema on 2026-08-08 (verification recorded in
+  `docs/features/active/2026-08-07-parallel-mutation-protocol-442/evidence/other/upstream-f3-mutations-schema.md`).
+  The landed rule is: `item_key` null
+  for `close` only; `prior_state` null for `add` and `close`; `new_state` null for `close` only.
+  The `op` vocabulary is unchanged. Sources: `scripts/dev_tools/_parallel_state_records.py`
+  (`OPS_REQUIRING_NULL_PRIOR_STATE = ("add", "close")`,
+  `OPS_REQUIRING_NULL_NEW_STATE = ("close",)`, enforced with the error
+  `prior_state must be null for op 'add'`) and `.claude/rules/parallel-orchestration.md`
+  invariant 16. The re-verification found one constraint difference against this table's original
+  `add` rows, which assigned `prior_state: prepared`; per the rule that the landed shape wins,
+  the table above has been updated and now reflects the landed shape.
 - A sequence of N mutation operations starting at generation `g` ends at exactly
   `g + (number of recompute-triggering operations)`.
 
@@ -517,21 +532,21 @@ without in-flight conflicts; remove at each lifecycle state; close on an `open`-
 
 ## Acceptance Criteria
 
-- [ ] `scripts/dev_tools/parallel_mutation_protocol.py` exists and implements the recolor, admission, removal, close, generation-accounting, mutation-log-entry, and completion functions as pure functions (no file I/O, no wall-clock reads, inputs never mutated), with frozen dataclass value objects and an injectable clock seam.
-- [ ] `/parallel-add` is delivered as `.claude/skills/parallel-add/SKILL.md` (`context: fork`, `agent: parallel-orchestrator`): the item enters `proposed`, is prepared via a preparation-mode child `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, conflict edges are computed against all items including in-flight ones, and the admission decision admits into the current cohort only when the candidate conflicts with no in-flight item, otherwise defers and recolors the unstarted subgraph.
-- [ ] `/parallel-remove` is delivered as `.claude/skills/parallel-remove/SKILL.md` and implements the design §8.4 state-dependent behavior table exactly: `proposed`/`admitted`/`prepared`/`scheduled` mark `withdrawn`, drop the vertex, and recolor the unstarted subgraph; `in_flight` removal is rejected without an explicit `detach|abandon` disposition and no default is ever inferred; `detach` lets the item finish and merge on its own while the run stops tracking it; `abandon` closes the PR, removes the worktree, and marks `withdrawn` via a single deterministic CLI invocation; `merged` removal is rejected.
-- [ ] `/parallel-close` is delivered as `.claude/skills/parallel-close/SKILL.md`: it terminates an `open`-mode run and is rejected while any item is `in_flight`.
-- [ ] The pinning invariant holds and is proven by tests: recoloring is a pure function of `(remaining subgraph, pinned set)` delegating to F2's coloring entry point without reimplementation; pinned items are never assigned or moved; unit tests plus property-based tests P1 (determinism), P2 (independent-set validity), and P3 (pin stability under mutation sequences) pass.
-- [ ] Every add, remove, close, and drift-induced requeue appends exactly one `mutations[]` entry with the fields `{ op, item_key, at, prior_state, new_state, disposition, recolor_generation }`, matching the per-op entry-contents table in this spec; rejected operations append nothing and change no state.
-- [ ] The recompute boundary is implemented as specified: deferred add, remove of an unstarted item, and drift-induced requeue each increment `recolor_generation` by exactly one; no-conflict admission, `detach`, `abandon`, and `close` do not increment it and stamp the current generation into their entries; a sequence of N ops from generation g ends at exactly g plus the number of recompute-triggering ops, verified by test.
-- [ ] Mode-dependent completion semantics are implemented and tested: the `closed`-mode completion predicate fires only when every non-withdrawn item is `merged` or `worktree_removed`; `open` mode never auto-completes and terminates only via `/parallel-close`.
-- [ ] `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` enforces mutation-entry shape, monotonically non-decreasing `recolor_generation` across `mutations[]`, and the mode-dependent completion invariant, wired into `validate_parallel_orchestrator_state.py` by exactly one additive import and one call line; checkpoints without the relevant keys validate unchanged.
-- [ ] `.claude/hooks/enforce-parallel-abandon-gate.ps1` denies any command carrying `--disposition abandon` without the explicit confirmation marker using reason code prefix `PARALLEL_ABANDON_BLOCKED`, allows it with the marker, allows out-of-scope commands, throws on malformed JSON, and is registered by one additive entry in the `.claude/settings.json` `PreToolUse` → `Bash` matcher.
-- [ ] The wave-4 contention constraint is honored: the only edit to `.claude/skills/parallel-orchestrate/SKILL.md` is one appended section (proposed `## Mutation Protocol`, or F5's landed reserved name); no existing section of any shared file is reflowed or reordered; no checkpoint schema field or enum value is added; no existing epic implementation is modified.
-- [ ] The atomic plan records and executes the upstream re-verification precondition before execution: F5's reserved section names, F3's `mutations[]` schema shape (op vocabulary and field nullability), F1's `conflicts(a, b)` signature, and F2's Welsh-Powell recoloring entry point, each checked against the integration branch head, with any divergence resolved in favor of the landed shape.
-- [ ] Python deliverables pass Black, Ruff, and Pyright with zero findings; pytest passes with line coverage >= 85% and branch coverage >= 75%; all Python tests live under `tests/scripts/dev_tools/`; no production or test file exceeds 500 lines.
-- [ ] The PowerShell hook passes PoshQC formatting and PSScriptAnalyzer with zero findings; Pester tests at `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1` cover the deny, allow, out-of-scope, and malformed-JSON paths using a mocked read seam.
-- [ ] No test creates or uses temporary files; all tests are deterministic (injected clock for timestamps; seeded RNG with printed seed for any randomized generation).
+- [x] `scripts/dev_tools/parallel_mutation_protocol.py` exists and implements the recolor, admission, removal, close, generation-accounting, mutation-log-entry, and completion functions as pure functions (no file I/O, no wall-clock reads, inputs never mutated), with frozen dataclass value objects and an injectable clock seam.
+- [x] `/parallel-add` is delivered as `.claude/skills/parallel-add/SKILL.md` (`context: fork`, `agent: parallel-orchestrator`): the item enters `proposed`, is prepared via a preparation-mode child `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, conflict edges are computed against all items including in-flight ones, and the admission decision admits into the current cohort only when the candidate conflicts with no in-flight item, otherwise defers and recolors the unstarted subgraph.
+- [x] `/parallel-remove` is delivered as `.claude/skills/parallel-remove/SKILL.md` and implements the design §8.4 state-dependent behavior table exactly: `proposed`/`admitted`/`prepared`/`scheduled` mark `withdrawn`, drop the vertex, and recolor the unstarted subgraph; `in_flight` removal is rejected without an explicit `detach|abandon` disposition and no default is ever inferred; `detach` lets the item finish and merge on its own while the run stops tracking it; `abandon` closes the PR, removes the worktree, and marks `withdrawn` via a single deterministic CLI invocation; `merged` removal is rejected.
+- [x] `/parallel-close` is delivered as `.claude/skills/parallel-close/SKILL.md`: it terminates an `open`-mode run and is rejected while any item is `in_flight`.
+- [x] The pinning invariant holds and is proven by tests: recoloring is a pure function of `(remaining subgraph, pinned set)` delegating to F2's coloring entry point without reimplementation; pinned items are never assigned or moved; unit tests plus property-based tests P1 (determinism), P2 (independent-set validity), and P3 (pin stability under mutation sequences) pass.
+- [x] Every add, remove, close, and drift-induced requeue appends exactly one `mutations[]` entry with the fields `{ op, item_key, at, prior_state, new_state, disposition, recolor_generation }`, matching the per-op entry-contents table in this spec; rejected operations append nothing and change no state.
+- [x] The recompute boundary is implemented as specified: deferred add, remove of an unstarted item, and drift-induced requeue each increment `recolor_generation` by exactly one; no-conflict admission, `detach`, `abandon`, and `close` do not increment it and stamp the current generation into their entries; a sequence of N ops from generation g ends at exactly g plus the number of recompute-triggering ops, verified by test.
+- [x] Mode-dependent completion semantics are implemented and tested: the `closed`-mode completion predicate fires only when every non-withdrawn item is `merged` or `worktree_removed`; `open` mode never auto-completes and terminates only via `/parallel-close`.
+- [x] `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` enforces mutation-entry shape, monotonically non-decreasing `recolor_generation` across `mutations[]`, and the mode-dependent completion invariant, wired into `validate_parallel_orchestrator_state.py` by exactly one additive import and one call line; checkpoints without the relevant keys validate unchanged.
+- [x] `.claude/hooks/enforce-parallel-abandon-gate.ps1` denies any command carrying `--disposition abandon` without the explicit confirmation marker using reason code prefix `PARALLEL_ABANDON_BLOCKED`, allows it with the marker, allows out-of-scope commands, throws on malformed JSON, and is registered by one additive entry in the `.claude/settings.json` `PreToolUse` → `Bash` matcher.
+- [x] The wave-4 contention constraint is honored: the only edit to `.claude/skills/parallel-orchestrate/SKILL.md` is one appended section (proposed `## Mutation Protocol`, or F5's landed reserved name); no existing section of any shared file is reflowed or reordered; no checkpoint schema field or enum value is added; no existing epic implementation is modified.
+- [x] The atomic plan records and executes the upstream re-verification precondition before execution: F5's reserved section names, F3's `mutations[]` schema shape (op vocabulary and field nullability), F1's `conflicts(a, b)` signature, and F2's Welsh-Powell recoloring entry point, each checked against the integration branch head, with any divergence resolved in favor of the landed shape.
+- [x] Python deliverables pass Black, Ruff, and Pyright with zero findings; pytest passes with line coverage >= 85% and branch coverage >= 75%; all Python tests live under `tests/scripts/dev_tools/`; no production or test file exceeds 500 lines.
+- [x] The PowerShell hook passes PoshQC formatting and PSScriptAnalyzer with zero findings; Pester tests at `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1` cover the deny, allow, out-of-scope, and malformed-JSON paths using a mocked read seam.
+- [x] No test creates or uses temporary files; all tests are deterministic (injected clock for timestamps; seeded RNG with printed seed for any randomized generation).
 
 ## Definition of Done
 

@@ -434,7 +434,150 @@ else.
 
 ## Mutation Protocol (F6)
 
-Reserved for F6; content is appended by that feature and must not be relocated.
+A parallel run is mutable while it executes. Three slash commands mutate it, and each one appends
+exactly one `mutations[]` entry to the parallel-orchestrator checkpoint on success:
+
+- `/parallel-add <issue|potential-entry>` — `.claude/skills/parallel-add/SKILL.md`. Admits one new
+  item: the item enters `proposed`, is prepared through a preparation-mode child
+  `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, its conflict
+  edges are computed against ALL items including in-flight ones, and the admission decision either
+  places it in the current cohort or defers it and recolors the unstarted subgraph.
+- `/parallel-remove <item> [--disposition detach|abandon]` —
+  `.claude/skills/parallel-remove/SKILL.md`. Removes one item per the state-dependent behavior
+  table: an unstarted item is withdrawn and the unstarted subgraph is recolored; an in-flight item
+  requires an explicit disposition and is rejected without one; a merged item is rejected.
+- `/parallel-close <parallel-slug>` — `.claude/skills/parallel-close/SKILL.md`. Terminates an
+  `open`-mode run. Rejected while any item is `in_flight`.
+
+Every mutation re-derives durable state (`git worktree list --porcelain`, `git branch`,
+`gh pr view`) before it is applied, because the checkpoint is a cache of durable state and not the
+source of truth. A rejected mutation appends no entry and changes no state.
+
+The decision logic for all three commands is the pure engine
+`scripts/dev_tools/parallel_mutation_protocol.py`. It decides; it never applies. Item keys are
+integers (`items[].issue_num`) everywhere on this surface.
+
+### Pinning invariant
+
+**In-flight items are pinned. Scheduling is recomputed only over the not-yet-started subgraph, and
+recoloring is a pure function of `(remaining subgraph, pinned set)`.**
+
+The recolor function takes the induced subgraph of unstarted items (states `proposed`, `admitted`,
+`prepared`, `scheduled`), the pinned set (state `in_flight`), and the current generation. It returns
+cohort assignments for unstarted items ONLY: the returned mapping's key set equals the unstarted set
+exactly and contains no pinned key. A pinned item is therefore absent from the result rather than
+reassigned, and that absence IS the guarantee that a mutation never moves work already running.
+
+Coloring is delegated in full to the Welsh-Powell entry point `compute_cohorts` in
+`scripts/dev_tools/parallel_cohort_computation.py`. No part of the coloring, the vertex ordering, or
+the tie-break is reimplemented by the mutation engine.
+
+### Recompute boundary
+
+`recolor_generation` increments by exactly one on a recompute and is stamped unchanged on every
+other operation. The boundary is normative:
+
+Operations that RECOMPUTE (`recolor_generation` increments by exactly one):
+
+1. **Deferred add** — the candidate conflicts with an in-flight item, so the unstarted subgraph,
+   including the new item, is recolored.
+2. **Remove of an unstarted item** — the vertex is dropped and the remaining unstarted subgraph is
+   recolored.
+3. **Drift-induced requeue** — the later-started item of a newly conflicting pair is halted and
+   requeued into a future cohort.
+
+Operations that DO NOT recompute (generation stamped unchanged):
+
+1. **Admission into the current cohort with no in-flight conflict** — no cohort assignment changes.
+2. **`detach`** — the detached item was pinned and was never a vertex of the unstarted subgraph, so
+   its departure cannot change the induced subgraph.
+3. **`abandon`** — same rationale as `detach`. An unstarted item previously deferred because of a
+   conflict with the now-abandoned item keeps its deferred cohort assignment: the assignment remains
+   valid and is at most conservative, and no opportunistic recompute is performed. This keeps
+   generation accounting minimal and deterministic.
+4. **`close`** — run termination changes no cohort assignment.
+
+A non-recompute operation still appends exactly one `mutations[]` entry, stamping the current,
+unchanged `recolor_generation`. A sequence of N operations from generation `g` therefore ends at
+exactly `g` plus the number of recompute operations.
+
+### Per-op mutation-log entry contents
+
+| Op case | `op` | `item_key` | `prior_state` | `new_state` | `disposition` | `recolor_generation` |
+| --- | --- | --- | --- | --- | --- | --- |
+| Add, no-conflict admit | `add` | item key | null | `scheduled` | null | `g` (unchanged) |
+| Add, deferred | `add` | item key | null | `scheduled` | null | `g` + 1 |
+| Remove, unstarted | `remove` | item key | prior state (`proposed`/`admitted`/`prepared`/`scheduled`) | `withdrawn` | null | `g` + 1 |
+| Remove, `detach` | `remove` | item key | `in_flight` | `withdrawn` | `detach` | `g` (unchanged) |
+| Remove, `abandon` | `remove` | item key | `in_flight` | `withdrawn` | `abandon` | `g` (unchanged) |
+| Close | `close` | null (run-scoped) | null | null | null | `g` (unchanged) |
+| Drift-induced requeue | `requeue` | item key | `in_flight` | `blocked` | null | `g` + 1 |
+
+`prior_state` is null on BOTH add rows. The accompanying `prepared` -> `scheduled` transition is not
+lost and is not recorded in the mutation entry: it is recorded as an item-state update in `items[]`
+with the checkpoint's lifecycle timestamps, the same mechanism that records
+`proposed` -> `admitted` -> `prepared` during preparation. `new_state` is null for `close` only, and
+`item_key` is null for `close` only. `disposition` is non-null only on a `remove` entry whose
+`prior_state` is `in_flight`. Every `at` timestamp comes from the engine's injected clock seam; the
+engine never reads the wall clock. No field and no enum member is added to `mutations[]`; the nine
+parallel enums of `.claude/rules/parallel-orchestration.md` are consumed, never extended.
+
+Retrospective validation of the log is the helper
+`scripts/dev_tools/_parallel_orchestrator_state_mutations.py`, wired into
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. It requires every entry to carry all
+seven fields and no eighth, and requires `recolor_generation` to be monotonically non-decreasing in
+append order, which is what makes a lost update detectable after the fact.
+
+### Mode-dependent completion semantics
+
+- **`closed` mode (the default).** The completion gate fires when every non-withdrawn item is
+  `merged` or `worktree_removed`, evaluated over per-item `merge_status`. Mid-execution mutation
+  remains permitted. The predicate is `is_closed_mode_complete` in the mutation engine.
+- **`open` mode.** The run NEVER auto-completes. It is a standing queue and terminates only via
+  `/parallel-close`. The close record is the run's final mutation; nothing may be appended to
+  `mutations[]` after it. Do not synthesize a completion condition for an `open`-mode run.
+
+A withdrawn item is exempt from the predicate in both modes: it left the run before reaching a merge
+outcome, so requiring a terminal merge status of it would make every run that dropped an item
+permanently incompletable. This is also why `detach` records `withdrawn` — the run does not wait for
+a detached item.
+
+### Abandon confirmation-marker contract
+
+The `abandon` disposition is destructive: it closes the item's pull request and removes its
+worktree. Both side effects run through ONE deterministic CLI invocation of
+`scripts/dev_tools/parallel_mutation_abandon_cli.py`, documented in full in
+`.claude/skills/parallel-remove/SKILL.md`. Executing the abandon disposition through ad hoc `gh` or
+`git` commands is prohibited, because an ad hoc command is not matchable and would bypass the
+confirmation contract.
+
+The contract is enforced by the PreToolUse hook
+`.claude/hooks/enforce-parallel-abandon-gate.ps1` on the `Bash` matcher:
+
+- A Bash command carrying the abandon disposition token MUST also carry the explicit confirmation
+  marker `--confirm-abandon` in the SAME command.
+- Without the marker, the command is DENIED with a deny reason prefixed
+  `PARALLEL_ABANDON_BLOCKED`.
+- With the marker, the command is allowed.
+- A command carrying no abandon disposition token is out of scope and is allowed unchanged.
+
+When the gate denies a command, add the confirmation marker deliberately. Do not reformulate the
+command to evade the match: that defeats the only mechanism protecting a destructive operation.
+
+### Drift-requeue append contract
+
+Radius drift detection consumes this protocol rather than reimplementing it. When drift halts the
+later-started item of a newly conflicting pair, the requeue is recorded through the mutation
+engine's `build_requeue_entry` constructor and the recolor through `recolor_unstarted`:
+
+- Item state becomes `blocked` and per-item `merge_status` becomes `blocked_drift`.
+- Exactly one `mutations[]` entry is appended with `op: requeue`, `prior_state: in_flight`,
+  `new_state: blocked`, `disposition: null`, and `recolor_generation` equal to `g` + 1 — the requeue
+  is a recompute.
+- The recolor runs over the unstarted subgraph only, so no other in-flight item moves.
+
+The drift event itself is recorded in `drift_events[]`, which this protocol does not write. See
+`## Radius Drift Detection (F8)`.
 
 ## Enforcement Hooks (F7)
 
