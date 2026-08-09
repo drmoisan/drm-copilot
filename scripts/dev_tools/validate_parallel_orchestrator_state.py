@@ -35,6 +35,9 @@ from __future__ import annotations
 import json
 from typing import cast
 
+from scripts.dev_tools._parallel_orchestrator_state_cohort_barrier import (
+    validate_cohort_barrier_ordering,
+)
 from scripts.dev_tools._parallel_state_common import (
     MERGED_MERGE_STATUSES,
     VALID_MODES,
@@ -329,6 +332,7 @@ def validate_parallel_orchestrator_state_text(
     # this block, plus the helper's import. Nothing else in this function moves,
     # so F7 and F3 cannot contend over the same lines (epic wave-4 rule).
     # Add F7 helper invocations below this line, one per line.
+    errors.extend(validate_cohort_barrier_ordering(state_map))
     # END F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
 
     if require_complete:

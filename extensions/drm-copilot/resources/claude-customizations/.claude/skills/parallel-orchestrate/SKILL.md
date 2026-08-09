@@ -438,7 +438,55 @@ Reserved for F6; content is appended by that feature and must not be relocated.
 
 ## Enforcement Hooks (F7)
 
-Reserved for F7; content is appended by that feature and must not be relocated.
+Three hooks enforce this surface mechanically: two new, one an additive extension of an existing epic
+hook. All three fail closed — once a call is in scope, every unresolvable condition (missing or
+malformed checkpoint, unresolvable target item, missing `items[]` record, missing `merge_status`)
+denies. Out-of-scope calls allow without reading the checkpoint.
+
+**Layer 1, per-call deterrent.** `.claude/hooks/enforce-parallel-cohort-barrier.ps1`, a `PreToolUse`
+hook on the `Agent` matcher. It activates only when `subagent_type` is `orchestrator` and the
+serialized delegation prompt carries the marker `Parallel mode: true` (emitted per
+`## Parallel-Mode Kickoff Parameter`). It then resolves the target from the
+`docs/features/active/<folder>` token in the prompt matched against `items[].feature_folder`, reads
+`artifacts/orchestration/parallel-orchestrator-state.json`, projects cohorts to the rows whose
+`generation` equals `recolor_generation`, and denies with a reason prefixed
+`PARALLEL_COHORT_BARRIER_BLOCKED` unless every `conflict_edges[]` neighbour in a strictly prior
+current-generation cohort has `merge_status` of `merged` or `worktree_removed`. `ci_green` does not
+satisfy the barrier. Same-cohort and later-cohort neighbours do not block Layer 1.
+
+**Layer 2, retrospective backstop.** `validate_cohort_barrier_ordering` in
+`scripts/dev_tools/_parallel_orchestrator_state_cohort_barrier.py`, invoked from
+`validate_parallel_orchestrator_state_text` and reached at `parallel-orchestrator` `SubagentStop` time
+by the `.claude/settings.json` matcher that runs `.claude/hooks/validate-orchestrator-output.ps1` with
+`-ArtifactType parallel-orchestrator-state`. It appends exactly one message per violated edge, in the
+form `PARALLEL_COHORT_BARRIER_VIOLATION: <a> ran concurrently with conflicting <b>`. The check is
+key-gated on `conflict_edges` and `cohorts`, so a checkpoint lacking either key yields zero errors,
+and it adds no checkpoint fields.
+
+**Why both layers are required.** A `PreToolUse` hook fires once per tool call with no cross-call or
+conversation-state visibility, so it cannot see the rest of a batch of concurrent `Agent` calls and
+cannot reject the batch as a whole. The retrospective validator does see the recorded batch, but only
+after those calls executed. Layer 1 deters the individual out-of-order launch; Layer 2 detects the
+concurrent batch Layer 1 structurally cannot. Removing either layer reopens the gap, so neither
+substitutes for the other and neither substitutes for the procedure in
+`## Cohort Barrier and Max-Concurrency Slot Filling`.
+
+**Worktree removal gate.** `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`, a `PreToolUse`
+hook on the `Bash` matcher, intercepts `git worktree remove` and matches the normalized target path
+against `items[].worktree_path`. Removal is allowed only when that item's `merge_status` is `merged`
+or `worktree_removed`; anything else — including an unreadable checkpoint or no matching record —
+denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that are not
+`git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
+
+**Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
+additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,
+`parallel-planner`, and `parallel-orchestrator`. An `Agent(parallel-planner)` or
+`Agent(parallel-orchestrator)` call whose caller `agent_type` is `orchestrator` is denied with a
+reason prefixed `PARALLEL_INVOCATION_ORIGIN_BLOCKED`, because both parallel personas delegate to
+`Agent(orchestrator)` and an orchestrator-originated invocation would nest `orchestrator` inside its
+own delegation chain; invoke either persona from the main session instead. Main-thread invocations
+(absent or blank caller `agent_type`) and non-orchestrator callers continue to allow. Epic behaviour
+is unchanged: the `EPIC_INVOCATION_ORIGIN_BLOCKED` reason string is byte-identical for epic targets.
 
 ## Radius Drift Detection (F8)
 

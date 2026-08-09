@@ -124,6 +124,13 @@
             '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
             '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
             '.claude/lib/blast-radius/BlastRadius.psm1'
+            # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
+            # barrier and the worktree removal gate) and extended the invocation-origin
+            # hook with the parallel-agent family; measured here so no new or changed
+            # production hook is excluded from coverage.
+            '.claude/hooks/enforce-parallel-cohort-barrier.ps1'
+            '.claude/hooks/enforce-parallel-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-invocation-origin.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
