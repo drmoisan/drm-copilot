@@ -100,41 +100,41 @@ files.
 
 ## Acceptance Criteria
 
-- [ ] Invoking `/parallel-run` reaches the parallel execution agent:
+- [x] Invoking `/parallel-run` reaches the parallel execution agent:
       `.claude/skills/parallel-run/SKILL.md` exists and its frontmatter declares
       `context: fork` and `agent: parallel-orchestrator`.
-- [ ] An unprepared run stops with actionable guidance: the `parallel-run` procedure contains a
+- [x] An unprepared run stops with actionable guidance: the `parallel-run` procedure contains a
       STOP path, taken when no kickoff artifact is found at the parallel home, whose text names
       `/parallel-plan`.
-- [ ] Direct invocation without the entry point is available:
+- [x] Direct invocation without the entry point is available:
       `.claude/skills/parallel-orchestrate/SKILL.md` exists and its frontmatter declares an
       argument hint accepting the parallel manifest path or slug.
-- [ ] Launched items resume rather than re-plan: the delivered `parallel-run` and
+- [x] Launched items resume rather than re-plan: the delivered `parallel-run` and
       `parallel-orchestrate` skill text both state that items resume at atomic execution from
       their committed `plan-path` rather than re-running promotion, research, or planning.
-- [ ] Every child launch is identifiable as a parallel child: the
+- [x] Every child launch is identifiable as a parallel child: the
       `## Parallel-Mode Kickoff Parameter` section of `parallel-orchestrate/SKILL.md` contains
       the literal marker `Parallel mode: true` and requires the item's
       `docs/features/active/<basename>` folder path and canonical issue number in the kickoff
       prompt.
-- [ ] Concurrency never exceeds the configured cap: the skill text states that
+- [x] Concurrency never exceeds the configured cap: the skill text states that
       `max_concurrency` bounds simultaneous in-flight items independently of cohort size and
       that slots fill in `ascending item-key order`.
-- [ ] The operator can read run progress from one document: the skill's
+- [x] The operator can read run progress from one document: the skill's
       `## Documentation Maintenance Boundaries` section requires the `parallel-status.md`
       header fields `parallel_slug`, `mode`, `max_concurrency`, `current_cohort`,
       `recolor_generation`, and `last_updated`, an item table with a cohort column, and a
       cohort table carrying `generation`.
-- [ ] Each item ships independently: the three delivered runtime files contain no instruction
+- [x] Each item ships independently: the three delivered runtime files contain no instruction
       to create an integration branch or a final integration PR — none contains the literals
       `Epic mode: true`, `--base epic/`, or `integration-to-main`.
-- [ ] An interrupted run resumes: the agent's `## Startup Protocol` section requires reading
+- [x] An interrupted run resumes: the agent's `## Startup Protocol` section requires reading
       `artifacts/orchestration/parallel-orchestrator-state.json` and re-deriving state via
       `git worktree list --porcelain`, `git branch`, and `gh pr view`.
-- [ ] Open-mode runs never complete silently: the skill's `## Completion Requirements` section
+- [x] Open-mode runs never complete silently: the skill's `## Completion Requirements` section
       states that `open` mode has no automatic completion and terminates only via
       `/parallel-close`, while `closed` mode completes when every non-withdrawn item is
       `merged` or `worktree_removed`.
-- [ ] The pre-F7 limitation is discoverable by the operator: the delivered skill text names
+- [x] The pre-F7 limitation is discoverable by the operator: the delivered skill text names
       `EPIC_MERGE_GATE_BLOCKED` and `EPIC_WORKTREE_REMOVAL_BLOCKED` as the block conditions a
       live run encounters until F7 lands.

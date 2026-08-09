@@ -286,11 +286,20 @@ exists in the child contract.
 Child-owned remediation, parent-initiated — adapted from the epic fan-in section with
 `origin/main` substituted for the integration branch (research C.3):
 
-1. On a conflicted `gh pr merge --merge`, the parent converts the conflict into a synthetic
-   Blocking finding written to the item's own `remediation-inputs.<timestamp>.md` (in the
-   item's active feature folder), instructing conflict resolution against `origin/main`
-   (`git fetch origin main`; `git merge --no-commit origin/main`; capture
-   `git diff --name-only --diff-filter=U` plus conflict markers).
+1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates the
+   item's child orchestration, passing the conflict signal and the instruction to resolve
+   against `origin/main`. The conflict capture and the finding write both belong to the
+   child's `atomic-executor`, working inside the item's own worktree — the only working tree
+   holding the item's branch: `git fetch origin main`; `git merge --no-commit origin/main`;
+   on non-zero exit capture `git diff --name-only --diff-filter=U` plus the conflict markers;
+   then write the synthetic Blocking finding to the item's own
+   `remediation-inputs.<timestamp>.md` in the item's active feature folder. **Correction
+   (remediation cycle 1, 2026-08-08):** the original wording of this item assigned the
+   capture and the finding write to the parent, which contradicted both the frozen epic
+   precedent at `.claude/skills/epic-orchestrate/SKILL.md:187-194` and the
+   `parallel-orchestrator` persona's `Write` grants (`docs/features/parallel/**` and
+   `artifacts/orchestration/**` only); the actor was corrected to the child for parity with
+   that precedent and with those grants.
 2. The parent re-delegates the child orchestration, which processes the finding through its
    unmodified R1–R5 remediation loop (shared `remediation_pass` cap of 3).
 3. Each remediated pass ends again at child DONE with CI green; the parent then retries the
@@ -515,75 +524,75 @@ comparison. The contract-test deliverable (R4) is the vehicle for the structural
 
 ## Acceptance Criteria
 
-- [ ] `.claude/agents/parallel-orchestrator.md` exists and its YAML frontmatter declares
+- [x] `.claude/agents/parallel-orchestrator.md` exists and its YAML frontmatter declares
       `name: parallel-orchestrator` (exact string), a `model`, a `tools` allowlist, a `skills`
       list containing `parallel-orchestrate`, and a `SubagentStop` hook invoking
       `validate-orchestrator-output.ps1` with
       `-CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json` and
       `-ArtifactType parallel-orchestrator-state`.
-- [ ] The agent frontmatter `tools` allowlist does not contain `Agent(pr-author)`.
-- [ ] The agent body contains the headings `## Skill`, `## Startup Protocol`,
+- [x] The agent frontmatter `tools` allowlist does not contain `Agent(pr-author)`.
+- [x] The agent body contains the headings `## Skill`, `## Startup Protocol`,
       `## Invocation Origin`, `## Prepared-Run Execution`, `## Delegation Model`,
       `## Cohort Scheduling`, `## Checkpoint Persistence`, `## Documentation Maintenance`, and
       `## Completion Requirements`.
-- [ ] The agent's `## Invocation Origin` section names `/parallel-orchestrate` and
+- [x] The agent's `## Invocation Origin` section names `/parallel-orchestrate` and
       `/parallel-run` as entry points and contains a prohibition on invoking
       `Agent(parallel-orchestrator)` from within an `orchestrator` run.
-- [ ] `.claude/skills/parallel-orchestrate/SKILL.md` exists and its frontmatter declares
+- [x] `.claude/skills/parallel-orchestrate/SKILL.md` exists and its frontmatter declares
       `context: fork` and `agent: parallel-orchestrator`.
-- [ ] The skill contains the F5-authored elements of R2.1 (the `# Parallel Orchestrate Skill`
+- [x] The skill contains the F5-authored elements of R2.1 (the `# Parallel Orchestrate Skill`
       intro heading and the thirteen named `##` sections, items 2–15) in the exact order
       listed, verifiable by an ordered-heading assertion.
-- [ ] The skill's final three top-level headings are exactly `## Mutation Protocol (F6)`,
+- [x] The skill's final three top-level headings are exactly `## Mutation Protocol (F6)`,
       `## Enforcement Hooks (F7)`, and `## Radius Drift Detection (F8)`, in that order, each
       appearing exactly once, each followed by a one-line reserved body stating that content is
       appended by that feature and must not be relocated.
-- [ ] The `## Parallel-Mode Kickoff Parameter` section contains the literal string
+- [x] The `## Parallel-Mode Kickoff Parameter` section contains the literal string
       `Parallel mode: true` and the literal string `PR base branch MUST be main`, states that
       the kickoff prompt never carries `Preparation mode: true` or `Epic mode: true`, and
       contains no instruction for the child to merge its own PR (no occurrence of
       `gh pr merge` within that section).
-- [ ] The `## Cohort Barrier and Max-Concurrency Slot Filling` section states that cohort
+- [x] The `## Cohort Barrier and Max-Concurrency Slot Filling` section states that cohort
       `N+1` launches only after every cohort-`N` item is `merged` or `worktree_removed`, and
       contains the token `max_concurrency` and the phrase `ascending item-key order`.
-- [ ] The `## Per-Item Merge to Main (Merge-on-Green)` section states that the
+- [x] The `## Per-Item Merge to Main (Merge-on-Green)` section states that the
       `parallel-orchestrator` executes `gh pr merge --merge` against `main` after durably
       confirming CI green, and states that `.claude/skills/orchestrate/SKILL.md` is not
       modified by this feature.
-- [ ] The `## Per-Item Merge-Conflict Handling` section maps the exhausted remediation loop to
+- [x] The `## Per-Item Merge-Conflict Handling` section maps the exhausted remediation loop to
       `blocked_ci_loop_limit`, states the shared remediation cap of 3, and contains a hand-off
       sentence naming F8 for drift recording, quiesce, recompute, and requeue.
-- [ ] The `## Documentation Maintenance Boundaries` section states that `parallel-status.md`
+- [x] The `## Documentation Maintenance Boundaries` section states that `parallel-status.md`
       is generated and never hand-authored, states it is never the source of the cohort table,
       and lists regeneration boundaries including item transitions, cohort transitions,
       `recolor_generation` increments, `mutations[]` appends, and `drift_events[]` appends.
-- [ ] The `## Parallel-Level Checkpoint` section enumerates all eight §12 `merge_status`
+- [x] The `## Parallel-Level Checkpoint` section enumerates all eight §12 `merge_status`
       values (`not_started`, `worktree_created`, `pr_open`, `ci_green`, `merged`,
       `worktree_removed`, `blocked_drift`, `blocked_ci_loop_limit`) and states that F5 never
       writes `blocked_drift`, `conflict_edges[]`, `mutations[]`, or `drift_events[]`.
-- [ ] The `## Completion Requirements` section defines mode-dependent completion: `closed`
+- [x] The `## Completion Requirements` section defines mode-dependent completion: `closed`
       fires when every non-withdrawn item is `merged` or `worktree_removed`; `open` terminates
       only via `/parallel-close`.
-- [ ] The delivered skill text names both `EPIC_MERGE_GATE_BLOCKED` and
+- [x] The delivered skill text names both `EPIC_MERGE_GATE_BLOCKED` and
       `EPIC_WORKTREE_REMOVAL_BLOCKED` as F7-dependency block conditions that prevent
       end-to-end execution until F7 lands.
-- [ ] `.claude/skills/parallel-run/SKILL.md` exists, its frontmatter declares `context: fork`
+- [x] `.claude/skills/parallel-run/SKILL.md` exists, its frontmatter declares `context: fork`
       and `agent: parallel-orchestrator`, its discovery step STOPs with an instruction naming
       `/parallel-plan` when no kickoff artifact is found, and it states that items resume at
       atomic execution from their committed `plan-path`.
-- [ ] `docs/features/templates/parallel/parallel-status.md` exists and begins with an
+- [x] `docs/features/templates/parallel/parallel-status.md` exists and begins with an
       HTML-comment generated-file banner stating the file is generated and must not be
       hand-authored.
-- [ ] `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` exists and
+- [x] `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` exists and
       passes, asserting the structural conditions above including content-hash pinning of
       `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md`.
-- [ ] None of the three delivered runtime files (`parallel-orchestrator.md`,
+- [x] None of the three delivered runtime files (`parallel-orchestrator.md`,
       `parallel-orchestrate/SKILL.md`, `parallel-run/SKILL.md`) contains any of the
       prescriptive literals `Epic mode: true`, `--base epic/`, or `integration-to-main`.
-- [ ] `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` are
+- [x] `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` are
       byte-identical to their pre-feature state (empty `git diff` for both paths over the
       feature branch).
-- [ ] `.claude/skills/orchestrate/SKILL.md` is byte-identical to its pre-feature state (empty
+- [x] `.claude/skills/orchestrate/SKILL.md` is byte-identical to its pre-feature state (empty
       `git diff` for that path over the feature branch).
-- [ ] The feature branch diff contains no changes under `.claude/hooks/` and no change to
+- [x] The feature branch diff contains no changes under `.claude/hooks/` and no change to
       `.claude/settings.json`.
