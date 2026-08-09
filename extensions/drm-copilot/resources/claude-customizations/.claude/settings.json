@@ -192,6 +192,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-cohort-barrier.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-drift-gate.ps1"
           }
         ]
       }

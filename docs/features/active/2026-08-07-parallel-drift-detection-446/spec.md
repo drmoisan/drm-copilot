@@ -303,51 +303,51 @@ Scope (what changes, not sequencing). All production files are new except two co
 
 ## Acceptance Criteria
 
-- [ ] `detect_escaped_paths` returns the set of observed paths not subsumed by declared
+- [x] `detect_escaped_paths` returns the set of observed paths not subsumed by declared
       `blast_radius.paths`, reusing F1's path-subsumption predicate (or the documented
       `fnmatch.fnmatchcase` fallback with the deviation recorded), covering the cases: no escape,
       single escape, multiple escapes, and glob boundary cases (pattern-edge paths, separator
       handling, rename old/new paths both required to be covered).
-- [ ] An escape records an append-only `drift_events[]` entry with the §12 shape
+- [x] An escape records an append-only `drift_events[]` entry with the §12 shape
       `{ item_key, declared, observed, escaped_paths[], at, action }`, where `item_key` is the
       item's `issue_num` and `action` is one of `blocking_finding_raised`, `halted_later_started`,
       `resolved` (or F3's landed enum names, with the reconciliation recorded).
-- [ ] An escape produces a synthetic Blocking finding written into the child's own
+- [x] An escape produces a synthetic Blocking finding written into the child's own
       `docs/features/active/<child-slug>/remediation-inputs.<yyyy-MM-ddTHH-mm>.md` (flat form)
       containing the literal line `- Severity: Blocking`, the escaped paths, and the declared
       patterns.
-- [ ] Quiesce is derived state: `has_unresolved_drift(events)` returns `True` exactly while the
+- [x] Quiesce is derived state: `has_unresolved_drift(events)` returns `True` exactly while the
       latest entry for any `item_key` has `action != "resolved"`, and the exported predicate is the
       single seam F6's admission control consults; no quiesce field is added to the checkpoint.
-- [ ] Conflict recomputation substitutes the observed radius for the drifting item's declared
+- [x] Conflict recomputation substitutes the observed radius for the drifting item's declared
       radius and evaluates F1's `conflicts(a, b)` relation; the relation is imported, not
       reimplemented.
-- [ ] `select_halted_item` halts the **later-started** item of a newly conflicting pair using the
+- [x] `select_halted_item` halts the **later-started** item of a newly conflicting pair using the
       `(start_ts, item_key)` lexicographic rule with the deterministic tie-break (equal timestamps:
       larger `issue_num` is later-started; single missing timestamp: the timestamped item is
       earlier-started; both missing: item-key tie-break), and identical inputs produce identical
       halt/requeue decisions.
-- [ ] The halted item's `merge_status` is set to `blocked_drift` and the requeue appends exactly
+- [x] The halted item's `merge_status` is set to `blocked_drift` and the requeue appends exactly
       one `mutations[]` entry and increments `recolor_generation` by one, routed through the single
       recolor seam (F6's entry point or the documented stub); no second recolor implementation
       exists in F8's code.
-- [ ] Layer-1 drift gate: `.claude/hooks/enforce-parallel-drift-gate.ps1` denies a
+- [x] Layer-1 drift gate: `.claude/hooks/enforce-parallel-drift-gate.ps1` denies a
       `feature-review` delegation with `PARALLEL_DRIFT_GATE_BLOCKED` when the target item's latest
       drift event is unresolved and its synthetic finding has not been written; allows
       non-feature-review targets, prompts without the `Parallel mode: true` marker, and resolved
       events; fails closed on an unreadable checkpoint or unresolved target.
-- [ ] Layer-2 drift gate: the key-gated invariant in
+- [x] Layer-2 drift gate: the key-gated invariant in
       `scripts/dev_tools/_parallel_orchestrator_state_drift.py` emits one
       `PARALLEL_DRIFT_GATE_VIOLATION:` error per item whose latest drift event is unresolved while
       its `merge_status` is in `{pr_open, ci_green, merged, worktree_removed}`; a checkpoint with
       no `drift_events[]` key produces zero new errors.
-- [ ] The R1-R5 remediation loop is reused unmodified: no new remediation loop is authored, and
+- [x] The R1-R5 remediation loop is reused unmodified: no new remediation loop is authored, and
       `.claude/skills/orchestrate/SKILL.md` is not modified by this feature.
-- [ ] Wave-4 contention constraints hold: the SKILL.md edit is confined to the single H2 section
+- [x] Wave-4 contention constraints hold: the SKILL.md edit is confined to the single H2 section
       `## Radius Drift Detection and Drift Gate` with no reflow or reorder of existing sections;
       the validator edit is one import plus one key-gated dispatch call; the `.claude/settings.json`
       edit appends exactly one entry to the `Agent` matcher list.
-- [ ] All new Python and PowerShell modules pass their full toolchains and meet line coverage
+- [x] All new Python and PowerShell modules pass their full toolchains and meet line coverage
       >= 85% and branch coverage >= 75%.
 
 ## Definition of Done
