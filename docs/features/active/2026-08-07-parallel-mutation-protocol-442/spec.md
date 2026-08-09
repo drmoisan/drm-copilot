@@ -5,7 +5,8 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-09T06-40
 - **Status:** Ready for planning
-- **Version:** 1.2 (design corrections: admission checks the full current cohort, not the in-flight subset; recoloring applies the pinned-barrier offset so a deferred candidate cannot rejoin its pinned conflict; FR9 invariant 3 wording reconciled to the delivered two-signal formalization)
+- **Version:** 1.3 (documentation-only consistency correction: corrects three pre-1.2 formulations left stale by the v1.2 amendment — the pinning-invariant input tuple in Non-Negotiable Constraints item 1, and two Seeded Test Conditions lines. No behavior change; no requirement, acceptance criterion, or test obligation is added, removed, or altered)
+- **Version history:** 1.2 (design corrections: admission checks the full current cohort, not the in-flight subset; recoloring applies the pinned-barrier offset so a deferred candidate cannot rejoin its pinned conflict; FR9 invariant 3 wording reconciled to the delivered two-signal formalization)
 - **Work Mode:** full-feature
 - **Design source:** `docs/research/2026-08-07-parallel-orchestration-design-research.md` (§8 in full, §9 abandon gate; consumed structures §5.4, §6, §11, §12)
 - **Research artifact:** `docs/features/active/2026-08-07-parallel-mutation-protocol-442/research/2026-08-07-parallel-mutation-protocol-research.md`
@@ -454,7 +455,8 @@ All new unless noted:
 
 1. **Pinning invariant.** In-flight items are pinned; scheduling is recomputed only over the
    not-yet-started subgraph; recoloring is a pure function of
-   `(remaining subgraph, pinned set)`. Determinism under mutation is what the tests must prove.
+   `(remaining subgraph, pinned set, current cohort index)`. Determinism under mutation is what
+   the tests must prove.
 2. **No default disposition.** Removal of an `in_flight` item is rejected without an explicit
    `detach | abandon` disposition. A default is never inferred (accepted decision, design §3).
 3. **Traceability.** `recolor_generation` exists so that a changing cohort table is traceable,
@@ -691,7 +693,7 @@ without in-flight conflicts; remove at each lifecycle state; close on an `open`-
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: admission decision (no-conflict admit, in-flight-conflict defer), removal behavior per lifecycle state, disposition rejection paths, close rejection while in-flight, mutation-log append shape, recolor-generation increment, mode-dependent completion.
-- [ ] Property/determinism tests: recoloring is a pure function of `(remaining subgraph, pinned set)`; identical inputs yield identical cohort assignments; pinned items never move.
+- [ ] Unit coverage: admission decision (admit when the candidate conflicts with no member of the current cohort; defer on a conflict with any current-cohort member, pinned or unstarted), removal behavior per lifecycle state, disposition rejection paths, close rejection while in-flight, mutation-log append shape, recolor-generation increment, mode-dependent completion.
+- [ ] Property/determinism tests: recoloring is a pure function of `(remaining subgraph, pinned set, current cohort index)`; identical inputs yield identical cohort assignments; pinned items never move.
 - [ ] Hook tests: abandon gate denies without the confirmation marker and permits with it.
 - [ ] Integration scenarios: add during an active cohort with and without in-flight conflicts; remove at each lifecycle state; close on `open`-mode runs.
