@@ -39,7 +39,11 @@ Responsibilities and boundaries:
 Key invariants and constraints:
     Pinning (spec FR4): items in state ``in_flight`` are pinned. Recoloring runs
     over the unstarted subgraph only and never assigns or moves a pinned item,
-    so a mutation cannot disturb work already running.
+    so a mutation cannot disturb work already running. It also places unstarted
+    items at ABSOLUTE cohort indices at or above the pinned items' index
+    (``current_cohort``), and strictly above it whenever an unstarted-to-pinned
+    conflict exists, so a deferred candidate cannot be returned to the cohort of
+    the pinned item it conflicts with.
 
     Item keys are ``int`` throughout -- F3's ``items[].issue_num``
     (``.claude/rules/parallel-orchestration.md`` invariant 5). No signature here
@@ -89,7 +93,10 @@ from scripts.dev_tools._parallel_mutation_models import (
     UnknownItemError,
 )
 from scripts.dev_tools._parallel_state_common import VALID_DISPOSITIONS
-from scripts.dev_tools.parallel_cohort_computation import compute_cohorts
+from scripts.dev_tools.parallel_cohort_computation import (
+    ParallelCohortInputError,
+    compute_cohorts,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -115,19 +122,26 @@ def decide_admission(
     candidate: int,
     conflict_edges: Sequence[tuple[int, int]],
     in_flight: frozenset[int],
+    *,
+    current_cohort_members: frozenset[int],
 ) -> AdmissionDecision:
     """Decide whether a candidate joins the current cohort or is deferred.
 
-    Implements spec FR1 step 4: the candidate is admitted into the current
-    cohort if and only if it shares no conflict edge with any in-flight item.
-    Any in-flight conflict defers it, because admitting it would schedule
-    contending work alongside work already running, and the deferral is what
-    makes the recolor necessary.
+    Implements spec FR1 step 4 as amended by spec 1.2 design correction C1: the
+    candidate is admitted into the current cohort if and only if it shares no
+    conflict edge with any member of the current cohort -- both the ``in_flight``
+    (pinned) members and the scheduled/unstarted members. Any conflict with a
+    current-cohort member defers the candidate, because admitting it would
+    schedule contending work into the cohort the next ``max_concurrency`` batch
+    launches together, and the deferral is what makes the recolor necessary.
 
-    A conflict with an UNSTARTED item is deliberately not a deferral: the
-    coloring places contending unstarted items in different cohorts, so such a
-    conflict is resolved by ``recolor_unstarted`` rather than by rejecting or
-    deferring the candidate.
+    A conflict with an unstarted item OUTSIDE the current cohort is not a
+    deferral: the cohort barrier prevents two items in different cohorts from
+    running concurrently, so their conflict is already resolved by the ordering.
+
+    The recolor the deferral triggers is ``recolor_unstarted``, which applies the
+    pinned-barrier offset so the deferred candidate cannot be placed back into
+    the pinned items' own cohort index.
 
     Args:
         candidate (int): The candidate's ``items[].issue_num``.
@@ -136,12 +150,24 @@ def decide_admission(
             ``items[].issue_num`` values. Produced by the caller from F1's
             ``conflicts(a, b, config)`` relation; this function never calls it.
             Edge direction is irrelevant and the sequence is only read.
-        in_flight (frozenset[int]): The pinned set -- keys whose items are in
+        in_flight (frozenset[int]): The pinning set -- keys whose items are in
             state ``in_flight``.
+        current_cohort_members (frozenset[int]): The FULL membership of the
+            current cohort, including both its pinned members and its
+            not-yet-launched ``scheduled`` members. Required and keyword-only:
+            a default would silently restore the defective in-flight-only rule,
+            and keyword-only placement makes it impossible to pass a different
+            set positionally. ``in_flight`` is retained separately because the
+            two are semantically distinct -- one is the pinning set, the other is
+            cohort membership -- and conflating them in the signature would lose
+            that distinction; they are unioned only in the decision below. The
+            caller derives this set from re-verified durable state, not from a
+            possibly stale checkpoint.
 
     Returns:
         AdmissionDecision: ``ADMIT_CURRENT_COHORT`` when no edge joins the
-        candidate to an in-flight item, otherwise ``DEFER_AND_RECOLOR``.
+        candidate to any key in ``in_flight | current_cohort_members``,
+        otherwise ``DEFER_AND_RECOLOR``.
 
     Raises:
         None. Admission has no rejection branch: an unknown candidate simply
@@ -149,13 +175,23 @@ def decide_admission(
         resolution of the key against ``items[]``.
     """
 
-    # Scan every edge for one joining the candidate to a pinned item. Both
+    # The candidate may join the current cohort only if it is disjoint from that
+    # cohort's WHOLE membership. The union is formed here rather than in the
+    # signature so the two sets stay semantically distinct to callers:
+    # ``in_flight`` is the pinning set, ``current_cohort_members`` is cohort
+    # membership, and every pinned item is also a current-cohort member.
+    blocking_keys = in_flight | current_cohort_members
+
+    # Scan every edge for one joining the candidate to a blocking key. Both
     # endpoint positions are checked because edge direction carries no meaning;
     # the first such edge settles the decision, so the scan stops there.
     for first, second in conflict_edges:
-        if first == candidate and second in in_flight:
+        # Either endpoint may be the candidate; a conflict with any blocking key
+        # defers, because admitting would schedule contending work into the same
+        # cohort that the next max-concurrency batch launches together.
+        if first == candidate and second in blocking_keys:
             return AdmissionDecision(candidate, AdmissionOutcome.DEFER_AND_RECOLOR)
-        if second == candidate and first in in_flight:
+        if second == candidate and first in blocking_keys:
             return AdmissionDecision(candidate, AdmissionOutcome.DEFER_AND_RECOLOR)
 
     return AdmissionDecision(candidate, AdmissionOutcome.ADMIT_CURRENT_COHORT)
@@ -166,22 +202,41 @@ def recolor_unstarted(
     conflict_edges: Sequence[tuple[int, int]],
     pinned: frozenset[int],
     current_generation: int,
+    *,
+    current_cohort: int,
 ) -> RecolorResult:
     """Recolor the unstarted subgraph, leaving every pinned item untouched.
 
-    Implements the pinning invariant of spec FR4: recoloring is a pure function
-    of ``(remaining subgraph, pinned set)``. The induced subgraph is taken
-    internally by dropping every edge with an endpoint outside
-    ``unstarted_items``, which is the mechanism that excludes pinned vertices
-    from the coloring input. A pinned item is therefore absent from the result
-    rather than reassigned, and that absence is the guarantee that a mutation
-    never moves work already running.
+    Implements the pinning invariant of spec FR4 as amended by spec 1.2 design
+    correction C2: recoloring is a pure function of
+    ``(remaining subgraph, pinned set, pinned cohort index)``.
+
+    The pinning guarantee has two parts and the induced subgraph delivers only
+    the first. Dropping every edge with an endpoint outside ``unstarted_items``
+    excludes pinned VERTICES from the coloring input, so a pinned item is absent
+    from the result rather than reassigned, and that absence is what keeps a
+    mutation from moving work already running. It does NOT honour the pinned
+    CONSTRAINT: an edge joining an unstarted key to a pinned key is dropped along
+    with its pinned endpoint, and F2 then treats a candidate with no surviving
+    edge as an isolated vertex in local class 0. The pinned constraint is
+    honoured separately, by the pinned-barrier offset: ``crosses_pinned`` is
+    computed from the FULL edge list before the restriction, and every unstarted
+    index is shifted to ``current_cohort + 1`` or above whenever an
+    unstarted-to-pinned conflict exists.
 
     Coloring is DELEGATED IN FULL to F2's landed Welsh-Powell entry point
     ``compute_cohorts``. This function reimplements no part of the coloring, the
     vertex ordering, or the ``(-degree, item_key)`` tie-break, and does not call
     the sibling ``compute_concurrency_batches``. The ``item_key -> cohort_index``
     view is derived from the returned ``list[list[int]]`` in one comprehension.
+
+    The offset is a single uniform shift applied to every color class, so the map
+    from F2's local index to the absolute index is injective: two unstarted items
+    F2 placed in different classes remain in different cohorts, and two it placed
+    in the same class share no edge by F2's own guarantee. F3 invariants 13 and 14
+    therefore remain satisfiable, which
+    ``tests/scripts/dev_tools/test_parallel_mutation_cohort_invariant_binding.py``
+    proves by running F3's landed validator over a constructed checkpoint.
 
     Args:
         unstarted_items (Sequence[int]): Keys whose items are in an unstarted
@@ -190,23 +245,39 @@ def recolor_unstarted(
         conflict_edges (Sequence[tuple[int, int]]): Conflict edges over ALL
             items; the induced subgraph is taken here, so the caller passes the
             full edge list unchanged.
-        pinned (frozenset[int]): Keys whose items are ``in_flight``. Used to
-            assert the exclusion the induced subgraph already performs, so a
-            pinned key that also appeared in ``unstarted_items`` is caught
-            rather than silently colored.
+        pinned (frozenset[int]): Keys whose items are ``in_flight``. Used both to
+            assert the exclusion the induced subgraph performs -- so a pinned key
+            that also appeared in ``unstarted_items`` is caught rather than
+            silently colored -- and to compute ``crosses_pinned``.
         current_generation (int): The run's generation before this recolor.
+        current_cohort (int): F3's top-level ``current_cohort`` field. This is
+            the index the pinned items occupy for as long as they run, because
+            the cohort barrier increments ``current_cohort`` only on durable
+            confirmation that every cohort item is ``merged`` or
+            ``worktree_removed`` and an ``in_flight`` item is neither. Required
+            and keyword-only: a default would silently restore the defective
+            re-index-from-zero behavior, and keyword-only placement prevents a
+            silent transposition with ``current_generation``, the other ``int``
+            parameter. It must be derived from re-verified durable state, never
+            from a possibly stale checkpoint.
 
     Returns:
         RecolorResult: Cohort assignments for unstarted items only -- the
         mapping's key set equals the ``unstarted_items`` set exactly and is
         disjoint from ``pinned`` -- with ``generation`` equal to
-        ``current_generation + 1``.
+        ``current_generation + 1``. The assigned indices are ABSOLUTE checkpoint
+        cohort indices, not zero-based local color indices: every index is at or
+        above ``current_cohort``, and strictly above ``current_cohort`` whenever
+        any unstarted item conflicts with a pinned item. The caller writes them
+        verbatim into ``cohorts[].index`` without re-basing them.
 
     Raises:
         UnknownItemError: If a key appears in both ``unstarted_items`` and
             ``pinned``, since it cannot be both a colored vertex and pinned.
-        ParallelCohortInputError: Propagated from ``compute_cohorts`` if
-            ``unstarted_items`` holds a duplicate key.
+        ParallelCohortInputError: If ``current_cohort`` is negative, since F3
+            invariant 12 requires a non-negative ``cohorts[].index``; also
+            propagated from ``compute_cohorts`` if ``unstarted_items`` holds a
+            duplicate key.
     """
 
     unstarted_keys = frozenset(unstarted_items)
@@ -214,9 +285,31 @@ def recolor_unstarted(
     if overlap:
         raise UnknownItemError(min(overlap))
 
+    # A negative index cannot name a cohort: F3 invariant 12 requires every
+    # cohorts[].index to be a non-negative integer, so a negative base would
+    # produce an unwritable assignment. Reject it with F2's existing input error
+    # rather than shifting the whole assignment into invalid territory.
+    if current_cohort < 0:
+        raise ParallelCohortInputError(
+            f"current_cohort must be >= 0 per F3 invariant 12; "
+            f"received {current_cohort}.",
+            current_cohort,
+        )
+
+    # Decide the pinned barrier BEFORE the induced restriction discards the
+    # candidate-to-pinned edges: those edges carry a real constraint even though
+    # their pinned endpoint is not a colored vertex.
+    crosses_pinned = any(
+        (first in unstarted_keys and second in pinned)
+        or (second in unstarted_keys and first in pinned)
+        for first, second in conflict_edges
+    )
+
     # Take the induced subgraph: an edge survives only when BOTH endpoints are
-    # unstarted vertices. Dropping the rest is what keeps pinned items out of
-    # the coloring input without the coloring needing to know about pinning.
+    # unstarted vertices, which restricts the COLORED VERTEX SET to unstarted
+    # keys. The dropped edges still carry a constraint; that constraint is not
+    # discarded here but honoured separately by ``crosses_pinned`` above and the
+    # ``cohort_offset`` barrier below.
     induced_edges = [
         (first, second)
         for first, second in conflict_edges
@@ -225,9 +318,22 @@ def recolor_unstarted(
 
     cohorts = compute_cohorts(unstarted_items, induced_edges)
 
-    # Derive the mapping view from F2's cohort list; list position is the cohort
-    # index, so enumerating it yields the assignment without any recoloring.
-    assignments = {key: index for index, cohort in enumerate(cohorts) for key in cohort}
+    # The pinned items hold index ``current_cohort`` for as long as they run, so
+    # an unstarted item conflicting with one of them must start strictly above
+    # that index. With no such conflict there is nothing to protect, so the
+    # unstarted items may share the running cohort and max-concurrency slot
+    # filling is preserved. The shift is uniform, keeping the local-to-absolute
+    # map injective so F2's distinct color classes stay distinct cohorts.
+    cohort_offset = current_cohort + 1 if crosses_pinned else current_cohort
+
+    # Derive the mapping view from F2's cohort list; list position is the local
+    # color index, so enumerating it and adding the offset yields the absolute
+    # assignment without any recoloring.
+    assignments = {
+        key: cohort_offset + index
+        for index, cohort in enumerate(cohorts)
+        for key in cohort
+    }
 
     return RecolorResult(
         cohort_assignments=assignments,

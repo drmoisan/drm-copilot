@@ -65,24 +65,50 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    compute edges over the unstarted subset only: an in-flight conflict is precisely what the
    admission decision turns on.
 
-4. **Decide admission.** Call `decide_admission(candidate, conflict_edges, in_flight)` from
-   `scripts/dev_tools/parallel_mutation_protocol.py`.
-   - `ADMIT_CURRENT_COHORT` — the candidate shares no edge with any in-flight item. Admit it into
-     the current cohort. NO recompute occurs and `recolor_generation` is unchanged.
-   - `DEFER_AND_RECOLOR` — the candidate shares an edge with at least one in-flight item. Defer it
-     to a future cohort and recolor by calling `recolor_unstarted(unstarted_items,
-     conflict_edges, pinned, current_generation)`. The recolor is a recompute:
-     `recolor_generation` increments by exactly one.
+4. **Decide admission.** Call
+   `decide_admission(candidate, conflict_edges, in_flight, current_cohort_members=current_cohort_members)`
+   from `scripts/dev_tools/parallel_mutation_protocol.py`.
+   - `ADMIT_CURRENT_COHORT` — the candidate shares no edge with any member of the current cohort,
+     pinned or unstarted. Admit it into the current cohort. NO recompute occurs and
+     `recolor_generation` is unchanged — precisely because the candidate conflicts with no
+     current-cohort member, so no cohort assignment needs to change.
+   - `DEFER_AND_RECOLOR` — the candidate shares an edge with at least one member of the current
+     cohort, pinned or not-yet-launched. Defer it to a future cohort and recolor by calling
+     `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort)`.
+     The recolor is a recompute: `recolor_generation` increments by exactly one, and it places every
+     unstarted item at an index at or above `current_cohort`, strictly above it when a pinned
+     conflict exists.
 
-   A conflict with an UNSTARTED item is not a deferral. The coloring places contending unstarted
-   items in different cohorts, so such a conflict is resolved by the recolor, never by rejecting
-   the candidate.
+   Derive `current_cohort_members` from the re-verified durable state, not from the cached
+   checkpoint: it is the full membership of the current-generation cohort at `current_cohort`,
+   INCLUDING its not-yet-launched `scheduled` members. Derive `current_cohort` from that same
+   re-verified state; it is F3's top-level `current_cohort` field and is the index the pinned items
+   occupy. Both matter because `max_concurrency` caps simultaneously in-flight items independently
+   of cohort size and refills each freed slot from the same current cohort — see
+   `## Cohort Barrier and Max-Concurrency Slot Filling` in
+   `.claude/skills/parallel-orchestrate/SKILL.md` — so the current cohort durably holds `scheduled`
+   members that a candidate can contend with.
 
-5. **Apply the recolor result, if any.** Write `RecolorResult.cohort_assignments` into `cohorts[]`
-   and set the top-level `recolor_generation` to `RecolorResult.generation`. The result's key set
-   equals the unstarted set exactly and contains no pinned key: no in-flight item changes cohort or
-   state as a result of this admission. Verify that before writing, and stop rather than write a
-   result that names a pinned key.
+   A conflict with an unstarted member of the CURRENT cohort defers the candidate and recolors,
+   because the next `max_concurrency` batch would otherwise launch the two concurrently. A conflict
+   with an unstarted item OUTSIDE the current cohort does not defer: the cohort barrier keeps the
+   two from running concurrently, so the coloring's existing separation already resolves it.
+
+5. **Apply the recolor result.** Write `RecolorResult.cohort_assignments` into `cohorts[]` and set
+   the top-level `recolor_generation` to `RecolorResult.generation`. The result's key set equals the
+   unstarted set exactly and contains no pinned key: no in-flight item changes cohort or state as a
+   result of this admission. Verify that before writing, and stop rather than write a result that
+   names a pinned key. The admit branch performs no recolor at all, precisely because the candidate
+   conflicts with no current-cohort member.
+
+   The returned `cohort_assignments` values are **ABSOLUTE cohort indices**. Write them VERBATIM
+   into `cohorts[].index`; never re-base them to zero. When the lowest returned index equals
+   `current_cohort` — the no-pinned-conflict case, where the offset is not applied — the returned
+   keys at that index are **MERGED into the single existing current-generation cohort entry at
+   `current_cohort`** alongside its pinned members, and are never written as a second cohort entry
+   carrying the same `index`, because F3 invariant 13 requires current-generation `cohorts[].index`
+   values to be unique (`scripts/dev_tools/_parallel_state_structures.py:282-305` — duplicate-index
+   detection at 282-293, error emission at 301-305).
 
 6. **Append exactly one `mutations[]` entry**, at admission-decision time, built by
    `build_add_entry` from `scripts/dev_tools/parallel_mutation_protocol.py`:

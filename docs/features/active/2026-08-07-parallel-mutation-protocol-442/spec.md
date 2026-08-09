@@ -3,9 +3,9 @@
 - **Issue:** #442
 - **Parent (optional):** Epic `parallel-orchestration` (`docs/features/epics/parallel-orchestration/epic.md`, child feature F6, wave 4)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-08T00-00
+- **Last Updated:** 2026-08-09T06-40
 - **Status:** Ready for planning
-- **Version:** 1.1 (per-op entry-contents table reconciled to F3's landed `mutations[]` nullability rule)
+- **Version:** 1.2 (design corrections: admission checks the full current cohort, not the in-flight subset; recoloring applies the pinned-barrier offset so a deferred candidate cannot rejoin its pinned conflict; FR9 invariant 3 wording reconciled to the delivered two-signal formalization)
 - **Work Mode:** full-feature
 - **Design source:** `docs/research/2026-08-07-parallel-orchestration-design-research.md` (§8 in full, §9 abandon gate; consumed structures §5.4, §6, §11, §12)
 - **Research artifact:** `docs/features/active/2026-08-07-parallel-mutation-protocol-442/research/2026-08-07-parallel-mutation-protocol-research.md`
@@ -43,13 +43,99 @@ F3-owned validator.
 3. Conflict edges are computed against ALL items, including in-flight ones, using F1's
    `conflicts(a, b)` relation (expected contract; see Upstream Contracts).
 4. Admission decision:
-   - No conflict with any in-flight item: admit into the current cohort. No recompute occurs.
+   - No conflict with any member of the current cohort — neither an `in_flight` (pinned) member
+     nor an unstarted (`proposed`/`admitted`/`prepared`/`scheduled`) member scheduled into the
+     current cohort: admit into the current cohort. No recompute occurs.
    - Otherwise: defer to a future cohort and recolor the unstarted subgraph (recompute;
      `recolor_generation` increments by exactly one).
 
 The item's lifecycle transitions during the add procedure follow §8.2
 (`proposed -> admitted -> prepared -> scheduled`); the add op appends exactly one `mutations[]`
 entry at admission-decision time (see Recompute Boundary and Mutation-Log Entry Contents).
+
+### Design corrections (spec 1.2)
+
+Version 1.2 corrects two defects in this feature's own design. Both concern the same guarantee —
+that two items scheduled into the same cohort never share a conflict edge — and both are
+corrections to functions this feature authors, not to an upstream contract F6 merely consumes.
+
+**Correction C1 — admission checked the in-flight subset, not the current cohort.**
+
+The pre-1.2 rule in FR1 step 4 admitted a candidate into the current cohort whenever it
+conflicted with no `in_flight` item, checking the in-flight members only. That rule was inherited
+verbatim from the design source
+`docs/research/2026-08-07-parallel-orchestration-design-research.md` line 173 ("No conflict with
+any in-flight item, admit into the current cohort").
+
+The rule is unsafe because `max_concurrency` caps the number of simultaneously in-flight items
+independently of cohort size, and each freed slot is refilled with the next unstarted item of the
+SAME current cohort in ascending item-key order — see
+`.claude/skills/parallel-orchestrate/SKILL.md` section
+`## Cohort Barrier and Max-Concurrency Slot Filling`. A cohort larger than `max_concurrency`
+therefore launches in several batches, and the current cohort durably holds not-yet-launched
+`scheduled` members. A cohort is an independent set only because F2's coloring produced it; a
+candidate inserted into that cohort without a recolor was never part of that coloring, so nothing
+establishes that it is disjoint from the cohort's unstarted members. Admitting a candidate that
+conflicts with a `scheduled` member of the current cohort places two contending items in one
+cohort for the next batch to launch concurrently.
+
+The amended rule strictly generalizes the previous one, because every `in_flight` item is itself a
+member of the current cohort: any candidate the old rule deferred is still deferred, and the new
+rule additionally defers a candidate conflicting with an unstarted current-cohort member. The
+pinning invariant is unchanged — no pinned item is moved, reassigned, or named in the result.
+
+**Correction C2 — recoloring dropped the pinned CONSTRAINT along with the pinned VERTICES.**
+
+`recolor_unstarted` built its induced subgraph by keeping an edge only when BOTH endpoints are
+unstarted. Dropping the candidate-to-pinned edges removes the pinned VERTICES from the coloring
+input, which is correct, but it also removes the pinned CONSTRAINT, which is not. F2's
+`compute_cohorts` documents that a key appearing in no edge is an isolated vertex and lands in
+cohort 0. The cohort barrier increments `current_cohort` only on durable confirmation that every
+cohort-`N` item is `merged` or `worktree_removed`, and an `in_flight` item is neither, so
+`current_cohort` cannot advance while any item runs.
+
+Composing those three facts: a candidate deferred BECAUSE it conflicts with an in-flight item has
+that edge dropped, becomes an isolated vertex, and is assigned cohort index 0. When
+`current_cohort == 0`, index 0 IS the current cohort, so the candidate rejoins the very pinned
+item it conflicts with — index 0 is the current cohort in exactly the situation the deferral was
+meant to resolve. Without C2, C1's fix is cosmetic on its primary case.
+
+The corrected rule is the pinned-barrier offset stated in FR4:
+
+1. The pinned items occupy cohort index `current_cohort` for as long as they run, so
+   `current_cohort` is a required input to the recolor.
+2. `crosses_pinned` is true exactly when some conflict edge joins a key in `unstarted_items` to a
+   key in `pinned`, computed from the FULL edge list BEFORE the induced subgraph drops those
+   edges.
+3. `cohort_offset = current_cohort + 1` when `crosses_pinned`, otherwise `current_cohort`.
+4. Each unstarted key's final cohort index is `cohort_offset + local_index`, where `local_index`
+   is the color-class index F2's `compute_cohorts` assigned over the induced unstarted subgraph.
+
+Because the offset is a single uniform shift, the local-to-absolute index map is injective: F2's
+distinct color classes remain distinct cohorts and independence within the unstarted set is
+preserved exactly, by F2's own guarantee rather than by any reimplementation. An unconditional
+`+1` was rejected: it would evacuate the running cohort of its not-yet-launched `scheduled`
+members even when no unstarted item conflicts with a pinned item, needlessly reducing concurrency
+with no correctness gain.
+
+F3 invariants 13 (every non-withdrawn item appears in exactly one current-generation cohort) and
+14 (`current_cohort` must not exceed the maximum current-generation index) remain satisfiable
+under the corrected contract. That claim is PROVEN by an executable binding test —
+`tests/scripts/dev_tools/test_parallel_mutation_cohort_invariant_binding.py` runs F3's landed
+`validate_parallel_orchestrator_state_text` over a constructed in-memory checkpoint reflecting the
+corrected recolor output and asserts zero errors — rather than by assertion.
+
+**F2 is not modified.** The offset is applied entirely inside F6's `recolor_unstarted`. No part of
+the coloring, the vertex ordering, or the `(-degree, item_key)` tie-break is changed or
+reimplemented; `compute_cohorts` is still called with the induced subgraph and its local indices
+are still the only coloring input to the result.
+
+**Deliberate divergence from the design research.** Both amendments deliberately diverge from
+`docs/research/2026-08-07-parallel-orchestration-design-research.md` — C1 from its §8.3 admission
+rule at line 173, and C2 from the pinning formulation that treats removing the pinned vertices as
+a complete account of the pinning constraint. That design document is **NOT amended by this
+feature**; it remains the historical design record, and this spec is the normative source for the
+corrected rules.
 
 ### FR2 — `/parallel-remove <item> [--disposition detach|abandon]` (design §8.4)
 
@@ -87,14 +173,24 @@ no `mutations[]` entry and makes no state change. A successful close appends one
 ### FR4 — Pinning invariant (design §8.1)
 
 **In-flight items are pinned; scheduling is recomputed only over the not-yet-started subgraph;
-recoloring is a pure function of `(remaining subgraph, pinned set)`.**
+recoloring is a pure function of `(remaining subgraph, pinned set, pinned cohort index)`.**
 
 This is the core correctness property of the feature. Requirements:
 
 - The recolor function takes the induced subgraph of unstarted items (states
-  `proposed | admitted | prepared | scheduled`), the pinned set (states `in_flight`), and the
-  current generation; it returns cohort assignments for unstarted items only and never assigns
-  or moves a pinned item.
+  `proposed | admitted | prepared | scheduled`), the pinned set (states `in_flight`), the
+  current generation, and the current cohort index that the pinned items occupy; it returns
+  cohort assignments for unstarted items only and never assigns or moves a pinned item. The
+  returned assignment places every unstarted item at an index at or above `current_cohort`, and
+  strictly above `current_cohort` whenever any conflict edge joins an unstarted item to a pinned
+  item — the pinned-barrier offset. When no such edge exists the lowest assigned index equals
+  `current_cohort` exactly, so unstarted items may share the running cohort and
+  `max_concurrency` slot filling is preserved.
+- The offset is a single uniform shift applied to every color class, so the mapping from F2's
+  local color index to the final absolute index is injective: two unstarted items F2 placed in
+  different classes remain in different cohorts, and independence is preserved exactly. No
+  non-uniform or per-item remapping is used, because a non-uniform map could collapse two
+  distinct classes onto one index and reintroduce a contention violation.
 - Coloring delegates to F2's Welsh-Powell entry point in
   `scripts/dev_tools/parallel_cohort_computation.py` (expected contract; see Upstream
   Contracts). F6 must not reimplement the coloring.
@@ -170,7 +266,16 @@ relevant keys validates as before):
 1. Mutation-entry shape: each `mutations[]` entry carries the seven §8.6 fields.
 2. `recolor_generation` is monotonically non-decreasing across `mutations[]` in append order,
    which makes a lost update detectable retrospectively.
-3. The mode-dependent completion invariant per FR7.
+3. The mode-dependent completion invariant per FR7, enforced from the two signals the F3 schema
+   carries — a `mutations[]` `op == 'close'` record and an empty current-generation cohort set —
+   because F3's schema has no completion field and F6 may add none. In `open` mode the close
+   record must additionally be terminal: nothing may follow it. The invariant deliberately does
+   not fire on a healthy in-progress checkpoint, nor on an idle `open` run whose items have all
+   merged, because firing there would block the next `/parallel-add`, which is precisely what
+   `open` mode exists to permit. The formalization is documented in the module docstring at
+   `scripts/dev_tools/_parallel_orchestrator_state_mode_completion.py:16-43`. Closed-mode
+   completion itself is guarded by F3's own invariant 20 under `require_complete`, which F6
+   deliberately does not duplicate.
 
 The helper returns literal error strings in the existing validator message style and never
 mutates its input.
@@ -197,8 +302,8 @@ admission into the current cohort performs no recompute. The boundary below is n
 
 ### Operations that trigger a recompute (`recolor_generation` increments by exactly one)
 
-1. **Deferred add** — `/parallel-add` where the candidate conflicts with an in-flight item; the
-   unstarted subgraph (including the new item) is recolored.
+1. **Deferred add** — `/parallel-add` where the candidate conflicts with any member of the current
+   cohort (in-flight or unstarted); the unstarted subgraph (including the new item) is recolored.
 2. **Remove of an unstarted item** — `/parallel-remove` on a `proposed`, `admitted`,
    `prepared`, or `scheduled` item; the vertex is dropped and the remaining unstarted subgraph
    is recolored.
@@ -208,8 +313,8 @@ admission into the current cohort performs no recompute. The boundary below is n
 
 ### Operations that do not trigger a recompute (generation unchanged)
 
-1. **Admission into the current cohort with no in-flight conflict** — the item joins the
-   current cohort; no cohort assignment changes.
+1. **Admission into the current cohort with no conflict against any current-cohort member** — the
+   item joins the current cohort; no cohort assignment changes.
 2. **`detach`** — the detached item was pinned and is not a vertex in the unstarted subgraph;
    its departure does not change the induced unstarted subgraph.
 3. **`abandon`** — same rationale as `detach`: the abandoned item was pinned, not a vertex in
@@ -221,6 +326,10 @@ admission into the current cohort performs no recompute. The boundary below is n
 
 Non-recompute operations still append exactly one `mutations[]` entry, stamping the **current**
 (unchanged) `recolor_generation` into the entry.
+
+The pinned-barrier offset introduced in FR4 changes only WHICH cohort index an unstarted item
+receives; it never changes how many times the generation increments, so a recolor still increments
+`recolor_generation` by exactly one and every row of the per-op table below keeps its stated value.
 
 ### Per-op entry contents
 
@@ -283,20 +392,27 @@ Expected engine shapes (final names fixed at plan time; normative in intent):
 
 ```python
 def recolor_unstarted(
-    unstarted_items: Sequence[str],            # item keys, state in {proposed..scheduled}
-    conflict_edges: Sequence[tuple[str, str]], # full graph; induced subgraph taken internally
-    pinned: frozenset[str],                    # item keys with state in_flight
+    unstarted_items: Sequence[int],            # item keys, state in {proposed..scheduled}
+    conflict_edges: Sequence[tuple[int, int]], # full graph; induced subgraph taken internally
+    pinned: frozenset[int],                    # item keys with state in_flight
     current_generation: int,
-) -> RecolorResult:                            # cohorts for unstarted items only,
+    *,
+    current_cohort: int,                       # required keyword-only; the pinned items' index
+) -> RecolorResult:                            # ABSOLUTE cohort indices for unstarted items only,
+    ...                                        # at or above current_cohort, strictly above it
+    ...                                        # when an unstarted-to-pinned edge exists;
     ...                                        # generation == current_generation + 1
 
 def decide_admission(
-    candidate: str,
-    conflict_edges: Sequence[tuple[str, str]], # computed over ALL items incl. in-flight
-    in_flight: frozenset[str],
+    candidate: int,
+    conflict_edges: Sequence[tuple[int, int]], # computed over ALL items incl. in-flight
+    in_flight: frozenset[int],                 # the pinning set
+    *,
+    current_cohort_members: frozenset[int],    # required keyword-only; full current-cohort
+                                               # membership, pinned and not-yet-launched
 ) -> AdmissionDecision:                        # ADMIT_CURRENT_COHORT | DEFER_AND_RECOLOR
 
-def is_closed_mode_complete(items: Mapping[str, ItemRecord]) -> bool: ...
+def is_closed_mode_complete(items: Mapping[int, ItemRecord]) -> bool: ...
 ```
 
 Value objects (`RecolorResult`, `AdmissionDecision`, `ItemRecord`) are frozen dataclasses. The
@@ -495,10 +611,14 @@ Unit tests (pytest):
    non-recompute op leaves the generation unchanged and stamps the current generation into its
    entry; a sequence of N ops from generation `g` ends at exactly
    `g + (number of recompute-triggering ops)`.
-4. **Admission over ALL items.** A candidate conflicting only with an in-flight item is
-   deferred; a candidate conflicting only with an unstarted item is placed by the coloring, not
-   rejected; a candidate with no conflicts is admitted into the current cohort with no
-   generation change.
+4. **Admission over ALL items.** Four cases:
+   - a candidate conflicting with an `in_flight` item is deferred and the unstarted subgraph is
+     recolored;
+   - a candidate conflicting with a `scheduled` (not-yet-launched) member of the CURRENT cohort is
+     likewise deferred and recolored — the case the pre-1.2 wording got wrong;
+   - a candidate conflicting only with an unstarted item that is NOT in the current cohort is
+     admitted, because the cohort barrier keeps the two from running concurrently;
+   - a candidate with no conflicts is admitted into the current cohort with no generation change.
 5. **Removal behavior table** (FR2): one test per row, including rejection without disposition
    for `in_flight` and rejection for `merged`; disposition never defaulted.
 6. **Close gating** (FR3): rejected while any item is `in_flight`; terminates `open` mode
@@ -508,6 +628,14 @@ Unit tests (pytest):
    mode never auto-completes.
 8. **Mutation-log shape**: every op appends exactly one entry with the seven §8.6 fields; `at`
    from the injected clock; rejected ops append nothing.
+9. **Pinned-barrier offset** (FR4, correction C2). Four cases:
+   - an unstarted item conflicting with a pinned item is assigned a cohort index strictly greater
+     than `current_cohort`, exercised at `current_cohort = 0` and at a non-zero base;
+   - with no unstarted-to-pinned conflict edge present, the lowest assigned index equals
+     `current_cohort` exactly;
+   - the offset is uniform, so two unstarted items that conflict with each other still receive
+     distinct indices separated by the same amount as their F2 local color classes;
+   - a negative `current_cohort` is rejected.
 
 Property-based tests (>= 1 per pure function):
 
@@ -518,6 +646,9 @@ Property-based tests (>= 1 per pure function):
   edge.
 - **P3 (pin stability under mutation sequences):** for an arbitrary sequence of add/remove ops,
   items in flight at op time never change cohort or state as a result of the op.
+- **P4 (composed contention invariant):** over arbitrary conflict graphs, arbitrary
+  pinned/unstarted partitions, and arbitrary admission-and-recolor sequences, no cohort in the
+  resulting assignment contains two items sharing a conflict edge, counting edges to pinned items.
 
 Validator-helper tests (pytest): mutation-entry shape errors, generation-monotonicity violation
 detection, the mode-dependent completion invariant, and backward compatibility (a checkpoint
@@ -533,14 +664,14 @@ without in-flight conflicts; remove at each lifecycle state; close on an `open`-
 ## Acceptance Criteria
 
 - [x] `scripts/dev_tools/parallel_mutation_protocol.py` exists and implements the recolor, admission, removal, close, generation-accounting, mutation-log-entry, and completion functions as pure functions (no file I/O, no wall-clock reads, inputs never mutated), with frozen dataclass value objects and an injectable clock seam.
-- [x] `/parallel-add` is delivered as `.claude/skills/parallel-add/SKILL.md` (`context: fork`, `agent: parallel-orchestrator`): the item enters `proposed`, is prepared via a preparation-mode child `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, conflict edges are computed against all items including in-flight ones, and the admission decision admits into the current cohort only when the candidate conflicts with no in-flight item, otherwise defers and recolors the unstarted subgraph.
+- [x] `/parallel-add` is delivered as `.claude/skills/parallel-add/SKILL.md` (`context: fork`, `agent: parallel-orchestrator`): the item enters `proposed`, is prepared via a preparation-mode child `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, conflict edges are computed against all items including in-flight ones, and the admission decision admits into the current cohort only when the candidate conflicts with no member of the current cohort, in-flight or unstarted, otherwise defers and recolors the unstarted subgraph.
 - [x] `/parallel-remove` is delivered as `.claude/skills/parallel-remove/SKILL.md` and implements the design §8.4 state-dependent behavior table exactly: `proposed`/`admitted`/`prepared`/`scheduled` mark `withdrawn`, drop the vertex, and recolor the unstarted subgraph; `in_flight` removal is rejected without an explicit `detach|abandon` disposition and no default is ever inferred; `detach` lets the item finish and merge on its own while the run stops tracking it; `abandon` closes the PR, removes the worktree, and marks `withdrawn` via a single deterministic CLI invocation; `merged` removal is rejected.
 - [x] `/parallel-close` is delivered as `.claude/skills/parallel-close/SKILL.md`: it terminates an `open`-mode run and is rejected while any item is `in_flight`.
-- [x] The pinning invariant holds and is proven by tests: recoloring is a pure function of `(remaining subgraph, pinned set)` delegating to F2's coloring entry point without reimplementation; pinned items are never assigned or moved; unit tests plus property-based tests P1 (determinism), P2 (independent-set validity), and P3 (pin stability under mutation sequences) pass.
+- [x] The pinning invariant holds and is proven by tests: recoloring is a pure function of `(remaining subgraph, pinned set, pinned cohort index)` and assigns every unstarted item an index strictly above the pinned items' index whenever any unstarted item conflicts with a pinned item, delegating to F2's coloring entry point without reimplementation; pinned items are never assigned or moved; unit tests plus property-based tests P1 (determinism), P2 (independent-set validity), P3 (pin stability under mutation sequences), and P4 (composed contention invariant) pass.
 - [x] Every add, remove, close, and drift-induced requeue appends exactly one `mutations[]` entry with the fields `{ op, item_key, at, prior_state, new_state, disposition, recolor_generation }`, matching the per-op entry-contents table in this spec; rejected operations append nothing and change no state.
 - [x] The recompute boundary is implemented as specified: deferred add, remove of an unstarted item, and drift-induced requeue each increment `recolor_generation` by exactly one; no-conflict admission, `detach`, `abandon`, and `close` do not increment it and stamp the current generation into their entries; a sequence of N ops from generation g ends at exactly g plus the number of recompute-triggering ops, verified by test.
 - [x] Mode-dependent completion semantics are implemented and tested: the `closed`-mode completion predicate fires only when every non-withdrawn item is `merged` or `worktree_removed`; `open` mode never auto-completes and terminates only via `/parallel-close`.
-- [x] `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` enforces mutation-entry shape, monotonically non-decreasing `recolor_generation` across `mutations[]`, and the mode-dependent completion invariant, wired into `validate_parallel_orchestrator_state.py` by exactly one additive import and one call line; checkpoints without the relevant keys validate unchanged.
+- [x] `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` enforces mutation-entry shape, monotonically non-decreasing `recolor_generation` across `mutations[]`, and the mode-dependent completion invariant in its two-signal formalization (a `mutations[]` `op == 'close'` record together with an empty current-generation cohort set, with the close record required to be terminal in `open` mode, and no firing on a healthy in-progress checkpoint or an idle `open` run; closed-mode completion itself is guarded by F3's invariant 20 under `require_complete` and is deliberately not duplicated), wired into `validate_parallel_orchestrator_state.py` by exactly one additive import and one call line; checkpoints without the relevant keys validate unchanged.
 - [x] `.claude/hooks/enforce-parallel-abandon-gate.ps1` denies any command carrying `--disposition abandon` without the explicit confirmation marker using reason code prefix `PARALLEL_ABANDON_BLOCKED`, allows it with the marker, allows out-of-scope commands, throws on malformed JSON, and is registered by one additive entry in the `.claude/settings.json` `PreToolUse` → `Bash` matcher.
 - [x] The wave-4 contention constraint is honored: the only edit to `.claude/skills/parallel-orchestrate/SKILL.md` is one appended section (proposed `## Mutation Protocol`, or F5's landed reserved name); no existing section of any shared file is reflowed or reordered; no checkpoint schema field or enum value is added; no existing epic implementation is modified.
 - [x] The atomic plan records and executes the upstream re-verification precondition before execution: F5's reserved section names, F3's `mutations[]` schema shape (op vocabulary and field nullability), F1's `conflicts(a, b)` signature, and F2's Welsh-Powell recoloring entry point, each checked against the integration branch head, with any divergence resolved in favor of the landed shape.

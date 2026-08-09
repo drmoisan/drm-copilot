@@ -70,6 +70,16 @@ from scripts.dev_tools._parallel_state_common import (
     VALID_MUTATION_OPS,
 )
 
+# The op classification is F3-OWNED and is CONSUMED here, never restated. Local
+# copies previously duplicated these three tuples, so an F3 amendment could have
+# diverged silently while both sides held full coverage; importing the originals
+# makes that divergence impossible by construction.
+from scripts.dev_tools._parallel_state_records import (
+    OPS_REQUIRING_ITEM_KEY,
+    OPS_REQUIRING_NULL_NEW_STATE,
+    OPS_REQUIRING_NULL_PRIOR_STATE,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from datetime import datetime
@@ -105,13 +115,6 @@ PINNED_ITEM_STATE = "in_flight"
 # The ``merge_status`` F3 reads for an item that records none (invariant 7).
 DEFAULT_MERGE_STATUS = "not_started"
 
-# Mutation ops carrying a resolving ``item_key``; ``close`` is run-scoped.
-ITEM_SCOPED_OPS: tuple[str, ...] = tuple("add remove requeue".split())
-
-# Ops requiring null state fields, mirroring F3's own two op tuples.
-OPS_WITH_NULL_PRIOR_STATE: tuple[str, ...] = tuple("add close".split())
-OPS_WITH_NULL_NEW_STATE: tuple[str, ...] = ("close",)
-
 
 class AdmissionOutcome(Enum):
     """The two verdicts ``decide_admission`` can return (spec FR1 step 4).
@@ -120,10 +123,12 @@ class AdmissionOutcome(Enum):
     call site. Carries no data; ``AdmissionDecision`` pairs it with a candidate.
 
     Attributes:
-        ADMIT_CURRENT_COHORT: No conflict with any in-flight item; the
-            candidate joins the current cohort, generation unchanged.
-        DEFER_AND_RECOLOR: A conflict with an in-flight item; the candidate is
-            deferred, the unstarted subgraph is recolored, and the generation
+        ADMIT_CURRENT_COHORT: The candidate conflicts with no member of the
+            current cohort, pinned or unstarted, so it joins the current cohort
+            with the generation unchanged.
+        DEFER_AND_RECOLOR: A conflict with any current-cohort member -- pinned or
+            not-yet-launched -- defers the candidate, the unstarted subgraph is
+            recolored under the pinned-barrier offset, and the generation
             increments by exactly one.
     """
 
@@ -293,9 +298,23 @@ class RecolorResult:
         set equals the caller's unstarted set exactly and is disjoint from the
         pinned set; ``generation`` is the current generation plus one.
 
+        The values are ABSOLUTE checkpoint cohort indices, not zero-based local
+        color indices. They already carry the pinned-barrier offset: every index
+        is at or above the run's ``current_cohort``, and strictly above it
+        whenever an unstarted item conflicts with a pinned item. The caller
+        writes them VERBATIM into ``cohorts[].index`` and never re-bases them to
+        zero. When the lowest returned index equals ``current_cohort`` -- the
+        no-pinned-conflict case, where the offset is not applied -- the keys at
+        that index are MERGED into the single existing current-generation cohort
+        entry at ``current_cohort`` alongside its pinned members, never written as
+        a second entry carrying the same index, because F3 invariant 13 requires
+        current-generation ``cohorts[].index`` values to be unique.
+
     Attributes:
         cohort_assignments (Mapping[int, int]): ``item_key -> cohort_index``
-            for unstarted items only, read-only.
+            for unstarted items only, read-only. The index is an ABSOLUTE
+            checkpoint cohort index written verbatim into ``cohorts[].index``,
+            not a zero-based local color index.
         generation (int): The generation the assignment belongs to.
     """
 
@@ -389,7 +408,7 @@ class MutationEntry:
             )
 
         key = self.item_key
-        if self.op not in ITEM_SCOPED_OPS:
+        if self.op not in OPS_REQUIRING_ITEM_KEY:
             if key is not None:
                 raise MutationEntryContractError(self.op, "item_key", key)
         elif key is None or isinstance(key, bool) or key <= 0:
@@ -415,8 +434,8 @@ class MutationEntry:
         # Both fields share one rule shape and differ only in which op set
         # requires a null, so one pass over the pair keeps them consistent.
         for field_name, value, null_ops in (
-            ("prior_state", self.prior_state, OPS_WITH_NULL_PRIOR_STATE),
-            ("new_state", self.new_state, OPS_WITH_NULL_NEW_STATE),
+            ("prior_state", self.prior_state, OPS_REQUIRING_NULL_PRIOR_STATE),
+            ("new_state", self.new_state, OPS_REQUIRING_NULL_NEW_STATE),
         ):
             if self.op in null_ops:
                 if value is not None:

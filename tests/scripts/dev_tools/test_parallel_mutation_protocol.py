@@ -1,12 +1,16 @@
-"""Unit tests for the parallel mutation engine: pinning, generations, admission.
+"""Unit tests for the parallel mutation engine: enums, generations, completion.
 
-Covers these spec Test Strategy unit scenarios: 1 (pinned items never move),
-3 (generation accounting across the recompute boundary), 4 (admission computed
-over ALL items including in-flight ones), and 7 (the mode-dependent completion
-predicate). The per-op scenarios 5, 6, and 8 -- removal table, close gating, and
-mutation-log shape -- live in
-``tests/scripts/dev_tools/test_parallel_mutation_protocol_ops.py`` so neither
-file exceeds the repository's 500-line limit.
+Covers these spec Test Strategy unit scenarios: 3 (generation accounting across
+the recompute boundary) and 7 (the mode-dependent completion predicate), plus the
+F3 enum- and constant-consumption bindings. Sibling modules hold the rest, so no
+file exceeds the repository's 500-line limit:
+
+- scenarios 5, 6, and 8 -- removal table, close gating, and mutation-log shape --
+  live in ``tests/scripts/dev_tools/test_parallel_mutation_protocol_ops.py``;
+- scenario 4 (admission) lives in
+  ``tests/scripts/dev_tools/test_parallel_mutation_admission.py``;
+- scenario 1 (pinned items never move) and scenario 9 (the pinned-barrier offset)
+  live in ``tests/scripts/dev_tools/test_parallel_mutation_recolor.py``.
 
 Every fixture is a literal dict keyed by ``int`` item keys, matching F3's
 positive-integer ``items[].issue_num`` primary key. The clock is injected as a
@@ -20,10 +24,12 @@ from datetime import datetime, timezone
 
 import pytest
 
+from scripts.dev_tools import _parallel_mutation_models as models
+from scripts.dev_tools import _parallel_orchestrator_state_mutations as validator
+from scripts.dev_tools import _parallel_state_records as records
 from scripts.dev_tools._parallel_mutation_models import (
     PINNED_ITEM_STATE,
     UNSTARTED_ITEM_STATES,
-    AdmissionOutcome,
     ItemRecord,
     RecolorResult,
     UnknownEnumMemberError,
@@ -41,7 +47,6 @@ from scripts.dev_tools.parallel_mutation_protocol import (
     build_close_entry,
     build_remove_entry,
     build_requeue_entry,
-    decide_admission,
     decide_removal,
     is_closed_mode_complete,
     recolor_unstarted,
@@ -124,85 +129,66 @@ class TestEnumConsumption:
         with pytest.raises(expected):
             ItemRecord(issue_num, state, merge_status)
 
+    def test_models_module_uses_f3_op_classification_objects(self) -> None:
+        """The models module's op tuples ARE F3's, not equal-valued copies."""
 
-class TestPinnedItemsNeverMove:
-    """Scenario 1 -- the pinning invariant of spec FR4."""
+        assert models.OPS_REQUIRING_ITEM_KEY is records.OPS_REQUIRING_ITEM_KEY
+        assert (
+            models.OPS_REQUIRING_NULL_PRIOR_STATE
+            is records.OPS_REQUIRING_NULL_PRIOR_STATE
+        )
+        assert (
+            models.OPS_REQUIRING_NULL_NEW_STATE is records.OPS_REQUIRING_NULL_NEW_STATE
+        )
 
-    def test_recolor_assigns_no_pinned_item(self) -> None:
-        """A pinned item receives no cohort assignment from a recolor."""
+    def test_validator_module_uses_f3_op_classification_objects(self) -> None:
+        """The FR9 validator's op tuples ARE F3's, not equal-valued copies."""
 
-        # Arrange: two unstarted items and two pinned items, all interconnected.
-        unstarted = [11, 12]
-        pinned = frozenset({21, 22})
-        edges = [(11, 12), (11, 21), (12, 22), (21, 22)]
+        assert validator.OPS_REQUIRING_ITEM_KEY is records.OPS_REQUIRING_ITEM_KEY
+        assert (
+            validator.OPS_REQUIRING_NULL_PRIOR_STATE
+            is records.OPS_REQUIRING_NULL_PRIOR_STATE
+        )
+        assert (
+            validator.OPS_REQUIRING_NULL_NEW_STATE
+            is records.OPS_REQUIRING_NULL_NEW_STATE
+        )
 
-        # Act
-        result = recolor_unstarted(unstarted, edges, pinned, START_GENERATION)
+    def test_the_two_f6_modules_agree_on_the_f3_op_classification(self) -> None:
+        """Both F6 modules resolve to the same objects, so they cannot diverge."""
 
-        # Assert
-        assert set(result.cohort_assignments).isdisjoint(pinned)
+        assert models.OPS_REQUIRING_ITEM_KEY is validator.OPS_REQUIRING_ITEM_KEY
+        assert (
+            models.OPS_REQUIRING_NULL_PRIOR_STATE
+            is validator.OPS_REQUIRING_NULL_PRIOR_STATE
+        )
+        assert (
+            models.OPS_REQUIRING_NULL_NEW_STATE
+            is validator.OPS_REQUIRING_NULL_NEW_STATE
+        )
 
-    def test_recolor_key_set_equals_the_unstarted_set_exactly(self) -> None:
-        """The result assigns every unstarted item and nothing else."""
+    @pytest.mark.parametrize(
+        "restated_name",
+        ["ITEM_SCOPED_OPS", "OPS_WITH_NULL_PRIOR_STATE", "OPS_WITH_NULL_NEW_STATE"],
+    )
+    def test_neither_f6_module_declares_a_local_op_tuple(
+        self, restated_name: str
+    ) -> None:
+        """A future re-restatement of F3's op classification must fail here.
 
-        # Arrange
-        unstarted = [11, 12, 13]
-        edges = [(11, 12), (12, 99), (99, 13)]
+        Finding R2 was exactly this: two local copies agreeing with F3 only by
+        coincidence, with no test binding them. Asserting the local names are
+        ABSENT makes reintroducing a copy a test failure rather than silent debt.
+        """
 
-        # Act
-        result = recolor_unstarted(unstarted, edges, frozenset({99}), START_GENERATION)
-
-        # Assert
-        assert set(result.cohort_assignments) == set(unstarted)
-
-    def test_applying_a_recolor_leaves_pinned_state_and_cohort_unchanged(self) -> None:
-        """Applying the result changes no pinned item's state or cohort index."""
-
-        # Arrange: a cohort table and item table holding one pinned item.
-        items = {11: ItemRecord(11, "scheduled"), 21: ItemRecord(21, "in_flight")}
-        cohort_by_key = {11: 0, 21: 0}
-        pinned_state_before = items[21].state
-        pinned_cohort_before = cohort_by_key[21]
-
-        # Act: recolor the unstarted subgraph and apply only its assignments.
-        result = recolor_unstarted([11], [(11, 21)], frozenset({21}), START_GENERATION)
-        for key, index in result.cohort_assignments.items():
-            cohort_by_key[key] = index
-
-        # Assert
-        assert items[21].state == pinned_state_before
-        assert cohort_by_key[21] == pinned_cohort_before
-
-    def test_recolor_rejects_a_key_that_is_both_unstarted_and_pinned(self) -> None:
-        """A key cannot be a colored vertex and pinned at the same time."""
-
-        # Arrange / Act / Assert
-        with pytest.raises(UnknownItemError):
-            recolor_unstarted([11, 21], [(11, 21)], frozenset({21}), START_GENERATION)
-
-    def test_recolor_does_not_mutate_its_inputs(self) -> None:
-        """A recolor leaves the caller's vertex list and edge list unchanged."""
-
-        # Arrange
-        unstarted = [11, 12]
-        edges = [(11, 12), (11, 21)]
-
-        # Act
-        recolor_unstarted(unstarted, edges, frozenset({21}), START_GENERATION)
-
-        # Assert
-        assert unstarted == [11, 12]
-        assert edges == [(11, 12), (11, 21)]
-
-    def test_recolor_result_mapping_is_read_only(self) -> None:
-        """The returned assignment mapping cannot be mutated by a caller."""
-
-        # Arrange
-        result = recolor_unstarted([11], [], frozenset(), START_GENERATION)
-
-        # Act / Assert
-        with pytest.raises(TypeError):
-            result.cohort_assignments[11] = 99  # type: ignore[index]
+        assert not hasattr(models, restated_name), (
+            f"{restated_name} was reintroduced in _parallel_mutation_models.py; "
+            f"import F3's tuple from _parallel_state_records.py instead"
+        )
+        assert not hasattr(validator, restated_name), (
+            f"{restated_name} was reintroduced in "
+            f"_parallel_orchestrator_state_mutations.py; import F3's tuple instead"
+        )
 
 
 class TestGenerationAccounting:
@@ -211,7 +197,9 @@ class TestGenerationAccounting:
     def test_recolor_result_generation_is_current_plus_one(self) -> None:
         """A recolor always yields exactly one generation beyond the current."""
 
-        result = recolor_unstarted([11], [], frozenset(), START_GENERATION)
+        result = recolor_unstarted(
+            [11], [], frozenset(), START_GENERATION, current_cohort=0
+        )
 
         assert result.generation == START_GENERATION + 1
 
@@ -320,95 +308,6 @@ class TestGenerationAccounting:
 
         # Assert
         assert observed == sorted(observed)
-
-
-class TestAdmissionOverAllItems:
-    """Scenario 4 -- admission decided against ALL items including in-flight."""
-
-    def test_conflict_only_with_an_in_flight_item_defers(self) -> None:
-        """An in-flight conflict defers the candidate and forces a recolor."""
-
-        decision = decide_admission(11, [(11, 21)], frozenset({21}))
-
-        assert decision.outcome is AdmissionOutcome.DEFER_AND_RECOLOR
-        assert decision.triggers_recompute is True
-
-    def test_conflict_only_with_an_unstarted_item_admits(self) -> None:
-        """An unstarted-only conflict is resolved by coloring, not by deferral."""
-
-        decision = decide_admission(11, [(11, 12)], frozenset({21}))
-
-        assert decision.outcome is AdmissionOutcome.ADMIT_CURRENT_COHORT
-
-    def test_unstarted_conflict_is_placed_by_the_coloring_not_rejected(self) -> None:
-        """The contending unstarted pair lands in different cohorts."""
-
-        # Arrange / Act
-        result = recolor_unstarted([11, 12], [(11, 12)], frozenset(), START_GENERATION)
-
-        # Assert: both placed, and not in the same cohort.
-        assert set(result.cohort_assignments) == {11, 12}
-        assert result.cohort_assignments[11] != result.cohort_assignments[12]
-
-    def test_no_conflicts_admits_with_no_generation_change(self) -> None:
-        """With no conflict at all the candidate joins the current cohort."""
-
-        # Arrange / Act
-        decision = decide_admission(11, [(12, 13)], frozenset({21}))
-        entry = build_add_entry(
-            11,
-            deferred=decision.triggers_recompute,
-            current_generation=START_GENERATION,
-            clock=fixed_clock,
-        )
-
-        # Assert
-        assert decision.outcome is AdmissionOutcome.ADMIT_CURRENT_COHORT
-        assert entry.recolor_generation == START_GENERATION
-
-    @pytest.mark.parametrize("edge", [(11, 21), (21, 11)])
-    def test_edge_direction_does_not_affect_the_decision(
-        self, edge: tuple[int, int]
-    ) -> None:
-        """Conflict edges are undirected, so either endpoint order defers."""
-
-        decision = decide_admission(11, [edge], frozenset({21}))
-
-        assert decision.outcome is AdmissionOutcome.DEFER_AND_RECOLOR
-
-    def test_candidate_key_is_recorded_on_the_decision(self) -> None:
-        """The decision names the candidate it applies to."""
-
-        assert decide_admission(11, [], frozenset()).candidate == 11
-
-    def test_admission_does_not_mutate_its_inputs(self) -> None:
-        """Deciding admission leaves the caller's edge list unchanged."""
-
-        # Arrange
-        edges = [(11, 21), (12, 13)]
-
-        # Act
-        decide_admission(11, edges, frozenset({21}))
-
-        # Assert
-        assert edges == [(11, 21), (12, 13)]
-
-    def test_admission_is_deterministic_for_equal_inputs(self) -> None:
-        """Two calls with equal inputs return equal decisions."""
-
-        edges = [(11, 21)]
-        pinned = frozenset({21})
-
-        assert decide_admission(11, edges, pinned) == decide_admission(
-            11, edges, pinned
-        )
-
-    def test_empty_edge_list_admits(self) -> None:
-        """A run with no conflict edges admits every candidate."""
-
-        decision = decide_admission(11, [], frozenset({21}))
-
-        assert decision.outcome is AdmissionOutcome.ADMIT_CURRENT_COHORT
 
 
 class TestCompletionPredicate:

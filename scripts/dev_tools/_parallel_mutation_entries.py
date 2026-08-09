@@ -103,8 +103,9 @@ def build_add_entry(
 
     Args:
         item_key (int): The admitted item's ``items[].issue_num``.
-        deferred (bool): True for the deferred row (an in-flight conflict forced
-            a recolor), False for the no-conflict admit row.
+        deferred (bool): True for the deferred row (a conflict with a member of
+            the current cohort, pinned or unstarted, forced a recolor), False for
+            the no-conflict admit row.
         current_generation (int): The run's generation before the add.
         clock (Callable[[], datetime]): Injected clock seam supplying ``at``.
             Required, so this function can never read the wall clock.

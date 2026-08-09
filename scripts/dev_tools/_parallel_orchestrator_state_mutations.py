@@ -70,6 +70,16 @@ from scripts.dev_tools._parallel_orchestrator_state_mode_completion import (
 )
 from scripts.dev_tools._parallel_state_common import is_non_negative_integer
 
+# The op classification is F3-OWNED and is CONSUMED here, never restated. Local
+# copies previously duplicated these three tuples, so an F3 amendment could have
+# diverged silently while both sides held full coverage; importing the originals
+# makes that divergence impossible by construction.
+from scripts.dev_tools._parallel_state_records import (
+    OPS_REQUIRING_ITEM_KEY,
+    OPS_REQUIRING_NULL_NEW_STATE,
+    OPS_REQUIRING_NULL_PRIOR_STATE,
+)
+
 # The single entry point the F3-owned validator calls. Listing it here marks the
 # re-export as deliberate so static analysis does not read the module as unused.
 __all__ = ["validate_mutation_protocol"]
@@ -87,16 +97,6 @@ MUTATION_ENTRY_FIELDS: tuple[str, ...] = tuple(
 
 # The run-level operation that carries no ``item_key`` and no state fields.
 CLOSE_OP = "close"
-
-# Item-scoped operations, which must carry a resolving ``item_key``.
-ITEM_SCOPED_OPS: tuple[str, ...] = tuple("add remove requeue".split())
-
-# Operations whose ``prior_state`` F3 requires to be null; every other operation
-# must therefore carry one, which is the completeness side this module checks.
-OPS_WITH_NULL_PRIOR_STATE: tuple[str, ...] = tuple("add close".split())
-
-# Operations whose ``new_state`` F3 requires to be null; the run close alone.
-OPS_WITH_NULL_NEW_STATE: tuple[str, ...] = (CLOSE_OP,)
 
 
 def _entry_context(context: str, position: int) -> str:
@@ -193,13 +193,13 @@ def _validate_entry_completeness(
     # which F3 mandates a null. Both fields share that rule shape and differ
     # only in which op set applies, so one pass keeps them consistent.
     requirements = (
-        ("prior_state", OPS_WITH_NULL_PRIOR_STATE),
-        ("new_state", OPS_WITH_NULL_NEW_STATE),
+        ("prior_state", OPS_REQUIRING_NULL_PRIOR_STATE),
+        ("new_state", OPS_REQUIRING_NULL_NEW_STATE),
     )
 
     errors: list[str] = []
     for field, null_ops in requirements:
-        if op in null_ops or op not in ITEM_SCOPED_OPS:
+        if op in null_ops or op not in OPS_REQUIRING_ITEM_KEY:
             continue
         if field in record and record[field] is None:
             errors.append(f"{entry_context} {field} must not be null for op {op!r}.")

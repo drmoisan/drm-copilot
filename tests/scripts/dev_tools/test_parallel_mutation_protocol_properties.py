@@ -1,30 +1,30 @@
 """Determinism and property-based tests for the parallel mutation engine.
 
-This is the feature's primary test obligation: spec FR4 makes the pinning
-invariant the core correctness property, and proving it under mutation against a
-live in-flight set requires properties over many graphs rather than a handful of
-examples.
+This is the feature's primary test obligation: spec FR4 makes the pinning invariant
+the core correctness property, and proving it under mutation against a live
+in-flight set requires properties over many graphs rather than a few examples.
 
-Properties proved here:
+Properties proved here, plus at least one property per pure engine function
+(``recolor_unstarted``, ``decide_removal``, ``decide_close``,
+``is_closed_mode_complete``, and the four entry constructors):
 
-- P1 determinism -- for arbitrary graphs and arbitrary pinned/unstarted
-  partitions, ``recolor_unstarted(x) == recolor_unstarted(x)``, every unstarted
-  vertex is assigned exactly one cohort, and no pinned vertex is assigned any.
-- P2 independent-set validity -- no two items in one recolored cohort share an
-  edge.
-- P3 pin stability -- for an arbitrary sequence of add and remove operations,
-  items in flight at operation time never change cohort or state.
+- P1 determinism -- for arbitrary graphs and arbitrary pinned/unstarted partitions,
+  ``recolor_unstarted(x) == recolor_unstarted(x)``, every unstarted vertex is
+  assigned exactly one cohort, no pinned vertex is assigned any, and the indices are
+  contiguous from the computed pinned-barrier offset.
+- P2 independent-set validity -- no two items in one recolored cohort share an edge,
+  and pinned edges leave the induced class STRUCTURE intact while shifting the final
+  assignment past the pinned index.
 
-Plus at least one property per pure engine function: ``decide_admission``,
-``recolor_unstarted``, ``decide_removal``, ``decide_close``,
-``is_closed_mode_complete``, and the four entry constructors.
+Sibling modules hold the rest, so no file exceeds the 500-line limit: P3 pin
+stability in ``test_parallel_mutation_pin_stability_properties.py``; P4 composed
+contention and the ``decide_admission`` property in
+``test_parallel_mutation_contention_properties.py``.
 
 Mechanism: seeded ``random.Random(seed)`` generation of ``int``-keyed conflict
-graphs. The seed appears in every assertion message and in each parametrized
-case id, so any failure is reproducible by rerunning that case. ``hypothesis``
-is absent from ``pyproject.toml``, is deliberately not imported, and no
-dependency is added by this feature.
-
+graphs. The seed appears in every assertion message and in each parametrized case
+id, so any failure is reproducible by rerunning that case. ``hypothesis`` is absent
+from ``pyproject.toml``, is deliberately not imported, and no dependency is added.
 No test creates a temporary file, starts a subprocess, reads the wall clock, or
 invokes ``git`` or ``gh``.
 """
@@ -33,11 +33,14 @@ from __future__ import annotations
 
 import random
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 import pytest
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
 from scripts.dev_tools._parallel_mutation_models import (
-    AdmissionOutcome,
     ItemRecord,
     ParallelMutationError,
     RecolorResult,
@@ -63,10 +66,9 @@ SEEDS = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233]
 MIN_ITEMS = 2
 MAX_ITEMS = 12
 
-# The generation every generated case starts from.
+# The generation every generated case starts from, and the single timestamp every
+# constructed entry records.
 START_GENERATION = 4
-
-# The single timestamp every constructed entry records.
 FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=timezone.utc)
 
 # The four unstarted item states, cycled when labelling generated items.
@@ -74,11 +76,7 @@ UNSTARTED_STATE_CYCLE = ("proposed", "admitted", "prepared", "scheduled")
 
 
 def fixed_clock() -> datetime:
-    """Return the module's fixed timestamp.
-
-    Returns:
-        datetime: ``FIXED_NOW``, so every constructed entry is deterministic.
-    """
+    """Return ``FIXED_NOW`` so every constructed entry is deterministic."""
 
     return FIXED_NOW
 
@@ -86,54 +84,40 @@ def fixed_clock() -> datetime:
 class GeneratedRun:
     """A randomly generated parallel run, reproducible from its seed.
 
-    Purpose and responsibilities:
-        Produce one arbitrary conflict graph plus an arbitrary partition of its
-        vertices into pinned (``in_flight``) and unstarted items, so a property
-        can be asserted over many shapes. It generates data only; it asserts
-        nothing and calls no engine function.
-
-    Usage and invariants:
-        Keys are positive ``int`` values, matching F3's ``items[].issue_num``.
-        The pinned and unstarted key sets are disjoint and together cover every
-        generated key. Edges are normalized to ``(a, b)`` with ``a < b`` and
-        deduplicated, matching F3's conflict-edge normalization.
+    Produces one arbitrary conflict graph plus an arbitrary pinned/unstarted
+    partition, so a property can be asserted over many shapes. Keys are positive
+    ``int`` values matching F3's ``items[].issue_num``; the pinned and unstarted sets
+    are disjoint and cover every generated key; edges are normalized to ``(a, b)``
+    with ``a < b`` and deduplicated, matching F3's conflict-edge normalization.
 
     Attributes:
         seed (int): The seed this run was generated from, reported on failure.
         keys (list[int]): Every generated item key, ascending.
         pinned (frozenset[int]): Keys whose items are ``in_flight``.
         unstarted (list[int]): Keys whose items are unstarted, ascending.
+        current_cohort (int): The index the pinned items occupy.
         edges (list[tuple[int, int]]): Normalized, deduplicated conflict edges.
         items (dict[int, ItemRecord]): The item table for this run.
     """
 
     def __init__(self, seed: int) -> None:
-        """Generate one run from a seed.
-
-        Args:
-            seed (int): The RNG seed. The same seed always yields the same run,
-                so a reported seed reproduces a failure exactly.
-
-        Returns:
-            None.
-
-        Side Effects:
-            None beyond populating this instance.
-        """
+        """Generate one run from ``seed``; the same seed always yields the same run."""
 
         self.seed = seed
-        rng = random.Random(seed)  # noqa: S311 - test data generation, not security
-
-        count = rng.randint(MIN_ITEMS, MAX_ITEMS)
+        # Deterministic test data; S311 authorized in pyproject per-file-ignores.
+        rng = random.Random(seed)
         # Offset the keys off 1 so a test cannot pass by assuming 0-based keys.
+        count = rng.randint(MIN_ITEMS, MAX_ITEMS)
         self.keys = [100 + index for index in range(count)]
 
         # Partition the vertices. The pinned share varies with the seed so some
-        # runs have no pinned item and others are almost entirely pinned.
+        # runs have no pinned item and others are almost entirely pinned. The
+        # cohort index is varied off zero so no assertion can pass by assuming a
+        # zero-based assignment.
         pinned_count = rng.randint(0, count - 1)
-        pinned_keys = rng.sample(self.keys, pinned_count)
-        self.pinned = frozenset(pinned_keys)
+        self.pinned = frozenset(rng.sample(self.keys, pinned_count))
         self.unstarted = [key for key in self.keys if key not in self.pinned]
+        self.current_cohort = rng.randint(0, 4)
 
         # Generate edges over ALL vertices, including pinned ones, because
         # admission is decided against the full graph.
@@ -157,10 +141,10 @@ class GeneratedRun:
             self.items[key] = ItemRecord(key, state)
 
     def recolor(self, generation: int = START_GENERATION) -> RecolorResult:
-        """Recolor this run's unstarted subgraph.
+        """Recolor this run's unstarted subgraph at this run's cohort index.
 
-        A thin wrapper over ``recolor_unstarted`` that binds this run's vertex
-        set, edges, and pinned set, so each property reads as one call.
+        A thin wrapper binding this run's vertex set, edges, pinned set, and cohort
+        index, so each property reads as one call.
 
         Args:
             generation (int): The generation to recolor from.
@@ -169,36 +153,87 @@ class GeneratedRun:
             RecolorResult: The engine's result for this run.
         """
 
-        return recolor_unstarted(self.unstarted, self.edges, self.pinned, generation)
+        return recolor_unstarted(
+            self.unstarted,
+            self.edges,
+            self.pinned,
+            generation,
+            current_cohort=self.current_cohort,
+        )
 
-    def __str__(self) -> str:
-        """Describe the run compactly for an assertion message.
+    def crosses_pinned(self, edges: list[tuple[int, int]] | None = None) -> bool:
+        """Recompute the pinned-barrier predicate independently of the engine.
+
+        Args:
+            edges (list[tuple[int, int]] | None): Edge list to test; defaults to
+                this run's full edge list.
 
         Returns:
-            str: The seed and the run's shape, so a failure message alone is
-            enough to reproduce the case.
+            bool: True when some edge joins an unstarted key to a pinned key.
         """
+
+        unstarted_keys = frozenset(self.unstarted)
+        # Scan the FULL list; the induced restriction is what discards these edges.
+        return any(
+            (first in unstarted_keys and second in self.pinned)
+            or (second in unstarted_keys and first in self.pinned)
+            for first, second in (self.edges if edges is None else edges)
+        )
+
+    def expected_offset(self, edges: list[tuple[int, int]] | None = None) -> int:
+        """Return the absolute base index the offset rule requires.
+
+        Args:
+            edges (list[tuple[int, int]] | None): Edge list to test.
+
+        Returns:
+            int: ``current_cohort + 1`` when an unstarted-to-pinned edge exists,
+            otherwise ``current_cohort``.
+        """
+
+        return self.current_cohort + (1 if self.crosses_pinned(edges) else 0)
+
+    def __str__(self) -> str:
+        """Report the seed and shape, so a failure message alone reproduces it."""
 
         return (
             f"seed={self.seed} keys={self.keys} pinned={sorted(self.pinned)} "
-            f"edges={self.edges}"
+            f"current_cohort={self.current_cohort} edges={self.edges}"
         )
 
 
 @pytest.fixture(params=SEEDS, ids=[f"seed{seed}" for seed in SEEDS])
 def run(request: pytest.FixtureRequest) -> GeneratedRun:
-    """Provide one generated run per seed.
+    """Provide one generated run per seed; the case id names the seed.
 
     Args:
-        request (pytest.FixtureRequest): Pytest's request object carrying the
-            seed parameter.
+        request (pytest.FixtureRequest): Carries the seed parameter.
 
     Returns:
-        GeneratedRun: The run for this seed. The case id names the seed, so a
-        failing case is reproducible from the test report alone.
+        GeneratedRun: The run for this seed, reproducible from the report alone.
     """
 
     return GeneratedRun(int(request.param))
+
+
+def _classes(assignments: Mapping[int, int]) -> set[frozenset[int]]:
+    """Group an assignment into its color classes, discarding the index labels.
+
+    Comparing two assignments' class sets compares their PARTITIONS rather than
+    their labels, so a uniform index shift cannot change the comparison.
+
+    Args:
+        assignments (Mapping[int, int]): An ``item_key -> cohort_index`` mapping.
+
+    Returns:
+        set[frozenset[int]]: One frozen key set per occupied cohort index.
+    """
+
+    grouped: dict[int, set[int]] = {}
+    # Collect the keys sharing each index, then drop the index value itself.
+    for key, index in assignments.items():
+        grouped.setdefault(index, set()).add(key)
+    return {frozenset(keys) for keys in grouped.values()}
 
 
 class TestPropertyOneDeterminism:
@@ -218,7 +253,11 @@ class TestPropertyOneDeterminism:
 
         # Act
         reordered = recolor_unstarted(
-            shuffled_vertices, shuffled_edges, run.pinned, START_GENERATION
+            shuffled_vertices,
+            shuffled_edges,
+            run.pinned,
+            START_GENERATION,
+            current_cohort=run.current_cohort,
         )
 
         # Assert
@@ -249,12 +288,30 @@ class TestPropertyOneDeterminism:
             run.recolor().generation == START_GENERATION + 1
         ), f"wrong generation for {run}"
 
-    def test_cohort_indices_are_contiguous_from_zero(self, run: GeneratedRun) -> None:
-        """Indices form a gapless range, so no cohort position is empty."""
+    def test_cohort_indices_are_contiguous_from_the_computed_offset(
+        self, run: GeneratedRun
+    ) -> None:
+        """Indices form a gapless range starting at the computed offset.
+
+        Replaces ``test_cohort_indices_are_contiguous_from_zero``, which asserted a
+        zero base the pinned-barrier offset replaces. STRICTLY STRONGER: it keeps
+        the contiguity claim and adds the offset-value claim, so it fails if the
+        offset is removed, re-based to zero, or made unconditional.
+        """
 
         indices = set(run.recolor().cohort_assignments.values())
-        expected = set(range(len(indices)))
-        assert indices == expected, f"cohort indices were not contiguous for {run}"
+        if not indices:
+            return
+
+        offset = run.expected_offset()
+
+        # Contiguity, now measured from the computed offset rather than zero.
+        assert indices == set(
+            range(offset, offset + len(indices))
+        ), f"cohort indices were not contiguous from offset {offset} for {run}"
+
+        # The offset itself equals the rule in spec FR4, not merely some shift.
+        assert min(indices) == offset, f"offset base should be {offset} for {run}"
 
 
 class TestPropertyTwoIndependentSets:
@@ -275,10 +332,19 @@ class TestPropertyTwoIndependentSets:
                     assignments[first] != assignments[second]
                 ), f"edge ({first}, {second}) fell inside one cohort for {run}"
 
-    def test_edges_touching_a_pinned_vertex_do_not_constrain_the_coloring(
+    def test_pinned_edges_leave_the_class_structure_but_shift_the_assignment(
         self, run: GeneratedRun
     ) -> None:
-        """Dropping pinned endpoints is what makes the subgraph induced."""
+        """Pinned edges do not constrain the LOCAL coloring but do shift the result.
+
+        Replaces ``test_edges_touching_a_pinned_vertex_do_not_constrain_the_coloring``,
+        whose full-versus-induced EQUALITY assertion codified the C2 defect: it can
+        only hold if the pinned edges are discarded entirely, constraint included.
+        STRICTLY STRONGER, asserting both halves of the corrected statement -- F2
+        receives the same induced subgraph so the class STRUCTURE is identical, yet
+        the final assignment is SHIFTED past the pinned index whenever an
+        unstarted-to-pinned edge exists, which the old equality forbade.
+        """
 
         # Arrange: recolor with the full edge list and with the induced list.
         induced = [
@@ -288,114 +354,41 @@ class TestPropertyTwoIndependentSets:
         ]
 
         # Act
+        from_full = run.recolor()
         from_induced = recolor_unstarted(
-            run.unstarted, induced, run.pinned, START_GENERATION
+            run.unstarted,
+            induced,
+            run.pinned,
+            START_GENERATION,
+            current_cohort=run.current_cohort,
         )
 
-        # Assert
-        assert run.recolor() == from_induced, f"pinned edges affected coloring: {run}"
+        # Assert: identical class STRUCTURE. Comparing grouped key sets compares
+        # partitions, not labels, so a uniform shift cannot change the comparison.
+        assert _classes(from_full.cohort_assignments) == _classes(
+            from_induced.cohort_assignments
+        ), f"pinned edges changed the induced class structure for {run}"
 
+        if not from_full.cohort_assignments:
+            return
 
-class TestPropertyThreePinStability:
-    """P3 -- in-flight items are untouched by an arbitrary mutation sequence."""
-
-    def test_pinned_items_never_change_state_or_cohort_across_a_sequence(
-        self, run: GeneratedRun
-    ) -> None:
-        """Apply a generated add/remove sequence and assert pins never moved."""
-
-        # Arrange: record every pinned item's state and cohort before the run.
-        rng = random.Random(run.seed)  # noqa: S311 - test data generation
-        items = dict(run.items)
-        generation = START_GENERATION
-        cohort_by_key = dict(run.recolor(generation).cohort_assignments)
-        for key in run.pinned:
-            # Pinned items hold a cohort from an earlier generation; model that
-            # as index 0, which the recolor must never overwrite.
-            cohort_by_key.setdefault(key, 0)
-        pinned_states_before = {key: items[key].state for key in run.pinned}
-        pinned_cohorts_before = {key: cohort_by_key[key] for key in run.pinned}
-
-        # Act: perform an arbitrary sequence of adds and removes.
-        unstarted = list(run.unstarted)
-        for step in range(6):
-            if unstarted and rng.random() < 0.5:
-                target = rng.choice(unstarted)
-                try:
-                    decision = decide_removal(target, items)
-                except ParallelMutationError:
-                    continue
-                unstarted.remove(target)
-                items[target] = ItemRecord(target, decision.new_state)
-                generation = build_remove_entry(
-                    decision, current_generation=generation, clock=fixed_clock
-                ).recolor_generation
-            else:
-                candidate = 900 + step
-                decision = decide_admission(candidate, run.edges, run.pinned)
-                unstarted.append(candidate)
-                items[candidate] = ItemRecord(candidate, "scheduled")
-                generation = build_add_entry(
-                    candidate,
-                    deferred=decision.triggers_recompute,
-                    current_generation=generation,
-                    clock=fixed_clock,
-                ).recolor_generation
-
-            # Reapply the recolor after each op, as the orchestrator would.
-            refreshed = recolor_unstarted(unstarted, run.edges, run.pinned, generation)
-            for key, index in refreshed.cohort_assignments.items():
-                cohort_by_key[key] = index
-            generation = refreshed.generation
-
-        # Assert: every pinned item is exactly as it started.
-        for key in run.pinned:
+        # Assert: the assignment is shifted past the pinned index exactly when an
+        # unstarted-to-pinned edge exists.
+        full_base = min(from_full.cohort_assignments.values())
+        assert (
+            full_base == run.expected_offset()
+        ), f"full-edge assignment did not carry the pinned barrier for {run}"
+        assert (
+            min(from_induced.cohort_assignments.values()) == run.current_cohort
+        ), f"induced-edge assignment should start at current_cohort for {run}"
+        if run.crosses_pinned():
             assert (
-                items[key].state == pinned_states_before[key]
-            ), f"pinned item {key} changed state for {run}"
-            assert (
-                cohort_by_key[key] == pinned_cohorts_before[key]
-            ), f"pinned item {key} changed cohort for {run}"
-
-    def test_a_pinned_item_is_never_a_removal_target_without_a_disposition(
-        self, run: GeneratedRun
-    ) -> None:
-        """Every pinned item rejects a bare removal, for every generated run."""
-
-        # Act / Assert
-        for key in run.pinned:
-            with pytest.raises(ParallelMutationError):
-                decide_removal(key, run.items)
+                full_base > run.current_cohort
+            ), f"a pinned conflict must push the assignment above the index: {run}"
 
 
 class TestPerFunctionProperties:
     """At least one property per pure engine function."""
-
-    def test_admission_defers_exactly_when_a_pinned_neighbour_exists(
-        self, run: GeneratedRun
-    ) -> None:
-        """``decide_admission`` agrees with the graph for every unstarted item."""
-
-        # Arrange: derive each vertex's pinned neighbours straight from the edges.
-        for candidate in run.unstarted:
-            has_pinned_neighbour = any(
-                (first == candidate and second in run.pinned)
-                or (second == candidate and first in run.pinned)
-                for first, second in run.edges
-            )
-
-            # Act
-            decision = decide_admission(candidate, run.edges, run.pinned)
-
-            # Assert
-            expected = (
-                AdmissionOutcome.DEFER_AND_RECOLOR
-                if has_pinned_neighbour
-                else AdmissionOutcome.ADMIT_CURRENT_COHORT
-            )
-            assert (
-                decision.outcome is expected
-            ), f"wrong admission for candidate {candidate} in {run}"
 
     def test_removal_of_an_unstarted_item_always_recomputes_and_withdraws(
         self, run: GeneratedRun
@@ -489,8 +482,16 @@ class TestPerFunctionProperties:
         items_before = dict(run.items)
 
         # Act: exercise every pure function that takes a container.
-        decide_admission(run.keys[0], run.edges, run.pinned)
-        recolor_unstarted(run.unstarted, run.edges, run.pinned, START_GENERATION)
+        decide_admission(
+            run.keys[0], run.edges, run.pinned, current_cohort_members=run.pinned
+        )
+        recolor_unstarted(
+            run.unstarted,
+            run.edges,
+            run.pinned,
+            START_GENERATION,
+            current_cohort=run.current_cohort,
+        )
         is_closed_mode_complete(run.items)
 
         # Assert

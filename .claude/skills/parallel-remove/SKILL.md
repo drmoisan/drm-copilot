@@ -79,9 +79,17 @@ Do not record a partial removal, and do not record the rejection itself in `muta
 
 3. **Unstarted removal (recompute).** Set the item's state to `withdrawn`, drop its vertex, and
    recolor by calling `recolor_unstarted(unstarted_items, conflict_edges, pinned,
-   current_generation)`. Write `RecolorResult.cohort_assignments` into `cohorts[]` and set the
-   top-level `recolor_generation` to `RecolorResult.generation`; the generation increments by
-   exactly one. The result names no pinned key, so no in-flight item moves.
+   current_generation, current_cohort=current_cohort)`. Write
+   `RecolorResult.cohort_assignments` into `cohorts[]` and set the top-level `recolor_generation`
+   to `RecolorResult.generation`; the generation increments by exactly one. The result names no
+   pinned key, so no in-flight item moves.
+
+   `current_cohort` is F3's top-level field, read from the re-verified durable state, and is the
+   index the pinned items occupy. The returned indices are ABSOLUTE and are written VERBATIM into
+   `cohorts[].index`, never re-based to zero. Returned keys whose index equals `current_cohort` are
+   MERGED into the single existing current-generation cohort entry at that index alongside its
+   pinned members, never written as a second entry carrying the same `index`, which F3 invariant 13
+   rejects.
 
 4. **`detach` (no recompute).** Set the item's state to `withdrawn` and record
    `disposition: "detach"` in the mutation entry. `recolor_generation` is UNCHANGED: the detached

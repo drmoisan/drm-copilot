@@ -149,7 +149,8 @@ def run_with_subprocess(argv: Sequence[str]) -> int:
     if executable is None:
         raise AbandonSideEffectError(argv, -1)
     command = [executable, *argv[1:]]
-    # noqa: S603 - static analysis can't verify runtime validation
+    # S603 rationale: static analysis can't verify runtime validation. The
+    # executable is resolved through shutil.which above before the call.
     completed = subprocess.run(  # noqa: S603
         command,
         check=False,

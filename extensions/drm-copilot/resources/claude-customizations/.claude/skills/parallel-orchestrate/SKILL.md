@@ -440,8 +440,9 @@ exactly one `mutations[]` entry to the parallel-orchestrator checkpoint on succe
 - `/parallel-add <issue|potential-entry>` — `.claude/skills/parallel-add/SKILL.md`. Admits one new
   item: the item enters `proposed`, is prepared through a preparation-mode child
   `Agent(orchestrator)` run reusing the `route_id: preparation` contract unchanged, its conflict
-  edges are computed against ALL items including in-flight ones, and the admission decision either
-  places it in the current cohort or defers it and recolors the unstarted subgraph.
+  edges are computed against ALL items including in-flight ones, and the admission decision places
+  it in the current cohort only when it conflicts with no member of that cohort, pinned or
+  unstarted, and otherwise defers it and recolors the unstarted subgraph.
 - `/parallel-remove <item> [--disposition detach|abandon]` —
   `.claude/skills/parallel-remove/SKILL.md`. Removes one item per the state-dependent behavior
   table: an unstarted item is withdrawn and the unstarted subgraph is recolored; an in-flight item
@@ -460,17 +461,42 @@ integers (`items[].issue_num`) everywhere on this surface.
 ### Pinning invariant
 
 **In-flight items are pinned. Scheduling is recomputed only over the not-yet-started subgraph, and
-recoloring is a pure function of `(remaining subgraph, pinned set)`.**
+recoloring is a pure function of `(remaining subgraph, pinned set, pinned cohort index)`.**
 
 The recolor function takes the induced subgraph of unstarted items (states `proposed`, `admitted`,
-`prepared`, `scheduled`), the pinned set (state `in_flight`), and the current generation. It returns
-cohort assignments for unstarted items ONLY: the returned mapping's key set equals the unstarted set
-exactly and contains no pinned key. A pinned item is therefore absent from the result rather than
-reassigned, and that absence IS the guarantee that a mutation never moves work already running.
+`prepared`, `scheduled`), the pinned set (state `in_flight`), the current generation, and — as a
+third scheduling input — the current cohort index `current_cohort` that the pinned items occupy. It
+returns cohort assignments for unstarted items ONLY: the returned mapping's key set equals the
+unstarted set exactly and contains no pinned key. A pinned item is therefore absent from the result
+rather than reassigned, and that absence IS the guarantee that a mutation never moves work already
+running.
+
+**Pinned-barrier offset.** The returned indices are ABSOLUTE checkpoint cohort indices at or above
+`current_cohort`, and strictly above `current_cohort` whenever any conflict edge joins an unstarted
+item to a pinned item. When no such edge exists the lowest returned index equals `current_cohort`
+exactly, so unstarted items may share the running cohort and `max_concurrency` slot filling is
+preserved. The offset is a single uniform shift applied to every color class, so F2's distinct color
+classes remain distinct cohort indices and independence within the unstarted set is preserved
+exactly.
+
+Write the returned indices VERBATIM into `cohorts[].index`; never re-base them to zero. `cohorts[]`
+carries exactly ONE current-generation entry per index, so returned keys landing on index
+`current_cohort` JOIN the pinned members of that one entry instead of forming a second entry with
+the same index, which F3 invariant 13 rejects.
 
 Coloring is delegated in full to the Welsh-Powell entry point `compute_cohorts` in
 `scripts/dev_tools/parallel_cohort_computation.py`. No part of the coloring, the vertex ordering, or
-the tie-break is reimplemented by the mutation engine.
+the tie-break is reimplemented by the mutation engine, and the offset is applied entirely inside the
+mutation engine's own recolor function.
+
+**Two design corrections (spec 1.2).** Admission previously checked only the `in_flight` subset, but
+`max_concurrency` caps simultaneously in-flight items independently of cohort size and refills each
+freed slot from the same current cohort — see
+`## Cohort Barrier and Max-Concurrency Slot Filling` — so the current cohort durably holds
+not-yet-launched `scheduled` members that a candidate can contend with. Recoloring previously
+dropped the candidate-to-pinned edges together with the pinned vertices, which discarded the pinned
+CONSTRAINT as well as the pinned VERTICES and returned a deferred candidate to cohort 0, the current
+cohort, whenever the cohort barrier held `current_cohort` at 0.
 
 ### Recompute boundary
 
@@ -479,8 +505,8 @@ other operation. The boundary is normative:
 
 Operations that RECOMPUTE (`recolor_generation` increments by exactly one):
 
-1. **Deferred add** — the candidate conflicts with an in-flight item, so the unstarted subgraph,
-   including the new item, is recolored.
+1. **Deferred add** — the candidate conflicts with a member of the current cohort — pinned or
+   not-yet-launched — so the unstarted subgraph, including the new item, is recolored.
 2. **Remove of an unstarted item** — the vertex is dropped and the remaining unstarted subgraph is
    recolored.
 3. **Drift-induced requeue** — the later-started item of a newly conflicting pair is halted and
@@ -488,7 +514,8 @@ Operations that RECOMPUTE (`recolor_generation` increments by exactly one):
 
 Operations that DO NOT recompute (generation stamped unchanged):
 
-1. **Admission into the current cohort with no in-flight conflict** — no cohort assignment changes.
+1. **Admission into the current cohort with no conflict against any current-cohort member** — no
+   cohort assignment changes.
 2. **`detach`** — the detached item was pinned and was never a vertex of the unstarted subgraph, so
    its departure cannot change the induced subgraph.
 3. **`abandon`** — same rationale as `detach`. An unstarted item previously deferred because of a
@@ -574,7 +601,10 @@ engine's `build_requeue_entry` constructor and the recolor through `recolor_unst
 - Exactly one `mutations[]` entry is appended with `op: requeue`, `prior_state: in_flight`,
   `new_state: blocked`, `disposition: null`, and `recolor_generation` equal to `g` + 1 — the requeue
   is a recompute.
-- The recolor runs over the unstarted subgraph only, so no other in-flight item moves.
+- The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Its call
+  shape is the five-argument form
+  `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort)`,
+  where `current_cohort` is required and keyword-only.
 
 The drift event itself is recorded in `drift_events[]`, which this protocol does not write. See
 `## Radius Drift Detection (F8)`.
