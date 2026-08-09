@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 4 (440 and 446 merged; 442 still executing)
-- Last updated: 2026-08-09T08:10:00Z
+- Current wave: all waves complete; integration-to-`main` PR pending
+- Last updated: 2026-08-09T08:50:00Z
 
 ## Feature Status
 
@@ -25,7 +25,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/455 | c939b5b80c8c297db49febaebdd35dda2c869a3f | 2026-08-08T20:55:00Z | 2026-08-09T00:40:12Z | 2026-08-09T00:45:49Z | 2026-08-09T01:02:00Z |
 | 2026-08-07-parallel-drift-detection-446 | 446 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/457 | 1b2ecc00d3e2dfb5b950fc3ba19cd0bc03ca391b | 2026-08-09T01:05:00Z | 2026-08-09T07:41:26Z | 2026-08-09T07:53:02Z | 2026-08-09T08:06:00Z |
 | 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/456 | acddff246d06c6c003231d4ebb98eb4d9072d95f | 2026-08-09T01:05:00Z | 2026-08-09T05:50:17Z | 2026-08-09T05:52:51Z | 2026-08-09T06:08:00Z |
-| 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | worktree_created | — | — | 2026-08-09T01:05:00Z | — | — | — |
+| 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/458 | 08f2907c755696504da29bfa1054a3e49deb46f7 | 2026-08-09T01:05:00Z | 2026-08-09T08:19:01Z | 2026-08-09T08:30:14Z | 2026-08-09T08:45:00Z |
 
 ## Wave Schedule
 
@@ -38,7 +38,7 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | 1 | 444 schema and validators; 452 F1a blast-radius correction (added) | complete |
 | 2 | 443 parallel-planner surface | complete |
 | 3 | 441 parallel-orchestrator surface | complete |
-| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | in_progress; 440 merged clean, 446 merged after resolving an 8-file fan-in conflict, 442 still running |
+| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | complete; 440 merged clean, 446 and 442 each resolved an 8-file fan-in conflict in one pass |
 
 ## Resolved Decision: F1a Correction Authorized (was blocking wave 2)
 
@@ -206,13 +206,31 @@ gate enforced. Layer 2 retrospective validation may be the only live enforcement
 No harm resulted. Every worktree removal in this run followed durable merge confirmation via
 `gh pr view`, a clean-tree check, an ancestry check, and content rescue.
 
-### 2. Three F8 acceptance criteria pend on F6
+### 2. Three F8 acceptance criteria are still unchecked (F6 has now landed)
 
-F8 (#446) closed 18 of 21 acceptance criteria: `spec.md` 12/12, `user-story.md` 6/9. The three
-remaining — US-3 admission-control consultation, US-4's requeue clause, and US-6 `mutations[]`
-visibility — are genuine cross-feature dependencies on F6 (#442), which was still executing. F8's
-reviewer independently confirmed this is not an F8 gap being deflected. These will be re-evaluated
-once #442 merges and flagged in the completion summary if they remain unchecked.
+F8 (#446) closed 18 of 21: `spec.md` 12/12, `user-story.md` 6/9. The three remaining, at
+`user-story.md` lines 85, 88, and 93, are cross-feature dependencies on F6 (#442):
+admission-control consultation while a drift event is unresolved, the requeue clause needing F6's
+recolor entry point, and `mutations[]` requeue visibility. F8's reviewer independently confirmed
+this was not an F8 gap being deflected.
+
+F6 has since merged and delivered `decide_admission`, `recolor_unstarted`, the pinning invariant,
+and the mutation log — so these three became verifiable only after that merge, and **no agent has
+re-evaluated them since**. They remain unchecked.
+
+`epic-orchestrator` has deliberately not checked them off. The `acceptance-criteria-tracking` skill
+assigns check-off to executors and reviewers on verified evidence, and assigns orchestrators the duty
+to verify AC files reflect delivered work and to *flag* what remains. Marking these would be a review
+judgment not earned by evidence. Recommended resolution: a targeted `feature-review` pass over F8's
+`user-story.md` against F6's landed implementation.
+
+### 4. `--require-complete` is unsatisfiable for a prepared epic child
+
+F6 reported that the completion gate demands promotion receipts a prepared child was explicitly told
+not to produce, because `epic-planner` performed promotion during preparation rather than at
+execution time. F6 recorded the exemption honestly rather than fabricating receipts. Every prepared
+child in this epic inherits this gap; it is a contract defect, not child misbehaviour, and warrants a
+follow-up against the orchestrate completion gate.
 
 ### 3. `run_poshqc_test` measures the installed bundle, not the worktree
 
