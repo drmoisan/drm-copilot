@@ -124,6 +124,20 @@
             '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
             '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
             '.claude/lib/blast-radius/BlastRadius.psm1'
+            # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
+            # barrier and the worktree removal gate) and extended the invocation-origin
+            # hook with the parallel-agent family; measured here so no new or changed
+            # production hook is excluded from coverage.
+            '.claude/hooks/enforce-parallel-cohort-barrier.ps1'
+            '.claude/hooks/enforce-parallel-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-invocation-origin.ps1'
+            # Issue #446 added this Layer-1 parallel drift-gate PreToolUse hook; measured here so
+            # the new production hook is not excluded from coverage.
+            '.claude/hooks/enforce-parallel-drift-gate.ps1'
+            # Issue #446 remediation cycle 1 split the seven shape-and-derivation helpers out of
+            # that hook into this dot-sourced sibling module; measured here so the Coverage
+            # Exclusion Policy's no-production-file-excluded rule still holds after the split.
+            '.claude/hooks/enforce-parallel-drift-gate-helpers.ps1'
             # Issue #442 added this PreToolUse abandon-gate hook, which guards the destructive
             # parallel abandon disposition; measured here so the new production hook is not
             # excluded from coverage. The test suite dot-sources the file (guarded body) so

@@ -36,6 +36,10 @@ import json
 from typing import cast
 
 from scripts.dev_tools import _parallel_orchestrator_state_mutations as mutation_rules
+from scripts.dev_tools._parallel_orchestrator_state_cohort_barrier import (
+    validate_cohort_barrier_ordering,
+)
+from scripts.dev_tools._parallel_orchestrator_state_drift import validate_drift_gate
 from scripts.dev_tools._parallel_state_common import (
     MERGED_MERGE_STATUSES,
     VALID_MODES,
@@ -323,6 +327,7 @@ def validate_parallel_orchestrator_state_text(
     errors.extend(scan_prohibited_keys(state_map, CONTEXT))
     errors.extend(_validate_collections(state_map))
     errors.extend(mutation_rules.validate_mutation_protocol(state_map, CONTEXT))
+    errors.extend(validate_drift_gate(state_map, CONTEXT))
 
     # BEGIN F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
     # F7 (parallel enforcement hooks) owns the retrospective cohort-ordering
@@ -331,6 +336,7 @@ def validate_parallel_orchestrator_state_text(
     # this block, plus the helper's import. Nothing else in this function moves,
     # so F7 and F3 cannot contend over the same lines (epic wave-4 rule).
     # Add F7 helper invocations below this line, one per line.
+    errors.extend(validate_cohort_barrier_ordering(state_map))
     # END F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
 
     if require_complete:

@@ -245,26 +245,45 @@ def test_orchestrate_skill_reserved_wave_four_sections_close_the_file() -> None:
 
 
 def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> None:
-    """Require each still-reserved section body to be its reserved sentence.
+    """Require each still-reserved section body to be its single reserved sentence.
 
-    A heading listed in ``POPULATED_RESERVED_HEADINGS`` is skipped: its owning
-    wave-4 feature has landed its content, so its body is legitimately no longer
-    the placeholder. Every other reserved section must still carry the one-line
-    statement, which is what keeps one wave-4 feature from writing into another's
-    section ahead of that feature.
+    A feature named in ``LANDED_WAVE_FOUR_FEATURES`` is exempt from the pin
+    entirely: its content is not ahead of itself. A placeholder listed in
+    ``FILLED_RESERVED_HEADINGS`` has been filled by its own owning feature,
+    which the reserved sentence directs that feature to do, so the one-line
+    obligation is released for it and inverted instead: the section must no
+    longer hold the placeholder sentence.
     """
 
-    # Assert each remaining placeholder body is exactly the one-line reserved
-    # statement, so no wave-4 content has been added ahead of its own feature.
+    # The filled set must name only reserved headings, otherwise a typo there
+    # would silently exempt nothing while looking like an exemption.
+    assert set(pinned.FILLED_RESERVED_HEADINGS).issubset(
+        set(pinned.RESERVED_HEADINGS)
+    ), (
+        "every FILLED_RESERVED_HEADINGS entry must be a reserved heading; found "
+        f"{pinned.FILLED_RESERVED_HEADINGS} against {pinned.RESERVED_HEADINGS}"
+    )
+
+    # Assert each unfilled placeholder body is exactly the one-line reserved
+    # statement, so no wave-4 content has been added ahead of its own feature,
+    # and each filled placeholder no longer carries that statement. A section
+    # whose owning feature has landed is exempt: it is not ahead of itself.
     for heading in pinned.RESERVED_HEADINGS:
-        if heading in pinned.POPULATED_RESERVED_HEADINGS:
-            continue
         feature = heading.rsplit("(", 1)[1].rstrip(")")
+        if feature in pinned.LANDED_WAVE_FOUR_FEATURES:
+            continue
+
         body = collapse_whitespace(orchestrate_skill_section(heading))
         expected = (
             f"Reserved for {feature}; content is appended by that feature "
             "and must not be relocated."
         )
+        if heading in pinned.FILLED_RESERVED_HEADINGS:
+            assert body and body != expected, (
+                f"{heading} is recorded as filled by {feature}, so its body must "
+                f"be that feature's content rather than {expected!r}"
+            )
+            continue
         assert body == expected, f"{heading} body must be {expected!r}, found {body!r}"
 
 

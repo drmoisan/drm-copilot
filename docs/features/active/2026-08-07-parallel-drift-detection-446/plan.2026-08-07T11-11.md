@@ -88,7 +88,7 @@ execution time.
 
 ### Phase 0 — Policy Compliance and Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in this exact order — `CLAUDE.md`,
+- [x] [P0-T1] Read the policy files in this exact order — `CLAUDE.md`,
   `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
   `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`,
   `.claude/rules/powershell.md` — and write
@@ -96,35 +96,35 @@ execution time.
   containing `Timestamp:`, `Policy Order:`, and the explicit list of files read.
   - Acceptance: The artifact exists at the stated path with all three required fields and
     lists all six files in the stated order.
-- [ ] [P0-T2] Run `poetry run black --check .` from the repo root and write
+- [x] [P0-T2] Run `poetry run black --check .` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/python-format-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields; `Output Summary:` states pass/fail
     and any files that would be reformatted.
-- [ ] [P0-T3] Run `poetry run ruff check .` from the repo root and write
+- [x] [P0-T3] Run `poetry run ruff check .` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/python-lint-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and an error-count summary.
-- [ ] [P0-T4] Run `poetry run pyright` from the repo root and write
+- [x] [P0-T4] Run `poetry run pyright` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/python-typecheck-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and an error-count summary.
-- [ ] [P0-T5] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` from the
+- [x] [P0-T5] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` from the
   repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/python-test-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields; `Output Summary:` records the
     pass/fail counts and the numeric baseline line-coverage and branch-coverage percentages.
-- [ ] [P0-T6] Run `mcp__drm-copilot__run_poshqc_format` and write
+- [x] [P0-T6] Run `mcp__drm-copilot__run_poshqc_format` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/powershell-format-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields; any pre-existing format drift is
     named in `Output Summary:`.
-- [ ] [P0-T7] Run `mcp__drm-copilot__run_poshqc_analyze` and write
+- [x] [P0-T7] Run `mcp__drm-copilot__run_poshqc_analyze` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/powershell-analyze-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and a finding-count summary.
-- [ ] [P0-T8] Run `mcp__drm-copilot__run_poshqc_test` and write
+- [x] [P0-T8] Run `mcp__drm-copilot__run_poshqc_test` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/baseline/powershell-test-baseline.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields, Pester pass/fail counts, and the
@@ -132,7 +132,7 @@ execution time.
 
 ### Phase 1 — Upstream Contract Reconciliation (IC-1a through IC-6b)
 
-- [ ] [P1-T1] Read F1's landed `spec.md` (under `docs/features/active/` or
+- [x] [P1-T1] Read F1's landed `spec.md` (under `docs/features/active/` or
   `docs/features/completed/`) and `scripts/dev_tools/compute_blast_radius.py`, and record in
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/other/upstream-contract-reconciliation.<timestamp>.md`
   the reconciled IC-1a contract (the real name and signature of F1's path-subsumption
@@ -150,7 +150,7 @@ execution time.
   - Acceptance: The artifact exists and contains an IC-1a entry and an IC-1b entry, each with
     the adopted symbol name, source file path, and either `Deviation: none` or the recorded
     deviation/BLOCKED state.
-- [ ] [P1-T2] Read F3's landed `spec.md` and `scripts/dev_tools/validate_parallel_orchestrator_state.py`,
+- [x] [P1-T2] Read F3's landed `spec.md` and `scripts/dev_tools/validate_parallel_orchestrator_state.py`,
   and append to the same reconciliation artifact the reconciled IC-3a contract (the exact
   checkpoint field names for `drift_events[]`, the `items[]` start-of-execution timestamp
   field — `in_flight_at` if F3 defines one, otherwise `worktree_created_at` — `blocked_drift`
@@ -167,7 +167,7 @@ execution time.
   - Acceptance: The artifact contains an IC-3a entry and an IC-3b entry with adopted field
     names (including the start-timestamp field and the `action` enum) and either
     `Deviation: none` or the recorded deviation/BLOCKED state.
-- [ ] [P1-T3] Read F5's landed `.claude/skills/parallel-orchestrate/SKILL.md` and
+- [x] [P1-T3] Read F5's landed `.claude/skills/parallel-orchestrate/SKILL.md` and
   `.claude/agents/parallel-orchestrator.md`, and append to the same reconciliation artifact
   the reconciled IC-5a contract (the byte-exact `Parallel mode: true` kickoff marker line
   including the `parallel_checkpoint_path` element, which the Phase 5 hook constant must match
@@ -178,7 +178,7 @@ execution time.
   reflowing; record the choice.
   - Acceptance: The artifact contains an IC-5a entry quoting the marker line verbatim and an
     IC-5b entry recording placeholder presence/absence and the worktree-path field name.
-- [ ] [P1-T4] Determine whether F6's recolor entry point (assumed `requeue_via_recolor(...)`)
+- [x] [P1-T4] Determine whether F6's recolor entry point (assumed `requeue_via_recolor(...)`)
   and admission-control surface are callable on the branch at execution time, and append to
   the same reconciliation artifact the reconciled IC-6a contract (F8 exports
   `has_unresolved_drift(events) -> bool` regardless; the consultation edge is F6's to wire —
@@ -191,7 +191,7 @@ execution time.
 
 ### Phase 2 — Pure Detection Module
 
-- [ ] [P2-T1] Create `scripts/dev_tools/parallel_drift_detection.py` containing
+- [x] [P2-T1] Create `scripts/dev_tools/parallel_drift_detection.py` containing
   `detect_escaped_paths(changed, declared)` returning the observed paths not subsumed by the
   declared `blast_radius.paths` patterns, using F1's path-subsumption predicate as reconciled
   in P1-T1 (imported, not reimplemented; or the documented `fnmatch.fnmatchcase` fallback with
@@ -199,7 +199,7 @@ execution time.
   type hints and docstrings.
   - Acceptance: The file exists; `detect_escaped_paths` imports the P1-T1 predicate (or the
     documented fallback) and contains no filesystem, subprocess, or `datetime.now` calls.
-- [ ] [P2-T2] Implement `select_halted_item(a, b)` in
+- [x] [P2-T2] Implement `select_halted_item(a, b)` in
   `scripts/dev_tools/parallel_drift_detection.py`: later-started selection as `argmax` over
   the tuple `(start_ts, item_key)` with lexicographic comparison and `item_key` compared as
   integer `issue_num`; equal timestamps deem the larger `issue_num` later-started (smaller key
@@ -208,7 +208,7 @@ execution time.
   function inputs (the start-timestamp field name is the one reconciled in P1-T2).
   - Acceptance: The function exists, is pure, and encodes all three tie-break branches; no
     code path selects the drifting item by virtue of drifting.
-- [ ] [P2-T3] Implement `build_drift_event(...)` in
+- [x] [P2-T3] Implement `build_drift_event(...)` in
   `scripts/dev_tools/parallel_drift_detection.py`, constructing the §12-shaped record
   `{ item_key, declared, observed, escaped_paths[], at, action }` with `item_key` as
   `issue_num`, `declared`/`observed` provenance per §5.2, `at` as an injected ISO-8601 input,
@@ -216,13 +216,13 @@ execution time.
   shape are produced.
   - Acceptance: The function exists, is pure, validates `action` against the reconciled enum,
     and raises a specific exception on an out-of-enum value.
-- [ ] [P2-T4] Implement `has_unresolved_drift(events) -> bool` in
+- [x] [P2-T4] Implement `has_unresolved_drift(events) -> bool` in
   `scripts/dev_tools/parallel_drift_detection.py`: returns `True` exactly while the latest
   entry (by `at`, then append order) for any `item_key` has `action != "resolved"` (using the
   reconciled enum name for resolution). This is the single exported quiesce predicate F6's
   admission control consults (IC-6a); no quiesce field is written anywhere.
   - Acceptance: The function exists, is pure, and implements latest-entry-per-item semantics.
-- [ ] [P2-T5] Implement the single recolor seam function in
+- [x] [P2-T5] Implement the single recolor seam function in
   `scripts/dev_tools/parallel_drift_detection.py` (one function, e.g.
   `request_requeue_via_recolor(...)`) that delegates to F6's recolor entry point as
   reconciled in P1-T4 (or the documented stub the F6 landing replaces): the delegated
@@ -234,7 +234,7 @@ execution time.
   - Acceptance: Exactly one seam function exists; grep of the module shows no Welsh-Powell,
     cohort-assignment, or graph-coloring logic; the stub (if used) is documented with the
     IC-6b citation.
-- [ ] [P2-T6] Create `tests/scripts/dev_tools/test_parallel_drift_detection.py` with the
+- [x] [P2-T6] Create `tests/scripts/dev_tools/test_parallel_drift_detection.py` with the
   escape-matrix tests for `detect_escaped_paths`: no escape, single escape, multiple escapes,
   and glob boundary cases (pattern-edge paths, separator handling, and rename handling where
   both old and new paths must be covered — fail closed). Tests are deterministic, use no
@@ -242,35 +242,35 @@ execution time.
   - Acceptance: The file exists and contains parametrized cases covering all four matrix
     categories; `poetry run pytest tests/scripts/dev_tools/test_parallel_drift_detection.py`
     exits 0.
-- [ ] [P2-T7] Add later-started selection tests for `select_halted_item` to
+- [x] [P2-T7] Add later-started selection tests for `select_halted_item` to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`: distinct timestamps (later
   halted), equal timestamps (larger `issue_num` halted, smaller survives), exactly one
   missing timestamp (timestamped item is earlier-started), both missing (item-key tie-break),
   all with injected timestamp inputs.
   - Acceptance: All four tie-break scenarios have at least one test each and pass.
-- [ ] [P2-T8] Add record-shape tests for `build_drift_event` to
+- [x] [P2-T8] Add record-shape tests for `build_drift_event` to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`: the produced record contains
   exactly the §12 keys, `action` accepts each reconciled enum value, and an out-of-enum
   `action` raises the specific exception.
   - Acceptance: Shape, enum-accept, and enum-reject tests exist and pass.
-- [ ] [P2-T9] Add `has_unresolved_drift` tests to
+- [x] [P2-T9] Add `has_unresolved_drift` tests to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`: empty event list is resolved;
   an unresolved latest entry for any item yields `True`; a later `resolved` entry for the
   same `item_key` clears it; an unresolved entry for one item is not masked by another
   item's resolution.
   - Acceptance: All four scenarios have tests and pass.
-- [ ] [P2-T10] Add recolor-seam tests to
+- [x] [P2-T10] Add recolor-seam tests to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`, mocking the delegated entry
   point at the import location used by the seam: exactly one `mutations[]` entry with the
   P2-T5 shape is requested, `recolor_generation` increments by exactly one, the halted item's
   `merge_status` becomes `blocked_drift`, and the seam performs no recoloring itself.
   - Acceptance: The mock-based tests exist and pass without temporary files.
-- [ ] [P2-T11] Add a determinism test to
+- [x] [P2-T11] Add a determinism test to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`: invoking the full detection and
   halt-selection path twice with identical inputs produces identical escaped-path sets and
   identical halt/requeue decisions.
   - Acceptance: The test exists and passes.
-- [ ] [P2-T12] Implement conflict recomputation in
+- [x] [P2-T12] Implement conflict recomputation in
   `scripts/dev_tools/parallel_drift_detection.py` (for example
   `recompute_conflicts_with_observed(items, drifting_item_key, observed_paths, conflict_edges)`):
   substitute the observed radius for the drifting item's declared `blast_radius.paths`, evaluate
@@ -284,7 +284,7 @@ execution time.
   - Acceptance: The function exists, is pure, imports F1's `conflicts(a, b)` relation (or records
     the P1-T1 BLOCKED state), returns only newly-introduced conflicts, and contains no
     reimplementation of the contention relation.
-- [ ] [P2-T13] Add conflict-recomputation tests to
+- [x] [P2-T13] Add conflict-recomputation tests to
   `tests/scripts/dev_tools/test_parallel_drift_detection.py`, mocking F1's `conflicts(a, b)` at
   the import location used by the unit under test: an escape that introduces no new conflict
   returns an empty pair set; an escape that newly conflicts with exactly one in-flight item
@@ -296,7 +296,7 @@ execution time.
 
 ### Phase 3 — CLI Wrapper
 
-- [ ] [P3-T1] Create `scripts/dev_tools/parallel_drift_detection_cli.py`: a thin argparse
+- [x] [P3-T1] Create `scripts/dev_tools/parallel_drift_detection_cli.py`: a thin argparse
   wrapper that accepts the changed-path list (as produced by
   `git diff --name-only <merge-base(origin/main, HEAD)> HEAD` at the child's pre-review
   commit) and the parallel checkpoint path, invokes the pure functions from
@@ -308,7 +308,7 @@ execution time.
   commands itself and adds no dependency.
   - Acceptance: The file exists, imports only the pure module plus stdlib, and
     `scripts/dev_tools/parallel_drift_detection.py` remains free of I/O.
-- [ ] [P3-T2] Create `tests/scripts/dev_tools/test_parallel_drift_detection_cli.py` covering
+- [x] [P3-T2] Create `tests/scripts/dev_tools/test_parallel_drift_detection_cli.py` covering
   argument parsing (valid invocation, missing required argument, unknown argument) and
   dispatch into the pure functions with the I/O seams mocked; no temporary files and no
   subprocess execution.
@@ -317,7 +317,7 @@ execution time.
 
 ### Phase 4 — Layer-2 Validator Invariant
 
-- [ ] [P4-T1] Create `scripts/dev_tools/_parallel_orchestrator_state_drift.py`: a key-gated
+- [x] [P4-T1] Create `scripts/dev_tools/_parallel_orchestrator_state_drift.py`: a key-gated
   helper following the `_orchestrator_state_*.py` split convention, exposing one
   `_validate_drift_events(state) -> list[str]`-style entry that (a) returns an empty list
   when the checkpoint has no `drift_events[]` key, (b) performs `drift_events[]` entry shape
@@ -327,14 +327,14 @@ execution time.
   The helper never mutates its input and imports resolution semantics from
   `scripts/dev_tools/parallel_drift_detection.py` rather than duplicating them.
   - Acceptance: The file exists, is under 500 lines, and the absent-key path returns `[]`.
-- [ ] [P4-T2] Edit `scripts/dev_tools/validate_parallel_orchestrator_state.py` (F3-owned) to
+- [x] [P4-T2] Edit `scripts/dev_tools/validate_parallel_orchestrator_state.py` (F3-owned) to
   add exactly one import line for `_parallel_orchestrator_state_drift` and exactly one
   key-gated dispatch call (`errors.extend(...)` style, matching the pattern reconciled in
   P1-T2). This edit must not reflow, reorder, or modify any existing line of the file
   (wave-4 contention constraint; F6 and F7 edit the same file concurrently).
   - Acceptance: `git diff scripts/dev_tools/validate_parallel_orchestrator_state.py` shows
     only two added lines (one import, one dispatch call) and zero removed or reflowed lines.
-- [ ] [P4-T3] Create `tests/scripts/dev_tools/test_validate_parallel_orchestrator_state_drift.py`
+- [x] [P4-T3] Create `tests/scripts/dev_tools/test_validate_parallel_orchestrator_state_drift.py`
   covering: a checkpoint with no `drift_events[]` key produces zero drift errors (key-gated
   invariant); an unresolved latest event with each of the four progressed `merge_status`
   values produces exactly one `PARALLEL_DRIFT_GATE_VIOLATION:` error per item; a `resolved`
@@ -347,7 +347,7 @@ execution time.
 
 ### Phase 5 — Layer-1 Hook and Registration
 
-- [ ] [P5-T1] Create `.claude/hooks/enforce-parallel-drift-gate.ps1`, adapted near-verbatim
+- [x] [P5-T1] Create `.claude/hooks/enforce-parallel-drift-gate.ps1`, adapted near-verbatim
   from `.claude/hooks/enforce-epic-wave-barrier.ps1` (which is not modified): script-scoped
   constants including the `Parallel mode: true` marker line matched byte-for-byte per the
   P1-T3 reconciliation, two injectable read seams so tests mock both boundaries without
@@ -367,14 +367,14 @@ execution time.
   unreadable checkpoint or an unresolvable target item.
   - Acceptance: The file exists, is under 500 lines, contains no `git` invocation and no
     path-glob matching, and emits allow/deny decisions as `hookSpecificOutput` JSON.
-- [ ] [P5-T2] Edit `.claude/settings.json` to append exactly one hook entry for
+- [x] [P5-T2] Edit `.claude/settings.json` to append exactly one hook entry for
   `.claude/hooks/enforce-parallel-drift-gate.ps1` at the end of the existing `PreToolUse`
   `Agent` matcher hook list. The edit must not reorder, reflow, or modify any existing entry
   (append-only; F7 appends to the same list concurrently).
   - Acceptance: `git diff .claude/settings.json` shows only the one appended entry (plus any
     required trailing-comma line adjustment on the immediately preceding entry) and no
     reordering of existing entries.
-- [ ] [P5-T3] Create `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
+- [x] [P5-T3] Create `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
   (Pester v5), mocking both the checkpoint-read seam and the finding-presence seam and
   creating no temporary files, covering:
   allow on non-feature-review `subagent_type`; allow on a prompt without the
@@ -385,7 +385,7 @@ execution time.
   target item cannot be resolved from the prompt.
   - Acceptance: The file exists and all seven scenarios have at least one test each;
     `mcp__drm-copilot__run_poshqc_test` reports them passing.
-- [ ] [P5-T4] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` to append exactly
+- [x] [P5-T4] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` to append exactly
   one entry, `'.claude/hooks/enforce-parallel-drift-gate.ps1'`, to the end of the existing
   `CodeCoverage.Path` list with a one-line comment citing issue #446, so the new production hook
   is not excluded from coverage measurement per `.claude/rules/general-unit-test.md` Coverage
@@ -396,7 +396,7 @@ execution time.
 
 ### Phase 6 — Procedure Documentation and Edit-Confinement Verification
 
-- [ ] [P6-T1] Edit `.claude/skills/parallel-orchestrate/SKILL.md` (F5-owned) to add the
+- [x] [P6-T1] Edit `.claude/skills/parallel-orchestrate/SKILL.md` (F5-owned) to add the
   single new H2 section `## Radius Drift Detection and Drift Gate` — filling F5's reserved
   placeholder of that name if P1-T3 found one, otherwise appending the section at the end of
   the file. The section documents: the six §7 steps; the child-side evaluation point (the
@@ -415,7 +415,7 @@ execution time.
   - Acceptance: The SKILL.md contains exactly one `## Radius Drift Detection and Drift Gate`
     section covering all listed elements;
     `git diff .claude/skills/orchestrate/SKILL.md` is empty.
-- [ ] [P6-T2] Verify edit confinement on the three shared files and write
+- [x] [P6-T2] Verify edit confinement on the three shared files and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/other/shared-file-edit-confinement.<timestamp>.md`
   recording, with the diff hunks quoted: `.claude/skills/parallel-orchestrate/SKILL.md` shows
   only the single added H2 section; `scripts/dev_tools/validate_parallel_orchestrator_state.py`
@@ -433,22 +433,22 @@ language's loop from its first step until a single clean pass completes; the art
 record the final clean pass. Every task in this phase is unconditional: each stated command
 must be executed and recorded, and `EXIT_CODE: SKIPPED` is not a permitted outcome.
 
-- [ ] [P7-T1] Run `poetry run black .` from the repo root and write
+- [x] [P7-T1] Run `poetry run black .` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/python-format-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields; `Output Summary:` states whether
     any file was reformatted (a reformat restarts the Python loop).
-- [ ] [P7-T2] Run `poetry run ruff check .` from the repo root and write
+- [x] [P7-T2] Run `poetry run ruff check .` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/python-lint-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and `EXIT_CODE: 0` on the recorded
     clean pass.
-- [ ] [P7-T3] Run `poetry run pyright` from the repo root and write
+- [x] [P7-T3] Run `poetry run pyright` from the repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/python-typecheck-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and `EXIT_CODE: 0` (zero errors) on
     the recorded clean pass.
-- [ ] [P7-T4] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` from the
+- [x] [P7-T4] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` from the
   repo root and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/python-test-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
@@ -458,24 +458,24 @@ must be executed and recorded, and `EXIT_CODE: SKIPPED` is not a permitted outco
     `scripts/dev_tools/parallel_drift_detection.py`,
     `scripts/dev_tools/parallel_drift_detection_cli.py`, and
     `scripts/dev_tools/_parallel_orchestrator_state_drift.py`.
-- [ ] [P7-T5] Run `mcp__drm-copilot__run_poshqc_format` and write
+- [x] [P7-T5] Run `mcp__drm-copilot__run_poshqc_format` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/powershell-format-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields; any reformat restarts the
     PowerShell loop and the artifact records the final clean pass.
-- [ ] [P7-T6] Run `mcp__drm-copilot__run_poshqc_analyze` and write
+- [x] [P7-T6] Run `mcp__drm-copilot__run_poshqc_analyze` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/powershell-analyze-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields and zero findings on the recorded
     clean pass.
-- [ ] [P7-T7] Run `mcp__drm-copilot__run_poshqc_test` and write
+- [x] [P7-T7] Run `mcp__drm-copilot__run_poshqc_test` and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/powershell-test-final.<timestamp>.md`
   containing `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: The artifact exists with all four fields, Pester pass counts including
     `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`, and the numeric
     post-change line and branch coverage for
     `.claude/hooks/enforce-parallel-drift-gate.ps1`.
-- [ ] [P7-T8] Verify coverage thresholds and delta, and write
+- [x] [P7-T8] Verify coverage thresholds and delta, and write
   `docs/features/active/2026-08-07-parallel-drift-detection-446/evidence/qa-gates/coverage-delta.<timestamp>.md`
   reporting: the numeric baseline coverage from the P0-T5 artifact, the numeric post-change
   coverage from the P7-T4 artifact, the per-file coverage of the three new Python modules and
@@ -486,7 +486,7 @@ must be executed and recorded, and `EXIT_CODE: SKIPPED` is not a permitted outco
   - Acceptance: The artifact exists with `Timestamp:`, both numeric coverage sets for both
     languages, the
     per-module threshold verdicts, and an explicit PASS or remediation-required conclusion.
-- [ ] [P7-T9] Check off the acceptance criteria per the `acceptance-criteria-tracking` skill:
+- [x] [P7-T9] Check off the acceptance criteria per the `acceptance-criteria-tracking` skill:
   for every item in the `## Acceptance Criteria` sections of
   `docs/features/active/2026-08-07-parallel-drift-detection-446/spec.md` and
   `docs/features/active/2026-08-07-parallel-drift-detection-446/user-story.md`, mark the
