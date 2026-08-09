@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
+<report name="Pester (08/08/2026 22:47:45)">
+  <sessioninfo id="this" start="1786229261969" dump="1786229265241" />
+  <package name="hooks">
+    <class name="hooks/enforce-epic-invocation-origin" sourcefilename="enforce-epic-invocation-origin.ps1">
+      <method name="&lt;script&gt;" desc="()" line="40">
+        <counter type="INSTRUCTION" missed="7" covered="6" />
+        <counter type="LINE" missed="5" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-EpicInvocationOriginAllowDecision" desc="()" line="49">
+        <counter type="INSTRUCTION" missed="0" covered="4" />
+        <counter type="LINE" missed="0" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-EpicInvocationOriginBlockDecision" desc="()" line="65">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="5" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="ConvertFrom-EpicInvocationOriginPayload" desc="()" line="96">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-EpicInvocationOriginTargetSubagent" desc="()" line="129">
+        <counter type="INSTRUCTION" missed="0" covered="13" />
+        <counter type="LINE" missed="0" covered="10" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-EpicInvocationOriginCallerAgentType" desc="()" line="165">
+        <counter type="INSTRUCTION" missed="0" covered="9" />
+        <counter type="LINE" missed="0" covered="8" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Invoke-EpicInvocationOriginDecision" desc="()" line="204">
+        <counter type="INSTRUCTION" missed="0" covered="20" />
+        <counter type="LINE" missed="0" covered="20" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <counter type="INSTRUCTION" missed="7" covered="62" />
+      <counter type="LINE" missed="5" covered="55" />
+      <counter type="METHOD" missed="0" covered="7" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </class>
+    <class name="hooks/enforce-parallel-cohort-barrier" sourcefilename="enforce-parallel-cohort-barrier.ps1">
+      <method name="&lt;script&gt;" desc="()" line="50">
+        <counter type="INSTRUCTION" missed="7" covered="5" />
+        <counter type="LINE" missed="5" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelCohortBarrierCheckpointContent" desc="()" line="66">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelCohortBarrierFolderBasename" desc="()" line="95">
+        <counter type="INSTRUCTION" missed="0" covered="8" />
+        <counter type="LINE" missed="0" covered="6" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Find-ParallelCohortBarrierFeatureFolderFromPrompt" desc="()" line="128">
+        <counter type="INSTRUCTION" missed="0" covered="17" />
+        <counter type="LINE" missed="0" covered="12" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Find-ParallelCohortBarrierItemRecord" desc="()" line="168">
+        <counter type="INSTRUCTION" missed="0" covered="16" />
+        <counter type="LINE" missed="0" covered="12" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Find-ParallelCohortBarrierItemByKey" desc="()" line="210">
+        <counter type="INSTRUCTION" missed="0" covered="15" />
+        <counter type="LINE" missed="0" covered="11" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Find-ParallelCohortBarrierCohortIndex" desc="()" line="256">
+        <counter type="INSTRUCTION" missed="0" covered="23" />
+        <counter type="LINE" missed="0" covered="16" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelCohortBarrierConflictNeighborList" desc="()" line="308">
+        <counter type="INSTRUCTION" missed="0" covered="19" />
+        <counter type="LINE" missed="0" covered="16" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Test-ParallelCohortBarrierClear" desc="()" line="357">
+        <counter type="INSTRUCTION" missed="0" covered="26" />
+        <counter type="LINE" missed="0" covered="22" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelCohortBarrierAllowDecision" desc="()" line="402">
+        <counter type="INSTRUCTION" missed="0" covered="4" />
+        <counter type="LINE" missed="0" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelCohortBarrierBlockDecision" desc="()" line="418">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="5" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Invoke-ParallelCohortBarrierDecision" desc="()" line="442">
+        <counter type="INSTRUCTION" missed="0" covered="24" />
+        <counter type="LINE" missed="0" covered="22" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <counter type="INSTRUCTION" missed="7" covered="167" />
+      <counter type="LINE" missed="5" covered="133" />
+      <counter type="METHOD" missed="0" covered="12" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </class>
+    <class name="hooks/enforce-parallel-worktree-removal-gate" sourcefilename="enforce-parallel-worktree-removal-gate.ps1">
+      <method name="&lt;script&gt;" desc="()" line="31">
+        <counter type="INSTRUCTION" missed="7" covered="4" />
+        <counter type="LINE" missed="5" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelWorktreeRemovalGateCheckpointContent" desc="()" line="46">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelWorktreeRemovalCommandPath" desc="()" line="68">
+        <counter type="INSTRUCTION" missed="0" covered="3" />
+        <counter type="LINE" missed="0" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Find-ParallelWorktreeItemRecord" desc="()" line="94">
+        <counter type="INSTRUCTION" missed="0" covered="19" />
+        <counter type="LINE" missed="0" covered="13" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Test-ParallelWorktreeRemovalAllowed" desc="()" line="136">
+        <counter type="INSTRUCTION" missed="0" covered="8" />
+        <counter type="LINE" missed="0" covered="6" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelWorktreeGateAllowDecision" desc="()" line="151">
+        <counter type="INSTRUCTION" missed="0" covered="4" />
+        <counter type="LINE" missed="0" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-ParallelWorktreeGateBlockDecision" desc="()" line="167">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="5" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Invoke-ParallelWorktreeRemovalGateDecision" desc="()" line="191">
+        <counter type="INSTRUCTION" missed="0" covered="21" />
+        <counter type="LINE" missed="0" covered="19" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <counter type="INSTRUCTION" missed="7" covered="69" />
+      <counter type="LINE" missed="5" covered="56" />
+      <counter type="METHOD" missed="0" covered="8" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </class>
+    <sourcefile name="enforce-epic-invocation-origin.ps1">
+      <line nr="40" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="41" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="42" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="49" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="50" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="51" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="52" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="65" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="66" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="67" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="68" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="69" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="96" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="97" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="101" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="103" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="129" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="130" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="132" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="135" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="136" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="137" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="138" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="139" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="141" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="145" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="165" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="166" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="168" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="169" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="172" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="173" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="174" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="176" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="204" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="205" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="206" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="208" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="209" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="212" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="213" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="214" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="217" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="218" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="221" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="222" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="228" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="229" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="230" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="235" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="236" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="237" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="240" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="241" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="245" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="250" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="252" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="253" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="256" mi="3" ci="0" mb="0" cb="0" />
+      <line nr="258" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="7" covered="62" />
+      <counter type="LINE" missed="5" covered="55" />
+      <counter type="METHOD" missed="0" covered="7" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <sourcefile name="enforce-parallel-cohort-barrier.ps1">
+      <line nr="50" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="51" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="52" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="66" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="67" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="69" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="95" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="96" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="99" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="100" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="101" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="103" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="128" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="129" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="132" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="133" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="134" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="135" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="138" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="139" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="140" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="141" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="144" mi="0" ci="4" mb="0" cb="0" />
+      <line nr="145" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="168" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="169" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="171" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="172" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="173" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="177" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="178" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="179" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="182" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="183" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="184" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="187" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="210" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="211" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="213" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="214" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="215" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="218" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="219" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="220" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="223" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="224" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="227" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="256" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="257" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="259" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="260" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="261" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="264" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="266" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="267" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="268" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="271" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="274" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="275" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="278" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="279" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="280" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="284" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="308" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="309" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="310" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="312" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="313" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="314" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="319" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="320" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="321" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="324" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="325" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="326" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="327" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="328" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="329" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="332" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="357" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="358" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="360" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="361" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="362" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="365" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="366" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="367" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="369" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="372" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="373" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="374" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="378" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="382" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="383" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="384" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="386" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="387" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="388" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="390" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="391" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="394" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="402" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="403" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="404" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="405" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="418" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="419" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="420" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="421" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="422" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="442" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="443" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="447" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="449" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="452" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="453" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="454" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="457" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="458" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="459" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="462" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="463" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="464" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="467" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="468" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="469" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="471" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="473" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="477" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="478" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="479" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="482" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="486" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="491" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="493" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="494" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="497" mi="3" ci="0" mb="0" cb="0" />
+      <line nr="499" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="7" covered="167" />
+      <counter type="LINE" missed="5" covered="133" />
+      <counter type="METHOD" missed="0" covered="12" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <sourcefile name="enforce-parallel-worktree-removal-gate.ps1">
+      <line nr="31" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="32" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="46" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="47" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="49" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="68" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="69" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="71" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="94" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="95" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="97" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="98" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="99" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="102" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="106" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="107" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="108" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="111" mi="0" ci="3" mb="0" cb="0" />
+      <line nr="112" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="113" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="116" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="136" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="137" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="139" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="140" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="141" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="143" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="151" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="152" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="153" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="154" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="167" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="168" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="169" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="170" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="171" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="191" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="192" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="196" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="198" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="201" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="202" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="203" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="206" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="207" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="210" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="212" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="213" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="214" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="216" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="218" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="222" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="223" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="224" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="227" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="231" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="236" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="238" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="239" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="242" mi="3" ci="0" mb="0" cb="0" />
+      <line nr="244" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="7" covered="69" />
+      <counter type="LINE" missed="5" covered="56" />
+      <counter type="METHOD" missed="0" covered="8" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="21" covered="298" />
+    <counter type="LINE" missed="15" covered="244" />
+    <counter type="METHOD" missed="0" covered="27" />
+    <counter type="CLASS" missed="0" covered="3" />
+  </package>
+  <counter type="INSTRUCTION" missed="21" covered="298" />
+  <counter type="LINE" missed="15" covered="244" />
+  <counter type="METHOD" missed="0" covered="27" />
+  <counter type="CLASS" missed="0" covered="3" />
+</report>

@@ -245,12 +245,16 @@ def test_orchestrate_skill_reserved_wave_four_sections_close_the_file() -> None:
 
 
 def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> None:
-    """Require each reserved section body to be its single reserved sentence."""
+    """Require each still-reserved section body to be its reserved sentence."""
 
     # Assert each placeholder body is exactly the one-line reserved statement, so
-    # no wave-4 content has been added ahead of its own feature.
+    # no wave-4 content has been added ahead of its own feature. A section whose
+    # owning feature has landed is exempt: its content is not ahead of itself.
     for heading in pinned.RESERVED_HEADINGS:
         feature = heading.rsplit("(", 1)[1].rstrip(")")
+        if feature in pinned.LANDED_WAVE_FOUR_FEATURES:
+            continue
+
         body = collapse_whitespace(orchestrate_skill_section(heading))
         expected = (
             f"Reserved for {feature}; content is appended by that feature "

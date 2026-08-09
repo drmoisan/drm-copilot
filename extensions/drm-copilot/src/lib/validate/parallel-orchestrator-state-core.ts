@@ -33,6 +33,7 @@
  *     None; pure text-in, errors-out validation.
  */
 
+import { validateCohortBarrierOrdering } from "./parallel-orchestrator-state-cohort-barrier";
 import {
   MERGED_MERGE_STATUSES,
   VALID_MODES,
@@ -311,6 +312,7 @@ export function validateParallelOrchestratorStateText(
   // block, plus the helper's import. Nothing else in this function moves, so F7
   // and F3 cannot contend over the same lines (epic wave-4 rule).
   // Add F7 helper invocations below this line, one per line.
+  errors.push(...validateCohortBarrierOrdering(state));
   // END F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
 
   if (options.requireComplete === true) {

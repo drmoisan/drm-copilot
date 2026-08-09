@@ -176,6 +176,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/parallel-orchestrator-state-cohort-barrier.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/parallel-orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,
