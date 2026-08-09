@@ -3,6 +3,7 @@ name: commit-and-push-agent-memory-before-pr
 description: The repo-root .claude/agent-memory/ tree is gitignored; the only tracked location is the bundled mirror under extensions/drm-copilot/resources/claude-customizations/.claude/agent-memory/, and memory must be copied there and committed before a PR opens.
 metadata:
   type: feedback
+  scope: general
 ---
 
 **The repo-root `.claude/agent-memory/` tree is gitignored** (`.gitignore:78`, pattern

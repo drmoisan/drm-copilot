@@ -3,6 +3,7 @@ name: no-sendmessage-tool-for-epic-orchestrator
 description: The epic-orchestrator tool allowlist has no SendMessage tool, so a launched child cannot be course-corrected; delegation prompts must be complete and self-correcting at launch.
 metadata:
   type: feedback
+  scope: general
 ---
 
 `epic-orchestrator`'s tool allowlist is `Agent(orchestrator)`, `Agent(pr-author)`, `Read`, `Grep`,

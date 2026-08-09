@@ -3,6 +3,7 @@ name: worktree-isolation-branches-from-main
 description: Agent(isolation "worktree") branches the child worktree from origin/main, not from the invoking worktree's HEAD, so every epic child prompt must begin with an explicit fetch-and-checkout of the integration branch.
 metadata:
   type: feedback
+  scope: general
 ---
 
 `Agent(..., isolation: "worktree")` creates the child worktree from `origin/main`, **not** from the
