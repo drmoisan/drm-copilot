@@ -19,9 +19,9 @@ Responsibilities:
 Boundaries:
     Path subsumption is F1's ``is_path_subsumed`` (IC-1a) and the contention
     relation is F1's ``conflicts`` (IC-1b); neither is reimplemented, and no
-    ``fnmatch`` fallback is used. An observed radius is always built by
-    ``radius_from_observed_paths`` (IC-1b) so its module and shared-surface
-    levels are resolved by the library instead of being silently dropped.
+    ``fnmatch`` fallback is used. Observed radii come from
+    ``parallel_drift_resolution.build_observed_radius``, whose module docstring
+    records the IC-1b hand-construction prohibition.
     ``conflict_edges[]`` is read only, and no ``depends_on`` or
     ``integration_branch`` field is produced anywhere (invariants 10, 11).
 
@@ -42,6 +42,7 @@ from scripts.dev_tools._parallel_drift_shape import (
     ParallelDriftInputError,
     as_item_key,
     canonical_pair,
+    is_later_canonical_timestamp,
     record_paths,
     require_enum_member,
     require_item_key,
@@ -51,14 +52,12 @@ from scripts.dev_tools._parallel_drift_shape import (
 from scripts.dev_tools._parallel_state_common import (
     VALID_DRIFT_ACTIONS,
     VALID_ITEM_STATES,
-    is_non_empty_string,
     is_positive_integer,
 )
 from scripts.dev_tools.compute_blast_radius import (
     RADIUS_SOURCE_OBSERVED,
     BlastRadius,
     conflicts,
-    radius_from_observed_paths,
 )
 from scripts.dev_tools.parallel_drift_halt import (
     ITEM_STATE_IN_FLIGHT,
@@ -67,6 +66,7 @@ from scripts.dev_tools.parallel_drift_halt import (
     request_requeue_via_recolor,
     select_halted_item,
 )
+from scripts.dev_tools.parallel_drift_resolution import build_observed_radius
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -206,8 +206,12 @@ def unresolved_drift_item_keys(
     ``blast_radius.paths`` under ``is_path_subsumed``; or the radius was
     re-recorded from a later diff, so ``blast_radius.source == 'observed'`` and its
     ``computed_at`` is strictly greater than the event's ``at``, covering
-    remediation that narrowed the diff instead of widening the radius. The
-    derivation fails closed: no resolvable radius means unresolved.
+    remediation that narrowed the diff instead of widening the radius. Both
+    timestamps in that second disjunct must carry the canonical
+    ``yyyy-MM-ddTHH-mm`` shape of ``CANONICAL_TIMESTAMP_RE``; a non-conforming
+    value on either side leaves the item unresolved rather than comparing
+    ordinally against a differently shaped string. The derivation fails closed: no
+    resolvable radius means unresolved.
 
     Args:
         events (Sequence[Mapping[str, object]]): ``drift_events[]`` in append
@@ -277,10 +281,8 @@ def recompute_conflicts_with_observed(
 
     Design section 7 step 4: substitute the drifting item's observed radius for
     its declared one and re-evaluate F1's contention relation against every
-    concurrently in-flight peer. The observed radius is built by
-    ``radius_from_observed_paths`` so its module and shared-surface levels are
-    resolved by the library; hand-constructing it would drop those disjuncts and
-    under-report contention. ``conflict_edges[]`` is read only, for edge identity
+    concurrently in-flight peer. The observed radius comes from
+    ``build_observed_radius``. ``conflict_edges[]`` is read only, for edge identity
     alone, and gains no field. Identity is the canonical ``(a, b)`` pair with
     ``a < b`` (F3 invariant 15), normalized before comparison so an edge recorded
     in either order is recognized as already known. The recomputation fails
@@ -315,10 +317,8 @@ def recompute_conflicts_with_observed(
     in_flight = require_enum_member(
         ITEM_STATE_IN_FLIGHT, VALID_ITEM_STATES, "items[].state"
     )
-    observed_radius = radius_from_observed_paths(
-        require_paths(observed_paths, "observed_paths", allow_empty=True),
-        config,
-        computed_at=require_text(computed_at, "computed_at"),
+    observed_radius = build_observed_radius(
+        observed_paths, config, computed_at=computed_at
     )
     existing = _existing_edge_pairs(conflict_edges)
 
@@ -412,13 +412,17 @@ def _is_drift_resolved(
     Args:
         radius (Mapping[str, object] | None): The item's recorded
             ``blast_radius``, or ``None`` when no readable radius exists.
-        at (str): The latest drift event's ``at`` timestamp.
+        at (str): The latest drift event's ``at`` timestamp. Disjunct (b) requires
+            it to carry the canonical ``yyyy-MM-ddTHH-mm`` shape.
         escaped_paths (tuple[str, ...]): The latest drift event's escaped paths.
 
     Returns:
         bool: ``True`` when the radius widened to cover every escaped path, or was
         re-recorded from a later observed diff. ``False`` otherwise, including for
-        a missing or malformed radius.
+        a missing or malformed radius, and including whenever either
+        ``computed_at`` or ``at`` is not canonically formatted — a non-conforming
+        value is unresolved rather than compared ordinally against a differently
+        shaped string, which would otherwise fail open.
     """
     if radius is None:
         return False
@@ -431,11 +435,12 @@ def _is_drift_resolved(
         return True
 
     # Disjunct (b): the radius was re-recorded from a diff taken after the event.
-    computed_at = radius.get("computed_at")
-    return (
-        radius.get("source") == RADIUS_SOURCE_OBSERVED
-        and is_non_empty_string(computed_at)
-        and cast("str", computed_at) > at
+    # The comparison runs through the canonical-shape predicate rather than a raw
+    # ``>``, because ordinally ``-`` sorts below ``:``, so a colon-bearing
+    # ``computed_at`` compares greater than a same-instant hyphen-bearing ``at``
+    # and an ungated comparison would resolve the drift spuriously.
+    return radius.get("source") == RADIUS_SOURCE_OBSERVED and (
+        is_later_canonical_timestamp(radius.get("computed_at"), at)
     )
 
 

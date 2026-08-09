@@ -452,7 +452,7 @@ under-reporting when the radius is derived, and this procedure bounds it while t
 Neither half eliminates the risk. Nothing in this section re-derives F1's matcher or F1's
 contention relation; both are imported by the implementation.
 
-#### Six-Step Procedure
+#### Seven-Step Procedure
 
 1. Compare the observed changed-path list against the item's declared `blast_radius.paths`.
 2. On escape, record one `drift_events[]` entry and raise a synthetic Blocking finding in the
@@ -463,6 +463,18 @@ contention relation; both are imported by the implementation.
    that pair, record `merge_status: blocked_drift` with item `state: blocked`, and requeue it into a
    future cohort.
 6. The child's existing R1 through R5 remediation loop processes the finding unmodified.
+7. **Resolve the recorded drift.** Actor: the `parallel-orchestrator`. Trigger: the consuming
+   remediation cycle exiting with `blocking_count == 0`. The parent then performs exactly one of two
+   writes to the item's `items[].blast_radius`. Either it re-records the radius from the
+   post-remediation diff — the library-built value the detecting invocation already emitted as the
+   `observed_radius` payload key, carrying `source: observed` and a `computed_at` that must be
+   strictly later than the event's `at` — or, when remediation widened the declared radius instead of
+   narrowing the diff, it extends `blast_radius.paths` so every `escaped_paths` entry of the latest
+   event is covered. The radius is never hand-constructed; it is the value the command line emitted,
+   so the module and shared-surface levels are resolved by F1's library. **No other write clears the
+   derived unresolved state**: appending an event cannot, because the action enum has no `resolved`
+   member and a zero-escape event is rejected, and changing `merge_status` or item `state` cannot,
+   because the derivation reads only `blast_radius`.
 
 Deferral of admission into a **future** cohort remains allowed during quiesce; only admission into
 the current cohort is suspended.
@@ -519,7 +531,8 @@ parseable:
   "escaped_paths": [],
   "newly_conflicting_pairs": [],
   "halted_item_keys": [],
-  "drift_event": null
+  "drift_event": null,
+  "observed_radius": null
 }
 ```
 
@@ -530,8 +543,11 @@ later-started item of each. `newly_conflicting_pairs` holds ascending canonical 
 pairs, the same edge identity `conflict_edges[]` records, so a recomputed pair is comparable with a
 recorded one without normalization. `drift_event` is `null` exactly when `result` is `no_escape`,
 because an event with zero
-escaped paths is not a drift event. Exit status is `0` on success, `1` on missing or malformed
-input, and argparse's `2` on a usage error.
+escaped paths is not a drift event. `observed_radius` is the serialized observed `blast_radius` the
+parent writes back in step 7 of `#### Seven-Step Procedure`: it carries the six invariant-9 keys with
+`source: observed`, is built by F1's library rather than by hand, and is `null` exactly when `result`
+is `no_escape`, on the same precondition as `drift_event`. Exit status is `0` on success, `1` on
+missing or malformed input, and argparse's `2` on a usage error.
 
 #### Synthetic Blocking Finding
 
@@ -550,12 +566,24 @@ patterns, and the required action.
 
 #### Halt the Later-Started Item
 
-The later-started item of a newly conflicting pair is halted. The drifting item is **never** halted
-by virtue of drifting: its work is already broader than planned and is more expensive to unwind.
-This is not configurable and no alternative is offered. The selection function receives only the two
-start markers and no drift information at all, so the rule cannot be inverted by a caller.
+The later-started item of a newly conflicting pair is halted, and **the drifting item is never the
+one halted**. Halting the drifting item is not an option: it must not be implemented, and it must not
+be offered as a configuration. The prohibition is unconditional and holds even when the drifting item
+is the later starter by either tie-break. Two reasons make it necessary: the drifting item's work is
+already broader than planned and is more expensive to unwind, and the drifting item is mid-remediation
+on its own R1 through R5 loop for the drift finding, so halting it would deadlock the very remediation
+that resolves the drift.
 
-Selection is `argmax` over `(start_unknown, worktree_created_at, item_key)`, where
+The exclusion is applied **at the call site, before the later-started comparator runs**:
+`halted_item_keys` in `scripts/dev_tools/parallel_drift_detection_cli.py` drops the drifting key from
+each pair's candidate list, then halts the single remaining candidate, or applies the comparator when
+two remain. Because a recomputed pair holds two distinct canonical keys, the candidate list is always
+one or two entries and can never be empty. It remains true, and remains a real structural guarantee,
+that the selection function itself receives only the two start markers and no drift information at
+all, so a caller cannot invert the comparator; the exclusion lives one level up because that is where
+the drifting key is known.
+
+Selection among two candidates is `argmax` over `(start_unknown, worktree_created_at, item_key)`, where
 `worktree_created_at` is the adopted start-of-execution marker and `item_key` is the integer
 `issue_num`. The three tie-breaks:
 
@@ -638,6 +666,20 @@ because a `PreToolUse` hook fires per call with no cross-call state visibility a
   with no `drift_events` key produces zero new errors. An item resting at `blocked_drift` produces no
   error, which is what makes the gate compatible with the state the halt path writes.
 
+The Layer-1 finding-presence check is narrowed to the **current** drift event. A matched
+`remediation-inputs.<yyyy-MM-ddTHH-mm>.md` file opens the gate only when the timestamp embedded in
+its name is ordinally greater than or equal to the item's latest drift event's `at`; a finding
+written by an earlier, unrelated remediation cycle is therefore ignored and does not open the gate
+for drifted, unsurfaced work. The check remains **presence gating only**: the timestamp is taken
+with a fixed-offset substring of the directory entry's name and compared ordinally, and the hook
+performs no path-glob match, no git command, and no read of any file's content. A name whose
+embedded substring is absent or not canonically formatted, and a latest-event `at` that is itself
+not canonically formatted, both leave the gate closed, so an unreadable timestamp on either side
+denies rather than allows. The canonical `yyyy-MM-ddTHH-mm` shape is required on both sides of every
+timestamp comparison the gate makes, in both runtimes: an ungated ordinal comparison fails open,
+because `-` sorts below `:` and a colon-bearing value therefore compares greater than a
+hyphen-bearing value naming the same instant.
+
 #### Resolution Semantics
 
 This is the least obvious part of the feature and is stated here in full. `drift_events[].action` has
@@ -660,8 +702,17 @@ disjunct holds against K's currently recorded `blast_radius`:
 
 The derivation is **fail-closed**: absent an affirmative parent write, neither disjunct holds, drift
 stays unresolved, and the gate keeps denying. A malformed event log is likewise reported as
-unresolved. Both disjuncts are concrete, recordable parent actions that the existing R1 through R5
-remediation cycle already drives, so nothing deadlocks. The R1 through R5 loop is **reused
+unresolved.
+
+Each disjunct has a named producer, so the gate has a release path and nothing deadlocks. The
+producer is step 7 of `#### Seven-Step Procedure`: the `parallel-orchestrator` performs one of the two
+writes when the consuming remediation cycle exits with `blocking_count == 0`. Non-deadlock is
+therefore a consequence of that named producer rather than a property asserted without one. For
+disjunct (b) the value written is not hand-constructed: the command line emits it as the
+`observed_radius` key of its stdout payload, documented under `#### CLI Invocation`, and the parent
+applies that library-built value verbatim with a `computed_at` strictly later than the event's `at`.
+For disjunct (a) the parent extends `blast_radius.paths` to cover every escaped path. The R1 through
+R5 loop that drives the remediation preceding either write is **reused
 unmodified**: `atomic-planner` plans the resolution, `atomic-executor` performs preflight then
 resolves, `feature-review` re-audits, and the loop exits on zero blocking findings. No new
 remediation loop is authored, no line of the existing loop is modified, and the shared
@@ -679,6 +730,10 @@ The hook is therefore strictly more conservative than the Python derivation: omi
 can only report unresolved where Python reports resolved. The direction of the narrowing is
 **deny-only**, never allow-only, and the finding-file allowance above keeps that conservatism from
 deadlocking review. Python remains the single authority on resolution, and a cross-runtime seam test
-in `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` runs both runtimes over one
-shared checkpoint-state table and fails when they diverge. This is a real limitation, recorded here
-rather than omitted.
+in `tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1` runs both runtimes
+over one shared checkpoint-state table and fails when they diverge. This is a real limitation,
+recorded here rather than omitted.
+
+Recovery action for a spurious Layer-1 deny — one the operator can always take: re-record the item's
+`blast_radius` from the later observed diff, which satisfies both runtimes because it is disjunct
+(b), the one disjunct the hook evaluates.

@@ -5,6 +5,10 @@ Covers the argument surface of `scripts/dev_tools/parallel_drift_detection_cli.p
 `evaluate_drift` into the pure detection functions, and the reader helpers of
 `scripts/dev_tools/_parallel_drift_cli_io.py`. Every checkpoint is in memory and
 every file read goes through a stub, so no temporary file and no subprocess is used.
+
+The halt-selection call-site tests live in
+`test_parallel_drift_detection_cli_halt.py`, and the checkpoint fixtures both files
+share live in `parallel_drift_test_support.py`.
 """
 
 from __future__ import annotations
@@ -31,17 +35,21 @@ from scripts.dev_tools.parallel_drift_detection_cli import (
     RESULT_NO_NEW_CONFLICT,
     build_parser,
     default_timestamp,
-    evaluate_drift,
     main,
 )
-from tests.scripts.dev_tools.parallel_drift_test_support import CONFIG, item
+from tests.scripts.dev_tools.parallel_drift_test_support import (
+    AT,
+    COMPUTED_AT,
+    CONFIG,
+    checkpoint,
+    evaluate,
+    in_flight,
+    item,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from pathlib import Path
-
-AT = "2026-08-08T10-00"
-COMPUTED_AT = "2026-08-08T10-05"
 
 # The three module attributes the command line calls. Patching them here, at the
 # import locations the unit under test uses, is what keeps every test off the
@@ -108,41 +116,6 @@ class _StubPath:
         return self._text
 
 
-def _in_flight(
-    issue_num: int, paths: Sequence[str], started: str | None
-) -> dict[str, object]:
-    """Build an in-flight item record carrying a start-of-execution marker.
-
-    Args:
-        issue_num (int): The item's primary key.
-        paths (Sequence[str]): The item's declared radius path entries.
-        started (str | None): The `worktree_created_at` value; `None` means the
-            checkpoint records no start for the item.
-
-    Returns:
-        dict[str, object]: A new item mapping in the F3 shape.
-    """
-    record = item(issue_num, paths)
-    record["worktree_created_at"] = started
-    return record
-
-
-def _checkpoint(
-    items: Sequence[Mapping[str, object]], edges: Sequence[object] = ()
-) -> dict[str, object]:
-    """Build the minimal in-memory checkpoint the command line reads.
-
-    Args:
-        items (Sequence[Mapping[str, object]]): The `items[]` records.
-        edges (Sequence[object]): The `conflict_edges[]` records.
-
-    Returns:
-        dict[str, object]: A mapping carrying only the two collections detection
-        consumes, so no failure can be attributed to an unrelated field.
-    """
-    return {"items": list(items), "conflict_edges": list(edges)}
-
-
 def _load_seam(
     state: Mapping[str, object], config: Mapping[str, object]
 ) -> Callable[[Path, str], Mapping[str, object]]:
@@ -163,29 +136,6 @@ def _load_seam(
         return state if label == "Parallel checkpoint" else config
 
     return _load
-
-
-def _evaluate(
-    state: Mapping[str, object], changed: Sequence[str], *, item_key: int = 446
-) -> dict[str, object]:
-    """Run `evaluate_drift` with the fixed truth table and injected timestamps.
-
-    Args:
-        state (Mapping[str, object]): The in-memory checkpoint.
-        changed (Sequence[str]): The observed changed-path set.
-        item_key (int): The item whose diff is evaluated.
-
-    Returns:
-        dict[str, object]: The command line's result payload.
-    """
-    return evaluate_drift(
-        state=state,
-        config=CONFIG,
-        item_key=item_key,
-        changed_paths=changed,
-        at=AT,
-        computed_at=COMPUTED_AT,
-    )
 
 
 def test_parser_accepts_a_valid_invocation() -> None:
@@ -252,9 +202,9 @@ def test_default_timestamp_uses_the_repository_timestamp_shape() -> None:
 def test_evaluate_drift_reports_no_escape_for_a_diff_inside_the_radius() -> None:
     """Report `no_escape` and record no event when nothing left the radius."""
 
-    state = _checkpoint([_in_flight(446, ["docs/**"], "2026-08-08T09-00")])
+    state = checkpoint([in_flight(446, ["docs/**"], "2026-08-08T09-00")])
 
-    result = _evaluate(state, ["docs/a.md"])
+    result = evaluate(state, ["docs/a.md"])
 
     assert result["result"] == RESULT_NO_ESCAPE
     assert result["escaped_paths"] == []
@@ -267,9 +217,9 @@ def test_evaluate_drift_reports_no_new_conflict_when_no_peer_contends() -> None:
     """Record the drift event but halt nothing when no peer newly conflicts."""
 
     peer = item(445, ["packages/mcp-server/**"], state="scheduled")
-    state = _checkpoint([_in_flight(446, ["docs/**"], "2026-08-08T09-00"), peer])
+    state = checkpoint([in_flight(446, ["docs/**"], "2026-08-08T09-00"), peer])
 
-    result = _evaluate(state, ["packages/mcp-server/src/index.ts"])
+    result = evaluate(state, ["packages/mcp-server/src/index.ts"])
     event = cast("Mapping[str, object]", result["drift_event"])
 
     assert result["result"] == RESULT_NO_NEW_CONFLICT
@@ -280,56 +230,18 @@ def test_evaluate_drift_reports_no_new_conflict_when_no_peer_contends() -> None:
     assert event["item_key"] == 446
 
 
-def test_evaluate_drift_halts_the_later_started_item_of_a_new_conflict() -> None:
-    """Report the pair, halt the later-started item, and record the halt action."""
-
-    state = _checkpoint(
-        [
-            _in_flight(446, ["docs/**"], "2026-08-08T09-00"),
-            _in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
-        ]
-    )
-
-    result = _evaluate(state, ["packages/mcp-server/src/index.ts"])
-    event = cast("Mapping[str, object]", result["drift_event"])
-
-    assert result["result"] == RESULT_HALT_REQUIRED
-    assert result["newly_conflicting_pairs"] == [[445, 446]]
-    assert result["halted_item_keys"] == [446]
-    assert event["action"] == "halted_later_started_item"
-
-
-def test_evaluate_drift_selects_one_halted_item_per_newly_conflicting_pair() -> None:
-    """Apply the later-started rule per pair when the escape hits several peers."""
-
-    state = _checkpoint(
-        [
-            _in_flight(446, ["docs/**"], "2026-08-08T09-00"),
-            _in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
-            _in_flight(447, ["scripts/dev_tools/**"], "2026-08-08T10-00"),
-        ]
-    )
-
-    result = _evaluate(
-        state, ["packages/mcp-server/src/index.ts", "scripts/dev_tools/a.py"]
-    )
-
-    assert result["newly_conflicting_pairs"] == [[445, 446], [446, 447]]
-    assert result["halted_item_keys"] == [446, 447]
-
-
 def test_evaluate_drift_treats_an_unreadable_conflict_edge_as_absent() -> None:
     """Keep reporting the conflict when a recorded edge cannot be read."""
 
-    state = _checkpoint(
+    state = checkpoint(
         [
-            _in_flight(446, ["docs/**"], "2026-08-08T09-00"),
-            _in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
+            in_flight(446, ["docs/**"], "2026-08-08T09-00"),
+            in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
         ],
         edges=[None, {"a": 445, "b": 447, "reason": "path_overlap"}],
     )
 
-    result = _evaluate(state, ["packages/mcp-server/src/index.ts"])
+    result = evaluate(state, ["packages/mcp-server/src/index.ts"])
 
     assert result["newly_conflicting_pairs"] == [[445, 446]]
 
@@ -337,16 +249,16 @@ def test_evaluate_drift_treats_an_unreadable_conflict_edge_as_absent() -> None:
 def test_evaluate_drift_leaves_the_checkpoint_untouched() -> None:
     """Read the checkpoint without mutating any of its collections."""
 
-    state = _checkpoint(
+    state = checkpoint(
         [
-            _in_flight(446, ["docs/**"], "2026-08-08T09-00"),
-            _in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
+            in_flight(446, ["docs/**"], "2026-08-08T09-00"),
+            in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
         ],
         edges=[{"a": 445, "b": 446, "reason": "path_overlap"}],
     )
     snapshot = copy.deepcopy(state)
 
-    _evaluate(state, ["packages/mcp-server/src/index.ts"])
+    evaluate(state, ["packages/mcp-server/src/index.ts"])
 
     assert state == snapshot
 
@@ -358,16 +270,16 @@ def test_evaluate_drift_rejects_an_unusable_checkpoint_collection(
     """Fail loudly rather than narrow the compared data on a malformed collection."""
 
     with pytest.raises(DriftCliInputError, match=expected):
-        _evaluate(state, ["packages/mcp-server/src/index.ts"])
+        evaluate(state, ["packages/mcp-server/src/index.ts"])
 
 
 def test_evaluate_drift_rejects_an_item_key_the_checkpoint_does_not_track() -> None:
     """Fail loudly when the requested item is absent from `items[]`."""
 
-    state = _checkpoint([_in_flight(446, ["docs/**"], None)])
+    state = checkpoint([in_flight(446, ["docs/**"], None)])
 
     with pytest.raises(DriftCliInputError, match="no items\\[\\] entry"):
-        _evaluate(state, ["docs/a.md"], item_key=999)
+        evaluate(state, ["docs/a.md"], item_key=999)
 
 
 def test_main_prints_the_detection_result_as_json(
@@ -375,10 +287,10 @@ def test_main_prints_the_detection_result_as_json(
 ) -> None:
     """Serialize the halt verdict to stdout and return the success exit code."""
 
-    state = _checkpoint(
+    state = checkpoint(
         [
-            _in_flight(446, ["docs/**"], "2026-08-08T09-00"),
-            _in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
+            in_flight(446, ["docs/**"], "2026-08-08T09-00"),
+            in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
         ]
     )
     monkeypatch.setattr(LOAD_SEAM, _load_seam(state, CONFIG))
@@ -389,7 +301,9 @@ def test_main_prints_the_detection_result_as_json(
 
     assert status == EXIT_OK
     assert payload["result"] == RESULT_HALT_REQUIRED
-    assert payload["halted_item_keys"] == [446]
+    # The peer is halted, not the drifting item 446, which the call site excludes
+    # from candidacy even though it carries the later `worktree_created_at`.
+    assert payload["halted_item_keys"] == [445]
     assert payload["at"] == AT
     assert payload["computed_at"] == COMPUTED_AT
 
@@ -399,7 +313,7 @@ def test_main_defaults_both_timestamps_from_the_clock_boundary(
 ) -> None:
     """Derive `at` at the boundary and reuse it for `computed_at` when omitted."""
 
-    state = _checkpoint([_in_flight(446, ["docs/**"], "2026-08-08T09-00")])
+    state = checkpoint([in_flight(446, ["docs/**"], "2026-08-08T09-00")])
     monkeypatch.setattr(LOAD_SEAM, _load_seam(state, CONFIG))
     monkeypatch.setattr(CLOCK_SEAM, lambda: AT)
 
@@ -416,7 +330,7 @@ def test_main_dispatches_the_cli_inputs_into_the_pure_detection_function(
 ) -> None:
     """Forward the changed-path argument and the declared radius unchanged."""
 
-    state = _checkpoint([_in_flight(446, ["docs/**"], "2026-08-08T09-00")])
+    state = checkpoint([in_flight(446, ["docs/**"], "2026-08-08T09-00")])
     monkeypatch.setattr(LOAD_SEAM, _load_seam(state, CONFIG))
     captured: list[tuple[tuple[str, ...], tuple[str, ...]]] = []
 

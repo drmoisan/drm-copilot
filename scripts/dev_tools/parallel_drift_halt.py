@@ -174,6 +174,12 @@ def select_halted_item(a: ItemStart, b: ItemStart) -> int:
     present on exactly one item makes that timestamped item earlier-started;
     both unknown falls through to the item-key tie-break.
 
+    Drifting-item exclusion is applied by the caller, not here, because the spec
+    fixes this signature as ``(a, b)`` with no drifting-item parameter and this
+    function receives no drift information at all; the call site
+    ``_halted_item_keys`` in ``parallel_drift_detection_cli`` drops the drifting key
+    from a pair's candidates before this comparator runs.
+
     Args:
         a (ItemStart): One item's start marker.
         b (ItemStart): The other item's start marker. Its ``item_key`` must

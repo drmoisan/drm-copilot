@@ -503,3 +503,46 @@ dependencies recorded for the epic orchestrator to reconcile when F6 lands.
 
 All three unchecked items are F6 cross-feature dependencies, not F8 gaps. No F8 remediation is
 required for acceptance criteria.
+
+---
+
+## CORRECTION — US-4 Disposition Restated as a Three-Clause Split (2026-08-09)
+
+Appended by [P6-T4] and [P6-T5] of `remediation-plan.2026-08-09T00-01.md`, remediation cycle 1 for
+issue #446. This block corrects the `### US-4 [ ]` entry above; that entry is left in place rather
+than rewritten, so the original disposition and this correction are both auditable.
+
+Reviewer finding F8-N9 recorded that the original disposition was partly deflected. US-4 carries
+**three** distinct clauses with **two** distinct owners, and the original entry did not separate them:
+
+| # | Clause | Owner | Post-remediation status |
+| --- | --- | --- | --- |
+| 1 | "the **later-started** item of the pair is halted (`merge_status: blocked_drift`)" | **F8** | **Met.** `select_halted_item` in `scripts/dev_tools/parallel_drift_halt.py` implements the later-started rule with all three tie-breaks, unchanged from `bcf2de15`; `tests/scripts/dev_tools/test_parallel_drift_halt.py` passes with 30 tests. |
+| 2 | "the drifting item is never the one halted" | **F8** | **Met once F8-B2 was fixed.** The drifting key is dropped from every pair's candidate list at the call site `halted_item_keys` in `scripts/dev_tools/parallel_drift_detection_cli.py` before any selection occurs, so the drifting key can never be returned. Asserted by `test_the_drifting_item_is_never_halted_even_when_it_started_later` in `tests/scripts/dev_tools/test_parallel_drift_detection_cli_halt.py` for both tie-breaks — later by timestamp and later by the `issue_num` tie-break. Evidence: `evidence/remediation-baseline/f8-b2-verification.2026-08-09T00-01.md`. |
+| 3 | "and requeued into a future cohort" | **F6 (issue #442), IC-6b** | **Outstanding cross-feature dependency.** F6's recolor entry point is not callable on the branch; its spec names it `recolor_unstarted` and marks its shape provisional. F8 ships exactly one documented stub seam returning the requeue intent and implements no second recolor. |
+
+**The previous reason deflected clause 2 to F6 in error.** The original entry grouped "the halt half"
+as delivered and attributed the remainder to F6's recolor entry point, which left the
+never-halt-the-drifting-item guarantee inside the F6-attributed remainder. That was wrong on two
+counts. Clause 2 is F8's own — it is fixed by three independent statements in this feature's own
+authoritative requirement documents (`spec.md` line 48, `user-story.md` line 90, and
+`user-story.md` lines 108-109 under `## Non-Goals`) — and, at the time of the original check-off, it
+was **not** in fact satisfied: `_halted_item_keys` formed pairs as `(drifting, peer)` with no
+drifting-item exclusion, so the drifting item was halted whenever it was the later starter, which the
+item-key tie-break made true for roughly half of same-minute cohort pairs. That defect was reviewer
+finding **F8-B2**, Blocking, and it is remediated by Phase 3 of this cycle. Deflecting clause 2 to F6
+had therefore concealed an F8 Blocking defect behind a cross-feature dependency.
+
+**The checkbox remains unchecked.** Per [P6-T5], `user-story.md` was re-evaluated and the verdict is
+that the criterion **cannot** be checked. A markdown checkbox is atomic: it cannot record two met
+clauses and one unmet clause. Clause 3, "requeued into a future cohort", is still unmet and still
+depends on F6's IC-6b recolor entry point, so the criterion as a whole is not satisfied and the
+`- [ ]` at `user-story.md` lines 88-90 stands. That file is **unmodified by this cycle**; no
+checkbox in it was changed, and no criterion text was edited.
+
+**Corrected per-file totals are unchanged in count.** `user-story.md` remains 9 total / 6 checked /
+3 unchecked, and the combined figure remains 21 / 18 / 3. What changes is the *reason* recorded
+against US-4: two of its three clauses are F8-owned and now met, and only the requeue clause is an
+F6 dependency. The other two unchecked `user-story.md` criteria (US-3, admission control and
+un-quiesce; US-6, the `mutations[]` requeue entry with an incremented `recolor_generation`) remain
+wholly F6 dependencies with no F8-owned clause outstanding.

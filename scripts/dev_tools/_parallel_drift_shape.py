@@ -31,6 +31,7 @@ Raises and side effects:
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools._parallel_state_common import (
@@ -42,6 +43,18 @@ from scripts.dev_tools._parallel_state_common import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+CANONICAL_TIMESTAMP_RE = r"^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}$"
+"""The single canonical timestamp shape ``yyyy-MM-ddTHH-mm``.
+
+Ordinal comparison of two timestamps is only meaningful when both carry the same
+fixed-width shape. The pattern text is duplicated character-for-character in
+``.claude/hooks/enforce-parallel-drift-gate-helpers.ps1`` so the Python
+derivation and the PowerShell Layer-1 hook accept exactly the same value set;
+the cross-runtime seam test in
+``tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1``
+binds the two runtimes over a shared row table.
+"""
 
 
 class ParallelDriftInputError(ValueError):
@@ -225,6 +238,38 @@ def record_paths(value: object) -> tuple[str, ...] | None:
     if not is_string_list(value):
         return None
     return tuple(cast("list[str]", value))
+
+
+def is_later_canonical_timestamp(candidate: object, reference: object) -> bool:
+    """Report whether a candidate timestamp is strictly later than a reference.
+
+    Both values must carry the canonical ``yyyy-MM-ddTHH-mm`` shape before the
+    ordinal comparison is allowed to decide anything. Without that requirement the
+    comparison fails open: ordinally ``-`` (0x2D) sorts below ``:`` (0x3A), so a
+    colon-bearing candidate such as ``2026-01-09T10:00:00Z`` compares greater than
+    the hyphen-bearing reference ``2026-01-09T10-00`` even though the two name the
+    same instant, reporting a strictly later timestamp where none exists.
+
+    Args:
+        candidate (object): The value asserted to be later, typically a
+            ``blast_radius.computed_at`` read from a checkpoint.
+        reference (object): The value compared against, typically a drift event's
+            ``at``.
+
+    Returns:
+        bool: ``True`` only when both values are strings matching
+        ``CANONICAL_TIMESTAMP_RE`` and ``candidate`` is ordinally greater than
+        ``reference``. ``False`` for every other input, including a non-string, a
+        blank string, or a non-conforming shape on either side, so a
+        non-conforming value is treated as "not later" rather than as later.
+    """
+    if not isinstance(candidate, str) or not isinstance(reference, str):
+        return False
+    if re.match(CANONICAL_TIMESTAMP_RE, candidate) is None:
+        return False
+    if re.match(CANONICAL_TIMESTAMP_RE, reference) is None:
+        return False
+    return candidate > reference
 
 
 def canonical_pair(first: int, second: int) -> tuple[int, int]:

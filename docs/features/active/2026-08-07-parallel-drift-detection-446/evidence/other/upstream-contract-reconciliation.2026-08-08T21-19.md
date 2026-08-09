@@ -977,3 +977,54 @@ empty F7 seam; the F8 dispatch call goes immediately after `_validate_collection
 merge-conflict risk; the `Parallel mode: true` token; `items[].worktree_path`; the two sibling
 reserved sections; F6 not landed; and `parallel_cohort_computation.py` exposing only pure cohort
 computation.
+
+---
+
+## IC-6a Amendment — Remediation Cycle 1 (2026-08-09), issue #446
+
+Appended by [P6-T3] of `remediation-plan.2026-08-09T00-01.md`. This is an amendment, not a rewrite:
+the `## IC-6a — Quiesce Predicate Export (cross-feature acceptance dependency)` section above is left
+in place verbatim, including its `**Deviation:** none from the plan's stated IC-6a contract` line,
+which was accurate against the contract as stated when it was written. Reviewer finding F8-N6 observed
+that the delivered export is wider than that contract, and this block records the widening so F6's
+planner reads the delivered contract rather than the assumed one.
+
+**The delivered export takes two arguments.** `scripts/dev_tools/parallel_drift_detection.py` exports
+
+```text
+has_unresolved_drift(events: Sequence[Mapping[str, object]],
+                     items: Sequence[Mapping[str, object]]) -> bool
+```
+
+not the one-argument `has_unresolved_drift(events) -> bool` recorded in the IC-6a section above.
+
+**The second argument is unavoidable.** It is not a convenience parameter and cannot be defaulted
+away. Resolution is *derived* rather than recorded: F3's `drift_events[].action` enum has exactly two
+members and no `resolved` member, and invariant 18 rejects an event with zero escaped paths, so a
+clean re-evaluation cannot be written to the event log at all. Both resolution disjuncts therefore
+read the item's currently recorded `blast_radius` — disjunct (a) compares `escaped_paths` against
+`items[].blast_radius.paths` under the path-subsumption predicate, and disjunct (b) reads
+`items[].blast_radius.source` and `items[].blast_radius.computed_at`. Neither field appears anywhere
+in `drift_events[]`. A one-argument predicate over `events` alone has no access to the state that
+decides resolution, so it could only report whether a drift event was ever recorded, never whether one
+is still unresolved — which is the question F6's admission-control path asks.
+
+**The widening follows directly from the IC-3a resolution-semantics deviation.** The
+`### ADOPTED RESOLUTION SEMANTICS (IC-3a reconciliation decision)` block above is where resolution
+became a derivation over `items[].blast_radius` instead of a recorded event field. Once that decision
+was adopted, `items` became a required input to every consumer of the derivation, including
+`has_unresolved_drift` and `unresolved_drift_item_keys`. The IC-6a widening is a consequence of the
+IC-3a deviation rather than an independent change of contract, and no schema field was added and no
+enum extended in either case.
+
+**Consequence for F6 (issue #442).** F6's admission-control path must call the two-argument form and
+pass the checkpoint's `items[]` alongside its `drift_events[]`. Both are already present on the
+parallel-orchestrator checkpoint F6 reads, so the call site needs no new data source. F6's `spec.md`
+still contains no reference to `has_unresolved_drift`, so the consultation edge remains an outstanding
+F6 acceptance dependency as recorded above; this amendment fixes the signature F6 should wire when it
+does.
+
+**Cross-runtime note.** The PowerShell Layer-1 counterpart `Get-ParallelDriftGateUnresolvedState`
+likewise reads both `drift_events` and `items` from the checkpoint object it receives, for the same
+reason, so the two-argument shape is consistent across both runtimes rather than a Python-only
+artefact.

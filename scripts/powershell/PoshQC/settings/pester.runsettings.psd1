@@ -127,6 +127,10 @@
             # Issue #446 added this Layer-1 parallel drift-gate PreToolUse hook; measured here so
             # the new production hook is not excluded from coverage.
             '.claude/hooks/enforce-parallel-drift-gate.ps1'
+            # Issue #446 remediation cycle 1 split the seven shape-and-derivation helpers out of
+            # that hook into this dot-sourced sibling module; measured here so the Coverage
+            # Exclusion Policy's no-production-file-excluded rule still holds after the split.
+            '.claude/hooks/enforce-parallel-drift-gate-helpers.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

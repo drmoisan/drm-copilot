@@ -26,7 +26,12 @@ from scripts.dev_tools.parallel_drift_detection import (
     request_requeue_via_recolor,
     select_halted_item,
 )
-from tests.scripts.dev_tools.parallel_drift_test_support import CONFIG, item
+from scripts.dev_tools.parallel_drift_detection_cli import halted_item_keys
+from tests.scripts.dev_tools.parallel_drift_test_support import (
+    CONFIG,
+    in_flight,
+    item,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -337,11 +342,18 @@ def test_recompute_conflicts_uses_the_real_relation_without_mocking() -> None:
 
 
 def test_recomputed_pair_feeds_halt_selection_and_yields_later_started_item() -> None:
-    """Run the whole path: escape, recomputation, halt selection, requeue request."""
+    """Run the whole path: escape, recomputation, halt selection, requeue request.
+
+    Halt selection is routed through the exclusion-aware call site rather than
+    through the bare comparator, because the drifting item is never the one halted.
+    Drifting item 446 carries the strictly later `worktree_created_at` here, so the
+    bare later-started rule would select it; the call site drops it from candidacy
+    and the peer 445 is halted and requeued.
+    """
 
     items = [
-        item(446, ["scripts/dev_tools/**"]),
-        item(445, ["packages/mcp-server/**"]),
+        in_flight(446, ["scripts/dev_tools/**"], "2026-08-08T09-00"),
+        in_flight(445, ["packages/mcp-server/**"], "2026-08-08T08-00"),
     ]
     escaped = detect_escaped_paths(
         ["scripts/dev_tools/a.py", "packages/mcp-server/src/index.ts"],
@@ -356,18 +368,15 @@ def test_recomputed_pair_feeds_halt_selection_and_yields_later_started_item() ->
         CONFIG,
         computed_at="2026-08-08T10-00",
     )
-    first, second = pairs[0]
-    halted = select_halted_item(
-        ItemStart(item_key=first, worktree_created_at="2026-08-08T08-00"),
-        ItemStart(item_key=second, worktree_created_at="2026-08-08T09-00"),
-    )
+    halted = halted_item_keys(items, pairs, 446)
     request = request_requeue_via_recolor(
-        halted_item_key=halted, at="2026-08-08T10-00", current_recolor_generation=2
+        halted_item_key=halted[0], at="2026-08-08T10-00", current_recolor_generation=2
     )
 
     assert escaped == ("packages/mcp-server/src/index.ts",)
     assert pairs == ((445, 446),)
-    assert halted == 446
+    assert halted == (445,)
+    assert request.item_key == 445
     assert request.merge_status == "blocked_drift"
     assert request.state == "blocked"
     assert request.recolor_generation == 3

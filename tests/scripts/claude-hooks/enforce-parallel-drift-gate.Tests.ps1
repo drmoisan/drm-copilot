@@ -6,11 +6,16 @@
 .DESCRIPTION
     Both read boundaries are mocked -- the checkpoint-read seam
     (Get-ParallelDriftGateCheckpointContent) and the finding-presence seam
-    (Test-ParallelDriftFindingPresent) -- so no test writes a temporary file. Three binding
-    tests keep the hook tied to the artifacts it consumes rather than to hardcoded copies: the
-    marker-binding test reads .claude/skills/parallel-orchestrate/SKILL.md at run time, the
-    registration test reads .claude/settings.json at run time, and the cross-runtime seam test
-    runs the PowerShell and Python drift derivations over one shared checkpoint-state table.
+    (Test-ParallelDriftFindingPresent) -- so no test writes a temporary file. Two binding tests
+    keep the hook tied to the artifacts it consumes rather than to hardcoded copies: the
+    marker-binding test reads .claude/skills/parallel-orchestrate/SKILL.md at run time and the
+    registration test reads .claude/settings.json at run time.
+
+    This suite covers the hook's decision path, its two read seams, and its prompt and item
+    resolution. The seven shape-and-derivation helpers the hook dot-sources, and the
+    cross-runtime seam test that runs the PowerShell and Python drift derivations over one
+    shared checkpoint-state table, are covered by
+    enforce-parallel-drift-gate-helpers.Tests.ps1.
 #>
 
 Describe 'enforce-parallel-drift-gate.ps1' {
@@ -157,6 +162,62 @@ Describe 'enforce-parallel-drift-gate.ps1' {
         }
     }
 
+    Context 'Layer-1 finding-presence narrowing to the current drift event' {
+        # These cases drive the whole decision path with the REAL Test-ParallelDriftFindingPresent
+        # and mock only its two read boundaries, so the narrowing itself is exercised rather than
+        # stubbed out. The checkpoint-read seam supplies the latest event's at; the directory
+        # listing supplies one candidate finding-file name. No temporary file is created.
+        BeforeEach {
+            Mock -CommandName Get-ParallelDriftGateCheckpointContent -MockWith {
+                Get-CheckpointJson -EventAt '2026-01-02T00-00'
+            }
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-ChildItem -MockWith {
+                @([pscustomobject]@{ Name = $script:NarrowingFindingName })
+            }
+        }
+
+        It '<Label>' -ForEach @(
+            @{
+                Label    = 'denies when the only finding file predates the latest drift event'
+                Finding  = 'remediation-inputs.2026-01-01T00-00.md'
+                Expected = 'deny'
+            }
+            @{
+                Label    = 'allows when the finding file timestamp equals the latest drift event at'
+                Finding  = 'remediation-inputs.2026-01-02T00-00.md'
+                Expected = 'allow'
+            }
+            @{
+                Label    = 'allows when the finding file timestamp follows the latest drift event at'
+                Finding  = 'remediation-inputs.2026-01-05T00-00.md'
+                Expected = 'allow'
+            }
+            @{
+                Label    = 'denies when the finding file name carries a non-conforming embedded substring'
+                Finding  = 'remediation-inputs.cycle-one.md'
+                Expected = 'deny'
+            }
+        ) {
+            # Arrange: publish the candidate name where the Get-ChildItem mock can read it.
+            $script:NarrowingFindingName = $Finding
+
+            # Act.
+            $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw (Get-ToolInputJson -Prompt $script:AlphaPrompt)
+
+            # Assert.
+            $decision.hookSpecificOutput.permissionDecision | Should -Be $Expected
+        }
+
+        It 'names the current-event requirement in the deny reason for a stale finding file' {
+            $script:NarrowingFindingName = 'remediation-inputs.2026-01-01T00-00.md'
+            $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw (Get-ToolInputJson -Prompt $script:AlphaPrompt)
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_DRIFT_GATE_BLOCKED:*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'dated at or after that event'
+        }
+    }
+
     Context 'marker binding to the parallel-orchestrate skill' {
         It 'asserts the hook marker constant is a substring of the marker line in SKILL.md' {
             # Arrange: read F5's kickoff section at run time so an edit to its marker text fails here.
@@ -207,111 +268,6 @@ Describe 'enforce-parallel-drift-gate.ps1' {
         }
     }
 
-    Context 'cross-runtime binding of the unresolved-drift derivation' {
-        BeforeAll {
-            $script:PythonExe = @(@(Get-Command python -CommandType Application -ErrorAction SilentlyContinue) +
-                @(Get-Command py -CommandType Application -ErrorAction SilentlyContinue))[0].Source
-
-            $script:PyHarness = @'
-import json, sys
-
-from scripts.dev_tools._parallel_drift_shape import ParallelDriftInputError
-from scripts.dev_tools.parallel_drift_detection import unresolved_drift_item_keys
-
-
-def verdict(state):
-    try:
-        keys = unresolved_drift_item_keys(
-            state.get("drift_events", []), state.get("items", [])
-        )
-    except ParallelDriftInputError:
-        return {"malformed": True, "unresolved": []}
-    return {"malformed": False, "unresolved": list(keys)}
-
-
-print(json.dumps([verdict(state) for state in json.load(sys.stdin)]))
-'@
-
-            # One shared table of checkpoint states. Widened marks the row where the PowerShell
-            # narrowing (disjunct (b) only) is expected to be strictly more conservative than
-            # Python's derivation; every other row must agree exactly.
-            $script:ParityRows = @(
-                @{ Name = 'no drift_events key'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-01T00-00"}}]}' }
-                @{ Name = 'empty drift_events list'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-01T00-00"}}],"drift_events":[]}' }
-                @{ Name = 'unresolved against a declared radius'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-01T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'resolved by a later observed radius'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"observed","computed_at":"2026-01-03T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'observed radius older than the event'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"observed","computed_at":"2026-01-01T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'declared radius newer than the event'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-09T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'observed radius without computed_at'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"observed"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'item without a blast_radius'; Widened = $false; Json = '{"items":[{"issue_num":501}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'drift event with no matching item'; Widened = $false; Json = '{"items":[],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'one item unresolved beside one resolved item'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-01T00-00"}},{"issue_num":502,"blast_radius":{"paths":["s/c/"],"source":"observed","computed_at":"2026-01-05T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]},{"item_key":502,"at":"2026-01-02T00-00","escaped_paths":["s/d/y.py"]}]}' }
-                @{ Name = 'latest of two events decides, not the earliest'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"observed","computed_at":"2026-01-03T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-01T00-00","escaped_paths":["s/b/x.py"]},{"item_key":501,"at":"2026-01-04T00-00","escaped_paths":["s/b/z.py"]}]}' }
-                @{ Name = 'an earlier event does not mask a resolved latest event'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"observed","computed_at":"2026-01-05T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-04T00-00","escaped_paths":["s/b/z.py"]},{"item_key":501,"at":"2026-01-01T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'malformed: blank at'; Widened = $false; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/a/"],"source":"declared","computed_at":"2026-01-01T00-00"}}],"drift_events":[{"item_key":501,"at":"","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'malformed: empty escaped_paths'; Widened = $false; Json = '{"items":[{"issue_num":501}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":[]}]}' }
-                @{ Name = 'malformed: escaped_paths is not a list'; Widened = $false; Json = '{"items":[{"issue_num":501}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":"s/b/x.py"}]}' }
-                @{ Name = 'malformed: item_key is not a positive integer'; Widened = $false; Json = '{"items":[{"issue_num":501}],"drift_events":[{"item_key":0,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-                @{ Name = 'radius widened to cover the escape (PowerShell narrowing)'; Widened = $true; Json = '{"items":[{"issue_num":501,"blast_radius":{"paths":["s/b/x.py"],"source":"declared","computed_at":"2026-01-01T00-00"}}],"drift_events":[{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["s/b/x.py"]}]}' }
-            )
-        }
-
-        It 'binds the PowerShell unresolved-drift decision to the Python unresolved_drift_item_keys derivation' {
-            # Arrange: run the Python derivation over the same table the PowerShell code sees.
-            $script:PythonExe | Should -Not -BeNullOrEmpty -Because 'the cross-runtime binding needs a Python interpreter'
-            $tableJson = '[' + ((@($script:ParityRows) | ForEach-Object { $_.Json }) -join ',') + ']'
-            $previousPythonPath = $env:PYTHONPATH
-            try {
-                $env:PYTHONPATH = $script:RepoRoot
-                $raw = ($tableJson | & $script:PythonExe -c $script:PyHarness) -join ''
-                $pythonExit = $LASTEXITCODE
-            } finally {
-                $env:PYTHONPATH = $previousPythonPath
-            }
-            $pythonExit | Should -Be 0 -Because "the harness must run cleanly; output was: $raw"
-            $pythonVerdicts = @($raw | ConvertFrom-Json)
-            $pythonVerdicts.Count | Should -Be @($script:ParityRows).Count
-
-            # Act: evaluate every row with the hook's own derivation and collect disagreements.
-            $divergences = [System.Collections.Generic.List[string]]::new()
-            for ($index = 0; $index -lt @($script:ParityRows).Count; $index++) {
-                $row = @($script:ParityRows)[$index]
-                $expected = $pythonVerdicts[$index]
-                $actual = Get-ParallelDriftGateUnresolvedState -Checkpoint ($row.Json | ConvertFrom-Json)
-                $pythonKeys = @($expected.unresolved)
-                $powerShellKeys = @($actual.UnresolvedItemKeys)
-
-                if ([bool]$actual.Malformed -ne [bool]$expected.malformed) {
-                    $divergences.Add("$($row.Name): malformed PowerShell=$($actual.Malformed) Python=$($expected.malformed)")
-                }
-                # Fail-closed direction, asserted on every row: PowerShell must never allow an
-                # item key Python reports as unresolved.
-                foreach ($key in $pythonKeys) {
-                    if ($powerShellKeys -notcontains [long]$key) {
-                        $divergences.Add("$($row.Name): PowerShell dropped Python-unresolved key $key")
-                    }
-                }
-                # Exact agreement, asserted on every row outside the documented narrowing.
-                if (-not $row.Widened -and (($powerShellKeys -join ',') -ne ($pythonKeys -join ','))) {
-                    $divergences.Add("$($row.Name): keys PowerShell=[$($powerShellKeys -join ',')] Python=[$($pythonKeys -join ',')]")
-                }
-            }
-
-            # Assert: no runtime disagreed on any row.
-            ($divergences -join ' | ') | Should -BeNullOrEmpty
-        }
-
-        It 'records the narrowing as strictly conservative on the widened-radius row' {
-            # Arrange, act: the one row where Python resolves via the glob disjunct the hook omits.
-            $row = @($script:ParityRows) | Where-Object { $_.Widened } | Select-Object -First 1
-            $actual = Get-ParallelDriftGateUnresolvedState -Checkpoint ($row.Json | ConvertFrom-Json)
-
-            # Assert: the hook reports unresolved, the deny-side (fail-closed) direction.
-            $actual.Malformed | Should -BeFalse
-            @($actual.UnresolvedItemKeys) | Should -Contain 501
-        }
-    }
-
     Context 'Find-ParallelDriftGateFeatureFolderFromPrompt helper' {
         It 'returns $null for an empty prompt' {
             Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt '' | Should -BeNullOrEmpty
@@ -332,85 +288,7 @@ print(json.dumps([verdict(state) for state in json.load(sys.stdin)]))
         }
     }
 
-    Context 'shape predicates mirroring the F3-owned Python helpers' {
-        It 'Test-ParallelDriftGateItemKey rejects <Label>' -ForEach @(
-            @{ Label = 'a boolean'; Value = $true }
-            @{ Label = 'a string'; Value = '501' }
-            @{ Label = 'zero'; Value = 0 }
-            @{ Label = 'a negative integer'; Value = -1 }
-            @{ Label = 'null'; Value = $null }
-        ) {
-            Test-ParallelDriftGateItemKey -Value $Value | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateItemKey accepts a positive integer' {
-            Test-ParallelDriftGateItemKey -Value 501 | Should -BeTrue
-        }
-
-        It 'Test-ParallelDriftGateText rejects <Label>' -ForEach @(
-            @{ Label = 'null'; Value = $null }
-            @{ Label = 'an empty string'; Value = '' }
-            @{ Label = 'whitespace'; Value = '   ' }
-            @{ Label = 'an integer'; Value = 5 }
-        ) {
-            Test-ParallelDriftGateText -Value $Value | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateText accepts a non-blank string' {
-            Test-ParallelDriftGateText -Value '2026-01-02T00-00' | Should -BeTrue
-        }
-
-        It 'Test-ParallelDriftGateEventRecord rejects a $null record' {
-            Test-ParallelDriftGateEventRecord -Record $null | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateEventRecord rejects an escaped_paths entry that is blank' {
-            $record = '{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["a/b.py","  "]}' | ConvertFrom-Json
-            Test-ParallelDriftGateEventRecord -Record $record | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateEventRecord accepts a well-formed record' {
-            $record = '{"item_key":501,"at":"2026-01-02T00-00","escaped_paths":["a/b.py"]}' | ConvertFrom-Json
-            Test-ParallelDriftGateEventRecord -Record $record | Should -BeTrue
-        }
-    }
-
-    Context 'derivation helpers' {
-        It 'Get-ParallelDriftGateLatestEventMap reports malformed for a $null checkpoint' {
-            (Get-ParallelDriftGateLatestEventMap -Checkpoint $null).Malformed | Should -BeTrue
-        }
-
-        It 'Get-ParallelDriftGateLatestEventMap reports malformed for a non-list drift_events' {
-            $checkpoint = '{"drift_events":"none"}' | ConvertFrom-Json
-            (Get-ParallelDriftGateLatestEventMap -Checkpoint $checkpoint).Malformed | Should -BeTrue
-        }
-
-        It 'Get-ParallelDriftGateItemRadiusMap returns an empty index for a $null checkpoint' {
-            (Get-ParallelDriftGateItemRadiusMap -Checkpoint $null).Count | Should -Be 0
-        }
-
-        It 'Get-ParallelDriftGateItemRadiusMap skips a null item, a bad key, and a non-object radius' {
-            $checkpoint = '{"items":[null,{"issue_num":"x","blast_radius":{}},{"issue_num":7,"blast_radius":"nope"},{"issue_num":9,"blast_radius":{"paths":[]}}]}' |
-                ConvertFrom-Json
-            $radii = Get-ParallelDriftGateItemRadiusMap -Checkpoint $checkpoint
-            $radii.Count | Should -Be 1
-            $radii.ContainsKey([long]9) | Should -BeTrue
-        }
-
-        It 'Test-ParallelDriftGateEventResolved rejects a source that differs only in case' {
-            $radius = '{"source":"Observed","computed_at":"2026-01-09T00-00"}' | ConvertFrom-Json
-            Test-ParallelDriftGateEventResolved -Radius $radius -At '2026-01-02T00-00' | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateEventResolved rejects a $null radius' {
-            Test-ParallelDriftGateEventResolved -Radius $null -At '2026-01-02T00-00' | Should -BeFalse
-        }
-
-        It 'Test-ParallelDriftGateEventResolved rejects a computed_at equal to the event at' {
-            $radius = '{"source":"observed","computed_at":"2026-01-02T00-00"}' | ConvertFrom-Json
-            Test-ParallelDriftGateEventResolved -Radius $radius -At '2026-01-02T00-00' | Should -BeFalse
-        }
-
+    Context 'item-record resolution helper' {
         It 'Find-ParallelDriftGateItemRecord returns $null for <Label>' -ForEach @(
             @{ Label = 'a $null checkpoint'; Json = $null; Folder = 'alpha-501' }
             @{ Label = 'a blank target folder'; Json = '{"items":[]}'; Folder = '' }
@@ -444,24 +322,32 @@ print(json.dumps([verdict(state) for state in json.load(sys.stdin)]))
             @{ Label = 'a null worktree path'; Worktree = ''; Folder = 'alpha-501' }
             @{ Label = 'a blank feature folder'; Worktree = 'C:/worktrees/alpha'; Folder = '' }
         ) {
-            Test-ParallelDriftFindingPresent -WorktreePath $Worktree -FeatureFolder $Folder | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath $Worktree -FeatureFolder $Folder -EventAt '2026-08-08T21-19' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence when the feature folder does not exist' {
             Mock -CommandName Test-Path -MockWith { $false }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence when no remediation-inputs file is present' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'spec.md' }, [pscustomobject]@{ Name = 'remediation-inputs.2026-01-01T00-00.txt' }) }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-01-01T00-00' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports presence for a remediation-inputs markdown file' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'plan.md' }, [pscustomobject]@{ Name = 'remediation-inputs.2026-08-08T21-19.md' }) }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' | Should -BeTrue
+            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeTrue
+        }
+
+        It 'Test-ParallelDriftFindingPresent reports absence for a non-canonical EventAt' {
+            # Fail closed rather than compare a conforming file name against an unusable
+            # reference: an ordinal comparison across shapes is the F8-N4 inversion.
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'remediation-inputs.2026-08-08T21-19.md' }) }
+            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21:19:00Z' | Should -BeFalse
         }
     }
 

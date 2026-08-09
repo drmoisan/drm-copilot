@@ -49,7 +49,8 @@ Stdout contract:
           "escaped_paths": [<str>, ...],            # empty when result is no_escape
           "newly_conflicting_pairs": [[<int>, <int>], ...],
           "halted_item_keys": [<int>, ...],         # one per newly conflicting pair
-          "drift_event": {<six section-12 fields>} | null
+          "drift_event": {<six section-12 fields>} | null,
+          "observed_radius": {<six invariant-9 fields>} | null
         }
 
     ``result`` is the explicit verdict: ``no_escape`` means the diff stayed inside
@@ -60,6 +61,25 @@ Stdout contract:
     is ``no_escape``, because F3 invariant 18 rejects an event with zero escaped
     paths. Errors are written to stderr, never to stdout, so a caller can parse
     stdout unconditionally.
+
+    ``observed_radius`` is the serialized ``BlastRadius`` built from the observed
+    changed-path set, produced by ``parallel_drift_resolution.request_resolution_write``
+    so the value is library-built rather than hand-constructed. It is the value the
+    ``parallel-orchestrator`` writes into ``items[].blast_radius`` to satisfy
+    resolution disjunct (b), and it is ``null`` exactly when ``result`` is
+    ``no_escape``, on the same precondition as ``drift_event``.
+
+    Residual gap, recorded so a reaudit does not read it as a new finding: because
+    ``observed_radius`` is ``null`` whenever ``result`` is ``no_escape``, and
+    ``no_escape`` is exactly the post-remediation state once remediation has
+    narrowed the diff or widened the declared radius, the emitted-value path closes
+    resolution only through the still-escaping invocation -- the invocation made
+    while the drift is still observable. That is the realistic path and it is the
+    one the resolution seam test exercises: the parent captures ``observed_radius``
+    from the detecting invocation and applies it, with a ``computed_at`` strictly
+    later than the event's ``at``, once remediation has completed. An invocation
+    made after the diff already stopped escaping emits no radius and cannot itself
+    close the loop.
 
 Exit codes:
     ``0`` on success, ``1`` when an input is missing or malformed, and argparse's
@@ -91,6 +111,7 @@ from scripts.dev_tools.parallel_drift_detection import (
     recompute_conflicts_with_observed,
     select_halted_item,
 )
+from scripts.dev_tools.parallel_drift_resolution import request_resolution_write
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -250,6 +271,7 @@ def evaluate_drift(
     pairs: tuple[tuple[int, int], ...] = ()
     halted: tuple[int, ...] = ()
     event: dict[str, object] | None = None
+    observed_radius: Mapping[str, object] | None = None
     result = RESULT_NO_ESCAPE
 
     # An escape is the precondition for every later step: with nothing outside the
@@ -265,7 +287,16 @@ def evaluate_drift(
             config,
             computed_at=computed_at,
         )
-        halted = _halted_item_keys(items, pairs)
+        halted = halted_item_keys(items, pairs, item_key)
+        # Emit the library-built observed radius the parent writes back to resolve
+        # the event this pass records; the seam requests the write, never performs
+        # it, so this boundary only serializes the requested value.
+        observed_radius = request_resolution_write(
+            item_key=item_key,
+            observed_paths=changed_paths,
+            config=config,
+            computed_at=computed_at,
+        ).blast_radius
         result = RESULT_HALT_REQUIRED if pairs else RESULT_NO_NEW_CONFLICT
         event = build_drift_event(
             item_key=item_key,
@@ -289,6 +320,7 @@ def evaluate_drift(
         "newly_conflicting_pairs": [list(pair) for pair in pairs],
         "halted_item_keys": list(halted),
         "drift_event": event,
+        "observed_radius": observed_radius,
     }
 
 
@@ -371,23 +403,41 @@ def _start_markers(items: Sequence[Mapping[str, object]]) -> dict[int, ItemStart
     return markers
 
 
-def _halted_item_keys(
+def halted_item_keys(
     items: Sequence[Mapping[str, object]],
     pairs: Sequence[tuple[int, int]],
+    drifting_item_key: int,
 ) -> tuple[int, ...]:
-    """Select the later-started item of every newly conflicting pair.
+    """Select the halted item of every newly conflicting pair, never the drifter.
+
+    The drifting item is excluded from halt candidacy before the later-started
+    comparator runs, so it is never returned even when it started later. The
+    exclusion is required and is not a narrowing of the later-started rule: the
+    drifting item is mid-remediation on its own R1 through R5 loop for the drift
+    finding, so halting it would deadlock the very remediation that resolves the
+    drift, and its work is already broader than planned and more expensive to
+    unwind. `spec.md` and `user-story.md` both state the prohibition
+    unconditionally.
+
+    The exclusion lives here rather than in ``select_halted_item`` because the
+    drifting key is known only at this call site; the comparator keeps its ``(a, b)``
+    signature and receives no drift information, which is the structural guarantee
+    that no item is ever selected by virtue of drifting.
 
     Args:
         items (Sequence[Mapping[str, object]]): The checkpoint's item records,
             read for the start markers.
         pairs (Sequence[tuple[int, int]]): The canonical newly conflicting pairs
-            returned by conflict recomputation.
+            returned by conflict recomputation. Every pair holds two distinct keys
+            with ``a < b`` (F3 invariant 15).
+        drifting_item_key (int): ``issue_num`` of the item whose diff escaped. It
+            is never a member of the returned tuple.
 
     Returns:
         tuple[int, ...]: The item keys to halt, deduplicated and ascending. Empty
         when no pair newly conflicts. The common case is one pair and therefore
-        one key; several pairs each contribute their own later-started item, and
-        the selection rule is applied per pair rather than across pairs.
+        one key; several pairs each contribute their own halted item, and the
+        selection rule is applied per pair rather than across pairs.
 
     Raises:
         ParallelDriftInputError: If a start marker is malformed, or if a pair
@@ -400,11 +450,22 @@ def _halted_item_keys(
         return ()
 
     markers = _start_markers(items)
-    # Apply the later-started rule to each pair independently; a set collapses the
-    # repeats that arise when one item is the later-started member of two pairs.
-    halted = {
-        select_halted_item(markers[first], markers[second]) for first, second in pairs
-    }
+    halted: set[int] = set()
+
+    # Apply the rule to each pair independently, on the pair's candidates after the
+    # drifting key is dropped. Because a canonical pair holds two distinct keys, the
+    # candidate list is provably one or two entries: dropping the drifting key
+    # leaves one when the pair contains it and two when it does not. A pair can
+    # never be emptied, so no zero-candidate branch exists to write. A set collapses
+    # the repeats that arise when one item is the halted member of two pairs.
+    for first, second in pairs:
+        candidates = [key for key in (first, second) if key != drifting_item_key]
+        if len(candidates) == 1:
+            halted.add(candidates[0])
+        else:
+            halted.add(
+                select_halted_item(markers[candidates[0]], markers[candidates[1]])
+            )
     return tuple(sorted(halted))
 
 

@@ -15,16 +15,21 @@
     uses its parent directory); read the parallel checkpoint and locate the items[] record
     whose feature_folder basename matches; derive which item keys have an unresolved latest
     drift event; deny with PARALLEL_DRIFT_GATE_BLOCKED when the resolved item is one of them
-    and its synthetic Blocking finding file has not been written. Allowed: a
-    non-feature-review target, a prompt without the marker, a resolved latest event, and an
-    unresolved event whose finding file exists, so the R1-R5 remediation review is never
-    deadlocked. A missing or unreadable checkpoint, or an unresolvable target item, denies
-    (fail-closed).
+    and no synthetic Blocking finding file dated at or after that item's latest drift event has
+    been written. Allowed: a non-feature-review target, a prompt without the marker, a resolved
+    latest event, and an unresolved event whose finding file is dated at or after it, so the
+    R1-R5 remediation review is never deadlocked. A missing or unreadable checkpoint, an
+    unresolvable target item, and an unreadable drift log that yields no latest event timestamp
+    all deny (fail-closed).
 
     PRESENCE GATING ONLY: checkpoint-state reads plus exactly one finding-file existence
     check through the finding-presence seam. No git command, no diff computation, and no
     path-glob matching; all path-matching semantics stay in the single Python
-    implementation, scripts/dev_tools/parallel_drift_detection.py.
+    implementation, scripts/dev_tools/parallel_drift_detection.py. The finding-presence check
+    additionally requires the matched name's embedded yyyy-MM-ddTHH-mm timestamp to be
+    ordinally at or after the current drift event's at, so a finding from an earlier
+    remediation cycle does not open the gate; that narrowing is substring extraction plus
+    CompareOrdinal over directory entry NAMES and reads no file content.
 
     Resolution semantics are owned by Python, not reimplemented here. That module's
     unresolved_drift_item_keys derives resolution from two disjuncts: (a) the recorded
@@ -35,18 +40,31 @@
     is ordinal string comparison and needs no glob matcher. Omitting disjunct (a) can only
     report unresolved where Python reports resolved, the fail-closed direction, and the
     finding-file allowance keeps that from deadlocking review. The cross-runtime seam test in
-    tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1 runs both runtimes over
-    one shared checkpoint-state table and fails when they diverge. Layer 2, the retrospective
-    backstop, is the PARALLEL_DRIFT_GATE_VIOLATION invariant in
+    tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1 runs both runtimes
+    over one shared checkpoint-state table and fails when they diverge. Layer 2, the
+    retrospective backstop, is the PARALLEL_DRIFT_GATE_VIOLATION invariant in
     scripts/dev_tools/_parallel_orchestrator_state_drift.py.
 
 .NOTES
     PowerShell 7+, no module dependencies. Both read boundaries -- the checkpoint read and the
     finding-file existence check -- are injectable wrapper functions, so tests mock them
     without writing temporary files.
+
+    The eight shape-and-derivation helpers this hook calls live in the dot-sourced sibling
+    module .claude/hooks/enforce-parallel-drift-gate-helpers.ps1, together with the
+    $script:ObservedRadiusSource and $script:CanonicalTimestampPattern constants they alone
+    read. They were split out to restore
+    file-size headroom (issue #446 remediation cycle 1, finding F8-N10); the split was a pure
+    move with no behaviour change. This file keeps the two read seams, the prompt and item
+    resolution, and the decision path.
 #>
 [CmdletBinding()]
 param()
+
+# Dot-source the shape-and-derivation helpers. Guarded so a missing file produces a clear error
+# and so dot-sourcing this hook in tests loads the helpers too.
+$script:ParallelDriftGateHelpersPath = Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1'
+. $script:ParallelDriftGateHelpersPath
 
 $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:ParallelModeMarker = 'Parallel mode: true'
@@ -54,7 +72,11 @@ $script:ReviewSubagentType = 'feature-review'
 $script:ActiveFeatureRoot = 'docs/features/active'
 $script:FindingFilePrefix = 'remediation-inputs.'
 $script:FindingFileSuffix = '.md'
-$script:ObservedRadiusSource = 'observed'
+
+# Character length of the canonical yyyy-MM-ddTHH-mm timestamp a finding file name embeds
+# immediately after the prefix. Read only by Test-ParallelDriftFindingPresent, which takes the
+# substring at that fixed offset rather than matching a pattern against the path.
+$script:FindingFileStampLength = 16
 
 function Get-ParallelDriftGateCheckpointContent {
     <#
@@ -83,15 +105,36 @@ function Test-ParallelDriftFindingPresent {
         worktree_path, which is optional in the schema and may be null: absence reports $false
         so the caller fails closed. Names are compared with ordinal prefix and suffix tests, so
         no glob matcher is involved.
+
+        The finding must correspond to the CURRENT unresolved drift event, not to any earlier
+        remediation cycle: a matched name's embedded yyyy-MM-ddTHH-mm timestamp must be
+        ordinally greater than or equal to EventAt before $true is reported (issue #446
+        remediation cycle 1, finding F8-N3). Before that narrowing, a remediation-inputs file
+        written by an unrelated earlier cycle opened the Layer 1 gate for drifted, unsurfaced
+        work.
+
+        The narrowing stays PRESENCE GATING ONLY. The timestamp is taken with Substring from
+        the fixed offset after the remediation-inputs. prefix and compared with CompareOrdinal.
+        There is no path-glob match, no git invocation, and no read of any file's CONTENT; only
+        directory entry names are inspected. A name too short to carry the substring, or whose
+        substring is not canonically formatted, reports $false, as does a non-canonical EventAt,
+        so an unreadable timestamp on either side holds the gate closed.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreePath,
-        [AllowNull()][AllowEmptyString()][string] $FeatureFolder
+        [AllowNull()][AllowEmptyString()][string] $FeatureFolder,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $EventAt
     )
 
     if ([string]::IsNullOrWhiteSpace($WorktreePath) -or [string]::IsNullOrWhiteSpace($FeatureFolder)) {
+        return $false
+    }
+
+    # Fail closed on an unusable reference timestamp rather than comparing against it: an
+    # ordinal comparison with a differently shaped value is exactly the inversion F8-N4 closed.
+    if (-not (Test-ParallelDriftGateCanonicalTimestamp -Value $EventAt)) {
         return $false
     }
     $folder = Join-Path -Path $WorktreePath -ChildPath $script:ActiveFeatureRoot -AdditionalChildPath $FeatureFolder
@@ -99,12 +142,25 @@ function Test-ParallelDriftFindingPresent {
         return $false
     }
 
-    # Report on the first remediation-inputs.<timestamp>.md entry; the timestamp varies per
-    # cycle, so the name is matched by ordinal prefix and suffix rather than a pattern.
+    # Report on the first remediation-inputs.<timestamp>.md entry whose embedded timestamp is at
+    # or after the current event. The timestamp varies per cycle, so the name is matched by
+    # ordinal prefix and suffix and the timestamp is read at a fixed offset, not by a pattern.
+    $stampOffset = $script:FindingFilePrefix.Length
+    $stampLength = $script:FindingFileStampLength
     foreach ($entry in @(Get-ChildItem -LiteralPath $folder -File)) {
         $name = [string]$entry.Name
-        if ($name.StartsWith($script:FindingFilePrefix, [System.StringComparison]::Ordinal) -and
-            $name.EndsWith($script:FindingFileSuffix, [System.StringComparison]::Ordinal)) {
+        if (-not ($name.StartsWith($script:FindingFilePrefix, [System.StringComparison]::Ordinal) -and
+                $name.EndsWith($script:FindingFileSuffix, [System.StringComparison]::Ordinal))) {
+            continue
+        }
+        if ($name.Length -lt ($stampOffset + $stampLength)) {
+            continue
+        }
+        $stamp = $name.Substring($stampOffset, $stampLength)
+        if (-not (Test-ParallelDriftGateCanonicalTimestamp -Value $stamp)) {
+            continue
+        }
+        if ([string]::CompareOrdinal($stamp, $EventAt) -ge 0) {
             return $true
         }
     }
@@ -140,211 +196,6 @@ function Find-ParallelDriftGateFeatureFolderFromPrompt {
         $best = $best -replace '/[^/]+\.md$', ''
     }
     return ($best -split '/')[-1]
-}
-
-function Test-ParallelDriftGateItemKey {
-    <#
-    .SYNOPSIS
-        Report whether a checkpoint value is a positive, non-boolean integer issue_num,
-        mirroring is_positive_integer in scripts/dev_tools/_parallel_state_common.py.
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param([AllowNull()] $Value)
-
-    # A boolean in a numeric slot is malformed data, not a value to coerce.
-    if ($Value -is [bool] -or -not ($Value -is [int] -or $Value -is [long])) {
-        return $false
-    }
-    return ([long]$Value -gt 0)
-}
-
-function Test-ParallelDriftGateText {
-    <#
-    .SYNOPSIS
-        Report whether a checkpoint value is a string carrying a non-space character,
-        mirroring is_non_empty_string in scripts/dev_tools/_parallel_state_common.py.
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param([AllowNull()] $Value)
-
-    return ($Value -is [string]) -and (-not [string]::IsNullOrWhiteSpace([string]$Value))
-}
-
-function Test-ParallelDriftGateEventRecord {
-    <#
-    .SYNOPSIS
-        Report whether one drift_events[] entry is well formed in the three fields this
-        derivation reads.
-    .DESCRIPTION
-        item_key must resolve as an issue_num and at must be non-empty. escaped_paths must be a
-        non-empty list of non-empty strings: F3 invariant 18 rejects a zero-escape event.
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param([AllowNull()] $Record)
-
-    if ($null -eq $Record -or
-        -not (Test-ParallelDriftGateItemKey -Value $Record.item_key) -or
-        -not (Test-ParallelDriftGateText -Value $Record.at) -or
-        $Record.escaped_paths -isnot [System.Collections.IList]) {
-        return $false
-    }
-    $escaped = @($Record.escaped_paths)
-    if ($escaped.Count -eq 0) {
-        return $false
-    }
-
-    # One blank or non-string entry fails the whole list, matching is_string_list.
-    foreach ($path in $escaped) {
-        if (-not (Test-ParallelDriftGateText -Value $path)) {
-            return $false
-        }
-    }
-    return $true
-}
-
-function Get-ParallelDriftGateLatestEventMap {
-    <#
-    .SYNOPSIS
-        Reduce drift_events[] to the latest event timestamp of each item key, returning an
-        OrderedDictionary with Malformed (bool) and LatestAt (item key to at).
-    .DESCRIPTION
-        Latest means the greatest at, ordinally compared so the ranking matches Python's
-        string ordering, with ties broken by append order so the later-appended record wins.
-        One malformed entry anywhere makes the whole log unreadable, matching
-        has_unresolved_drift's malformed-log verdict. A $null checkpoint is unreadable too.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param([AllowNull()] $Checkpoint)
-
-    $latestAt = @{}
-    if ($null -eq $Checkpoint) {
-        return [ordered]@{ Malformed = $true; LatestAt = $latestAt }
-    }
-
-    # An absent drift_events key is the pre-drift checkpoint shape: no events, no drift. A
-    # present but non-list value cannot be reduced, so it fails closed.
-    if (@($Checkpoint.PSObject.Properties.Name) -notcontains 'drift_events') {
-        return [ordered]@{ Malformed = $false; LatestAt = $latestAt }
-    }
-    if ($Checkpoint.drift_events -isnot [System.Collections.IList]) {
-        return [ordered]@{ Malformed = $true; LatestAt = $latestAt }
-    }
-
-    # Walk the append-ordered log once so each item's latest event is resolved in a single
-    # pass; a malformed entry aborts the whole derivation. Replacing the record on a comparison
-    # of zero is what makes append order the tie-break, matching Python's (at, index) rank.
-    foreach ($record in @($Checkpoint.drift_events)) {
-        if (-not (Test-ParallelDriftGateEventRecord -Record $record)) {
-            return [ordered]@{ Malformed = $true; LatestAt = @{} }
-        }
-        $key = [long]$record.item_key
-        $atText = [string]$record.at
-        $comparison = 1
-        if ($latestAt.ContainsKey($key)) {
-            $comparison = [string]::CompareOrdinal($atText, [string]$latestAt[$key])
-        }
-        if ($comparison -ge 0) {
-            $latestAt[$key] = $atText
-        }
-    }
-    return [ordered]@{ Malformed = $false; LatestAt = $latestAt }
-}
-
-function Get-ParallelDriftGateItemRadiusMap {
-    <#
-    .SYNOPSIS
-        Index the readable blast_radius blocks of items[] by item key.
-    .DESCRIPTION
-        An item with an unreadable issue_num or a non-object blast_radius is skipped rather
-        than rejected: the caller treats absence as unresolved (fail closed), and shape
-        reporting belongs to the checkpoint validator.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param([AllowNull()] $Checkpoint)
-
-    $radii = @{}
-    if ($null -eq $Checkpoint -or (@($Checkpoint.PSObject.Properties.Name) -notcontains 'items')) {
-        return $radii
-    }
-
-    # Collect only the item records whose key and radius are both readable.
-    foreach ($item in @($Checkpoint.items)) {
-        if ($null -eq $item -or -not (Test-ParallelDriftGateItemKey -Value $item.issue_num)) {
-            continue
-        }
-        if ($item.blast_radius -is [System.Management.Automation.PSCustomObject]) {
-            $radii[[long]$item.issue_num] = $item.blast_radius
-        }
-    }
-    return $radii
-}
-
-function Test-ParallelDriftGateEventResolved {
-    <#
-    .SYNOPSIS
-        Apply the re-recorded-radius resolution disjunct to one item's latest drift event.
-    .DESCRIPTION
-        The narrowed Layer 1 check described in the script header: only the disjunct that
-        needs no glob matcher is evaluated, a radius re-recorded from a diff taken after the
-        event (source == 'observed' and computed_at strictly greater than the event's at).
-        Comparisons are ordinal and case-sensitive so the verdict matches Python's. A missing
-        or unreadable radius is unresolved (fail closed).
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param(
-        [AllowNull()] $Radius,
-        [Parameter(Mandatory)][AllowEmptyString()][string] $At
-    )
-
-    if ($null -eq $Radius -or (([string]$Radius.source) -cne $script:ObservedRadiusSource)) {
-        return $false
-    }
-    if (-not (Test-ParallelDriftGateText -Value $Radius.computed_at)) {
-        return $false
-    }
-    return ([string]::CompareOrdinal([string]$Radius.computed_at, $At) -gt 0)
-}
-
-function Get-ParallelDriftGateUnresolvedState {
-    <#
-    .SYNOPSIS
-        Derive the item keys whose latest drift event is still unresolved, returning an
-        OrderedDictionary with Malformed (bool) and UnresolvedItemKeys (long[], ascending).
-    .DESCRIPTION
-        The PowerShell counterpart of unresolved_drift_item_keys in
-        scripts/dev_tools/parallel_drift_detection.py, narrowed as the script header records.
-        Malformed reports the case the Python derivation reports by raising, which
-        has_unresolved_drift treats as unresolved.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param([AllowNull()] $Checkpoint)
-
-    $latestState = Get-ParallelDriftGateLatestEventMap -Checkpoint $Checkpoint
-    if ($latestState.Malformed) {
-        return [ordered]@{ Malformed = $true; UnresolvedItemKeys = [long[]]@() }
-    }
-
-    # Keep the drifted items the resolution disjunct does not clear, sorted so the result is
-    # deterministic and directly comparable with the Python derivation.
-    $radii = Get-ParallelDriftGateItemRadiusMap -Checkpoint $Checkpoint
-    $unresolved = [System.Collections.Generic.List[long]]::new()
-    foreach ($itemKey in @($latestState.LatestAt.Keys)) {
-        $radius = if ($radii.ContainsKey($itemKey)) { $radii[$itemKey] } else { $null }
-        if (-not (Test-ParallelDriftGateEventResolved -Radius $radius -At ([string]$latestState.LatestAt[$itemKey]))) {
-            $unresolved.Add([long]$itemKey)
-        }
-    }
-    return [ordered]@{
-        Malformed          = $false
-        UnresolvedItemKeys = [long[]]@($unresolved | Sort-Object)
-    }
 }
 
 function Find-ParallelDriftGateItemRecord {
@@ -476,11 +327,19 @@ function Invoke-ParallelDriftGateDecision {
     if (-not $driftState.Malformed -and ($driftState.UnresolvedItemKeys -notcontains $itemKey)) {
         return Get-ParallelDriftGateAllowDecision
     }
-    if (Test-ParallelDriftFindingPresent -WorktreePath ([string]$item.worktree_path) -FeatureFolder $featureFolder) {
+
+    # The finding must correspond to the CURRENT event, so the allowance needs that event's at.
+    # An unreadable log carries no trustworthy timestamp, so no allowance is possible and the
+    # gate denies (fail closed) rather than falling back to bare presence.
+    $eventAt = ''
+    if ($driftState.LatestAt.ContainsKey($itemKey)) {
+        $eventAt = [string]$driftState.LatestAt[$itemKey]
+    }
+    if ($eventAt -and (Test-ParallelDriftFindingPresent -WorktreePath ([string]$item.worktree_path) -FeatureFolder $featureFolder -EventAt $eventAt)) {
         return Get-ParallelDriftGateAllowDecision
     }
 
-    return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: item $itemKey ('$featureFolder') has an unresolved radius drift event and no $script:FindingFilePrefix<timestamp>$script:FindingFileSuffix finding recorded in its feature folder. The synthetic Blocking finding must be written before review proceeds, or the drift event log was unreadable."
+    return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: item $itemKey ('$featureFolder') has an unresolved radius drift event and no $script:FindingFilePrefix<timestamp>$script:FindingFileSuffix finding dated at or after that event recorded in its feature folder. The synthetic Blocking finding for the current event must be written before review proceeds, or the drift event log was unreadable."
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.

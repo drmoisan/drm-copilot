@@ -2,14 +2,18 @@
 
 Purpose:
     Provide the `blast_radius`, `items[]`, and `drift_events[]` fixtures that the
-    quiesce-derivation and conflict-recomputation test files both need, so the two
-    split files share one definition of a well-formed record instead of copies.
+    quiesce-derivation, conflict-recomputation, and command-line test files all
+    need, so the split files share one definition of a well-formed record instead
+    of copies. The command-line fixtures `in_flight`, `checkpoint`, and
+    `evaluate` live here because both `test_parallel_drift_detection_cli.py` and
+    `test_parallel_drift_detection_cli_halt.py` consume them.
 
 Responsibilities:
-    Build plain dictionaries and nothing else. No file is read or written, no
-    clock is consulted, and no assertion is made here; the test files own the
-    assertions. Every timestamp is an explicit argument, which is what keeps the
-    tests deterministic.
+    Build plain dictionaries, and run `evaluate_drift` with fixed timestamps, and
+    nothing else. No file is read or written, no clock is consulted, and no
+    assertion is made here; the test files own the assertions. Every timestamp is
+    an explicit argument or a module constant, which is what keeps the tests
+    deterministic.
 """
 
 from __future__ import annotations
@@ -19,9 +23,15 @@ from typing import TYPE_CHECKING
 from scripts.dev_tools.parallel_drift_detection import (
     DRIFT_ACTION_RAISED_BLOCKING_FINDING,
 )
+from scripts.dev_tools.parallel_drift_detection_cli import evaluate_drift
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Mapping, Sequence
+
+# The two injected timestamps every command-line test uses. `COMPUTED_AT` is
+# strictly later than `AT` so a payload can be distinguished from a defaulted one.
+AT = "2026-08-08T10-00"
+COMPUTED_AT = "2026-08-08T10-05"
 
 # Minimal in-memory truth table standing in for `config/blast-radius.json`.
 # Passing it as data keeps the tested functions pure: nothing reads it from disk.
@@ -117,3 +127,61 @@ def event(
         "at": at,
         "action": action,
     }
+
+
+def in_flight(
+    issue_num: int, paths: Sequence[str], started: str | None
+) -> dict[str, object]:
+    """Build an in-flight item record carrying a start-of-execution marker.
+
+    Args:
+        issue_num (int): The item's primary key.
+        paths (Sequence[str]): The item's declared radius path entries.
+        started (str | None): The `worktree_created_at` value; `None` means the
+            checkpoint records no start for the item.
+
+    Returns:
+        dict[str, object]: A new item mapping in the F3 shape.
+    """
+    record = item(issue_num, paths)
+    record["worktree_created_at"] = started
+    return record
+
+
+def checkpoint(
+    items: Sequence[Mapping[str, object]], edges: Sequence[object] = ()
+) -> dict[str, object]:
+    """Build the minimal in-memory checkpoint the command line reads.
+
+    Args:
+        items (Sequence[Mapping[str, object]]): The `items[]` records.
+        edges (Sequence[object]): The `conflict_edges[]` records.
+
+    Returns:
+        dict[str, object]: A mapping carrying only the two collections detection
+        consumes, so no failure can be attributed to an unrelated field.
+    """
+    return {"items": list(items), "conflict_edges": list(edges)}
+
+
+def evaluate(
+    state: Mapping[str, object], changed: Sequence[str], *, item_key: int = 446
+) -> dict[str, object]:
+    """Run `evaluate_drift` with the fixed truth table and injected timestamps.
+
+    Args:
+        state (Mapping[str, object]): The in-memory checkpoint.
+        changed (Sequence[str]): The observed changed-path set.
+        item_key (int): The item whose diff is evaluated.
+
+    Returns:
+        dict[str, object]: The command line's result payload.
+    """
+    return evaluate_drift(
+        state=state,
+        config=CONFIG,
+        item_key=item_key,
+        changed_paths=changed,
+        at=AT,
+        computed_at=COMPUTED_AT,
+    )

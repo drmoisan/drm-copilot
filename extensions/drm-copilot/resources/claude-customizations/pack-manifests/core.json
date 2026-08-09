@@ -34,6 +34,7 @@
     ".claude/hooks/enforce-model-routing-receipt.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate.ps1",
     ".claude/hooks/enforce-parallel-drift-gate.ps1",
+    ".claude/hooks/enforce-parallel-drift-gate-helpers.ps1",
     ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
     ".claude/hooks/enforce-pr-author-skill.ps1",
     ".claude/hooks/enforce-prd-feature-before-planner.ps1",
