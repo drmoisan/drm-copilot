@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 4 (440 merged; 442 and 446 still executing concurrently)
-- Last updated: 2026-08-09T06:10:00Z
+- Current wave: 4 (440 and 446 merged; 442 still executing)
+- Last updated: 2026-08-09T08:10:00Z
 
 ## Feature Status
 
@@ -23,7 +23,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-blast-radius-under-reporting-gaps-452 (F1a) | 452 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/453 | b086cf6958ee4b628f60309cda80aac772304bc8 | 2026-08-08T02:10:00Z | 2026-08-08T17:41:02Z | 2026-08-08T17:42:58Z | 2026-08-08T17:56:00Z |
 | 2026-08-07-parallel-planner-surface-443 | 443 | 2 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/454 | ee0626e838109fe8d3fe3904fb4631c71879baa3 | 2026-08-08T17:58:00Z | 2026-08-08T20:34:31Z | 2026-08-08T20:37:53Z | 2026-08-08T20:52:00Z |
 | 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/455 | c939b5b80c8c297db49febaebdd35dda2c869a3f | 2026-08-08T20:55:00Z | 2026-08-09T00:40:12Z | 2026-08-09T00:45:49Z | 2026-08-09T01:02:00Z |
-| 2026-08-07-parallel-drift-detection-446 | 446 | 4 | worktree_created | — | — | 2026-08-09T01:05:00Z | — | — | — |
+| 2026-08-07-parallel-drift-detection-446 | 446 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/457 | 1b2ecc00d3e2dfb5b950fc3ba19cd0bc03ca391b | 2026-08-09T01:05:00Z | 2026-08-09T07:41:26Z | 2026-08-09T07:53:02Z | 2026-08-09T08:06:00Z |
 | 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/456 | acddff246d06c6c003231d4ebb98eb4d9072d95f | 2026-08-09T01:05:00Z | 2026-08-09T05:50:17Z | 2026-08-09T05:52:51Z | 2026-08-09T06:08:00Z |
 | 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | worktree_created | — | — | 2026-08-09T01:05:00Z | — | — | — |
 
@@ -38,7 +38,7 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | 1 | 444 schema and validators; 452 F1a blast-radius correction (added) | complete |
 | 2 | 443 parallel-planner surface | complete |
 | 3 | 441 parallel-orchestrator surface | complete |
-| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | in_progress; 440 merged with no fan-in conflict, 446 and 442 still running |
+| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | in_progress; 440 merged clean, 446 merged after resolving an 8-file fan-in conflict, 442 still running |
 
 ## Resolved Decision: F1a Correction Authorized (was blocking wave 2)
 
@@ -183,6 +183,41 @@ failed exactly 8 of 30 cases, so the claim is measured rather than asserted.
 is path-filtered on `extensions/drm-copilot/**` with no branch filter, so any child touching that
 path gets checks. The marketplace publish step is gated on `refs/tags/v*`, so a PR run builds and
 packages but cannot publish.
+
+## Open Items For The Integration PR Review
+
+### 1. Layer 1 PreToolUse gates may not be enforcing
+
+On 2026-08-09, `git worktree remove` for the #446 child worktree **succeeded** while the epic
+checkpoint still recorded `worktree_path: null` and `merge_status: worktree_created` for that
+feature — exactly the state `enforce-epic-worktree-removal-gate.ps1` exists to refuse. The hook is
+registered as a `PreToolUse` Bash hook in `.claude/settings.json`, and when executed directly with
+the matching `CLAUDE_TOOL_INPUT` it correctly returns `permissionDecision: deny` with
+`EPIC_WORKTREE_REMOVAL_BLOCKED` — for the bare command, for the compound form actually used, and for
+the exact 446 path. The hook logic is sound; the deny did not take effect. The cause was not
+diagnosed, to avoid stalling the epic.
+
+This matters to this epic's own deliverables: F7 cloned this gate design as
+`enforce-parallel-worktree-removal-gate.ps1` and the two-layer cohort barrier. If the epic original
+is inert in this runtime, the parallel clones inherit that. Across the whole run the epic wave
+barrier was only ever observed to *allow*, never to deny, so there is no positive evidence any Layer 1
+gate enforced. Layer 2 retrospective validation may be the only live enforcement.
+
+No harm resulted. Every worktree removal in this run followed durable merge confirmation via
+`gh pr view`, a clean-tree check, an ancestry check, and content rescue.
+
+### 2. Three F8 acceptance criteria pend on F6
+
+F8 (#446) closed 18 of 21 acceptance criteria: `spec.md` 12/12, `user-story.md` 6/9. The three
+remaining — US-3 admission-control consultation, US-4's requeue clause, and US-6 `mutations[]`
+visibility — are genuine cross-feature dependencies on F6 (#442), which was still executing. F8's
+reviewer independently confirmed this is not an F8 gap being deflected. These will be re-evaluated
+once #442 merges and flagged in the completion summary if they remain unchecked.
+
+### 3. `run_poshqc_test` measures the installed bundle, not the worktree
+
+Reported by F8: PowerShell coverage figures had to be taken from the repo-root path instead. It will
+understate obligations for any feature relying on the MCP coverage tool.
 
 ## Standing Notes
 
