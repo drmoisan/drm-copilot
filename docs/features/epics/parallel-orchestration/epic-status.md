@@ -10,8 +10,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/parallel-orchestration-integration`
 - Checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 - Max parallel features: 4
-- Current wave: 3
-- Last updated: 2026-08-08T20:55:00Z
+- Current wave: 4 (440 merged; 442 and 446 still executing concurrently)
+- Last updated: 2026-08-09T06:10:00Z
 
 ## Feature Status
 
@@ -22,10 +22,10 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-07-parallel-schema-validators-444 | 444 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/451 | 12174c418e304755fac707817abcd44bd13eb708 | 2026-08-07T22:09:00Z | 2026-08-08T01:29:26Z | 2026-08-08T01:32:05Z | 2026-08-08T01:46:00Z |
 | 2026-08-07-blast-radius-under-reporting-gaps-452 (F1a) | 452 | 1 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/453 | b086cf6958ee4b628f60309cda80aac772304bc8 | 2026-08-08T02:10:00Z | 2026-08-08T17:41:02Z | 2026-08-08T17:42:58Z | 2026-08-08T17:56:00Z |
 | 2026-08-07-parallel-planner-surface-443 | 443 | 2 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/454 | ee0626e838109fe8d3fe3904fb4631c71879baa3 | 2026-08-08T17:58:00Z | 2026-08-08T20:34:31Z | 2026-08-08T20:37:53Z | 2026-08-08T20:52:00Z |
-| 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | worktree_created | — | — | 2026-08-08T20:55:00Z | — | — | — |
-| 2026-08-07-parallel-drift-detection-446 | 446 | 4 | not_started | — | — | — | — | — | — |
-| 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | not_started | — | — | — | — | — | — |
-| 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | not_started | — | — | — | — | — | — |
+| 2026-08-07-parallel-orchestrator-surface-441 | 441 | 3 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/455 | c939b5b80c8c297db49febaebdd35dda2c869a3f | 2026-08-08T20:55:00Z | 2026-08-09T00:40:12Z | 2026-08-09T00:45:49Z | 2026-08-09T01:02:00Z |
+| 2026-08-07-parallel-drift-detection-446 | 446 | 4 | worktree_created | — | — | 2026-08-09T01:05:00Z | — | — | — |
+| 2026-08-07-parallel-enforcement-hooks-440 | 440 | 4 | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/456 | acddff246d06c6c003231d4ebb98eb4d9072d95f | 2026-08-09T01:05:00Z | 2026-08-09T05:50:17Z | 2026-08-09T05:52:51Z | 2026-08-09T06:08:00Z |
+| 2026-08-07-parallel-mutation-protocol-442 | 442 | 4 | worktree_created | — | — | 2026-08-09T01:05:00Z | — | — | — |
 
 ## Wave Schedule
 
@@ -37,8 +37,8 @@ Wave assignment is computed by longest-path layering over the `depends_on` DAG i
 | 0 | 447 blast-radius library, 445 cohort scheduler | complete |
 | 1 | 444 schema and validators; 452 F1a blast-radius correction (added) | complete |
 | 2 | 443 parallel-planner surface | complete |
-| 3 | 441 parallel-orchestrator surface | in_progress |
-| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | not_started |
+| 3 | 441 parallel-orchestrator surface | complete |
+| 4 | 446 drift detection, 440 enforcement hooks, 442 mutation protocol | in_progress; 440 merged with no fan-in conflict, 446 and 442 still running |
 
 ## Resolved Decision: F1a Correction Authorized (was blocking wave 2)
 
@@ -120,6 +120,69 @@ A second, lower-severity follow-up was raised by F3 and is not gating:
 `pythonRepr` quote-selection divergence affecting four pre-existing epic/codex validator pairs.
 F3 recorded rather than fixed it, because fixing it requires editing epic validators F3 was not
 permitted to touch.
+
+## Wave-4 Concurrency Pre-Launch Check (passed)
+
+All three wave-4 features were launched concurrently in a single message, per the epic-orchestrate
+skill's within-wave concurrency rule and an explicit human directive. Before launching,
+`epic-orchestrator` verified the contention precondition directly rather than accepting F5's claim:
+
+- `.claude/skills/parallel-orchestrate/SKILL.md` ends with three reserved, one-line placeholder
+  sections named exactly `## Mutation Protocol (F6)`, `## Enforcement Hooks (F7)`, and
+  `## Radius Drift Detection (F8)`, each carrying "Reserved for F<N>; content is appended by that
+  feature and must not be relocated." Confirmed by heading scan.
+- F3 (#444) shipped `mutations[]`, `drift_events[]`, and `conflict_edges[]` fully shaped, so F6 and
+  F8 consume those structures rather than extending the schema. This was the main structural risk
+  to concurrency and it is closed.
+
+Two residual risks were mitigated in the delegation prompts rather than by serializing:
+
+1. **Adjacent-section fan-in conflicts.** The three reserved sections are consecutive, so
+   concurrent edits will likely produce textual merge conflicts on fan-in. Each prompt states that
+   this is expected, not a defect, and that the correct resolution is always to keep **both** the
+   child's own section and the incoming sibling's section, preserving all three headings in order.
+   Each child's own R1–R5 merge-conflict loop (cap 3) owns the resolution.
+2. **Shared validator file and the 500-line cap.**
+   `scripts/dev_tools/validate_parallel_orchestrator_state.py` is 336 lines, and both F7 and F8 may
+   touch it. Both prompts direct extraction into a new sibling delegate module following the
+   established `_orchestrator_state_*.py` convention, which cannot conflict with a sibling's work
+   and cannot breach the cap.
+
+## Wave-4 Fan-In Contention Register (widened by F7)
+
+F7 (#440) merged first, cleanly — `mergeStateStatus` was CLEAN because its two siblings had not yet
+merged. `epic-orchestrator` independently confirmed by heading scan on the integration head that all
+three reserved sections survive in original order: F6 at line 435, F7 at 439, F8 at 491. F7 also
+honoured the shared-file discipline: its Layer 2 invariant went into the new sibling module
+`scripts/dev_tools/_parallel_orchestrator_state_cohort_barrier.py`, growing the validator by only
+4 lines to 340.
+
+F7 reported that the contention surface is **wider than the two files the manifest named**. Beyond
+`.claude/skills/parallel-orchestrate/SKILL.md` and `validate_parallel_orchestrator_state.py`, each
+remaining sibling also needs:
+
+- its own token in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, because
+  F5 pins each reserved section body to the placeholder sentence — so replacing a placeholder fails
+  that test until the expectation is updated;
+- a `pack-manifests/core.json` entry per new `.claude` file;
+- a bundle mirror — and the bundled copy of the `parallel-orchestrate` skill is a **second copy** of
+  the same three reserved sections, doubling the conflict surface.
+
+This was reported after #442 and #446 were already in flight, and `epic-orchestrator` has no
+mechanism to message a running child. It is not being worked around: each of these surfaces as a
+loud local test failure, which is exactly how F7 discovered them, and each child owns an R1–R5 loop.
+
+**Third instance of the dual-runtime parity defect class.** F7's one Blocking finding was an empty
+TypeScript parity seam: the schema feature had deliberately created *two* comment-delimited seams,
+Python and TypeScript, and the plan named only the Python one. The result would have been a
+checkpoint the Python CLI rejects while the MCP TypeScript surface reports clean. Remediation bound
+the two runtimes with a shared 30-document corpus both sides parametrize over; the fail-before proof
+failed exactly 8 of 30 cases, so the claim is measured rather than asserted.
+
+**`publish-extension.yml` does schedule on child PRs.** Unlike `ci.yml`, its `pull_request` trigger
+is path-filtered on `extensions/drm-copilot/**` with no branch filter, so any child touching that
+path gets checks. The marketplace publish step is gated on `refs/tags/v*`, so a PR run builds and
+packages but cannot publish.
 
 ## Standing Notes
 

@@ -247,10 +247,12 @@ def test_orchestrate_skill_reserved_wave_four_sections_close_the_file() -> None:
 def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> None:
     """Require each still-reserved section body to be its single reserved sentence.
 
-    A placeholder listed in ``FILLED_RESERVED_HEADINGS`` has been filled by its
-    own owning feature, which the reserved sentence directs that feature to do,
-    so the one-line obligation is released for it and inverted instead: the
-    section must no longer hold the placeholder sentence.
+    A feature named in ``LANDED_WAVE_FOUR_FEATURES`` is exempt from the pin
+    entirely: its content is not ahead of itself. A placeholder listed in
+    ``FILLED_RESERVED_HEADINGS`` has been filled by its own owning feature,
+    which the reserved sentence directs that feature to do, so the one-line
+    obligation is released for it and inverted instead: the section must no
+    longer hold the placeholder sentence.
     """
 
     # The filled set must name only reserved headings, otherwise a typo there
@@ -264,9 +266,13 @@ def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> N
 
     # Assert each unfilled placeholder body is exactly the one-line reserved
     # statement, so no wave-4 content has been added ahead of its own feature,
-    # and each filled placeholder no longer carries that statement.
+    # and each filled placeholder no longer carries that statement. A section
+    # whose owning feature has landed is exempt: it is not ahead of itself.
     for heading in pinned.RESERVED_HEADINGS:
         feature = heading.rsplit("(", 1)[1].rstrip(")")
+        if feature in pinned.LANDED_WAVE_FOUR_FEATURES:
+            continue
+
         body = collapse_whitespace(orchestrate_skill_section(heading))
         expected = (
             f"Reserved for {feature}; content is appended by that feature "

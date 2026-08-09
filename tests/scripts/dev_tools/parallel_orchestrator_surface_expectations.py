@@ -75,6 +75,14 @@ RESERVED_HEADINGS: tuple[str, ...] = (
     "## Radius Drift Detection (F8)",
 )
 
+# Wave-4 features whose content has landed in its own reserved section. The
+# one-line-reserved-body pin exists to catch content added AHEAD of its own
+# feature, so a section filled by the feature that owns it is exempt from that
+# pin while remaining pinned for heading identity, order, and uniqueness. Each
+# wave-4 feature adds its own token here when it appends its section; F7 landed
+# with issue #440.
+LANDED_WAVE_FOUR_FEATURES: frozenset[str] = frozenset({"F7"})
+
 # The reserved placeholders whose own wave-4 feature has landed and replaced the
 # one-line reserved sentence with its content, which the placeholder itself
 # directs that feature to do. Each wave-4 feature appends exactly its own heading

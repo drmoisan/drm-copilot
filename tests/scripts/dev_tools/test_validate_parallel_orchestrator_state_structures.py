@@ -35,9 +35,28 @@ def cohort_at(state: dict[str, object], index: int) -> dict[str, object]:
 
 
 def state_with_edges(edges: object) -> dict[str, object]:
-    """Return a valid checkpoint whose conflict-edge list is replaced."""
+    """Return a valid checkpoint whose conflict-edge list is replaced.
+
+    The builder places both items in one current-generation cohort, which is a
+    coherent graph colouring only while the conflict-edge list is empty. A
+    cohort is a colour class of the conflict graph, so two items sharing a
+    current-generation cohort index run concurrently by construction; an edge
+    injected between them is an invalid colouring and earns a cohort-barrier
+    violation on top of whatever edge-shape condition the caller is exercising.
+    Split the two items into distinct current-generation cohorts so an injected
+    edge is properly coloured and each test observes only its own condition.
+
+    Invariants 13 and 14 continue to hold: indices 0 and 1 are unique within
+    the current generation, every non-withdrawn item appears in exactly one
+    current-generation cohort, and ``current_cohort`` of 0 does not exceed the
+    maximum current-generation index of 1.
+    """
 
     state = build_valid_parallel_state()
+    state["cohorts"] = [
+        {"index": 0, "generation": 0, "item_keys": [444]},
+        {"index": 1, "generation": 0, "item_keys": [445]},
+    ]
     state["conflict_edges"] = edges
     return state
 
