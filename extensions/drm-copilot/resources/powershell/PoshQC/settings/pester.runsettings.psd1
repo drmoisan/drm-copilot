@@ -138,6 +138,11 @@
             # that hook into this dot-sourced sibling module; measured here so the Coverage
             # Exclusion Policy's no-production-file-excluded rule still holds after the split.
             '.claude/hooks/enforce-parallel-drift-gate-helpers.ps1'
+            # Issue #442 added this PreToolUse abandon-gate hook, which guards the destructive
+            # parallel abandon disposition; measured here so the new production hook is not
+            # excluded from coverage. The test suite dot-sources the file (guarded body) so
+            # line attribution is valid.
+            '.claude/hooks/enforce-parallel-abandon-gate.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

@@ -118,6 +118,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-worktree-removal-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-abandon-gate.ps1"
           }
         ]
       },

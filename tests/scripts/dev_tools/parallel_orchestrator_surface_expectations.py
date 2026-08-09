@@ -94,6 +94,12 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
     # Issue #446 (F8) filled this placeholder with the radius drift-detection
     # procedure, keeping its reserved title and its position.
     "## Radius Drift Detection (F8)",
+    # Issue #442 (F6) filled this placeholder with the mutation protocol,
+    # keeping its reserved title and its position. F6 originally shipped an
+    # equivalent constant of its own; at wave-4 fan-in it converged onto this
+    # mechanism, which is stricter because it asserts the section IS filled
+    # rather than merely exempting it from the placeholder pin.
+    "## Mutation Protocol (F6)",
 )
 
 # Baseline SHA-256 digests of the frozen epic surface, captured before any Phase
