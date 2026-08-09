@@ -75,6 +75,19 @@ RESERVED_HEADINGS: tuple[str, ...] = (
     "## Radius Drift Detection (F8)",
 )
 
+# The reserved placeholders whose own wave-4 feature has landed and replaced the
+# one-line reserved sentence with its content, which the placeholder itself
+# directs that feature to do. Each wave-4 feature appends exactly its own heading
+# here, one entry per line, so the three concurrently prepared features do not
+# contend over a single line. Every heading stays in ``RESERVED_HEADINGS``,
+# because the ordering and uniqueness obligations survive the fill; only the
+# one-line-body obligation is released, and only for the listed heading.
+FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+    # Issue #446 (F8) filled this placeholder with the radius drift-detection
+    # procedure, keeping its reserved title and its position.
+    "## Radius Drift Detection (F8)",
+)
+
 # Baseline SHA-256 digests of the frozen epic surface, captured before any Phase
 # 1 edit. This feature must modify neither file, so the digests are pinned as
 # constants and compared without any git dependency in-test.

@@ -75,10 +75,10 @@ open risk §13.1; neither eliminates the risk.
 
 ## Acceptance Criteria
 
-- [ ] When an in-flight item's pre-review diff includes a path outside its declared
+- [x] When an in-flight item's pre-review diff includes a path outside its declared
       `blast_radius.paths`, the run records a `drift_events[]` entry for that item without
       operator intervention.
-- [ ] The escape is surfaced to the affected child as a synthetic Blocking finding in that child's
+- [x] The escape is surfaced to the affected child as a synthetic Blocking finding in that child's
       own `remediation-inputs.<timestamp>.md`, containing the literal `- Severity: Blocking` line,
       and the child's existing R1-R5 remediation loop processes it with no operator-facing new
       workflow.
@@ -88,16 +88,16 @@ open risk §13.1; neither eliminates the risk.
 - [ ] When the observed radius newly conflicts with a concurrently in-flight item, the
       **later-started** item of the pair is halted (`merge_status: blocked_drift`) and requeued
       into a future cohort; the drifting item is never the one halted.
-- [ ] Re-running the same detection inputs yields the same halt/requeue decision, so the operator
+- [x] Re-running the same detection inputs yields the same halt/requeue decision, so the operator
       can reproduce and explain any scheduling change.
 - [ ] Every requeue is visible in the checkpoint as one `mutations[]` entry with an incremented
       `recolor_generation`, so the operator can audit how and why the cohort table changed.
-- [ ] A child with an unresolved, unsurfaced drift event cannot enter review: the operator sees a
+- [x] A child with an unresolved, unsurfaced drift event cannot enter review: the operator sees a
       `PARALLEL_DRIFT_GATE_BLOCKED` denial rather than a review of drifted work.
-- [ ] An item with an unresolved drift event cannot appear in the checkpoint with a
+- [x] An item with an unresolved drift event cannot appear in the checkpoint with a
       review-progressed `merge_status` (`pr_open`, `ci_green`, `merged`, `worktree_removed`)
       without the validator reporting a `PARALLEL_DRIFT_GATE_VIOLATION:` error.
-- [ ] Existing non-parallel orchestrations are unaffected: the hook fires only under the
+- [x] Existing non-parallel orchestrations are unaffected: the hook fires only under the
       `Parallel mode: true` marker, and checkpoints without a `drift_events[]` key validate with
       zero new errors.
 

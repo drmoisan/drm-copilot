@@ -35,6 +35,7 @@ from __future__ import annotations
 import json
 from typing import cast
 
+from scripts.dev_tools._parallel_orchestrator_state_drift import validate_drift_gate
 from scripts.dev_tools._parallel_state_common import (
     MERGED_MERGE_STATUSES,
     VALID_MODES,
@@ -321,6 +322,7 @@ def validate_parallel_orchestrator_state_text(
     errors.extend(_validate_identity(state_map))
     errors.extend(scan_prohibited_keys(state_map, CONTEXT))
     errors.extend(_validate_collections(state_map))
+    errors.extend(validate_drift_gate(state_map, CONTEXT))
 
     # BEGIN F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
     # F7 (parallel enforcement hooks) owns the retrospective cohort-ordering

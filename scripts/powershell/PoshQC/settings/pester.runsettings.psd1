@@ -124,6 +124,9 @@
             '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
             '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
             '.claude/lib/blast-radius/BlastRadius.psm1'
+            # Issue #446 added this Layer-1 parallel drift-gate PreToolUse hook; measured here so
+            # the new production hook is not excluded from coverage.
+            '.claude/hooks/enforce-parallel-drift-gate.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

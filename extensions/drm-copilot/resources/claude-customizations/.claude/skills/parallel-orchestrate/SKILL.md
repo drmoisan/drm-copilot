@@ -442,4 +442,243 @@ Reserved for F7; content is appended by that feature and must not be relocated.
 
 ## Radius Drift Detection (F8)
 
-Reserved for F8; content is appended by that feature and must not be relocated.
+### Radius Drift Detection and Drift Gate
+
+An in-flight item whose actual diff escapes its declared `blast_radius.paths` invalidates the
+concurrency guarantee for every item running beside it, which is the dominant failure mode of this
+surface and the compensating control for heuristically derived radii. Detection is the
+execution-time half of a paired mitigation: F1's plan-time coverage validation bounds
+under-reporting when the radius is derived, and this procedure bounds it while the item runs.
+Neither half eliminates the risk. Nothing in this section re-derives F1's matcher or F1's
+contention relation; both are imported by the implementation.
+
+#### Six-Step Procedure
+
+1. Compare the observed changed-path list against the item's declared `blast_radius.paths`.
+2. On escape, record one `drift_events[]` entry and raise a synthetic Blocking finding in the
+   child's own `remediation-inputs.<yyyy-MM-ddTHH-mm>.md`.
+3. Quiesce: suspend admission of new items into the current cohort.
+4. Recompute conflicts using the observed radius in place of the drifting item's declared radius.
+5. If the escape newly conflicts with a concurrently in-flight item, halt the later-started item of
+   that pair, record `merge_status: blocked_drift` with item `state: blocked`, and requeue it into a
+   future cohort.
+6. The child's existing R1 through R5 remediation loop processes the finding unmodified.
+
+Deferral of admission into a **future** cohort remains allowed during quiesce; only admission into
+the current cohort is suspended.
+
+#### Child-Side Evaluation Point
+
+Detection is evaluated at each child's pre-feature-review commit: the moment inside the child
+orchestrator's Pre-Feature-Review Commit step between the successful commit and the `feature-review`
+delegation. Evaluating after the commit is what makes the observed diff complete; evaluating before
+the delegation is what lets the synthetic finding reach the same review pass.
+
+The evaluation is active only for a child whose delegation prompt carries the `Parallel mode: true`
+marker emitted by `## Parallel-Mode Kickoff Parameter`. A child running outside a parallel run
+carries no such marker, evaluates no drift, and is unaffected.
+
+#### CLI Invocation
+
+Detection logic is pure and lives in `scripts/dev_tools/parallel_drift_detection.py` (escape
+detection, `drift_events[]` construction, the derived quiesce predicate, and conflict recomputation)
+and `scripts/dev_tools/parallel_drift_halt.py` (halt selection and the requeue seam). All I/O is
+confined to the thin wrapper `scripts/dev_tools/parallel_drift_detection_cli.py`, invoked as:
+
+```
+poetry run python -m scripts.dev_tools.parallel_drift_detection_cli \
+  --item-key <issue_num> \
+  [--checkpoint artifacts/orchestration/parallel-orchestrator-state.json] \
+  [--config config/blast-radius.json] \
+  [--at <yyyy-MM-ddTHH-mm>] [--computed-at <yyyy-MM-ddTHH-mm>] \
+  <CHANGED_PATH>...
+```
+
+Argument surface: `--item-key` is the only required argument and is the item's `issue_num`;
+`--checkpoint` and `--config` default to the two paths shown; `--at` is the timestamp recorded on
+the `drift_events[]` entry and `--computed-at` the timestamp recorded on the observed radius, each
+defaulting at the I/O boundary so the pure functions never read a clock; and the changed paths are
+positional and variadic. An empty changed-path list is legal and yields `no_escape`.
+
+The changed-path list is an argument, not something the module derives: the caller produces it with
+`git diff --name-only <merge-base(origin/main, HEAD)> HEAD` at the child's pre-review commit, and
+the module executes no git command of its own. Merge-base semantics matter — comparing against the
+merge base rather than against the current `origin/main` tip keeps a concurrently merged peer item's
+files from appearing as spurious drift. A rename lists both the old and the new path, and both must
+be covered, which is the fail-closed direction.
+
+Stdout carries exactly one JSON object; errors go to stderr only, so stdout is unconditionally
+parseable:
+
+```json
+{
+  "result": "no_escape | no_new_conflict | halt_required",
+  "item_key": 0,
+  "at": "",
+  "computed_at": "",
+  "escaped_paths": [],
+  "newly_conflicting_pairs": [],
+  "halted_item_keys": [],
+  "drift_event": null
+}
+```
+
+`result` is the verdict: `no_escape` means the diff stayed inside the declared radius;
+`no_new_conflict` means paths escaped but the observed radius introduced no contention, so nothing
+is halted; `halt_required` means at least one pair newly conflicts and `halted_item_keys` names the
+later-started item of each. `newly_conflicting_pairs` holds ascending canonical `[a, b]` item-key
+pairs, the same edge identity `conflict_edges[]` records, so a recomputed pair is comparable with a
+recorded one without normalization. `drift_event` is `null` exactly when `result` is `no_escape`,
+because an event with zero
+escaped paths is not a drift event. Exit status is `0` on success, `1` on missing or malformed
+input, and argparse's `2` on a usage error.
+
+#### Synthetic Blocking Finding
+
+The finding is written to `docs/features/active/<child-slug>/remediation-inputs.<yyyy-MM-ddTHH-mm>.md`
+— the flat form directly in the item's own active feature-folder root, matching the existing
+merge-conflict finding precedent rather than any folder-per-cycle variant.
+
+It is written by `parallel-orchestrator`, which detects the escape and owns the checkpoint, reaching
+the child's checkout through the item's recorded `items[].worktree_path`. That field is optional in
+the schema and may be null; an absent value means the finding cannot be written, which the drift
+gate treats as unwritten.
+
+The file must contain the literal line `- Severity: Blocking`, matched case-sensitively by the child
+orchestrator's post-review outcome evaluation, together with the escaped paths, the declared
+patterns, and the required action.
+
+#### Halt the Later-Started Item
+
+The later-started item of a newly conflicting pair is halted. The drifting item is **never** halted
+by virtue of drifting: its work is already broader than planned and is more expensive to unwind.
+This is not configurable and no alternative is offered. The selection function receives only the two
+start markers and no drift information at all, so the rule cannot be inverted by a caller.
+
+Selection is `argmax` over `(start_unknown, worktree_created_at, item_key)`, where
+`worktree_created_at` is the adopted start-of-execution marker and `item_key` is the integer
+`issue_num`. The three tie-breaks:
+
+- Equal timestamps — the normal case for a same-minute cohort fan-out — deem the larger `issue_num`
+  later-started, so the smaller key survives, consistent with the ascending-item-key determinism
+  convention used in `## Cohort Barrier and Max-Concurrency Slot Filling`.
+- A start timestamp present on exactly one item makes that timestamped item earlier-started, so the
+  item of unknown start is halted.
+- Both timestamps absent falls through to the item-key tie-break.
+
+Identical inputs produce identical halt decisions; every timestamp is a function input and no clock
+is read inside the pure functions.
+
+#### Quiesce Is Derived State
+
+Quiesce is derived, never stored. Admission into the current cohort is suspended while
+`has_unresolved_drift(events, items)` returns `True`. **No quiesce field is written anywhere** — not
+to the checkpoint, not to the manifest, not to the status document. Deriving quiesce from the event
+log and the item records makes it self-clearing on resolution and keeps the F3-owned checkpoint
+contract untouched, consistent with `## Parallel-Level Checkpoint`. That exported predicate is the
+single seam F6's admission control consults.
+
+#### Requeue Through the Single Recolor Seam
+
+The requeue passes through exactly one seam, `request_requeue_via_recolor`, which **requests** the
+mutation and never performs one. No second recolor implementation exists in this feature: the seam
+contains no coloring, no cohort assignment, and no graph logic. F6 owns the recolor engine that pins
+in-flight items, recolors the unstarted subgraph, and writes the checkpoint.
+
+The requested intent is:
+
+- the joint item write `merge_status: blocked_drift` **and** item `state: blocked`. Both are
+  required together: the schema requires a `blocked_drift` merge status to accompany item state
+  `blocked`, so writing the merge status alone produces a checkpoint that fails validation;
+- exactly one `mutations[]` entry
+  `{op: "requeue", item_key, at, prior_state: "in_flight", new_state: "blocked", disposition: null,
+  recolor_generation: <prior + 1>}`;
+- `recolor_generation` incremented by exactly one.
+
+`new_state` is the item-state value `blocked`, **not** `blocked_drift`. `mutations[].new_state` is
+validated against the item-state enum, and `blocked_drift` is a `merge_status`, so it would be
+rejected in that slot. `disposition` is null because a non-null disposition is permitted only on a
+`remove` entry whose `prior_state` is `in_flight`.
+
+#### Drift-Event Recording (A8)
+
+Exactly one `drift_events[]` entry is appended per drift occurrence, carrying the strongest action
+taken. `halted_later_started_item` subsumes `raised_blocking_finding`, so an occurrence that halted a
+later-started item records that one event and does **not** additionally record a
+`raised_blocking_finding` event for the same occurrence. The entry shape is the six F3-owned fields
+`{item_key, declared, observed, escaped_paths, at, action}`; `escaped_paths` is non-empty by
+definition. `drift_events[]` is append-only, and each append is a regeneration boundary for the
+status document per `## Documentation Maintenance Boundaries`.
+
+#### Two-Layer Drift Gate
+
+A child's transition to review, and the item's progression toward merge, are gated while an
+unresolved drift event exists for that item. The gate is implemented at both enforcement layers,
+because a `PreToolUse` hook fires per call with no cross-call state visibility and can be bypassed.
+
+- **Layer 1 — per-call deterrent.** `.claude/hooks/enforce-parallel-drift-gate.ps1`, registered on
+  the `PreToolUse` `Agent` matcher. It fires only when `subagent_type == "feature-review"` and the
+  prompt carries the `Parallel mode: true` marker, resolves the target item by scanning the prompt
+  for a `docs/features/active/<basename>` path token, reads
+  `artifacts/orchestration/parallel-orchestrator-state.json`, and denies with
+  `PARALLEL_DRIFT_GATE_BLOCKED` while the item's latest drift event is unresolved **and** its
+  synthetic finding has not been written. Requiring both conditions is what keeps the R4 review of
+  the remediation loop from being deadlocked: resolution itself requires a review, so once the
+  finding file exists, review proceeds. Allowed outright: a non-`feature-review` target, a prompt
+  without the marker, and a resolved or never-drifted item. Denied fail-closed: a missing or
+  unreadable checkpoint, an unresolvable target item, and an unreadable drift-event log. The hook
+  performs presence gating only — checkpoint-state reads plus one finding-file existence check. It
+  runs no git command and no path-glob matching, so all path-matching semantics stay in the single
+  Python implementation.
+- **Layer 2 — retrospective backstop.** A key-gated invariant in
+  `scripts/dev_tools/validate_parallel_orchestrator_state.py`, implemented in the helper
+  `scripts/dev_tools/_parallel_orchestrator_state_drift.py`. It emits one
+  `PARALLEL_DRIFT_GATE_VIOLATION:` error per item whose latest drift event is unresolved while its
+  `merge_status` is in `{pr_open, ci_green, merged, worktree_removed}`. It is additive: a checkpoint
+  with no `drift_events` key produces zero new errors. An item resting at `blocked_drift` produces no
+  error, which is what makes the gate compatible with the state the halt path writes.
+
+#### Resolution Semantics
+
+This is the least obvious part of the feature and is stated here in full. `drift_events[].action` has
+exactly two members, `raised_blocking_finding` and `halted_later_started_item`, and there is **no
+`resolved` member**. `escaped_paths` must be non-empty, so a clean re-evaluation cannot be recorded
+as a drift event at all. Resolution is therefore **derived** from fields that already exist, and this
+feature adds no schema field and extends no enum.
+
+The latest event for an item key is the one with the greatest `at`, ties broken by append order so
+the later-appended record wins. A latest event for item K is **unresolved** unless at least one
+disjunct holds against K's currently recorded `blast_radius`:
+
+- **(a) Radius widened to cover the escape.** Every `escaped_paths` entry of K's latest event is
+  subsumed by the item's current `blast_radius.paths` under F1's corrected path-subsumption
+  predicate, which honours exact match, listed-directory prefix, and glob match symmetrically with
+  the contention relation.
+- **(b) Radius re-recorded from a later observed diff.** The item's `blast_radius.source` is
+  `observed` **and** its `blast_radius.computed_at` is strictly later than the event's `at`. This
+  covers remediation that narrowed the diff instead of widening the radius.
+
+The derivation is **fail-closed**: absent an affirmative parent write, neither disjunct holds, drift
+stays unresolved, and the gate keeps denying. A malformed event log is likewise reported as
+unresolved. Both disjuncts are concrete, recordable parent actions that the existing R1 through R5
+remediation cycle already drives, so nothing deadlocks. The R1 through R5 loop is **reused
+unmodified**: `atomic-planner` plans the resolution, `atomic-executor` performs preflight then
+resolves, `feature-review` re-audits, and the loop exits on zero blocking findings. No new
+remediation loop is authored, no line of the existing loop is modified, and the shared
+`remediation_pass` cap of 3 applies. `.claude/skills/orchestrate/SKILL.md` is not modified by this
+feature.
+
+#### Layer-1 Narrowing — a Documented Limitation
+
+The Layer-1 PowerShell hook implements only disjunct **(b)**. Disjunct (a) requires F1's glob
+matcher, and duplicating that matcher in PowerShell would create exactly the divergent-matcher
+failure this feature exists to prevent, so the hook omits it and evaluates the ordinal
+`computed_at > at` comparison alone.
+
+The hook is therefore strictly more conservative than the Python derivation: omitting disjunct (a)
+can only report unresolved where Python reports resolved. The direction of the narrowing is
+**deny-only**, never allow-only, and the finding-file allowance above keeps that conservatism from
+deadlocking review. Python remains the single authority on resolution, and a cross-runtime seam test
+in `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` runs both runtimes over one
+shared checkpoint-state table and fails when they diverge. This is a real limitation, recorded here
+rather than omitted.

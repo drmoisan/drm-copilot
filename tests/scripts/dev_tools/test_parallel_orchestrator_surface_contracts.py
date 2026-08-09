@@ -245,10 +245,26 @@ def test_orchestrate_skill_reserved_wave_four_sections_close_the_file() -> None:
 
 
 def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> None:
-    """Require each reserved section body to be its single reserved sentence."""
+    """Require each still-reserved section body to be its single reserved sentence.
 
-    # Assert each placeholder body is exactly the one-line reserved statement, so
-    # no wave-4 content has been added ahead of its own feature.
+    A placeholder listed in ``FILLED_RESERVED_HEADINGS`` has been filled by its
+    own owning feature, which the reserved sentence directs that feature to do,
+    so the one-line obligation is released for it and inverted instead: the
+    section must no longer hold the placeholder sentence.
+    """
+
+    # The filled set must name only reserved headings, otherwise a typo there
+    # would silently exempt nothing while looking like an exemption.
+    assert set(pinned.FILLED_RESERVED_HEADINGS).issubset(
+        set(pinned.RESERVED_HEADINGS)
+    ), (
+        "every FILLED_RESERVED_HEADINGS entry must be a reserved heading; found "
+        f"{pinned.FILLED_RESERVED_HEADINGS} against {pinned.RESERVED_HEADINGS}"
+    )
+
+    # Assert each unfilled placeholder body is exactly the one-line reserved
+    # statement, so no wave-4 content has been added ahead of its own feature,
+    # and each filled placeholder no longer carries that statement.
     for heading in pinned.RESERVED_HEADINGS:
         feature = heading.rsplit("(", 1)[1].rstrip(")")
         body = collapse_whitespace(orchestrate_skill_section(heading))
@@ -256,6 +272,12 @@ def test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body() -> N
             f"Reserved for {feature}; content is appended by that feature "
             "and must not be relocated."
         )
+        if heading in pinned.FILLED_RESERVED_HEADINGS:
+            assert body and body != expected, (
+                f"{heading} is recorded as filled by {feature}, so its body must "
+                f"be that feature's content rather than {expected!r}"
+            )
+            continue
         assert body == expected, f"{heading} body must be {expected!r}, found {body!r}"
 
 
