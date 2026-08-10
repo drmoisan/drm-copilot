@@ -31,16 +31,16 @@ PCOH_LIB_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 source "$PCOH_LIB_DIR/parallel-common.sh"
 
 # Adjacency membership flags keyed by `a,b`; never iterated into output.
-declare -A PCOH_ADJACENT=()
+declare -gA PCOH_ADJACENT=()
 
 # Distinct-neighbor degree per item key; never iterated into output.
-declare -A PCOH_DEGREE=()
+declare -gA PCOH_DEGREE=()
 
 # Space-separated neighbor list per item key; never iterated into output.
-declare -A PCOH_NEIGHBORS=()
+declare -gA PCOH_NEIGHBORS=()
 
 # Assigned cohort index per item key; never iterated into output.
-declare -A PCOH_INDEX_OF=()
+declare -gA PCOH_INDEX_OF=()
 
 # The failure message set by the most recent non-zero return.
 PCOH_ERROR=""

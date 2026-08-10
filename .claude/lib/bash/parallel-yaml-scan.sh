@@ -52,19 +52,19 @@
 YP_ORDER=()
 
 # Lexical type per path: map, seq, null, bool, int, float, or str.
-declare -A YP_TYPE=()
+declare -gA YP_TYPE=()
 
 # Decoded scalar value per path; empty string for container nodes.
-declare -A YP_VALUE=()
+declare -gA YP_VALUE=()
 
 # Mapping-key name per path, for nodes that came from a `key:` entry.
-declare -A YP_KEY=()
+declare -gA YP_KEY=()
 
 # Rendered path of the mapping that owns each key node; `<root>` at the top.
-declare -A YP_PARENT=()
+declare -gA YP_PARENT=()
 
 # Child count per container path: sequence length or mapping key count.
-declare -A YP_COUNT=()
+declare -gA YP_COUNT=()
 
 # Parse outcome: ok, not_a_mapping, yaml_error, or out_of_subset.
 YP_STATUS="ok"
