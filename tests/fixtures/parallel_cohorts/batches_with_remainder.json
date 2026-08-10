@@ -1,0 +1,27 @@
+{
+  "name": "batches_with_remainder",
+  "notes": "Only the final batch may be shorter than the cap.",
+  "input": {
+    "cohort_item_keys": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "max_concurrency": 2
+  },
+  "expected_batches": [
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      5
+    ]
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "manifest_m1_missing_opening_fence",
+  "notes": "M1: a document that does not open with a fence fails before any field check runs.",
+  "manifest_text": "parallel: alpha-run\n---\n",
+  "expected_errors": [
+    "Parallel manifest must open with a '---' frontmatter fence."
+  ]
+}

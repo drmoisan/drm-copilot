@@ -1,0 +1,21 @@
+{
+  "name": "batches_negative_keys",
+  "notes": "Batching sorts numerically, so negative keys lead.",
+  "input": {
+    "cohort_item_keys": [
+      -2,
+      -5,
+      3
+    ],
+    "max_concurrency": 2
+  },
+  "expected_batches": [
+    [
+      -5,
+      -2
+    ],
+    [
+      3
+    ]
+  ]
+}

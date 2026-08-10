@@ -1,0 +1,8 @@
+{
+  "name": "manifest_m1_unterminated_fence",
+  "notes": "M1: an opening fence with no closing fence is an unterminated block, not an empty one.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\n",
+  "expected_errors": [
+    "Parallel manifest frontmatter block is not terminated by '---'."
+  ]
+}

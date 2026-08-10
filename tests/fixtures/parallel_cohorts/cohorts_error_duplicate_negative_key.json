@@ -1,0 +1,12 @@
+{
+  "name": "cohorts_error_duplicate_negative_key",
+  "notes": "Duplicate detection is value-based, so a negative key reports with its sign.",
+  "input": {
+    "item_keys": [
+      -1,
+      -1
+    ],
+    "conflict_edges": []
+  },
+  "expected_error": "Duplicate item key -1 in item_keys; item keys must be unique because cohort ordering relies on key uniqueness."
+}

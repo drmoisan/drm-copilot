@@ -1,0 +1,12 @@
+{
+  "name": "manifest_m6_malformed_blast_radius_fields",
+  "notes": "M6: every malformed radius field is reported, in field order, then source, then computed_at.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths: notalist\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: guessed\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest items[0] blast_radius.paths must be a list of non-empty strings.",
+    "Parallel manifest items[0] blast_radius.source must be one of derived, declared, observed; found: 'guessed'.",
+    "Parallel manifest items[0] blast_radius.computed_at must be a non-empty string."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

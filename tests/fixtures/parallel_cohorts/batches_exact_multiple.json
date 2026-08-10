@@ -1,0 +1,23 @@
+{
+  "name": "batches_exact_multiple",
+  "notes": "A cohort whose size divides the cap yields equal batches.",
+  "input": {
+    "cohort_item_keys": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "max_concurrency": 2
+  },
+  "expected_batches": [
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4
+    ]
+  ]
+}

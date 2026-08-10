@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m7_integration_branch_top_level",
+  "notes": "M7: integration_branch is prohibited at the document root only, because each parallel item opens its own pull request against main.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nintegration_branch: epic/alpha\nitems: []\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest carries prohibited key 'integration_branch' at <root>."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

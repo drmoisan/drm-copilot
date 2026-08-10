@@ -1,0 +1,8 @@
+{
+  "name": "manifest_m1_non_mapping_frontmatter",
+  "notes": "M1: a frontmatter block that parses to a sequence is not a mapping.",
+  "manifest_text": "---\n- alpha\n- beta\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest frontmatter must be a mapping."
+  ]
+}

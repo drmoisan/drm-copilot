@@ -1,0 +1,12 @@
+{
+  "name": "batches_error_zero_concurrency",
+  "notes": "A cap of zero would never drain the cohort.",
+  "input": {
+    "cohort_item_keys": [
+      1,
+      2
+    ],
+    "max_concurrency": 0
+  },
+  "expected_error": "max_concurrency must be >= 1; received 0."
+}

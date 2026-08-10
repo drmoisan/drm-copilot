@@ -1,0 +1,26 @@
+{
+  "name": "cohorts_negative_keys",
+  "notes": "Negative item keys order numerically, not lexically.",
+  "input": {
+    "item_keys": [
+      -3,
+      -1,
+      2
+    ],
+    "conflict_edges": [
+      [
+        -3,
+        2
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      -3,
+      -1
+    ],
+    [
+      2
+    ]
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "manifest_identity_then_prohibited_then_items",
+  "notes": "Section order is identity, then the prohibited-key scan, then items.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: paused\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\ndepends_on: []\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: queued\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest mode must be one of closed, open; found: 'paused'.",
+    "Parallel manifest carries prohibited key 'depends_on' at <root>.",
+    "Parallel manifest items[0] state must be one of proposed, admitted, prepared, scheduled, in_flight, merged, withdrawn, blocked; found: 'queued'."
+  ],
+  "expected_mode": "paused",
+  "expected_max_concurrency": 4
+}

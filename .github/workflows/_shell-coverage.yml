@@ -48,6 +48,9 @@ jobs:
           sudo cp -r /tmp/kcov-install/bin/* /usr/local/bin/
           kcov --version
 
+      - name: Run shell-qc check (shfmt diff + shellcheck)
+        run: bash scripts/bash/shell-qc.sh check
+
       - name: Run shell-qc test with coverage
         run: bash scripts/bash/shell-qc.sh test --coverage
 

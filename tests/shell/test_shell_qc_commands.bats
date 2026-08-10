@@ -78,7 +78,7 @@ teardown() {
     shfmt_calls="$(printf '%s\n' "$output" | grep -c '^shfmt -d ' || true)"
     shellcheck_calls="$(printf '%s\n' "$output" | grep -c '^shellcheck ' || true)"
     [ "$shfmt_calls" -eq 1 ]
-    [ "$shellcheck_calls" -eq 5 ]
+    [ "$shellcheck_calls" -eq 6 ]
     [[ "$output" == *"shfmt -d "*"tools/format_me.sh"* ]]
 }
 

@@ -1,0 +1,17 @@
+{
+  "name": "batches_cap_exceeds_cohort_size",
+  "notes": "A cap larger than the cohort yields a single batch.",
+  "input": {
+    "cohort_item_keys": [
+      7,
+      8
+    ],
+    "max_concurrency": 8
+  },
+  "expected_batches": [
+    [
+      7,
+      8
+    ]
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "manifest_cr_line_endings",
+  "notes": "A CR-only manifest splits identically to its LF form.",
+  "manifest_text": "---\rparallel: alpha-run\rmode: closed\rmax_concurrency: 4\rcreated_at: \"2026-08-10T00:00:00Z\"\ritems:\r  - issue_num: 101\r    feature_folder: docs/features/active/alpha-101\r    kind: feature\r    state: proposed\r    blast_radius:\r      paths:\r        - src/alpha.ts\r      modules: []\r      shared_surfaces: []\r      contracts: []\r      source: derived\r      computed_at: \"2026-08-10T00:00:00Z\"\r---\r\r# Parallel Run\r",
+  "expected_errors": [],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

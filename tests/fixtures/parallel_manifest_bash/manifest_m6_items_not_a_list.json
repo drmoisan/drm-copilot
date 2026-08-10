@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m6_items_not_a_list",
+  "notes": "M6: a non-list items value yields exactly one error.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems: 5\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest items must be a list."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

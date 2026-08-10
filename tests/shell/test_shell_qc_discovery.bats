@@ -58,6 +58,12 @@ setup() {
     [[ "$output" == *"scripts/sh_shebang"* ]]
 }
 
+@test "discover_shell_scripts finds a .sh file under the .claude/lib/bash root" {
+    run bash -c "cd '${FIXTURE_ROOT}' && source '${LIB}' && discover_shell_scripts"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *".claude/lib/bash/lib_entry.sh"* ]]
+}
+
 @test "discover_shell_scripts prunes the excluded node_modules directory" {
     run bash -c "cd '${FIXTURE_ROOT}' && source '${LIB}' && discover_shell_scripts"
     [ "$status" -eq 0 ]
@@ -75,10 +81,12 @@ setup() {
 @test "discover_shell_scripts output is sorted and de-duplicated" {
     run bash -c "cd '${FIXTURE_ROOT}' && source '${LIB}' && discover_shell_scripts"
     [ "$status" -eq 0 ]
-    [ "${#lines[@]}" -eq 5 ]
-    [ "${lines[0]}" = "scripts/env_s_bash" ]
-    [ "${lines[1]}" = "scripts/sh_shebang" ]
-    [ "${lines[2]}" = "scripts/uppercase_bash" ]
-    [ "${lines[3]}" = "scripts/with_shebang" ]
-    [ "${lines[4]}" = "tools/format_me.sh" ]
+    [ "${#lines[@]}" -eq 6 ]
+    # Under LC_ALL=C the .claude root sorts before scripts/ and tools/ (0x2E < 0x73).
+    [ "${lines[0]}" = ".claude/lib/bash/lib_entry.sh" ]
+    [ "${lines[1]}" = "scripts/env_s_bash" ]
+    [ "${lines[2]}" = "scripts/sh_shebang" ]
+    [ "${lines[3]}" = "scripts/uppercase_bash" ]
+    [ "${lines[4]}" = "scripts/with_shebang" ]
+    [ "${lines[5]}" = "tools/format_me.sh" ]
 }

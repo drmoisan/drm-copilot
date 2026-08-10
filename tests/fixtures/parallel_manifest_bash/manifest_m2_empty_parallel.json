@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m2_empty_parallel",
+  "notes": "M2: a whitespace-only slug carries no identifier.",
+  "manifest_text": "---\nparallel: \"   \"\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest parallel must be a non-empty string."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

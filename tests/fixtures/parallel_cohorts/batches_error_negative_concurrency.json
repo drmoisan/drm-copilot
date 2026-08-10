@@ -1,0 +1,11 @@
+{
+  "name": "batches_error_negative_concurrency",
+  "notes": "The rejection message renders the negative value verbatim.",
+  "input": {
+    "cohort_item_keys": [
+      1
+    ],
+    "max_concurrency": -3
+  },
+  "expected_error": "max_concurrency must be >= 1; received -3."
+}

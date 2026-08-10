@@ -1,0 +1,32 @@
+{
+  "name": "cohorts_permuted_input_equivalent",
+  "notes": "Same graph as cohorts_tie_breaking_equal_degrees with keys and edges supplied in reverse; output must be identical.",
+  "input": {
+    "item_keys": [
+      40,
+      30,
+      20,
+      10
+    ],
+    "conflict_edges": [
+      [
+        40,
+        30
+      ],
+      [
+        20,
+        10
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      10,
+      30
+    ],
+    [
+      20,
+      40
+    ]
+  ]
+}
