@@ -14,7 +14,9 @@ tools:
   - "Bash(git *)"
   - "Bash(gh *)"
   - "Bash(poetry run *)"
-  - "Bash(bash .claude/lib/bash/*)"
+  - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
+  - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
+  - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
@@ -150,15 +152,20 @@ The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObser
 `Test-BlastRadius`, and `Test-BlastRadiusConflict`. Its truth table is
 `config/blast-radius.json`, which push-down publishes alongside `.claude`.
 
-**Cohort seeding and concurrency batching — bash entry points.** These require the
-`"Bash(bash .claude/lib/bash/*)"` allowlist entry:
+**Cohort seeding and concurrency batching — bash entry points.** The bash library is granted as
+three entry-point-specific allowlist entries — `"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
+`"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`, and
+`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` — one per command-line entry point.
+The six sourceable libraries carry no grant because they are never invoked directly. The two
+commands below require the first two of those entries:
 
 ```bash
 bash .claude/lib/bash/compute-cohorts.sh --keys "<k1> <k2> ..." --edges "<a>:<b> ..."
 bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> ..." --max-concurrency <n>
 ```
 
-**Manifest validation — bash entry point.** The same allowlist entry covers:
+**Manifest validation — bash entry point.** The
+`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` allowlist entry covers:
 
 ```bash
 bash .claude/lib/bash/validate-parallel-manifest.sh <manifest-path>

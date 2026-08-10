@@ -15,7 +15,9 @@ tools:
   - "Bash(gh *)"
   - "Bash(poetry run python -c *)"
   - "Bash(poetry run python -m *)"
-  - "Bash(bash .claude/lib/bash/*)"
+  - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
+  - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
+  - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -69,7 +71,10 @@ checkpoint schema, and the parallel enums are defined once in
 
 The manifest gate is reached through the destination-runtime bash entry point, which needs no
 Python interpreter and is published by push-down alongside `.claude`, so the `tools` allowlist
-grants `"Bash(bash .claude/lib/bash/*)"` for it:
+grants one entry per command-line entry point —
+`"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
+`"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`, and
+`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` — the last of which covers it:
 
 ```bash
 bash .claude/lib/bash/validate-parallel-manifest.sh docs/features/parallel/<slug>/parallel.md

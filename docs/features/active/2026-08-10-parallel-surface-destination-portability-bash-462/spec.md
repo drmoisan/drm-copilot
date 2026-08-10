@@ -397,8 +397,8 @@ quote-selection rule the TypeScript port does not implement).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] bats unit coverage for the bash cohort computation: empty graph, single item, disjoint
-      items, fully connected items, deterministic tie-breaking, and generation handling.
+- [x] bats unit coverage for the bash cohort computation: empty graph, single item, disjoint
+      items, fully connected items, deterministic tie-breaking.
 - [x] bats unit coverage for the bash manifest validator: each of M1-M7, plus LF/CRLF/CR
       frontmatter extraction and the `mode`/`max_concurrency` default-resolving accessors.
 - [x] Parity fixtures shared by the bash and Python suites, asserting identical output.
