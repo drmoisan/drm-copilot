@@ -186,7 +186,7 @@ yp_classify_scalar() {
 			return 1
 		fi
 		local body=${raw:1:${#raw}-2}
-		local backslash='\'
+		local backslash=$'\\'
 		if [[ $body == *"$backslash"* || $body == *'"'* ]]; then
 			yp_reject "escape sequences inside double-quoted scalars are outside the subset"
 			return 1
