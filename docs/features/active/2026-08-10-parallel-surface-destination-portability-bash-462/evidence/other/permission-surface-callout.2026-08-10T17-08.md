@@ -34,10 +34,28 @@ interpreter, so those steps were unreachable. This change publishes bash ports o
 executable entry points under `.claude/lib/bash/`, and the two parallel agents need permission
 to run them.
 
-**Why the pattern is narrow.** The glob matches only `bash` invoked against a file directly
-under `.claude/lib/bash/`. It does not grant `bash` generally, does not match a nested
-subdirectory, and does not match any path outside that one directory. The directory contains
-exactly nine files, all authored in this change and all covered by shellcheck, shfmt, bats, and
+**Scope of the pattern, stated precisely.** The entry does not grant `bash` generally: an
+invocation must begin `bash .claude/lib/bash/`. It is, however, a **prefix wildcard**, not a
+single-directory glob. The trailing `*` matches across `/`, so it also matches a nested
+subdirectory (`.claude/lib/bash/sub/x.sh`) and a relative-traversal path that begins with the
+prefix (`.claude/lib/bash/../../../x.sh`). Neither case exists in the repository today — the
+directory contains exactly the nine files listed below and no subdirectory — but a reviewer
+should read the grant as "any `bash` invocation whose first argument starts with
+`.claude/lib/bash/`", not as "only the nine files below".
+
+An earlier revision of this callout claimed the pattern "does not match a nested subdirectory,
+and does not match any path outside that one directory". That claim was wrong and is corrected
+here.
+
+**Available narrowing (recommended follow-up, not applied here).** Only three of the nine files
+are command-line entry points; the other six are sourceable libraries never invoked directly.
+The grant could therefore be replaced by three entry-point-specific entries
+(`Bash(bash .claude/lib/bash/compute-cohorts.sh*)` and the two siblings) with no loss of
+function. That change is deliberately not made in this pull request: the single-entry pattern is
+referenced in four reviewed files, and narrowing it after the review pass would change a
+verified surface. It is recorded here so the decision is explicit rather than overlooked.
+
+The nine files, all authored in this change and all covered by shellcheck, shfmt, bats, and
 kcov in CI:
 
 - `compute-cohorts.sh`, `compute-concurrency-batches.sh`, `validate-parallel-manifest.sh`
