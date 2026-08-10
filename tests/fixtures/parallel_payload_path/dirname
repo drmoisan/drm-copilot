@@ -1,0 +1,22 @@
+#!/bin/sh
+# Checked-in PATH shim for tests/shell/parallel_payload_only.bats.
+#
+# That suite proves the published bash entry points need no Python interpreter.
+# On ubuntu-latest every standard utility directory also contains python3, so a
+# directory-level PATH restriction cannot exclude Python. Instead the suite sets
+# PATH to this fixture directory alone, which exposes only the four external
+# utilities the library actually uses (sort, cut, cat, dirname) and no
+# interpreter of any kind.
+#
+# The shebang is an absolute /bin/sh rather than /usr/bin/env bash because the
+# restricted PATH the suite installs cannot resolve an interpreter name, and the
+# real binary is resolved by absolute path for the same reason.
+set -eu
+
+for candidate in /usr/bin/dirname /bin/dirname /usr/local/bin/dirname; do
+	if [ -x "$candidate" ]; then
+		exec "$candidate" "$@"
+	fi
+done
+printf '%s: no real binary found at /usr/bin, /bin, or /usr/local/bin\n' "dirname" >&2
+exit 127
