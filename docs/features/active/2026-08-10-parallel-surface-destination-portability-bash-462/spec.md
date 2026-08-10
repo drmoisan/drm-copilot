@@ -301,18 +301,18 @@ quote-selection rule the TypeScript port does not implement).
 
 ## Acceptance Criteria
 
-- [ ] A bash cohort-computation entry point exists under `.claude/lib/bash/` and, for every
+- [x] A bash cohort-computation entry point exists under `.claude/lib/bash/` and, for every
       fixture in the shared corpus `tests/fixtures/parallel_cohorts/`, produces the same
       cohort partition (compact JSON, ascending inner lists, Welsh-Powell index assignment)
       and the same error messages as `scripts/dev_tools/parallel_cohort_computation.py`.
       Evidence: green `tests/shell/parallel_cohorts_parity.bats` in the `_shell-coverage.yml`
       lane and green `tests/scripts/dev_tools/test_parallel_cohort_bash_parity.py` in the
       pytest lane, both enforcing a fixture-count floor.
-- [ ] A bash `compute_concurrency_batches` entry point exists under `.claude/lib/bash/`,
+- [x] A bash `compute_concurrency_batches` entry point exists under `.claude/lib/bash/`,
       chunks a cohort into consecutive ascending slices of at most `max_concurrency`, and
       rejects `max_concurrency < 1` with the exact Python error message. Evidence: batching
       fixtures in the shared corpus asserted by both parity suites.
-- [ ] A bash manifest-contract validator exists under `.claude/lib/bash/` and reproduces the
+- [x] A bash manifest-contract validator exists under `.claude/lib/bash/` and reproduces the
       M1-M7 error strings of `scripts/dev_tools/parallel_manifest_contract.py` byte-for-byte —
       including the `Parallel manifest` context prefix and Python `repr` quoting — for every
       fixture in `tests/fixtures/parallel_manifest_bash/`, with one documented exception: for
@@ -320,90 +320,90 @@ quote-selection rule the TypeScript port does not implement).
       `Parallel manifest frontmatter is not valid YAML: ` plus single-element error-list
       shape. Evidence: both parity suites green with the divergence class recorded in their
       headers.
-- [ ] The bash validator exposes default-resolving accessors for `mode` (default `closed`)
+- [x] The bash validator exposes default-resolving accessors for `mode` (default `closed`)
       and `max_concurrency` (default `4`) matching `manifest_mode` and
       `manifest_max_concurrency`. Evidence: bats cases covering present, absent, and invalid
       values.
-- [ ] Every new `.claude/lib/bash/` file has a byte-identical bundled mirror under
+- [x] Every new `.claude/lib/bash/` file has a byte-identical bundled mirror under
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/`. Evidence: a
       manifest-membership test following the `BlastRadius.Manifest.Tests.ps1` pattern that
       discovers the repo files and asserts, for each, a `core.json` entry and a bundled
       counterpart.
-- [ ] The Claude push-down publishes `config/orchestration-routing.json` and
+- [x] The Claude push-down publishes `config/orchestration-routing.json` and
       `config/blast-radius.json` to a destination workspace, including under pack-scoped
       publishes. Evidence: Jest cases against the push-down service-call path.
-- [ ] The publish of `config/orchestration-routing.json` merges with a pre-existing
+- [x] The publish of `config/orchestration-routing.json` merges with a pre-existing
       destination file: the source `parallel` route is source-authoritative; the
       `preparation` route (and any other source route absent at the destination) is added;
       destination-local routes are preserved verbatim; a second push is byte-stable; an
       unparseable destination file fails with a reported error and is not overwritten.
       Evidence: Jest cases for copy, merge, stale-`parallel` overwrite, local-route
       preservation, idempotency, and fail-fast.
-- [ ] The published `blast-radius.json` default contains no drm-copilot-only entries:
+- [x] The published `blast-radius.json` default contains no drm-copilot-only entries:
       `shared_surfaces` limited to payload-guaranteed paths, `shared_surface_globs` empty,
       structure-guaranteed `modules` only, `over_breadth_fraction` 0.25; this repository's
       root `config/blast-radius.json` is unchanged. Evidence: Jest assertion on the published
       content plus diff review.
-- [ ] The Copilot and Codex push-down published sets are unchanged. Evidence: Jest
+- [x] The Copilot and Codex push-down published sets are unchanged. Evidence: Jest
       non-regression cases for both entry points.
-- [ ] `core.json` lists `.claude/rules/parallel-orchestration.md`, every new
+- [x] `core.json` lists `.claude/rules/parallel-orchestration.md`, every new
       `.claude/lib/bash/` path, `config/orchestration-routing.json`, and
       `config/blast-radius.json`. Evidence: the extended completeness test passes against the
       final tree.
-- [ ] `claude-pack-manifest-completeness.test.ts` enumerates `rules/*.md`, all files under
+- [x] `claude-pack-manifest-completeness.test.ts` enumerates `rules/*.md`, all files under
       `lib/**` recursively, and the bundled `config/` tree, so an unlisted file in any of
       those locations fails the test. Evidence: the extended enumeration is visible in the
       test diff and the suite is green.
-- [ ] The Shell-QC discovery contract and kcov include pattern cover `.claude/lib/bash/**`:
+- [x] The Shell-QC discovery contract and kcov include pattern cover `.claude/lib/bash/**`:
       search roots and include pattern extended in `scripts/bash/shell_qc_lib.sh`,
       `.claude/rules/shell.md` prose updated, and the existing shell-qc bats tests extended.
       Evidence: the CI coverage report enumerates the new library files.
-- [ ] shfmt, shellcheck, and bats pass on all new and modified shell files, and bash line
+- [x] shfmt, shellcheck, and bats pass on all new and modified shell files, and bash line
       coverage is >= 85%. Evidence: a green `_shell-coverage.yml` run against the branch
       head, with the run URL, conclusion, and the `Bash coverage (lines): NN.N%` log line
       recorded under
       `docs/features/active/2026-08-10-parallel-surface-destination-portability-bash-462/evidence/qa-gates/`.
-- [ ] Destination-runtime references in the `parallel-plan`, `parallel-orchestrate`, and
+- [x] Destination-runtime references in the `parallel-plan`, `parallel-orchestrate`, and
       `parallel-add` skills and the `parallel-planner` and `parallel-orchestrator` agents
       invoke the bash entry points (blast-radius references invoke the existing PowerShell
       port); the Python modules are cited only as repository authority and parity reference.
       Evidence: no `poetry run` invocation remains on the `/parallel-plan`
       destination-runtime path (grep over `.claude/`).
-- [ ] Bash allowlist entries permitting execution of the `.claude/lib/bash` entry points are
+- [x] Bash allowlist entries permitting execution of the `.claude/lib/bash` entry points are
       added to `parallel-planner.md`, `parallel-orchestrator.md`, and
       `.claude/settings.json`, and the pull request identifies them as a deliberate
       permission-surface change. Evidence: diff review of the three files and the PR
       description.
-- [ ] A payload-only workspace with no Python and no Poetry clears all four reported
+- [x] A payload-only workspace with no Python and no Poetry clears all four reported
       blockers. Evidence: Jest in-memory push-down assertions for payload content, plus a
       bats case on `ubuntu-latest` invoking the published bash entry points from a directory
       containing only the payload.
-- [ ] No parallel-surface schema field, enum member, or validator invariant is added,
+- [x] No parallel-surface schema field, enum member, or validator invariant is added,
       removed, or altered: the Python validators, `_parallel_state_*` helpers, and the
       TypeScript parity port are unchanged by this feature. Evidence: diff scope review.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or CI evidence
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (bats, pytest, Jest, and the manifest-membership test)
-- [ ] Edge cases and error handling covered by tests (validation ordering, CRLF/CR, merge
+- [x] Acceptance criteria documented and mapped to tests or CI evidence
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (bats, pytest, Jest, and the manifest-membership test)
+- [x] Edge cases and error handling covered by tests (validation ordering, CRLF/CR, merge
       fail-fast, leading-zero and negative keys)
-- [ ] Docs updated (`.claude/rules/shell.md` prose; skill and agent wiring; bundle
+- [x] Docs updated (`.claude/rules/shell.md` prose; skill and agent wiring; bundle
       `config/` asymmetry documented)
-- [ ] CI evidence for the shell lane captured under `evidence/qa-gates/`
-- [ ] Toolchain pass completed (format → lint → type-check → test) for the TypeScript and
+- [x] CI evidence for the shell lane captured under `evidence/qa-gates/`
+- [x] Toolchain pass completed (format → lint → type-check → test) for the TypeScript and
       Python surfaces locally; shell surface via CI dispatch per the verification constraint
 
 ## Seeded Test Conditions (from potential)
 
 - [ ] bats unit coverage for the bash cohort computation: empty graph, single item, disjoint
       items, fully connected items, deterministic tie-breaking, and generation handling.
-- [ ] bats unit coverage for the bash manifest validator: each of M1-M7, plus LF/CRLF/CR
+- [x] bats unit coverage for the bash manifest validator: each of M1-M7, plus LF/CRLF/CR
       frontmatter extraction and the `mode`/`max_concurrency` default-resolving accessors.
-- [ ] Parity fixtures shared by the bash and Python suites, asserting identical output.
-- [ ] Jest coverage for the push-down config carriage: config published, routing merged,
+- [x] Parity fixtures shared by the bash and Python suites, asserting identical output.
+- [x] Jest coverage for the push-down config carriage: config published, routing merged,
       existing destination routes preserved, and the Copilot/Codex published sets unchanged.
-- [ ] A pack-manifest test asserting every `.claude/rules/*.md` and `.claude/lib/**` file on
+- [x] A pack-manifest test asserting every `.claude/rules/*.md` and `.claude/lib/**` file on
       disk has a `core.json` entry, so this class of omission cannot recur.
-- [ ] An end-to-end check that a payload-only workspace clears all four reported blockers.
+- [x] An end-to-end check that a payload-only workspace clears all four reported blockers.
