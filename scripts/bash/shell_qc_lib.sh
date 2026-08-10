@@ -9,6 +9,12 @@
 
 # EXCLUDED_DIRS are pruned during discovery traversal at any depth.
 # SEARCH_DIRS and TEST_DIR_CANDIDATES mirror the removed Python module's constants.
+#
+# shellcheck disable=SC2015
+# SC2015 is disabled file-wide for the `<test> && <assign> || true` idiom that
+# .claude/rules/shell.md mandates: a tool or test that legitimately returns
+# non-zero must be captured so it does not abort the script under `set -e`, and
+# the trailing `|| true` is the capture, not a mistaken if-then-else.
 
 extract_shebang_command() {
 	# Extract the interpreter command from a file's shebang line.

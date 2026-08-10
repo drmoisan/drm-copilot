@@ -17,6 +17,11 @@
 # The caller reads PCOH_ERROR after a non-zero return.
 #
 # The Python module remains the repository authority.
+#
+# shellcheck disable=SC2034
+# SC2034 is disabled file-wide because PCOH_ERROR and PCOH_RESULT are
+# written here and read by the entry points compute-cohorts.sh and
+# compute-concurrency-batches.sh, which shellcheck analyses separately.
 
 # Resolve this file's own directory so its dependencies source regardless of
 # the caller's working directory.
@@ -75,10 +80,10 @@ pcoh_validate_item_keys() {
 	# Returns 0 when every key is distinct, 1 with PCOH_ERROR otherwise.
 	local key seen=""
 	pcoh_split_words "$1"
-	local -a keys=("${PCOH_WORDS[@]}")
+	local -a key_items=("${PCOH_WORDS[@]}")
 	# Walk in the supplied order so the first repeat encountered is the key
 	# reported, which keeps the message stable for a given input.
-	for key in "${keys[@]}"; do
+	for key in "${key_items[@]}"; do
 		if pc_contains_word "$seen" "$key"; then
 			pcoh_fail "Duplicate item key $key in item_keys; item keys must be unique because cohort ordering relies on key uniqueness."
 			return 1
@@ -162,8 +167,8 @@ pcoh_welsh_powell_order() {
 	# Args: $1 = space-separated item keys.
 	local key
 	pcoh_split_words "$1"
-	local -a keys=("${PCOH_WORDS[@]}")
-	for key in "${keys[@]}"; do
+	local -a key_items=("${PCOH_WORDS[@]}")
+	for key in "${key_items[@]}"; do
 		printf '%s %s\n' "${PCOH_DEGREE["$key"]}" "$key"
 	done | LC_ALL=C sort -k1,1nr -k2,2n | cut -d' ' -f2
 }
@@ -216,8 +221,8 @@ pcoh_render_cohorts() {
 	# and each inner list holds that cohort's keys sorted ascending.
 	local key index highest=-1 ordered
 	pcoh_split_words "$1"
-	local -a keys=("${PCOH_WORDS[@]}")
-	for key in "${keys[@]}"; do
+	local -a key_items=("${PCOH_WORDS[@]}")
+	for key in "${key_items[@]}"; do
 		index="${PCOH_INDEX_OF["$key"]}"
 		((index > highest)) && highest=$index
 	done
@@ -230,7 +235,7 @@ pcoh_render_cohorts() {
 	for ((index = 0; index <= highest; index++)); do
 		buckets+=("")
 	done
-	ordered=$(printf '%s\n' "${keys[@]}" | LC_ALL=C sort -n)
+	ordered=$(printf '%s\n' "${key_items[@]}" | LC_ALL=C sort -n)
 	# Walk the ascending key order rather than any hash order, so each cohort's
 	# keys come out ascending regardless of how the caller ordered its input.
 	while IFS= read -r key; do
@@ -246,7 +251,7 @@ pcoh_render_cohorts() {
 	local rendered=""
 	for ((index = 0; index <= highest; index++)); do
 		[[ -z $rendered ]] || rendered="$rendered,"
-		rendered="$rendered[${buckets[index]}]"
+		rendered="${rendered}[${buckets[index]}]"
 	done
 	printf '[%s]' "$rendered"
 }
@@ -318,7 +323,7 @@ pcoh_compute_concurrency_batches() {
 			batch="$batch${ordered[position]}"
 		done
 		[[ -z $rendered ]] || rendered="$rendered,"
-		rendered="$rendered[$batch]"
+		rendered="${rendered}[$batch]"
 	done
 	PCOH_RESULT="[$rendered]"
 	return 0

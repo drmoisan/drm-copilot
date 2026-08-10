@@ -14,6 +14,12 @@
 # Locale. Every entry point that sources this file calls pc_enforce_c_locale
 # before doing any work, so sorting and character classification are byte
 # ordered and independent of the destination workspace's environment.
+#
+# shellcheck disable=SC2034
+# SC2034 is disabled file-wide because every constant below is consumed by a
+# sibling file of this library -- parallel-items-validate.sh,
+# parallel-manifest-validate.sh, and parallel-cohorts.sh -- which shellcheck
+# analyses separately and therefore cannot see the use.
 
 # Item lifecycle states, in canonical order (schema S4).
 PC_VALID_ITEM_STATES="proposed, admitted, prepared, scheduled, in_flight, merged, withdrawn, blocked"

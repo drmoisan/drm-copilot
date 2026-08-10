@@ -18,6 +18,12 @@
 # construct that is valid YAML but outside the subset sets
 # YP_STATUS=out_of_subset and makes the caller refuse to answer rather than
 # risk disagreeing with the Python authority.
+#
+# shellcheck disable=SC2034
+# SC2034 is disabled file-wide because the node-table and status globals this
+# module writes -- YP_TYPE, YP_COUNT, YP_STATUS -- are declared in
+# parallel-yaml-scan.sh and read by parallel-items-validate.sh and
+# parallel-manifest-validate.sh, which shellcheck analyses as separate files.
 
 # Resolve this file's own directory so the scanning half sources regardless of
 # the caller's working directory.

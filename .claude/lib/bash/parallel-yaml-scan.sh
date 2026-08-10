@@ -40,6 +40,13 @@
 # `parallel`, `items`, `items[0]`, `items[0].blast_radius.paths[1]`. Document
 # order is preserved in the indexed array YP_ORDER; the associative arrays are
 # used for lookup only and are never iterated, so no hash order reaches output.
+#
+# shellcheck disable=SC2034
+# SC2034 is disabled file-wide because this module is the storage half of a
+# two-file library: the node table and the parse-status globals declared below
+# are written here and read by parallel-yaml-emit.sh, parallel-items-validate.sh,
+# and parallel-manifest-validate.sh, which shellcheck analyses as separate
+# files and therefore cannot see the use.
 
 # Node paths in document order. Every ordered traversal walks this array.
 YP_ORDER=()
@@ -179,7 +186,8 @@ yp_classify_scalar() {
 			return 1
 		fi
 		local body=${raw:1:${#raw}-2}
-		if [[ $body == *'\'* || $body == *'"'* ]]; then
+		local backslash='\'
+		if [[ $body == *"$backslash"* || $body == *'"'* ]]; then
 			yp_reject "escape sequences inside double-quoted scalars are outside the subset"
 			return 1
 		fi

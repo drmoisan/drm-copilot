@@ -12,6 +12,12 @@
 #
 # Sourcing contract: this library defines functions only; it never runs work at
 # source time, so the wrapper and the bats suites can source it without side effects.
+#
+# shellcheck disable=SC2015
+# SC2015 is disabled file-wide for the `<test> && <assign> || true` idiom that
+# .claude/rules/shell.md mandates: a tool or test that legitimately returns
+# non-zero must be captured so it does not abort the script under `set -e`, and
+# the trailing `|| true` is the capture, not a mistaken if-then-else.
 # It depends on cleanup_worktrees_enumerate_lib.sh (source that first). All git
 # commands go through cleanup_wt_git so tests can stub the git binary via
 # CLEANUP_WT_GIT_BIN.

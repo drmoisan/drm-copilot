@@ -93,10 +93,10 @@ cb_main() {
 			;;
 		esac
 	done
-	((keys_seen == 1)) && [[ -n $cap ]] || {
+	if ((keys_seen == 0)) || [[ -z $cap ]]; then
 		cb_usage >&2
 		return 2
-	}
+	fi
 
 	cb_require_integer "$cap" "max_concurrency"
 	pcoh_split_words "$keys"

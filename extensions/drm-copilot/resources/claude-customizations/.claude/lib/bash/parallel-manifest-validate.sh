@@ -19,6 +19,11 @@
 # PM_SUBSET_DETAIL and emits no validation errors. Refusing to answer is
 # deliberate: a guessed parse could disagree with the Python authority
 # silently, whereas an explicit refusal is visible to the caller.
+#
+# shellcheck disable=SC2034
+# SC2034 is disabled file-wide because PM_SUBSET_DETAIL is written here and
+# read by the entry point validate-parallel-manifest.sh, which shellcheck
+# analyses as a separate file and therefore cannot see the use.
 
 # Resolve this file's own directory so its dependencies source regardless of
 # the caller's working directory.
