@@ -167,23 +167,23 @@ All work must comply with these policies; this plan does not duplicate their con
 
 ### Phase 6 — Destination-Runtime Wiring and Permission Surface
 
-- [ ] [P6-T1] Repoint `.claude/skills/parallel-plan/SKILL.md`: blast-radius derivation/validation/contention references to the existing PowerShell port under `.claude/lib/blast-radius/`; cohort seeding and the P5 recomputation-parity procedure to `bash .claude/lib/bash/compute-cohorts.sh`; manifest validation and the `mode`/`max_concurrency` consumption path to `bash .claude/lib/bash/validate-parallel-manifest.sh` and its accessor subcommands. The Python modules remain cited only as repository authority and parity reference.
+- [x] [P6-T1] Repoint `.claude/skills/parallel-plan/SKILL.md`: blast-radius derivation/validation/contention references to the existing PowerShell port under `.claude/lib/blast-radius/`; cohort seeding and the P5 recomputation-parity procedure to `bash .claude/lib/bash/compute-cohorts.sh`; manifest validation and the `mode`/`max_concurrency` consumption path to `bash .claude/lib/bash/validate-parallel-manifest.sh` and its accessor subcommands. The Python modules remain cited only as repository authority and parity reference.
   - Acceptance: no `poetry run` invocation remains in this skill's destination-runtime steps.
-- [ ] [P6-T2] Repoint `.claude/skills/parallel-orchestrate/SKILL.md`: the manifest-validation and cohort/batch-computation references at lines 56, 76, 79, 126, and 487 to the bash entry points. Leave the validator CLI fallback (line 407) and the drift-detection CLI (line 722) unchanged (out of scope).
+- [x] [P6-T2] Repoint `.claude/skills/parallel-orchestrate/SKILL.md`: the manifest-validation and cohort/batch-computation references at lines 56, 76, 79, 126, and 487 to the bash entry points. Leave the validator CLI fallback (line 407) and the drift-detection CLI (line 722) unchanged (out of scope).
   - Acceptance: only the in-scope references (lines 56, 76, 79, 126, 487) change; lines 407 and 722 semantics untouched.
-- [ ] [P6-T3] Repoint `.claude/skills/parallel-add/SKILL.md` (line ~60) contention reference to the PowerShell blast-radius port's contention function.
+- [x] [P6-T3] Repoint `.claude/skills/parallel-add/SKILL.md` (line ~60) contention reference to the PowerShell blast-radius port's contention function.
   - Acceptance: no Python invocation remains in this skill's destination-runtime path.
-- [ ] [P6-T4] Update `.claude/agents/parallel-planner.md`: add the allowlist entry `"Bash(bash .claude/lib/bash/*)"` to `tools`, and rewrite the `## Upstream Library Invocation` section to name the bash entry points with the Python modules as repository authority.
+- [x] [P6-T4] Update `.claude/agents/parallel-planner.md`: add the allowlist entry `"Bash(bash .claude/lib/bash/*)"` to `tools`, and rewrite the `## Upstream Library Invocation` section to name the bash entry points with the Python modules as repository authority.
   - Acceptance: allowlist entry present; section rewritten; no stale poetry justification for the parallel calls.
-- [ ] [P6-T5] Update `.claude/agents/parallel-orchestrator.md`: add the equivalent `"Bash(bash .claude/lib/bash/*)"` allowlist entry and repoint the manifest re-validation instruction to the bash validator; leave the MCP-primary checkpoint-validation path unchanged.
+- [x] [P6-T5] Update `.claude/agents/parallel-orchestrator.md`: add the equivalent `"Bash(bash .claude/lib/bash/*)"` allowlist entry and repoint the manifest re-validation instruction to the bash validator; leave the MCP-primary checkpoint-validation path unchanged.
   - Acceptance: allowlist entry present; manifest re-validation names the bash entry point.
-- [ ] [P6-T6] Add the matching `"Bash(bash .claude/lib/bash/*)"` allow entry to `.claude/settings.json` permissions.
+- [x] [P6-T6] Add the matching `"Bash(bash .claude/lib/bash/*)"` allow entry to `.claude/settings.json` permissions.
   - Acceptance: entry present; no other permission change.
-- [ ] [P6-T7] Mirror every `.claude/**` file changed in this phase (three skills, two agents, `settings.json`) byte-identically into `extensions/drm-copilot/resources/claude-customizations/.claude/`.
+- [x] [P6-T7] Mirror every `.claude/**` file changed in this phase (three skills, two agents, `settings.json`) byte-identically into `extensions/drm-copilot/resources/claude-customizations/.claude/`.
   - Acceptance: each changed file has a byte-identical bundled counterpart.
-- [ ] [P6-T8] Verify with `git grep -n "poetry run" -- .claude/skills/parallel-plan .claude/skills/parallel-add .claude/agents/parallel-planner.md` (and review remaining `.claude/` hits for the destination-runtime path) that no `poetry run` invocation remains on the `/parallel-plan` destination-runtime path; write `<FEATURE>/evidence/qa-gates/poetry-grep.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` listing the residual out-of-scope hits (orchestrate lines 407 and 722, parallel-remove) with their dispositions.
+- [x] [P6-T8] Verify with `git grep -n "poetry run" -- .claude/skills/parallel-plan .claude/skills/parallel-add .claude/agents/parallel-planner.md` (and review remaining `.claude/` hits for the destination-runtime path) that no `poetry run` invocation remains on the `/parallel-plan` destination-runtime path; write `<FEATURE>/evidence/qa-gates/poetry-grep.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` listing the residual out-of-scope hits (orchestrate lines 407 and 722, parallel-remove) with their dispositions.
   - Acceptance: artifact records zero in-scope hits and enumerates the accepted residual hits.
-- [ ] [P6-T9] Write `<FEATURE>/evidence/other/permission-surface-callout.<ts>.md` containing the exact PR-description text identifying the new `Bash(bash .claude/lib/bash/*)` allowlist entries in `parallel-planner.md`, `parallel-orchestrator.md`, and `.claude/settings.json` as a deliberate permission-surface change, for verbatim inclusion by the PR author (AC15).
+- [x] [P6-T9] Write `<FEATURE>/evidence/other/permission-surface-callout.<ts>.md` containing the exact PR-description text identifying the new `Bash(bash .claude/lib/bash/*)` allowlist entries in `parallel-planner.md`, `parallel-orchestrator.md`, and `.claude/settings.json` as a deliberate permission-surface change, for verbatim inclusion by the PR author (AC15).
   - Acceptance: artifact exists naming all three files and the exact allowlist pattern.
 
 ### Phase 7 — Final QA Loop, Coverage Delta, and Acceptance Check-Off

@@ -14,6 +14,7 @@ tools:
   - "Bash(git *)"
   - "Bash(gh *)"
   - "Bash(poetry run *)"
+  - "Bash(bash .claude/lib/bash/*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
@@ -133,17 +134,43 @@ Do not report completion until:
 
 ## Upstream Library Invocation
 
-The `"Bash(poetry run *)"` allowlist entry is retained deliberately, and its justification is
-recorded here rather than left implicit. The blast-radius library
-(`scripts/dev_tools/compute_blast_radius.py`) and the cohort-computation library
-(`scripts/dev_tools/parallel_cohort_computation.py`) landed as import-only Python libraries with
-no CLI entry point, matching the repository's `scripts/dev_tools/epic_wave_computation.py`
-precedent. Radius derivation, V1-V3 validation, the contention relation, and cohort seeding are
-therefore reached through a `poetry run` Python invocation, for example:
+Every upstream library this planner needs is reachable from the published customization payload
+alone, with no Python interpreter and no repository checkout. That is the point of the
+destination-portability work in issue #462: a workspace that received `.claude` and `config` can
+plan a parallel run.
 
-```bash
-poetry run python -c "from scripts.dev_tools.compute_blast_radius import derive_blast_radius"
+**Blast radius — PowerShell port.** Radius derivation, V1-V3 validation, and the contention
+relation come from `.claude/lib/blast-radius/BlastRadius.psm1`:
+
+```powershell
+Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
 ```
 
-That invocation form requires exactly this allowlist entry. Without it the planner cannot obtain a
-declared radius or a cohort partition, and planning cannot reach a ready state.
+The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObservedPaths`,
+`Test-BlastRadius`, and `Test-BlastRadiusConflict`. Its truth table is
+`config/blast-radius.json`, which push-down publishes alongside `.claude`.
+
+**Cohort seeding and concurrency batching — bash entry points.** These require the
+`"Bash(bash .claude/lib/bash/*)"` allowlist entry:
+
+```bash
+bash .claude/lib/bash/compute-cohorts.sh --keys "<k1> <k2> ..." --edges "<a>:<b> ..."
+bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> ..." --max-concurrency <n>
+```
+
+**Manifest validation — bash entry point.** The same allowlist entry covers:
+
+```bash
+bash .claude/lib/bash/validate-parallel-manifest.sh <manifest-path>
+bash .claude/lib/bash/validate-parallel-manifest.sh --print-mode <manifest-path>
+bash .claude/lib/bash/validate-parallel-manifest.sh --print-max-concurrency <manifest-path>
+```
+
+**Python modules are the repository authority, not the runtime path.**
+`scripts/dev_tools/compute_blast_radius.py`, `scripts/dev_tools/parallel_cohort_computation.py`,
+and `scripts/dev_tools/parallel_manifest_contract.py` remain the reference implementations that the
+ported libraries are asserted against by shared fixture corpora. Do not invoke them on the
+destination-runtime path; cite them for their contract.
+
+The `"Bash(poetry run *)"` allowlist entry is retained for the repository-local paths that still
+need it — it is not required by any step above.
