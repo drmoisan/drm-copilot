@@ -21,6 +21,7 @@ import {
   type PushDownSummary,
 } from "./copilot-customizations-engine";
 import { ExcludingFileSystem } from "./claude-filesystem-adapter";
+import { RoutingMergeFileSystem } from "./claude-routing-merge";
 import {
   assertSingleCsharpToolchain,
   computePublishedPaths,
@@ -33,8 +34,26 @@ import {
 /** Artifact directory for the Claude push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/claude-customizations";
 
-/** Inlined Claude scoped root folders (enumeration-order contract). */
-export const ROOT_FOLDERS: ReadonlyArray<string> = [".claude"];
+/**
+ * Inlined Claude scoped root folders (enumeration-order contract).
+ *
+ * `config` is published alongside `.claude` because the destination-runtime
+ * parallel surface reads `config/orchestration-routing.json` and
+ * `config/blast-radius.json`, and a workspace that received only `.claude`
+ * cannot resolve either. Enumeration order is the summary-artifact contract, so
+ * `config` is appended after `.claude` rather than inserted before it.
+ */
+export const ROOT_FOLDERS: ReadonlyArray<string> = [".claude", "config"];
+
+/**
+ * Destination-relative path whose write is merged rather than overwritten.
+ *
+ * A destination workspace may already carry its own routing document with
+ * locally added routes. Overwriting it would silently discard them, so this one
+ * path is merged by {@link RoutingMergeFileSystem}. Every other published file,
+ * including `config/blast-radius.json`, is a plain overwrite.
+ */
+export const ROUTING_MERGE_RELATIVE_PATH = "config/orchestration-routing.json";
 
 /** Repo-relative host-specific paths excluded from push-down. */
 export const EXCLUDED_RELATIVE_PATHS: ReadonlyArray<string> = [
@@ -62,6 +81,10 @@ export const MEMORY_MODE_CHOICES: ReadonlyArray<string> = [
 ];
 
 export { ManifestError } from "./claude-pack-selection";
+export {
+  RoutingMergeError,
+  RoutingMergeFileSystem,
+} from "./claude-routing-merge";
 export { type PushDownSummary, type CSharpVariant, type MemoryMode };
 
 /**
@@ -215,9 +238,18 @@ export function pushDownCustomizations(
     fs,
   );
 
+  // Merge, rather than overwrite, the one destination path that a workspace may
+  // legitimately have extended locally. The decorator sits closest to the real
+  // adapter so the filtering wrapper above it is unaffected.
+  const mergingFs = new RoutingMergeFileSystem(
+    fs,
+    destinationRoot,
+    ROUTING_MERGE_RELATIVE_PATH,
+  );
+
   // Wrap the adapter so enumeration omits excluded paths and honors selections.
   const excludingFs = new ExcludingFileSystem(
-    fs,
+    mergingFs,
     repoRoot,
     EXCLUDED_RELATIVE_PATHS,
     {

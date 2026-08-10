@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m7_depends_on_nested",
+  "notes": "M7: depends_on is prohibited at any nesting level; ordering is derived from blast-radius overlap, never declared.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    depends_on: []\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest carries prohibited key 'depends_on' at items[0]."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

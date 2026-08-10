@@ -17,20 +17,9 @@ develop-eggs/
 downloads/
 eggs/
 .eggs/
-lib/
-# TypeScript source/test directories named "lib" are not Python build artifacts.
-!extensions/drm-copilot/src/lib/
-!extensions/drm-copilot/src/lib/**
-!extensions/drm-copilot/test/lib/
-!extensions/drm-copilot/test/lib/**
-# The .claude/lib PowerShell library (and its bundled byte-mirror) is delivered
-# customization content, not a Python build artifact.
+/lib/
 .claude/worktrees
-!.claude/lib/
-!.claude/lib/**
-!extensions/drm-copilot/resources/claude-customizations/.claude/lib/
-!extensions/drm-copilot/resources/claude-customizations/.claude/lib/**
-lib64/
+/lib64/
 parts/
 sdist/
 var/

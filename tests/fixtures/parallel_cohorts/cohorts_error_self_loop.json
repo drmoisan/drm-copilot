@@ -1,0 +1,17 @@
+{
+  "name": "cohorts_error_self_loop",
+  "notes": "A self-edge can only come from an upstream defect.",
+  "input": {
+    "item_keys": [
+      1,
+      2
+    ],
+    "conflict_edges": [
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  "expected_error": "Self-loop edge on item key 1; the conflict relation is defined over distinct items, so an item cannot conflict with itself."
+}

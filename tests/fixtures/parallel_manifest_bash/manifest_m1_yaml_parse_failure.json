@@ -1,0 +1,8 @@
+{
+  "name": "manifest_m1_yaml_parse_failure",
+  "notes": "M1 declared divergence: only the message prefix and the single-element error-list shape are asserted, because the YAML library's exception text differs between the Python and bash lanes.",
+  "manifest_text": "---\nparallel: \"unterminated\nmode: closed\n---\n\n# Parallel Run\n",
+  "expected_errors": [],
+  "divergence": "M1_YAML_PARSE",
+  "expected_error_prefix": "Parallel manifest frontmatter is not valid YAML: "
+}

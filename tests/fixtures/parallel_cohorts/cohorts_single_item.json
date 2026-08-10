@@ -1,0 +1,15 @@
+{
+  "name": "cohorts_single_item",
+  "notes": "A lone vertex is isolated and lands in cohort 0.",
+  "input": {
+    "item_keys": [
+      7
+    ],
+    "conflict_edges": []
+  },
+  "expected_cohorts": [
+    [
+      7
+    ]
+  ]
+}

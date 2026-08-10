@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m7_depends_on_top_level",
+  "notes": "M7: a top-level depends_on renders with the <root> path label.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\ndepends_on: []\nitems: []\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest carries prohibited key 'depends_on' at <root>."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

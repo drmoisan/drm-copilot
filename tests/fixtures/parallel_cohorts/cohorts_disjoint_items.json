@@ -1,0 +1,19 @@
+{
+  "name": "cohorts_disjoint_items",
+  "notes": "Three isolated vertices all share cohort 0.",
+  "input": {
+    "item_keys": [
+      1,
+      2,
+      3
+    ],
+    "conflict_edges": []
+  },
+  "expected_cohorts": [
+    [
+      1,
+      2,
+      3
+    ]
+  ]
+}

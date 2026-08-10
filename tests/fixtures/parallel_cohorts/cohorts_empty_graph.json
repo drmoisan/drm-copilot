@@ -1,0 +1,9 @@
+{
+  "name": "cohorts_empty_graph",
+  "notes": "No vertices and no edges yield no cohorts at all.",
+  "input": {
+    "item_keys": [],
+    "conflict_edges": []
+  },
+  "expected_cohorts": []
+}

@@ -1,0 +1,17 @@
+{
+  "name": "cohorts_error_unknown_first_endpoint",
+  "notes": "Endpoints are checked in supplied order, so the first element is reported when both are candidates.",
+  "input": {
+    "item_keys": [
+      2,
+      3
+    ],
+    "conflict_edges": [
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "expected_error": "Conflict edge (1, 2) names item key 1, which is not a member of item_keys; every edge endpoint must be a declared item key."
+}

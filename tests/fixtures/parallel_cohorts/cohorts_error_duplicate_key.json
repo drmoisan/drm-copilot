@@ -1,0 +1,13 @@
+{
+  "name": "cohorts_error_duplicate_key",
+  "notes": "The first repeat encountered while walking the supplied order is the reported key.",
+  "input": {
+    "item_keys": [
+      1,
+      2,
+      1
+    ],
+    "conflict_edges": []
+  },
+  "expected_error": "Duplicate item key 1 in item_keys; item keys must be unique because cohort ordering relies on key uniqueness."
+}

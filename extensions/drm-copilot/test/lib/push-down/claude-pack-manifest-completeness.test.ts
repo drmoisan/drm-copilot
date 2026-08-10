@@ -26,26 +26,42 @@ import * as path from "node:path";
  *     assert real completeness without silently absorbing an unrelated
  *     production fix into this change. Do not add further entries here to mask
  *     a new regression; open a follow-up issue instead.
+ *
+ * Issue #462 extension:
+ *     The enumeration originally covered only `agents/`, `hooks/`, and
+ *     `skills/`, so a bundled `rules/*.md` or `lib/**` file absent from every
+ *     manifest was invisible. It now also enumerates those two trees. The
+ *     bundled `config/` tree is a sibling of `.claude` under the bundle root
+ *     rather than a child of it, so extending `CLAUDE_ROOT`'s walk alone would
+ *     have enumerated nothing for it; a second root constant walks the bundle
+ *     root and emits bundle-root-relative `config/...` paths matching the
+ *     `core.json` entry spelling. A non-empty floor on the `config/` walk makes
+ *     a broken glob fail rather than pass vacuously.
  */
 
-const CLAUDE_ROOT = path.join(
+const BUNDLE_ROOT = path.join(
   __dirname,
   "..",
   "..",
   "..",
   "resources",
   "claude-customizations",
-  ".claude",
 );
-const MANIFEST_DIR = path.join(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "resources",
-  "claude-customizations",
-  "pack-manifests",
-);
+const CLAUDE_ROOT = path.join(BUNDLE_ROOT, ".claude");
+const MANIFEST_DIR = path.join(BUNDLE_ROOT, "pack-manifests");
+
+/** Bundled `config/` tree, a sibling of `.claude` under the bundle root. */
+const CONFIG_ROOT = path.join(BUNDLE_ROOT, "config");
+
+/**
+ * Floor on the bundled `config/` walk (issue #462).
+ *
+ * The destination-portability payload must carry both
+ * `config/orchestration-routing.json` and `config/blast-radius.json`, so a walk
+ * that finds fewer than two files means the tree moved or the glob broke, not
+ * that the manifests are complete.
+ */
+const MINIMUM_CONFIG_FILE_COUNT = 2;
 
 /** Pre-existing, unrelated manifest gaps out of scope for issue #279. */
 const PRE_EXISTING_UNRELATED_EXCEPTIONS: ReadonlySet<string> = new Set([
@@ -87,7 +103,67 @@ function enumerateBundledClaudeRelativePaths(): string[] {
     }
   }
 
+  // Issue #462: rules carry repository policy the destination runtime reads,
+  // and lib carries the PowerShell and bash libraries the skills invoke. Both
+  // trees were previously unenumerated, so a bundled file could be absent from
+  // every manifest without this suite noticing.
+  const rulesDir = path.join(CLAUDE_ROOT, "rules");
+  for (const entry of fs.readdirSync(rulesDir)) {
+    if (entry.endsWith(".md")) {
+      results.push(`.claude/rules/${entry}`);
+    }
+  }
+
+  // The lib walk is recursive and deliberately not extension-filtered: a
+  // published library file of any kind must be manifest-listed to reach a
+  // pack-scoped destination.
+  for (const relative of walkFilesRelative(path.join(CLAUDE_ROOT, "lib"))) {
+    results.push(`.claude/lib/${relative}`);
+  }
+
   return results.sort();
+}
+
+/**
+ * Recursively enumerate every file beneath a directory.
+ *
+ * @param root Absolute directory to walk; a missing directory yields nothing.
+ * @returns Forward-slash paths relative to `root`, in directory-walk order.
+ */
+function walkFilesRelative(root: string): string[] {
+  if (!fs.existsSync(root)) {
+    return [];
+  }
+  const results: string[] = [];
+  // A depth-first walk keeps the implementation independent of any glob
+  // library and cannot silently skip a nested directory.
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      for (const nested of walkFilesRelative(path.join(root, entry.name))) {
+        results.push(`${entry.name}/${nested}`);
+      }
+      continue;
+    }
+    if (entry.isFile()) {
+      results.push(entry.name);
+    }
+  }
+  return results;
+}
+
+/**
+ * Enumerate every bundled `config/`-relative path (issue #462).
+ *
+ * Paths are emitted relative to the bundle root rather than to `.claude`,
+ * because that is the spelling `core.json` uses for these entries and the
+ * spelling the push-down engine derives from the `config` root folder.
+ *
+ * @returns Sorted bundle-root-relative POSIX paths under `config/`.
+ */
+function enumerateBundledConfigRelativePaths(): string[] {
+  return walkFilesRelative(CONFIG_ROOT)
+    .map((relative) => `config/${relative}`)
+    .sort();
 }
 
 /**
@@ -136,6 +212,46 @@ describe("claude pack manifest completeness (real filesystem)", () => {
     // Assert: no bundled file is silently dropped from every manifest.
     expect(missing).toEqual([]);
   });
+
+  it("lists every bundled config/ file in some pack manifest", () => {
+    // Arrange: the config tree is a sibling of .claude, so it is enumerated
+    // from its own root rather than through the .claude walk.
+    const onDiskPaths = enumerateBundledConfigRelativePaths();
+    const manifestUnion = unionOfManifestPaths();
+
+    // Assert the floor first so a broken walk fails loudly rather than passing
+    // vacuously with an empty enumeration.
+    expect(onDiskPaths.length).toBeGreaterThanOrEqual(
+      MINIMUM_CONFIG_FILE_COUNT,
+    );
+
+    // Act
+    const missing = onDiskPaths.filter(
+      (candidate) => !manifestUnion.has(candidate),
+    );
+
+    // Assert
+    expect(missing).toEqual([]);
+  });
+
+  it.each([
+    "config/orchestration-routing.json",
+    "config/blast-radius.json",
+    ".claude/rules/parallel-orchestration.md",
+    ".claude/rules/shell.md",
+    ".claude/lib/bash/compute-cohorts.sh",
+    ".claude/lib/bash/compute-concurrency-batches.sh",
+    ".claude/lib/bash/validate-parallel-manifest.sh",
+  ])(
+    "issue #462: %s is present in the union of pack-manifest paths",
+    (expectedPath) => {
+      // Arrange
+      const manifestUnion = unionOfManifestPaths();
+
+      // Act / Assert
+      expect(manifestUnion.has(expectedPath)).toBe(true);
+    },
+  );
 
   it.each([
     ".claude/agents/epic-orchestrator.md",

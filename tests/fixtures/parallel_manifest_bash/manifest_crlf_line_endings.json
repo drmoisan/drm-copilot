@@ -1,0 +1,8 @@
+{
+  "name": "manifest_crlf_line_endings",
+  "notes": "The three-terminator splitter consumes CRLF as one terminator, so a CRLF-authored valid manifest produces no errors.",
+  "manifest_text": "---\r\nparallel: alpha-run\r\nmode: closed\r\nmax_concurrency: 4\r\ncreated_at: \"2026-08-10T00:00:00Z\"\r\nitems:\r\n  - issue_num: 101\r\n    feature_folder: docs/features/active/alpha-101\r\n    kind: feature\r\n    state: proposed\r\n    blast_radius:\r\n      paths:\r\n        - src/alpha.ts\r\n      modules: []\r\n      shared_surfaces: []\r\n      contracts: []\r\n      source: derived\r\n      computed_at: \"2026-08-10T00:00:00Z\"\r\n---\r\n\r\n# Parallel Run\r\n",
+  "expected_errors": [],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

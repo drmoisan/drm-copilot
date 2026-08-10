@@ -1,0 +1,24 @@
+{
+  "name": "cohorts_zero_key",
+  "notes": "Item key 0 is a legal vertex and is not confused with a missing value.",
+  "input": {
+    "item_keys": [
+      0,
+      1
+    ],
+    "conflict_edges": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      0
+    ],
+    [
+      1
+    ]
+  ]
+}

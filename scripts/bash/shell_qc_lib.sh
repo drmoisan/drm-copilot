@@ -73,7 +73,8 @@ is_shell_script() {
 }
 
 discover_shell_scripts() {
-	# Discover shell scripts under tools/ and scripts/ relative to the current dir.
+	# Discover shell scripts under tools/, scripts/, and .claude/lib/bash/ relative to
+	# the current dir.
 	#
 	# Missing roots are silently skipped. Traversal prunes .venv, .git, node_modules,
 	# dist, and build at any depth. Output is de-duplicated and sorted with LC_ALL=C
@@ -81,8 +82,10 @@ discover_shell_scripts() {
 	local -a roots=()
 	local root
 	# Collect only the search roots that exist, mirroring Path.exists() skipping.
-	for root in tools scripts; do
-		[[ -d $root ]] && roots+=("$root") || true
+	for root in tools scripts .claude/lib/bash; do
+		if [[ -d $root ]]; then
+			roots+=("$root")
+		fi
 	done
 	((${#roots[@]})) || return 0
 	local f
@@ -105,7 +108,9 @@ find_bats_test_dirs() {
 	local candidate
 	# Preserve the documented precedence order of the two candidate directories.
 	for candidate in "tests/shell" "tests/bash"; do
-		[[ -d $candidate ]] && dirs+=("$candidate") || true
+		if [[ -d $candidate ]]; then
+			dirs+=("$candidate")
+		fi
 	done
 	((${#dirs[@]})) || return 0
 	local d
@@ -181,13 +186,17 @@ run_check() {
 	local exit_code=0 rc=0
 	# shfmt legitimately returns non-zero when a file differs; capture, do not abort.
 	"$shfmt_bin" -d "${files[@]}" || rc=$?
-	((rc > exit_code)) && exit_code=$rc || true
+	if ((rc > exit_code)); then
+		exit_code=$rc
+	fi
 	local file
 	# Lint each discovered file independently to keep failures localized.
 	for file in "${files[@]}"; do
 		rc=0
 		"$shellcheck_bin" "$file" || rc=$?
-		((rc > exit_code)) && exit_code=$rc || true
+		if ((rc > exit_code)); then
+			exit_code=$rc
+		fi
 	done
 	return "$exit_code"
 }
@@ -237,7 +246,9 @@ run_test() {
 	for test_dir in "${test_dirs[@]}"; do
 		rc=0
 		"$bats_bin" "$test_dir" || rc=$?
-		((rc > exit_code)) && exit_code=$rc || true
+		if ((rc > exit_code)); then
+			exit_code=$rc
+		fi
 	done
 	return "$exit_code"
 }
@@ -319,8 +330,9 @@ run_test_coverage() {
 	mkdir -p "$out_dir"
 	local runs_dir="$out_dir/.kcov_runs"
 	mkdir -p "$runs_dir"
-	# Scope coverage to repo scripts/tools; exclude the test sources themselves.
-	local include_pattern="$repo_root/tools,$repo_root/scripts"
+	# Scope coverage to repo scripts/tools and the Claude bash library; exclude the test
+	# sources themselves.
+	local include_pattern="$repo_root/tools,$repo_root/scripts,$repo_root/.claude/lib/bash"
 	local exclude_pattern="$repo_root/tests"
 	local exit_code=0 rc=0 test_dir
 	local -a run_dirs=()
@@ -336,7 +348,9 @@ run_test_coverage() {
 			"--include-pattern=$include_pattern" \
 			"--exclude-pattern=$exclude_pattern" \
 			"$run_dir" "$bats_bin" "$test_dir" || rc=$?
-		((rc > exit_code)) && exit_code=$rc || true
+		if ((rc > exit_code)); then
+			exit_code=$rc
+		fi
 		if ((exit_code != 0)); then
 			break
 		fi
@@ -345,7 +359,9 @@ run_test_coverage() {
 	if ((exit_code == 0)) && ((${#run_dirs[@]} > 0)); then
 		rc=0
 		"$kcov_bin" --merge "$out_dir" "${run_dirs[@]}" || rc=$?
-		((rc > exit_code)) && exit_code=$rc || true
+		if ((rc > exit_code)); then
+			exit_code=$rc
+		fi
 		# kcov --merge writes the combined Cobertura report to <out_dir>/kcov-merged/cov.xml.
 		# Copy it to the canonical <out_dir>/cov.xml so the summary parse below and
 		# downstream tooling (Coverage Gutters) find a single cov.xml at the documented path.

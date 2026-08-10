@@ -1,0 +1,32 @@
+{
+  "name": "cohorts_tie_breaking_equal_degrees",
+  "notes": "All four vertices have degree 1, so the ascending item-key tiebreak alone fixes the visit order.",
+  "input": {
+    "item_keys": [
+      10,
+      20,
+      30,
+      40
+    ],
+    "conflict_edges": [
+      [
+        10,
+        20
+      ],
+      [
+        30,
+        40
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      10,
+      30
+    ],
+    [
+      20,
+      40
+    ]
+  ]
+}

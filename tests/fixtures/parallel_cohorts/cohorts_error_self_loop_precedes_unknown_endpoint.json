@@ -1,0 +1,16 @@
+{
+  "name": "cohorts_error_self_loop_precedes_unknown_endpoint",
+  "notes": "The self-loop check runs before the endpoint-membership check, so an unknown self-conflicting key reports as a self-loop.",
+  "input": {
+    "item_keys": [
+      2
+    ],
+    "conflict_edges": [
+      [
+        5,
+        5
+      ]
+    ]
+  },
+  "expected_error": "Self-loop edge on item key 5; the conflict relation is defined over distinct items, so an item cannot conflict with itself."
+}

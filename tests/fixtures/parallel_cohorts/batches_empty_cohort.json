@@ -1,0 +1,9 @@
+{
+  "name": "batches_empty_cohort",
+  "notes": "An empty cohort yields no batches.",
+  "input": {
+    "cohort_item_keys": [],
+    "max_concurrency": 4
+  },
+  "expected_batches": []
+}

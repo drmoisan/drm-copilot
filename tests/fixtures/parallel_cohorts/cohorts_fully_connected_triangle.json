@@ -1,0 +1,36 @@
+{
+  "name": "cohorts_fully_connected_triangle",
+  "notes": "A 3-clique forces one cohort per vertex; greedy matches the chromatic number here.",
+  "input": {
+    "item_keys": [
+      1,
+      2,
+      3
+    ],
+    "conflict_edges": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      1
+    ],
+    [
+      2
+    ],
+    [
+      3
+    ]
+  ]
+}

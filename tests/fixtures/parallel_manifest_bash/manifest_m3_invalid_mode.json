@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m3_invalid_mode",
+  "notes": "M3: mode outside the two-member enum is rejected; the accessor still falls back to the default.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: paused\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest mode must be one of closed, open; found: 'paused'."
+  ],
+  "expected_mode": "paused",
+  "expected_max_concurrency": 4
+}

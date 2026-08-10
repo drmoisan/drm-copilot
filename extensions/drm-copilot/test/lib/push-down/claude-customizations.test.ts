@@ -283,6 +283,6 @@ describe("pushDownCustomizations (claude)", () => {
       `${DEST}/artifacts/claude-customizations/push-down-20260626T001500Z.json`,
     );
     expect(ARTIFACT_DIRECTORY).toBe("artifacts/claude-customizations");
-    expect(ROOT_FOLDERS).toEqual([".claude"]);
+    expect(ROOT_FOLDERS).toEqual([".claude", "config"]);
   });
 });

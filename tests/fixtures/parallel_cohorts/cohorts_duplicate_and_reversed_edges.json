@@ -1,0 +1,32 @@
+{
+  "name": "cohorts_duplicate_and_reversed_edges",
+  "notes": "An edge supplied twice and in both directions collapses to one adjacency entry.",
+  "input": {
+    "item_keys": [
+      1,
+      2
+    ],
+    "conflict_edges": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      1
+    ],
+    [
+      2
+    ]
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "cohorts_path_of_three",
+  "notes": "Welsh-Powell visits the degree-2 middle vertex first, so it takes cohort 0 and both endpoints share cohort 1.",
+  "input": {
+    "item_keys": [
+      1,
+      2,
+      3
+    ],
+    "conflict_edges": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      2
+    ],
+    [
+      1,
+      3
+    ]
+  ]
+}

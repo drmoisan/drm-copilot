@@ -1,0 +1,38 @@
+{
+  "name": "cohorts_isolated_plus_clique",
+  "notes": "An isolated vertex joins cohort 0 alongside the first clique member.",
+  "input": {
+    "item_keys": [
+      1,
+      2,
+      3,
+      9
+    ],
+    "conflict_edges": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  "expected_cohorts": [
+    [
+      1,
+      9
+    ],
+    [
+      2
+    ],
+    [
+      3
+    ]
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "manifest_valid_empty_items",
+  "notes": "An empty items list is the documented authoring shape before any item is admitted (schema S1).",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems: []\n---\n\n# Parallel Run\n",
+  "expected_errors": [],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

@@ -111,6 +111,19 @@
     ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
     ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
     ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
-    ".claude/lib/blast-radius/BlastRadius.psm1"
+    ".claude/lib/blast-radius/BlastRadius.psm1",
+    ".claude/rules/parallel-orchestration.md",
+    ".claude/rules/shell.md",
+    ".claude/lib/bash/compute-cohorts.sh",
+    ".claude/lib/bash/compute-concurrency-batches.sh",
+    ".claude/lib/bash/parallel-cohorts.sh",
+    ".claude/lib/bash/parallel-common.sh",
+    ".claude/lib/bash/parallel-items-validate.sh",
+    ".claude/lib/bash/parallel-manifest-validate.sh",
+    ".claude/lib/bash/parallel-yaml-emit.sh",
+    ".claude/lib/bash/parallel-yaml-scan.sh",
+    ".claude/lib/bash/validate-parallel-manifest.sh",
+    "config/orchestration-routing.json",
+    "config/blast-radius.json"
   ]
 }

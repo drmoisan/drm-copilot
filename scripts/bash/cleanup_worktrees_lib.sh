@@ -12,6 +12,7 @@
 #
 # Sourcing contract: this library defines functions only; it never runs work at
 # source time, so the wrapper and the bats suites can source it without side effects.
+#
 # It depends on cleanup_worktrees_enumerate_lib.sh (source that first). All git
 # commands go through cleanup_wt_git so tests can stub the git binary via
 # CLEANUP_WT_GIT_BIN.
@@ -470,7 +471,9 @@ run_report() {
 		[[ -z $name ]] && continue
 		crc=0
 		classify_branch "$name" || crc=$?
-		((crc > rc)) && rc=$crc || true
+		if ((crc > rc)); then
+			rc=$crc
+		fi
 	done <<<"$ebout"
 	return "$rc"
 }

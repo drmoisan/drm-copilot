@@ -1,0 +1,8 @@
+{
+  "name": "manifest_accessor_open_mode_max_cap",
+  "notes": "M3/M4 present values: the accessors return the declared open mode and the upper-bound cap of 8.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: open\nmax_concurrency: 8\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
+  "expected_errors": [],
+  "expected_mode": "open",
+  "expected_max_concurrency": 8
+}
