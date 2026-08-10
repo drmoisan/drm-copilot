@@ -30,6 +30,11 @@ lib/
 !.claude/lib/**
 !extensions/drm-copilot/resources/claude-customizations/.claude/lib/
 !extensions/drm-copilot/resources/claude-customizations/.claude/lib/**
+# The Shell-QC discovery fixture tree mirrors the three real search roots, so it
+# must contain a `.claude/lib/bash` directory. It is checked-in test data, not a
+# Python build artifact.
+!tests/fixtures/shell_qc/.claude/lib/
+!tests/fixtures/shell_qc/.claude/lib/**
 lib64/
 parts/
 sdist/

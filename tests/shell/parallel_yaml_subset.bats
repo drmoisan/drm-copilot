@@ -10,6 +10,10 @@
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     LIB_DIR="${REPO_ROOT}/.claude/lib/bash"
+    # The YAML modules do not depend on parallel-common.sh, so the locale guard
+    # is sourced explicitly here rather than arriving transitively.
+    # shellcheck source=/dev/null
+    source "${LIB_DIR}/parallel-common.sh"
     # shellcheck source=/dev/null
     source "${LIB_DIR}/parallel-yaml-emit.sh"
     pc_enforce_c_locale
