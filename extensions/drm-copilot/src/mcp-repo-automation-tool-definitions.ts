@@ -342,6 +342,9 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "epic-orchestrator-state",
             "epic-planner-state",
             "epic-kickoff",
+            "parallel-orchestrator-state",
+            "parallel-planner-state",
+            "parallel-kickoff",
           ],
           description: "The type of orchestration artifact to validate.",
         },
@@ -353,7 +356,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         require_complete: {
           type: "boolean",
           description:
-            "When true and artifact_type is 'orchestrator-state' or 'epic-orchestrator-state', require all phases to be complete.",
+            "When true and artifact_type is 'orchestrator-state', 'epic-orchestrator-state', or 'parallel-orchestrator-state', require all phases to be complete.",
         },
         require_model_routing: {
           type: "boolean",
@@ -373,7 +376,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         require_ready_for_execution: {
           type: "boolean",
           description:
-            "When true and artifact_type is 'epic-planner-state', require every child to be prepared and preflight-cleared.",
+            "When true and artifact_type is 'epic-planner-state' or 'parallel-planner-state', require every child to be prepared and preflight-cleared.",
         },
       },
       required: ["workspace_root", "artifact_type", "artifact_path"],

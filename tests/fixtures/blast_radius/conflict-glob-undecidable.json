@@ -1,0 +1,42 @@
+{
+  "description": "Fail-closed glob x glob. No single repository path can match both scripts/*/alpha.py and scripts/*/beta.py, yet the conservative shared-literal-prefix test cannot prove the pair disjoint because both literal prefixes are scripts/. The documented fail-closed clause therefore reports overlap.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/*/alpha.py"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["scripts/*/beta.py"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [
+      {
+        "kind": "path_overlap",
+        "detail": "scripts/*/alpha.py ~ scripts/*/beta.py"
+      }
+    ]
+  }
+}

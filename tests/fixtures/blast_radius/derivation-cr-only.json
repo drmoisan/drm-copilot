@@ -1,0 +1,39 @@
+{
+  "description": "CR-only plan text: every line terminator is a bare carriage return. Also exercises the .claude/ and extensions/ top-level segments and a module map whose globs must not match across a nested .claude/ path inside the bundled payload.",
+  "input": {
+    "plan_text": "### Phase 2 — Mirror\r- [ ] [P2-T1] Create `.claude/lib/blast-radius/BlastRadius.psm1`.\r- [ ] [P2-T2] Mirror it into `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadius.psm1`.\r",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-cr-fixture-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "claude-runtime": [".claude/**"],
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"],
+        "vscode-extension": ["extensions/drm-copilot/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        ".claude/lib/blast-radius/BlastRadius.psm1",
+        "docs/features/active/2026-08-07-cr-fixture-447/**",
+        "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadius.psm1"
+      ],
+      "modules": ["claude-runtime", "docs", "vscode-extension"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

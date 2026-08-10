@@ -1,0 +1,50 @@
+{
+  "description": "V3 boundary, exactly at the fraction. Three concrete radius paths against twelve tracked files sits exactly on the 0.25 fraction (3 <= 3.0), so the rule does not trigger. Both 0.25 * 8 and 0.25 * 12 are exact in binary floating point, so the boundary is not fuzzy in either language.",
+  "input": {
+    "plan_text": "### Phase 1 — Breadth\n- [ ] [P1-T1] Touch `scripts/dev_tools/a.py`, `scripts/dev_tools/b.py`, and `scripts/dev_tools/c.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-v3-at-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 12,
+    "radius": {
+      "paths": [
+        "scripts/dev_tools/a.py",
+        "scripts/dev_tools/b.py",
+        "scripts/dev_tools/c.py"
+      ],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-07-v3-at-447/**",
+        "scripts/dev_tools/a.py",
+        "scripts/dev_tools/b.py",
+        "scripts/dev_tools/c.py"
+      ],
+      "modules": ["docs", "python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": []
+  }
+}

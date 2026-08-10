@@ -1,0 +1,57 @@
+{
+  "name": "cohorts-as-object",
+  "notes": "A non-array cohorts value yields an empty projection, so no endpoint pair can be ordered and the edge is left unjudged.",
+  "document": {
+    "objective": "deliver parallel-enforcement-hooks-440",
+    "completed_steps": ["manifest_parsed"],
+    "next_step": "cohort_0_launch",
+    "last_updated": "2026-08-08T10-00",
+    "route_id": "parallel",
+    "parallel_slug": "wave-four",
+    "parallel_manifest_path": "docs/features/parallel/wave-four/parallel.md",
+    "parallel_status_doc_path": "docs/features/parallel/wave-four/parallel-status.md",
+    "mode": "closed",
+    "max_concurrency": 4,
+    "current_cohort": 0,
+    "recolor_generation": 0,
+    "cohorts": {},
+    "items": [
+      {
+        "issue_num": 444,
+        "feature_folder": "2026-08-07-parallel-item-444",
+        "state": "scheduled",
+        "blast_radius": {
+          "paths": ["scripts/dev_tools/**"],
+          "modules": ["scripts"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-07T10-00"
+        }
+      },
+      {
+        "issue_num": 445,
+        "feature_folder": "2026-08-07-parallel-item-445",
+        "state": "scheduled",
+        "blast_radius": {
+          "paths": ["scripts/dev_tools/**"],
+          "modules": ["scripts"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-07T10-00"
+        }
+      }
+    ],
+    "conflict_edges": [
+      {
+        "a": 444,
+        "b": 445,
+        "reason": "path_overlap"
+      }
+    ],
+    "mutations": [],
+    "drift_events": []
+  },
+  "expected_barrier_errors": []
+}

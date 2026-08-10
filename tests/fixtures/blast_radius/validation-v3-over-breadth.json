@@ -1,0 +1,57 @@
+{
+  "description": "V3 over-breadth, Advisory, just over the boundary. Three concrete radius paths against eight tracked files exceeds the 0.25 fraction (3 > 2.0), so exactly one Advisory finding is reported against the paths level.",
+  "input": {
+    "plan_text": "### Phase 1 — Breadth\n- [ ] [P1-T1] Touch `scripts/dev_tools/a.py`, `scripts/dev_tools/b.py`, and `scripts/dev_tools/c.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-07-v3-over-447",
+    "computed_at": "2026-08-07T12-00",
+    "tracked_file_count": 8,
+    "radius": {
+      "paths": [
+        "scripts/dev_tools/a.py",
+        "scripts/dev_tools/b.py",
+        "scripts/dev_tools/c.py"
+      ],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-07-v3-over-447/**",
+        "scripts/dev_tools/a.py",
+        "scripts/dev_tools/b.py",
+        "scripts/dev_tools/c.py"
+      ],
+      "modules": ["docs", "python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "findings": [
+      {
+        "rule": "V3",
+        "severity": "Advisory",
+        "subject": "blast_radius.paths",
+        "message": "Radius covers 3 of 8 tracked files, which exceeds the configured over-breadth fraction."
+      }
+    ]
+  }
+}

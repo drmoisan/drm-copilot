@@ -114,6 +114,35 @@
             # changed production surface is not excluded from coverage.
             '.codex/hooks/enforce-epic-child-worktree-binding.ps1'
             '.codex/hooks/enforce-epic-planning-only.ps1'
+            # Issue #447 added the .claude-resident PowerShell blast-radius library, the
+            # two-language mirror of scripts/dev_tools/compute_blast_radius.py and its
+            # helper modules. The set is split across five files only to satisfy the
+            # 500-line limit; measured here so no new production module is excluded from
+            # coverage.
+            '.claude/lib/blast-radius/BlastRadiusExtraction.psm1'
+            '.claude/lib/blast-radius/BlastRadiusGlob.psm1'
+            '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
+            '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
+            '.claude/lib/blast-radius/BlastRadius.psm1'
+            # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
+            # barrier and the worktree removal gate) and extended the invocation-origin
+            # hook with the parallel-agent family; measured here so no new or changed
+            # production hook is excluded from coverage.
+            '.claude/hooks/enforce-parallel-cohort-barrier.ps1'
+            '.claude/hooks/enforce-parallel-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-invocation-origin.ps1'
+            # Issue #446 added this Layer-1 parallel drift-gate PreToolUse hook; measured here so
+            # the new production hook is not excluded from coverage.
+            '.claude/hooks/enforce-parallel-drift-gate.ps1'
+            # Issue #446 remediation cycle 1 split the seven shape-and-derivation helpers out of
+            # that hook into this dot-sourced sibling module; measured here so the Coverage
+            # Exclusion Policy's no-production-file-excluded rule still holds after the split.
+            '.claude/hooks/enforce-parallel-drift-gate-helpers.ps1'
+            # Issue #442 added this PreToolUse abandon-gate hook, which guards the destructive
+            # parallel abandon disposition; measured here so the new production hook is not
+            # excluded from coverage. The test suite dot-sources the file (guarded body) so
+            # line attribution is valid.
+            '.claude/hooks/enforce-parallel-abandon-gate.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

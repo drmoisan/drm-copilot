@@ -433,6 +433,9 @@ const VALID_ARTIFACT_TYPES = new Set([
   "epic-orchestrator-state",
   "epic-planner-state",
   "epic-kickoff",
+  "parallel-orchestrator-state",
+  "parallel-planner-state",
+  "parallel-kickoff",
 ]);
 
 export function resolveValidateOrchestrationArtifactsToolInput(

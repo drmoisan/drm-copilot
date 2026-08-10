@@ -1,0 +1,39 @@
+{
+  "description": "contract_dependency in isolation: the contracts sets intersect on one identifier while every other level is disjoint. The reported detail is the ordinally smallest shared identifier, which makes the relation symmetric in its two arguments.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_tools/a.py"],
+      "modules": ["python-dev-tools"],
+      "shared_surfaces": [],
+      "contracts": ["derive_blast_radius", "zeta"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["tests/scripts/b.py"],
+      "modules": ["tests"],
+      "shared_surfaces": [],
+      "contracts": ["derive_blast_radius", "omega"],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [
+      { "kind": "contract_dependency", "detail": "derive_blast_radius" }
+    ]
+  }
+}

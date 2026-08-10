@@ -159,5 +159,34 @@ module.exports = {
     // from coverage measurement"), it legitimately reports 0% executable
     // coverage under the v8 provider and is omitted only from the per-file
     // threshold gate; it remains included in `collectCoverageFrom`.
+    "./src/lib/validate/parallel-state-shared.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/parallel-state-structures.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // `parallel-state-records.ts` carries the record-level validators split out
+    // of `parallel-state-structures.ts` to keep both modules under the 500-line
+    // cap. It is production runtime code, so the coverage-exclusion policy in
+    // `.claude/rules/general-unit-test.md` requires it to sit behind the same
+    // per-file gate as the module it was split from.
+    "./src/lib/validate/parallel-state-records.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/parallel-orchestrator-state-cohort-barrier.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/parallel-orchestrator-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/parallel-planner-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

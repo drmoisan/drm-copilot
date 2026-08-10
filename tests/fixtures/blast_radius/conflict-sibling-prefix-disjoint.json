@@ -1,0 +1,37 @@
+{
+  "description": "Gap 2 non-regression (issue #452). A sibling directory whose name shares a character prefix must stay disjoint: scripts/dev_toolsX/a.py is not inside scripts/dev_tools. This pins the anchoring of the listed-directory rule on a trailing separator, without which the widened relation would make unrelated work items contend. Both radii declare empty modules so the coarse module map cannot mask the path level.",
+  "input": {
+    "radius_a": {
+      "paths": ["scripts/dev_toolsX/a.py"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "radius_b": {
+      "paths": ["scripts/dev_tools"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-08-07T12-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": ["config/orchestration-routing.json", "poetry.lock"],
+      "shared_surface_globs": ["scripts/dev_tools/validate_*.py"],
+      "modules": {
+        "config": ["config/**"],
+        "docs": ["docs/**"],
+        "python-dev-tools": ["scripts/dev_tools/**"],
+        "tests": ["tests/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": false,
+    "reasons": []
+  }
+}
