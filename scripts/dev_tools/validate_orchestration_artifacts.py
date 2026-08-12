@@ -14,6 +14,10 @@ import sys
 from pathlib import Path
 
 from scripts.dev_tools.epic_planner_readiness import build_epic_readiness_context
+from scripts.dev_tools.parallel_codex_readiness_filesystem import (
+    build_parallel_codex_readiness_evidence,
+    build_parallel_readiness_file_context,
+)
 from scripts.dev_tools.parallel_kickoff_contract import validate_parallel_kickoff_text
 from scripts.dev_tools.plan_gate_discrimination import (
     PlanGateContext,
@@ -233,10 +237,17 @@ def build_parser() -> argparse.ArgumentParser:
         "code-review",
         "feature-audit",
         "epic-kickoff",
-        "parallel-kickoff",
     ):
         artifact_parser = subparsers.add_parser(artifact_type)
         artifact_parser.add_argument("path")
+
+    parallel_kickoff_parser = subparsers.add_parser("parallel-kickoff")
+    parallel_kickoff_parser.add_argument("path")
+    parallel_kickoff_parser.add_argument(
+        "--require-ready-for-execution",
+        action="store_true",
+        help="Require consistent version-1 committed kickoff identity.",
+    )
 
     state_parser = subparsers.add_parser("orchestrator-state")
     state_parser.add_argument("path")
@@ -314,6 +325,11 @@ def build_parser() -> argparse.ArgumentParser:
     parallel_state_parser = subparsers.add_parser("parallel-orchestrator-state")
     parallel_state_parser.add_argument("path")
     parallel_state_parser.add_argument(
+        "--workspace-root",
+        default=".",
+        help="Repository root used for guarded Codex readiness evidence.",
+    )
+    parallel_state_parser.add_argument(
         "--require-complete",
         action="store_true",
         help=(
@@ -324,6 +340,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     parallel_planner_parser = subparsers.add_parser("parallel-planner-state")
     parallel_planner_parser.add_argument("path")
+    parallel_planner_parser.add_argument(
+        "--workspace-root",
+        default=".",
+        help="Repository root used for guarded Codex readiness evidence.",
+    )
     parallel_planner_parser.add_argument(
         "--require-ready-for-execution",
         action="store_true",
@@ -358,8 +379,16 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
     if args.artifact_type == "plan":
         return _plan_channels(args)[0]
     path = Path(args.path)
-    if args.artifact_type == "epic-planner-state" and not path.is_absolute():
-        path = Path(args.workspace_root) / path
+    if (
+        args.artifact_type
+        in (
+            "epic-planner-state",
+            "parallel-orchestrator-state",
+            "parallel-planner-state",
+        )
+        and not path.is_absolute()
+    ):
+        path = Path(getattr(args, "workspace_root", ".")) / path
     return _validate_errors_only(args, _read_text(path))
 
 
@@ -440,17 +469,54 @@ def _validate_errors_only(args: argparse.Namespace, text: str) -> list[str]:
             readiness_context=readiness_context,
         )
     if args.artifact_type == "parallel-orchestrator-state":
-        return validate_parallel_orchestrator_state_text(
-            text,
-            require_complete=bool(args.require_complete),
-        )
+        require_complete = bool(getattr(args, "require_complete", False))
+        readiness_errors: tuple[str, ...] = ()
+        readiness_context = None
+        if require_complete:
+            readiness = build_parallel_codex_readiness_evidence(
+                text,
+                build_parallel_readiness_file_context(
+                    Path(getattr(args, "workspace_root", ".")), Path(args.path)
+                ),
+            )
+            readiness_errors = readiness.errors
+            readiness_context = readiness.evidence
+        return [
+            *readiness_errors,
+            *validate_parallel_orchestrator_state_text(
+                text,
+                require_complete=require_complete,
+                readiness_context=readiness_context,
+            ),
+        ]
     if args.artifact_type == "parallel-planner-state":
-        return validate_parallel_planner_state_text(
-            text,
-            require_ready_for_execution=bool(args.require_ready_for_execution),
-        )
+        require_ready = bool(getattr(args, "require_ready_for_execution", False))
+        readiness_errors = ()
+        readiness_context = None
+        if require_ready:
+            readiness = build_parallel_codex_readiness_evidence(
+                text,
+                build_parallel_readiness_file_context(
+                    Path(getattr(args, "workspace_root", ".")), Path(args.path)
+                ),
+            )
+            readiness_errors = readiness.errors
+            readiness_context = readiness.evidence
+        return [
+            *readiness_errors,
+            *validate_parallel_planner_state_text(
+                text,
+                require_ready_for_execution=require_ready,
+                readiness_context=readiness_context,
+            ),
+        ]
     if args.artifact_type == "parallel-kickoff":
-        return validate_parallel_kickoff_text(text)
+        return validate_parallel_kickoff_text(
+            text,
+            require_ready_for_execution=bool(
+                getattr(args, "require_ready_for_execution", False)
+            ),
+        )
     return [f"Unsupported artifact type: {args.artifact_type}"]
 
 

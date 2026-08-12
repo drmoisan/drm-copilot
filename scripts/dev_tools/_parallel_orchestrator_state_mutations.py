@@ -68,6 +68,9 @@ from typing import cast
 from scripts.dev_tools._parallel_orchestrator_state_mode_completion import (
     validate_mode_completion,
 )
+from scripts.dev_tools._parallel_orchestrator_state_mutation_receipts import (
+    validate_receipt_bound_mutation_state,
+)
 from scripts.dev_tools._parallel_state_common import is_non_negative_integer
 
 # The op classification is F3-OWNED and is CONSUMED here, never restated. Local
@@ -310,4 +313,5 @@ def validate_mutation_protocol(state: dict[str, object], context: str) -> list[s
     errors.extend(_validate_entry_shapes(entries, context))
     errors.extend(_validate_generation_monotonicity(entries, context))
     errors.extend(validate_mode_completion(state, entries, context))
+    errors.extend(validate_receipt_bound_mutation_state(state, context))
     return errors

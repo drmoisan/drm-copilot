@@ -37,6 +37,19 @@ def test_resolves_standalone_base_profiles(
     assert receipt["c3_overlay_reason"] is None
 
 
+def test_resolves_commit_steward_c4_profile() -> None:
+    """Route commit stewardship through its generated Sol/max deployment."""
+
+    receipt = resolve_codex_deployment("commit-steward", "C4", "standalone", "C4")
+
+    assert receipt["logical_agent"] == "commit-steward"
+    assert receipt["deployment_agent"] == "commit-steward-c4"
+    assert receipt["model"] == "gpt-5.6-sol"
+    assert receipt["model_reasoning_effort"] == "max"
+    assert receipt["c3_overlay_applied"] is False
+    assert receipt["orchestration_complexity_ceiling"] == "C4"
+
+
 @pytest.mark.parametrize("context", ["epic_preparation_child", "epic_execution_child"])
 def test_elevates_c3_for_epic_children(context: str) -> None:
     """Route C3 epic children to the Sol/high elevated agent profile."""
@@ -79,6 +92,65 @@ def test_forces_epic_personas_to_sol_ultra(persona: str) -> None:
     assert receipt["model"] == "gpt-5.6-sol"
     assert receipt["model_reasoning_effort"] == "ultra"
     assert receipt["c3_overlay_applied"] is False
+
+
+@pytest.mark.parametrize(
+    ("persona", "context"),
+    [
+        ("parallel-planner", "parallel_planning"),
+        ("parallel-orchestrator", "parallel_execution"),
+    ],
+)
+def test_forces_parallel_personas_to_sol_ultra(persona: str, context: str) -> None:
+    """Resolve each parallel root context to its exact forced deployment."""
+
+    receipt = resolve_codex_deployment(persona, "C1", context, "C4")
+
+    assert receipt["logical_agent"] == persona
+    assert receipt["deployment_agent"] == persona
+    assert receipt["execution_context"] == context
+    assert receipt["orchestration_complexity_ceiling"] == "C4"
+    assert receipt["model"] == "gpt-5.6-sol"
+    assert receipt["model_reasoning_effort"] == "ultra"
+    assert receipt["c3_overlay_applied"] is False
+
+
+@pytest.mark.parametrize(
+    ("agent", "context"),
+    [
+        ("parallel-planner", "parallel_execution"),
+        ("parallel-orchestrator", "parallel_planning"),
+        ("orchestrator", "parallel_planning"),
+        ("epic-planner", "parallel_planning"),
+        ("orchestrator", "parallel_execution"),
+        ("epic-orchestrator", "parallel_execution"),
+    ],
+)
+def test_parallel_context_rejects_mismatched_agent(agent: str, context: str) -> None:
+    """Forbid ordinary, epic, and cross-wired agents in parallel root contexts."""
+
+    with pytest.raises(ValueError, match="requires its forced root persona"):
+        resolve_codex_deployment(agent, "C4", context, "C4")
+
+
+@pytest.mark.parametrize(
+    ("persona", "context"),
+    [
+        ("parallel-planner", "parallel_planning"),
+        ("parallel-orchestrator", "parallel_execution"),
+    ],
+)
+def test_parallel_persona_has_no_model_fallback(persona: str, context: str) -> None:
+    """Reject unavailable Sol routing instead of downgrading a parallel persona."""
+
+    with pytest.raises(ModelUnavailableError, match="model_unavailable"):
+        resolve_codex_deployment(
+            persona,
+            "C4",
+            context,
+            "C4",
+            available_models={"gpt-5.6-terra", "gpt-5.6-luna"},
+        )
 
 
 def test_does_not_overlay_non_c3_epic_work() -> None:

@@ -12,6 +12,70 @@ import pytest
 MANIFEST_DIR_RELATIVE = (
     "extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests"
 )
+REPO_ROOT = Path(__file__).resolve().parents[3]
+REAL_MANIFEST_DIR = REPO_ROOT / MANIFEST_DIR_RELATIVE
+PORTABLE_CLAUDE_PATHS = frozenset(
+    {
+        ".claude/lib/bash/compute-cohorts.sh",
+        ".claude/lib/bash/compute-concurrency-batches.sh",
+        ".claude/lib/bash/parallel-cohorts.sh",
+        ".claude/lib/bash/parallel-common.sh",
+        ".claude/lib/bash/parallel-items-validate.sh",
+        ".claude/lib/bash/parallel-manifest-validate.sh",
+        ".claude/lib/bash/parallel-yaml-emit.sh",
+        ".claude/lib/bash/parallel-yaml-scan.sh",
+        ".claude/lib/bash/validate-parallel-manifest.sh",
+        ".claude/lib/blast-radius/BlastRadius.psm1",
+        ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+        ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+        ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+        ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+    }
+)
+COMMIT_STEWARD_PROFILE_PATHS = frozenset(
+    f".codex/agents/commit-steward{suffix}.toml"
+    for suffix in ("", "-c1", "-c2", "-c3", "-c3-elevated", "-c4")
+)
+SELECTED_PARALLEL_CORE_PATHS = frozenset(
+    {
+        ".agents/skills/parallel-add/SKILL.md",
+        ".agents/skills/parallel-close/SKILL.md",
+        ".agents/skills/parallel-orchestrate/SKILL.md",
+        ".agents/skills/parallel-plan/SKILL.md",
+        ".agents/skills/parallel-remove/SKILL.md",
+        ".agents/skills/parallel-run/SKILL.md",
+        ".codex/agents/parallel-orchestrator.toml",
+        ".codex/agents/parallel-planner.toml",
+        ".codex/hooks/authorize-root-parallel-invocation.ps1",
+        ".codex/hooks/codex-authority-store.ps1",
+        ".codex/hooks/enforce-codex-model-routing.ps1",
+        ".codex/hooks/enforce-completion-consistency.ps1",
+        ".codex/hooks/enforce-parallel-abandon-gate.ps1",
+        ".codex/hooks/enforce-parallel-child-worktree-binding.ps1",
+        ".codex/hooks/enforce-parallel-cohort-barrier.ps1",
+        ".codex/hooks/enforce-parallel-drift-gate.ps1",
+        ".codex/hooks/enforce-parallel-root-invocation.ps1",
+        ".codex/hooks/enforce-parallel-worktree-removal-gate.ps1",
+        ".codex/hooks/parallel-hook-common.ps1",
+        ".codex/hooks/record-subagent-routing-attestation.ps1",
+        ".codex/hooks/validate-codex-subagent-routing.ps1",
+        ".codex/hooks/validate-parallel-agent-output.ps1",
+        ".codex/scripts/codex-child-launch-contract-core.ps1",
+        ".codex/scripts/codex-child-launch-persistence.ps1",
+        ".codex/scripts/codex-child-launch-resume.ps1",
+        ".codex/scripts/codex-child-launch-runtime.ps1",
+        ".codex/scripts/launch-parallel-child-batch.ps1",
+        ".codex/scripts/parallel-child-launch-contract.ps1",
+        ".codex/scripts/parallel-child-post-session.ps1",
+        ".codex/scripts/resume-parallel-child.ps1",
+        ".codex/config.toml",
+        "AGENTS.md",
+        "config/blast-radius.json",
+        "config/orchestration-routing.json",
+        *PORTABLE_CLAUDE_PATHS,
+        *COMMIT_STEWARD_PROFILE_PATHS,
+    }
+)
 
 
 @dataclass
@@ -229,6 +293,44 @@ def test_compute_published_paths_includes_core() -> None:
 
     assert published == frozenset(
         {".codex/config.toml", ".agents/skills/typescript/SKILL.md"}
+    )
+
+
+def test_selected_language_pack_inherits_the_complete_parallel_core() -> None:
+    """Require explicit language selection to retain the exact core closure."""
+
+    module = _selection_module()
+    source_root = Path("/repo")
+    fs = RecordingFileSystem()
+    for name in ("core", "typescript"):
+        _write_manifest(
+            fs,
+            source_root,
+            name,
+            (REAL_MANIFEST_DIR / f"{name}.json").read_text(encoding="utf-8"),
+        )
+
+    manifests = module.load_pack_manifests(
+        source_root / MANIFEST_DIR_RELATIVE,
+        frozenset({"typescript"}),
+        fs,
+    )
+    published = module.compute_published_paths(
+        frozenset({"core", "typescript"}), manifests
+    )
+
+    assert published is not None
+    core_paths = manifests["core"].paths
+    assert len(SELECTED_PARALLEL_CORE_PATHS) == 54
+    assert SELECTED_PARALLEL_CORE_PATHS <= published
+    assert {
+        path for path in published if path.startswith(".codex/agents/commit-steward")
+    } == COMMIT_STEWARD_PROFILE_PATHS
+    for profile_path in COMMIT_STEWARD_PROFILE_PATHS:
+        assert core_paths.count(profile_path) == 1
+        assert profile_path not in manifests["typescript"].paths
+    assert {path for path in published if path.startswith(".claude/")} == (
+        PORTABLE_CLAUDE_PATHS
     )
 
 

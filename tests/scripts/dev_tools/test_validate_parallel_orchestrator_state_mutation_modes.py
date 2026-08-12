@@ -34,18 +34,23 @@ def test_invariant_3_open_mode_rejects_a_mutation_after_the_close() -> None:
     assert base.check(state) == [
         f"{CONTEXT} mutations[1] records op 'add' after the run-close entry at "
         f"mutations[0]; an open-mode run terminates at the close record and "
-        f"must not auto-complete."
+        f"must not auto-complete.",
+        f"{CONTEXT} mutations[0] close requires no item in flight; "
+        "still in flight: [444].",
     ]
 
 
-def test_invariant_3_open_mode_accepts_a_terminal_close() -> None:
-    """A close record with nothing after it is the permitted open-mode end."""
+def test_invariant_3_open_mode_rejects_close_while_work_remains() -> None:
+    """A terminal close still rejects a checkpoint with in-flight work."""
 
     state = base.build_state(
         mode="open", mutations=[dict(base.ADD_ENTRY), dict(base.CLOSE_ENTRY)]
     )
 
-    assert base.check(state) == []
+    assert base.check(state) == [
+        f"{CONTEXT} mutations[1] close requires no item in flight; "
+        "still in flight: [444]."
+    ]
 
 
 def test_invariant_3_open_mode_ignores_an_idle_run_without_a_close() -> None:
@@ -87,12 +92,15 @@ def test_invariant_3_closed_mode_exempts_a_withdrawn_item() -> None:
     assert base.check(state) == []
 
 
-def test_invariant_3_closed_mode_ignores_a_close_while_work_remains() -> None:
-    """A close recorded with work still schedulable asserts no completion."""
+def test_invariant_3_closed_mode_rejects_a_close_while_work_remains() -> None:
+    """A close with schedulable work is rejected atomically."""
 
     state = base.build_state(mutations=[dict(base.CLOSE_ENTRY)])
 
-    assert base.check(state) == []
+    assert base.check(state) == [
+        f"{CONTEXT} mutations[0] close requires no item in flight; "
+        "still in flight: [444]."
+    ]
 
 
 def test_invariant_3_ignores_a_checkpoint_recording_no_close() -> None:

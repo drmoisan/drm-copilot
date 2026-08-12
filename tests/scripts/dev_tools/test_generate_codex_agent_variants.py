@@ -11,6 +11,7 @@ import pytest
 from scripts.dev_tools import generate_codex_agent_variants as generator
 from scripts.dev_tools.generate_codex_agent_variants import (
     BUNDLE_ROOT,
+    CORE_FAMILIES,
     PACK_FAMILIES,
     PACK_ROOT,
     PROFILES,
@@ -30,6 +31,37 @@ def test_expected_inventory_contains_five_profiles_per_agent_family() -> None:
     expected = expected_variant_files()
 
     assert len(expected) == len(GENERATED_AGENT_FAMILIES) * len(PROFILES)
+
+
+def test_commit_steward_inventory_contains_exact_generated_profiles() -> None:
+    """Require all and only the five generated commit-steward variants."""
+
+    expected_paths = {
+        Path(".codex") / "agents" / f"commit-steward-{profile.suffix}.toml"
+        for profile in PROFILES
+    }
+
+    assert {
+        path for path in expected_variant_files() if "commit-steward" in path.name
+    } == expected_paths
+
+
+def test_core_pack_requires_commit_steward_base_and_generated_profiles() -> None:
+    """Keep the base alias and all generated profiles in the core pack."""
+
+    assert "commit-steward" in CORE_FAMILIES
+
+    rendered = json.loads(
+        render_manifest(
+            cast("Path", StubManifestPath(json.dumps({"paths": []}))), CORE_FAMILIES
+        )
+    )
+    expected_paths = {".codex/agents/commit-steward.toml"} | {
+        f".codex/agents/commit-steward-{profile.suffix}.toml" for profile in PROFILES
+    }
+    assert {path for path in rendered["paths"] if "commit-steward" in path} == (
+        expected_paths
+    )
 
 
 def test_render_variant_replaces_only_top_level_profile_fields() -> None:

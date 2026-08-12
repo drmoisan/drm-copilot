@@ -15,19 +15,45 @@ if TYPE_CHECKING:
     from collections.abc import Collection
 
 ExecutionContext = Literal[
-    "standalone", "epic_preparation_child", "epic_execution_child"
+    "standalone",
+    "epic_preparation_child",
+    "epic_execution_child",
+    "parallel_planning",
+    "parallel_execution",
 ]
-TopologyRoute = Literal["small", "large", "epic"]
-Topology = Literal["typed_engineer", "orchestrator", "epic_persona"]
-RootPersona = Literal["epic-planner", "epic-orchestrator"]
+TopologyRoute = Literal["small", "large", "epic", "parallel"]
+Topology = Literal["typed_engineer", "orchestrator", "epic_persona", "parallel_persona"]
+RootPersona = Literal[
+    "epic-planner",
+    "epic-orchestrator",
+    "parallel-planner",
+    "parallel-orchestrator",
+]
 
 VALID_EXECUTION_CONTEXTS: frozenset[str] = frozenset(
-    {"standalone", "epic_preparation_child", "epic_execution_child"}
+    {
+        "standalone",
+        "epic_preparation_child",
+        "epic_execution_child",
+        "parallel_planning",
+        "parallel_execution",
+    }
 )
 EPIC_CHILD_CONTEXTS: frozenset[str] = frozenset(
     {"epic_preparation_child", "epic_execution_child"}
 )
-FORCED_ROOT_PERSONAS: frozenset[str] = frozenset({"epic-planner", "epic-orchestrator"})
+FORCED_ROOT_PERSONAS: frozenset[str] = frozenset(
+    {
+        "epic-planner",
+        "epic-orchestrator",
+        "parallel-planner",
+        "parallel-orchestrator",
+    }
+)
+PARALLEL_ROOT_CONTEXT_PERSONAS: dict[str, RootPersona] = {
+    "parallel_planning": "parallel-planner",
+    "parallel_execution": "parallel-orchestrator",
+}
 ORCHESTRATOR_LOGICAL_AGENT = "orchestrator"
 ESCALATION_PRECEDENCE: tuple[str, ...] = (
     "epic_child_context",
@@ -178,7 +204,8 @@ def resolve_codex_topology(
     A standalone, single-language change inside a canonical direct-mode budget
     selects that language's typed engineer. All escalation conditions select
     the orchestrator. Epic child work always selects the orchestrator, while an
-    explicit root epic persona selects itself.
+    explicit root epic persona selects itself. Parallel root contexts require
+    their matching forced parallel persona and reject every other root.
     """
 
     context = _validate_context(execution_context)
@@ -186,9 +213,44 @@ def resolve_codex_topology(
     _validate_counts(production_file_count, test_file_count)
     _validate_cross_cutting(cross_cutting)
 
+    parallel_persona = PARALLEL_ROOT_CONTEXT_PERSONAS.get(context)
+    if parallel_persona is not None:
+        if root_persona != parallel_persona:
+            raise ValueError(
+                f"Parallel context {context!r} requires its forced root persona "
+                f"{parallel_persona!r}."
+            )
+        return {
+            "execution_context": context,
+            "languages": normalized_languages,
+            "production_file_count": production_file_count,
+            "test_file_count": test_file_count,
+            "cross_cutting": cross_cutting,
+            "root_persona": parallel_persona,
+            "route": "parallel",
+            "topology": "parallel_persona",
+            "logical_agent": parallel_persona,
+            "routing_reason": "forced_root_persona",
+            "max_production_files": None,
+            "max_test_files": None,
+        }
+
     if root_persona is not None:
         if root_persona not in FORCED_ROOT_PERSONAS:
             raise ValueError(f"Unsupported Codex root persona: {root_persona!r}.")
+        parallel_context = next(
+            (
+                candidate
+                for candidate, persona in PARALLEL_ROOT_CONTEXT_PERSONAS.items()
+                if persona == root_persona
+            ),
+            None,
+        )
+        if parallel_context is not None:
+            raise ValueError(
+                f"Parallel persona {root_persona!r} requires "
+                f"{parallel_context!r} context."
+            )
         if context != "standalone":
             raise ValueError("A forced root persona requires standalone context.")
         persona = cast("RootPersona", root_persona)

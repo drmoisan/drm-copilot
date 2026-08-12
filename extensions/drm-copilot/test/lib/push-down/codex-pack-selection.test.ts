@@ -1,4 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import {
   CSHARP_CANONICAL_PATHS,
@@ -13,9 +15,87 @@ import {
 import { buildInMemoryFileSystem } from "./push-down.test-helpers";
 
 const MANIFEST_DIR = "/bundle/pack-manifests";
+const REAL_MANIFEST_DIR = resolve(
+  __dirname,
+  "../../../resources/codex-and-agents-customizations/pack-manifests",
+);
+const PARALLEL_CORE_PATHS = [
+  ".agents/skills/parallel-add/SKILL.md",
+  ".agents/skills/parallel-close/SKILL.md",
+  ".agents/skills/parallel-orchestrate/SKILL.md",
+  ".agents/skills/parallel-plan/SKILL.md",
+  ".agents/skills/parallel-remove/SKILL.md",
+  ".agents/skills/parallel-run/SKILL.md",
+  ".codex/agents/parallel-orchestrator.toml",
+  ".codex/agents/parallel-planner.toml",
+  ".codex/hooks/authorize-root-parallel-invocation.ps1",
+  ".codex/hooks/codex-authority-store.ps1",
+  ".codex/hooks/enforce-codex-model-routing.ps1",
+  ".codex/hooks/enforce-completion-consistency.ps1",
+  ".codex/hooks/enforce-parallel-abandon-gate.ps1",
+  ".codex/hooks/enforce-parallel-child-worktree-binding.ps1",
+  ".codex/hooks/enforce-parallel-cohort-barrier.ps1",
+  ".codex/hooks/enforce-parallel-drift-gate.ps1",
+  ".codex/hooks/enforce-parallel-root-invocation.ps1",
+  ".codex/hooks/enforce-parallel-worktree-removal-gate.ps1",
+  ".codex/hooks/parallel-hook-common.ps1",
+  ".codex/hooks/record-subagent-routing-attestation.ps1",
+  ".codex/hooks/validate-codex-subagent-routing.ps1",
+  ".codex/hooks/validate-parallel-agent-output.ps1",
+  ".codex/scripts/codex-child-launch-contract-core.ps1",
+  ".codex/scripts/codex-child-launch-persistence.ps1",
+  ".codex/scripts/codex-child-launch-resume.ps1",
+  ".codex/scripts/codex-child-launch-runtime.ps1",
+  ".codex/scripts/launch-parallel-child-batch.ps1",
+  ".codex/scripts/parallel-child-launch-contract.ps1",
+  ".codex/scripts/parallel-child-post-session.ps1",
+  ".codex/scripts/resume-parallel-child.ps1",
+  ".codex/config.toml",
+  "AGENTS.md",
+  "config/blast-radius.json",
+  "config/orchestration-routing.json",
+  ".claude/lib/bash/compute-cohorts.sh",
+  ".claude/lib/bash/compute-concurrency-batches.sh",
+  ".claude/lib/bash/parallel-cohorts.sh",
+  ".claude/lib/bash/parallel-common.sh",
+  ".claude/lib/bash/parallel-items-validate.sh",
+  ".claude/lib/bash/parallel-manifest-validate.sh",
+  ".claude/lib/bash/parallel-yaml-emit.sh",
+  ".claude/lib/bash/parallel-yaml-scan.sh",
+  ".claude/lib/bash/validate-parallel-manifest.sh",
+  ".claude/lib/blast-radius/BlastRadius.psm1",
+  ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+  ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+  ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+  ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+] as const;
+const LANGUAGE_MANIFESTS = [
+  "python",
+  "powershell",
+  "typescript",
+  "csharp-modern",
+  "csharp-legacy",
+] as const;
 
 function manifestJson(manifest: Record<string, unknown>): string {
   return JSON.stringify(manifest);
+}
+
+function readRealManifestPaths(name: string): string[] {
+  const parsed: unknown = JSON.parse(
+    readFileSync(resolve(REAL_MANIFEST_DIR, `${name}.json`), "utf8"),
+  );
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`${name}.json must be an object`);
+  }
+  const paths = (parsed as Record<string, unknown>)["paths"];
+  if (
+    !Array.isArray(paths) ||
+    !paths.every((path) => typeof path === "string")
+  ) {
+    throw new Error(`${name}.json paths must be strings`);
+  }
+  return paths as string[];
 }
 
 describe("Codex loadPackManifests", () => {
@@ -120,6 +200,43 @@ describe("Codex computePublishedPaths", () => {
     expect([
       ...(computePublishedPaths(new Set(["typescript"]), manifests) ?? []),
     ]).toEqual([".agents/skills/typescript/SKILL.md", ".codex/config.toml"]);
+  });
+
+  it("keeps the complete parallel closure unique and core-owned", () => {
+    const corePaths = readRealManifestPaths("core");
+    const required = new Set(PARALLEL_CORE_PATHS);
+
+    expect(PARALLEL_CORE_PATHS).toHaveLength(48);
+    expect(new Set(corePaths).size).toBe(corePaths.length);
+    expect(
+      PARALLEL_CORE_PATHS.filter((path) => !corePaths.includes(path)),
+    ).toEqual([]);
+    expect(corePaths.filter((path) => path.startsWith(".claude/"))).toEqual(
+      PARALLEL_CORE_PATHS.filter((path) => path.startsWith(".claude/")),
+    );
+    for (const manifestName of LANGUAGE_MANIFESTS) {
+      expect(
+        readRealManifestPaths(manifestName).filter((path) =>
+          required.has(path),
+        ),
+      ).toEqual([]);
+    }
+  });
+
+  it("keeps the complete commit-steward generated family in core", () => {
+    const corePaths = readRealManifestPaths("core");
+    const commitStewardPaths = [
+      ".codex/agents/commit-steward.toml",
+      ".codex/agents/commit-steward-c1.toml",
+      ".codex/agents/commit-steward-c2.toml",
+      ".codex/agents/commit-steward-c3.toml",
+      ".codex/agents/commit-steward-c3-elevated.toml",
+      ".codex/agents/commit-steward-c4.toml",
+    ];
+
+    expect(corePaths.filter((path) => path.includes("commit-steward"))).toEqual(
+      commitStewardPaths,
+    );
   });
 });
 

@@ -348,3 +348,40 @@ describe("cross-runtime parity with the Python kickoff contract", () => {
     },
   );
 });
+
+describe("validateParallelKickoffText committed readiness", () => {
+  it("accepts a version-1 committed identity", () => {
+    expect(
+      validateParallelKickoffText(kickoffWithIntegrity(), {
+        requireReadyForExecution: true,
+      }),
+    ).toEqual([]);
+  });
+
+  it("preserves legacy structural validation outside the explicit gate", () => {
+    expect(validateParallelKickoffText(kickoff())).toEqual([]);
+  });
+
+  it("requires planning_commit at the explicit readiness gate", () => {
+    expect(
+      validateParallelKickoffText(kickoff(), {
+        requireReadyForExecution: true,
+      }),
+    ).toContain(
+      "Parallel kickoff readiness requires version-1 committed planning_commit identity.",
+    );
+  });
+
+  it("rejects cross-wired heading and invocation identities", () => {
+    const text = kickoffWithIntegrity().replace(
+      "Run `/parallel-run sample-run`",
+      "Run `/parallel-run other-run`",
+    );
+
+    expect(
+      validateParallelKickoffText(text, { requireReadyForExecution: true }),
+    ).toContain(
+      "Parallel kickoff readiness requires heading and invocation slugs to match.",
+    );
+  });
+});

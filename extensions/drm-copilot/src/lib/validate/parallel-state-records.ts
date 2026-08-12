@@ -40,16 +40,23 @@ import {
 } from "./parallel-state-shared";
 
 /** Operations that act on one tracked item and therefore need a resolving key. */
-const OPS_REQUIRING_ITEM_KEY: readonly string[] = ["add", "remove", "requeue"];
+export const OPS_REQUIRING_ITEM_KEY: readonly string[] = [
+  "add",
+  "remove",
+  "requeue",
+];
 
 /**
  * Operations for which `prior_state` must be null: `add` introduces an item that
  * had no prior state, and `close` is a run-level record (schema S5).
  */
-const OPS_REQUIRING_NULL_PRIOR_STATE: readonly string[] = ["add", "close"];
+export const OPS_REQUIRING_NULL_PRIOR_STATE: readonly string[] = [
+  "add",
+  "close",
+];
 
 /** Operations for which `new_state` must be null; only the run-level close. */
-const OPS_REQUIRING_NULL_NEW_STATE: readonly string[] = ["close"];
+export const OPS_REQUIRING_NULL_NEW_STATE: readonly string[] = ["close"];
 
 /**
  * Report whether a value is Python's `None`: JSON null or an absent key.

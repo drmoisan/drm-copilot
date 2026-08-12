@@ -14,6 +14,7 @@ param()
 . (Join-Path $PSScriptRoot 'codex-agent-profile-attestation.ps1')
 . (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1')
 $script:EpicPersonas = @('epic-planner', 'epic-orchestrator')
+$script:ParallelPersonas = @('parallel-planner', 'parallel-orchestrator')
 
 function ConvertFrom-SubagentAttestationJson {
     [CmdletBinding()]
@@ -140,6 +141,70 @@ function Test-RootEpicReceipt {
     return $expiry -gt $Now
 }
 
+function Test-RootParallelReceipt {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [AllowNull()] $Receipt,
+        [Parameter(Mandatory)] $Payload,
+        [Parameter(Mandatory)][string] $RepositoryRoot,
+        [Parameter(Mandatory)][string] $CurrentHeadSha,
+        [Parameter(Mandatory)][datetimeoffset] $Now
+    )
+
+    if ($null -eq $Receipt) {
+        return $false
+    }
+    $required = @(
+        'schema_version', 'surface', 'repository_root', 'repository_sha256',
+        'repository_head_sha', 'session_id', 'turn_id', 'prompt_sha256',
+        'requested_persona', 'entry_kind', 'parallel_reference', 'parallel_slug',
+        'parallel_identity', 'mutation_identity', 'kickoff_path', 'created_at',
+        'expires_at', 'consumed', 'consumed_by', 'consumed_at'
+    )
+    $properties = @($Receipt.PSObject.Properties.Name)
+    if (@($required | Where-Object { $properties -notcontains $_ }).Count -gt 0 -or
+        @($properties | Where-Object { $required -notcontains $_ }).Count -gt 0) {
+        return $false
+    }
+    $entry = [string]$Receipt.entry_kind
+    $personaMatches = switch ([string]$Receipt.requested_persona) {
+        'parallel-planner' { $entry -eq 'parallel-plan' }
+        'parallel-orchestrator' { $entry -in @('parallel-run', 'parallel-orchestrate') }
+        default { $false }
+    }
+    $identity = [string]$Receipt.parallel_identity
+    $expectedKickoff = if ($entry -eq 'parallel-run') {
+        "docs/features/parallel/$($Receipt.parallel_slug)/parallel-kickoff.md"
+    } else {
+        ''
+    }
+    if (-not $personaMatches -or [string]$Receipt.surface -cne 'parallel' -or
+        [int]$Receipt.schema_version -ne 1 -or [string]$Receipt.repository_root -cne
+        (Get-CodexCanonicalAuthorityPath -Path $RepositoryRoot) -or
+        [string]$Receipt.repository_sha256 -cne
+        (Get-CodexAuthorityRepositoryKey -RepositoryRoot $RepositoryRoot) -or
+        [string]$Receipt.repository_head_sha -cne $CurrentHeadSha -or
+        [string]$Receipt.session_id -cne [string]$Payload.session_id -or
+        [string]$Receipt.turn_id -cne [string]$Payload.turn_id -or
+        [string]$Receipt.requested_persona -cne [string]$Payload.agent_type -or
+        [string]::IsNullOrWhiteSpace([string]$Receipt.parallel_reference) -or
+        [string]::IsNullOrWhiteSpace([string]$Receipt.parallel_slug) -or
+        $identity -notmatch '^[0-9a-f]{64}$' -or
+        $identity -cne [string]$Receipt.mutation_identity -or
+        [string]$Receipt.kickoff_path -cne $expectedKickoff -or
+        $Receipt.consumed -isnot [bool] -or [bool]$Receipt.consumed -or
+        $null -ne $Receipt.consumed_by -or $null -ne $Receipt.consumed_at) {
+        return $false
+    }
+    $created = [datetimeoffset]::MinValue
+    $expiry = [datetimeoffset]::MinValue
+    return [datetimeoffset]::TryParse([string]$Receipt.created_at, [ref]$created) -and
+    [datetimeoffset]::TryParse([string]$Receipt.expires_at, [ref]$expiry) -and
+    $created -le $Now.AddMinutes(1) -and $expiry -gt $Now -and
+    $expiry -gt $created -and $expiry -le $created.AddMinutes(60)
+}
+
 function Get-CodexSubagentAttestation {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -159,8 +224,16 @@ function Get-CodexSubagentAttestation {
         throw 'MODEL_ROUTING_ATTESTATION_BLOCKED: SubagentStart requires agent_id, agent_type, and model.'
     }
     $isEpic = $script:EpicPersonas -contains $agentType
+    $isParallel = $script:ParallelPersonas -contains $agentType
     $rootAuthorized = if ($isEpic) {
         Test-RootEpicReceipt `
+            -Receipt $RootReceipt `
+            -Payload $Payload `
+            -RepositoryRoot $RepositoryRoot `
+            -CurrentHeadSha $CurrentHeadSha `
+            -Now $Now
+    } elseif ($isParallel) {
+        Test-RootParallelReceipt `
             -Receipt $RootReceipt `
             -Payload $Payload `
             -RepositoryRoot $RepositoryRoot `
@@ -176,7 +249,7 @@ function Get-CodexSubagentAttestation {
     $agentProfile = $null
     $profileValidationError = $null
     $routingValid = $true
-    if ($isEpic) {
+    if ($isEpic -or $isParallel) {
         $expectedModel = 'gpt-5.6-sol'
         $expectedReasoningEffort = 'ultra'
     } elseif (Test-CodexRoutedAgentType -AgentType $agentType) {
@@ -192,7 +265,7 @@ function Get-CodexSubagentAttestation {
             }
         }
     }
-    if ($isEpic -or (Test-CodexRoutedAgentType -AgentType $agentType)) {
+    if ($isEpic -or $isParallel -or (Test-CodexRoutedAgentType -AgentType $agentType)) {
         try {
             $agentProfile = Get-CodexAgentProfileAttestation `
                 -RepositoryRoot $RepositoryRoot `
@@ -211,13 +284,14 @@ function Get-CodexSubagentAttestation {
     $launchAuthorityValid = Test-CodexEpicChildRoutingLaunchAuthority -RoutingReceipt $routingReceipt -Payload $Payload -RepositoryRoot $RepositoryRoot
     $routingValid = $routingValid -and $launchAuthorityValid
 
-    $provenanceValid = -not $isEpic -or [bool]$rootAuthorized
+    $provenanceValid = -not ($isEpic -or $isParallel) -or [bool]$rootAuthorized
     return [ordered]@{
         schema_version              = 2
         session_id                  = [string]$Payload.session_id
         turn_id                     = [string]$Payload.turn_id
         agent_id                    = $agentId
         agent_type                  = $agentType
+        surface                     = if ($isParallel) { 'parallel' } else { 'epic' }
         transcript_path             = [string]$Payload.transcript_path
         attestation_key             = Get-SubagentAttestationKey -TranscriptPath ([string]$Payload.transcript_path) -AgentId $agentId
         actual_model                = $model
@@ -230,14 +304,18 @@ function Get-CodexSubagentAttestation {
         profile_sha256              = if ($null -ne $agentProfile) { [string]$agentProfile.profile_sha256 } else { $null }
         profile_validation_error    = $profileValidationError
         routing_valid               = $routingValid
+        fallback_used               = if ($isParallel) { -not $routingValid } else { $false }
         launch_authority_valid      = $launchAuthorityValid
         root_authorized             = $rootAuthorized
         root_entry_kind             = if ($rootAuthorized) { [string]$RootReceipt.entry_kind } else { $null }
-        root_epic_reference         = if ($rootAuthorized) { [string]$RootReceipt.epic_reference } else { $null }
+        root_epic_reference         = if ($isEpic -and $rootAuthorized) { [string]$RootReceipt.epic_reference } else { $null }
+        root_parallel_reference     = if ($isParallel -and $rootAuthorized) { [string]$RootReceipt.parallel_reference } else { $null }
+        parallel_identity           = if ($isParallel -and $rootAuthorized) { [string]$RootReceipt.parallel_identity } else { $null }
+        mutation_identity           = if ($isParallel -and $rootAuthorized) { [string]$RootReceipt.mutation_identity } else { $null }
         root_kickoff_path           = if ($rootAuthorized) { [string]$RootReceipt.kickoff_path } else { $null }
         authority_repository_sha256 = Get-CodexAuthorityRepositoryKey -RepositoryRoot $RepositoryRoot
         provenance_valid            = $provenanceValid
-        enforcement_marker          = if ($provenanceValid) { $null } else { 'EPIC_INVOCATION_ORIGIN_BLOCKED' }
+        enforcement_marker          = if ($provenanceValid) { $null } elseif ($isParallel) { 'PARALLEL_INVOCATION_ORIGIN_BLOCKED' } else { 'EPIC_INVOCATION_ORIGIN_BLOCKED' }
         recorded_at                 = $Now.ToUniversalTime().ToString('o')
     }
 }
@@ -251,12 +329,14 @@ function Write-CodexSubagentAttestation {
 
     $directory = Get-CodexAuthorityStateRoot `
         -RepositoryRoot $RepositoryRoot `
-        -SessionId ([string]$Attestation.session_id)
+        -SessionId ([string]$Attestation.session_id) `
+        -Surface $(if ([string]$Attestation.surface -eq 'parallel') { 'parallel' } else { 'epic' })
     [System.IO.Directory]::CreateDirectory($directory) | Out-Null
     $path = Get-CodexAuthorityAttestationPath `
         -RepositoryRoot $RepositoryRoot `
         -SessionId ([string]$Attestation.session_id) `
-        -AttestationKey ([string]$Attestation.attestation_key)
+        -AttestationKey ([string]$Attestation.attestation_key) `
+        -Surface $(if ([string]$Attestation.surface -eq 'parallel') { 'parallel' } else { 'epic' })
     $stream = [System.IO.File]::Open(
         $path,
         [System.IO.FileMode]::CreateNew,
@@ -291,8 +371,8 @@ function Get-CodexSubagentAttestationFromAuthority {
         [Parameter(Mandatory)][datetimeoffset] $Now
     )
 
-    $isEpic = $script:EpicPersonas -contains [string]$Payload.agent_type
-    if (-not $isEpic -or -not (Test-Path -LiteralPath $ReceiptPath -PathType Leaf)) {
+    $requiresRootReceipt = ([string]$Payload.agent_type -in ($script:EpicPersonas + $script:ParallelPersonas))
+    if (-not $requiresRootReceipt -or -not (Test-Path -LiteralPath $ReceiptPath -PathType Leaf)) {
         return Get-CodexSubagentAttestation `
             -Payload $Payload `
             -RootReceipt $null `
@@ -363,12 +443,14 @@ try {
     $payload = ConvertFrom-SubagentAttestationJson -Raw ([Console]::In.ReadToEnd()) -Name 'SubagentStart input'
     $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     $stateRoot = Join-Path $repositoryRoot 'artifacts/orchestration'
+    $surface = if ([string]$payload.agent_type -in $script:ParallelPersonas) { 'parallel' } else { 'epic' }
     $receiptPath = Get-CodexAuthorityReceiptPath `
         -RepositoryRoot $repositoryRoot `
         -SessionId ([string]$payload.session_id) `
-        -TurnId ([string]$payload.turn_id)
+        -TurnId ([string]$payload.turn_id) `
+        -Surface $surface
     $checkpoints = @()
-    foreach ($name in @('epic-planner-state.json', 'epic-orchestrator-state.json', 'orchestrator-state.json')) {
+    foreach ($name in @('epic-planner-state.json', 'epic-orchestrator-state.json', 'parallel-planner-state.json', 'parallel-orchestrator-state.json', 'orchestrator-state.json')) {
         $path = Join-Path $stateRoot $name
         if (Test-Path -LiteralPath $path -PathType Leaf) {
             $parsed = ConvertFrom-SubagentAttestationJson -Raw (Get-Content -Raw -LiteralPath $path) -Name $name -Optional
@@ -380,7 +462,7 @@ try {
     $now = [datetimeoffset]::UtcNow
     $headSha = [string](& git -C $repositoryRoot rev-parse HEAD 2>$null)
     if ($LASTEXITCODE -ne 0 -or $headSha -notmatch '^[0-9a-fA-F]{40,64}$') {
-        throw 'EPIC_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved.'
+        throw "$(if ($surface -eq 'parallel') { 'PARALLEL' } else { 'EPIC' })_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved."
     }
     $attestation = Get-CodexSubagentAttestationFromAuthority `
         -Payload $payload `
@@ -391,11 +473,12 @@ try {
         -Now $now
     $attestationPath = Write-CodexSubagentAttestation -RepositoryRoot $repositoryRoot -Attestation $attestation
     if (-not $attestation.provenance_valid) {
+        $marker = [string]$attestation.enforcement_marker
         [ordered]@{
-            systemMessage      = "EPIC_INVOCATION_ORIGIN_BLOCKED: $($payload.agent_type) requires a fresh root-session epic invocation receipt."
+            systemMessage      = "$marker`: $($payload.agent_type) requires a fresh root-session $surface invocation receipt."
             hookSpecificOutput = [ordered]@{
                 hookEventName     = 'SubagentStart'
-                additionalContext = 'Do not mutate state. Report EPIC_INVOCATION_ORIGIN_BLOCKED and stop.'
+                additionalContext = "Do not mutate state. Report $marker and stop."
             }
         } | ConvertTo-Json -Compress -Depth 5 | Write-Output
     } elseif (-not $attestation.routing_valid) {

@@ -55,6 +55,10 @@ param()
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
 $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
 . $script:CompletionHelpersPath
+. (Join-Path $PSScriptRoot 'validate-parallel-agent-output.ps1')
+
+$script:ParallelOrchestratorCheckpointPath =
+'artifacts/orchestration/parallel-orchestrator-state.json'
 
 function ConvertFrom-CheckpointJson {
     <#
@@ -102,6 +106,14 @@ function Test-IsCheckpointPath {
     )
 
     return $NormalizedPath -match '(^|/)artifacts/orchestration/orchestrator-state\.json$'
+}
+
+function Test-IsParallelCheckpointPath {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][string] $NormalizedPath)
+
+    return $NormalizedPath -match '(^|/)artifacts/orchestration/parallel-orchestrator-state\.json$'
 }
 
 function Get-CheckpointStringValue {
@@ -289,7 +301,10 @@ function Resolve-EditedCheckpointContent {
         $ToolInput,
 
         [Parameter(Mandatory)]
-        [scriptblock] $CheckpointReader
+        [scriptblock] $CheckpointReader,
+
+        [Parameter()]
+        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
     )
 
     $oldString = $null
@@ -305,7 +320,7 @@ function Resolve-EditedCheckpointContent {
         $newString = [string]$ToolInput.new_string
     }
 
-    $onDisk = & $CheckpointReader 'artifacts/orchestration/orchestrator-state.json'
+    $onDisk = & $CheckpointReader $CheckpointPath
     if ([string]::IsNullOrEmpty([string]$onDisk)) {
         # The on-disk checkpoint does not exist (or is empty); cannot patch.
         return $null
@@ -339,7 +354,19 @@ function Invoke-CompletionConsistencyDecision {
         [scriptblock] $CheckpointReader = { param($Path) Get-CheckpointFileContent -Path $Path },
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $RoutingMatrixReader
+        [scriptblock] $RoutingMatrixReader,
+
+        [Parameter(Mandatory = $false)]
+        [string] $WorkspaceRoot = '.',
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $ParallelCompletionValidator = {
+            param($CheckpointContent, $RepositoryRoot)
+            $null = $CheckpointContent
+            Invoke-CodexParallelAgentOutputSharedValidator `
+                -AgentType parallel-orchestrator `
+                -WorkspaceRoot $RepositoryRoot
+        }
     )
 
     if (-not $ToolInputRaw) {
@@ -359,7 +386,9 @@ function Invoke-CompletionConsistencyDecision {
     }
 
     $normalized = $filePath -replace '\\', '/'
-    if (-not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
+    $isParallelCheckpoint = Test-IsParallelCheckpointPath -NormalizedPath $normalized
+    if (-not $isParallelCheckpoint -and
+        -not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
@@ -368,7 +397,15 @@ function Invoke-CompletionConsistencyDecision {
     # apply the old_string -> new_string patch in memory (read-then-validate).
     $content = $toolInput.content
     if (-not $content) {
-        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
+        $checkpointPath = if ($isParallelCheckpoint) {
+            $script:ParallelOrchestratorCheckpointPath
+        } else {
+            'artifacts/orchestration/orchestrator-state.json'
+        }
+        $content = Resolve-EditedCheckpointContent `
+            -ToolInput $toolInput `
+            -CheckpointReader $CheckpointReader `
+            -CheckpointPath $checkpointPath
         if (-not $content) {
             return [ordered]@{ hookSpecificOutput = [ordered]@{
                     hookEventName = 'PreToolUse'; permissionDecision = 'deny'
@@ -384,6 +421,23 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{
                 hookEventName = 'PreToolUse'; permissionDecision = 'deny'
                 permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint must remain valid JSON.'
+            } }
+    }
+
+    if ($isParallelCheckpoint) {
+        if ((Get-CheckpointStringValue -Payload $payload -Name 'next_step') -ne 'complete') {
+            return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+        }
+        $parallelErrors = @(& $ParallelCompletionValidator $content $WorkspaceRoot) |
+            ForEach-Object { ([string]$_).Trim() } |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        if ($parallelErrors.Count -eq 0) {
+            return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+        }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = "PARALLEL_COMPLETION_BLOCKED: $($parallelErrors -join '; ')"
             } }
     }
 
@@ -423,9 +477,12 @@ try {
     $mappedInputs = @(
         ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath
     )
+    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     foreach ($toolInput in $mappedInputs) {
         $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
-        $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $toolInputRaw
+        $decision = Invoke-CompletionConsistencyDecision `
+            -ToolInputRaw $toolInputRaw `
+            -WorkspaceRoot $repositoryRoot
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
             $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
             exit 0

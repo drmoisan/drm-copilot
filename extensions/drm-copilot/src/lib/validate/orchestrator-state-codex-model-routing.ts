@@ -1,12 +1,14 @@
-/** Deterministic Codex deployment resolution and checkpoint receipt validation. */
-
 export const CODEX_MODEL_ROUTING_RECEIPTS_KEY = "codex_model_routing_receipts";
 
 export const BAND_ORDER = ["C1", "C2", "C3", "C4"] as const;
 
 export type ComplexityBand = (typeof BAND_ORDER)[number];
 export type ExecutionContext =
-  "standalone" | "epic_preparation_child" | "epic_execution_child";
+  | "standalone"
+  | "epic_preparation_child"
+  | "epic_execution_child"
+  | "parallel_planning"
+  | "parallel_execution";
 export type ModelReasoningEffort = "low" | "medium" | "high" | "max" | "ultra";
 
 export interface CodexDeploymentReceipt {
@@ -31,6 +33,8 @@ const VALID_EXECUTION_CONTEXTS: ReadonlySet<string> = new Set([
   "standalone",
   "epic_preparation_child",
   "epic_execution_child",
+  "parallel_planning",
+  "parallel_execution",
 ]);
 const EPIC_EXECUTION_CONTEXTS: ReadonlySet<string> = new Set([
   "epic_preparation_child",
@@ -48,6 +52,7 @@ const GENERATED_AGENT_FAMILIES: ReadonlySet<string> = new Set([
   "powershell-typed-engineer",
   "csharp-typed-engineer",
   "typescript-engineer",
+  "commit-steward",
 ]);
 export const LOGICAL_AGENT_ALIASES: Readonly<Record<string, string>> = {
   "feature-review": "feature-reviewer",
@@ -80,23 +85,24 @@ const C3_ELEVATED_PROFILE: DeploymentProfile = {
   model: "gpt-5.6-sol",
   model_reasoning_effort: "high",
 };
-const FORCED_PERSONA_PROFILES: Readonly<Record<string, DeploymentProfile>> = {
-  "epic-planner": {
-    suffix: "",
-    model: "gpt-5.6-sol",
-    model_reasoning_effort: "ultra",
-  },
-  "epic-orchestrator": {
-    suffix: "",
-    model: "gpt-5.6-sol",
-    model_reasoning_effort: "ultra",
-  },
+const FORCED_PERSONA_PROFILE: DeploymentProfile = {
+  suffix: "",
+  model: "gpt-5.6-sol",
+  model_reasoning_effort: "ultra",
 };
+const FORCED_PERSONA_PROFILES: Readonly<Record<string, DeploymentProfile>> = {
+  "epic-planner": FORCED_PERSONA_PROFILE,
+  "epic-orchestrator": FORCED_PERSONA_PROFILE,
+  "parallel-planner": FORCED_PERSONA_PROFILE,
+  "parallel-orchestrator": FORCED_PERSONA_PROFILE,
+};
+export const PARALLEL_ROOT_CONTEXT_PERSONAS: Readonly<Record<string, string>> =
+  {
+    parallel_planning: "parallel-planner",
+    parallel_execution: "parallel-orchestrator",
+  };
 
-const REQUIRED_KEYS = [
-  "logical_agent",
-  "deployment_agent",
-  "phase",
+const ROUTING_KEYS = [
   "complexity_band",
   "execution_context",
   "orchestration_complexity_ceiling",
@@ -105,19 +111,18 @@ const REQUIRED_KEYS = [
   "model",
   "model_reasoning_effort",
 ] as const;
+const REQUIRED_KEYS = [
+  "logical_agent",
+  "deployment_agent",
+  "phase",
+  ...ROUTING_KEYS,
+] as const;
 const RESOLVED_KEYS: ReadonlyArray<keyof CodexDeploymentReceipt> = [
   "logical_agent",
   "deployment_agent",
-  "complexity_band",
-  "execution_context",
-  "orchestration_complexity_ceiling",
-  "c3_overlay_applied",
-  "c3_overlay_reason",
-  "model",
-  "model_reasoning_effort",
+  ...ROUTING_KEYS,
 ];
 
-/** Error raised when the exact routed model is unavailable. */
 export class ModelUnavailableError extends Error {
   public constructor(message: string) {
     super(message);
@@ -129,7 +134,6 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** Format JSON-compatible values like Python repr for parity errors. */
 function pythonRepr(value: unknown): string {
   if (value === undefined || value === null) {
     return "None";
@@ -153,10 +157,9 @@ function pythonRepr(value: unknown): string {
     return `[${value.map(pythonRepr).join(", ")}]`;
   }
   if (isObject(value)) {
-    const entries = Object.entries(value).map(
-      ([key, item]) => `${pythonRepr(key)}: ${pythonRepr(item)}`,
-    );
-    return `{${entries.join(", ")}}`;
+    return `{${Object.entries(value)
+      .map(([key, item]) => `${pythonRepr(key)}: ${pythonRepr(item)}`)
+      .join(", ")}}`;
   }
   return String(value);
 }
@@ -195,16 +198,13 @@ function selectC3OverlayReason(
   if (epicContext && c4Ceiling) {
     return "epic_context_and_c4_ceiling";
   }
-  if (epicContext) {
-    return "epic_context";
-  }
-  if (c4Ceiling) {
-    return "c4_orchestration_ceiling";
-  }
-  return null;
+  return epicContext
+    ? "epic_context"
+    : c4Ceiling
+      ? "c4_orchestration_ceiling"
+      : null;
 }
 
-/** Resolve the exact Codex deployment profile for a logical agent delegation. */
 export function resolveCodexDeployment(
   logicalAgent: string,
   complexityBand: string,
@@ -222,6 +222,23 @@ export function resolveCodexDeployment(
     throw new Error(
       "orchestration_complexity_ceiling must be greater than or equal to " +
         `complexity_band, found ${ceiling} below ${band}.`,
+    );
+  }
+
+  const parallelPersona = PARALLEL_ROOT_CONTEXT_PERSONAS[context];
+  if (parallelPersona !== undefined && logicalAgent !== parallelPersona) {
+    throw new Error(
+      `Parallel context ${pythonRepr(context)} requires its forced root ` +
+        `persona ${pythonRepr(parallelPersona)}.`,
+    );
+  }
+  const parallelContext = Object.entries(PARALLEL_ROOT_CONTEXT_PERSONAS).find(
+    ([, persona]) => persona === logicalAgent,
+  )?.[0];
+  if (parallelContext !== undefined && context !== parallelContext) {
+    throw new Error(
+      `Parallel persona ${pythonRepr(logicalAgent)} requires ` +
+        `${pythonRepr(parallelContext)} context.`,
     );
   }
 
@@ -372,7 +389,6 @@ function validateReceipt(
   return { errors, resolvedCeiling: currentCeiling };
 }
 
-/** Validate one Codex receipt against the canonical deployment resolver. */
 export function validateCodexModelRoutingReceipt(
   value: unknown,
   prefix = `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY}[0]`,
@@ -380,7 +396,6 @@ export function validateCodexModelRoutingReceipt(
   return validateReceipt(value, prefix).errors;
 }
 
-/** Validate every present receipt in the checkpoint list. */
 export function validateCodexModelRoutingReceipts(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [
@@ -422,7 +437,6 @@ function delegatedAgentNames(state: Record<string, unknown>): Set<string> {
   return result;
 }
 
-/** Require a valid logical or deployment receipt for every delegation. */
 export function validateCodexModelRoutingGate(
   state: Record<string, unknown>,
 ): string[] {
@@ -464,7 +478,6 @@ export function validateCodexModelRoutingGate(
   return errors;
 }
 
-/** Apply always-on present-receipt validation and the optional delegation gate. */
 export function validateCodexModelRoutingState(
   state: Record<string, unknown>,
   requireGate = false,

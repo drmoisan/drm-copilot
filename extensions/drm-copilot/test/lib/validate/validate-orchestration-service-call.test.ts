@@ -1,6 +1,8 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
 import type { FileSystem } from "../../../src/lib/file-system";
+import type { CommandRunner } from "../../../src/lib/subprocess-runner";
+import * as orchestrationArtifacts from "../../../src/lib/validate/orchestration-artifacts";
 import { validateOrchestrationServiceCall } from "../../../src/lib/validate/validate-orchestration-service-call";
 
 const VALID_PLAN = [
@@ -122,6 +124,57 @@ describe("validateOrchestrationServiceCall", () => {
       }),
     ).toThrow(
       "Execution-ready planner checkpoint next_step must be 'EPIC_EXECUTION_READY'.",
+    );
+  });
+
+  it("passes the file-backed context for parallel planner readiness", () => {
+    const statePath =
+      "C:/workspace/artifacts/orchestration/parallel-planner-state.json";
+    const fileSystem = new VirtualFileSystem({ [statePath]: "{}" });
+    const runner: CommandRunner = {
+      run: jest.fn(() => ({ stdout: "", stderr: "", code: 0 })),
+    };
+    const dispatch = jest
+      .spyOn(orchestrationArtifacts, "validateArtifact")
+      .mockReturnValueOnce([]);
+
+    const result = validateOrchestrationServiceCall({
+      fileSystem,
+      runner,
+      workspaceRoot: "C:/workspace",
+      artifactType: "parallel-planner-state",
+      artifactPath: "artifacts/orchestration/parallel-planner-state.json",
+      requireReadyForExecution: true,
+    });
+
+    expect(result.summary).toContain("parallel-planner-state");
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        artifactPath: statePath,
+        fs: fileSystem,
+        root: "C:/workspace",
+        runner,
+        requireReadyForExecution: true,
+      }),
+    );
+    dispatch.mockRestore();
+  });
+
+  it("fails closed when parallel readiness lacks the Git evidence seam", () => {
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/artifacts/orchestration/parallel-planner-state.json": "{}",
+    });
+
+    expect(() =>
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "C:/workspace",
+        artifactType: "parallel-planner-state",
+        artifactPath: "artifacts/orchestration/parallel-planner-state.json",
+        requireReadyForExecution: true,
+      }),
+    ).toThrow(
+      "Parallel Codex readiness evidence context requires filesystem, workspace root, artifact path, and Git runner.",
     );
   });
 

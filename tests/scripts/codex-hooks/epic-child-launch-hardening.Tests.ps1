@@ -276,10 +276,15 @@ Describe 'Codex epic-child launcher hardening' {
 
     It 'uses CreateNew receipts, an exclusive wave lock, and the checked-in resume wrapper' {
         $launcher = Get-Content -Raw (Join-Path $script:RepoRoot '.codex/scripts/launch-epic-child-wave.ps1')
+        $resume = Get-Content -Raw (Join-Path $script:RepoRoot '.codex/scripts/resume-epic-child.ps1')
         $persistence = Get-Content -Raw (Join-Path $script:RepoRoot '.codex/scripts/epic-child-persistence-runtime.ps1')
         $manifest = Get-Content -Raw (Join-Path $script:RepoRoot `
                 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json')
 
+        ([scriptblock]::Create($launcher).Ast.ParamBlock.Parameters.Name.VariablePath.UserPath -join ',') |
+            Should -BeExactly 'LaunchSpecPath,MaxParallel,Supervisor,Wait,RepositoryRoot'
+        ([scriptblock]::Create($resume).Ast.ParamBlock.Parameters.Name.VariablePath.UserPath -join ',') |
+            Should -BeExactly 'ReceiptPath,Prompt,LastMessagePath'
         $persistence | Should -Match 'FileMode\]::CreateNew'
         $persistence | Should -Match 'FileShare\]::None'
         $launcher | Should -Match 'resume-epic-child\.ps1'

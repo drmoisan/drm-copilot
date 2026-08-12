@@ -136,6 +136,41 @@ describe("resolveCodexTopology", () => {
     },
   );
 
+  it.each([
+    ["parallel_planning", "parallel-planner"],
+    ["parallel_execution", "parallel-orchestrator"],
+  ] as const)("forces %s to the %s root persona", (context, persona) => {
+    expect(
+      resolveCodexTopology([], 0, 0, context, {
+        rootPersona: persona,
+      }),
+    ).toMatchObject({
+      execution_context: context,
+      route: "parallel",
+      topology: "parallel_persona",
+      logical_agent: persona,
+      root_persona: persona,
+      routing_reason: "forced_root_persona",
+    });
+  });
+
+  it.each([
+    ["parallel_planning", null],
+    ["parallel_planning", "orchestrator"],
+    ["parallel_planning", "epic-planner"],
+    ["parallel_execution", null],
+    ["parallel_execution", "orchestrator"],
+    ["parallel_execution", "epic-orchestrator"],
+    ["parallel_planning", "parallel-orchestrator"],
+    ["parallel_execution", "parallel-planner"],
+  ] as const)("rejects %s with root persona %s", (context, persona) => {
+    expect(() =>
+      resolveCodexTopology([], 0, 0, context, {
+        rootPersona: persona,
+      }),
+    ).toThrow("requires its forced root persona");
+  });
+
   it("normalizes and deduplicates languages", () => {
     expect(
       resolveCodexTopology([" Python ", "PYTHON"], 1, 0, "standalone"),

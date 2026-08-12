@@ -63,3 +63,12 @@ def test_agent_families_and_contexts_match_routing_config() -> None:
     assert set(policy["generated_agent_families"]) == GENERATED_AGENT_FAMILIES
     assert set(policy["execution_contexts"]) == VALID_EXECUTION_CONTEXTS
     assert policy["logical_agent_aliases"] == LOGICAL_AGENT_ALIASES
+
+
+def test_commit_steward_is_a_canonical_generated_family() -> None:
+    """Require commit stewardship in both model-policy family authorities."""
+
+    policy = _load_policy()
+
+    assert "commit-steward" in GENERATED_AGENT_FAMILIES
+    assert "commit-steward" in policy["generated_agent_families"]

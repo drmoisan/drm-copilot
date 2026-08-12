@@ -3,9 +3,10 @@
     Resolves the non-workspace authority store used by Codex provenance hooks.
 
 .DESCRIPTION
-    Epic-entry receipts and routed-subagent attestations must not be writable by
-    workspace-scoped agents. These helpers derive a repository- and session-bound
-    directory under CODEX_HOME and exact receipt/attestation paths within it.
+    Root-entry receipts and routed-subagent attestations must not be writable by
+    workspace-scoped agents. These helpers derive surface-, repository-, and
+    session-bound directories under CODEX_HOME and exact receipt/attestation
+    paths within them.
 #>
 [CmdletBinding()]
 param()
@@ -133,13 +134,14 @@ function Get-CodexAuthorityStateRoot {
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][string] $RepositoryRoot,
-        [Parameter(Mandatory)][string] $SessionId
+        [Parameter(Mandatory)][string] $SessionId,
+        [Parameter()][ValidateSet('epic', 'parallel')][string] $Surface = 'epic'
     )
 
     $repositoryKey = Get-CodexAuthorityRepositoryKey -RepositoryRoot $RepositoryRoot
     $safeSession = ConvertTo-CodexAuthorityPathSegment -Value $SessionId
     $stateRoot = Join-Path (
-        Join-Path (Join-Path (Get-CodexAuthorityHome) 'authority/epic-entry') $repositoryKey
+        Join-Path (Join-Path (Get-CodexAuthorityHome) "authority/$Surface-entry") $repositoryKey
     ) $safeSession
     Assert-CodexAuthorityOutsideRepository -AuthorityPath $stateRoot -RepositoryRoot $RepositoryRoot
     return $stateRoot
@@ -151,14 +153,16 @@ function Get-CodexAuthorityReceiptPath {
     param(
         [Parameter(Mandatory)][string] $RepositoryRoot,
         [Parameter(Mandatory)][string] $SessionId,
-        [Parameter(Mandatory)][string] $TurnId
+        [Parameter(Mandatory)][string] $TurnId,
+        [Parameter()][ValidateSet('epic', 'parallel')][string] $Surface = 'epic'
     )
 
     $stateRoot = Get-CodexAuthorityStateRoot `
         -RepositoryRoot $RepositoryRoot `
-        -SessionId $SessionId
+        -SessionId $SessionId `
+        -Surface $Surface
     $safeTurn = ConvertTo-CodexAuthorityPathSegment -Value $TurnId
-    return Join-Path $stateRoot "epic-root-invocation.$safeTurn.json"
+    return Join-Path $stateRoot "$Surface-root-invocation.$safeTurn.json"
 }
 
 function Get-CodexAuthorityAttestationPath {
@@ -167,12 +171,14 @@ function Get-CodexAuthorityAttestationPath {
     param(
         [Parameter(Mandatory)][string] $RepositoryRoot,
         [Parameter(Mandatory)][string] $SessionId,
-        [Parameter(Mandatory)][string] $AttestationKey
+        [Parameter(Mandatory)][string] $AttestationKey,
+        [Parameter()][ValidateSet('epic', 'parallel')][string] $Surface = 'epic'
     )
 
     $stateRoot = Get-CodexAuthorityStateRoot `
         -RepositoryRoot $RepositoryRoot `
-        -SessionId $SessionId
+        -SessionId $SessionId `
+        -Surface $Surface
     $safeKey = ConvertTo-CodexAuthorityPathSegment -Value $AttestationKey
     return Join-Path $stateRoot "codex-routing-attestation.$safeKey.json"
 }

@@ -132,6 +132,36 @@ def test_generated_deployment_name_satisfies_topology_gate() -> None:
     assert _validate(state) == []
 
 
+def test_commit_steward_checkpoint_satisfies_strict_model_and_topology_gates() -> None:
+    """Validate generated stewardship beside its implementation topology."""
+
+    python_model = _model_receipt()
+    commit_model: dict[str, object] = dict(
+        resolve_codex_deployment("commit-steward", "C4", "standalone", "C4")
+    )
+    commit_model["phase"] = "S6_commit_steward"
+    commit_model["ceiling_transition"] = {
+        "from": "C3",
+        "to": "C4",
+        "affected_delegation_ids": ["agent-1"],
+    }
+    state = _base_state(agent_name=None)
+    state["delegation_receipts"] = [
+        _delegation_receipt("python-typed-engineer"),
+        _delegation_receipt("commit-steward-c4"),
+    ]
+    state["codex_model_routing_receipts"] = [python_model, commit_model]
+    state["codex_topology_receipts"] = [_topology_receipt()]
+
+    errors = validate_orchestrator_state_text(
+        json.dumps(state),
+        require_codex_model_routing=True,
+        require_codex_topology=True,
+    )
+
+    assert errors == []
+
+
 def test_invalid_model_receipt_does_not_authorize_variant_name() -> None:
     """Do not trust an unvalidated deployment mapping during topology checks."""
 

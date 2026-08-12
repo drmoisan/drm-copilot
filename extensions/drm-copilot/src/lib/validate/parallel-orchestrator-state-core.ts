@@ -33,7 +33,15 @@
  *     None; pure text-in, errors-out validation.
  */
 
-import { validateCohortBarrierOrdering } from "./parallel-orchestrator-state-cohort-barrier";
+import {
+  type ParallelCodexReadinessEvidence,
+  validateParallelCodexCheckpointReadiness,
+  validateParallelStateIsStandalone,
+} from "./parallel-codex-readiness";
+import { validateCompletionReceipts } from "./parallel-orchestrator-state-completion-receipts";
+import { validateMutationProtocol } from "./parallel-orchestrator-state-mutations";
+import { validateReceiptBoundCohortAdmission } from "./parallel-orchestrator-state-receipt-cohort";
+import { validateParallelResumeTruth } from "./parallel-orchestrator-state-resume-truth";
 import {
   MERGED_MERGE_STATUSES,
   VALID_MODES,
@@ -98,6 +106,8 @@ export const REQUIRED_KEYS: readonly string[] = [
 export interface ValidateParallelOrchestratorStateOptions {
   /** When true, enforce the mode-dependent completion gate (invariants 20-21). */
   readonly requireComplete?: boolean;
+  /** External Codex evidence required only by the explicit completion gate. */
+  readonly readinessContext?: ParallelCodexReadinessEvidence;
 }
 
 /**
@@ -303,7 +313,12 @@ export function validateParallelOrchestratorStateText(
   errors.push(...missingRequiredKeys(state));
   errors.push(...validateIdentity(state));
   errors.push(...scanProhibitedKeys(state, CONTEXT));
+  errors.push(...validateParallelStateIsStandalone(state, CONTEXT));
   errors.push(...validateCollections(state));
+
+  // F6 mutation composition seam: the base collection validator owns record
+  // shape, while this additive helper owns cross-record protocol semantics.
+  errors.push(...validateMutationProtocol(state, CONTEXT));
 
   // BEGIN F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
   // F7 (parallel enforcement hooks) owns the retrospective cohort-ordering
@@ -312,11 +327,20 @@ export function validateParallelOrchestratorStateText(
   // block, plus the helper's import. Nothing else in this function moves, so F7
   // and F3 cannot contend over the same lines (epic wave-4 rule).
   // Add F7 helper invocations below this line, one per line.
-  errors.push(...validateCohortBarrierOrdering(state));
+  errors.push(...validateReceiptBoundCohortAdmission(state, CONTEXT));
+  errors.push(...validateParallelResumeTruth(state, CONTEXT));
   // END F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
 
   if (options.requireComplete === true) {
+    errors.push(
+      ...validateParallelCodexCheckpointReadiness(
+        state,
+        CONTEXT,
+        options.readinessContext,
+      ),
+    );
     errors.push(...validateCompletion(state));
+    errors.push(...validateCompletionReceipts(state, CONTEXT));
   }
   return errors;
 }

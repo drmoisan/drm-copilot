@@ -90,6 +90,30 @@ parse_status_for() {
     [ "$(parse_status_for "$(printf -- '---\nnot-an-entry\n---\n')")" = "yaml_error" ]
 }
 
+@test "an exotic mapping key is rejected fail-closed" {
+    [ "$(parse_status_for "$(printf -- '---\nbad.key: value\n---\n')")" = "out_of_subset" ]
+}
+
+@test "a multi-document marker is rejected fail-closed" {
+    YP_BODY_LINES=("parallel: alpha" "---")
+
+    yp_parse_body || true
+
+    [ "$YP_STATUS" = "out_of_subset" ]
+    [ "$YP_DETAIL" = "multi-document streams are outside the subset" ]
+}
+
+@test "explicit null and false scalars retain their lexical types" {
+    yp_extract_frontmatter_body "$(printf -- '---\nempty: null\ndisabled: false\n---\n')" "$CONTEXT"
+
+    yp_parse_body
+
+    [ "$(yp_type_of empty)" = "null" ]
+    [ -z "$(yp_value_of empty)" ]
+    [ "$(yp_type_of disabled)" = "bool" ]
+    [ "$(yp_value_of disabled)" = "false" ]
+}
+
 @test "a non-empty flow collection is rejected fail-closed" {
     [ "$(parse_status_for "$(printf -- '---\nitems: [1, 2]\n---\n')")" = "out_of_subset" ]
 }

@@ -66,6 +66,43 @@ REQUIRED_BUNDLED_FILES = (
     Path(".codex/prompts/generate-pr.md"),
     Path(".codex/prompts/orchestrate-work.md"),
 )
+PARALLEL_RUNTIME_CONTRACT_FILES = (
+    Path(".agents/skills/parallel-add/SKILL.md"),
+    Path(".agents/skills/parallel-close/SKILL.md"),
+    Path(".agents/skills/parallel-orchestrate/SKILL.md"),
+    Path(".agents/skills/parallel-plan/SKILL.md"),
+    Path(".agents/skills/parallel-remove/SKILL.md"),
+    Path(".agents/skills/parallel-run/SKILL.md"),
+    Path(".codex/agents/parallel-orchestrator.toml"),
+    Path(".codex/agents/parallel-planner.toml"),
+    Path(".codex/hooks/authorize-root-parallel-invocation.ps1"),
+    Path(".codex/hooks/codex-authority-store.ps1"),
+    Path(".codex/hooks/enforce-codex-model-routing.ps1"),
+    Path(".codex/hooks/enforce-completion-consistency.ps1"),
+    Path(".codex/hooks/enforce-parallel-abandon-gate.ps1"),
+    Path(".codex/hooks/enforce-parallel-child-worktree-binding.ps1"),
+    Path(".codex/hooks/enforce-parallel-cohort-barrier.ps1"),
+    Path(".codex/hooks/enforce-parallel-drift-gate.ps1"),
+    Path(".codex/hooks/enforce-parallel-root-invocation.ps1"),
+    Path(".codex/hooks/enforce-parallel-worktree-removal-gate.ps1"),
+    Path(".codex/hooks/parallel-hook-common.ps1"),
+    Path(".codex/hooks/record-subagent-routing-attestation.ps1"),
+    Path(".codex/hooks/validate-codex-subagent-routing.ps1"),
+    Path(".codex/hooks/validate-parallel-agent-output.ps1"),
+    Path(".codex/scripts/codex-child-launch-contract-core.ps1"),
+    Path(".codex/scripts/codex-child-launch-persistence.ps1"),
+    Path(".codex/scripts/codex-child-launch-resume.ps1"),
+    Path(".codex/scripts/codex-child-launch-runtime.ps1"),
+    Path(".codex/scripts/launch-parallel-child-batch.ps1"),
+    Path(".codex/scripts/parallel-child-launch-contract.ps1"),
+    Path(".codex/scripts/parallel-child-post-session.ps1"),
+    Path(".codex/scripts/resume-parallel-child.ps1"),
+    Path(".codex/config.toml"),
+)
+COMMIT_STEWARD_PROFILE_FILES = tuple(
+    Path(f".codex/agents/commit-steward{suffix}.toml")
+    for suffix in ("", "-c1", "-c2", "-c3", "-c3-elevated", "-c4")
+)
 CODEX_CONFIG_PATH = Path(".codex/config.toml")
 ORCHESTRATOR_ROLE_PATH = Path(".codex/agents/orchestrator.toml")
 EXPECTED_DRM_COPILOT_TOOLS = (
@@ -195,6 +232,49 @@ def test_bundled_codex_pack_manifests_and_variants_exist() -> None:
         assert relative_path in bundled_files
     for relative_path in REQUIRED_VARIANT_FILES:
         assert relative_path in bundled_files
+
+
+def test_parallel_runtime_contract_has_exact_root_and_bundle_membership() -> None:
+    """Require every parallel runtime contract file in source and bundle."""
+
+    root_files = frozenset(list_scoped_files(REPO_ROOT))
+    bundled_files = frozenset(list_scoped_files(BUNDLED_ROOT))
+
+    assert len(PARALLEL_RUNTIME_CONTRACT_FILES) == 31
+    assert len(set(PARALLEL_RUNTIME_CONTRACT_FILES)) == 31
+    for relative_path in PARALLEL_RUNTIME_CONTRACT_FILES:
+        assert relative_path in root_files
+        assert relative_path in bundled_files
+    assert (BUNDLED_ROOT / "AGENTS.md").read_bytes() == (
+        REPO_ROOT / "AGENTS.md"
+    ).read_bytes()
+
+
+def test_commit_steward_family_has_exact_full_tree_pairing() -> None:
+    """Require full-tree publishing to carry exactly the generated family."""
+
+    root_files = frozenset(list_scoped_files(REPO_ROOT))
+    bundled_files = frozenset(list_scoped_files(BUNDLED_ROOT))
+    root_family = {
+        path
+        for path in root_files
+        if path.parent == Path(".codex/agents")
+        and path.stem.startswith("commit-steward")
+    }
+    bundled_family = {
+        path
+        for path in bundled_files
+        if path.parent == Path(".codex/agents")
+        and path.stem.startswith("commit-steward")
+    }
+
+    assert len(COMMIT_STEWARD_PROFILE_FILES) == 6
+    assert root_family == set(COMMIT_STEWARD_PROFILE_FILES)
+    assert bundled_family == set(COMMIT_STEWARD_PROFILE_FILES)
+    for relative_path in COMMIT_STEWARD_PROFILE_FILES:
+        assert (REPO_ROOT / relative_path).read_bytes() == (
+            BUNDLED_ROOT / relative_path
+        ).read_bytes()
 
 
 def test_routing_config_remains_a_shared_resource_outside_codex_bundle() -> None:

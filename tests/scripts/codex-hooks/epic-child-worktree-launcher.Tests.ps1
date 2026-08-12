@@ -198,6 +198,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
 
             $errors | Should -BeNullOrEmpty
             $receipt.issue_num | Should -BeExactly 101
+            $receipt.codex_home_path | Should -BeExactly 'C:\isolated'
         }
 
         It 'rejects execution prompts missing required epic identity, branch, or PR-base markers' {
@@ -326,6 +327,7 @@ config = [
             $runtime = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/scripts/epic-child-launch-runtime.ps1')
             $launcher = Get-Content -Raw -LiteralPath `
             (Join-Path $script:RepoRoot '.codex/scripts/launch-epic-child-wave.ps1')
+            $sharedRuntime = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/scripts/codex-child-launch-runtime.ps1')
 
             $runtime | Should -Match 'git-common-dir'
             $runtime | Should -Match "status', '--porcelain=v1', '--untracked-files=all'"
@@ -333,7 +335,7 @@ config = [
             $runtime | Should -Match 'RepositoryRoot must be completely clean at its committed integration tip'
             ([regex]::Matches($runtime, "status', '--porcelain=v1', '--untracked-files=all'")).Count |
                 Should -BeGreaterThan 1
-            $launcher | Should -Match '--dangerously-bypass-hook-trust'
+            "$launcher`n$sharedRuntime" | Should -Match '--dangerously-bypass-hook-trust'
             Test-CodexChildCustomizationClean -StatusLines @() | Should -BeTrue
             Test-CodexChildCustomizationClean -StatusLines @(' M .codex/config.toml') | Should -BeFalse
         }

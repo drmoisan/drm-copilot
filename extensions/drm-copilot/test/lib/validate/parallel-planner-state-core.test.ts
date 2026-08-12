@@ -30,7 +30,7 @@ import {
 const CONTEXT = "Parallel planner checkpoint";
 
 /** The kickoff path invariant P9 pins for the builder's slug (assumption A6). */
-const EXPECTED_KICKOFF = "artifacts/orchestration/parallel-kickoff-wave-one.md";
+const EXPECTED_KICKOFF = "docs/features/parallel/wave-one/parallel-kickoff.md";
 
 /** Error-string prefix for the second builder item, which the gate cases mutate. */
 const ITEM1 = `${CONTEXT} items[1]`;
@@ -86,12 +86,15 @@ function validate(state: JsonRecord, ready = false): string[] {
 }
 
 describe("parallel planner checkpoint root handling", () => {
-  it.each([false, true])(
-    "returns no errors for a valid checkpoint with the gate %p",
-    (ready) => {
-      expect(validate(buildValidPlannerState(), ready)).toEqual([]);
-    },
-  );
+  it("returns no errors for a valid checkpoint with the gate false", () => {
+    expect(validate(buildValidPlannerState())).toEqual([]);
+  });
+
+  it("requires external Codex evidence with the gate true", () => {
+    expect(validate(buildValidPlannerState(), true)).toEqual([
+      `${CONTEXT} Codex readiness evidence is required.`,
+    ]);
+  });
 
   it("does not mutate its input", () => {
     const state = buildValidPlannerState();
@@ -344,6 +347,7 @@ describe("invariants P6-P9 structural readiness gate", () => {
 
     expect(validate(state, true)).toEqual([
       `${CONTEXT} requires at least 2 items for execution readiness; found: 1.`,
+      `${CONTEXT} Codex readiness evidence is required.`,
     ]);
   });
 
@@ -403,8 +407,8 @@ describe("invariants P6-P9 structural readiness gate", () => {
 
   it.each([
     [
-      "artifacts/orchestration/parallel-kickoff-other.md",
-      "'artifacts/orchestration/parallel-kickoff-other.md'",
+      "docs/features/parallel/other/parallel-kickoff.md",
+      "'docs/features/parallel/other/parallel-kickoff.md'",
     ],
     [
       "artifacts/orchestration/epic-kickoff-wave-one.md",

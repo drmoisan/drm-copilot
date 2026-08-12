@@ -1,0 +1,28 @@
+{
+  "files": [
+    {"file": "/work/.claude/lib/bash/parallel-cohorts.sh", "percent_covered": "99.25", "covered_lines": "133", "total_lines": "134"},
+    {"file": "/work/scripts/bash/cleanup_worktrees_enumerate_lib.sh", "percent_covered": "92.13", "covered_lines": "82", "total_lines": "89"},
+    {"file": "/work/.claude/lib/bash/parallel-items-validate.sh", "percent_covered": "100.00", "covered_lines": "115", "total_lines": "115"},
+    {"file": "/work/.claude/lib/bash/parallel-manifest-validate.sh", "percent_covered": "100.00", "covered_lines": "63", "total_lines": "63"},
+    {"file": "/work/.claude/lib/bash/validate-parallel-manifest.sh", "percent_covered": "93.48", "covered_lines": "43", "total_lines": "46"},
+    {"file": "/work/scripts/bash/cleanup_worktrees_lib.sh", "percent_covered": "93.26", "covered_lines": "180", "total_lines": "193"},
+    {"file": "/work/scripts/bash/coverage_lib.sh", "percent_covered": "100.00", "covered_lines": "3", "total_lines": "3"},
+    {"file": "/work/.claude/lib/bash/parallel-common.sh", "percent_covered": "96.36", "covered_lines": "53", "total_lines": "55"},
+    {"file": "/work/scripts/bash/cleanup-worktrees.sh", "percent_covered": "100.00", "covered_lines": "20", "total_lines": "20"},
+    {"file": "/work/.claude/lib/bash/compute-concurrency-batches.sh", "percent_covered": "90.91", "covered_lines": "40", "total_lines": "44"},
+    {"file": "/work/scripts/bash/shell_qc_lib.sh", "percent_covered": "86.49", "covered_lines": "160", "total_lines": "185"},
+    {"file": "/work/scripts/bash/cleanup_worktrees_actions_lib.sh", "percent_covered": "92.76", "covered_lines": "141", "total_lines": "152"},
+    {"file": "/work/.claude/lib/bash/compute-cohorts.sh", "percent_covered": "92.45", "covered_lines": "49", "total_lines": "53"},
+    {"file": "/work/scripts/bash/shell-qc.sh", "percent_covered": "88.57", "covered_lines": "31", "total_lines": "35"},
+    {"file": "/work/.claude/lib/bash/parallel-yaml-emit.sh", "percent_covered": "90.20", "covered_lines": "138", "total_lines": "153"},
+    {"file": "/work/scripts/bash/coverage_demo.sh", "percent_covered": "100.00", "covered_lines": "4", "total_lines": "4"},
+    {"file": "/work/.claude/lib/bash/parallel-yaml-scan.sh", "percent_covered": "93.16", "covered_lines": "109", "total_lines": "117"}
+  ],
+  "percent_covered": "93.36",
+  "covered_lines": 1364,
+  "total_lines": 1461,
+  "percent_low": 25,
+  "percent_high": 75,
+  "command": "",
+  "date": "2026-08-11 23:03:35"
+}

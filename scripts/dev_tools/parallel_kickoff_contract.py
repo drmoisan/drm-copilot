@@ -360,7 +360,35 @@ def parse_parallel_kickoff(text: str) -> tuple[ParsedParallelKickoff | None, lis
     )
 
 
-def validate_parallel_kickoff_text(text: str) -> list[str]:
+def _validate_ready_identity(parsed: ParsedParallelKickoff) -> list[str]:
+    """Require the version-1 committed identity for execution readiness."""
+
+    expected_manifest = f"docs/features/parallel/{parsed.slug}/parallel.md"
+    expected_branch = f"parallel/{parsed.slug}-plan"
+    errors: list[str] = []
+    if parsed.invocation_slug != parsed.slug:
+        errors.append(
+            "Parallel kickoff readiness requires heading and invocation slugs to match."
+        )
+    if parsed.manifest_path != expected_manifest:
+        errors.append(
+            f"Parallel kickoff readiness manifest must be '{expected_manifest}'."
+        )
+    if parsed.plan_home_branch != expected_branch:
+        errors.append(
+            f"Parallel kickoff readiness plan-home branch must be '{expected_branch}'."
+        )
+    if parsed.planning_commit is None:
+        errors.append(
+            "Parallel kickoff readiness requires version-1 committed "
+            "planning_commit identity."
+        )
+    return errors
+
+
+def validate_parallel_kickoff_text(
+    text: str, *, require_ready_for_execution: bool = False
+) -> list[str]:
     """Validate the standalone parallel kickoff Markdown contract.
 
     Purpose:
@@ -370,6 +398,8 @@ def validate_parallel_kickoff_text(text: str) -> list[str]:
 
     Args:
         text (str): Full kickoff document text. Not mutated.
+        require_ready_for_execution (bool): Require consistent slug, manifest,
+            plan-home branch, and committed planning identity when True.
 
     Returns:
         list[str]: One error string per structural violation; empty when the
@@ -382,5 +412,7 @@ def validate_parallel_kickoff_text(text: str) -> list[str]:
         None.
     """
 
-    _, errors = parse_parallel_kickoff(text)
-    return errors
+    parsed, errors = parse_parallel_kickoff(text)
+    if parsed is None or not require_ready_for_execution:
+        return errors
+    return [*errors, *_validate_ready_identity(parsed)]
