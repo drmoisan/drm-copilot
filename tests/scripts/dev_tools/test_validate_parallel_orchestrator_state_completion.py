@@ -409,7 +409,9 @@ def test_invariant_20_closed_mode_accepts_terminal_merge_status(
     for index in (0, 1):
         item_at(state, index)["merge_status"] = merge_status
 
-    assert validate(state, require_complete=True) == []
+    assert validate(state, require_complete=True) == [
+        "Parallel checkpoint Codex readiness evidence is required."
+    ]
 
 
 def test_invariant_20_closed_mode_rejects_a_blocked_item() -> None:
@@ -433,7 +435,9 @@ def test_invariant_20_exempts_a_withdrawn_item() -> None:
     item_at(state, 1)["state"] = "withdrawn"
     del item_at(state, 1)["merge_status"]
 
-    assert validate(state, require_complete=True) == []
+    assert validate(state, require_complete=True) == [
+        "Parallel checkpoint Codex readiness evidence is required."
+    ]
 
 
 def test_invariant_21_open_mode_requires_a_close_mutation() -> None:
@@ -443,8 +447,9 @@ def test_invariant_21_open_mode_requires_a_close_mutation() -> None:
     state["mode"] = "open"
 
     assert validate(state, require_complete=True) == [
+        "Parallel checkpoint Codex readiness evidence is required.",
         "Parallel checkpoint completion validation failed: open mode requires "
-        "a mutations[] entry with op 'close'."
+        "a mutations[] entry with op 'close'.",
     ]
 
 
@@ -455,7 +460,9 @@ def test_invariant_21_open_mode_accepts_a_recorded_close() -> None:
     state["mode"] = "open"
     state["mutations"] = [dict(CLOSE_MUTATION)]
 
-    assert validate(state, require_complete=True) == []
+    assert validate(state, require_complete=True) == [
+        "Parallel checkpoint Codex readiness evidence is required."
+    ]
 
 
 def test_invariant_21_open_mode_still_applies_the_per_item_condition() -> None:

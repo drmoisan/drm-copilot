@@ -50,6 +50,75 @@ BUNDLED_CODEX_ROOT = (
     / "codex-and-agents-customizations"
 )
 MANIFEST_DIR = BUNDLED_CODEX_ROOT / "pack-manifests"
+PORTABLE_CLAUDE_PATHS: frozenset[str] = frozenset(
+    {
+        ".claude/lib/bash/compute-cohorts.sh",
+        ".claude/lib/bash/compute-concurrency-batches.sh",
+        ".claude/lib/bash/parallel-cohorts.sh",
+        ".claude/lib/bash/parallel-common.sh",
+        ".claude/lib/bash/parallel-items-validate.sh",
+        ".claude/lib/bash/parallel-manifest-validate.sh",
+        ".claude/lib/bash/parallel-yaml-emit.sh",
+        ".claude/lib/bash/parallel-yaml-scan.sh",
+        ".claude/lib/bash/validate-parallel-manifest.sh",
+        ".claude/lib/blast-radius/BlastRadius.psm1",
+        ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+        ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+        ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+        ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+    }
+)
+COMMIT_STEWARD_PROFILE_PATHS: frozenset[str] = frozenset(
+    f".codex/agents/commit-steward{suffix}.toml"
+    for suffix in ("", "-c1", "-c2", "-c3", "-c3-elevated", "-c4")
+)
+PARALLEL_CORE_PATHS: frozenset[str] = frozenset(
+    {
+        ".agents/skills/parallel-add/SKILL.md",
+        ".agents/skills/parallel-close/SKILL.md",
+        ".agents/skills/parallel-orchestrate/SKILL.md",
+        ".agents/skills/parallel-plan/SKILL.md",
+        ".agents/skills/parallel-remove/SKILL.md",
+        ".agents/skills/parallel-run/SKILL.md",
+        ".codex/agents/parallel-orchestrator.toml",
+        ".codex/agents/parallel-planner.toml",
+        ".codex/hooks/authorize-root-parallel-invocation.ps1",
+        ".codex/hooks/codex-authority-store.ps1",
+        ".codex/hooks/enforce-codex-model-routing.ps1",
+        ".codex/hooks/enforce-completion-consistency.ps1",
+        ".codex/hooks/enforce-parallel-abandon-gate.ps1",
+        ".codex/hooks/enforce-parallel-child-worktree-binding.ps1",
+        ".codex/hooks/enforce-parallel-cohort-barrier.ps1",
+        ".codex/hooks/enforce-parallel-drift-gate.ps1",
+        ".codex/hooks/enforce-parallel-root-invocation.ps1",
+        ".codex/hooks/enforce-parallel-worktree-removal-gate.ps1",
+        ".codex/hooks/parallel-hook-common.ps1",
+        ".codex/hooks/record-subagent-routing-attestation.ps1",
+        ".codex/hooks/validate-codex-subagent-routing.ps1",
+        ".codex/hooks/validate-parallel-agent-output.ps1",
+        ".codex/scripts/codex-child-launch-contract-core.ps1",
+        ".codex/scripts/codex-child-launch-persistence.ps1",
+        ".codex/scripts/codex-child-launch-resume.ps1",
+        ".codex/scripts/codex-child-launch-runtime.ps1",
+        ".codex/scripts/launch-parallel-child-batch.ps1",
+        ".codex/scripts/parallel-child-launch-contract.ps1",
+        ".codex/scripts/parallel-child-post-session.ps1",
+        ".codex/scripts/resume-parallel-child.ps1",
+        ".codex/config.toml",
+        "AGENTS.md",
+        "config/blast-radius.json",
+        "config/orchestration-routing.json",
+        *PORTABLE_CLAUDE_PATHS,
+        *COMMIT_STEWARD_PROFILE_PATHS,
+    }
+)
+LANGUAGE_MANIFEST_NAMES = (
+    "python",
+    "powershell",
+    "typescript",
+    "csharp-modern",
+    "csharp-legacy",
+)
 
 # Pre-existing, unrelated Codex-side manifest gaps out of scope for issue #372
 # (see the module docstring "Scope note"). Verified against the real bundle
@@ -63,7 +132,6 @@ PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS: frozenset[str] = frozenset(
         ".codex/agents/api-architect.toml",
         ".codex/agents/atomic-planning.toml",
         ".codex/agents/commentary-remediation.toml",
-        ".codex/agents/commit-steward.toml",
         ".codex/agents/csharp-atomic-executor.toml",
         ".codex/agents/csharp-atomic-planning.toml",
         ".codex/agents/csharp-orchestrator.toml",
@@ -228,6 +296,18 @@ def union_of_manifest_paths() -> frozenset[str]:
     return frozenset(union)
 
 
+def manifest_paths(name: str) -> list[str]:
+    """Return the ordered path list from one real Codex pack manifest."""
+
+    loaded = json.loads((MANIFEST_DIR / f"{name}.json").read_text(encoding="utf-8"))
+    assert isinstance(loaded, dict)
+    paths = cast("dict[str, object]", loaded).get("paths")
+    assert isinstance(paths, list)
+    raw_paths = cast("list[object]", paths)
+    assert all(isinstance(path, str) for path in raw_paths)
+    return [path for path in raw_paths if isinstance(path, str)]
+
+
 def test_bundled_codex_files_are_listed_in_some_pack_manifest() -> None:
     """Require every bundled Codex agent/skill/hook to appear in a manifest.
 
@@ -273,3 +353,33 @@ def test_no_bundled_codex_file_is_absent_from_disk_and_exception_list() -> None:
         "Documented exceptions no longer exist on disk (stale entries): "
         f"{stale_exceptions}"
     )
+
+
+def test_core_manifest_owns_the_complete_parallel_dependency_closure() -> None:
+    """Require core to own every parallel and portable dependency once."""
+
+    core_paths = manifest_paths("core")
+
+    assert len(PARALLEL_CORE_PATHS) == 54
+    assert len(core_paths) == len(set(core_paths)), "core.json contains duplicates"
+    assert sorted(PARALLEL_CORE_PATHS - set(core_paths)) == []
+    assert {
+        path for path in core_paths if path.startswith(".codex/agents/commit-steward")
+    } == COMMIT_STEWARD_PROFILE_PATHS
+    for profile_path in COMMIT_STEWARD_PROFILE_PATHS:
+        assert core_paths.count(profile_path) == 1
+    for manifest_name in LANGUAGE_MANIFEST_NAMES:
+        language_paths = set(manifest_paths(manifest_name))
+        assert sorted(PARALLEL_CORE_PATHS & language_paths) == []
+        assert COMMIT_STEWARD_PROFILE_PATHS.isdisjoint(language_paths)
+
+
+def test_core_manifest_selects_only_the_approved_portable_claude_paths() -> None:
+    """Reject broad or unrelated Claude membership in the Codex core pack."""
+
+    selected_claude_paths = {
+        path for path in manifest_paths("core") if path.startswith(".claude/")
+    }
+
+    assert len(PORTABLE_CLAUDE_PATHS) == 14
+    assert selected_claude_paths == PORTABLE_CLAUDE_PATHS

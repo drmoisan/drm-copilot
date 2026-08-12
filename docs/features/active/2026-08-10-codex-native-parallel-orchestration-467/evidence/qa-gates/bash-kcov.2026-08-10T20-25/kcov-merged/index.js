@@ -1,0 +1,22 @@
+var data = {files:[
+{"link":"parallel-cohorts.sh.8d2831d.html","title":"parallel-cohorts.sh","summary_name":"/work/.claude/lib/bash/parallel-cohorts.sh","covered_class":"lineCov","covered":"99.3","covered_lines":"133","uncovered_lines":"1","total_lines" : "134"},
+{"link":"cleanup_worktrees_enumerate_lib.sh.11fb9e64.html","title":"cleanup_worktrees_enumerate_lib.sh","summary_name":"/work/scripts/bash/cleanup_worktrees_enumerate_lib.sh","covered_class":"lineCov","covered":"92.1","covered_lines":"82","uncovered_lines":"7","total_lines" : "89"},
+{"link":"parallel-items-validate.sh.b252a5c0.html","title":"parallel-items-validate.sh","summary_name":"/work/.claude/lib/bash/parallel-items-validate.sh","covered_class":"lineCov","covered":"100.0","covered_lines":"115","uncovered_lines":"0","total_lines" : "115"},
+{"link":"parallel-manifest-validate.sh.6a0dcd04.html","title":"parallel-manifest-validate.sh","summary_name":"/work/.claude/lib/bash/parallel-manifest-validate.sh","covered_class":"lineCov","covered":"100.0","covered_lines":"63","uncovered_lines":"0","total_lines" : "63"},
+{"link":"validate-parallel-manifest.sh.2967d6e6.html","title":"validate-parallel-manifest.sh","summary_name":"/work/.claude/lib/bash/validate-parallel-manifest.sh","covered_class":"lineCov","covered":"93.5","covered_lines":"43","uncovered_lines":"3","total_lines" : "46"},
+{"link":"cleanup_worktrees_lib.sh.ab1433b.html","title":"cleanup_worktrees_lib.sh","summary_name":"/work/scripts/bash/cleanup_worktrees_lib.sh","covered_class":"lineCov","covered":"93.3","covered_lines":"180","uncovered_lines":"13","total_lines" : "193"},
+{"link":"coverage_lib.sh.8c2de105.html","title":"coverage_lib.sh","summary_name":"/work/scripts/bash/coverage_lib.sh","covered_class":"lineCov","covered":"100.0","covered_lines":"3","uncovered_lines":"0","total_lines" : "3"},
+{"link":"parallel-common.sh.e9e47d71.html","title":"parallel-common.sh","summary_name":"/work/.claude/lib/bash/parallel-common.sh","covered_class":"lineCov","covered":"96.4","covered_lines":"53","uncovered_lines":"2","total_lines" : "55"},
+{"link":"cleanup-worktrees.sh.cffe1015.html","title":"cleanup-worktrees.sh","summary_name":"/work/scripts/bash/cleanup-worktrees.sh","covered_class":"lineCov","covered":"100.0","covered_lines":"20","uncovered_lines":"0","total_lines" : "20"},
+{"link":"compute-concurrency-batches.sh.5bab382b.html","title":"compute-concurrency-batches.sh","summary_name":"/work/.claude/lib/bash/compute-concurrency-batches.sh","covered_class":"lineCov","covered":"90.9","covered_lines":"40","uncovered_lines":"4","total_lines" : "44"},
+{"link":"shell_qc_lib.sh.aae94b35.html","title":"shell_qc_lib.sh","summary_name":"/work/scripts/bash/shell_qc_lib.sh","covered_class":"lineCov","covered":"86.5","covered_lines":"160","uncovered_lines":"25","total_lines" : "185"},
+{"link":"cleanup_worktrees_actions_lib.sh.74ea2f3b.html","title":"cleanup_worktrees_actions_lib.sh","summary_name":"/work/scripts/bash/cleanup_worktrees_actions_lib.sh","covered_class":"lineCov","covered":"92.8","covered_lines":"141","uncovered_lines":"11","total_lines" : "152"},
+{"link":"compute-cohorts.sh.74492c82.html","title":"compute-cohorts.sh","summary_name":"/work/.claude/lib/bash/compute-cohorts.sh","covered_class":"lineCov","covered":"92.5","covered_lines":"49","uncovered_lines":"4","total_lines" : "53"},
+{"link":"shell-qc.sh.78c88ad4.html","title":"shell-qc.sh","summary_name":"/work/scripts/bash/shell-qc.sh","covered_class":"lineCov","covered":"88.6","covered_lines":"31","uncovered_lines":"4","total_lines" : "35"},
+{"link":"parallel-yaml-emit.sh.91e2e687.html","title":"parallel-yaml-emit.sh","summary_name":"/work/.claude/lib/bash/parallel-yaml-emit.sh","covered_class":"lineCov","covered":"90.2","covered_lines":"138","uncovered_lines":"15","total_lines" : "153"},
+{"link":"coverage_demo.sh.c90a8f65.html","title":"coverage_demo.sh","summary_name":"/work/scripts/bash/coverage_demo.sh","covered_class":"lineCov","covered":"100.0","covered_lines":"4","uncovered_lines":"0","total_lines" : "4"},
+{"link":"parallel-yaml-scan.sh.a032d239.html","title":"parallel-yaml-scan.sh","summary_name":"/work/.claude/lib/bash/parallel-yaml-scan.sh","covered_class":"lineCov","covered":"93.2","covered_lines":"109","uncovered_lines":"8","total_lines" : "117"},
+]};
+var percent_low = 25;var percent_high = 75;
+var header = { "command" : "", "date" : "2026-08-11 23:03:35", "instrumented" : 1461, "covered" : 1364,};
+var merged_data = [];

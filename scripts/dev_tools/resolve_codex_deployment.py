@@ -17,12 +17,22 @@ if TYPE_CHECKING:
     from collections.abc import Collection
 
 ExecutionContext = Literal[
-    "standalone", "epic_preparation_child", "epic_execution_child"
+    "standalone",
+    "epic_preparation_child",
+    "epic_execution_child",
+    "parallel_planning",
+    "parallel_execution",
 ]
 ModelReasoningEffort = Literal["low", "medium", "high", "max", "ultra"]
 
 VALID_EXECUTION_CONTEXTS: frozenset[str] = frozenset(
-    {"standalone", "epic_preparation_child", "epic_execution_child"}
+    {
+        "standalone",
+        "epic_preparation_child",
+        "epic_execution_child",
+        "parallel_planning",
+        "parallel_execution",
+    }
 )
 EPIC_EXECUTION_CONTEXTS: frozenset[str] = frozenset(
     {"epic_preparation_child", "epic_execution_child"}
@@ -42,6 +52,7 @@ GENERATED_AGENT_FAMILIES: frozenset[str] = frozenset(
         "powershell-typed-engineer",
         "csharp-typed-engineer",
         "typescript-engineer",
+        "commit-steward",
     }
 )
 LOGICAL_AGENT_ALIASES: dict[str, str] = {"feature-review": "feature-reviewer"}
@@ -107,6 +118,20 @@ FORCED_PERSONA_PROFILES: dict[str, DeploymentProfile] = {
         "model": "gpt-5.6-sol",
         "model_reasoning_effort": "ultra",
     },
+    "parallel-planner": {
+        "suffix": "",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "ultra",
+    },
+    "parallel-orchestrator": {
+        "suffix": "",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "ultra",
+    },
+}
+PARALLEL_ROOT_CONTEXT_PERSONAS: dict[str, str] = {
+    "parallel_planning": "parallel-planner",
+    "parallel_execution": "parallel-orchestrator",
 }
 
 
@@ -174,8 +199,8 @@ def resolve_codex_deployment(
 
     C3 defaults to Terra/high. It elevates to Sol/high only for an epic child
     or when the orchestration ceiling is C4. Epic planner and orchestrator
-    personas are always forced to Sol/ultra. No model alias or fallback is
-    accepted.
+    personas and their context-bound parallel counterparts are always forced
+    to Sol/ultra. No model alias or fallback is accepted.
     """
 
     band = _validate_band(complexity_band, field_name="complexity_band")
@@ -188,6 +213,26 @@ def resolve_codex_deployment(
         raise ValueError(
             "orchestration_complexity_ceiling must be greater than or equal to "
             f"complexity_band, found {ceiling} below {band}."
+        )
+
+    parallel_persona = PARALLEL_ROOT_CONTEXT_PERSONAS.get(context)
+    if parallel_persona is not None and logical_agent != parallel_persona:
+        raise ValueError(
+            f"Parallel context {context!r} requires its forced root persona "
+            f"{parallel_persona!r}."
+        )
+    parallel_context = next(
+        (
+            candidate
+            for candidate, persona in PARALLEL_ROOT_CONTEXT_PERSONAS.items()
+            if persona == logical_agent
+        ),
+        None,
+    )
+    if parallel_context is not None and context != parallel_context:
+        raise ValueError(
+            f"Parallel persona {logical_agent!r} requires "
+            f"{parallel_context!r} context."
         )
 
     forced_profile = FORCED_PERSONA_PROFILES.get(logical_agent)

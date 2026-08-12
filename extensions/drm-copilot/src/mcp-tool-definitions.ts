@@ -393,7 +393,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
   {
     name: "validate_orchestration_artifacts",
     description:
-      "Validate an orchestration artifact, including epic planner, kickoff, and execution checkpoints, against its structural schema.",
+      "Validate an orchestration artifact, including epic planner, kickoff, and execution checkpoints, against its structural and semantic invariants.",
     inputSchema: {
       type: "object",
       properties: {
@@ -443,7 +443,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
         require_ready_for_execution: {
           type: "boolean",
           description:
-            "When true and artifact_type is 'epic-planner-state' or 'parallel-planner-state', require every child to be prepared and preflight-cleared.",
+            "When true for 'epic-planner-state', 'parallel-planner-state', or 'parallel-kickoff', require complete preparation and committed execution-readiness evidence.",
         },
       },
       required: ["workspace_root", "artifact_type", "artifact_path"],

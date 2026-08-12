@@ -73,7 +73,9 @@ describe("invariants 20-21 completion gate", () => {
         itemAt(state, index)["merge_status"] = mergeStatus;
       }
 
-      expect(validateState(state, true)).toEqual([]);
+      expect(validateState(state, true)).toEqual([
+        "Parallel checkpoint Codex readiness evidence is required.",
+      ]);
     },
   );
 
@@ -92,7 +94,9 @@ describe("invariants 20-21 completion gate", () => {
     itemAt(state, 1)["state"] = "withdrawn";
     delete itemAt(state, 1)["merge_status"];
 
-    expect(validateState(state, true)).toEqual([]);
+    expect(validateState(state, true)).toEqual([
+      "Parallel checkpoint Codex readiness evidence is required.",
+    ]);
   });
 
   it("requires a close mutation in open mode", () => {
@@ -100,6 +104,7 @@ describe("invariants 20-21 completion gate", () => {
     state["mode"] = "open";
 
     expect(validateState(state, true)).toEqual([
+      "Parallel checkpoint Codex readiness evidence is required.",
       "Parallel checkpoint completion validation failed: open mode requires a mutations[] entry with op 'close'.",
     ]);
   });
@@ -109,7 +114,9 @@ describe("invariants 20-21 completion gate", () => {
     state["mode"] = "open";
     state["mutations"] = [buildCloseMutation()];
 
-    expect(validateState(state, true)).toEqual([]);
+    expect(validateState(state, true)).toEqual([
+      "Parallel checkpoint Codex readiness evidence is required.",
+    ]);
   });
 
   it("still applies the per-item condition in open mode", () => {

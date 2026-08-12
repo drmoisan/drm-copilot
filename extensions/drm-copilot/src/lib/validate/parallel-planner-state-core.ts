@@ -49,6 +49,11 @@ import {
   validateItems,
 } from "./parallel-state-shared";
 import {
+  type ParallelCodexReadinessEvidence,
+  validateParallelCodexCheckpointReadiness,
+  validateParallelStateIsStandalone,
+} from "./parallel-codex-readiness";
+import {
   collectIssueNumbers,
   validateCohortShapes,
   validateConflictEdges,
@@ -134,6 +139,8 @@ const READY_ITEM_PATH_KEYS: readonly string[] = ["research_path", "plan_path"];
 export interface ValidateParallelPlannerStateOptions {
   /** When true, enforce the structural readiness gate (invariants P6-P9). */
   readonly requireReadyForExecution?: boolean;
+  /** External Codex evidence required only by the explicit readiness gate. */
+  readonly readinessContext?: ParallelCodexReadinessEvidence;
 }
 
 /**
@@ -144,7 +151,7 @@ export interface ValidateParallelPlannerStateOptions {
  * Python `str` semantics so a missing slug renders as `None`.
  */
 function kickoffPathFor(slug: unknown): string {
-  return `artifacts/orchestration/parallel-kickoff-${pythonStr(slug)}.md`;
+  return `docs/features/parallel/${pythonStr(slug)}/parallel-kickoff.md`;
 }
 
 /**
@@ -444,10 +451,18 @@ export function validateParallelPlannerStateText(
   errors.push(...missingRequiredKeys(state));
   errors.push(...validateIdentity(state));
   errors.push(...scanProhibitedKeys(state, CONTEXT));
+  errors.push(...validateParallelStateIsStandalone(state, CONTEXT));
   errors.push(...validateCollections(state));
 
   if (options.requireReadyForExecution === true) {
     errors.push(...validateReadyGate(state));
+    errors.push(
+      ...validateParallelCodexCheckpointReadiness(
+        state,
+        CONTEXT,
+        options.readinessContext,
+      ),
+    );
   }
   return errors;
 }

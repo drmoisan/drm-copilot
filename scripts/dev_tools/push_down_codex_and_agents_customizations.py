@@ -13,7 +13,10 @@ import json
 from pathlib import Path
 
 try:
-    from scripts.dev_tools.push_down_codex_filesystem import ExcludingFileSystem
+    from scripts.dev_tools.push_down_codex_filesystem import (
+        ExcludingFileSystem,
+        PortableAssetFileSystem,
+    )
     from scripts.dev_tools.push_down_codex_pack_selection import (
         CSharpVariant,
         ManifestError,
@@ -23,6 +26,9 @@ try:
         compute_published_paths,
         load_pack_manifests,
         resolve_manifest_pack_names,
+    )
+    from scripts.dev_tools.push_down_codex_routing_merge import (
+        AdditiveRoutingMergeFileSystem,
     )
     from scripts.dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
@@ -36,7 +42,10 @@ try:
 except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallback
     if error.name is None or not error.name.startswith("scripts"):
         raise
-    from dev_tools.push_down_codex_filesystem import ExcludingFileSystem
+    from dev_tools.push_down_codex_filesystem import (
+        ExcludingFileSystem,
+        PortableAssetFileSystem,
+    )
     from dev_tools.push_down_codex_pack_selection import (
         CSharpVariant,
         ManifestError,
@@ -46,6 +55,9 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         compute_published_paths,
         load_pack_manifests,
         resolve_manifest_pack_names,
+    )
+    from dev_tools.push_down_codex_routing_merge import (
+        AdditiveRoutingMergeFileSystem,
     )
     from dev_tools.push_down_copilot_customizations import (
         PushDownFileSystem,
@@ -62,11 +74,14 @@ BUNDLE_ROOT_RELATIVE_DIR = Path(
     "extensions/drm-copilot/resources/codex-and-agents-customizations"
 )
 PACK_MANIFEST_SUBDIR = "pack-manifests"
+GENERIC_RESOURCE_BUNDLE_NAME = "claude-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
+PORTABLE_ROOT_FOLDER = Path(".claude")
 ROUTING_CONFIG_RELATIVE_PATH = Path("config/orchestration-routing.json")
 PUBLISHED_ROOT_FOLDERS: tuple[Path, ...] = (
     *ROOT_FOLDERS,
+    PORTABLE_ROOT_FOLDER,
     ROUTING_CONFIG_RELATIVE_PATH.parent,
 )
 CSHARP_VARIANT_CHOICES: tuple[str, ...] = ("modern", "legacy")
@@ -233,15 +248,27 @@ def push_down_customizations(
         csharp_variant=csharp_variant,
         variant_root=effective_bundle,
     )
-    publishing_fs = _RoutingConfigFileSystem(
+    routing_fs = _RoutingConfigFileSystem(
         excluding_fs,
         source_root=effective_source,
         bundle_root=effective_bundle,
     )
+    publishing_fs = PortableAssetFileSystem(
+        routing_fs,
+        source_root=effective_source,
+        resource_root=effective_bundle.parent / GENERIC_RESOURCE_BUNDLE_NAME,
+        published_paths=published_paths,
+    )
+    publishing_fs.validate_destination_collisions(destination_root)
+    merge_fs = AdditiveRoutingMergeFileSystem(
+        publishing_fs,
+        destination_root=destination_root,
+        merge_relative_path=ROUTING_CONFIG_RELATIVE_PATH,
+    )
     summary = push_down_scoped_customizations(
         repo_root=repo_root,
         destination_root=destination_root,
-        fs=publishing_fs,
+        fs=merge_fs,
         source_root=source_root,
         artifact_root=artifact_root,
         root_folders=PUBLISHED_ROOT_FOLDERS,

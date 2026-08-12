@@ -36,10 +36,15 @@ import json
 from typing import cast
 
 from scripts.dev_tools import _parallel_orchestrator_state_mutations as mutation_rules
-from scripts.dev_tools._parallel_orchestrator_state_cohort_barrier import (
-    validate_cohort_barrier_ordering,
+from scripts.dev_tools._parallel_orchestrator_state_completion_receipts import (
+    validate_completion_receipts,
 )
-from scripts.dev_tools._parallel_orchestrator_state_drift import validate_drift_gate
+from scripts.dev_tools._parallel_orchestrator_state_receipt_cohort import (
+    validate_receipt_bound_cohort_admission,
+)
+from scripts.dev_tools._parallel_orchestrator_state_resume_truth import (
+    validate_parallel_resume_truth,
+)
 from scripts.dev_tools._parallel_state_common import (
     MERGED_MERGE_STATUSES,
     VALID_MODES,
@@ -58,6 +63,11 @@ from scripts.dev_tools._parallel_state_structures import (
     validate_drift_events,
     validate_mutations,
     validate_receipt_arrays,
+)
+from scripts.dev_tools.validate_parallel_codex_readiness import (
+    ParallelCodexReadinessEvidence,
+    validate_parallel_codex_checkpoint_readiness,
+    validate_parallel_state_is_standalone,
 )
 
 # Literal context prefix for every error this module and its helpers emit.
@@ -288,7 +298,10 @@ def _validate_completion(state: dict[str, object]) -> list[str]:
 
 
 def validate_parallel_orchestrator_state_text(
-    text: str, *, require_complete: bool = False
+    text: str,
+    *,
+    require_complete: bool = False,
+    readiness_context: ParallelCodexReadinessEvidence | None = None,
 ) -> list[str]:
     """Validate a parallel-orchestrator checkpoint document.
 
@@ -297,6 +310,9 @@ def validate_parallel_orchestrator_state_text(
         require_complete (bool): When True, additionally enforce the
             mode-dependent completion gate (invariants 20 and 21). When False
             the gate contributes no errors, so an in-progress run validates.
+        readiness_context (ParallelCodexReadinessEvidence | None): External
+            Codex launch, status, receipt, and ledger evidence resolved by the
+            guarded service-call boundary. Required only for completion.
 
     Returns:
         list[str]: Validation errors for a malformed or incomplete checkpoint;
@@ -325,10 +341,9 @@ def validate_parallel_orchestrator_state_text(
     errors.extend(_missing_required_keys(state_map))
     errors.extend(_validate_identity(state_map))
     errors.extend(scan_prohibited_keys(state_map, CONTEXT))
+    errors.extend(validate_parallel_state_is_standalone(state_map, context=CONTEXT))
     errors.extend(_validate_collections(state_map))
     errors.extend(mutation_rules.validate_mutation_protocol(state_map, CONTEXT))
-    errors.extend(validate_drift_gate(state_map, CONTEXT))
-
     # BEGIN F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
     # F7 (parallel enforcement hooks) owns the retrospective cohort-ordering
     # invariant of design section 9 Layer 2. Its entire edit to this module is
@@ -336,9 +351,18 @@ def validate_parallel_orchestrator_state_text(
     # this block, plus the helper's import. Nothing else in this function moves,
     # so F7 and F3 cannot contend over the same lines (epic wave-4 rule).
     # Add F7 helper invocations below this line, one per line.
-    errors.extend(validate_cohort_barrier_ordering(state_map))
+    errors.extend(validate_receipt_bound_cohort_admission(state_map, CONTEXT))
+    errors.extend(validate_parallel_resume_truth(state_map, CONTEXT))
     # END F7 EXTENSION SEAM -- PARALLEL_COHORT_BARRIER_VIOLATION
 
     if require_complete:
+        errors.extend(
+            validate_parallel_codex_checkpoint_readiness(
+                state_map,
+                context=CONTEXT,
+                evidence=readiness_context,
+            )
+        )
         errors.extend(_validate_completion(state_map))
+        errors.extend(validate_completion_receipts(state_map, CONTEXT))
     return errors

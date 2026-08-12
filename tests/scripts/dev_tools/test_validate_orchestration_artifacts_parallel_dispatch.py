@@ -23,10 +23,16 @@ import json
 from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_orchestration_artifacts as validator
+from scripts.dev_tools.parallel_codex_readiness_filesystem import (
+    ParallelReadinessBuildResult,
+)
 
 # The completion builder is reached through a module alias rather than a direct
 # `from ... import` because the fully qualified module path exceeds the 88-column
 # lint limit on a single import line.
+from tests.scripts.dev_tools import (
+    test_validate_parallel_codex_readiness as readiness_tests,
+)
 from tests.scripts.dev_tools import (
     test_validate_parallel_orchestrator_state_completion as completion_tests,
 )
@@ -74,6 +80,40 @@ def install_state(monkeypatch: MonkeyPatch, state: dict[str, object]) -> None:
     monkeypatch.setattr(
         validator, "_read_text", build_read_text_stub(json.dumps(state))
     )
+
+
+def add_readiness_paths(state: dict[str, object]) -> dict[str, object]:
+    """Add the guarded external-evidence fields required by explicit gates."""
+
+    state["kickoff_prompt_path"] = readiness_tests.KICKOFF_PATH
+    items = cast("list[dict[str, object]]", state["items"])
+    for item in items:
+        issue = cast("int", item["issue_num"])
+        prefix = "artifacts/orchestration/parallel-child-launches/" f"wave-one/{issue}"
+        item.update(
+            {
+                "cohort": 0,
+                "batch": 0,
+                "branch": f"feature/parallel-{issue}",
+                "worktree_path": f"C:/worktrees/parallel-{issue}",
+                "launch_receipt_path": f"{prefix}.receipt.json",
+                "launch_status_path": f"{prefix}.status.json",
+            }
+        )
+    return state
+
+
+def install_readiness(monkeypatch: MonkeyPatch, state: dict[str, object]) -> None:
+    """Inject complete evidence while asserting the dispatcher forwards text."""
+
+    evidence = readiness_tests.build_evidence(state)
+
+    def build(text: str, context: object) -> ParallelReadinessBuildResult:
+        del context
+        assert json.loads(text) == state
+        return ParallelReadinessBuildResult(evidence, ())
+
+    monkeypatch.setattr(validator, "build_parallel_codex_readiness_evidence", build)
 
 
 def dispatch(namespace: argparse.Namespace) -> list[str]:
@@ -224,9 +264,10 @@ def test_validate_from_args_routes_parallel_kickoff_to_its_validator(
     monkeypatch.setattr(validator, "_read_text", build_read_text_stub("kickoff text"))
     received: list[str] = []
 
-    def record(text: str) -> list[str]:
+    def record(text: str, *, require_ready_for_execution: bool = False) -> list[str]:
         """Stand in for the kickoff validator and capture its argument."""
 
+        assert require_ready_for_execution is False
         received.append(text)
         return ["sentinel error"]
 
@@ -303,7 +344,9 @@ def test_main_parallel_orchestrator_require_complete_returns_0_for_completed(
 ) -> None:
     """A closed-mode run whose items all merged satisfies the completion gate."""
 
-    install_state(monkeypatch, completion_tests.build_completed_state())
+    state = add_readiness_paths(completion_tests.build_completed_state())
+    install_state(monkeypatch, state)
+    install_readiness(monkeypatch, state)
 
     result = validator.main([ORCHESTRATOR_TYPE, "ignored.json", "--require-complete"])
 
@@ -369,13 +412,50 @@ def test_main_parallel_planner_require_ready_returns_0_for_ready(
 ) -> None:
     """A fully prepared planner checkpoint satisfies the readiness gate."""
 
-    install_state(monkeypatch, build_valid_planner_state())
+    state = add_readiness_paths(build_valid_planner_state())
+    install_state(monkeypatch, state)
+    install_readiness(monkeypatch, state)
 
     result = validator.main(
         [PLANNER_TYPE, "ignored.json", "--require-ready-for-execution"]
     )
 
     assert result == 0
+
+
+def test_parallel_ready_dispatch_surfaces_loader_rejection(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """A missing or mismatched guarded file fails through public dispatch."""
+
+    state = add_readiness_paths(build_valid_planner_state())
+    install_state(monkeypatch, state)
+
+    def reject(text: str, context: object) -> ParallelReadinessBuildResult:
+        del text, context
+        return ParallelReadinessBuildResult(
+            None, ("Parallel checkpoint launch record is missing.",)
+        )
+
+    monkeypatch.setattr(
+        validator,
+        "build_parallel_codex_readiness_evidence",
+        reject,
+    )
+
+    errors = dispatch(
+        argparse.Namespace(
+            path="ignored.json",
+            workspace_root=".",
+            artifact_type=PLANNER_TYPE,
+            require_ready_for_execution=True,
+        )
+    )
+
+    assert errors == [
+        "Parallel checkpoint launch record is missing.",
+        "Parallel planner checkpoint Codex readiness evidence is required.",
+    ]
 
 
 def test_main_parallel_planner_require_ready_returns_1_for_unready(

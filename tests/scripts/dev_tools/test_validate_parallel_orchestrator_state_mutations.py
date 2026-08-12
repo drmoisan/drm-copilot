@@ -283,12 +283,15 @@ def test_invariant_1_rejects_a_null_where_a_value_is_required(
     )
 
 
-def test_invariant_1_accepts_the_nulls_f3_requires() -> None:
-    """The null side of the rule stays F3's; add and close report nothing."""
+def test_invariant_1_accepts_nulls_but_rejects_close_while_in_flight() -> None:
+    """The null shape remains valid while the atomic close gate still applies."""
 
     state = build_state(mutations=[dict(ADD_ENTRY), dict(CLOSE_ENTRY)])
 
-    assert check(state) == []
+    assert check(state) == [
+        f"{CONTEXT} mutations[1] close requires no item in flight; "
+        "still in flight: [444]."
+    ]
 
 
 def test_invariant_1_ignores_an_out_of_enum_op() -> None:

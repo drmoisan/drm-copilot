@@ -1,0 +1,22 @@
+# P3-T5 authoritative child resume reconciliation evidence
+
+- Task: `[P3-T5]`
+- Result: PASS
+- Final physical line counts:
+  - `.codex/scripts/codex-child-launch-resume.ps1`: 461
+  - `.codex/scripts/resume-epic-child.ps1`: 265
+  - `tests/scripts/codex-hooks/codex-child-launch-resume-core.Tests.ps1`: 203
+- Public epic adapter parameters: exact `ReceiptPath,Prompt,LastMessagePath` parity; parse errors: 0.
+- PoshQC format: PASS in the final uninterrupted loop.
+- PoshQC analyze: PASS with zero findings in the final uninterrupted loop.
+- Focused Pester: 60 passed, 0 failed, 0 errors.
+  - Shared authoritative resume reconciliation: 7/7.
+  - Epic launch attestation: 12/12.
+  - Epic launch hardening and resume: 19/19.
+  - Epic worktree launcher and process behavior: 22/22.
+- Cached-status authority: a cached `running` state with no live process permits reconciliation, while a still-running authoritative live process rejects relaunch even when cached state is terminal.
+- Missing/corrupt/mismatched identity matrix: uniform validation rejects all three invalid shapes for specification hash, checkpoint hash, repository, branch, worktree, agent, model, reasoning, authority receipt, delegation receipt, topology receipt, model-routing receipt, permission, and child-status path.
+- Process and child-status rejection: missing/corrupt status, invalid schema, absent launch entry, path/session/state/PID mismatch, live PID mismatch, and a still-running live process all reject before relaunch.
+- Epic adapter evidence: the sealed specification and checkpoint hashes, exact Git repository/worktree/branch, generated agent/model/reasoning/permission profile, sealed status path, session identity, and live PID are reconciled before process relaunch.
+- Repository checks: `.claude` diff count `0`; `git diff --check` exit `0`.
+- Corrective-loop evidence: the first focused run exposed caller-scope `Set-StrictMode` leakage (53 passed, 7 failed); the side effect was removed and the complete format/analyze/test loop was restarted and passed.

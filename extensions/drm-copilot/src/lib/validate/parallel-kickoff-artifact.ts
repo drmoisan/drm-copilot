@@ -72,6 +72,12 @@ export interface ParallelKickoffParseResult {
   readonly errors: string[];
 }
 
+/** Options controlling the committed parallel-kickoff readiness gate. */
+export interface ValidateParallelKickoffOptions {
+  /** Require internally consistent, version-1 committed kickoff identity. */
+  readonly requireReadyForExecution?: boolean;
+}
+
 function splitSections(text: string): {
   readonly sections: ReadonlyMap<string, string[]>;
   readonly errors: string[];
@@ -368,7 +374,44 @@ export function parseParallelKickoff(text: string): ParallelKickoffParseResult {
   };
 }
 
+function validateReadyIdentity(parsed: ParsedParallelKickoff): string[] {
+  const expectedManifest = `docs/features/parallel/${parsed.slug}/parallel.md`;
+  const expectedBranch = `parallel/${parsed.slug}-plan`;
+  const errors: string[] = [];
+  if (parsed.invocationSlug !== parsed.slug) {
+    errors.push(
+      "Parallel kickoff readiness requires heading and invocation slugs to match.",
+    );
+  }
+  if (parsed.manifestPath !== expectedManifest) {
+    errors.push(
+      `Parallel kickoff readiness manifest must be '${expectedManifest}'.`,
+    );
+  }
+  if (parsed.planHomeBranch !== expectedBranch) {
+    errors.push(
+      `Parallel kickoff readiness plan-home branch must be '${expectedBranch}'.`,
+    );
+  }
+  if (parsed.planningCommit === undefined) {
+    errors.push(
+      "Parallel kickoff readiness requires version-1 committed planning_commit identity.",
+    );
+  }
+  return errors;
+}
+
 /** Validate the standalone parallel kickoff Markdown contract. */
-export function validateParallelKickoffText(text: string): string[] {
-  return parseParallelKickoff(text).errors;
+export function validateParallelKickoffText(
+  text: string,
+  options: ValidateParallelKickoffOptions = {},
+): string[] {
+  const result = parseParallelKickoff(text);
+  if (
+    result.parsed === undefined ||
+    options.requireReadyForExecution !== true
+  ) {
+    return result.errors;
+  }
+  return [...result.errors, ...validateReadyIdentity(result.parsed)];
 }

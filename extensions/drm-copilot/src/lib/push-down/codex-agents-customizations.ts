@@ -27,6 +27,8 @@ import {
   resolveManifestPackNames,
   resolveVariantSourcePath,
 } from "./codex-pack-selection";
+import { PortableAssetFileSystem } from "./codex-portable-assets";
+import { AdditiveRoutingMergeFileSystem } from "./claude-routing-merge";
 
 /** Artifact directory for the Codex/agents push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
@@ -34,9 +36,11 @@ export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
 /** Inlined Codex/agents scoped root folders (enumeration-order contract). */
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".codex", ".agents"];
 export const PACK_MANIFEST_SUBDIR = "pack-manifests";
+export const GENERIC_RESOURCE_BUNDLE_NAME = "claude-customizations";
 export const ROUTING_CONFIG_RELATIVE_PATH = "config/orchestration-routing.json";
 const PUBLISHED_ROOT_FOLDERS: ReadonlyArray<string> = [
   ...ROOT_FOLDERS,
+  ".claude",
   "config",
 ];
 
@@ -275,15 +279,29 @@ export function pushDownCustomizations(
     publishedPaths,
     csharpVariant,
   });
-  const publishingFs = new RoutingConfigFileSystem(filteringFs, {
+  const routingFs = new RoutingConfigFileSystem(filteringFs, {
     sourceRoot,
     bundleRoot,
   });
+  const publishingFs = new PortableAssetFileSystem(routingFs, {
+    sourceRoot,
+    resourceRoot: joinPosix(
+      parentPosix(bundleRoot),
+      GENERIC_RESOURCE_BUNDLE_NAME,
+    ),
+    publishedPaths,
+  });
+  publishingFs.validateDestinationCollisions(options.destinationRoot);
+  const mergeFs = new AdditiveRoutingMergeFileSystem(
+    publishingFs,
+    options.destinationRoot,
+    ROUTING_CONFIG_RELATIVE_PATH,
+  );
   void options.memoryMode;
   return enginePushDown({
     repoRoot: options.repoRoot,
     destinationRoot: options.destinationRoot,
-    fs: publishingFs,
+    fs: mergeFs,
     sourceRoot,
     ...(options.artifactRoot === undefined
       ? {}

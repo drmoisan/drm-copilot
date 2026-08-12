@@ -1,0 +1,578 @@
+{
+  "schema_version": 1,
+  "lifecycle_requirements": {
+    "quiescence": "observed-file-escapes-declared-radius",
+    "later_started_halt": "later-started-conflicting-peer-is-halted",
+    "unstarted_recolor": "unstarted-subgraph-recolors-after-halt",
+    "ascending_requeue": "multiple-halts-requeue-in-item-order",
+    "persisted_resolution": "persisted-observed-radius-resolves-drift"
+  },
+  "config": {
+    "shared_surfaces": [".codex/config.toml"],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": ["scripts/dev_tools/**"],
+      "mcp-server": ["packages/mcp-server/**"]
+    }
+  },
+  "detection_defaults": {
+    "item_key": 444,
+    "at": "2026-08-10T21-00",
+    "computed_at": "2026-08-10T21-05",
+    "conflict_edges": []
+  },
+  "scheduler_defaults": {
+    "unstarted_keys": [446, 447, 448],
+    "pinned_keys": [444, 445],
+    "conflict_edges": [
+      [444, 446],
+      [446, 447]
+    ],
+    "current_generation": 0,
+    "current_cohort": 0,
+    "max_concurrency": 2,
+    "admission_candidate": 448,
+    "current_cohort_members": [444, 445]
+  },
+  "base_document": {
+    "objective": "deliver codex-native-parallel-orchestration-467",
+    "completed_steps": ["manifest_parsed"],
+    "next_step": "cohort_0_launch",
+    "last_updated": "2026-08-10T21-00",
+    "route_id": "parallel",
+    "parallel_slug": "codex-native-parallel-orchestration-467",
+    "parallel_manifest_path": "docs/features/parallel/codex-native-parallel-orchestration-467/parallel.md",
+    "parallel_status_doc_path": "docs/features/parallel/codex-native-parallel-orchestration-467/parallel-status.md",
+    "mode": "closed",
+    "max_concurrency": 4,
+    "current_cohort": 0,
+    "recolor_generation": 0,
+    "cohorts": [
+      {
+        "index": 0,
+        "generation": 0,
+        "item_keys": [444, 445, 446, 447]
+      }
+    ],
+    "items": [
+      {
+        "issue_num": 444,
+        "feature_folder": "2026-08-07-parallel-schema-validators-444",
+        "launch_receipt_path": "artifacts/orchestration/item-444.launch.json",
+        "launch_status_path": "artifacts/orchestration/item-444.status.json",
+        "state": "in_flight",
+        "merge_status": "pr_open",
+        "worktree_created_at": "2026-08-10T20-00",
+        "blast_radius": {
+          "paths": ["scripts/dev_tools/**"],
+          "modules": ["python-dev-tools"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-00"
+        }
+      },
+      {
+        "issue_num": 445,
+        "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+        "state": "in_flight",
+        "merge_status": "pr_open",
+        "worktree_created_at": "2026-08-10T20-01",
+        "blast_radius": {
+          "paths": ["packages/mcp-server/**"],
+          "modules": ["mcp-server"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-00"
+        }
+      },
+      {
+        "issue_num": 446,
+        "feature_folder": "2026-08-07-parallel-drift-detection-446",
+        "state": "scheduled",
+        "merge_status": "not_started",
+        "blast_radius": {
+          "paths": ["docs/**"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-00"
+        }
+      },
+      {
+        "issue_num": 447,
+        "feature_folder": "2026-08-07-parallel-drift-resolution-447",
+        "state": "scheduled",
+        "merge_status": "not_started",
+        "blast_radius": {
+          "paths": ["tests/**"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-00"
+        }
+      }
+    ],
+    "conflict_edges": [],
+    "mutations": [],
+    "drift_events": []
+  },
+  "cases": [
+    {
+      "name": "declared-files-remain-quiescent",
+      "behavior": "quiescence",
+      "detection": {
+        "changed_paths": ["scripts/dev_tools/parallel_drift_detection.py"],
+        "item_overrides": {}
+      },
+      "document_overrides": {},
+      "expected": {
+        "normalized_event": null,
+        "affected_item_order": [],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [],
+        "admission_decision": "admit_current_cohort",
+        "completion_decision": "incomplete",
+        "accepted": true,
+        "reason_code": "DRIFT_NO_ESCAPE_QUIESCENT"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "observed-file-escapes-declared-radius",
+      "behavior": "observed-versus-declared-files",
+      "detection": {
+        "changed_paths": [
+          "outside/unowned.txt",
+          "scripts/dev_tools/parallel_drift_detection.py"
+        ],
+        "item_overrides": {}
+      },
+      "document_overrides": {
+        "drift_events": [
+          {
+            "item_key": 444,
+            "declared": ["scripts/dev_tools/**"],
+            "observed": [
+              "outside/unowned.txt",
+              "scripts/dev_tools/parallel_drift_detection.py"
+            ],
+            "escaped_paths": ["outside/unowned.txt"],
+            "at": "2026-08-10T21-00",
+            "action": "raised_blocking_finding"
+          }
+        ]
+      },
+      "expected": {
+        "normalized_event": {
+          "item_key": 444,
+          "declared": ["scripts/dev_tools/**"],
+          "observed": [
+            "outside/unowned.txt",
+            "scripts/dev_tools/parallel_drift_detection.py"
+          ],
+          "escaped_paths": ["outside/unowned.txt"],
+          "at": "2026-08-10T21-00",
+          "action": "raised_blocking_finding"
+        },
+        "affected_item_order": [444],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [],
+        "admission_decision": "blocked_unresolved_drift",
+        "completion_decision": "blocked_unresolved_drift",
+        "accepted": false,
+        "reason_code": "DRIFT_OBSERVED_PATH_ESCAPE"
+      },
+      "typescript_error_contains": "unresolved drift",
+      "currently_divergent": false
+    },
+    {
+      "name": "later-started-conflicting-peer-is-halted",
+      "behavior": "later-started-conflict-halt",
+      "detection": {
+        "changed_paths": [
+          "packages/mcp-server/src/index.ts",
+          "scripts/dev_tools/parallel_drift_detection.py"
+        ],
+        "item_overrides": {}
+      },
+      "document_overrides": {
+        "drift_events": [
+          {
+            "item_key": 444,
+            "declared": ["scripts/dev_tools/**"],
+            "observed": [
+              "packages/mcp-server/src/index.ts",
+              "scripts/dev_tools/parallel_drift_detection.py"
+            ],
+            "escaped_paths": ["packages/mcp-server/src/index.ts"],
+            "at": "2026-08-10T21-00",
+            "action": "halted_later_started_item"
+          }
+        ]
+      },
+      "expected": {
+        "normalized_event": {
+          "item_key": 444,
+          "declared": ["scripts/dev_tools/**"],
+          "observed": [
+            "packages/mcp-server/src/index.ts",
+            "scripts/dev_tools/parallel_drift_detection.py"
+          ],
+          "escaped_paths": ["packages/mcp-server/src/index.ts"],
+          "at": "2026-08-10T21-00",
+          "action": "halted_later_started_item"
+        },
+        "affected_item_order": [444, 445],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [
+          {
+            "item_key": 445,
+            "merge_status": "blocked_drift",
+            "state": "blocked",
+            "mutation": {
+              "op": "requeue",
+              "item_key": 445,
+              "at": "2026-08-10T21-00",
+              "prior_state": "in_flight",
+              "new_state": "blocked",
+              "disposition": null,
+              "recolor_generation": 1
+            },
+            "recolor_generation": 1
+          }
+        ],
+        "admission_decision": "blocked_unresolved_drift",
+        "completion_decision": "blocked_unresolved_drift",
+        "accepted": false,
+        "reason_code": "DRIFT_LATER_STARTED_HALT_REQUIRED"
+      },
+      "typescript_error_contains": "unresolved drift",
+      "currently_divergent": false
+    },
+    {
+      "name": "unstarted-subgraph-recolors-after-halt",
+      "behavior": "unstarted-recoloring",
+      "detection": {
+        "changed_paths": [
+          "packages/mcp-server/src/index.ts",
+          "scripts/dev_tools/parallel_drift_detection.py"
+        ],
+        "item_overrides": {}
+      },
+      "document_overrides": {
+        "drift_events": [
+          {
+            "item_key": 444,
+            "declared": ["scripts/dev_tools/**"],
+            "observed": [
+              "packages/mcp-server/src/index.ts",
+              "scripts/dev_tools/parallel_drift_detection.py"
+            ],
+            "escaped_paths": ["packages/mcp-server/src/index.ts"],
+            "at": "2026-08-10T21-00",
+            "action": "halted_later_started_item"
+          }
+        ]
+      },
+      "expected": {
+        "normalized_event": {
+          "item_key": 444,
+          "declared": ["scripts/dev_tools/**"],
+          "observed": [
+            "packages/mcp-server/src/index.ts",
+            "scripts/dev_tools/parallel_drift_detection.py"
+          ],
+          "escaped_paths": ["packages/mcp-server/src/index.ts"],
+          "at": "2026-08-10T21-00",
+          "action": "halted_later_started_item"
+        },
+        "affected_item_order": [444, 445],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [
+          {
+            "item_key": 445,
+            "merge_status": "blocked_drift",
+            "state": "blocked",
+            "mutation": {
+              "op": "requeue",
+              "item_key": 445,
+              "at": "2026-08-10T21-00",
+              "prior_state": "in_flight",
+              "new_state": "blocked",
+              "disposition": null,
+              "recolor_generation": 1
+            },
+            "recolor_generation": 1
+          }
+        ],
+        "admission_decision": "blocked_unresolved_drift",
+        "completion_decision": "blocked_unresolved_drift",
+        "accepted": false,
+        "reason_code": "DRIFT_UNSTARTED_RECOLOR_REQUIRED"
+      },
+      "typescript_error_contains": "unresolved drift",
+      "currently_divergent": false
+    },
+    {
+      "name": "multiple-halts-requeue-in-item-order",
+      "behavior": "deterministic-requeue",
+      "detection": {
+        "changed_paths": [
+          "scripts/dev_tools/parallel_drift_detection.py",
+          "packages/mcp-server/src/index.ts",
+          "docs/guide.md",
+          "packages/mcp-server/src/index.ts"
+        ],
+        "item_overrides": {
+          "446": {
+            "state": "in_flight",
+            "merge_status": "pr_open",
+            "worktree_created_at": "2026-08-10T20-02"
+          }
+        }
+      },
+      "document_overrides": {
+        "drift_events": [
+          {
+            "item_key": 444,
+            "declared": ["scripts/dev_tools/**"],
+            "observed": [
+              "docs/guide.md",
+              "packages/mcp-server/src/index.ts",
+              "scripts/dev_tools/parallel_drift_detection.py"
+            ],
+            "escaped_paths": [
+              "docs/guide.md",
+              "packages/mcp-server/src/index.ts"
+            ],
+            "at": "2026-08-10T21-00",
+            "action": "halted_later_started_item"
+          }
+        ]
+      },
+      "expected": {
+        "normalized_event": {
+          "item_key": 444,
+          "declared": ["scripts/dev_tools/**"],
+          "observed": [
+            "docs/guide.md",
+            "packages/mcp-server/src/index.ts",
+            "scripts/dev_tools/parallel_drift_detection.py"
+          ],
+          "escaped_paths": [
+            "docs/guide.md",
+            "packages/mcp-server/src/index.ts"
+          ],
+          "at": "2026-08-10T21-00",
+          "action": "halted_later_started_item"
+        },
+        "affected_item_order": [444, 445, 446],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [
+          {
+            "item_key": 445,
+            "merge_status": "blocked_drift",
+            "state": "blocked",
+            "mutation": {
+              "op": "requeue",
+              "item_key": 445,
+              "at": "2026-08-10T21-00",
+              "prior_state": "in_flight",
+              "new_state": "blocked",
+              "disposition": null,
+              "recolor_generation": 1
+            },
+            "recolor_generation": 1
+          },
+          {
+            "item_key": 446,
+            "merge_status": "blocked_drift",
+            "state": "blocked",
+            "mutation": {
+              "op": "requeue",
+              "item_key": 446,
+              "at": "2026-08-10T21-00",
+              "prior_state": "in_flight",
+              "new_state": "blocked",
+              "disposition": null,
+              "recolor_generation": 2
+            },
+            "recolor_generation": 2
+          }
+        ],
+        "admission_decision": "blocked_unresolved_drift",
+        "completion_decision": "blocked_unresolved_drift",
+        "accepted": false,
+        "reason_code": "DRIFT_REQUEUE_ITEM_ORDER"
+      },
+      "typescript_error_contains": "unresolved drift",
+      "currently_divergent": false
+    },
+    {
+      "name": "persisted-observed-radius-resolves-drift",
+      "behavior": "persisted-resolution",
+      "detection": {
+        "changed_paths": [
+          "outside/unowned.txt",
+          "scripts/dev_tools/parallel_drift_detection.py"
+        ],
+        "item_overrides": {}
+      },
+      "document_overrides": {
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "launch_receipt_path": "artifacts/orchestration/item-444.launch.json",
+            "launch_status_path": "artifacts/orchestration/item-444.status.json",
+            "state": "in_flight",
+            "merge_status": "pr_open",
+            "worktree_created_at": "2026-08-10T20-00",
+            "blast_radius": {
+              "paths": [
+                "outside/unowned.txt",
+                "scripts/dev_tools/parallel_drift_detection.py"
+              ],
+              "modules": ["python-dev-tools"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "observed",
+              "computed_at": "2026-08-10T21-05"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "in_flight",
+            "merge_status": "pr_open",
+            "worktree_created_at": "2026-08-10T20-01",
+            "blast_radius": {
+              "paths": ["packages/mcp-server/**"],
+              "modules": ["mcp-server"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-00"
+            }
+          },
+          {
+            "issue_num": 446,
+            "feature_folder": "2026-08-07-parallel-drift-detection-446",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["docs/**"],
+              "modules": [],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-00"
+            }
+          },
+          {
+            "issue_num": 447,
+            "feature_folder": "2026-08-07-parallel-drift-resolution-447",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["tests/**"],
+              "modules": [],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-00"
+            }
+          }
+        ],
+        "drift_events": [
+          {
+            "item_key": 444,
+            "declared": ["scripts/dev_tools/**"],
+            "observed": [
+              "outside/unowned.txt",
+              "scripts/dev_tools/parallel_drift_detection.py"
+            ],
+            "escaped_paths": ["outside/unowned.txt"],
+            "at": "2026-08-10T21-00",
+            "action": "raised_blocking_finding"
+          }
+        ]
+      },
+      "expected": {
+        "normalized_event": {
+          "item_key": 444,
+          "declared": ["scripts/dev_tools/**"],
+          "observed": [
+            "outside/unowned.txt",
+            "scripts/dev_tools/parallel_drift_detection.py"
+          ],
+          "escaped_paths": ["outside/unowned.txt"],
+          "at": "2026-08-10T21-00",
+          "action": "raised_blocking_finding"
+        },
+        "affected_item_order": [444],
+        "recomputed": {
+          "generation": 1,
+          "cohort_assignments": [
+            { "item_key": 446, "cohort_index": 1 },
+            { "item_key": 447, "cohort_index": 2 },
+            { "item_key": 448, "cohort_index": 1 }
+          ],
+          "batches": [[446, 448], [447]]
+        },
+        "ordered_requeues": [],
+        "admission_decision": "admit_current_cohort",
+        "completion_decision": "incomplete",
+        "accepted": true,
+        "reason_code": "DRIFT_PERSISTED_RESOLUTION"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    }
+  ]
+}

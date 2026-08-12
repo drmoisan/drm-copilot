@@ -9,6 +9,32 @@ import {
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");
+const PORTABLE_CLAUDE_PATHS = [
+  ".claude/lib/bash/compute-cohorts.sh",
+  ".claude/lib/bash/compute-concurrency-batches.sh",
+  ".claude/lib/bash/parallel-cohorts.sh",
+  ".claude/lib/bash/parallel-common.sh",
+  ".claude/lib/bash/parallel-items-validate.sh",
+  ".claude/lib/bash/parallel-manifest-validate.sh",
+  ".claude/lib/bash/parallel-yaml-emit.sh",
+  ".claude/lib/bash/parallel-yaml-scan.sh",
+  ".claude/lib/bash/validate-parallel-manifest.sh",
+  ".claude/lib/blast-radius/BlastRadius.psm1",
+  ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
+  ".claude/lib/blast-radius/BlastRadiusExtraction.psm1",
+  ".claude/lib/blast-radius/BlastRadiusGlob.psm1",
+  ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
+] as const;
+const BLAST_RADIUS_CONFIG = "config/blast-radius.json";
+const UNRELATED_CLAUDE_PATH = ".claude/rules/parallel-orchestration.md";
+const COMMIT_STEWARD_PROFILE_PATHS = [
+  ".codex/agents/commit-steward.toml",
+  ".codex/agents/commit-steward-c1.toml",
+  ".codex/agents/commit-steward-c2.toml",
+  ".codex/agents/commit-steward-c3.toml",
+  ".codex/agents/commit-steward-c3-elevated.toml",
+  ".codex/agents/commit-steward-c4.toml",
+] as const;
 
 describe("passthroughRewrite", () => {
   it("returns the text unchanged with zero counts and no unmatched refs", () => {
@@ -180,6 +206,64 @@ describe("pushDownCustomizations (codex/agents)", () => {
     expect(fs.isFile("/dest/.agents/skills/csharp/SKILL.md")).toBe(false);
   });
 
+  it("publishes the generated family once and additively merges routing", () => {
+    const bundleRoot = "/resources/codex-and-agents-customizations";
+    const files: Record<string, string> = {
+      "/resources/config/orchestration-routing.json": JSON.stringify({
+        codex_model_policy: {
+          generated_agent_families: ["commit-steward"],
+        },
+      }),
+      "/dest/config/orchestration-routing.json": JSON.stringify({
+        routes: { destination: { owner: "destination" } },
+        destination_only: true,
+      }),
+      "/src/.claude/rules/unrelated.md": "unrelated\n",
+      [`${bundleRoot}/pack-manifests/core.json`]: JSON.stringify({
+        name: "core",
+        paths: [
+          ...COMMIT_STEWARD_PROFILE_PATHS,
+          "config/orchestration-routing.json",
+        ],
+      }),
+    };
+    for (const relativePath of COMMIT_STEWARD_PROFILE_PATHS) {
+      files[`/src/${relativePath}`] = `profile:${relativePath}\n`;
+    }
+    const fs = buildInMemoryFileSystem(files, ["/dest"]);
+
+    const summary = pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot,
+      packs: new Set(["core"]),
+      fs,
+      clock: CLOCK,
+    });
+
+    const publishedFamily = summary.files
+      .map((file) => file.relativePath)
+      .filter((path) => path.startsWith(".codex/agents/commit-steward"));
+    expect(publishedFamily).toEqual([...COMMIT_STEWARD_PROFILE_PATHS].sort());
+    for (const relativePath of COMMIT_STEWARD_PROFILE_PATHS) {
+      expect(
+        fs.writtenPaths.filter((path) => path === `/dest/${relativePath}`),
+      ).toHaveLength(1);
+    }
+    expect(fs.isFile("/dest/.claude/rules/unrelated.md")).toBe(false);
+    expect(
+      JSON.parse(fs.readTextFile("/dest/config/orchestration-routing.json")),
+    ).toEqual({
+      routes: { destination: { owner: "destination" } },
+      destination_only: true,
+      codex_model_policy: {
+        generated_agent_families: ["commit-steward"],
+      },
+    });
+  });
+
   it("routes legacy C# source content to canonical paths only", () => {
     const fs = buildInMemoryFileSystem(
       {
@@ -285,5 +369,83 @@ describe("pushDownCustomizations (codex/agents)", () => {
       (f) => f.relativePath === ".codex/config.md",
     );
     expect(codexResult?.destinationStatus).toBe("overwritten");
+  });
+
+  it("publishes only the fixed portable assets and the generic config", () => {
+    const bundleRoot = "/resources/codex-and-agents-customizations";
+    const claudeBundle = "/resources/claude-customizations";
+    const files: Record<string, string> = {
+      "/src/.codex/config.toml": "codex-config\n",
+      "/src/config/blast-radius.json": "repo-specific\n",
+      [`${claudeBundle}/${BLAST_RADIUS_CONFIG}`]: "generic-default\n",
+      [`/src/${UNRELATED_CLAUDE_PATH}`]: "unrelated\n",
+      [`${bundleRoot}/pack-manifests/core.json`]: JSON.stringify({
+        name: "core",
+        paths: [
+          ".codex/config.toml",
+          ...PORTABLE_CLAUDE_PATHS,
+          BLAST_RADIUS_CONFIG,
+        ],
+      }),
+    };
+    for (const relativePath of PORTABLE_CLAUDE_PATHS) {
+      const content = `portable:${relativePath}\n`;
+      files[`/src/${relativePath}`] = content;
+      files[`${claudeBundle}/${relativePath}`] = content;
+    }
+    const fs = buildInMemoryFileSystem(files, ["/dest"]);
+
+    pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot,
+      packs: new Set(["core"]),
+      fs,
+      clock: CLOCK,
+    });
+
+    expect(PORTABLE_CLAUDE_PATHS).toHaveLength(14);
+    for (const relativePath of PORTABLE_CLAUDE_PATHS) {
+      expect(fs.isFile(`/dest/${relativePath}`)).toBe(true);
+    }
+    expect(fs.readTextFile(`/dest/${BLAST_RADIUS_CONFIG}`)).toBe(
+      "generic-default\n",
+    );
+    expect(fs.isFile(`/dest/${UNRELATED_CLAUDE_PATH}`)).toBe(false);
+  });
+
+  it("rejects an unequal existing portable destination collision", () => {
+    const bundleRoot = "/resources/codex-and-agents-customizations";
+    const portablePath = PORTABLE_CLAUDE_PATHS[0];
+    const fs = buildInMemoryFileSystem(
+      {
+        "/src/.codex/config.toml": "codex-config\n",
+        [`/src/${portablePath}`]: "source-owned\n",
+        [`/dest/${portablePath}`]: "destination-owned\n",
+        [`${bundleRoot}/pack-manifests/core.json`]: JSON.stringify({
+          name: "core",
+          paths: [".codex/config.toml", portablePath],
+        }),
+      },
+      ["/dest"],
+    );
+
+    expect(() =>
+      pushDownCustomizations({
+        repoRoot: "/src",
+        destinationRoot: "/dest",
+        sourceRoot: "/src",
+        artifactRoot: "/dest",
+        bundleRoot,
+        packs: new Set(["core"]),
+        fs,
+        clock: CLOCK,
+      }),
+    ).toThrow(/portable.*collision/i);
+    expect(fs.readTextFile(`/dest/${portablePath}`)).toBe(
+      "destination-owned\n",
+    );
   });
 });

@@ -127,6 +127,22 @@ describe("Codex topology checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
+  it("accepts commit-steward C4 beside matching topology evidence", () => {
+    const state = baseState();
+    const commitSteward = {
+      ...resolveCodexDeployment("commit-steward", "C4", "standalone", "C4"),
+      phase: "S6_commit_steward",
+    };
+    state["delegation_receipts"] = [
+      delegationReceipt("python-typed-engineer"),
+      delegationReceipt("commit-steward-c4"),
+    ];
+    state["codex_model_routing_receipts"] = [commitSteward];
+    state["codex_topology_receipts"] = [topologyReceipt()];
+
+    expect(validate(state)).toEqual([]);
+  });
+
   it("does not trust an invalid model receipt as deployment evidence", () => {
     const model = modelReceipt();
     const state = baseState(String(model["deployment_agent"]));

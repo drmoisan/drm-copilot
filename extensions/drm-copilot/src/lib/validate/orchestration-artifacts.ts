@@ -16,6 +16,11 @@ import {
 } from "./orchestrator-state-core";
 import { validateParallelKickoffText } from "./parallel-kickoff-artifact";
 import {
+  buildParallelCodexReadinessEvidence,
+  type ParallelReadinessBuildResult,
+  validateCommittedParallelKickoff,
+} from "./parallel-codex-readiness-filesystem";
+import {
   validateParallelOrchestratorStateText,
   type ValidateParallelOrchestratorStateOptions,
 } from "./parallel-orchestrator-state-core";
@@ -178,6 +183,30 @@ export interface ValidateArtifactInput {
   readonly routingMatrix?: unknown;
 }
 
+function buildParallelReadiness(
+  input: ValidateArtifactInput,
+): ParallelReadinessBuildResult {
+  if (
+    input.fs === undefined ||
+    input.root === undefined ||
+    input.artifactPath === undefined ||
+    input.runner === undefined
+  ) {
+    return {
+      errors: [
+        "Parallel Codex readiness evidence context requires filesystem, " +
+          "workspace root, artifact path, and Git runner.",
+      ],
+    };
+  }
+  return buildParallelCodexReadinessEvidence(input.text, {
+    fileSystem: input.fs,
+    workspaceRoot: input.root,
+    artifactPath: input.artifactPath,
+    runner: input.runner,
+  });
+}
+
 /**
  * Dispatch the requested validator.
  *
@@ -261,23 +290,70 @@ export function validateArtifact(input: ValidateArtifactInput): string[] {
     case "epic-kickoff":
       return validateEpicKickoffText(input.text);
     case "parallel-orchestrator-state": {
+      const readiness: ParallelReadinessBuildResult =
+        input.requireComplete === true
+          ? buildParallelReadiness(input)
+          : { errors: [] };
       const options: ValidateParallelOrchestratorStateOptions = {
         ...(input.requireComplete === undefined
           ? {}
           : { requireComplete: input.requireComplete }),
+        ...(readiness.evidence === undefined
+          ? {}
+          : { readinessContext: readiness.evidence }),
       };
-      return validateParallelOrchestratorStateText(input.text, options);
+      return [
+        ...readiness.errors,
+        ...validateParallelOrchestratorStateText(input.text, options),
+      ];
     }
     case "parallel-planner-state": {
+      const readiness: ParallelReadinessBuildResult =
+        input.requireReadyForExecution === true
+          ? buildParallelReadiness(input)
+          : { errors: [] };
       const options: ValidateParallelPlannerStateOptions = {
         ...(input.requireReadyForExecution === undefined
           ? {}
           : { requireReadyForExecution: input.requireReadyForExecution }),
+        ...(readiness.evidence === undefined
+          ? {}
+          : { readinessContext: readiness.evidence }),
       };
-      return validateParallelPlannerStateText(input.text, options);
+      return [
+        ...readiness.errors,
+        ...validateParallelPlannerStateText(input.text, options),
+      ];
     }
-    case "parallel-kickoff":
-      return validateParallelKickoffText(input.text);
+    case "parallel-kickoff": {
+      const errors = validateParallelKickoffText(input.text, {
+        ...(input.requireReadyForExecution === undefined
+          ? {}
+          : { requireReadyForExecution: input.requireReadyForExecution }),
+      });
+      if (input.requireReadyForExecution !== true) return errors;
+      if (
+        input.fs === undefined ||
+        input.root === undefined ||
+        input.artifactPath === undefined ||
+        input.runner === undefined
+      ) {
+        return [
+          ...errors,
+          "Parallel committed kickoff evidence context requires filesystem, " +
+            "workspace root, artifact path, and Git runner.",
+        ];
+      }
+      return [
+        ...errors,
+        ...validateCommittedParallelKickoff(input.text, {
+          fileSystem: input.fs,
+          workspaceRoot: input.root,
+          artifactPath: input.artifactPath,
+          runner: input.runner,
+        }),
+      ];
+    }
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];
   }

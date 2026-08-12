@@ -89,6 +89,54 @@ extends = ":workspace"
 [permissions.orchestrator-workspace.network]
 enabled = true
 
+[permissions.parallel-planner-workspace]
+description = "Read-first parallel planning with writes limited to planning artifacts and Git metadata."
+extends = "orchestrator-workspace"
+
+[permissions.parallel-planner-workspace.filesystem.":workspace_roots"]
+"**" = "read"
+".claude/**" = "deny"
+".git" = "write"
+".git/**" = "write"
+".codex/state/**" = "write"
+"artifacts/orchestration/parallel-planner-state.json" = "write"
+"docs/features/**" = "write"
+"docs/research/**" = "write"
+
+[permissions.parallel-planner-workspace.network]
+enabled = true
+
+[permissions.parallel-orchestrator-workspace]
+description = "Read-first parallel scheduling with writes limited to parallel state, status, and Git metadata."
+extends = "orchestrator-workspace"
+
+[permissions.parallel-orchestrator-workspace.filesystem.":workspace_roots"]
+"**" = "read"
+".claude/**" = "deny"
+".git" = "write"
+".git/**" = "write"
+".codex/state/**" = "write"
+"artifacts/orchestration/parallel-*.json" = "write"
+"artifacts/orchestration/parallel/**" = "write"
+"docs/features/parallel/**" = "write"
+
+[permissions.parallel-orchestrator-workspace.network]
+enabled = true
+
+[permissions.parallel-child-workspace]
+description = "Isolated parallel item implementation with protected customization and routing policy."
+extends = "orchestrator-workspace"
+
+[permissions.parallel-child-workspace.filesystem.":workspace_roots"]
+".claude/**" = "deny"
+".codex/**" = "read"
+".agents/**" = "read"
+"AGENTS.md" = "read"
+"config/orchestration-routing.json" = "read"
+
+[permissions.parallel-child-workspace.network]
+enabled = true
+
 [features]
 multi_agent = true
 hooks = true
@@ -106,8 +154,15 @@ command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.code
 timeout = 15
 statusMessage = "Authorizing root epic entry"
 
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/authorize-root-parallel-invocation.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/authorize-root-parallel-invocation.ps1"'
+timeout = 15
+statusMessage = "Authorizing root parallel entry"
+
 [[hooks.SubagentStart]]
-matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+matcher = "parallel-planner|parallel-orchestrator|epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
 
 [[hooks.SubagentStart.hooks]]
 type = "command"
@@ -183,6 +238,51 @@ command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.code
 timeout = 30
 
 [[hooks.PreToolUse]]
+matcher = "^(shell_command|apply_patch|mcp__.*)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-root-invocation.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-root-invocation.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-child-worktree-binding.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-child-worktree-binding.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse]]
+matcher = "^spawn_agent$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-cohort-barrier.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-cohort-barrier.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-drift-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-drift-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse]]
+matcher = "^shell_command$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-abandon-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-parallel-abandon-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse]]
 matcher = "^(apply_patch|Edit|Write)$"
 
 [[hooks.PreToolUse.hooks]]
@@ -234,7 +334,7 @@ command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.code
 timeout = 30
 
 [[hooks.SubagentStop]]
-matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+matcher = "parallel-planner|parallel-orchestrator|epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
 
 [[hooks.SubagentStop.hooks]]
 type = "command"

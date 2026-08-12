@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
 import type { FileSystem } from "../../../src/lib/file-system";
+import type { CommandRunner } from "../../../src/lib/subprocess-runner";
 import { buildValidateOrchestrationServiceCallInput } from "../../../src/lib/validate/build-validate-orchestration-service-call-input";
 
 /**
@@ -22,6 +23,11 @@ const fileSystemStub: FileSystem = {
     throw new Error("not used");
   },
   ensureDir() {
+    throw new Error("not used");
+  },
+};
+const runnerStub: CommandRunner = {
+  run() {
     throw new Error("not used");
   },
 };
@@ -155,5 +161,34 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
     expect("requireModelRouting" in completeOnly).toBe(false);
     expect(routingOnly.requireModelRouting).toBe(true);
     expect("requireComplete" in routingOnly).toBe(false);
+  });
+
+  it("preserves parallel readiness flags and existing evidence seams exactly", () => {
+    const result = buildValidateOrchestrationServiceCallInput(
+      fileSystemStub,
+      {
+        workspaceRoot: "C:/workspace",
+        artifactType: "parallel-orchestrator-state",
+        artifactPath:
+          "artifacts/orchestration/parallel-orchestrator-state.json",
+        requireComplete: true,
+        requireCodexModelRouting: true,
+        requireCodexTopology: true,
+        requireReadyForExecution: true,
+      },
+      runnerStub,
+    );
+
+    expect(result).toEqual({
+      fileSystem: fileSystemStub,
+      runner: runnerStub,
+      workspaceRoot: "C:/workspace",
+      artifactType: "parallel-orchestrator-state",
+      artifactPath: "artifacts/orchestration/parallel-orchestrator-state.json",
+      requireComplete: true,
+      requireCodexModelRouting: true,
+      requireCodexTopology: true,
+      requireReadyForExecution: true,
+    });
   });
 });

@@ -114,6 +114,27 @@ def test_variant_agent_name_matches_deployment_agent() -> None:
     assert _validate(state) == []
 
 
+def test_commit_steward_c4_receipt_requires_generated_deployment() -> None:
+    """Accept exact C4 stewardship and reject a base-agent substitution."""
+
+    receipt: dict[str, object] = dict(
+        resolve_codex_deployment("commit-steward", "C4", "standalone", "C4")
+    )
+    receipt["phase"] = "S6_commit_steward"
+    state = _base_state("commit-steward-c4")
+    state["codex_model_routing_receipts"] = [receipt]
+
+    assert _validate(state) == []
+
+    receipt["deployment_agent"] = "commit-steward"
+    state["delegation_receipts"] = [_delegation_receipt("commit-steward")]
+    errors = _validate(state)
+
+    assert any(
+        "deployment_agent must be 'commit-steward-c4'" in error for error in errors
+    )
+
+
 def test_missing_codex_receipt_is_rejected_after_delegation() -> None:
     """Require the deployment decision to be persisted before delegated work."""
 

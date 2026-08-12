@@ -11,29 +11,78 @@ param(
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'epic-child-launch-contract.ps1')
 . (Join-Path $PSScriptRoot 'epic-child-launch-runtime.ps1')
+. (Join-Path $PSScriptRoot 'codex-child-launch-runtime.ps1')
+. (Join-Path $PSScriptRoot 'codex-child-launch-persistence.ps1')
+
+function Write-CodexChildJsonCreateNew {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $Path,
+        [Parameter(Mandatory)] $Value,
+        [scriptblock] $EnsureDirectory = {
+            param([string] $DirectoryPath)
+            [System.IO.Directory]::CreateDirectory($DirectoryPath) | Out-Null
+        },
+        [scriptblock] $OpenFile = {
+            param([string] $FilePath)
+            [System.IO.File]::Open($FilePath, [System.IO.FileMode]::CreateNew,
+                [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+        }
+    )
+    Write-CodexChildJsonCreateNewCore -Path $Path -Value $Value `
+        -EnsureDirectory $EnsureDirectory -OpenFile $OpenFile
+}
+
+function Write-CodexChildJsonAtomic {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $Path, [Parameter(Mandatory)] $Value)
+    Write-CodexChildJsonAtomicCore -Path $Path -Value $Value
+}
+
+function Enter-CodexChildWaveLock {
+    [OutputType([System.IO.Stream])]
+    param(
+        [Parameter(Mandatory)][string] $Path,
+        [scriptblock] $OpenLock = {
+            param([string] $LockPath)
+            [System.IO.File]::Open($LockPath, [System.IO.FileMode]::OpenOrCreate,
+                [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        }
+    )
+    return Enter-CodexChildScheduleLockCore -Path $Path -ScheduleKind wave `
+        -ErrorPrefix 'EPIC_CHILD_LAUNCH_BLOCKED:' -OpenLock $OpenLock
+}
+
+function Set-CodexChildReceiptState {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)] $Receipt,
+        [Parameter(Mandatory)][ValidateSet('launching', 'active', 'completed', 'failed')][string] $State,
+        [AllowEmptyString()][string] $SessionId = '',
+        [Nullable[int]] $ExitCode = $null,
+        [AllowEmptyString()][string] $FailureReason = ''
+    )
+    if (-not $PSCmdlet.ShouldProcess(
+            [string]$Receipt.receipt_path,
+            "Set epic-child receipt state to '$State'"
+        )) {
+        return
+    }
+    $writeReceipt = {
+        param([string] $ReceiptPath, $ReceiptValue)
+        Write-CodexChildJsonAtomicCore -Path $ReceiptPath -Value $ReceiptValue
+    }
+    Set-CodexChildReceiptStateCore -Receipt $Receipt -State $State `
+        -SessionId $SessionId -ExitCode $ExitCode -FailureReason $FailureReason `
+        -ErrorPrefix 'EPIC_CHILD_LAUNCH_BLOCKED:' -WriteReceipt $writeReceipt `
+        -Confirm:$false
+}
 
 function Get-CodexChildSessionId {
     [OutputType([string])]
     param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $JsonLines)
-    foreach ($line in $JsonLines) {
-        if ([string]::IsNullOrWhiteSpace($line)) {
-            continue
-        }
-        try {
-            $codexEvent = $line | ConvertFrom-Json -Depth 16 -ErrorAction Stop
-        } catch {
-            throw "EPIC_CHILD_LAUNCH_BLOCKED: codex --json emitted malformed JSON: $_"
-        }
-        foreach ($candidate in @(
-                $codexEvent.thread_id, $codexEvent.session_id, $codexEvent.thread.id,
-                $codexEvent.payload.thread_id, $codexEvent.payload.session_id
-            )) {
-            if (-not [string]::IsNullOrWhiteSpace([string]$candidate)) {
-                return [string]$candidate
-            }
-        }
-    }
-    return ''
+    return Get-CodexChildSessionIdCore -JsonLines $JsonLines `
+        -ErrorPrefix 'EPIC_CHILD_LAUNCH_BLOCKED:'
 }
 
 function Get-CodexChildSealedJsonFile {
@@ -48,24 +97,8 @@ function Get-CodexChildSealedJsonFile {
                 [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read)
         }
     )
-    $stream = & $OpenFile $Path
-    try {
-        $memory = [System.IO.MemoryStream]::new()
-        try { $stream.CopyTo($memory); $bytes = $memory.ToArray() } finally { $memory.Dispose() }
-        $offset = if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) { 3 } else { 0 }
-        try {
-            $raw = [System.Text.UTF8Encoding]::new($false, $true).GetString($bytes, $offset, $bytes.Length - $offset)
-        } catch {
-            throw "EPIC_CHILD_LAUNCH_BLOCKED: $Name is not valid UTF-8."
-        }
-        $value = ConvertFrom-CodexChildLaunchJson -Raw $raw -Name $Name
-        $sha256 = [Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
-        if (-not $HoldOpen) { $stream.Dispose(); $stream = $null }
-        return [pscustomobject]@{ Value = $value; Sha256 = $sha256; Stream = $stream }
-    } catch {
-        $stream.Dispose()
-        throw
-    }
+    return Get-CodexChildSealedJsonFileCore -Path $Path -Name $Name `
+        -ErrorPrefix 'EPIC_CHILD_LAUNCH_BLOCKED:' -HoldOpen:$HoldOpen -OpenFile $OpenFile
 }
 
 function Get-CodexChildLaunchReceipt {
@@ -126,46 +159,14 @@ function Get-CodexChildProcessStartInfo {
         [Parameter(Mandatory)] $Receipt,
         [Parameter(Mandatory)][string] $LastMessagePath
     )
-    $codexCommandPath = [string]$Receipt.codex_command_path
-    $isPowerShellShim = $codexCommandPath.EndsWith('.ps1', [System.StringComparison]::OrdinalIgnoreCase)
-    $info = [System.Diagnostics.ProcessStartInfo]::new($(if ($isPowerShellShim) { 'pwsh' } else { $codexCommandPath }))
-    $info.UseShellExecute = $false; $info.CreateNoWindow = $true
-    $info.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $info.RedirectStandardInput = $true; $info.RedirectStandardOutput = $true
-    $info.RedirectStandardError = $true; $info.WorkingDirectory = [string]$Entry.worktree_path
-    if ($isPowerShellShim) {
-        foreach ($argument in @('-NoProfile', '-File', $codexCommandPath)) { $info.ArgumentList.Add($argument) }
-    }
     $permissionOverride = Get-CodexChildPermissionOverride -DeniedPaths ([string[]]$Receipt.codex_denied_paths)
     $projectsOverride = Get-CodexChildProjectsOverride -WorktreePath ([string]$Entry.worktree_path)
     $shellOverrides = Get-CodexChildShellEnvironmentOverrideList -WorktreePath ([string]$Entry.worktree_path)
-    foreach ($argument in @(
-            'exec', '--ignore-user-config', '-C', [string]$Entry.worktree_path,
-            '-c', $projectsOverride, '-c', $permissionOverride,
-            '-c', $shellOverrides[0], '-c', $shellOverrides[1],
-            '-m', [string]$AgentProfile.model,
-            '-c', "model_reasoning_effort=$($AgentProfile.model_reasoning_effort)",
-            '-c', 'default_permissions="epic-child-workspace"', '-c', 'approval_policy="never"',
-            '-c', ('developer_instructions=' + ([string]$AgentProfile.developer_instructions | ConvertTo-Json -Compress)),
-            '-c', "skills.config=$($AgentProfile.skills_config)", '--strict-config',
-            '--dangerously-bypass-hook-trust', '--json', '-o', $LastMessagePath, '-'
-        )) { $info.ArgumentList.Add($argument) }
-    if ($IsWindows) { $info.ArgumentList.Insert(1, 'windows.sandbox="elevated"'); $info.ArgumentList.Insert(1, '-c') }
-    $environment = @{
-        CODEX_EPIC_CHILD_LAUNCH_ID         = [string]$Receipt.launch_id
-        CODEX_EPIC_CHILD_LAUNCH_RECEIPT    = [string]$Receipt.receipt_path
-        CODEX_EPIC_CHILD_LAUNCH_SPEC       = [string]$Receipt.spec_path
-        CODEX_EPIC_CHILD_EXPECTED_WORKTREE = [string]$Receipt.worktree_path
-        CODEX_EPIC_CHILD_DELEGATION_ID     = [string]$Receipt.delegation_id
-        CODEX_EPIC_CHILD_EXECUTION_CONTEXT = [string]$Receipt.execution_context
-        CODEX_EPIC_CHILD_AGENT             = [string]$Receipt.deployment_agent
-        CODEX_EPIC_CHILD_MODEL             = [string]$Receipt.model
-        CODEX_EPIC_CHILD_REASONING_EFFORT  = [string]$Receipt.model_reasoning_effort
-        CODEX_EPIC_CHILD_PROFILE_SHA256    = [string]$Receipt.profile_sha256
-    }
-    foreach ($item in $environment.GetEnumerator()) { $info.Environment[$item.Key] = $item.Value }
-    $info.Environment['CODEX_HOME'] = [string]$Receipt.codex_home_path
-    return $info
+    return Get-CodexChildProcessStartInfoCore -Entry $Entry -AgentProfile $AgentProfile `
+        -Receipt $Receipt -LastMessagePath $LastMessagePath `
+        -RuntimePermissions 'epic-child-workspace' -EnvironmentPrefix 'CODEX_EPIC_CHILD' `
+        -PermissionOverride $permissionOverride -ProjectsOverride $projectsOverride `
+        -ShellOverrides $shellOverrides
 }
 
 function Start-CodexChildProcess {
@@ -177,61 +178,33 @@ function Start-CodexChildProcess {
         [Parameter(Mandatory)][string] $ArtifactRoot
     )
     $base = Join-Path $ArtifactRoot ([string]$Entry.launch_id)
-    if (-not $PSCmdlet.ShouldProcess([string]$Entry.worktree_path, "Start Codex epic child $($Entry.launch_id)")) { return $null }
-    $process = [System.Diagnostics.Process]::new()
-    $process.StartInfo = Get-CodexChildProcessStartInfo -Entry $Entry -AgentProfile $AgentProfile `
-        -Receipt $Receipt -LastMessagePath "$base.last-message.txt"
-    $started = $false
-    try {
-        if (-not $process.Start()) { throw "failed to start $($Entry.launch_id)." }
-        $started = $true
-        $errorTask = $process.StandardError.ReadToEndAsync()
-        $process.StandardInput.Write([string]$Entry.prompt); $process.StandardInput.Close()
-        $prefixLines = [System.Collections.Generic.List[string]]::new()
-        $sessionId = ''; $deadline = [datetimeoffset]::UtcNow.AddSeconds(30)
-        while ([string]::IsNullOrWhiteSpace($sessionId) -and $prefixLines.Count -lt 16) {
-            $remaining = [Math]::Max(1, [int]($deadline - [datetimeoffset]::UtcNow).TotalMilliseconds)
-            $readTask = $process.StandardOutput.ReadLineAsync()
-            if (-not $readTask.Wait($remaining)) { throw 'session id timeout.' }
-            if ($null -eq $readTask.Result) { break }
-            $prefixLines.Add($readTask.Result)
-            $sessionId = Get-CodexChildSessionId -JsonLines @($readTask.Result)
-        }
-        if ([string]::IsNullOrWhiteSpace($sessionId)) { throw 'no usable Codex session id was emitted.' }
-        Set-CodexChildReceiptState -Receipt $Receipt -State active -SessionId $sessionId
-        return [pscustomobject]@{
-            Entry = $Entry; Process = $process; ErrorTask = $errorTask; SessionId = $sessionId
-            OutputTask = $process.StandardOutput.ReadToEndAsync(); ExitTask = $process.WaitForExitAsync()
-            OutputPrefix = [string]::Join([Environment]::NewLine, $prefixLines) + [Environment]::NewLine
-            BasePath = $base; StartedAt = [datetimeoffset]::UtcNow.ToString('o'); Receipt = $Receipt
-        }
-    } catch {
-        if ($started -and -not $process.HasExited) { $process.Kill($true) }
-        Set-CodexChildReceiptState -Receipt $Receipt -State failed -FailureReason ([string]$_)
-        throw "EPIC_CHILD_LAUNCH_BLOCKED: $($Entry.launch_id) failed during startup: $_"
+    if (-not $PSCmdlet.ShouldProcess(
+            [string]$Entry.worktree_path,
+            "Start Codex epic child $($Entry.launch_id)"
+        )) {
+        return $null
     }
+    $startInfo = Get-CodexChildProcessStartInfo -Entry $Entry -AgentProfile $AgentProfile `
+        -Receipt $Receipt -LastMessagePath "$base.last-message.txt"
+    $setReceiptState = {
+        param($ReceiptValue, [string] $StateValue, [string] $SessionIdValue,
+            [Nullable[int]] $ExitCodeValue, [string] $FailureReasonValue)
+        Set-CodexChildReceiptState -Receipt $ReceiptValue -State $StateValue `
+            -SessionId $SessionIdValue -ExitCode $ExitCodeValue `
+            -FailureReason $FailureReasonValue -Confirm:$false
+    }
+    return Start-CodexChildProcessCore -Entry $Entry -Receipt $Receipt `
+        -ArtifactRoot $ArtifactRoot -StartInfo $startInfo -SurfaceLabel epic `
+        -ErrorPrefix 'EPIC_CHILD_LAUNCH_BLOCKED:' -SetReceiptState $setReceiptState `
+        -Confirm:$false
 }
 
 function Get-CodexChildTerminalStatusEntry {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param([Parameter(Mandatory)] $Child, [Parameter(Mandatory)][string] $ReceiptPath)
     $wrapper = Join-Path ([string]$Child.Entry.worktree_path) '.codex/scripts/resume-epic-child.ps1'
-    $quotedWrapper = "'" + $wrapper.Replace("'", "''") + "'"
-    $quotedReceipt = "'" + $ReceiptPath.Replace("'", "''") + "'"
-    $status = [ordered]@{
-        state              = $(if ($Child.Process.ExitCode -eq 0) { 'completed' } else { 'failed' })
-        pid = $Child.Process.Id; exit_code = $Child.Process.ExitCode
-        codex_session_id = $Child.SessionId; receipt_path = $ReceiptPath
-        resume_script_path = $wrapper
-        resume_command     = "& $quotedWrapper -ReceiptPath $quotedReceipt"
-        stdout_path = "$($Child.BasePath).stdout.jsonl"; stderr_path = "$($Child.BasePath).stderr.log"
-    }
-    if ($Child.Process.ExitCode -eq 0) {
-        $status.completed_at = [string]$Child.Receipt.completed_at
-    } else {
-        $status.failed_at = [string]$Child.Receipt.failed_at
-    }
-    return $status
+    return Get-CodexChildTerminalStatusEntryCore -Child $Child `
+        -ReceiptPath $ReceiptPath -ResumeScriptPath $wrapper
 }
 
 function Get-CodexChildResumeStatus {
@@ -251,11 +224,13 @@ function Get-CodexChildResumeStatus {
 
 function Write-CodexChildWaveStatus {
     param([string] $Path, [string] $WaveId, [string] $State, $Statuses, [AllowEmptyString()][string] $Failure = '')
-    Write-CodexChildJsonAtomic -Path $Path -Value ([ordered]@{
-            schema_version = 2; wave_id = $WaveId; supervisor_pid = $PID
-            state = $State; failure = $Failure; launches = $Statuses
-            updated_at = [datetimeoffset]::UtcNow.ToString('o')
-        })
+    $writeStatus = {
+        param([string] $StatusPath, $Value)
+        Write-CodexChildJsonAtomic -Path $StatusPath -Value $Value
+    }
+    Write-CodexChildScheduleStatusCore -Path $Path -ScheduleKind wave `
+        -ScheduleId $WaveId -State $State -Statuses $Statuses -Failure $Failure `
+        -WriteStatus $writeStatus
 }
 
 function Invoke-CodexChildWaveSupervisor {
@@ -298,7 +273,9 @@ function Invoke-CodexChildWaveSupervisor {
         $specHash = [string]$specSeal.Sha256; $checkpointHash = [string]$checkpointSeal.Sha256
         Write-CodexChildWaveStatus -Path $statusPath -WaveId $Spec.wave_id -State running -Statuses $statuses
         while ($queue.Count -gt 0 -or $running.Count -gt 0) {
-            while ($queue.Count -gt 0 -and $running.Count -lt $MaxParallel) {
+            $availableLaunches = Get-CodexChildAvailableLaunchCount -Maximum $MaxParallel `
+                -RunningCount $running.Count -QueuedCount $queue.Count
+            while ($availableLaunches -gt 0) {
                 $entry = $queue.Dequeue(); $currentEntry = $entry
                 $receiptPath = Join-Path $ArtifactRoot "$($entry.launch_id).receipt.json"
                 $profileKey = Get-CodexChildProfileKey -WorktreePath ([string]$entry.worktree_path) `
@@ -332,6 +309,7 @@ function Invoke-CodexChildWaveSupervisor {
                     receipt_path = $receiptPath; started_at = $child.StartedAt
                 }
                 Write-CodexChildWaveStatus -Path $statusPath -WaveId $Spec.wave_id -State running -Statuses $statuses
+                $availableLaunches--
             }
             if ($running.Count -eq 0) { continue }
             [System.Threading.Tasks.Task]::WaitAny([System.Threading.Tasks.Task[]]@($running | ForEach-Object { $_.ExitTask })) | Out-Null

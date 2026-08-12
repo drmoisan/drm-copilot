@@ -55,6 +55,11 @@ from scripts.dev_tools._parallel_state_structures import (
     validate_current_cohort_bound,
     validate_current_generation_cohorts,
 )
+from scripts.dev_tools.validate_parallel_codex_readiness import (
+    ParallelCodexReadinessEvidence,
+    validate_parallel_codex_checkpoint_readiness,
+    validate_parallel_state_is_standalone,
+)
 
 # Literal context prefix for every error this module and its helpers emit.
 CONTEXT = "Parallel planner checkpoint"
@@ -99,9 +104,10 @@ READY_RADIUS_SOURCE = "declared"
 # A parallel run needs at least two items to be worth scheduling (invariant P6).
 MINIMUM_READY_ITEMS = 2
 
-# Kickoff-prompt path convention pinned by invariant P9 (assumption A6). The
-# path is checked; its contents are F4's concern and are never read here.
-KICKOFF_PATH_TEMPLATE = "artifacts/orchestration/parallel-kickoff-{slug}.md"
+# Committed kickoff path pinned by invariant P9. Repository-backed identity is
+# supplied through the explicit Codex readiness context rather than inferred
+# from an ignored orchestration artifact.
+KICKOFF_PATH_TEMPLATE = "docs/features/parallel/{slug}/parallel-kickoff.md"
 
 # Per-item paths the readiness gate requires to name a produced artifact.
 READY_ITEM_PATH_KEYS: tuple[str, ...] = ("research_path", "plan_path")
@@ -404,7 +410,10 @@ def _validate_ready_gate(state: dict[str, object]) -> list[str]:
 
 
 def validate_parallel_planner_state_text(
-    text: str, *, require_ready_for_execution: bool = False
+    text: str,
+    *,
+    require_ready_for_execution: bool = False,
+    readiness_context: ParallelCodexReadinessEvidence | None = None,
 ) -> list[str]:
     """Validate a parallel-planner checkpoint document.
 
@@ -414,6 +423,9 @@ def validate_parallel_planner_state_text(
             structural readiness gate (invariants P6 through P9). When False
             the gate contributes no errors, so a checkpoint written mid-
             preparation validates.
+        readiness_context (ParallelCodexReadinessEvidence | None): External
+            Codex launch, status, receipt, kickoff, and ledger evidence loaded
+            by the guarded service-call boundary. Required only for readiness.
 
     Returns:
         list[str]: Validation errors for a malformed or unready checkpoint; an
@@ -442,8 +454,16 @@ def validate_parallel_planner_state_text(
     errors.extend(_missing_required_keys(state_map))
     errors.extend(_validate_identity(state_map))
     errors.extend(scan_prohibited_keys(state_map, CONTEXT))
+    errors.extend(validate_parallel_state_is_standalone(state_map, context=CONTEXT))
     errors.extend(_validate_collections(state_map))
 
     if require_ready_for_execution:
         errors.extend(_validate_ready_gate(state_map))
+        errors.extend(
+            validate_parallel_codex_checkpoint_readiness(
+                state_map,
+                context=CONTEXT,
+                evidence=readiness_context,
+            )
+        )
     return errors

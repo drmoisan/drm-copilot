@@ -447,3 +447,34 @@ def test_invocation_without_the_resume_boundary_sentence_is_reported() -> None:
         "Parallel kickoff invocation must structurally name the manifest, "
         "plan-home branch, and atomic-execution resume boundary." in errors
     )
+
+
+def test_committed_readiness_accepts_version_one_identity() -> None:
+    """The explicit gate accepts consistent committed kickoff provenance."""
+
+    assert not validate_parallel_kickoff_text(
+        kickoff_with_integrity(), require_ready_for_execution=True
+    )
+
+
+def test_committed_readiness_requires_planning_commit() -> None:
+    """The explicit gate rejects a structurally valid uncommitted kickoff."""
+
+    errors = validate_parallel_kickoff_text(kickoff(), require_ready_for_execution=True)
+    assert (
+        "Parallel kickoff readiness requires version-1 committed "
+        "planning_commit identity." in errors
+    )
+
+
+def test_committed_readiness_rejects_cross_wired_slug() -> None:
+    """Heading and invocation identities cannot select different runs."""
+
+    document = kickoff_with_integrity().replace(
+        "Run `/parallel-run sample-run`", "Run `/parallel-run other-run`"
+    )
+    errors = validate_parallel_kickoff_text(document, require_ready_for_execution=True)
+    assert (
+        "Parallel kickoff readiness requires heading and invocation slugs to match."
+        in errors
+    )

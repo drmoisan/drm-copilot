@@ -9,36 +9,7 @@ param(
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'epic-child-launch-contract.ps1')
 . (Join-Path $PSScriptRoot 'epic-child-launch-runtime.ps1')
-
-function Test-CodexChildResumeSpecEntry {
-    [OutputType([string[]])]
-    param([Parameter(Mandatory)] $Receipt, [Parameter(Mandatory)] $Spec)
-    $errors = [System.Collections.Generic.List[string]]::new()
-    $entry = @($Spec.launches | Where-Object { [string]$_.launch_id -eq [string]$Receipt.launch_id })
-    if ($entry.Count -ne 1) {
-        return @('sealed launch specification must contain the receipt launch_id exactly once.')
-    }
-    $entry = $entry[0]
-    $pairs = @(
-        @('delegation_id', 'delegation_id'), @('feature_folder', 'feature_folder'),
-        @('deployment_agent', 'deployment_agent'), @('model', 'model'),
-        @('model_reasoning_effort', 'model_reasoning_effort'), @('permissions', 'permissions'),
-        @('execution_context', 'execution_context'), @('worktree_path', 'worktree_path'),
-        @('branch_name', 'branch_name')
-    )
-    foreach ($pair in $pairs) {
-        if ([string]$entry.($pair[0]) -cne [string]$Receipt.($pair[1])) {
-            $errors.Add("sealed launch specification $($pair[0]) differs from the receipt.")
-        }
-    }
-    if (-not (Test-CodexChildIssueEqual -Left $entry.issue_num -Right $Receipt.issue_num)) {
-        $errors.Add('sealed launch specification issue_num differs from the receipt.')
-    }
-    if ((Get-CodexChildSha256 -Value ([string]$entry.prompt)) -ne [string]$Receipt.prompt_sha256) {
-        $errors.Add('sealed launch specification prompt hash differs from the receipt.')
-    }
-    return $errors.ToArray()
-}
+. (Join-Path $PSScriptRoot 'codex-child-launch-resume.ps1')
 
 function Get-CodexChildResumeContext {
     [CmdletBinding()]
@@ -113,13 +84,44 @@ function Get-CodexChildResumeContext {
     if ([string]$receipt.checkpoint_kind -cne [string]$spec.checkpoint_kind) {
         $errors.Add('checkpoint_kind differs from the sealed launch specification.')
     }
+    $checkpointPath = Get-CodexChildCanonicalPath -Path ([string]$receipt.checkpoint_path) `
+        -BasePath ([string]$receipt.trusted_repository_root)
+    if ((Get-FileHash -LiteralPath $checkpointPath -Algorithm SHA256).Hash.ToLowerInvariant() -cne
+        [string]$receipt.checkpoint_sha256) {
+        $errors.Add('sealed checkpoint hash has changed.')
+    }
     $expectedLockPath = Get-CodexChildSemanticWaveLockPath -Spec $spec -ArtifactRoot (Split-Path $specPath -Parent)
     $receiptLockPath = Get-CodexChildCanonicalPath -Path ([string]$receipt.wave_lock_path) `
         -BasePath ([string]$receipt.trusted_repository_root)
     if ($receiptLockPath -cne $expectedLockPath) {
         $errors.Add('wave_lock_path does not match the sealed semantic wave identity.')
     }
-    foreach ($specError in @(Test-CodexChildResumeSpecEntry -Receipt $receipt -Spec $spec)) {
+    $status = $null
+    try {
+        $statusPath = Get-CodexChildCanonicalPath -Path ([string]$receipt.status_path) `
+            -BasePath ([string]$receipt.trusted_repository_root)
+        if ($statusPath -cne [string]$receipt.status_path) {
+            throw 'status_path is not canonical.'
+        }
+        $status = ConvertFrom-CodexChildLaunchJson -Raw `
+        (Get-Content -Raw -LiteralPath $statusPath) -Name 'child status'
+    } catch {
+        $errors.Add("child status data is missing or corrupt: $_")
+    }
+    $getLiveProcess = {
+        param([int] $ProcessId)
+        try {
+            return Get-Process -Id $ProcessId -ErrorAction Stop
+        } catch [Microsoft.PowerShell.Commands.ProcessCommandException] {
+            return $null
+        }
+    }
+    foreach ($specError in @(Get-CodexChildResumeReconciliationCore `
+                -Receipt $receipt `
+                -Spec $spec `
+                -Status $status `
+                -ReceiptPath $canonicalReceipt `
+                -GetLiveProcess $getLiveProcess)) {
         $errors.Add($specError)
     }
     $codexRuntime = Get-CodexChildCommandContext

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  ModelUnavailableError,
   resolveCodexDeployment,
   validateCodexModelRoutingGate,
   validateCodexModelRoutingReceipt,
@@ -79,6 +80,83 @@ describe("Codex model-routing checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
+  it.each([
+    ["parallel-planner", "parallel_planning"],
+    ["parallel-orchestrator", "parallel_execution"],
+  ] as const)("forces %s through its exact model route", (persona, context) => {
+    expect(resolveCodexDeployment(persona, "C1", context, "C4")).toMatchObject({
+      logical_agent: persona,
+      deployment_agent: persona,
+      execution_context: context,
+      orchestration_complexity_ceiling: "C4",
+      model: "gpt-5.6-sol",
+      model_reasoning_effort: "ultra",
+      c3_overlay_applied: false,
+      c3_overlay_reason: null,
+    });
+  });
+
+  it("rejects an absent parallel-orchestrator routing receipt", () => {
+    const state = baseState("parallel-orchestrator");
+    state["codex_model_routing_receipts"] = [];
+
+    expect(validate(state)).toContain(
+      "Checkpoint codex_model_routing_receipts is missing a receipt for " +
+        "delegated agent: parallel-orchestrator.",
+    );
+  });
+
+  it("rejects an epic receipt for a parallel-orchestrator delegation", () => {
+    const state = baseState("parallel-orchestrator");
+    state["codex_model_routing_receipts"] = [codexReceipt("epic-orchestrator")];
+
+    expect(validate(state)).toContain(
+      "Checkpoint codex_model_routing_receipts is missing a receipt for " +
+        "delegated agent: parallel-orchestrator.",
+    );
+  });
+
+  it("rejects a downgraded parallel-orchestrator routing receipt", () => {
+    const receipt = {
+      logical_agent: "parallel-orchestrator",
+      deployment_agent: "parallel-orchestrator",
+      phase: "parallel_execution",
+      complexity_band: "C4",
+      execution_context: "parallel_execution",
+      orchestration_complexity_ceiling: "C4",
+      c3_overlay_applied: false,
+      c3_overlay_reason: null,
+      model: "gpt-5.6-terra",
+      model_reasoning_effort: "high",
+    };
+
+    const errors = validateCodexModelRoutingReceipt(
+      receipt,
+      "Parallel orchestrator model_routing_receipt",
+    );
+
+    expect(errors).toContain(
+      "Parallel orchestrator model_routing_receipt.model must be " +
+        "'gpt-5.6-sol', found 'gpt-5.6-terra'.",
+    );
+    expect(errors).toContain(
+      "Parallel orchestrator model_routing_receipt.model_reasoning_effort " +
+        "must be 'ultra', found 'high'.",
+    );
+  });
+
+  it("does not fall back when the forced parallel model is unavailable", () => {
+    expect(() =>
+      resolveCodexDeployment(
+        "parallel-orchestrator",
+        "C4",
+        "parallel_execution",
+        "C4",
+        new Set(["gpt-5.6-terra", "gpt-5.6-luna"]),
+      ),
+    ).toThrow(ModelUnavailableError);
+  });
+
   it("requires Codex routing evidence for canonical mixed agents", () => {
     // Arrange
     const state = baseState();
@@ -102,6 +180,24 @@ describe("Codex model-routing checkpoint receipts", () => {
     state["codex_model_routing_receipts"] = [codexReceipt()];
 
     // Act / Assert
+    expect(validate(state)).toEqual([]);
+  });
+
+  it("accepts the exact generated commit-steward C4 deployment", () => {
+    const receipt = {
+      ...resolveCodexDeployment("commit-steward", "C4", "standalone", "C4"),
+      phase: "S6_commit_steward",
+    };
+    const state = baseState("commit-steward-c4");
+    state["codex_model_routing_receipts"] = [receipt];
+
+    expect(receipt).toMatchObject({
+      logical_agent: "commit-steward",
+      deployment_agent: "commit-steward-c4",
+      model: "gpt-5.6-sol",
+      model_reasoning_effort: "max",
+      c3_overlay_applied: false,
+    });
     expect(validate(state)).toEqual([]);
   });
 

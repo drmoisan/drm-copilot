@@ -1,10 +1,19 @@
 /** Resolve Codex implementation topology from deterministic scope inputs. */
 
 export type ExecutionContext =
-  "standalone" | "epic_preparation_child" | "epic_execution_child";
-export type TopologyRoute = "small" | "large" | "epic";
-export type Topology = "typed_engineer" | "orchestrator" | "epic_persona";
-export type RootPersona = "epic-planner" | "epic-orchestrator";
+  | "standalone"
+  | "epic_preparation_child"
+  | "epic_execution_child"
+  | "parallel_planning"
+  | "parallel_execution";
+export type TopologyRoute = "small" | "large" | "epic" | "parallel";
+export type Topology =
+  "typed_engineer" | "orchestrator" | "epic_persona" | "parallel_persona";
+export type RootPersona =
+  | "epic-planner"
+  | "epic-orchestrator"
+  | "parallel-planner"
+  | "parallel-orchestrator";
 
 export interface LanguageBudget {
   readonly direct_mode_enabled: boolean;
@@ -37,6 +46,8 @@ export const VALID_EXECUTION_CONTEXTS: ReadonlySet<string> = new Set([
   "standalone",
   "epic_preparation_child",
   "epic_execution_child",
+  "parallel_planning",
+  "parallel_execution",
 ]);
 export const EPIC_CHILD_CONTEXTS: ReadonlySet<string> = new Set([
   "epic_preparation_child",
@@ -45,7 +56,15 @@ export const EPIC_CHILD_CONTEXTS: ReadonlySet<string> = new Set([
 export const FORCED_ROOT_PERSONAS: ReadonlySet<string> = new Set([
   "epic-planner",
   "epic-orchestrator",
+  "parallel-planner",
+  "parallel-orchestrator",
 ]);
+export const PARALLEL_ROOT_CONTEXT_PERSONAS: Readonly<
+  Record<string, RootPersona>
+> = {
+  parallel_planning: "parallel-planner",
+  parallel_execution: "parallel-orchestrator",
+};
 export const ORCHESTRATOR_LOGICAL_AGENT = "orchestrator";
 export const ESCALATION_PRECEDENCE = [
   "epic_child_context",
@@ -182,6 +201,30 @@ export function resolveCodexTopology(
   );
   const rootPersona = options.rootPersona ?? null;
 
+  const parallelPersona = PARALLEL_ROOT_CONTEXT_PERSONAS[context];
+  if (parallelPersona !== undefined) {
+    if (rootPersona !== parallelPersona) {
+      throw new Error(
+        `Parallel context ${pythonRepr(context)} requires its forced root ` +
+          `persona ${pythonRepr(parallelPersona)}.`,
+      );
+    }
+    return {
+      execution_context: context,
+      languages,
+      production_file_count: productionFileCount,
+      test_file_count: testFileCount,
+      cross_cutting: crossCutting,
+      root_persona: parallelPersona,
+      route: "parallel",
+      topology: "parallel_persona",
+      logical_agent: parallelPersona,
+      routing_reason: "forced_root_persona",
+      max_production_files: null,
+      max_test_files: null,
+    };
+  }
+
   if (rootPersona !== null) {
     if (
       typeof rootPersona !== "string" ||
@@ -189,6 +232,15 @@ export function resolveCodexTopology(
     ) {
       throw new Error(
         `Unsupported Codex root persona: ${pythonRepr(rootPersona)}.`,
+      );
+    }
+    const parallelContext = Object.entries(PARALLEL_ROOT_CONTEXT_PERSONAS).find(
+      ([, persona]) => persona === rootPersona,
+    )?.[0];
+    if (parallelContext !== undefined) {
+      throw new Error(
+        `Parallel persona ${pythonRepr(rootPersona)} requires ` +
+          `${pythonRepr(parallelContext)} context.`,
       );
     }
     if (context !== "standalone") {

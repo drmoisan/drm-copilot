@@ -3,10 +3,8 @@
 Covers the unconditional structural invariants P1 through P4 and the
 structural readiness gate P6 through P9, including the
 ``PARALLEL_EXECUTION_READY`` sentinel and the kickoff-PATH convention.
-Delegation to the shared helper modules is asserted with one representative
-error per helper; the helpers' exhaustive per-branch behavior is covered by
-the Phase 1 orchestrator-checkpoint test files. The deliberate omission
-recorded as spec P5 is asserted as an absence. Checkpoints are built as
+Shared helper modules have focused coverage in the Phase 1 checkpoint tests.
+The deliberate omission recorded as spec P5 is asserted as an absence. Data is
 dictionaries and serialized with ``json.dumps``; no temporary file is created.
 """
 
@@ -32,7 +30,7 @@ from tests.scripts.dev_tools.test_validate_parallel_orchestrator_state import (
 CONTEXT = "Parallel planner checkpoint"
 
 # The kickoff path invariant P9 pins for the builder's slug (assumption A6).
-EXPECTED_KICKOFF = "artifacts/orchestration/parallel-kickoff-wave-one.md"
+EXPECTED_KICKOFF = "docs/features/parallel/wave-one/parallel-kickoff.md"
 
 # Error-string prefix for the second builder item, which the readiness-gate
 # cases mutate so a reported error is unambiguously attributable to them.
@@ -120,9 +118,10 @@ def assert_error(
 
 @pytest.mark.parametrize("ready", [False, True])
 def test_valid_checkpoint_yields_no_errors(ready: bool) -> None:
-    """A valid checkpoint validates cleanly with the readiness gate off and on."""
+    """The explicit gate adds only the missing external-evidence error."""
 
-    assert validate(build_valid_planner_state(), ready=ready) == []
+    expected = [f"{CONTEXT} Codex readiness evidence is required."] if ready else []
+    assert validate(build_valid_planner_state(), ready=ready) == expected
 
 
 def test_validator_does_not_mutate_its_input() -> None:
@@ -385,7 +384,8 @@ def test_invariant_p6_requires_at_least_two_items() -> None:
     cohort_at(state, 0)["item_keys"] = [444]
 
     assert validate(state, ready=True) == [
-        f"{CONTEXT} requires at least 2 items for execution readiness; found: 1."
+        f"{CONTEXT} requires at least 2 items for execution readiness; found: 1.",
+        f"{CONTEXT} Codex readiness evidence is required.",
     ]
 
 
@@ -464,7 +464,7 @@ def test_invariant_p8_requires_the_readiness_sentinel(next_step: object) -> None
 @pytest.mark.parametrize(
     "kickoff",
     [
-        "artifacts/orchestration/parallel-kickoff-other.md",
+        "docs/features/parallel/other/parallel-kickoff.md",
         "artifacts/orchestration/epic-kickoff-wave-one.md",
         "",
         None,

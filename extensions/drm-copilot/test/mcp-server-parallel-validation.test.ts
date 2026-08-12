@@ -105,6 +105,8 @@ describe("repo automation MCP parallel validation", () => {
         artifact_path:
           "artifacts/orchestration/parallel-orchestrator-state.json",
         require_complete: true,
+        require_codex_topology: true,
+        require_codex_model_routing: true,
       },
     });
 
@@ -114,6 +116,8 @@ describe("repo automation MCP parallel validation", () => {
       artifactType: "parallel-orchestrator-state",
       artifactPath: "artifacts/orchestration/parallel-orchestrator-state.json",
       requireComplete: true,
+      requireCodexTopology: true,
+      requireCodexModelRouting: true,
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
@@ -121,6 +125,41 @@ describe("repo automation MCP parallel validation", () => {
       tool: "validate_orchestration_artifacts",
       workspace_root: "C:/workspace",
     });
+  });
+
+  it("surfaces ordered parallel mutation and drift rejection through MCP", async () => {
+    const message = [
+      "Validation failed for parallel-orchestrator-state artifact:",
+      "mutations[0] expected recompute generation 1",
+      "unresolved drift for items [444]",
+    ].join("\n");
+    service.validateOrchestrationArtifacts.mockRejectedValue(
+      new Error(message),
+    );
+
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "parallel-orchestrator-state",
+        artifact_path:
+          "artifacts/orchestration/parallel-orchestrator-state.json",
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      artifactType: "parallel-orchestrator-state",
+      artifactPath: "artifacts/orchestration/parallel-orchestrator-state.json",
+    });
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({
+      ok: false,
+      tool: "validate_orchestration_artifacts",
+    });
+    expect((result.structuredContent as { summary: string }).summary).toBe(
+      message,
+    );
   });
 
   it("forwards parallel planner readiness validation through MCP", async () => {
@@ -155,6 +194,37 @@ describe("repo automation MCP parallel validation", () => {
       tool: "validate_orchestration_artifacts",
       workspace_root: "C:/workspace",
     });
+  });
+
+  it("surfaces missing file-backed readiness evidence through MCP", async () => {
+    const message =
+      "Validation failed for parallel-planner-state artifact at " +
+      "'artifacts/orchestration/parallel-planner-state.json':\n" +
+      "Parallel checkpoint items[0] launch record is missing.";
+    service.validateOrchestrationArtifacts.mockRejectedValue(
+      new Error(message),
+    );
+
+    const result = await client.callTool({
+      name: "validate_orchestration_artifacts",
+      arguments: {
+        workspace_root: "C:/workspace",
+        artifact_type: "parallel-planner-state",
+        artifact_path: "artifacts/orchestration/parallel-planner-state.json",
+        require_ready_for_execution: true,
+      },
+    });
+
+    expect(service.validateOrchestrationArtifacts).toHaveBeenCalledWith({
+      workspaceRoot: "C:/workspace",
+      artifactType: "parallel-planner-state",
+      artifactPath: "artifacts/orchestration/parallel-planner-state.json",
+      requireReadyForExecution: true,
+    });
+    expect(result.isError).toBe(true);
+    expect((result.structuredContent as { summary: string }).summary).toBe(
+      message,
+    );
   });
 
   // The rejection probe below was `parallel-kickoff` until that type was

@@ -27,8 +27,11 @@ const EDGE_REASON_ENUM =
   "path_overlap, module_overlap, shared_surface_overlap, contract_dependency";
 const ITEM_STATE_ENUM =
   "proposed, admitted, prepared, scheduled, in_flight, merged, withdrawn, blocked";
+const UNRESOLVED_DRIFT_ERROR =
+  "Parallel checkpoint unresolved drift for items [444] blocks admission and completion.";
+const MISSING_DRIFT_EVENT_ERROR =
+  "Parallel checkpoint semantic-drift requeue requires a persisted halted_later_started_item event.";
 
-/** Values rejected wherever a non-negative integer is required, with reprs. */
 const NON_INTEGER_CASES: [unknown, string][] = [
   [-1, "-1"],
   [true, "True"],
@@ -36,7 +39,6 @@ const NON_INTEGER_CASES: [unknown, string][] = [
   [null, "None"],
 ];
 
-/** Values rejected wherever a key must resolve to an item, with reprs. */
 const UNRESOLVED_KEY_CASES: [unknown, string][] = [
   [999, "999"],
   ["444", "'444'"],
@@ -54,23 +56,7 @@ function expectValid(state: JsonRecord): void {
   expect(validateState(state)).toEqual([]);
 }
 
-/**
- * Return a valid checkpoint whose conflict-edge list is replaced.
- *
- * The builder colours 444 and 445 into one current-generation cohort, which is a
- * coherent graph colouring only while the conflict-edge list is empty. A cohort
- * is a colour class of the conflict graph, so two items sharing a
- * current-generation cohort index run concurrently by construction; an edge
- * injected between them is an invalid colouring and earns a cohort-barrier
- * violation on top of whatever edge-shape condition the caller is exercising.
- * Split the two items into distinct current-generation cohorts so an injected
- * edge is properly coloured and each test observes only its own condition.
- *
- * Invariants 13 and 14 continue to hold: indices 0 and 1 are unique within the
- * current generation, every non-withdrawn item appears in exactly one
- * current-generation cohort, and `current_cohort` of 0 does not exceed the
- * maximum current-generation index of 1.
- */
+/** Return a checkpoint with replaced edges and a valid split coloring. */
 function stateWithEdges(edges: unknown): JsonRecord {
   const state = buildValidParallelState();
   state["cohorts"] = [
@@ -321,8 +307,8 @@ describe("invariant 15 conflict edges", () => {
 });
 
 describe("invariant 16 mutation log", () => {
-  it("accepts a fully populated item-scoped mutation", () => {
-    expectValid(stateWithMutation());
+  it("accepts the item-scoped shape before requiring its drift event", () => {
+    expectError(stateWithMutation(), MISSING_DRIFT_EVENT_ERROR);
   });
 
   it("accepts the run-level close record", () => {
@@ -447,8 +433,8 @@ describe("invariant 17 in-flight removal disposition", () => {
 });
 
 describe("invariant 18 drift events", () => {
-  it("accepts a fully populated drift event", () => {
-    expectValid(stateWithDriftEvent());
+  it("accepts the complete shape before unresolved-drift quiescence", () => {
+    expectError(stateWithDriftEvent(), UNRESOLVED_DRIFT_ERROR);
   });
 
   it("rejects a non-list drift_events value", () => {
@@ -481,7 +467,7 @@ describe("invariant 18 drift events", () => {
   });
 
   it.each(["declared", "observed"])("accepts an empty %s set", (field) => {
-    expectValid(stateWithDriftEvent({ [field]: [] }));
+    expectError(stateWithDriftEvent({ [field]: [] }), UNRESOLVED_DRIFT_ERROR);
   });
 
   it.each([[[]], ["extensions/b.ts"], [[""]], [null]])(
@@ -502,7 +488,7 @@ describe("invariant 18 drift events", () => {
   });
 
   it.each(VALID_DRIFT_ACTIONS)("accepts drift action %s", (action) => {
-    expectValid(stateWithDriftEvent({ action }));
+    expectError(stateWithDriftEvent({ action }), UNRESOLVED_DRIFT_ERROR);
   });
 
   it("rejects an action outside the two-value enum", () => {

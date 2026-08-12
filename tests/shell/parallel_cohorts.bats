@@ -214,6 +214,16 @@ setup() {
     [ "$status" -eq 2 ]
 }
 
+@test "batching reports help and rejects unknown options" {
+    run bash "$BATCHES" --help
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = 'Usage: compute-concurrency-batches.sh --keys "<k1> <k2> ..." --max-concurrency <n>' ]
+
+    run bash "$BATCHES" --unknown-option
+    [ "$status" -eq 2 ]
+    [ "${lines[0]}" = 'Usage: compute-concurrency-batches.sh --keys "<k1> <k2> ..." --max-concurrency <n>' ]
+}
+
 @test "the sourced library exposes the same results as the entry points" {
     pcoh_compute_cohorts "1 2 3" "1:2 2:3"
     [ "$PCOH_RESULT" = "[[2],[1,3]]" ]

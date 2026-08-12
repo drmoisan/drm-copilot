@@ -29,6 +29,9 @@ import {
 // so neither file exceeds the repository's 500-line limit, and are re-exported
 // here so callers depend on this one module for every collection validator.
 export {
+  OPS_REQUIRING_ITEM_KEY,
+  OPS_REQUIRING_NULL_NEW_STATE,
+  OPS_REQUIRING_NULL_PRIOR_STATE,
   validateDriftEvents,
   validateMutations,
 } from "./parallel-state-records";

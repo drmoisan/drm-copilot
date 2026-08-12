@@ -23,6 +23,9 @@ jobs:
   poshqc:
     uses: ./.github/workflows/_poshqc.yml
 
+  parallel-completion-gate:
+    uses: ./.github/workflows/_poshqc.yml
+
   shell-coverage:
     uses: ./.github/workflows/_shell-coverage.yml
 

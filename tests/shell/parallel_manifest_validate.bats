@@ -147,6 +147,13 @@ valid_body() {
     [ "$output" = "4" ]
 }
 
+@test "the CLI prints help and exits successfully" {
+    run bash "$ENTRY" --help
+
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Usage: validate-parallel-manifest.sh [--print-mode | --print-max-concurrency] <manifest-path>" ]
+}
+
 @test "the CLI exits 2 for a missing manifest and for a usage error" {
     run bash "$ENTRY" "${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/no-such-file.md"
     [ "$status" -eq 2 ]

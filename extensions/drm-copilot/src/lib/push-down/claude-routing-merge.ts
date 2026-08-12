@@ -72,6 +72,31 @@ export class RoutingMergeError extends Error {
   }
 }
 
+/** Stable reason emitted for substantive destination-owned collisions. */
+const ROUTING_MERGE_CONFLICT_REASON = "ROUTING_MERGE_SUBSTANTIVE_COLLISION";
+
+/** Error raised when an additive merge would replace destination-owned data. */
+export class RoutingMergeConflictError extends Error {
+  /** Stable machine-readable reason code. */
+  public readonly reasonCode = ROUTING_MERGE_CONFLICT_REASON;
+
+  /** Destination path whose values conflict. */
+  public readonly path: string;
+
+  /** Conflicting keys in deterministic ascending order. */
+  public readonly conflicts: readonly string[];
+
+  constructor(path: string, conflicts: readonly string[]) {
+    const orderedConflicts = [...conflicts].sort();
+    super(
+      `${ROUTING_MERGE_CONFLICT_REASON}: ${path}: ${orderedConflicts.join(", ")}`,
+    );
+    this.name = "RoutingMergeConflictError";
+    this.path = path;
+    this.conflicts = orderedConflicts;
+  }
+}
+
 /**
  * Normalize a path to forward-slash separators with no trailing slash.
  *
@@ -134,6 +159,143 @@ function asObject(value: JsonValue | undefined): JsonObject | null {
     return null;
   }
   return Array.isArray(value) ? null : value;
+}
+
+/** Compare JSON values structurally without relying on object key order. */
+function jsonValuesEqual(
+  left: JsonValue | undefined,
+  right: JsonValue | undefined,
+): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return (
+      Array.isArray(left) &&
+      Array.isArray(right) &&
+      left.length === right.length &&
+      left.every((value, index) => jsonValuesEqual(value, right[index]))
+    );
+  }
+  const leftObject = asObject(left);
+  const rightObject = asObject(right);
+  if (leftObject === null || rightObject === null) {
+    return false;
+  }
+  const leftKeys = Object.keys(leftObject).sort();
+  const rightKeys = Object.keys(rightObject).sort();
+  return (
+    leftKeys.length === rightKeys.length &&
+    leftKeys.every(
+      (key, index) =>
+        key === rightKeys[index] &&
+        jsonValuesEqual(leftObject[key], rightObject[key]),
+    )
+  );
+}
+
+/** Read a key known to originate from `Object.keys` or `Object.entries`. */
+function requiredJsonValue(object: JsonObject, key: string): JsonValue {
+  const value = object[key];
+  if (value === undefined) {
+    throw new Error(`Parsed routing document is missing key: ${key}`);
+  }
+  return value;
+}
+
+/** Return substantive shared-key conflicts in deterministic order. */
+function findAdditiveConflicts(
+  destination: JsonObject,
+  source: JsonObject,
+): string[] {
+  const conflicts: string[] = [];
+  for (const key of Object.keys(destination)) {
+    if (
+      key !== ROUTES_KEY &&
+      key in source &&
+      !jsonValuesEqual(destination[key], source[key])
+    ) {
+      conflicts.push(key);
+    }
+  }
+
+  if (ROUTES_KEY in destination && ROUTES_KEY in source) {
+    const destinationRoutes = asObject(destination[ROUTES_KEY]);
+    const sourceRoutes = asObject(source[ROUTES_KEY]);
+    if (destinationRoutes === null || sourceRoutes === null) {
+      if (!jsonValuesEqual(destination[ROUTES_KEY], source[ROUTES_KEY])) {
+        conflicts.push(ROUTES_KEY);
+      }
+    } else {
+      for (const routeName of Object.keys(destinationRoutes)) {
+        if (
+          routeName in sourceRoutes &&
+          !jsonValuesEqual(
+            destinationRoutes[routeName],
+            sourceRoutes[routeName],
+          )
+        ) {
+          conflicts.push(`${ROUTES_KEY}.${routeName}`);
+        }
+      }
+    }
+  }
+  return conflicts.sort();
+}
+
+/**
+ * Add missing source entries without replacing destination-owned routing data.
+ *
+ * Existing equal entries retain the destination's exact bytes when no
+ * additions are required. New route and top-level keys are appended in
+ * ascending order.
+ */
+export function mergeAdditiveRoutingDocuments(
+  destinationText: string,
+  sourceText: string,
+  path: string,
+): string {
+  const destination = parseRoutingObject(destinationText, path);
+  const source = parseRoutingObject(sourceText, path);
+  const conflicts = findAdditiveConflicts(destination, source);
+  if (conflicts.length > 0) {
+    throw new RoutingMergeConflictError(path, conflicts);
+  }
+
+  const merged: JsonObject = { ...destination };
+  let changed = false;
+  const destinationRoutes = asObject(destination[ROUTES_KEY]);
+  const sourceRoutes = asObject(source[ROUTES_KEY]);
+  if (sourceRoutes !== null) {
+    if (destinationRoutes === null && !(ROUTES_KEY in destination)) {
+      merged[ROUTES_KEY] = Object.fromEntries(
+        Object.keys(sourceRoutes)
+          .sort()
+          .map((name) => [name, requiredJsonValue(sourceRoutes, name)]),
+      );
+      changed = true;
+    } else if (destinationRoutes !== null) {
+      const missingRoutes = Object.keys(sourceRoutes)
+        .filter((name) => !(name in destinationRoutes))
+        .sort();
+      if (missingRoutes.length > 0) {
+        const mergedRoutes: JsonObject = { ...destinationRoutes };
+        for (const name of missingRoutes) {
+          mergedRoutes[name] = requiredJsonValue(sourceRoutes, name);
+        }
+        merged[ROUTES_KEY] = mergedRoutes;
+        changed = true;
+      }
+    }
+  }
+
+  for (const key of Object.keys(source)
+    .filter((name) => name !== ROUTES_KEY && !(name in destination))
+    .sort()) {
+    merged[key] = requiredJsonValue(source, key);
+    changed = true;
+  }
+  return changed ? `${JSON.stringify(merged, null, 2)}\n` : destinationText;
 }
 
 /**
@@ -286,12 +448,21 @@ export class RoutingMergeFileSystem implements PushDownFileSystem {
       this.inner.writeTextFile(path, content);
       return;
     }
-    const merged = mergeRoutingDocuments(
+    const merged = this.mergeDocuments(
       this.inner.readTextFile(path),
       content,
       path,
     );
     this.inner.writeTextFile(path, merged);
+  }
+
+  /** Merge source content into an existing destination routing document. */
+  protected mergeDocuments(
+    destinationText: string,
+    sourceText: string,
+    path: string,
+  ): string {
+    return mergeRoutingDocuments(destinationText, sourceText, path);
   }
 
   /**
@@ -304,5 +475,17 @@ export class RoutingMergeFileSystem implements PushDownFileSystem {
     return (
       relativeToPosix(path, this.destinationRoot) === this.mergeRelativePath
     );
+  }
+}
+
+/** Routing filesystem decorator that rejects destination-owned collisions. */
+export class AdditiveRoutingMergeFileSystem extends RoutingMergeFileSystem {
+  /** @inheritdoc */
+  protected override mergeDocuments(
+    destinationText: string,
+    sourceText: string,
+    path: string,
+  ): string {
+    return mergeAdditiveRoutingDocuments(destinationText, sourceText, path);
   }
 }

@@ -1,0 +1,702 @@
+{
+  "schema_version": 1,
+  "description": "Shared mutation-decision scenarios evaluated against the Python checkpoint, mutation-entry, removal, close, and recoloring authorities.",
+  "lifecycle_modes": {
+    "add": "complete-seven-field-record",
+    "remove": "merged-item-removal-rejected",
+    "close": "close-rejected-while-item-in-flight",
+    "detach": "in-flight-detach-exactly-confirmed",
+    "abandon": "in-flight-abandon-exactly-confirmed"
+  },
+  "base_document": {
+    "objective": "deliver codex-native-parallel-orchestration-467",
+    "completed_steps": ["manifest_parsed"],
+    "next_step": "cohort_0_launch",
+    "last_updated": "2026-08-10T20-25",
+    "route_id": "parallel",
+    "parallel_slug": "codex-native-parallel-orchestration-467",
+    "parallel_manifest_path": "docs/features/parallel/codex-native-parallel-orchestration-467/parallel.md",
+    "parallel_status_doc_path": "docs/features/parallel/codex-native-parallel-orchestration-467/parallel-status.md",
+    "mode": "closed",
+    "max_concurrency": 4,
+    "current_cohort": 0,
+    "recolor_generation": 0,
+    "cohorts": [
+      {
+        "index": 0,
+        "generation": 0,
+        "item_keys": [444, 445]
+      }
+    ],
+    "items": [
+      {
+        "issue_num": 444,
+        "feature_folder": "2026-08-07-parallel-schema-validators-444",
+        "state": "in_flight",
+        "merge_status": "pr_open",
+        "blast_radius": {
+          "paths": ["scripts/dev_tools/**"],
+          "modules": ["scripts"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-25"
+        }
+      },
+      {
+        "issue_num": 445,
+        "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+        "state": "scheduled",
+        "merge_status": "not_started",
+        "blast_radius": {
+          "paths": ["extensions/drm-copilot/**"],
+          "modules": ["extensions"],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-10T20-25"
+        }
+      }
+    ],
+    "conflict_edges": [],
+    "mutations": [],
+    "drift_events": []
+  },
+  "cases": [
+    {
+      "name": "complete-seven-field-record",
+      "behavior": "complete-record",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "mutations": [
+          {
+            "op": "add",
+            "item_key": 445,
+            "at": "2026-08-10T20-26",
+            "prior_state": null,
+            "new_state": "scheduled",
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": null,
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_RECORD_COMPLETE"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "missing-required-record-field",
+      "behavior": "complete-record",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "mutations": [
+          {
+            "op": "add",
+            "item_key": 445,
+            "at": "2026-08-10T20-26",
+            "prior_state": null,
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": null,
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_RECORD_INCOMPLETE"
+      },
+      "typescript_error_contains": "mutations[0] is missing required field: new_state.",
+      "currently_divergent": true
+    },
+    {
+      "name": "recompute-sequence-gap",
+      "behavior": "sequence-gap",
+      "authority": "requeue_sequence",
+      "document_overrides": {
+        "recolor_generation": 2,
+        "cohorts": [
+          {
+            "index": 0,
+            "generation": 2,
+            "item_keys": [444, 445]
+          }
+        ],
+        "mutations": [
+          {
+            "op": "requeue",
+            "item_key": 444,
+            "at": "2026-08-10T20-27",
+            "prior_state": "in_flight",
+            "new_state": "blocked",
+            "disposition": null,
+            "recolor_generation": 2
+          }
+        ]
+      },
+      "operation": {
+        "start_generation": 0
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_SEQUENCE_GAP"
+      },
+      "typescript_error_contains": "mutations[0] recolor_generation 2 must equal the expected recompute generation 1.",
+      "currently_divergent": true
+    },
+    {
+      "name": "duplicate-recompute-sequence",
+      "behavior": "sequence-duplicate",
+      "authority": "requeue_sequence",
+      "document_overrides": {
+        "recolor_generation": 1,
+        "cohorts": [
+          {
+            "index": 0,
+            "generation": 1,
+            "item_keys": [444, 445]
+          }
+        ],
+        "mutations": [
+          {
+            "op": "requeue",
+            "item_key": 444,
+            "at": "2026-08-10T20-27",
+            "prior_state": "in_flight",
+            "new_state": "blocked",
+            "disposition": null,
+            "recolor_generation": 1
+          },
+          {
+            "op": "requeue",
+            "item_key": 444,
+            "at": "2026-08-10T20-28",
+            "prior_state": "in_flight",
+            "new_state": "blocked",
+            "disposition": null,
+            "recolor_generation": 1
+          }
+        ]
+      },
+      "operation": {
+        "start_generation": 0
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_SEQUENCE_DUPLICATE"
+      },
+      "typescript_error_contains": "mutations[1] recolor_generation 1 must equal the expected recompute generation 2.",
+      "currently_divergent": true
+    },
+    {
+      "name": "open-mode-remains-admissible-without-close",
+      "behavior": "open-mode",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "mode": "open"
+      },
+      "operation": null,
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_OPEN_MODE_ACTIVE"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "open-mode-terminal-close",
+      "behavior": "open-mode",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "mode": "open",
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["scripts/dev_tools/**"],
+              "modules": ["scripts"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["extensions/drm-copilot/**"],
+              "modules": ["extensions"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          }
+        ],
+        "mutations": [
+          {
+            "op": "close",
+            "item_key": null,
+            "at": "2026-08-10T20-29",
+            "prior_state": null,
+            "new_state": null,
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": null,
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_OPEN_MODE_CLOSED"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "open-mode-mutation-after-close",
+      "behavior": "open-mode",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "mode": "open",
+        "mutations": [
+          {
+            "op": "close",
+            "item_key": null,
+            "at": "2026-08-10T20-29",
+            "prior_state": null,
+            "new_state": null,
+            "disposition": null,
+            "recolor_generation": 0
+          },
+          {
+            "op": "add",
+            "item_key": 445,
+            "at": "2026-08-10T20-30",
+            "prior_state": null,
+            "new_state": "scheduled",
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": null,
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_AFTER_OPEN_CLOSE"
+      },
+      "typescript_error_contains": "records op 'add' after the run-close entry at mutations[0]",
+      "currently_divergent": true
+    },
+    {
+      "name": "closed-mode-terminal-completion",
+      "behavior": "closed-mode",
+      "authority": "checkpoint",
+      "document_overrides": {
+        "cohorts": [],
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "state": "merged",
+            "merge_status": "merged",
+            "blast_radius": {
+              "paths": ["scripts/dev_tools/**"],
+              "modules": ["scripts"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "merged",
+            "merge_status": "worktree_removed",
+            "blast_radius": {
+              "paths": ["extensions/drm-copilot/**"],
+              "modules": ["extensions"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          }
+        ],
+        "mutations": [
+          {
+            "op": "close",
+            "item_key": null,
+            "at": "2026-08-10T20-31",
+            "prior_state": null,
+            "new_state": null,
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": null,
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_CLOSED_MODE_COMPLETE"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "close-rejected-while-item-in-flight",
+      "behavior": "closed-mode",
+      "authority": "close",
+      "document_overrides": {
+        "mutations": [
+          {
+            "op": "close",
+            "item_key": null,
+            "at": "2026-08-10T20-31",
+            "prior_state": null,
+            "new_state": null,
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": {
+        "op": "close"
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_CLOSE_IN_FLIGHT"
+      },
+      "typescript_error_contains": "close requires no item in flight",
+      "currently_divergent": true
+    },
+    {
+      "name": "pinned-item-excluded-from-recolor",
+      "behavior": "pinned-in-flight",
+      "authority": "recolor",
+      "document_overrides": {},
+      "operation": {
+        "item_keys": [444, 445],
+        "conflict_edges": [[444, 445]],
+        "unstarted_keys": [445],
+        "pinned_keys": [444],
+        "current_cohort": 0,
+        "current_generation": 0
+      },
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_PIN_PRESERVED"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "pinned-item-illegally-recomputed",
+      "behavior": "pinned-in-flight",
+      "authority": "recolor",
+      "document_overrides": {},
+      "operation": {
+        "item_keys": [444, 445],
+        "conflict_edges": [[444, 445]],
+        "unstarted_keys": [444, 445],
+        "pinned_keys": [444],
+        "current_cohort": 0,
+        "current_generation": 0
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_PIN_VIOLATION"
+      },
+      "typescript_error_contains": "pinned item 444 must not participate in unstarted recomputation",
+      "currently_divergent": true
+    },
+    {
+      "name": "merged-item-removal-rejected",
+      "behavior": "merged-removal",
+      "authority": "removal",
+      "document_overrides": {
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "state": "merged",
+            "merge_status": "merged",
+            "blast_radius": {
+              "paths": ["scripts/dev_tools/**"],
+              "modules": ["scripts"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["extensions/drm-copilot/**"],
+              "modules": ["extensions"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          }
+        ],
+        "mutations": [
+          {
+            "op": "remove",
+            "item_key": 444,
+            "at": "2026-08-10T20-32",
+            "prior_state": "merged",
+            "new_state": "withdrawn",
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": {
+        "op": "remove",
+        "item_key": 444,
+        "disposition": null,
+        "confirmation": null
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_REMOVE_MERGED"
+      },
+      "typescript_error_contains": "cannot remove item 444 from prior_state 'merged'",
+      "currently_divergent": true
+    },
+    {
+      "name": "in-flight-removal-requires-explicit-confirmation",
+      "behavior": "detach-abandon-confirmation",
+      "authority": "removal",
+      "document_overrides": {
+        "mutations": [
+          {
+            "op": "remove",
+            "item_key": 444,
+            "at": "2026-08-10T20-33",
+            "prior_state": "in_flight",
+            "new_state": "withdrawn",
+            "disposition": null,
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": {
+        "op": "remove",
+        "item_key": 444,
+        "disposition": null,
+        "confirmation": null
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_REMOVE_CONFIRMATION_REQUIRED"
+      },
+      "typescript_error_contains": "disposition must be one of detach, abandon for an in-flight removal",
+      "currently_divergent": false
+    },
+    {
+      "name": "in-flight-detach-exactly-confirmed",
+      "behavior": "detach-abandon-confirmation",
+      "authority": "removal",
+      "document_overrides": {
+        "cohorts": [
+          {
+            "index": 0,
+            "generation": 0,
+            "item_keys": [445]
+          }
+        ],
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "state": "withdrawn",
+            "merge_status": "pr_open",
+            "blast_radius": {
+              "paths": ["scripts/dev_tools/**"],
+              "modules": ["scripts"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["extensions/drm-copilot/**"],
+              "modules": ["extensions"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          }
+        ],
+        "mutations": [
+          {
+            "op": "remove",
+            "item_key": 444,
+            "at": "2026-08-10T20-34",
+            "prior_state": "in_flight",
+            "new_state": "withdrawn",
+            "disposition": "detach",
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": {
+        "op": "remove",
+        "item_key": 444,
+        "disposition": "detach",
+        "confirmation": {
+          "operation": "detach",
+          "item_key": 444,
+          "worktree_identity": "C:/worktrees/parallel-item-444",
+          "token": "confirm:detach:444:C:/worktrees/parallel-item-444"
+        }
+      },
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_REMOVE_DETACH_CONFIRMED"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "in-flight-abandon-exactly-confirmed",
+      "behavior": "detach-abandon-confirmation",
+      "authority": "removal",
+      "document_overrides": {
+        "cohorts": [
+          {
+            "index": 0,
+            "generation": 0,
+            "item_keys": [445]
+          }
+        ],
+        "items": [
+          {
+            "issue_num": 444,
+            "feature_folder": "2026-08-07-parallel-schema-validators-444",
+            "state": "withdrawn",
+            "merge_status": "pr_open",
+            "blast_radius": {
+              "paths": ["scripts/dev_tools/**"],
+              "modules": ["scripts"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          },
+          {
+            "issue_num": 445,
+            "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+            "state": "scheduled",
+            "merge_status": "not_started",
+            "blast_radius": {
+              "paths": ["extensions/drm-copilot/**"],
+              "modules": ["extensions"],
+              "shared_surfaces": [],
+              "contracts": [],
+              "source": "declared",
+              "computed_at": "2026-08-10T20-25"
+            }
+          }
+        ],
+        "mutations": [
+          {
+            "op": "remove",
+            "item_key": 444,
+            "at": "2026-08-10T20-35",
+            "prior_state": "in_flight",
+            "new_state": "withdrawn",
+            "disposition": "abandon",
+            "recolor_generation": 0
+          }
+        ]
+      },
+      "operation": {
+        "op": "remove",
+        "item_key": 444,
+        "disposition": "abandon",
+        "confirmation": {
+          "operation": "abandon",
+          "item_key": 444,
+          "worktree_identity": "C:/worktrees/parallel-item-444",
+          "token": "confirm:abandon:444:C:/worktrees/parallel-item-444"
+        }
+      },
+      "expected": {
+        "accepted": true,
+        "reason_code": "MUTATION_REMOVE_ABANDON_CONFIRMED"
+      },
+      "typescript_error_contains": null,
+      "currently_divergent": false
+    },
+    {
+      "name": "in-flight-removal-moves-pinned-generation",
+      "behavior": "pinned-in-flight",
+      "authority": "removal",
+      "document_overrides": {
+        "recolor_generation": 1,
+        "cohorts": [
+          {
+            "index": 0,
+            "generation": 1,
+            "item_keys": [444, 445]
+          }
+        ],
+        "mutations": [
+          {
+            "op": "remove",
+            "item_key": 444,
+            "at": "2026-08-10T20-36",
+            "prior_state": "in_flight",
+            "new_state": "withdrawn",
+            "disposition": "detach",
+            "recolor_generation": 1
+          }
+        ]
+      },
+      "operation": {
+        "op": "remove",
+        "item_key": 444,
+        "disposition": "detach",
+        "start_generation": 0,
+        "confirmation": {
+          "operation": "detach",
+          "item_key": 444,
+          "worktree_identity": "C:/worktrees/parallel-item-444",
+          "token": "confirm:detach:444:C:/worktrees/parallel-item-444"
+        }
+      },
+      "expected": {
+        "accepted": false,
+        "reason_code": "MUTATION_PIN_GENERATION_CHANGED"
+      },
+      "typescript_error_contains": "in-flight remove must preserve recolor_generation 0; found: 1",
+      "currently_divergent": true
+    }
+  ]
+}

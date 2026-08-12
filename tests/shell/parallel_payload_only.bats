@@ -22,92 +22,127 @@
 # shims are checked-in fixtures.
 
 setup() {
-    REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    PAYLOAD_ROOT="${REPO_ROOT}/extensions/drm-copilot/resources/claude-customizations"
-    PAYLOAD_LIB="${PAYLOAD_ROOT}/.claude/lib/bash"
-    FIXTURE_MANIFEST="${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel.md"
-    BASH_BIN="$(command -v bash)"
-    RESTRICTED_PATH="${REPO_ROOT}/tests/fixtures/parallel_payload_path"
-    # Checked-in shims may be stored without the executable bit on some
-    # platforms; make them runnable for this checkout. Idempotent; creates no
-    # files.
-    chmod +x "${RESTRICTED_PATH}"/* 2>/dev/null || true
+	REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
+	PAYLOAD_ROOT="${REPO_ROOT}/extensions/drm-copilot/resources/claude-customizations"
+	PAYLOAD_LIB="${PAYLOAD_ROOT}/.claude/lib/bash"
+	FIXTURE_MANIFEST="${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel.md"
+	BASH_BIN="$(command -v bash)"
+	RESTRICTED_PATH="${REPO_ROOT}/tests/fixtures/parallel_payload_path"
+	APPROVED_BASH_FILES=(
+		compute-cohorts.sh
+		compute-concurrency-batches.sh
+		parallel-cohorts.sh
+		parallel-common.sh
+		parallel-items-validate.sh
+		parallel-manifest-validate.sh
+		parallel-yaml-emit.sh
+		parallel-yaml-scan.sh
+		validate-parallel-manifest.sh
+	)
+	APPROVED_BLAST_RADIUS_FILES=(
+		BlastRadius.psm1
+		BlastRadiusConfig.psm1
+		BlastRadiusExtraction.psm1
+		BlastRadiusGlob.psm1
+		BlastRadiusValidation.psm1
+	)
+	# Checked-in shims may be stored without the executable bit on some
+	# platforms; make them runnable for this checkout. Idempotent; creates no
+	# files.
+	chmod +x "${RESTRICTED_PATH}"/* 2>/dev/null || true
 }
 
 # Run a payload entry point with the restricted PATH from the payload root.
 run_payload() {
-    local script="$1"
-    shift
-    run env -i PATH="$RESTRICTED_PATH" HOME="$HOME" \
-        "$BASH_BIN" "${PAYLOAD_LIB}/${script}" "$@"
+	local script="$1"
+	shift
+	run env -i PATH="$RESTRICTED_PATH" HOME="$HOME" \
+		"$BASH_BIN" "${PAYLOAD_LIB}/${script}" "$@"
 }
 
 @test "the payload directory carries the three entry points" {
-    [ -d "$PAYLOAD_ROOT" ]
-    [ -f "${PAYLOAD_LIB}/compute-cohorts.sh" ]
-    [ -f "${PAYLOAD_LIB}/compute-concurrency-batches.sh" ]
-    [ -f "${PAYLOAD_LIB}/validate-parallel-manifest.sh" ]
+	[ -d "$PAYLOAD_ROOT" ]
+	[ -f "${PAYLOAD_LIB}/compute-cohorts.sh" ]
+	[ -f "${PAYLOAD_LIB}/compute-concurrency-batches.sh" ]
+	[ -f "${PAYLOAD_LIB}/validate-parallel-manifest.sh" ]
 }
 
 @test "the payload directory carries the config tree and the parallel rule" {
-    [ -f "${PAYLOAD_ROOT}/config/orchestration-routing.json" ]
-    [ -f "${PAYLOAD_ROOT}/config/blast-radius.json" ]
-    [ -f "${PAYLOAD_ROOT}/.claude/rules/parallel-orchestration.md" ]
+	[ -f "${PAYLOAD_ROOT}/config/orchestration-routing.json" ]
+	[ -f "${PAYLOAD_ROOT}/config/blast-radius.json" ]
+	[ -f "${PAYLOAD_ROOT}/.claude/rules/parallel-orchestration.md" ]
+}
+
+@test "the payload carries the exact nine-file portable bash library" {
+	actual="$(find "$PAYLOAD_LIB" -maxdepth 1 -type f -name '*.sh' -printf '%f\n' | sort)"
+	expected="$(printf '%s\n' "${APPROVED_BASH_FILES[@]}" | sort)"
+	[ "$actual" = "$expected" ]
+}
+
+@test "the payload carries all five blast-radius modules and generic config" {
+	for name in "${APPROVED_BLAST_RADIUS_FILES[@]}"; do
+		[ -f "${PAYLOAD_ROOT}/.claude/lib/blast-radius/${name}" ]
+	done
+	generic_config="${PAYLOAD_ROOT}/config/blast-radius.json"
+	[ -f "$generic_config" ]
+	for repository_only in scripts/dev_tools packages/mcp-server poetry.lock package-lock.json; do
+		! grep -qF "$repository_only" "$generic_config"
+	done
 }
 
 @test "the restricted PATH exposes no Python interpreter" {
-    run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v python'
-    [ "$status" -ne 0 ]
-    run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v python3'
-    [ "$status" -ne 0 ]
-    run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v poetry'
-    [ "$status" -ne 0 ]
+	run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v python'
+	[ "$status" -ne 0 ]
+	run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v python3'
+	[ "$status" -ne 0 ]
+	run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c 'command -v poetry'
+	[ "$status" -ne 0 ]
 }
 
 @test "the restricted PATH exposes the four utilities the library needs" {
-    for tool in sort cut cat dirname; do
-        run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c "command -v $tool"
-        [ "$status" -eq 0 ]
-    done
+	for tool in sort cut cat dirname; do
+		run env -i PATH="$RESTRICTED_PATH" "$BASH_BIN" -c "command -v $tool"
+		[ "$status" -eq 0 ]
+	done
 }
 
 @test "the payload computes cohorts without Python on PATH" {
-    run_payload compute-cohorts.sh --keys "1 2 3" --edges "1:2 2:3"
-    [ "$status" -eq 0 ]
-    [ "$output" = "[[2],[1,3]]" ]
+	run_payload compute-cohorts.sh --keys "1 2 3" --edges "1:2 2:3"
+	[ "$status" -eq 0 ]
+	[ "$output" = "[[2],[1,3]]" ]
 }
 
 @test "the payload reports a cohort input error without Python on PATH" {
-    run_payload compute-cohorts.sh --keys "1 2" --edges "1:1"
-    [ "$status" -eq 1 ]
-    [ "$output" = "Self-loop edge on item key 1; the conflict relation is defined over distinct items, so an item cannot conflict with itself." ]
+	run_payload compute-cohorts.sh --keys "1 2" --edges "1:1"
+	[ "$status" -eq 1 ]
+	[ "$output" = "Self-loop edge on item key 1; the conflict relation is defined over distinct items, so an item cannot conflict with itself." ]
 }
 
 @test "the payload computes concurrency batches without Python on PATH" {
-    run_payload compute-concurrency-batches.sh --keys "5 1 3 2" --max-concurrency 2
-    [ "$status" -eq 0 ]
-    [ "$output" = "[[1,2],[3,5]]" ]
+	run_payload compute-concurrency-batches.sh --keys "5 1 3 2" --max-concurrency 2
+	[ "$status" -eq 0 ]
+	[ "$output" = "[[1,2],[3,5]]" ]
 }
 
 @test "the payload validates a manifest without Python on PATH" {
-    run_payload validate-parallel-manifest.sh "$FIXTURE_MANIFEST"
-    [ "$status" -eq 0 ]
-    [ -z "$output" ]
+	run_payload validate-parallel-manifest.sh "$FIXTURE_MANIFEST"
+	[ "$status" -eq 0 ]
+	[ -z "$output" ]
 }
 
 @test "the payload resolves both manifest accessors without Python on PATH" {
-    run_payload validate-parallel-manifest.sh --print-mode "$FIXTURE_MANIFEST"
-    [ "$status" -eq 0 ]
-    [ "$output" = "closed" ]
-    run_payload validate-parallel-manifest.sh --print-max-concurrency "$FIXTURE_MANIFEST"
-    [ "$status" -eq 0 ]
-    [ "$output" = "4" ]
+	run_payload validate-parallel-manifest.sh --print-mode "$FIXTURE_MANIFEST"
+	[ "$status" -eq 0 ]
+	[ "$output" = "closed" ]
+	run_payload validate-parallel-manifest.sh --print-max-concurrency "$FIXTURE_MANIFEST"
+	[ "$status" -eq 0 ]
+	[ "$output" = "4" ]
 }
 
 @test "the payload reports manifest errors without Python on PATH" {
-    run_payload validate-parallel-manifest.sh \
-        "${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel-invalid.md"
-    [ "$status" -eq 1 ]
-    [ "${lines[0]}" = "Parallel manifest parallel must be a non-empty string." ]
-    [ "${lines[1]}" = "Parallel manifest created_at must be a non-empty string." ]
+	run_payload validate-parallel-manifest.sh \
+		"${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel-invalid.md"
+	[ "$status" -eq 1 ]
+	[ "${lines[0]}" = "Parallel manifest parallel must be a non-empty string." ]
+	[ "${lines[1]}" = "Parallel manifest created_at must be a non-empty string." ]
 }

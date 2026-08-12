@@ -153,6 +153,48 @@ def test_root_epic_persona_is_forced(persona: str) -> None:
     assert receipt["routing_reason"] == "forced_root_persona"
 
 
+@pytest.mark.parametrize(
+    ("context", "persona"),
+    [
+        ("parallel_planning", "parallel-planner"),
+        ("parallel_execution", "parallel-orchestrator"),
+    ],
+)
+def test_root_parallel_persona_is_forced(context: str, persona: str) -> None:
+    """Route each parallel root context only to its forced parallel persona."""
+
+    receipt = resolve_codex_topology([], 0, 0, context, root_persona=persona)
+
+    assert receipt["execution_context"] == context
+    assert receipt["route"] == "parallel"
+    assert receipt["topology"] == "parallel_persona"
+    assert receipt["logical_agent"] == persona
+    assert receipt["root_persona"] == persona
+    assert receipt["routing_reason"] == "forced_root_persona"
+
+
+@pytest.mark.parametrize(
+    ("context", "persona"),
+    [
+        ("parallel_planning", None),
+        ("parallel_planning", "orchestrator"),
+        ("parallel_planning", "epic-planner"),
+        ("parallel_execution", None),
+        ("parallel_execution", "orchestrator"),
+        ("parallel_execution", "epic-orchestrator"),
+        ("parallel_planning", "parallel-orchestrator"),
+        ("parallel_execution", "parallel-planner"),
+    ],
+)
+def test_parallel_root_context_rejects_other_personas(
+    context: str, persona: str | None
+) -> None:
+    """Reject ordinary, epic, absent, and cross-wired parallel root personas."""
+
+    with pytest.raises(ValueError, match="requires its forced root persona"):
+        resolve_codex_topology([], 0, 0, context, root_persona=persona)
+
+
 def test_language_normalization_is_stable() -> None:
     """Normalize case and duplicate language inputs before resolution."""
 

@@ -9,6 +9,7 @@ param()
 . (Join-Path $PSScriptRoot 'codex-agent-profile-attestation.ps1')
 
 $script:CodexModelGateRepositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$script:CodexParallelModelGatePersonas = @('parallel-planner', 'parallel-orchestrator')
 
 function ConvertFrom-CodexModelGateJson {
     [CmdletBinding()]
@@ -59,6 +60,23 @@ function Test-CodexModelGateProfileAttestation {
         }
     }
     if ([string]$Attestation.profile_sha256 -notmatch '^[0-9a-f]{64}$') {
+        return $false
+    }
+    if ([string]$Attestation.agent_type -in $script:CodexParallelModelGatePersonas -and (
+            [string]$Attestation.surface -cne 'parallel' -or
+            $Attestation.provenance_valid -isnot [bool] -or
+            -not [bool]$Attestation.provenance_valid -or
+            $Attestation.root_authorized -isnot [bool] -or
+            -not [bool]$Attestation.root_authorized -or
+            [string]$Attestation.expected_model -cne 'gpt-5.6-sol' -or
+            [string]$Attestation.actual_model -cne 'gpt-5.6-sol' -or
+            [string]$Attestation.profile_model -cne 'gpt-5.6-sol' -or
+            [string]$Attestation.expected_reasoning_effort -cne 'ultra' -or
+            [string]$Attestation.actual_reasoning_effort -cne 'ultra' -or
+            $Attestation.fallback_used -isnot [bool] -or
+            [bool]$Attestation.fallback_used -or
+            [string]::IsNullOrWhiteSpace([string]$Attestation.parallel_identity) -or
+            [string]$Attestation.parallel_identity -cne [string]$Attestation.mutation_identity)) {
         return $false
     }
     try {
@@ -129,7 +147,8 @@ function Test-CodexModelGateAgentType {
         'feature-reviewer', 'task-researcher', 'prd-feature', 'pr-author',
         'python-typed-engineer', 'powershell-typed-engineer',
         'csharp-typed-engineer', 'typescript-engineer',
-        'epic-planner', 'epic-orchestrator'
+        'epic-planner', 'epic-orchestrator',
+        'parallel-planner', 'parallel-orchestrator'
     ) -contains $AgentType
 }
 
@@ -158,13 +177,19 @@ try {
     $repositoryRoot = $script:CodexModelGateRepositoryRoot
     $sessionId = [string]$payload.session_id
     $transcriptPath = [string]$payload.transcript_path
+    $surface = if ([string]$payload.agent_type -in $script:CodexParallelModelGatePersonas) {
+        'parallel'
+    } else {
+        'epic'
+    }
     if (-not [string]::IsNullOrWhiteSpace($transcriptPath) -and
         -not [string]::IsNullOrWhiteSpace($sessionId)) {
         $key = Get-CodexModelGateAttestationKey -TranscriptPath $transcriptPath
         $path = Get-CodexAuthorityAttestationPath `
             -RepositoryRoot $repositoryRoot `
             -SessionId $sessionId `
-            -AttestationKey $key
+            -AttestationKey $key `
+            -Surface $surface
         if (Test-Path -LiteralPath $path -PathType Leaf) {
             $attestationRaw = Get-Content -Raw -LiteralPath $path
         }
@@ -174,7 +199,8 @@ try {
         -not [string]::IsNullOrWhiteSpace($sessionId)) {
         $stateRoot = Get-CodexAuthorityStateRoot `
             -RepositoryRoot $repositoryRoot `
-            -SessionId $sessionId
+            -SessionId $sessionId `
+            -Surface $surface
         foreach ($path in Get-ChildItem -LiteralPath $stateRoot -Filter 'codex-routing-attestation.*.json' -File -ErrorAction SilentlyContinue) {
             $candidate = Get-Content -Raw -LiteralPath $path.FullName
             try {
