@@ -353,9 +353,9 @@ Determinism is enforced through an injected `TimeProvider` (`FakeTimeProvider` i
 
 Distributed as the `csharp-legacy` Claude pack ([.claude-variants/csharp-legacy](extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/)), selectable through the `push_down_claude_customizations` tool with `csharp_variant: "legacy"`. It applies the same stage order on the .NET Framework / VSTO toolchain:
 
-- format: `dotnet tool run csharpier .`
-- analyze: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-- nullable: `msbuild <solution>.sln /t:Build /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+- format: `dotnet tool run csharpier format .` (apply) and `dotnet tool run csharpier check .` (verify)
+- analyze: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- nullable: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
 - test: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` (MSTest)
 
 The legacy variant uses the `IClock` clock seam rather than `TimeProvider`, reflecting pre-.NET 8 contexts that have not been migrated.

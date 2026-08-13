@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from typing import cast
@@ -235,3 +236,112 @@ def test_codex_role_files_do_not_retain_drm_copilot_transport() -> None:
     assert_no_role_local_drm_copilot_transport(
         read_toml(BUNDLED_ROOT, ORCHESTRATOR_ROLE_PATH),
     )
+
+
+CODEX_LEGACY_VARIANT_FILES: tuple[Path, ...] = (
+    Path(".agents-variants/csharp-legacy/skills/csharp/SKILL.md"),
+    Path(".agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"),
+)
+LEGACY_REQUIRED_SUBSTRINGS: tuple[str, ...] = (
+    "dotnet tool run csharpier format .",
+    "dotnet tool run csharpier check .",
+    "dotnet tool restore",
+    "/t:Rebuild /m",
+    '"/p:Platform=Any CPU"',
+    "/p:TreatWarningsAsErrors=true",
+    "#nullable enable",
+)
+LEGACY_FORBIDDEN_SUBSTRINGS: tuple[str, ...] = (
+    "csharpier .",
+    "sln /t:Build",
+    '/p:Platform="Any CPU"',
+)
+NULLABLE_SPAN_SCOPE_LITERALS: tuple[str, str] = ("msbuild", "/p:Nullable=enable")
+INLINE_CODE_SPAN_PATTERN = re.compile(r"`([^`\n]+)`")
+
+
+def test_codex_legacy_variant_files_contain_corrected_gate_commands() -> None:
+    """Assert both Codex legacy variant files carry the corrected gate commands.
+
+    The corrected `csharp-legacy` gate contract requires the CSharpier
+    subcommand forms, the manifest restore step, the `/t:Rebuild /m` local
+    build, the whole-argument platform token, the retained warnings-as-errors
+    property, and the per-file nullable opt-in marker. Real repository bytes are
+    read so the assertion reflects what the push-down engine emits.
+    """
+
+    # Arrange: the two canonical Codex variant sources.
+    variant_files = CODEX_LEGACY_VARIANT_FILES
+
+    # Act / Assert: every required substring must appear in every variant file.
+    for relative_path in variant_files:
+        content = read_text(BUNDLED_ROOT, relative_path)
+        for required in LEGACY_REQUIRED_SUBSTRINGS:
+            assert required in content, (
+                f"Required legacy gate substring missing from "
+                f"{relative_path}: {required}"
+            )
+
+
+def _spans_with_both_literals(content: str) -> list[str]:
+    """Return inline code spans containing both nullable-scope literals.
+
+    Purpose:
+        Implement the span-scoped nullable predicate: a documented command lives
+        inside a backtick-delimited inline code span, so the guard against
+        `/p:Nullable=enable` reaching an MSBuild command line is expressed as a
+        conjunction over one span rather than over a whole line or file.
+
+    Args:
+        content (str): Full UTF-8 text of a variant file.
+
+    Returns:
+        list[str]: Every extracted span that contains both the lowercase
+        `msbuild` token and the `/p:Nullable=enable` literal. An empty list
+        means the file satisfies the predicate.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    msbuild_token, nullable_property = NULLABLE_SPAN_SCOPE_LITERALS
+    # Matching is case-sensitive on purpose: the lowercase `msbuild` token
+    # appears only in command spans, while prose names the product `MSBuild`.
+    return [
+        span
+        for span in INLINE_CODE_SPAN_PATTERN.findall(content)
+        if msbuild_token in span and nullable_property in span
+    ]
+
+
+def test_codex_legacy_variant_files_exclude_stale_gate_commands() -> None:
+    """Assert both Codex legacy variant files carry no stale gate command form.
+
+    Two distinct scopes apply. The three literals in
+    ``LEGACY_FORBIDDEN_SUBSTRINGS`` are file-scoped: they must not appear
+    anywhere in either variant file. The `/p:Nullable=enable` guard is
+    span-scoped: no backtick-delimited inline code span may contain both
+    `msbuild` and `/p:Nullable=enable`, which permits prohibition prose that
+    names the property while still forbidding it as a command argument. The
+    scan targets only these two files; the Codex default-slot files carry
+    pre-existing, out-of-scope stale content and are deliberately not scanned.
+    """
+
+    # Arrange: the two canonical Codex variant sources.
+    variant_files = CODEX_LEGACY_VARIANT_FILES
+
+    # Act / Assert: file-scoped absence, then the span-scoped nullable predicate.
+    for relative_path in variant_files:
+        content = read_text(BUNDLED_ROOT, relative_path)
+        for forbidden in LEGACY_FORBIDDEN_SUBSTRINGS:
+            assert (
+                forbidden not in content
+            ), f"Stale legacy gate substring present in {relative_path}: {forbidden}"
+        offending_spans = _spans_with_both_literals(content)
+        assert not offending_spans, (
+            f"Inline code span in {relative_path} contains both 'msbuild' and "
+            f"'/p:Nullable=enable': {offending_spans}"
+        )

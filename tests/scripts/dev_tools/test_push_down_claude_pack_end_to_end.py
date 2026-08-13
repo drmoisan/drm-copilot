@@ -316,3 +316,75 @@ def test_push_down_no_arguments_publishes_full_tree() -> None:
     assert dest / ".claude/agent-memory/shared/MEMORY.md" in fs.files
     # The default run reads modern C# content (no variant routing).
     assert fs.read_text(dest / ".claude/rules/csharp.md") == "# Modern C#\n"
+
+
+def _destination_map(fs: RecordingFileSystem, destination_root: Path) -> dict[str, str]:
+    """Return a `{relative_path: content}` map for one destination root.
+
+    Purpose:
+        Reduce a push-down result to a root-independent value so two generations
+        written to different destination roots can be compared directly.
+
+    Args:
+        fs (RecordingFileSystem): The in-memory filesystem holding both runs.
+        destination_root (Path): The destination root whose files are collected.
+
+    Returns:
+        dict[str, str]: POSIX-style relative path to file content for every file
+        written beneath the destination root.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Key by POSIX relative path so the two maps are comparable across roots.
+    return {
+        path.relative_to(destination_root).as_posix(): fs.read_text(path)
+        for path in fs.list_files(destination_root)
+    }
+
+
+def test_push_down_claude_repeated_generation_is_deterministic() -> None:
+    """Verify two legacy-variant generations produce identical output.
+
+    Both generations run against one seeded source tree and write to separate
+    destination roots. `artifact_root` points outside both destinations so the
+    timestamped push-down artifacts are excluded from the comparison, leaving
+    only the published payload. Equal maps establish that repeated generation is
+    deterministic.
+    """
+
+    # Arrange: one seeded source tree plus two destination roots and an artifact
+    # root outside both. `_seed_full_tree` registers only the first destination,
+    # so the second destination and the artifact root are registered explicitly.
+    module = _entry_module()
+    source_root = Path("/repo")
+    first_dest = Path("/dest")
+    second_dest = Path("/dest2")
+    artifact_root = Path("/artifacts")
+    fs = RecordingFileSystem()
+    _seed_full_tree(fs, source_root, first_dest)
+    fs.directories.update({second_dest, artifact_root})
+
+    # Act: publish the same pack selection twice, once into each destination.
+    for destination in (first_dest, second_dest):
+        module.push_down_customizations(
+            repo_root=source_root,
+            destination_root=destination,
+            fs=fs,
+            source_root=source_root,
+            artifact_root=artifact_root,
+            packs=frozenset({"core", "csharp-legacy"}),
+            csharp_variant="legacy",
+        )
+
+    # Assert: both generations wrote the same relative paths and contents.
+    first_map = _destination_map(fs, first_dest)
+    second_map = _destination_map(fs, second_dest)
+    assert first_map, "First generation must publish at least one file."
+    assert (
+        first_map == second_map
+    ), "Repeated generation must produce identical destination content."
