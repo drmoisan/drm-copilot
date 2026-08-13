@@ -1,6 +1,9 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     . (Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-wave-barrier.ps1')
+    . (Join-Path $script:RepoRoot '.codex/hooks/validate-codex-subagent-routing.ps1')
+    . (Join-Path $script:RepoRoot '.codex/scripts/launch-epic-child-wave.ps1')
+    . (Join-Path $script:RepoRoot '.codex/scripts/resume-epic-child.ps1') -ReceiptPath unused
     $script:Now = [datetimeoffset]'2026-07-10T22:00:00Z'
 
     function Get-WaveLaunchContext {
@@ -141,5 +144,157 @@ Describe 'Receipt-bound epic wave barrier' {
 
         Invoke-TestWaveDecision -Context $context -Payload '{"tool_name":"Read","session_id":"session-1"}' |
             Should -BeNullOrEmpty
+    }
+
+    It 'normalizes routed stop payloads and classifies every gated agent family' {
+        (ConvertFrom-CodexStopJson -Raw '{"agent_type":"default"}' -Name payload).
+        agent_type | Should -Be 'default'
+        { ConvertFrom-CodexStopJson -Raw ' ' -Name payload } |
+            Should -Throw '*payload is empty*'
+        { ConvertFrom-CodexStopJson -Raw '{' -Name payload } |
+            Should -Throw '*payload is malformed JSON*'
+        Test-CodexStopGatedAgent -AgentType atomic-executor-c3 | Should -BeTrue
+        Test-CodexStopGatedAgent -AgentType parallel-orchestrator | Should -BeTrue
+        Test-CodexStopGatedAgent -AgentType default | Should -BeFalse
+        (Get-CodexStopContinuation -Reason blocked -AlreadyContinued $false).decision |
+            Should -Be 'block'
+        (Get-CodexStopContinuation -Reason blocked -AlreadyContinued $true).continue |
+            Should -BeFalse
+    }
+
+    It 'fails routed stop decisions closed for missing or invalid attestations' {
+        $payloads = @(
+            @{ agent_type = 'epic-planner'; agent_id = 'agent'; stop_hook_active = $false },
+            @{ agent_type = 'parallel-planner'; agent_id = 'agent'; stop_hook_active = $false },
+            @{ agent_type = 'atomic-executor-c3'; agent_id = 'agent'; stop_hook_active = $true }
+        )
+        foreach ($payload in $payloads) {
+            $decision = Invoke-CodexSubagentStopDecision `
+                -PayloadRaw ($payload | ConvertTo-Json -Compress) -AttestationRaw ''
+            ($decision.reason + $decision.stopReason) | Should -Match 'BLOCKED'
+        }
+        Invoke-CodexSubagentStopDecision `
+            -PayloadRaw '{"agent_type":"default"}' -AttestationRaw '' |
+            Should -BeNullOrEmpty
+
+        $payloadRaw = '{"agent_type":"epic-planner","agent_id":"agent","model":"gpt-5.6-sol"}'
+        $identityDrift = @{ agent_type = 'epic-planner'; agent_id = 'other' } |
+            ConvertTo-Json -Compress
+        (Invoke-CodexSubagentStopDecision `
+            -PayloadRaw $payloadRaw -AttestationRaw $identityDrift).reason |
+            Should -Match 'identity does not match'
+        $badProvenance = @{
+            agent_type = 'epic-planner'; agent_id = 'agent'; provenance_valid = $false
+        } | ConvertTo-Json -Compress
+        (Invoke-CodexSubagentStopDecision `
+            -PayloadRaw $payloadRaw -AttestationRaw $badProvenance).reason |
+            Should -Match 'lacks valid root provenance'
+    }
+
+    It 'enforces parallel model identity and delegates valid output validation' {
+        $payload = @{
+            agent_type = 'parallel-orchestrator'; agent_id = 'agent'
+            model = 'gpt-5.6-sol'
+        }
+        $attestation = @{
+            agent_type = 'parallel-orchestrator'; agent_id = 'agent'; surface = 'parallel'
+            provenance_valid = $true; root_authorized = $true; routing_valid = $true
+            actual_model = 'gpt-5.6-sol'; expected_model = 'gpt-5.6-sol'
+            profile_model = 'gpt-5.6-sol'; actual_reasoning_effort = 'ultra'
+            expected_reasoning_effort = 'ultra'; fallback_used = $false
+            parallel_identity = 'identity'; mutation_identity = 'identity'
+        }
+        $payloadRaw = $payload | ConvertTo-Json -Compress
+        $invalid = $attestation.Clone(); $invalid.fallback_used = $true
+        (Invoke-CodexSubagentStopDecision -PayloadRaw $payloadRaw `
+            -AttestationRaw ($invalid | ConvertTo-Json -Compress)).reason |
+            Should -Match 'no-fallback routing'
+        $invalid = $attestation.Clone(); $invalid.routing_valid = $false
+        (Invoke-CodexSubagentStopDecision -PayloadRaw $payloadRaw `
+            -AttestationRaw ($invalid | ConvertTo-Json -Compress)).reason |
+            Should -Match 'recorded deployment model'
+        $payload.model = 'gpt-5.6-terra'; $invalid = $attestation.Clone()
+        (Invoke-CodexSubagentStopDecision -PayloadRaw ($payload | ConvertTo-Json -Compress) `
+            -AttestationRaw ($invalid | ConvertTo-Json -Compress)).reason |
+            Should -Match 'stop model differs'
+        $payload.model = 'gpt-5.6-sol'; $script:ValidatedWorkspace = ''
+        $validator = {
+            param($raw, $root)
+            $raw | Should -Match 'parallel-orchestrator'
+            $script:ValidatedWorkspace = $root
+            'validated'
+        }
+        Invoke-CodexSubagentStopDecision -PayloadRaw ($payload | ConvertTo-Json -Compress) `
+            -AttestationRaw ($attestation | ConvertTo-Json -Compress) `
+            -WorkspaceRoot $script:RepoRoot -ParallelOutputValidator $validator |
+            Should -Be 'validated'
+        $script:ValidatedWorkspace | Should -Be $script:RepoRoot
+        { Invoke-CodexSubagentStopDecision -PayloadRaw ($payload | ConvertTo-Json -Compress) `
+                -AttestationRaw ($attestation | ConvertTo-Json -Compress) `
+                -ParallelOutputValidator $validator } |
+            Should -Throw '*workspace root is required*'
+    }
+
+    It 'finds matching stop attestations while ignoring malformed candidates' {
+        Mock Test-Path { $true }
+        Mock Get-ChildItem {
+            @([pscustomobject]@{ FullName = 'bad.json' }, [pscustomobject]@{ FullName = 'good.json' })
+        }
+        Mock Get-Content {
+            param($LiteralPath)
+            if ($LiteralPath -eq 'bad.json') { return '{' }
+            return '{"agent_id":"agent"}'
+        }
+        Find-CodexStopAttestationRaw -StateRoot state -AgentId agent |
+            Should -Match 'agent_id'
+        Find-CodexStopAttestationRaw -StateRoot state -AgentId absent |
+            Should -BeNullOrEmpty
+        Mock Test-Path { $false }
+        Find-CodexStopAttestationRaw -StateRoot absent -AgentId agent |
+            Should -BeNullOrEmpty
+    }
+
+    It 'builds resume process arguments and updates terminal wave entries' {
+        $receipt = [pscustomobject]@{
+            worktree_path = 'C:\worktree'; codex_denied_paths = @('C:\denied')
+            model = 'gpt-5.6-sol'; model_reasoning_effort = 'high'
+            launch_id = 'launch'; receipt_path = 'C:\receipt.json'; spec_path = 'C:\spec.json'
+            status_path = 'NUL'; state = 'active'; completed_at = ''; failed_at = ''; exit_code = 0
+            delegation_id = 'delegation'; execution_context = 'epic_execution_child'
+            deployment_agent = 'orchestrator-c3'; profile_sha256 = 'profile'
+            codex_session_id = 'session'; codex_home_path = 'C:\home'
+        }
+        $context = [pscustomobject]@{
+            Receipt      = $receipt
+            Profile      = [pscustomobject]@{ developer_instructions = 'instructions'; skills_config = '[]' }
+            CodexRuntime = [pscustomobject]@{ CommandPath = 'C:\codex.ps1' }
+        }
+        $info = Get-CodexChildResumeStartInfo -Context $context `
+            -ResumePrompt continue -OutputPath 'C:\last.txt'
+        $info.FileName | Should -Be pwsh
+        $info.ArgumentList | Should -Contain resume
+        $info.ArgumentList | Should -Contain session
+        $info.ArgumentList | Should -Contain continue
+        $info.Environment['CODEX_EPIC_CHILD_SESSION_ID'] | Should -Be session
+
+        Mock Write-CodexChildJsonAtomic { }
+        Mock Get-Content {
+            '{"updated_at":"","launches":{"launch":{"state":"active","codex_session_id":"","receipt_path":"","exit_code":0,"completed_at":"","failed_at":""}}}'
+        }
+        $receipt.state = 'completed'; $receipt.completed_at = 'done'
+        Set-CodexChildResumeWaveStatus -Receipt $receipt -Confirm:$false
+        Should -Invoke Write-CodexChildJsonAtomic -Times 1 -ParameterFilter {
+            $Value.launches.launch.exit_code -eq 0 -and
+            $Value.launches.launch.completed_at -eq 'done'
+        }
+        $receipt.state = 'failed'; $receipt.exit_code = 7; $receipt.failed_at = 'failed'
+        Set-CodexChildResumeWaveStatus -Receipt $receipt -Confirm:$false
+        Should -Invoke Write-CodexChildJsonAtomic -Times 1 -ParameterFilter {
+            $Value.launches.launch.exit_code -eq 7 -and
+            $Value.launches.launch.failed_at -eq 'failed'
+        }
+        $receipt.launch_id = 'missing'
+        { Set-CodexChildResumeWaveStatus -Receipt $receipt -Confirm:$false } |
+            Should -Throw '*lacks the receipt launch_id*'
     }
 }

@@ -332,11 +332,11 @@ Deliver an additive, root-controlled Codex parallel surface with the following e
       batches without Python or Poetry and does not contain unrelated `.claude/` files.
 - [x] Existing Codex epic and delivered Claude parallel suites pass, and a before/after byte audit
       reports no `.claude/` source changes.
-- [x] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
+- [ ] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
       linting, type checking where applicable, unit and integration tests, Pester, Bats, and
       zero-regression checks in the required order.
       Evidence: [final four-language QA index](evidence/qa-gates/index.md).
-- [x] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
+- [ ] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
       remains at least 75 percent, each new module/class/method targets at least 90 percent, changed-
       line coverage does not regress, and coverage evidence is stored under the canonical feature
       evidence path; QA-gate evidence uses `<FEATURE>/evidence/qa-gates/`.

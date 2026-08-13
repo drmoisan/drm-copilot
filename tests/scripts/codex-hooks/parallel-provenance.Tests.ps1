@@ -10,6 +10,9 @@ Describe 'Codex parallel root provenance contracts' {
             'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents'
         $script:ConfigContent = Get-Content -Raw -LiteralPath `
         (Join-Path $script:RepoRoot '.codex/config.toml')
+        . (Join-Path $script:RepoRoot '.codex/hooks/record-subagent-routing-attestation.ps1')
+        $script:ParallelNow = [datetimeoffset]'2026-08-12T12:00:00Z'
+        $script:ParallelHead = 'a' * 40
 
         function Get-ParallelPersonaContract {
             param(
@@ -40,6 +43,44 @@ Describe 'Codex parallel root provenance contracts' {
                 Permission    = $permission.Groups['value'].Value
                 Prompt        = $prompt.Groups['value'].Value
                 EnabledSkills = @($skills | ForEach-Object { $_.Groups['value'].Value })
+            }
+        }
+
+        function Get-TestParallelRootReceipt {
+            param(
+                [ValidateSet('parallel-plan', 'parallel-run', 'parallel-orchestrate')]
+                [string] $EntryKind = 'parallel-run'
+            )
+
+            $persona = if ($EntryKind -eq 'parallel-plan') {
+                'parallel-planner'
+            } else {
+                'parallel-orchestrator'
+            }
+            $identity = Get-CodexAuthoritySha256 -Text "run-a|$EntryKind"
+            return [pscustomobject][ordered]@{
+                schema_version      = 1
+                surface             = 'parallel'
+                repository_root     = Get-CodexCanonicalAuthorityPath -Path $script:RepoRoot
+                repository_sha256   = Get-CodexAuthorityRepositoryKey -RepositoryRoot $script:RepoRoot
+                repository_head_sha = $script:ParallelHead
+                session_id          = 'session-parallel'
+                turn_id             = 'turn-parallel'
+                prompt_sha256       = 'b' * 64
+                requested_persona   = $persona
+                entry_kind          = $EntryKind
+                parallel_reference  = 'run-a'
+                parallel_slug       = 'run-a'
+                parallel_identity   = $identity
+                mutation_identity   = $identity
+                kickoff_path        = $(if ($EntryKind -eq 'parallel-run') {
+                        'docs/features/parallel/run-a/parallel-kickoff.md'
+                    } else { '' })
+                created_at          = $script:ParallelNow.AddMinutes(-1).ToString('o')
+                expires_at          = $script:ParallelNow.AddMinutes(30).ToString('o')
+                consumed            = $false
+                consumed_by         = $null
+                consumed_at         = $null
             }
         }
     }
@@ -249,5 +290,95 @@ Describe 'Codex parallel root provenance contracts' {
             )
         }
         $body | Should -Not -Match '(?m)^"\*\*" = "write"$'
+    }
+
+    It 'validates every supported parallel root-entry receipt shape' {
+        foreach ($entryKind in @('parallel-plan', 'parallel-run', 'parallel-orchestrate')) {
+            $receipt = Get-TestParallelRootReceipt -EntryKind $entryKind
+            $payload = [pscustomobject]@{
+                session_id = 'session-parallel'
+                turn_id    = 'turn-parallel'
+                agent_type = [string]$receipt.requested_persona
+            }
+
+            Test-RootParallelReceipt `
+                -Receipt $receipt -Payload $payload -RepositoryRoot $script:RepoRoot `
+                -CurrentHeadSha $script:ParallelHead -Now $script:ParallelNow |
+                Should -BeTrue
+        }
+        Test-RootParallelReceipt `
+            -Receipt $null -Payload ([pscustomobject]@{}) -RepositoryRoot $script:RepoRoot `
+            -CurrentHeadSha $script:ParallelHead -Now $script:ParallelNow |
+            Should -BeFalse
+    }
+
+    It 'rejects malformed, drifted, consumed, and expired parallel receipts' {
+        $base = Get-TestParallelRootReceipt
+        $payload = [pscustomobject]@{
+            session_id = 'session-parallel'; turn_id = 'turn-parallel'
+            agent_type = 'parallel-orchestrator'
+        }
+        $cases = @(
+            { param($r) $r.PSObject.Properties.Remove('surface') }
+            { param($r) Add-Member -InputObject $r -NotePropertyName unexpected -NotePropertyValue value }
+            { param($r) $r.surface = 'epic' }
+            { param($r) $r.parallel_identity = 'invalid' }
+            { param($r) $r.mutation_identity = 'c' * 64 }
+            { param($r) $r.kickoff_path = 'other.md' }
+            { param($r) $r.consumed = $true }
+            { param($r) $r.expires_at = $script:ParallelNow.AddMinutes(-1).ToString('o') }
+            { param($r) $r.requested_persona = 'unknown' }
+        )
+        foreach ($mutate in $cases) {
+            $receipt = $base | ConvertTo-Json | ConvertFrom-Json
+            & $mutate $receipt
+            Test-RootParallelReceipt `
+                -Receipt $receipt -Payload $payload -RepositoryRoot $script:RepoRoot `
+                -CurrentHeadSha $script:ParallelHead -Now $script:ParallelNow |
+                Should -BeFalse
+        }
+    }
+
+    It 'builds a complete parallel attestation and fails closed without root authority' {
+        $receipt = Get-TestParallelRootReceipt
+        $payload = [pscustomobject]@{
+            session_id      = 'session-parallel'
+            turn_id         = 'turn-parallel'
+            agent_id        = 'agent-parallel'
+            agent_type      = 'parallel-orchestrator'
+            model           = 'gpt-5.6-sol'
+            transcript_path = 'parallel.jsonl'
+        }
+        $accepted = Get-CodexSubagentAttestation `
+            -Payload $payload -RootReceipt $receipt -Checkpoints @() `
+            -RepositoryRoot $script:RepoRoot -CurrentHeadSha $script:ParallelHead `
+            -Now $script:ParallelNow
+        $accepted.root_authorized | Should -BeTrue
+        $accepted.provenance_valid | Should -BeTrue
+        $accepted.surface | Should -Be 'parallel'
+        $accepted.fallback_used | Should -BeFalse
+        $accepted.parallel_identity | Should -Be $receipt.parallel_identity
+
+        $rejected = Get-CodexSubagentAttestation `
+            -Payload $payload -RootReceipt $null -Checkpoints @() `
+            -RepositoryRoot $script:RepoRoot -CurrentHeadSha $script:ParallelHead `
+            -Now $script:ParallelNow
+        $rejected.root_authorized | Should -BeFalse
+        $rejected.provenance_valid | Should -BeFalse
+        $rejected.enforcement_marker | Should -Be 'PARALLEL_INVOCATION_ORIGIN_BLOCKED'
+    }
+
+    It 'uses the no-receipt authority path without creating files' {
+        $payload = [pscustomobject]@{
+            session_id = 'session'; turn_id = 'turn'; agent_id = 'agent'
+            agent_type = 'default'; model = 'gpt-5.6-terra'; transcript_path = ''
+        }
+        $result = Get-CodexSubagentAttestationFromAuthority `
+            -Payload $payload -ReceiptPath (Join-Path $script:RepoRoot 'absent-receipt.json') `
+            -Checkpoints @() -RepositoryRoot $script:RepoRoot `
+            -CurrentHeadSha $script:ParallelHead -Now $script:ParallelNow
+        $result.agent_id | Should -Be 'agent'
+        $result.routing_valid | Should -BeTrue
+        $result.attestation_key | Should -Match '^[0-9a-f]{64}$'
     }
 }
