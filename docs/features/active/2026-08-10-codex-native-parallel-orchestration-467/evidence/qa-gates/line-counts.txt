@@ -1,18 +1,22 @@
 # Final Changed-Code Line-Count Gate
 
-Task: [P13-T2]
+Tasks: [P13-T2], refreshed by [P13-T23]
 
-Timestamp: 2026-08-12T10:29:23.0485544-04:00
+Timestamp: 2026-08-13T19:13:13.1445484Z
 
 Merge base: `fe0413d4aca1e76b2d02d05701fba79a887d5405`
 
-Command: enumerate `git diff --name-only --diff-filter=ACMRTUXB fe0413d4aca1e76b2d02d05701fba79a887d5405 --` plus `git ls-files --others --exclude-standard`; retain existing production, test, and reusable script files with `.py`, `.ps1`, `.psm1`, `.psd1`, `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.sh`, `.bash`, or `.cs` suffixes; exclude documentation/evidence, generated artifacts, dependency/build output, and coverage output; count physical lines with `Get-Content`.
+Command: enumerate `git diff --name-only --diff-filter=ACMRTUXB fe0413d4aca1e76b2d02d05701fba79a887d5405 --` plus `git ls-files --others --exclude-standard`; retain existing production, test, and reusable script files with `.py`, `.ps1`, `.psm1`, `.psd1`, `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.sh`, `.bash`, or `.cs` suffixes; exclude paths rooted under `docs/` or `artifacts/` and paths within `node_modules`, `coverage`, `dist`, `build`, `out`, or `__pycache__`; sort uniquely and count physical lines with `Get-Content`.
 
 EXIT_CODE: 0
 
 Output Summary: 161 changed production/test/reusable script files were counted; 161 are at or below 500 physical lines; 0 exceed 500; maximum line count is 500.
 
-Scope manifest SHA-256: `2BC4495C099EAAE14B37F43E73B0A24C1AE6C20A9298B9B33BA07D3E4DAD1F1F`
+Scope manifest SHA-256: `82FBD4B4E3C8B7A33E9D0EFF84D86F4AEFCA0F7E46B4D5C9A4BC0525CC87F65D`
+
+An initial unaccepted filter omitted the evidence/generated-output exclusions, found two 3,079-line kcov `handlebars.js` files, and exited 1. The accepted command above corrected only the documented scope filter; it did not change any file.
+
+R5 owner reconciliation: production owners are 414 lines (`_parallel_orchestrator_state_resume_truth.py`), 465 lines (`_parallel_orchestrator_state_receipt_cohort.py`), and 495 lines (`validate_parallel_codex_readiness.py`); their read-only focused test owners are 243 lines (`test_parallel_resume_truth.py`), 286 lines (`test_parallel_receipt_bound_cohort.py`), and 447 lines (`test_validate_parallel_codex_readiness.py`). All six remain at or below 500 lines, and no production/test file was created or extracted.
 
 | Lines | Result | Path |
 |---:|---|---|
@@ -41,27 +45,27 @@ Scope manifest SHA-256: `2BC4495C099EAAE14B37F43E73B0A24C1AE6C20A9298B9B33BA07D3
 | 375 | PASS | `.codex/scripts/parallel-child-post-session.ps1` |
 | 265 | PASS | `.codex/scripts/resume-epic-child.ps1` |
 | 475 | PASS | `.codex/scripts/resume-parallel-child.ps1` |
-| 320 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/authorize-root-parallel-invocation.ps1` |
+| 362 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/authorize-root-parallel-invocation.ps1` |
 | 188 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-authority-store.ps1` |
 | 224 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-codex-model-routing.ps1` |
 | 495 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1` |
-| 115 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-abandon-gate.ps1` |
-| 130 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-child-worktree-binding.ps1` |
-| 124 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-cohort-barrier.ps1` |
-| 124 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-drift-gate.ps1` |
-| 247 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-root-invocation.ps1` |
-| 116 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1` |
+| 134 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-abandon-gate.ps1` |
+| 152 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-child-worktree-binding.ps1` |
+| 143 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-cohort-barrier.ps1` |
+| 143 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-drift-gate.ps1` |
+| 266 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-root-invocation.ps1` |
+| 135 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1` |
 | 220 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/parallel-hook-common.ps1` |
 | 497 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/record-subagent-routing-attestation.ps1` |
 | 211 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-codex-subagent-routing.ps1` |
-| 179 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-parallel-agent-output.ps1` |
+| 254 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-parallel-agent-output.ps1` |
 | 351 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-contract-core.ps1` |
 | 256 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-persistence.ps1` |
 | 461 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-resume.ps1` |
-| 245 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-runtime.ps1` |
+| 248 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-runtime.ps1` |
 | 312 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-launch-contract.ps1` |
 | 449 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-epic-child-wave.ps1` |
-| 486 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-parallel-child-batch.ps1` |
+| 493 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-parallel-child-batch.ps1` |
 | 233 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-launch-contract.ps1` |
 | 375 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-post-session.ps1` |
 | 265 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-epic-child.ps1` |
@@ -116,8 +120,8 @@ Scope manifest SHA-256: `2BC4495C099EAAE14B37F43E73B0A24C1AE6C20A9298B9B33BA07D3
 | 361 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_completion_receipts.py` |
 | 443 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_mutation_receipts.py` |
 | 317 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` |
-| 318 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py` |
-| 285 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_resume_truth.py` |
+| 465 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py` |
+| 414 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_resume_truth.py` |
 | 294 | PASS | `scripts/dev_tools/generate_codex_agent_variants.py` |
 | 484 | PASS | `scripts/dev_tools/parallel_codex_readiness_filesystem.py` |
 | 453 | PASS | `scripts/dev_tools/parallel_kickoff_contract.py` |
@@ -127,7 +131,7 @@ Scope manifest SHA-256: `2BC4495C099EAAE14B37F43E73B0A24C1AE6C20A9298B9B33BA07D3
 | 362 | PASS | `scripts/dev_tools/resolve_codex_deployment.py` |
 | 414 | PASS | `scripts/dev_tools/resolve_codex_topology.py` |
 | 464 | PASS | `scripts/dev_tools/validate_orchestration_artifacts.py` |
-| 493 | PASS | `scripts/dev_tools/validate_parallel_codex_readiness.py` |
+| 495 | PASS | `scripts/dev_tools/validate_parallel_codex_readiness.py` |
 | 368 | PASS | `scripts/dev_tools/validate_parallel_orchestrator_state.py` |
 | 469 | PASS | `scripts/dev_tools/validate_parallel_planner_state.py` |
 | 190 | PASS | `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` |

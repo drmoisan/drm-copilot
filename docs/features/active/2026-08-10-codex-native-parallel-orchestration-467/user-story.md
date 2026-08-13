@@ -76,9 +76,10 @@ blocks delivery.
 
 ## Acceptance Criteria
 
-- [ ] Root `parallel-plan`, `parallel-run`, and manual `parallel-orchestrate` entry resolves only its
+- [x] Root `parallel-plan`, `parallel-run`, and manual `parallel-orchestrate` entry resolves only its
       forced authorized parallel persona; ordinary and epic orchestrators are mechanically rejected
       as parallel roots, and no silent topology or model fallback occurs.
+      Evidence: [R4 authority traceability and current validators](evidence/qa-gates/remediation-traceability.md#r4--dedicated-parallel-authority-contract).
 - [x] Planning cannot launch implementation, and execution requires a committed kickoff that passes
       deterministic ready-for-execution validation with complete item preflight and required
       authority, topology, and model-routing receipts.
@@ -136,16 +137,20 @@ blocks delivery.
 - [x] A published payload-only destination validates manifests and computes deterministic cohorts
       and bounded batches without Python or Poetry, using the issue-462 portability assets and
       additive destination configuration.
-- [ ] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
+- [x] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
       differential parity, root/bundle parity, pack, registration, destination, and zero-regression
       gates pass in one clean toolchain loop.
-- [ ] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
+      Evidence: [final four-language QA index](evidence/qa-gates/index.md).
+- [x] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
       remains at least 75 percent, each new module/class/method targets at least 90 percent, changed-
       line coverage does not regress, and baseline, QA-gate, regression, and coverage evidence is
       stored under the active feature's canonical `evidence/` subtree; QA-gate evidence uses
       `<FEATURE>/evidence/qa-gates/`.
+      Evidence: [R1–R3 numeric coverage traceability](evidence/qa-gates/remediation-traceability.md#r1--python-newmodified-file-coverage).
 - [ ] All required GitHub checks pass for the exact current PR head SHA; results from an earlier head
       do not satisfy merge or completion.
+      Deferred to the orchestrator: requires hosted CI for the exact final published head; local
+      evidence does not satisfy this criterion.
 
 
 ## Non-Goals
