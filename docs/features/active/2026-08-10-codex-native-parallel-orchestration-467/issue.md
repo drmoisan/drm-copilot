@@ -81,6 +81,8 @@ Deliver an additive root-controlled Codex parallel surface with:
       Python or Poetry, using the issue-462 portability assets and additive destination configuration.
 - [ ] Language formatting, linting, type checking, unit/integration tests, coverage, Pester, Bats,
       parity, pack, registration, destination, and required CI gates pass for the current PR head.
+      Deferred to the orchestrator: local toolchain and coverage gates are complete, but the combined
+      issue criterion also requires hosted CI for the exact final published head.
 
 ## Constraints & Risks
 

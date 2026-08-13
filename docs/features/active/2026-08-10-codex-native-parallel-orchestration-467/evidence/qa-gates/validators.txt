@@ -48,3 +48,60 @@ ALREADY-GREEN GATES — NOT RERUN
 - Language QA: the uninterrupted Python, PowerShell, TypeScript, and Bash results remain indexed in `evidence/qa-gates/index.md`; no language command was rerun by P13-T7.
 
 Acceptance result: PASS — every validator assigned to P13-T7 exited successfully, and no already-green source/bundle parity, topology, prompt/permission, or language QA gate was rerun.
+
+P13-T24 R5 STALE-VALIDATOR REFRESH
+
+VALIDATOR 1 — REMEDIATION PLAN
+Timestamp: 2026-08-13T19:15:20.4167240Z to 2026-08-13T19:15:21.1756656Z
+Command: poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-12T01-42.md
+EXIT_CODE: 0
+Output Summary: plan validation passed for the canonical remediation plan.
+
+VALIDATOR 2 — EVIDENCE LOCATIONS
+Timestamp: 2026-08-13T19:15:26.8521983Z to 2026-08-13T19:15:29.5367742Z
+Command: poetry run python scripts/dev_tools/validate_evidence_locations.py --root .
+EXIT_CODE: 0
+Output Summary: the repository scan emitted no non-canonical evidence-location finding.
+
+VALIDATOR 3 — R5 BATCH A DOCUMENTATION POLICY
+Timestamp: 2026-08-13T19:15:48.9764473Z to 2026-08-13T19:15:49.6690520Z
+Command: extract the complete `$R5Checker` here-string from `evidence/qa-gates/r5-documentation-batch-a-green.md`, then pipe that exact body to `poetry run python - scripts/dev_tools/_parallel_orchestrator_state_resume_truth.py scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py --owner=tests/scripts/dev_tools/test_parallel_resume_truth.py --owner=tests/scripts/dev_tools/test_parallel_receipt_bound_cohort.py`.
+EXIT_CODE: 0
+Output Summary: resume-truth reported 11 callables, 0 contract failures, 14 adjacency nodes, and 0 adjacency failures; receipt-cohort reported 12 callables, 0 contract failures, 17 adjacency nodes, and 0 adjacency failures. Semantic SHA-256 values remained `6BA8CA044417E215896FBBD426F15915EE8389AD8A23971F38A7103E5CBFBC06` and `17C3B3BE4E01D0B8552FA4CC2AA20610F5D3FF241315B86E7E81BD006DC2CE28`. Test-owner SHA-256 values remained `BECB0A7CD0D85D8A4832F41DF1CA3095B5014429AB2B4F80F560942C819F6176` and `EA6A38F6DAC07311E6D83F287020EE456629C9700C1F340043A0CC8BF5F39F98`.
+
+VALIDATOR 4 — R5 BATCH B DOCUMENTATION POLICY
+Timestamp: 2026-08-13T19:15:58.7500080Z to 2026-08-13T19:15:59.5368426Z
+Command: extract the complete `$R5Checker` here-string from `evidence/qa-gates/r5-documentation-batch-b-green.md`, then pipe that exact body to `poetry run python - scripts/dev_tools/validate_parallel_codex_readiness.py --owner=tests/scripts/dev_tools/test_validate_parallel_codex_readiness.py --allow-readiness-guard-adjudication`.
+EXIT_CODE: 0
+Output Summary: readiness reported 12 callables, 0 contract failures, 16 iteration nodes, 0 actionable adjacency failures, and exactly 1 adjudicated audit-line-231/current-line-232 generator guard. Semantic SHA-256 remained `BE8753F4922604A5B0894E455C4A081C88973ADAB2C6401DB24B924A5AD1933B`; test-owner SHA-256 remained `55AA3400137E160BB00DDB11973529F551EF66CDD2C57DB84AB621923794347C`.
+
+VALIDATOR 5 — R5 SUPPRESSION, TEMPORARY-FILE, TEST-LOCATION, AND FILE-CREATION POLICY
+Timestamp: recorded after execution at 2026-08-13T19:18:14.8883538Z
+Command: an inline read-only Python checker ran `git diff --unified=0 fe0413d4aca1e76b2d02d05701fba79a887d5405 --` for the three R5 production and three focused-test owners; scanned added lines for `noqa`, `type: ignore`, `pyright: ignore`, `pragma: no cover`, `tempfile`, `TemporaryDirectory`, `NamedTemporaryFile`, `mkstemp`, `tmp_path`, and `tmpdir`; ran `git ls-files --others --exclude-standard -- scripts/dev_tools tests/scripts/dev_tools`; and compared the three test-owner bytes to their P13-T8/P13-T13 SHA-256 values.
+EXIT_CODE: 0
+Output Summary: added suppression hits 0; added temporary-file hits 0; untracked Python production/test files 0; all three test owners remained under `tests/scripts/dev_tools/` and matched their required SHA-256 values exactly. An earlier unaccepted read-only checker exited 1 because it compared file-addition status to the feature merge base and therefore misclassified the six known feature owners as R5-created; it changed no file and was replaced only by the corrected R5-scope query.
+
+VALIDATOR 6 — REPOSITORY WHITESPACE POLICY
+Timestamp: 2026-08-13T19:17:39.7281826Z to 2026-08-13T19:17:39.7852331Z
+Command: git diff --check
+EXIT_CODE: 0
+Output Summary: no whitespace error or warning was emitted.
+
+VALIDATOR 7 — CLAUDE IMMUTABILITY
+Timestamp: 2026-08-13T19:18:14.8077758Z to 2026-08-13T19:18:14.8883538Z
+Command: git diff --name-only -- .claude
+EXIT_CODE: 0
+Output Summary: changed-path count 0.
+Command: git status --short -- .claude
+EXIT_CODE: 0
+Output Summary: status-path count 0.
+
+ALREADY-GREEN GATES — NOT RERUN BY P13-T24
+- Original-plan validation remained green from P13-T7 and was not invalidated by R5.
+- Strict checkpoint topology/model-routing validation remained green from P13-T7 and was not invalidated by R5.
+- Source/bundle parity and publisher validation remained green from P13-T3/P13-T7 and were not invalidated by the three root-only Python documentation changes.
+- Prompt/permission validation remained green and was not invalidated by R5.
+- PowerShell, TypeScript, and Bash QA remained byte-indexed in `evidence/qa-gates/index.md` and was not rerun.
+- Python Black, Ruff, Pyright, and full Pytest/coverage were completed once in P13-T18 through P13-T21 and were not rerun by P13-T24.
+
+Acceptance result: PASS — every validator made stale by P13-T8 through P13-T23 exited successfully, the corrected policy check found no R5 policy violation, and every explicitly preserved gate remained unrerun.

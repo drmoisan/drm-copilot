@@ -1,0 +1,66 @@
+FINAL AUTHORIZED DIFF INVENTORY — P13-T27
+
+Timestamp: 2026-08-13T19:24:15.6277298Z
+Reviewed base: fe0413d4aca1e76b2d02d05701fba79a887d5405
+Current HEAD: d10a02504e9468960a7283a59444543f0185a61e
+
+Commands:
+- git diff --name-only fe0413d4aca1e76b2d02d05701fba79a887d5405 --
+- git ls-files --others --exclude-standard
+- git status --short
+- git diff --cached --name-only
+- git diff --name-only -- .claude
+- git status --short -- .claude
+
+FINAL_COMBINED_PATH_COUNT: 1407
+FINAL_COMBINED_PATH_MANIFEST_SHA256: B52A53AFBB4F731D8BB1B4C16E5A6207C23087410F9F6771CB9576315D6564AF
+TRACKED_BASE_DIFF_PATH_COUNT: 1403
+TRACKED_BASE_DIFF_PATH_MANIFEST_SHA256: 53FE2281B9EBBE5D491F8D19DD0ACE7DFF25EE214EF4C9B3F1B1ED483CD74AAA
+CHANGED_PRODUCTION_TEST_REUSABLE_SCRIPT_COUNT: 161
+CHANGED_CODE_PATH_MANIFEST_SHA256: 82FBD4B4E3C8B7A33E9D0EFF84D86F4AEFCA0F7E46B4D5C9A4BC0525CC87F65D
+LINE_COUNT_EVIDENCE_PATH_MANIFEST_SHA256: 82FBD4B4E3C8B7A33E9D0EFF84D86F4AEFCA0F7E46B4D5C9A4BC0525CC87F65D
+CODE_MANIFEST_MATCH: PASS
+CODE_LINE_COUNT: 161/161 <=500; maximum 500
+
+The 161-file code manifest equals the complete `evidence/qa-gates/line-counts.txt` path manifest. Earlier scope evidence classified the feature paths to their plan phases, and the canonical remediation plan authorizes the subsequent bounded Python, PowerShell, TypeScript, prompt/bundle, test, and evidence changes.
+
+POST-USER-COMMIT WORKTREE BOUNDARY
+
+The user-requested staged-only commit produced HEAD d10a02504e9468960a7283a59444543f0185a61e and an empty index before P13-T19 resumed. At the P13-T27 pre-write boundary:
+- status paths: 13
+- staged paths: 0
+- untracked paths: 3
+- production/test/reusable-script paths changed or untracked relative to current HEAD: 0
+
+The 13 pre-write status paths were all explicitly authorized P13 documentation/evidence paths:
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/index.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/line-counts.txt
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-format-r5-refresh.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-lint-r5-refresh.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-types-r5-refresh.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/validators.txt
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/issue.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-12T01-42.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/spec.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/user-story.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-coverage-r5-refresh.json
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-tests-coverage-r5-refresh.md
+- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/remediation-traceability.md
+
+This receipt adds only its own plan-authorized canonical evidence path. No P13-T18 through P13-T27 action added or modified a production or test file.
+
+After this receipt and the P13-T27 checkoff were written, the exact boundary was 14 status paths, 0 staged paths, and 4 untracked paths. The four untracked paths are canonical QA evidence (`python-coverage-r5-refresh.json`, `python-tests-coverage-r5-refresh.md`, `remediation-traceability.md`, and this inventory). The combined tracked-base-diff plus untracked manifest contains 1,407 unique paths with SHA-256 `B52A53AFBB4F731D8BB1B4C16E5A6207C23087410F9F6771CB9576315D6564AF`; 1,193 evidence-like paths are under the canonical feature evidence root and 0 are outside it.
+
+POLICY CLASSIFICATION
+
+- `.claude/**` tracked diff paths: 0
+- `.claude/**` status paths: 0
+- evidence-like paths outside `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/`: 0
+- untracked production/test/reusable-script paths: 0
+- post-HEAD changed production/test/reusable-script paths: 0
+- repository-root `.coverage-python-r5-refresh`: absent
+- staged paths: 0
+
+The full merge-base diagnostic `git diff --check fe0413d4aca1e76b2d02d05701fba79a887d5405 --` exited 2 on historical review Markdown and generated coverage HTML/JavaScript whitespace already contained in the feature evidence corpus. It was not a P13-T27 acceptance gate and identified no current P13-T18 through P13-T26 path. The scoped current-worktree `git diff --check` required and accepted by P13-T24 exited 0. The orchestrator must retain the full-diff diagnostic in final strict-validation disposition rather than treating it as an unreported green result.
+
+Acceptance result: PASS — no unauthorized production/test path, no new P13 production/test file, no `.claude/**` change, and no evidence outside the canonical feature evidence tree.

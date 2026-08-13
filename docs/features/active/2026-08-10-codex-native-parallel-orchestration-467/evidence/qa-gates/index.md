@@ -1,26 +1,29 @@
 # Final QA Integration Index
 
-Task: [P13-T1]
+Tasks: [P13-T1], refreshed by [P13-T22]
 
-Generated: 2026-08-12T10:25:00-04:00
+Refreshed: 2026-08-13T19:09:10.3821763Z
 
-The Phase 9 through Phase 12 receipts below are the complete final repository QA command set. Each language completed one uninterrupted green policy-ordered pass after its last source or test change. P13-T1 indexes those completed executions and does not rerun them.
+The Phase 9 through Phase 12 receipts below are the complete final repository QA command set. Python was refreshed in P13-T18 through P13-T21 after the R5 documentation-only changes. The already-green PowerShell, TypeScript, and Bash entries remain unchanged and were not rerun.
 
 ## Python — Black, Ruff, Pyright, Pytest
 
 | Order | Timestamp | Exact command | Exit | Receipt |
 |---:|---|---|---:|---|
-| 1 | 2026-08-12T07:39:40-04:00 | `poetry run black . --check` | 0 | `evidence/qa-gates/python-format.md` |
-| 2 | 2026-08-12T07:40:09-04:00 | `poetry run ruff check .` | 0 | `evidence/qa-gates/python-lint.md` |
-| 3 | 2026-08-12T07:40:40-04:00 | `poetry run pyright` | 0 | `evidence/qa-gates/python-types.md` |
-| 4 | 2026-08-12T07:44:31-04:00 | `$env:COVERAGE_FILE='docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/.coverage-python-full'; poetry run pytest -o "addopts=" -q --cov --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/python-coverage.json` | 0 | `evidence/qa-gates/python-tests-coverage.md` |
+| 1 | 2026-08-13T18:45:36.0783999Z | `$repo=(Resolve-Path -LiteralPath '.').Path; $coverage=[System.IO.Path]::GetFullPath((Join-Path $repo '.coverage-python-r5-refresh')); $parent=[System.IO.Directory]::GetParent($coverage).FullName; $exists=Test-Path -LiteralPath $coverage; if(-not [StringComparer]::OrdinalIgnoreCase.Equals($parent,$repo) -or $exists){exit 1}; poetry run black . --check` | 0 | `evidence/qa-gates/python-format-r5-refresh.md` |
+| 2 | 2026-08-13T18:56:41.7745556Z | `poetry run ruff check .` | 0 | `evidence/qa-gates/python-lint-r5-refresh.md` |
+| 3 | 2026-08-13T18:57:16.7602203Z | `poetry run pyright` | 0 | `evidence/qa-gates/python-types-r5-refresh.md` |
+| 4 | 2026-08-13T19:03:42.5177148Z | `$env:COVERAGE_FILE='C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\.coverage-python-r5-refresh'; poetry run pytest -o "addopts=" -q --cov --cov-branch --cov-report=term-missing --cov-report=json:C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\qa-gates\python-coverage-r5-refresh.json` | 0 | `evidence/qa-gates/python-tests-coverage-r5-refresh.md` |
 
-Result: 3,963 passed, 5 skipped, 0 failed. Lines were 14,348/15,525 = 92.418680%; branches were 4,892/5,772 = 84.753985%; changed executable lines were 1,079/1,149 = 93.907746%. All five added owners exceeded 90%, and all three modified owners exceeded their P0 baselines. Numeric line and branch coverage PASS.
+Result: 3,963 passed, 5 skipped, 0 failed. Lines were 14,348/15,525 = 92.418680%; branches were 4,892/5,772 = 84.753985%; changed executable lines were 1,079/1,149 = 93.907746%. All five added owners exceeded 90%, all three modified owners exceeded their P0 baselines, and all three R5 documentation owners remained at their pre-R5 numeric values. Numeric line and branch coverage PASS. The same-attempt `.coverage-python-r5-refresh` data file was removed and verified absent after JSON reconciliation.
 
 Coverage artifacts:
 
-- `evidence/qa-gates/python-coverage.json`, SHA-256 `17CEF330834D2F4AB776A1D355580495CE054C814FF31A9375A31C5C60521A4D`.
-- `evidence/qa-gates/.coverage-python-full`, SHA-256 `DA637423061ED736814D0D061616C672C80BD07160F80263FB5F754A4DC02509`.
+- `evidence/qa-gates/python-coverage-r5-refresh.json`, SHA-256 `E3099AEA7CEEE5E58D93108B518BECE7FB88E3A8DCF2B521027F835C5AC957DE`.
+- `evidence/qa-gates/python-format-r5-refresh.md`, SHA-256 `F6418F905DB69F59C5BAEC04F889BF878493601297940CA79E31B362781AA965`.
+- `evidence/qa-gates/python-lint-r5-refresh.md`, SHA-256 `1888990A39CDD648D6863241F5A61B0404E88C4BBE2E9BAC94C0E7CA3A26C976`.
+- `evidence/qa-gates/python-types-r5-refresh.md`, SHA-256 `98CECB6F5551B363AB727FA42A80F71284380CEE0FB2447FF0602DD196A8CA69`.
+- `evidence/qa-gates/python-tests-coverage-r5-refresh.md`, SHA-256 `8A0149F8ACB4DA8BD175A1AC52BF855D055D4F7F14289E045066FBBF19913CB3`.
 
 ## PowerShell — PoshQC format, analyze, Pester
 

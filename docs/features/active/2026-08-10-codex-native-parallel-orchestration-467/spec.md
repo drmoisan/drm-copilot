@@ -298,8 +298,9 @@ Deliver an additive, root-controlled Codex parallel surface with the following e
 - [x] Every acceptance criterion in `spec.md` and `user-story.md` is mapped to named automated tests
       or a deterministic process demonstration, with evidence retained under this feature's
       canonical `evidence/` subtree.
-- [ ] Root provenance, forced planner/orchestrator routing, planning-only behavior, committed-kickoff
+- [x] Root provenance, forced planner/orchestrator routing, planning-only behavior, committed-kickoff
       readiness, monotonic topology/model routing, and no-fallback receipt validation pass.
+      Evidence: [R4 authority traceability and current validators](evidence/qa-gates/remediation-traceability.md#r4--dedicated-parallel-authority-contract).
 - [x] Differential Python, TypeScript/MCP, and portable Bash fixtures prove identical normalization,
       conflict edges, cohorts, bounded batches, mutation decisions, open/closed behavior, and drift
       decisions.
@@ -331,15 +332,19 @@ Deliver an additive, root-controlled Codex parallel surface with the following e
       batches without Python or Poetry and does not contain unrelated `.claude/` files.
 - [x] Existing Codex epic and delivered Claude parallel suites pass, and a before/after byte audit
       reports no `.claude/` source changes.
-- [ ] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
+- [x] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
       linting, type checking where applicable, unit and integration tests, Pester, Bats, and
       zero-regression checks in the required order.
-- [ ] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
+      Evidence: [final four-language QA index](evidence/qa-gates/index.md).
+- [x] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
       remains at least 75 percent, each new module/class/method targets at least 90 percent, changed-
       line coverage does not regress, and coverage evidence is stored under the canonical feature
       evidence path; QA-gate evidence uses `<FEATURE>/evidence/qa-gates/`.
+      Evidence: [R1–R3 numeric coverage traceability](evidence/qa-gates/remediation-traceability.md#r1--python-newmodified-file-coverage).
 - [ ] All required GitHub checks pass for the current PR head SHA; stale-head results do not satisfy
       completion.
+      Deferred to the orchestrator: requires hosted CI for the exact final published head; local
+      evidence does not satisfy this criterion.
 
 ## Seeded Test Conditions (from potential)
 - [x] Differential Python/TypeScript/Bash fixtures cover normalization, conflict edges, Welsh-Powell
