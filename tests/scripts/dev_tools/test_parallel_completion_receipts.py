@@ -8,6 +8,9 @@ from typing import cast
 
 import pytest
 
+from scripts.dev_tools import (
+    _parallel_orchestrator_state_completion_receipts as completion_receipts,
+)
 from scripts.dev_tools.validate_parallel_orchestrator_state import (
     validate_parallel_orchestrator_state_text,
 )
@@ -237,4 +240,51 @@ def test_receipt_validation_preserves_error_order_and_input() -> None:
             if label in error
         )
         for error in first_run
+    ]
+
+
+def test_completion_item_seam_accepts_a_valid_positive_receipt() -> None:
+    """The item-level seam returns no diagnostic for a valid completion."""
+
+    validator = getattr(completion_receipts, "_validate_completion_item", None)
+    assert callable(validator), "completion item testability seam must exist"
+
+    assert validator(_items(_receipt_state())[0], 0, CONTEXT) == []
+
+
+def test_completion_item_seam_rejects_a_negative_blank_pr_url() -> None:
+    """The item-level seam rejects a blank required PR URL."""
+
+    item = _items(_receipt_state())[0]
+    item["pr_url"] = " "
+    validator = getattr(completion_receipts, "_validate_completion_item", None)
+    assert callable(validator), "completion item testability seam must exist"
+
+    assert validator(item, 0, CONTEXT) == [
+        f"{CONTEXT} items[0] completion receipt pr_url must be a non-empty string."
+    ]
+
+
+def test_completion_item_seam_skips_the_withdrawn_boundary() -> None:
+    """The withdrawn boundary remains outside completion receipt validation."""
+
+    item = _items(_receipt_state())[0]
+    item["state"] = "withdrawn"
+    item["pr_number"] = False
+    validator = getattr(completion_receipts, "_validate_completion_item", None)
+    assert callable(validator), "completion item testability seam must exist"
+
+    assert validator(item, 0, CONTEXT) == []
+
+
+def test_completion_item_seam_reports_an_invalid_number_error() -> None:
+    """The item-level seam treats boolean PR numbers as invalid input."""
+
+    item = _items(_receipt_state())[0]
+    item["pr_number"] = True
+    validator = getattr(completion_receipts, "_validate_completion_item", None)
+    assert callable(validator), "completion item testability seam must exist"
+
+    assert validator(item, 0, CONTEXT) == [
+        f"{CONTEXT} items[0] completion receipt pr_number must be positive."
     ]

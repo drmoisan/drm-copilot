@@ -4,11 +4,24 @@ from __future__ import annotations
 
 import pytest
 
+from scripts.dev_tools import resolve_codex_deployment as deployment
 from scripts.dev_tools.resolve_codex_deployment import (
     ModelUnavailableError,
     main,
     resolve_codex_deployment,
 )
+
+
+def test_parallel_persona_context_seam_covers_all_identity_outcomes() -> None:
+    """The persona seam resolves both roots, ordinary agents, and misuse."""
+
+    resolver = getattr(deployment, "_parallel_persona_context", None)
+    assert callable(resolver), "deployment persona-context seam must exist"
+    assert resolver("parallel-planner") == "parallel_planning"
+    assert resolver("parallel-orchestrator") == "parallel_execution"
+    assert resolver("orchestrator") is None
+    with pytest.raises(ValueError, match="requires 'parallel_planning'"):
+        resolve_codex_deployment("parallel-planner", "C1", "standalone", "C1")
 
 
 @pytest.mark.parametrize(

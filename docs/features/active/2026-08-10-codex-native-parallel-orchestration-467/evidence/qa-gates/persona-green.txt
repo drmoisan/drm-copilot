@@ -1,0 +1,15 @@
+Timestamp: 2026-08-12T05-46
+Command 1: mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":["tests/scripts/codex-hooks/parallel-provenance.Tests.ps1"]})
+EXIT_CODE 1: 0
+Output Summary 1: The focused PoshQC Pester owner passed all 19 tests with 0 errors, 0 failures, and 0 disabled tests in 0.668 seconds. This includes the planner and orchestrator prompt/profile assertions introduced in Phase 1.
+Command 2: poetry run pytest -o "addopts=" -q tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py
+EXIT_CODE 2: 0
+Output Summary 2: The canonical source/bundle and pack-manifest parity suites passed all 13 tests in 0.22 seconds. The parity owner excludes `.codex/state/**`, which is the runtime-only hook state namespace and is not distributable customization content.
+Command 3: SHA-256 comparison of `.codex/agents/parallel-planner.toml` and `.codex/agents/parallel-orchestrator.toml` against their exact bundle destinations
+EXIT_CODE 3: 0
+Output Summary 3: Planner source and bundle both have SHA-256 `6A32C493A4761B8044D23CABDD79DB4D5EA7F12399BD38D10471E1077D70A10B`; orchestrator source and bundle both have SHA-256 `7880F4B441D3B9D50FAE208D36D39AC9C5DE9E1E398CFCD72C2F2ADA4301BFF4`.
+Command 4: git diff --exit-code -- .claude
+EXIT_CODE 4: 0
+Output Summary 4: No `.claude/**` path changed.
+Unexpected Baseline Reconciliation: The first full Python parity attempt reported one failure because an executor hook created `.codex/state/powershell-batch-budget.<session>.json`. The parity-owner inventory now excludes only the runtime-only `.codex/state/**` namespace. After Black formatting, Black check, Ruff, and Pyright passed, and the complete parity command passed on restart.
+

@@ -1,0 +1,29 @@
+PowerShell batch 7 green gate
+
+Timestamp: 2026-08-12T11:06:32.844Z
+
+Final uninterrupted toolchain pass after renaming one test variable that shadowed the PowerShell automatic `$PROFILE` variable
+
+Command: mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/scripts/launch-epic-child-wave.ps1",".codex/scripts/parallel-child-post-session.ps1",".codex/scripts/resume-epic-child.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-7.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC format completed with ok=true for all six selected paths.
+
+Command: mcp__drm_copilot__run_poshqc_analyze({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/scripts/launch-epic-child-wave.ps1",".codex/scripts/parallel-child-post-session.ps1",".codex/scripts/resume-epic-child.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-7.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC analyze completed with ok=true and zero batch diagnostics.
+
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-7.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 0
+
+Output Summary: Repository PoshQC ran 6 tests: 6 passed, 0 failed, 0 skipped, 0 inconclusive, and 0 not run in 0.707 seconds. Numeric root attribution was:
+
+- `.codex/scripts/launch-epic-child-wave.ps1`: 60/344 instructions (17.4419%) and 37/225 lines (16.4444%).
+- `.codex/scripts/parallel-child-post-session.ps1`: 19/230 instructions (8.2609%) and 14/175 lines (8.0000%).
+- `.codex/scripts/resume-epic-child.ps1`: 9/273 instructions (3.2967%) and 6/178 lines (3.3708%).
+
+Acceptance result: PASS. Each batch runtime now has numeric source attribution, all focused tests pass without external child or GitHub operations, no runtime behavior changed, and the final restarted gate completed without a failure or file change.

@@ -1,0 +1,44 @@
+Task: [P10-T1]
+Timestamp: 2026-08-12T07:46:03-04:00
+Command: mcp__drm_copilot__run_poshqc_format({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25" })
+Exit code: 0
+MCP result: ok=true
+Output summary: Ran bundled PoshQC format against the full configured repository PowerShell scope.
+
+Pre-format PowerShell inventory: 238 files; aggregate SHA-256 745F9657C6A276CCA5E4D24CD0D33851BF568683B165E9B31DDB7AD4C38C02D6
+Post-format PowerShell inventory: 238 files; aggregate SHA-256 745F9657C6A276CCA5E4D24CD0D33851BF568683B165E9B31DDB7AD4C38C02D6
+
+Acceptance result: PASS - formatting succeeded and changed zero PowerShell files.
+
+Restart after P10-T3 correction:
+Timestamp: 2026-08-12T07:53:33-04:00
+Command: mcp__drm_copilot__run_poshqc_format({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25" })
+Exit code: 0
+MCP result: ok=true
+Pre/post inventory: 238 files; aggregate SHA-256 remained 745F9657C6A276CCA5E4D24CD0D33851BF568683B165E9B31DDB7AD4C38C02D6.
+Restart acceptance result: PASS - formatting succeeded, changed zero files, and `.codex/state` remained absent.
+
+Authorized final Phase 10 restart after bounded coverage correction:
+Timestamp: 2026-08-12T09:42:04.9222372-04:00
+Command: mcp__drm-copilot__run_poshqc_format({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25" })
+EXIT_CODE: 0
+MCP result: ok=true
+Pre/post PowerShell inventory: 375 files; aggregate SHA-256 remained 745E9B357EDAEE428C04357D624030B9CCAD959D5D9F89D180E14D8F534BF86E.
+Output Summary: Full configured repository PowerShell formatting passed and changed zero PowerShell files. The transient `.codex/state/powershell-batch-budget.019fedff-89e0-7eb2-ac57-889779169374.json` correction-batch receipt was removed before this final restart.
+Acceptance result: PASS.
+
+Post-cleanup Phase 10 restart:
+Timestamp: 2026-08-12T09:59:49.3026819-04:00
+Command: mcp__drm-copilot__run_poshqc_format({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25" })
+EXIT_CODE: 0
+Pre/post PowerShell inventory: 375 files; aggregate SHA-256 remained 745E9B357EDAEE428C04357D624030B9CCAD959D5D9F89D180E14D8F534BF86E.
+Output Summary: Full formatting passed, changed zero PowerShell files, and `.codex/state` remained absent before and after the command.
+Acceptance result: PASS.
+
+Canonical-invocation Phase 10 restart:
+Timestamp: 2026-08-12T09:51:24.0733306-04:00
+Command: mcp__drm-copilot__run_poshqc_format({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25" })
+EXIT_CODE: 0
+Pre/post PowerShell inventory: 375 files; aggregate SHA-256 remained 745E9B357EDAEE428C04357D624030B9CCAD959D5D9F89D180E14D8F534BF86E.
+Output Summary: Full configured repository formatting passed, changed zero PowerShell files, and left zero PowerShell batch-budget state receipts.
+Acceptance result: PASS.

@@ -8,6 +8,7 @@ from typing import cast
 
 import pytest
 
+from scripts.dev_tools import validate_parallel_codex_readiness as readiness
 from scripts.dev_tools.resolve_codex_deployment import resolve_codex_deployment
 from scripts.dev_tools.resolve_codex_topology import resolve_codex_topology
 from scripts.dev_tools.validate_parallel_codex_readiness import (
@@ -33,6 +34,93 @@ from tests.scripts.dev_tools.test_validate_parallel_planner_state import (
 )
 
 KICKOFF_PATH = "docs/features/parallel/wave-one/parallel-kickoff.md"
+
+
+def test_readiness_item_paths_seam_covers_all_path_outcomes() -> None:
+    """The item path seam handles valid, unsafe, missing, and absolute inputs."""
+
+    validator = getattr(readiness, "_readiness_item_paths", None)
+    assert callable(validator), "readiness item-path testability seam must exist"
+    valid = {
+        "launch_receipt_path": "artifacts/item.launch.json",
+        "launch_status_path": "artifacts/item.status.json",
+    }
+    assert validator(valid, "Checkpoint items[0]") == (
+        "artifacts/item.launch.json",
+        "artifacts/item.status.json",
+        [],
+    )
+    empty = cast("tuple[str | None, str | None, list[str]]", validator({}, "item"))
+    unsafe = cast(
+        "tuple[str | None, str | None, list[str]]",
+        validator({**valid, "launch_receipt_path": "artifacts\\item.json"}, "item"),
+    )
+    absolute = cast(
+        "tuple[str | None, str | None, list[str]]",
+        validator({**valid, "launch_status_path": "/outside.json"}, "item"),
+    )
+    assert len(empty[2]) == 2
+    assert "POSIX path" in unsafe[2][0]
+    assert "workspace root" in absolute[2][0]
+
+
+def test_readiness_low_level_shape_errors_are_complete() -> None:
+    """Launch and ledger validators report malformed boundary shapes."""
+
+    non_object = readiness.validate_parallel_launch_provenance(
+        None,
+        context="item",
+        parallel_slug="run",
+        item_key=1,
+        cohort=0,
+        batch=0,
+        head_branch="feature/item",
+        worktree_path="worktrees/item",
+        launch_receipt_path="item.launch.json",
+        launch_status_path="item.status.json",
+    )
+    missing = readiness.validate_parallel_launch_provenance(
+        {},
+        context="item",
+        parallel_slug="run",
+        item_key=1,
+        cohort=0,
+        batch=0,
+        head_branch="feature/item",
+        worktree_path="worktrees/item",
+        launch_receipt_path="item.launch.json",
+        launch_status_path="item.status.json",
+    )
+    assert "must be an object" in non_object[0]
+    assert "missing required keys" in missing[0]
+    assert readiness.validate_zero_lost_ledger([], context="item")
+    ledger = [None, {"gate_id": "", "status": "UNKNOWN"}]
+    errors = readiness.validate_zero_lost_ledger(ledger, context="item")
+    assert any("must be an object" in error for error in errors)
+    assert any("gate_id must be" in error for error in errors)
+    assert any("status must be" in error for error in errors)
+
+
+def test_checkpoint_readiness_skips_unreadable_items_and_non_list_boundary() -> None:
+    """Malformed item containers remain owned by shared shape validation."""
+
+    state = _prepared_planner_state()
+    evidence = build_evidence(state)
+    state["items"] = {}
+    assert not readiness.validate_parallel_codex_checkpoint_readiness(
+        state, context="item", evidence=evidence
+    )
+    state["items"] = [None]
+    assert not readiness.validate_parallel_codex_checkpoint_readiness(
+        state, context="item", evidence=evidence
+    )
+    state = _prepared_planner_state()
+    evidence = build_evidence(state)
+    del planner_item_at(state, 0)["branch"]
+    errors = readiness.validate_parallel_codex_checkpoint_readiness(
+        state, context="item", evidence=evidence
+    )
+    assert any("branch is required" in error for error in errors)
 
 
 def _prepared_planner_state() -> dict[str, object]:

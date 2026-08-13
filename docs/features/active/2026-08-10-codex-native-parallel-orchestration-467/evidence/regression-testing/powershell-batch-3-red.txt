@@ -1,0 +1,11 @@
+PowerShell batch 3 expected-red gate
+
+Timestamp: 2026-08-12T10:51:55.774Z
+
+Command: mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":["tests/scripts/codex-hooks/powershell-attribution-batch-3.Tests.ps1"]})
+
+EXIT_CODE: 3
+
+Output Summary: Expected red after correcting one test-payload fixture before production edits. Pester ran 6 tests with exactly 3 failures, 0 errors, and 0 disabled tests in 0.689 seconds. The failures were only the missing-registration assertions for `.codex/hooks/enforce-parallel-cohort-barrier.ps1`, `.codex/hooks/enforce-parallel-drift-gate.ps1`, and `.codex/hooks/validate-parallel-agent-output.ps1`; all three focused behavior tests passed. P0-T9 recorded no root-path attribution for these runtimes, and no batch 3 production or coverage-settings edit preceded this final expected-red command.
+
+Acceptance result: PASS-AS-EXPECTED-RED.

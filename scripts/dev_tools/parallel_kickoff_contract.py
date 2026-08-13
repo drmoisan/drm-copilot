@@ -360,12 +360,47 @@ def parse_parallel_kickoff(text: str) -> tuple[ParsedParallelKickoff | None, lis
     )
 
 
-def _validate_ready_identity(parsed: ParsedParallelKickoff) -> list[str]:
-    """Require the version-1 committed identity for execution readiness."""
+def _ready_identity_paths(slug: str) -> tuple[str, str]:
+    """Build conventional execution paths for a syntactically valid run slug.
 
-    expected_manifest = f"docs/features/parallel/{parsed.slug}/parallel.md"
-    expected_branch = f"parallel/{parsed.slug}-plan"
+    Args:
+        slug (str): Candidate parallel run slug without heading decoration.
+
+    Returns:
+        tuple[str, str]: Manifest path and plan-home branch for the slug.
+
+    Raises:
+        ValueError: The slug does not satisfy the kickoff heading grammar.
+
+    Side Effects:
+        None.
+    """
+
+    # Reuse the heading grammar so direct helper callers cannot create unsafe paths.
+    if KICKOFF_HEADING_RE.fullmatch(f"# Parallel Kickoff: {slug}") is None:
+        raise ValueError("Parallel kickoff slug is invalid.")
+    return f"docs/features/parallel/{slug}/parallel.md", f"parallel/{slug}-plan"
+
+
+def _validate_ready_identity(parsed: ParsedParallelKickoff) -> list[str]:
+    """Require the version-1 committed identity for execution readiness.
+
+    Args:
+        parsed (ParsedParallelKickoff): Structurally valid parsed kickoff.
+
+    Returns:
+        list[str]: Ordered slug, manifest, branch, and commit diagnostics.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    expected_manifest, expected_branch = _ready_identity_paths(parsed.slug)
     errors: list[str] = []
+    # Cross-check each independently parsed identity before committed provenance.
     if parsed.invocation_slug != parsed.slug:
         errors.append(
             "Parallel kickoff readiness requires heading and invocation slugs to match."

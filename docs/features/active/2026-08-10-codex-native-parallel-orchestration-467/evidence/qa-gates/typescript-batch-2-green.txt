@@ -1,0 +1,21 @@
+TypeScript batch 2 uninterrupted-green gate
+
+Timestamp: 2026-08-12T11:29:44.3078275Z
+
+Implementation result: No production testability seam was required. The two declared focused test owners now cover forced parallel-context/persona mismatches and both kickoff manifest/plan-home identity mismatches. Production source remained unchanged.
+
+Ordered loop:
+1. `npm --prefix extensions/drm-copilot run format`: PASS; all extension TypeScript, JSON, and CJS paths reported unchanged.
+2. `npm --prefix extensions/drm-copilot run lint`: PASS; ESLint returned 0.
+3. `npm --prefix extensions/drm-copilot run typecheck`: PASS; `tsc -p ./ --noEmit` returned 0.
+4. Targeted Jest coverage command using `--findRelatedTests` for the two production paths, targeted `collectCoverageFrom`, and original per-file thresholds: PASS; 73 suites and 1,116 tests passed with 0 failures in 32.694 seconds.
+
+Per-file line coverage:
+- `orchestrator-state-codex-model-routing.ts`: 96.17%, above the reviewed 95.66% threshold and above the P7 baseline of 93.76%.
+- `parallel-kickoff-artifact.ts`: 100%, equal to the reviewed 100% threshold and above the P7 baseline of 98.08%.
+- Target aggregate: 895/914 lines (97.92%), 229/248 branches (92.33%), and 24/24 functions (100%).
+- Raw LCOV and JSON-summary evidence is retained in the adjacent `typescript-batch-2-coverage-green/` directory.
+
+Changed-line result: No production line changed, so there is no changed-production-line coverage regression. Test-owner line counts are 30 and 414, both within the 500-line policy.
+
+Acceptance result: PASS.

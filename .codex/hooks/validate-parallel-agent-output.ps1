@@ -143,37 +143,112 @@ function Invoke-CodexParallelAgentOutputDecision {
         -AlreadyContinued ([bool]$payload.stop_hook_active)
 }
 
+function ConvertTo-CodexParallelAgentOutputHookResult {
+    <#
+    .SYNOPSIS
+        Creates one native SubagentStop transport result.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory)][int] $ExitCode,
+        [Parameter()][AllowEmptyString()][string] $Stdout = '',
+        [Parameter()][AllowEmptyString()][string] $Stderr = ''
+    )
+
+    return [pscustomobject]@{
+        ExitCode = $ExitCode
+        Stdout   = $Stdout
+        Stderr   = $Stderr
+    }
+}
+
+function Invoke-CodexParallelAgentOutputHookEntrypoint {
+    <#
+    .SYNOPSIS
+        Evaluates one native SubagentStop payload without terminating the host.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PayloadRaw,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $WorkspaceRoot,
+        [Parameter()][scriptblock] $Validator = {
+            param($AgentType, $RepositoryRoot)
+            Invoke-CodexParallelAgentOutputSharedValidator `
+                -AgentType $AgentType `
+                -WorkspaceRoot $RepositoryRoot
+        }
+    )
+
+    $stopHookActive = $null
+    try {
+        $payload = ConvertFrom-CodexStopJson `
+            -Raw $PayloadRaw `
+            -Name 'parallel SubagentStop input'
+        if ($payload.PSObject.Properties.Name -contains 'stop_hook_active' -and
+            $payload.stop_hook_active -is [bool]) {
+            $stopHookActive = [bool]$payload.stop_hook_active
+        }
+        $decision = Invoke-CodexParallelAgentOutputDecision `
+            -PayloadRaw $PayloadRaw `
+            -WorkspaceRoot $WorkspaceRoot `
+            -Validator $Validator
+        $stdout = if ($null -eq $decision) {
+            ''
+        } else {
+            $decision | ConvertTo-Json -Compress -Depth 5
+        }
+        return ConvertTo-CodexParallelAgentOutputHookResult -ExitCode 0 -Stdout $stdout
+    } catch {
+        $reason = 'PARALLEL_AGENT_OUTPUT_BLOCKED: {0}' -f ([string]$_).Trim()
+        if ($stopHookActive -is [bool] -and $stopHookActive) {
+            $continuation = Get-CodexStopContinuation `
+                -Reason $reason `
+                -AlreadyContinued $true |
+                ConvertTo-Json -Compress -Depth 5
+            return ConvertTo-CodexParallelAgentOutputHookResult `
+                -ExitCode 0 `
+                -Stdout $continuation
+        }
+        return ConvertTo-CodexParallelAgentOutputHookResult -ExitCode 2 -Stderr $reason
+    }
+}
+
+function Write-CodexParallelAgentOutputHookResult {
+    <#
+    .SYNOPSIS
+        Writes one native SubagentStop result and returns its exit code.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory)] $Result,
+        [Parameter()][scriptblock] $OutputWriter = {
+            param($value)
+            [Console]::Out.WriteLine($value)
+        },
+        [Parameter()][scriptblock] $ErrorWriter = {
+            param($value)
+            [Console]::Error.WriteLine($value)
+        }
+    )
+
+    if (-not [string]::IsNullOrEmpty([string]$Result.Stdout)) {
+        & $OutputWriter ([string]$Result.Stdout)
+    }
+    if (-not [string]::IsNullOrEmpty([string]$Result.Stderr)) {
+        & $ErrorWriter ([string]$Result.Stderr)
+    }
+    return [int]$Result.ExitCode
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$stopHookActive = $null
-try {
-    $payloadRaw = [Console]::In.ReadToEnd()
-    $payload = ConvertFrom-CodexStopJson `
-        -Raw $payloadRaw `
-        -Name 'parallel SubagentStop input'
-    if ($payload.PSObject.Properties.Name -contains 'stop_hook_active' -and
-        $payload.stop_hook_active -is [bool]) {
-        $stopHookActive = [bool]$payload.stop_hook_active
-    }
-
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $decision = Invoke-CodexParallelAgentOutputDecision `
-        -PayloadRaw $payloadRaw `
-        -WorkspaceRoot $repositoryRoot
-    if ($null -ne $decision) {
-        $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-    }
-    exit 0
-} catch {
-    $reason = 'PARALLEL_AGENT_OUTPUT_BLOCKED: {0}' -f ([string]$_).Trim()
-    if ($stopHookActive -is [bool] -and $stopHookActive) {
-        Get-CodexStopContinuation -Reason $reason -AlreadyContinued $true |
-            ConvertTo-Json -Compress -Depth 5 |
-                Write-Output
-        exit 0
-    }
-    [Console]::Error.WriteLine($reason)
-    exit 2
-}
+$repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$result = Invoke-CodexParallelAgentOutputHookEntrypoint `
+    -PayloadRaw ([Console]::In.ReadToEnd()) `
+    -WorkspaceRoot $repositoryRoot
+exit (Write-CodexParallelAgentOutputHookResult -Result $result)

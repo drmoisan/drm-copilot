@@ -5,18 +5,27 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools import (
+    parallel_codex_readiness_filesystem as readiness_filesystem,
+)
 from scripts.dev_tools.parallel_codex_readiness_filesystem import (
+    GitParallelReadinessRepository,
     ParallelReadinessFileContext,
     build_parallel_codex_readiness_evidence,
+    build_parallel_readiness_file_context,
 )
+from scripts.dev_tools.pr_context.models import CommandResult
 from tests.scripts.dev_tools.test_parallel_kickoff_contract import (
     kickoff,
     kickoff_with_integrity,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 ROOT = Path("C:/workspace")
 COMMIT = "e" * 40
@@ -75,6 +84,26 @@ class MemoryGitRepository:
 
         assert path == KICKOFF_PATH
         return "b" * 40 if self.drift else BLOB
+
+
+class StaticCommandRunner:
+    """Return one configured Git result while recording exact invocations."""
+
+    def __init__(self, result: CommandResult) -> None:
+        self.result = result
+        self.calls: list[tuple[tuple[str, ...], Path | None, bool]] = []
+
+    def run(
+        self,
+        args: Sequence[str],
+        *,
+        cwd: Path | None = None,
+        allow_error: bool = False,
+    ) -> CommandResult:
+        """Record the command boundary and return the configured result."""
+
+        self.calls.append((tuple(args), cwd, allow_error))
+        return self.result
 
 
 def checkpoint(*, second_item: bool = False) -> dict[str, object]:
@@ -265,3 +294,122 @@ def test_requires_kickoff_integrity_without_mutating_inputs() -> None:
     assert any("planning_commit is required" in error for error in result.errors)
     assert state == state_snapshot
     assert files == files_snapshot
+
+
+def test_git_hash_seam_normalizes_a_positive_hash() -> None:
+    """A successful complete Git hash is normalized to lowercase."""
+
+    normalizer = getattr(readiness_filesystem, "_normalize_git_hash_result", None)
+    assert callable(normalizer), "Git hash result testability seam must exist"
+
+    assert normalizer(0, "A" * 40) == "a" * 40
+
+
+def test_git_hash_seam_rejects_a_negative_command_result() -> None:
+    """A nonzero Git result cannot supply trusted identity evidence."""
+
+    normalizer = getattr(readiness_filesystem, "_normalize_git_hash_result", None)
+    assert callable(normalizer), "Git hash result testability seam must exist"
+
+    assert normalizer(1, "a" * 40) is None
+
+
+def test_git_hash_seam_rejects_the_empty_boundary() -> None:
+    """An empty successful Git response remains unresolved."""
+
+    normalizer = getattr(readiness_filesystem, "_normalize_git_hash_result", None)
+    assert callable(normalizer), "Git hash result testability seam must exist"
+
+    assert normalizer(0, "") is None
+
+
+def test_git_hash_seam_rejects_malformed_output_as_an_error() -> None:
+    """Malformed Git output cannot be accepted as a commit or blob hash."""
+
+    normalizer = getattr(readiness_filesystem, "_normalize_git_hash_result", None)
+    assert callable(normalizer), "Git hash result testability seam must exist"
+
+    assert normalizer(0, "not-a-hash") is None
+
+
+def test_git_repository_routes_all_read_only_identity_queries() -> None:
+    """The concrete Git adapter shapes all three commands through its runner."""
+
+    runner = StaticCommandRunner(CommandResult("A" * 40 + "\n", "", 0))
+    repository = GitParallelReadinessRepository(ROOT, runner)
+
+    assert repository.resolve_commit("origin/parallel/sample-run-plan") == "a" * 40
+    assert repository.committed_blob_hash("main", "path.txt") == "a" * 40
+    assert repository.worktree_blob_hash("path.txt") == "a" * 40
+    assert runner.calls == [
+        (
+            (
+                "git",
+                "rev-parse",
+                "--verify",
+                "origin/parallel/sample-run-plan^{commit}",
+            ),
+            ROOT,
+            True,
+        ),
+        (("git", "rev-parse", "--verify", "main:path.txt"), ROOT, True),
+        (("git", "hash-object", "--", "path.txt"), ROOT, True),
+    ]
+
+
+def test_context_builder_resolves_relative_artifact_with_injected_adapters() -> None:
+    """The context builder anchors a relative artifact without performing I/O."""
+
+    file_system = MemoryFileSystem({})
+    git = MemoryGitRepository()
+
+    context = build_parallel_readiness_file_context(
+        ROOT,
+        Path("artifacts/orchestration/checkpoint.json"),
+        file_system=file_system,
+        git=git,
+    )
+
+    assert context.workspace_root == ROOT
+    assert context.artifact_path == ROOT / "artifacts/orchestration/checkpoint.json"
+    assert context.file_system is file_system
+    assert context.git is git
+
+
+def test_builder_rejects_invalid_json_and_non_mapping_roots() -> None:
+    """Unreadable and non-object checkpoint roots return no assembled evidence."""
+
+    context = ParallelReadinessFileContext(
+        workspace_root=ROOT,
+        artifact_path=ROOT / "checkpoint.json",
+        file_system=MemoryFileSystem({}),
+        git=MemoryGitRepository(),
+    )
+
+    assert build_parallel_codex_readiness_evidence("{", context).evidence is None
+    assert build_parallel_codex_readiness_evidence("[]", context).evidence is None
+
+
+def test_builder_skips_a_non_mapping_item_boundary() -> None:
+    """An unreadable item remains owned by base shape validation and is skipped."""
+
+    state = checkpoint()
+    state["items"] = [None]
+
+    result = build(state, MemoryFileSystem(valid_files()))
+
+    assert result.evidence is not None
+    assert result.evidence.launch_records == {}
+
+
+def test_rejects_unsafe_kickoff_path_before_file_access() -> None:
+    """A traversal kickoff path fails before any attempted filesystem read."""
+
+    state = checkpoint()
+    state["kickoff_prompt_path"] = "../parallel-kickoff.md"
+    file_system = MemoryFileSystem(valid_files())
+
+    result = build(state, file_system)
+
+    assert any("kickoff_prompt_path must be a guarded" in e for e in result.errors)
+    assert not any("parallel-kickoff.md" in path for path in file_system.reads)

@@ -1,0 +1,7 @@
+Timestamp: 2026-08-12T05-37
+Command: poetry run pytest -o "addopts=" -q tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_parallel_persona_prompts_match_profiles_and_generated_bundles
+EXIT_CODE: 1
+Output Summary: Pytest selected the focused persona parity contract and reported 1 failed in 0.08 seconds. Canonical and bundled persona files were already byte-identical, and both dedicated profiles denied `.claude/**` writes. The assertion failed only because the planner prompt omitted its required `parallel-planner-workspace` sandbox authority and still declared the ordinary `orchestrator-workspace` authority. Targeted Black, Ruff, and Pyright checks all passed before this expected-red run. No production-source or `.claude/**` file was edited.
+Expected Failure: current canonical and bundled prompt authority contradiction
+Unexpected Failures: 0
+

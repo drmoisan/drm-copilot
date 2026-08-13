@@ -1,10 +1,13 @@
-"""Pure Codex provenance and readiness checks for standalone parallel state.
+"""Validate external Codex provenance for standalone parallel checkpoints.
 
-The shared parallel checkpoints remain runtime-neutral. Codex launch provenance
-is an external, versioned record supplied by the guarded launch/status path
-loader; this module validates that record without reading the filesystem. The
-planner and orchestrator validators compose these checks and retain ownership
-of their existing backward-compatible state schemas.
+The runtime-neutral checkpoints reference guarded launch, status, authority,
+delegation, topology, model-routing, ledger, and kickoff evidence. This pure
+module validates those already-loaded records without filesystem access or
+input mutation. It rejects epic/fan-in contamination, unsafe paths, missing or
+cross-wired evidence, LOST ledger rows, and identity drift in stable order.
+Every helper returns diagnostics instead of raising and has no side effects;
+individual docstrings therefore state their inputs and returned result without
+repeating those module-wide guarantees.
 """
 
 from __future__ import annotations
@@ -68,7 +71,12 @@ _LAUNCH_RECORD_KEYS = (
 
 @dataclass(frozen=True)
 class ParallelCodexReadinessEvidence:
-    """External evidence loaded by the guarded repository service boundary."""
+    """Carry immutable external records loaded by the guarded service boundary.
+
+    Callers assemble launch/status/receipt mappings, one ledger value, and an
+    optional kickoff identity, then pass the value to the checkpoint validator.
+    The class only stores references and performs no loading or mutation.
+    """
 
     launch_records: Mapping[str, object]
     status_records: Mapping[str, object]
@@ -78,16 +86,16 @@ class ParallelCodexReadinessEvidence:
 
 
 def _is_non_empty_string(value: object) -> bool:
-    """Return whether ``value`` is a non-blank string."""
-
+    """Check text. Args: value. Returns: bool. Raises: None. Side Effects: None."""
     return isinstance(value, str) and bool(value.strip())
 
 
 def _mixed_state_paths(value: object, path: str = "") -> list[str]:
-    """Return deterministic paths to epic or fan-in keys in parallel data."""
-
+    """Find state. Args: inputs. Returns: paths. Raises: None. Side Effects: None."""
     paths: list[str] = []
+    # Recurse through mappings by field name and sequences by stable index.
     if isinstance(value, Mapping):
+        # Preserve persisted mapping order while constructing dotted child paths.
         for key, child in cast("Mapping[object, object]", value).items():
             key_text = str(key)
             child_path = f"{path}.{key_text}" if path else key_text
@@ -95,6 +103,7 @@ def _mixed_state_paths(value: object, path: str = "") -> list[str]:
                 paths.append(child_path)
             paths.extend(_mixed_state_paths(child, child_path))
     elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        # Traverse collection elements without treating strings as sequences.
         for index, child in enumerate(cast("Sequence[object]", value)):
             paths.extend(_mixed_state_paths(child, f"{path}[{index}]"))
     return paths
@@ -103,8 +112,8 @@ def _mixed_state_paths(value: object, path: str = "") -> list[str]:
 def validate_parallel_state_is_standalone(
     state: Mapping[str, object], *, context: str
 ) -> list[str]:
-    """Reject epic or fan-in keys without changing the shared state schema."""
-
+    """Reject mix. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
+    # Render every prohibited structural path with the caller's surface context.
     return [
         (f"{context} contains prohibited epic or fan-in key at {path}.")
         for path in _mixed_state_paths(state)
@@ -124,16 +133,17 @@ def validate_parallel_launch_provenance(
     launch_receipt_path: str,
     launch_status_path: str,
 ) -> list[str]:
-    """Validate one external Codex item-launch record against guarded paths."""
-
+    """Check launch. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     prefix = f"{context} Codex launch provenance"
     if not isinstance(value, Mapping):
         return [f"{prefix} must be an object loaded from the guarded launch path."]
     record = cast("Mapping[str, object]", value)
+    # Missing required keys stop cross-field checks that would duplicate symptoms.
     missing = [key for key in _LAUNCH_RECORD_KEYS if key not in record]
     if missing:
         return [f"{prefix} missing required keys: {', '.join(missing)}."]
 
+    # Compare all fixed and caller-bound launch identities in declared order.
     expected: tuple[tuple[str, object], ...] = (
         ("schema_version", PARALLEL_LAUNCH_SCHEMA_VERSION),
         ("surface", PARALLEL_SURFACE),
@@ -147,6 +157,7 @@ def validate_parallel_launch_provenance(
         ("worktree_path", worktree_path),
         ("launch_status_path", launch_status_path),
     )
+    # Compare every sealed launch identity field to its expected durable value.
     errors = [
         f"{prefix}.{key} must be {expected_value!r}; found: {record.get(key)!r}."
         for key, expected_value in expected
@@ -157,6 +168,7 @@ def validate_parallel_launch_provenance(
             f"{prefix}.launch_receipt_path must match the guarded path "
             f"{launch_receipt_path!r}; found: {record.get('launch_receipt_path')!r}."
         )
+    # Require non-empty routing and receipt references independently.
     for key in (
         "deployment_agent",
         "model",
@@ -178,14 +190,14 @@ def validate_parallel_launch_provenance(
 
 
 def validate_zero_lost_ledger(value: object, *, context: str) -> list[str]:
-    """Require a complete-shaped enforceability ledger with no LOST row."""
-
+    """Check ledger. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     prefix = f"{context} enforceability_ledger"
     if not isinstance(value, list) or not value:
         return [f"{prefix} must be a non-empty list for execution readiness."]
 
     errors: list[str] = []
     seen_gate_ids: set[str] = set()
+    # Validate each ledger row and track prior gate ownership for uniqueness.
     for index, item in enumerate(cast("list[object]", value)):
         item_prefix = f"{prefix}[{index}]"
         if not isinstance(item, Mapping):
@@ -194,12 +206,14 @@ def validate_zero_lost_ledger(value: object, *, context: str) -> list[str]:
         entry = cast("Mapping[str, object]", item)
         gate_id = entry.get("gate_id")
         status = entry.get("status")
+        # Gate identities must be present and unique before their status is trusted.
         if not _is_non_empty_string(gate_id):
             errors.append(f"{item_prefix}.gate_id must be a non-empty string.")
         elif cast("str", gate_id) in seen_gate_ids:
             errors.append(f"{item_prefix}.gate_id must be unique; found: {gate_id!r}.")
         else:
             seen_gate_ids.add(cast("str", gate_id))
+        # Reject unknown statuses first, then treat the recognized LOST value as fatal.
         if status not in VALID_LEDGER_STATUSES:
             errors.append(
                 f"{item_prefix}.status must be one of "
@@ -211,8 +225,7 @@ def validate_zero_lost_ledger(value: object, *, context: str) -> list[str]:
 
 
 def _guarded_path(value: object, *, field: str) -> tuple[str | None, list[str]]:
-    """Return a safe repository-relative evidence path or one error."""
-
+    """Check path. Args: inputs. Returns: pair. Raises: None. Side Effects: None."""
     if not _is_non_empty_string(value) or cast("str", value).find("\\") >= 0:
         return None, [f"{field} must be a repository-relative POSIX path."]
     path = PurePosixPath(cast("str", value))
@@ -221,14 +234,27 @@ def _guarded_path(value: object, *, field: str) -> tuple[str | None, list[str]]:
     return path.as_posix(), []
 
 
+def _readiness_item_paths(
+    item: Mapping[str, object], item_context: str
+) -> tuple[str | None, str | None, list[str]]:
+    """Check paths. Args: inputs. Returns: data. Raises: None. Side Effects: None."""
+    receipt_path, receipt_errors = _guarded_path(
+        item.get("launch_receipt_path"),
+        field=f"{item_context}.launch_receipt_path",
+    )
+    status_path, status_errors = _guarded_path(
+        item.get("launch_status_path"), field=f"{item_context}.launch_status_path"
+    )
+    return receipt_path, status_path, [*receipt_errors, *status_errors]
+
+
 def _validate_kickoff_identity(
     state: Mapping[str, object],
     evidence: ParallelCodexReadinessEvidence,
     *,
     context: str,
 ) -> list[str]:
-    """Validate the service-verified committed kickoff identity."""
-
+    """Check start. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     if "kickoff_prompt_path" not in state:
         return []
     prefix = f"{context} committed kickoff identity"
@@ -237,11 +263,13 @@ def _validate_kickoff_identity(
         return [f"{prefix} is required for execution readiness."]
     slug = state.get("parallel_slug")
     expected_path = f"docs/features/parallel/{slug}/parallel-kickoff.md"
+    # Bind service-verified fields to the checkpoint's conventional slug paths.
     expected: tuple[tuple[str, object], ...] = (
         ("schema_version", 1),
         ("path", expected_path),
         ("plan_home_ref", f"origin/parallel/{slug}-plan"),
     )
+    # Report every kickoff identity field that diverges from the committed contract.
     errors = [
         f"{prefix}.{key} must be {wanted!r}; found: {identity.get(key)!r}."
         for key, wanted in expected
@@ -259,6 +287,7 @@ def _validate_kickoff_identity(
         )
     blob = identity.get("blob_sha256")
     worktree = identity.get("worktree_sha256")
+    # A valid committed digest must also equal the service-observed worktree digest.
     if not isinstance(blob, str) or _SHA256_RE.fullmatch(blob) is None:
         errors.append(f"{prefix}.blob_sha256 must be 64 lowercase hex characters.")
     if worktree != blob:
@@ -272,13 +301,13 @@ def _validate_status(
     context: str,
     launch_receipt_path: str,
 ) -> list[str]:
-    """Validate one terminal status record and its receipt binding."""
-
+    """Check status. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     prefix = f"{context} external launch status"
     if not isinstance(value, Mapping):
         return [f"{prefix} must be an object loaded from the guarded status path."]
     record = cast("Mapping[str, object]", value)
     errors: list[str] = []
+    # Validate terminal shape and receipt binding independently for complete evidence.
     if record.get("schema_version") != PARALLEL_LAUNCH_SCHEMA_VERSION:
         errors.append(
             f"{prefix}.schema_version must be {PARALLEL_LAUNCH_SCHEMA_VERSION}; "
@@ -302,8 +331,7 @@ def _receipt_document(
     key: str,
     context: str,
 ) -> tuple[Mapping[str, object] | None, list[str]]:
-    """Resolve one required external receipt object by its launch-record path."""
-
+    """Resolve doc. Args: inputs. Returns: data. Raises: None. Side Effects: None."""
     label = key.removesuffix("_receipt_path").replace("_", "-")
     path = record.get(key)
     if not _is_non_empty_string(path):
@@ -322,10 +350,10 @@ def _validate_referenced_receipts(
     parallel_slug: object,
     item_key: object,
 ) -> list[str]:
-    """Validate authority, delegation, topology, and model receipt binding."""
-
+    """Check refs. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     documents: dict[str, Mapping[str, object]] = {}
     errors: list[str] = []
+    # Resolve all four required receipt documents before cross-binding their fields.
     for key in (
         "authority_receipt_path",
         "delegation_receipt_path",
@@ -341,6 +369,7 @@ def _validate_referenced_receipts(
 
     authority = documents.get("authority_receipt_path")
     if authority is not None:
+        # Authority must select this exact parallel item and record authorization.
         for key, expected in (
             ("surface", PARALLEL_SURFACE),
             ("parallel_slug", parallel_slug),
@@ -353,6 +382,7 @@ def _validate_referenced_receipts(
                     f"found: {authority.get(key)!r}."
                 )
     delegation = documents.get("delegation_receipt_path")
+    # Delegation identity must name both a durable delegation and the launch agent.
     if delegation is not None:
         if not _is_non_empty_string(delegation.get("delegation_id")):
             errors.append(
@@ -364,6 +394,7 @@ def _validate_referenced_receipts(
             )
     topology = documents.get("topology_receipt_path")
     if topology is not None:
+        # Reuse topology authority and replace its generic receipt context.
         for error in validate_codex_topology_receipts([topology]):
             errors.append(
                 error.replace(
@@ -373,6 +404,7 @@ def _validate_referenced_receipts(
             )
     model = documents.get("model_routing_receipt_path")
     if model is not None:
+        # Reuse model authority, then bind launch routing fields to its receipt.
         for error in validate_codex_model_routing_receipts([model]):
             errors.append(
                 error.replace(
@@ -380,6 +412,7 @@ def _validate_referenced_receipts(
                     f"{context} model-routing receipt",
                 )
             )
+        # Compare each launch routing identity against the validated model receipt.
         for key in ("deployment_agent", "model", "model_reasoning_effort"):
             if record.get(key) != model.get(key):
                 errors.append(f"{context} {key} must match model-routing receipt.")
@@ -392,8 +425,7 @@ def validate_parallel_codex_checkpoint_readiness(
     context: str,
     evidence: ParallelCodexReadinessEvidence | None,
 ) -> list[str]:
-    """Validate guarded external evidence for an explicit ready/complete gate."""
-
+    """Check ready. Args: inputs. Returns: errors. Raises: None. Side Effects: None."""
     if evidence is None:
         return [f"{context} Codex readiness evidence is required."]
     errors = validate_zero_lost_ledger(evidence.enforceability_ledger, context=context)
@@ -402,30 +434,28 @@ def validate_parallel_codex_checkpoint_readiness(
     if not isinstance(items, list):
         return errors
     seen_paths: set[str] = set()
+    # Validate readable items in persistence order while enforcing path ownership.
     for index, value in enumerate(cast("list[object]", items)):
         if not isinstance(value, Mapping):
             continue
         item = cast("Mapping[str, object]", value)
         item_context = f"{context} items[{index}]"
-        receipt_path, receipt_errors = _guarded_path(
-            item.get("launch_receipt_path"),
-            field=f"{item_context}.launch_receipt_path",
+        receipt_path, status_path, path_errors = _readiness_item_paths(
+            item, item_context
         )
-        status_path, status_errors = _guarded_path(
-            item.get("launch_status_path"),
-            field=f"{item_context}.launch_status_path",
-        )
-        errors.extend(receipt_errors)
-        errors.extend(status_errors)
+        errors.extend(path_errors)
+        # Readiness needs execution identity fields beyond the shared state schema.
         for key in ("branch", "worktree_path", "cohort", "batch"):
             if key not in item:
                 errors.append(f"{item_context}.{key} is required for Codex readiness.")
         if receipt_path is None or status_path is None:
             continue
+        # A guarded launch/status path may belong to only one item and one role.
         if receipt_path in seen_paths or status_path in seen_paths:
             errors.append(f"{item_context} launch and status paths must be unique.")
         seen_paths.update((receipt_path, status_path))
         record_value = evidence.launch_records.get(receipt_path)
+        # A missing launch record prevents all downstream receipt cross-binding.
         if not isinstance(record_value, Mapping):
             errors.append(
                 f"{item_context} external launch record is missing at {receipt_path!r}."

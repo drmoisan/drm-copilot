@@ -1,0 +1,10 @@
+Task: [P11-T1]
+Timestamp: 2026-08-12T10:15:07.5693785-04:00
+Working Directory: repository root
+Command: npm --prefix extensions/drm-copilot run format
+EXIT_CODE: 0
+Output Summary: Prettier completed over the full configured TypeScript, test, JSON, and CommonJS scope. All 402 files were reported unchanged.
+Pre-format scope SHA-256: BF5CF362CC8E143EC5DF02A0D6C9F87E8977D1317BBFFBB420A0BC11621D27F8
+Post-format scope SHA-256: BF5CF362CC8E143EC5DF02A0D6C9F87E8977D1317BBFFBB420A0BC11621D27F8
+Files changed: false
+Acceptance result: PASS.

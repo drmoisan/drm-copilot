@@ -165,7 +165,10 @@ function Start-CodexChildProcessCore {
         [Parameter(Mandatory)][System.Diagnostics.ProcessStartInfo] $StartInfo,
         [Parameter(Mandatory)][string] $SurfaceLabel,
         [Parameter(Mandatory)][string] $ErrorPrefix,
-        [Parameter(Mandatory)][scriptblock] $SetReceiptState
+        [Parameter(Mandatory)][scriptblock] $SetReceiptState,
+        [Parameter()][scriptblock] $ProcessFactory = {
+            [System.Diagnostics.Process]::new()
+        }
     )
     $base = Join-Path $ArtifactRoot ([string]$Entry.launch_id)
     if (-not $PSCmdlet.ShouldProcess(
@@ -174,7 +177,7 @@ function Start-CodexChildProcessCore {
         )) {
         return $null
     }
-    $process = [System.Diagnostics.Process]::new()
+    $process = & $ProcessFactory
     $process.StartInfo = $StartInfo
     $started = $false
     try {

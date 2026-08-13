@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools import resolve_codex_topology as topology
 from scripts.dev_tools.resolve_codex_topology import (
     main,
     resolve_codex_topology,
@@ -14,6 +15,18 @@ from scripts.dev_tools.resolve_codex_topology import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+
+def test_parallel_root_context_seam_covers_all_persona_outcomes() -> None:
+    """The root seam resolves both personas, ordinary roots, and misuse."""
+
+    resolver = getattr(topology, "_parallel_root_context", None)
+    assert callable(resolver), "topology persona-context seam must exist"
+    assert resolver("parallel-planner") == "parallel_planning"
+    assert resolver("parallel-orchestrator") == "parallel_execution"
+    assert resolver("epic-planner") is None
+    with pytest.raises(ValueError, match="requires 'parallel_planning'"):
+        resolve_codex_topology([], 0, 0, "standalone", root_persona="parallel-planner")
 
 
 @pytest.mark.parametrize(

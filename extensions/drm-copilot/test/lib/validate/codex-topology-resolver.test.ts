@@ -215,6 +215,20 @@ describe("resolveCodexTopology", () => {
     ).toThrow("A forced root persona requires standalone context.");
   });
 
+  it("reports a null execution context using the canonical representation", () => {
+    expect(() => resolveCodexTopology(["python"], 1, 1, null as never)).toThrow(
+      "found None.",
+    );
+  });
+
+  it("requires a parallel root persona to use its matching context", () => {
+    expect(() =>
+      resolveCodexTopology([], 0, 0, "standalone", {
+        rootPersona: "parallel-planner",
+      }),
+    ).toThrow("requires 'parallel_planning' context");
+  });
+
   it("exports the canonical budget and precedence policy", () => {
     expect(LANGUAGE_BUDGETS["typescript"]).toMatchObject({
       direct_mode_enabled: false,

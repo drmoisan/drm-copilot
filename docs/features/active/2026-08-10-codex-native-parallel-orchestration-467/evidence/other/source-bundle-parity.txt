@@ -1,0 +1,9 @@
+Task: [P8-T2]
+Command: poetry run pytest -q tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py
+Exit code: 0
+
+Output:
+.............                                                            [100%]
+13 passed in 0.24s
+
+Acceptance result: PASS - all scoped canonical sources, generated bundles, and pack manifests passed the parity validator.

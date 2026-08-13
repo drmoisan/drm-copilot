@@ -1,0 +1,19 @@
+Task: [P8-T4]
+
+COMMAND 1
+Command: mcp__drm_copilot__run_poshqc_test({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25", scan_folders: ["tests/scripts/codex-hooks/parallel-provenance.Tests.ps1"] })
+Exit code: 0
+MCP result: ok=true
+JUnit: tests=19, errors=0, failures=0, disabled=0
+Result: PASS - planner/orchestrator profile, entry-skill routing, prompt authority, and dedicated permission assertions passed.
+
+COMMAND 2
+Command: PowerShell inline runtime validator over `.codex/agents/parallel-planner.toml`, `.codex/agents/parallel-orchestrator.toml`, their exact generated bundle copies, `pack-manifests/core.json`, `config/orchestration-routing.json`, `.codex/config.toml`, and the three parallel entry skills.
+Exit code: 0
+Output:
+{"Persona":"parallel-planner","Permission":"parallel-planner-workspace","PromptAuthorities":"parallel-planner-workspace","RootBundleParity":true,"RootSha256":"6A32C493A4761B8044D23CABDD79DB4D5EA7F12399BD38D10471E1077D70A10B","ManifestRegistered":true,"TopologyContext":"parallel-planner","ModelContext":"parallel-planner","Model":"gpt-5.6-sol","Reasoning":"ultra","EntrySkillCount":1}
+{"Persona":"parallel-orchestrator","Permission":"parallel-orchestrator-workspace","PromptAuthorities":"parallel-orchestrator-workspace","RootBundleParity":true,"RootSha256":"7880F4B441D3B9D50FAE208D36D39AC9C5DE9E1E398CFCD72C2F2ADA4301BFF4","ManifestRegistered":true,"TopologyContext":"parallel-orchestrator","ModelContext":"parallel-orchestrator","Model":"gpt-5.6-sol","Reasoning":"ultra","EntrySkillCount":2}
+CONTRADICTORY_PERMISSION_CLAIM_COUNT: 0
+VALIDATION_FAILURE_COUNT: 0
+
+Acceptance result: PASS - both forced parallel personas have matching profiles, core-manifest registration, topology and model-context mappings, prompt authorities, dedicated permission profiles, entry-skill authorities, and byte-identical generated bundles. No contradictory permission claims or validation failures were found.

@@ -1,0 +1,14 @@
+Timestamp: 2026-08-12T05-47
+Command: PowerShell `Get-Content -LiteralPath <path>` count over every production, generated-bundle, and test file changed in Phases 1 and 2
+EXIT_CODE: 0
+Output Summary: All 6 changed production/test files are at or below the 500-line limit; maximum physical line count is 366.
+
+Path | Lines | At or below 500
+--- | ---: | ---
+.codex/agents/parallel-planner.toml | 63 | PASS
+.codex/agents/parallel-orchestrator.toml | 74 | PASS
+extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/parallel-planner.toml | 63 | PASS
+extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/parallel-orchestrator.toml | 74 | PASS
+tests/scripts/codex-hooks/parallel-provenance.Tests.ps1 | 253 | PASS
+tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py | 366 | PASS
+

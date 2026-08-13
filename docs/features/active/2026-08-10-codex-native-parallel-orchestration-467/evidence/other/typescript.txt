@@ -1,0 +1,17 @@
+TypeScript Phase 7 changed-file line-count gate
+
+Timestamp: 2026-08-12T11:30:18.7237386Z
+
+Command:
+`$paths = @('extensions/drm-copilot/test/lib/push-down/codex-routing-merge.test.ts','extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts','extensions/drm-copilot/test/lib/validate/orchestration-artifacts-parallel-dispatch.test.ts','extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing-coverage.test.ts','extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts'); foreach($path in $paths){ $count=@(Get-Content -LiteralPath $path).Count; '{0} | {1} | {2}' -f $count,($count -le 500),$path }`
+
+Results:
+- 210 | PASS | `extensions/drm-copilot/test/lib/push-down/codex-routing-merge.test.ts`
+- 248 | PASS | `extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts`
+- 488 | PASS | `extensions/drm-copilot/test/lib/validate/orchestration-artifacts-parallel-dispatch.test.ts`
+- 30 | PASS | `extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing-coverage.test.ts`
+- 414 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts`
+
+Reconciliation: 5 changed TypeScript test paths, 5 unique paths, and 5 at or below 500 physical lines. Phase 7 changed 0 TypeScript production paths because all reviewed coverage gaps were reachable through existing public behavior and no testability seam was required.
+
+Acceptance result: PASS.

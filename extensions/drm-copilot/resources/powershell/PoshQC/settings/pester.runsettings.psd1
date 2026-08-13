@@ -129,6 +129,46 @@
             '.codex/hooks/enforce-evidence-locations.ps1'
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
+            # Issue #467 remediation batch 1 measures the root parallel authority transport
+            # so each changed runtime has source-attributable Pester coverage.
+            '.codex/hooks/authorize-root-parallel-invocation.ps1'
+            '.codex/hooks/enforce-parallel-root-invocation.ps1'
+            '.codex/hooks/parallel-hook-common.ps1'
+            # Issue #467 remediation batch 2 measures the destructive mutation adapters and
+            # the parallel-child worktree-binding gate through their focused Pester owner.
+            '.codex/hooks/enforce-parallel-abandon-gate.ps1'
+            '.codex/hooks/enforce-parallel-child-worktree-binding.ps1'
+            '.codex/hooks/enforce-parallel-worktree-removal-gate.ps1'
+            # Issue #467 remediation batch 3 measures cohort, drift, and bounded agent-output
+            # enforcement through one focused root-runtime Pester owner.
+            '.codex/hooks/enforce-parallel-cohort-barrier.ps1'
+            '.codex/hooks/enforce-parallel-drift-gate.ps1'
+            '.codex/hooks/validate-parallel-agent-output.ps1'
+            # Issue #467 remediation batch 4 measures the authority store and model-routing
+            # attestation enforcement through one focused Pester owner.
+            '.codex/hooks/codex-authority-store.ps1'
+            '.codex/hooks/enforce-codex-model-routing.ps1'
+            '.codex/hooks/record-subagent-routing-attestation.ps1'
+            # Issue #467 remediation batch 5 measures subagent stop validation plus the
+            # surface-neutral child launch and resume contract helpers.
+            '.codex/hooks/validate-codex-subagent-routing.ps1'
+            '.codex/scripts/codex-child-launch-contract-core.ps1'
+            '.codex/scripts/codex-child-launch-resume.ps1'
+            # Issue #467 remediation batch 6 measures child persistence/runtime helpers and
+            # the epic-specific launch contract through their focused Pester owner.
+            '.codex/scripts/codex-child-launch-persistence.ps1'
+            '.codex/scripts/codex-child-launch-runtime.ps1'
+            '.codex/scripts/epic-child-launch-contract.ps1'
+            # Issue #467 remediation batch 7 measures epic launch/resume entrypoints and the
+            # parallel post-session verifier through their safe helper seams.
+            '.codex/scripts/launch-epic-child-wave.ps1'
+            '.codex/scripts/parallel-child-post-session.ps1'
+            '.codex/scripts/resume-epic-child.ps1'
+            # Issue #467 remediation batch 8 measures parallel launch/resume entrypoints and
+            # their launch-contract adapter through focused, side-effect-free helper cases.
+            '.codex/scripts/launch-parallel-child-batch.ps1'
+            '.codex/scripts/parallel-child-launch-contract.ps1'
+            '.codex/scripts/resume-parallel-child.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
@@ -207,11 +247,3 @@
         CoveragePercentTarget = 0
     }
 }
-
-
-
-
-
-
-
-

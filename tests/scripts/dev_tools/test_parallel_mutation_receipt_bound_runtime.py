@@ -8,6 +8,9 @@ from typing import cast
 
 import pytest
 
+from scripts.dev_tools import (
+    _parallel_orchestrator_state_mutation_receipts as mutation_receipts,
+)
 from scripts.dev_tools.validate_parallel_orchestrator_state import (
     validate_parallel_orchestrator_state_text,
 )
@@ -260,3 +263,70 @@ def test_receipt_validation_does_not_mutate_checkpoint_input() -> None:
 
     assert _validate(state) == _validate(state)
     assert state == snapshot
+
+
+def _mutation_entries(state: dict[str, object]) -> list[dict[str, object]]:
+    """Return typed mutation entries from the local test fixture."""
+
+    return cast("list[dict[str, object]]", state["mutations"])
+
+
+def test_mutation_parts_seam_accepts_a_positive_bound_receipt() -> None:
+    """The parsed-parts seam accepts an exact detach receipt."""
+
+    state = _receipt_bound_removal("detach")
+    validator = getattr(mutation_receipts, "_validate_mutation_state_parts", None)
+    assert callable(validator), "mutation parts testability seam must exist"
+
+    assert validator(state, _mutation_entries(state), CONTEXT) == []
+
+
+def test_mutation_parts_seam_rejects_a_negative_token_binding() -> None:
+    """The parsed-parts seam rejects a mismatched confirmation token."""
+
+    state = _receipt_bound_removal("detach")
+    receipt = cast("list[dict[str, object]]", state["mutation_receipts"])[0]
+    receipt["confirmation_token"] = WORKTREE
+    validator = getattr(mutation_receipts, "_validate_mutation_state_parts", None)
+    assert callable(validator), "mutation parts testability seam must exist"
+
+    errors = cast("list[str]", validator(state, _mutation_entries(state), CONTEXT))
+    assert "token must equal" in "\n".join(errors)
+
+
+def test_mutation_parts_seam_accepts_the_empty_log_boundary() -> None:
+    """An empty mutation log remains a valid additive boundary."""
+
+    state = _state()
+    validator = getattr(mutation_receipts, "_validate_mutation_state_parts", None)
+    assert callable(validator), "mutation parts testability seam must exist"
+
+    assert validator(state, [], CONTEXT) == []
+
+
+def test_mutation_parts_seam_reports_a_non_list_receipt_error() -> None:
+    """The parsed-parts seam reports malformed receipt collection input."""
+
+    state = _state()
+    state["mutation_receipts"] = {}
+    validator = getattr(mutation_receipts, "_validate_mutation_state_parts", None)
+    assert callable(validator), "mutation parts testability seam must exist"
+
+    assert validator(state, [], CONTEXT) == [
+        f"{CONTEXT} mutation_receipts must be a list."
+    ]
+
+
+def test_mutation_parts_seam_reports_incomplete_blank_receipt_fields() -> None:
+    """The seam reports every missing field plus a blank present receipt path."""
+
+    state = _state()
+    state["mutation_receipts"] = [{"receipt_path": ""}]
+    validator = getattr(mutation_receipts, "_validate_mutation_state_parts", None)
+    assert callable(validator), "mutation parts testability seam must exist"
+
+    errors = cast("list[str]", validator(state, [], CONTEXT))
+    assert len(errors) == 6
+    assert errors[-1] == (
+        f"{CONTEXT} mutation_receipts[0] receipt_path must be a non-empty string."
+    )

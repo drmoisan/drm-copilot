@@ -434,6 +434,29 @@ describe("validateArtifact parallel dispatch", () => {
     expect(errors).toEqual(["Parallel kickoff is empty."]);
   });
 
+  it("does not require committed context when kickoff readiness is disabled", () => {
+    const errors = validateArtifact({
+      artifactType: "parallel-kickoff",
+      text: "",
+      requireReadyForExecution: false,
+    });
+
+    expect(errors).toEqual(["Parallel kickoff is empty."]);
+  });
+
+  it("requires every committed-evidence dependency for kickoff readiness", () => {
+    const errors = validateArtifact({
+      artifactType: "parallel-kickoff",
+      text: "",
+      requireReadyForExecution: true,
+    });
+
+    expect(errors).toContain(
+      "Parallel committed kickoff evidence context requires filesystem, " +
+        "workspace root, artifact path, and Git runner.",
+    );
+  });
+
   it("requires committed file-backed identity for a ready kickoff", () => {
     const state = publicReadyState();
     const fs = new ReadinessFileSystem(publicReadyFiles(state));

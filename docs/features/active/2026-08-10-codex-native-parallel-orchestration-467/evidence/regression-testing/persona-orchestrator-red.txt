@@ -1,0 +1,7 @@
+Timestamp: 2026-08-12T05-35
+Command: pwsh -NoProfile -Command "& { Import-Module Pester -MinimumVersion 5.0.0; Invoke-Pester -Path 'tests/scripts/codex-hooks/parallel-provenance.Tests.ps1' -FullNameFilter '*aligns the orchestrator prompt tool and permission statements*' -CI -Output Detailed }"
+EXIT_CODE: 1
+Output Summary: Pester discovered 19 tests, selected only the focused orchestrator contract test, and reported 0 passed, 1 failed, and 18 not run. The test failed because the prompt's `orchestrator-workspace` sandbox authority did not equal the profile's `parallel-orchestrator-workspace` default_permissions value. Scoped PoshQC formatting and analysis both passed before this expected-red run. No production-source file was edited.
+Expected Failure: current orchestrator prompt/profile permission contradiction
+Unexpected Failures: 0
+

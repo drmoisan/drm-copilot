@@ -165,6 +165,10 @@ Describe 'Codex parallel child resume live-truth contract' {
 
         @(Invoke-TestParallelResumeValidation -Evidence $evidence) | Should -BeNullOrEmpty
         ($evidence | ConvertTo-Json -Depth 32 -Compress) | Should -BeExactly $snapshot
+
+        $evidence.Checkpoint.mutations = @()
+        $evidence.LiveTruth.latest_mutation_sequence = 0
+        @(Invoke-TestParallelResumeValidation -Evidence $evidence) | Should -BeNullOrEmpty
     }
 
     It 'rejects a relaunch whose sealed runtime permission changed' {
@@ -193,6 +197,56 @@ Describe 'Codex parallel child resume live-truth contract' {
             $evidence = Get-TestParallelResumeEvidence
             $evidence.LiveTruth.($case.Field) = $case.Value
 
+            @(Invoke-TestParallelResumeValidation -Evidence $evidence) |
+                Should -Contain $case.Code
+        }
+    }
+
+    It 'rejects invalid sealed receipt, launch, checkpoint, and status evidence' {
+        $cases = @(
+            @{ Code = 'parallel resume evidence must not contain integration or fan-in state.'; Mutate = {
+                    param($item) $item.Receipt | Add-Member integration_branch 'forbidden'
+                } }
+            @{ Code = 'parallel resume requires the parallel launch surface.'; Mutate = {
+                    param($item) $item.Receipt.surface = 'epic'
+                } }
+            @{ Code = 'parallel resume requires main as both base and PR target.'; Mutate = {
+                    param($item) $item.Spec.base_branch = 'develop'
+                } }
+            @{ Code = 'parallel resume requires one exact launch entry.'; Mutate = {
+                    param($item) $item.Spec.launches = @()
+                } }
+            @{ Code = 'parallel resume requires one exact checkpoint item.'; Mutate = {
+                    param($item) $item.Checkpoint.items = @($item.Checkpoint.items[1])
+                } }
+            @{ Code = 'parallel resume model differs from the sealed launch entry.'; Mutate = {
+                    param($item) $item.Receipt.model = 'other-model'
+                } }
+            @{ Code = 'parallel resume worktree or branch differs from the checkpoint item.'; Mutate = {
+                    param($item) $item.Checkpoint.items[0].worktree_path = 'other-worktree'
+                } }
+            @{ Code = 'parallel resume must select the first incomplete persisted cohort, batch, and item.'; Mutate = {
+                    param($item) $item.Checkpoint.items[0].state = 'merged'
+                } }
+            @{ Code = 'parallel resume child status launch_id differs from the receipt.'; Mutate = {
+                    param($item) $item.Status.launch_id = 'other-launch'
+                } }
+            @{ Code = 'parallel resume receipt is missing authority_receipt_path.'; Mutate = {
+                    param($item) $item.Receipt.PSObject.Properties.Remove('authority_receipt_path')
+                } }
+            @{ Code = 'parallel resume child-status path differs from the launch entry.'; Mutate = {
+                    param($item) $item.Receipt.child_status_path = 'other-status.json'
+                } }
+            @{ Code = 'PARALLEL_RESUME_TRUTH_INVALID'; Mutate = {
+                    param($item) $item.LiveTruth.PSObject.Properties.Remove('repository')
+                } }
+            @{ Code = 'PARALLEL_RESUME_RELAUNCH_NOT_AUTHORIZED'; Mutate = {
+                    param($item) $item.LiveTruth.should_relaunch = $false
+                } }
+        )
+        foreach ($case in $cases) {
+            $evidence = Get-TestParallelResumeEvidence
+            & $case.Mutate $evidence
             @(Invoke-TestParallelResumeValidation -Evidence $evidence) |
                 Should -Contain $case.Code
         }
@@ -240,7 +294,6 @@ Describe 'Codex parallel child resume live-truth contract' {
             $statusPath     = '{}'
         }
         $script:InjectedLiveTruth = $evidence.LiveTruth.PSObject.Copy()
-        $script:InjectedLiveTruth.origin_main_head = 'd' * 40
         $script:LiveTruthProviderCalled = $false
 
         Mock Get-CodexChildCanonicalPath { return [string]$Path }
@@ -253,20 +306,35 @@ Describe 'Codex parallel child resume live-truth contract' {
             }
             return [pscustomobject]@{ Hash = $hash }
         }
-        Mock Get-CodexChildResumeStatusEntryCore { return $evidence.Status }
-        Mock Get-CodexChildResumeReconciliationCore { return @() }
+        $statusEntry = $evidence.Status.PSObject.Copy()
+        $statusEntry.PSObject.Properties.Remove('spec_sha256')
+        $statusEntry.PSObject.Properties.Remove('checkpoint_sha256')
+        $statusEntry.PSObject.Properties.Remove('launch_id')
+        Mock Get-CodexChildResumeStatusEntryCore { return $statusEntry }
+        Mock Get-CodexChildResumeReconciliationCore {
+            & $GetLiveProcess 2147483647 | Out-Null
+            return @()
+        }
         Mock Get-CodexParallelOriginMainHead { return $evidence.Receipt.origin_main_head }
         Mock Get-CodexChildGitScalar {
             if ($GitArgs -contains '--show-current') { return $evidence.Receipt.branch_name }
             return $evidence.LiveTruth.worktree_head
         }
         Mock Test-CodexChildGit { return $true }
-        Mock Get-CodexParallelChildProfile { return [pscustomobject]@{} }
+        Mock Get-CodexParallelChildProfile {
+            return [pscustomobject]@{ name = 'orchestrator-c3-elevated' }
+        }
 
         $provider = {
             $script:LiveTruthProviderCalled = $true
             return $script:InjectedLiveTruth
         }
+        $context = Get-CodexParallelChildResumeContext `
+            -Path $receiptPath -GetLiveTruth $provider
+        $context.RepositoryRoot | Should -Be $script:RepoRoot
+        $context.Profile | Should -Not -BeNullOrEmpty
+
+        $script:InjectedLiveTruth.origin_main_head = 'd' * 40
         { Get-CodexParallelChildResumeContext -Path $receiptPath -GetLiveTruth $provider } |
             Should -Throw '*PARALLEL_RESUME_GIT_MISMATCH*'
         $script:LiveTruthProviderCalled | Should -BeTrue
@@ -284,5 +352,97 @@ Describe 'Codex parallel child resume live-truth contract' {
         $evidence.LiveTruth.should_relaunch = $true
         @(Invoke-TestParallelResumeValidation -Evidence $evidence) |
             Should -Contain 'PARALLEL_RESUME_PROCESS_RUNNING'
+    }
+
+    It 'collects live PR, checks, mutation, drift, and process truth' {
+        $evidence = Get-TestParallelResumeEvidence
+        Mock Get-CodexParallelPostSessionPr {
+            [pscustomobject]@{
+                number = 444; baseRefName = 'main'; headRefName = 'feature/parallel-item-101'
+                headRefOid = ('a' * 40); state = 'OPEN'
+            }
+        }
+        Mock Get-CodexParallelPostSessionCheckReceipt {
+            [pscustomobject]@{ head_sha = ('a' * 40); conclusion = 'success' }
+        }
+        Mock Get-Process { $null }
+        $truth = Get-CodexParallelChildResumeLiveTruth `
+            -Receipt $evidence.Receipt `
+            -Checkpoint $evidence.Checkpoint `
+            -Status $evidence.Status `
+            -OriginMainHead ('a' * 40) `
+            -WorktreePath 'C:/worktrees/parallel-item-101' `
+            -BranchName 'feature/parallel-item-101' `
+            -WorktreeHead ('a' * 40) `
+            -InvokeGh { }
+        $truth.selected_issue_num | Should -Be 101
+        $truth.pr_number | Should -Be 444
+        $truth.latest_mutation_sequence | Should -Be 2
+        $truth.unresolved_drift | Should -BeFalse
+        $truth.live_process_running | Should -BeFalse
+        $truth.should_relaunch | Should -BeTrue
+
+        $evidence.Checkpoint.mutations = @()
+        $evidence.Checkpoint.drift_events[0].status = 'open'
+        $evidence.Status.pid = 0
+        $truth = Get-CodexParallelChildResumeLiveTruth `
+            -Receipt $evidence.Receipt -Checkpoint $evidence.Checkpoint `
+            -Status $evidence.Status -OriginMainHead ('a' * 40) `
+            -WorktreePath 'worktree' -BranchName 'branch' -WorktreeHead ('a' * 40) `
+            -InvokeGh { }
+        $truth.latest_mutation_sequence | Should -Be 0
+        $truth.unresolved_drift | Should -BeTrue
+        $truth.live_process_pid | Should -Be 0
+    }
+
+    It 'rejects missing item order and GitHub lookup failures while collecting live truth' {
+        $evidence = Get-TestParallelResumeEvidence
+        $evidence.Checkpoint.items = @()
+        { Get-CodexParallelChildResumeLiveTruth `
+                -Receipt $evidence.Receipt -Checkpoint $evidence.Checkpoint `
+                -Status $evidence.Status -OriginMainHead ('a' * 40) `
+                -WorktreePath 'worktree' -BranchName 'branch' -WorktreeHead ('a' * 40) `
+                -InvokeGh { } } | Should -Throw '*PARALLEL_RESUME_ORDER_MISMATCH*'
+
+        $evidence = Get-TestParallelResumeEvidence
+        Mock Get-CodexParallelPostSessionPr { throw 'PR lookup failed' }
+        { Get-CodexParallelChildResumeLiveTruth `
+                -Receipt $evidence.Receipt -Checkpoint $evidence.Checkpoint `
+                -Status $evidence.Status -OriginMainHead ('a' * 40) `
+                -WorktreePath 'worktree' -BranchName 'branch' -WorktreeHead ('a' * 40) `
+                -InvokeGh { } } | Should -Throw '*PARALLEL_RESUME_GITHUB_MISMATCH*'
+    }
+
+    It 'builds a sealed resume process command and environment' {
+        $evidence = Get-TestParallelResumeEvidence
+        $receipt = $evidence.Receipt
+        $receipt | Add-Member -NotePropertyMembers @{
+            codex_command_path = 'codex.ps1'
+            codex_denied_paths = @('C:/denied')
+            codex_home_path    = 'C:/codex-home'
+            codex_session_id   = 'session-101'
+        }
+        $context = [pscustomobject]@{
+            Receipt = $receipt
+            Profile = [pscustomobject]@{
+                developer_instructions = 'instructions'
+                skills_config          = '[]'
+            }
+        }
+        $info = Get-CodexParallelChildResumeStartInfo `
+            -Context $context `
+            -ResumePrompt 'continue work' `
+            -OutputPath 'last-message.txt'
+        $info.FileName | Should -Be 'pwsh'
+        $info.WorkingDirectory | Should -Be $receipt.worktree_path
+        $info.ArgumentList | Should -Contain 'resume'
+        $info.ArgumentList | Should -Contain 'session-101'
+        $info.ArgumentList | Should -Contain 'continue work'
+        $info.ArgumentList | Should -Contain 'last-message.txt'
+        $info.Environment['CODEX_HOME'] | Should -Be 'C:/codex-home'
+        $info.Environment['CODEX_PARALLEL_CHILD_LAUNCH_ID'] |
+            Should -Be 'parallel-101'
+        ($info.ArgumentList -join "`n") | Should -Match 'enabled_tools'
+        ($info.ArgumentList -join "`n") | Should -Match 'disabled_tools'
     }
 }

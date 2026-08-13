@@ -1,0 +1,47 @@
+Task: [P11-T4]
+Timestamp: 2026-08-12T10:16:13.1759259-04:00
+Working Directory: repository root
+Command: npm --prefix extensions/drm-copilot run test:coverage -- --coverageReporters=lcov --coverageReporters=text --coverageReporters=json-summary
+EXIT_CODE: 0
+Output Summary: Jest passed 194/194 suites and 2,690/2,690 tests with zero failures and zero snapshots in 9.661 seconds.
+
+Repository coverage:
+- Lines: 44,127/45,740 = 96.47% (PASS; threshold 85%).
+- Statements: 44,127/45,740 = 96.47%.
+- Branches: 6,589/7,338 = 89.79% (PASS; threshold 75%).
+- Functions: 1,304/1,434 = 90.93%.
+
+Modified-file no-regression reconciliation:
+
+| Production path | P0 baseline lines | Current lines | Exact delta | Result |
+|---|---:|---:|---:|---|
+| `extensions/drm-copilot/src/lib/push-down/claude-routing-merge.ts` | 466/491 = 94.908350% | 484/491 = 98.574338% | +3.665988 pp | PASS |
+| `extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts` | 308/320 = 96.250000% | 315/320 = 98.437500% | +2.187500 pp | PASS |
+| `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` | 354/360 = 98.333333% | 360/360 = 100.000000% | +1.666667 pp | PASS |
+| `extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts` | 466/497 = 93.762575% | 478/497 = 96.177062% | +2.414487 pp | PASS |
+| `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` | 409/417 = 98.081535% | 417/417 = 100.000000% | +1.918465 pp | PASS |
+
+Changed-line coverage relative to merge base `fe0413d4aca1e76b2d02d05701fba79a887d5405`:
+
+| Production path | Covered/current changed executable lines | Coverage |
+|---|---:|---:|
+| `extensions/drm-copilot/src/lib/push-down/claude-routing-merge.ts` | 180/185 | 97.297297% |
+| `extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts` | 56/56 | 100.000000% |
+| `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` | 80/80 | 100.000000% |
+| `extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts` | 58/58 | 100.000000% |
+| `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` | 45/45 | 100.000000% |
+| Aggregate | 419/424 | 98.820755% |
+
+No changed production line was introduced after the uninterrupted-green P7 batch gates. Current per-file values equal those batch-green values and remain above every P0 baseline, so no changed-line or per-owner line-coverage regression occurred.
+
+File-size and no-write checks:
+- Production owners: 491, 320, 360, 497, and 417 lines.
+- Test owners: 210, 248, 488, 30, and 414 lines.
+- All ten scoped owners are at or below 500 lines.
+- The 402-file formatter scope retained SHA-256 `BF5CF362CC8E143EC5DF02A0D6C9F87E8977D1317BBFFBB420A0BC11621D27F8` through the test step; no production or test file changed during the QA loop.
+
+Artifact integrity:
+- `extensions/drm-copilot/coverage/coverage-summary.json` SHA-256: `D1F43ABFA4FF4200CE315B3E30598B6F7DD320A5F02C873B9EF1063A59B1C5C0`.
+- `extensions/drm-copilot/coverage/lcov.info` SHA-256: `CD2EB217F021996B5577A7478C92DED7AD4B996C309169D6F0B4AF9FB8E34182`.
+
+Acceptance result: PASS.

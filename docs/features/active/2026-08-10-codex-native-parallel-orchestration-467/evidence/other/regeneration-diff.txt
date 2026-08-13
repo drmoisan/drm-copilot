@@ -1,0 +1,19 @@
+Canonical customization regeneration diff
+
+Timestamp: 2026-08-12T11:32:45.5470148Z
+
+Commands:
+- `poetry run python -m scripts.dev_tools.generate_codex_agent_variants`
+- `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`
+- `git diff --exit-code -- <150 generator-owned root, bundle, and manifest paths>`
+- `git diff HEAD --name-status -- <150 generator-owned root, bundle, and manifest paths>`
+
+Exit codes:
+- Generation: 0.
+- Check mode: 0.
+- Generator-owned working-tree diff: 0.
+- Generator-owned tracked diff against HEAD: 0.
+
+Output summary: The generator reconciled 150 owned root/bundle/profile/manifest paths and check mode reported no stale output. It rewrote newline bytes in five language-pack manifests (`csharp-legacy.json`, `csharp-modern.json`, `powershell.json`, `python.json`, and `typescript.json`), all under the mapped generated manifest root. Git normalization determined that those byte-only rewrites produce no tracked content delta. Both working-tree and HEAD-relative tracked diff listings were empty. No `.claude/**` path was in the output inventory or changed.
+
+Acceptance result: PASS — resulting tracked diff is empty.

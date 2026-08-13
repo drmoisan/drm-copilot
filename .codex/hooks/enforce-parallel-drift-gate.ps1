@@ -108,17 +108,36 @@ function Invoke-CodexParallelDriftGate {
     }
 }
 
+function Invoke-CodexParallelDriftHookEntrypoint {
+    <#
+    .SYNOPSIS
+        Runs native hook transport through injectable console boundaries.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRoot,
+        [Parameter()][scriptblock] $PayloadReader = { [Console]::In.ReadToEnd() },
+        [Parameter()][scriptblock] $ResultWriter = {
+            param($result)
+            Write-CodexParallelHookResult -Result $result
+        }
+    )
+
+    try {
+        $result = Invoke-CodexParallelDriftGate `
+            -PayloadRaw (& $PayloadReader) `
+            -RepositoryRoot $RepositoryRoot
+        return & $ResultWriter $result
+    } catch {
+        [Console]::Error.WriteLine([string]$_)
+        return 2
+    }
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $result = Invoke-CodexParallelDriftGate `
-        -PayloadRaw ([Console]::In.ReadToEnd()) `
-        -RepositoryRoot $repositoryRoot
-    exit (Write-CodexParallelHookResult -Result $result)
-} catch {
-    [Console]::Error.WriteLine([string]$_)
-    exit 2
-}
+$repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+exit (Invoke-CodexParallelDriftHookEntrypoint -RepositoryRoot $repositoryRoot)

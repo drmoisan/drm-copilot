@@ -106,6 +106,44 @@ describe("additive Codex routing merge", () => {
     expect(merged).toBe(destination);
   });
 
+  it("rejects non-object routing document roots", () => {
+    const invalidDestination = "[]\n";
+
+    expect(() =>
+      mergeAdditiveRoutingDocuments(
+        invalidDestination,
+        "{}\n",
+        "config/orchestration-routing.json",
+      ),
+    ).toThrow("document root is not a JSON object");
+  });
+
+  it("adds a sorted routes object when the destination has no routes", () => {
+    const merged = JSON.parse(
+      mergeAdditiveRoutingDocuments(
+        "{}\n",
+        document({ routes: { zeta: 2, alpha: 1 } }),
+        "config/orchestration-routing.json",
+      ),
+    ) as Record<string, unknown>;
+
+    expect(merged).toEqual({ routes: { alpha: 1, zeta: 2 } });
+  });
+
+  it("reports unequal array configuration as a substantive conflict", () => {
+    expect(() =>
+      mergeAdditiveRoutingDocuments(
+        document({ generated_agent_families: ["planner"] }),
+        document({ generated_agent_families: ["orchestrator"] }),
+        "config/orchestration-routing.json",
+      ),
+    ).toThrow(
+      expect.objectContaining({
+        conflicts: ["generated_agent_families"],
+      }),
+    );
+  });
+
   it("fails substantive collisions in stable reason order", () => {
     const target = "/dest/config/orchestration-routing.json";
     const destination = document({

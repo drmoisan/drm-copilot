@@ -1,0 +1,11 @@
+PowerShell batch 4 expected-red gate
+
+Timestamp: 2026-08-12T10:55:35.543Z
+
+Command: mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":["tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1"]})
+
+EXIT_CODE: 3
+
+Output Summary: Expected red. Pester ran 6 tests with exactly 3 failures, 0 errors, and 0 disabled tests in 0.631 seconds. Failures were only the missing-registration assertions for `.codex/hooks/codex-authority-store.ps1`, `.codex/hooks/enforce-codex-model-routing.ps1`, and `.codex/hooks/record-subagent-routing-attestation.ps1`; all three focused behavior tests passed. P0-T9 recorded no root source attribution for these runtimes, and no batch 4 production or coverage-settings edit preceded the command.
+
+Acceptance result: PASS-AS-EXPECTED-RED.

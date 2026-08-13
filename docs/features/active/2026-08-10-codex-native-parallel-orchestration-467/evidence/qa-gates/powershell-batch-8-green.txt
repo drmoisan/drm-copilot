@@ -1,0 +1,27 @@
+PowerShell batch 8 uninterrupted-green gate
+
+Timestamp: 2026-08-12T11:13:04.9662123Z
+
+Bounded owners:
+- `.codex/scripts/launch-parallel-child-batch.ps1`
+- `.codex/scripts/parallel-child-launch-contract.ps1`
+- `.codex/scripts/resume-parallel-child.ps1`
+- `tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1`
+- `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
+- `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`
+
+Ordered commands and results:
+1. `mcp__drm_copilot__run_poshqc_format` with the six bounded paths: PASS; 6 selected scan folders.
+2. `mcp__drm_copilot__run_poshqc_analyze` with the six bounded paths: PASS; 6 selected scan folders.
+3. `pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"`: PASS; 6 passed, 0 failed, 0 skipped, 0 inconclusive, 0 not-run in 689 milliseconds.
+
+Attributable coverage (`artifacts/pester/powershell-coverage.xml`):
+- `launch-parallel-child-batch.ps1`: instructions 22/318 (6.9182%); lines 14/240 (5.8333%).
+- `parallel-child-launch-contract.ps1`: instructions 10/143 (6.9930%); lines 8/108 (7.4074%).
+- `resume-parallel-child.ps1`: instructions 18/339 (5.3097%); lines 11/264 (4.1667%).
+- Targeted aggregate: 0.59% across 9,348 analyzed commands in 76 registered files.
+- P0-T9 baseline attribution for each batch 8 runtime: absent. Numeric source attribution is newly present for all three files, with no regression from the recorded baseline.
+
+Testability result: Existing safe dot-source guards and pure helper functions provided the required seams. No runtime production edit was required. The only production configuration change was registration of the three runtime paths in both Pester settings copies. Canonical/bundled settings parity is exact at SHA-256 `0AFFEBB7A08F407E562BEFEAA2CD7AD56CB2C3816489BC1D64CD0366950FC81D`.
+
+Acceptance result: PASS.

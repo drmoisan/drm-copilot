@@ -314,4 +314,184 @@ Describe 'Codex parallel-child worktree launcher contract' {
             -Status ([pscustomobject]@{ spec_sha256 = ('b' * 64) }) |
             Should -Contain 'resume launch hashes do not match the sealed evidence.'
     }
+
+    It 'assembles and executes one sealed batch context through injected boundaries' {
+        $originHead = 'd' * 40
+        $spec = $script:Spec.PSObject.Copy()
+        $spec | Add-Member origin_main_head $originHead
+        $spec.checkpoint_path = 'checkpoint.json'
+        $script:CapturedBatchContext = $null
+        Mock Get-CodexChildCanonicalPath {
+            Join-Path $script:RepoRoot ([string]$Path)
+        }
+        Mock Get-CodexChildSealedJsonFileCore {
+            if ($Name -eq 'parallel launch spec') {
+                return [pscustomobject]@{ Value = $spec; Sha256 = ('a' * 64) }
+            }
+            return [pscustomobject]@{ Value = $script:Checkpoint; Sha256 = ('b' * 64) }
+        }
+        Mock Get-CodexParallelOriginMainHead { $originHead }
+        Mock Initialize-CodexParallelChildWorktree { [string]$Entry.worktree_path }
+        Mock Get-CodexParallelChildProfile { $script:Profile }
+        Mock Get-CodexChildProfileKey { 'profile-key' }
+        Mock Test-CodexParallelChildLaunchSpec { [string[]]@() }
+        Mock Get-CodexChildCommandContext {
+            [pscustomobject]@{ CommandPath = 'codex'; OriginalAuthPath = 'auth'; DeniedPaths = @() }
+        }
+        Mock Enter-CodexChildScheduleLockCore { [System.IO.MemoryStream]::new() }
+        Mock Start-CodexParallelChildBatch {
+            $script:CapturedBatchContext = $Context
+            return [ordered]@{ 'parallel-101' = [pscustomobject]@{ state = 'completed' } }
+        }
+
+        $result = Invoke-CodexParallelChildBatch `
+            -SpecPath 'spec.json' -Root $script:RepoRoot -Maximum 2 -Confirm:$false
+        $result['parallel-101'].state | Should -Be 'completed'
+        $script:CapturedBatchContext.OriginMainHead | Should -Be $originHead
+        $script:CapturedBatchContext.OrderedLaunches.Count | Should -Be 1
+        $script:CapturedBatchContext.Profiles['profile-key'] | Should -Be $script:Profile
+        $script:CapturedBatchContext.BatchLockPath | Should -Match 'parallel\.sample-run'
+    }
+
+    It 'rejects changed origin and contract validation errors before batch execution' {
+        $spec = $script:Spec.PSObject.Copy()
+        $spec | Add-Member origin_main_head ('a' * 40)
+        $spec.checkpoint_path = 'checkpoint.json'
+        Mock Get-CodexChildCanonicalPath {
+            Join-Path $script:RepoRoot ([string]$Path)
+        }
+        Mock Get-CodexChildSealedJsonFileCore {
+            if ($Name -eq 'parallel launch spec') {
+                return [pscustomobject]@{ Value = $spec; Sha256 = ('a' * 64) }
+            }
+            return [pscustomobject]@{ Value = $script:Checkpoint; Sha256 = ('b' * 64) }
+        }
+        Mock Get-CodexParallelOriginMainHead { 'd' * 40 }
+        { Invoke-CodexParallelChildBatch `
+                -SpecPath 'spec.json' -Root $script:RepoRoot -Maximum 2 -Confirm:$false } |
+            Should -Throw '*sealed origin/main commit changed*'
+
+        Mock Get-CodexParallelOriginMainHead { 'a' * 40 }
+        Mock Initialize-CodexParallelChildWorktree { [string]$Entry.worktree_path }
+        Mock Get-CodexParallelChildProfile { $script:Profile }
+        Mock Get-CodexChildProfileKey { 'profile-key' }
+        Mock Test-CodexParallelChildLaunchSpec { [string[]]@('contract failure') }
+        { Invoke-CodexParallelChildBatch `
+                -SpecPath 'spec.json' -Root $script:RepoRoot -Maximum 2 -Confirm:$false } |
+            Should -Throw '*contract failure*'
+    }
+
+    It 'starts one parallel child through sealed receipt and sandbox boundaries' {
+        $context = [pscustomobject]@{
+            Checkpoint = $script:Checkpoint; RepositoryRoot = $script:RepoRoot
+            Profiles = @{ 'profile-key' = $script:Profile }; Spec = $script:Spec
+            CodexRuntime  = [pscustomobject]@{
+                CommandPath = 'codex'; OriginalAuthPath = 'auth'; DeniedPaths = @('denied')
+            }
+            SpecPath = 'spec.json'; SpecSha256 = ('a' * 64)
+            CheckpointPath = 'checkpoint.json'; CheckpointSha256 = ('b' * 64)
+            BatchLockPath = 'batch.lock'
+        }
+        $receipt = [pscustomobject]@{
+            launch_id = 'parallel-101'; receipt_path = 'receipt.json'
+            codex_home_path = 'home'; worktree_path = $script:Worktree
+        }
+        Mock Get-CodexParallelCheckpointItem { $script:Checkpoint.items[0] }
+        Mock Get-CodexChildCanonicalPath { [string]$Path }
+        Mock Get-CodexChildProfileKey { 'profile-key' }
+        Mock New-CodexChildIsolatedHome { 'isolated-home' }
+        Mock Get-CodexParallelChildLaunchReceipt { $receipt }
+        Mock Write-CodexParallelChildJsonCreateNew { }
+        Mock Get-CodexChildSandboxProbeStartInfo {
+            [System.Diagnostics.ProcessStartInfo]::new('pwsh')
+        }
+        Mock Assert-CodexChildSandboxPreflight { }
+        Mock Get-CodexParallelChildProcessStartInfo {
+            [System.Diagnostics.ProcessStartInfo]::new('pwsh')
+        }
+        Mock Set-CodexParallelChildReceiptState { }
+        Mock Start-CodexChildProcessCore {
+            & $SetReceiptState $Receipt active 'session-101' $null ''
+            [pscustomobject]@{
+                Entry = $script:Entry; Process = [pscustomobject]@{ Id = 42 }
+                SessionId = 'session-101'; StartedAt = '2026-08-12T12:00:00Z'
+                Receipt = $receipt; ExitTask = [System.Threading.Tasks.Task]::CompletedTask
+            }
+        }
+        Mock Write-CodexParallelChildStatus { }
+
+        $child = Start-CodexParallelChildProcess `
+            -Context $context -Entry $script:Entry -Confirm:$false
+        $child.ReceiptPath | Should -Be $script:Checkpoint.items[0].launch_receipt_path
+        $child.StatusPath | Should -Be $script:Entry.launch_status_path
+        Should -Invoke Write-CodexParallelChildJsonCreateNew -Times 1
+        Should -Invoke Assert-CodexChildSandboxPreflight -Times 1
+        Should -Invoke Write-CodexParallelChildStatus -Times 1
+    }
+
+    It 'completes child outcomes and exercises persistence and worktree boundaries' {
+        $script:CompletionStates = @()
+        $script:WrittenPaths = @()
+        Mock Complete-CodexChildProcessCore { $Child.TestResult }
+        Mock Set-CodexParallelChildReceiptState { $script:CompletionStates += $State }
+        Mock Remove-CodexChildIsolatedAuth { }
+        Mock Get-CodexChildTerminalStatusEntryCore {
+            [pscustomobject]@{ launch_id = ''; spec_sha256 = ''; checkpoint_sha256 = '' }
+        }
+        Mock Write-CodexParallelChildStatus { }
+        $writeText = {
+            param([string] $Path, [string] $Value)
+            $script:WrittenPaths += "$Path=$Value"
+        }
+        foreach ($exitCode in @(0, 1)) {
+            $child = [pscustomobject]@{
+                BasePath = "child-$exitCode"; ReceiptPath = 'receipt.json'; StatusPath = 'status.json'
+                Receipt    = [pscustomobject]@{ codex_home_path = 'home' }
+                Entry      = [pscustomobject]@{ launch_id = "launch-$exitCode"; worktree_path = 'worktree' }
+                TestResult = [pscustomobject]@{ output = 'out'; error = 'err'; exit_code = $exitCode }
+            }
+            Complete-CodexParallelChildProcess -Context ([pscustomobject]@{
+                    SpecSha256 = 'spec'; CheckpointSha256 = 'checkpoint'
+                }) -Child $child -WriteText $writeText | Out-Null
+        }
+        $script:CompletionStates | Should -Be @('completed', 'failed')
+        $script:WrittenPaths.Count | Should -Be 4
+        Mock Get-CodexChildCanonicalPath { if ($Path -eq 'top') { $script:Worktree } else { [string]$Path } }
+        Mock Test-Path { $false }
+        Mock Invoke-CodexChildGit { }
+        Mock Get-CodexChildGitScalar {
+            if ($GitArgs -contains '--show-toplevel') { 'top' } elseif ($GitArgs -contains '--show-current') {
+                $script:Entry.branch_name
+            } else { 'origin-head' }
+        }
+        Initialize-CodexParallelChildWorktree -RepositoryRoot $script:RepoRoot `
+            -Entry $script:Entry -OriginMainHead 'origin-head' -WhatIf | Should -Be $script:Worktree
+        Initialize-CodexParallelChildWorktree -RepositoryRoot $script:RepoRoot `
+            -Entry $script:Entry -OriginMainHead 'origin-head' -Confirm:$false | Should -Be $script:Worktree
+        Mock Get-CodexChildGitScalar { if ($GitArgs -contains '--show-current') { 'wrong' } else { 'origin-head' } }
+        { Initialize-CodexParallelChildWorktree -RepositoryRoot $script:RepoRoot `
+                -Entry $script:Entry -OriginMainHead 'origin-head' -Confirm:$false } |
+            Should -Throw '*worktree, branch, or origin/main base commit differs*'
+        Mock Write-CodexChildJsonCreateNewCore {
+            & $EnsureDirectory $script:RepoRoot
+            { & $OpenFile $script:BatchPath } | Should -Throw
+        }
+        Write-CodexParallelChildJsonCreateNew -Path 'unused.json' -Value @{ state = 'done' }
+        Mock Write-CodexParallelChildJsonCreateNew { }
+        Mock Move-Item { }
+        Mock Remove-Item { }
+        Mock Test-Path { $true }
+        Mock Write-CodexChildJsonAtomicCore {
+            & $CreateNew 'temporary.json' $Value
+            & $MoveFile 'temporary.json' $Path
+            if (& $PathExists 'temporary.json') { & $DeleteFile 'temporary.json' }
+        }
+        Write-CodexParallelChildJsonAtomic -Path 'result.json' -Value @{ state = 'done' }
+        $invalidChild = [pscustomobject]@{
+            BasePath   = [string][char]0
+            TestResult = [pscustomobject]@{ output = 'out'; error = 'err'; exit_code = 0 }
+        }
+        { Complete-CodexParallelChildProcess -Context @{} -Child $invalidChild } |
+            Should -Throw
+    }
 }
