@@ -2,9 +2,9 @@
 
 Timestamp: 2026-08-13T17-28
 
-PostedAs: unknown
+PostedAs: https://github.com/drmoisan/drm-copilot/issues/469#issuecomment-5286830741
 
-POSTING BLOCKED — reason: this executor is prohibited from running any `gh` command. The orchestrator owns all Git and GitHub operations, so no comment or body update was posted to https://github.com/drmoisan/drm-copilot/issues/469. The exact text below is the intended update; the local `issue.md` checkbox state has already been updated to match.
+POSTED BY ORCHESTRATOR — the executor is prohibited from running any `gh` command, so it prepared this text and deferred posting. The orchestrator posted the exact text below to https://github.com/drmoisan/drm-copilot/issues/469 as comment 5286830741 on 2026-08-13. The local `issue.md` checkbox state matches.
 
 ## Exact update text
 
