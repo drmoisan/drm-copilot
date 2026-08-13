@@ -76,7 +76,7 @@ blocks delivery.
 
 ## Acceptance Criteria
 
-- [x] Root `parallel-plan`, `parallel-run`, and manual `parallel-orchestrate` entry resolves only its
+- [ ] Root `parallel-plan`, `parallel-run`, and manual `parallel-orchestrate` entry resolves only its
       forced authorized parallel persona; ordinary and epic orchestrators are mechanically rejected
       as parallel roots, and no silent topology or model fallback occurs.
 - [x] Planning cannot launch implementation, and execution requires a committed kickoff that passes
@@ -136,10 +136,10 @@ blocks delivery.
 - [x] A published payload-only destination validates manifests and computes deterministic cohorts
       and bounded batches without Python or Poetry, using the issue-462 portability assets and
       additive destination configuration.
-- [x] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
+- [ ] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
       differential parity, root/bundle parity, pack, registration, destination, and zero-regression
       gates pass in one clean toolchain loop.
-- [x] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
+- [ ] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
       remains at least 75 percent, each new module/class/method targets at least 90 percent, changed-
       line coverage does not regress, and baseline, QA-gate, regression, and coverage evidence is
       stored under the active feature's canonical `evidence/` subtree; QA-gate evidence uses

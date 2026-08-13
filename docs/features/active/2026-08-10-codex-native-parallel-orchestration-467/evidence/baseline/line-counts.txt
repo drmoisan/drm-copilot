@@ -1,0 +1,115 @@
+# P0-T6 Scoped Line-Count Baseline
+
+Timestamp: 2026-08-12T05-05
+Command: Enumerate existing production, test, reusable script, persona, and runtime-configuration paths cited by `evidence/baseline/scope.md`; count physical lines with PowerShell `Get-Content`.
+EXIT_CODE: 0
+Output Summary: 104 scoped files counted; 104 are at or below 500 physical lines; 0 exceed 500; no pre-edit split task is required.
+
+Limit: 500 physical lines
+Result: PASS
+
+LINES	RESULT	PATH
+167	PASS	.agents/skills/parallel-orchestrate/SKILL.md
+226	PASS	.agents/skills/parallel-plan/SKILL.md
+66	PASS	.agents/skills/parallel-run/SKILL.md
+74	PASS	.codex/agents/parallel-orchestrator.toml
+63	PASS	.codex/agents/parallel-planner.toml
+352	PASS	.codex/config.toml
+320	PASS	.codex/hooks/authorize-root-parallel-invocation.ps1
+188	PASS	.codex/hooks/codex-authority-store.ps1
+224	PASS	.codex/hooks/enforce-codex-model-routing.ps1
+495	PASS	.codex/hooks/enforce-completion-consistency.ps1
+115	PASS	.codex/hooks/enforce-parallel-abandon-gate.ps1
+130	PASS	.codex/hooks/enforce-parallel-child-worktree-binding.ps1
+124	PASS	.codex/hooks/enforce-parallel-cohort-barrier.ps1
+124	PASS	.codex/hooks/enforce-parallel-drift-gate.ps1
+247	PASS	.codex/hooks/enforce-parallel-root-invocation.ps1
+116	PASS	.codex/hooks/enforce-parallel-worktree-removal-gate.ps1
+220	PASS	.codex/hooks/parallel-hook-common.ps1
+497	PASS	.codex/hooks/record-subagent-routing-attestation.ps1
+211	PASS	.codex/hooks/validate-codex-subagent-routing.ps1
+179	PASS	.codex/hooks/validate-parallel-agent-output.ps1
+351	PASS	.codex/scripts/codex-child-launch-contract-core.ps1
+256	PASS	.codex/scripts/codex-child-launch-persistence.ps1
+461	PASS	.codex/scripts/codex-child-launch-resume.ps1
+245	PASS	.codex/scripts/codex-child-launch-runtime.ps1
+312	PASS	.codex/scripts/epic-child-launch-contract.ps1
+449	PASS	.codex/scripts/launch-epic-child-wave.ps1
+486	PASS	.codex/scripts/launch-parallel-child-batch.ps1
+233	PASS	.codex/scripts/parallel-child-launch-contract.ps1
+375	PASS	.codex/scripts/parallel-child-post-session.ps1
+265	PASS	.codex/scripts/resume-epic-child.ps1
+475	PASS	.codex/scripts/resume-parallel-child.ps1
+6	PASS	config/poshqc-scan.json
+74	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/parallel-orchestrator.toml
+63	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/parallel-planner.toml
+320	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/authorize-root-parallel-invocation.ps1
+188	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-authority-store.ps1
+224	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-codex-model-routing.ps1
+495	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1
+115	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-abandon-gate.ps1
+130	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-child-worktree-binding.ps1
+124	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-cohort-barrier.ps1
+124	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-drift-gate.ps1
+247	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-root-invocation.ps1
+116	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1
+220	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/parallel-hook-common.ps1
+497	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/record-subagent-routing-attestation.ps1
+211	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-codex-subagent-routing.ps1
+179	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-parallel-agent-output.ps1
+351	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-contract-core.ps1
+256	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-persistence.ps1
+461	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-resume.ps1
+245	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-runtime.ps1
+312	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-launch-contract.ps1
+449	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-epic-child-wave.ps1
+486	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-parallel-child-batch.ps1
+233	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-launch-contract.ps1
+375	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-post-session.ps1
+265	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-epic-child.ps1
+475	PASS	extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-parallel-child.ps1
+491	PASS	extensions/drm-copilot/src/lib/push-down/claude-routing-merge.ts
+320	PASS	extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts
+360	PASS	extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts
+497	PASS	extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts
+417	PASS	extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts
+301	PASS	extensions/drm-copilot/test/lib/push-down/codex-pack-selection.test.ts
+172	PASS	extensions/drm-copilot/test/lib/push-down/codex-routing-merge.test.ts
+234	PASS	extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts
+465	PASS	extensions/drm-copilot/test/lib/validate/orchestration-artifacts-parallel-dispatch.test.ts
+458	PASS	extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing.test.ts
+387	PASS	extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts
+220	PASS	scripts/dev_tools/_parallel_orchestrator_state_completion_receipts.py
+295	PASS	scripts/dev_tools/_parallel_orchestrator_state_mutation_receipts.py
+318	PASS	scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py
+285	PASS	scripts/dev_tools/_parallel_orchestrator_state_resume_truth.py
+339	PASS	scripts/dev_tools/parallel_codex_readiness_filesystem.py
+418	PASS	scripts/dev_tools/parallel_kickoff_contract.py
+190	PASS	scripts/dev_tools/push_down_codex_routing_merge.py
+299	PASS	scripts/dev_tools/resolve_codex_deployment.py
+353	PASS	scripts/dev_tools/resolve_codex_topology.py
+465	PASS	scripts/dev_tools/validate_parallel_codex_readiness.py
+158	PASS	scripts/powershell/PoshQC/settings/pester.runsettings.psd1
+203	PASS	tests/scripts/codex-hooks/codex-child-launch-resume-core.Tests.ps1
+191	PASS	tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1
+471	PASS	tests/scripts/codex-hooks/codex-parallel-registered-transport.Tests.ps1
+474	PASS	tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1
+497	PASS	tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1
+186	PASS	tests/scripts/codex-hooks/model-profile-attestation.Tests.ps1
+279	PASS	tests/scripts/codex-hooks/parallel-child-post-session.Tests.ps1
+288	PASS	tests/scripts/codex-hooks/parallel-child-resume-live-truth.Tests.ps1
+317	PASS	tests/scripts/codex-hooks/parallel-child-worktree-launcher.Tests.ps1
+267	PASS	tests/scripts/codex-hooks/parallel-completion-compensating-controls.Tests.ps1
+175	PASS	tests/scripts/codex-hooks/parallel-provenance.Tests.ps1
+267	PASS	tests/scripts/dev_tools/test_parallel_codex_readiness_filesystem.py
+240	PASS	tests/scripts/dev_tools/test_parallel_completion_receipts.py
+480	PASS	tests/scripts/dev_tools/test_parallel_kickoff_contract.py
+262	PASS	tests/scripts/dev_tools/test_parallel_mutation_receipt_bound_runtime.py
+286	PASS	tests/scripts/dev_tools/test_parallel_receipt_bound_cohort.py
+243	PASS	tests/scripts/dev_tools/test_parallel_resume_truth.py
+385	PASS	tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py
+317	PASS	tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py
+186	PASS	tests/scripts/dev_tools/test_push_down_codex_routing_merge.py
+250	PASS	tests/scripts/dev_tools/test_resolve_codex_deployment.py
+259	PASS	tests/scripts/dev_tools/test_resolve_codex_topology.py
+359	PASS	tests/scripts/dev_tools/test_validate_parallel_codex_readiness.py

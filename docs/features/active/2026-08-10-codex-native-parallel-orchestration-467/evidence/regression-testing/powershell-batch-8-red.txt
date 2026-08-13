@@ -1,0 +1,15 @@
+PowerShell batch 8 expected-red gate
+
+Timestamp: 2026-08-12T11:10:46.5958037Z
+
+Commands:
+- mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":["tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1"]})
+- pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 1 (repository PoshQC verification; MCP wrapper returned code 3)
+
+Output Summary: Expected red. Pester discovered and ran 6 tests with exactly 3 failures, 3 passes, 0 skipped, 0 inconclusive, and 0 not-run tests in 718 milliseconds. Failures were limited to the three missing-registration assertions for `.codex/scripts/launch-parallel-child-batch.ps1`, `.codex/scripts/parallel-child-launch-contract.ps1`, and `.codex/scripts/resume-parallel-child.ps1`. The deterministic batch-order, forbidden-state/binding-field, and first-incomplete-item behavior tests all passed. Existing safe dot-source guards and helper seams were used without invoking external child processes or filesystem mutations. No batch 8 production or coverage-settings edit preceded these commands.
+
+Coverage Summary: PoshQC processed source-attributable coverage while the expected registration failures remained active: 0.06% aggregate coverage across 8,548 analyzed commands in 73 registered files. The three batch 8 paths are intentionally absent from the denominator until [P6-T17].
+
+Acceptance result: PASS-AS-EXPECTED-RED.

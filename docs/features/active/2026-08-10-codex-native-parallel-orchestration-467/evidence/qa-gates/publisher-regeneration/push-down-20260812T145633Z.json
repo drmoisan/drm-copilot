@@ -1,0 +1,1672 @@
+{
+  "created_count": 0,
+  "destination_root": "C:/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/extensions/drm-copilot/resources/codex-and-agents-customizations",
+  "files": [
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/5.1-beast-adjusted.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/5.1-thinking-beast-mode-adjusted.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/api-architect.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-executor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planner.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/atomic-planning.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commentary-remediation.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/commit-steward.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-atomic-executor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-atomic-planning.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/csharp-typed-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/epic-orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/epic-planner.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/epic-review.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/expert-nextjs-developer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/expert-react-frontend-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-review.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/feature-reviewer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/gpt-5-beast-mode.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/hlbpa.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/mentor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/parallel-orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/parallel-planner.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-atomic-executor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-atomic-planning.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-di-unit-test-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/powershell-typed-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pr-author.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd-feature.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/prd.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/pytest-unit-test-coding.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-atomic-executor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-atomic-planning.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-execution-only-typed.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-orchestrator.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/python-typed-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/staged-review.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/status-updater.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/task-researcher.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/tdd-green.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/tdd-red.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/tdd-refactor.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer-c1.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer-c2.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer-c3-elevated.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer-c3.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer-c4.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/typescript-engineer.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/agents/voidbeast-gpt41enhanced.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/codex-web-setup.plan.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/codex-web-setup.sh",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/config.toml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/authorize-root-epic-invocation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/authorize-root-parallel-invocation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/check-powershell-test-purity.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/check-python-test-purity.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/codex-agent-profile-attestation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/codex-authority-store.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/codex-epic-child-launch-attestation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/codex-pretooluse-file-mapping.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-checkpoint-monotonic.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-codex-model-routing.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-completion-consistency.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-completion-helpers.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-child-worktree-binding.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-merge-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-planning-only.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-root-invocation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-wave-barrier.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-epic-worktree-removal-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-evidence-locations.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-abandon-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-child-worktree-binding.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-cohort-barrier.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-drift-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-root-invocation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-parallel-worktree-removal-gate.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-powershell-batch-budget.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-promotion-mcp-only.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/enforce-python-batch-budget.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/parallel-hook-common.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/record-subagent-routing-attestation.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/validate-bash.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/validate-codex-subagent-routing.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/validate-feature-review-coverage.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/hooks/validate-parallel-agent-output.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/prompts/feature-review-remediate.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/prompts/generate-commit-message-repo.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/prompts/generate-pr.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/prompts/orchestrate-work.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/codex-child-launch-contract-core.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/codex-child-launch-persistence.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/codex-child-launch-resume.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/codex-child-launch-runtime.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/epic-child-launch-contract.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/epic-child-launch-runtime.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/epic-child-persistence-runtime.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/epic-child-sandbox-preflight.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/launch-epic-child-wave.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/launch-parallel-child-batch.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/parallel-child-launch-contract.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/parallel-child-post-session.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/post-codex-worktree-session.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/resume-epic-child.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".codex/scripts/resume-parallel-child.ps1",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/README.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/README.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/architecture-boundaries/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/atomic-executor/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/atomic-plan-contract/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/atomic-planner/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/benchmark-baselines/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/ci-workflows/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/codex-model-routing/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/codex-model-routing/agents/openai.yaml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/commit-message-conventions/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/commit-message/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/csharp-change-budget-router/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/csharp-orchestration-state-machine/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/csharp-qa-gate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/csharp/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/epic-orchestrate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/epic-plan/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/epic-run/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/evidence-and-timestamp-conventions/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/execute-hard-lock/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/feature-promotion-lifecycle/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/feature-review-workflow/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/feature-review/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/fill-feature-docs/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/general-code-change/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/general-unit-test/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/human-exception-runbook/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/human-exception-runbook/example.runbook.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/invoke-csharp-engineer/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/invoke-powershell-engineer/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/invoke-python-engineer/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/make-skill-template/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/orchestrate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/orchestrator-state/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/orchestrator-workflow/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-add/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-close/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-orchestrate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-plan/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-remove/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/parallel-run/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/policy-audit-template-usage/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/policy-compliance-order/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/powershell-change-budget-router/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/powershell-orchestration-state-machine/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/powershell-qa-gate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/powershell/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/pr-author/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/pr-authoring/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/pr-base-branch-merge-base/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/pr-context-artifacts/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/python-change-budget-router/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/python-qa-gate/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/python-suppressions/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/python/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/quality-tiers/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/remediation-handoff-atomic-planner/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/repo-automation-adapter/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/repo-automation-adapter/agents/openai.yaml",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/research-issue/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/review-epic/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/review-feature/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/review-staged/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/skill-canonical-location-audit/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/tonality/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/translate-claude-to-codex/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/translate-copilot-to-claude/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/typescript-suppressions/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/typescript/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    },
+    {
+      "destination_status": "overwritten",
+      "placeholder_rewrite_count": 0,
+      "relative_path": ".agents/skills/update-status/SKILL.md",
+      "rewritten_reference_count": 0,
+      "unmatched_references": []
+    }
+  ],
+  "finished_at": "2026-08-12T14:56:33.137560+00:00",
+  "overwritten_count": 237,
+  "placeholder_rewrite_count": 0,
+  "repo_root": "C:/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25",
+  "rewritten_reference_count": 0,
+  "started_at": "2026-08-12T14:56:33.032372+00:00",
+  "unmatched_references": []
+}

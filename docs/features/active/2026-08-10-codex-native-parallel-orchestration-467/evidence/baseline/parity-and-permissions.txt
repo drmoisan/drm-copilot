@@ -1,0 +1,48 @@
+P0-T7 SOURCE/BUNDLE PARITY AND PERSONA-PERMISSION BASELINE
+Timestamp: 2026-08-12T05-07
+
+COMMAND 1
+Command: poetry run pytest -q tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py
+EXIT_CODE: 0
+Output Summary: 12 passed in 0.19s. Current root/bundle resource contracts and pack membership are green.
+Output:
+............                                                             [100%]
+12 passed in 0.19s
+
+COMMAND 2
+Command: mcp__drm_copilot__run_poshqc_test({ workspace_root: "C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25", scan_folders: ["tests/scripts/codex-hooks/parallel-provenance.Tests.ps1"] })
+EXIT_CODE: 0
+Output Summary: MCP returned ok=true. The generated JUnit artifact reports 17 tests, 0 errors, 0 failures, and 0 disabled for parallel-provenance.Tests.ps1.
+Output:
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","summary":"Ran bundled PoshQC test against the workspace with 1 selected scan folder(s)."}
+JUnit: <testsuites name="Pester" tests="17" errors="0" failures="0" disabled="0" time="0.991">
+
+COMMAND 3
+Command: PowerShell inline persona validator: for parallel-planner and parallel-orchestrator, extract default_permissions and the developer-prompt sandbox-authority statement from the root TOML, compare both with the dedicated expected authority, compare root/bundle bytes and SHA-256, print each mismatch, and exit 1 when any mismatch exists.
+EXIT_CODE: 1
+Output Summary: Expected baseline contradiction reproduced. Both default_permissions values are correct and both root/bundle pairs are byte-identical, but both developer prompts incorrectly name orchestrator-workspace. ERROR_COUNT is 2.
+Output:
+PERSONA: parallel-planner
+EXPECTED: parallel-planner-workspace
+DEFAULT_PERMISSIONS: parallel-planner-workspace
+PROMPT_AUTHORITY: orchestrator-workspace
+ROOT_SHA256: E8ADFC937F40FA009B2B9F2A2A91FA53056CB62E3B2BE9584F73981FB350A3A4
+BUNDLE_SHA256: E8ADFC937F40FA009B2B9F2A2A91FA53056CB62E3B2BE9584F73981FB350A3A4
+BUNDLE_PARITY: True
+PERSONA: parallel-orchestrator
+EXPECTED: parallel-orchestrator-workspace
+DEFAULT_PERMISSIONS: parallel-orchestrator-workspace
+PROMPT_AUTHORITY: orchestrator-workspace
+ROOT_SHA256: E7BBE7ABD46A7E40BDB85104CC63EAE9965372B5B89E362D96349CAC2D8D0B2B
+BUNDLE_SHA256: E7BBE7ABD46A7E40BDB85104CC63EAE9965372B5B89E362D96349CAC2D8D0B2B
+BUNDLE_PARITY: True
+ERROR_COUNT: 2
+ERROR: parallel-planner: prompt authority 'orchestrator-workspace' != 'parallel-planner-workspace'
+ERROR: parallel-orchestrator: prompt authority 'orchestrator-workspace' != 'parallel-orchestrator-workspace'
+
+BASELINE DISPOSITION
+- Root/bundle parity: PASS for both persona pairs and the canonical resource-contract suite.
+- Existing persona-profile suite: PASS, 17/17.
+- Planner prompt/profile authority agreement: FAIL, reproduced for P1-T1.
+- Orchestrator prompt/profile authority agreement: FAIL, reproduced for P1-T2.
+- The existing suite does not inspect developer-prompt authority, which is the P1-T1 through P1-T3 test gap.

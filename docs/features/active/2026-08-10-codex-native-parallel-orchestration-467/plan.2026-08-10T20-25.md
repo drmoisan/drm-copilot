@@ -16,7 +16,7 @@
 ## Required References
 
 - Requirements: [`issue.md`](issue.md), [`spec.md`](spec.md), and [`user-story.md`](user-story.md)
-- Feature research: [`artifacts/research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md`](../../../../artifacts/research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md)
+- Feature research: [`docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md`](research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md)
 - Corrected Codex research basis: [`docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md`](../../../research/20260616-codex-native-ecosystem.2026-06-16T13-32.md)
 - Repository policies: [`AGENTS.md`](../../../../AGENTS.md), [`.agents/skills/general-code-change/SKILL.md`](../../../../.agents/skills/general-code-change/SKILL.md), and [`.agents/skills/general-unit-test/SKILL.md`](../../../../.agents/skills/general-unit-test/SKILL.md)
 - Language policies: [`.agents/skills/python/SKILL.md`](../../../../.agents/skills/python/SKILL.md), [`.agents/skills/python-suppressions/SKILL.md`](../../../../.agents/skills/python-suppressions/SKILL.md), [`.agents/skills/typescript/SKILL.md`](../../../../.agents/skills/typescript/SKILL.md), [`.agents/skills/typescript-suppressions/SKILL.md`](../../../../.agents/skills/typescript-suppressions/SKILL.md), [`.agents/skills/powershell/SKILL.md`](../../../../.agents/skills/powershell/SKILL.md), and [`.agents/skills/ci-workflows/SKILL.md`](../../../../.agents/skills/ci-workflows/SKILL.md)
@@ -758,5 +758,5 @@ Each language loop below is ordered and indivisible. If a step fails or changes 
 - PC-03 is resolved by `P0-T4` through compatibility fixtures before schema mutation; implementation must select only the proven additive receipt layout.
 - PC-04 is resolved by `P0-T5` and `P5-T7`; every full/selected pack path receives one deterministic membership or justified-exclusion result.
 - PC-05 is resolved by `P5-T10`; `P5-T11` permits only the automated demonstrated-gap branch and always requires the G16 CI hard backstop.
-- PC-06 is resolved by retaining the supplied feature research at `artifacts/research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md`, using `docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md` as the corrected translation basis, and writing all implementation evidence only under this feature's canonical `evidence/` tree.
+- PC-06 is resolved by retaining the supplied feature research at `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/research/2026-08-10T20-10-codex-native-parallel-orchestration-research.md`, using `docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md` as the corrected translation basis, and writing all implementation evidence only under this feature's canonical `evidence/` tree.
 - Any later repository drift that invalidates one of these decisions fails the dependent Phase 0 acceptance criterion and returns this same plan of record for revision; it does not authorize executor replanning.

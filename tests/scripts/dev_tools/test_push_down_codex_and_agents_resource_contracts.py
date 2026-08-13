@@ -33,6 +33,7 @@ SHARED_ROUTING_CONFIG = (
 BUNDLE_ROUTING_CONFIG = BUNDLED_ROOT / "config" / "orchestration-routing.json"
 MCP_SERVER_MANIFEST = REPO_ROOT / "packages" / "mcp-server" / "package.json"
 SCOPED_ROOTS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
+RUNTIME_ONLY_ROOTS: tuple[Path, ...] = (Path(".codex/state"),)
 PACK_MANIFEST_ROOT = Path("pack-manifests")
 VARIANT_ROOTS: tuple[Path, ...] = (
     Path(".agents-variants"),
@@ -99,6 +100,13 @@ PARALLEL_RUNTIME_CONTRACT_FILES = (
     Path(".codex/scripts/resume-parallel-child.ps1"),
     Path(".codex/config.toml"),
 )
+PARALLEL_PERSONA_CONTRACTS = (
+    (Path(".codex/agents/parallel-planner.toml"), "parallel-planner-workspace"),
+    (
+        Path(".codex/agents/parallel-orchestrator.toml"),
+        "parallel-orchestrator-workspace",
+    ),
+)
 COMMIT_STEWARD_PROFILE_FILES = tuple(
     Path(f".codex/agents/commit-steward{suffix}.toml")
     for suffix in ("", "-c1", "-c2", "-c3", "-c3-elevated", "-c4")
@@ -147,8 +155,15 @@ def list_scoped_files(root: Path) -> list[Path]:
     for scoped_root in SCOPED_ROOTS:
         scoped_path = root / scoped_root
         for path in scoped_path.rglob("*"):
-            if path.is_file():
-                files.append(path.relative_to(root))
+            if not path.is_file():
+                continue
+            relative_path = path.relative_to(root)
+            if any(
+                relative_path == runtime_root or runtime_root in relative_path.parents
+                for runtime_root in RUNTIME_ONLY_ROOTS
+            ):
+                continue
+            files.append(relative_path)
     return sorted(files)
 
 
@@ -248,6 +263,40 @@ def test_parallel_runtime_contract_has_exact_root_and_bundle_membership() -> Non
     assert (BUNDLED_ROOT / "AGENTS.md").read_bytes() == (
         REPO_ROOT / "AGENTS.md"
     ).read_bytes()
+
+
+def test_parallel_persona_prompts_match_profiles_and_generated_bundles() -> None:
+    """Require dedicated prompt authority, bundle parity, and Claude write denial."""
+
+    for relative_path, expected_permission in PARALLEL_PERSONA_CONTRACTS:
+        assert ".claude" not in relative_path.parts
+        assert (REPO_ROOT / relative_path).read_bytes() == (
+            BUNDLED_ROOT / relative_path
+        ).read_bytes()
+
+        for root in (REPO_ROOT, BUNDLED_ROOT):
+            persona = read_toml(root, relative_path)
+            assert persona["default_permissions"] == expected_permission
+            prompt = persona["developer_instructions"]
+            assert isinstance(prompt, str)
+            assert f"sandbox authority `{expected_permission}`." in prompt
+            assert "sandbox authority `orchestrator-workspace`." not in prompt
+
+            config = read_toml(root, CODEX_CONFIG_PATH)
+            permissions = config.get("permissions")
+            assert isinstance(permissions, dict)
+            profile = cast("dict[str, object]", permissions)[expected_permission]
+            assert isinstance(profile, dict)
+            filesystem = cast("dict[str, object]", profile)["filesystem"]
+            assert isinstance(filesystem, dict)
+            roots = cast("dict[str, object]", filesystem)[":workspace_roots"]
+            assert isinstance(roots, dict)
+            writable_roots = cast("dict[str, object]", roots)
+            assert writable_roots[".claude/**"] == "deny"
+            assert not any(
+                path.startswith(".claude/") and access == "write"
+                for path, access in writable_roots.items()
+            )
 
 
 def test_commit_steward_family_has_exact_full_tree_pairing() -> None:

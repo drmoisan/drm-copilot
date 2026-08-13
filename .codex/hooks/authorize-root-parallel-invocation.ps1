@@ -244,25 +244,35 @@ function Write-RootParallelInvocationReceipt {
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][string] $RepositoryRoot,
-        [Parameter(Mandatory)][System.Collections.IDictionary] $Receipt
+        [Parameter(Mandatory)][System.Collections.IDictionary] $Receipt,
+        [Parameter()]
+        [scriptblock] $CreateDirectory = {
+            param([string] $Path)
+            [System.IO.Directory]::CreateDirectory($Path) | Out-Null
+        },
+        [Parameter()]
+        [scriptblock] $OpenStream = {
+            param([string] $Path)
+            [System.IO.File]::Open(
+                $Path,
+                [System.IO.FileMode]::CreateNew,
+                [System.IO.FileAccess]::Write,
+                [System.IO.FileShare]::None
+            )
+        }
     )
 
     $directory = Get-CodexAuthorityStateRoot `
         -RepositoryRoot $RepositoryRoot `
         -SessionId ([string]$Receipt.session_id) `
         -Surface parallel
-    [System.IO.Directory]::CreateDirectory($directory) | Out-Null
+    & $CreateDirectory $directory
     $path = Get-CodexAuthorityReceiptPath `
         -RepositoryRoot $RepositoryRoot `
         -SessionId ([string]$Receipt.session_id) `
         -TurnId ([string]$Receipt.turn_id) `
         -Surface parallel
-    $stream = [System.IO.File]::Open(
-        $path,
-        [System.IO.FileMode]::CreateNew,
-        [System.IO.FileAccess]::Write,
-        [System.IO.FileShare]::None
-    )
+    $stream = & $OpenStream $path
     try {
         $writer = [System.IO.StreamWriter]::new(
             $stream,
@@ -280,31 +290,49 @@ function Write-RootParallelInvocationReceipt {
     return $path
 }
 
-if ($MyInvocation.InvocationName -eq '.') {
-    return
-}
-
-try {
-    $payload = ConvertFrom-RootParallelHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
-    $entryKind = Get-RootParallelEntryKind -Prompt ([string]$payload.prompt
+function Invoke-RootParallelAuthorization {
+    <#
+    .SYNOPSIS
+        Executes one root authorization request through injectable boundaries.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PayloadRaw,
+        [Parameter(Mandatory)][string] $RepositoryRoot,
+        [Parameter()][datetimeoffset] $Now = [datetimeoffset]::UtcNow,
+        [Parameter()]
+        [scriptblock] $HeadResolver = {
+            param([string] $Root)
+            $head = [string](& git -C $Root rev-parse HEAD 2>$null)
+            if ($LASTEXITCODE -ne 0 -or $head -notmatch '^[0-9a-fA-F]{40,64}$') {
+                throw 'PARALLEL_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved.'
+            }
+            $head
+        },
+        [Parameter()]
+        [scriptblock] $ReceiptWriter = {
+            param([string] $Root, [System.Collections.IDictionary] $Value)
+            Write-RootParallelInvocationReceipt -RepositoryRoot $Root -Receipt $Value
+        }
     )
+
+    $payload = ConvertFrom-RootParallelHookPayload -PayloadRaw $PayloadRaw
+    $entryKind = Get-RootParallelEntryKind -Prompt ([string]$payload.prompt)
     if (-not $entryKind) {
-        exit 0
+        return $null
     }
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $headSha = [string](& git -C $repositoryRoot rev-parse HEAD 2>$null)
-    if ($LASTEXITCODE -ne 0 -or $headSha -notmatch '^[0-9a-fA-F]{40,64}$') {
+    $headSha = [string](& $HeadResolver $RepositoryRoot)
+    if ($headSha -notmatch '^[0-9a-fA-F]{40,64}$') {
         throw 'PARALLEL_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved.'
     }
     $receipt = Get-RootParallelInvocationReceipt `
         -Payload $payload `
-        -Now ([datetimeoffset]::UtcNow) `
-        -RepositoryRoot $repositoryRoot `
+        -Now $Now `
+        -RepositoryRoot $RepositoryRoot `
         -HeadSha $headSha
-    $receiptPath = Write-RootParallelInvocationReceipt `
-        -RepositoryRoot $repositoryRoot `
-        -Receipt $receipt
-    [ordered]@{
+    $receiptPath = & $ReceiptWriter $RepositoryRoot $receipt
+    return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName     = 'UserPromptSubmit'
             additionalContext = (
@@ -312,7 +340,21 @@ try {
                 "parallel identity: $($receipt.parallel_identity); receipt: $receiptPath"
             )
         }
-    } | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    }
+}
+
+if ($MyInvocation.InvocationName -eq '.') {
+    return
+}
+
+try {
+    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $result = Invoke-RootParallelAuthorization `
+        -PayloadRaw ([Console]::In.ReadToEnd()) `
+        -RepositoryRoot $repositoryRoot
+    if ($null -ne $result) {
+        $result | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    }
     exit 0
 } catch {
     [Console]::Error.WriteLine([string]$_)

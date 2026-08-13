@@ -216,23 +216,31 @@ function Find-CodexParallelRootAttestation {
     return ''
 }
 
-if ($MyInvocation.InvocationName -eq '.') {
-    return
-}
+function Invoke-CodexParallelRootGate {
+    <#
+    .SYNOPSIS
+        Evaluates one root-gate request through an injectable attestation lookup.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PayloadRaw,
+        [Parameter(Mandatory)][string] $RepositoryRoot,
+        [Parameter()]
+        [scriptblock] $AttestationFinder = {
+            param($Payload, [string] $Root)
+            Find-CodexParallelRootAttestation -Payload $Payload -RepositoryRoot $Root
+        }
+    )
 
-$payloadRaw = [Console]::In.ReadToEnd()
-try {
     $payload = ConvertFrom-CodexParallelHookPayload `
-        -PayloadRaw $payloadRaw `
+        -PayloadRaw $PayloadRaw `
         -HookName 'enforce-parallel-root-invocation'
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $attestationRaw = Find-CodexParallelRootAttestation `
-        -Payload $payload `
-        -RepositoryRoot $repositoryRoot
-    $result = Invoke-CodexParallelHookValidation `
+    $attestationRaw = & $AttestationFinder $payload $RepositoryRoot
+    return Invoke-CodexParallelHookValidation `
         -HookName 'enforce-parallel-root-invocation' `
         -ReasonCode 'PARALLEL_INVOCATION_ORIGIN_BLOCKED' `
-        -PayloadRaw $payloadRaw `
+        -PayloadRaw $PayloadRaw `
         -Validator {
         param($toolInput, $parsedPayload)
         Get-CodexParallelRootError `
@@ -240,6 +248,17 @@ try {
             -Payload $parsedPayload `
             -AttestationRaw $attestationRaw
     }
+}
+
+if ($MyInvocation.InvocationName -eq '.') {
+    return
+}
+
+try {
+    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $result = Invoke-CodexParallelRootGate `
+        -PayloadRaw ([Console]::In.ReadToEnd()) `
+        -RepositoryRoot $repositoryRoot
     exit (Write-CodexParallelHookResult -Result $result)
 } catch {
     [Console]::Error.WriteLine([string]$_)

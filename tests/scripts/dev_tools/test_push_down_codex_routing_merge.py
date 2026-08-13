@@ -6,6 +6,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+import pytest
+
+from scripts.dev_tools import push_down_codex_routing_merge as routing_merge
 from scripts.dev_tools.push_down_codex_routing_merge import (
     AdditiveRoutingMergeFileSystem,
     RoutingMergeConflictError,
@@ -62,6 +65,29 @@ def _document(value: dict[str, object]) -> str:
     """Render one deterministic JSON fixture."""
 
     return f"{json.dumps(value, indent=2)}\n"
+
+
+def test_object_merge_seam_covers_positive_negative_boundary_and_error() -> None:
+    """The object seam exposes additive, unchanged, and collision outcomes."""
+
+    merger = getattr(routing_merge, "_merge_routing_objects", None)
+    assert callable(merger), "routing object testability seam must exist"
+    addition = {"routes": {"new": {"enabled": True}}}
+    assert merger({"routes": {}}, addition, "routing.json") == (addition, True)
+    assert merger({}, {"routes": {"b": 2, "a": 1}}, "routing.json") == (
+        {"routes": {"a": 1, "b": 2}},
+        True,
+    )
+    unchanged = {"routes": {"same": {"enabled": True}}}
+    assert merger(unchanged, unchanged, "routing.json") == (unchanged, False)
+    with pytest.raises(RoutingMergeConflictError, match="routes.shared"):
+        merger({"routes": {"shared": 1}}, {"routes": {"shared": 2}}, "routing.json")
+    with pytest.raises(RoutingMergeConflictError, match="schema_version"):
+        merger({"schema_version": 1}, {"schema_version": 2}, "routing.json")
+    with pytest.raises(ValueError, match="not valid JSON"):
+        merge_additive_routing_documents("{", "{}", "routing.json")
+    with pytest.raises(ValueError, match="root is not"):
+        merge_additive_routing_documents("[]", "{}", "routing.json")
 
 
 def test_merge_preserves_destination_and_sorts_source_additions() -> None:

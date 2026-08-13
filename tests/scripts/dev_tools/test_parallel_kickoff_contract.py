@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pytest
 
+from scripts.dev_tools import parallel_kickoff_contract as kickoff_contract
 from scripts.dev_tools.parallel_kickoff_contract import (
     ITEM_HEADERS,
     KickoffItem,
@@ -33,21 +34,24 @@ HASH_40 = "a" * 40
 HASH_64 = "b" * 64
 
 
+def test_ready_identity_path_seam_covers_slug_inputs() -> None:
+    """The identity seam accepts valid slugs and rejects invalid boundaries."""
+
+    resolver = getattr(kickoff_contract, "_ready_identity_paths", None)
+    assert callable(resolver), "ready-identity path testability seam must exist"
+    assert resolver("sample-run") == (
+        "docs/features/parallel/sample-run/parallel.md",
+        "parallel/sample-run-plan",
+    )
+    assert resolver("x") == ("docs/features/parallel/x/parallel.md", "parallel/x-plan")
+    with pytest.raises(ValueError):
+        resolver("Sample_Run")
+    with pytest.raises(ValueError):
+        resolver("")
+
+
 def kickoff(*, rows: tuple[str, ...] = (ITEM_ROW_101,)) -> str:
-    """Render a canonical parallel kickoff without the optional integrity section.
-
-    Args:
-        rows (tuple[str, ...]): Item-summary data rows to include, in order.
-
-    Returns:
-        str: A kickoff document that satisfies the contract.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Render a canonical kickoff for ``rows`` without optional integrity data."""
 
     return "\n".join(
         (
@@ -77,24 +81,28 @@ def kickoff_with_integrity(
         f"| docs/features/active/item-101/plan.md | {HASH_40} |",
     ),
 ) -> str:
-    """Render a canonical parallel kickoff including the optional integrity section.
-
-    Args:
-        rows (tuple[str, ...]): Item-summary data rows to include, in order.
-        integrity_lines (tuple[str, ...]): Body lines of the `## Integrity`
-            section, in order.
-
-    Returns:
-        str: A kickoff document carrying an `## Integrity` section.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Render a kickoff for ``rows`` with supplied ``integrity_lines``."""
 
     return "\n".join((kickoff(rows=rows), "## Integrity", *integrity_lines))
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "expected"),
+    [
+        ("| 101 |", "| bad |", "issue_num"),
+        ("| 0 |", "| bad |", "cohort"),
+        ("| C3 |", "| C9 |", "complexity"),
+    ],
+)
+def test_invalid_item_cells_report_their_owned_error(
+    old: str, new: str, expected: str
+) -> None:
+    """Invalid numeric and enum cells produce row-scoped diagnostics."""
+
+    errors = validate_parallel_kickoff_text(
+        kickoff(rows=(ITEM_ROW_101.replace(old, new),))
+    )
+    assert any(expected in error for error in errors)
 
 
 def test_item_headers_are_the_six_ordered_parallel_columns() -> None:

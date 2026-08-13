@@ -1,0 +1,22 @@
+TypeScript batch 1 uninterrupted-green gate
+
+Timestamp: 2026-08-12T11:25:16.1439065Z
+
+Implementation result: No production testability seam was required. The three declared focused test owners now cover sorted first-route creation, substantive array configuration collisions, forced parallel-persona context validation, and the missing committed-evidence context boundary. Production source remained unchanged.
+
+Ordered loop:
+1. `npm --prefix extensions/drm-copilot run format`: PASS; all extension TypeScript, JSON, and CJS paths reported unchanged.
+2. `npm --prefix extensions/drm-copilot run lint`: PASS; ESLint returned 0.
+3. `npm --prefix extensions/drm-copilot run typecheck`: PASS; `tsc -p ./ --noEmit` returned 0.
+4. Targeted Jest coverage command using `--findRelatedTests` for the three production paths, targeted `collectCoverageFrom`, and original per-file thresholds: PASS; 74 suites and 1,114 tests passed with 0 failures in 41.444 seconds.
+
+Per-file line coverage:
+- `claude-routing-merge.ts`: 98.57%, above the reviewed 98.05% threshold and above the P7 baseline of 94.90%.
+- `codex-topology-resolver.ts`: 98.43%, above the reviewed 97.39% threshold and above the P7 baseline of 96.25%.
+- `orchestration-artifacts.ts`: 100%, equal to the reviewed 100% threshold and above the P7 baseline of 98.33%.
+- Target aggregate: 1,159/1,171 lines (98.97%), 243/253 branches (96.04%), and 36/36 functions (100%).
+- Raw LCOV and JSON-summary evidence is retained in the adjacent `typescript-batch-1-coverage-green/` directory.
+
+Changed-line result: No production line changed, so there is no changed-production-line coverage regression. Test-owner line counts are 210, 248, and 488, each within the 500-line policy.
+
+Acceptance result: PASS.

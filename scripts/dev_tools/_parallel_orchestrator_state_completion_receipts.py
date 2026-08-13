@@ -1,4 +1,25 @@
-"""Validate additive per-item PR, CI, merge, and worktree-removal receipts."""
+"""Validate additive per-item PR, CI, merge, and worktree-removal receipts.
+
+Purpose:
+    Enforce the completion evidence required for every non-withdrawn parallel
+    item once any completion-receipt field appears in a checkpoint.
+
+Responsibilities and usage:
+    Normalize readable item mappings, validate their PR/check/merge bindings,
+    and report duplicate PR ownership. The public validator is called after the
+    base checkpoint shape validator and preserves legacy checkpoints that have
+    not entered completion-receipt mode.
+
+High-level flow and invariants:
+    Detect receipt mode, validate each active item without short-circuiting, and
+    then enforce one item per positive PR number. Paths must remain normalized
+    repository-relative paths, and all Git identities must be complete SHA-1s.
+
+Raises and side effects:
+    None. Every function is pure, performs no I/O, and does not mutate input.
+    Individual docstrings therefore omit duplicate Raises and Side Effects
+    sections.
+"""
 
 from __future__ import annotations
 
@@ -28,11 +49,20 @@ SHA_PATTERN = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def _mapping_items(state: dict[str, object]) -> list[dict[str, object]]:
-    """Return object-shaped item records in persisted order."""
+    """Extract object-shaped item records in persisted order.
+
+    Args:
+        state (dict[str, object]): Parsed checkpoint containing optional items.
+
+    Returns:
+        list[dict[str, object]]: Mapping entries only; malformed entries are
+        excluded because the base shape validator owns their diagnostics.
+    """
 
     value = state.get("items")
     if not isinstance(value, list):
         return []
+    # Preserve source order while excluding shapes this additive gate cannot read.
     return [
         cast("dict[str, object]", entry)
         for entry in cast("list[object]", value)
@@ -41,29 +71,59 @@ def _mapping_items(state: dict[str, object]) -> list[dict[str, object]]:
 
 
 def _receipt_mode(items: list[dict[str, object]]) -> bool:
-    """Preserve legacy checkpoints until a completion-receipt field appears."""
+    """Report whether any item activates additive receipt validation.
 
+    Args:
+        items (list[dict[str, object]]): Readable checkpoint item records.
+
+    Returns:
+        bool: True once at least one completion-receipt field is present.
+    """
+
+    # One additive field opts the whole checkpoint into the complete receipt contract.
     return any(COMPLETION_RECEIPT_FIELDS.intersection(item) for item in items)
 
 
 def _non_empty_text(value: object) -> bool:
-    """Return whether a value is a non-blank string."""
+    """Report whether a value carries non-blank text.
+
+    Args:
+        value (object): Candidate deserialized value.
+
+    Returns:
+        bool: True only for a string containing a non-space character.
+    """
 
     return isinstance(value, str) and bool(value.strip())
 
 
 def _sha(value: object) -> bool:
-    """Return whether a value is a complete hexadecimal Git SHA-1."""
+    """Report whether a value is a complete hexadecimal Git SHA-1.
+
+    Args:
+        value (object): Candidate deserialized Git identity.
+
+    Returns:
+        bool: True only for a 40-character hexadecimal string.
+    """
 
     return isinstance(value, str) and SHA_PATTERN.fullmatch(value) is not None
 
 
 def _relative_path(value: object) -> bool:
-    """Accept only normalized repository-relative forward-slash paths."""
+    """Report whether a value is a normalized repository-relative path.
+
+    Args:
+        value (object): Candidate serialized receipt path.
+
+    Returns:
+        bool: True for a non-blank relative POSIX path without traversal.
+    """
 
     if not _non_empty_text(value):
         return False
     path = cast("str", value)
+    # Reject host-specific absolute forms before interpreting POSIX path parts.
     if "\\" in path or re.match(r"^[A-Za-z]:/", path):
         return False
     parsed = PurePosixPath(path)
@@ -71,7 +131,16 @@ def _relative_path(value: object) -> bool:
 
 
 def _item_error(context: str, index: int, detail: str) -> str:
-    """Render one stable item-scoped completion diagnostic."""
+    """Render one stable item-scoped completion diagnostic.
+
+    Args:
+        context (str): Caller-provided checkpoint label.
+        index (int): Zero-based persisted item position.
+        detail (str): Specific violated receipt requirement.
+
+    Returns:
+        str: Stable diagnostic prefixed with the owning item location.
+    """
 
     return f"{context} items[{index}] completion receipt {detail}."
 
@@ -79,9 +148,19 @@ def _item_error(context: str, index: int, detail: str) -> str:
 def _validate_pr_binding(
     item: dict[str, object], index: int, context: str
 ) -> list[str]:
-    """Validate one item's unique main-only PR and exact checked-head binding."""
+    """Validate one item's main-only PR and exact checked-head binding.
+
+    Args:
+        item (dict[str, object]): Readable checkpoint item record.
+        index (int): Zero-based persisted item position.
+        context (str): Caller-provided checkpoint label.
+
+    Returns:
+        list[str]: Ordered field and cross-field binding diagnostics.
+    """
 
     errors: list[str] = []
+    # Validate scalar PR identity before comparing fields that depend on it.
     number = item.get("pr_number")
     if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
         errors.append(_item_error(context, index, "pr_number must be positive"))
@@ -90,6 +169,7 @@ def _validate_pr_binding(
     if item.get("pr_base_branch") != "main":
         errors.append(_item_error(context, index, "PR base branch must be 'main'"))
 
+    # Bind the PR head branch to the work item's persisted execution branch.
     branch = item.get("branch_name")
     if not _non_empty_text(branch):
         errors.append(
@@ -100,6 +180,7 @@ def _validate_pr_binding(
             _item_error(context, index, "PR head branch must match branch_name")
         )
 
+    # Require complete identities before checking exact-head equality.
     checked_head = item.get("checked_head")
     pr_head = item.get("pr_head_sha")
     if not _sha(checked_head):
@@ -120,9 +201,19 @@ def _validate_pr_binding(
 def _validate_check_binding(
     item: dict[str, object], index: int, context: str
 ) -> list[str]:
-    """Validate required-check success against the exact recorded PR head."""
+    """Validate required-check success against the exact recorded PR head.
+
+    Args:
+        item (dict[str, object]): Readable checkpoint item record.
+        index (int): Zero-based persisted item position.
+        context (str): Caller-provided checkpoint label.
+
+    Returns:
+        list[str]: Ordered check-identity and conclusion diagnostics.
+    """
 
     errors: list[str] = []
+    # Check identity and conclusion independently so all missing evidence is visible.
     checks_head = item.get("checks_head_sha")
     if not _sha(checks_head):
         errors.append(
@@ -142,9 +233,19 @@ def _validate_check_binding(
 def _validate_merge_and_removal(
     item: dict[str, object], index: int, context: str
 ) -> list[str]:
-    """Validate merged state and matching worktree-removal evidence."""
+    """Validate merged state and matching worktree-removal evidence.
+
+    Args:
+        item (dict[str, object]): Readable checkpoint item record.
+        index (int): Zero-based persisted item position.
+        context (str): Caller-provided checkpoint label.
+
+    Returns:
+        list[str]: Ordered merge and durable removal-evidence diagnostics.
+    """
 
     errors: list[str] = []
+    # Accumulate every terminal-state defect so remediation is not iterative.
     if item.get("pr_state") != "MERGED":
         errors.append(_item_error(context, index, "PR state must be 'MERGED'"))
     if not _non_empty_text(item.get("merged_at")):
@@ -188,8 +289,45 @@ def _validate_merge_and_removal(
     return errors
 
 
+def _validate_completion_item(
+    item: dict[str, object], index: int, context: str
+) -> list[str]:
+    """Validate all completion bindings for one active item.
+
+    This narrow seam keeps item-level positive and negative cases independent
+    from checkpoint-wide duplicate-PR detection.
+
+    Args:
+        item (dict[str, object]): Readable checkpoint item record.
+        index (int): Zero-based persisted item position.
+        context (str): Caller-provided checkpoint label.
+
+    Returns:
+        list[str]: Ordered item diagnostics, or an empty list when withdrawn.
+    """
+
+    # Withdrawn work left the run before completion and owns no terminal receipt.
+    if item.get("state") == "withdrawn":
+        return []
+    # Combine the three independent evidence layers in stable diagnostic order.
+    return [
+        *_validate_pr_binding(item, index, context),
+        *_validate_check_binding(item, index, context),
+        *_validate_merge_and_removal(item, index, context),
+    ]
+
+
 def validate_completion_receipts(state: dict[str, object], context: str) -> list[str]:
-    """Return ordered receipt errors for a completion-receipt-mode checkpoint."""
+    """Validate completion receipts without changing legacy checkpoints.
+
+    Args:
+        state (dict[str, object]): Parsed parallel checkpoint.
+        context (str): Caller-provided checkpoint label.
+
+    Returns:
+        list[str]: Ordered item and duplicate-PR diagnostics; empty outside
+        completion-receipt mode.
+    """
 
     items = _mapping_items(state)
     if not _receipt_mode(items):
@@ -198,18 +336,21 @@ def validate_completion_receipts(state: dict[str, object], context: str) -> list
     errors: list[str] = []
     pr_owners: dict[int, int] = {}
     duplicate_prs: set[int] = set()
+    # Validate each active item and collect valid PR ownership for global uniqueness.
     for index, item in enumerate(items):
+        errors.extend(_validate_completion_item(item, index, context))
+        # Withdrawn records do not participate in completion PR ownership.
         if item.get("state") == "withdrawn":
             continue
-        errors.extend(_validate_pr_binding(item, index, context))
-        errors.extend(_validate_check_binding(item, index, context))
-        errors.extend(_validate_merge_and_removal(item, index, context))
         number = item.get("pr_number")
+        # Only structurally valid PR numbers can participate in uniqueness checks.
         if isinstance(number, int) and not isinstance(number, bool) and number > 0:
+            # Retain the first owner and report later ownership as one stable PR error.
             if number in pr_owners:
                 duplicate_prs.add(number)
             else:
                 pr_owners[number] = index
+    # Sort duplicate identities so diagnostics remain deterministic across inputs.
     errors.extend(
         f"{context} completion receipts assign PR {number} to multiple items."
         for number in sorted(duplicate_prs)

@@ -10,6 +10,38 @@ Describe 'Codex parallel root provenance contracts' {
             'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents'
         $script:ConfigContent = Get-Content -Raw -LiteralPath `
         (Join-Path $script:RepoRoot '.codex/config.toml')
+
+        function Get-ParallelPersonaContract {
+            param(
+                [Parameter(Mandatory)]
+                [string]$Persona
+            )
+
+            $content = Get-Content -Raw -LiteralPath `
+            (Join-Path $script:AgentRoot "$Persona.toml")
+            $permission = [regex]::Match(
+                $content,
+                '(?m)^default_permissions = "(?<value>[^"]+)"$'
+            )
+            $prompt = [regex]::Match(
+                $content,
+                "(?ms)^developer_instructions = '''\r?\n(?<value>.*?)\r?\n'''$"
+            )
+            $skills = [regex]::Matches(
+                $content,
+                '(?m)^\s*\{ name = "(?<value>[^"]+)", enabled = true \},?$'
+            )
+
+            $permission.Success | Should -BeTrue
+            $prompt.Success | Should -BeTrue
+            $skills.Count | Should -BeGreaterThan 0
+
+            return [pscustomobject]@{
+                Permission    = $permission.Groups['value'].Value
+                Prompt        = $prompt.Groups['value'].Value
+                EnabledSkills = @($skills | ForEach-Object { $_.Groups['value'].Value })
+            }
+        }
     }
 
     It 'publishes root-only skill <Name>' -ForEach @(
@@ -101,6 +133,52 @@ Describe 'Codex parallel root provenance contracts' {
         $content | Should -BeExactly (Get-Content -Raw -LiteralPath $bundlePath)
         $script:ConfigContent | Should -Match `
             "(?m)^\[permissions\.$([regex]::Escape($Permission))\]$"
+    }
+
+    It 'aligns the planner prompt tool and permission statements with its dedicated profile' {
+        $contract = Get-ParallelPersonaContract -Persona 'parallel-planner'
+        $toolStatements = [regex]::Matches(
+            $contract.Prompt,
+            '(?m)^Apply `(?<value>[^`]+)` as the canonical procedure\.'
+        )
+        $permissionStatements = [regex]::Matches(
+            $contract.Prompt,
+            'sandbox authority `(?<value>[^`]+)`'
+        )
+
+        $toolStatements.Count | Should -BeGreaterThan 0
+        foreach ($statement in $toolStatements) {
+            $contract.EnabledSkills | Should -Contain $statement.Groups['value'].Value
+        }
+
+        $permissionStatements.Count | Should -BeGreaterThan 0
+        foreach ($statement in $permissionStatements) {
+            $statement.Groups['value'].Value | Should -BeExactly $contract.Permission `
+                -Because 'the planner prompt authority must match default_permissions'
+        }
+    }
+
+    It 'aligns the orchestrator prompt tool and permission statements with its dedicated profile' {
+        $contract = Get-ParallelPersonaContract -Persona 'parallel-orchestrator'
+        $toolStatements = [regex]::Matches(
+            $contract.Prompt,
+            '(?m)(?:^Apply|and) `(?<value>parallel-(?:run|orchestrate))` (?:for|as) '
+        )
+        $permissionStatements = [regex]::Matches(
+            $contract.Prompt,
+            'sandbox authority `(?<value>[^`]+)`'
+        )
+
+        $toolStatements.Count | Should -BeGreaterThan 0
+        foreach ($statement in $toolStatements) {
+            $contract.EnabledSkills | Should -Contain $statement.Groups['value'].Value
+        }
+
+        $permissionStatements.Count | Should -BeGreaterThan 0
+        foreach ($statement in $permissionStatements) {
+            $statement.Groups['value'].Value | Should -BeExactly $contract.Permission `
+                -Because 'the orchestrator prompt authority must match default_permissions'
+        }
     }
 
     It 'limits G02 root persona writes to the dedicated <Permission> profile' -ForEach @(

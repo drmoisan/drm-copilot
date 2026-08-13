@@ -336,11 +336,18 @@ function Start-CodexParallelChildProcess {
 
 function Complete-CodexParallelChildProcess {
     [CmdletBinding()]
-    param([Parameter(Mandatory)] $Context, [Parameter(Mandatory)] $Child)
+    param(
+        [Parameter(Mandatory)] $Context,
+        [Parameter(Mandatory)] $Child,
+        [scriptblock] $WriteText = {
+            param([string] $Path, [string] $Value)
+            [System.IO.File]::WriteAllText($Path, $Value)
+        }
+    )
 
     $result = Complete-CodexChildProcessCore -Child $Child
-    [System.IO.File]::WriteAllText("$($Child.BasePath).stdout.jsonl", [string]$result.output)
-    [System.IO.File]::WriteAllText("$($Child.BasePath).stderr.log", [string]$result.error)
+    & $WriteText "$($Child.BasePath).stdout.jsonl" ([string]$result.output)
+    & $WriteText "$($Child.BasePath).stderr.log" ([string]$result.error)
     if ([int]$result.exit_code -eq 0) {
         Set-CodexParallelChildReceiptState -Receipt $Child.Receipt -State completed `
             -ExitCode 0 -Confirm:$false

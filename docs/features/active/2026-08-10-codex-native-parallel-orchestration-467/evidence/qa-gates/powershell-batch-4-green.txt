@@ -1,0 +1,29 @@
+PowerShell batch 4 green gate
+
+Timestamp: 2026-08-12T10:56:50.641Z
+
+Final uninterrupted toolchain pass
+
+Command: mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/codex-authority-store.ps1",".codex/hooks/enforce-codex-model-routing.ps1",".codex/hooks/record-subagent-routing-attestation.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC format completed with ok=true for all six selected paths.
+
+Command: mcp__drm_copilot__run_poshqc_analyze({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/codex-authority-store.ps1",".codex/hooks/enforce-codex-model-routing.ps1",".codex/hooks/record-subagent-routing-attestation.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC analyze completed with ok=true and zero batch diagnostics.
+
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 0
+
+Output Summary: Repository PoshQC ran 6 tests: 6 passed, 0 failed, 0 skipped, 0 inconclusive, and 0 not run in 0.634 seconds. Numeric root-package attribution was:
+
+- `.codex/hooks/codex-authority-store.ps1`: 4/64 instructions (6.2500%) and 4/58 lines (6.8966%).
+- `.codex/hooks/enforce-codex-model-routing.ps1`: 13/92 instructions (14.1304%) and 9/79 lines (11.3924%).
+- `.codex/hooks/record-subagent-routing-attestation.ps1`: 15/316 instructions (4.7468%) and 9/229 lines (3.9301%).
+
+Acceptance result: PASS. Each batch runtime now has numeric source attribution, all focused tests pass, no runtime behavior changed, and the ordered gate completed without a failure or file change.

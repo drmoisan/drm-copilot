@@ -1,0 +1,29 @@
+PowerShell batch 6 green gate
+
+Timestamp: 2026-08-12T11:02:30.530Z
+
+Final uninterrupted toolchain pass
+
+Command: mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/scripts/codex-child-launch-persistence.ps1",".codex/scripts/codex-child-launch-runtime.ps1",".codex/scripts/epic-child-launch-contract.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC format completed with ok=true for all six selected paths.
+
+Command: mcp__drm_copilot__run_poshqc_analyze({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/scripts/codex-child-launch-persistence.ps1",".codex/scripts/codex-child-launch-runtime.ps1",".codex/scripts/epic-child-launch-contract.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC analyze completed with ok=true and zero batch diagnostics.
+
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 0
+
+Output Summary: Repository PoshQC ran 6 tests: 6 passed, 0 failed, 0 skipped, 0 inconclusive, and 0 not run in 0.565 seconds. Numeric root attribution was:
+
+- `.codex/scripts/codex-child-launch-persistence.ps1`: 9/120 instructions (7.5000%) and 6/98 lines (6.1224%).
+- `.codex/scripts/codex-child-launch-runtime.ps1`: 1/130 instructions (0.7692%) and 1/110 lines (0.9091%).
+- `.codex/scripts/epic-child-launch-contract.ps1`: 12/217 instructions (5.5300%) and 8/160 lines (5.0000%).
+
+Acceptance result: PASS. Each batch runtime now has numeric source attribution, all focused tests pass, no runtime behavior changed, and the ordered gate completed without a failure or file change.

@@ -1,0 +1,25 @@
+TypeScript batch 1 expected-red gate
+
+Timestamp: 2026-08-12T11:22:02.1223876Z
+
+Pre-test checks:
+- `npm --prefix extensions/drm-copilot exec -- prettier --check <three batch test owners>`: PASS after Prettier formatted the topology-owner edit and the sequence restarted at formatting.
+- `npm --prefix extensions/drm-copilot exec -- eslint <three batch test owners>`: PASS.
+- `npm --prefix extensions/drm-copilot run typecheck`: PASS.
+
+Coverage command:
+`npm --prefix extensions/drm-copilot run test:coverage -- --runInBand --findRelatedTests src/lib/push-down/claude-routing-merge.ts src/lib/validate/codex-topology-resolver.ts src/lib/validate/orchestration-artifacts.ts --coverageDirectory=../../docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/typescript-batch-1-coverage-red --coverageReporters=text --coverageReporters=json-summary --collectCoverageFrom=src/lib/push-down/claude-routing-merge.ts --collectCoverageFrom=src/lib/validate/codex-topology-resolver.ts --collectCoverageFrom=src/lib/validate/orchestration-artifacts.ts --coverageThreshold='{"./src/lib/push-down/claude-routing-merge.ts":{"lines":98.05},"./src/lib/validate/codex-topology-resolver.ts":{"lines":97.39},"./src/lib/validate/orchestration-artifacts.ts":{"lines":100}}'`
+
+EXIT_CODE: 1
+
+Expected-red result:
+- 74 related suites passed; 1,110 tests passed; 0 assertion failures.
+- `claude-routing-merge.ts`: 95.31%; failed the reviewed 98.05% no-regression threshold. Remaining lines: 121-122, 173-179, 201-202, 216, 218-219, 226-228, 271-276.
+- `codex-topology-resolver.ts`: 96.87%; failed the reviewed 97.39% threshold. Remaining lines: 113-117, 241-245.
+- `orchestration-artifacts.ts`: 98.33%; failed the reviewed 100% threshold. Remaining lines: 341-346.
+- Aggregate for the three collected files: 1,132/1,171 lines (96.66%) and 232/250 branches (92.80%).
+- Raw JSON-summary and LCOV outputs are retained in the adjacent `typescript-batch-1-coverage-red/` directory.
+
+Attribution: Each of the three failures is a per-file coverage-threshold failure whose remaining lines are contained in the reviewed baseline gap inventory. The newly added invalid-root, null-context, and explicit-readiness-boundary tests are correct and pass. No batch 1 production file was edited before this run.
+
+Acceptance result: PASS-AS-EXPECTED-RED.

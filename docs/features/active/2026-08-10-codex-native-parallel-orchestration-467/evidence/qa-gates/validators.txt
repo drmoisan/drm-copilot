@@ -1,0 +1,50 @@
+P13-T7 CANONICAL VALIDATOR RECEIPT
+
+RESEARCH RELOCATION
+Timestamp: 2026-08-12T15:18:00Z
+Command: tracked-and-ignored exact-reference scan over `git ls-files --cached --others --ignored --exclude-standard`, followed by SHA-256 and reference-resolution checks
+EXIT_CODE: 0
+Output Summary: Scanned 46,725 files. The legacy reference count was 0. The canonical target, the original-plan link and PC-06 reference, and both checkpoint values resolved. The canonical target SHA-256 was A4C3BAF2C50ADFDF59228C24CF3912D7E6C0CACC7A356D12D8CF54F0B3E669EA. The old ignored source was then deleted after containment and hash verification; the target retained the same hash and `.claude/**` diff and status counts remained 0.
+
+VALIDATOR 1 — EVIDENCE LOCATIONS
+Timestamp: 2026-08-12T15:19:24.7358467Z
+Command: poetry run python scripts/dev_tools/validate_evidence_locations.py --root .
+EXIT_CODE: 0
+Output Summary: The repository scan reported no non-canonical evidence location.
+Completed: 2026-08-12T15:19:28.0868169Z
+
+VALIDATOR 2 — ORIGINAL PLAN
+Timestamp: 2026-08-12T15:19:34.2861007Z
+Command: poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/plan.2026-08-10T20-25.md
+EXIT_CODE: 0
+Output Summary: plan validation passed: docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/plan.2026-08-10T20-25.md
+Completed: 2026-08-12T15:19:35.1541791Z
+
+VALIDATOR 3 — REMEDIATION PLAN
+Timestamp: 2026-08-12T15:19:42.9402741Z
+Command: poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-12T01-42.md
+EXIT_CODE: 0
+Output Summary: plan validation passed: docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-12T01-42.md
+Completed: 2026-08-12T15:19:43.7383824Z
+
+VALIDATOR 4 — STRICT ORCHESTRATOR CHECKPOINT
+Timestamp: 2026-08-12T15:20:03.5010897Z
+Command: poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state artifacts/orchestration/orchestrator-state.json --require-codex-topology --require-codex-model-routing
+EXIT_CODE: 0
+Output Summary: orchestrator-state validation passed: artifacts/orchestration/orchestrator-state.json
+Completed: 2026-08-12T15:20:04.4217609Z
+
+VALIDATOR 5 — REPOSITORY WHITESPACE POLICY
+Timestamp: 2026-08-12T15:20:14.6865091Z
+Command: git diff --check
+EXIT_CODE: 0
+Output Summary: No whitespace error was reported. Git emitted non-failing CRLF-to-LF working-copy warnings for five Codex pack manifests and testResults.xml.
+Completed: 2026-08-12T15:20:14.8202165Z
+
+ALREADY-GREEN GATES — NOT RERUN
+- Source/bundle parity: direct root/bundle enumeration reported 237/237 byte-equal files, 0 missing, and 0 mismatch. The fresh live named resource-parity test passed 1/1 at 2026-08-12T14:57:05.8720464Z–2026-08-12T14:57:07.0347946Z. `.claude/**` diff and status counts were 0. The canonical state-absent publisher receipt is `publisher-regeneration/push-down-20260812T145633Z.json`.
+- Topology/model routing: forced parallel-planner and parallel-orchestrator topology receipts and C4 deployment receipts passed with model `gpt-5.6-sol` and reasoning `ultra`.
+- Prompt/permission: `tests/scripts/codex-hooks/parallel-provenance.Tests.ps1` passed 19/19 with 0 failures and 0 skipped.
+- Language QA: the uninterrupted Python, PowerShell, TypeScript, and Bash results remain indexed in `evidence/qa-gates/index.md`; no language command was rerun by P13-T7.
+
+Acceptance result: PASS — every validator assigned to P13-T7 exited successfully, and no already-green source/bundle parity, topology, prompt/permission, or language QA gate was rerun.

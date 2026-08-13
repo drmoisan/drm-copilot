@@ -1,0 +1,31 @@
+PowerShell batch 1 green gate
+
+Timestamp: 2026-08-12T10:46:04.079Z
+
+Final uninterrupted toolchain pass
+
+Command: mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/authorize-root-parallel-invocation.ps1",".codex/hooks/enforce-parallel-root-invocation.ps1",".codex/hooks/parallel-hook-common.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-1.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC format completed with ok=true for all six selected paths and made no subsequent restart necessary.
+
+Command: mcp__drm_copilot__run_poshqc_analyze({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/authorize-root-parallel-invocation.ps1",".codex/hooks/enforce-parallel-root-invocation.ps1",".codex/hooks/parallel-hook-common.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-1.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC analyze completed with ok=true for all six selected paths.
+
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-1.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 0
+
+Output Summary: Repository PoshQC discovered and ran 7 tests: 7 passed, 0 failed, 0 skipped, 0 inconclusive, and 0 not run in 0.596 seconds. It analyzed 6,110 commands across 55 configured files. Numeric batch attribution from `artifacts/pester/powershell-coverage.xml` was:
+
+- `.codex/hooks/authorize-root-parallel-invocation.ps1`: 33/135 instructions (24.4444%) and 27/117 lines (23.0769%).
+- `.codex/hooks/enforce-parallel-root-invocation.ps1`: 26/100 instructions (26.0000%) and 18/81 lines (22.2222%).
+- `.codex/hooks/parallel-hook-common.ps1`: 18/61 instructions (29.5082%) and 16/51 lines (31.3725%).
+
+The targeted test used the repository PoshQC module because the preceding MCP test process loaded its installed settings bundle and therefore could not attribute newly registered worktree paths. Format and analysis remained on the required MCP surface. `git diff --check` reported no whitespace errors for the exact batch and settings paths.
+
+Acceptance result: PASS. Every batch runtime has numeric source attribution, all focused behavior tests pass, no runtime behavior changed, and the final format, analyze, and targeted Pester sequence completed without a failure or file change.

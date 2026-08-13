@@ -1,0 +1,22 @@
+PowerShell Phase 6 changed-file line-count gate
+
+Timestamp: 2026-08-12T11:13:58.9051046Z
+
+Command:
+`$paths = @('scripts/powershell/PoshQC/settings/pester.runsettings.psd1','extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1') + (1..8 | ForEach-Object { "tests/scripts/codex-hooks/powershell-attribution-batch-$_.Tests.ps1" }); foreach ($path in $paths) { $count = @(Get-Content -LiteralPath $path).Count; '{0} | {1} | {2}' -f $count, ($count -le 500), $path }`
+
+Results:
+- 190 | PASS | `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
+- 190 | PASS | `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`
+- 68 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-1.Tests.ps1`
+- 71 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-2.Tests.ps1`
+- 75 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-3.Tests.ps1`
+- 50 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1`
+- 60 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-5.Tests.ps1`
+- 61 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1`
+- 65 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-7.Tests.ps1`
+- 71 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1`
+
+Reconciliation: 10 changed PowerShell production/configuration and test paths, 10 unique paths, and 10 at or below 500 physical lines. No Phase 6 runtime source file required a production edit because the existing helper and dot-source seams were sufficient.
+
+Acceptance result: PASS.

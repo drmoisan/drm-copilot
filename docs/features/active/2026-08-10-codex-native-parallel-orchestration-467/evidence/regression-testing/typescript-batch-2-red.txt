@@ -1,0 +1,24 @@
+TypeScript batch 2 expected-red gate
+
+Timestamp: 2026-08-12T11:27:52.4050456Z
+
+Pre-test checks:
+- Scoped Prettier check for the two batch owners: PASS.
+- Scoped ESLint for the two batch owners: PASS.
+- `npm --prefix extensions/drm-copilot run typecheck`: PASS.
+
+Coverage command:
+`npm --prefix extensions/drm-copilot run test:coverage -- --runInBand --findRelatedTests src/lib/validate/orchestrator-state-codex-model-routing.ts src/lib/validate/parallel-kickoff-artifact.ts --coverageDirectory=../../docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/typescript-batch-2-coverage-red --coverageReporters=text --coverageReporters=json-summary --collectCoverageFrom=src/lib/validate/orchestrator-state-codex-model-routing.ts --collectCoverageFrom=src/lib/validate/parallel-kickoff-artifact.ts --coverageThreshold='{"./src/lib/validate/orchestrator-state-codex-model-routing.ts":{"lines":95.66},"./src/lib/validate/parallel-kickoff-artifact.ts":{"lines":100}}'`
+
+EXIT_CODE: 1
+
+Expected-red result:
+- 73 related suites passed; 1,113 tests passed; 0 assertion failures.
+- `orchestrator-state-codex-model-routing.ts`: 94.16%; failed the reviewed 95.66% no-regression threshold. Remaining lines: 230-234, 239-243, 339-343, 353-356, 366-370, 374, 376-379.
+- `parallel-kickoff-artifact.ts`: 99.04%; failed the reviewed 100% threshold. Remaining lines: 387-390.
+- Aggregate for the two collected files: 881/914 lines (96.38%), 224/246 branches (91.05%), and 24/24 functions (100%).
+- Raw JSON-summary and LCOV outputs are retained in the adjacent `typescript-batch-2-coverage-red/` directory.
+
+Attribution: Both failures are per-file coverage-threshold failures whose remaining lines are contained in the reviewed baseline gap inventory. The newly added symbol-formatting and mismatched plan-home-branch boundary tests are correct and pass. No batch 2 production file was edited before this run.
+
+Acceptance result: PASS-AS-EXPECTED-RED.

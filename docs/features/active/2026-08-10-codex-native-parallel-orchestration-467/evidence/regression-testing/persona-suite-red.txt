@@ -1,0 +1,11 @@
+Timestamp: 2026-08-12T05-38
+Command 1: pwsh -NoProfile -Command "& { Import-Module Pester -MinimumVersion 5.0.0; Invoke-Pester -Path 'tests/scripts/codex-hooks/parallel-provenance.Tests.ps1' -FullNameFilter '*aligns the planner prompt tool and permission statements*','*aligns the orchestrator prompt tool and permission statements*' -CI -Output Detailed }"
+EXIT_CODE 1: 1
+Output Summary 1: Pester discovered 19 tests, selected the two new persona-contract tests, and reported 0 passed, 2 failed, and 17 not run. The planner assertion explicitly reported `orchestrator-workspace` versus `parallel-planner-workspace`; the orchestrator assertion explicitly reported `orchestrator-workspace` versus `parallel-orchestrator-workspace`.
+Command 2: poetry run pytest -o "addopts=" -q tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_parallel_persona_prompts_match_profiles_and_generated_bundles
+EXIT_CODE 2: 1
+Output Summary 2: Pytest selected the new parity contract and reported 1 failed in 0.07 seconds. Canonical/bundle bytes and `.claude/**` denial checks passed before the expected assertion that the planner prompt must declare `parallel-planner-workspace` failed against the current prompt.
+Expected Failures: 3 explicit assertions covering planner authority, orchestrator authority, and canonical/bundle prompt authority.
+Unexpected Failures: 0
+Production Prompt Edits: none
+

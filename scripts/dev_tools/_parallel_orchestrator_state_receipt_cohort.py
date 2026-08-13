@@ -36,10 +36,21 @@ REQUEUE_MUTATION_OPERATION = "requeue"
 
 
 def _mapping_entries(value: object) -> list[dict[str, object]]:
-    """Return object-shaped JSON collection entries without mutating them."""
+    """Return mapping-shaped collection entries without mutation.
+
+    Args:
+        value: Parsed collection candidate.
+    Returns:
+        Mapping-shaped entries in their persisted order.
+    Raises:
+        None.
+    Side Effects:
+        None; returned mappings are not changed.
+    """
 
     if not isinstance(value, list):
         return []
+    # Retain only mapping-shaped entries for deterministic downstream validation.
     return [
         cast("dict[str, object]", entry)
         for entry in cast("list[object]", value)
@@ -48,9 +59,20 @@ def _mapping_entries(value: object) -> list[dict[str, object]]:
 
 
 def _items_by_key(state: Mapping[str, object]) -> dict[int, dict[str, object]]:
-    """Index well-keyed checkpoint items by their integer primary key."""
+    """Index well-keyed checkpoint items by integer primary key.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+    Returns:
+        First persisted item for each valid positive issue key.
+    Raises:
+        None.
+    Side Effects:
+        None; checkpoint records are not mutated.
+    """
 
     records: dict[int, dict[str, object]] = {}
+    # Preserve the first valid record for each issue key to expose duplicates elsewhere.
     for record in _mapping_entries(state.get("items")):
         key = record.get("issue_num")
         if is_positive_integer(key):
@@ -61,12 +83,24 @@ def _items_by_key(state: Mapping[str, object]) -> dict[int, dict[str, object]]:
 def _cohort_assignments(
     state: Mapping[str, object], records: Mapping[int, dict[str, object]]
 ) -> dict[int, int]:
-    """Project current-generation persisted cohorts into item assignments."""
+    """Project current-generation cohorts into item assignments.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        records: Valid items keyed by issue number.
+    Returns:
+        Item-to-cohort assignments for the current recolor generation.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     generation = state.get("recolor_generation")
     if not is_non_negative_integer(generation):
         return {}
     assignments: dict[int, int] = {}
+    # Inspect only current-generation cohort records for authoritative assignments.
     for cohort in _mapping_entries(state.get("cohorts")):
         if cohort.get("generation") != generation:
             continue
@@ -74,6 +108,7 @@ def _cohort_assignments(
         item_keys = cohort.get("item_keys")
         if not is_non_negative_integer(index) or not isinstance(item_keys, list):
             continue
+        # Bind valid known issue keys without overwriting their first assignment.
         for value in cast("list[object]", item_keys):
             if is_positive_integer(value) and cast("int", value) in records:
                 assignments.setdefault(cast("int", value), cast("int", index))
@@ -81,9 +116,20 @@ def _cohort_assignments(
 
 
 def _conflict_edges(state: Mapping[str, object]) -> list[tuple[int, int]]:
-    """Return valid persisted conflict endpoints in document order."""
+    """Return valid persisted conflict endpoints in document order.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+    Returns:
+        Distinct positive endpoint pairs in persisted order.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     edges: list[tuple[int, int]] = []
+    # Retain only well-formed non-self conflict edges for barrier evaluation.
     for edge in _mapping_entries(state.get("conflict_edges")):
         first = edge.get("a")
         second = edge.get("b")
@@ -97,7 +143,17 @@ def _conflict_edges(state: Mapping[str, object]) -> list[tuple[int, int]]:
 
 
 def _has_started(record: Mapping[str, object]) -> bool:
-    """Report whether durable item fields show that execution has begun."""
+    """Report whether durable item fields show execution has begun.
+
+    Args:
+        record: Persisted item record.
+    Returns:
+        ``True`` when worktree or merge state proves a start.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     timestamp = record.get("worktree_created_at")
     if isinstance(timestamp, str) and timestamp.strip():
@@ -107,14 +163,35 @@ def _has_started(record: Mapping[str, object]) -> bool:
 
 
 def _has_path(record: Mapping[str, object], field: str) -> bool:
-    """Report whether a receipt field binds a non-empty repository path."""
+    """Report whether a receipt field binds a non-empty path.
+
+    Args:
+        record: Persisted item record.
+        field: Receipt-path field to inspect.
+    Returns:
+        ``True`` when the field contains a non-empty string.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     value = record.get(field)
     return isinstance(value, str) and bool(value.strip())
 
 
 def _receipt_mode(records: Mapping[int, Mapping[str, object]]) -> bool:
-    """Preserve legacy checkpoints until an additive receipt field is present."""
+    """Determine whether additive receipt-bound validation applies.
+
+    Args:
+        records: Persisted item records keyed by issue number.
+    Returns:
+        ``True`` when any record contains a receipt-binding field.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     fields = (
         "launch_receipt_path",
@@ -122,6 +199,8 @@ def _receipt_mode(records: Mapping[int, Mapping[str, object]]) -> bool:
         "merge_receipt_path",
         "worktree_removal_receipt_path",
     )
+    # Inspect every persisted item because one receipt field activates strict mode.
+    # Check the complete receipt-field set for each item before advancing.
     return any(any(field in record for field in fields) for record in records.values())
 
 
@@ -130,13 +209,26 @@ def _receipt_barrier_errors(
     records: Mapping[int, dict[str, object]],
     existing_errors: list[str],
 ) -> list[str]:
-    """Validate external receipt bindings for ordered conflicting cohorts."""
+    """Validate receipt bindings across ordered conflicting cohorts.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        records: Valid items keyed by issue number.
+        existing_errors: Prior barrier errors used to avoid duplicate diagnostics.
+    Returns:
+        Ordered receipt and cohort-barrier validation errors.
+    Raises:
+        None.
+    Side Effects:
+        None; input collections remain unchanged.
+    """
 
     if not _receipt_mode(records):
         return []
     assignments = _cohort_assignments(state, records)
     errors: list[str] = []
     later_launch_reported: set[int] = set()
+    # Evaluate every conflicting pair against durable predecessor completion receipts.
     for first, second in _conflict_edges(state):
         first_index = assignments.get(first)
         second_index = assignments.get(second)
@@ -185,7 +277,18 @@ def _receipt_barrier_errors(
 
 
 def _unresolved_drift_errors(state: Mapping[str, object], context: str) -> list[str]:
-    """Render the shared unresolved-drift decision as one quiescence error."""
+    """Render unresolved drift as one stable quiescence error.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        context: Validator context prefixed to diagnostics.
+    Returns:
+        One unresolved-drift error or an empty list.
+    Raises:
+        None; malformed drift input is treated as non-attributable here.
+    Side Effects:
+        None.
+    """
 
     events = _mapping_entries(state.get("drift_events"))
     items = _mapping_entries(state.get("items"))
@@ -202,14 +305,27 @@ def _unresolved_drift_errors(state: Mapping[str, object], context: str) -> list[
 
 
 def _halt_requeue_errors(state: Mapping[str, object], context: str) -> list[str]:
-    """Validate persisted halt presence and ascending requeue order."""
+    """Validate persisted halt presence and ascending requeue order.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        context: Validator context prefixed to diagnostics.
+    Returns:
+        Ordered halt and requeue validation errors.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     mutations = _mapping_entries(state.get("mutations"))
     errors: list[str] = []
+    # Validate each persisted halt event against mutations recorded after it.
     for position, event in enumerate(_mapping_entries(state.get("drift_events"))):
         if event.get("action") != DRIFT_ACTION_HALTED_LATER_STARTED_ITEM:
             continue
         event_at = event.get("at")
+        # Select requeue mutations attributable to the current halt event.
         requeues = [
             mutation
             for mutation in mutations
@@ -218,6 +334,7 @@ def _halt_requeue_errors(state: Mapping[str, object], context: str) -> list[str]
             and isinstance(event_at, str)
             and cast("str", mutation.get("at")) >= event_at
         ]
+        # Project valid item keys so persisted requeue order can be verified.
         keys = [
             cast("int", key)
             for mutation in requeues
@@ -238,13 +355,27 @@ def _halt_requeue_errors(state: Mapping[str, object], context: str) -> list[str]
 
 
 def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
-    """Validate pinned work and delegate unstarted recoloring to its authority."""
+    """Validate pinned work and authoritative unstarted recoloring.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        context: Validator context prefixed to diagnostics.
+    Returns:
+        Ordered pinning and deterministic recolor errors.
+    Raises:
+        UnknownItemError: Propagated when persisted pinning overlaps unstarted work.
+        ParallelCohortInputError: Propagated for invalid recolor inputs.
+    Side Effects:
+        None.
+    """
 
     events = _mapping_entries(state.get("drift_events"))
     mutations = _mapping_entries(state.get("mutations"))
+    # Require both a durable halt and requeue before validating recolor output.
     if not any(
         event.get("action") == DRIFT_ACTION_HALTED_LATER_STARTED_ITEM
         for event in events
+        # Pair the halt with a persisted requeue before treating recolor as active.
     ) or not any(
         mutation.get("op") == REQUEUE_MUTATION_OPERATION for mutation in mutations
     ):
@@ -252,12 +383,14 @@ def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
 
     records = _items_by_key(state)
     assignments = _cohort_assignments(state, records)
+    # Pin all running items so deterministic recoloring cannot move active work.
     pinned = frozenset(
         key
         for key, record in records.items()
         if record.get("state") == PINNED_ITEM_STATE
     )
     errors: list[str] = []
+    # Report any pinned key that improperly appears in persisted recolor assignments.
     moved_pinned = sorted(key for key in pinned if key in assignments)
     if moved_pinned:
         errors.append(
@@ -272,6 +405,7 @@ def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
         or not is_non_negative_integer(current_cohort)
     ):
         return errors
+    # Recolor only items whose durable states still permit scheduling changes.
     unstarted = sorted(
         key
         for key, record in records.items()
@@ -284,6 +418,7 @@ def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
         cast("int", generation) - 1,
         current_cohort=cast("int", current_cohort),
     )
+    # Compare persisted assignments with the authoritative deterministic result.
     actual = {key: assignments[key] for key in unstarted if key in assignments}
     if expected.cohort_assignments != actual:
         errors.append(
@@ -296,7 +431,19 @@ def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
 def validate_receipt_bound_cohort_admission(
     state: Mapping[str, object], context: str
 ) -> list[str]:
-    """Return ordered receipt, drift, halt, and recolor validation errors."""
+    """Validate receipt-bound cohort admission and completion state.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+        context: Validator context prefixed to diagnostics.
+    Returns:
+        Ordered receipt, drift, halt, and recolor errors.
+    Raises:
+        UnknownItemError: Propagated from authoritative recoloring validation.
+        ParallelCohortInputError: Propagated for invalid recolor inputs.
+    Side Effects:
+        None; checkpoint state is inspected without mutation.
+    """
 
     state_map = cast("dict[str, object]", state)
     barrier_errors = validate_cohort_barrier_ordering(state_map)

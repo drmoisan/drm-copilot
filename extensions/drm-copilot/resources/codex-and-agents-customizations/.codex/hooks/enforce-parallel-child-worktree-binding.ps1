@@ -113,18 +113,40 @@ function Invoke-CodexParallelChildWorktreeBinding {
     }
 }
 
+function Invoke-CodexParallelChildBindingHookEntrypoint {
+    <#
+    .SYNOPSIS
+        Runs native hook transport through injectable console boundaries.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRoot,
+        [Parameter()][AllowEmptyString()][string] $LaunchId = '',
+        [Parameter()][scriptblock] $PayloadReader = { [Console]::In.ReadToEnd() },
+        [Parameter()][scriptblock] $ResultWriter = {
+            param($result)
+            Write-CodexParallelHookResult -Result $result
+        }
+    )
+
+    try {
+        $result = Invoke-CodexParallelChildWorktreeBinding `
+            -PayloadRaw (& $PayloadReader) `
+            -RepositoryRoot $RepositoryRoot `
+            -LaunchId $LaunchId
+        return & $ResultWriter $result
+    } catch {
+        [Console]::Error.WriteLine([string]$_)
+        return 2
+    }
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $result = Invoke-CodexParallelChildWorktreeBinding `
-        -PayloadRaw ([Console]::In.ReadToEnd()) `
+$repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+exit (Invoke-CodexParallelChildBindingHookEntrypoint `
         -RepositoryRoot $repositoryRoot `
-        -LaunchId ([string]$env:CODEX_PARALLEL_CHILD_LAUNCH_ID)
-    exit (Write-CodexParallelHookResult -Result $result)
-} catch {
-    [Console]::Error.WriteLine([string]$_)
-    exit 2
-}
+        -LaunchId ([string]$env:CODEX_PARALLEL_CHILD_LAUNCH_ID))

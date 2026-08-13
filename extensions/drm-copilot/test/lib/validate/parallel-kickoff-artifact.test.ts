@@ -384,4 +384,31 @@ describe("validateParallelKickoffText committed readiness", () => {
       "Parallel kickoff readiness requires heading and invocation slugs to match.",
     );
   });
+
+  it("rejects a plan-home branch that differs from the kickoff slug", () => {
+    const text = kickoffWithIntegrity().replace(
+      "parallel/sample-run-plan already contains",
+      "parallel/other-run-plan already contains",
+    );
+
+    expect(
+      validateParallelKickoffText(text, { requireReadyForExecution: true }),
+    ).toContain(
+      "Parallel kickoff readiness plan-home branch must be 'parallel/sample-run-plan'.",
+    );
+  });
+
+  it("rejects a manifest path that differs from the kickoff slug", () => {
+    const text = kickoffWithIntegrity().replace(
+      "docs/features/parallel/sample-run/parallel.md",
+      "docs/features/parallel/other-run/parallel.md",
+    );
+
+    expect(
+      validateParallelKickoffText(text, { requireReadyForExecution: true }),
+    ).toContain(
+      "Parallel kickoff readiness manifest must be " +
+        "'docs/features/parallel/sample-run/parallel.md'.",
+    );
+  });
 });

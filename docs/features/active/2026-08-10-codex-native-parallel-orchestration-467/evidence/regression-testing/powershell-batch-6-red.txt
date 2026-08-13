@@ -1,0 +1,11 @@
+PowerShell batch 6 expected-red gate
+
+Timestamp: 2026-08-12T11:01:10.122Z
+
+Command: mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":["tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1"]})
+
+EXIT_CODE: 3
+
+Output Summary: Expected red. Pester ran 6 tests with exactly 3 failures, 0 errors, and 0 disabled tests in 0.592 seconds. Failures were only the missing-registration assertions for `.codex/scripts/codex-child-launch-persistence.ps1`, `.codex/scripts/codex-child-launch-runtime.ps1`, and `.codex/scripts/epic-child-launch-contract.ps1`; all three focused persistence, capacity-boundary, and feature-identity tests passed. P0-T9 recorded no attribution for these runtimes, and no batch 6 production or settings edit preceded the command.
+
+Acceptance result: PASS-AS-EXPECTED-RED.

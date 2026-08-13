@@ -84,11 +84,22 @@ REQUIRED_TRUTH_FIELDS = frozenset(
 
 
 def _mapping_items(state: dict[str, object]) -> list[dict[str, object]]:
-    """Return object-shaped checkpoint items in persisted order."""
+    """Return object-shaped checkpoint items in persisted order.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+    Returns:
+        Mapping-shaped items in their persisted order.
+    Raises:
+        None.
+    Side Effects:
+        None; returned entries are not mutated.
+    """
 
     value = state.get("items")
     if not isinstance(value, list):
         return []
+    # Retain only mapping-shaped items so later validators receive stable records.
     return [
         cast("dict[str, object]", item)
         for item in cast("list[object]", value)
@@ -97,20 +108,51 @@ def _mapping_items(state: dict[str, object]) -> list[dict[str, object]]:
 
 
 def _positive_integer(value: object) -> bool:
-    """Return whether a value is a non-Boolean positive integer."""
+    """Identify a non-Boolean positive integer.
+
+    Args:
+        value: Candidate parsed value.
+    Returns:
+        ``True`` only for integers greater than zero, excluding Booleans.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
 def _integer(value: object) -> bool:
-    """Return whether a value is a non-Boolean integer."""
+    """Identify a non-Boolean integer.
+
+    Args:
+        value: Candidate parsed value.
+    Returns:
+        ``True`` only for integer values that are not Booleans.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     return isinstance(value, int) and not isinstance(value, bool)
 
 
 def _first_incomplete(items: Iterable[dict[str, object]]) -> dict[str, object] | None:
-    """Select the first incomplete item by cohort, batch, and item key."""
+    """Select the first incomplete item in deterministic scheduling order.
 
+    Args:
+        items: Persisted item records to inspect.
+    Returns:
+        The first incomplete item by cohort, batch, and issue, or ``None``.
+    Raises:
+        None.
+    Side Effects:
+        None; the input records are not mutated.
+    """
+
+    # Exclude terminal work before applying deterministic scheduling order.
     candidates = [
         item for item in items if item.get("state") not in TERMINAL_ITEM_STATES
     ]
@@ -118,6 +160,18 @@ def _first_incomplete(items: Iterable[dict[str, object]]) -> dict[str, object] |
         return None
 
     def ordering(item: dict[str, object]) -> tuple[int, int, int]:
+        """Build the deterministic scheduling key for one checkpoint item.
+
+        Args:
+            item: Persisted item record.
+        Returns:
+            Cohort, batch, and issue key used for stable ordering.
+        Raises:
+            None.
+        Side Effects:
+            None.
+        """
+
         return (
             cast("int", item.get("cohort", 0)),
             cast("int", item.get("batch", 0)),
@@ -128,14 +182,27 @@ def _first_incomplete(items: Iterable[dict[str, object]]) -> dict[str, object] |
 
 
 def _contains_forbidden_key(value: object) -> bool:
-    """Detect integration and fan-in state recursively."""
+    """Detect forbidden integration and fan-in state recursively.
+
+    Args:
+        value: Parsed checkpoint value to inspect.
+    Returns:
+        ``True`` when any nested mapping contains a forbidden key.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     if isinstance(value, dict):
         record = cast("dict[object, object]", value)
+        # Reject a forbidden key at the current mapping boundary before recursion.
         if any(isinstance(key, str) and key in FORBIDDEN_KEYS for key in record):
             return True
+        # Descend through mapping values to reject forbidden nested state.
         return any(_contains_forbidden_key(entry) for entry in record.values())
     if isinstance(value, list):
+        # Descend through list entries because persisted state may nest collections.
         return any(
             _contains_forbidden_key(entry) for entry in cast("list[object]", value)
         )
@@ -143,30 +210,55 @@ def _contains_forbidden_key(value: object) -> bool:
 
 
 def _has_duplicate_identity(items: list[dict[str, object]]) -> bool:
-    """Reject duplicate launch, worktree, branch, or PR identity."""
+    """Detect duplicate launch, worktree, branch, or PR identity.
 
+    Args:
+        items: Persisted item records participating in identity validation.
+    Returns:
+        ``True`` when an active identity value is reused.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
+
+    # Validate each durable identity namespace independently to preserve diagnostics.
     for field in IDENTITY_FIELDS:
+        # Ignore withdrawn and absent identities when detecting active collisions.
         values = [
             item.get(field)
             for item in items
             if item.get("state") != "withdrawn" and item.get(field) not in (None, "")
         ]
+        # Normalize comparable identity values before testing uniqueness.
         if len(values) != len({str(value) for value in values}):
             return True
     return False
 
 
 def _latest_mutation_sequence(state: dict[str, object]) -> int:
-    """Return the highest persisted mutation sequence, or zero."""
+    """Return the highest valid persisted mutation sequence.
+
+    Args:
+        state: Parsed orchestrator checkpoint.
+    Returns:
+        Highest integer mutation sequence, or zero when none exists.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
 
     value = state.get("mutations")
     if not isinstance(value, list):
         return 0
+    # Project sequence values only from mapping-shaped mutation entries.
     sequences = [
         cast("dict[str, object]", entry).get("sequence")
         for entry in cast("list[object]", value)
         if isinstance(entry, dict)
     ]
+    # Discard malformed sequence values before computing the durable maximum.
     integers = [cast("int", sequence) for sequence in sequences if _integer(sequence)]
     return max(integers, default=0)
 
@@ -174,14 +266,37 @@ def _latest_mutation_sequence(state: dict[str, object]) -> int:
 def _selected_item(
     items: list[dict[str, object]], selected_issue: object
 ) -> dict[str, object] | None:
-    """Return the uniquely selected checkpoint item."""
+    """Return the uniquely selected checkpoint item.
 
+    Args:
+        items: Persisted item records.
+        selected_issue: Issue identity from the live-truth receipt.
+    Returns:
+        The unique matching item, or ``None`` for zero or multiple matches.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
+
+    # Preserve ambiguity as a validation failure instead of choosing arbitrarily.
     matches = [item for item in items if item.get("issue_num") == selected_issue]
     return matches[0] if len(matches) == 1 else None
 
 
 def _append_once(errors: list[str], reason: str) -> None:
-    """Append one stable reason code at most once."""
+    """Append one stable reason code at most once.
+
+    Args:
+        errors: Ordered error collection to update.
+        reason: Stable reason code to append.
+    Returns:
+        None.
+    Raises:
+        None.
+    Side Effects:
+        Mutates ``errors`` when ``reason`` is not already present.
+    """
 
     if reason not in errors:
         errors.append(reason)
@@ -190,7 +305,18 @@ def _append_once(errors: list[str], reason: str) -> None:
 def validate_parallel_resume_truth(
     state: dict[str, object], _context: str
 ) -> list[str]:
-    """Return ordered live-truth errors for an explicitly resumable checkpoint."""
+    """Validate live truth before resuming a parallel child.
+
+    Args:
+        state: Parsed orchestrator checkpoint and live-truth receipt.
+        _context: Reserved validation context retained for API compatibility.
+    Returns:
+        Ordered stable reason codes for every detected resume violation.
+    Raises:
+        None.
+    Side Effects:
+        None; checkpoint state is inspected without mutation.
+    """
 
     required = state.get("resume_required") is True
     truth_value = state.get("resume_truth")
@@ -241,6 +367,7 @@ def validate_parallel_resume_truth(
         or truth.get("pr_state") != "OPEN"
     ):
         errors.append(REASON_GITHUB_MISMATCH)
+    # Require the launch receipt and selected checkpoint item to remain identical.
     if any(
         truth.get(field) != selected.get(field)
         for field in ("launch_id", "spec_sha256", "checkpoint_sha256")
@@ -256,6 +383,7 @@ def validate_parallel_resume_truth(
         or truth.get("drift_resolution_generation") != generation
     ):
         errors.append(REASON_DRIFT_UNRESOLVED)
+    # Require all sealed routing fields to match the selected child identity.
     if any(truth.get(field) != selected.get(field) for field in ROUTING_FIELDS):
         errors.append(REASON_ROUTING_MISMATCH)
     if (
@@ -277,6 +405,7 @@ def validate_parallel_resume_truth(
         errors.append(REASON_RELAUNCH_NOT_AUTHORIZED)
 
     ordered: list[str] = []
+    # Preserve first occurrence order while removing duplicate reason codes.
     for error in errors:
         _append_once(ordered, error)
     return ordered

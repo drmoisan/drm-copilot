@@ -1,0 +1,101 @@
+Task: [P10-T3]
+Pre-discovery failure receipt:
+Timestamp: 2026-08-12T09:44:00-04:00
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('scripts','tests/powershell','tests/scripts') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+EXIT_CODE: 1
+Output Summary: No tests were discovered or executed. The explicit configured path `tests/powershell` does not exist, and Invoke-PoshQCTest fails closed for an explicit missing scan folder.
+Canonical invocation audit: `scripts` exists and contains 0 `*.Tests.ps1` files; `tests/powershell` is absent and contains 0; `tests/scripts` exists and contains 126. The authorized invocation-only correction retains the two existing configured paths in deterministic order and does not edit settings or configuration.
+
+Canonical-invocation Phase 10 restart result:
+Timestamp: 2026-08-12T09:57:08.5743431-04:00
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('scripts','tests/scripts') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+EXIT_CODE: 1
+Output Summary: Pester discovered 2,430 tests in 126 files. Results were 2,420 passed, 1 failed, 9 skipped, 0 inconclusive, and 0 not run. Repository line coverage was 86.32% (9,394 analyzed commands in 76 files). The run stopped acceptance at the first failing test; per-file threshold reconciliation was not accepted.
+First failure: `Every registered Codex PreToolUse handler accepts every tool name its matcher admits.leaves no Codex batch-budget state behind` in `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1:195-196`.
+Failure message: `Expected $false, because benign payloads must not create batch-budget state, but got $true.`
+Failure attribution: `.codex/state` existed as an empty directory after correction-batch receipt cleanup; it contained 0 batch-budget files and 0 total entries. The test requires the directory itself to be absent.
+JUnit SHA-256: 1423DA21A627A0195AD59CFBDBCA4D91586E968517BD1AC4BFD05C7E8F5BBEA9
+Coverage SHA-256: 99398B48D7A464A2DB9790609689BCCCD71C0CFF570A39A480C51D9AA34DD10A
+Acceptance result: FAIL. [P10-T3] remains unchecked.
+
+Authorized empty-runtime-directory cleanup:
+Timestamp: 2026-08-12T09:58:29.2918596-04:00
+Command: Resolve `.codex/state` beneath the current workspace, require it to be a directory with zero recursive entries, remove that exact empty directory using native PowerShell `Remove-Item -LiteralPath`, and verify post-removal absence.
+EXIT_CODE: 0
+Resolved workspace: C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25
+Resolved target: C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\.codex\state
+Inside workspace: true
+Pre-removal recursive entry count: 0
+Removal result: removed only the empty runtime directory; no file or other directory was removed.
+Post-removal target exists: false
+
+Corrected authoritative Phase 10 completion:
+Timestamp: 2026-08-12T10:12:34.3831142-04:00
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('scripts','tests/scripts') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+EXIT_CODE: 0
+Output Summary: Pester discovered 2,430 tests across the complete 126-file surface. Results were 2,421 passed, 0 failed, 9 skipped/disabled, 0 errors, 0 inconclusive, and 0 not run. The two existing configured scan folders preserve the full test surface; the configured-but-absent `tests/powershell` path contains zero files and remains documented in the pre-discovery failure receipt above.
+
+Repository coverage:
+- Line: 6,127/7,035 = 87.093106% (PASS; threshold 85%).
+- Instruction: 8,109/9,394 = 86.321056%.
+- Method: 501/554 = 90.433213%.
+- Class: 74/76 = 97.368421%.
+- Branch: unsupported by the configured Pester/JaCoCo-compatible output. The XML contains zero `BRANCH` counters, so branch coverage is explicitly not treated as PASS.
+
+Changed-line reconciliation:
+- Merge base: `fe0413d4aca1e76b2d02d05701fba79a887d5405`.
+- All 25 authoritative runtime paths are now source-attributed. Their added/current changed executable lines total 1,943, of which 1,707 are covered and 236 are missed: 87.853834% complete changed-line coverage.
+- The P0 receipt's 25/27 = 92.592593% changed-line value covered only `.codex/hooks/enforce-completion-consistency.ps1` and explicitly failed because the other 24 paths were absent. It is therefore not a like-for-like aggregate denominator. For the one comparable P0-attributed owner, current changed-line coverage is 27/29 = 93.103448%, an increase of 0.510855 percentage points.
+- The other modified owners have no valid P0 per-path value. Their first attributable Phase 6 green values are used below as the numeric non-regression checkpoints. Every modified owner improved or held its checkpoint, and all 17 added owners meet the 90% per-file threshold. No comparable changed-line or per-owner line-coverage value regressed.
+
+| Authoritative runtime path | Base status | File lines | Current line coverage | Current changed-line coverage |
+|---|:---:|---:|---:|---:|
+| `.codex/hooks/authorize-root-parallel-invocation.ps1` | A | 362 | 116/126 = 92.063492% | 116/126 = 92.063492% |
+| `.codex/hooks/codex-authority-store.ps1` | M | 188 | 46/58 = 79.310345% | 2/2 = 100.000000% |
+| `.codex/hooks/enforce-codex-model-routing.ps1` | M | 224 | 46/79 = 58.227848% | 3/7 = 42.857143% |
+| `.codex/hooks/enforce-completion-consistency.ps1` | M | 495 | 157/159 = 98.742138% | 27/29 = 93.103448% |
+| `.codex/hooks/enforce-parallel-abandon-gate.ps1` | A | 134 | 27/29 = 93.103448% | 27/29 = 93.103448% |
+| `.codex/hooks/enforce-parallel-child-worktree-binding.ps1` | A | 152 | 27/30 = 90.000000% | 27/30 = 90.000000% |
+| `.codex/hooks/enforce-parallel-cohort-barrier.ps1` | A | 143 | 26/28 = 92.857143% | 26/28 = 92.857143% |
+| `.codex/hooks/enforce-parallel-drift-gate.ps1` | A | 143 | 26/28 = 92.857143% | 26/28 = 92.857143% |
+| `.codex/hooks/enforce-parallel-root-invocation.ps1` | A | 266 | 76/83 = 91.566265% | 76/83 = 91.566265% |
+| `.codex/hooks/enforce-parallel-worktree-removal-gate.ps1` | A | 135 | 27/30 = 90.000000% | 27/30 = 90.000000% |
+| `.codex/hooks/parallel-hook-common.ps1` | A | 220 | 50/51 = 98.039216% | 50/51 = 98.039216% |
+| `.codex/hooks/record-subagent-routing-attestation.ps1` | M | 497 | 111/229 = 48.471616% | 19/61 = 31.147541% |
+| `.codex/hooks/validate-codex-subagent-routing.ps1` | M | 211 | 28/86 = 32.558140% | 4/26 = 15.384615% |
+| `.codex/hooks/validate-parallel-agent-output.ps1` | A | 254 | 72/76 = 94.736842% | 72/76 = 94.736842% |
+| `.codex/scripts/codex-child-launch-contract-core.ps1` | A | 351 | 142/147 = 96.598639% | 142/147 = 96.598639% |
+| `.codex/scripts/codex-child-launch-persistence.ps1` | A | 256 | 91/98 = 92.857143% | 91/98 = 92.857143% |
+| `.codex/scripts/codex-child-launch-resume.ps1` | A | 461 | 133/135 = 98.518519% | 133/135 = 98.518519% |
+| `.codex/scripts/codex-child-launch-runtime.ps1` | A | 248 | 105/111 = 94.594595% | 105/111 = 94.594595% |
+| `.codex/scripts/epic-child-launch-contract.ps1` | M | 312 | 134/160 = 83.750000% | 8/12 = 66.666667% |
+| `.codex/scripts/launch-epic-child-wave.ps1` | M | 449 | 45/225 = 20.000000% | 6/29 = 20.689655% |
+| `.codex/scripts/launch-parallel-child-batch.ps1` | A | 493 | 217/241 = 90.041494% | 217/241 = 90.041494% |
+| `.codex/scripts/parallel-child-launch-contract.ps1` | A | 233 | 105/108 = 97.222222% | 105/108 = 97.222222% |
+| `.codex/scripts/parallel-child-post-session.ps1` | A | 375 | 159/175 = 90.857143% | 159/175 = 90.857143% |
+| `.codex/scripts/resume-epic-child.ps1` | M | 265 | 40/178 = 22.471910% | 1/17 = 5.882353% |
+| `.codex/scripts/resume-parallel-child.ps1` | A | 475 | 238/264 = 90.151515% | 238/264 = 90.151515% |
+
+Attribution result: PASS. Exactly 25/25 authoritative runtime files have numeric source-attributed line coverage. Aggregate full-file coverage across the 25 owners is 2,244/2,934 = 76.482618%; this aggregate includes modified legacy owners and is not the new-file threshold denominator. Exactly 17/17 added owners are at least 90%, with a minimum of 90.000000%.
+
+| Modified runtime owner | Prior attributable checkpoint | Current line coverage | Delta (percentage points) | Result |
+|---|---:|---:|---:|---|
+| `.codex/hooks/codex-authority-store.ps1` | 4/58 = 6.8966% | 46/58 = 79.310345% | +72.413745 | PASS |
+| `.codex/hooks/enforce-codex-model-routing.ps1` | 9/79 = 11.3924% | 46/79 = 58.227848% | +46.835448 | PASS |
+| `.codex/hooks/enforce-completion-consistency.ps1` | 157/159 = 98.742138% | 157/159 = 98.742138% | 0.000000 | PASS |
+| `.codex/hooks/record-subagent-routing-attestation.ps1` | 9/229 = 3.9301% | 111/229 = 48.471616% | +44.541516 | PASS |
+| `.codex/hooks/validate-codex-subagent-routing.ps1` | 17/86 = 19.7674% | 28/86 = 32.558140% | +12.790740 | PASS |
+| `.codex/scripts/epic-child-launch-contract.ps1` | 8/160 = 5.0000% | 134/160 = 83.750000% | +78.750000 | PASS |
+| `.codex/scripts/launch-epic-child-wave.ps1` | 37/225 = 16.4444% | 45/225 = 20.000000% | +3.555600 | PASS |
+| `.codex/scripts/resume-epic-child.ps1` | 6/178 = 3.3708% | 40/178 = 22.471910% | +19.101110 | PASS |
+
+File-size and state cleanup:
+- The 95 changed/new PowerShell `.ps1`, `.psm1`, and `.psd1` files contain zero files above 500 lines. The maximum is 497 lines.
+- All 25 authoritative runtime owners are at or below 500 lines; the maximum is 497 lines.
+- `.codex/state` remained absent after the successful authoritative run. No batch-budget state or temporary filesystem artifact remains.
+
+Artifact integrity:
+- `artifacts/pester/pester-junit.xml` SHA-256: `5DEF529B1BB6ABC63B7BD5BF398C453D7AD2AFA94F341601266C59D317B121A3`.
+- `artifacts/pester/powershell-coverage.xml` SHA-256: `D19E50AC6931E45877AD5FEFE992EB5FD9DC00BA657A0D90DAECDE79431CD910`.
+
+Acceptance result: PASS. [P10-T3] is accepted from the single corrected authoritative run; no completed Phase 10 gate was rerun during reconciliation.

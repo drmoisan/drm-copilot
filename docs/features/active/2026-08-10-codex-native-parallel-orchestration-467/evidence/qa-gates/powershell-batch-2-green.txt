@@ -1,0 +1,29 @@
+PowerShell batch 2 green gate
+
+Timestamp: 2026-08-12T10:49:19.522Z
+
+Final uninterrupted toolchain pass
+
+Command: mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/enforce-parallel-abandon-gate.ps1",".codex/hooks/enforce-parallel-child-worktree-binding.ps1",".codex/hooks/enforce-parallel-worktree-removal-gate.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-2.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC format completed with ok=true for all six selected paths.
+
+Command: mcp__drm_copilot__run_poshqc_analyze({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-10T19-25","scan_folders":[".codex/hooks/enforce-parallel-abandon-gate.ps1",".codex/hooks/enforce-parallel-child-worktree-binding.ps1",".codex/hooks/enforce-parallel-worktree-removal-gate.ps1","tests/scripts/codex-hooks/powershell-attribution-batch-2.Tests.ps1","scripts/powershell/PoshQC/settings/pester.runsettings.psd1","extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"]})
+
+EXIT_CODE: 0
+
+Output Summary: PoshQC analyze completed with ok=true for all six selected paths.
+
+Command: pwsh -NoProfile -Command "Import-Module './scripts/powershell/PoshQC/PoshQC.psd1' -Force; Invoke-PoshQCTest -Root (Get-Location).Path -ScanFolders @('tests/scripts/codex-hooks/powershell-attribution-batch-2.Tests.ps1') -SettingsPath './scripts/powershell/PoshQC/settings/pester.runsettings.psd1' -DisableKoverageCopy"
+
+EXIT_CODE: 0
+
+Output Summary: Repository PoshQC ran 6 tests: 6 passed, 0 failed, 0 skipped, 0 inconclusive, and 0 not run in 0.538 seconds. Numeric root-package attribution was:
+
+- `.codex/hooks/enforce-parallel-abandon-gate.ps1`: 8/32 instructions (25.0000%) and 6/26 lines (23.0769%).
+- `.codex/hooks/enforce-parallel-child-worktree-binding.ps1`: 5/32 instructions (15.6250%) and 4/27 lines (14.8148%).
+- `.codex/hooks/enforce-parallel-worktree-removal-gate.ps1`: 8/32 instructions (25.0000%) and 7/27 lines (25.9259%).
+
+Acceptance result: PASS. Each batch runtime has source-attributable coverage, all focused tests pass, no runtime behavior changed, and the ordered gate completed without a failure or file change.

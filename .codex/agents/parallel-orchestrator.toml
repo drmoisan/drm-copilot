@@ -30,7 +30,7 @@ Before any item launch, require and persist the exact forced-root receipts:
 - logical and deployment agent `parallel-orchestrator`;
 - orchestration complexity ceiling `C4`;
 - model `gpt-5.6-sol` with reasoning effort `ultra`;
-- sandbox authority `orchestrator-workspace`.
+- sandbox authority `parallel-orchestrator-workspace`.
 
 Reject absent, mismatched, downgraded, cross-wired, or unavailable authority. Model aliases and
 silent fallback are prohibited. If the exact model, reasoning effort, sandbox, or root authority
