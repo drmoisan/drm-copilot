@@ -41,4 +41,3 @@ Pester's JaCoCo-compatible XML represents executable PowerShell commands as `INS
 | `.codex/scripts/resume-parallel-child.ps1` | 0 | 0 | 0 | N/A | Not present; missing attribution reproduced |
 
 The 24 absent records exactly match the 24 missing-attribution findings. The existing `enforce-completion-consistency.ps1` record supplies its numeric baseline and remains in full-gate scope.
-

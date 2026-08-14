@@ -13,4 +13,3 @@ Output Summary: The repository Bash formatter completed successfully under the i
 ## Environment reconciliation
 
 The initial Windows `bash scripts/bash/shell-qc.sh format` invocation selected the default `docker-desktop` distribution and returned exit code 1 because `/bin/bash` was absent. The first explicit Ubuntu invocation returned exit code 1 because `shfmt` was absent. The required `shfmt`, `shellcheck`, `bats`, and `kcov` packages were then installed in Ubuntu, and the Bash loop restarted from the successful format command above.
-

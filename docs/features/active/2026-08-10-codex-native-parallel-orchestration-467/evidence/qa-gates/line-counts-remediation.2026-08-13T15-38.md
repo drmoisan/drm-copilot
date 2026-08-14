@@ -1,0 +1,189 @@
+# Remediation Changed-Code Line-Count Gate
+
+Timestamp: `2026-08-13T15-38`
+
+Merge base: `fe0413d4aca1e76b2d02d05701fba79a887d5405`
+
+Command: enumerate `git diff --name-only --diff-filter=ACMRTUXB fe0413d4aca1e76b2d02d05701fba79a887d5405 --`; retain existing production, test, and reusable script files with `.py`, `.ps1`, `.psm1`, `.psd1`, `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.sh`, `.bash`, or `.cs` suffixes; exclude paths rooted under `docs/` or `artifacts/` and paths within `node_modules`, `coverage`, `dist`, `build`, `out`, or `__pycache__`; sort uniquely and count physical lines with `Get-Content`.
+
+- Enumeration exit code: `0`.
+- Applicable existing paths: 167.
+- Applicable deleted paths: 0.
+- Paths at or below 500 lines: 167.
+- Paths above 500 lines: 0.
+- Maximum line count: 500.
+- Scope manifest SHA-256 (`path|lines`, sorted, CRLF-delimited): `49753A407AE1CB9AE616F8A1E52ED29CFAD9A5664A65BAE642EF146A43B8B322`.
+
+| Lines | Result | Path |
+|---:|:---:|---|
+| 362 | PASS | `.codex/hooks/authorize-root-parallel-invocation.ps1` |
+| 188 | PASS | `.codex/hooks/codex-authority-store.ps1` |
+| 224 | PASS | `.codex/hooks/enforce-codex-model-routing.ps1` |
+| 495 | PASS | `.codex/hooks/enforce-completion-consistency.ps1` |
+| 134 | PASS | `.codex/hooks/enforce-parallel-abandon-gate.ps1` |
+| 152 | PASS | `.codex/hooks/enforce-parallel-child-worktree-binding.ps1` |
+| 143 | PASS | `.codex/hooks/enforce-parallel-cohort-barrier.ps1` |
+| 143 | PASS | `.codex/hooks/enforce-parallel-drift-gate.ps1` |
+| 266 | PASS | `.codex/hooks/enforce-parallel-root-invocation.ps1` |
+| 135 | PASS | `.codex/hooks/enforce-parallel-worktree-removal-gate.ps1` |
+| 220 | PASS | `.codex/hooks/parallel-hook-common.ps1` |
+| 497 | PASS | `.codex/hooks/record-subagent-routing-attestation.ps1` |
+| 211 | PASS | `.codex/hooks/validate-codex-subagent-routing.ps1` |
+| 254 | PASS | `.codex/hooks/validate-parallel-agent-output.ps1` |
+| 351 | PASS | `.codex/scripts/codex-child-launch-contract-core.ps1` |
+| 256 | PASS | `.codex/scripts/codex-child-launch-persistence.ps1` |
+| 461 | PASS | `.codex/scripts/codex-child-launch-resume.ps1` |
+| 248 | PASS | `.codex/scripts/codex-child-launch-runtime.ps1` |
+| 312 | PASS | `.codex/scripts/epic-child-launch-contract.ps1` |
+| 449 | PASS | `.codex/scripts/launch-epic-child-wave.ps1` |
+| 493 | PASS | `.codex/scripts/launch-parallel-child-batch.ps1` |
+| 233 | PASS | `.codex/scripts/parallel-child-launch-contract.ps1` |
+| 375 | PASS | `.codex/scripts/parallel-child-post-session.ps1` |
+| 265 | PASS | `.codex/scripts/resume-epic-child.ps1` |
+| 475 | PASS | `.codex/scripts/resume-parallel-child.ps1` |
+| 362 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/authorize-root-parallel-invocation.ps1` |
+| 188 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/codex-authority-store.ps1` |
+| 224 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-codex-model-routing.ps1` |
+| 495 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1` |
+| 134 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-abandon-gate.ps1` |
+| 152 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-child-worktree-binding.ps1` |
+| 143 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-cohort-barrier.ps1` |
+| 143 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-drift-gate.ps1` |
+| 266 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-root-invocation.ps1` |
+| 135 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-parallel-worktree-removal-gate.ps1` |
+| 220 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/parallel-hook-common.ps1` |
+| 497 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/record-subagent-routing-attestation.ps1` |
+| 211 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-codex-subagent-routing.ps1` |
+| 254 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-parallel-agent-output.ps1` |
+| 351 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-contract-core.ps1` |
+| 256 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-persistence.ps1` |
+| 461 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-resume.ps1` |
+| 248 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/codex-child-launch-runtime.ps1` |
+| 312 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/epic-child-launch-contract.ps1` |
+| 449 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-epic-child-wave.ps1` |
+| 493 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/launch-parallel-child-batch.ps1` |
+| 233 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-launch-contract.ps1` |
+| 375 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/parallel-child-post-session.ps1` |
+| 265 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-epic-child.ps1` |
+| 475 | PASS | `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/scripts/resume-parallel-child.ps1` |
+| 190 | PASS | `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1` |
+| 491 | PASS | `extensions/drm-copilot/src/lib/push-down/claude-routing-merge.ts` |
+| 314 | PASS | `extensions/drm-copilot/src/lib/push-down/codex-agents-customizations.ts` |
+| 190 | PASS | `extensions/drm-copilot/src/lib/push-down/codex-portable-assets.ts` |
+| 320 | PASS | `extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts` |
+| 360 | PASS | `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` |
+| 497 | PASS | `extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts` |
+| 302 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-codex-readiness-filesystem.ts` |
+| 477 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-codex-readiness.ts` |
+| 417 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` |
+| 258 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-completion-receipts.ts` |
+| 346 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` |
+| 496 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-drift.ts` |
+| 207 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-mutation-receipts.ts` |
+| 372 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-mutations.ts` |
+| 279 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-receipt-cohort.ts` |
+| 313 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-resume-truth.ts` |
+| 468 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-planner-state-core.ts` |
+| 354 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-state-records.ts` |
+| 499 | PASS | `extensions/drm-copilot/src/lib/validate/parallel-state-structures.ts` |
+| 405 | PASS | `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts` |
+| 454 | PASS | `extensions/drm-copilot/src/mcp-tool-definitions.ts` |
+| 451 | PASS | `extensions/drm-copilot/test/lib/push-down/codex-agents-customizations.test.ts` |
+| 301 | PASS | `extensions/drm-copilot/test/lib/push-down/codex-pack-selection.test.ts` |
+| 149 | PASS | `extensions/drm-copilot/test/lib/push-down/codex-portable-assets.test.ts` |
+| 210 | PASS | `extensions/drm-copilot/test/lib/push-down/codex-routing-merge.test.ts` |
+| 194 | PASS | `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts` |
+| 248 | PASS | `extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts` |
+| 488 | PASS | `extensions/drm-copilot/test/lib/validate/orchestration-artifacts-parallel-dispatch.test.ts` |
+| 30 | PASS | `extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing-coverage.test.ts` |
+| 458 | PASS | `extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing.test.ts` |
+| 317 | PASS | `extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-topology.test.ts` |
+| 357 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-codex-readiness-filesystem.test.ts` |
+| 399 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-codex-readiness.test.ts` |
+| 406 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-drift-parity.test.ts` |
+| 414 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-kickoff-artifact.test.ts` |
+| 281 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-mutation-parity.test.ts` |
+| 220 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-completion-receipts.test.ts` |
+| 133 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-completion.test.ts` |
+| 203 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-mutation-receipts.test.ts` |
+| 224 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-receipt-cohort.test.ts` |
+| 204 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-resume-truth.test.ts` |
+| 500 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-orchestrator-state-structures.test.ts` |
+| 434 | PASS | `extensions/drm-copilot/test/lib/validate/parallel-planner-state-core.test.ts` |
+| 219 | PASS | `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts` |
+| 288 | PASS | `extensions/drm-copilot/test/mcp-server-parallel-validation.test.ts` |
+| 300 | PASS | `extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts` |
+| 361 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_completion_receipts.py` |
+| 443 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_mutation_receipts.py` |
+| 317 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_mutations.py` |
+| 465 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py` |
+| 414 | PASS | `scripts/dev_tools/_parallel_orchestrator_state_resume_truth.py` |
+| 294 | PASS | `scripts/dev_tools/generate_codex_agent_variants.py` |
+| 484 | PASS | `scripts/dev_tools/parallel_codex_readiness_filesystem.py` |
+| 453 | PASS | `scripts/dev_tools/parallel_kickoff_contract.py` |
+| 373 | PASS | `scripts/dev_tools/push_down_codex_and_agents_customizations.py` |
+| 244 | PASS | `scripts/dev_tools/push_down_codex_filesystem.py` |
+| 237 | PASS | `scripts/dev_tools/push_down_codex_routing_merge.py` |
+| 362 | PASS | `scripts/dev_tools/resolve_codex_deployment.py` |
+| 414 | PASS | `scripts/dev_tools/resolve_codex_topology.py` |
+| 464 | PASS | `scripts/dev_tools/validate_orchestration_artifacts.py` |
+| 495 | PASS | `scripts/dev_tools/validate_parallel_codex_readiness.py` |
+| 368 | PASS | `scripts/dev_tools/validate_parallel_orchestrator_state.py` |
+| 469 | PASS | `scripts/dev_tools/validate_parallel_planner_state.py` |
+| 190 | PASS | `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` |
+| 203 | PASS | `tests/scripts/codex-hooks/codex-child-launch-resume-core.Tests.ps1` |
+| 191 | PASS | `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` |
+| 471 | PASS | `tests/scripts/codex-hooks/codex-parallel-registered-transport.Tests.ps1` |
+| 332 | PASS | `tests/scripts/codex-hooks/epic-child-launch-attestation.Tests.ps1` |
+| 496 | PASS | `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` |
+| 497 | PASS | `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1` |
+| 487 | PASS | `tests/scripts/codex-hooks/epic-wave-launch-binding.Tests.ps1` |
+| 494 | PASS | `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` |
+| 332 | PASS | `tests/scripts/codex-hooks/model-profile-attestation.Tests.ps1` |
+| 279 | PASS | `tests/scripts/codex-hooks/parallel-child-post-session.Tests.ps1` |
+| 448 | PASS | `tests/scripts/codex-hooks/parallel-child-resume-live-truth.Tests.ps1` |
+| 497 | PASS | `tests/scripts/codex-hooks/parallel-child-worktree-launcher.Tests.ps1` |
+| 267 | PASS | `tests/scripts/codex-hooks/parallel-completion-compensating-controls.Tests.ps1` |
+| 384 | PASS | `tests/scripts/codex-hooks/parallel-provenance.Tests.ps1` |
+| 188 | PASS | `tests/scripts/codex-hooks/parallel-runtime-lifecycle.Tests.ps1` |
+| 402 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-1.Tests.ps1` |
+| 267 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-2.Tests.ps1` |
+| 329 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-3.Tests.ps1` |
+| 50 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-4.Tests.ps1` |
+| 405 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-5.Tests.ps1` |
+| 400 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-6.Tests.ps1` |
+| 122 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-7.Tests.ps1` |
+| 189 | PASS | `tests/scripts/codex-hooks/powershell-attribution-batch-8.Tests.ps1` |
+| 196 | PASS | `tests/scripts/dev_tools/test_codex_full_migration_inventory.py` |
+| 74 | PASS | `tests/scripts/dev_tools/test_codex_model_policy_config_parity.py` |
+| 217 | PASS | `tests/scripts/dev_tools/test_generate_codex_agent_variants.py` |
+| 415 | PASS | `tests/scripts/dev_tools/test_parallel_codex_readiness_filesystem.py` |
+| 290 | PASS | `tests/scripts/dev_tools/test_parallel_completion_receipts.py` |
+| 395 | PASS | `tests/scripts/dev_tools/test_parallel_drift_parity.py` |
+| 499 | PASS | `tests/scripts/dev_tools/test_parallel_kickoff_contract.py` |
+| 335 | PASS | `tests/scripts/dev_tools/test_parallel_mutation_parity.py` |
+| 332 | PASS | `tests/scripts/dev_tools/test_parallel_mutation_receipt_bound_runtime.py` |
+| 286 | PASS | `tests/scripts/dev_tools/test_parallel_receipt_bound_cohort.py` |
+| 243 | PASS | `tests/scripts/dev_tools/test_parallel_resume_truth.py` |
+| 390 | PASS | `tests/scripts/dev_tools/test_push_down_claude_pack_end_to_end.py` |
+| 432 | PASS | `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` |
+| 495 | PASS | `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py` |
+| 385 | PASS | `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` |
+| 476 | PASS | `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` |
+| 416 | PASS | `tests/scripts/dev_tools/test_push_down_codex_pack_selection.py` |
+| 176 | PASS | `tests/scripts/dev_tools/test_push_down_codex_portable_assets.py` |
+| 212 | PASS | `tests/scripts/dev_tools/test_push_down_codex_routing_merge.py` |
+| 263 | PASS | `tests/scripts/dev_tools/test_resolve_codex_deployment.py` |
+| 272 | PASS | `tests/scripts/dev_tools/test_resolve_codex_topology.py` |
+| 493 | PASS | `tests/scripts/dev_tools/test_validate_orchestration_artifacts_parallel_dispatch.py` |
+| 237 | PASS | `tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py` |
+| 304 | PASS | `tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py` |
+| 447 | PASS | `tests/scripts/dev_tools/test_validate_parallel_codex_readiness.py` |
+| 476 | PASS | `tests/scripts/dev_tools/test_validate_parallel_orchestrator_state_completion.py` |
+| 183 | PASS | `tests/scripts/dev_tools/test_validate_parallel_orchestrator_state_mutation_modes.py` |
+| 401 | PASS | `tests/scripts/dev_tools/test_validate_parallel_orchestrator_state_mutations.py` |
+| 499 | PASS | `tests/scripts/dev_tools/test_validate_parallel_planner_state.py` |
+
+- Inventory completeness: `PASS`; the table path set exactly equals the filtered merge-base diff path set.
+- Acceptance result: `PASS`.
+

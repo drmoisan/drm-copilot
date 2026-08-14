@@ -12,4 +12,3 @@ Command 4: git diff --exit-code -- .claude
 EXIT_CODE 4: 0
 Output Summary 4: No `.claude/**` path changed.
 Unexpected Baseline Reconciliation: The first full Python parity attempt reported one failure because an executor hook created `.codex/state/powershell-batch-budget.<session>.json`. The parity-owner inventory now excludes only the runtime-only `.codex/state/**` namespace. After Black formatting, Black check, Ruff, and Pyright passed, and the complete parity command passed on restart.
-

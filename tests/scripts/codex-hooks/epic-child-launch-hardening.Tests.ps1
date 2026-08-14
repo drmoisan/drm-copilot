@@ -471,4 +471,26 @@ Describe 'Codex epic-child launcher hardening' {
         $resume | Should -Match 'trusted_surface_objects'
         $resume | Should -Match 'codex_session_id'
     }
+
+    It 'executes the sealed launch entrypoint through its synchronous supervisor boundary' {
+        $launchPath = Join-Path $script:RepoRoot '.codex/scripts/launch-epic-child-wave.ps1'
+        $specPath = Join-Path $script:RepoRoot 'artifacts/orchestration/epic-child-launches/wave/spec.json'
+        [System.AppDomain]::CurrentDomain.SetData('P2T3.LaunchRoot', $script:RepoRoot)
+        $breakpoint = Set-PSBreakpoint -Script $launchPath -Line 402 -Action {
+            Set-Item Function:\Get-CodexChildCanonicalPath { param($Path, $BasePath); if ([System.IO.Path]::IsPathFullyQualified([string]$Path)) { [string]$Path } else { Join-Path $BasePath $Path } }
+            Set-Item Function:\Get-CodexChildSealedJsonFile { param($Name); $root = [System.AppDomain]::CurrentDomain.GetData('P2T3.LaunchRoot'); $isSpec = $Name -eq 'launch spec'; [pscustomobject]@{ Value = $(if ($isSpec) { [pscustomobject]@{ wave_id = 'wave'; checkpoint_path = Join-Path $root 'artifacts/orchestration/epic-orchestrator-state.json'; checkpoint_kind = 'epic-orchestrator'; max_parallel_features = 1 } } else { [pscustomobject]@{} }); Sha256 = $(if ($isSpec) { 'spec' } else { 'checkpoint' }) } }
+            Set-Item Function:\Get-CodexChildRuntimeContext { [pscustomobject]@{ Profiles = @{}; Branches = @{} } }
+            Set-Item Function:\Test-CodexChildLaunchSpec { @() }; Set-Item Function:\Get-CodexChildEffectiveMaximum { 1 }
+            Set-Item Function:\Get-CodexChildCommandContext { [pscustomobject]@{} }; Set-Item Function:\Invoke-CodexChildWaveSupervisor { 'status' }
+        }
+        $pipeline = [PowerShell]::Create([System.Management.Automation.RunspaceMode]::CurrentRunspace)
+        try {
+            $null = $pipeline.AddCommand($launchPath).AddParameter('LaunchSpecPath', $specPath).
+            AddParameter('RepositoryRoot', $script:RepoRoot).AddParameter('Supervisor', $true)
+            $pipeline.Invoke() | Should -Be status
+        } finally {
+            $pipeline.Dispose(); Remove-PSBreakpoint $breakpoint
+            [System.AppDomain]::CurrentDomain.SetData('P2T3.LaunchRoot', $null)
+        }
+    }
 }

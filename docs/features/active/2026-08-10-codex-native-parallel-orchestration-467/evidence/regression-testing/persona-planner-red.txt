@@ -4,4 +4,3 @@ EXIT_CODE: 1
 Output Summary: Pester ran 18 tests with 17 passing and 1 failing. The focused test `Codex parallel root provenance contracts.aligns the planner prompt tool and permission statements with its dedicated profile` failed because the prompt's `orchestrator-workspace` sandbox authority did not equal the profile's `parallel-planner-workspace` default_permissions value. Scoped PoshQC formatting and analysis both passed before this expected-red run. No production-source file was edited.
 Expected Failure: current planner prompt/profile permission contradiction
 Unexpected Failures: 0
-

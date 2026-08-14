@@ -9,4 +9,3 @@ WSL Inner Command: `bash scripts/bash/shell-qc.sh check`
 EXIT_CODE: 0
 
 Output Summary: The repository Bash `shfmt -d` and ShellCheck gate completed successfully under Ubuntu WSL with no diagnostics.
-

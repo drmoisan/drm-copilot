@@ -8,4 +8,3 @@ Output Summary 2: Pytest selected the new parity contract and reported 1 failed 
 Expected Failures: 3 explicit assertions covering planner authority, orchestrator authority, and canonical/bundle prompt authority.
 Unexpected Failures: 0
 Production Prompt Edits: none
-

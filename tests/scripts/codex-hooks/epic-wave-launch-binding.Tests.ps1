@@ -254,6 +254,38 @@ Describe 'Receipt-bound epic wave barrier' {
             Should -BeNullOrEmpty
     }
 
+    It 'executes routed-stop and resume entrypoint failures in the current runspace' {
+        $inputReader = [System.IO.StringReader]::new(
+            '{"agent_type":"default","agent_id":"agent","session_id":"session"}')
+        $originalInput = [Console]::In; [Console]::SetIn($inputReader)
+        $pipeline = [PowerShell]::Create([System.Management.Automation.RunspaceMode]::CurrentRunspace)
+        try {
+            $null = $pipeline.AddCommand((Join-Path $script:RepoRoot '.codex/hooks/validate-codex-subagent-routing.ps1'))
+            $pipeline.Invoke() | Should -BeNullOrEmpty
+        } finally { $pipeline.Dispose(); [Console]::SetIn($originalInput); $inputReader.Dispose() }
+
+        $resumePath = Join-Path $script:RepoRoot '.codex/scripts/resume-epic-child.ps1'
+        [System.AppDomain]::CurrentDomain.SetData('P2T3.ResumeContext', [pscustomobject]@{
+                Receipt      = [pscustomobject]@{ receipt_path = 'C:\folder\receipt.json'; launch_id = 'launch'; worktree_path = 'C:\worktree'; wave_lock_path = 'lock'; codex_home_path = 'C:\home'; codex_denied_paths = @(); state = 'active'; codex_session_id = 'session' }
+                CodexRuntime = [pscustomobject]@{ OriginalAuthPath = 'auth'; CommandPath = 'codex' }
+            })
+        $breakpoint = Set-PSBreakpoint -Script $resumePath -Line 213 -Action {
+            Set-Item Function:\Get-CodexChildResumeContext { [System.AppDomain]::CurrentDomain.GetData('P2T3.ResumeContext') }
+            Set-Item Function:\Enter-CodexChildWaveLock { [System.IO.MemoryStream]::new() }
+            Set-Item Function:\Restore-CodexChildIsolatedAuth {}; Set-Item Function:\Get-CodexChildSandboxProbeStartInfo { [pscustomobject]@{} }
+            Set-Item Function:\Assert-CodexChildSandboxPreflight { throw 'preflight stop' }
+            Set-Item Function:\Set-CodexChildReceiptState {}; Set-Item Function:\Set-CodexChildResumeWaveStatus {}; Set-Item Function:\Remove-CodexChildIsolatedAuth {}
+        }
+        $pipeline = [PowerShell]::Create([System.Management.Automation.RunspaceMode]::CurrentRunspace)
+        try {
+            $null = $pipeline.AddCommand($resumePath).AddParameter('ReceiptPath', 'C:\folder\receipt.json').AddParameter('Confirm', $false)
+            { $pipeline.Invoke() } | Should -Throw '*preflight stop*'
+        } finally {
+            $pipeline.Dispose(); Remove-PSBreakpoint $breakpoint
+            [System.AppDomain]::CurrentDomain.SetData('P2T3.ResumeContext', $null)
+        }
+    }
+
     It 'builds resume process arguments and updates terminal wave entries' {
         $receipt = [pscustomobject]@{
             worktree_path = 'C:\worktree'; codex_denied_paths = @('C:\denied')
@@ -296,5 +328,160 @@ Describe 'Receipt-bound epic wave barrier' {
         $receipt.launch_id = 'missing'
         { Set-CodexChildResumeWaveStatus -Receipt $receipt -Confirm:$false } |
             Should -Throw '*lacks the receipt launch_id*'
+    }
+
+    It 'validates complete resume context and aggregates sealed-state drift' {
+        $script:ResumeContextInvalid = $false
+        $receipt = [ordered]@{
+            state = 'active'; receipt_path = 'C:\receipt.json'; worktree_path = 'C:\worktree'
+            trusted_repository_root = 'C:\repository'; trusted_repository_head = 'trusted'
+            git_common_directory = 'C:\git'; branch_name = 'feature'; integration_head = 'parent'
+            child_head = 'child'; trusted_surface_objects = @{ '.codex/config.toml' = 'object' }
+            trusted_surface_sha256 = 'surface'; profile_path = 'C:\different-profile.toml'
+            profile_sha256 = 'profile'; deployment_agent = 'agent'; model = 'gpt-5.6-sol'
+            model_reasoning_effort = 'high'; permissions = 'epic-child-workspace'
+            developer_instructions_sha256 = 'instructions'; skills_config_sha256 = 'skills'
+            spec_path = 'C:\spec.json'; spec_sha256 = 'spec'; checkpoint_kind = 'epic-orchestrator'
+            checkpoint_path = 'C:\checkpoint.json'; checkpoint_sha256 = 'checkpoint'
+            wave_lock_path = 'C:\wave.lock'; status_path = 'C:\status.json'; launch_id = 'launch'
+            codex_home_path = 'C:\authority\home'; codex_command_path = 'C:\codex.ps1'
+            codex_denied_paths = @('C:\denied', 'C:\authority\home')
+        }
+        $script:ResumeReceipt = $receipt
+        Mock Get-CodexChildCanonicalPath {
+            param($Path, $BasePath)
+            if ($script:ResumeContextInvalid -and $Path -eq 'C:\status.json') { return 'C:\other-status.json' }
+            if (-not [System.IO.Path]::IsPathFullyQualified([string]$Path)) { return Join-Path $BasePath $Path }
+            return [string]$Path
+        }
+        Mock Get-Content {
+            param($LiteralPath)
+            switch ([string]$LiteralPath) {
+                'C:\receipt.json' { return ($script:ResumeReceipt | ConvertTo-Json -Depth 10) }
+                'C:\spec.json' { return '{"checkpoint_kind":"epic-orchestrator"}' }
+                'C:\status.json' { return '{"launches":{"launch":{"state":"active"}}}' }
+                default { return 'profile' }
+            }
+        }
+        Mock Get-CodexChildActiveReceiptErrorList { @() }
+        Mock Get-CodexChildTerminalReceiptErrorList { @() }
+        Mock Get-CodexChildGitScalar {
+            param($GitArgs)
+            if ($GitArgs -contains '--show-toplevel') { return $(if ($script:ResumeContextInvalid) { 'C:\other' } else { 'C:\worktree' }) }
+            if ($GitArgs -contains '--show-current') { return $(if ($script:ResumeContextInvalid) { 'other' } else { 'feature' }) }
+            return 'head'
+        }
+        Mock Get-CodexChildCommonDirectory { $(if ($script:ResumeContextInvalid) { 'C:\other' } else { 'C:\git' }) }
+        Mock Test-CodexChildGit { -not $script:ResumeContextInvalid }
+        Mock Get-CodexChildSurfaceObjectMap { @{ '.codex/config.toml' = 'object' } }
+        Mock Test-CodexChildSurfaceObjectsEqual { -not $script:ResumeContextInvalid }
+        Mock Get-CodexChildSurfaceFingerprint { $(if ($script:ResumeContextInvalid) { 'other' } else { 'surface' }) }
+        Mock Invoke-CodexChildGit { @('') }
+        Mock Test-CodexChildCustomizationClean { -not $script:ResumeContextInvalid }
+        Mock ConvertFrom-CodexAgentProfile {
+            [pscustomobject]@{
+                name = 'agent'; model = 'gpt-5.6-sol'; model_reasoning_effort = 'high'
+                default_permissions = 'epic-child-workspace'; developer_instructions = 'dev'; skills_config = '[]'
+            }
+        }
+        Mock Get-CodexChildSha256 { param($Value); if ($Value -eq 'dev') { 'instructions' } else { 'skills' } }
+        Mock Get-FileHash {
+            param($LiteralPath)
+            $hash = switch ($LiteralPath) { 'C:\spec.json' { 'SPEC' }; 'C:\checkpoint.json' { 'CHECKPOINT' }; default { 'PROFILE' } }
+            [pscustomobject]@{ Hash = $(if ($script:ResumeContextInvalid) { 'DRIFT' } else { $hash }) }
+        }
+        Mock Get-CodexChildSemanticWaveLockPath { $(if ($script:ResumeContextInvalid) { 'C:\other.lock' } else { 'C:\wave.lock' }) }
+        Mock Get-CodexChildResumeReconciliationCore { if ($script:ResumeContextInvalid) { 'reconciliation drift' } else { @() } }
+        Mock Get-CodexChildCommandContext { [pscustomobject]@{ CommandPath = 'C:\codex.ps1'; DeniedPaths = @('C:\denied') } }
+        Mock Get-CodexChildAuthorityRoot { 'C:\authority' }
+        Mock Test-Path { -not $script:ResumeContextInvalid }
+
+        { Get-CodexChildResumeContext -Path 'C:\receipt.json' } | Should -Throw '*generated deployment profile*'
+        $receipt.state = 'completed'; $receipt.receipt_path = 'C:\different.json'
+        $script:ResumeContextInvalid = $true
+        { Get-CodexChildResumeContext -Path 'C:\receipt.json' } | Should -Throw '*reconciliation drift*'
+        { Get-CodexChildResumeContext -Path 'relative.json' } | Should -Throw '*absolute path*'
+    }
+
+    It 'adapts launch helpers without file-system persistence' {
+        . (Join-Path $script:RepoRoot '.codex/scripts/launch-epic-child-wave.ps1')
+        Mock Write-CodexChildJsonAtomicCore { }
+        Write-CodexChildJsonAtomic -Path ignored -Value @{}
+        Write-CodexChildJsonCreateNew -Path (Join-Path $script:RepoRoot 'NUL') -Value @{ valid = $true } `
+            -OpenFile { [System.IO.MemoryStream]::new() }
+        $lock = Enter-CodexChildWaveLock -Path ignored -OpenLock { [System.IO.MemoryStream]::new() }
+        $lock.Dispose()
+        Mock Set-CodexChildReceiptStateCore { }
+        $receipt = [pscustomobject]@{ receipt_path = 'NUL'; codex_home_path = 'C:\home' }
+        Set-CodexChildReceiptState -Receipt $receipt -State active -Confirm:$false
+        Set-CodexChildReceiptState -Receipt $receipt -State active -WhatIf
+        Mock Get-CodexChildSealedJsonFileCore { [pscustomobject]@{ Value = @{ valid = $true } } }
+        (Get-CodexChildSealedJsonFile -Path ignored -Name spec).Value | Should -Not -BeNullOrEmpty
+        Mock Get-CodexChildProcessStartInfo { [System.Diagnostics.ProcessStartInfo]::new('pwsh') }
+        Mock Start-CodexChildProcessCore { 'child' }
+        $entry = [pscustomobject]@{ launch_id = 'launch'; worktree_path = 'C:\worktree' }
+        Start-CodexChildProcess -Entry $entry -AgentProfile @{} -Receipt $receipt -ArtifactRoot root -Confirm:$false |
+            Should -Be child
+        Start-CodexChildProcess -Entry $entry -AgentProfile @{} -Receipt $receipt -ArtifactRoot root -WhatIf |
+            Should -BeNullOrEmpty
+        Mock Write-CodexChildJsonAtomic { }
+        Mock Write-CodexChildScheduleStatusCore { param($Path, $WriteStatus); & $WriteStatus $Path @{} }
+        Write-CodexChildWaveStatus -Path status -WaveId wave -State running -Statuses @{}
+
+    }
+
+    It 'supervises completion and aborts in-flight children after a launch failure' {
+        $entry = [pscustomobject]@{ launch_id = 'one'; worktree_path = $script:RepoRoot; deployment_agent = 'agent' }
+        $script:SupervisorSpec = [pscustomobject]@{ wave_id = 'wave'; launches = @($entry) }
+        $script:SupervisorFailure = $false; $script:SupervisorSealDrift = $false
+        $script:SupervisorValidationError = $false; $script:SupervisorStarts = 0
+        $agentProfile = [pscustomobject]@{}
+        Mock Get-CodexChildSemanticWaveLockPath { Join-Path $script:RepoRoot 'wave.lock' }
+        Mock Enter-CodexChildWaveLock { [System.IO.MemoryStream]::new() }
+        Mock Get-CodexChildSealedJsonFile {
+            param($Name)
+            $value = if ($Name -eq 'launch spec') { $script:SupervisorSpec } else { [pscustomobject]@{} }
+            $hash = if ($Name -eq 'launch spec') { 'spec' } else { 'checkpoint' }
+            [pscustomobject]@{ Value = $value; Sha256 = $(if ($script:SupervisorSealDrift) { 'drift' } else { $hash }); Stream = [System.IO.MemoryStream]::new() }
+        }
+        Mock Get-CodexChildRuntimeContext { [pscustomobject]@{ Profiles = @{ key = $agentProfile }; Branches = @{} } }
+        Mock Test-CodexChildLaunchSpec { if ($script:SupervisorValidationError) { 'validation failed' } else { @() } }
+        Mock Get-CodexChildProfileKey { 'key' }
+        Mock Write-CodexChildWaveStatus { }
+        Mock New-CodexChildIsolatedHome { 'C:\home' }
+        Mock Get-CodexChildSandboxProbeStartInfo { [pscustomobject]@{} }
+        Mock Assert-CodexChildSandboxPreflight { }
+        Mock Get-CodexChildLaunchReceipt {
+            [pscustomobject]@{ state = 'launching'; receipt_path = 'NUL'; codex_home_path = 'C:\home'; exit_code = -1; failed_at = '' }
+        }
+        Mock Write-CodexChildJsonCreateNew { }
+        Mock Start-CodexChildProcess {
+            $script:SupervisorStarts++
+            if ($script:SupervisorFailure -and $script:SupervisorStarts -eq 2) { throw 'launch failed' }
+            $process = [pscustomobject]@{ Id = $script:SupervisorStarts; HasExited = $false; ExitCode = 9 }
+            $process | Add-Member ScriptMethod Kill { param($tree); $null = $tree; $this.HasExited = $true }
+            $process | Add-Member ScriptMethod WaitForExit { }
+            $task = if ($script:SupervisorFailure) { [System.Threading.Tasks.TaskCompletionSource[int]]::new().Task } else { [System.Threading.Tasks.Task]::CompletedTask }
+            [pscustomobject]@{ Entry = $entry; Process = $process; ExitTask = $task; SessionId = 'session'; StartedAt = 'now'; Receipt = [pscustomobject]@{ receipt_path = 'NUL'; codex_home_path = 'C:\home'; exit_code = -1; failed_at = '' } }
+        }
+        Mock Get-CodexChildResumeStatus { [ordered]@{ state = 'completed' } }
+        Mock Remove-CodexChildIsolatedHome { }
+        Mock Remove-CodexChildIsolatedAuth { }
+        Mock Set-CodexChildReceiptState { param($Receipt); $Receipt.exit_code = 9; $Receipt.failed_at = 'failed' }
+        $arguments = @{
+            Profiles = @{ key = $agentProfile }; CodexRuntime = [pscustomobject]@{ CommandPath = 'codex'; DeniedPaths = @(); OriginalAuthPath = 'auth' }
+            SpecPath = 'spec'; CheckpointPath = 'checkpoint'; ArtifactRoot = $script:RepoRoot
+            SpecSha256 = 'spec'; CheckpointSha256 = 'checkpoint'; RepositoryRoot = $script:RepoRoot; MaxParallel = 2
+        }
+        $script:SupervisorSealDrift = $true
+        { Invoke-CodexChildWaveSupervisor -Spec $script:SupervisorSpec @arguments } | Should -Throw '*changed after validation*'
+        $script:SupervisorSealDrift = $false; $script:SupervisorValidationError = $true
+        { Invoke-CodexChildWaveSupervisor -Spec $script:SupervisorSpec @arguments } | Should -Throw '*validation failed*'
+        $script:SupervisorValidationError = $false
+        Invoke-CodexChildWaveSupervisor -Spec $script:SupervisorSpec @arguments | Should -Match 'status.json$'
+        $two = [pscustomobject]@{ launch_id = 'two'; worktree_path = $script:RepoRoot; deployment_agent = 'agent' }
+        $script:SupervisorSpec = [pscustomobject]@{ wave_id = 'wave'; launches = @($entry, $two) }
+        $script:SupervisorFailure = $true; $script:SupervisorStarts = 0
+        { Invoke-CodexChildWaveSupervisor -Spec $script:SupervisorSpec @arguments } | Should -Throw '*launch failed*'
     }
 }
