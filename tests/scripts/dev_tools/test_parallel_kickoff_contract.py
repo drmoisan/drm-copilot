@@ -482,7 +482,18 @@ def test_committed_readiness_rejects_cross_wired_slug() -> None:
         "Run `/parallel-run sample-run`", "Run `/parallel-run other-run`"
     )
     errors = validate_parallel_kickoff_text(document, require_ready_for_execution=True)
-    assert (
-        "Parallel kickoff readiness requires heading and invocation slugs to match."
-        in errors
+    assert any("heading and invocation slugs" in error for error in errors)
+
+
+def test_committed_readiness_rejects_cross_wired_paths() -> None:
+    """Manifest and branch identities must derive from the heading slug."""
+
+    replacements = (
+        ("/sample-run/parallel.md", "/other-run/parallel.md", "manifest must be"),
+        ("sample-run-plan", "other-run-plan", "plan-home branch must be"),
     )
+    for old, new, expected in replacements:
+        errors = validate_parallel_kickoff_text(
+            kickoff_with_integrity().replace(old, new), require_ready_for_execution=True
+        )
+        assert any(expected in error for error in errors)

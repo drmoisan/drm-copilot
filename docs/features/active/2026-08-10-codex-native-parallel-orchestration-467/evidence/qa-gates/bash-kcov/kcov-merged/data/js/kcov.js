@@ -50,7 +50,7 @@ window.onload = function () {
 	elem = document.getElementById('header-percent-covered')
 
 	elem.className = toCoverPercentString(header.covered, header.instrumented);
-	elem.innerHTML = ((header.covered / header.instrumented) * 100).toFixed(1) + "%";	    
+	elem.innerHTML = ((header.covered / header.instrumented) * 100).toFixed(1) + "%";
 
 	document.getElementById('header-command').innerHTML = header.command;
 	document.getElementById('window-title').innerHTML = "Coverage report - " + header.command;

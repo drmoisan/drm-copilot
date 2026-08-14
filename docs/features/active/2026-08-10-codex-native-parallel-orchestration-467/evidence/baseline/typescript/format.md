@@ -17,4 +17,3 @@ Initial Command: `npm --prefix extensions/drm-copilot exec -- prettier --check "
 Initial EXIT_CODE: 1
 
 Initial Output Summary: From the repository root, `npm exec` evaluated the globs relative to the root and reported that `test/**/*.ts` matched no files. The matched files had no formatting defects. The uninterrupted TypeScript loop restarted at the successful extension-local command above.
-

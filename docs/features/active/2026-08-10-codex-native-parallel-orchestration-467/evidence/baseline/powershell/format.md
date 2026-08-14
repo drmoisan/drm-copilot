@@ -7,4 +7,3 @@ Command: `mcp__drm_copilot__run_poshqc_format({"workspace_root":"C:\\Users\\DanM
 EXIT_CODE: 0
 
 Output Summary: The bundled PoshQC format check completed with `ok: true` for the target worktree.
-

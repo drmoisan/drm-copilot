@@ -1,10 +1,10 @@
 # Feature Audit: Codex-Native Parallel Orchestration (#467)
 
-**Audit Date:** 2026-08-12  
-**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`  
-**Base Branch:** `main`  
-**Head Branch:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`  
-**Work Mode:** `full-feature`  
+**Audit Date:** 2026-08-12
+**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`
+**Base Branch:** `main`
+**Head Branch:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`
+**Work Mode:** `full-feature`
 **Audit Type:** Initial acceptance review
 
 ---

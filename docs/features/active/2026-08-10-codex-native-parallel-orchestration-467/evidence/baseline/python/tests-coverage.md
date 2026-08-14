@@ -24,4 +24,3 @@ Line coverage is calculated from covered executable lines divided by statements,
 | Modified; P9-T4 threshold | `scripts/dev_tools/resolve_codex_topology.py` | 107/108 | 99.07407407407408% | 250 |
 
 The five added-file coverage gaps are attributable to the exact uncovered lines above. The three modified-file percentages are the individual no-regression thresholds for P9-T4.
-

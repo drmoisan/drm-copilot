@@ -61,4 +61,3 @@ Output Summary: The complete feature-versus-base diff check failed as expected w
 | `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-inputs.2026-08-12T01-42.md` | trailing whitespace: 3, 4, 5, 6, 7 |
 
 Acceptance result: PASS for `[expect-fail]`; the non-zero result and every reported path/line diagnostic are preserved.
-

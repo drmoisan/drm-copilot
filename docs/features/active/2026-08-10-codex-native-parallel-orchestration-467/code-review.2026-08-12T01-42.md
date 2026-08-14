@@ -1,11 +1,11 @@
 # Code Review: Codex-Native Parallel Orchestration (#467)
 
-**Review Date:** 2026-08-12  
-**Reviewer:** generated `feature-reviewer-c4`  
-**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`  
-**Feature Folder Selection Rule:** The fresh PR-context bundle and explicit full-feature scope identify this active issue-467 folder.  
-**Base Branch:** `main`  
-**Head Branch:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`  
+**Review Date:** 2026-08-12
+**Reviewer:** generated `feature-reviewer-c4`
+**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`
+**Feature Folder Selection Rule:** The fresh PR-context bundle and explicit full-feature scope identify this active issue-467 folder.
+**Base Branch:** `main`
+**Head Branch:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`
 **Review Type:** Initial full-feature review
 
 ---

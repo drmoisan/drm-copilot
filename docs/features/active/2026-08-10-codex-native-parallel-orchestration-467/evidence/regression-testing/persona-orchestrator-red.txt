@@ -4,4 +4,3 @@ EXIT_CODE: 1
 Output Summary: Pester discovered 19 tests, selected only the focused orchestrator contract test, and reported 0 passed, 1 failed, and 18 not run. The test failed because the prompt's `orchestrator-workspace` sandbox authority did not equal the profile's `parallel-orchestrator-workspace` default_permissions value. Scoped PoshQC formatting and analysis both passed before this expected-red run. No production-source file was edited.
 Expected Failure: current orchestrator prompt/profile permission contradiction
 Unexpected Failures: 0
-

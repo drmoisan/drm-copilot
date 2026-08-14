@@ -19,4 +19,3 @@ Output Summary: Jest passed 193 test suites and 2,678 tests with 0 failures in 1
 | `extensions/drm-copilot/src/lib/validate/parallel-kickoff-artifact.ts` | 409/417 | 98.08% | 387-390, 392-395 | Reproduces the reviewed 98.08% value |
 
 These five percentages are the individual no-regression thresholds for P11-T4.
-

@@ -27,7 +27,6 @@ The following is the exact `git status --short` output captured after P0-T1. The
 ?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-inputs.2026-08-13T15-38.md
 ?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-13T15-38.md
 ```
-
 ## Complete feature-versus-base changed-path inventory
 
 The exact `git diff --name-status fe0413d4aca1e76b2d02d05701fba79a887d5405 HEAD` command completed successfully. The inventory below was cross-checked from the same two tree objects with `git diff-tree --no-commit-id --name-status -r fe0413d4aca1e76b2d02d05701fba79a887d5405 8c7f389a7620834a41fe779116a1d2bab7bf0dd7` so the complete output could be persisted without terminal truncation.
@@ -420,4 +419,3 @@ M	tests/shell/parallel_manifest_validate.bats
 M	tests/shell/parallel_payload_only.bats
 M	tests/shell/parallel_yaml_subset.bats
 ```
-

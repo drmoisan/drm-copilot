@@ -1,10 +1,10 @@
 # Remediation Inputs: Codex-Native Parallel Orchestration (#467)
 
-**Timestamp:** 2026-08-12T01-42  
-**Review Status:** REMEDIATION_REQUIRED  
-**Authoritative requirements source for remediation:** This file  
-**Feature requirements sources:** `spec.md`, `user-story.md`  
-**Base:** `main` at merge-base `fe0413d4aca1e76b2d02d05701fba79a887d5405`  
+**Timestamp:** 2026-08-12T01-42
+**Review Status:** REMEDIATION_REQUIRED
+**Authoritative requirements source for remediation:** This file
+**Feature requirements sources:** `spec.md`, `user-story.md`
+**Base:** `main` at merge-base `fe0413d4aca1e76b2d02d05701fba79a887d5405`
 **Reviewed head:** `35323f412f752467f3d787326399218d9564c8b2`
 
 ## Required Context Package

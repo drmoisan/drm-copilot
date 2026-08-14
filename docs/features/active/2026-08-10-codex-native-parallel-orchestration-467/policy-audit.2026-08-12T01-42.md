@@ -1,11 +1,11 @@
 # Policy Compliance Audit: Codex-Native Parallel Orchestration (#467)
 
-**Audit Date:** 2026-08-12  
-**Reviewer:** generated `feature-reviewer-c4`  
-**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`  
-**Base Branch:** `main`  
-**Merge Base:** `fe0413d4aca1e76b2d02d05701fba79a887d5405`  
-**Head:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`  
+**Audit Date:** 2026-08-12
+**Reviewer:** generated `feature-reviewer-c4`
+**Feature Folder:** `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467`
+**Base Branch:** `main`
+**Merge Base:** `fe0413d4aca1e76b2d02d05701fba79a887d5405`
+**Head:** `feature/codex-native-parallel-orchestration-467` at `35323f412f752467f3d787326399218d9564c8b2`
 **Template Source:** Bundled policy-audit asset resolved through the drm-copilot MCP template resolver on 2026-08-12.
 
 **Code Under Test:** The complete `main...HEAD` feature diff: Python validators and publishing helpers; TypeScript/MCP validation and publishing code; PowerShell Codex hooks and launch/runtime scripts; portable Bash validation code; GitHub Actions configuration; root and bundled Codex customization files; tests; feature documentation; and retained evidence. The comparison contains 1,038 changed paths and was not narrowed.
