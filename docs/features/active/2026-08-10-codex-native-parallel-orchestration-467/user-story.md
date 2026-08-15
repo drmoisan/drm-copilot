@@ -137,7 +137,7 @@ blocks delivery.
 - [x] A published payload-only destination validates manifests and computes deterministic cohorts
       and bounded batches without Python or Poetry, using the issue-462 portability assets and
       additive destination configuration.
-- [ ] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
+- [x] Formatting, linting, type checking where applicable, unit and integration tests, Pester, Bats,
       differential parity, root/bundle parity, pack, registration, destination, and zero-regression
       gates pass in one clean toolchain loop.
       Evidence: [final four-language QA index](evidence/qa-gates/index.md).

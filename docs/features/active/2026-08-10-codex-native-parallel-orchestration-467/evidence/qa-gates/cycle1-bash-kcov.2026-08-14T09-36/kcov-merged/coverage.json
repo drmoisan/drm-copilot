@@ -1,0 +1,28 @@
+{
+  "files": [
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/shell_qc_lib.sh", "percent_covered": "87.03", "covered_lines": "161", "total_lines": "185"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/validate-parallel-manifest.sh", "percent_covered": "93.48", "covered_lines": "43", "total_lines": "46"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/coverage_lib.sh", "percent_covered": "100.00", "covered_lines": "3", "total_lines": "3"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/coverage_demo.sh", "percent_covered": "100.00", "covered_lines": "4", "total_lines": "4"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/cleanup_worktrees_actions_lib.sh", "percent_covered": "92.76", "covered_lines": "141", "total_lines": "152"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-common.sh", "percent_covered": "94.55", "covered_lines": "52", "total_lines": "55"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/cleanup_worktrees_lib.sh", "percent_covered": "93.26", "covered_lines": "180", "total_lines": "193"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-items-validate.sh", "percent_covered": "97.39", "covered_lines": "112", "total_lines": "115"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/compute-concurrency-batches.sh", "percent_covered": "86.36", "covered_lines": "38", "total_lines": "44"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-yaml-emit.sh", "percent_covered": "87.58", "covered_lines": "134", "total_lines": "153"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-manifest-validate.sh", "percent_covered": "95.24", "covered_lines": "60", "total_lines": "63"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/shell-qc.sh", "percent_covered": "88.57", "covered_lines": "31", "total_lines": "35"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-yaml-scan.sh", "percent_covered": "83.76", "covered_lines": "98", "total_lines": "117"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/cleanup-worktrees.sh", "percent_covered": "100.00", "covered_lines": "20", "total_lines": "20"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/compute-cohorts.sh", "percent_covered": "88.68", "covered_lines": "47", "total_lines": "53"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/scripts/bash/cleanup_worktrees_enumerate_lib.sh", "percent_covered": "92.13", "covered_lines": "82", "total_lines": "89"},
+    {"file": "/mnt/c/Users/DanMoisan/repos/drm-copilot-wt/2026-08-10T19-25/.claude/lib/bash/parallel-cohorts.sh", "percent_covered": "99.25", "covered_lines": "133", "total_lines": "134"}
+  ],
+  "percent_covered": "91.65",
+  "covered_lines": 1339,
+  "total_lines": 1461,
+  "percent_low": 25,
+  "percent_high": 75,
+  "command": "",
+  "date": "2026-08-15 00:25:28"
+}
