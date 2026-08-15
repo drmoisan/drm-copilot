@@ -68,9 +68,15 @@ Note the self-blocking shape of the condition: `next_step: "S8_create_pr"` with 
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Unit coverage areas: a parity test asserting the TypeScript and Python surfaces return the same verdict for `require_pr_creation_ready` across a constructed corpus, following the existing parity-test pattern used for the parallel validators.
-- [ ] Integration scenario to retest: a checkpoint with each blocking `stepN_status` value in turn must be rejected by both surfaces.
-- [ ] Manual verification notes: if the subset relationship is intentional, document it in `.claude/rules/orchestrator-state.md` the way the model-routing subset is documented, and make the orchestrate skill's PR preflight cite the Python validator rather than the MCP tool. Also document the expected `step8_status` value during PR creation.
+The owner directive of 2026-08-15 sets the resolution direction: **no enforcement hook may use Python.** Every enforcement hook must be implemented in bash or PowerShell, and bash is preferred because the hook surface is migrating to bash long-term. That reframes this defect. The correct fix is not to add a third parity obligation across TypeScript, Python, and PowerShell; it is to remove the Python leg from the enforcement path entirely so the divergence has nowhere to occur.
+
+- [ ] Remove the Python deference from `.claude/lib/orchestrator-state/OrchestratorState.psm1`. The module already carries a complete PowerShell mirror of the readiness logic but calls `Test-PythonOrchestratorValidatorAvailable` and defers to the Python CLI whenever it is importable. Deleting that branch makes the hook enforce one implementation everywhere.
+- [ ] Preferred target per the directive: port the readiness logic to a bash library under `.claude/lib/bash/` and have the hook call that, so the enforcement path is identical in drm-copilot and in every destination.
+- [ ] Unit coverage areas: assert the hook returns the same verdict with and without a Python environment present. That is the assertion which would have caught this, and it is stronger than a TypeScript-versus-Python parity corpus.
+- [ ] Integration scenario to retest: a checkpoint with each blocking `stepN_status` value in turn must be rejected by the hook in an environment with no Python available.
+- [ ] Document the expected `step8_status` value during PR creation. `in_progress` clears the gate truthfully while a PR is being created; `pending` is self-blocking and `completed` would be false before the PR exists.
+
+Note that this is not only a drm-copilot concern. Because the module runs the Python validator here and the PowerShell mirror in a destination, the same hook enforces via a different implementation depending on the repository — which is the portability failure mode the directive is intended to prevent.
 
 ## Next Step
 
