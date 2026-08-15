@@ -4,6 +4,8 @@ Tasks: [P13-T1], refreshed by [P13-T22]
 
 Refreshed: 2026-08-13T19:09:10.3821763Z
 
+Additional remediation cycle 1 refreshed: 2026-08-15T00:40:00-04:00
+
 The Phase 9 through Phase 12 receipts below are the complete final repository QA command set. Python was refreshed in P13-T18 through P13-T21 after the R5 documentation-only changes. The already-green PowerShell, TypeScript, and Bash entries remain unchanged and were not rerun.
 
 ## Python — Black, Ruff, Pyright, Pytest
@@ -35,7 +37,7 @@ Coverage artifacts:
 
 Result: formatting changed zero files; analysis reported zero findings; Pester discovered 2,430 tests across 126 files and recorded 2,421 passed, 9 skipped/disabled, and 0 failed. Lines were 6,127/7,035 = 87.093106%; changed executable lines were 1,707/1,943 = 87.853834%. Exactly 25/25 authoritative runtime owners were attributed, all 17 added owners met at least 90%, and all eight modified owners were non-regressing. Numeric line coverage PASS.
 
-PowerShell branch coverage is unsupported by the configured Pester/JaCoCo-compatible output. The XML contains zero `BRANCH` counters; branch coverage is explicitly not treated as PASS.
+PowerShell branch coverage result: FAIL. The configured Pester/JaCoCo-compatible output contains zero `BRANCH` counters, with branch covered=0, missed=0, and denominator=0. These placeholder fields are unavailable branch data rather than measured control-flow outcomes. `POWERSHELL_BRANCH_POLICY_UNRESOLVED`.
 
 Coverage artifacts:
 
@@ -77,6 +79,31 @@ Canonical coverage artifacts:
 
 ## Integrated acceptance
 
-All four languages completed the complete policy-ordered command set in one uninterrupted green pass after their last applicable source/test change. Repository line coverage exceeds 85% for every language. Python and TypeScript supply supported numeric aggregate branch coverage above 75%. PowerShell and Bash branch coverage remain explicitly unsupported and are not represented as passing.
+All four languages completed the complete policy-ordered command set in one uninterrupted green pass after their last applicable source/test change. Repository line coverage exceeds 85% for every language. Python and TypeScript supply supported numeric aggregate branch coverage above 75%. Bash branch coverage remains unsupported and is N/A/not-PASS under the Bash-specific policy. PowerShell has no measured branch denominator, so its branch result is FAIL and the integrated result remains remediation-required.
 
-Acceptance result: PASS.
+Acceptance result: REMEDIATION_REQUIRED: POWERSHELL_BRANCH_POLICY_UNRESOLVED.
+
+## Additional remediation cycle 1 — authoritative final result
+
+The cycle-1 comparison and receipts below supersede the numeric current-result summary above without rewriting its historical command record.
+
+| Language | Final tests | Final lines | Final branches | Owner result | Disposition |
+|---|---:|---:|---:|---|---|
+| Python | 3,971 passed; 5 skipped | 14,350/15,525 = 92.431562% | 4,894/5,772 = 84.788635% | 5/5 added >=90%; 8/8 changed non-regressing; target 109/109 lines and 38/38 branches | PASS |
+| PowerShell | 2,447 passed; 9 disabled | 4,040/4,260 = 94.835681% configured; preserved source-attributed receipt 6,529/7,035 | 0 counters; denominator 0 | 25/25 attributed; 17/17 added >=90%; 8/8 modified satisfy requirements | Branch FAIL |
+| TypeScript | 194 suites; 2,690 tests | 44,127/45,740 = 96.47% | 6,589/7,338 = 89.79% | 5/5 modified non-regressing | PASS |
+| Bash | 255 passed | 1,339/1,461 = 91.6% | unsupported | No additional owner threshold | Applicable gates PASS; branch N/A/not-PASS |
+
+Cycle-1 receipts:
+
+- Python: `evidence/qa-gates/cycle1-python-black.2026-08-14T09-36.md`, `cycle1-python-ruff.2026-08-14T09-36.md`, `cycle1-python-pyright.2026-08-14T09-36.md`, `cycle1-python-test.2026-08-14T09-36.md`, and `cycle1-python-coverage.2026-08-14T09-36.json`.
+- PowerShell: `evidence/qa-gates/cycle1-powershell-format.2026-08-14T09-36.md`, `cycle1-powershell-analyze.2026-08-14T09-36.md`, `cycle1-powershell-test.2026-08-14T09-36.md`, and `cycle1-powershell-coverage.2026-08-14T09-36.md`.
+- TypeScript: `evidence/qa-gates/cycle1-typescript-format.2026-08-14T09-36.md`, `cycle1-typescript-lint.2026-08-14T09-36.md`, `cycle1-typescript-typecheck.2026-08-14T09-36.md`, and `cycle1-typescript-test.2026-08-14T09-36.md`.
+- Bash: `evidence/qa-gates/cycle1-bash-format-lint.2026-08-14T09-36.md`, `cycle1-bash-test.2026-08-14T09-36.md`, and `cycle1-bash-kcov.2026-08-14T09-36/cov.xml`.
+- Integrated comparison: `evidence/qa-gates/remediation-final-comparison.2026-08-14T09-36.md`.
+
+`GENUINE_BRANCH_COLLECTOR_ESTABLISHED: NO`
+
+PowerShell branch coverage result: `FAIL — POWERSHELL_BRANCH_POLICY_UNRESOLVED`.
+
+Cycle-1 acceptance result: `REMEDIATION_REQUIRED: POWERSHELL_BRANCH_POLICY_UNRESOLVED`.

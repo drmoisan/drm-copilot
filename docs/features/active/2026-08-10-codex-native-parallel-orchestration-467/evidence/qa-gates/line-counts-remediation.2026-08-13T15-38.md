@@ -186,4 +186,3 @@ Command: enumerate `git diff --name-only --diff-filter=ACMRTUXB fe0413d4aca1e76b
 
 - Inventory completeness: `PASS`; the table path set exactly equals the filtered merge-base diff path set.
 - Acceptance result: `PASS`.
-

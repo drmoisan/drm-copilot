@@ -1,0 +1,182 @@
+# Cycle 1 Pre-Commit Staging Manifest
+
+- Issue: `#467`
+- Captured at: `2026-08-15T00:47:38.8932834-04:00`
+- Pre-stage HEAD: `7f63b7323fc88fee0aadb83fa2e603b4480a8039`
+- Explicit intended path count: `158`
+- Sorted LF-delimited intended path-set SHA-256: `554EB3E073E588CDCCA15C324173358D6F6C5BCD223F82CF5CEAF9966E87CBD1`
+- Tracked modifications: `8`
+- Grouped audit documents: `3` under `audit-2026-08-14T09-36/`
+- Grouped remediation documents: `2` under `remediation-2026-08-14T09-36/`
+- Canonical cycle evidence paths including this receipt: `145` under `evidence/<kind>/`
+- Unexpected paths: `0`
+- `.claude/**` paths: `0`
+- Staging command: `git add -A --` with exactly the path set below.
+- Initial post-stage equality: `PASS`; intended and cached sets were `158/158` with zero differences.
+- Deterministic normalization: removed one receipt EOF blank line and trailing whitespace from the two cycle-1 generated kcov evidence copies identified by the initial cached diff check; no semantic content or path membership changed.
+- Final post-receipt-restage equality: `PASS`; cached set remains `158` paths with sorted LF-delimited SHA-256 `554EB3E073E588CDCCA15C324173358D6F6C5BCD223F82CF5CEAF9966E87CBD1`.
+- `git diff --cached --check`: `PASS`; exit code `0` with no output.
+- Unstaged in-scope remainder: `0`.
+
+The intended set includes the preserved user-owned PowerShell test edit, the feasible cycle corrections, grouped audit and remediation documents, synchronized requirements, canonical cycle evidence, and the P5-T24 handback. No unrelated or `.claude/**` path is included.
+
+## Exact Explicit Path Set
+
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-14T09-36/code-review.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-14T09-36/feature-audit.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-14T09-36/policy-audit.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/issue-updates/cycle1-acceptance-criteria.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/branch-tooling-frozen.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-executor-to-orchestrator-handback.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-precommit-manifest.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-preqa-ac-state.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/powershell-branch-capability-decision.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/r2-integrity-reconciliation.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/bash-final-kcov.2026-08-13T15-38/data/js/kcov.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/bash-final-kcov.2026-08-13T15-38/kcov-merged/data/js/kcov.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-format-lint.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/amber.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/bcov.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/cov.xml`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/amber.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/bcov.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/glass.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/js/handlebars.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/js/jquery.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/js/jquery.tablesorter.widgets.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/js/kcov.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/js/tablesorter.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/data/tablesorter-theme.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/glass.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/index.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/index.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/amber.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/bcov.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_actions_lib.sh.b80e7a68.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_actions_lib.sh.b80e7a68.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_enumerate_lib.sh.9b6cf96c.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_enumerate_lib.sh.9b6cf96c.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_lib.sh.1ac4cf71.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup_worktrees_lib.sh.1ac4cf71.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup-worktrees.sh.2c2063ac.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cleanup-worktrees.sh.2c2063ac.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cobertura.xml`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/codecov.json`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/compute-cohorts.sh.8842fa2b.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/compute-cohorts.sh.8842fa2b.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/compute-concurrency-batches.sh.d13c5f23.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/compute-concurrency-batches.sh.d13c5f23.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/cov.xml`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/coverage_demo.sh.54f25ed.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/coverage_demo.sh.54f25ed.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/coverage_lib.sh.c5f0fcb1.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/coverage_lib.sh.c5f0fcb1.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/coverage.json`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/amber.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/bcov.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/glass.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/js/handlebars.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/js/jquery.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/js/jquery.tablesorter.widgets.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/js/kcov.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/js/tablesorter.min.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/data/tablesorter-theme.css`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/glass.png`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/index.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/index.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-cohorts.sh.a7249387.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-cohorts.sh.a7249387.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-common.sh.15efabd8.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-common.sh.15efabd8.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-items-validate.sh.28402287.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-items-validate.sh.28402287.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-manifest-validate.sh.98a3291f.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-manifest-validate.sh.98a3291f.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-yaml-emit.sh.7fb3b85.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-yaml-emit.sh.7fb3b85.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-yaml-scan.sh.362b0f3b.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/parallel-yaml-scan.sh.362b0f3b.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/shell_qc_lib.sh.e3345681.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/shell_qc_lib.sh.e3345681.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/shell-qc.sh.a05f01d7.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/shell-qc.sh.a05f01d7.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/sonarqube.xml`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/summary.db`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/validate-parallel-manifest.sh.dbc932fd.html`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/kcov-merged/validate-parallel-manifest.sh.dbc932fd.js`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/coverage.db`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/054f25ed`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/07fb3b85`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/15efabd8`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/1ac4cf71`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/28402287`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/2c2063ac`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/362b0f3b`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/8842fa2b`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/98a3291f`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/9b6cf96c`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/a05f01d7`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/a7249387`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/b80e7a68`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/c5f0fcb1`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/d13c5f23`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/dbc932fd`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-kcov.2026-08-14T09-36/merged-kcov-output/metadata/e3345681`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-bash-test.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-claude-invariance.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-coverage-policy-reconciliation.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-evidence-locations.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-file-sizes.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-dependencies.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-diff-check.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-evidence-locations.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-file-sizes.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-policy-thresholds.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-scope.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-final-suppressions.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-orchestration-preservation.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-plan-synchronization.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-powershell-analyze.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-powershell-coverage.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-powershell-format.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-powershell-test.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-preservation-precheck.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-prohibited-change-check.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-python-black.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-python-coverage.2026-08-14T09-36.json`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-python-pyright.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-python-ruff.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-python-test.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-root-bundle-parity.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-root-testresults-invariance.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-scope-manifest.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-typescript-format.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-typescript-lint.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-typescript-test.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle1-typescript-typecheck.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/index.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/line-counts-remediation.2026-08-13T15-38.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/remediation-final-comparison.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-codex-pretooluse-focused.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-focused-scope.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-python-focused-coverage.2026-08-14T09-36.json`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-python-focused.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-python-loop-comment-green.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-python-loop-comment-red.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-whitespace-green.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle1-whitespace-red.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle-context.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/phase0-instructions-read.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/powershell-branch-contract-conflict.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/powershell-bundled-coverage.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/powershell-junit.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/powershell-owner-reconciliation.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/pr-context-integrity.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/preserved-closures.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/repository-state.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-14T09-36/remediation-inputs.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-14T09-36/remediation-plan.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/spec.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/user-story.md`
+- `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`
+- `tests/scripts/dev_tools/test_parallel_kickoff_contract.py`

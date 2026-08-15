@@ -332,7 +332,7 @@ Deliver an additive, root-controlled Codex parallel surface with the following e
       batches without Python or Poetry and does not contain unrelated `.claude/` files.
 - [x] Existing Codex epic and delivered Claude parallel suites pass, and a before/after byte audit
       reports no `.claude/` source changes.
-- [ ] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
+- [x] All changed Python, TypeScript, PowerShell, and Bash surfaces pass repository formatting,
       linting, type checking where applicable, unit and integration tests, Pester, Bats, and
       zero-regression checks in the required order.
       Evidence: [final four-language QA index](evidence/qa-gates/index.md).

@@ -492,6 +492,7 @@ def test_committed_readiness_rejects_cross_wired_paths() -> None:
         ("/sample-run/parallel.md", "/other-run/parallel.md", "manifest must be"),
         ("sample-run-plan", "other-run-plan", "plan-home branch must be"),
     )
+    # Exercise cross-wired identities to enforce manifest and plan-branch boundaries.
     for old, new, expected in replacements:
         errors = validate_parallel_kickoff_text(
             kickoff_with_integrity().replace(old, new), require_ready_for_execution=True
