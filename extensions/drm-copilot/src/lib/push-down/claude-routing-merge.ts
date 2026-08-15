@@ -5,8 +5,11 @@
  *     Special-case the single destination-relative path
  *     `config/orchestration-routing.json` so publishing it into a workspace that
  *     already carries its own routing document adds the source's routes without
- *     discarding the destination's. Every other path passes straight through to
- *     the wrapped adapter.
+ *     discarding the destination's. One further path,
+ *     `config/blast-radius.json`, is intercepted by the blast-radius derive
+ *     decorator composed alongside this one
+ *     (`claude-blast-radius-derive.ts`); every remaining path passes straight
+ *     through to the wrapped adapter.
  *
  * Why a decorator rather than engine logic:
  *     The merge is Claude-specific and path-specific. Putting it in the shared

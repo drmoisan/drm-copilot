@@ -3,7 +3,6 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import {
-  pushDownCustomizations,
   ROOT_FOLDERS,
   ROUTING_MERGE_RELATIVE_PATH,
   RoutingMergeError,
@@ -14,7 +13,19 @@ import {
 } from "../../../src/lib/push-down/codex-agents-customizations";
 import { pushDownCustomizations as pushDownCopilotCustomizations } from "../../../src/lib/push-down/copilot-customizations";
 import { COPILOT_ROOT_FOLDERS } from "../../../src/lib/push-down/copilot-customizations-engine";
-import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
+import { buildInMemoryFileSystem } from "./push-down.test-helpers";
+import {
+  CLOCK,
+  DEST,
+  layoutLister,
+  publish,
+  REPO_ROOT,
+  seedTree,
+  SOURCE_BLAST_RADIUS,
+  SOURCE_ROUTING,
+  SRC,
+  SRC_APP_LAYOUT,
+} from "./config-carriage.test-helpers";
 
 /**
  * Config carriage for the Claude push-down (issue #462).
@@ -35,125 +46,6 @@ import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
  *     source) is asserted here against the real files on disk; every other case
  *     uses the hermetic in-memory adapter.
  */
-
-const CLOCK = fixedClock("2026-08-10T00:15:00.000Z");
-const SRC = "/src";
-const DEST = "/dest";
-const BUNDLE = `${SRC}/extensions/drm-copilot/resources/claude-customizations`;
-const MANIFEST_DIR = `${BUNDLE}/pack-manifests`;
-
-/** Repository root resolved from this test file's location. */
-const REPO_ROOT = path.join(__dirname, "..", "..", "..", "..", "..");
-
-/** The generic routing document a destination workspace receives. */
-const SOURCE_ROUTING = `${JSON.stringify(
-  {
-    version: 3,
-    routes: {
-      small: { route_id: "small" },
-      parallel: { route_id: "parallel", requires_pr_gate: false },
-      preparation: { route_id: "preparation" },
-    },
-    model_policy: { default: "opus" },
-  },
-  null,
-  2,
-)}\n`;
-
-/** The generic blast-radius document a destination workspace receives. */
-const SOURCE_BLAST_RADIUS = `${JSON.stringify(
-  {
-    version: 1,
-    shared_surfaces: [
-      ".claude/settings.json",
-      "config/orchestration-routing.json",
-      "config/blast-radius.json",
-    ],
-    shared_surface_globs: [],
-    modules: {
-      "claude-runtime": [".claude/**"],
-      config: ["config/**"],
-      docs: ["docs/**"],
-      tests: ["tests/**"],
-    },
-    over_breadth_fraction: 0.25,
-  },
-  null,
-  2,
-)}\n`;
-
-/**
- * Serialize a pack manifest for seeding.
- *
- * @param fields Manifest fields to serialize.
- * @returns Serialized manifest JSON.
- */
-function manifestJson(fields: Record<string, unknown>): string {
-  return JSON.stringify(fields);
-}
-
-/**
- * Seed a `.claude` tree plus the bundled `config/` tree and pack manifests.
- *
- * @param extraFiles Additional files to seed (for example a destination-side
- *   routing document already present in the workspace).
- * @returns A seeded in-memory filesystem with `/dest` ensured.
- */
-function seedTree(
-  extraFiles: Record<string, string> = {},
-): ReturnType<typeof buildInMemoryFileSystem> {
-  return buildInMemoryFileSystem(
-    {
-      [`${SRC}/.claude/settings.json`]: '{"core": true}\n',
-      [`${SRC}/.claude/agents/orchestrator.md`]: "# Orchestrator\n",
-      [`${SRC}/.claude/rules/parallel-orchestration.md`]: "# Parallel rules\n",
-      [`${SRC}/.claude/lib/bash/compute-cohorts.sh`]: "#!/usr/bin/env bash\n",
-      [`${SRC}/.claude/lib/bash/compute-concurrency-batches.sh`]:
-        "#!/usr/bin/env bash\n",
-      [`${SRC}/.claude/lib/bash/validate-parallel-manifest.sh`]:
-        "#!/usr/bin/env bash\n",
-      [`${SRC}/config/orchestration-routing.json`]: SOURCE_ROUTING,
-      [`${SRC}/config/blast-radius.json`]: SOURCE_BLAST_RADIUS,
-      [`${MANIFEST_DIR}/core.json`]: manifestJson({
-        name: "core",
-        label: "Core",
-        paths: [
-          ".claude/settings.json",
-          ".claude/agents/orchestrator.md",
-          ".claude/rules/parallel-orchestration.md",
-          ".claude/lib/bash/compute-cohorts.sh",
-          ".claude/lib/bash/compute-concurrency-batches.sh",
-          ".claude/lib/bash/validate-parallel-manifest.sh",
-          "config/orchestration-routing.json",
-          "config/blast-radius.json",
-        ],
-      }),
-      ...extraFiles,
-    },
-    [DEST],
-  );
-}
-
-/**
- * Run the Claude push-down against a seeded filesystem.
- *
- * @param seeded The seeded in-memory filesystem.
- * @param packs Optional pack selection.
- * @returns The completed run summary.
- */
-function publish(
-  seeded: ReturnType<typeof buildInMemoryFileSystem>,
-  packs: ReadonlySet<string> | null = null,
-): ReturnType<typeof pushDownCustomizations> {
-  return pushDownCustomizations({
-    repoRoot: SRC,
-    destinationRoot: DEST,
-    fs: seeded,
-    bundleRoot: BUNDLE,
-    packs,
-    clock: CLOCK,
-  });
-}
 
 describe("issue #462 AC6: the Claude push-down publishes the config tree", () => {
   it("publishes both config files on a plain publish", () => {
@@ -373,17 +265,26 @@ describe("issue #462 AC7: the routing write merges rather than overwrites", () =
 });
 
 describe("issue #462 AC8: the published blast-radius default is generic", () => {
-  it("publishes the pinned generic document with no drm-copilot-only entries", () => {
-    // Arrange
+  it("publishes a document derived from the destination's own layout", () => {
+    // Arrange: a destination carrying one C# project. The layout is visible only
+    // through the injected lister, because the real-filesystem default lister
+    // cannot see the in-memory destination tree.
     const seeded = seedTree();
 
     // Act
-    publish(seeded);
+    publish(seeded, null, layoutLister(SRC_APP_LAYOUT));
     const published = seeded.readTextFile(`${DEST}/config/blast-radius.json`);
 
-    // Assert
-    expect(published).toBe(SOURCE_BLAST_RADIUS);
+    // Assert: genericity is asserted as a property rather than as equality with
+    // a seeded constant (issue #472). The published map must name the
+    // destination's own module, must carry no location bucket or universal
+    // glob, and must carry no drm-copilot-only entry.
+    expect(published).toContain('"src/App"');
+    expect(published).toContain('"src/App/**"');
     for (const forbidden of [
+      '"**"',
+      '"docs/**"',
+      '"tests/**"',
       "scripts/dev_tools",
       "packages/mcp-server",
       "poetry.lock",
@@ -394,18 +295,29 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
   });
 
   it("overwrites the destination blast-radius rather than merging it", () => {
-    // Arrange: only the routing path is merged; blast-radius is a plain write.
+    // Arrange: only the routing path is merged; blast-radius is replaced. The
+    // layout-bearing lister makes the derived document differ observably from
+    // both the seeded source constant and the pre-existing destination bytes,
+    // so the assertion has discriminating force.
+    const preExisting = `${JSON.stringify(
+      { version: 99, modules: { "destination-local": ["local/**"] } },
+      null,
+      2,
+    )}\n`;
     const seeded = seedTree({
-      [`${DEST}/config/blast-radius.json`]: '{"version": 99}\n',
+      [`${DEST}/config/blast-radius.json`]: preExisting,
     });
 
     // Act
-    publish(seeded);
+    publish(seeded, null, layoutLister(SRC_APP_LAYOUT));
+    const published = seeded.readTextFile(`${DEST}/config/blast-radius.json`);
 
-    // Assert
-    expect(seeded.readTextFile(`${DEST}/config/blast-radius.json`)).toBe(
-      SOURCE_BLAST_RADIUS,
-    );
+    // Assert: the pre-existing content is gone rather than merged in, and the
+    // replacement is the derived document, not the seeded source bytes.
+    expect(published).not.toContain("destination-local");
+    expect(published).not.toContain('"version": 99');
+    expect(published).toContain('"src/App/**"');
+    expect(published).not.toBe(SOURCE_BLAST_RADIUS);
   });
 });
 

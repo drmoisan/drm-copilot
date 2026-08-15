@@ -304,6 +304,13 @@ Describe 'Committed blast-radius truth table shape' {
         # Read the authoritative truth table as the pinning source, mirroring the
         # constraints tests/scripts/dev_tools/test_blast_radius_config.py asserts.
         $script:CommittedConfig = Get-Content -Path $script:ConfigPath -Raw | ConvertFrom-Json -AsHashtable
+
+        # The bundled copy the Claude push-down surface publishes into a
+        # destination repository. It is a separate committed artifact that can
+        # drift from the repo-root copy, so the negative pin below reads both.
+        $script:BundledConfigPath = Join-Path $script:RepoRoot `
+            'extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json'
+        $script:BundledConfig = Get-Content -Path $script:BundledConfigPath -Raw | ConvertFrom-Json -AsHashtable
     }
 
     Context 'Schema version' {
@@ -390,6 +397,68 @@ Describe 'Committed blast-radius truth table shape' {
 
             # Assert: no separator-free surface may carry either wildcard.
             $offending | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Location-bucket modules' {
+        It 'declares no location-bucket module in either committed copy' {
+            # Arrange: a bucket keyed on where a file lives rather than on which
+            # subsystem owns it attaches to nearly every work item, so it makes
+            # every pair of items contend at the module level (issue #472).
+            # Mirrors test_no_committed_copy_declares_a_location_bucket_module in
+            # tests/scripts/dev_tools/test_blast_radius_config.py.
+            $bucketName = @('docs', 'tests')
+            $bucketGlob = @('docs/**', 'tests/**')
+
+            # Act: walk both committed copies and record every module name and
+            # every glob that matches a location bucket. Comparison is ordinal,
+            # matching the case-sensitive semantics of the Python reference.
+            $offendingName = [System.Collections.Generic.List[string]]::new()
+            $offendingGlob = [System.Collections.Generic.List[string]]::new()
+            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
+                $moduleMap = $config['modules']
+                foreach ($name in @($moduleMap.Keys)) {
+                    if ($bucketName -ccontains $name) {
+                        $offendingName.Add($name)
+                    }
+                    foreach ($glob in @($moduleMap[$name])) {
+                        if ($bucketGlob -ccontains $glob) {
+                            $offendingGlob.Add($glob)
+                        }
+                    }
+                }
+            }
+
+            # Assert: neither the bucket name nor its glob may appear anywhere.
+            $offendingName.ToArray() | Should -BeNullOrEmpty
+            $offendingGlob.ToArray() | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Disjoint work items' {
+        It 'reports no contention between two items with disjoint paths' {
+            # Arrange: two work items with distinct feature folders and disjoint
+            # production paths, derived through the mirror against the committed
+            # map. Mirrors
+            # test_disjoint_items_do_not_contend_through_the_committed_map in
+            # tests/scripts/dev_tools/test_blast_radius_config.py.
+            $benchmarkRadius = Get-BlastRadius -SpecText '' `
+                -PlanText '- [ ] [P1-T1] Edit `scripts/benchmarks/run.py` and `tests/benchmarks/test_run.py`.' `
+                -FeatureFolder '2026-08-15-example-benchmark-item' `
+                -Config $script:CommittedConfig -ComputedAt '2026-08-15T09-48'
+            $extensionRadius = Get-BlastRadius -SpecText '' `
+                -PlanText '- [ ] [P1-T1] Edit `extensions/drm-copilot/src/lib/foo.ts`.' `
+                -FeatureFolder '2026-08-15-example-extension-item' `
+                -Config $script:CommittedConfig -ComputedAt '2026-08-15T09-48'
+
+            # Act: ask the contention relation whether the items may run together.
+            $result = Test-BlastRadiusConflict -RadiusA $benchmarkRadius `
+                -RadiusB $extensionRadius -Config $script:CommittedConfig
+
+            # Assert: no disjunct may fire. The reason signature is asserted empty
+            # as well, so a failure names the level that forced the contention.
+            $result['conflict'] | Should -BeFalse
+            (Get-ReasonSignature -Reason @($result['reasons'])) | Should -BeNullOrEmpty
         }
     }
 }

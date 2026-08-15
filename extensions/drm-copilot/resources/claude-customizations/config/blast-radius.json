@@ -8,9 +8,7 @@
   "shared_surface_globs": [],
   "modules": {
     "claude-runtime": [".claude/**"],
-    "config": ["config/**"],
-    "docs": ["docs/**"],
-    "tests": ["tests/**"]
+    "config": ["config/**"]
   },
   "over_breadth_fraction": 0.25
 }

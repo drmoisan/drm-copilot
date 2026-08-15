@@ -23,6 +23,10 @@ import {
 import { ExcludingFileSystem } from "./claude-filesystem-adapter";
 import { RoutingMergeFileSystem } from "./claude-routing-merge";
 import {
+  BlastRadiusDeriveFileSystem,
+  type DirectoryLister,
+} from "./claude-blast-radius-derive";
+import {
   assertSingleCsharpToolchain,
   computePublishedPaths,
   type CSharpVariant,
@@ -50,8 +54,14 @@ export const ROOT_FOLDERS: ReadonlyArray<string> = [".claude", "config"];
  *
  * A destination workspace may already carry its own routing document with
  * locally added routes. Overwriting it would silently discard them, so this one
- * path is merged by {@link RoutingMergeFileSystem}. Every other published file,
- * including `config/blast-radius.json`, is a plain overwrite.
+ * path is merged by {@link RoutingMergeFileSystem}.
+ *
+ * Two destination-relative paths receive special handling. This one is merged;
+ * `config/blast-radius.json` is intercepted by
+ * {@link BlastRadiusDeriveFileSystem}, which replaces the bundled bytes with a
+ * module map derived from the destination's own layout (the bundled map
+ * describes drm-copilot and names none of an unrelated destination's modules).
+ * Every other published file is a plain overwrite.
  */
 export const ROUTING_MERGE_RELATIVE_PATH = "config/orchestration-routing.json";
 
@@ -85,6 +95,12 @@ export {
   RoutingMergeError,
   RoutingMergeFileSystem,
 } from "./claude-routing-merge";
+export {
+  BlastRadiusDeriveError,
+  BlastRadiusDeriveFileSystem,
+  BlastRadiusGuardError,
+  type DirectoryLister,
+} from "./claude-blast-radius-derive";
 export { type PushDownSummary, type CSharpVariant, type MemoryMode };
 
 /**
@@ -192,6 +208,15 @@ export interface ClaudePushDownOptions {
   readonly memoryMode?: MemoryMode;
   readonly bundleRoot?: string;
   readonly clock?: Clock;
+
+  /**
+   * Shallow directory lister used to scan the destination layout.
+   *
+   * Optional and non-breaking: when omitted the real-filesystem lister is used.
+   * A test publishing to an in-memory destination injects a fake here, because
+   * the real lister cannot see an in-memory tree.
+   */
+  readonly listEntries?: DirectoryLister;
 }
 
 /**
@@ -221,6 +246,7 @@ export function pushDownCustomizations(
     memoryMode,
     bundleRoot,
     clock,
+    listEntries,
   } = options;
 
   const effectiveSource = sourceRoot ?? repoRoot;
@@ -247,9 +273,22 @@ export function pushDownCustomizations(
     ROUTING_MERGE_RELATIVE_PATH,
   );
 
+  // Derive, rather than copy, the blast-radius module map. The two decorators
+  // intercept disjoint paths, so their relative order is immaterial; this one is
+  // layered above the merging decorator purely to keep both adjacent and close
+  // to the real adapter, below the filtering wrapper.
+  const derivingFs =
+    listEntries === undefined
+      ? new BlastRadiusDeriveFileSystem(mergingFs, destinationRoot)
+      : new BlastRadiusDeriveFileSystem(
+          mergingFs,
+          destinationRoot,
+          listEntries,
+        );
+
   // Wrap the adapter so enumeration omits excluded paths and honors selections.
   const excludingFs = new ExcludingFileSystem(
-    mergingFs,
+    derivingFs,
     repoRoot,
     EXCLUDED_RELATIVE_PATHS,
     {

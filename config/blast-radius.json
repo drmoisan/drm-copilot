@@ -29,9 +29,7 @@
     "mcp-server": ["packages/mcp-server/**"],
     "vscode-extension": ["extensions/drm-copilot/**"],
     "config": ["config/**"],
-    "schemas": ["schemas/**"],
-    "tests": ["tests/**"],
-    "docs": ["docs/**"]
+    "schemas": ["schemas/**"]
   },
   "over_breadth_fraction": 0.25
 }
