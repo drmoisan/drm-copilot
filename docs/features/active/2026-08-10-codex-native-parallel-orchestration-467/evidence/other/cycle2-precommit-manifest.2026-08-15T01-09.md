@@ -1,0 +1,85 @@
+# Cycle 2 Pre-Commit Staging Manifest
+
+- Issue: `#467`
+- Rebuilt at: `2026-08-15T03:00:28.5421356-04:00`
+- Pre-stage HEAD: `e693a2a32d1c5a936f8a95494900c840139a9b55`
+- Superseded historical P3-T1 intended set: `57` paths with sorted LF-delimited SHA-256 `E5F53D35276976EDF2BD526B73E3D14A23436C702829E71436ABC2C1E6B7462E`
+- Corrected explicit intended path count: `58`
+- Sorted LF-delimited corrected path-set SHA-256: `897381D13ECE66DB836FC1F4B415C5D69CE54F1C1A69A6DD5D7A88E5E6B8806D`
+- Preserved modified cycle-1 plan: `1`
+- Grouped cycle-1 R5 audit documents: `3` under `audit-2026-08-15T00-56/`
+- Grouped cycle-2 remediation documents: `2` under `remediation-2026-08-15T01-09/`
+- Canonical evidence paths including the correction receipt: `52` under `evidence/<kind>/`
+- Unexpected paths: `0`
+- `.claude/**` paths: `0`
+- Post-stage equality: `58/58`; exact manifest/index equality `PASS`.
+- Final staged path count: `58`.
+- Final staged sorted LF-delimited path-set SHA-256: `897381D13ECE66DB836FC1F4B415C5D69CE54F1C1A69A6DD5D7A88E5E6B8806D`.
+- Cached diff-check exit: `0`; diagnostics: `0`.
+- Unstaged in-scope remainder: `0`.
+- Untracked in-scope remainder: `0`.
+- Unrelated staged paths: `0`.
+- Staging form: `git add --` followed by each of the 58 exact file arguments enumerated below; no directory pathspec or glob was used.
+
+This corrected manifest supersedes the historical P3-T1 staging target. The intended set contains the original 57 paths plus the cycle-2 R5 whitespace-correction receipt, and no other path. It contains the preserved completed cycle-1 plan, the normalized grouped cycle-1 R5 audits, cycle-1 commit-message/R5-decision/remediation-commit receipts, the complete grouped cycle-2 remediation pair, and all canonical cycle-2 evidence through the P2-T21 handback. It contains no executable, source, test, dependency, policy, quality-tier, coverage-configuration, threshold, suppression, unrelated, or `.claude/**` path.
+
+## Exact Explicit Path Set
+
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-15T00-56/code-review.2026-08-15T00-56.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-15T00-56/feature-audit.2026-08-15T00-56.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-15T00-56/policy-audit.2026-08-15T00-56.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/issue-updates/cycle2-preqa-acceptance.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-commit-message.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-r5-decision.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle1-remediation-commit.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle2-executor-to-orchestrator-handback.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle2-powershell-branch-decision.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle2-precommit-manifest.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle2-r5-whitespace-correction.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-bash-reuse.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-claude-invariance.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-dependencies.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-evidence-locations.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-executable-input-freshness.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-executable-scope-freeze.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-file-sizes.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-final-comparison.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-final-evidence-locations.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-final-scope.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-final-whitespace.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-policy-thresholds.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-powershell-analyze.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-powershell-coverage.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-powershell-format.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-powershell-test.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-python-reuse.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-root-bundle-parity.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-root-testresults-invariance.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-scope-manifest.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-semantic-consistency.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-suppressions.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle2-typescript-reuse.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-bash-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-claude-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-dependency-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-evidence-location-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-executable-input-fingerprint.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-file-size-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-group-integrity.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-orchestration-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-phase0-instructions-read.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-policy-threshold-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-powershell-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-pr-context-integrity.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-python-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-r5-integrity.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-repository-state.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-requirements-source.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-root-bundle-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-root-testresults-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-suppression-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-typescript-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle2-whitespace-baseline.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-14T09-36/remediation-plan.2026-08-14T09-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-15T01-09/remediation-inputs.2026-08-15T01-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-15T01-09/remediation-plan.2026-08-15T01-09.md`
