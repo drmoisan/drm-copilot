@@ -61,7 +61,7 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             }
         }
 
-        It 'blocks gh pr create --body-file end-to-end via the real validator subprocess (exit 0, deny, ORCHESTRATOR_STATE_PREFLIGHT_FAILED)' {
+        It 'blocks gh pr create --body-file end-to-end in a real pwsh process (exit 0, deny, ORCHESTRATOR_STATE_PREFLIGHT_FAILED)' {
             # Spawns a real, separate pwsh process. Dot-sources the hook (bypassing its entrypoint
             # guard) and points the context-artifact seam at a real, permanently-existing file
             # (the hook script itself) so Case C does not intercept first -- the same "real seam,
@@ -69,10 +69,12 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             # so no temporary file is created -- then replays the hook's own entrypoint logic. The
             # checkpoint seam is also overridden to a deliberately-nonexistent, non-temp-file
             # sibling path (a filename that is guaranteed absent from a checked-out repository) so
-            # the real Invoke-OrchestratorStatePreflight default $Invoker's Python validator
-            # subprocess deterministically reports a missing-checkpoint failure, independent of the
-            # real, mutable artifacts/orchestration/orchestrator-state.json checkpoint's current
-            # content (which is not structurally guaranteed to remain incomplete/absent).
+            # the real Invoke-OrchestratorStatePreflight default $Invoker deterministically reports
+            # a missing-checkpoint failure, independent of the real, mutable
+            # artifacts/orchestration/orchestrator-state.json checkpoint's current content (which is
+            # not structurally guaranteed to remain incomplete/absent). As of issue #475 that
+            # default $Invoker runs the portable in-process validation and starts no subprocess of
+            # its own; the only subprocess here is the pwsh process this test spawns.
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
                 $env:CLAUDE_TOOL_INPUT = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'

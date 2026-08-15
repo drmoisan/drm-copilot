@@ -90,6 +90,27 @@
             # coverage.
             '.claude/hooks/enforce-discovery-artifact-gate.ps1'
             '.claude/hooks/validate-discovery-artifact-gate.ps1'
+            # Issue #475 added the portable discovery-validation module so both discovery
+            # hooks stop invoking a Python interpreter; measured here so the new production
+            # module is not excluded from coverage.
+            '.claude/lib/discovery-validation/DiscoveryValidation.psm1'
+            # Issue #475 added the portable orchestrator-state parity modules so the
+            # completion hook validates the checkpoint without a Python interpreter;
+            # measured here so the new production modules are not excluded from coverage.
+            '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1'
+            # Issue #475 added the portable Codex routing resolvers so the U6.X and U6.T
+            # checkpoint checks resolve deployments and topologies without a Python
+            # interpreter; measured here so the new production modules are not excluded.
+            '.claude/lib/codex-routing/CodexDeployment.psm1'
+            '.claude/lib/codex-routing/CodexTopology.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
             # Issue #392 changed the Invoke-PoshQCTest default seams ($EnsureModule -Global
             # import and the global-session-state $InvokePester trampoline) so the bundled
             # entry path hosts the Pester run in the global session state; measured here so
