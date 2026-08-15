@@ -430,8 +430,8 @@ Describe 'Committed truth table' {
             # Act: read every module pair.
             $pairs = @(Get-ConfigModuleEntry -Config $config)
 
-            # Assert: the committed map carries the fourteen spec modules.
-            $pairs.Count | Should -Be 14
+            # Assert: the committed map carries the twelve spec modules.
+            $pairs.Count | Should -Be 12
         }
 
         It 'exposes the committed over-breadth fraction' {

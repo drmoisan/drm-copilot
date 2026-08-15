@@ -17,14 +17,35 @@ from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools.compute_blast_radius import conflicts, derive_blast_radius
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
+
+    from scripts.dev_tools.compute_blast_radius import BlastRadius, ConflictResult
 
 # Repo-root resolution: this file lives at
 # tests/scripts/dev_tools/test_blast_radius_config.py, so the repository root is
 # three parents above the file's resolved directory.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_PATH = REPO_ROOT / "config" / "blast-radius.json"
+
+# The second committed copy of the truth table. The Claude push-down surface
+# publishes it into a destination repository, so it is a separate artifact that
+# can drift from the repo-root copy and must be pinned alongside it.
+BUNDLED_CONFIG_PATH = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "claude-customizations"
+    / "config"
+    / "blast-radius.json"
+)
+
+# Timestamp handed to every derived radius below. The value is a constant rather
+# than a clock read so the derivation tests are deterministic.
+COMPUTED_AT = "2026-08-15T09-48"
 
 # A drive-qualified path such as ``C:/repo/config`` is absolute on Windows even
 # without a leading separator, so the repo-relative check screens for it too.
@@ -62,8 +83,11 @@ def require_string_list(value: object, label: str) -> tuple[str, ...]:
     return tuple(entries)
 
 
-def load_config() -> Mapping[str, object]:
-    """Read and parse the committed blast-radius truth table.
+def load_config_file(path: Path) -> Mapping[str, object]:
+    """Read and parse one committed blast-radius truth table.
+
+    Args:
+        path (Path): Absolute path to a committed ``blast-radius.json`` copy.
 
     Returns:
         Mapping[str, object]: The parsed top-level configuration object.
@@ -72,13 +96,31 @@ def load_config() -> Mapping[str, object]:
         TypeError: If the file does not parse to a JSON object.
 
     Side Effects:
-        Reads ``config/blast-radius.json`` from the repository tree. The file is
-        committed and read-only for these tests.
+        Reads the named file. Every copy this module reads is committed and
+        read-only for these tests; no temporary file is created.
     """
-    parsed = cast("object", json.loads(CONFIG_PATH.read_text(encoding="utf-8")))
+    parsed = cast("object", json.loads(path.read_text(encoding="utf-8")))
     if not isinstance(parsed, dict):
-        raise TypeError("config/blast-radius.json must contain a JSON object.")
+        raise TypeError(f"{path.name} must contain a JSON object.")
     return cast("Mapping[str, object]", parsed)
+
+
+def load_config() -> Mapping[str, object]:
+    """Read and parse the repo-root blast-radius truth table.
+
+    Thin wrapper over ``load_config_file`` that names the repo-root copy once
+    so its many consumers do not repeat the path.
+
+    Returns:
+        Mapping[str, object]: The parsed top-level configuration object.
+
+    Raises:
+        TypeError: If the file does not parse to a JSON object.
+
+    Side Effects:
+        Reads the committed, read-only ``config/blast-radius.json``.
+    """
+    return load_config_file(CONFIG_PATH)
 
 
 def load_module_globs(
@@ -243,3 +285,215 @@ def test_every_separator_free_shared_surface_is_wildcard_free(surface: str) -> N
         f"Separator-free shared surface {surface!r} must not contain '?'; a "
         "wildcard entry belongs in the shared_surface_globs list instead."
     )
+
+
+def derive_item_radius(feature_folder: str, plan_text: str) -> BlastRadius:
+    """Derive one work item's radius against the committed truth table.
+
+    Args:
+        feature_folder (str): Bare feature-folder name. Callers pass distinct
+            names so the radii carry distinct feature-folder globs, making the
+            verdict depend on the module map, not on a shared document tree.
+        plan_text (str): Approved-plan text citing paths in inline code.
+
+    Returns:
+        BlastRadius: The derived radius, with a fixed timestamp.
+
+    Side Effects:
+        None beyond the module-level read of the committed configuration.
+    """
+    return derive_blast_radius(
+        plan_text, "", feature_folder, CONFIG, computed_at=COMPUTED_AT
+    )
+
+
+def reason_kinds(result: ConflictResult) -> tuple[str, ...]:
+    """Read the triggered contention kinds out of a conflict result.
+
+    Args:
+        result (ConflictResult): Verdict returned by ``conflicts``.
+
+    Returns:
+        tuple[str, ...]: The ``kind`` of each reason, in the fixed order the
+        relation reports them.
+    """
+    # Reading only the kinds keeps the assertions independent of the
+    # smallest-overlap detail, which differs between the pre- and post-fix maps.
+    return tuple(reason.kind for reason in result.reasons)
+
+
+def reason_detail(result: ConflictResult, kind: str) -> str:
+    """Read the detail string of one triggered contention kind.
+
+    Args:
+        result (ConflictResult): Verdict returned by ``conflicts``.
+        kind (str): Contention kind whose detail is wanted.
+
+    Returns:
+        str: The detail of the matching reason.
+
+    Raises:
+        AssertionError: If no reason of that kind is present, so the calling
+            test fails instead of raising an opaque lookup error.
+    """
+    # A generator with next() would raise StopIteration on a miss; selecting the
+    # matches first lets the assertion name the kind that was absent.
+    matches = tuple(reason for reason in result.reasons if reason.kind == kind)
+    assert matches, f"Expected a {kind} reason; observed {reason_kinds(result)}."
+    return matches[0].detail
+
+
+def test_disjoint_items_do_not_contend_through_the_committed_map() -> None:
+    """Reject a module map that makes two unrelated work items contend.
+
+    Two items with distinct feature folders and disjoint production paths must
+    schedule concurrently. A location-bucket module keyed on where a file lives
+    (``docs``, ``tests``) attaches to essentially every item, so it would make
+    this pair contend at the module level and force an otherwise parallel run to
+    execute serially (issue #472).
+    """
+    # Arrange: two work items whose only structural similarity is that each
+    # writes its own feature folder and its own tests.
+    benchmarks_item = derive_item_radius(
+        "2026-08-15-example-benchmark-item",
+        "- [ ] [P1-T1] Edit `scripts/benchmarks/run.py` and "
+        "`tests/benchmarks/test_run.py`.",
+    )
+    extension_item = derive_item_radius(
+        "2026-08-15-example-extension-item",
+        "- [ ] [P1-T1] Edit `extensions/drm-copilot/src/lib/foo.ts`.",
+    )
+
+    # Act: ask the contention relation whether the two items may run together.
+    result = conflicts(benchmarks_item, extension_item, CONFIG)
+
+    # Assert: no disjunct may fire. The reason tuple is asserted empty as well as
+    # the verdict so a failure names which level forced the false contention.
+    assert result.conflict is False, (
+        "Two items with disjoint production paths must not contend; observed "
+        f"reasons {tuple((r.kind, r.detail) for r in result.reasons)}."
+    )
+    assert result.reasons == (), (
+        "A disjoint item pair must report zero contention reasons; observed "
+        f"{tuple((r.kind, r.detail) for r in result.reasons)}."
+    )
+
+
+# Paths the behaviour-preservation matrix has both items cite. Each names a real
+# contention level that must keep firing after the location-bucket modules are
+# removed: a production module file, a test file, and a declared shared surface.
+SHARED_DEV_TOOLS_PATH = "scripts/dev_tools/example_shared.py"
+SHARED_TEST_PATH = "tests/scripts/dev_tools/test_example_shared.py"
+SHARED_CONFIG_SURFACE = "config/blast-radius.json"
+
+
+def derive_matrix_pair(path: str) -> tuple[BlastRadius, BlastRadius]:
+    """Derive two radii whose plans cite the same single path.
+
+    Args:
+        path (str): Repository-relative path both work items cite.
+
+    Returns:
+        tuple[BlastRadius, BlastRadius]: The two radii. Their feature folders
+        differ, so the shared path is their only deliberate commonality.
+    """
+    citation = f"- [ ] [P1-T1] Edit `{path}`."
+    return (
+        derive_item_radius("2026-08-15-example-matrix-left", citation),
+        derive_item_radius("2026-08-15-example-matrix-right", citation),
+    )
+
+
+def test_items_sharing_a_dev_tools_file_contend_on_path_and_module() -> None:
+    """Preserve contention for two items editing the same production file."""
+    # Arrange / Act: both items cite the same file under scripts/dev_tools/.
+    left, right = derive_matrix_pair(SHARED_DEV_TOOLS_PATH)
+    result = conflicts(left, right, CONFIG)
+    kinds = reason_kinds(result)
+
+    # Assert: the path level and the subsystem module level must both fire. The
+    # module is asserted through the resolved module sets, not the reason detail,
+    # because the detail reports the smallest shared module and that selection
+    # differs while a location bucket is still present.
+    assert result.conflict is True, "Items editing the same file must contend."
+    assert "path_overlap" in kinds, f"Expected path_overlap; observed {kinds}."
+    assert "module_overlap" in kinds, f"Expected module_overlap; observed {kinds}."
+    assert "python-dev-tools" in left.modules, "Left item must resolve the module."
+    assert "python-dev-tools" in right.modules, "Right item must resolve the module."
+
+
+def test_items_sharing_only_a_test_file_contend_on_the_path_level() -> None:
+    """Preserve contention for two items editing the same test file."""
+    # Arrange / Act: both items cite the same file under tests/.
+    left, right = derive_matrix_pair(SHARED_TEST_PATH)
+    result = conflicts(left, right, CONFIG)
+
+    # Assert: removing the tests location bucket must not stop two items editing
+    # the same test file from contending; the path level carries that case.
+    assert result.conflict is True, "Items editing the same test file must contend."
+    assert "path_overlap" in reason_kinds(result), (
+        "Expected path_overlap for a shared test file; observed "
+        f"{reason_kinds(result)}."
+    )
+    assert (
+        reason_detail(result, "path_overlap")
+        == f"{SHARED_TEST_PATH} ~ {SHARED_TEST_PATH}"
+    ), "The path_overlap detail must cite the shared test file."
+
+
+def test_items_sharing_the_truth_table_contend_on_three_levels() -> None:
+    """Preserve contention for two items editing the blast-radius truth table."""
+    # Arrange / Act: both items cite config/blast-radius.json, which is itself a
+    # declared shared surface as well as a member of the config module.
+    left, right = derive_matrix_pair(SHARED_CONFIG_SURFACE)
+    result = conflicts(left, right, CONFIG)
+    kinds = reason_kinds(result)
+
+    # Assert: all three applicable levels must fire.
+    assert result.conflict is True, "Items editing the truth table must contend."
+    assert "path_overlap" in kinds, f"Expected path_overlap; observed {kinds}."
+    assert "module_overlap" in kinds, f"Expected module_overlap; observed {kinds}."
+    assert "config" in left.modules, "Left item must resolve the config module."
+    assert "config" in right.modules, "Right item must resolve the config module."
+    assert (
+        "shared_surface_overlap" in kinds
+    ), f"Expected shared_surface_overlap; observed {kinds}."
+    assert (
+        reason_detail(result, "shared_surface_overlap") == SHARED_CONFIG_SURFACE
+    ), "The shared_surface_overlap detail must cite the truth table itself."
+
+
+# Location-bucket module names and globs: buckets keyed on where a file lives
+# rather than on which subsystem owns it. Such a bucket attaches to nearly every
+# work item, so it makes every pair contend at the module level (issue #472).
+LOCATION_BUCKET_NAMES = ("docs", "tests")
+LOCATION_BUCKET_GLOBS = ("docs/**", "tests/**")
+
+# Both committed copies, labelled by repo-relative path so a parametrized
+# failure names the offending file.
+BUNDLED_CONFIG_LABEL = (
+    "extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json"
+)
+COMMITTED_CONFIGS: tuple[tuple[str, Path], ...] = (
+    ("config/blast-radius.json", CONFIG_PATH),
+    (BUNDLED_CONFIG_LABEL, BUNDLED_CONFIG_PATH),
+)
+
+
+@pytest.mark.parametrize(("label", "path"), COMMITTED_CONFIGS)
+def test_no_committed_copy_declares_a_location_bucket_module(
+    label: str, path: Path
+) -> None:
+    """Reject a location-bucket module in either committed truth table."""
+    # Arrange: read the copy under test rather than the module-level CONFIG, so
+    # the bundled copy is pinned by the same assertions as the repo-root one.
+    pairs = load_module_globs(load_config_file(path))
+    names = tuple(name for name, _ in pairs)
+    globs = tuple(glob for _, entries in pairs for glob in entries)
+
+    # Assert: neither the bucket name nor its glob may appear anywhere in the
+    # map. Both are checked because a rename would defeat a name-only pin.
+    for bucket in LOCATION_BUCKET_NAMES:
+        assert bucket not in names, f"{label} must not declare module {bucket!r}."
+    for bucket in LOCATION_BUCKET_GLOBS:
+        assert bucket not in globs, f"{label} must not declare glob {bucket!r}."
