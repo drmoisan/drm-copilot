@@ -445,42 +445,46 @@ Describe 'validate-orchestrator-output.ps1' {
     # validate-orchestrator-output.human-interaction.Tests.ps1 to keep this
     # file under the 500-line cap.
 
-    Context 'capability detection (Python-path routing)' {
+    Context 'portable-path routing (no interpreter subprocess)' {
         BeforeAll {
             # Pre-import the portable completion module so its function is a resolvable
             # command that tests can mock to detect whether the portable branch runs.
             $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
             Import-Module $portableModule -Force
-
-            # OrchestratorStateCompletion.psm1's own nested Import-Module of OrchestratorState.psm1
-            # (its .psm1-internal load) drops this scope's global visibility of the sibling
-            # Test-PythonOrchestratorValidatorAvailable probe now hosted there; re-importing it here
-            # restores visibility for the unqualified Mock below.
-            $orchestratorStateModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorState.psm1").Path
-            Import-Module $orchestratorStateModule -Force
         }
 
-        It 'selects the Python-CLI branch (portable completion seam not invoked) when the probe reports available' {
-            # With the probe reporting available, the default routing invoker must take
-            # the Python branch and not call the portable completion seam. The probe is
-            # mocked (never python directly); the portable function is mocked only to
-            # detect invocation.
-            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $true }
+        It 'routes the default orchestrator-state dispatch to the portable completion seam' {
+            # The default routing invoker has exactly one path for the standard
+            # checkpoint type: the portable completion validation. No capability probe
+            # decides between branches any more.
             Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
 
-            $null = Invoke-RoutingContractValidation -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+            $result = Invoke-RoutingContractValidation -CheckpointPath 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
 
-            Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 0 -Exactly
+            $result.HasErrors | Should -BeFalse
+            Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 1 -Exactly
         }
 
-        It 'preserves the byte-for-byte Python invocation with both completion flags in the default invoker' {
-            # The default invoker's Python branch must still thread --require-complete
-            # and --require-model-routing so existing block reasons and fail-closed
-            # behavior are unchanged.
-            $source = ${function:Invoke-RoutingContractValidation}.Ast.Extent.Text
-            $source | Should -Match 'python -m scripts\.dev_tools\.validate_orchestration_artifacts'
-            $source | Should -Match '--require-complete'
-            $source | Should -Match '--require-model-routing'
+        It 'invokes no python, python3, py, or poetry command anywhere in the default invoker' {
+            # Negative-invocation AST assertion (issue #475): the inverse of the former
+            # source-text assertion that pinned the interpreter invocation string. Each
+            # CommandAst is classified by its resolved command name, so an interpreter
+            # name in a comment or string neither satisfies nor defeats this assertion.
+            $functionAst = ${function:Invoke-RoutingContractValidation}.Ast
+            $commandAsts = @($functionAst.FindAll(
+                    { param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))
+
+            $bannedNames = @('python', 'python3', 'py', 'poetry')
+            $invokedNames = @(
+                $commandAsts |
+                    ForEach-Object { $_.GetCommandName() } |
+                        Where-Object { $_ } |
+                            ForEach-Object { $_.ToLowerInvariant() }
+            )
+            $violations = @($invokedNames | Where-Object { $bannedNames -contains $_ })
+
+            $violations | Should -BeNullOrEmpty -Because (
+                'the default invoker must name no interpreter on any code path; found: ' + ($violations -join ', '))
         }
     }
 }

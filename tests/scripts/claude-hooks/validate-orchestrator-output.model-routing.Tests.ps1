@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Pester tests for the model-routing additions to the
@@ -17,13 +17,16 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output.ps1 model-routing gate' {
-    Context 'default routing invoker threads --require-model-routing' {
-        It 'passes both --require-complete and --require-model-routing to the Python CLI' {
-            # The default $Invoker scriptblock is embedded in the function source;
-            # assert both flags are threaded so one subprocess covers both gates.
+    Context 'default routing invoker covers the model-routing gate' {
+        It 'routes orchestrator-state to the complete-parity completion entry point' {
+            # Before issue #475 this asserted that the default invoker threaded the
+            # --require-complete and --require-model-routing CLI flags to a subprocess.
+            # There is no subprocess now: the portable entry point
+            # Test-OrchestratorStateCompletionReadiness is a complete-parity port of
+            # that exact flag pair, so naming it is the surviving form of the same
+            # assertion — one call covers both gates.
             $source = ${function:Invoke-RoutingContractValidation}.Ast.Extent.Text
-            $source | Should -Match '--require-complete'
-            $source | Should -Match '--require-model-routing'
+            $source | Should -Match 'Test-OrchestratorStateCompletionReadiness'
         }
     }
 
@@ -89,24 +92,15 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
         }
     }
 
-    Context 'capability detection (portable-path routing)' {
+    Context 'portable-path routing' {
         BeforeAll {
             # Pre-import the portable completion module so
             # Test-OrchestratorStateCompletionReadiness is a resolvable command that the
-            # default invoker's guarded import reuses and that tests can mock.
+            # default invoker's guarded import reuses and that tests can mock. As of
+            # issue #475 the portable path is the only path, so no capability probe is
+            # imported or mocked here.
             $portableModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1").Path
             Import-Module $portableModule -Force
-
-            # OrchestratorStateCompletion.psm1 internally re-imports OrchestratorState.psm1 as
-            # part of its own module load (a nested Import-Module inside a .psm1 file); that
-            # nested re-import removes this scope's global visibility of the sibling
-            # Test-PythonOrchestratorValidatorAvailable probe that now lives in
-            # OrchestratorState.psm1 (moved there per remediation-plan.2026-07-06T15-01.md
-            # P1-T1/R-2). Re-importing OrchestratorState.psm1 directly, after the completion
-            # module, restores that visibility so the unqualified Mock below (matching
-            # Invoke-RoutingContractValidation's own unqualified, non-module call site) resolves.
-            $orchestratorStateModule = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/orchestrator-state/OrchestratorState.psm1").Path
-            Import-Module $orchestratorStateModule -Force
         }
 
         BeforeEach {
@@ -120,11 +114,10 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
             }
         }
 
-        It 'surfaces MODEL_ROUTING_BLOCKED via the portable path for an uncovered delegated agent when the probe reports unavailable' {
-            # Probe reports the Python validator unavailable, so the default invoker
-            # routes to the portable completion seam, which reports a missing routing
-            # receipt; the hook maps it to MODEL_ROUTING_BLOCKED.
-            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+        It 'surfaces MODEL_ROUTING_BLOCKED via the portable path for an uncovered delegated agent' {
+            # The default invoker routes the standard checkpoint type to the portable
+            # completion seam, which reports a missing routing receipt; the hook maps
+            # it to MODEL_ROUTING_BLOCKED.
             Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith {
                 @{ ExitCode = 1; Output = 'Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.' }
             }
@@ -137,10 +130,9 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
             Should -Invoke -CommandName Test-OrchestratorStateCompletionReadiness -Times 1 -Exactly
         }
 
-        It 'does not block a covered checkpoint on the portable path when the probe reports unavailable' {
-            # Probe reports unavailable and the portable completion seam reports a clean
-            # checkpoint (ExitCode 0, no output), so DONE is not blocked.
-            Mock -CommandName Test-PythonOrchestratorValidatorAvailable -MockWith { $false }
+        It 'does not block a covered checkpoint on the portable path' {
+            # The portable completion seam reports a clean checkpoint (ExitCode 0, no
+            # output), so DONE is not blocked.
             Mock -CommandName Test-OrchestratorStateCompletionReadiness -MockWith {
                 @{ ExitCode = 0; Output = '' }
             }

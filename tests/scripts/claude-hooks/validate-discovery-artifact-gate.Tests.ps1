@@ -168,4 +168,44 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             }
         }
     }
+
+    Context 'defect D-2 avoidance: a passing validation must yield an Ok result' {
+        It 'returns Ok = $true when the validator reports success with EMPTY output' {
+            # This is the shape the portable module now returns on success. The gate
+            # blocks on a non-zero exit code OR on non-empty output, so success must be
+            # silent for a passing validation to be accepted.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+
+            $result.Ok | Should -Be $true
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'returns Ok = $false when the validator reports success but emits a success line' {
+            # The defect itself. The previous Python CLI printed
+            # "<type> validation passed: <path>" on success, and the wrapper captured
+            # stdout, so a PASSING validation blocked the gate. This pins that the
+            # block-on-non-empty-output logic is unchanged and that the fix is the
+            # module's empty-output success contract, not a relaxed gate.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = 'coverage-ledger validation passed: discovery/coverage-ledger/coverage-ledger.json' } }
+
+            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+
+            $result.Ok | Should -Be $false
+            $result.Message | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*'
+        }
+
+        It 'returns Ok = $true when the validator reports success with whitespace-only output' {
+            # The gate treats whitespace-only output as empty.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = "   " } }
+
+            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+
+            $result.Ok | Should -Be $true
+        }
+    }
 }

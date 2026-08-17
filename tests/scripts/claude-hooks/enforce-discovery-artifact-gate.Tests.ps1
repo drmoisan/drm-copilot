@@ -187,4 +187,44 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
             }
         }
     }
+
+    Context 'defect D-2 avoidance: a passing validation must yield an allow verdict' {
+        It 'allows the write when the validator reports success with EMPTY output' {
+            # This is the shape the portable module now returns on success. The gate
+            # denies on a non-zero exit code OR on non-empty output, so success must be
+            # silent for a passing validation to be allowed.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeNullOrEmpty
+        }
+
+        It 'denies when the validator reports success but emits a success line' {
+            # The defect itself. The previous Python CLI printed
+            # "<type> validation passed: <path>" on success, and the wrapper captured
+            # stdout, so a PASSING validation produced a DENY. This pins that the
+            # deny-on-non-empty-output logic is unchanged and that the fix is the
+            # module's empty-output success contract, not a relaxed gate.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = 'coverage-ledger validation passed: discovery/coverage-ledger/coverage-ledger.json' } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*'
+        }
+
+        It 'allows the write when the validator reports success with whitespace-only output' {
+            # The gate treats whitespace-only output as empty.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = "   " } }
+
+            $json = ConvertTo-DiscoveryToolInput -FilePath 'discovery/coverage-ledger/coverage-ledger.json'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
 }
