@@ -295,7 +295,7 @@ During Copilot publication, supported script references are rewritten to stable 
 
 ## Language toolchain ecosystems
 
-The repository defines a separate, fully specified quality toolchain for each supported language. Every toolchain is run in a fixed stage order and the loop restarts from stage 1 whenever a stage fails or rewrites files. The canonical definitions live in [.claude/rules/](.claude/rules/) and `.github/instructions/`. Coverage thresholds are uniform across all module tiers (T1–T4): line coverage >= 85% and branch coverage >= 75%, with no regression on changed lines.
+The repository defines a separate, fully specified quality toolchain for each supported language. Every toolchain is run in a fixed stage order and the loop restarts from stage 1 whenever a stage fails or rewrites files. The canonical definitions live in [.claude/rules/](.claude/rules/) and `.github/instructions/`. Coverage thresholds are uniform across all module tiers (T1–T4): line coverage >= 85%, with no regression on changed lines. Branch coverage >= 75% applies additionally to languages whose coverage tooling measures branch coverage; PowerShell (Pester) and bash (kcov) are exempt from the branch threshold because neither tool measures branch coverage, and they remain fully subject to the line threshold and the no-regression requirement.
 
 | Ecosystem | Format | Lint / analyze | Type / nullable | Test | Coverage |
 |---|---|---|---|---|---|
