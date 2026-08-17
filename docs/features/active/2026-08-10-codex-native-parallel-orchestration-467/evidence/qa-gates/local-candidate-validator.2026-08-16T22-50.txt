@@ -1,0 +1,9 @@
+Timestamp: 2026-08-16T22-50
+Command: poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/orchestrator-state.candidate.2026-08-16T22-50.json --require-codex-model-routing --require-codex-topology
+EXIT_CODE: 0
+Output Summary: Strict local candidate validator passed without qualification.
+
+STDOUT:
+orchestrator-state validation passed: docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/orchestrator-state.candidate.2026-08-16T22-50.json
+
+STDERR:

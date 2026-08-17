@@ -1,0 +1,38 @@
+Timestamp: 2026-08-16T22-50
+Command: git diff --check; git status --porcelain=v1 -uall; git diff -- artifacts/orchestration/orchestrator-state.json; git diff -- docs/features/active/2026-08-10-codex-native-parallel-orchestration-467
+EXIT_CODE: 0
+Output Summary: git diff --check passed. No staged or unstaged tracked changes exist. The real checkpoint has no diff. All status entries are untracked paths under the authorized issue #467 feature folder; the 8 launch-time paths remain preserved and the additional paths are pass-7 plan-authorized canonical evidence.
+
+STDOUT:
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-16T22-35/code-review.2026-08-16T22-35.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-16T22-35/feature-audit.2026-08-16T22-35.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/audit-2026-08-16T22-35/policy-audit.2026-08-16T22-35.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/checkpoint-identity.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/evidence-locations.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/input-sha256.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/local-checkpoint-validator.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/phase0-instructions-read.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/repository-state.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/additive-reconciliation-spec.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/authorization-boundary.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/candidate-identity.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/candidate-json-delta.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-commit-message.2026-08-16T22-33.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-r5-decision.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-remediation-commit.2026-08-16T22-33.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/historical-array-byte-identity.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/legacy-receipt-derivation-result.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/legacy-receipt-derivation.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/not-applicable-tasks.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/orchestrator-state.candidate.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/post-p0-failure.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/routing-contract-inventory.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/routing-receipt-inventory.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/final-evidence-locations.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/local-candidate-validator.2026-08-16T22-50.txt
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/mcp-candidate-validator.2026-08-16T22-50.json
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-16T22-50/remediation-inputs.2026-08-16T22-50.md
+?? docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-16T22-50/remediation-plan.2026-08-16T22-50.md
+
+STDERR:

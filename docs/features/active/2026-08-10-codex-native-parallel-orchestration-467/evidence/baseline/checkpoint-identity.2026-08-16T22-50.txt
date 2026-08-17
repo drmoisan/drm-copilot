@@ -1,0 +1,15 @@
+Timestamp: 2026-08-16T22-50
+Command: Copy-Item -LiteralPath 'artifacts/orchestration/orchestrator-state.json' -Destination 'docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json'; Get-FileHash -Algorithm SHA256 -LiteralPath 'artifacts/orchestration/orchestrator-state.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json'; Get-Item -LiteralPath 'artifacts/orchestration/orchestrator-state.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json' | Select-Object FullName,Length
+EXIT_CODE: 0
+Output Summary: Real checkpoint and baseline copy have equal SHA-256 values and byte counts.
+
+Algorithm Hash                                                             Path
+--------- ----                                                             ----
+SHA256   81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477 C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\artifacts\orchestration\orchestrator-state.json
+SHA256   81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477 C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\baseline\orchestrator-state.before.2026-08-16T22-50.json
+
+FullName : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\artifacts\orchestration\orchestrator-state.json
+Length   : 549240
+
+FullName : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\baseline\orchestrator-state.before.2026-08-16T22-50.json
+Length   : 549240

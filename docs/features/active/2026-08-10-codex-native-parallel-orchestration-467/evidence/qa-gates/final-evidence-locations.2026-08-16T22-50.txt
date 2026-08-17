@@ -1,0 +1,8 @@
+Timestamp: 2026-08-16T22-50
+Command: poetry run python scripts/dev_tools/validate_evidence_locations.py --root .
+EXIT_CODE: 0
+Output Summary: Final evidence-location validation passed with zero non-canonical paths.
+
+STDOUT:
+
+STDERR:

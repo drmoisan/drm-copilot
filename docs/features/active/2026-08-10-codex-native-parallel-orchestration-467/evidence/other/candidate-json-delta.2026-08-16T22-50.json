@@ -1,0 +1,106 @@
+{
+  "baseline_sha256": "81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477",
+  "candidate_sha256": "0BD8705F88E9288460D9A0A3D29AA21112BD68557AC9BB5DFDC5C839BE6A5F9C",
+  "summary": {
+    "add_count": 1,
+    "remove_count": 0,
+    "replace_count": 0,
+    "added_receipt_count": 11
+  },
+  "operations": [
+    {
+      "op": "add",
+      "path": "/model_routing_receipts",
+      "value": [
+        {
+          "phase": "S4_atomic_preflight_attempt_2",
+          "agent": "atomic-executor",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "post_execution_metadata_commit_executor",
+          "agent": "atomic-executor-c4",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S4_atomic_planning",
+          "agent": "atomic-planner",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S17_remediation_planning",
+          "agent": "atomic-planner-c4",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "P6-T35_commit_steward_predelegation",
+          "agent": "commit-steward",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "post_execution_metadata_commit_steward",
+          "agent": "commit-steward-c4",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S6_feature_review",
+          "agent": "feature-review",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S16_remediation_feature_re_review",
+          "agent": "feature-reviewer-c4",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S19_orchestrator_resume",
+          "agent": "orchestrator-c4",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S3b_feature_documents",
+          "agent": "prd-feature",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        },
+        {
+          "phase": "S2_research",
+          "agent": "task-researcher",
+          "complexity_band": "C4",
+          "fable_policy": "preferred",
+          "table_model": "fable",
+          "model": "fable"
+        }
+      ]
+    }
+  ]
+}

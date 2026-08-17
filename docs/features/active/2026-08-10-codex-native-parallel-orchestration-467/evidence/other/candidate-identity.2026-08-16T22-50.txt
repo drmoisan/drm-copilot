@@ -1,0 +1,19 @@
+Timestamp: 2026-08-16T22-50
+Command: Get-FileHash -Algorithm SHA256 -LiteralPath 'artifacts/orchestration/orchestrator-state.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/orchestrator-state.candidate.2026-08-16T22-50.json'; Get-Item -LiteralPath 'artifacts/orchestration/orchestrator-state.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/baseline/orchestrator-state.before.2026-08-16T22-50.json','docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/orchestrator-state.candidate.2026-08-16T22-50.json' | Select-Object FullName,Length
+EXIT_CODE: 0
+Output Summary: Real checkpoint remains byte-identical to baseline. Candidate differs only by the P2-T2 additive model_routing_receipts property.
+
+Algorithm Hash                                                             Path
+--------- ----                                                             ----
+SHA256   81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477 C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\artifacts\orchestration\orchestrator-state.json
+SHA256   81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477 C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\baseline\orchestrator-state.before.2026-08-16T22-50.json
+SHA256   0BD8705F88E9288460D9A0A3D29AA21112BD68557AC9BB5DFDC5C839BE6A5F9C C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\other\orchestrator-state.candidate.2026-08-16T22-50.json
+
+FullName : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\artifacts\orchestration\orchestrator-state.json
+Length   : 549240
+
+FullName : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\baseline\orchestrator-state.before.2026-08-16T22-50.json
+Length   : 549240
+
+FullName : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\evidence\other\orchestrator-state.candidate.2026-08-16T22-50.json
+Length   : 551602

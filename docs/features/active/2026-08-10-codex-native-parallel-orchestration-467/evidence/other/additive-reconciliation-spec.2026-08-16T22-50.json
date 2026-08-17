@@ -1,0 +1,105 @@
+{
+  "operation": "append_only",
+  "target_json_pointer": "/model_routing_receipts",
+  "baseline_length": 0,
+  "addition_count": 11,
+  "additions": [
+    {
+      "phase": "S4_atomic_preflight_attempt_2",
+      "agent": "atomic-executor",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "post_execution_metadata_commit_executor",
+      "agent": "atomic-executor-c4",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S4_atomic_planning",
+      "agent": "atomic-planner",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S17_remediation_planning",
+      "agent": "atomic-planner-c4",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "P6-T35_commit_steward_predelegation",
+      "agent": "commit-steward",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "post_execution_metadata_commit_steward",
+      "agent": "commit-steward-c4",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S6_feature_review",
+      "agent": "feature-review",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S16_remediation_feature_re_review",
+      "agent": "feature-reviewer-c4",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S19_orchestrator_resume",
+      "agent": "orchestrator-c4",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S3b_feature_documents",
+      "agent": "prd-feature",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    },
+    {
+      "phase": "S2_research",
+      "agent": "task-researcher",
+      "complexity_band": "C4",
+      "fable_policy": "preferred",
+      "table_model": "fable",
+      "model": "fable"
+    }
+  ],
+  "prohibitions": [
+    "deletion of any pre-existing entry",
+    "replacement of any pre-existing entry",
+    "relabeling of any pre-existing field or value",
+    "normalization or reserialization of pre-existing content",
+    "deduplication of any pre-existing entry",
+    "reordering of any pre-existing entry",
+    "any change to existing raw entry bytes"
+  ]
+}

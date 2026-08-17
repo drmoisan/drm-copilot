@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "checkpoint_sha256": "81024F3C6C1DB26B51F733D7712CBFBEA020F087275709C008CFDC7360974477",
+  "routing_config": "config/orchestration-routing.json",
+  "legacy_validator": "scripts/dev_tools/_orchestrator_state_model_routing.py",
+  "legacy_gate": "scripts/dev_tools/_orchestrator_state_model_routing_gate.py",
+  "identity_count": 11,
+  "proposed_fields_only": [
+    "phase",
+    "agent",
+    "complexity_band",
+    "fable_policy",
+    "table_model",
+    "model"
+  ],
+  "excluded_as_not_required_or_not_canonically_derived": [
+    "timestamp",
+    "model_reasoning_effort",
+    "execution_context",
+    "orchestration_complexity_ceiling",
+    "c3_overlay_applied",
+    "c3_overlay_reason",
+    "clamped_from",
+    "clamp_reason"
+  ],
+  "identities": [
+    {
+      "identity": "atomic-executor",
+      "delegation_index": 6,
+      "codex_model_routing_receipt_index": 11,
+      "complexity_assessment_index": 9,
+      "proposed_receipt": {
+        "phase": "S4_atomic_preflight_attempt_2",
+        "agent": "atomic-executor",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[11].phase",
+          "value": "S4_atomic_preflight_attempt_2"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[6].agent_name",
+          "corroboration": "codex_model_routing_receipts[11].logical_agent",
+          "value": "atomic-executor"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[11].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[9].phase",
+        "value": "S4_atomic_preflight_attempt_2"
+      }
+    },
+    {
+      "identity": "atomic-executor-c4",
+      "delegation_index": 47,
+      "codex_model_routing_receipt_index": 173,
+      "complexity_assessment_index": 171,
+      "proposed_receipt": {
+        "phase": "post_execution_metadata_commit_executor",
+        "agent": "atomic-executor-c4",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[173].phase",
+          "value": "post_execution_metadata_commit_executor"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[47].agent_name",
+          "corroboration": "codex_model_routing_receipts[173].deployment_agent",
+          "value": "atomic-executor-c4"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[173].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[171].phase",
+        "value": "post_execution_metadata_commit_executor"
+      }
+    },
+    {
+      "identity": "atomic-planner",
+      "delegation_index": 3,
+      "codex_model_routing_receipt_index": 4,
+      "complexity_assessment_index": 2,
+      "proposed_receipt": {
+        "phase": "S4_atomic_planning",
+        "agent": "atomic-planner",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[4].phase",
+          "value": "S4_atomic_planning"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[3].agent_name",
+          "corroboration": "codex_model_routing_receipts[4].logical_agent",
+          "value": "atomic-planner"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[4].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[2].phase",
+        "value": "S4_atomic_planning"
+      }
+    },
+    {
+      "identity": "atomic-planner-c4",
+      "delegation_index": 62,
+      "codex_model_routing_receipt_index": 1,
+      "complexity_assessment_index": 200,
+      "proposed_receipt": {
+        "phase": "S17_remediation_planning",
+        "agent": "atomic-planner-c4",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[1].phase",
+          "value": "S17_remediation_planning"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[62].agent_name",
+          "corroboration": "codex_model_routing_receipts[1].deployment_agent",
+          "value": "atomic-planner-c4"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[1].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[200].phase",
+        "value": "S17_remediation_planning"
+      }
+    },
+    {
+      "identity": "commit-steward",
+      "delegation_index": 44,
+      "codex_model_routing_receipt_index": 162,
+      "complexity_assessment_index": 160,
+      "proposed_receipt": {
+        "phase": "P6-T35_commit_steward_predelegation",
+        "agent": "commit-steward",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[162].phase",
+          "value": "P6-T35_commit_steward_predelegation"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[44].agent_name",
+          "corroboration": "codex_model_routing_receipts[162].logical_agent",
+          "value": "commit-steward"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[162].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[160].phase",
+        "value": "P6-T35_commit_steward_predelegation"
+      }
+    },
+    {
+      "identity": "commit-steward-c4",
+      "delegation_index": 46,
+      "codex_model_routing_receipt_index": 172,
+      "complexity_assessment_index": 170,
+      "proposed_receipt": {
+        "phase": "post_execution_metadata_commit_steward",
+        "agent": "commit-steward-c4",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[172].phase",
+          "value": "post_execution_metadata_commit_steward"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[46].agent_name",
+          "corroboration": "codex_model_routing_receipts[172].deployment_agent",
+          "value": "commit-steward-c4"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[172].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[170].phase",
+        "value": "post_execution_metadata_commit_steward"
+      }
+    },
+    {
+      "identity": "feature-review",
+      "delegation_index": 48,
+      "codex_model_routing_receipt_index": 174,
+      "complexity_assessment_index": 172,
+      "proposed_receipt": {
+        "phase": "S6_feature_review",
+        "agent": "feature-review",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[174].phase",
+          "value": "S6_feature_review"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[48].agent_name",
+          "corroboration": "codex_model_routing_receipts[174].logical_agent",
+          "value": "feature-review"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[174].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[172].phase",
+        "value": "S6_feature_review"
+      }
+    },
+    {
+      "identity": "feature-reviewer-c4",
+      "delegation_index": 61,
+      "codex_model_routing_receipt_index": 201,
+      "complexity_assessment_index": 199,
+      "proposed_receipt": {
+        "phase": "S16_remediation_feature_re_review",
+        "agent": "feature-reviewer-c4",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[201].phase",
+          "value": "S16_remediation_feature_re_review"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[61].agent_name",
+          "corroboration": "codex_model_routing_receipts[201].deployment_agent",
+          "value": "feature-reviewer-c4"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[201].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[199].phase",
+        "value": "S16_remediation_feature_re_review"
+      }
+    },
+    {
+      "identity": "orchestrator-c4",
+      "delegation_index": 0,
+      "codex_model_routing_receipt_index": 204,
+      "complexity_assessment_index": 203,
+      "proposed_receipt": {
+        "phase": "S19_orchestrator_resume",
+        "agent": "orchestrator-c4",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[204].phase",
+          "value": "S19_orchestrator_resume"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[0].agent_name",
+          "corroboration": "codex_model_routing_receipts[204].deployment_agent",
+          "value": "orchestrator-c4"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[204].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[203].phase",
+        "value": "S19_orchestrator_resume"
+      }
+    },
+    {
+      "identity": "prd-feature",
+      "delegation_index": 2,
+      "codex_model_routing_receipt_index": 3,
+      "complexity_assessment_index": 1,
+      "proposed_receipt": {
+        "phase": "S3b_feature_documents",
+        "agent": "prd-feature",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[3].phase",
+          "value": "S3b_feature_documents"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[2].agent_name",
+          "corroboration": "codex_model_routing_receipts[3].logical_agent",
+          "value": "prd-feature"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[3].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[1].phase",
+        "value": "S3b_feature_documents"
+      }
+    },
+    {
+      "identity": "task-researcher",
+      "delegation_index": 1,
+      "codex_model_routing_receipt_index": 2,
+      "complexity_assessment_index": 0,
+      "proposed_receipt": {
+        "phase": "S2_research",
+        "agent": "task-researcher",
+        "complexity_band": "C4",
+        "fable_policy": "preferred",
+        "table_model": "fable",
+        "model": "fable"
+      },
+      "field_sources": {
+        "phase": {
+          "source": "codex_model_routing_receipts[2].phase",
+          "value": "S2_research"
+        },
+        "agent": {
+          "source": "delegation_receipts.agents[1].agent_name",
+          "corroboration": "codex_model_routing_receipts[2].logical_agent",
+          "value": "task-researcher"
+        },
+        "complexity_band": {
+          "source": "codex_model_routing_receipts[2].complexity_band",
+          "value": "C4"
+        },
+        "fable_policy": {
+          "source": "config/orchestration-routing.json#/model_budget/fable_policy",
+          "value": "preferred"
+        },
+        "table_model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "value": "fable"
+        },
+        "model": {
+          "source": "config/orchestration-routing.json#/model_policy/complexity_to_model/C4",
+          "resolver_rule": "preferred policy leaves the C4 table value unclamped",
+          "value": "fable"
+        }
+      },
+      "phase_pairing_source": {
+        "source": "complexity_assessments[0].phase",
+        "value": "S2_research"
+      }
+    }
+  ]
+}

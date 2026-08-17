@@ -1,0 +1,8 @@
+Timestamp: 2026-08-16T22-50
+Command: Get-FileHash -Algorithm SHA256 -LiteralPath 'docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-16T22-50/remediation-inputs.2026-08-16T22-50.md' | Format-List Algorithm,Hash,Path
+EXIT_CODE: 0
+Output Summary: SHA-256 matched the authoritative requirements-source hash.
+
+Algorithm : SHA256
+Hash      : E42E142EB2ED4200CBA52106B9A93653DC2704938A587E3BF2EEAC3D3E2261FF
+Path      : C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-10T19-25\docs\features\active\2026-08-10-codex-native-parallel-orchestration-467\remediation-2026-08-16T22-50\remediation-inputs.2026-08-16T22-50.md
