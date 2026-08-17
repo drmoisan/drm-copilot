@@ -336,7 +336,7 @@ Deliver an additive, root-controlled Codex parallel surface with the following e
       linting, type checking where applicable, unit and integration tests, Pester, Bats, and
       zero-regression checks in the required order.
       Evidence: [final four-language QA index](evidence/qa-gates/index.md).
-- [ ] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
+- [x] Repository-wide line coverage remains at least 85 percent, repository-wide branch coverage
       remains at least 75 percent, each new module/class/method targets at least 90 percent, changed-
       line coverage does not regress, and coverage evidence is stored under the canonical feature
       evidence path; QA-gate evidence uses `<FEATURE>/evidence/qa-gates/`.

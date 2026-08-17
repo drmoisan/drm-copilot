@@ -87,7 +87,7 @@ The planner must read these exact files before writing the plan:
 
 ### Primary requirements
 
-- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-15T03-09/remediation-inputs.2026-08-15T03-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-inputs.2026-08-15T03-09.md`
 
 ### Canonical PR context
 

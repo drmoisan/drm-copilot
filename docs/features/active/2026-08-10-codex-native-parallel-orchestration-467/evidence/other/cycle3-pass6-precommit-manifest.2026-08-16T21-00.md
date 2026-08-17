@@ -1,0 +1,93 @@
+# Cycle 3 Pass 6 Pre-Commit Staging Manifest
+
+- Issue: `#467`
+- Built at: `2026-08-16T22:25:00-04:00`
+- Pre-stage HEAD: `80fd06b835f6ec5c257b6c670a0bdfaf46cded0e`
+- Explicit intended path count: `59`
+- Sorted ordinal LF-delimited path-set SHA-256: `044B28E23C16347EB97951C24C9902B1AEA952165EC0F925D9A3F793BAB528D7`
+- Preserved grouped-to-flat relocation deletions: `2`
+- Requirement-source token-only modifications: `2`
+- Canonical feature evidence, including this manifest: `52`
+- Flat input/plan pair: `2`
+- Issue-scoped exception runbook: `1`
+- Unexpected paths: `0`
+- `.claude/**` paths: `0`
+- Governed executable-input paths: `0`
+- Staging form: `git add --` followed by every exact file argument enumerated below; no directory pathspec or glob is permitted.
+- Initial cached diff-check exit: `2`; diagnostics: exactly four blank lines at EOF.
+- Mechanical correction scope: removed only the final extra LF from the acceptance-reconciliation, executor-handback, repository-state, and final-comparison receipts.
+- Corrected acceptance-reconciliation SHA-256: `83B4359A1F00BFEC80FA3F8BE7AE671AB724B6137830EB6F2AB4BA864CEC2D01`.
+- Corrected final-comparison SHA-256: `C39043040CB11BB5844A78ACCE79CEFA0D905BB83D5AD4F915690ACF13C3F739`.
+- Corrected repository-state SHA-256: `08EEE8FE8A18B526699B9F1204DC195172BAEE68151298D90EFEC1DAB565ACE1`.
+- Corrected executor-handback SHA-256: `0DC8659CEBCD298817CC07194A66023DBF3AF7CC9460C2E8D97A055F346697CB`.
+- Final staged path count with rename detection disabled: `59`.
+- Final staged sorted ordinal LF-delimited path-set SHA-256: `044B28E23C16347EB97951C24C9902B1AEA952165EC0F925D9A3F793BAB528D7`.
+- Manifest/index equality: `59/59`; `PASS`.
+- Final cached diff-check exit: `0`; diagnostics: `0`.
+- Unstaged paths: `0`; untracked paths: `0`; unrelated staged paths: `0`.
+
+This manifest binds the complete issue #467 pass-6 working-tree set after executor P6-T4. It preserves the user-directed flat input/plan relocation, records only the authorized S-D14 and U20 checkbox-token changes, and includes canonical evidence for all retained gates. `RAW_BRANCH_RESULT: 0/0 UNAVAILABLE`. `COMPLIANCE_DISPOSITION: ONE_TIME_EXCEPTION_AUTHORIZED`. No measured PowerShell branch PASS is asserted.
+
+## Exact Explicit Path Set
+
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/issue-updates/cycle3-pass6-acceptance-reconciliation.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-branch-capability-decision.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-branch-capability-inventory.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-continuation-decision.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-no-implementation-delta.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-raw-branch-reconciliation.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-resume-verification.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-retained-gates.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-exception-runbook-conformance.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-executor-to-orchestrator-handback.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-fail-closed-decision.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-powershell-branch-one-time-exception.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-precommit-manifest.2026-08-16T21-00.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/other/cycle3-pass6-repository-handback-state.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-bash-check.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-bash-coverage.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-bash-freshness.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-claude-invariance.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-diff-check.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-evidence-locations.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-file-sizes.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-final-comparison.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-final-scope.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-policy-scope.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-powershell-analyze.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-powershell-coverage.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-powershell-format.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-powershell-owner-comparison.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-powershell-test.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-python-coverage.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-python-format.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-python-freshness.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-python-lint.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-python-typecheck.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-root-bundle-parity.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-typescript-coverage.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-typescript-format.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-typescript-freshness.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-typescript-lint.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/qa-gates/cycle3-pass6-typescript-typecheck.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/regression-testing/cycle3-pass6-branch-capability-probe.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-acceptance-baseline.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-authorization-gate.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-context-integrity.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-executable-input-fingerprint.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-phase0-instructions-read.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-powershell-analyze.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-powershell-coverage.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-powershell-format.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-powershell-ownership.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-powershell-test.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/evidence/remediation-baseline/cycle3-pass6-repository-state.2026-08-15T10-36.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-15T03-09/remediation-inputs.2026-08-15T03-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-2026-08-15T03-09/remediation-plan.2026-08-15T03-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-inputs.2026-08-15T03-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/remediation-plan.2026-08-15T03-09.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/runbooks/powershell-branch-coverage-one-time-exception.runbook.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/spec.md`
+- `docs/features/active/2026-08-10-codex-native-parallel-orchestration-467/user-story.md`
+
+Result before staging: `READY`.
