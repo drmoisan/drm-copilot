@@ -111,6 +111,76 @@ class TestM8KeyAbsent:
         ]
 
 
+class TestM8ResolutionTargetDegradation:
+    """M8's resolution target when the item table is itself malformed.
+
+    Reporting a malformed ``items`` collection is invariant M6's job. M8 must
+    contribute no SECOND error for the same defect: it simply resolves nothing
+    against a malformed entry, so its members are reported as unresolved rather
+    than crashing or double-reporting.
+    """
+
+    def test_a_non_list_items_value_leaves_every_member_unresolved(self) -> None:
+        """A scalar ``items`` value yields M6's error plus an unresolved member."""
+
+        document = (
+            "---\n"
+            "parallel: alpha-run\n"
+            'created_at: "2026-08-10T00:00:00Z"\n'
+            "items: alpha\n"
+            "expected_conflict_components:\n"
+            "  - members:\n"
+            "      - 101\n"
+            "---\n"
+            "\n"
+            "# Parallel Run\n"
+        )
+
+        assert validate_parallel_manifest_text(document) == [
+            f"{CONTEXT} items must be a list.",
+            f"{CONTEXT} expected_conflict_components[0] members[0] does not "
+            "resolve to an items[] issue_num; found: 101.",
+        ]
+
+    def test_a_non_mapping_item_entry_contributes_no_resolvable_key(self) -> None:
+        """A scalar entry inside ``items`` is skipped by M8's resolution scan."""
+
+        document = (
+            "---\n"
+            "parallel: alpha-run\n"
+            'created_at: "2026-08-10T00:00:00Z"\n'
+            "items:\n"
+            "  - alpha\n"
+            "expected_conflict_components:\n"
+            "  - members:\n"
+            "      - 101\n"
+            "---\n"
+            "\n"
+            "# Parallel Run\n"
+        )
+
+        assert validate_parallel_manifest_text(document) == [
+            f"{CONTEXT} items[0] must be an object.",
+            f"{CONTEXT} expected_conflict_components[0] members[0] does not "
+            "resolve to an items[] issue_num; found: 101.",
+        ]
+
+    def test_an_item_with_a_malformed_issue_num_contributes_no_resolvable_key(
+        self,
+    ) -> None:
+        """An entry whose primary key is non-positive resolves nothing for M8."""
+
+        document = build_manifest(
+            "expected_conflict_components:\n  - members:\n      - 101\n", keys=(102,)
+        ).replace("issue_num: 102", "issue_num: 0")
+
+        assert validate_parallel_manifest_text(document) == [
+            f"{CONTEXT} items[0] issue_num must be a positive integer; found: 0.",
+            f"{CONTEXT} expected_conflict_components[0] members[0] does not "
+            "resolve to an items[] issue_num; found: 101.",
+        ]
+
+
 class TestM8PositivePaths:
     """Block-sequence components that satisfy the invariant."""
 
