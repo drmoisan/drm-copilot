@@ -108,7 +108,7 @@ describe("invariants 2-4 run identity", () => {
     );
   });
 
-  it.each([1, 4, 8])("accepts in-range concurrency %p", (concurrency) => {
+  it.each([1, 4, 32])("accepts in-range concurrency %p", (concurrency) => {
     const state = buildValidParallelState();
     state["max_concurrency"] = concurrency;
 
@@ -117,7 +117,7 @@ describe("invariants 2-4 run identity", () => {
 
   it.each([
     [0, "0"],
-    [9, "9"],
+    [33, "33"],
     [-1, "-1"],
     [true, "True"],
     ["4", "'4'"],
@@ -128,7 +128,7 @@ describe("invariants 2-4 run identity", () => {
     state["max_concurrency"] = concurrency;
 
     expect(validateState(state)).toContain(
-      `Parallel checkpoint max_concurrency must be an integer from 1 through 8; found: ${String(rendered)}.`,
+      `Parallel checkpoint max_concurrency must be an integer from 1 through 32; found: ${String(rendered)}.`,
     );
   });
 });

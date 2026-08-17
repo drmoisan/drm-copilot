@@ -91,6 +91,7 @@ class TestPinnedBarrierOffsetRegression:
             pinned,
             START_GENERATION,
             current_cohort=pinned_cohort_index,
+            highest_pinned_cohort=pinned_cohort_index,
         )
 
         # Assert: the deferred candidate must not share the pinned items' cohort.
@@ -116,7 +117,12 @@ class TestPinnedItemsNeverMove:
 
         # Act
         result = recolor_unstarted(
-            unstarted, edges, pinned, START_GENERATION, current_cohort=0
+            unstarted,
+            edges,
+            pinned,
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         # Assert
@@ -131,7 +137,12 @@ class TestPinnedItemsNeverMove:
 
         # Act
         result = recolor_unstarted(
-            unstarted, edges, frozenset({99}), START_GENERATION, current_cohort=0
+            unstarted,
+            edges,
+            frozenset({99}),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         # Assert
@@ -148,7 +159,12 @@ class TestPinnedItemsNeverMove:
 
         # Act: recolor the unstarted subgraph and apply only its assignments.
         result = recolor_unstarted(
-            [11], [(11, 21)], frozenset({21}), START_GENERATION, current_cohort=0
+            [11],
+            [(11, 21)],
+            frozenset({21}),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
         for key, index in result.cohort_assignments.items():
             cohort_by_key[key] = index
@@ -168,6 +184,7 @@ class TestPinnedItemsNeverMove:
                 frozenset({21}),
                 START_GENERATION,
                 current_cohort=0,
+                highest_pinned_cohort=0,
             )
 
     def test_recolor_does_not_mutate_its_inputs(self) -> None:
@@ -179,7 +196,12 @@ class TestPinnedItemsNeverMove:
 
         # Act
         recolor_unstarted(
-            unstarted, edges, frozenset({21}), START_GENERATION, current_cohort=0
+            unstarted,
+            edges,
+            frozenset({21}),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         # Assert
@@ -191,7 +213,12 @@ class TestPinnedItemsNeverMove:
 
         # Arrange
         result = recolor_unstarted(
-            [11], [], frozenset(), START_GENERATION, current_cohort=0
+            [11],
+            [],
+            frozenset(),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         # Act / Assert
@@ -221,6 +248,7 @@ class TestPinnedBarrierOffset:
             frozenset({100}),
             START_GENERATION,
             current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         assert min(result.cohort_assignments.values()) == 1
@@ -241,6 +269,7 @@ class TestPinnedBarrierOffset:
             frozenset({100}),
             START_GENERATION,
             current_cohort=3,
+            highest_pinned_cohort=3,
         )
 
         assert min(result.cohort_assignments.values()) == 4
@@ -260,6 +289,7 @@ class TestPinnedBarrierOffset:
             frozenset({100}),
             START_GENERATION,
             current_cohort=3,
+            highest_pinned_cohort=3,
         )
 
         assert min(result.cohort_assignments.values()) == 3
@@ -279,6 +309,7 @@ class TestPinnedBarrierOffset:
             frozenset({100}),
             START_GENERATION,
             current_cohort=2,
+            highest_pinned_cohort=2,
         )
 
         first = result.cohort_assignments[200]
@@ -292,7 +323,12 @@ class TestPinnedBarrierOffset:
 
         with pytest.raises(ParallelCohortInputError) as excinfo:
             recolor_unstarted(
-                [200], [], frozenset({100}), START_GENERATION, current_cohort=-1
+                [200],
+                [],
+                frozenset({100}),
+                START_GENERATION,
+                current_cohort=-1,
+                highest_pinned_cohort=-1,
             )
 
         assert excinfo.value.offending_value == -1
@@ -305,7 +341,107 @@ class TestPinnedBarrierOffset:
         """
 
         result = recolor_unstarted(
-            [11, 12, 13], [(11, 12)], frozenset(), START_GENERATION, current_cohort=0
+            [11, 12, 13],
+            [(11, 12)],
+            frozenset(),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         assert dict(result.cohort_assignments) == {11: 0, 12: 1, 13: 0}
+
+
+class TestHighestPinnedCohortOffset:
+    """The per-edge-barrier generalization of the pinned-barrier offset (D1).
+
+    Purpose:
+        Bind the offset to the HIGHEST current-generation cohort index occupied
+        by any pinned item rather than to ``current_cohort``. Under the per-edge
+        barrier an item starts as soon as its own conflicting prior-cohort
+        neighbours are terminal, so in-flight items are not confined to one
+        index and the pinned frontier can span several cohorts.
+
+    Scope:
+        Two directions are bound. The multi-cohort case proves the offset clears
+        the highest pinned index, and the single-frontier case proves the
+        generalization is behaviour-identical wherever
+        ``highest_pinned_cohort == current_cohort`` -- every state reachable
+        before D1 landed.
+    """
+
+    def test_multi_cohort_pinned_frontier_pushes_above_the_highest_pinned_index(
+        self,
+    ) -> None:
+        """A candidate conflicting with an index-1 pinned item lands above index 1.
+
+        Pinned items occupy current-generation indices {0, 1} while
+        ``current_cohort`` is still 0, which the per-edge barrier permits: the
+        index-1 item started because its own prior-cohort neighbours were
+        terminal, not because the whole cohort 0 had drained. The pre-D1 offset
+        ``current_cohort + 1`` would place the deferred candidate at index 1 --
+        the very index its pinned conflict occupies -- so this test fails
+        against the previous expression.
+        """
+
+        # Arrange: 100 is pinned at index 0 and 101 is pinned at index 1, so the
+        # pinned frontier spans two cohorts while current_cohort is still 0. The
+        # only edge is candidate-to-pinned against the HIGHER pinned index.
+        unstarted = [200, 300]
+        conflict_edges = [(101, 300)]
+        pinned = frozenset({100, 101})
+
+        # Act
+        result = recolor_unstarted(
+            unstarted,
+            conflict_edges,
+            pinned,
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=1,
+        )
+
+        # Assert: the deferred candidate must clear the highest pinned index.
+        assert result.cohort_assignments[300] > 1
+        assert min(result.cohort_assignments.values()) == 2
+
+    def test_single_frontier_offset_matches_the_previous_behavior(self) -> None:
+        """With one pinned frontier the generalized offset reproduces the old one.
+
+        Identity regression for spec AC13: whenever every pinned item occupies
+        ``current_cohort`` -- every state reachable before D1 -- the generalized
+        expression ``highest_pinned_cohort + 1`` equals the previous
+        ``current_cohort + 1``, and the no-conflict path is untouched at
+        ``current_cohort``.
+        """
+
+        # Arrange: one pinned item at index 3, so the frontier is a single index.
+        current_cohort = 3
+        pinned = frozenset({100})
+        crossing_edges = [(100, 300)]
+        non_crossing_edges = [(200, 300)]
+
+        # Act: recolor once with a pinned conflict and once without.
+        crossing = recolor_unstarted(
+            [200, 300],
+            crossing_edges,
+            pinned,
+            START_GENERATION,
+            current_cohort=current_cohort,
+            highest_pinned_cohort=current_cohort,
+        )
+        non_crossing = recolor_unstarted(
+            [200, 300],
+            non_crossing_edges,
+            pinned,
+            START_GENERATION,
+            current_cohort=current_cohort,
+            highest_pinned_cohort=current_cohort,
+        )
+
+        # Assert: both bases equal the pre-D1 rule computed from current_cohort
+        # alone, so no reachable pre-D1 recoloring changed.
+        assert min(crossing.cohort_assignments.values()) == current_cohort + 1
+        assert min(non_crossing.cohort_assignments.values()) == current_cohort
+        assert dict(crossing.cohort_assignments) == {200: 4, 300: 4}
+        assert dict(non_crossing.cohort_assignments) == {200: 3, 300: 4}

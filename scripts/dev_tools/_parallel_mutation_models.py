@@ -300,8 +300,11 @@ class RecolorResult:
 
         The values are ABSOLUTE checkpoint cohort indices, not zero-based local
         color indices. They already carry the pinned-barrier offset: every index
-        is at or above the run's ``current_cohort``, and strictly above it
-        whenever an unstarted item conflicts with a pinned item. The caller
+        is at or above the run's ``current_cohort``, and strictly above the
+        HIGHEST current-generation index occupied by any pinned item whenever an
+        unstarted item conflicts with a pinned item. Under the per-edge barrier
+        an item starts once its own conflicting prior-cohort neighbours are
+        terminal, so in-flight items are not confined to one index. The caller
         writes them VERBATIM into ``cohorts[].index`` and never re-bases them to
         zero. When the lowest returned index equals ``current_cohort`` -- the
         no-pinned-conflict case, where the offset is not applied -- the keys at

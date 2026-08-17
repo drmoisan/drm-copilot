@@ -172,6 +172,7 @@ class GeneratedRun:
             self.pinned,
             generation,
             current_cohort=self.current_cohort,
+            highest_pinned_cohort=self.current_cohort,
         )
 
     def __str__(self) -> str:
@@ -261,6 +262,7 @@ class TestPropertyThreePinStability:
                 run.pinned,
                 generation,
                 current_cohort=run.current_cohort,
+                highest_pinned_cohort=run.current_cohort,
             )
             for key, index in refreshed.cohort_assignments.items():
                 cohort_by_key[key] = index

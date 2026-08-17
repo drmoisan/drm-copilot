@@ -64,6 +64,23 @@ The first two were recorded as undetermined cause, partly because the check happ
 
 The consistent shape — source deleted, destination reported but absent — suggests the move is performed as a delete plus a write whose write leg fails silently, or that the destination write targets a path different from the one reported. Inspect the promotion implementation's move step and confirm whether its reported `destination_path` is the path actually written.
 
+### Correction from a fourth observation (2026-08-16, issue #479)
+
+**The attribution above is wrong, and the title of this entry is misleading.** A fourth observation with clean bracketing shows the promoted record SURVIVES `potential_to_issue` and is removed later:
+
+1. `potential_to_issue` returned `ok: true` with a `destination_path`.
+2. An immediate probe found the destination PRESENT at 6901 bytes, and the pre-promotion source correctly absent. The move had succeeded, contradicting observations 1-3.
+3. `git checkout -b` ran (no file removal).
+4. `new_active_feature_folder` ran.
+5. A later probe found the destination ABSENT.
+6. `docs/features/potential/promoted` and the newly created active feature folder carried the IDENTICAL mtime to the nanosecond (`2026-08-16 22:09:57.221665500 -0400`), indicating a single operation touched both.
+
+The suspect is therefore `new_active_feature_folder`, not `potential_to_issue`. Observations 1-3 could not distinguish the two calls because each probed only once, after `potential_to_issue` but after `new_active_feature_folder` had also run, or well after both.
+
+A further detail that made this hard to notice: because the promoted record is created and deleted within a single session and is never committed, its disappearance produces NO `git status` deletion entry. It simply stops appearing as untracked. Observation 3's claim that `git status` showed "a bare deletion" applies only when the source was already tracked from a prior commit.
+
+Revised investigation target: inspect `new_active_feature_folder`'s implementation for a cleanup or move step that operates on `docs/features/potential/promoted/`. Re-scope this entry to the promotion lifecycle as a whole rather than to `potential_to_issue` alone, and rename it accordingly before promotion.
+
 ## Proposed Fix / Validation Ideas
 
 - [ ] Unit coverage areas: the promotion move step; assert the reported `destination_path` exists after a successful promotion.

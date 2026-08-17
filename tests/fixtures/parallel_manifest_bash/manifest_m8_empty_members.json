@@ -1,0 +1,10 @@
+{
+  "name": "manifest_m8_empty_members",
+  "notes": "M8: an empty members list asserts no membership and is rejected.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha101.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n  - issue_num: 102\n    feature_folder: docs/features/active/alpha-102\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha102.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\nexpected_conflict_components:\n  - members: []\n---\n\n# Parallel Run\n",
+  "expected_errors": [
+    "Parallel manifest expected_conflict_components[0] members must be a non-empty list of positive integers."
+  ],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}

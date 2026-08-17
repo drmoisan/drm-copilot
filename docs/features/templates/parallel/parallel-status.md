@@ -28,8 +28,8 @@ source of the cohort table or of the schedule.
 
 - `parallel_slug`: _(run slug)_
 - `mode`: _(`closed` or `open`; defaults to `closed`)_
-- `max_concurrency`: _(integer 1 through 8; defaults to 4)_
-- `current_cohort`: _(index of the cohort currently launched)_
+- `max_concurrency`: _(integer 1 through 32; defaults to 4)_
+- `current_cohort`: _(progress indicator: the lowest current-generation cohort index still holding a non-terminal, non-withdrawn item; updated only on durable confirmation and gating nothing)_
 - `recolor_generation`: _(current generation; only cohorts at this generation are scheduled)_
 - `last_updated`: _(ISO-8601 timestamp of this regeneration)_
 

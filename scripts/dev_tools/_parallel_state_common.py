@@ -194,7 +194,7 @@ def in_bounded_range(value: object, minimum: int, maximum: int) -> bool:
 
     Returns:
         bool: True for a non-boolean ``int`` within the bounds. Used for
-        ``max_concurrency``, whose accepted range is 1 through 8 (A7).
+        ``max_concurrency``, whose accepted range is 1 through 32 (A7).
     """
 
     if not isinstance(value, int) or isinstance(value, bool):
