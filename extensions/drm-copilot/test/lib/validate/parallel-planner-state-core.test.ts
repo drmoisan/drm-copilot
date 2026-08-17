@@ -178,10 +178,19 @@ describe("invariant P2 run identity", () => {
     );
   });
 
+  // The accept direction had no case before the 1..32 widening, so a raised
+  // ceiling could not have been detected from the planner core suite alone.
+  it.each([1, 4, 32])("accepts in-range concurrency %p", (concurrency) => {
+    const state = buildValidPlannerState();
+    state["max_concurrency"] = concurrency;
+
+    expect(validate(state)).toEqual([]);
+  });
+
   it.each([
     [0, "0"],
     [-1, "-1"],
-    [9, "9"],
+    [33, "33"],
     ["4", "'4'"],
     [1.5, "1.5"],
     [true, "True"],
@@ -191,7 +200,7 @@ describe("invariant P2 run identity", () => {
     state["max_concurrency"] = concurrency;
 
     expect(validate(state)).toContain(
-      `${CONTEXT} max_concurrency must be an integer from 1 through 8; found: ${String(rendered)}.`,
+      `${CONTEXT} max_concurrency must be an integer from 1 through 32; found: ${String(rendered)}.`,
     );
   });
 });

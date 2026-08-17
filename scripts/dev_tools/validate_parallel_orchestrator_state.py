@@ -68,7 +68,7 @@ EXPECTED_ROUTE_ID = "parallel"
 
 # Inclusive bounds on ``max_concurrency`` (invariant 4, assumption A7).
 MIN_CONCURRENCY = 1
-MAX_CONCURRENCY = 8
+MAX_CONCURRENCY = 32
 
 # Required top-level keys (invariant 1). The first four mirror the epic
 # baseline so the existing structural checkpoint hooks apply unmodified; the

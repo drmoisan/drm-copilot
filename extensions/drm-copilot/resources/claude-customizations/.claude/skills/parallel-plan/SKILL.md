@@ -62,9 +62,42 @@ Intake proceeds directly to preparation fan-out.
 ## Preparation Fan-Out
 
 One preparation-mode `Agent(orchestrator)` run per item. Preparation produces documents and plans
-rather than code, and items carry no ordering constraint, so launch ALL item preparations
-concurrently: one message, N `Agent` calls, each `isolation: "worktree"` and
-`run_in_background: true`. Create each preparation worktree's branch from `origin/main`.
+rather than code, and items carry no ordering constraint, so preparations may run concurrently —
+but they are BOUNDED, not unbounded.
+
+**Launch preparations in waves of at most `max_concurrency`.** Compute the waves with the same
+deterministic chunker the execution phase uses:
+
+```
+bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<all item keys>" --max-concurrency <n>
+```
+
+(already granted to this agent at `.claude/agents/parallel-planner.md:18`). It prints a compact
+JSON array of arrays, returns the batches in order, and sorts the keys itself, so wave membership
+does not depend on caller ordering. Launch wave *k* as one message carrying that wave's `Agent`
+calls, each `isolation: "worktree"` and `run_in_background: true`.
+Create each preparation worktree's branch from `origin/main`.
+Launch wave *k+1* only after every child of wave *k* has TERMINATED — not merely reported
+progress. All of this happens inside a single `/parallel-plan` invocation with no operator action
+between waves.
+
+The bound is `max_concurrency` itself, and no new knob is introduced. A preparation child and an
+execution child are the same workload class — one background orchestrator per item — so the
+operator's declared appetite for concurrent children applies to both phases. At the motivating
+scale, `max_concurrency: 13` over 69 items runs `ceil(69 / 13) = 6` waves.
+
+**A `max_preparation_concurrency` manifest key was considered and is explicitly NOT adopted now.**
+Such a key would carry the same `1..32` bounds and the same boolean rejection as M4 and would
+default to `max_concurrency`. It is deferred because no evidence yet shows the two phases need
+different caps, and adding a second knob would force every operator to reason about two numbers
+where one suffices. Revisit it only if a real run shows preparation and execution have materially
+different concurrency profiles.
+
+**`/parallel-add` is NOT the intake path.** It performs incremental admission into an
+already-running open-mode queue: exactly one item per invocation, with a single sequential
+preparation child. Preparing 69 items through it would take 57 or more separate operator
+invocations after the initial plan. Use `/parallel-plan` for intake and `/parallel-add` only to
+admit an item into a run that is already in flight.
 
 Each delegation prompt includes this literal kickoff line, followed by the model-budget marker
 line:
@@ -250,10 +283,27 @@ The library returns the partition; the planner supplies the record fields.
    item is `prepared` and radius-validated. Derive the conflict edge set by applying
    `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
-2. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
-3. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
-4. Record `recolor_generation: 0` and `current_cohort: 0`.
-5. Record `max_concurrency` — default 4, bounded 1 through 8 by the F3 schema — without enforcing
+2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
+   lane-assertion diagnostic:
+   `poetry run python -m scripts.dev_tools.parallel_lane_assertion --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
+   (covered by the planner's existing `Bash(poetry run *)` grant). It compares the manifest's
+   optional `expected_conflict_components` assertion (invariant M8) against the connected
+   components of the DERIVED conflict graph and prints one `ADVISORY` line per finding in four
+   classes: expected-together-but-derived-apart, expected-apart-but-derived-together, a member
+   naming no manifest item, and — informational only — a manifest item covered by no expected
+   component.
+   **The diagnostic is ADVISORY ONLY.** It never blocks the run, never modifies or suppresses a
+   derived edge, never feeds `compute_cohorts`, and never influences scheduling. It always exits 0,
+   including when it reports disagreements. A disagreement is a signal to re-examine the blast
+   radii; it is never a licence to narrow a radius to suppress an edge, which stays prohibited.
+   When the manifest carries no `expected_conflict_components` key the diagnostic still runs and
+   reports every item as uncovered, which is the expected output for a run with no assertion.
+   Recording the diagnostic's result in the planner checkpoint is a tolerated extra field, not a
+   validated one; no validator changes for it.
+3. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
+4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
+5. Record `recolor_generation: 0` and `current_cohort: 0`.
+6. Record `max_concurrency` — default 4, bounded 1 through 32 by the F3 schema — without enforcing
    it. Enforcement is F5's, through
    `bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> ..." --max-concurrency <n>`
    (the bash port of `compute_concurrency_batches(cohort_item_keys, max_concurrency)`), which fills
@@ -281,16 +331,23 @@ No production module is added for this check; it is a re-invocation of the lande
 ## Manifest Authoring
 
 Write `docs/features/parallel/<slug>/parallel.md` conforming to the F3-owned frontmatter schema
-recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M7):
+recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M8):
 
 - `parallel` — the run slug, a non-empty string.
 - `mode` — `closed` or `open`; defaults to `closed` when absent.
-- `max_concurrency` — an integer from 1 through 8; defaults to `4` when absent.
+- `max_concurrency` — an integer from 1 through 32; defaults to `4` when absent.
 - `created_at` — a non-empty ISO-8601 string.
 - `items[]` — one entry per item, each carrying `issue_num` (a positive integer, unique across
   items), `feature_folder` (a non-empty string), `kind` (`feature` or `bug`), `state`, and
   `blast_radius` carrying `paths`, `modules`, `shared_surfaces`, `contracts`, `source: "declared"`,
   and `computed_at`.
+- `expected_conflict_components[]` — OPTIONAL (invariant M8). A block sequence of objects, each
+  carrying a required non-empty `members` list of positive `issue_num` integers that resolve to
+  declared items, with no item in two components, plus an optional non-empty-string `name` used as
+  a diagnostic label only. A flow-style value (`members: [101, 102]`) is outside the bash YAML
+  subset and must not be authored. The field is an ASSERTION consumed by the advisory lane
+  diagnostic in `### Seeding procedure`: it never overrides a derived edge, never feeds
+  `compute_cohorts`, and never influences scheduling.
 
 The manifest carries no `depends_on` field at any level and no top-level `integration_branch`
 field; both are prohibited-key rejections in the schema. Commit it to `parallel/<slug>-plan` in
@@ -454,6 +511,11 @@ The final report to the operator must include:
 - Per item: one `plan-path:` line, the branch name, the preflight status, and the
   radius-validation result, including any V3 Advisory findings.
 - The cohort table at `generation 0`, together with the result of the recomputation-parity check.
+- The lane-assertion diagnostic's result: the derived conflict-component count, the disagreement
+  count, and every `ADVISORY` line it emitted. This line-item is REQUIRED and is reported even when
+  the manifest carries no `expected_conflict_components` assertion and even when the diagnostic
+  found nothing, so its silence is never ambiguous. Report it as advisory information: it does not
+  gate the report, does not change the cohort table, and no finding is escalated to Blocking.
 - Both kickoff artifact paths: `artifacts/orchestration/parallel-kickoff-<slug>.md` and
   `docs/features/parallel/<slug>/parallel-kickoff.md`.
 

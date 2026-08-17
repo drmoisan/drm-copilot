@@ -208,6 +208,7 @@ class GeneratedRun:
             self.pinned,
             generation,
             current_cohort=self.current_cohort,
+            highest_pinned_cohort=self.current_cohort,
         )
 
     def __str__(self) -> str:
@@ -407,6 +408,7 @@ def replay_admission_sequence(generated: GeneratedRun) -> dict[str, bool]:
                 generated.pinned,
                 generation,
                 current_cohort=generated.current_cohort,
+                highest_pinned_cohort=generated.current_cohort,
             )
             assert_offset_value(generated, edges, unstarted_keys, refreshed)
             if not crosses_pinned(edges, unstarted_keys, generated.pinned):

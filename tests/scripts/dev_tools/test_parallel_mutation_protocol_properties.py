@@ -1,32 +1,30 @@
 """Determinism and property-based tests for the parallel mutation engine.
 
-This is the feature's primary test obligation: spec FR4 makes the pinning invariant
-the core correctness property, and proving it under mutation against a live
-in-flight set requires properties over many graphs rather than a few examples.
+This is the feature's primary test obligation: spec FR4 makes the pinning invariant the
+core correctness property, and proving it under mutation against a live in-flight set
+requires properties over many graphs rather than a few examples.
 
 Properties proved here, plus at least one property per pure engine function
 (``recolor_unstarted``, ``decide_removal``, ``decide_close``,
 ``is_closed_mode_complete``, and the four entry constructors):
 
-- P1 determinism -- for arbitrary graphs and arbitrary pinned/unstarted partitions,
-  ``recolor_unstarted(x) == recolor_unstarted(x)``, every unstarted vertex is
-  assigned exactly one cohort, no pinned vertex is assigned any, and the indices are
-  contiguous from the computed pinned-barrier offset.
-- P2 independent-set validity -- no two items in one recolored cohort share an edge,
-  and pinned edges leave the induced class STRUCTURE intact while shifting the final
-  assignment past the pinned index.
+- P1 determinism -- ``recolor_unstarted(x) == recolor_unstarted(x)`` for arbitrary
+  graphs and partitions; every unstarted vertex gets exactly one cohort, no pinned
+  vertex gets any, and the indices are contiguous from the pinned-barrier offset.
+- P2 independent-set validity -- no two items in one recolored cohort share an edge;
+  pinned edges leave the class STRUCTURE intact while shifting past the pinned index.
 
 Sibling modules hold the rest, so no file exceeds the 500-line limit: P3 pin
 stability in ``test_parallel_mutation_pin_stability_properties.py``; P4 composed
-contention and the ``decide_admission`` property in
+contention and ``decide_admission`` in
 ``test_parallel_mutation_contention_properties.py``.
 
 Mechanism: seeded ``random.Random(seed)`` generation of ``int``-keyed conflict
-graphs. The seed appears in every assertion message and in each parametrized case
-id, so any failure is reproducible by rerunning that case. ``hypothesis`` is absent
-from ``pyproject.toml``, is deliberately not imported, and no dependency is added.
-No test creates a temporary file, starts a subprocess, reads the wall clock, or
-invokes ``git`` or ``gh``.
+graphs. The seed appears in every assertion message and in each parametrized case id,
+so any failure is reproducible by rerunning that case. ``hypothesis`` is absent from
+``pyproject.toml``, is deliberately not imported, and no dependency is added. No test
+creates a temporary file, starts a subprocess, reads the wall clock, or invokes
+``git`` or ``gh``.
 """
 
 from __future__ import annotations
@@ -57,17 +55,16 @@ from scripts.dev_tools.parallel_mutation_protocol import (
     recolor_unstarted,
 )
 
-# Seeds driving the generated cases. A fixed list keeps the suite deterministic
-# while still covering many graph shapes; the seed appears in each case id.
+# Seeds driving the generated cases. A fixed list keeps the suite deterministic while
+# still covering many graph shapes; the seed appears in each case id.
 SEEDS = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233]
 
-# Bounds on generated graphs. Small graphs keep the suite fast while still
-# producing pinned/unstarted partitions, isolated vertices, and dense cliques.
+# Bounds on generated graphs. Small graphs keep the suite fast while still producing
+# pinned/unstarted partitions, isolated vertices, and dense cliques.
 MIN_ITEMS = 2
 MAX_ITEMS = 12
 
-# The generation every generated case starts from, and the single timestamp every
-# constructed entry records.
+# The generation every case starts from, and the timestamp every entry records.
 START_GENERATION = 4
 FIXED_NOW = datetime(2026, 8, 8, 11, 0, tzinfo=timezone.utc)
 
@@ -84,11 +81,11 @@ def fixed_clock() -> datetime:
 class GeneratedRun:
     """A randomly generated parallel run, reproducible from its seed.
 
-    Produces one arbitrary conflict graph plus an arbitrary pinned/unstarted
-    partition, so a property can be asserted over many shapes. Keys are positive
-    ``int`` values matching F3's ``items[].issue_num``; the pinned and unstarted sets
-    are disjoint and cover every generated key; edges are normalized to ``(a, b)``
-    with ``a < b`` and deduplicated, matching F3's conflict-edge normalization.
+    Produces one arbitrary conflict graph plus an arbitrary pinned/unstarted partition,
+    so a property can be asserted over many shapes. Keys are positive ``int`` values
+    matching F3's ``items[].issue_num``; the pinned and unstarted sets are disjoint and
+    cover every generated key; edges are normalized to ``(a, b)`` with ``a < b`` and
+    deduplicated, matching F3's conflict-edge normalization.
 
     Attributes:
         seed (int): The seed this run was generated from, reported on failure.
@@ -110,17 +107,15 @@ class GeneratedRun:
         count = rng.randint(MIN_ITEMS, MAX_ITEMS)
         self.keys = [100 + index for index in range(count)]
 
-        # Partition the vertices. The pinned share varies with the seed so some
-        # runs have no pinned item and others are almost entirely pinned. The
-        # cohort index is varied off zero so no assertion can pass by assuming a
-        # zero-based assignment.
+        # Partition the vertices. The pinned share varies with the seed so some runs
+        # have no pinned item and others are almost entirely pinned. The cohort index
+        # is varied off zero so no assertion can assume a zero-based assignment.
         pinned_count = rng.randint(0, count - 1)
         self.pinned = frozenset(rng.sample(self.keys, pinned_count))
         self.unstarted = [key for key in self.keys if key not in self.pinned]
         self.current_cohort = rng.randint(0, 4)
 
-        # Generate edges over ALL vertices, including pinned ones, because
-        # admission is decided against the full graph.
+        # Edges span ALL vertices, pinned included: admission uses the full graph.
         density = rng.random()
         edge_set: set[tuple[int, int]] = set()
         for first_index, first in enumerate(self.keys):
@@ -129,8 +124,8 @@ class GeneratedRun:
                     edge_set.add((first, second))
         self.edges = sorted(edge_set)
 
-        # Label each item with a state consistent with its partition, cycling the
-        # unstarted states so every one of the four appears across the suite.
+        # Label each item consistently with its partition, cycling the unstarted
+        # states so every one of the four appears across the suite.
         self.items: dict[int, ItemRecord] = {}
         for index, key in enumerate(self.keys):
             state = (
@@ -143,8 +138,7 @@ class GeneratedRun:
     def recolor(self, generation: int = START_GENERATION) -> RecolorResult:
         """Recolor this run's unstarted subgraph at this run's cohort index.
 
-        A thin wrapper binding this run's vertex set, edges, pinned set, and cohort
-        index, so each property reads as one call.
+        A thin wrapper binding this run's inputs, so each property is one call.
 
         Args:
             generation (int): The generation to recolor from.
@@ -159,6 +153,7 @@ class GeneratedRun:
             self.pinned,
             generation,
             current_cohort=self.current_cohort,
+            highest_pinned_cohort=self.current_cohort,
         )
 
     def crosses_pinned(self, edges: list[tuple[int, int]] | None = None) -> bool:
@@ -258,6 +253,7 @@ class TestPropertyOneDeterminism:
             run.pinned,
             START_GENERATION,
             current_cohort=run.current_cohort,
+            highest_pinned_cohort=run.current_cohort,
         )
 
         # Assert
@@ -361,6 +357,7 @@ class TestPropertyTwoIndependentSets:
             run.pinned,
             START_GENERATION,
             current_cohort=run.current_cohort,
+            highest_pinned_cohort=run.current_cohort,
         )
 
         # Assert: identical class STRUCTURE. Comparing grouped key sets compares
@@ -491,6 +488,7 @@ class TestPerFunctionProperties:
             run.pinned,
             START_GENERATION,
             current_cohort=run.current_cohort,
+            highest_pinned_cohort=run.current_cohort,
         )
         is_closed_mode_complete(run.items)
 

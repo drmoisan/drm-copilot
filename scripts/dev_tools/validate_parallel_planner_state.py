@@ -61,7 +61,7 @@ CONTEXT = "Parallel planner checkpoint"
 
 # Inclusive bounds on ``max_concurrency`` (invariant P2, assumption A7).
 MIN_CONCURRENCY = 1
-MAX_CONCURRENCY = 8
+MAX_CONCURRENCY = 32
 
 # Required top-level keys (invariant P1, schema S3). ``kickoff_prompt_path`` is
 # deliberately absent: it is optional outside the readiness gate, where

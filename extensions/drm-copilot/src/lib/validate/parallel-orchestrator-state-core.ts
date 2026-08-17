@@ -67,7 +67,7 @@ const EXPECTED_ROUTE_ID = "parallel";
 const MIN_CONCURRENCY = 1;
 
 /** Inclusive upper bound on `max_concurrency` (invariant 4, assumption A7). */
-const MAX_CONCURRENCY = 8;
+const MAX_CONCURRENCY = 32;
 
 /**
  * Required top-level keys (invariant 1). The first four mirror the epic baseline

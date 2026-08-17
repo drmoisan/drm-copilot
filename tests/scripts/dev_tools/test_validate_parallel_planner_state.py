@@ -208,7 +208,7 @@ def test_invariant_p2_rejects_an_out_of_enum_mode() -> None:
     assert_error(state, f"{CONTEXT} mode must be one of closed, open; found: 'ajar'.")
 
 
-@pytest.mark.parametrize("concurrency", [0, -1, 9, "4", 1.5, True, None])
+@pytest.mark.parametrize("concurrency", [0, -1, 33, "4", 1.5, True, None])
 def test_invariant_p2_rejects_out_of_bound_concurrency(concurrency: object) -> None:
     """Out-of-range, non-integer, and boolean concurrency values are rejected."""
 
@@ -217,7 +217,7 @@ def test_invariant_p2_rejects_out_of_bound_concurrency(concurrency: object) -> N
 
     assert_error(
         state,
-        f"{CONTEXT} max_concurrency must be an integer from 1 through 8; "
+        f"{CONTEXT} max_concurrency must be an integer from 1 through 32; "
         f"found: {concurrency!r}.",
     )
 

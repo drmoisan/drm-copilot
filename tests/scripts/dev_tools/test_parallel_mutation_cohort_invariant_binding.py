@@ -190,6 +190,7 @@ def validate_recolor(
         frozenset({PINNED_KEY}),
         START_GENERATION,
         current_cohort=current_cohort,
+        highest_pinned_cohort=current_cohort,
     )
     cohorts = build_cohorts(
         dict(result.cohort_assignments), current_cohort, [PINNED_KEY]
@@ -294,6 +295,7 @@ class TestMergeObligationIsNecessary:
             frozenset({PINNED_KEY}),
             START_GENERATION,
             current_cohort=current_cohort,
+            highest_pinned_cohort=current_cohort,
         )
         assignments = dict(result.cohort_assignments)
         assert (

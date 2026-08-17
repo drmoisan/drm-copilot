@@ -249,9 +249,9 @@ def test_invariant_m3_accessor_resolves_mode(
     assert manifest_mode(mapping) == expected
 
 
-@pytest.mark.parametrize("concurrency", [1, 2, 4, 8])
+@pytest.mark.parametrize("concurrency", [1, 2, 4, 8, 32])
 def test_invariant_m4_accepts_in_range_concurrency(concurrency: int) -> None:
-    """Concurrency values inside the 1..8 bound validate cleanly."""
+    """Concurrency values inside the 1..32 bound validate cleanly."""
 
     mapping = build_valid_manifest()
     mapping["max_concurrency"] = concurrency
@@ -259,7 +259,7 @@ def test_invariant_m4_accepts_in_range_concurrency(concurrency: int) -> None:
     assert validate(mapping) == []
 
 
-@pytest.mark.parametrize("concurrency", [0, -1, 9, 100, "4", 1.5, True, None])
+@pytest.mark.parametrize("concurrency", [0, -1, 33, 100, "4", 1.5, True, None])
 def test_invariant_m4_rejects_out_of_bound_concurrency(concurrency: object) -> None:
     """Out-of-range, non-integer, and boolean concurrency values are rejected."""
 
@@ -267,7 +267,7 @@ def test_invariant_m4_rejects_out_of_bound_concurrency(concurrency: object) -> N
     mapping["max_concurrency"] = concurrency
 
     assert (
-        f"Parallel manifest max_concurrency must be an integer from 1 through 8; "
+        f"Parallel manifest max_concurrency must be an integer from 1 through 32; "
         f"found: {concurrency!r}." in validate(mapping)
     )
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 # Unit tests for .claude/lib/bash/parallel-manifest-validate.sh and the CLI
 # entry point .claude/lib/bash/validate-parallel-manifest.sh. Covers the M1
-# through M7 orchestration order and the two default-resolving accessors for
+# through M8 orchestration order and the two default-resolving accessors for
 # present, absent, and invalid `mode` and `max_concurrency` values, which is
 # the AC4 evidence. Every input is a literal in this file or a checked-in
 # fixture manifest; no temporary file is created.
@@ -67,11 +67,11 @@ valid_body() {
 }
 
 @test "identity errors are emitted in schema field order" {
-    pm_validate_text "$(document "mode: paused\nmax_concurrency: 12\nitems: []")"
+    pm_validate_text "$(document "mode: paused\nmax_concurrency: 33\nitems: []")"
     [ "$(pc_errors_count)" -eq 4 ]
     [ "${PC_ERRORS[0]}" = "Parallel manifest parallel must be a non-empty string." ]
     [ "${PC_ERRORS[1]}" = "Parallel manifest mode must be one of closed, open; found: 'paused'." ]
-    [ "${PC_ERRORS[2]}" = "Parallel manifest max_concurrency must be an integer from 1 through 8; found: 12." ]
+    [ "${PC_ERRORS[2]}" = "Parallel manifest max_concurrency must be an integer from 1 through 32; found: 33." ]
     [ "${PC_ERRORS[3]}" = "Parallel manifest created_at must be a non-empty string." ]
 }
 
@@ -89,10 +89,10 @@ valid_body() {
 }
 
 @test "the accessors return declared present values" {
-    pm_validate_text "$(document "parallel: x\nmode: open\nmax_concurrency: 8\ncreated_at: \"t\"\nitems: []")"
+    pm_validate_text "$(document "parallel: x\nmode: open\nmax_concurrency: 32\ncreated_at: \"t\"\nitems: []")"
     [ "$(pc_errors_count)" -eq 0 ]
     [ "$(pm_manifest_mode)" = "open" ]
-    [ "$(pm_manifest_max_concurrency)" = "8" ]
+    [ "$(pm_manifest_max_concurrency)" = "32" ]
 }
 
 @test "the accessors resolve the documented defaults when both keys are absent" {
@@ -116,20 +116,20 @@ valid_body() {
 
 @test "a boolean max_concurrency is rejected and falls back to 4" {
     pm_validate_text "$(document "parallel: x\nmax_concurrency: true\ncreated_at: \"t\"\nitems: []")"
-    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 8; found: True." ]
+    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 32; found: True." ]
     [ "$(pm_manifest_max_concurrency)" = "4" ]
 }
 
 @test "a non-integer max_concurrency is rejected and falls back to 4" {
     pm_validate_text "$(document "parallel: x\nmax_concurrency: \"four\"\ncreated_at: \"t\"\nitems: []")"
-    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 8; found: 'four'." ]
+    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 32; found: 'four'." ]
     [ "$(pm_manifest_max_concurrency)" = "4" ]
 }
 
 @test "an out-of-range max_concurrency is reported but still returned" {
-    pm_validate_text "$(document "parallel: x\nmax_concurrency: 9\ncreated_at: \"t\"\nitems: []")"
-    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 8; found: 9." ]
-    [ "$(pm_manifest_max_concurrency)" = "9" ]
+    pm_validate_text "$(document "parallel: x\nmax_concurrency: 33\ncreated_at: \"t\"\nitems: []")"
+    [ "$(pc_errors_print)" = "Parallel manifest max_concurrency must be an integer from 1 through 32; found: 33." ]
+    [ "$(pm_manifest_max_concurrency)" = "33" ]
 }
 
 @test "the CLI validates the checked-in fixture manifest and exits 0 silently" {
@@ -162,4 +162,34 @@ valid_body() {
     [ "${lines[0]}" = "Parallel manifest parallel must be a non-empty string." ]
     [ "${lines[1]}" = "Parallel manifest created_at must be a non-empty string." ]
     [ "${#lines[@]}" -eq 2 ]
+}
+
+@test "M8 accepts a named block-sequence expected_conflict_components entry" {
+    pm_validate_text "$(document "$(valid_body)\nexpected_conflict_components:\n  - name: hooks-lane\n    members:\n      - 101")"
+    [ "$(pc_errors_count)" -eq 0 ]
+}
+
+@test "M8 accepts an unnamed block-sequence entry, since name is optional" {
+    pm_validate_text "$(document "$(valid_body)\nexpected_conflict_components:\n  - members:\n      - 101")"
+    [ "$(pc_errors_count)" -eq 0 ]
+}
+
+@test "M8 contributes no error when the key is absent" {
+    pm_validate_text "$(document "$(valid_body)")"
+    [ "$(pc_errors_count)" -eq 0 ]
+}
+
+@test "M8 rejects a non-list expected_conflict_components value" {
+    pm_validate_text "$(document "$(valid_body)\nexpected_conflict_components: hooks-lane")"
+    [ "$(pc_errors_print)" = "Parallel manifest expected_conflict_components must be a list." ]
+}
+
+@test "M8 rejects a component whose members key is missing" {
+    pm_validate_text "$(document "$(valid_body)\nexpected_conflict_components:\n  - name: hooks-lane")"
+    [ "$(pc_errors_print)" = "Parallel manifest expected_conflict_components[0] members must be a non-empty list of positive integers." ]
+}
+
+@test "M8 rejects a member that resolves to no items[] issue_num" {
+    pm_validate_text "$(document "$(valid_body)\nexpected_conflict_components:\n  - members:\n      - 999")"
+    [ "$(pc_errors_print)" = "Parallel manifest expected_conflict_components[0] members[0] does not resolve to an items[] issue_num; found: 999." ]
 }

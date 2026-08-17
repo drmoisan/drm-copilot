@@ -26,7 +26,7 @@ Enforced by `validate_parallel_orchestrator_state_text(text, *, require_complete
 
 3. **Mode enum.** `mode` must be `closed` or `open`.
 
-4. **Bounded concurrency.** `max_concurrency` must be an integer from 1 through 8, and must not be a boolean.
+4. **Bounded concurrency.** `max_concurrency` must be an integer from 1 through 32, and must not be a boolean.
 
 5. **Item uniqueness and shape.** Each `items[]` entry must be an object whose `issue_num` is a positive integer unique across items and whose `feature_folder` is a non-empty string.
 
@@ -98,13 +98,29 @@ Enforced by `validate_parallel_manifest_text(text)` in `scripts/dev_tools/parall
 
 - **M3 — Mode default.** `mode`, when present, must be `closed` or `open`. When absent it defaults to `closed`: the accessor `manifest_mode(mapping)` returns the default and the validator emits no error for absence.
 
-- **M4 — Concurrency default.** `max_concurrency`, when present, must be an integer from 1 through 8. When absent it defaults to `4`: the accessor `manifest_max_concurrency(mapping)` returns the default and the validator emits no error for absence.
+- **M4 — Concurrency default.** `max_concurrency`, when present, must be an integer from 1 through 32. When absent it defaults to `4`: the accessor `manifest_max_concurrency(mapping)` returns the default and the validator emits no error for absence.
 
 - **M5 — Created-at.** `created_at` must be a non-empty string.
 
 - **M6 — Items.** `items` must be a list. An empty list is valid at authoring time. Each entry must be an object carrying `issue_num` (positive integer, unique across items), `feature_folder` (non-empty string), `kind` in `{feature, bug}`, `state` in the item-state enum, and `blast_radius` in the shape of orchestrator invariant 9.
 
 - **M7 — Prohibited keys.** No `depends_on` key may appear at any level, and no `integration_branch` key may appear at top level. Presence is an explicit rejection.
+
+- **M8 — Expected conflict components (optional assertion).** `expected_conflict_components`, when present, must be a list. Each entry must be an object carrying a required `members` list that is non-empty and holds positive integers, each of which resolves to an `items[].issue_num`, with no `issue_num` appearing in more than one component; and an optional `name` that, when present, must be a non-empty string. When the key is ABSENT the invariant contributes zero errors and the manifest's error list is byte-identical to what it was before M8 existed.
+
+  The value must be authored as a YAML BLOCK sequence. The destination-runtime bash YAML subset parser (`.claude/lib/bash/parallel-yaml-scan.sh`) rejects a non-empty flow collection, so a flow-style value such as `members: [101, 102]` is outside the supported subset and is not accepted on the bash path.
+
+  `expected_conflict_components` is an ASSERTION, not a declaration. It NEVER overrides a derived conflict edge, NEVER feeds `compute_cohorts`, and NEVER influences scheduling. It is consumed by a planner diagnostic (`scripts/dev_tools/parallel_lane_assertion.py`), invoked advisory-only, whose findings never block. Its name deliberately references the DERIVED conflict graph: the field asserts what the operator expects blast-radius derivation to produce, and a mismatch is a signal to re-examine the radii, never a licence to edit the graph. The prohibition on narrowing a radius to suppress an edge is unaffected, as is the `depends_on` prohibition of invariant 10, P3, and M7 — this key is not a dependency edge and does not express ordering.
+
+  Example, in the mandatory block-sequence form:
+
+  ```yaml
+  expected_conflict_components:
+    - name: hooks-lane          # optional, diagnostic label only
+      members:                  # required, non-empty, positive ints
+        - 101
+        - 102
+  ```
 
 ## Cache Doctrine — the checkpoint is not the source of truth
 
@@ -135,9 +151,18 @@ Per-item `merge_commit_sha` is retained; only the run-level merge-pull-request b
 
 ## Concurrency Bound (A7)
 
-`max_concurrency` is bounded at 1 through 8 inclusive and defaults to `4` when absent from the manifest. The design document sets only the default of 4; the upper bound of 8 is adopted here for symmetry with the epic surface, whose `max_parallel_features` is validated as `1..8`. The bound is recorded in this rule file so that downstream features do not re-litigate it. Booleans are rejected even though `True` and `False` are integers in Python.
+`max_concurrency` is bounded at 1 through 32 inclusive and defaults to `4` when absent from the manifest. The design document sets only the default of 4. Booleans are rejected even though `True` and `False` are integers in Python.
+
+The upper bound is derived from a constraint analysis of this surface alone. No other surface's bound is a reason for it. The findings recorded here so that downstream features do not re-litigate them:
+
+- **No constraint binds hard below O(100) concurrent worktrees.** Git worktrees, per-item feature branches, checkpoint size, and the cohort-coloring computation all scale well past a hundred concurrent items; none of them fails, or degrades sharply, anywhere near 32.
+- **The first-binding constraint is GitHub Actions job concurrency**, which begins to bite at roughly 10 to 20 concurrent items on a typical plan. It binds by QUEUING, not by failing: excess jobs wait for a runner and the run completes more slowly. A `max_concurrency` above that point is therefore not an error, merely a setting whose marginal throughput is absorbed by the queue.
+- **The ceiling of 32 is a SANITY limit, not a capacity limit.** Its purpose is to reject an order-of-magnitude operator typo (`320` for `32`), not to express a supported maximum. Do not read a value at or below 32 as an assurance that the runner pool can serve it.
+- **Under the per-edge cohort barrier `max_concurrency` is a pure throughput throttle.** Mutual exclusion inside a conflict component is automatic: a conflicting neighbour in a strictly prior current-generation cohort must be `merged` or `worktree_removed` before an item starts, so raising the cap can never co-schedule two conflicting items. Raising it changes only how many independent lanes advance at once.
 
 The bound is enforced in three places with the same semantics: orchestrator invariant 4, planner invariant P2, and manifest invariant M4.
+
+The epic surface is unaffected. `max_parallel_features` remains bounded at `1..8`; it is a different field on a different surface and is not changed by this bound.
 
 ## Drift-Event Recording Rule (A8)
 

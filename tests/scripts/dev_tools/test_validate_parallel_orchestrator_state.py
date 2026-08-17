@@ -188,7 +188,7 @@ def test_invariant_3_rejects_unknown_mode() -> None:
     )
 
 
-@pytest.mark.parametrize("concurrency", [1, 4, 8])
+@pytest.mark.parametrize("concurrency", [1, 4, 32])
 def test_invariant_4_accepts_in_range_concurrency(concurrency: int) -> None:
     """Concurrency at both bounds and in the middle validates."""
 
@@ -198,7 +198,7 @@ def test_invariant_4_accepts_in_range_concurrency(concurrency: int) -> None:
     assert validate(state) == []
 
 
-@pytest.mark.parametrize("concurrency", [0, 9, -1, True, "4", 4.0, None])
+@pytest.mark.parametrize("concurrency", [0, 33, -1, True, "4", 4.0, None])
 def test_invariant_4_rejects_out_of_range_concurrency(concurrency: object) -> None:
     """Out-of-range, boolean, and non-integer concurrency values are rejected."""
 
@@ -207,7 +207,7 @@ def test_invariant_4_rejects_out_of_range_concurrency(concurrency: object) -> No
 
     assert any(
         error.startswith(
-            "Parallel checkpoint max_concurrency must be an integer from 1 through 8;"
+            "Parallel checkpoint max_concurrency must be an integer from 1 through 32;"
         )
         for error in validate(state)
     )

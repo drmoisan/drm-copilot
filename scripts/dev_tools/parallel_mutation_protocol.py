@@ -40,10 +40,10 @@ Key invariants and constraints:
     Pinning (spec FR4): items in state ``in_flight`` are pinned. Recoloring runs
     over the unstarted subgraph only and never assigns or moves a pinned item,
     so a mutation cannot disturb work already running. It also places unstarted
-    items at ABSOLUTE cohort indices at or above the pinned items' index
-    (``current_cohort``), and strictly above it whenever an unstarted-to-pinned
-    conflict exists, so a deferred candidate cannot be returned to the cohort of
-    the pinned item it conflicts with.
+    items at ABSOLUTE cohort indices at or above ``current_cohort``, and strictly
+    above ``highest_pinned_cohort`` whenever an unstarted-to-pinned conflict
+    exists, so a deferred candidate cannot be returned to the cohort of any
+    pinned item it conflicts with.
 
     Item keys are ``int`` throughout -- F3's ``items[].issue_num``
     (``.claude/rules/parallel-orchestration.md`` invariant 5). No signature here
@@ -204,37 +204,30 @@ def recolor_unstarted(
     current_generation: int,
     *,
     current_cohort: int,
+    highest_pinned_cohort: int,
 ) -> RecolorResult:
     """Recolor the unstarted subgraph, leaving every pinned item untouched.
 
     Implements the pinning invariant of spec FR4 as amended by spec 1.2 design
     correction C2: recoloring is a pure function of
-    ``(remaining subgraph, pinned set, pinned cohort index)``.
+    ``(remaining subgraph, pinned set, pinned cohort indices)``.
 
     The pinning guarantee has two parts and the induced subgraph delivers only
     the first. Dropping every edge with an endpoint outside ``unstarted_items``
-    excludes pinned VERTICES from the coloring input, so a pinned item is absent
-    from the result rather than reassigned, and that absence is what keeps a
-    mutation from moving work already running. It does NOT honour the pinned
-    CONSTRAINT: an edge joining an unstarted key to a pinned key is dropped along
-    with its pinned endpoint, and F2 then treats a candidate with no surviving
-    edge as an isolated vertex in local class 0. The pinned constraint is
-    honoured separately, by the pinned-barrier offset: ``crosses_pinned`` is
-    computed from the FULL edge list before the restriction, and every unstarted
-    index is shifted to ``current_cohort + 1`` or above whenever an
-    unstarted-to-pinned conflict exists.
+    excludes pinned VERTICES, so a pinned item is absent rather than reassigned,
+    which is what keeps a mutation from moving running work. It does NOT honour
+    the pinned CONSTRAINT: such an edge is dropped with its pinned endpoint and
+    F2 then treats the candidate as an isolated vertex in local class 0. The
+    pinned-barrier offset under ``Returns`` honours it separately.
 
-    Coloring is DELEGATED IN FULL to F2's landed Welsh-Powell entry point
-    ``compute_cohorts``. This function reimplements no part of the coloring, the
-    vertex ordering, or the ``(-degree, item_key)`` tie-break, and does not call
-    the sibling ``compute_concurrency_batches``. The ``item_key -> cohort_index``
-    view is derived from the returned ``list[list[int]]`` in one comprehension.
+    Coloring is DELEGATED IN FULL to F2's Welsh-Powell ``compute_cohorts``: no
+    part of the coloring, the vertex ordering, or the ``(-degree, item_key)``
+    tie-break is reimplemented, and ``compute_concurrency_batches`` is never
+    called.
 
-    The offset is a single uniform shift applied to every color class, so the map
-    from F2's local index to the absolute index is injective: two unstarted items
-    F2 placed in different classes remain in different cohorts, and two it placed
-    in the same class share no edge by F2's own guarantee. F3 invariants 13 and 14
-    therefore remain satisfiable, which
+    The offset is a single uniform shift applied to every color class, so the
+    local-to-absolute map is injective and F2's distinct classes stay distinct
+    cohorts. F3 invariants 13 and 14 therefore remain satisfiable, which
     ``tests/scripts/dev_tools/test_parallel_mutation_cohort_invariant_binding.py``
     proves by running F3's landed validator over a constructed checkpoint.
 
@@ -243,41 +236,44 @@ def recolor_unstarted(
             state (``proposed``, ``admitted``, ``prepared``, or ``scheduled``).
             These are the only vertices colored. Keys must be unique.
         conflict_edges (Sequence[tuple[int, int]]): Conflict edges over ALL
-            items; the induced subgraph is taken here, so the caller passes the
-            full edge list unchanged.
-        pinned (frozenset[int]): Keys whose items are ``in_flight``. Used both to
-            assert the exclusion the induced subgraph performs -- so a pinned key
-            that also appeared in ``unstarted_items`` is caught rather than
-            silently colored -- and to compute ``crosses_pinned``.
+            items; the induced subgraph is taken here, so pass the full list.
+        pinned (frozenset[int]): Keys whose items are ``in_flight``. Used to
+            assert the exclusion the induced subgraph performs (a pinned key also
+            in ``unstarted_items`` is caught) and to compute ``crosses_pinned``.
         current_generation (int): The run's generation before this recolor.
-        current_cohort (int): F3's top-level ``current_cohort`` field. This is
-            the index the pinned items occupy for as long as they run, because
-            the cohort barrier increments ``current_cohort`` only on durable
-            confirmation that every cohort item is ``merged`` or
-            ``worktree_removed`` and an ``in_flight`` item is neither. Required
-            and keyword-only: a default would silently restore the defective
-            re-index-from-zero behavior, and keyword-only placement prevents a
-            silent transposition with ``current_generation``, the other ``int``
-            parameter. It must be derived from re-verified durable state, never
-            from a possibly stale checkpoint.
+        current_cohort (int): F3's top-level ``current_cohort`` field, the base
+            index used when no unstarted item conflicts with a pinned one.
+            Required and keyword-only: a default would silently restore the
+            defective re-index-from-zero behavior, and keyword-only placement
+            prevents a silent transposition with ``current_generation``. Derive
+            it from re-verified durable state, never from a stale checkpoint.
+        highest_pinned_cohort (int): The HIGHEST current-generation cohort index
+            occupied by any pinned item. Under the per-edge barrier a pinned
+            item is not confined to ``current_cohort``: an item starts once its
+            own conflicting prior-cohort neighbours are terminal, so in-flight
+            items can span several indices. Shifting only above
+            ``current_cohort`` could therefore land a deferred candidate on the
+            same index as a pinned item it conflicts with. Required and
+            keyword-only for the same reasons as ``current_cohort``, and derived
+            from the same re-verified durable state. When every pinned item sits
+            at ``current_cohort`` this equals ``current_cohort`` and the offset
+            is identical to the previous single-frontier behavior.
 
     Returns:
-        RecolorResult: Cohort assignments for unstarted items only -- the
-        mapping's key set equals the ``unstarted_items`` set exactly and is
-        disjoint from ``pinned`` -- with ``generation`` equal to
-        ``current_generation + 1``. The assigned indices are ABSOLUTE checkpoint
-        cohort indices, not zero-based local color indices: every index is at or
-        above ``current_cohort``, and strictly above ``current_cohort`` whenever
-        any unstarted item conflicts with a pinned item. The caller writes them
-        verbatim into ``cohorts[].index`` without re-basing them.
+        RecolorResult: Cohort assignments for unstarted items only -- the key
+        set equals ``unstarted_items`` exactly and is disjoint from ``pinned``
+        -- with ``generation`` equal to ``current_generation + 1``. The indices
+        are ABSOLUTE checkpoint cohort indices, at or above ``current_cohort``
+        and strictly above ``highest_pinned_cohort`` whenever any unstarted item
+        conflicts with a pinned item. The caller writes them verbatim, never
+        re-basing them.
 
     Raises:
         UnknownItemError: If a key appears in both ``unstarted_items`` and
             ``pinned``, since it cannot be both a colored vertex and pinned.
-        ParallelCohortInputError: If ``current_cohort`` is negative, since F3
-            invariant 12 requires a non-negative ``cohorts[].index``; also
-            propagated from ``compute_cohorts`` if ``unstarted_items`` holds a
-            duplicate key.
+        ParallelCohortInputError: If ``current_cohort`` is negative (F3 invariant
+            12 requires a non-negative ``cohorts[].index``); also propagated from
+            ``compute_cohorts`` if ``unstarted_items`` holds a duplicate key.
     """
 
     unstarted_keys = frozenset(unstarted_items)
@@ -286,9 +282,8 @@ def recolor_unstarted(
         raise UnknownItemError(min(overlap))
 
     # A negative index cannot name a cohort: F3 invariant 12 requires every
-    # cohorts[].index to be a non-negative integer, so a negative base would
-    # produce an unwritable assignment. Reject it with F2's existing input error
-    # rather than shifting the whole assignment into invalid territory.
+    # cohorts[].index to be non-negative, so a negative base would produce an
+    # unwritable assignment. Reject it with F2's existing input error.
     if current_cohort < 0:
         raise ParallelCohortInputError(
             f"current_cohort must be >= 0 per F3 invariant 12; "
@@ -297,8 +292,8 @@ def recolor_unstarted(
         )
 
     # Decide the pinned barrier BEFORE the induced restriction discards the
-    # candidate-to-pinned edges: those edges carry a real constraint even though
-    # their pinned endpoint is not a colored vertex.
+    # candidate-to-pinned edges: they carry a real constraint even though their
+    # pinned endpoint is not a colored vertex.
     crosses_pinned = any(
         (first in unstarted_keys and second in pinned)
         or (second in unstarted_keys and first in pinned)
@@ -306,10 +301,8 @@ def recolor_unstarted(
     )
 
     # Take the induced subgraph: an edge survives only when BOTH endpoints are
-    # unstarted vertices, which restricts the COLORED VERTEX SET to unstarted
-    # keys. The dropped edges still carry a constraint; that constraint is not
-    # discarded here but honoured separately by ``crosses_pinned`` above and the
-    # ``cohort_offset`` barrier below.
+    # unstarted, restricting the COLORED VERTEX SET. The dropped edges' constraint
+    # is honoured by ``crosses_pinned`` above and ``cohort_offset`` below.
     induced_edges = [
         (first, second)
         for first, second in conflict_edges
@@ -318,13 +311,14 @@ def recolor_unstarted(
 
     cohorts = compute_cohorts(unstarted_items, induced_edges)
 
-    # The pinned items hold index ``current_cohort`` for as long as they run, so
-    # an unstarted item conflicting with one of them must start strictly above
-    # that index. With no such conflict there is nothing to protect, so the
+    # Under the per-edge barrier in-flight items can occupy several cohort
+    # indices, so an unstarted item conflicting with a pinned item must start
+    # strictly above the HIGHEST index any pinned item holds, not merely above
+    # current_cohort. With no such conflict there is nothing to protect, so the
     # unstarted items may share the running cohort and max-concurrency slot
-    # filling is preserved. The shift is uniform, keeping the local-to-absolute
-    # map injective so F2's distinct color classes stay distinct cohorts.
-    cohort_offset = current_cohort + 1 if crosses_pinned else current_cohort
+    # filling is preserved. The uniform shift keeps the local-to-absolute map
+    # injective, so classes stay distinct.
+    cohort_offset = highest_pinned_cohort + 1 if crosses_pinned else current_cohort
 
     # Derive the mapping view from F2's cohort list; list position is the local
     # color index, so enumerating it and adding the offset yields the absolute

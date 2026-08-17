@@ -3,7 +3,7 @@
   "notes": "M4: the inclusive lower bound is 1, so zero is rejected.",
   "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 0\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n---\n\n# Parallel Run\n",
   "expected_errors": [
-    "Parallel manifest max_concurrency must be an integer from 1 through 8; found: 0."
+    "Parallel manifest max_concurrency must be an integer from 1 through 32; found: 0."
   ],
   "expected_mode": "closed",
   "expected_max_concurrency": 0

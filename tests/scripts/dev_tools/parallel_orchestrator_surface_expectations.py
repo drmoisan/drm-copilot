@@ -152,8 +152,9 @@ KICKOFF_RESUME_FRAGMENTS: tuple[str, ...] = (
 )
 
 COHORT_BARRIER_FRAGMENTS: tuple[str, ...] = (
-    "Cohort `N+1` branches from `main` only after every cohort-`N` item "
-    "is `merged` or `worktree_removed`",
+    "An item may start only when every conflicting neighbour "
+    "(`conflict_edges[]`) that sits in a strictly prior current-generation "
+    "cohort has `merge_status` of `merged` or `worktree_removed`",
     "max_concurrency",
     "ascending item-key order",
 )

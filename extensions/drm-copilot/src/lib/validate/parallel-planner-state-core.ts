@@ -63,7 +63,7 @@ const CONTEXT = "Parallel planner checkpoint";
 const MIN_CONCURRENCY = 1;
 
 /** Inclusive upper bound on `max_concurrency` (invariant P2, assumption A7). */
-const MAX_CONCURRENCY = 8;
+const MAX_CONCURRENCY = 32;
 
 /**
  * Required top-level keys (invariant P1, schema S3). `kickoff_prompt_path` is

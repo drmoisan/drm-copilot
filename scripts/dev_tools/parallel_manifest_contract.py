@@ -3,7 +3,7 @@
 Purpose:
     Enforce the repository contract for the frontmatter of
     ``docs/features/parallel/<slug>/parallel.md`` -- spec invariants M1 through
-    M7 -- and expose the two default-resolving accessors that every consumer of
+    M8 -- and expose the two default-resolving accessors that every consumer of
     the manifest uses instead of reading ``mode`` and ``max_concurrency``
     directly.
 
@@ -62,7 +62,7 @@ DEFAULT_MAX_CONCURRENCY = 4
 
 # Inclusive bounds on a present ``max_concurrency`` (invariant M4, A7).
 MIN_CONCURRENCY = 1
-MAX_CONCURRENCY = 8
+MAX_CONCURRENCY = 32
 
 # Keys the manifest rejects at any nesting level (invariant M7). Ordering is
 # never declared in a parallel run; it is derived from blast-radius overlap.
@@ -271,8 +271,160 @@ def _validate_identity(mapping: dict[str, object]) -> list[str]:
     return errors
 
 
+def _declared_issue_nums(items: object) -> set[int]:
+    """Collect the positive-integer ``issue_num`` values a manifest declares.
+
+    Purpose:
+        Supply the resolution target for invariant M8's membership check
+        without re-running the M6 item validation, so a malformed item is
+        reported once by M6 and simply contributes no resolvable key here.
+
+    Args:
+        items (object): The manifest's ``items`` value, of any shape. A
+            non-list, or an entry that is not a mapping or carries a
+            non-positive-integer ``issue_num``, contributes nothing.
+
+    Returns:
+        set[int]: Every well-formed ``issue_num``. Empty when ``items`` is
+        absent, malformed, or holds no well-formed entry.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    if not isinstance(items, list):
+        return set()
+    declared: set[int] = set()
+    # Accept only entries whose primary key is already well formed; a malformed
+    # entry is M6's to report, and admitting it here would produce a second,
+    # confusing error from M8 for the same defect.
+    for entry in cast("list[object]", items):
+        if not isinstance(entry, dict):
+            continue
+        issue_num = cast("dict[str, object]", entry).get("issue_num")
+        if (
+            isinstance(issue_num, int)
+            and not isinstance(issue_num, bool)
+            and issue_num > 0
+        ):
+            declared.add(issue_num)
+    return declared
+
+
+def _validate_component_members(
+    members: object, position: str, declared: set[int], claimed: set[int]
+) -> list[str]:
+    """Validate one component's ``members`` list against invariant M8.
+
+    Args:
+        members (object): The component's ``members`` value, of any shape.
+        position (str): The component's error-message prefix, already carrying
+            the context and the component index.
+        declared (set[int]): Every ``issue_num`` the manifest's ``items``
+            collection declares, used as the resolution target.
+        claimed (set[int]): Keys already claimed by an earlier component.
+            MUTATED: each newly accepted key is added, so the caller's running
+            set enforces the no-duplicate-membership rule across components.
+
+    Returns:
+        list[str]: One error per violated member condition, in member order.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Adds every accepted key to ``claimed``.
+    """
+
+    if not isinstance(members, list) or not members:
+        return [f"{position} members must be a non-empty list of positive integers."]
+
+    errors: list[str] = []
+    # Walk the declared members in order so the message sequence reproduces the
+    # document. Each member is subjected to three successive gates and the
+    # first failure ends that member's checks: an unusable value cannot be
+    # resolved, and an unresolved key cannot meaningfully duplicate another.
+    for index, member in enumerate(cast("list[object]", members)):
+        slot = f"{position} members[{index}]"
+        if not isinstance(member, int) or isinstance(member, bool) or member <= 0:
+            errors.append(f"{slot} must be a positive integer; found: {member!r}.")
+            continue
+        if member not in declared:
+            errors.append(
+                f"{slot} does not resolve to an items[] issue_num; found: {member!r}."
+            )
+            continue
+        if member in claimed:
+            errors.append(
+                f"{slot} repeats issue_num {member}, "
+                f"already claimed by an earlier component."
+            )
+            continue
+        claimed.add(member)
+    return errors
+
+
+def _validate_expected_conflict_components(mapping: dict[str, object]) -> list[str]:
+    """Validate the optional ``expected_conflict_components`` key (M8).
+
+    Purpose:
+        Enforce the shape of the manifest's lane-grouping ASSERTION. The field
+        is a diagnostic input only: nothing here feeds cohort computation,
+        overrides a derived conflict edge, or influences scheduling.
+
+    Args:
+        mapping (dict[str, object]): A parsed manifest frontmatter mapping.
+
+    Returns:
+        list[str]: One error per violated condition, in document order. An
+        EMPTY list when the key is absent, so a manifest that predates M8
+        validates byte-identically to before.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Key-gated: absence is the overwhelmingly common shape and must cost the
+    # caller nothing, so the whole invariant is skipped rather than defaulted.
+    if "expected_conflict_components" not in mapping:
+        return []
+
+    components = mapping["expected_conflict_components"]
+    if not isinstance(components, list):
+        return [f"{CONTEXT} expected_conflict_components must be a list."]
+
+    errors: list[str] = []
+    declared = _declared_issue_nums(mapping.get("items"))
+    claimed: set[int] = set()
+    # Validate each component in place and thread one `claimed` set through the
+    # whole traversal, so cross-component duplicate membership is decided in a
+    # single pass without a second walk.
+    for index, component in enumerate(cast("list[object]", components)):
+        position = f"{CONTEXT} expected_conflict_components[{index}]"
+        if not isinstance(component, dict):
+            errors.append(f"{position} must be an object.")
+            continue
+        entry = cast("dict[str, object]", component)
+        # Field order follows the documented authoring order: the optional
+        # diagnostic label first, then the required membership list.
+        if "name" in entry and not is_non_empty_string(entry["name"]):
+            errors.append(f"{position} name must be a non-empty string.")
+        errors.extend(
+            _validate_component_members(
+                entry.get("members"), position, declared, claimed
+            )
+        )
+    return errors
+
+
 def validate_parallel_manifest_text(text: str) -> list[str]:
-    """Validate a parallel-run manifest document against invariants M1 to M7.
+    """Validate a parallel-run manifest document against invariants M1 to M8.
 
     Args:
         text (str): Raw manifest document text, authored with LF, CRLF, or CR
@@ -282,7 +434,9 @@ def validate_parallel_manifest_text(text: str) -> list[str]:
         list[str]: Validation errors for a malformed manifest; an empty list
         when the manifest is valid. A frontmatter failure returns a
         single-element list. An empty ``items`` list is valid: a manifest may
-        be authored before any item is admitted (schema S1).
+        be authored before any item is admitted (schema S1). Invariant M8 is
+        key-gated, so a manifest without ``expected_conflict_components``
+        produces exactly the list it produced before M8 existed.
 
     Raises:
         None.
@@ -309,4 +463,7 @@ def validate_parallel_manifest_text(text: str) -> list[str]:
     # The manifest carries `kind` on every item, unlike the orchestrator
     # checkpoint, so the shared item validator is asked to require it (S1).
     errors.extend(validate_items(mapping.get("items"), CONTEXT, require_kind=True))
+    # M8 runs last because its membership check resolves against the same
+    # `items` collection the previous call validated.
+    errors.extend(_validate_expected_conflict_components(mapping))
     return errors

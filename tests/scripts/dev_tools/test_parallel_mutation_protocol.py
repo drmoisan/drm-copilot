@@ -198,7 +198,12 @@ class TestGenerationAccounting:
         """A recolor always yields exactly one generation beyond the current."""
 
         result = recolor_unstarted(
-            [11], [], frozenset(), START_GENERATION, current_cohort=0
+            [11],
+            [],
+            frozenset(),
+            START_GENERATION,
+            current_cohort=0,
+            highest_pinned_cohort=0,
         )
 
         assert result.generation == START_GENERATION + 1
