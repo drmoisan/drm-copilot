@@ -207,7 +207,7 @@ Class rules going forward: (1) a task that touches a new or existing `.claude/` 
 
 ### Phase 7 — Regression Evidence
 
-- [ ] [P7-T1] Write the regression evidence artifact `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/verification-integrity-before-after.<ts>.md` (AC-E5) recording: the before-state edge list `[(485, 486), (485, 487), (486, 487)]` and cohorts `[[485], [486], [487]]`; the after-state edge list `[(486, 487)]` (surviving overlap `extensions/drm-copilot/src/mcp-tools.ts`) and cohorts `[[485, 486], [487]]`; the fixture path; and the `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` fields from the Python and Pester regression runs. Verify no evidence for this feature resolves to an `artifacts/`-rooted path.
+- [x] [P7-T1] Write the regression evidence artifact `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/verification-integrity-before-after.<ts>.md` (AC-E5) recording: the before-state edge list `[(485, 486), (485, 487), (486, 487)]` and cohorts `[[485], [486], [487]]`; the after-state edge list `[(486, 487)]` (surviving overlap `extensions/drm-copilot/src/mcp-tools.ts`) and cohorts `[[485, 486], [487]]`; the fixture path; and the `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` fields from the Python and Pester regression runs. Verify no evidence for this feature resolves to an `artifacts/`-rooted path.
   - Command: `git diff main --name-only | pwsh -Command '$input | Select-String -Pattern "^artifacts/"'`
   - Acceptance: artifact exists with all required fields; the command MUST exit 0 AND return zero matches — a parse error, non-zero exit, or any other failure to execute does not satisfy this gate.
 
@@ -215,39 +215,39 @@ Class rules going forward: (1) a task that touches a new or existing `.claude/` 
 
 Loop rule: within each language, if any step fails or changes files, restart that language's loop from its first step and repeat until a single clean pass completes. Every command below is unconditional — `SKIPPED` is not a valid outcome for any task in this phase. One evidence artifact per command step under `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/qa-gates/`, each with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
 
-- [ ] [P8-T1] Python format: `poetry run black .`
+- [x] [P8-T1] Python format: `poetry run black .`
   - Acceptance: exit code 0 and no file reformatted on the final pass; qa-gates artifact recorded.
-- [ ] [P8-T2] Python lint: `poetry run ruff check .`
+- [x] [P8-T2] Python lint: `poetry run ruff check .`
   - Acceptance: exit code 0; qa-gates artifact recorded.
-- [ ] [P8-T3] Python type-check: `poetry run pyright`
+- [x] [P8-T3] Python type-check: `poetry run pyright`
   - Acceptance: exit code 0 with zero errors; qa-gates artifact recorded.
-- [ ] [P8-T4] Python full test suite with coverage: `poetry run pytest --cov --cov-branch`
+- [x] [P8-T4] Python full test suite with coverage: `poetry run pytest --cov --cov-branch`
   - Acceptance: exit code 0; `Output Summary:` records numeric total line and branch coverage (line >= 85, branch >= 75); qa-gates artifact recorded.
-- [ ] [P8-T5] Python changed-module coverage (dotted-module form only): `poetry run pytest tests/scripts/dev_tools/ --cov=scripts.dev_tools._blast_radius_extraction --cov=scripts.dev_tools._blast_radius_validation --cov=scripts.dev_tools._blast_radius_guards --cov=scripts.dev_tools._blast_radius_normalization --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`
+- [x] [P8-T5] Python changed-module coverage (dotted-module form only): `poetry run pytest tests/scripts/dev_tools/ --cov=scripts.dev_tools._blast_radius_extraction --cov=scripts.dev_tools._blast_radius_validation --cov=scripts.dev_tools._blast_radius_guards --cov=scripts.dev_tools._blast_radius_normalization --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`
   - Acceptance: exit code 0; each of the five modules reports line >= 85 and branch >= 75 in the recorded output; qa-gates artifact recorded with the per-module numbers (AC-H2 Python half).
-- [ ] [P8-T6] PowerShell format via MCP tool `mcp__drm-copilot__run_poshqc_format`.
+- [x] [P8-T6] PowerShell format via MCP tool `mcp__drm-copilot__run_poshqc_format`.
   - Acceptance: clean pass (no residual formatting changes on the final iteration); qa-gates artifact recorded.
-- [ ] [P8-T7] PowerShell analyze via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
+- [x] [P8-T7] PowerShell analyze via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
   - Acceptance: zero diagnostics; qa-gates artifact recorded.
-- [ ] [P8-T8] PowerShell tests with coverage via MCP tool `mcp__drm-copilot__run_poshqc_test`.
+- [x] [P8-T8] PowerShell tests with coverage via MCP tool `mcp__drm-copilot__run_poshqc_test`.
   - Acceptance: all tests pass; `Output Summary:` records the numeric line-coverage percentage (>= 85; branch threshold exempt for PowerShell per `.claude/rules/quality-tiers.md`); `Output Summary:` must also record the measured line-coverage percentage for `.claude/lib/blast-radius/BlastRadiusNormalization.psm1` specifically, confirming the relocated functions remain in the coverage denominator after the P4-T1 split; qa-gates artifact recorded (AC-H2 PowerShell half).
-- [ ] [P8-T9] Re-verify byte-copy parity and the frozen PowerShell diff after the PowerShell format step (the formatter may have touched sources after P4-T7, and `run_poshqc_format` can touch `BlastRadiusGlob.psm1`, which would invalidate P4-T4's zero-diff gate, AC-C1): rerun the P4-T7 hash comparison and re-run `git diff main -- .claude/lib/blast-radius/BlastRadiusGlob.psm1`; if any hash pair differs, re-copy and restart the PowerShell loop from P8-T6; if the frozen diff is non-empty, revert `BlastRadiusGlob.psm1` and restart the PowerShell loop from P8-T6.
+- [x] [P8-T9] Re-verify byte-copy parity and the frozen PowerShell diff after the PowerShell format step (the formatter may have touched sources after P4-T7, and `run_poshqc_format` can touch `BlastRadiusGlob.psm1`, which would invalidate P4-T4's zero-diff gate, AC-C1): rerun the P4-T7 hash comparison and re-run `git diff main -- .claude/lib/blast-radius/BlastRadiusGlob.psm1`; if any hash pair differs, re-copy and restart the PowerShell loop from P8-T6; if the frozen diff is non-empty, revert `BlastRadiusGlob.psm1` and restart the PowerShell loop from P8-T6.
   - Command: the P4-T7 `Get-FileHash` loop command, unchanged; then `git diff main -- .claude/lib/blast-radius/BlastRadiusGlob.psm1`.
   - Acceptance: all six pairs report `True` on the final pass AND the frozen-file diff prints nothing; qa-gates artifact recorded.
-- [ ] [P8-T10] TypeScript format, run in `extensions/drm-copilot`: `npm run format`
+- [x] [P8-T10] TypeScript format, run in `extensions/drm-copilot`: `npm run format`
   - Acceptance: exit code 0 and no file changed on the final pass (`git status --porcelain -- extensions/drm-copilot` shows no new modification caused by this step on the final iteration); qa-gates artifact recorded.
-- [ ] [P8-T11] TypeScript lint, run in `extensions/drm-copilot`: `npm run lint`
+- [x] [P8-T11] TypeScript lint, run in `extensions/drm-copilot`: `npm run lint`
   - Acceptance: exit code 0; qa-gates artifact recorded.
-- [ ] [P8-T12] TypeScript type-check, run in `extensions/drm-copilot`: `npm run typecheck`
+- [x] [P8-T12] TypeScript type-check, run in `extensions/drm-copilot`: `npm run typecheck`
   - Acceptance: exit code 0; qa-gates artifact recorded.
-- [ ] [P8-T13] TypeScript tests with coverage, run in `extensions/drm-copilot`: `npm run test:coverage`
+- [x] [P8-T13] TypeScript tests with coverage, run in `extensions/drm-copilot`: `npm run test:coverage`
   - Acceptance: exit code 0; `Output Summary:` records numeric line and branch coverage (line >= 85, branch >= 75). The configured reporters are `lcov` and `text-summary`; `text-summary` emits aggregate totals only, so the per-file figures for `claude-blast-radius-derive-core.ts` MUST be read from the lcov report at `extensions/drm-copilot/coverage/lcov.info` (the `SF:` record for `src/lib/push-down/claude-blast-radius-derive-core.ts`, then `LH`/`LF` for line coverage and `BRH`/`BRF` for branch coverage) and recorded numerically in `Output Summary:`. A Jest run that exits 0 is not by itself evidence that this file met 85/75 unless the P5-T1 `coverageThreshold` entry is present. qa-gates artifact recorded (AC-H2 TypeScript half).
-- [ ] [P8-T14] Coverage delta verification (Coverage Evidence Contract): compare the Phase 0 baseline numbers (P0-T8, P0-T10, P0-T13) against the Phase 8 post-change numbers (P8-T4, P8-T8, P8-T13) and the changed-module numbers (P8-T5), and record baseline, post-change, and changed-code coverage side by side. If any required numeric value is unavailable, the plan outcome is remediation-required, not PASS.
+- [x] [P8-T14] Coverage delta verification (Coverage Evidence Contract): compare the Phase 0 baseline numbers (P0-T8, P0-T10, P0-T13) against the Phase 8 post-change numbers (P8-T4, P8-T8, P8-T13) and the changed-module numbers (P8-T5), and record baseline, post-change, and changed-code coverage side by side. If any required numeric value is unavailable, the plan outcome is remediation-required, not PASS.
   - Acceptance: qa-gates artifact `coverage-delta.<ts>.md` records all three value sets numerically, shows no regression on changed lines, and confirms thresholds met.
-- [ ] [P8-T15] Test-integrity review over the branch diff (AC-H3): review `git diff main -- tests/ extensions/drm-copilot/test/` and confirm no removed assertion without a documented behavior-change replacement, no broadened exception check, and no temporary-file creation; every new test input is a committed fixture.
+- [x] [P8-T15] Test-integrity review over the branch diff (AC-H3): review `git diff main -- tests/ extensions/drm-copilot/test/` and confirm no removed assertion without a documented behavior-change replacement, no broadened exception check, and no temporary-file creation; every new test input is a committed fixture.
   - Command: `git diff main -- tests/ extensions/drm-copilot/test/ | pwsh -Command '$input | Select-String -Pattern "tempfile|mkstemp|TemporaryFile|New-TemporaryItem"'`
   - Acceptance: the command MUST exit 0 AND return zero matches — a parse error, non-zero exit, or any other failure to execute does not satisfy this gate; qa-gates artifact records the review conclusion with the per-file disposition of every modified test file.
-- [ ] [P8-T16] Acceptance-criteria reconciliation per the `acceptance-criteria-tracking` skill: verify each of the 31 criteria in `spec.md` individually against its delivering task's recorded evidence, check off satisfied items one at a time (change only `- [ ]` to `- [x]`), and emit the AC status summary in the completion report.
+- [x] [P8-T16] Acceptance-criteria reconciliation per the `acceptance-criteria-tracking` skill: verify each of the 31 criteria in `spec.md` individually against its delivering task's recorded evidence, check off satisfied items one at a time (change only `- [ ]` to `- [x]`), and emit the AC status summary in the completion report.
   - Command: `pwsh -Command "(Select-String -Path 'docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/spec.md' -Pattern '^- \[x\] AC-').Count"`
   - Acceptance: count is 31 and the unchecked-pattern count from P0-T2 is 0; any criterion that cannot be verified stays unchecked and is reported as an outstanding gap (remediation-required outcome).
 

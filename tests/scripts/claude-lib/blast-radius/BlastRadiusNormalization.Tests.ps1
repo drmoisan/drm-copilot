@@ -33,7 +33,7 @@ BeforeAll {
     # The facade is imported FIRST and deliberately so. Import-Module -Force
     # removes a module before re-importing it, and the facade force-imports the
     # normalization module, so the reverse order would strip Test-MandateRead and
-    # Remove-MandateRead out of scope.
+    # Get-NonMandateReadEntry out of scope.
     $facadePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadius.psm1").Path
     Import-Module $facadePath -Force
 
@@ -109,7 +109,7 @@ Describe 'Test-MandateRead' {
     }
 }
 
-Describe 'Remove-MandateRead' {
+Describe 'Get-NonMandateReadEntry' {
     Context 'Collection filtering' {
         It 'drops exact, subtree, and glob-equal citations together' {
             # Arrange: one entry of each excluded class plus one genuine claim.
@@ -121,7 +121,7 @@ Describe 'Remove-MandateRead' {
             )
 
             # Act
-            $survivors = @(Remove-MandateRead -Entry $entries -MandateRead $script:MandateRead)
+            $survivors = @(Get-NonMandateReadEntry -Entry $entries -MandateRead $script:MandateRead)
 
             # Assert
             $survivors | Should -Be @('config/blast-radius.json')
@@ -132,7 +132,7 @@ Describe 'Remove-MandateRead' {
             $entries = @('quality-tiers.yml', 'config/blast-radius.json', 'artifacts/report.md')
 
             # Act
-            $survivors = @(Remove-MandateRead -Entry $entries -MandateRead @())
+            $survivors = @(Get-NonMandateReadEntry -Entry $entries -MandateRead @())
 
             # Assert: the same content, ordinally sorted.
             $survivors | Should -Be @(
@@ -141,7 +141,7 @@ Describe 'Remove-MandateRead' {
 
         It 'accepts an empty entry collection' {
             # Arrange / Act: an empty radius filters to an empty radius.
-            $survivors = @(Remove-MandateRead -Entry @() -MandateRead $script:MandateRead)
+            $survivors = @(Get-NonMandateReadEntry -Entry @() -MandateRead $script:MandateRead)
 
             # Assert
             $survivors.Count | Should -Be 0

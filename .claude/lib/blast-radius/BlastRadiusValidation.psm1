@@ -353,7 +353,7 @@ function Test-BlastRadius {
     # exclusion is applied here for the same reason: the derivation harvest drops
     # those citations, so V1 and V2 must not then demand that the radius cover
     # them (issue #489).
-    $planPath = [string[]]@(Remove-MandateRead -MandateRead (
+    $planPath = [string[]]@(Get-NonMandateReadEntry -MandateRead (
             [string[]]@(Get-ConfigMandateRead -Config $Config)) -Entry (
             [string[]]@(Get-PlanPaths -PlanText $PlanText `
                     -RootSurface ([string[]]@(Get-ConfigRootSurface -Config $Config)))))

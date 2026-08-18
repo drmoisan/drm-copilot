@@ -383,10 +383,10 @@ Describe 'Get-NormalizedDeclaredRadius' {
             # A truth table carrying the ratified mandate-read list and one
             # module, kept independent of the committed configuration.
             $script:NormalizerConfig = @{
-                version              = 1
-                shared_surfaces      = @('config/blast-radius.json', 'quality-tiers.yml')
-                shared_surface_globs = @()
-                mandate_reads        = @(
+                version               = 1
+                shared_surfaces       = @('config/blast-radius.json', 'quality-tiers.yml')
+                shared_surface_globs  = @()
+                mandate_reads         = @(
                     '.claude/rules/**',
                     '.claude/skills/atomic-plan-contract/SKILL.md',
                     '.claude/skills/evidence-and-timestamp-conventions/SKILL.md',
@@ -394,7 +394,7 @@ Describe 'Get-NormalizedDeclaredRadius' {
                     'artifacts/**',
                     'quality-tiers.yml'
                 )
-                modules              = @{ config = @('config/**') }
+                modules               = @{ config = @('config/**') }
                 over_breadth_fraction = 0.25
             }
         }

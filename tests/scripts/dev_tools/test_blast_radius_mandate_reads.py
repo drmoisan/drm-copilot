@@ -19,6 +19,7 @@ import pytest
 
 from scripts.dev_tools._blast_radius_validation import config_mandate_reads
 from scripts.dev_tools.compute_blast_radius import (
+    BlastRadius,
     derive_blast_radius,
     validate_blast_radius,
 )
@@ -65,14 +66,14 @@ def committed_config() -> dict[str, object]:
     return parsed
 
 
-def derive(config: Mapping[str, object]) -> object:
+def derive(config: Mapping[str, object]) -> BlastRadius:
     """Derive a radius from ``MANDATE_CITING_PLAN`` under a supplied config.
 
     Args:
         config (Mapping[str, object]): Truth table to derive against.
 
     Returns:
-        object: The derived ``BlastRadius``.
+        BlastRadius: The derived radius.
     """
     return derive_blast_radius(
         MANDATE_CITING_PLAN,

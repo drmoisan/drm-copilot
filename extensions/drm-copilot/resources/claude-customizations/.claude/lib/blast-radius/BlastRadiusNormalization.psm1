@@ -241,7 +241,7 @@ function Test-MandateRead {
     return $false
 }
 
-function Remove-MandateRead {
+function Get-NonMandateReadEntry {
     <#
     .SYNOPSIS
         Drop every read-by-mandate citation from a collection of radius entries.
@@ -292,4 +292,4 @@ Export-ModuleMember -Function `
     Get-ContractIdentifier, `
     Resolve-BlastRadiusModule, `
     Test-MandateRead, `
-    Remove-MandateRead
+    Get-NonMandateReadEntry

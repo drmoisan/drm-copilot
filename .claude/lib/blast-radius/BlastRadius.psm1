@@ -181,7 +181,7 @@ function Get-BlastRadius {
     # against its own plan. The feature-folder glob is added afterwards so it can
     # never be excluded.
     $surviving = [System.Collections.Generic.List[string]]::new()
-    $surviving.AddRange([string[]]@(Remove-MandateRead -Entry $entry.ToArray() `
+    $surviving.AddRange([string[]]@(Get-NonMandateReadEntry -Entry $entry.ToArray() `
                 -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config))))
     $surviving.Add((Get-FeatureFolderGlob -FeatureFolder (
                 Get-RequiredText -Value $FeatureFolder -FieldName 'feature_folder')))
@@ -264,7 +264,7 @@ function Get-NormalizedDeclaredRadius {
         }
     }
 
-    $paths = [string[]]@(Remove-MandateRead -Entry $accepted.ToArray() `
+    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $accepted.ToArray() `
             -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config)))
     $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
 
