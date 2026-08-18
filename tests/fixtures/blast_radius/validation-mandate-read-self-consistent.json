@@ -1,0 +1,56 @@
+{
+  "description": "Symmetric exclusion. The declared radius omits the plan's read-by-mandate citations, and V1 and V2 apply the same exclusion to the plan-side extraction, so the radius validates clean rather than reporting the citations as uncovered (issue #489).",
+  "input": {
+    "plan_text": "### Phase 0 — Policy Reads\n- [ ] [P0-T1] Read `quality-tiers.yml` and `.claude/rules/python.md`.\n### Phase 1 — Implementation\n- [ ] [P1-T1] Edit `scripts/dev_tools/compute_blast_radius.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-18-mandate-read-self-consistent-489",
+    "computed_at": "2026-08-18T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25,
+      "mandate_reads": [
+        ".claude/rules/**",
+        ".claude/skills/atomic-plan-contract/SKILL.md",
+        ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+        ".github/instructions/**",
+        "artifacts/**",
+        "quality-tiers.yml"
+      ]
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-18-mandate-read-self-consistent-489/**",
+        "scripts/dev_tools/compute_blast_radius.py"
+      ],
+      "modules": [
+        "python-dev-tools"
+      ],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-18T12-00"
+    },
+    "findings": []
+  }
+}

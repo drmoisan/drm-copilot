@@ -1,0 +1,50 @@
+{
+  "description": "Directory-shaped token rejection. A wildcard-free token whose final component carries no recognized extension names a location rather than a write claim and is rejected; a subtree glob and a line-suffixed file citation stay admitted (issue #489).",
+  "input": {
+    "plan_text": "### Phase 1 — Work\n- [ ] [P1-T1] Work in `extensions/drm-copilot` and `scripts/dev_tools`.\n- [ ] [P1-T2] Claim `tests/scripts/dev_tools/**` and cite `config/blast-radius.json:12`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-18-directory-shaped-rejected-489",
+    "computed_at": "2026-08-18T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "config/blast-radius.json:12",
+        "docs/features/active/2026-08-18-directory-shaped-rejected-489/**",
+        "tests/scripts/dev_tools/**"
+      ],
+      "modules": [
+        "config",
+        "tests"
+      ],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-18T12-00"
+    },
+    "findings": []
+  }
+}

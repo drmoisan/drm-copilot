@@ -7,19 +7,23 @@ Purpose:
     working-tree checkpoint.
 
 Responsibilities:
-    This module asserts the BEFORE state only: the three radii load at their
+    This module asserts both states. BEFORE: the three radii load at their
     recorded sizes, the frozen contention relation over those radii under the
     pre-fix config yields the complete K3 triangle, and colouring that triangle
-    yields three single-item cohorts (fully serial execution). The AFTER-state
-    assertions, which exercise the new mandate-read exclusion, are added
-    separately and read the same fixture's `post_fix_config` block.
+    yields three single-item cohorts (fully serial execution). AFTER: the same
+    recorded radii, re-filtered by `normalize_declared_radius` against the
+    committed `config/blast-radius.json`, contend on one pair only, and that
+    pair colours into two cohorts with 485 and 486 concurrent.
 
 Key invariants and constraints:
     Every assertion here must hold both before and after the fix. The
+    Every BEFORE assertion here must hold both before and after the fix. The
     contention relation in `scripts/dev_tools/_blast_radius_conflicts.py` is a
     frozen surface for issue #489, and the pre-fix config is embedded in the
     fixture rather than read from `config/blast-radius.json`, so neither input
-    moves when the repository config is amended.
+    moves when the repository config is amended. The AFTER assertions read the
+    committed repository config deliberately: the fix is only delivered if the
+    config that actually ships produces the two-cohort partition.
 
 Important side effects:
     None. Every test reads one committed JSON fixture and calls pure functions.
@@ -35,7 +39,10 @@ from typing import cast
 import pytest
 
 from scripts.dev_tools._blast_radius_conflicts import conflicts
-from scripts.dev_tools.compute_blast_radius import BlastRadius
+from scripts.dev_tools.compute_blast_radius import (
+    BlastRadius,
+    normalize_declared_radius,
+)
 from scripts.dev_tools.parallel_cohort_computation import compute_cohorts
 
 FIXTURE_PATH = Path(
@@ -61,6 +68,19 @@ EXPECTED_BEFORE_EDGES: list[tuple[int, int]] = [(485, 486), (485, 487), (486, 48
 
 # Three single-item cohorts, i.e. fully serial execution.
 EXPECTED_BEFORE_COHORTS: list[list[int]] = [[485], [486], [487]]
+
+# The committed repository truth table, read rather than embedded: the fix is
+# delivered only if the config that actually ships produces the after state.
+COMMITTED_CONFIG_PATH = Path("config/blast-radius.json")
+
+# The one genuine conflict of the recorded run. 486 and 487 both edit the MCP
+# tool surface; every other edge of the K3 triangle was an artefact of citations
+# that were evidence of a mandated read rather than of a write.
+EXPECTED_AFTER_EDGES: list[tuple[int, int]] = [(486, 487)]
+SURVIVING_OVERLAP = "extensions/drm-copilot/src/mcp-tools.ts"
+
+# Two cohorts: 485 and 486 run concurrently, 487 follows.
+EXPECTED_AFTER_COHORTS: list[list[int]] = [[485, 486], [487]]
 
 
 @pytest.fixture(name="fixture_document")
@@ -152,3 +172,102 @@ def test_before_state_colours_into_three_serial_cohorts(
 
     # Assert
     assert cohorts == EXPECTED_BEFORE_COHORTS
+
+
+@pytest.fixture(name="committed_config")
+def committed_config_fixture() -> dict[str, object]:
+    """Load the committed repository truth table.
+
+    Returns:
+        dict[str, object]: The parsed `config/blast-radius.json` mapping.
+    """
+
+    return json.loads(COMMITTED_CONFIG_PATH.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(name="after_radii")
+def after_radii_fixture(
+    before_radii: dict[int, BlastRadius],
+    committed_config: dict[str, object],
+) -> dict[int, BlastRadius]:
+    """Re-filter each recorded radius against the committed truth table.
+
+    Args:
+        before_radii (dict[int, BlastRadius]): The recorded radii.
+        committed_config (dict[str, object]): The committed truth table.
+
+    Returns:
+        dict[int, BlastRadius]: The normalized radius per issue number.
+    """
+
+    return {
+        key: normalize_declared_radius(radius, committed_config)
+        for key, radius in before_radii.items()
+    }
+
+
+def after_edges(
+    after_radii: dict[int, BlastRadius], config: dict[str, object]
+) -> list[tuple[int, int]]:
+    """Evaluate the frozen relation over each canonical ascending pair.
+
+    Args:
+        after_radii (dict[int, BlastRadius]): The normalized radii.
+        config (dict[str, object]): The truth table to compare against.
+
+    Returns:
+        list[tuple[int, int]]: The contending pairs, ascending.
+    """
+
+    return [
+        (left, right)
+        for left, right in combinations(ITEM_KEYS, 2)
+        if conflicts(after_radii[left], after_radii[right], config).conflict
+    ]
+
+
+def test_after_state_yields_only_the_genuine_conflict_edge(
+    after_radii: dict[int, BlastRadius],
+    committed_config: dict[str, object],
+) -> None:
+    """Normalization collapses the K3 triangle to the single real conflict."""
+
+    # Arrange / Act
+    edges = after_edges(after_radii, committed_config)
+
+    # Assert
+    assert edges == EXPECTED_AFTER_EDGES
+
+
+def test_after_state_surviving_edge_cites_the_shared_mcp_tool_surface(
+    after_radii: dict[int, BlastRadius],
+    committed_config: dict[str, object],
+) -> None:
+    """The one surviving edge is a real path overlap, not a residual artefact."""
+
+    # Arrange / Act
+    result = conflicts(after_radii[486], after_radii[487], committed_config)
+    details = tuple(reason.detail for reason in result.reasons)
+
+    # Assert — both sides of the reported overlap name the same edited file.
+    assert result.conflict is True
+    assert details == (f"{SURVIVING_OVERLAP} ~ {SURVIVING_OVERLAP}",), (
+        "The surviving edge must be the shared MCP tool surface; observed "
+        f"{details}."
+    )
+
+
+def test_after_state_colours_into_two_cohorts(
+    after_radii: dict[int, BlastRadius],
+    committed_config: dict[str, object],
+) -> None:
+    """485 and 486 become concurrent; only 487 is forced into a later cohort."""
+
+    # Arrange
+    edges = after_edges(after_radii, committed_config)
+
+    # Act
+    cohorts = compute_cohorts(list(ITEM_KEYS), edges)
+
+    # Assert
+    assert cohorts == EXPECTED_AFTER_COHORTS

@@ -186,14 +186,18 @@ def test_scan_plan_lines_assigns_every_line_to_exactly_one_category() -> None:
         ".codex/",
         ".github/",
         ".agents/",
-        "artifacts/",
     ],
 )
 def test_classify_path_token_accepts_each_known_top_level_segment(
     segment: str,
 ) -> None:
-    """Accept an extensionless token solely because of its top-level segment."""
-    assert classify_path_token(f"{segment}nested/item") == PATH_KIND_CONCRETE
+    """Accept an extension-bearing token under each known top-level segment.
+
+    The token must name a file: since issue #489 a wildcard-free token whose
+    final component carries no recognized extension is a directory reference
+    and is rejected, so the segment is exercised with a real file name.
+    """
+    assert classify_path_token(f"{segment}nested/item.py") == PATH_KIND_CONCRETE
 
 
 @pytest.mark.parametrize(
@@ -296,15 +300,18 @@ def test_extract_plan_paths_collects_paths_from_a_crlf_plan() -> None:
         [
             "### Phase 1 — Work on `config/blast-radius.json`",
             "- [ ] [P1-T1] Create `scripts/dev_tools/alpha.py`",
-            "Evidence goes to `docs/features/active/sample/evidence/baseline/`",
+            "Evidence goes to `docs/features/active/sample/evidence/note.md`",
         ]
     )
 
     paths = extract_plan_paths(plan_text)
 
+    # The prose citation names a file rather than the evidence directory it
+    # named pre-change: since issue #489 a directory-shaped token is rejected,
+    # so a directory citation would no longer exercise the prose source at all.
     assert paths == (
         "config/blast-radius.json",
-        "docs/features/active/sample/evidence/baseline/",
+        "docs/features/active/sample/evidence/note.md",
         "scripts/dev_tools/alpha.py",
     )
 

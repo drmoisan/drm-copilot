@@ -1,0 +1,46 @@
+{
+  "description": "Cross-corpus documentation-glob rejection. A glob whose wildcard occupies or truncates the feature-folder segment claims every feature folder and is rejected; a glob naming one complete feature folder is retained (issue #489).",
+  "input": {
+    "plan_text": "### Phase 1 — Documentation\n- [ ] [P1-T1] Update `docs/features/**/plan*.md` and `docs/features/active/*/spec.md`.\n- [ ] [P1-T2] Update `docs/features/active/2026-08-18-other-feature-490/**`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-18-cross-corpus-doc-glob-489",
+    "computed_at": "2026-08-18T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-18-cross-corpus-doc-glob-489/**",
+        "docs/features/active/2026-08-18-other-feature-490/**"
+      ],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-18T12-00"
+    },
+    "findings": []
+  }
+}

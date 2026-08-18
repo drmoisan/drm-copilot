@@ -42,6 +42,7 @@ from scripts.dev_tools._blast_radius_guards import (
 from scripts.dev_tools._blast_radius_guards import (
     require_text as require_text,
 )
+from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
 from scripts.dev_tools._blast_radius_thresholds import config_over_breadth_fraction
 
 if TYPE_CHECKING:
@@ -322,9 +323,15 @@ def validate_blast_radius(
     # The root-surface set comes from the same ``config`` mapping that V1 and V2
     # use below to resolve modules and shared surfaces, and from the same reader
     # ``derive_blast_radius`` calls. That shared source is what keeps a derived
-    # radius passing V1 and V2 against its own plan (issue #452).
+    # radius passing V1 and V2 against its own plan (issue #452). The
+    # mandate-read exclusion is applied here for the same reason: the derivation
+    # harvest drops those citations, so V1 and V2 must not then demand that the
+    # radius cover them (issue #489).
     plan_concrete = concrete_entries(
-        extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config))
+        exclude_mandate_reads(
+            extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config)),
+            config_mandate_reads(config),
+        )
     )
 
     findings: list[RadiusFinding] = list(_coverage_findings(radius, plan_concrete))
