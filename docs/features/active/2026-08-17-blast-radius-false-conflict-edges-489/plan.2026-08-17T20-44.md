@@ -1,44 +1,266 @@
-# 2026-08-17-blast-radius-false-conflict-edges (Plan)
+# Atomic Implementation Plan — Blast-Radius False Conflict Edges (Issue #489)
 
 - **Issue:** #489
-- **Parent (optional):** none
-- **Owner:** drmoisan
-- **Last Updated:** 2026-08-17T20-44
-- **Status:** Draft
-- **Version:** 0.1
+- **Feature folder:** `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489`
+- **Work Mode:** full-bug (`spec.md` is the sole acceptance-criteria source; `user-story.md` absent by design)
+- **AC source:** `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/spec.md` — 31 unchecked criteria in groups A–H (spec lines 222–273)
+- **Plan path:** `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/plan.2026-08-17T20-44.md` (updated in place across all preflight revisions; no sibling plan files)
+- **Research:** `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/research/2026-08-17T23-55-blast-radius-false-conflict-edges-research.md`
+- **Executed demonstration (supersedes research where the research marks a claim unverified):** `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/other/orchestrator-fix-feasibility-demonstration.2026-08-17T21-20.md`
+- **Last Updated:** 2026-08-17
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+## Evidence Location Clause (non-overridable)
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+All evidence artifacts produced by this plan resolve to `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/<kind>/` per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. `artifacts/`-rooted evidence paths are forbidden. Every command-step evidence artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; test-step artifacts carry numeric coverage headlines in `Output Summary:`. Evidence filenames use the run-time ISO-8601 stamp `yyyy-MM-ddTHH-mm`.
 
+## Frozen Surfaces (verify, never modify)
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+- `scripts/dev_tools/_blast_radius_conflicts.py`, `scripts/dev_tools/_blast_radius_glob.py`, `scripts/dev_tools/_blast_radius_thresholds.py`, `scripts/dev_tools/parallel_cohort_computation.py` — zero diff (AC-B7).
+- `.claude/lib/blast-radius/BlastRadiusGlob.psm1` — zero diff. `.claude/lib/blast-radius/BlastRadiusValidation.psm1` receives exactly one plan-extraction call-site edit (mandate-read forwarding, P4-T4); its comparison logic is untouched.
+- The radius dict shape: `BlastRadius.from_dict` accepted key set unchanged (`compute_blast_radius.py:197-202`); the change adds config keys only (AC-B8).
+- No JSON Schema file is authored, imported, or read; the foreign `drmoisan.github.io/mix-calculator/` schema is not copied (AC-G2).
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+## Design Determinations (verified against the working tree during planning)
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#489-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+1. **File-size relief is mandatory before growth.** Measured line counts: `scripts/dev_tools/_blast_radius_validation.py` = 485, `.claude/lib/blast-radius/BlastRadiusExtraction.psm1` = 491, `.claude/lib/blast-radius/BlastRadiusConfig.psm1` = 492, `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` = 465, `tests/scripts/dev_tools/test_blast_radius_config.py` = 500, `scripts/dev_tools/_blast_radius_extraction.py` = 419, `scripts/dev_tools/compute_blast_radius.py` = 333, `.claude/lib/blast-radius/BlastRadius.psm1` = 380. The 500-line limit binds production, test, and reusable script files. Relief moves are prescribed per task; every touched code file must measure <= 500 lines at task completion.
+2. **Python relief:** move `require_text`, `require_str_tuple`, `require_mapping` (currently `_blast_radius_validation.py:104-170`) into a new `scripts/dev_tools/_blast_radius_guards.py`, re-exported from `_blast_radius_validation.py` via explicit `from ... import x as x` aliases so the frozen `_blast_radius_conflicts.py` import surface is unchanged. New exclusion/normalization helpers live in a new `scripts/dev_tools/_blast_radius_normalization.py`; the public `normalize_declared_radius` lives on `compute_blast_radius.py` (spec pins that file, AC-B6).
+3. **V1/V2 symmetric exclusion (necessary consequence of AC-B1).** If mandate-read citations are excluded from the derivation harvest but not from `validate_blast_radius`'s plan-side extraction, every post-fix plan citing a policy file produces V1 Blocking findings against its own derived radius (the radius no longer contains the citation) and spurious V2 findings for `quality-tiers.yml`. Both `derive_blast_radius` and `validate_blast_radius` therefore apply the same `exclude_mandate_reads` helper from `_blast_radius_normalization.py` to the harvested/extracted path sets, reading `config_mandate_reads(config)` from the same config mapping. A unit test and a parity fixture pin the self-consistency invariant (a derived radius passes V1 and V2 against its own plan when the plan cites mandate-read paths). The PowerShell mirror requires the matching one-call-site edit in `BlastRadiusValidation.psm1` (plan extraction, not comparison logic).
+4. **PowerShell relief:** create `.claude/lib/blast-radius/BlastRadiusNormalization.psm1` housing (a) `Get-ContractIdentifier` relocated from `BlastRadiusExtraction.psm1` (gains the letterless filter), (b) `Resolve-BlastRadiusModule` relocated from `BlastRadiusConfig.psm1` (verified consumed only by `BlastRadius.psm1` and tests; `BlastRadiusValidation.psm1` consumes only `Resolve-BlastRadiusSharedSurface`, `Get-ConfigOverBreadthFraction`, `Get-ConfigRootSurface`, `Get-PlanPaths`, which all stay in place), and (c) the new mandate-read exclusion helpers. `Get-ConfigMandateRead` is added to `BlastRadiusConfig.psm1`; `Get-NormalizedDeclaredRadius` is added to the facade `BlastRadius.psm1`.
+5. **Regression fixture placement.** Both parity drivers enumerate top-level `tests/fixtures/blast_radius/*.json` only (`test_blast_radius_parity.py:170,337-341`; `BlastRadius.Parity.Tests.ps1:39,212-213`) and require every top-level file to match one of two fixture kinds. The verification-integrity fixture has a different shape (three radii plus pre-fix and post-fix configs), so it is committed in a subdirectory: `tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json`. This satisfies AC-E1 ("under `tests/fixtures/blast_radius/`") without corrupting the parity corpus; the spec's Test Strategy explicitly allows the final name to vary within that tree.
+6. **Pester truth-table relocation.** `BlastRadius.Parity.Tests.ps1` is at 465 lines; the amended truth-table content must grow (mandate-read shape checks, removed-module negative pins) and AC-E4 pins the verification-integrity cases to this file. The `Committed blast-radius truth table shape` Describe (pre-change lines 302-436, the location AC-F3 records as "pre-change") is relocated to a new `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` and amended there; the verification-integrity Describe is added to `BlastRadius.Parity.Tests.ps1`.
+7. **Python config-content tests** go to a new `tests/scripts/dev_tools/test_blast_radius_mandate_reads.py` because `test_blast_radius_config.py` is already at 500 lines; rewrites inside that file must be line-neutral or shrinking.
+8. **TypeScript scope is carriage only.** `CARRIED_KEYS` (`claude-blast-radius-derive-core.ts:145-150`), the assembly literal (lines 431-437), and the emission-order documentation (lines 405-407) gain `mandate_reads`; the bundled base document gains the key. No TS extraction or conflict semantics exist or are added. Jest tests live at `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts` and `blast-radius-derive.test.ts`.
+9. **Unconditional extraction rules move existing pins.** Verified pins that the new rules invalidate and that must move in the same commit: `tests/scripts/dev_tools/test_blast_radius_extraction.py:192-196` (asserts `f"{segment}nested/item"` classifies concrete for every known segment, including `artifacts/`), `tests/scripts/claude-lib/blast-radius/BlastRadiusExtraction.Path.Tests.ps1` (directory-shaped admission case near line 34), and any top-level parity fixture whose plan/spec text cites directory-shaped tokens or letterless contract tokens (expected blocks are recomputed, never weakened).
+10. **Command realism constraints honored throughout:** `poetry run python -c` is single-line only; Python coverage targets use the dotted-module `--cov=` form only; the extension npm scripts verified in `extensions/drm-copilot/package.json` are `format`, `lint`, `typecheck`, `test:unit`, `test:coverage`.
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+## Ratified Content (implement exactly; do not re-open)
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+- `mandate_reads` membership: `.claude/rules/**`, `quality-tiers.yml`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `artifacts/**`, `.github/instructions/**`.
+- `modules` map after removal of `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`, `agents-surface`: exactly `mcp-server`, `benchmarks`, `poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, `schemas`.
+- `quality-tiers.yml` stays in `shared_surfaces` and is also listed in `mandate_reads`.
+- Required outcome: BEFORE edges `[(485, 486), (485, 487), (486, 487)]`, cohorts `[[485], [486], [487]]`; AFTER edges `[(486, 487)]`, cohorts `[[485, 486], [487]]`.
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+### Phase 0 — Policy Reads and Baseline Capture
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+- [ ] [P0-T1] Read the policy documents in the mandated order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/parallel-orchestration.md`, `.claude/rules/self-explanatory-code-commenting.md`.
+  - Acceptance: evidence artifact `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/other/phase0-instructions-read.<ts>.md` exists with `Timestamp:`, `Policy Order:`, and the explicit file list.
+- [ ] [P0-T2] Verify the full-bug mode gate: `spec.md` exists in the feature folder, carries `Work Mode: full-bug`, and carries exactly 31 unchecked acceptance criteria.
+  - Command: `pwsh -Command "(Select-String -Path 'docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/spec.md' -Pattern '^- \[ \] AC-').Count"` — expected output `31`.
+  - Acceptance: evidence artifact under `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/baseline/` with the four required fields; count is 31.
+- [ ] [P0-T3] Verify the volatile source data before any other work: the gitignored working-tree checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` still holds the three recorded radii with sizes 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10).
+  - Command: `poetry run python -c "import json;d=json.load(open('artifacts/orchestration/parallel-orchestrator-state.json'));s={i['issue_num']:(len(i['blast_radius']['paths']),len(i['blast_radius']['modules']),len(i['blast_radius']['shared_surfaces']),len(i['blast_radius']['contracts'])) for i in d['items'] if i['issue_num'] in (485,486,487)};assert s=={485:(184,6,1,40),486:(125,3,2,45),487:(140,4,1,10)},s;print('SOURCE-OK')"`
+  - Acceptance: command prints `SOURCE-OK` with exit code 0; evidence artifact under `evidence/baseline/`. If the assertion fails, stop and report blocked state (the fixture source is gone); do not fabricate radii.
+- [ ] [P0-T4] Capture the file-size inventory for every growth-target file named in Design Determination 1.
+  - Command: `pwsh -Command "foreach ($f in @('scripts/dev_tools/_blast_radius_extraction.py','scripts/dev_tools/_blast_radius_validation.py','scripts/dev_tools/compute_blast_radius.py','.claude/lib/blast-radius/BlastRadiusExtraction.psm1','.claude/lib/blast-radius/BlastRadiusConfig.psm1','.claude/lib/blast-radius/BlastRadius.psm1','tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1','tests/scripts/dev_tools/test_blast_radius_config.py','tests/scripts/dev_tools/test_blast_radius_extraction.py','extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts')) { \"$f=$((Get-Content $f).Count)\" }"`
+  - Acceptance: evidence artifact under `evidence/baseline/` recording each measured count and the remaining headroom against 500.
+- [ ] [P0-T5] Python formatting baseline: `poetry run black --check .`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
+- [ ] [P0-T6] Python lint baseline: `poetry run ruff check .`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
+- [ ] [P0-T7] Python type-check baseline: `poetry run pyright`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
+- [ ] [P0-T8] Python test-and-coverage baseline: `poetry run pytest --cov --cov-branch`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric total line and branch coverage percentages and the pass count.
+- [ ] [P0-T9] PowerShell analyzer baseline via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields (record the MCP invocation as `Command:`).
+- [ ] [P0-T10] PowerShell test-and-coverage baseline via MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric line-coverage percentage and pass/fail counts (branch coverage not measured by Pester; line threshold only).
+- [ ] [P0-T11] TypeScript lint baseline, run in `extensions/drm-copilot`: `npm run lint`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
+- [ ] [P0-T12] TypeScript type-check baseline, run in `extensions/drm-copilot`: `npm run typecheck`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
+- [ ] [P0-T13] TypeScript test-and-coverage baseline, run in `extensions/drm-copilot`: `npm run test:coverage`
+  - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric line and branch coverage percentages.
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+### Phase 1 — Fixture Capture and Before-State Pin
+
+- [ ] [P1-T1] Create `tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json` holding: (a) the three recorded `blast_radius` blocks for items 485, 486, 487 copied VERBATIM from `artifacts/orchestration/parallel-orchestrator-state.json` `items[].blast_radius` (keyed `"485"`, `"486"`, `"487"` under a `radii` object; each block matches `RADIUS_KEYS` exactly), (b) a `pre_fix_config` block equal to the current committed `config/blast-radius.json` content (twelve-module map, no `mandate_reads`), and (c) a `post_fix_config` block equal to the ratified content (seven-module map plus `mandate_reads`). The subdirectory placement keeps the file invisible to the top-level parity enumerations (Design Determination 5).
+  - Command: `poetry run python -c "import json;from scripts.dev_tools.compute_blast_radius import BlastRadius;f=json.load(open('tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json'));[BlastRadius.from_dict(f['radii'][k]) for k in ('485','486','487')];print('FIXTURE-OK')"`
+  - Acceptance: command prints `FIXTURE-OK` with exit code 0 (AC-E1 loading requirement).
+- [ ] [P1-T2] Write `tests/scripts/dev_tools/test_blast_radius_verification_integrity.py` with the before-state pin: (a) size assertions 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10) over the fixture radii (AC-E1); (b) pairwise `conflicts()` over the raw fixture radii with the fixture's `pre_fix_config` yields exactly the edges `[(485, 486), (485, 487), (486, 487)]`; (c) `compute_cohorts([485, 486, 487], edges) == [[485], [486], [487]]` using `compute_cohorts` from `scripts/dev_tools/parallel_cohort_computation.py`. This test must pass both before and after the fix because the comparison relation is frozen and the pre-fix config is embedded. After-state assertions are added in P3-T9.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_verification_integrity.py`
+  - Acceptance: exit code 0; file <= 500 lines.
+- [ ] [P1-T3] Record the executed before-state as regression evidence: `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/before-state-pin.<ts>.md` carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the three edges and the three single-item cohorts).
+  - Acceptance: artifact exists with all four fields and names the K3 edge list verbatim.
+
+### Phase 2 — Python Config Layer (reader, content, moved pins)
+
+- [ ] [P2-T1] File-size relief for `scripts/dev_tools/_blast_radius_validation.py` (measured 485/500): create `scripts/dev_tools/_blast_radius_guards.py` containing `require_text`, `require_str_tuple`, and `require_mapping` moved verbatim (docstrings intact), and re-export all three from `_blast_radius_validation.py` using explicit `from scripts.dev_tools._blast_radius_guards import require_mapping as require_mapping, require_str_tuple as require_str_tuple, require_text as require_text` so the frozen `_blast_radius_conflicts.py` and the facade imports are unchanged.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_validation.py tests/scripts/dev_tools/test_blast_radius_invariants.py tests/scripts/dev_tools/test_compute_blast_radius.py`
+  - Acceptance: exit code 0; `git diff main --stat -- scripts/dev_tools/_blast_radius_conflicts.py` prints nothing; `pwsh -Command "(Get-Content 'scripts/dev_tools/_blast_radius_validation.py').Count"` <= 460 and `pwsh -Command "(Get-Content 'scripts/dev_tools/_blast_radius_guards.py').Count"` <= 500.
+- [ ] [P2-T2] Add `config_mandate_reads(config)` to `scripts/dev_tools/_blast_radius_validation.py` directly beside `config_root_surfaces`, implemented over `config_string_list` with key `"mandate_reads"` (absent key yields an empty tuple; malformed entries raise `TypeError`/`ValueError` through the existing guard chain). Add reader unit tests in a new `tests/scripts/dev_tools/test_blast_radius_mandate_reads.py`: present key, absent key yields `()`, non-list value raises `TypeError`, blank entry raises `ValueError` (AC-A4 reader half; the byte-identical-derivation half lands in P3-T5 and is discoverable by the same `-k mandate` selector).
+  - Command: `poetry run pytest tests/scripts/dev_tools/ -k mandate`
+  - Acceptance: exit code 0 with at least 4 selected tests; `_blast_radius_validation.py` <= 500 lines.
+- [ ] [P2-T3] Edit `config/blast-radius.json`: add the `mandate_reads` key with the six ratified members; remove the five umbrella `modules` entries; retain the seven ratified modules; leave `shared_surfaces` (including `quality-tiers.yml`), `shared_surface_globs`, `version`, and `over_breadth_fraction` unchanged (AC-A1, AC-A2, AC-A3).
+  - Command: `poetry run python -c "import json;c=json.load(open('config/blast-radius.json'));assert sorted(c['modules'])==sorted(['mcp-server','benchmarks','poshqc','powershell-dev-tools','codex-runtime','config','schemas']),sorted(c['modules']);assert sorted(c['mandate_reads'])==sorted(['.claude/rules/**','quality-tiers.yml','.claude/skills/atomic-plan-contract/SKILL.md','.claude/skills/evidence-and-timestamp-conventions/SKILL.md','artifacts/**','.github/instructions/**']),c['mandate_reads'];assert 'quality-tiers.yml' in c['shared_surfaces'];print('CONFIG-OK')"`
+  - Acceptance: command prints `CONFIG-OK` with exit code 0.
+- [ ] [P2-T4] Move the Python config-content test pins in the same commit as P2-T3 (AC-F1, AC-F2): rewrite `test_items_sharing_a_dev_tools_file_contend_on_path_and_module` (`tests/scripts/dev_tools/test_blast_radius_config.py:407-422`) against the retained `benchmarks` module (shared file under `scripts/benchmarks/`), preserving the path-level contention assertion and the `module_overlap` assertion against the retained module — no assertion deleted without a retained-module replacement. Audit the whole file for any other reference to a removed module and update it. Do not modify `test_truth_table_populates_every_parametrized_collection` (lines 180-191) or `test_items_sharing_the_truth_table_contend_on_three_levels` (lines 444-463).
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`
+  - Acceptance: exit code 0; `test_blast_radius_config.py` <= 500 lines; `git diff main -- tests/scripts/dev_tools/test_blast_radius_config.py` shows no hunk overlapping lines 180-191 or 444-463 of the pre-change file.
+
+### Phase 3 — Python Extraction Rules, Exclusion, and Normalization
+
+- [ ] [P3-T1] In `scripts/dev_tools/_blast_radius_extraction.py`: remove `artifacts/` from `KNOWN_TOP_LEVEL_SEGMENTS` (lines 69-74) and implement directory-shaped token rejection in `classify_path_token` (acceptance block at lines 277-281): a wildcard-free token whose final component carries no recognized extension is rejected even when it starts with a known segment; `**` glob subtree claims remain admitted; line-suffixed file citations such as `.claude/rules/python.md:90` remain admitted (strip a trailing `:<digits>` suffix before the extension test); configured root-surface exact matches are unaffected. Rewrite the moved pin `test_classify_path_token_accepts_each_known_top_level_segment` (`tests/scripts/dev_tools/test_blast_radius_extraction.py:192-196`) to use extension-bearing tokens, and add unit tests: rejected — `extensions/drm-copilot`, `scripts/dev_tools`, `docs/features`, `.claude/rules/`, `artifacts/pr_context/`; admitted — `scripts/dev_tools/**`, `.claude/rules/python.md:90`, `scripts/dev_tools/compute_blast_radius.py` (AC-B2, AC-B3 classifier half).
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_extraction.py`
+  - Acceptance: exit code 0; `_blast_radius_extraction.py` and `test_blast_radius_extraction.py` each <= 500 lines.
+- [ ] [P3-T2] In `scripts/dev_tools/_blast_radius_extraction.py`: implement cross-corpus doc-glob rejection — a harvested glob token rooted under `docs/features/` is rejected when a wildcard occupies or truncates the feature-folder name segment (spans multiple feature folders); a glob carrying a complete, wildcard-free feature-folder segment is retained. Unit tests: rejected — `docs/features/**/plan*.md`, `docs/features/active/*/plan.md`; retained — `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/**` (AC-B4).
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_extraction.py -k doc_glob`
+  - Acceptance: exit code 0 with at least 3 selected tests; `_blast_radius_extraction.py` <= 500 lines.
+- [ ] [P3-T3] In `scripts/dev_tools/_blast_radius_extraction.py`: implement letterless contract-token rejection in `extract_contract_identifiers` — a contract identifier must contain at least one ASCII letter. Unit tests: `->`, `{`, `=`, `0` rejected inside a qualifying section; a letter-bearing identifier retained (AC-B5).
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_extraction.py -k contract`
+  - Acceptance: exit code 0 with at least 2 selected tests; `_blast_radius_extraction.py` <= 500 lines.
+- [ ] [P3-T4] Create `scripts/dev_tools/_blast_radius_normalization.py` with pure helpers: `matches_mandate_read(entry, mandate_reads)` (exact ordinal equality for any entry, plus `matches_glob` containment for concrete entries against `**` patterns, plus exact-string equality for glob-vs-glob) and `exclude_mandate_reads(entries, mandate_reads)` (returns the surviving sorted tuple; empty `mandate_reads` returns the input content unchanged). Import guards from `_blast_radius_guards`, never from `_blast_radius_validation` (no import cycle). Unit tests in `tests/scripts/dev_tools/test_blast_radius_normalization.py` covering exact-path exclusion, `**`-glob exclusion (`artifacts/pr_context.summary.txt` excluded by `artifacts/**`), glob-entry exclusion (`.claude/rules/**` token excluded by the identical `mandate_reads` glob), and empty-list passthrough.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_normalization.py`
+  - Acceptance: exit code 0; both new files <= 500 lines.
+- [ ] [P3-T5] Apply the mandate-read exclusion symmetrically (Design Determination 3): in `scripts/dev_tools/compute_blast_radius.py`, `derive_blast_radius` filters the harvested plan+spec entries through `exclude_mandate_reads(entries, config_mandate_reads(config))` before adding the feature-folder glob; in `scripts/dev_tools/_blast_radius_validation.py`, `validate_blast_radius` applies the same filter to its plan-side extraction so V1 and V2 iterate the filtered set. Tests: (a) AC-B1 — `derive` over a plan citing `.claude/rules/python.md` and `quality-tiers.yml` with the committed config excludes them from `paths`, `modules`, and `shared_surfaces`, while the same call with the key removed includes them; (b) AC-A4 — with `mandate_reads` absent the derivation output is equal field-for-field to the pre-change behavior; (c) AC-B3 — `artifacts/pr_context.summary.txt` cited in a plan does not enter the derived radius under the committed config; (d) self-consistency — the derived radius passes `validate_blast_radius` against its own plan with zero findings when the plan cites mandate-read paths. Place tests in `test_blast_radius_mandate_reads.py`.
+  - Command: `poetry run pytest tests/scripts/dev_tools/ -k mandate`
+  - Acceptance: exit code 0 with at least 8 selected tests; `compute_blast_radius.py` and `_blast_radius_validation.py` each <= 500 lines.
+- [ ] [P3-T6] Implement `normalize_declared_radius(radius, config)` on `scripts/dev_tools/compute_blast_radius.py` (AC-B6): a pure function that (a) raises a specific `ValueError` naming the observed-source prohibition when `radius.source == "observed"` before any other work; (b) re-filters `radius.paths` through `classify_path_token` (with `config_root_surfaces`) so directory-shaped tokens and cross-corpus doc globs recorded by the old extractor are dropped, then applies `exclude_mandate_reads`; (c) filters `radius.contracts` by the ASCII-letter rule; (d) re-resolves `modules` and `shared_surfaces` from the surviving paths against the config; (e) preserves `source` and `computed_at`; (f) never mutates its input. Unit tests: purity (input radius unchanged after the call), idempotence (normalizing an already-clean radius returns an equal radius), and the observed-source rejection.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_normalization.py -k normalize`
+  - Acceptance: exit code 0 with at least 3 selected tests; `compute_blast_radius.py` <= 500 lines.
+- [ ] [P3-T7] Audit and update every existing Python test and every top-level parity fixture whose expected output changes under the unconditional rules: `tests/scripts/dev_tools/test_compute_blast_radius.py` (module expectations at lines 221 and 329 and any sample plan citing directory-shaped or letterless tokens), `test_blast_radius_validation.py`, `test_blast_radius_invariants.py`, and the `tests/fixtures/blast_radius/*.json` derivation/validation fixtures (recompute `expected` blocks; never delete a fixture; never weaken an assertion — behavior-change updates only, each traceable to a named rule).
+  - Command: `poetry run pytest tests/scripts/dev_tools/`
+  - Acceptance: exit code 0 (the Pester side is expected red until Phase 4 and is not part of this gate).
+- [ ] [P3-T8] Add new top-level parity-corpus fixtures, one per new rule, exercised by both runtimes (AC-C3 corpus half): `derivation-mandate-read-excluded.json` (config carries `mandate_reads`), `derivation-directory-shaped-rejected.json`, `derivation-artifacts-segment-removed.json`, `derivation-cross-corpus-doc-glob-rejected.json`, `derivation-letterless-contract-rejected.json`, and `validation-mandate-read-self-consistent.json` (plan cites `quality-tiers.yml`; expected findings empty). Additions only; the floor `MINIMUM_FIXTURE_COUNT = 26` (`test_blast_radius_parity.py:56`) is untouched.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_parity.py`
+  - Acceptance: exit code 0; `pwsh -Command "(Get-ChildItem 'tests/fixtures/blast_radius' -Filter '*.json' -File).Count"` >= 32.
+- [ ] [P3-T9] Add the after-state assertions to `tests/scripts/dev_tools/test_blast_radius_verification_integrity.py` (AC-E2 already pinned in P1-T2; this task completes AC-E3): `normalize_declared_radius` over the three fixture radii with the fixed committed config (loaded from `config/blast-radius.json`) followed by pairwise `conflicts()` yields the edge set exactly `[(486, 487)]`, the surviving overlap is `extensions/drm-copilot/src/mcp-tools.ts`, and `compute_cohorts([485, 486, 487], [(486, 487)]) == [[485, 486], [487]]`.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_verification_integrity.py`
+  - Acceptance: exit code 0; the test file asserts both the before state and the after state; file <= 500 lines.
+- [ ] [P3-T10] Frozen-surface verification (AC-B7, AC-B8): the four frozen Python files carry zero diff, and the parallel-checkpoint validator suites pass without any assertion edit.
+  - Command: `git diff main --stat -- scripts/dev_tools/_blast_radius_conflicts.py scripts/dev_tools/_blast_radius_glob.py scripts/dev_tools/_blast_radius_thresholds.py scripts/dev_tools/parallel_cohort_computation.py` — expected empty output; then `poetry run pytest tests/scripts/dev_tools/ -k "parallel_orchestrator_state or parallel_planner_state or parallel_manifest"`.
+  - Acceptance: empty diff output; pytest exit code 0; `git diff main --name-only -- tests/scripts/dev_tools/` lists no `validate_parallel`- or `_parallel_state`-related test file.
+
+### Phase 4 — PowerShell Mirror
+
+- [ ] [P4-T1] File-size relief and new module: create `.claude/lib/blast-radius/BlastRadiusNormalization.psm1` and relocate into it, verbatim plus export list updates, `Get-ContractIdentifier` from `BlastRadiusExtraction.psm1` and `Resolve-BlastRadiusModule` from `BlastRadiusConfig.psm1` (Design Determination 4; `BlastRadiusValidation.psm1` consumes neither). Update `Import-Module` lines in `.claude/lib/blast-radius/BlastRadius.psm1` to load the new module, update both source modules' `Export-ModuleMember` lists, and update every test file that imports the relocated functions.
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes; `pwsh -Command "foreach ($f in @('.claude/lib/blast-radius/BlastRadiusExtraction.psm1','.claude/lib/blast-radius/BlastRadiusConfig.psm1','.claude/lib/blast-radius/BlastRadiusNormalization.psm1','.claude/lib/blast-radius/BlastRadius.psm1')) { \"$f=$((Get-Content $f).Count)\" }"` reports every count <= 500.
+- [ ] [P4-T2] Mirror the extraction rules in `.claude/lib/blast-radius/BlastRadiusExtraction.psm1` (`Get-PathTokenKind`): remove the `artifacts/` known segment, reject wildcard-free tokens whose final component (after stripping a trailing `:<digits>` suffix) carries no recognized extension, and reject cross-corpus `docs/features/` globs; add the letterless filter to the relocated `Get-ContractIdentifier` in `BlastRadiusNormalization.psm1`. Update `tests/scripts/claude-lib/blast-radius/BlastRadiusExtraction.Path.Tests.ps1` (directory-shaped admission pin near line 34) and `BlastRadiusExtraction.Tests.ps1` with the same admitted/rejected matrix as P3-T1 through P3-T3 (AC-C1 extraction half).
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes; touched `.psm1` files each <= 500 lines.
+- [ ] [P4-T3] Add `Get-ConfigMandateRead` to `.claude/lib/blast-radius/BlastRadiusConfig.psm1` beside the other config readers (absent key yields an empty array; malformed entries throw), and mandate-read matching/exclusion helpers to `BlastRadiusNormalization.psm1` mirroring `matches_mandate_read`/`exclude_mandate_reads`. Add Pester unit tests in `tests/scripts/claude-lib/blast-radius/BlastRadiusConfig.Tests.ps1` and a new `tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1`.
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes; `BlastRadiusConfig.psm1` <= 500 lines; new test file <= 500 lines.
+- [ ] [P4-T4] Mirror the exclusion and the normalization entry point: `Get-BlastRadius` in `.claude/lib/blast-radius/BlastRadius.psm1` filters the harvested entries through the mandate-read exclusion before adding the feature-folder glob; the plan-extraction call site in `.claude/lib/blast-radius/BlastRadiusValidation.psm1` (the `Get-PlanPaths` invocation near line 353) applies the same exclusion so V1/V2 stay self-consistent — this is the single permitted `BlastRadiusValidation.psm1` edit and touches no comparison logic; add `Get-NormalizedDeclaredRadius` to `BlastRadius.psm1` mirroring `normalize_declared_radius` including the observed-source throw. Pester tests: derive exclusion with and without the key, self-consistency (derived radius validates clean against its own mandate-citing plan), normalization purity and observed rejection.
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes; `git diff main -- .claude/lib/blast-radius/BlastRadiusGlob.psm1` prints nothing; the `BlastRadiusValidation.psm1` diff is confined to the plan-extraction call site plus its comment; `BlastRadius.psm1` and `BlastRadiusValidation.psm1` each <= 500 lines.
+- [ ] [P4-T5] Move the Pester truth-table pins (AC-F3): relocate the `Committed blast-radius truth table shape` Describe (pre-change `BlastRadius.Parity.Tests.ps1:302-436`, including the location-bucket Context) to a new `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` and amend it there in the same commit as the config change: module-map pins updated to the seven retained modules, negative pins for the five removed umbrella modules in both committed copies where applicable, and `mandate_reads` shape checks for the repo-root config (list of non-empty strings; contains `quality-tiers.yml`). Update any behavior-matrix case naming a removed module. Relocation rationale: the 500-line file limit (Design Determination 6).
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes; `BlastRadius.Parity.Tests.ps1` and `BlastRadius.TruthTable.Tests.ps1` each <= 500 lines.
+- [ ] [P4-T6] Add the verification-integrity before/after Describe to `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` (AC-E4): read `tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json`; before — `Test-BlastRadiusConflict` pairwise with the fixture `pre_fix_config` reports conflict for all three pairs; after — `Get-NormalizedDeclaredRadius` with the committed `config/blast-radius.json` followed by `Test-BlastRadiusConflict` reports exactly the 486-487 conflict with a `path_overlap` detail citing `extensions/drm-copilot/src/mcp-tools.ts` (cohort assertions are Python-side; PowerShell has no cohort port). This run also proves the extended parity corpus green on the PowerShell side (AC-C3 second driver).
+  - Command: MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: Pester suite passes over the extended corpus; `BlastRadius.Parity.Tests.ps1` <= 500 lines.
+- [ ] [P4-T7] Update the published byte-copies (AC-C2): copy every changed or new module under `.claude/lib/blast-radius/` to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/` in the same commit, including the new `BlastRadiusNormalization.psm1`.
+  - Command: `pwsh -Command "foreach ($n in @('BlastRadius.psm1','BlastRadiusExtraction.psm1','BlastRadiusConfig.psm1','BlastRadiusValidation.psm1','BlastRadiusGlob.psm1','BlastRadiusNormalization.psm1')) { $a=(Get-FileHash \".claude/lib/blast-radius/$n\").Hash; $b=(Get-FileHash \"extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/$n\").Hash; \"$n $($a -eq $b)\" }"`
+  - Acceptance: all six lines report `True`.
+
+### Phase 5 — TypeScript Push-Down Carriage
+
+- [ ] [P5-T1] Extend `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`: add `"mandate_reads"` to `CARRIED_KEYS` (lines 145-150), add the carried property to the assembly literal (lines 431-437) in the fixed emission order `version`, `shared_surfaces`, `shared_surface_globs`, `mandate_reads`, `modules`, `over_breadth_fraction`, and update the emission-order documentation (the `@returns` doc near lines 405-407 and the `CARRIED_KEYS` comment). An absent source key must not emit the property (AC-D1 code half).
+  - Command: run in `extensions/drm-copilot`: `npm run typecheck`
+  - Acceptance: exit code 0; `claude-blast-radius-derive-core.ts` <= 500 lines.
+- [ ] [P5-T2] Add the `mandate_reads` key with the six ratified members to the bundled base document `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` (AC-D2). Do not add any byte-identity assertion between this file and `config/blast-radius.json` anywhere in the branch.
+  - Command: `poetry run python -c "import json;c=json.load(open('extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json'));assert sorted(c['mandate_reads'])==sorted(['.claude/rules/**','quality-tiers.yml','.claude/skills/atomic-plan-contract/SKILL.md','.claude/skills/evidence-and-timestamp-conventions/SKILL.md','artifacts/**','.github/instructions/**']);print('BUNDLED-OK')"`
+  - Acceptance: command prints `BUNDLED-OK` with exit code 0; `git diff main | pwsh -Command "$input | Select-String -Pattern 'byte-identical' -SimpleMatch"` over the branch introduces no new byte-identity assertion for this pair (executor reviews matches, expected none in test code).
+- [ ] [P5-T3] Extend the Jest suites `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts` and `blast-radius-derive.test.ts`: assert `mandate_reads` survives derivation into the pushed-down destination document verbatim (parse the output of `deriveDestinationModuleMap` over the bundled document text and deep-equal the array), assert the new serialized key order, and update any existing key-set or emission-order pins (AC-D1 test half).
+  - Command: run in `extensions/drm-copilot`: `npm run test:unit`
+  - Acceptance: exit code 0; both test files <= 500 lines.
+
+### Phase 6 — Prose and Doctrine
+
+- [ ] [P6-T1] Amend `.claude/skills/parallel-plan/SKILL.md` (AC-G1): rewrite the F1a load-bearing paragraph (currently lines 219-225) so the narrowing prohibition reads "do not narrow a radius beyond the configured exclusions", describes the `mandate_reads` exclusion as part of the landed contract, and documents the planner's obligation to explicitly append an excluded path to a declared radius when the plan's diff will genuinely touch it; amend the planner procedure step 1 to call `normalize_declared_radius(radius, config)` after derivation and before recording the `declared` radius. The amended text must still contain the literal `conflicts(a, b, config)` and must not contain the literal `conflicts(a, b)` (AC-F4), and must not alter the pinned derive-signature sentence.
+  - Command: `poetry run pytest tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py`
+  - Acceptance: exit code 0; `pwsh -Command "(Select-String -Path '.claude/skills/parallel-plan/SKILL.md' -Pattern 'beyond the configured exclusions').Count"` >= 1.
+- [ ] [P6-T2] Add a doctrine section to `.claude/rules/parallel-orchestration.md` (AC-G2) documenting (a) the mandate-read classification concept — read-by-mandate paths enumerated in `config/blast-radius.json` `mandate_reads` are excluded from derived contention, the planner remains obliged to enumerate a genuine write explicitly, and `detect_escaped_paths` makes the read/write distinction exact at execution time; (b) the module-map granularity criterion — an umbrella bucket that essentially every item writes into is not a coherent unit of contention (extending the #472 rationale); and (c) that enforcement remains prose plus validator logic, never an imported JSON Schema. Update the pushed-down rule mirror `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md` with the matching section in the same commit.
+  - Command: `pwsh -Command "foreach ($f in @('.claude/rules/parallel-orchestration.md','extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md')) { \"$f=$((Select-String -Path $f -Pattern 'mandate-read').Count)\" }"`
+  - Acceptance: both files report a count >= 1; `git diff main --name-only` lists no `*.schema.json` file; `git diff main | pwsh -Command "$input | Select-String -Pattern 'mix-calculator' -SimpleMatch"` returns no added occurrence outside pre-existing prose context (expected none).
+
+### Phase 7 — Regression Evidence
+
+- [ ] [P7-T1] Write the regression evidence artifact `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/verification-integrity-before-after.<ts>.md` (AC-E5) recording: the before-state edge list `[(485, 486), (485, 487), (486, 487)]` and cohorts `[[485], [486], [487]]`; the after-state edge list `[(486, 487)]` (surviving overlap `extensions/drm-copilot/src/mcp-tools.ts`) and cohorts `[[485, 486], [487]]`; the fixture path; and the `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` fields from the Python and Pester regression runs. Verify no evidence for this feature resolves to an `artifacts/`-rooted path.
+  - Command: `git diff main --name-only | pwsh -Command "$input | Select-String -Pattern '^artifacts/'"`
+  - Acceptance: artifact exists with all required fields; the command returns no matches.
+
+### Phase 8 — Final QA Loop and Acceptance Reconciliation
+
+Loop rule: within each language, if any step fails or changes files, restart that language's loop from its first step and repeat until a single clean pass completes. Every command below is unconditional — `SKIPPED` is not a valid outcome for any task in this phase. One evidence artifact per command step under `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/qa-gates/`, each with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+
+- [ ] [P8-T1] Python format: `poetry run black .`
+  - Acceptance: exit code 0 and no file reformatted on the final pass; qa-gates artifact recorded.
+- [ ] [P8-T2] Python lint: `poetry run ruff check .`
+  - Acceptance: exit code 0; qa-gates artifact recorded.
+- [ ] [P8-T3] Python type-check: `poetry run pyright`
+  - Acceptance: exit code 0 with zero errors; qa-gates artifact recorded.
+- [ ] [P8-T4] Python full test suite with coverage: `poetry run pytest --cov --cov-branch`
+  - Acceptance: exit code 0; `Output Summary:` records numeric total line and branch coverage (line >= 85, branch >= 75); qa-gates artifact recorded.
+- [ ] [P8-T5] Python changed-module coverage (dotted-module form only): `poetry run pytest tests/scripts/dev_tools/ --cov=scripts.dev_tools._blast_radius_extraction --cov=scripts.dev_tools._blast_radius_validation --cov=scripts.dev_tools._blast_radius_guards --cov=scripts.dev_tools._blast_radius_normalization --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`
+  - Acceptance: exit code 0; each of the five modules reports line >= 85 and branch >= 75 in the recorded output; qa-gates artifact recorded with the per-module numbers (AC-H2 Python half).
+- [ ] [P8-T6] PowerShell format via MCP tool `mcp__drm-copilot__run_poshqc_format`.
+  - Acceptance: clean pass (no residual formatting changes on the final iteration); qa-gates artifact recorded.
+- [ ] [P8-T7] PowerShell analyze via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
+  - Acceptance: zero diagnostics; qa-gates artifact recorded.
+- [ ] [P8-T8] PowerShell tests with coverage via MCP tool `mcp__drm-copilot__run_poshqc_test`.
+  - Acceptance: all tests pass; `Output Summary:` records the numeric line-coverage percentage (>= 85; branch threshold exempt for PowerShell per `.claude/rules/quality-tiers.md`); qa-gates artifact recorded (AC-H2 PowerShell half).
+- [ ] [P8-T9] Re-verify byte-copy parity after the PowerShell format step (the formatter may have touched sources after P4-T7): rerun the P4-T7 hash comparison; if any pair differs, re-copy and restart the PowerShell loop from P8-T6.
+  - Command: the P4-T7 `Get-FileHash` loop command, unchanged.
+  - Acceptance: all six pairs report `True` on the final pass; qa-gates artifact recorded.
+- [ ] [P8-T10] TypeScript format, run in `extensions/drm-copilot`: `npm run format`
+  - Acceptance: exit code 0 and no file changed on the final pass (`git status --porcelain -- extensions/drm-copilot` shows no new modification caused by this step on the final iteration); qa-gates artifact recorded.
+- [ ] [P8-T11] TypeScript lint, run in `extensions/drm-copilot`: `npm run lint`
+  - Acceptance: exit code 0; qa-gates artifact recorded.
+- [ ] [P8-T12] TypeScript type-check, run in `extensions/drm-copilot`: `npm run typecheck`
+  - Acceptance: exit code 0; qa-gates artifact recorded.
+- [ ] [P8-T13] TypeScript tests with coverage, run in `extensions/drm-copilot`: `npm run test:coverage`
+  - Acceptance: exit code 0; `Output Summary:` records numeric line and branch coverage (line >= 85, branch >= 75) including `claude-blast-radius-derive-core.ts`; qa-gates artifact recorded (AC-H2 TypeScript half).
+- [ ] [P8-T14] Coverage delta verification (Coverage Evidence Contract): compare the Phase 0 baseline numbers (P0-T8, P0-T10, P0-T13) against the Phase 8 post-change numbers (P8-T4, P8-T8, P8-T13) and the changed-module numbers (P8-T5), and record baseline, post-change, and changed-code coverage side by side. If any required numeric value is unavailable, the plan outcome is remediation-required, not PASS.
+  - Acceptance: qa-gates artifact `coverage-delta.<ts>.md` records all three value sets numerically, shows no regression on changed lines, and confirms thresholds met.
+- [ ] [P8-T15] Test-integrity review over the branch diff (AC-H3): review `git diff main -- tests/ extensions/drm-copilot/test/` and confirm no removed assertion without a documented behavior-change replacement, no broadened exception check, and no temporary-file creation; every new test input is a committed fixture.
+  - Command: `git diff main -- tests/ extensions/drm-copilot/test/ | pwsh -Command "$input | Select-String -Pattern 'tempfile|mkstemp|TemporaryFile|New-TemporaryItem'"`
+  - Acceptance: command returns no matches; qa-gates artifact records the review conclusion with the per-file disposition of every modified test file.
+- [ ] [P8-T16] Acceptance-criteria reconciliation per the `acceptance-criteria-tracking` skill: verify each of the 31 criteria in `spec.md` individually against its delivering task's recorded evidence, check off satisfied items one at a time (change only `- [ ]` to `- [x]`), and emit the AC status summary in the completion report.
+  - Command: `pwsh -Command "(Select-String -Path 'docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/spec.md' -Pattern '^- \[x\] AC-').Count"`
+  - Acceptance: count is 31 and the unchecked-pattern count from P0-T2 is 0; any criterion that cannot be verified stays unchecked and is reported as an outstanding gap (remediation-required outcome).
+
+## Acceptance-Criteria Traceability (spec lines 222-273)
+
+| AC | Delivering tasks |
+| --- | --- |
+| AC-A1 | P2-T3 |
+| AC-A2 | P2-T3 |
+| AC-A3 | P2-T3 |
+| AC-A4 | P2-T2, P3-T5 |
+| AC-B1 | P3-T5 |
+| AC-B2 | P3-T1 |
+| AC-B3 | P3-T1, P3-T4, P3-T5 |
+| AC-B4 | P3-T2 |
+| AC-B5 | P3-T3 |
+| AC-B6 | P3-T6 |
+| AC-B7 | P3-T10 |
+| AC-B8 | P3-T10 |
+| AC-C1 | P4-T1, P4-T2, P4-T3, P4-T4 |
+| AC-C2 | P4-T7, P8-T9 |
+| AC-C3 | P3-T8, P4-T6 |
+| AC-D1 | P5-T1, P5-T3 |
+| AC-D2 | P5-T2 |
+| AC-E1 | P1-T1, P1-T2 |
+| AC-E2 | P1-T2 |
+| AC-E3 | P3-T9 |
+| AC-E4 | P4-T6 |
+| AC-E5 | P7-T1 |
+| AC-F1 | P2-T4 |
+| AC-F2 | P2-T4 |
+| AC-F3 | P4-T5 |
+| AC-F4 | P6-T1 |
+| AC-G1 | P6-T1 |
+| AC-G2 | P6-T2 |
+| AC-H1 | P8-T1 through P8-T13 |
+| AC-H2 | P8-T5, P8-T8, P8-T13, P8-T14 |
+| AC-H3 | P8-T15 |
+
+## Execution Notes
+
+- Commit discipline: the config-content change (P2-T3), its Python pins (P2-T4), and its Pester pins (P4-T5) land in the same commit series on the feature branch; the byte-copies (P4-T7) land in the same commit as their sources.
+- The Pester suite is expected red between P2-T3/P3-T7 and the completion of Phase 4; each task's acceptance gate names only the suites it is responsible for.
+- Interim task-level pytest/Pester acceptance commands do not replace the Phase 8 loop; Phase 8 runs unconditionally.
+- `poetry run python -c` commands in this plan are single-line by construction; do not reflow them into multi-line strings (multi-line `-c` is a silent no-op on this host).
