@@ -221,14 +221,34 @@ separator-free repository-root shared surfaces from plan and spec text, admittin
 as an exact ordinal member of the configured `shared_surfaces` list in `config/blast-radius.json`;
 and the contention path comparison now honours listed-directory prefixes on both sides, aligning
 with `is_path_subsumed`. Both corrections move results in the fail-closed direction — they report
-more contention, not less. Do not work around either correction, and do not narrow a radius in
-order to suppress a conflict edge they produce.
+more contention, not less. Do not work around either correction.
+
+**The exclusions are configured, not improvised (issue #489).** `config/blast-radius.json` carries
+an optional `mandate_reads` list naming the paths every agent is instructed to read before doing
+any work: the policy rules, the tier map, and the process artifacts. A citation of one of those
+paths is evidence that the author obeyed the reading order, not evidence that the change will write
+the file, so `derive_blast_radius` drops it from the harvest and `validate_blast_radius` drops it
+from its plan-side extraction, which keeps V1 and V2 self-consistent. The extractor likewise rejects
+three token shapes that were never write claims: a wildcard-free token naming a directory rather
+than a file, a `docs/features/` glob whose wildcard spans every feature folder, and a contract token
+carrying no ASCII letter. These exclusions are part of the landed contract, so the prohibition now
+reads: do not narrow a radius beyond the configured exclusions in order to suppress a conflict edge.
+
+**Appending an excluded path is the planner's obligation, not an exception.** An exclusion describes
+the default reading relationship, not a permanent ban. When an item's plan will genuinely WRITE a
+path that the exclusions remove — amending a rule file under `.claude/rules/`, editing
+`quality-tiers.yml`, or changing an instruction document under `.github/instructions/` — the planner
+MUST append that exact path to the item's declared radius explicitly after normalization. Omitting
+it under-reports contention and lets two items that both rewrite the same policy file run
+concurrently.
 
 ### Planner procedure
 
 1. After an item's plan is approved and preflight-clear, read the approved plan text and the
-   feature `spec.md` text, derive the radius with `source: "declared"`, and record it on the item.
-   The `declared` radius is the authoritative input to scheduling.
+   feature `spec.md` text, derive the radius with `source: "declared"`, then call
+   `normalize_declared_radius(radius, config)` to re-apply the current extraction rules and the
+   configured exclusions, append any excluded path the plan's diff will genuinely write, and record
+   the result on the item. The `declared` radius is the authoritative input to scheduling.
 2. Validate the radius and record the findings under the item's `radius_validation` entry.
 3. **V1 (coverage) or V2 (shared-surface enumeration) Blocking failure.** The item does NOT
    transition to `prepared`. Record the findings in the checkpoint and issue a follow-up
