@@ -124,6 +124,7 @@
     ".claude/lib/blast-radius/BlastRadiusConfig.psm1",
     ".claude/lib/blast-radius/BlastRadiusValidation.psm1",
     ".claude/lib/blast-radius/BlastRadius.psm1",
+    ".claude/lib/blast-radius/BlastRadiusNormalization.psm1",
     ".claude/rules/parallel-orchestration.md",
     ".claude/rules/shell.md",
     ".claude/lib/bash/compute-cohorts.sh",

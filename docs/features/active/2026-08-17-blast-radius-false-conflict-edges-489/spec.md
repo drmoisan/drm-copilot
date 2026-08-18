@@ -237,9 +237,9 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 
 ### Group C — PowerShell parity
 
-- [ ] AC-C1: The extraction rules and the normalization entry point are mirrored in `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, `BlastRadiusConfig.psm1`, and `BlastRadius.psm1`, with comparison logic in `BlastRadiusGlob.psm1` and `BlastRadiusValidation.psm1` unchanged. Verify by `git diff` scope and the Pester suite.
-- [ ] AC-C2: The published byte-copies under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/` are updated in the same commit as their sources and are byte-identical to them. Verify by file comparison.
-- [ ] AC-C3: New parity fixtures covering each new extraction rule are added to `tests/fixtures/blast_radius/` (additive; on-disk count >= 26), and both drivers — `poetry run pytest tests/scripts/dev_tools/test_blast_radius_parity.py` and the Pester run of `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` — pass over the extended corpus.
+- [x] AC-C1: The extraction rules and the normalization entry point are mirrored in `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, `BlastRadiusConfig.psm1`, and `BlastRadius.psm1`, with comparison logic in `BlastRadiusGlob.psm1` and `BlastRadiusValidation.psm1` unchanged. Verify by `git diff` scope and the Pester suite.
+- [x] AC-C2: The published byte-copies under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/` are updated in the same commit as their sources and are byte-identical to them. Verify by file comparison.
+- [x] AC-C3: New parity fixtures covering each new extraction rule are added to `tests/fixtures/blast_radius/` (additive; on-disk count >= 26), and both drivers — `poetry run pytest tests/scripts/dev_tools/test_blast_radius_parity.py` and the Pester run of `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` — pass over the extended corpus.
 
 ### Group D — TypeScript push-down carriage
 
@@ -251,14 +251,14 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 - [x] AC-E1: A committed fixture under `tests/fixtures/blast_radius/` holds the three recorded `verification-integrity` `blast_radius` blocks (485: 184/6/1/40, 486: 125/3/2/45, 487: 140/4/1/10 paths/modules/shared_surfaces/contracts) verbatim. Verify by reading the fixture and loading each block through `BlastRadius.from_dict`.
 - [x] AC-E2: A Python regression test pins the before state: pairwise `conflicts()` over the raw fixture radii with the pre-fix config yields edges `[(485, 486), (485, 487), (486, 487)]` and `compute_cohorts` yields `[[485], [486], [487]]`. Verify with `poetry run pytest` on the regression test file.
 - [x] AC-E3: The same regression test asserts the after state: `normalize_declared_radius` over the fixture radii with the fixed committed config yields the edge set exactly `[(486, 487)]` — the genuine conflict on `extensions/drm-copilot/src/mcp-tools.ts` — and `compute_cohorts([485, 486, 487], [(486, 487)]) == [[485, 486], [487]]`, i.e. two cohorts with 485 and 486 concurrent. Verify with `poetry run pytest` on the regression test file.
-- [ ] AC-E4: Matching before/after regression cases exist in `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` and pass under Pester.
+- [x] AC-E4: Matching before/after regression cases exist in `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` and pass under Pester.
 - [ ] AC-E5: The regression evidence artifact recording the before/after edge sets and cohort partitions is committed under `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/`, and no evidence for this feature is written under any `artifacts/`-rooted path. Verify by listing the evidence directory and grepping the branch diff for `artifacts/`-rooted evidence writes.
 
 ### Group F — Test pins moved in the same commit
 
 - [x] AC-F1: `test_items_sharing_a_dev_tools_file_contend_on_path_and_module` (`tests/scripts/dev_tools/test_blast_radius_config.py:407-422`) is rewritten against a retained module or has its `module_overlap` clause dropped, with the path-level contention assertion preserved and no assertion weakened. Verify by reading the test and running it.
 - [x] AC-F2: The non-empty-module-map test (`test_blast_radius_config.py:180-191`) and the `config`-module pin (`test_blast_radius_config.py:444-463`) pass unmodified against the reduced module map. Verify with `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [ ] AC-F3: The committed-truth-table and location-bucket Describe blocks in `BlastRadius.Parity.Tests.ps1` (lines 302-436 pre-change), and any behavior-matrix case naming a removed module, are amended in the same commit as the config change and pass under Pester.
+- [x] AC-F3: The committed-truth-table and location-bucket Describe blocks in `BlastRadius.Parity.Tests.ps1` (lines 302-436 pre-change), and any behavior-matrix case naming a removed module, are amended in the same commit as the config change and pass under Pester.
 - [ ] AC-F4: `tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py:59-71` passes unmodified: the amended parallel-plan skill still contains the literal `conflicts(a, b, config)` and does not contain the literal `conflicts(a, b)`. Verify with `poetry run pytest tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py`.
 
 ### Group G — Prose and doctrine
