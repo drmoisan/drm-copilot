@@ -258,7 +258,7 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 
 - [x] AC-F1: `test_items_sharing_a_dev_tools_file_contend_on_path_and_module` (`tests/scripts/dev_tools/test_blast_radius_config.py:407-422`) is rewritten against a retained module or has its `module_overlap` clause dropped, with the path-level contention assertion preserved and no assertion weakened. Verify by reading the test and running it.
 - [x] AC-F2: The non-empty-module-map test (`test_blast_radius_config.py:180-191`) and the `config`-module pin (`test_blast_radius_config.py:444-463`) pass unmodified against the reduced module map. Verify with `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [x] AC-F3: The committed-truth-table and location-bucket Describe blocks in `BlastRadius.Parity.Tests.ps1` (lines 302-436 pre-change), and any behavior-matrix case naming a removed module, are amended in the same commit as the config change and pass under Pester.
+- [ ] AC-F3: The committed-truth-table and location-bucket Describe blocks in `BlastRadius.Parity.Tests.ps1` (lines 302-436 pre-change), and any behavior-matrix case naming a removed module, are amended in the same commit as the config change and pass under Pester.
 - [x] AC-F4: `tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py:59-71` passes unmodified: the amended parallel-plan skill still contains the literal `conflicts(a, b, config)` and does not contain the literal `conflicts(a, b)`. Verify with `poetry run pytest tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py`.
 
 ### Group G — Prose and doctrine
