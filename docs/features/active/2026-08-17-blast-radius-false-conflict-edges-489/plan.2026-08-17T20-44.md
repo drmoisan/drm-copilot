@@ -71,45 +71,45 @@ Class rules going forward: (1) a task that touches a new or existing `.claude/` 
 
 ### Phase 0 — Policy Reads and Baseline Capture
 
-- [ ] [P0-T1] Read the policy documents in the mandated order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/parallel-orchestration.md`, `.claude/rules/self-explanatory-code-commenting.md`.
+- [x] [P0-T1] Read the policy documents in the mandated order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/powershell.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/parallel-orchestration.md`, `.claude/rules/self-explanatory-code-commenting.md`.
   - Acceptance: evidence artifact `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/other/phase0-instructions-read.<ts>.md` exists with `Timestamp:`, `Policy Order:`, and the explicit file list.
-- [ ] [P0-T2] Verify the full-bug mode gate: `spec.md` exists in the feature folder, carries `Work Mode: full-bug`, and carries exactly 31 unchecked acceptance criteria.
+- [x] [P0-T2] Verify the full-bug mode gate: `spec.md` exists in the feature folder, carries `Work Mode: full-bug`, and carries exactly 31 unchecked acceptance criteria.
   - Command: `pwsh -Command "(Select-String -Path 'docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/spec.md' -Pattern '^- \[ \] AC-').Count"` — expected output `31`.
   - Acceptance: evidence artifact under `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/baseline/` with the four required fields; count is 31.
-- [ ] [P0-T3] Verify the volatile source data before any other work: the gitignored working-tree checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` still holds the three recorded radii with sizes 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10).
+- [x] [P0-T3] Verify the volatile source data before any other work: the gitignored working-tree checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` still holds the three recorded radii with sizes 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10).
   - Command: `poetry run python -c "import json;d=json.load(open('artifacts/orchestration/parallel-orchestrator-state.json'));s={i['issue_num']:(len(i['blast_radius']['paths']),len(i['blast_radius']['modules']),len(i['blast_radius']['shared_surfaces']),len(i['blast_radius']['contracts'])) for i in d['items'] if i['issue_num'] in (485,486,487)};assert s=={485:(184,6,1,40),486:(125,3,2,45),487:(140,4,1,10)},s;print('SOURCE-OK')"`
   - Acceptance: command prints `SOURCE-OK` with exit code 0; evidence artifact under `evidence/baseline/`. If the assertion fails, stop and report blocked state (the fixture source is gone); do not fabricate radii.
-- [ ] [P0-T4] Capture the file-size inventory for every growth-target file named in Design Determination 1.
+- [x] [P0-T4] Capture the file-size inventory for every growth-target file named in Design Determination 1.
   - Command: `pwsh -Command 'foreach ($f in @("scripts/dev_tools/_blast_radius_extraction.py","scripts/dev_tools/_blast_radius_validation.py","scripts/dev_tools/compute_blast_radius.py",".claude/lib/blast-radius/BlastRadiusExtraction.psm1",".claude/lib/blast-radius/BlastRadiusConfig.psm1",".claude/lib/blast-radius/BlastRadius.psm1","tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1","tests/scripts/dev_tools/test_blast_radius_config.py","tests/scripts/dev_tools/test_blast_radius_extraction.py","extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts","extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts","extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts")) { "$f=$((Get-Content $f).Count)" }'`
   - Acceptance: evidence artifact under `evidence/baseline/` recording each measured count and the remaining headroom against 500.
-- [ ] [P0-T5] Python formatting baseline: `poetry run black --check .`
+- [x] [P0-T5] Python formatting baseline: `poetry run black --check .`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
-- [ ] [P0-T6] Python lint baseline: `poetry run ruff check .`
+- [x] [P0-T6] Python lint baseline: `poetry run ruff check .`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
-- [ ] [P0-T7] Python type-check baseline: `poetry run pyright`
+- [x] [P0-T7] Python type-check baseline: `poetry run pyright`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
-- [ ] [P0-T8] Python test-and-coverage baseline: `poetry run pytest --cov --cov-branch`
+- [x] [P0-T8] Python test-and-coverage baseline: `poetry run pytest --cov --cov-branch`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric total line and branch coverage percentages and the pass count.
-- [ ] [P0-T9] PowerShell analyzer baseline via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
+- [x] [P0-T9] PowerShell analyzer baseline via MCP tool `mcp__drm-copilot__run_poshqc_analyze`.
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields (record the MCP invocation as `Command:`).
-- [ ] [P0-T10] PowerShell test-and-coverage baseline via MCP tool `mcp__drm-copilot__run_poshqc_test`.
+- [x] [P0-T10] PowerShell test-and-coverage baseline via MCP tool `mcp__drm-copilot__run_poshqc_test`.
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric line-coverage percentage and pass/fail counts (branch coverage not measured by Pester; line threshold only).
-- [ ] [P0-T11] TypeScript lint baseline, run in `extensions/drm-copilot`: `npm run lint`
+- [x] [P0-T11] TypeScript lint baseline, run in `extensions/drm-copilot`: `npm run lint`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
-- [ ] [P0-T12] TypeScript type-check baseline, run in `extensions/drm-copilot`: `npm run typecheck`
+- [x] [P0-T12] TypeScript type-check baseline, run in `extensions/drm-copilot`: `npm run typecheck`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields.
-- [ ] [P0-T13] TypeScript test-and-coverage baseline, run in `extensions/drm-copilot`: `npm run test:coverage`
+- [x] [P0-T13] TypeScript test-and-coverage baseline, run in `extensions/drm-copilot`: `npm run test:coverage`
   - Acceptance: evidence artifact under `evidence/baseline/` with the four required fields; `Output Summary:` records the numeric line and branch coverage percentages.
 
 ### Phase 1 — Fixture Capture and Before-State Pin
 
-- [ ] [P1-T1] Create `tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json` holding: (a) the three recorded `blast_radius` blocks for items 485, 486, 487 copied VERBATIM from `artifacts/orchestration/parallel-orchestrator-state.json` `items[].blast_radius` (keyed `"485"`, `"486"`, `"487"` under a `radii` object; each block matches `RADIUS_KEYS` exactly), (b) a `pre_fix_config` block equal to the current committed `config/blast-radius.json` content (twelve-module map, no `mandate_reads`), and (c) a `post_fix_config` block equal to the ratified content (seven-module map plus `mandate_reads`). The subdirectory placement keeps the file invisible to the top-level parity enumerations (Design Determination 5).
+- [x] [P1-T1] Create `tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json` holding: (a) the three recorded `blast_radius` blocks for items 485, 486, 487 copied VERBATIM from `artifacts/orchestration/parallel-orchestrator-state.json` `items[].blast_radius` (keyed `"485"`, `"486"`, `"487"` under a `radii` object; each block matches `RADIUS_KEYS` exactly), (b) a `pre_fix_config` block equal to the current committed `config/blast-radius.json` content (twelve-module map, no `mandate_reads`), and (c) a `post_fix_config` block equal to the ratified content (seven-module map plus `mandate_reads`). The subdirectory placement keeps the file invisible to the top-level parity enumerations (Design Determination 5).
   - Command: `poetry run python -c "import json;from scripts.dev_tools.compute_blast_radius import BlastRadius;f=json.load(open('tests/fixtures/blast_radius/verification-integrity/verification-integrity-485-486-487.json'));[BlastRadius.from_dict(f['radii'][k]) for k in ('485','486','487')];print('FIXTURE-OK')"`
   - Acceptance: command prints `FIXTURE-OK` with exit code 0 (AC-E1 loading requirement).
-- [ ] [P1-T2] Write `tests/scripts/dev_tools/test_blast_radius_verification_integrity.py` with the before-state pin: (a) size assertions 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10) over the fixture radii (AC-E1); (b) pairwise `conflicts()` over the raw fixture radii with the fixture's `pre_fix_config` yields exactly the edges `[(485, 486), (485, 487), (486, 487)]`; (c) `compute_cohorts([485, 486, 487], edges) == [[485], [486], [487]]` using `compute_cohorts` from `scripts/dev_tools/parallel_cohort_computation.py`. This test must pass both before and after the fix because the comparison relation is frozen and the pre-fix config is embedded. After-state assertions are added in P3-T9.
+- [x] [P1-T2] Write `tests/scripts/dev_tools/test_blast_radius_verification_integrity.py` with the before-state pin: (a) size assertions 485=(184,6,1,40), 486=(125,3,2,45), 487=(140,4,1,10) over the fixture radii (AC-E1); (b) pairwise `conflicts()` over the raw fixture radii with the fixture's `pre_fix_config` yields exactly the edges `[(485, 486), (485, 487), (486, 487)]`; (c) `compute_cohorts([485, 486, 487], edges) == [[485], [486], [487]]` using `compute_cohorts` from `scripts/dev_tools/parallel_cohort_computation.py`. This test must pass both before and after the fix because the comparison relation is frozen and the pre-fix config is embedded. After-state assertions are added in P3-T9.
   - Command: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_verification_integrity.py`
   - Acceptance: exit code 0; file <= 500 lines.
-- [ ] [P1-T3] Record the executed before-state as regression evidence: `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/before-state-pin.<ts>.md` carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the three edges and the three single-item cohorts).
+- [x] [P1-T3] Record the executed before-state as regression evidence: `docs/features/active/2026-08-17-blast-radius-false-conflict-edges-489/evidence/regression-testing/before-state-pin.<ts>.md` carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the three edges and the three single-item cohorts).
   - Acceptance: artifact exists with all four fields and names the K3 edge list verbatim.
 
 ### Phase 2 — Python Config Layer (reader, content, moved pins)
