@@ -377,25 +377,113 @@ Describe 'Get-BlastRadiusFromObservedPaths' {
     }
 }
 
+Describe 'Get-NormalizedDeclaredRadius' {
+    Context 'Re-filtering a recorded radius (issue #489)' {
+        BeforeAll {
+            # A truth table carrying the ratified mandate-read list and one
+            # module, kept independent of the committed configuration.
+            $script:NormalizerConfig = @{
+                version               = 1
+                shared_surfaces       = @('config/blast-radius.json', 'quality-tiers.yml')
+                shared_surface_globs  = @()
+                mandate_reads         = @(
+                    '.claude/rules/**',
+                    '.claude/skills/atomic-plan-contract/SKILL.md',
+                    '.claude/skills/evidence-and-timestamp-conventions/SKILL.md',
+                    '.github/instructions/**',
+                    'artifacts/**',
+                    'quality-tiers.yml'
+                )
+                modules               = @{ config = @('config/**') }
+                over_breadth_fraction = 0.25
+            }
+        }
+
+        It 'does not mutate its input' {
+            # Arrange: a recorded radius carrying one entry of each rejected class.
+            $radius = @{
+                paths           = @('config/blast-radius.json', 'scripts/dev_tools', 'quality-tiers.yml')
+                modules         = @('config')
+                shared_surfaces = @('config/blast-radius.json', 'quality-tiers.yml')
+                contracts       = @('Get-NormalizedDeclaredRadius', '->')
+                source          = 'declared'
+                computed_at     = '2026-08-18T10-00'
+            }
+            $before = ($radius['paths'] -join ',') + '|' + ($radius['contracts'] -join ',')
+
+            # Act
+            [void](Get-NormalizedDeclaredRadius -Radius $radius -Config $script:NormalizerConfig)
+
+            # Assert: the supplied hashtable is unchanged.
+            (($radius['paths'] -join ',') + '|' + ($radius['contracts'] -join ',')) |
+                Should -Be $before
+        }
+
+        It 'drops every rejected entry class and re-resolves the levels' {
+            # Arrange: directory tokens, corpus globs, mandate reads, notation.
+            $radius = @{
+                paths           = @(
+                    '.claude/rules/**', 'artifacts/pr_context.summary.txt',
+                    'config/blast-radius.json', 'docs/features/**/plan*.md',
+                    'quality-tiers.yml', 'scripts/dev_tools'
+                )
+                modules         = @('config', 'python-dev-tools')
+                shared_surfaces = @('config/blast-radius.json', 'quality-tiers.yml')
+                contracts       = @('Get-NormalizedDeclaredRadius', '->', '{')
+                source          = 'declared'
+                computed_at     = '2026-08-18T10-00'
+            }
+
+            # Act
+            $result = Get-NormalizedDeclaredRadius -Radius $radius -Config $script:NormalizerConfig
+
+            # Assert
+            $result['paths'] | Should -Be @('config/blast-radius.json')
+            $result['modules'] | Should -Be @('config')
+            $result['shared_surfaces'] | Should -Be @('config/blast-radius.json')
+            $result['contracts'] | Should -Be @('Get-NormalizedDeclaredRadius')
+            $result['source'] | Should -Be 'declared'
+            $result['computed_at'] | Should -Be '2026-08-18T10-00'
+        }
+
+        It 'throws for a radius whose source is observed' {
+            # Arrange: an observed radius records a diff listing, not a harvest.
+            $radius = @{
+                paths           = @('config/blast-radius.json')
+                modules         = @('config')
+                shared_surfaces = @('config/blast-radius.json')
+                contracts       = @()
+                source          = 'observed'
+                computed_at     = '2026-08-18T10-00'
+            }
+
+            # Act / Assert
+            { Get-NormalizedDeclaredRadius -Radius $radius -Config $script:NormalizerConfig } |
+                Should -Throw '*observed*'
+        }
+    }
+}
+
 Describe 'Exported facade surface' {
     Context 'Spec PowerShell surface' {
         It 'exports <_>' -ForEach @(
             'Get-PlanPaths', 'Get-BlastRadius', 'Get-BlastRadiusFromObservedPaths',
-            'Test-BlastRadius', 'Test-BlastRadiusConflict'
+            'Get-NormalizedDeclaredRadius', 'Test-BlastRadius', 'Test-BlastRadiusConflict'
         ) {
             # Arrange: the module's exported command table.
             $exported = (Get-Module BlastRadius).ExportedFunctions.Keys
 
-            # Act / Assert: the five spec-fixed names are all exported.
+            # Act / Assert: the six spec-fixed names are all exported.
+            # Get-NormalizedDeclaredRadius joined the contract with issue #489.
             $exported | Should -Contain $_
         }
 
-        It 'exports no function beyond the five spec-fixed names' {
+        It 'exports no function beyond the six spec-fixed names' {
             # Arrange: the module's exported command table.
             $exported = @((Get-Module BlastRadius).ExportedFunctions.Keys)
 
             # Assert: the facade surface is exactly the documented contract.
-            $exported.Count | Should -Be 5
+            $exported.Count | Should -Be 6
         }
     }
 }

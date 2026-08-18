@@ -21,25 +21,115 @@ BeforeAll {
     # Resolve-Path normalizes the separators so Pester's code-coverage
     # breakpoints bind to the same on-disk path the run settings name.
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
+    # Get-ContractIdentifier was relocated to BlastRadiusNormalization.psm1 so
+    # BlastRadiusExtraction.psm1 stays inside the 500-line limit (issue #489);
+    # its Describe below still belongs here beside the path-token cases.
+    # BlastRadiusNormalization.psm1 is imported FIRST and deliberately so.
+    # Import-Module -Force removes the named module from the session before
+    # re-importing it, and the normalization module force-imports its own
+    # dependencies, so importing it second would strip this file's primary
+    # module out of scope. Importing it first lets the primary import restore
+    # every shared function afterwards.
+    $normalizationPath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadiusNormalization.psm1").Path
+    Import-Module $normalizationPath -Force
+
     $modulePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadiusExtraction.psm1").Path
     Import-Module $modulePath -Force
 }
 
 Describe 'Get-PathTokenKind' {
     Context 'Known top-level segments' {
-        It 'accepts a token under the known segment <_>' -ForEach @(
+        It 'accepts a subtree glob under the known segment <_>' -ForEach @(
             'scripts/', 'tests/', 'docs/', 'config/', 'schemas/', 'packages/',
-            'extensions/', '.claude/', '.codex/', '.github/', '.agents/', 'artifacts/'
+            'extensions/', '.claude/', '.codex/', '.github/', '.agents/'
         ) {
-            # Arrange: a directory-shaped token under the segment, with no
-            # extension so only the known-segment rule can accept it.
-            $token = "${_}thing"
+            # Arrange: a subtree claim under the segment, with no extension so
+            # only the known-segment rule can accept it. Since issue #489 a
+            # wildcard-free extensionless token is a directory reference and is
+            # rejected, so the segment is exercised with a ** claim.
+            $token = "${_}thing/**"
 
             # Act: classify the token.
             $kind = Get-PathTokenKind -Token $token
 
             # Assert: a known segment is accepted without a recognized extension.
+            $kind | Should -Be 'glob'
+        }
+    }
+
+    Context 'Directory-shaped token rejection (issue #489)' {
+        It 'rejects the directory-shaped token <_>' -ForEach @(
+            'extensions/drm-copilot', 'scripts/dev_tools', 'docs/features',
+            '.claude/rules/', 'artifacts/pr_context/'
+        ) {
+            # Arrange: a wildcard-free token whose final component names no file.
+            $token = $_
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: a location reference is not a write claim.
+            $kind | Should -BeNullOrEmpty
+        }
+
+        It 'admits a line-suffixed file citation' {
+            # Arrange: a file citation anchored to a line number.
+            $token = '.claude/rules/python.md:90'
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: the :<line> suffix is stripped before the extension test.
             $kind | Should -Be 'concrete'
+        }
+
+        It 'rejects the artifacts subtree glob' {
+            # Arrange: artifacts/ is no longer a known top-level segment.
+            $token = 'artifacts/**'
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: the process-artifact tree is read by mandate, not written.
+            $kind | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Cross-corpus documentation-glob rejection (issue #489)' {
+        It 'rejects the corpus-spanning documentation glob <_>' -ForEach @(
+            'docs/features/**/plan*.md', 'docs/features/active/*/plan.md',
+            'docs/features/**'
+        ) {
+            # Arrange: a glob whose wildcard reaches the feature-folder segment.
+            $token = $_
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: a corpus-wide claim is not evidence of contention.
+            $kind | Should -BeNullOrEmpty
+        }
+
+        It 'retains a glob naming one complete feature folder' {
+            # Arrange: a glob carrying a wildcard-free feature-folder segment.
+            $token = 'docs/features/active/2026-08-17-example-489/**'
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: an own-folder claim is a genuine write claim.
+            $kind | Should -Be 'glob'
+        }
+
+        It 'retains a glob outside the documentation corpus' {
+            # Arrange: the cross-corpus rule is scoped to docs/features/ only.
+            $token = 'scripts/dev_tools/**'
+
+            # Act: classify the token.
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert: an unrelated subtree claim is unaffected.
+            $kind | Should -Be 'glob'
         }
     }
 
@@ -80,8 +170,10 @@ Describe 'Get-PathTokenKind' {
 
     Context 'Glob classification' {
         It 'records a wildcard token as a glob' {
-            # Arrange: a recursive glob under a known segment.
-            $token = 'docs/features/**'
+            # Arrange: a recursive glob under a known segment. The token names a
+            # documentation subtree outside docs/features/ because since issue
+            # #489 a corpus-spanning docs/features/ glob is rejected outright.
+            $token = 'docs/research/**'
 
             # Act: classify the token.
             $kind = Get-PathTokenKind -Token $token
@@ -232,6 +324,32 @@ Describe 'Get-PathFromLine and Get-PlanPaths' {
             # Assert: a plan with no citations yields no paths.
             $paths.Count | Should -Be 0
         }
+    }
+}
+
+Describe 'Get-ContractIdentifier letterless rejection (issue #489)' {
+    It 'rejects the letterless notation token <_>' -ForEach @('->', '{', '=', '0') {
+        # Arrange: a qualifying interface section citing punctuation-only
+        # notation. Such notation appears in nearly every interface section, so
+        # admitting it made unrelated specs contend on a token naming nothing.
+        $spec = "## Interface`n`nThe surface exposes ``$_`` here.`n"
+
+        # Act: extract the contract identifiers.
+        $identifiers = @(Get-ContractIdentifier -SpecText $spec)
+
+        # Assert: the notation token is dropped.
+        $identifiers | Should -Not -Contain $_
+    }
+
+    It 'retains a letter-bearing identifier in the same section' {
+        # Arrange: the same section shape carrying a real identifier.
+        $spec = "## Interface`n`nThe surface exposes ``Get-NormalizedDeclaredRadius`` here.`n"
+
+        # Act: extract the contract identifiers.
+        $identifiers = @(Get-ContractIdentifier -SpecText $spec)
+
+        # Assert: only the letter-bearing token survives.
+        $identifiers | Should -Be @('Get-NormalizedDeclaredRadius')
     }
 }
 

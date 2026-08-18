@@ -64,14 +64,27 @@ INLINE_CODE_SPAN_RE = re.compile(r"`([^`]+)`")
 HEADING_RE = re.compile(r"^(?P<hashes>#{1,6}) (?P<title>.+)$")
 
 # Top-level directories of this repository. A token starting with one of these
-# is accepted without needing a recognized extension, which admits
-# directory-shaped tokens and ``**`` globs.
+# is accepted without needing a recognized extension, which admits ``**`` globs
+# naming a subtree. ``artifacts/`` is deliberately absent (issue #489): the
+# process-artifact tree is read by mandate rather than written by a work item,
+# so admitting ``artifacts/**`` as a subtree claim made unrelated items contend.
 KNOWN_TOP_LEVEL_SEGMENTS: tuple[str, ...] = tuple(
     (
         "scripts/ tests/ docs/ config/ schemas/ packages/ extensions/ "
-        ".claude/ .codex/ .github/ .agents/ artifacts/"
+        ".claude/ .codex/ .github/ .agents/"
     ).split()
 )
+
+# A file citation may carry a trailing line reference such as ``:90``. The
+# suffix is stripped before the extension test so a line-anchored citation keeps
+# the acceptance its unanchored form has; the token itself is recorded verbatim.
+LINE_SUFFIX_RE = re.compile(r":\d+$")
+
+# Documentation-corpus root and the index, counted after that prefix, of the
+# segment that names one feature folder. A glob whose wildcard reaches this
+# segment or any earlier one claims every feature folder in the corpus.
+FEATURE_CORPUS_PREFIX = "docs/features/"
+FEATURE_FOLDER_SEGMENT_INDEX = 1
 
 # Fallback acceptance rule: a token shaped ``<segment>/.../<name>.<ext>`` counts
 # as a repository path when its final component carries one of these extensions.
@@ -81,6 +94,12 @@ RECOGNIZED_PATH_EXTENSIONS: frozenset[str] = frozenset(
         "py sh sln toml ts tsx txt xml yaml yml"
     ).split()
 )
+
+# A contract identifier names something callable or referenceable, so it must
+# carry at least one ASCII letter. Punctuation-only tokens such as ``->``, an
+# opening brace, or a bare digit are notation from an interface example rather
+# than a contract, and admitting them made unrelated specs contend (issue #489).
+CONTRACT_LETTER_RE = re.compile(r"[A-Za-z]")
 
 # A spec section qualifies as an interface section when its heading, or the
 # heading of an ancestor section, contains one of these words.
@@ -220,6 +239,48 @@ def extract_inline_code_tokens(line: str) -> tuple[str, ...]:
     return tuple(tokens)
 
 
+def spans_multiple_feature_folders(token: str) -> bool:
+    """Report whether a glob claims more than one documentation feature folder.
+
+    The documentation corpus is laid out as
+    ``docs/features/<bucket>/<feature-folder>/...``. A glob whose wildcard
+    occupies or truncates the feature-folder segment therefore claims every
+    feature folder in the corpus, which made two unrelated work items contend
+    purely because both wrote documentation (issue #489). A glob that carries a
+    complete, wildcard-free feature-folder segment claims one folder and is
+    retained.
+
+    Args:
+        token (str): A wildcard-bearing token already accepted by the shape
+            rules of ``classify_path_token``.
+
+    Returns:
+        bool: ``True`` when the token is rooted in the documentation corpus and
+        its wildcard reaches the feature-folder segment or any earlier one;
+        ``False`` for every other token, including one rooted elsewhere.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+    if not token.startswith(FEATURE_CORPUS_PREFIX):
+        return False
+
+    segments = token[len(FEATURE_CORPUS_PREFIX) :].split("/")
+
+    # A token that stops at or before the feature-folder segment has had that
+    # segment truncated away by the wildcard, so it spans the whole corpus.
+    if len(segments) <= FEATURE_FOLDER_SEGMENT_INDEX:
+        return True
+
+    # Every segment up to and including the feature-folder name must be a
+    # literal for the claim to resolve to exactly one folder.
+    naming = segments[: FEATURE_FOLDER_SEGMENT_INDEX + 1]
+    return any("*" in segment for segment in naming)
+
+
 def classify_path_token(
     token: str, *, root_surfaces: Sequence[str] = ()
 ) -> PathTokenKind | None:
@@ -236,7 +297,10 @@ def classify_path_token(
     Returns:
         PathTokenKind | None: ``"glob"`` for an accepted token containing
         ``*``, ``"concrete"`` for an accepted token without one, and ``None``
-        when the token is not a repository path reference.
+        when the token is not a repository path reference. A wildcard-free
+        token is accepted only when it names a file: it must be a configured
+        root surface or carry a recognized extension, optionally followed by a
+        ``:<line>`` suffix. A directory-shaped token is rejected (issue #489).
 
     Raises:
         None.
@@ -265,26 +329,38 @@ def classify_path_token(
         return None
 
     # Read the final component's extension for the fallback acceptance rule; a
-    # component with no dot (a directory name or ``**``) has no extension.
-    final_component = token.rsplit("/", 1)[-1]
+    # component with no dot (a directory name or ``**``) has no extension. A
+    # trailing line reference is stripped first so ``file.md:90`` reads as
+    # ``md`` rather than as the unrecognized extension ``md:90``.
+    final_component = LINE_SUFFIX_RE.sub("", token.rsplit("/", 1)[-1])
     extension = ""
     if "." in final_component:
         extension = final_component.rsplit(".", 1)[-1].lower()
 
-    # Acceptance requires one of the two documented shape rules; failing both
-    # means the token is prose or a non-path expression that merely contains a
-    # separator, so it is dropped.
-    if not (
-        token.startswith(KNOWN_TOP_LEVEL_SEGMENTS)
-        or extension in RECOGNIZED_PATH_EXTENSIONS
-    ):
+    has_extension = extension in RECOGNIZED_PATH_EXTENSIONS
+
+    # A wildcard-free token must name a file, not a directory (issue #489). A
+    # directory-shaped token such as ``scripts/dev_tools`` is a location
+    # reference, not a write claim, and admitting it made every item touching
+    # anything under that directory contend at the path level.
+    if "*" not in token:
+        return PATH_KIND_CONCRETE if has_extension else None
+
+    # A wildcard-bearing token must still satisfy one of the two documented
+    # shape rules; failing both means the token is prose or a non-path
+    # expression that merely contains a separator, so it is dropped.
+    if not (token.startswith(KNOWN_TOP_LEVEL_SEGMENTS) or has_extension):
+        return None
+
+    # A documentation glob spanning the whole feature corpus is a cross-corpus
+    # claim rather than a write claim, so it is dropped before it can become a
+    # radius entry.
+    if spans_multiple_feature_folders(token):
         return None
 
     # An accepted token carrying a wildcard names a set of files, so it cannot
     # take part in concrete exact-match comparisons and is recorded as a glob.
-    if "*" in token:
-        return PATH_KIND_GLOB
-    return PATH_KIND_CONCRETE
+    return PATH_KIND_GLOB
 
 
 def extract_paths_from_lines(
@@ -372,8 +448,9 @@ def extract_contract_identifiers(spec_text: str) -> tuple[str, ...]:
 
     Returns:
         tuple[str, ...]: Identifiers, deduplicated and ordinally sorted. Tokens
-        containing a separator are excluded as path references; a spec with no
-        qualifying section yields an empty tuple.
+        containing a separator are excluded as path references, as are tokens
+        carrying no ASCII letter; a spec with no qualifying section yields an
+        empty tuple.
 
     Raises:
         None.
@@ -411,9 +488,10 @@ def extract_contract_identifiers(spec_text: str) -> tuple[str, ...]:
 
         # Inside a qualifying section an inline-code token without a separator is
         # a contract identifier; a token with one is a path reference and is
-        # recorded at the paths level instead.
+        # recorded at the paths level instead. A token carrying no ASCII letter
+        # is notation, not an identifier, and is dropped.
         for token in extract_inline_code_tokens(line):
-            if "/" not in token:
+            if "/" not in token and CONTRACT_LETTER_RE.search(token) is not None:
                 identifiers.add(token)
 
     return tuple(sorted(identifiers))

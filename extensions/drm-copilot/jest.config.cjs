@@ -188,5 +188,9 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/push-down/claude-blast-radius-derive-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

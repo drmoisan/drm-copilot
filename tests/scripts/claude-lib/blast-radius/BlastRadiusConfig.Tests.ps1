@@ -20,6 +20,14 @@ BeforeAll {
     # Resolve-Path normalizes the separators so Pester's code-coverage
     # breakpoints bind to the same on-disk path the run settings name.
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
+    # Resolve-BlastRadiusModule was relocated to BlastRadiusNormalization.psm1
+    # under the 500-line limit (issue #489); its Describe stays here. That module
+    # is imported FIRST because Import-Module -Force removes a module before
+    # re-importing it and this one force-imports its own dependencies, so the
+    # reverse order would strip BlastRadiusConfig out of scope.
+    $normalizationPath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadiusNormalization.psm1").Path
+    Import-Module $normalizationPath -Force
+
     $modulePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadiusConfig.psm1").Path
     Import-Module $modulePath -Force
 
@@ -330,6 +338,46 @@ Describe 'Get-ConfigOverBreadthFraction' {
     }
 }
 
+Describe 'Get-ConfigMandateRead' {
+    Context 'Optional read-by-mandate list' {
+        It 'returns the configured entries ordinally sorted' {
+            # Arrange: an unsorted list carrying one duplicate.
+            $config = @{
+                mandate_reads = @('quality-tiers.yml', '.claude/rules/**', 'quality-tiers.yml')
+            }
+
+            # Act: read the key.
+            $entries = @(Get-ConfigMandateRead -Config $config)
+
+            # Assert: the reader deduplicates and sorts like every other reader.
+            $entries | Should -Be @('.claude/rules/**', 'quality-tiers.yml')
+        }
+
+        It 'returns an empty array when the key is absent' {
+            # Arrange: a truth table that has not opted in to the exclusion.
+            $config = @{ shared_surfaces = @('quality-tiers.yml') }
+
+            # Act: read the key.
+            $entries = @(Get-ConfigMandateRead -Config $config)
+
+            # Assert: an absent key excludes nothing (fail-closed default).
+            $entries.Count | Should -Be 0
+        }
+
+        It 'throws for a non-list value' {
+            # Arrange / Act / Assert: a scalar is malformed, not a one-entry list.
+            { Get-ConfigMandateRead -Config @{ mandate_reads = 'quality-tiers.yml' } } |
+                Should -Throw
+        }
+
+        It 'throws for a blank entry' {
+            # Arrange / Act / Assert: a whitespace-only entry excludes nothing.
+            { Get-ConfigMandateRead -Config @{ mandate_reads = @('a', '   ') } } |
+                Should -Throw
+        }
+    }
+}
+
 Describe 'Resolve-BlastRadiusModule' {
     Context 'Module resolution' {
         It 'resolves a path to the module whose glob covers it' {
@@ -430,8 +478,11 @@ Describe 'Committed truth table' {
             # Act: read every module pair.
             $pairs = @(Get-ConfigModuleEntry -Config $config)
 
-            # Assert: the committed map carries the twelve spec modules.
-            $pairs.Count | Should -Be 12
+            # Assert: the committed map carries the seven ratified subsystem
+            # modules benchmarks, codex-runtime, config, mcp-server, poshqc,
+            # powershell-dev-tools, and schemas; the five umbrella buckets it
+            # used to carry were removed for issue #489.
+            $pairs.Count | Should -Be 7
         }
 
         It 'exposes the committed over-breadth fraction' {

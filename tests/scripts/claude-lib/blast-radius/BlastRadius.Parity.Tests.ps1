@@ -298,167 +298,108 @@ Describe 'Blast-radius contention parity' {
         }
     }
 }
-
-Describe 'Committed blast-radius truth table shape' {
+Describe 'Verification-integrity regression (issue #489)' {
     BeforeAll {
-        # Read the authoritative truth table as the pinning source, mirroring the
-        # constraints tests/scripts/dev_tools/test_blast_radius_config.py asserts.
-        $script:CommittedConfig = Get-Content -Path $script:ConfigPath -Raw | ConvertFrom-Json -AsHashtable
+        # The committed capture of the verification-integrity parallel run. Its
+        # three recorded radii are the data the false-conflict defect was found
+        # on, so the fix is demonstrated against them rather than against the
+        # gitignored working-tree checkpoint.
+        $fixturePath = Join-Path $script:RepoRoot (
+            'tests/fixtures/blast_radius/verification-integrity/' +
+            'verification-integrity-485-486-487.json')
+        # -DateKind String keeps computed_at a string. The recorded radii carry
+        # real ISO-8601 instants, which ConvertFrom-Json otherwise materializes
+        # as [datetime]; the radius contract requires a string.
+        $script:Capture = Get-Content -Path $fixturePath -Raw |
+            ConvertFrom-Json -AsHashtable -DateKind String
+        $script:ItemKey = @('485', '486', '487')
+        $script:CommittedTruthTable = Get-Content -Path $script:ConfigPath -Raw |
+            ConvertFrom-Json -AsHashtable
 
-        # The bundled copy the Claude push-down surface publishes into a
-        # destination repository. It is a separate committed artifact that can
-        # drift from the repo-root copy, so the negative pin below reads both.
-        $script:BundledConfigPath = Join-Path $script:RepoRoot `
-            'extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json'
-        $script:BundledConfig = Get-Content -Path $script:BundledConfigPath -Raw | ConvertFrom-Json -AsHashtable
-    }
+        # The one genuine conflict of the recorded run: 486 and 487 both edit the
+        # MCP tool surface.
+        $script:SurvivingOverlap = 'extensions/drm-copilot/src/mcp-tools.ts'
 
-    Context 'Schema version' {
-        It 'declares version 1' {
-            # Act / Assert: a version change is a cross-language contract change.
-            $script:CommittedConfig['version'] | Should -Be 1
-        }
-    }
-
-    Context 'Module map' {
-        It 'populates the module map' {
-            # Assert: an empty map would make the per-module check vacuous.
-            @($script:CommittedConfig['modules'].Keys).Count | Should -BeGreaterThan 0
-        }
-
-        It 'maps every module to a non-empty glob list' {
-            # Arrange: collect modules whose glob list is empty.
-            $moduleMap = $script:CommittedConfig['modules']
-            $empty = @($moduleMap.Keys | Where-Object { @($moduleMap[$_]).Count -eq 0 })
-
-            # Assert: a module with no globs can never resolve a path, so the
-            # module would be unreachable and module overlap silently narrower.
-            $empty | Should -BeNullOrEmpty
-        }
-    }
-
-    Context 'Over-breadth fraction' {
-        It 'declares an over-breadth fraction within (0, 1]' {
-            # Arrange / Act: read the V3 threshold.
-            $fraction = [double]$script:CommittedConfig['over_breadth_fraction']
-
-            # Assert: zero or a negative value would make every radius
-            # over-broad, and a value above 1 would make V3 unreachable.
-            $fraction | Should -BeGreaterThan 0
-            $fraction | Should -BeLessOrEqual 1
-        }
-    }
-
-    Context 'Shared surfaces' {
-        It 'populates the shared-surface truth table and its membership globs' {
-            # Assert: either list being empty would make the checks below vacuous.
-            @($script:CommittedConfig['shared_surfaces']).Count | Should -BeGreaterThan 0
-            @($script:CommittedConfig['shared_surface_globs']).Count | Should -BeGreaterThan 0
-        }
-
-        It 'lists every shared surface as a repo-relative path' {
-            # Arrange: an absolute, drive-qualified, or parent-relative entry
-            # could never equal a repository-relative path from a diff or a plan,
-            # so the surface would never be recognized as touched.
-            $offending = @(
-                $script:CommittedConfig['shared_surfaces'] | Where-Object {
-                    $_.StartsWith('/') -or $_.Contains(':') -or ($_ -split '/') -contains '..'
-                }
+        # Evaluate the frozen relation over each canonical ascending pair and
+        # return the contending pairs as 'a-b' strings.
+        function Get-ConflictEdge {
+            [CmdletBinding()]
+            [OutputType([System.Object[]])]
+            param(
+                [Parameter(Mandatory = $true)] [hashtable] $Radius,
+                [Parameter(Mandatory = $true)] [hashtable] $Config
             )
-
-            # Assert: no entry may violate the repo-relative constraint.
-            $offending | Should -BeNullOrEmpty
-        }
-
-        It 'gives every shared-surface membership glob a wildcard' {
-            # Arrange: a wildcard-free pattern belongs in the literal
-            # shared_surfaces list; leaving it here would hide it from V2.
-            $offending = @(
-                $script:CommittedConfig['shared_surface_globs'] |
-                    Where-Object { -not $_.Contains('*') }
-            )
-
-            # Assert: every membership glob must carry a wildcard.
-            $offending | Should -BeNullOrEmpty
-        }
-
-        It 'gives every separator-free shared surface no wildcard' {
-            # Arrange: Get-ConfigRootSurface admits a separator-free entry as a
-            # concrete path token (issue #452). A wildcard-bearing entry would
-            # classify as a glob instead, so the configured root surface would
-            # never be recognized as concrete and V2 could not enumerate it.
-            # Mirrors test_every_separator_free_shared_surface_is_wildcard_free
-            # in tests/scripts/dev_tools/test_blast_radius_config.py.
-            $offending = @(
-                $script:CommittedConfig['shared_surfaces'] |
-                    Where-Object { -not $_.Contains('/') } |
-                        Where-Object { $_.Contains('*') -or $_.Contains('?') }
-            )
-
-            # Assert: no separator-free surface may carry either wildcard.
-            $offending | Should -BeNullOrEmpty
-        }
-    }
-
-    Context 'Location-bucket modules' {
-        It 'declares no location-bucket module in either committed copy' {
-            # Arrange: a bucket keyed on where a file lives rather than on which
-            # subsystem owns it attaches to nearly every work item, so it makes
-            # every pair of items contend at the module level (issue #472).
-            # Mirrors test_no_committed_copy_declares_a_location_bucket_module in
-            # tests/scripts/dev_tools/test_blast_radius_config.py.
-            $bucketName = @('docs', 'tests')
-            $bucketGlob = @('docs/**', 'tests/**')
-
-            # Act: walk both committed copies and record every module name and
-            # every glob that matches a location bucket. Comparison is ordinal,
-            # matching the case-sensitive semantics of the Python reference.
-            $offendingName = [System.Collections.Generic.List[string]]::new()
-            $offendingGlob = [System.Collections.Generic.List[string]]::new()
-            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
-                $moduleMap = $config['modules']
-                foreach ($name in @($moduleMap.Keys)) {
-                    if ($bucketName -ccontains $name) {
-                        $offendingName.Add($name)
-                    }
-                    foreach ($glob in @($moduleMap[$name])) {
-                        if ($bucketGlob -ccontains $glob) {
-                            $offendingGlob.Add($glob)
-                        }
+            $edge = [System.Collections.Generic.List[string]]::new()
+            for ($i = 0; $i -lt $script:ItemKey.Count; $i++) {
+                for ($j = $i + 1; $j -lt $script:ItemKey.Count; $j++) {
+                    $left = $script:ItemKey[$i]
+                    $right = $script:ItemKey[$j]
+                    $result = Test-BlastRadiusConflict -RadiusA $Radius[$left] `
+                        -RadiusB $Radius[$right] -Config $Config
+                    if ($result['conflict']) {
+                        $edge.Add("$left-$right")
                     }
                 }
             }
-
-            # Assert: neither the bucket name nor its glob may appear anywhere.
-            $offendingName.ToArray() | Should -BeNullOrEmpty
-            $offendingGlob.ToArray() | Should -BeNullOrEmpty
+            return @($edge.ToArray())
         }
     }
 
-    Context 'Disjoint work items' {
-        It 'reports no contention between two items with disjoint paths' {
-            # Arrange: two work items with distinct feature folders and disjoint
-            # production paths, derived through the mirror against the committed
-            # map. Mirrors
-            # test_disjoint_items_do_not_contend_through_the_committed_map in
-            # tests/scripts/dev_tools/test_blast_radius_config.py.
-            $benchmarkRadius = Get-BlastRadius -SpecText '' `
-                -PlanText '- [ ] [P1-T1] Edit `scripts/benchmarks/run.py` and `tests/benchmarks/test_run.py`.' `
-                -FeatureFolder '2026-08-15-example-benchmark-item' `
-                -Config $script:CommittedConfig -ComputedAt '2026-08-15T09-48'
-            $extensionRadius = Get-BlastRadius -SpecText '' `
-                -PlanText '- [ ] [P1-T1] Edit `extensions/drm-copilot/src/lib/foo.ts`.' `
-                -FeatureFolder '2026-08-15-example-extension-item' `
-                -Config $script:CommittedConfig -ComputedAt '2026-08-15T09-48'
+    Context 'Before state' {
+        It 'reports contention for all three pairs under the pre-fix config' {
+            # Arrange: the raw recorded radii and the pre-fix truth table, both
+            # embedded in the fixture so neither input moves when the repository
+            # configuration is amended.
+            $radius = @{}
+            foreach ($key in $script:ItemKey) {
+                $radius[$key] = $script:Capture['radii'][$key]
+            }
 
-            # Act: ask the contention relation whether the items may run together.
-            $result = Test-BlastRadiusConflict -RadiusA $benchmarkRadius `
-                -RadiusB $extensionRadius -Config $script:CommittedConfig
+            # Act
+            $edges = Get-ConflictEdge -Radius $radius -Config $script:Capture['pre_fix_config']
 
-            # Assert: no disjunct may fire. The reason signature is asserted empty
-            # as well, so a failure names the level that forced the contention.
-            $result['conflict'] | Should -BeFalse
-            (Get-ReasonSignature -Reason @($result['reasons'])) | Should -BeNullOrEmpty
+            # Assert: the complete K3 triangle, which forced fully serial
+            # execution of three thematically unrelated items.
+            $edges | Should -Be @('485-486', '485-487', '486-487')
+        }
+    }
+
+    Context 'After state' {
+        It 'reports only the genuine 486-487 conflict after normalization' {
+            # Arrange: the same recorded radii re-filtered against the committed
+            # repository truth table. Reading the shipped config deliberately:
+            # the fix is only delivered if the config that actually ships
+            # produces this result.
+            $radius = @{}
+            foreach ($key in $script:ItemKey) {
+                $radius[$key] = Get-NormalizedDeclaredRadius `
+                    -Radius $script:Capture['radii'][$key] -Config $script:CommittedTruthTable
+            }
+
+            # Act
+            $edges = Get-ConflictEdge -Radius $radius -Config $script:CommittedTruthTable
+
+            # Assert
+            $edges | Should -Be @('486-487')
+        }
+
+        It 'cites the shared MCP tool surface as the surviving path overlap' {
+            # Arrange
+            $left = Get-NormalizedDeclaredRadius -Radius $script:Capture['radii']['486'] `
+                -Config $script:CommittedTruthTable
+            $right = Get-NormalizedDeclaredRadius -Radius $script:Capture['radii']['487'] `
+                -Config $script:CommittedTruthTable
+
+            # Act
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right `
+                -Config $script:CommittedTruthTable
+            $detail = @($result['reasons'] | ForEach-Object { $_['detail'] })
+
+            # Assert: the surviving edge is a real path overlap on one file, not
+            # a residual artefact of a mandated read. Cohort assertions are
+            # Python-side; this port has no cohort computation.
+            $result['conflict'] | Should -BeTrue
+            $detail | Should -Be @("$script:SurvivingOverlap ~ $script:SurvivingOverlap")
         }
     }
 }

@@ -38,14 +38,18 @@ from scripts.dev_tools._blast_radius_conflicts import (
     conflicts,
 )
 from scripts.dev_tools._blast_radius_extraction import (
+    CONTRACT_LETTER_RE,
+    classify_path_token,
     extract_contract_identifiers,
     extract_paths_from_lines,
     extract_plan_paths,
     normalize_lines,
 )
 from scripts.dev_tools._blast_radius_glob import concrete_entries
+from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
+    config_mandate_reads,
     config_root_surfaces,
     require_str_tuple,
     require_text,
@@ -65,6 +69,7 @@ __all__ = [
     "conflicts",
     "derive_blast_radius",
     "extract_plan_paths",
+    "normalize_declared_radius",
     "radius_from_observed_paths",
     "validate_blast_radius",
 ]
@@ -252,6 +257,7 @@ def derive_blast_radius(
     # invariant that a derived radius always passes V1 and V2 against its own
     # plan (issue #452).
     root_surfaces = config_root_surfaces(config)
+    mandate_reads = config_mandate_reads(config)
 
     # Plan task bodies are the primary signal, the spec contributes the paths it
     # cites in inline code, and the feature folder is always present because
@@ -262,8 +268,16 @@ def derive_blast_radius(
             normalize_lines(spec_text), root_surfaces=root_surfaces
         )
     )
-    entries.add(_feature_folder_glob(require_text(feature_folder, "feature_folder")))
-    paths = tuple(sorted(entries))
+
+    # Read-by-mandate citations are dropped before the feature folder is added:
+    # a plan cites the policy rules because its author was told to read them,
+    # not because the change will write them (issue #489). The same filter runs
+    # on the plan-side extraction in ``validate_blast_radius``, which is what
+    # keeps the derived radius passing V1 and V2 against its own plan. The
+    # feature-folder glob is added afterwards so it can never be excluded.
+    surviving = set(exclude_mandate_reads(tuple(entries), mandate_reads))
+    surviving.add(_feature_folder_glob(require_text(feature_folder, "feature_folder")))
+    paths = tuple(sorted(surviving))
 
     return BlastRadius(
         paths=paths,
@@ -272,6 +286,78 @@ def derive_blast_radius(
         contracts=extract_contract_identifiers(spec_text),
         source=source,
         computed_at=computed_at,
+    )
+
+
+def normalize_declared_radius(
+    radius: BlastRadius, config: Mapping[str, object]
+) -> BlastRadius:
+    """Re-apply the current extraction rules to an already-recorded radius.
+
+    A radius recorded by an older extractor can carry entries the current rules
+    reject: directory-shaped tokens, cross-corpus documentation globs, read-by-
+    mandate citations, and letterless contract tokens. Re-deriving from the plan
+    text is not always possible, so this function re-filters the recorded radius
+    in place of a fresh derivation and re-resolves the levels that depend on the
+    surviving paths (issue #489).
+
+    Args:
+        radius (BlastRadius): A ``derived`` or ``declared`` radius to re-filter.
+        config (Mapping[str, object]): Parsed ``config/blast-radius.json``. The
+            root-surface set, the mandate-read list, the module map, and the
+            shared-surface list are all read from this one mapping.
+
+    Returns:
+        BlastRadius: A new radius carrying the surviving paths, contracts
+        re-filtered by the ASCII-letter rule, modules and shared surfaces
+        re-resolved from the surviving paths, and ``source`` and ``computed_at``
+        preserved unchanged.
+
+    Raises:
+        TypeError: If the truth table has a wrong type.
+        ValueError: If ``radius.source`` is ``observed``. An observed radius is
+            a diff listing rather than a plan-text harvest, so the plan-text
+            acceptance rules do not apply to it and re-filtering one would
+            silently discard genuine evidence of what a work item wrote.
+
+    Side Effects:
+        None; the input radius and mapping are not mutated.
+    """
+    # Fail fast, before any other work, so the prohibition is unambiguous and
+    # no partially-filtered value can escape.
+    if radius.source == RADIUS_SOURCE_OBSERVED:
+        raise ValueError(
+            "normalize_declared_radius rejects a radius whose source is "
+            f"{RADIUS_SOURCE_OBSERVED!r}: an observed radius records a diff "
+            "listing, not a plan-text harvest, so the plan-text acceptance "
+            "rules must not be applied to it."
+        )
+
+    root_surfaces = config_root_surfaces(config)
+
+    # Re-run the classifier over each recorded entry. An entry the current rules
+    # reject is dropped; the mandate-read filter then removes the citations that
+    # are evidence of a read rather than of a write.
+    accepted = tuple(
+        entry
+        for entry in radius.paths
+        if classify_path_token(entry, root_surfaces=root_surfaces) is not None
+    )
+    paths = exclude_mandate_reads(accepted, config_mandate_reads(config))
+
+    contracts = tuple(
+        identifier
+        for identifier in radius.contracts
+        if CONTRACT_LETTER_RE.search(identifier) is not None
+    )
+
+    return BlastRadius(
+        paths=paths,
+        modules=resolve_modules(paths, config),
+        shared_surfaces=resolve_shared_surfaces(concrete_entries(paths), config),
+        contracts=contracts,
+        source=radius.source,
+        computed_at=radius.computed_at,
     )
 
 

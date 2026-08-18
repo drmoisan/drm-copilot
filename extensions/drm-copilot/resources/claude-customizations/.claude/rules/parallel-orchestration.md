@@ -110,7 +110,7 @@ Enforced by `validate_parallel_manifest_text(text)` in `scripts/dev_tools/parall
 
   The value must be authored as a YAML BLOCK sequence. The destination-runtime bash YAML subset parser (`.claude/lib/bash/parallel-yaml-scan.sh`) rejects a non-empty flow collection, so a flow-style value such as `members: [101, 102]` is outside the supported subset and is not accepted on the bash path.
 
-  `expected_conflict_components` is an ASSERTION, not a declaration. It NEVER overrides a derived conflict edge, NEVER feeds `compute_cohorts`, and NEVER influences scheduling. It is consumed by a planner diagnostic (`scripts/dev_tools/parallel_lane_assertion.py`), invoked advisory-only, whose findings never block. Its name deliberately references the DERIVED conflict graph: the field asserts what the operator expects blast-radius derivation to produce, and a mismatch is a signal to re-examine the radii, never a licence to edit the graph. The prohibition on narrowing a radius to suppress an edge is unaffected, as is the `depends_on` prohibition of invariant 10, P3, and M7 — this key is not a dependency edge and does not express ordering.
+  `expected_conflict_components` is an ASSERTION, not a declaration. It NEVER overrides a derived conflict edge, NEVER feeds `compute_cohorts`, and NEVER influences scheduling. It is consumed by a planner diagnostic (`scripts/dev_tools/parallel_lane_assertion.py`), invoked advisory-only, whose findings never block. Its name deliberately references the DERIVED conflict graph: the field asserts what the operator expects blast-radius derivation to produce, and a mismatch is a signal to re-examine the radii, never a licence to edit the graph. The prohibition on narrowing a radius beyond the configured exclusions to suppress an edge is unaffected, as is the `depends_on` prohibition of invariant 10, P3, and M7 — this key is not a dependency edge and does not express ordering.
 
   Example, in the mandatory block-sequence form:
 
@@ -197,6 +197,65 @@ The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` 
 F3 deliberately excludes the kickoff-prompt contract module `scripts/dev_tools/parallel_kickoff_contract.py` and the `parallel-kickoff` `artifact_type`. Both are F4's scope, and F3 neither creates the module nor registers the artifact type on the CLI or MCP surfaces. The MCP surface grows by exactly two `artifact_type` values: `parallel-orchestrator-state` and `parallel-planner-state`.
 
 F3's `require_ready_for_execution` gate is STRUCTURAL ONLY. It enforces the kickoff-PATH invariant (P9: `kickoff_prompt_path` must equal `artifacts/orchestration/parallel-kickoff-<parallel_slug>.md`) and does not parse or cross-check kickoff CONTENT. The deeper readiness-integrity machinery of the epic surface — git-integrity checks, launch-evidence binding, and kickoff-contract cross-checks — is left to F4, which may layer repository-aware checks behind an additional keyword without changing the schema. F3 likewise does not recompute the cohort coloring (planner invariant P5).
+
+## Blast-Radius Contention Doctrine (issue #489)
+
+The conflict graph that seeds cohorts is only as good as the evidence that produces its edges. Two
+classes of derivation defect made thematically unrelated items contend, and the corrections below
+are part of the landed contract. Enforcement remains prose plus validator logic; no JSON Schema is
+authored, imported, or read for any of it.
+
+### Read-by-mandate classification
+
+Every agent in this repository is instructed to read the policy rules, the tier map, and the process
+artifacts before doing any work. A plan that cites `.claude/rules/python.md` or `quality-tiers.yml`
+is therefore reporting compliance with the reading order, not declaring that its diff will write
+those files. Counting such a citation as contention made every well-formed plan collide with every
+other well-formed plan.
+
+`config/blast-radius.json` carries an optional `mandate_reads` list enumerating those paths as exact
+entries and `**` subtree globs. That list is the mandate-read exclusion set. `derive_blast_radius` removes matching citations from the harvest
+before resolving modules and shared surfaces, and `validate_blast_radius` removes them from its
+plan-side extraction so V1 and V2 stay self-consistent against a radius derived from the same plan.
+The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
+pre-change behaviour exactly.
+
+Three constraints bound the mandate-read exclusion:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
+   the default reading relationship, not a permanent ban. When an item's plan will actually write an
+   excluded path, the planner appends that exact path to the declared radius after normalization.
+2. **`quality-tiers.yml` stays a shared surface.** It is listed in both `shared_surfaces` and
+   `mandate_reads`: the first governs what happens when an item really writes it, the second governs
+   what happens when an item merely cites it.
+3. **`detect_escaped_paths` makes the read/write distinction exact at execution time.** The
+   derivation heuristic reads intent from plan text and can be wrong in either direction; drift
+   detection compares the declared radius against the paths a diff actually touched, so an item that
+   wrote an excluded path is caught against observed evidence rather than against prose.
+
+The extractor additionally rejects three token shapes that were never write claims: a wildcard-free
+token whose final component names a directory rather than a file, a `docs/features/` glob whose
+wildcard occupies or truncates the feature-folder segment, and a contract token carrying no ASCII
+letter. `artifacts/` is not a known top-level segment, so a bare `artifacts/**` subtree claim no
+longer satisfies the shape rules.
+
+### Module-map granularity criterion
+
+Issue #472 removed the location-bucket modules `docs` and `tests` because a bucket keyed on where a
+file lives rather than on which subsystem owns it attaches to nearly every work item. The same
+reasoning extends to umbrella buckets keyed on a top-level directory that essentially every item
+writes into: an umbrella that matches almost every radius is not a coherent unit of contention,
+because a level that always fires carries no information and only suppresses concurrency.
+
+Under that criterion `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
+and `agents-surface` were removed, leaving the seven subsystem modules `mcp-server`, `benchmarks`,
+`poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, and `schemas`. Removing a module never
+weakens the relation below the path level: two items editing the same file still contend on
+`path_overlap`, and two items editing a declared shared surface still contend on
+`shared_surface_overlap`.
+
+A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
+A candidate that matches the majority of work items belongs nowhere.
 
 ## Enforcement
 

@@ -17,17 +17,20 @@
     "scripts/dev_tools/_orchestrator_state_*.py",
     "scripts/dev_tools/_epic_orchestrator_state_*.py"
   ],
+  "mandate_reads": [
+    ".claude/rules/**",
+    ".claude/skills/atomic-plan-contract/SKILL.md",
+    ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+    ".github/instructions/**",
+    "artifacts/**",
+    "quality-tiers.yml"
+  ],
   "modules": {
-    "python-dev-tools": ["scripts/dev_tools/**"],
     "powershell-dev-tools": ["scripts/dev-tools/**"],
     "poshqc": ["scripts/powershell/**"],
     "benchmarks": ["scripts/benchmarks/**"],
-    "claude-runtime": [".claude/**"],
     "codex-runtime": [".codex/**"],
-    "copilot-surface": [".github/**"],
-    "agents-surface": [".agents/**"],
     "mcp-server": ["packages/mcp-server/**"],
-    "vscode-extension": ["extensions/drm-copilot/**"],
     "config": ["config/**"],
     "schemas": ["schemas/**"]
   },

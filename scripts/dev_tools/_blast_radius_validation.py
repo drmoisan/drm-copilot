@@ -33,6 +33,16 @@ from scripts.dev_tools._blast_radius_glob import (
     is_path_subsumed,
     matches_glob,
 )
+from scripts.dev_tools._blast_radius_guards import (
+    require_mapping as require_mapping,
+)
+from scripts.dev_tools._blast_radius_guards import (
+    require_str_tuple as require_str_tuple,
+)
+from scripts.dev_tools._blast_radius_guards import (
+    require_text as require_text,
+)
+from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
 from scripts.dev_tools._blast_radius_thresholds import config_over_breadth_fraction
 
 if TYPE_CHECKING:
@@ -54,6 +64,7 @@ FINDING_SEVERITIES: tuple[str, ...] = (SEVERITY_BLOCKING, SEVERITY_ADVISORY)
 CONFIG_SHARED_SURFACES = "shared_surfaces"
 CONFIG_SHARED_SURFACE_GLOBS = "shared_surface_globs"
 CONFIG_MODULES = "modules"
+CONFIG_MANDATE_READS = "mandate_reads"
 
 
 @dataclass(frozen=True)
@@ -99,75 +110,6 @@ class RadiusFinding:
             )
         require_text(self.subject, "RadiusFinding.subject")
         require_text(self.message, "RadiusFinding.message")
-
-
-def require_text(value: object, field_name: str, *, allow_empty: bool = False) -> str:
-    """Guard a caller-supplied value that must be a string.
-
-    Args:
-        value (object): Value of unknown runtime type.
-        field_name (str): Name used in the error message.
-        allow_empty (bool): When ``True`` a blank string is accepted.
-
-    Returns:
-        str: The validated value, unchanged.
-
-    Raises:
-        TypeError: If the value is not a string.
-        ValueError: If the value is blank and ``allow_empty`` is ``False``.
-    """
-    if not isinstance(value, str):
-        raise TypeError(f"{field_name} must be a string, got {type(value).__name__}.")
-    if not allow_empty and not value.strip():
-        raise ValueError(f"{field_name} must not be empty.")
-    return value
-
-
-def require_str_tuple(value: object, field_name: str) -> tuple[str, ...]:
-    """Guard a caller-supplied string collection and normalize its order.
-
-    Args:
-        value (object): A list or tuple of non-blank strings. A bare string is
-            rejected because accepting it would silently split into characters.
-        field_name (str): Name used in the error message.
-
-    Returns:
-        tuple[str, ...]: Entries deduplicated and ordinally sorted for parity.
-
-    Raises:
-        TypeError: If the value is not a list or tuple, or holds a non-string.
-        ValueError: If any entry is blank.
-    """
-    if not isinstance(value, (list, tuple)):
-        raise TypeError(
-            f"{field_name} must be a list or tuple, got {type(value).__name__}."
-        )
-
-    # Validate every entry before sorting so an error names the offending value
-    # rather than a position in an already-reordered collection.
-    entries: set[str] = set()
-    for item in cast("Sequence[object]", value):
-        entries.add(require_text(item, f"{field_name} entry"))
-
-    return tuple(sorted(entries))
-
-
-def require_mapping(value: object, field_name: str) -> Mapping[str, object]:
-    """Guard a caller-supplied mapping such as the parsed truth table.
-
-    Args:
-        value (object): Value of unknown runtime type.
-        field_name (str): Name used in the error message.
-
-    Returns:
-        Mapping[str, object]: The validated mapping, neither copied nor mutated.
-
-    Raises:
-        TypeError: If the value is not a mapping.
-    """
-    if not isinstance(value, dict):
-        raise TypeError(f"{field_name} must be a mapping, got {type(value).__name__}.")
-    return cast("Mapping[str, object]", value)
 
 
 def config_string_list(config: Mapping[str, object], key: str) -> tuple[str, ...]:
@@ -227,6 +169,38 @@ def config_root_surfaces(config: Mapping[str, object]) -> tuple[str, ...]:
     # admitting it here would widen nothing; a separator-free surface is the
     # only kind the classifier's separator test made unreachable.
     return tuple(surface for surface in listed if "/" not in surface)
+
+
+def config_mandate_reads(config: Mapping[str, object]) -> tuple[str, ...]:
+    """Read the read-by-mandate exclusion list from the truth table.
+
+    Mandate reads are the paths every agent is instructed to read before doing
+    any work: policy rules, the tier map, and the process artifacts. A citation
+    of one of them in a plan is evidence that the author obeyed the reading
+    order, not evidence that the change will write the file, so these entries
+    are excluded from derived contention (issue #489). Both entry points that
+    must agree — ``derive_blast_radius`` and ``validate_blast_radius`` — call
+    this reader on the same ``config`` mapping and forward the result.
+
+    Args:
+        config (Mapping[str, object]): Parsed ``config/blast-radius.json``.
+            Only the ``mandate_reads`` key is read. Entries may be exact paths
+            or ``**`` subtree globs.
+
+    Returns:
+        tuple[str, ...]: The entries of ``config["mandate_reads"]``, sorted and
+        deduplicated. A config with no ``mandate_reads`` key yields an empty
+        tuple, which excludes nothing and reproduces pre-change behaviour.
+
+    Raises:
+        TypeError: If ``mandate_reads`` is present but is not a list of
+            strings.
+        ValueError: If a ``mandate_reads`` entry is blank.
+
+    Side Effects:
+        None; the input mapping is not mutated.
+    """
+    return config_string_list(config, CONFIG_MANDATE_READS)
 
 
 def config_modules(
@@ -349,9 +323,15 @@ def validate_blast_radius(
     # The root-surface set comes from the same ``config`` mapping that V1 and V2
     # use below to resolve modules and shared surfaces, and from the same reader
     # ``derive_blast_radius`` calls. That shared source is what keeps a derived
-    # radius passing V1 and V2 against its own plan (issue #452).
+    # radius passing V1 and V2 against its own plan (issue #452). The
+    # mandate-read exclusion is applied here for the same reason: the derivation
+    # harvest drops those citations, so V1 and V2 must not then demand that the
+    # radius cover them (issue #489).
     plan_concrete = concrete_entries(
-        extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config))
+        exclude_mandate_reads(
+            extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config)),
+            config_mandate_reads(config),
+        )
     )
 
     findings: list[RadiusFinding] = list(_coverage_findings(radius, plan_concrete))
