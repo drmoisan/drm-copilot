@@ -382,7 +382,7 @@ def test_disjoint_items_do_not_contend_through_the_committed_map() -> None:
 # Paths the behaviour-preservation matrix has both items cite. Each names a real
 # contention level that must keep firing after the location-bucket modules are
 # removed: a production module file, a test file, and a declared shared surface.
-SHARED_DEV_TOOLS_PATH = "scripts/dev_tools/example_shared.py"
+SHARED_BENCHMARKS_PATH = "scripts/benchmarks/example_shared.py"
 SHARED_TEST_PATH = "tests/scripts/dev_tools/test_example_shared.py"
 SHARED_CONFIG_SURFACE = "config/blast-radius.json"
 
@@ -404,22 +404,22 @@ def derive_matrix_pair(path: str) -> tuple[BlastRadius, BlastRadius]:
     )
 
 
-def test_items_sharing_a_dev_tools_file_contend_on_path_and_module() -> None:
+def test_items_sharing_a_benchmarks_file_contend_on_path_and_module() -> None:
     """Preserve contention for two items editing the same production file."""
-    # Arrange / Act: both items cite the same file under scripts/dev_tools/.
-    left, right = derive_matrix_pair(SHARED_DEV_TOOLS_PATH)
+    # Arrange / Act: both items cite the same file under scripts/benchmarks/.
+    # The retained ``benchmarks`` module replaces the removed ``python-dev-tools``
+    # umbrella bucket here (issue #489); the contention levels asserted are the
+    # same two the pre-change pin asserted, against a module that still exists.
+    left, right = derive_matrix_pair(SHARED_BENCHMARKS_PATH)
     result = conflicts(left, right, CONFIG)
     kinds = reason_kinds(result)
 
-    # Assert: the path level and the subsystem module level must both fire. The
-    # module is asserted through the resolved module sets, not the reason detail,
-    # because the detail reports the smallest shared module and that selection
-    # differs while a location bucket is still present.
+    # Assert: the path level and the subsystem module level must both fire.
     assert result.conflict is True, "Items editing the same file must contend."
     assert "path_overlap" in kinds, f"Expected path_overlap; observed {kinds}."
     assert "module_overlap" in kinds, f"Expected module_overlap; observed {kinds}."
-    assert "python-dev-tools" in left.modules, "Left item must resolve the module."
-    assert "python-dev-tools" in right.modules, "Right item must resolve the module."
+    assert "benchmarks" in left.modules, "Left item must resolve the module."
+    assert "benchmarks" in right.modules, "Right item must resolve the module."
 
 
 def test_items_sharing_only_a_test_file_contend_on_the_path_level() -> None:

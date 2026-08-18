@@ -219,9 +219,9 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 
 ### Group A — Config content (`config/blast-radius.json`)
 
-- [ ] AC-A1: `config/blast-radius.json` carries a new optional `mandate_reads` key whose value is exactly the ratified membership: `.claude/rules/**`, `quality-tiers.yml`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `artifacts/**`, `.github/instructions/**`. Verify by reading the committed file.
-- [ ] AC-A2: The `modules` map in `config/blast-radius.json` no longer contains `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`, or `agents-surface`, and retains exactly `mcp-server`, `benchmarks`, `poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, `schemas`. Verify by reading the committed file.
-- [ ] AC-A3: `quality-tiers.yml` remains listed in `shared_surfaces` in `config/blast-radius.json` and is also listed in `mandate_reads`. Verify by reading the committed file.
+- [x] AC-A1: `config/blast-radius.json` carries a new optional `mandate_reads` key whose value is exactly the ratified membership: `.claude/rules/**`, `quality-tiers.yml`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `artifacts/**`, `.github/instructions/**`. Verify by reading the committed file.
+- [x] AC-A2: The `modules` map in `config/blast-radius.json` no longer contains `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`, or `agents-surface`, and retains exactly `mcp-server`, `benchmarks`, `poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, `schemas`. Verify by reading the committed file.
+- [x] AC-A3: `quality-tiers.yml` remains listed in `shared_surfaces` in `config/blast-radius.json` and is also listed in `mandate_reads`. Verify by reading the committed file.
 - [ ] AC-A4: A new config reader for `mandate_reads` exists in `scripts/dev_tools/_blast_radius_validation.py` beside `config_root_surfaces`, and a unit test asserts that an absent key yields an empty exclusion producing byte-identical derivation output to current behavior. Verify with `poetry run pytest tests/scripts/dev_tools/ -k mandate`.
 
 ### Group B — Extraction rules and normalization (Python)
@@ -256,8 +256,8 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 
 ### Group F — Test pins moved in the same commit
 
-- [ ] AC-F1: `test_items_sharing_a_dev_tools_file_contend_on_path_and_module` (`tests/scripts/dev_tools/test_blast_radius_config.py:407-422`) is rewritten against a retained module or has its `module_overlap` clause dropped, with the path-level contention assertion preserved and no assertion weakened. Verify by reading the test and running it.
-- [ ] AC-F2: The non-empty-module-map test (`test_blast_radius_config.py:180-191`) and the `config`-module pin (`test_blast_radius_config.py:444-463`) pass unmodified against the reduced module map. Verify with `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
+- [x] AC-F1: `test_items_sharing_a_dev_tools_file_contend_on_path_and_module` (`tests/scripts/dev_tools/test_blast_radius_config.py:407-422`) is rewritten against a retained module or has its `module_overlap` clause dropped, with the path-level contention assertion preserved and no assertion weakened. Verify by reading the test and running it.
+- [x] AC-F2: The non-empty-module-map test (`test_blast_radius_config.py:180-191`) and the `config`-module pin (`test_blast_radius_config.py:444-463`) pass unmodified against the reduced module map. Verify with `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
 - [ ] AC-F3: The committed-truth-table and location-bucket Describe blocks in `BlastRadius.Parity.Tests.ps1` (lines 302-436 pre-change), and any behavior-matrix case naming a removed module, are amended in the same commit as the config change and pass under Pester.
 - [ ] AC-F4: `tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py:59-71` passes unmodified: the amended parallel-plan skill still contains the literal `conflicts(a, b, config)` and does not contain the literal `conflicts(a, b)`. Verify with `poetry run pytest tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py`.
 
