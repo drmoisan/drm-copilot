@@ -20,8 +20,8 @@ rather than re-planning, and each item opens its own pull request against main.
 | issue_num | feature_folder | cohort | complexity | branch | plan-path |
 | --- | --- | --- | --- | --- | --- |
 | 485 | docs/features/active/2026-08-17-pr-context-verification-cannot-express-expected-nonzero-exit-485 | 0 | C3 | bug/pr-context-verification-cannot-express-expected-nonzero-exit-485 | docs/features/active/2026-08-17-pr-context-verification-cannot-express-expected-nonzero-exit-485/plan.2026-08-17T15-00.md |
-| 486 | docs/features/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486 | 1 | C3 | feature/reject-unfalsifiable-acceptance-gates-in-atomic-plans-486 | docs/features/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486/plan.2026-08-17T15-00.md |
-| 487 | docs/features/active/2026-08-17-promotion-lifecycle-loses-promoted-record-487 | 2 | C3 | bug/promotion-lifecycle-loses-promoted-record-487 | docs/features/active/2026-08-17-promotion-lifecycle-loses-promoted-record-487/plan.2026-08-17T15-01.md |
+| 486 | docs/features/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486 | 0 | C3 | feature/reject-unfalsifiable-acceptance-gates-in-atomic-plans-486 | docs/features/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486/plan.2026-08-17T15-00.md |
+| 487 | docs/features/active/2026-08-17-promotion-lifecycle-loses-promoted-record-487 | 1 | C3 | bug/promotion-lifecycle-loses-promoted-record-487 | docs/features/active/2026-08-17-promotion-lifecycle-loses-promoted-record-487/plan.2026-08-17T15-01.md |
 
 ## Integrity
 
