@@ -274,6 +274,8 @@ describe("issue #472: the no-signal floor", () => {
     expect(document["over_breadth_fraction"]).toEqual(
       sourceDocument["over_breadth_fraction"],
     );
+    // An absent optional key is carried as absent, not as null (issue #489).
+    expect(document).not.toHaveProperty("mandate_reads");
   });
 
   it("emits the keys in the fixed contract order", () => {
@@ -282,7 +284,9 @@ describe("issue #472: the no-signal floor", () => {
       deriveDestinationModuleMap([observe("")], SOURCE_DOCUMENT),
     );
 
-    // Assert
+    // Assert: `mandate_reads` is absent from this source document, so the
+    // carried property is `undefined` and `JSON.stringify` drops it entirely
+    // (issue #489). Its presence case is pinned in blast-radius-derive.test.ts.
     expect(Object.keys(parsed as Record<string, unknown>)).toEqual([
       "version",
       "shared_surfaces",

@@ -141,12 +141,21 @@ export const FORBIDDEN_GLOBS: ReadonlyArray<string> = [
   "tests/**",
 ];
 
-/** Top-level keys carried verbatim from the bundled source document. */
+/**
+ * Top-level keys carried verbatim from the bundled source document.
+ *
+ * The assembly literal indexes this array positionally, so a new key is
+ * APPENDED rather than inserted: inserting mid-array would shift every existing
+ * index. `mandate_reads` (issue #489) is optional in the source document, and
+ * `JSON.stringify` drops an `undefined`-valued property, so an absent source key
+ * emits no property without a conditional spread.
+ */
 const CARRIED_KEYS = [
   "version",
   "shared_surfaces",
   "shared_surface_globs",
   "over_breadth_fraction",
+  "mandate_reads",
 ] as const;
 
 /**
@@ -404,7 +413,9 @@ function parseSourceDocument(text: string): JsonObject {
  * @param sourceDocumentText Text of the bundled `config/blast-radius.json`.
  * @returns The serialized destination document: 2-space indented with a
  *   trailing newline, keys in the order `version`, `shared_surfaces`,
- *   `shared_surface_globs`, `modules`, `over_breadth_fraction`.
+ *   `shared_surface_globs`, `mandate_reads`, `modules`,
+ *   `over_breadth_fraction`. `mandate_reads` is omitted entirely when the
+ *   bundled source document does not declare it.
  * @throws BlastRadiusDeriveError When the bundled document is not parseable.
  * @throws BlastRadiusGuardError When an emitted glob is forbidden. The guard
  *   runs before the return, so a trip produces no output at all.
@@ -432,6 +443,7 @@ export function deriveDestinationModuleMap(
     version: source[CARRIED_KEYS[0]],
     shared_surfaces: source[CARRIED_KEYS[1]],
     shared_surface_globs: source[CARRIED_KEYS[2]],
+    mandate_reads: source[CARRIED_KEYS[4]],
     modules,
     over_breadth_fraction: source[CARRIED_KEYS[3]],
   };

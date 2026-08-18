@@ -243,8 +243,8 @@ Parity between the Python and PowerShell runtimes is bound by the genuine shared
 
 ### Group D — TypeScript push-down carriage
 
-- [ ] AC-D1: `CARRIED_KEYS`, the assembly object, and the emission-order documentation in `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` are extended with `mandate_reads`, and a Jest test asserts the key survives derivation into the pushed-down destination config. Verify with the extension Jest suite.
-- [ ] AC-D2: The bundled base document `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` gains the `mandate_reads` key; no test or tooling asserts byte-identity between it and `config/blast-radius.json`. Verify by reading the file and confirming no byte-identity assertion was added.
+- [x] AC-D1: `CARRIED_KEYS`, the assembly object, and the emission-order documentation in `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` are extended with `mandate_reads`, and a Jest test asserts the key survives derivation into the pushed-down destination config. Verify with the extension Jest suite.
+- [x] AC-D2: The bundled base document `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` gains the `mandate_reads` key; no test or tooling asserts byte-identity between it and `config/blast-radius.json`. Verify by reading the file and confirming no byte-identity assertion was added.
 
 ### Group E — Empirical demonstration (required outcome)
 

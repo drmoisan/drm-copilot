@@ -101,6 +101,33 @@ function writtenModules(
   return (parsed as { modules: Record<string, string[]> }).modules;
 }
 
+/** The ratified read-by-mandate membership carried by the bundled document. */
+const MANDATE_READS = [
+  ".claude/rules/**",
+  ".claude/skills/atomic-plan-contract/SKILL.md",
+  ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+  ".github/instructions/**",
+  "artifacts/**",
+  "quality-tiers.yml",
+];
+
+/** Bundled source document carrying the optional `mandate_reads` key. */
+const SOURCE_DOCUMENT_WITH_MANDATE_READS = `${JSON.stringify(
+  {
+    version: 1,
+    shared_surfaces: [".claude/settings.json", "config/blast-radius.json"],
+    shared_surface_globs: [],
+    mandate_reads: MANDATE_READS,
+    modules: {
+      "claude-runtime": [".claude/**"],
+      config: ["config/**"],
+    },
+    over_breadth_fraction: 0.25,
+  },
+  null,
+  2,
+)}\n`;
+
 describe("issue #472: destination scan", () => {
   it("visits the root plus two nested levels and stops there", () => {
     // Arrange: a four-level chain; the fourth level must not be observed.
@@ -392,5 +419,58 @@ describe("issue #472: idempotency", () => {
 
     // Assert
     expect(afterSecond).toBe(afterFirst);
+  });
+});
+
+describe("issue #489: mandate_reads carriage", () => {
+  it("carries mandate_reads into the destination document verbatim", () => {
+    // Arrange: a destination with no project structure, so the derivation
+    // contributes only the payload modules and the carried keys are the whole
+    // point of the assertion.
+    const seeded = buildInMemoryFileSystem({}, [DEST]);
+    const decorated = decorate(seeded, fakeLister({}));
+
+    // Act
+    decorated.writeTextFile(TARGET, SOURCE_DOCUMENT_WITH_MANDATE_READS);
+    const parsed: unknown = JSON.parse(seeded.readTextFile(TARGET));
+    const document = parsed as Record<string, unknown>;
+
+    // Assert: the array survives derivation element for element.
+    expect(document["mandate_reads"]).toEqual(MANDATE_READS);
+  });
+
+  it("emits mandate_reads between shared_surface_globs and modules", () => {
+    // Arrange
+    const seeded = buildInMemoryFileSystem({}, [DEST]);
+    const decorated = decorate(seeded, fakeLister({}));
+
+    // Act
+    decorated.writeTextFile(TARGET, SOURCE_DOCUMENT_WITH_MANDATE_READS);
+    const parsed: unknown = JSON.parse(seeded.readTextFile(TARGET));
+
+    // Assert: the serialized key order is the fixed contract order.
+    expect(Object.keys(parsed as Record<string, unknown>)).toEqual([
+      "version",
+      "shared_surfaces",
+      "shared_surface_globs",
+      "mandate_reads",
+      "modules",
+      "over_breadth_fraction",
+    ]);
+  });
+
+  it("omits mandate_reads when the source document declares none", () => {
+    // Arrange: the pre-#489 bundled document shape.
+    const seeded = buildInMemoryFileSystem({}, [DEST]);
+    const decorated = decorate(seeded, fakeLister({}));
+
+    // Act
+    decorated.writeTextFile(TARGET, SOURCE_DOCUMENT);
+    const parsed: unknown = JSON.parse(seeded.readTextFile(TARGET));
+
+    // Assert: an absent optional key emits no property at all.
+    expect(parsed as Record<string, unknown>).not.toHaveProperty(
+      "mandate_reads",
+    );
   });
 });
