@@ -324,13 +324,14 @@ Procedure, per item:
    `docs/features/parallel/<slug>/parallel-status.md`.
 5. On a merge failure caused by a conflict, follow `## Per-Item Merge-Conflict Handling`.
 
-**F7 dependency.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide `PreToolUse`
-Bash-matcher hook that denies any `gh pr merge --merge` unless an epic-shaped checkpoint satisfies
-its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. A parallel run has no
-epic-shaped checkpoint, so step 3 above is denied until F7 scopes or extends that gate's allow
-conditions for the parallel case. This feature modifies no file under `.claude/hooks/` and does not
-change `.claude/settings.json`, so the parallel surface is not executable end-to-end before F7
-lands. That limitation is documented, not worked around.
+**Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
+`PreToolUse` Bash-matcher hook that denies any `gh pr merge --merge` unless a checkpoint satisfies
+one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate now authorizes
+a parallel per-item merge when the parallel-orchestrator checkpoint has `route_id == "parallel"`,
+the target item's `merge_status == "ci_green"`, and, when a PR number is named, it matches the
+item's `pr_number`. Step 3 above is therefore permitted for a legitimate parallel merge; a missing,
+unreadable, or invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or
+a PR number that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
 
 Branch protection on `main` affects only the pacing of step 3, not its ownership: if `main`
 requires branches to be up to date, an automated `gh pr update-branch` plus re-green cycle is

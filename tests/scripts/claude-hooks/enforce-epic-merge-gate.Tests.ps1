@@ -85,6 +85,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"success"}}}'
             }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
             $json = '{"command":"gh pr merge 999 --merge"}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -98,6 +99,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"pending"}}}'
             }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
             $json = '{"command":"gh pr merge 410 --merge"}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -109,6 +111,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
         It 'denies EPIC_MERGE_GATE_BLOCKED when both checkpoints are absent' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
             $json = '{"command":"gh pr merge --merge"}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -118,10 +121,167 @@ Describe 'enforce-epic-merge-gate.ps1' {
         It 'denies when both checkpoints are unreadable (malformed JSON)' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { '{ broken' }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { '{ also broken' }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
             $json = '{"command":"gh pr merge --merge"}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+    }
+
+    Context 'allow via parallel-orchestrator checkpoint (route_id parallel + ci_green + matching PR)' {
+        It 'allows gh pr merge --merge <N> when route_id is parallel and the matched item is ci_green' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
+            }
+            $json = '{"command":"gh pr merge --merge 501"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
+
+    Context 'deny via parallel-orchestrator checkpoint (fail closed)' {
+        It 'denies when the matched item merge_status is not ci_green (e.g. pr_open)' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"pr_open"}]}'
+            }
+            $json = '{"command":"gh pr merge --merge 501"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'denies when the command PR number matches no item' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
+            }
+            $json = '{"command":"gh pr merge --merge 777"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'denies when route_id is not parallel' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
+                '{"route_id":"standard","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
+            }
+            $json = '{"command":"gh pr merge --merge 501"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'denies when the parallel checkpoint is absent and child and epic are also absent' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
+            $json = '{"command":"gh pr merge --merge 501"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'denies when the parallel checkpoint is malformed JSON' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { '{ broken parallel' }
+            $json = '{"command":"gh pr merge --merge 501"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'denies a bare gh pr merge --merge (no PR number) even when a parallel checkpoint is present' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
+            }
+            $json = '{"command":"gh pr merge --merge"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+    }
+
+    Context 'Get-EpicMergeGateCommandPrNumber extractor (flag-order forms)' {
+        It 'returns 410 for the number-before-flag form gh pr merge 410 --merge' {
+            Get-EpicMergeGateCommandPrNumber -CommandText 'gh pr merge 410 --merge' | Should -Be 410
+        }
+
+        It 'returns 410 for the flag-before-number form gh pr merge --merge 410' {
+            Get-EpicMergeGateCommandPrNumber -CommandText 'gh pr merge --merge 410' | Should -Be 410
+        }
+
+        It 'returns $null for a bare gh pr merge --merge with no PR number' {
+            Get-EpicMergeGateCommandPrNumber -CommandText 'gh pr merge --merge' | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'real Test-Path read seam for the parallel checkpoint' {
+        It 'Get-ParallelOrchestratorCheckpointContent returns $null when the checkpoint file does not exist' {
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Get-ParallelOrchestratorCheckpointContent | Should -BeNullOrEmpty
+        }
+
+        It 'Get-ParallelOrchestratorCheckpointContent reads real content when the file exists' {
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel"}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Get-ParallelOrchestratorCheckpointContent | Should -Be '{"route_id":"parallel"}'
+        }
+    }
+
+    Context 'Test-ParallelCheckpointAllowsMerge helper (direct branch coverage)' {
+        It 'returns $false when Checkpoint is $null' {
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $null -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $false when route_id is not parallel' {
+            $checkpoint = '{"route_id":"standard","items":[{"pr_number":501,"merge_status":"ci_green"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $false when CommandPrNumber is $null' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber $null | Should -BeFalse
+        }
+
+        It 'returns $false when items is absent' {
+            $checkpoint = '{"route_id":"parallel"}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $false when no item matches the command PR number' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 777 | Should -BeFalse
+        }
+
+        It 'returns $false when the matched item pr_number is non-numeric' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":"not-a-number","merge_status":"ci_green"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $false when the matched item has no merge_status' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":501}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $false when the matched item merge_status is not ci_green' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"pr_open"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeFalse
+        }
+
+        It 'returns $true when the matched item merge_status is ci_green' {
+            $checkpoint = '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsMerge -Checkpoint $checkpoint -CommandPrNumber 501 | Should -BeTrue
         }
     }
 
