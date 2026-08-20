@@ -52,6 +52,62 @@ _G4_PLAN = "\n".join(
     ]
 )
 
+_G5_LITERAL = "search literal absent here"
+_G6_LITERAL = "wrapped phrase literal"
+
+_COMBINED_THREE_MODE_PLAN = "\n".join(
+    [
+        "### Phase 1 — Work",
+        "- [ ] [P1-T1] Cover the module",
+        "  - Acceptance: `poetry run pytest -q --cov=scripts/dev_tools/foo.py` "
+        "passes.",
+        "- [ ] [P1-T2] Search for an absent literal",
+        f"  - Acceptance: `grep -F -n '{_G5_LITERAL}' docs/design.md` reports "
+        "one match.",
+        "- [ ] [P1-T3] Search for a wrapped literal",
+        f"  - Acceptance: `grep -F -n '{_G6_LITERAL}' docs/other.md` reports "
+        "one match.",
+        "",
+    ]
+)
+
+
+class _CombinedModeStubGitRepository:
+    """Tracked-tree stub answering the G5 and G6 literals of the combined plan.
+
+    Purpose:
+        Supply the exact tracked-tree answers `[P4-T1]` needs so one
+        `validate_plan_text_with_warnings` call over `_COMBINED_THREE_MODE_PLAN`
+        exercises G1, G5, and G6 in a single evaluation: the G5 literal is
+        absent from the tree entirely, and the G6 literal's first word
+        resolves to a tracked file whose committed text wraps the literal
+        across two adjacent lines.
+    """
+
+    def files_containing(self, literal: str) -> list[str]:
+        """Return the tracked file carrying the G6 literal's first word only."""
+
+        if literal == _G6_LITERAL.split()[0]:
+            return ["docs/other.md"]
+        return []
+
+    def is_tracked_file(self, path: str) -> bool:
+        """Return False; the literal rules never consult tracked files."""
+
+        return False
+
+    def is_tracked_directory(self, path: str) -> bool:
+        """Return False; the literal rules never consult tracked directories."""
+
+        return False
+
+    def read_tracked_text(self, path: str) -> str:
+        """Return the wrapped committed text for the G6 candidate path."""
+
+        if path == "docs/other.md":
+            return "the wrapped\nphrase literal continues here\n"
+        return ""
+
 
 class _StubGitRepository:
     """Tracked-tree stub that answers every query negatively."""
@@ -319,3 +375,68 @@ def test_non_plan_route_returns_an_empty_warning_channel(
     # Assert
     assert errors == ["Unsupported artifact type: unsupported"]
     assert warnings == []
+
+
+def test_validate_from_args_returns_blocking_channel_only_for_plan(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """The single-channel dispatcher's `plan` short-circuit returns the same
+    Blocking-only channel as the two-channel entry point, for the exact same
+    parsed arguments."""
+
+    # Arrange
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(_G1_PLAN))
+    args = argparse.Namespace(path="plan.md", artifact_type="plan", workspace_root=".")
+    # Access the private dispatcher and plan-channel helper via vars() to
+    # avoid Pyright reportPrivateUsage, matching the sibling module convention.
+    validate_from_args = cast(
+        "Callable[[argparse.Namespace], list[str]]",
+        vars(validator)["_validate_from_args"],
+    )
+    plan_channels = cast(
+        "Callable[[argparse.Namespace], tuple[list[str], list[str]]]",
+        vars(validator)["_plan_channels"],
+    )
+
+    # Act
+    errors = validate_from_args(args)
+
+    # Assert
+    assert errors == plan_channels(args)[0]
+    assert errors != []
+
+
+def test_combined_plan_produces_g1_g5_g6_findings_in_one_evaluation() -> None:
+    """One evaluation of a three-task plan produces all three confirmed modes.
+
+    Task 1's `--cov` value is a filesystem path ending in the Python suffix
+    (G1, Blocking). Task 2's grep literal is absent from the stub tracked
+    tree and not quoted elsewhere in the plan (G5, Warning). Task 3's grep
+    literal is present only across the stub tracked file's adjacent-line
+    window join, matching no single line (G6, Warning).
+    """
+
+    # Arrange
+    context = PlanGateContext(
+        workspace_root=Path("/workspace"),
+        file_system=_StubFileSystem(),
+        git=_CombinedModeStubGitRepository(),
+    )
+
+    # Act
+    errors, warnings = validator.validate_plan_text_with_warnings(
+        _COMBINED_THREE_MODE_PLAN, context=context
+    )
+
+    # Assert: exactly one Blocking (G1) and exactly two Warnings (G5, G6).
+    assert len(errors) == 1
+    assert errors[0].startswith("[P1-T1] ")
+    assert "Use --cov=scripts.dev_tools.foo." in errors[0]
+    assert len(warnings) == 2
+    g5_warning, g6_warning = warnings
+    assert g5_warning.startswith("[P1-T2] ")
+    assert f"`{_G5_LITERAL}`" in g5_warning
+    assert "is absent from the tracked tree" in g5_warning
+    assert g6_warning.startswith("[P1-T3] ")
+    assert f"`{_G6_LITERAL}`" in g6_warning
+    assert "present only across adjacent lines" in g6_warning

@@ -31,6 +31,20 @@ const GREP_PLAN = [
   "",
 ].join("\n");
 
+const G5_LITERAL = "search literal absent here";
+const G6_LITERAL = "wrapped phrase literal";
+
+const COMBINED_THREE_MODE_PLAN = [
+  "### Phase 1 — Work",
+  "- [ ] [P1-T1] Cover the module",
+  "  - Acceptance: `poetry run pytest -q --cov=scripts/dev_tools/foo.py` passes.",
+  "- [ ] [P1-T2] Search for an absent literal",
+  `  - Acceptance: \`grep -F -n '${G5_LITERAL}' docs/design.md\` reports one match.`,
+  "- [ ] [P1-T3] Search for a wrapped literal",
+  `  - Acceptance: \`grep -F -n '${G6_LITERAL}' docs/other.md\` reports one match.`,
+  "",
+].join("\n");
+
 /** Read-only filesystem stub that answers negatively and reads nothing. */
 const STUB_FILE_SYSTEM: FileSystem = {
   glob: () => [],
@@ -50,6 +64,37 @@ class RecordingRunner implements CommandRunner {
   public run(args: readonly string[]): CommandResult {
     this.calls.push([...args]);
     return { stdout: "", stderr: "", code: 0 };
+  }
+}
+
+/**
+ * Command runner stub answering the combined-plan G5 and G6 tracked-tree
+ * queries the `CommandRunnerPlanGateRepository` git adapter issues.
+ *
+ * Purpose:
+ *     Supply the exact `git grep -F -l` and `git show HEAD:` answers
+ *     `[P4-T2]` needs so one `validateArtifactWithWarnings` call over
+ *     `COMBINED_THREE_MODE_PLAN` exercises G1, G5, and G6 in a single
+ *     evaluation: the G5 literal's tracked-tree query returns empty output,
+ *     and the G6 literal's first-word query resolves to a tracked path whose
+ *     stubbed file content wraps the literal across two adjacent lines.
+ */
+class CombinedModeRunner implements CommandRunner {
+  public run(args: readonly string[]): CommandResult {
+    const [, subcommand, , , , operand] = args;
+    // Route on the git subcommand and operand: `grep -F -l -- <literal>`
+    // resolves tracked-tree presence, `show HEAD:<path>` reads committed text.
+    if (subcommand === "grep" && operand === G6_LITERAL.split(" ")[0]) {
+      return { stdout: "docs/other.md", stderr: "", code: 0 };
+    }
+    if (subcommand === "show" && args[2] === "HEAD:docs/other.md") {
+      return {
+        stdout: "the wrapped\nphrase literal continues here\n",
+        stderr: "",
+        code: 0,
+      };
+    }
+    return { stdout: "", stderr: "", code: 1 };
   }
 }
 
@@ -176,6 +221,37 @@ describe("validateArtifact plan acceptance gates", () => {
     // Assert
     expect(result.errors).toEqual([]);
     expect(result.warnings).toEqual([]);
+  });
+
+  it("produces one G1 Blocking finding and two Warnings (G5, G6) in a single combined-plan evaluation", () => {
+    // Arrange: task 1's `--cov` value is a `.py` filesystem path (G1);
+    // task 2's grep literal is absent from the stub tracked tree (G5); task
+    // 3's grep literal is present only across the stub tracked file's
+    // adjacent-line window join (G6).
+    const runner = new CombinedModeRunner();
+
+    // Act
+    const result = validateArtifactWithWarnings({
+      artifactType: "plan",
+      text: COMBINED_THREE_MODE_PLAN,
+      artifactPath: "docs/plan.md",
+      fs: STUB_FILE_SYSTEM,
+      root: "/workspace",
+      runner,
+    });
+
+    // Assert: exactly one Blocking (G1) and exactly two Warnings (G5, G6).
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toMatch(/^\[P1-T1\] /);
+    expect(result.errors[0]).toContain("Use --cov=scripts.dev_tools.foo.");
+    expect(result.warnings).toHaveLength(2);
+    const [g5Warning, g6Warning] = result.warnings;
+    expect(g5Warning).toMatch(/^\[P1-T2\] /);
+    expect(g5Warning).toContain(`\`${G5_LITERAL}\``);
+    expect(g5Warning).toContain("is absent from the tracked tree");
+    expect(g6Warning).toMatch(/^\[P1-T3\] /);
+    expect(g6Warning).toContain(`\`${G6_LITERAL}\``);
+    expect(g6Warning).toContain("present only across adjacent lines");
   });
 
   it("leaves every non-plan route on the single-channel path", () => {

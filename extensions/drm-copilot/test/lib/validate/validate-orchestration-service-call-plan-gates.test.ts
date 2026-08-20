@@ -17,6 +17,15 @@ const CLEAN_PLAN = [
   "",
 ].join("\n");
 
+const COMBINED_ERROR_AND_WARNING_PLAN = [
+  "### Phase 1 — Work",
+  "- [ ] [P1-T1] Do the first thing",
+  "  - Acceptance: `poetry run pytest -q --cov=scripts/dev_tools/foo.py` passes.",
+  "- [ ] [P1-T2] Do the second thing",
+  "  - Acceptance: `poetry run pytest -q --cov tests.bar` reports 0 failed.",
+  "",
+].join("\n");
+
 /** Filesystem stub returning one fixed artifact text for any path. */
 function stubFileSystem(text: string): FileSystem {
   return {
@@ -82,5 +91,30 @@ describe("validateOrchestrationServiceCall plan acceptance gates", () => {
 
     // Assert: the own-property list is byte-identical to the pre-change shape.
     expect(Object.keys(result)).toEqual(["tool", "workspaceRoot", "summary"]);
+  });
+
+  it("throws the combined error-and-warning message when both channels are non-empty", () => {
+    // Arrange: task 1's `--cov` value is a filesystem path ending in `.py`
+    // (G1 Blocking, errors channel); task 2's `--cov` value is supplied
+    // space-separated (G4 Warning, warnings channel).
+    const fileSystem = stubFileSystem(COMBINED_ERROR_AND_WARNING_PLAN);
+
+    // Act / Assert
+    expect(() =>
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "/workspace",
+        artifactType: "plan",
+        artifactPath: "docs/plan.md",
+      }),
+    ).toThrow(
+      "Validation failed for plan artifact at 'docs/plan.md':\n" +
+        "[P1-T1] --cov argument `scripts/dev_tools/foo.py` names a " +
+        "filesystem path; coverage.py accepts only directories or " +
+        "importable names. Use --cov=scripts.dev_tools.foo.\n" +
+        "PLAN GATE WARNING: [P1-T2] --cov argument value `tests.bar` is " +
+        "supplied space-separated; the ambiguous form can bind the " +
+        "following positional argument. Use the --cov=<module> form.",
+    );
   });
 });
