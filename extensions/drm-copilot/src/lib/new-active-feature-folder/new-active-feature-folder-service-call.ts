@@ -102,9 +102,31 @@ export interface NewActiveFeatureFolderServiceCallResult {
  * @throws Error When the workflow throws (invalid type/name, missing template,
  *   target exists, invalid work mode); the message is preserved.
  */
+/**
+ * Throw when a path the receipt is about to report does not exist.
+ *
+ * @param fileSystem Filesystem the workflow wrote through.
+ * @param path Path the receipt would report.
+ * @throws Error Naming the tool and the absent path.
+ */
+function requireReportedPathExists(
+  fileSystem: FolderFileSystem,
+  path: string,
+): void {
+  if (!fileSystem.exists(path)) {
+    throw new Error(
+      `new_active_feature_folder reported a path that does not exist: ${path}`,
+    );
+  }
+}
+
 export function newActiveFeatureFolderServiceCall(
   input: NewActiveFeatureFolderServiceCallInput,
 ): NewActiveFeatureFolderServiceCallResult {
+  // Hoisted so the post-condition below observes the SAME filesystem the
+  // workflow wrote to, rather than a second instance.
+  const fileSystem = input.fileSystem ?? new RealFolderFileSystem();
+
   const result = createActiveFolder({
     featureName: input.featureName,
     featureType: input.type,
@@ -112,7 +134,7 @@ export function newActiveFeatureFolderServiceCall(
     workMode: input.workMode,
     workspace: input.workspaceRoot,
     templateRoot: input.templateRoot,
-    fs: input.fileSystem ?? new RealFolderFileSystem(),
+    fs: fileSystem,
     // Route the guarded gh issue fetch through the injected F1 runner.
     issueFetcher: (issueNumber: string): IssueMeta | null =>
       defaultIssueFetcher(issueNumber, input.runner),
@@ -120,6 +142,14 @@ export function newActiveFeatureFolderServiceCall(
     codeLauncher: () => false,
     ...(input.log === undefined ? {} : { emit: input.log }),
   });
+
+  // Post-condition: every filesystem path this receipt reports must exist. A
+  // receipt that names an absent path is a false success, so fail loudly rather
+  // than returning a partially populated ok:true record.
+  requireReportedPathExists(fileSystem, result.target);
+  if (result.potentialIssuePath !== null) {
+    requireReportedPathExists(fileSystem, result.potentialIssuePath);
+  }
 
   return {
     tool: "new_active_feature_folder",

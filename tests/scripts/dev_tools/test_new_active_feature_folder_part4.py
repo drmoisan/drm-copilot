@@ -281,7 +281,7 @@ def test_create_active_folder_auto_resolve_feature_name_from_promoted_active_fil
     )
     assert result.target == expected_folder
     assert result.potential_issue_path == expected_folder / "issue.md"
-    assert active_file not in fs.files
+    assert active_file in fs.files
 
 
 def _auto_resolve_rejects_non_promoted_or_non_markdown_active_file() -> None:

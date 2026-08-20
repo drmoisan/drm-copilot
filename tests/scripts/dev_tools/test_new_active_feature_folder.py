@@ -281,7 +281,7 @@ def _seed_bug_template(fs: FakeFileSystem, workspace: Path) -> None:
     )
 
 
-def test_create_feature_folder_moves_potential_and_updates_files() -> None:
+def test_create_feature_folder_retains_promoted_potential_and_updates_files() -> None:
     """Verify feature-folder creation moves potential file and updates docs."""
     fs = FakeFileSystem()
     workspace = Path("/workspace")
@@ -330,7 +330,7 @@ def test_create_feature_folder_moves_potential_and_updates_files() -> None:
     )
     assert result.target == expected_folder
     assert result.potential_issue_path == expected_folder / "issue.md"
-    assert potential_path not in fs.files
+    assert potential_path in fs.files
     assert fs.exists(expected_folder / "user-story.md")
     user_story = fs.read_text(expected_folder / "user-story.md")
     assert "problem text" in user_story

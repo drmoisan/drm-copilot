@@ -31,6 +31,29 @@ function makeRunner(recorded: string[][]): CommandRunner {
   };
 }
 
+/**
+ * Filesystem fake that reports one designated path as absent.
+ *
+ * Used to drive the receipt post-condition: the promotion still moves the file
+ * normally, but the reported destination fails its existence check.
+ */
+class BlockedPathPotentialFileSystem extends FakePotentialFileSystem {
+  /**
+   * @param blockedPath Path whose existence check always reports false.
+   */
+  constructor(private readonly blockedPath: string) {
+    super();
+  }
+
+  /**
+   * @param path Path to test.
+   * @returns False for the blocked path; otherwise the inherited answer.
+   */
+  override exists(path: string): boolean {
+    return path === this.blockedPath ? false : super.exists(path);
+  }
+}
+
 /** Seed a feature potential with all required sections. */
 function seedFeature(fs: FakePotentialFileSystem, path: string): void {
   fs.files.set(
@@ -233,5 +256,72 @@ describe("potentialToIssueServiceCall — failure surface", () => {
         workMode: "full",
       }),
     ).toThrow("GitHub CLI is not authenticated. Run 'gh auth login' first.");
+  });
+});
+
+describe("potentialToIssueServiceCall receipt post-condition", () => {
+  const DESTINATION = "/workspace/docs/features/potential/promoted/sample.md";
+
+  it("throws when the promoted destination is absent", () => {
+    // Arrange: the promoted destination reports as absent after the move.
+    const build = (): FakePotentialFileSystem => {
+      const fs = new BlockedPathPotentialFileSystem(DESTINATION);
+      seedFeature(fs, POTENTIAL);
+      return fs;
+    };
+    const makeGh = (): FakeGhClient =>
+      new FakeGhClient(
+        { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+        { output: [], exitCode: 0 },
+      );
+
+    // Act / Assert
+    expect(() =>
+      potentialToIssueServiceCall({
+        fileSystem: build(),
+        runner: makeRunner([]),
+        gh: makeGh(),
+        workspaceRoot: WORKSPACE,
+        potentialPath: POTENTIAL,
+        promotionType: "feature",
+        workMode: "full",
+      }),
+    ).toThrow("potential_to_issue");
+    expect(() =>
+      potentialToIssueServiceCall({
+        fileSystem: build(),
+        runner: makeRunner([]),
+        gh: makeGh(),
+        workspaceRoot: WORKSPACE,
+        potentialPath: POTENTIAL,
+        promotionType: "feature",
+        workMode: "full",
+      }),
+    ).toThrow(DESTINATION);
+  });
+
+  it("returns the enriched record when the destination exists", () => {
+    // Arrange: nothing is blocked, so the promoted destination exists.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: WORKSPACE,
+      potentialPath: POTENTIAL,
+      promotionType: "feature",
+      workMode: "full",
+    });
+
+    // Assert
+    expect(result.destinationPath).toBe(DESTINATION);
+    expect(result.artifacts).toEqual(["https://example.com/issues/123"]);
   });
 });

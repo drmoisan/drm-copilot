@@ -156,12 +156,16 @@ export function potentialToIssueServiceCall(
     input.gh ??
     new RealGhClient({ runner: new CommandRunnerGhAdapter(input.runner) });
 
+  // Hoisted so the post-condition below observes the SAME filesystem the
+  // workflow wrote to, rather than a second instance.
+  const fileSystem = input.fileSystem ?? new RealPotentialFileSystem();
+
   const outcome = promotePotential({
     potentialPath: input.potentialPath,
     promotionType: input.promotionType,
     workMode: input.workMode,
     workspace: input.workspaceRoot,
-    fs: input.fileSystem ?? new RealPotentialFileSystem(),
+    fs: fileSystem,
     gh: ghClient,
     ...(input.log === undefined ? {} : { emit: input.log }),
   });
@@ -179,6 +183,16 @@ export function potentialToIssueServiceCall(
 
   // Enrich with the created issue URL when it was parsed from the gh output.
   const [issueUrl] = parseIssueReference(outcome.messages);
+
+  // Post-condition: the promoted destination this receipt reports must exist. A
+  // receipt that names an absent path is a false success. The `artifacts` entry
+  // for this tool is a GitHub issue URL, not a filesystem path, and is
+  // deliberately excluded from the existence check.
+  if (outcome.destination !== undefined && !fileSystem.exists(outcome.destination)) {
+    throw new Error(
+      `potential_to_issue reported a path that does not exist: ${outcome.destination}`,
+    );
+  }
 
   return {
     tool: "potential_to_issue",
