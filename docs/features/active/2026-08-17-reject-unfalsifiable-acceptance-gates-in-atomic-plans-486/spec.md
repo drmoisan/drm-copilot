@@ -197,6 +197,6 @@ The seam where that later feature attaches is fixed here so no rework is require
 - [x] **AC12 (PowerShell hook untouched).** `.claude/hooks/validate-planner-output.ps1` does not appear in `git diff --name-only <base>...<head>` for this feature branch.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage areas: pattern-absence detection against a controlled tracked-file set; `--cov=` argument-form classification for path, module, and package forms; the plan-task identifier attached to each rejection; the no-violation path producing an empty result.
+- [x] Unit coverage areas: pattern-absence detection against a controlled tracked-file set; `--cov=` argument-form classification for path, module, and package forms; the plan-task identifier attached to each rejection; the no-violation path producing an empty result.
 - [ ] Integration scenarios: a synthetic plan carrying one instance of each of the three confirmed failure modes produces three distinct findings at their specified severities; a clean plan from the existing corpus passes.
-- [ ] CLI/API examples: exit-code and message-format contract for the check, including the zero-violation case and the warning-only case.
+- [x] CLI/API examples: exit-code and message-format contract for the check, including the zero-violation case and the warning-only case.
