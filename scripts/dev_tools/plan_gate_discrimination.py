@@ -8,6 +8,12 @@ Purpose:
     specification's public surface is a single module. It imports the extractor
     and never imports `scripts.dev_tools.validate_orchestration_artifacts`,
     which imports this module.
+
+    The G1 through G4 coverage-argument cascade lives in the sibling module
+    `scripts.dev_tools.plan_gate_coverage` and is invoked from here, so this
+    module holds the shared report and context types, the G5 and G6 literal
+    rules, and the public entry point. That module depends on the types defined
+    here only under `TYPE_CHECKING`, so the runtime import graph is acyclic.
 """
 
 from __future__ import annotations
@@ -20,12 +26,15 @@ from scripts.dev_tools.epic_planner_readiness import (
     ReadinessFileSystem,
 )
 from scripts.dev_tools.plan_gate_commands import (
-    COV_FLAG,
-    COV_FLAG_PREFIX,
     KIND_GREP,
     PlanCommand,
     extract_plan_commands,
     grep_executable_index,
+)
+from scripts.dev_tools.plan_gate_coverage import (
+    cov_values,
+    evaluate_cov_value,
+    is_placeholder,
 )
 from scripts.dev_tools.pr_context.git import SubprocessRunner
 
@@ -34,12 +43,8 @@ if TYPE_CHECKING:
 
     from scripts.dev_tools.pr_context.git import CommandRunner
 
-PLACEHOLDER_MARKERS = ("<", ">", "${", "$(", "%")
 REGEX_METACHARACTERS = frozenset(".*[]^$\\(){}|+?")
 FIXED_STRING_FLAG = "-F"
-PATH_SEPARATORS = ("/", "\\")
-PYTHON_SUFFIX = ".py"
-PYTEST_NODE_SEPARATOR = "::"
 BLOCKING_CHANNEL = "blocking"
 WARNING_CHANNEL = "warning"
 _WINDOW_SIZE = 4
@@ -195,129 +200,6 @@ def build_plan_gate_context(
     )
 
 
-def _is_placeholder(value: str) -> bool:
-    """Return whether the value carries a placeholder or interpolation marker.
-
-    A value the plan spelled with a placeholder was never intended to run
-    verbatim, so its resolvability is not decidable and no rule may report it.
-    """
-
-    return any(marker in value for marker in PLACEHOLDER_MARKERS)
-
-
-def _dotted_remedy(value: str) -> str:
-    """Return the importable dotted form of a filesystem-path coverage value."""
-
-    stem = value[: -len(PYTHON_SUFFIX)] if value.endswith(PYTHON_SUFFIX) else value
-    return stem.replace("/", ".").replace("\\", ".")
-
-
-def _cov_values(command: PlanCommand) -> list[tuple[str, bool]]:
-    """Return each `--cov` value paired with whether it was space-separated.
-
-    A word is a `--cov` argument if and only if it equals `--cov` exactly or
-    begins with the six characters `--cov=`, so prefix matching never treats
-    `--cov-branch` or `--cov-report=term-missing` as a `--cov` argument.
-    """
-
-    values: list[tuple[str, bool]] = []
-    argv = command.argv
-    # Walk positionally: the space-separated form takes its value from the
-    # following word, which a per-word filter cannot see.
-    for index, word in enumerate(argv):
-        if word == COV_FLAG:
-            if index + 1 < len(argv):
-                values.append((argv[index + 1], True))
-            continue
-        if word.startswith(COV_FLAG_PREFIX):
-            values.append((word[len(COV_FLAG_PREFIX) :], False))
-    return values
-
-
-def _evaluate_cov_value(
-    report: PlanGateReport,
-    command: PlanCommand,
-    value: str,
-    *,
-    space_separated: bool,
-    context: PlanGateContext | None,
-) -> None:
-    """Apply the G1 through G4 cascade to one `--cov` value, in place.
-
-    The cascade decides each value once, so a value G1 rejects is never
-    additionally reported by G2 or G3.
-    """
-
-    task = command.task_id
-
-    # G4 is independent of resolvability: the ambiguous form is always reported.
-    if space_separated:
-        report.warnings.append(
-            f"[{task}] --cov argument value `{value}` is supplied "
-            "space-separated; the ambiguous form can bind the following "
-            "positional argument. Use the --cov=<module> form."
-        )
-
-    if _is_placeholder(value):
-        return
-
-    truncated = value.split(PYTEST_NODE_SEPARATOR, 1)[0]
-
-    # G1 is context-free: a `.py` suffix proves a filesystem path, so no lookup.
-    if truncated.endswith(PYTHON_SUFFIX):
-        report.blocking.append(
-            f"[{task}] --cov argument `{value}` names a filesystem path; "
-            "coverage.py accepts only directories or importable names. "
-            f"Use --cov={_dotted_remedy(truncated)}."
-        )
-        return
-
-    # No path separator means a dotted name, `.`, or empty: all accepted forms.
-    if not any(separator in value for separator in PATH_SEPARATORS):
-        return
-
-    # G2 and G3 need the tracked tree, so without a context they do not run.
-    if context is None:
-        return
-
-    try:
-        _evaluate_tracked_cov_value(report, task, value, context)
-    except Exception:
-        # Broad by contract: a validation run must never fail because the
-        # repository could not be queried (spec AC10, graceful degradation).
-        return
-
-
-def _evaluate_tracked_cov_value(
-    report: PlanGateReport, task: str, value: str, context: PlanGateContext
-) -> None:
-    """Apply the tracked-tree rules G2 and G3 to one `--cov` value, in place."""
-
-    truncated = value.split(PYTEST_NODE_SEPARATOR, 1)[0]
-
-    # G2: value plus `.py` is a tracked module, so the remedy is known exactly.
-    if context.git.is_tracked_file(truncated + PYTHON_SUFFIX):
-        report.blocking.append(
-            f"[{task}] --cov argument `{value}` names a tracked module file "
-            "path; coverage.py accepts only directories or importable names. "
-            f"Use --cov={_dotted_remedy(truncated)}."
-        )
-        return
-
-    # A tracked directory is an accepted coverage target.
-    if context.git.is_tracked_directory(truncated):
-        return
-
-    # G3: nothing tracked resolves, so warn rather than reject: data collection
-    # is unknown rather than provably absent.
-    report.warnings.append(
-        f"[{task}] --cov argument `{value}` contains a path separator but "
-        "resolves to neither a tracked file nor a tracked directory; coverage "
-        "may collect no data. Use the importable dotted form or a tracked "
-        "directory."
-    )
-
-
 def _pattern_operand(argv: tuple[str, ...]) -> str | None:
     """Return the first non-flag operand after the grep-family executable."""
 
@@ -342,7 +224,7 @@ def _is_checkable_literal(argv: tuple[str, ...], pattern: str) -> bool:
     to run verbatim states no real acceptance assertion.
     """
 
-    if _is_placeholder(pattern):
+    if is_placeholder(pattern):
         return False
     if FIXED_STRING_FLAG in argv:
         return True
@@ -490,8 +372,8 @@ def evaluate_plan_gates(
     # Coverage-argument rules run for every command, because a wrapper such as
     # `poetry run` can place a `--cov` argument in any command shape.
     for command in commands:
-        for value, space_separated in _cov_values(command):
-            _evaluate_cov_value(
+        for value, space_separated in cov_values(command):
+            evaluate_cov_value(
                 report,
                 command,
                 value,

@@ -4,6 +4,13 @@ The eight `PARITY_*` fixtures below are duplicated verbatim in
 `extensions/drm-copilot/test/lib/validate/plan-gate-parity.test.ts`, together
 with the same expected finding strings, so a divergence in either runtime's
 message text fails on both sides (spec AC9).
+
+The no-`repr` message-formatting prohibition is asserted against the set of
+Python gate modules named by `_PYTHON_GATE_MODULES` — currently
+`plan_gate_discrimination.py` and `plan_gate_coverage.py` — rather than against
+a single file, so relocating finding-string code between those modules cannot
+escape the check. Its TypeScript companion asserts over the three TypeScript
+gate modules for the same reason.
 """
 
 from __future__ import annotations
@@ -29,7 +36,10 @@ _TYPESCRIPT_MODULE = (
     / "validate"
     / "plan-gate-discrimination.ts"
 )
-_PYTHON_MODULE = _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_discrimination.py"
+_PYTHON_GATE_MODULES = (
+    _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_discrimination.py",
+    _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_coverage.py",
+)
 
 _G5_SEVERITY_TS_RE = re.compile(r'G5_SEVERITY\s*:\s*string\s*=\s*"([^"]+)"')
 
@@ -259,14 +269,19 @@ def test_g5_severity_constant_matches_typescript() -> None:
 
 
 def test_no_repr_formatting_in_gate_messages() -> None:
-    """The Python gate module renders values without `repr`-style formatting."""
+    """Every Python gate module renders values without `repr`-style formatting.
 
-    # Arrange
-    source = _PYTHON_MODULE.read_text(encoding="utf-8")
+    The prohibition covers the whole module set rather than one file, so moving
+    finding-string code into a sibling module cannot silently escape it.
+    """
 
-    # Act / Assert
-    assert "!r" not in source
-    assert "repr(" not in source
+    # Arrange / Act / Assert: both prohibited substrings are checked for every
+    # module in the set, and each assertion names the module it read so a
+    # failure identifies the offending file directly.
+    for module in _PYTHON_GATE_MODULES:
+        source = module.read_text(encoding="utf-8")
+        assert "!r" not in source, f"`!r` conversion present in {module.name}"
+        assert "repr(" not in source, f"`repr(` call present in {module.name}"
 
 
 def test_extractor_task_pattern_matches_validator_pattern() -> None:
