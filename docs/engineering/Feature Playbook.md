@@ -11,7 +11,7 @@ Key paths:
 Key scripts (PowerShell unless noted):
 - `new-potential-entry.ps1` – create a dated potential file and open backlog.
 - `scripts/dev_tools/potential_to_issue.py` – promote a potential to a GitHub issue, mark as promoted, move to promoted folder (Python).
-- `scripts/dev_tools/new_active_feature_folder.py` – create/seed `docs/features/active/<feature>-<issue>/` from templates and matching potential/promoted doc; auto-fill issue/owner/last updated and move the promoted potential into the active folder as `issue.md` (Python).
+- `scripts/dev_tools/new_active_feature_folder.py` – create/seed `docs/features/active/<feature>-<issue>/` from templates and matching potential/promoted doc; auto-fill issue/owner/last updated and copy the promoted potential into the active folder as `issue.md`, retaining the promoted record under `docs/features/potential/promoted/` (Python). A potential file that was not promoted — one resolved from `docs/features/potential/` directly — is still moved rather than copied.
 - `link-feature-docs.ps1` – add/update “Feature Docs” links in a GitHub issue (user-story/spec/plan).
 
 VS Code tasks wrap these scripts: see `.vscode/tasks.json` (e.g., “Feature: New Potential Entry”, “GitHub: Feature Issue from Potential”, “Feature: Create Active Folder”, “GitHub: Link Feature Docs”).

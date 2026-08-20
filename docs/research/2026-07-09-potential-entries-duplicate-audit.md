@@ -49,3 +49,22 @@ Candidate look-alike pairs identified by name similarity, then checked by readin
 4. `docs/features/completed/npm-audit-gate-and-dependabot/` vs `docs/features/completed/npm-dependency-vulnerability-remediation/` — Not a duplicate. `npm-dependency-vulnerability-remediation`'s Problem section reports the original `npm audit` findings (25 vulnerabilities) and remediates them; `npm-audit-gate-and-dependabot`'s Problem section opens with "Follow-up to PR #209 (`fix(deps): eliminate npm audit vulnerabilities`)" and adds a preventive CI gate plus Dependabot — an explicit, self-declared follow-up, not a re-filed duplicate.
 
 No genuine same-feature-filed-twice duplicates were found in this pass.
+
+---
+
+## Correction — 2026-08-20 (issue #487)
+
+The claim made at line 15 and repeated at line 28 of this document — that files moved into `promoted/` "stay there permanently as the historical record of promotion; no code path deletes or relocates them afterward" — **was false when it was written and has been falsified by issue #487**. The historical body above is preserved unchanged; this note is appended, not substituted.
+
+**What actually happened.** A code path did relocate promoted records. `new_active_feature_folder` unconditionally MOVED the resolved potential file into the active folder as `issue.md`, at both of its placement sites (`extensions/drm-copilot/src/lib/new-active-feature-folder/flow.ts:283` in the minor-audit branch and `:346` in the full branch, with the byte-parity Python at `scripts/dev_tools/new_active_feature_folder_flow.py:206` and `:266`). When the resolved source was a promoted record, the move deleted it. The promotion history was therefore destroyed on every full-lifecycle run in which `potential_to_issue` was followed by `new_active_feature_folder`.
+
+**Why this audit missed it.** The supporting evidence at line 24 was a repo-wide grep for `delete|remove|cleanup|unlink` (case-insensitive) scoped to `extensions/drm-copilot/src/lib/potential-to-issue/` **only**. That scope was too narrow in two independent ways:
+
+1. **Wrong cluster.** The deleting code was never in the `potential-to-issue` cluster. It was in the `new-active-feature-folder` cluster, which this audit never examined in either language. Scoping a whole-repository claim ("no code path anywhere") to a single directory cannot establish it.
+2. **Wrong search terms.** Even applied to the correct directory, the term set would have missed the defect. The operation that destroyed the record was `move`, not `delete`, `remove`, `cleanup`, or `unlink`. A relocation deletes its source as a side effect, so a search for deletion verbs is not sufficient evidence for a claim about relocation — and the claim at line 15 explicitly covers relocation ("deletes or relocates").
+
+The two implementations cited at lines 19 and 21 were read correctly: `promotePotential` and `potential_to_issue.py` do treat the move into `promoted/` as their terminal step and add no deletion logic. That observation is accurate and is not retracted. The error was in generalizing from those two functions to a repository-wide invariant without examining the workflow that consumes their output.
+
+**Current state.** The behavior described at line 15 is now the actual behavior, but by fix rather than by prior fact. Issue #487 changed both language implementations so that a source resolved from under `docs/features/potential/promoted` is COPIED into the active folder and the promoted record is retained; a source resolved from anywhere else is still moved. Retroactive repair of records lost before that fix was explicitly out of scope, so the historical gap this defect created is permanent.
+
+**Method note for future audits.** A negative claim of the form "no code path does X" requires either a repository-wide search or an explicit statement of the scope actually searched. This audit stated its conclusion at repository scope while searching at directory scope, and the gap between the two is exactly where the defect lived.

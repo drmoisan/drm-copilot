@@ -188,7 +188,10 @@ export function potentialToIssueServiceCall(
   // receipt that names an absent path is a false success. The `artifacts` entry
   // for this tool is a GitHub issue URL, not a filesystem path, and is
   // deliberately excluded from the existence check.
-  if (outcome.destination !== undefined && !fileSystem.exists(outcome.destination)) {
+  if (
+    outcome.destination !== undefined &&
+    !fileSystem.exists(outcome.destination)
+  ) {
     throw new Error(
       `potential_to_issue reported a path that does not exist: ${outcome.destination}`,
     );

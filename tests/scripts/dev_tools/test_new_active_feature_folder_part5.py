@@ -94,12 +94,7 @@ def test_create_feature_folder_copies_promoted_potential(
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)
     promoted_path = (
-        workspace
-        / "docs"
-        / "features"
-        / "potential"
-        / "promoted"
-        / "notes-feature.md"
+        workspace / "docs" / "features" / "potential" / "promoted" / "notes-feature.md"
     )
     fs.write_text(promoted_path, POTENTIAL_BODY)
 
@@ -117,6 +112,40 @@ def test_create_feature_folder_copies_promoted_potential(
     expected_issue = result.target / "issue.md"
     assert result.potential_issue_path == expected_issue
     assert expected_issue in fs.files
+    assert promoted_path in fs.files
+    assert fs.files[promoted_path] == POTENTIAL_BODY
+    assert f"Copied potential file to {expected_issue}" in capsys.readouterr().out
+
+
+def test_create_minor_audit_folder_copies_promoted_potential(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Verify the minor-audit placement site also retains a promoted source."""
+    # Arrange: the only matching potential file lives under promoted/.
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    promoted_path = (
+        workspace / "docs" / "features" / "potential" / "promoted" / "notes-feature.md"
+    )
+    fs.write_text(promoted_path, POTENTIAL_BODY)
+
+    # Act
+    result = mod.create_active_folder(
+        feature_name="notes-feature",
+        feature_type="feature",
+        workspace=workspace,
+        fs=fs,
+        code_launcher=FakeCodeLauncher(),
+        now_provider=lambda: FIXED_NOW,
+        work_mode="minor-audit",
+    )
+
+    # Assert: the promoted record survives and the minor-audit branch reports a
+    # copy, covering the second placement site.
+    expected_issue = result.target / "issue.md"
+    assert result.potential_issue_path == expected_issue
+    assert "- Work Mode: minor-audit" in fs.files[expected_issue]
     assert promoted_path in fs.files
     assert fs.files[promoted_path] == POTENTIAL_BODY
     assert f"Copied potential file to {expected_issue}" in capsys.readouterr().out
