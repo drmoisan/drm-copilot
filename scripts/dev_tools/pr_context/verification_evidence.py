@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 REQUIRED_FIELDS: tuple[str, str, str] = ("Timestamp", "Command", "EXIT_CODE")
+EXPECTED_EXIT_CODE_FIELD: str = "ExpectedExitCode"
 CANONICAL_GLOBS: tuple[str, str, str] = (
     "evidence/qa-gates/**/*.md",
     "evidence/regression-testing/**/*.md",
@@ -44,6 +45,8 @@ class VerificationEvidenceRecord:
         command: Parsed `Command` field when present.
         exit_code: Parsed `EXIT_CODE` integer when parseable.
         normalized_result: Deterministic status (`pass`, `fail`, `unparseable`).
+        expected_exit_code: Declared expected exit code, `0` when the optional
+            `ExpectedExitCode` field is absent and on every `unparseable` path.
     """
 
     feature: str
@@ -52,6 +55,23 @@ class VerificationEvidenceRecord:
     command: str | None
     exit_code: int | None
     normalized_result: NormalizedResult
+    expected_exit_code: int = 0
+
+
+def normalize_result(exit_code: int, expected_exit_code: int) -> NormalizedResult:
+    """Normalize an observed exit code against its declared expectation.
+
+    Args:
+        exit_code: Observed process exit code parsed from `EXIT_CODE`.
+        expected_exit_code: Declared expectation, `0` when undeclared.
+
+    Returns:
+        `pass` when the observed code equals the expectation, `fail` otherwise.
+
+    Side Effects:
+        None.
+    """
+    return "pass" if exit_code == expected_exit_code else "fail"
 
 
 def discover_canonical_evidence_files(root: Path, feature: str) -> list[Path]:
@@ -106,10 +126,13 @@ def parse_verification_evidence_markdown(
         key = key.strip()
         if key in REQUIRED_FIELDS:
             parsed[key] = value.strip()
+        elif key == EXPECTED_EXIT_CODE_FIELD and key not in parsed:
+            parsed[key] = value.strip()
 
     timestamp = parsed.get("Timestamp")
     command = parsed.get("Command")
     exit_code_raw = parsed.get("EXIT_CODE")
+    expected_exit_code_raw = parsed.get(EXPECTED_EXIT_CODE_FIELD)
 
     if not timestamp or not command or exit_code_raw is None:
         return VerificationEvidenceRecord(
@@ -119,6 +142,7 @@ def parse_verification_evidence_markdown(
             command=command,
             exit_code=None,
             normalized_result="unparseable",
+            expected_exit_code=0,
         )
 
     try:
@@ -131,9 +155,28 @@ def parse_verification_evidence_markdown(
             command=command,
             exit_code=None,
             normalized_result="unparseable",
+            expected_exit_code=0,
         )
 
-    normalized_result: NormalizedResult = "pass" if exit_code == 0 else "fail"
+    # An undeclared expectation defaults to zero, reproducing prior behavior.
+    try:
+        expected_exit_code = (
+            0 if expected_exit_code_raw is None else int(expected_exit_code_raw)
+        )
+    except ValueError:
+        return VerificationEvidenceRecord(
+            feature=feature,
+            source_file=source_file,
+            timestamp=timestamp,
+            command=command,
+            exit_code=None,
+            normalized_result="unparseable",
+            expected_exit_code=0,
+        )
+
+    normalized_result: NormalizedResult = normalize_result(
+        exit_code, expected_exit_code
+    )
     return VerificationEvidenceRecord(
         feature=feature,
         source_file=source_file,
@@ -141,6 +184,7 @@ def parse_verification_evidence_markdown(
         command=command,
         exit_code=exit_code,
         normalized_result=normalized_result,
+        expected_exit_code=expected_exit_code,
     )
 
 

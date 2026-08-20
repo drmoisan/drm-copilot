@@ -153,6 +153,9 @@ def _render_verification_evidence_section(
     lines: list[str] = []
     # Render deterministic rows sorted by source path for stable artifacts.
     for record in sorted(parseable_records, key=lambda item: item.source_file):
+        # Show a declared expectation only when non-zero; other rows render as before.
+        expected = record.expected_exit_code
+        expected_rows = [f"  - Expected EXIT_CODE: {expected}"] if expected else []
         lines.extend(
             [
                 f"- Feature: {record.feature}",
@@ -160,6 +163,7 @@ def _render_verification_evidence_section(
                 f"  - Timestamp: {record.timestamp}",
                 f"  - Command: {record.command}",
                 f"  - EXIT_CODE: {record.exit_code}",
+                *expected_rows,
                 f"  - Normalized result: {record.normalized_result}",
             ]
         )

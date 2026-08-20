@@ -113,12 +113,17 @@ export function renderVerificationEvidenceSection(
         : 0,
   );
   for (const record of sorted) {
+    // Show a declared expectation only when non-zero; other rows render as before.
+    const expected = record.expectedExitCode;
+    const expectedRows =
+      expected === 0 ? [] : [`  - Expected EXIT_CODE: ${String(expected)}`];
     lines.push(
       `- Feature: ${record.feature}`,
       `  - Source: ${record.sourceFile}`,
       `  - Timestamp: ${record.timestamp}`,
       `  - Command: ${record.command}`,
       `  - EXIT_CODE: ${record.exitCode}`,
+      ...expectedRows,
       `  - Normalized result: ${record.normalizedResult}`,
     );
   }

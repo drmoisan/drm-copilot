@@ -92,7 +92,54 @@ Any fix must land in both runtimes. `scripts/dev_tools/pr_context/verification_e
 - [ ] Integration scenario to retest: generate PR context for a feature carrying one absence-assertion gate with a declared non-zero expectation and confirm the Verification row reads `pass` while still displaying the observed exit code.
 - [ ] Manual verification notes: confirm byte-identical Verification output for a feature whose artifacts carry no expectation key, so the change is additive. Confirm Python and TypeScript parity across the same artifact set.
 
+## Delivered Outcome (2026-08-20)
+
+The fix landed on branch `bug/pr-context-verification-cannot-express-expected-nonzero-exit-485`, with
+both runtimes changed in one change set:
+
+- One optional, flat, integer-valued evidence key `ExpectedExitCode`, defaulting to `0` when absent,
+  accepted by both parsers without altering the required-field constant in either.
+- Normalization extracted into a pure two-argument helper per runtime and changed from "observed equals
+  zero" to "observed equals expected".
+- A present but non-integer expectation yields `unparseable`, and every `unparseable` record carries a
+  null observed code and expectation `0`.
+- A duplicated expectation key resolves first-wins in both runtimes.
+- One conditional row line, `  - Expected EXIT_CODE: <int>`, emitted between the `EXIT_CODE` and
+  `Normalized result` lines only when the expectation is non-zero.
+- The optional key documented in all six copies of `evidence-and-timestamp-conventions/SKILL.md`.
+- New Python parser test module (54 tests) and new Python collector-level sibling module; 22 tests
+  added on the TypeScript side. No pre-existing test was edited.
+
+Verification, in a single clean final toolchain pass for both languages:
+
+- Python: 3995 tests passed, 0 failed; overall line coverage 92.45%, branch 84.93%.
+- TypeScript: 2580 tests passed across 185 suites, 0 failed; overall line coverage 96.62%, branch
+  89.98%.
+- New/changed-code coverage: 100% across the four changed production files.
+- Additive proof (Invariant A): 1293 artifacts discovered by `CANONICAL_GLOBS`; **0 rendered-row
+  differences** between the pre-change reference and post-change output in BOTH runtimes.
+- 23 of the 25 acceptance criteria in `spec.md` are checked off.
+
+## Deferred defect — duplicate-key precedence divergence remains UNFIXED
+
+The two runtimes still disagree on which occurrence of a duplicated required key wins: Python assigns
+unconditionally in the parse loop, so the LAST occurrence wins; TypeScript guards with
+`!parsed.has(key)`, so the FIRST occurrence wins. This change deliberately does not touch that
+precedence, because converging it would change the reported result for real existing artifacts and so
+contradicts this fix's additive requirement.
+
+Measured at execution time: 165 artifacts carry two or more `EXIT_CODE:` lines and are reported
+differently by the two runtimes. Execution also established that the divergence is WIDER than the
+original framing: six further artifacts carry a single `EXIT_CODE:` line but a duplicated `Command:` or
+`Timestamp:` line, and are likewise reported differently — one of them renders in TypeScript and is
+dropped as unparseable in Python. Acceptance criteria AC10 and AC17, which assert zero cross-runtime
+differences over single-`EXIT_CODE` artifacts, are therefore left UNCHECKED.
+
+This defect is to be promoted separately via the potential-to-issue path, with its scope stated as
+duplicate-REQUIRED-KEY precedence rather than duplicate-`EXIT_CODE` precedence alone.
+
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
+- [ ] Promote the duplicate-REQUIRED-KEY precedence divergence as its own bug
