@@ -23,6 +23,9 @@ import { type FileSystem, toPosixPath } from "../file-system";
 /** Required schema fields parsed from an evidence markdown file. */
 export const REQUIRED_FIELDS = ["Timestamp", "Command", "EXIT_CODE"] as const;
 
+/** Optional schema field declaring the exit code a gate is expected to produce. */
+export const EXPECTED_EXIT_CODE_FIELD = "ExpectedExitCode";
+
 /** Canonical evidence glob roots, searched in fixed order. */
 export const CANONICAL_GLOBS = [
   "evidence/qa-gates/**/*.md",
@@ -41,6 +44,27 @@ export interface VerificationEvidenceRecord {
   readonly command: string | null;
   readonly exitCode: number | null;
   readonly normalizedResult: NormalizedResult;
+  /**
+   * Declared expected exit code. Defaults to `0` when the optional
+   * `ExpectedExitCode` field is absent, and is `0` on every `unparseable` path.
+   */
+  readonly expectedExitCode: number;
+}
+
+/**
+ * Normalize an observed exit code against its declared expectation.
+ *
+ * Mirrors Python `normalize_result`. Pure: performs no I/O.
+ *
+ * @param exitCode Observed process exit code parsed from `EXIT_CODE`.
+ * @param expectedExitCode Declared expectation, `0` when undeclared.
+ * @returns `pass` when the observed code equals the expectation, `fail` otherwise.
+ */
+export function normalizeResult(
+  exitCode: number,
+  expectedExitCode: number,
+): NormalizedResult {
+  return exitCode === expectedExitCode ? "pass" : "fail";
 }
 
 /**
@@ -113,11 +137,18 @@ export function parseVerificationEvidenceMarkdown(params: {
     ) {
       parsed.set(key, value);
     }
+    // Separate `if` rather than `else if` so the required-field block above is
+    // left byte-identical; the two conditions are mutually exclusive because the
+    // optional expectation field is not one of the required fields.
+    if (key === EXPECTED_EXIT_CODE_FIELD && !parsed.has(key)) {
+      parsed.set(key, value);
+    }
   }
 
   const timestamp = parsed.get("Timestamp") ?? null;
   const command = parsed.get("Command") ?? null;
   const exitCodeRaw = parsed.get("EXIT_CODE");
+  const expectedExitCodeRaw = parsed.get(EXPECTED_EXIT_CODE_FIELD);
 
   // A missing required field cannot produce a verifiable result.
   if (!timestamp || !command || exitCodeRaw === undefined) {
@@ -128,6 +159,7 @@ export function parseVerificationEvidenceMarkdown(params: {
       command,
       exitCode: null,
       normalizedResult: "unparseable",
+      expectedExitCode: 0,
     };
   }
 
@@ -140,10 +172,32 @@ export function parseVerificationEvidenceMarkdown(params: {
       command,
       exitCode: null,
       normalizedResult: "unparseable",
+      expectedExitCode: 0,
     };
   }
 
-  const normalizedResult: NormalizedResult = exitCode === 0 ? "pass" : "fail";
+  // An undeclared expectation defaults to zero, reproducing prior behavior; a
+  // declared but non-integer expectation is as unparseable as a bad EXIT_CODE.
+  const expectedExitCode =
+    expectedExitCodeRaw === undefined
+      ? 0
+      : parseIntegerStrict(expectedExitCodeRaw);
+  if (expectedExitCode === null) {
+    return {
+      feature,
+      sourceFile,
+      timestamp,
+      command,
+      exitCode: null,
+      normalizedResult: "unparseable",
+      expectedExitCode: 0,
+    };
+  }
+
+  const normalizedResult: NormalizedResult = normalizeResult(
+    exitCode,
+    expectedExitCode,
+  );
   return {
     feature,
     sourceFile,
@@ -151,6 +205,7 @@ export function parseVerificationEvidenceMarkdown(params: {
     command,
     exitCode,
     normalizedResult,
+    expectedExitCode,
   };
 }
 

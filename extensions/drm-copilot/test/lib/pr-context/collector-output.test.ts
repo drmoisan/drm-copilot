@@ -266,6 +266,68 @@ describe("buildAppendixText", () => {
 });
 
 describe("renderVerificationEvidenceSection", () => {
+  it("renders the expectation line for a non-zero declared expectation", () => {
+    const fs = new TreeFileSystem();
+    fs.addFile(
+      `${ROOT}/docs/features/active/f/evidence/qa-gates/absence-gate.md`,
+      "Timestamp: 2026-08-20T09-53\nCommand: git grep -n forbidden-token\nEXIT_CODE: 1\nExpectedExitCode: 1",
+    );
+    const section = renderVerificationEvidenceSection(fs, ROOT, [
+      {
+        feature: "f",
+        excerpt: "",
+        issueRefs: [],
+        contextFiles: [
+          "docs/features/active/f/evidence/qa-gates/absence-gate.md",
+        ],
+        primaryIssueRef: null,
+        readinessSignal: null,
+      },
+    ]);
+    const lines = section.split("\n");
+    const exitIndex = lines.indexOf("  - EXIT_CODE: 1");
+    const expectedIndex = lines.indexOf("  - Expected EXIT_CODE: 1");
+    const resultIndex = lines.indexOf("  - Normalized result: pass");
+    expect(expectedIndex).toBeGreaterThan(-1);
+    expect(expectedIndex).toBe(exitIndex + 1);
+    expect(resultIndex).toBe(expectedIndex + 1);
+  });
+
+  it.each([
+    { label: "key omitted", expectationRow: "" },
+    { label: "key written as zero", expectationRow: "\nExpectedExitCode: 0" },
+  ])(
+    "omits the expectation line when the expectation is zero ($label)",
+    ({ expectationRow }) => {
+      const fs = new TreeFileSystem();
+      fs.addFile(
+        `${ROOT}/docs/features/active/f/evidence/qa-gates/zero-gate.md`,
+        `Timestamp: 2026-08-20T09-53\nCommand: npm test\nEXIT_CODE: 0${expectationRow}`,
+      );
+      const section = renderVerificationEvidenceSection(fs, ROOT, [
+        {
+          feature: "f",
+          excerpt: "",
+          issueRefs: [],
+          contextFiles: [
+            "docs/features/active/f/evidence/qa-gates/zero-gate.md",
+          ],
+          primaryIssueRef: null,
+          readinessSignal: null,
+        },
+      ]);
+      expect(section).not.toContain("Expected EXIT_CODE");
+      expect(section.split("\n")).toEqual([
+        "- Feature: f",
+        "  - Source: docs/features/active/f/evidence/qa-gates/zero-gate.md",
+        "  - Timestamp: 2026-08-20T09-53",
+        "  - Command: npm test",
+        "  - EXIT_CODE: 0",
+        "  - Normalized result: pass",
+      ]);
+    },
+  );
+
   it("renders rows for parseable evidence sorted by source", () => {
     const fs = new TreeFileSystem();
     fs.addFile(

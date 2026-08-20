@@ -3,6 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import { type FileSystem } from "../../../src/lib/file-system";
 import {
   discoverCanonicalEvidenceFiles,
+  normalizeResult,
   parseVerificationEvidenceFile,
   parseVerificationEvidenceMarkdown,
 } from "../../../src/lib/pr-context/verification-evidence";
@@ -156,6 +157,242 @@ describe("parseVerificationEvidenceMarkdown", () => {
       markdown: md,
     });
     expect(record.timestamp).toBe("first");
+  });
+
+  // Eleven-shape fixture table transcribed from `spec.md` "Unit tests (pytest)",
+  // in the same order and with the same shape identifiers as the Python
+  // transcription in `tests/scripts/dev_tools/pr_context/test_verification_evidence.py`
+  // so the two tables are diffable by eye (AC8). Shapes 01-05 and 07-11 each
+  // carry exactly ONE `EXIT_CODE:` line.
+  //
+  // shape-06 is the DUPLICATED-`EXIT_CODE` case and carries TWO `EXIT_CODE:`
+  // lines by definition. Its expected record is RUNTIME-SPECIFIC: the guard
+  // `!parsed.has(key)` makes TypeScript FIRST-wins, so this case asserts the
+  // FIRST value (`1`), deliberately differing from the Python case, which
+  // asserts the second (`0`). shape-06 is EXCLUDED from the AC8 cross-runtime
+  // agreement assertion; the exclusion is attributable to the deferred
+  // duplicate-`EXIT_CODE` defect, not to this change.
+  const shapeCases: readonly {
+    readonly shapeId: string;
+    readonly markdown: string;
+    readonly expectedResult: "pass" | "fail" | "unparseable";
+    readonly expectedExit: number | null;
+    readonly expectedExpectation: number;
+  }[] = [
+    {
+      shapeId: "shape-01",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 0",
+      expectedResult: "pass",
+      expectedExit: 0,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-02",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 1",
+      expectedResult: "fail",
+      expectedExit: 1,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-03",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: ok",
+      expectedResult: "unparseable",
+      expectedExit: null,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-04",
+      markdown: "Timestamp: t\nEXIT_CODE: 0",
+      expectedResult: "unparseable",
+      expectedExit: null,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-05",
+      markdown: "Timestamp: t\nCommand:\nEXIT_CODE: 0",
+      expectedResult: "unparseable",
+      expectedExit: null,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-06",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 1\nEXIT_CODE: 0",
+      expectedResult: "fail",
+      expectedExit: 1,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-07",
+      markdown:
+        "Timestamp: t\nCommand: c\nEXIT_CODE: 0\nOutput Summary: all gates green",
+      expectedResult: "pass",
+      expectedExit: 0,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-08",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 2",
+      expectedResult: "fail",
+      expectedExit: 2,
+      expectedExpectation: 0,
+    },
+    {
+      shapeId: "shape-09",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 1\nExpectedExitCode: 1",
+      expectedResult: "pass",
+      expectedExit: 1,
+      expectedExpectation: 1,
+    },
+    {
+      shapeId: "shape-10",
+      markdown: "Timestamp: t\nCommand: c\nEXIT_CODE: 2\nExpectedExitCode: 1",
+      expectedResult: "fail",
+      expectedExit: 2,
+      expectedExpectation: 1,
+    },
+    {
+      shapeId: "shape-11",
+      markdown:
+        "Timestamp: t\nCommand: c\nEXIT_CODE: 1\nExpectedExitCode: banana",
+      expectedResult: "unparseable",
+      expectedExit: null,
+      expectedExpectation: 0,
+    },
+  ];
+
+  it.each(shapeCases)(
+    "parses $shapeId to its specified record",
+    ({ markdown, expectedResult, expectedExit, expectedExpectation }) => {
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "evidence/qa-gates/shape.md",
+        markdown,
+      });
+      expect(record.normalizedResult).toBe(expectedResult);
+      expect(record.exitCode).toBe(expectedExit);
+      expect(record.expectedExitCode).toBe(expectedExpectation);
+    },
+  );
+
+  it("defaults the expectation to zero and matches pre-change records", () => {
+    // Shapes 1-8 carry no expectation key, so each must reproduce the
+    // pre-change record: expectation zero and the pre-change expression.
+    for (const shape of shapeCases.slice(0, 8)) {
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "evidence/qa-gates/shape.md",
+        markdown: shape.markdown,
+      });
+      expect(record.expectedExitCode).toBe(0);
+      if (record.exitCode === null) {
+        expect(record.normalizedResult).toBe("unparseable");
+      } else {
+        expect(record.normalizedResult).toBe(
+          record.exitCode === 0 ? "pass" : "fail",
+        );
+      }
+    }
+  });
+
+  it("normalizeResult with a zero expectation matches the pre-change expression", () => {
+    const observedValues = [
+      -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -2147483648,
+      -1000000, 1000000, 2147483647,
+    ];
+    for (const observed of observedValues) {
+      expect(normalizeResult(observed, 0)).toBe(
+        observed === 0 ? "pass" : "fail",
+      );
+    }
+  });
+
+  it("normalizes to pass when the observed code equals a non-zero expectation", () => {
+    for (const value of [1, 137, -3]) {
+      const md = `Timestamp: 2026-08-20T09-53\nCommand: git grep -n forbidden-token\nEXIT_CODE: ${String(value)}\nExpectedExitCode: ${String(value)}`;
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "evidence/qa-gates/absence-gate.md",
+        markdown: md,
+      });
+      expect(record.normalizedResult).toBe("pass");
+      expect(record.exitCode).toBe(value);
+      expect(record.expectedExitCode).toBe(value);
+    }
+  });
+
+  it("normalizes to fail when the observed code differs from a non-zero expectation", () => {
+    for (const observed of [2, 0]) {
+      const md = `Timestamp: t\nCommand: c\nEXIT_CODE: ${String(observed)}\nExpectedExitCode: 1`;
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "s.md",
+        markdown: md,
+      });
+      expect(record.normalizedResult).toBe("fail");
+      expect(record.exitCode).toBe(observed);
+      expect(record.expectedExitCode).toBe(1);
+    }
+  });
+
+  it("reports unparseable for a non-integer expectation", () => {
+    for (const row of ["ExpectedExitCode: banana", "ExpectedExitCode:"]) {
+      const md = `Timestamp: t\nCommand: c\nEXIT_CODE: 1\n${row}`;
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "s.md",
+        markdown: md,
+      });
+      expect(record.normalizedResult).toBe("unparseable");
+      expect(record.exitCode).toBeNull();
+      expect(record.expectedExitCode).toBe(0);
+    }
+  });
+
+  it("takes the first occurrence of a duplicated expectation key", () => {
+    const md =
+      "Timestamp: t\nCommand: c\nEXIT_CODE: 7\nExpectedExitCode: 7\nExpectedExitCode: 9";
+    const record = parseVerificationEvidenceMarkdown({
+      feature: FEATURE,
+      sourceFile: "s.md",
+      markdown: md,
+    });
+    expect(record.expectedExitCode).toBe(7);
+    expect(record.normalizedResult).toBe("pass");
+  });
+
+  it("reports unparseable for EXIT_CODE SKIPPED", () => {
+    for (const md of [
+      "Timestamp: t\nCommand: c\nEXIT_CODE: SKIPPED",
+      "Timestamp: t\nCommand: c\nEXIT_CODE: SKIPPED\nExpectedExitCode: 1",
+    ]) {
+      const record = parseVerificationEvidenceMarkdown({
+        feature: FEATURE,
+        sourceFile: "s.md",
+        markdown: md,
+      });
+      expect(record.normalizedResult).toBe("unparseable");
+      expect(record.exitCode).toBeNull();
+      expect(record.expectedExitCode).toBe(0);
+    }
+  });
+
+  it("ignores rows outside the accept-list", () => {
+    const withExtraRows =
+      "Timestamp: t\nCommand: c\nEXIT_CODE: 1\nOutput Summary: one gate, zero matches\nexpectedexitcode: 1";
+    const withoutExtraRows = "Timestamp: t\nCommand: c\nEXIT_CODE: 1";
+    const record = parseVerificationEvidenceMarkdown({
+      feature: FEATURE,
+      sourceFile: "s.md",
+      markdown: withExtraRows,
+    });
+    const reference = parseVerificationEvidenceMarkdown({
+      feature: FEATURE,
+      sourceFile: "s.md",
+      markdown: withoutExtraRows,
+    });
+    expect(record).toEqual(reference);
+    expect(record.normalizedResult).toBe("fail");
+    expect(record.expectedExitCode).toBe(0);
   });
 });
 
