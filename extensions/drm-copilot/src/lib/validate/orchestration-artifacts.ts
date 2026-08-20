@@ -16,6 +16,11 @@ import {
 } from "./orchestrator-state-core";
 import { validateParallelKickoffText } from "./parallel-kickoff-artifact";
 import {
+  CommandRunnerPlanGateRepository,
+  evaluatePlanGates,
+  type PlanGateContext,
+} from "./plan-gate-discrimination";
+import {
   validateParallelOrchestratorStateText,
   type ValidateParallelOrchestratorStateOptions,
 } from "./parallel-orchestrator-state-core";
@@ -179,22 +184,91 @@ export interface ValidateArtifactInput {
 }
 
 /**
+ * Build the plan-gate repository context from the dispatcher input.
+ *
+ * The plan route acquires its repository seam exactly the way the
+ * epic-planner-state route does: every wiring field must be present, otherwise
+ * the gate runs context-free and only the G1 and G4 rules apply.
+ *
+ * @param input Dispatcher input carrying the optional wiring fields.
+ * @returns A context, or `undefined` when any wiring field is absent.
+ */
+function buildPlanGateContext(
+  input: ValidateArtifactInput,
+): PlanGateContext | undefined {
+  if (
+    input.fs === undefined ||
+    input.root === undefined ||
+    input.artifactPath === undefined ||
+    input.runner === undefined
+  ) {
+    return undefined;
+  }
+  return {
+    workspaceRoot: input.root,
+    fileSystem: input.fs,
+    git: new CommandRunnerPlanGateRepository(input.root, input.runner),
+  };
+}
+
+/**
+ * Dispatch the requested validator on both severity channels.
+ *
+ * Purpose:
+ *     Mirror Python `validate_plan_text_with_warnings` and
+ *     `_validate_from_args_with_warnings`. Give the service layer access to the
+ *     Warning channel without widening `validateArtifact`, whose non-empty
+ *     return is the failure signal every existing caller depends on.
+ *
+ * @param input Artifact type, text, and orchestrator-state wiring options.
+ * @returns Validation errors and, for the `plan` route, gate Warnings. Only the
+ *     `plan` route can populate the Warning channel today.
+ */
+export function validateArtifactWithWarnings(input: ValidateArtifactInput): {
+  errors: string[];
+  warnings: string[];
+} {
+  // The plan route is handled ahead of the type switch because it is the only
+  // route that produces two channels and the only one that needs a repository
+  // seam built from the dispatcher's wiring fields.
+  if (input.artifactType === "plan") {
+    const report = evaluatePlanGates(input.text, buildPlanGateContext(input));
+    return {
+      errors: [...validatePlanText(input.text), ...report.blocking],
+      warnings: report.warnings,
+    };
+  }
+  return { errors: dispatchValidatorErrors(input), warnings: [] };
+}
+
+/**
  * Dispatch the requested validator.
  *
  * Purpose:
  *     Mirror Python `_validate_from_args` routing while keeping the supported
- *     artifact-type names unchanged.
+ *     artifact-type names unchanged. The single-channel return shape and every
+ *     existing call site are unchanged; the body delegates to
+ *     {@link validateArtifactWithWarnings} and returns its error channel.
  *
  * @param input Artifact type, text, and orchestrator-state wiring options.
  * @returns Validation errors produced by the selected validator.
  */
 export function validateArtifact(input: ValidateArtifactInput): string[] {
+  return validateArtifactWithWarnings(input).errors;
+}
+
+/**
+ * Route a non-plan artifact type to its dedicated validator.
+ *
+ * @param input Artifact type, text, and orchestrator-state wiring options.
+ * @returns Validation errors produced by the selected validator.
+ */
+function dispatchValidatorErrors(input: ValidateArtifactInput): string[] {
   // Route each supported artifact type to its dedicated validator. The
   // orchestrator-state route additionally threads the completion flag and the
-  // routing-matrix wiring.
+  // routing-matrix wiring. The `plan` route never reaches this switch; it is
+  // handled by `validateArtifactWithWarnings` above.
   switch (input.artifactType) {
-    case "plan":
-      return validatePlanText(input.text);
     case "policy-audit":
       return validatePolicyAuditText(input.text);
     case "code-review":

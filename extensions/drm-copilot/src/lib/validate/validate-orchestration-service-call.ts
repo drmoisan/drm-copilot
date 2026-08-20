@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { type FileSystem, toPosixPath } from "../file-system";
 import type { CommandRunner } from "../subprocess-runner";
-import { validateArtifact } from "./orchestration-artifacts";
+import { validateArtifactWithWarnings } from "./orchestration-artifacts";
 
 /**
  * In-process orchestration-artifact validation wiring.
@@ -52,7 +52,15 @@ export interface ValidateOrchestrationServiceCallResult {
   readonly tool: "validate_orchestration_artifacts";
   readonly workspaceRoot: string;
   readonly summary: string;
+  /**
+   * Plan acceptance-gate Warnings, present only when the run produced at least
+   * one. A warning-free result is byte-identical to the pre-change shape.
+   */
+  readonly warnings?: ReadonlyArray<string>;
 }
+
+/** Prefix every surfaced plan-gate Warning line carries. */
+export const PLAN_GATE_WARNING_PREFIX = "PLAN GATE WARNING: ";
 
 /**
  * Validate an orchestration artifact in-process.
@@ -73,7 +81,7 @@ export function validateOrchestrationServiceCall(
     path.join(input.workspaceRoot, input.artifactPath),
   );
   const text = input.fileSystem.readTextFile(artifactFullPath);
-  const errors = validateArtifact({
+  const { errors, warnings } = validateArtifactWithWarnings({
     artifactType: input.artifactType,
     text,
     ...(input.requireComplete === undefined
@@ -99,17 +107,28 @@ export function validateOrchestrationServiceCall(
 
   // Surface validation failure as a thrown error so the MCP handler reports a
   // non-zero outcome, mirroring the Python stderr-per-line, exit-1 behavior.
+  // Warnings never fail the call; they are appended after the error block so a
+  // warning-free failure message is byte-identical to the pre-change format.
   if (errors.length > 0) {
+    const warningBlock =
+      warnings.length === 0
+        ? ""
+        : "\n" +
+          warnings
+            .map((warning) => `${PLAN_GATE_WARNING_PREFIX}${warning}`)
+            .join("\n");
     throw new Error(
       `Validation failed for ${input.artifactType} artifact at ` +
-        `'${input.artifactPath}':\n${errors.join("\n")}`,
+        `'${input.artifactPath}':\n${errors.join("\n")}${warningBlock}`,
     );
   }
 
-  // Preserve the existing success summary string.
+  // Preserve the existing success summary string. The warnings key is present
+  // only when the run produced at least one Warning.
   return {
     tool: "validate_orchestration_artifacts",
     workspaceRoot: input.workspaceRoot,
     summary: `Validated ${input.artifactType} artifact at '${input.artifactPath}'.`,
+    ...(warnings.length === 0 ? {} : { warnings }),
   };
 }

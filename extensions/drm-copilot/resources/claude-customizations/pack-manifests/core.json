@@ -57,6 +57,7 @@
     ".claude/rules/general-code-change.md",
     ".claude/rules/general-unit-test.md",
     ".claude/rules/orchestrator-state.md",
+    ".claude/rules/plan-acceptance-gates.md",
     ".claude/rules/quality-tiers.md",
     ".claude/rules/self-explanatory-code-commenting.md",
     ".claude/rules/tonality.md",
