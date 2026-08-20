@@ -170,6 +170,15 @@
             # excluded from coverage. The test suite dot-sources the file (guarded body) so
             # line attribution is valid.
             '.claude/hooks/enforce-parallel-abandon-gate.ps1'
+            # Issue #491 added the Mermaid validation PreToolUse hook and its dependency-free
+            # validator library; measured here so the new production files are not excluded from
+            # coverage. The hook's test suite dot-sources the file (guarded body) and the library
+            # suites import the modules, so line attribution is valid.
+            '.claude/hooks/enforce-mermaid-validation.ps1'
+            '.claude/lib/mermaid/MermaidGrammar.psm1'
+            '.claude/lib/mermaid/MermaidLineScanner.psm1'
+            '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
+            '.claude/lib/mermaid/MermaidValidation.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

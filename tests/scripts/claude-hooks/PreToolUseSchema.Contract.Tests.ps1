@@ -3,7 +3,7 @@
 
 <#
 .SYNOPSIS
-    PreToolUse deny-schema contract test for all 14 PreToolUse hooks.
+    PreToolUse deny-schema contract test for all 15 PreToolUse hooks.
 
 .DESCRIPTION
     For each PreToolUse-registered hook this test dot-sources the hook (using its
@@ -17,7 +17,7 @@
 
     This is the in-repo proving artifact for the root-cause invariant: Claude
     honors a PreToolUse deny only when the hook emits the hookSpecificOutput
-    schema. The contract is enforced once per hook (14 assertion blocks).
+    schema. The contract is enforced once per hook (15 assertion blocks).
 
     Each hook is dot-sourced inside its own It block so the imported functions
     are scoped to that test and do not collide across hooks (several hooks define
@@ -29,7 +29,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Injected seam stubs mirror the production scriptblock signatures for testing')]
 param()
 
-Describe 'PreToolUse deny-schema contract (all 14 hooks)' {
+Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
     BeforeAll {
         $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
 
@@ -137,6 +137,15 @@ Describe 'PreToolUse deny-schema contract (all 14 hooks)' {
     It 'enforce-epic-invocation-origin.ps1 emits a PreToolUse deny shape' {
         . (Join-Path $script:HookRoot 'enforce-epic-invocation-origin.ps1')
         $decision = Get-EpicInvocationOriginBlockDecision -Reason 'EPIC_INVOCATION_ORIGIN_BLOCKED: test reason'
+        Assert-PreToolUseDenyShape -Decision $decision
+    }
+
+    It 'enforce-mermaid-validation.ps1 emits a PreToolUse deny shape' {
+        . (Join-Path $script:HookRoot 'enforce-mermaid-validation.ps1')
+        # A diagram file whose content carries an invalid arrow for its declared type.
+        $content = "flowchart TD`n    A --> B`n    B ->> C`n"
+        $toolInput = (@{ file_path = 'docs/diagrams/contract.mmd'; content = $content } | ConvertTo-Json -Compress)
+        $decision = Invoke-MermaidValidationDecision -ToolInputRaw $toolInput
         Assert-PreToolUseDenyShape -Decision $decision
     }
 }

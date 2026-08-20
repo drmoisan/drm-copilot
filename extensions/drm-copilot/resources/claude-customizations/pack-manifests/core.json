@@ -137,6 +137,22 @@
     ".claude/lib/bash/parallel-yaml-scan.sh",
     ".claude/lib/bash/validate-parallel-manifest.sh",
     "config/orchestration-routing.json",
-    "config/blast-radius.json"
+    "config/blast-radius.json",
+    ".claude/hooks/enforce-mermaid-validation.ps1",
+    ".claude/rules/mermaid.md",
+    ".claude/skills/mermaid-diagram/SKILL.md",
+    ".claude/lib/mermaid/MermaidGrammar.psm1",
+    ".claude/lib/mermaid/MermaidLineScanner.psm1",
+    ".claude/lib/mermaid/MermaidMarkdownFences.psm1",
+    ".claude/lib/mermaid/MermaidValidation.psm1",
+    ".claude/skills/mermaid-diagram/references/flowchart.md",
+    ".claude/skills/mermaid-diagram/references/sequence.md",
+    ".claude/skills/mermaid-diagram/references/class.md",
+    ".claude/skills/mermaid-diagram/references/state.md",
+    ".claude/skills/mermaid-diagram/references/er.md",
+    ".claude/skills/mermaid-diagram/references/c4.md",
+    ".claude/skills/mermaid-diagram/references/gantt.md",
+    ".claude/skills/mermaid-diagram/references/pie.md",
+    ".claude/skills/mermaid-diagram/references/other-types.md"
   ]
 }
