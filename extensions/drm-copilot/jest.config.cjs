@@ -192,5 +192,22 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/plan-gate-commands.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // `plan-gate-rules.ts` carries the shared predicates and the G1-G4 coverage
+    // cascade split out of `plan-gate-discrimination.ts` to keep both modules
+    // under the 500-line cap. It is production runtime code, so the
+    // coverage-exclusion policy in `.claude/rules/general-unit-test.md` requires
+    // it to sit behind the same per-file gate as the module it was split from.
+    "./src/lib/validate/plan-gate-rules.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/plan-gate-discrimination.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

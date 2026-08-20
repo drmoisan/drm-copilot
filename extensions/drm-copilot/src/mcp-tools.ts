@@ -68,6 +68,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly rendered_tree?: string;
   readonly summary: string;
   readonly stderr_excerpt?: string;
+  readonly warnings?: ReadonlyArray<string>;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -104,6 +105,7 @@ function toMcpToolResult(
     ...(result.renderedTree === undefined
       ? {}
       : { rendered_tree: result.renderedTree }),
+    ...(result.warnings === undefined ? {} : { warnings: result.warnings }),
   };
 }
 

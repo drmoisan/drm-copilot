@@ -31,6 +31,7 @@ export interface RepoAutomationExecutionResult {
   readonly bundledSourcePath?: string;
   readonly destinationPath?: string;
   readonly renderedTree?: string;
+  readonly warnings?: ReadonlyArray<string>;
 }
 
 export interface WorkspaceExecutionInput {

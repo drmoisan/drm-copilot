@@ -15,6 +15,11 @@ from pathlib import Path
 
 from scripts.dev_tools.epic_planner_readiness import build_epic_readiness_context
 from scripts.dev_tools.parallel_kickoff_contract import validate_parallel_kickoff_text
+from scripts.dev_tools.plan_gate_discrimination import (
+    PlanGateContext,
+    build_plan_gate_context,
+    evaluate_plan_gates,
+)
 from scripts.dev_tools.validate_epic_orchestrator_state import (
     validate_epic_orchestrator_state_text,
 )
@@ -41,6 +46,7 @@ PLAN_PHASE_RE = re.compile(r"^### Phase (?P<phase>\d+) — (?P<title>.+)$")
 PLAN_TASK_RE = re.compile(
     r"^- \[(?P<state>[ xX])\] \[P(?P<phase>\d+)-T(?P<task>\d+)\] (?P<title>.+)$"
 )
+PLAN_GATE_WARNING_PREFIX = "PLAN GATE WARNING: "
 
 
 def _read_text(path: Path) -> str:
@@ -67,18 +73,19 @@ def _read_text(path: Path) -> str:
 
 
 def validate_plan_text(text: str) -> list[str]:
-    """Validate canonical atomic-plan structure.
+    """Validate canonical atomic-plan structure and acceptance-gate rules.
 
     Purpose:
         Enforce the repository's required phase and task formatting for atomic
-        execution plans.
+        execution plans, plus the Blocking acceptance-gate findings. The
+        signature and return type are unchanged; only Blocking findings are
+        returned, so a Warning never reaches this channel.
 
     Args:
         text (str): Full plan document text.
 
     Returns:
-        list[str]: Validation errors describing any structural contract
-        violations.
+        list[str]: Structural errors followed by Blocking gate findings.
 
     Raises:
         None.
@@ -86,6 +93,43 @@ def validate_plan_text(text: str) -> list[str]:
     Side Effects:
         None.
     """
+
+    return validate_plan_text_with_warnings(text)[0]
+
+
+def validate_plan_text_with_warnings(
+    text: str, *, context: PlanGateContext | None = None
+) -> tuple[list[str], list[str]]:
+    """Validate plan structure and gates on two severity channels.
+
+    Purpose:
+        Give the CLI and the MCP surface access to the Warning channel without
+        widening the existing single-channel entry point, whose non-emptiness
+        is the failure signal every caller already depends on.
+
+    Args:
+        text (str): Full plan document text.
+        context (PlanGateContext | None): Repository seam. When `None` only the
+            context-free gate rules run.
+
+    Returns:
+        tuple[list[str], list[str]]: Element 0 is the structural errors
+        concatenated with the Blocking gate findings; element 1 is the
+        Warning findings.
+
+    Raises:
+        None.
+
+    Side Effects:
+        May query the injected `git` seam via the supplied context.
+    """
+
+    report = evaluate_plan_gates(text, context=context)
+    return _plan_structure_errors(text) + report.blocking, report.warnings
+
+
+def _plan_structure_errors(text: str) -> list[str]:
+    """Return the canonical phase and task structural errors, in source order."""
 
     errors: list[str] = []
     current_phase: int | None = None
@@ -174,8 +218,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="artifact_type", required=True)
 
+    # The `plan` route carries a workspace root so the acceptance-gate rules
+    # can query the tracked tree, mirroring the `epic-planner-state` subparser.
+    plan_parser = subparsers.add_parser("plan")
+    plan_parser.add_argument("path")
+    plan_parser.add_argument(
+        "--workspace-root",
+        default=".",
+        help="Repository root used for plan acceptance-gate tracked-tree checks.",
+    )
+
     for artifact_type in (
-        "plan",
         "policy-audit",
         "code-review",
         "feature-audit",
@@ -283,11 +336,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _validate_from_args(args: argparse.Namespace) -> list[str]:
-    """Dispatch the requested validator.
+    """Dispatch the requested validator and return its error channel only.
 
     Purpose:
-        Route the parsed CLI request to the correct validator without changing
-        the public artifact-type names accepted by the entrypoint.
+        Preserve the single-channel dispatch contract every existing caller and
+        test depends on. Warnings reach `main` through the sibling below.
 
     Args:
         args (argparse.Namespace): Parsed CLI arguments.
@@ -302,12 +355,51 @@ def _validate_from_args(args: argparse.Namespace) -> list[str]:
         Reads the target artifact from disk.
     """
 
+    if args.artifact_type == "plan":
+        return _plan_channels(args)[0]
     path = Path(args.path)
     if args.artifact_type == "epic-planner-state" and not path.is_absolute():
         path = Path(args.workspace_root) / path
-    text = _read_text(path)
+    return _validate_errors_only(args, _read_text(path))
+
+
+def _plan_channels(args: argparse.Namespace) -> tuple[list[str], list[str]]:
+    """Validate a plan artifact on both channels, building the repository seam."""
+
+    text = _read_text(Path(args.path))
+    context = build_plan_gate_context(Path(getattr(args, "workspace_root", ".")))
+    return validate_plan_text_with_warnings(text, context=context)
+
+
+def _validate_from_args_with_warnings(
+    args: argparse.Namespace,
+) -> tuple[list[str], list[str]]:
+    """Dispatch the requested validator on both severity channels.
+
+    Purpose:
+        Route the parsed CLI request without changing the public artifact-type
+        names accepted by the entrypoint. Only the `plan` route can populate
+        the Warning channel today; every other route returns an empty list.
+
+    Args:
+        args (argparse.Namespace): Parsed CLI arguments.
+
+    Returns:
+        tuple[list[str], list[str]]: Validation errors and Warning findings.
+
+    Raises:
+        None. Reads the target artifact from disk and, for the `plan` route,
+        may query `git` through the built plan-gate context.
+    """
+
     if args.artifact_type == "plan":
-        return validate_plan_text(text)
+        return _plan_channels(args)
+    return _validate_from_args(args), []
+
+
+def _validate_errors_only(args: argparse.Namespace, text: str) -> list[str]:
+    """Route every non-plan artifact type to its single-channel validator."""
+
     if args.artifact_type == "policy-audit":
         return validate_policy_audit_text(text)
     if args.artifact_type == "code-review":
@@ -385,10 +477,15 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = build_parser()
     args = parser.parse_args(argv)
-    errors = _validate_from_args(args)
+    errors, warnings = _validate_from_args_with_warnings(args)
+    # Error lines are emitted exactly as before, then the warning lines, so a
+    # run with no warnings produces byte-identical stderr.
+    for error in errors:
+        print(error, file=sys.stderr)
+    for warning in warnings:
+        print(f"{PLAN_GATE_WARNING_PREFIX}{warning}", file=sys.stderr)
+    # The exit code is derived from the error list alone; warnings never fail.
     if errors:
-        for error in errors:
-            print(error, file=sys.stderr)
         return 1
     print(f"{args.artifact_type} validation passed: {args.path}")
     return 0

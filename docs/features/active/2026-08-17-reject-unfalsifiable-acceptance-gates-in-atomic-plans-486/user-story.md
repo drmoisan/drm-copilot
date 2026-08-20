@@ -62,12 +62,12 @@ The common property is that the command's output is invariant with respect to th
 
 ## Acceptance Criteria
 
-- [ ] **AC-U1.** A plan whose acceptance command searches for a literal that is absent from the tracked tree **and** absent from the plan document text is reported, and the report names the plan task and the unmatched literal. A plan whose literal is absent from the tree but quoted in the plan document is not reported. Verified by the two named tests recorded in `spec.md` AC1.
-- [ ] **AC-U2.** A plan that names a `.py` filesystem path in a `--cov` argument is rejected, and the message states the correct dotted module form. Verified by the named test recorded in `spec.md` AC2.
-- [ ] **AC-U3.** The check runs as part of the existing mandatory plan-validator call, with no new flag, no new artifact type, and no change to the MCP tool input schema. Verified by the named dispatch test and the schema property-key test recorded in `spec.md` AC4.
-- [ ] **AC-U4.** Every report, whether it fails the gate or not, begins with the identifier of the plan task the command belongs to, and commands that cannot be attributed to a task are not reported at all. Verified by the four named tests recorded in `spec.md` AC5.
-- [ ] **AC-U5.** A plan whose only finding is advisory is accepted: the validator exits 0 and the MCP call does not throw, while the advisory text is still surfaced to the author. Verified by the named test recorded in `spec.md` AC6.
-- [ ] **AC-U6.** A plan with no findings behaves exactly as it did before the change, including the existing structural error strings, the success line, and the exit code. Verified by the named test recorded in `spec.md` AC3.
+- [x] **AC-U1.** A plan whose acceptance command searches for a literal that is absent from the tracked tree **and** absent from the plan document text is reported, and the report names the plan task and the unmatched literal. A plan whose literal is absent from the tree but quoted in the plan document is not reported. Verified by the two named tests recorded in `spec.md` AC1.
+- [x] **AC-U2.** A plan that names a `.py` filesystem path in a `--cov` argument is rejected, and the message states the correct dotted module form. Verified by the named test recorded in `spec.md` AC2.
+- [x] **AC-U3.** The check runs as part of the existing mandatory plan-validator call, with no new flag, no new artifact type, and no change to the MCP tool input schema. Verified by the named dispatch test and the schema property-key test recorded in `spec.md` AC4.
+- [x] **AC-U4.** Every report, whether it fails the gate or not, begins with the identifier of the plan task the command belongs to, and commands that cannot be attributed to a task are not reported at all. Verified by the four named tests recorded in `spec.md` AC5.
+- [x] **AC-U5.** A plan whose only finding is advisory is accepted: the validator exits 0 and the MCP call does not throw, while the advisory text is still surfaced to the author. Verified by the named test recorded in `spec.md` AC6.
+- [x] **AC-U6.** A plan with no findings behaves exactly as it did before the change, including the existing structural error strings, the success line, and the exit code. Verified by the named test recorded in `spec.md` AC3.
 
 ## Non-Goals
 
