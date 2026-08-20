@@ -280,6 +280,21 @@ def _evaluate_cov_value(
     if context is None:
         return
 
+    try:
+        _evaluate_tracked_cov_value(report, task, value, context)
+    except Exception:
+        # Broad by contract: a validation run must never fail because the
+        # repository could not be queried (spec AC10, graceful degradation).
+        return
+
+
+def _evaluate_tracked_cov_value(
+    report: PlanGateReport, task: str, value: str, context: PlanGateContext
+) -> None:
+    """Apply the tracked-tree rules G2 and G3 to one `--cov` value, in place."""
+
+    truncated = value.split(PYTEST_NODE_SEPARATOR, 1)[0]
+
     # G2: value plus `.py` is a tracked module, so the remedy is known exactly.
     if context.git.is_tracked_file(truncated + PYTHON_SUFFIX):
         report.blocking.append(

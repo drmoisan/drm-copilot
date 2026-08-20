@@ -250,3 +250,75 @@ def test_tracked_directory_produces_no_finding() -> None:
     # Assert
     assert report.blocking == []
     assert report.warnings == []
+
+
+class _RaisingGitRepository(StubGitRepository):
+    """Stub whose every tracked-tree lookup raises, modelling an absent `git`.
+
+    Purpose:
+        Model the production failure the graceful-degradation clause covers:
+        `subprocess.run` raises rather than exiting non-zero when `git` is not
+        on `PATH`, so the seam itself raises instead of answering negatively.
+    """
+
+    def is_tracked_file(self, path: str) -> bool:
+        """Raise instead of answering, as an unavailable `git` seam does."""
+
+        raise RuntimeError("git is unavailable")
+
+    def is_tracked_directory(self, path: str) -> bool:
+        """Raise instead of answering, as an unavailable `git` seam does."""
+
+        raise RuntimeError("git is unavailable")
+
+
+def test_failing_git_adapter_skips_g2_g3_without_raising() -> None:
+    """A raising tracked-tree seam degrades G2 and G3 to zero findings."""
+
+    # Arrange
+    git = _RaisingGitRepository()
+    text = _plan("poetry run pytest --cov=scripts/dev_tools/missing")
+
+    # Act
+    report = evaluate_plan_gates(text, context=_context(git))
+
+    # Assert
+    assert report.blocking == []
+    assert report.warnings == []
+
+
+def _two_task_plan(first: str, second: str) -> str:
+    """Build a two-task plan whose acceptance bullets each hold a command."""
+
+    return "\n".join(
+        [
+            _PHASE,
+            "- [ ] [P3-T4] Do the first thing",
+            f"  - Acceptance: `{first}` reports 0 failed.",
+            "- [ ] [P3-T5] Do the second thing",
+            f"  - Acceptance: `{second}` reports 0 failed.",
+            "",
+        ]
+    )
+
+
+def test_raising_adapter_reports_only_context_free_findings() -> None:
+    """Degradation silences G2 and G3 while G1 and G4 still report."""
+
+    # Arrange
+    git = _RaisingGitRepository()
+    text = _two_task_plan(
+        "poetry run pytest --cov=scripts/dev_tools/foo.py",
+        "poetry run pytest --cov scripts/dev_tools/missing",
+    )
+
+    # Act
+    report = evaluate_plan_gates(text, context=_context(git))
+
+    # Assert
+    assert len(report.blocking) == 1
+    assert report.blocking[0].startswith("[P3-T4] ")
+    assert "names a filesystem path" in report.blocking[0]
+    assert len(report.warnings) == 1
+    assert report.warnings[0].startswith("[P3-T5] ")
+    assert "space-separated" in report.warnings[0]
