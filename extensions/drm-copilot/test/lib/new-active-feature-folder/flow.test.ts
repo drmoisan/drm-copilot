@@ -110,6 +110,7 @@ describe("createActiveFolder validation", () => {
 
     // Assert
     expect(emitted).toContain("Feature name source: active-file");
+    expect(fs.files.has(promoted)).toBe(true);
   });
 
   it("throws when the template dir is missing", () => {

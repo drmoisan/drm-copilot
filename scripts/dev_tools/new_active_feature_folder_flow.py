@@ -40,6 +40,29 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 
+def _is_promoted_potential_source(potential_file: Path, workspace_path: Path) -> bool:
+    """Return whether a resolved potential file is a promoted record.
+
+    A promoted record lives under ``docs/features/potential/promoted`` and is the
+    durable history of the promotion, so it is copied rather than moved. The
+    decision is taken from the RESOLVED source path, never from the requested
+    feature name.
+
+    Args:
+        potential_file: Resolved potential file path.
+        workspace_path: Workspace root.
+
+    Returns:
+        True when the source lies under the promoted root.
+    """
+    promoted_root = workspace_path / "docs" / "features" / "potential" / "promoted"
+    try:
+        potential_file.relative_to(promoted_root)
+    except ValueError:
+        return False
+    return True
+
+
 def create_active_folder(
     feature_name: str | None,
     feature_type: str = "feature",
@@ -112,6 +135,12 @@ def create_active_folder(
         resolved_feature_name, workspace_path, filesystem
     )
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
+    # Decide the disposition ONCE from the resolved source path so both placement
+    # sites and both emission sites agree: a promoted record is copied
+    # (retained), any other source is moved.
+    retains_potential_source = potential_file is not None and (
+        _is_promoted_potential_source(potential_file, workspace_path)
+    )
     selected_work_mode = normalize_requested_work_mode(work_mode, feature_type)
     use_minor_audit, fallback_reason = should_use_minor_audit_mode(
         work_mode=selected_work_mode,
@@ -203,7 +232,10 @@ def create_active_folder(
     if use_minor_audit:
         if potential_file:
             potential_issue_path = target_dir / "issue.md"
-            filesystem.move(potential_file, potential_issue_path)
+            if retains_potential_source:
+                filesystem.copy_file(potential_file, potential_issue_path)
+            else:
+                filesystem.move(potential_file, potential_issue_path)
             moved_content = filesystem.read_text(potential_issue_path)
             filesystem.write_text(
                 potential_issue_path,
@@ -260,16 +292,27 @@ def create_active_folder(
     if potential_file:
         if use_minor_audit:
             if potential_issue_path is not None:
-                print(f"Moved potential file to {potential_issue_path}")
+                # The minor-audit branch already placed the file; report the
+                # disposition it took rather than recomputing it here.
+                if retains_potential_source:
+                    print(f"Copied potential file to {potential_issue_path}")
+                else:
+                    print(f"Moved potential file to {potential_issue_path}")
         else:
             potential_issue_path = target_dir / "issue.md"
-            filesystem.move(potential_file, potential_issue_path)
+            if retains_potential_source:
+                filesystem.copy_file(potential_file, potential_issue_path)
+            else:
+                filesystem.move(potential_file, potential_issue_path)
             moved_content = filesystem.read_text(potential_issue_path)
             filesystem.write_text(
                 potential_issue_path,
                 upsert_work_mode_marker(moved_content, selected_work_mode),
             )
-            print(f"Moved potential file to {potential_issue_path}")
+            if retains_potential_source:
+                print(f"Copied potential file to {potential_issue_path}")
+            else:
+                print(f"Moved potential file to {potential_issue_path}")
 
     if potential_file:
         print(f"Seeded docs from potential: {potential_file.name}")

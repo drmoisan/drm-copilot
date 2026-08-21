@@ -16,6 +16,29 @@ const WORKSPACE = "/ws";
 const TEMPLATE_ROOT = "/ws/templates";
 
 /**
+ * Filesystem fake that reports one designated path as absent.
+ *
+ * Used to drive the receipt post-condition: the workflow still writes normally,
+ * but the reported path fails its existence check.
+ */
+class BlockedPathFolderFileSystem extends FakeFolderFileSystem {
+  /**
+   * @param blockedPath Path whose existence check always reports false.
+   */
+  constructor(private readonly blockedPath: string) {
+    super();
+  }
+
+  /**
+   * @param path Path to test.
+   * @returns False for the blocked path; otherwise the inherited answer.
+   */
+  override exists(path: string): boolean {
+    return path === this.blockedPath ? false : super.exists(path);
+  }
+}
+
+/**
  * Seed a feature template tree under the template root.
  *
  * @param fs Filesystem fake.
@@ -180,5 +203,108 @@ describe("newActiveFeatureFolderServiceCall", () => {
       "VS Code 'code' command not found. Files to edit:",
     );
     expect(runner.calls).toHaveLength(0);
+  });
+});
+
+describe("newActiveFeatureFolderServiceCall receipt post-condition", () => {
+  const TARGET = "/ws/docs/features/active/notes-feature";
+
+  it("throws when the reported destination path is absent", () => {
+    // Arrange: the target directory reports as absent after the workflow ran.
+    const build = (): BlockedPathFolderFileSystem => {
+      const fs = new BlockedPathFolderFileSystem(TARGET);
+      seedFeatureTemplate(fs);
+      return fs;
+    };
+    const runner = new FakeCommandRunner();
+
+    // Act / Assert
+    expect(() =>
+      newActiveFeatureFolderServiceCall({
+        fileSystem: build(),
+        runner,
+        workspaceRoot: WORKSPACE,
+        featureName: "notes-feature",
+        type: "feature",
+        workMode: "full-feature",
+        templateRoot: TEMPLATE_ROOT,
+      }),
+    ).toThrow(`new_active_feature_folder`);
+    expect(() =>
+      newActiveFeatureFolderServiceCall({
+        fileSystem: build(),
+        runner,
+        workspaceRoot: WORKSPACE,
+        featureName: "notes-feature",
+        type: "feature",
+        workMode: "full-feature",
+        templateRoot: TEMPLATE_ROOT,
+      }),
+    ).toThrow(TARGET);
+  });
+
+  it("throws when the reported artifact path is absent", () => {
+    // Arrange: the seeded issue.md reports as absent after the workflow ran.
+    const issuePath = `${TARGET}/issue.md`;
+    const build = (): BlockedPathFolderFileSystem => {
+      const fs = new BlockedPathFolderFileSystem(issuePath);
+      seedFeatureTemplate(fs);
+      fs.seed(
+        `${WORKSPACE}/docs/features/potential/notes-feature.md`,
+        "# notes-feature\n",
+      );
+      return fs;
+    };
+    const runner = new FakeCommandRunner();
+
+    // Act / Assert
+    expect(() =>
+      newActiveFeatureFolderServiceCall({
+        fileSystem: build(),
+        runner,
+        workspaceRoot: WORKSPACE,
+        featureName: "notes-feature",
+        type: "feature",
+        workMode: "full-feature",
+        templateRoot: TEMPLATE_ROOT,
+      }),
+    ).toThrow(`new_active_feature_folder`);
+    expect(() =>
+      newActiveFeatureFolderServiceCall({
+        fileSystem: build(),
+        runner,
+        workspaceRoot: WORKSPACE,
+        featureName: "notes-feature",
+        type: "feature",
+        workMode: "full-feature",
+        templateRoot: TEMPLATE_ROOT,
+      }),
+    ).toThrow(issuePath);
+  });
+
+  it("returns the enriched record when every reported path exists", () => {
+    // Arrange: nothing is blocked, so both reported paths exist.
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs);
+    fs.seed(
+      `${WORKSPACE}/docs/features/potential/notes-feature.md`,
+      "# notes-feature\n",
+    );
+    const runner = new FakeCommandRunner();
+
+    // Act
+    const result = newActiveFeatureFolderServiceCall({
+      fileSystem: fs,
+      runner,
+      workspaceRoot: WORKSPACE,
+      featureName: "notes-feature",
+      type: "feature",
+      workMode: "full-feature",
+      templateRoot: TEMPLATE_ROOT,
+    });
+
+    // Assert
+    expect(result.destinationPath).toBe(TARGET);
+    expect(result.artifacts).toEqual([`${TARGET}/issue.md`]);
   });
 });

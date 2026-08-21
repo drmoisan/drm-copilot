@@ -172,6 +172,12 @@ export function createActiveFolder(
   const potentialContent = potentialFile
     ? filesystem.readText(potentialFile)
     : "";
+  // Decide the disposition ONCE from the resolved source path so both placement
+  // sites and both emission sites agree: a promoted record is copied (retained),
+  // any other source is moved.
+  const retainsPotentialSource =
+    potentialFile !== null &&
+    isPromotedPotentialSource(potentialFile, workspacePath);
   const selectedWorkMode = normalizeRequestedWorkMode(workMode, featureType);
   const [useMinorAudit, fallbackReason] = shouldUseMinorAuditMode(
     selectedWorkMode,
@@ -280,7 +286,11 @@ export function createActiveFolder(
   if (useMinorAudit) {
     if (potentialFile) {
       potentialIssuePath = joinPosix(targetDir, "issue.md");
-      filesystem.move(potentialFile, potentialIssuePath);
+      if (retainsPotentialSource) {
+        filesystem.copyFile(potentialFile, potentialIssuePath);
+      } else {
+        filesystem.move(potentialFile, potentialIssuePath);
+      }
       const movedContent = filesystem.readText(potentialIssuePath);
       filesystem.writeText(
         potentialIssuePath,
@@ -334,22 +344,36 @@ export function createActiveFolder(
     );
   }
 
-  // Potential-file move + marker for the FULL path (the minor-audit path moved
-  // it already and only emits the moved-file line).
+  // Potential-file placement + marker for the FULL path (the minor-audit path
+  // placed it already and only emits the disposition line).
   if (potentialFile) {
     if (useMinorAudit) {
       if (potentialIssuePath !== null) {
-        emit(`Moved potential file to ${potentialIssuePath}`);
+        // The minor-audit branch already placed the file; report the
+        // disposition it took rather than recomputing it here.
+        emit(
+          retainsPotentialSource
+            ? `Copied potential file to ${potentialIssuePath}`
+            : `Moved potential file to ${potentialIssuePath}`,
+        );
       }
     } else {
       potentialIssuePath = joinPosix(targetDir, "issue.md");
-      filesystem.move(potentialFile, potentialIssuePath);
+      if (retainsPotentialSource) {
+        filesystem.copyFile(potentialFile, potentialIssuePath);
+      } else {
+        filesystem.move(potentialFile, potentialIssuePath);
+      }
       const movedContent = filesystem.readText(potentialIssuePath);
       filesystem.writeText(
         potentialIssuePath,
         upsertWorkModeMarker(movedContent, selectedWorkMode),
       );
-      emit(`Moved potential file to ${potentialIssuePath}`);
+      emit(
+        retainsPotentialSource
+          ? `Copied potential file to ${potentialIssuePath}`
+          : `Moved potential file to ${potentialIssuePath}`,
+      );
     }
   }
 
@@ -416,6 +440,30 @@ function isRelativeTo(child: string, root: string): boolean {
   return (
     normalizedChild === normalizedRoot ||
     normalizedChild.startsWith(`${normalizedRoot}/`)
+  );
+}
+
+/**
+ * Return whether a resolved potential file is a promoted record.
+ *
+ * A promoted record lives under `docs/features/potential/promoted` and is the
+ * durable history of the promotion, so it is copied rather than moved. The
+ * decision is taken from the RESOLVED source path, never from the requested
+ * feature name. Containment is delegated to {@link isRelativeTo}, so a sibling
+ * whose path is only a string prefix of the promoted root (for example
+ * `docs/features/potential/promoted-notes.md`) is correctly excluded.
+ *
+ * @param potentialPath Resolved potential file path.
+ * @param workspacePath Workspace root.
+ * @returns True when the source lies under the promoted root.
+ */
+function isPromotedPotentialSource(
+  potentialPath: string,
+  workspacePath: string,
+): boolean {
+  return isRelativeTo(
+    potentialPath,
+    joinPosix(workspacePath, "docs/features/potential/promoted"),
   );
 }
 
