@@ -494,7 +494,8 @@ Seeded from issue:
       non-empty set. Evidence captured in the same two locations.
 - [ ] Coverage obligations met and recorded: line coverage >= 85% and branch coverage >= 75% for
       Python (`poetry run pytest ... --cov=scripts.dev_tools --cov-branch`) and for TypeScript
-      (`npm run test:unit:coverage`); line coverage >= 85% for PowerShell, which is exempt from the
+      (`npm run test:coverage` in `extensions/drm-copilot`); line coverage >= 85% for
+      PowerShell, which is exempt from the
       branch threshold only because Pester measures no branch coverage. No coverage regression on
       changed lines, and no `exclude` entry added. Per `.claude/rules/general-unit-test.md` and
       `.claude/rules/quality-tiers.md`.
