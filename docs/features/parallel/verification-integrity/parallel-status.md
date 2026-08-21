@@ -16,7 +16,7 @@
 - `max_concurrency`: 8
 - `current_cohort`: 1
 - `recolor_generation`: 0
-- `last_updated`: 2026-08-21T01:07:00Z
+- `last_updated`: 2026-08-21T01:36:48Z
 
 **Items**
 
@@ -43,6 +43,7 @@
 
 | op | item_key | prior_state | new_state | disposition | recolor_generation | at |
 | --- | --- | --- | --- | --- | --- | --- |
+| close | - | - | - | - | 0 | 2026-08-21T01:36:48Z |
 
 ## Drift Events
 
