@@ -231,4 +231,46 @@ Describe 'enforce-python-batch-budget.ps1' {
         $hookText | Should -BeLike '*HookPayload.psm1*'
         $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
     }
+
+    Context 'entry-point dispatch' {
+        It 'returns exit code 0 and emits nothing for an allowed non-Python path (deny-only convention)' {
+            $allowed = Get-PythonToolInput -FilePath 'docs/readme.md'
+
+            $emitted = @(Invoke-PythonBatchBudgetEntryPoint -ToolInputRaw $allowed)
+
+            $emitted | Should -HaveCount 1
+            [int]$emitted[0] | Should -Be 0
+        }
+
+        It 'returns exit code 0 and emits a deny decision with no state property for an empty payload' {
+            $emitted = @(Invoke-PythonBatchBudgetEntryPoint -ToolInputRaw '')
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
+            [int]$code | Should -Be 0
+            $parsed = $stdout | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            ($parsed.PSObject.Properties.Name -contains 'state') | Should -BeFalse
+        }
+
+        It 'returns exit code 0 and emits a deny decision when ToolInputRaw is omitted and the ReadPayload seam is empty' {
+            $emitted = @(Invoke-PythonBatchBudgetEntryPoint -ReadPayload { '' })
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
+            [int]$code | Should -Be 0
+            ($stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'returns exit code 0 for malformed JSON with non-default session and cap environment variables set' {
+            $env:CLAUDE_SESSION_ID = 'entrypoint-session'
+            $env:CLAUDE_PYTHON_BUDGET_PROD = '5'
+            $env:CLAUDE_PYTHON_BUDGET_TEST = '5'
+
+            $emitted = @(Invoke-PythonBatchBudgetEntryPoint -ToolInputRaw '{not-json')
+            $code = $emitted[-1]
+
+            [int]$code | Should -Be 0
+        }
+    }
 }

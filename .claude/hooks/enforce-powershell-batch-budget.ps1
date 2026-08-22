@@ -214,28 +214,71 @@ function Invoke-PowerShellBatchBudgetHook {
     return $decision
 }
 
+function Invoke-PowerShellBatchBudgetEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the PowerShell batch-budget decision and returns the process exit code.
+    .DESCRIPTION
+        Wraps the dispatch logic that the hook entry point performs so it can be
+        exercised by unit tests. It acquires the payload through the shared reader
+        unless the caller supplies one, writes the compact JSON decision to the output
+        stream only when the decision is a deny (this hook is deny-only: an allow
+        decision emits nothing), and returns 0. This function does not call exit; the
+        thin entry-point wiring converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $sessionId = $env:CLAUDE_SESSION_ID
+    if (-not $sessionId) {
+        $sessionId = 'default'
+    }
+
+    $prodCap = 3
+    $testCap = 3
+    if ($env:CLAUDE_POWERSHELL_BUDGET_PROD -match '^\d+$') {
+        $prodCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_PROD
+    }
+    if ($env:CLAUDE_POWERSHELL_BUDGET_TEST -match '^\d+$') {
+        $testCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_TEST
+    }
+
+    $decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $ToolInputRaw -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
+    if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+        $decision.Remove('state')
+        $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    }
+
+    return 0
+}
+
+# Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$sessionId = $env:CLAUDE_SESSION_ID
-if (-not $sessionId) {
-    $sessionId = 'default'
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-PowerShellBatchBudgetEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$prodCap = 3
-$testCap = 3
-if ($env:CLAUDE_POWERSHELL_BUDGET_PROD -match '^\d+$') {
-    $prodCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_PROD
-}
-if ($env:CLAUDE_POWERSHELL_BUDGET_TEST -match '^\d+$') {
-    $testCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_TEST
-}
-
-$decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw (Read-ClaudeHookRawPayload) -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
-if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
-    $decision.Remove('state')
-    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-}
-
-exit 0
+exit ([int]$entryPointResult[-1])
