@@ -6,8 +6,10 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the Agent (Task) tool. Reads
-    tool input JSON from the the envelope's nested tool_input environment variable. Activates
-    only when subagent_type is 'atomic-planner'.
+    the tool payload through the shared hook-payload reader (stdin first, with
+    environment-variable fallback) and takes the tool arguments from the
+    envelope's nested tool_input object. Activates only when subagent_type is
+    'atomic-planner'.
 
     Feature folder resolution order:
       1. Scan the prompt text for any path matching
