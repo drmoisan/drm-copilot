@@ -461,14 +461,14 @@ Seeded from issue:
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`,
       whose `test_bundled_claude_payload_contains_all_repo_runtime_contracts` (lines 101-126) fails
       otherwise.
-- [x] `tests/scripts/dev_tools/test_blast_radius_config.py` carries the three-class key-partition
+- [ ] `tests/scripts/dev_tools/test_blast_radius_config.py` carries the three-class key-partition
       gate, extending the existing two-copy `COMMITTED_CONFIGS` pattern at lines 474-499: Class 1
       byte-equality of `version`, `over_breadth_fraction`, and `mandate_reads` across the two
       copies; Class 2 bundled `shared_surfaces` equal to a declared `PORTABLE_SHARED_SURFACES`
       constant and a subset of the self-hosted list, with bundled `shared_surface_globs` empty;
       Class 3 bundled `modules` key set a subset of the `PAYLOAD_MODULES` name set. Verified by
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [x] The same file asserts that neither copy declares any of the five disqualified umbrella module
+- [ ] The same file asserts that neither copy declares any of the five disqualified umbrella module
       names `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
       `agents-surface`, extending the existing two-name location-bucket pin; that every
       separator-free bundled `shared_surfaces` entry is wildcard-free; and a non-vacuity floor
