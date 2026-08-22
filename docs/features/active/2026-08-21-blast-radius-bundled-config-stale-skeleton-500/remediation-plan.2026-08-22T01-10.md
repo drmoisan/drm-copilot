@@ -182,28 +182,55 @@ cycle does not change. C# and shell are likewise untouched, matching the origina
       `It` block passing with 0 failed.
 - [ ] [P2-T4] Confirm the file size after P2-T3: `(Get-Content tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1).Count`.
       Acceptance: the reported line count is less than 500.
-- [ ] [P2-T5] [expect-fail] Demonstrate falsifiability by reverting the bundled copy to its
-      pre-fix, merge-base state and observing the new Python case fail. Run:
+- [ ] [P2-T5] [expect-fail] Demonstrate falsifiability in both languages by reverting the bundled
+      copy to its pre-fix, merge-base state and observing both the new Python case and the new
+      Pester case fail in that same reverted state. Run:
       `git show fb30a9a58b8422e610a09b07361421e97367807a:extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json > extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`,
       then
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`.
-      Record the fail-before evidence artifact at
+      Record the Python fail-before evidence artifact at
       `evidence/regression-testing/python-directional-invariant-fail-before.<timestamp>.md` with
       `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` quoting
       the assertion message naming the missing entries.
-      Acceptance: `EXIT_CODE: 1` and `1 failed` are recorded, with the failure naming at least one
-      of `poetry.lock`, `package-lock.json`, or `quality-tiers.yml` as missing from the reverted
-      bundle.
-- [ ] [P2-T6] Restore the bundled copy and confirm the case passes again: run
+      Acceptance (Python): `EXIT_CODE: 1` and `1 failed` are recorded, with the failure naming at
+      least one of `poetry.lock`, `package-lock.json`, or `quality-tiers.yml` as missing from the
+      reverted bundle.
+
+      In the same reverted state, run the mirrored Pester case in isolation using a name filter,
+      because an unfiltered run of the file also fails the umbrella, payload-module, Class 1, and
+      bundled-separator-free cases once the bundled copy is reverted, which would bury the new
+      case's signal. Build and run a scoped configuration:
+      ```powershell
+      $pesterConfig = New-PesterConfiguration
+      $pesterConfig.Run.Path = 'tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1'
+      $pesterConfig.Run.PassThru = $true
+      $pesterConfig.Filter.FullName = '*requires every separator-free self-hosted shared surface to reach the bundled copy*'
+      $result = Invoke-Pester -Configuration $pesterConfig
+      ```
+      Record the PowerShell fail-before evidence artifact at
+      `evidence/regression-testing/powershell-directional-invariant-fail-before.<timestamp>.md`
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`
+      quoting `$result.FailedCount` and the failure message naming the missing entries.
+      Acceptance (PowerShell): the filtered run reports `Passed=0 Failed=1`, with the failure
+      naming at least one of `poetry.lock`, `package-lock.json`, or `quality-tiers.yml` as missing
+      from the reverted bundle.
+- [ ] [P2-T6] Restore the bundled copy and confirm both new cases pass again: run
       `git checkout -- extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`,
       then `git status --short -- extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`
       (expect no output), then rerun
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`.
-      Record the pass-after evidence artifact at
+      Record the Python pass-after evidence artifact at
       `evidence/qa-gates/python-directional-invariant-pass-after.<timestamp>.md` with the same four
       required fields.
-      Acceptance: the `git status --short` command produces no output for that path, and
-      `EXIT_CODE: 0` with `1 passed` is recorded for the rerun.
+      Acceptance (restore + Python): the `git status --short` command produces no output for that
+      path, and `EXIT_CODE: 0` with `1 passed` is recorded for the rerun.
+
+      Then rerun the same filtered Pester configuration used in P2-T5 (identical `Run.Path` and
+      `Filter.FullName`) against the restored tree. Record the PowerShell pass-after evidence
+      artifact at `evidence/qa-gates/powershell-directional-invariant-pass-after.<timestamp>.md`
+      with the same four required fields, `Output Summary:` quoting `$result.PassedCount` and
+      `$result.FailedCount`.
+      Acceptance (PowerShell): the filtered rerun reports `Passed=1 Failed=0`.
 - [ ] [P2-T7] Amend `.claude/rules/parallel-orchestration.md`, in the
       `### The published truth table is not a copy of this one (issue #500)` section, appending a
       paragraph titled "A directional invariant closes the residual Class 2 gap (issue #500
@@ -256,18 +283,23 @@ cycle does not change. C# and shell are likewise untouched, matching the origina
       closed structurally by `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
       (added in Phase 2). Keep the phrase "Class 2 portable-set equality" contiguous on a single
       line so a line-oriented search still matches it.
-      Acceptance: `git grep -n -F "Class 2 portable-set equality" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
-      reports at least one match, and the matched line does not also contain the string "both fail
-      loudly when a future self-hosted change does not reach the bundle" (confirming the sentence
-      was rewritten rather than left in place).
+      Acceptance, all three checked against `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`:
+      (a) `git grep -c -F "byte-equality and Class 2 portable-set equality both fail loudly" -- spec.md`
+      reports `0` after the edit (this substring lies entirely on the pre-edit line 581 and reports
+      `1` before the edit, so the condition is false now and true only after the bullet is rewritten);
+      (b) `git grep -c -F "test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle" -- spec.md`
+      reports at least `1` after the edit (this literal is absent from `spec.md` before the edit);
+      (c) `git grep -c -F "test_every_separator_free_bundled_shared_surface_is_wildcard_free" -- spec.md`
+      reports at least `1` after the edit (also absent before the edit). All three conjuncts are
+      false against the unedited file and can only become true by performing the rewrite.
 
 ---
 
 ### Phase 5 — R5: Correct the `spec_text` omission in the conflict-graph evidence artifact
 
 - [ ] [P5-T1] In
-      `evidence/other/post-fix-conflict-graph.2026-08-22T00-20.md`, `## Commands` /
-      `Command:` block, amend the command description to name all four positional arguments passed
+      `evidence/other/post-fix-conflict-graph.2026-08-22T00-20.md`, the `Command:` block at line 7
+      (the file's only `Command:` block), amend the command description to name all four positional arguments passed
       to `derive_blast_radius`: `plan_text` (each folder's `plan*.md` content), `spec_text` (each
       folder's `spec.md` content, supplied as the second positional argument), `feature_folder`
       (the bare folder name), and `config` (the parsed truth table), plus the fixed `computed_at`
