@@ -461,19 +461,24 @@ Seeded from issue:
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`,
       whose `test_bundled_claude_payload_contains_all_repo_runtime_contracts` (lines 101-126) fails
       otherwise.
-- [ ] `tests/scripts/dev_tools/test_blast_radius_config.py` carries the three-class key-partition
-      gate, extending the existing two-copy `COMMITTED_CONFIGS` pattern at lines 474-499: Class 1
-      byte-equality of `version`, `over_breadth_fraction`, and `mandate_reads` across the two
-      copies; Class 2 bundled `shared_surfaces` equal to a declared `PORTABLE_SHARED_SURFACES`
-      constant and a subset of the self-hosted list, with bundled `shared_surface_globs` empty;
-      Class 3 bundled `modules` key set a subset of the `PAYLOAD_MODULES` name set. Verified by
-      `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [ ] The same file asserts that neither copy declares any of the five disqualified umbrella module
-      names `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
-      `agents-surface`, extending the existing two-name location-bucket pin; that every
-      separator-free bundled `shared_surfaces` entry is wildcard-free; and a non-vacuity floor
-      under which `COMMITTED_CONFIGS` has exactly two members and each collection intended to be
-      non-empty is non-empty. Verified by the same pytest invocation.
+- [x] `tests/scripts/dev_tools/test_blast_radius_config_parity.py` carries the three-class
+      key-partition gate, importing the shared helpers from
+      `tests/scripts/dev_tools/test_blast_radius_config.py` and holding its declared constants and
+      accessors in `tests/scripts/dev_tools/blast_radius_parity_test_support.py` (a sibling module
+      required by plan deviation PD-1, forced by the hard 499-of-500-line ceiling in
+      `.claude/rules/general-code-change.md`): Class 1 byte-equality of `version`,
+      `over_breadth_fraction`, and `mandate_reads` across the two copies; Class 2 bundled
+      `shared_surfaces` equal to a declared `PORTABLE_SHARED_SURFACES` constant and a subset of the
+      self-hosted list, with bundled `shared_surface_globs` empty; Class 3 bundled `modules` key set
+      a subset of the `PAYLOAD_MODULES` name set. Verified by
+      `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
+- [x] `tests/scripts/dev_tools/test_blast_radius_config_parity.py` asserts that neither copy
+      declares any of the five disqualified umbrella module names `python-dev-tools`,
+      `vscode-extension`, `claude-runtime`, `copilot-surface`, `agents-surface`, extending the
+      existing two-name location-bucket pin; that every separator-free bundled `shared_surfaces`
+      entry is wildcard-free; and a non-vacuity floor under which `COMMITTED_CONFIGS` has exactly
+      two members and each collection intended to be non-empty is non-empty. Verified by
+      `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
 - [x] `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 1
       equality, the Class 3 subset, the five-name umbrella denylist applied to both copies, and the
       separator-free-wildcard-free assertion, and stays under the 500-line limit. Verified by
@@ -578,8 +583,14 @@ Additionally rejected, and not to be reintroduced (research `## 4.4`):
     not silently satisfy a test it contradicts.
   - The mirror obligation is stated as its own acceptance criterion and is enforced by an existing
     test that fails loudly.
-  - Class 1 byte-equality and Class 2 portable-set equality both fail loudly when a future
-    self-hosted change does not reach the bundle.
+  - Class 1 byte-equality fails loudly when a `mandate_reads`, `version`, or `over_breadth_fraction`
+    change reaches only one copy. Class 2 portable-set equality fails on any unilateral change to
+    the bundled set or to the declared constant, and does not by itself observe the self-hosted set
+    growing away from it; the catastrophic form of the fail-open defect, a published table with no
+    separator-free shared surface, is independently blocked by the non-empty precondition in
+    `test_every_separator_free_bundled_shared_surface_is_wildcard_free`; and the residual gap is
+    closed structurally by `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
+    (added in Phase 2).
   - Rollback is a single-commit revert; there is no migration or persisted state.
 
 ## Rollout & Follow-up

@@ -256,8 +256,8 @@ Describe 'Committed blast-radius truth table shape' {
             # failure lists every disagreeing key rather than the first.
             $offending = [System.Collections.Generic.List[string]]::new()
             foreach ($key in $byteEqualKey) {
-                $committed = $script:CommittedConfig[$key] | ConvertTo-Json -Depth 10 -Compress
-                $bundled = $script:BundledConfig[$key] | ConvertTo-Json -Depth 10 -Compress
+                $committed = ConvertTo-Json -InputObject $script:CommittedConfig[$key] -Depth 10 -Compress
+                $bundled = ConvertTo-Json -InputObject $script:BundledConfig[$key] -Depth 10 -Compress
                 if ($committed -cne $bundled) {
                     $offending.Add($key)
                 }
@@ -265,6 +265,40 @@ Describe 'Committed blast-radius truth table shape' {
 
             # Assert
             $offending.ToArray() | Should -BeNullOrEmpty
+        }
+
+        It 'requires every separator-free self-hosted shared surface to reach the bundled copy' {
+            # Arrange: directional invariant closing the residual Class 2 gap
+            # (issue #500 remediation). Portable-set equality and the
+            # bundled <= self_hosted subset relation together do not observe
+            # the self-hosted copy gaining a portable separator-free surface
+            # that never reaches the bundle. Select the separator-free entries
+            # from each committed copy, since only a separator-free entry is
+            # accepted by the root-token extractor. Mirrors
+            # test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle
+            # in tests/scripts/dev_tools/test_blast_radius_config_parity.py.
+            $selfHostedSeparatorFree = @(
+                $script:CommittedConfig['shared_surfaces'] |
+                    Where-Object { -not $_.Contains('/') }
+            )
+            $bundledSeparatorFree = @(
+                $script:BundledConfig['shared_surfaces'] |
+                    Where-Object { -not $_.Contains('/') }
+            )
+
+            # Act: accumulate every self-hosted separator-free entry absent
+            # from the bundled separator-free set, so the failure names all
+            # missing entries rather than the first.
+            $missing = [System.Collections.Generic.List[string]]::new()
+            foreach ($entry in $selfHostedSeparatorFree) {
+                if ($bundledSeparatorFree -cnotcontains $entry) {
+                    $missing.Add($entry)
+                }
+            }
+
+            # Assert: no self-hosted separator-free entry may be missing from
+            # the bundled separator-free set.
+            $missing.ToArray() | Should -BeNullOrEmpty
         }
     }
 

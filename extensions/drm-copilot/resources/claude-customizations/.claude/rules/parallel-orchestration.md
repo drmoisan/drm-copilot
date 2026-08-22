@@ -301,6 +301,16 @@ the path-token extractor accepts a separator-free token at all, so a published t
 separator-free surface entry cannot detect two items rewriting the same root build file, whatever
 that file is named.
 
+**A directional invariant closes the residual Class 2 gap (issue #500 remediation).** Portable-set
+equality against the declared portable-surface constant and the `bundled <= self_hosted` subset
+relation together do not observe the self-hosted copy gaining a portable separator-free surface
+that never reaches the bundle: both checks are satisfied by a bundled set that stays fixed while
+the self-hosted set grows around it. `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, closes that gap
+structurally by asserting the reverse containment for separator-free entries: every separator-free
+self-hosted `shared_surfaces` entry must also appear in the bundled separator-free set.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.

@@ -250,6 +250,42 @@ def test_class_two_bundled_shared_surface_globs_are_empty() -> None:
     )
 
 
+def test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle() -> None:
+    """Require every separator-free self-hosted surface to reach the bundle.
+
+    Directional invariant closing the residual Class 2 gap (issue #500
+    remediation). Portable-set equality against ``PORTABLE_SHARED_SURFACES``
+    and the ``bundled <= self_hosted`` subset relation together do not observe
+    the self-hosted copy gaining a portable separator-free surface that never
+    reaches the bundle: both checks are satisfied by a bundled set that stays
+    fixed while the self-hosted set grows. This test asserts the reverse
+    containment restricted to separator-free entries, so a self-hosted
+    separator-free addition that is never carried into the bundled copy fails
+    loudly instead of passing silently.
+    """
+    # Arrange: select the separator-free entries from each committed copy,
+    # since only a separator-free entry is accepted by the root-token
+    # extractor and therefore only a separator-free omission is a live gap.
+    self_hosted_separator_free = frozenset(
+        entry for entry in shared_surfaces(SELF_HOSTED_CONFIG) if "/" not in entry
+    )
+    bundled_separator_free = frozenset(
+        entry for entry in shared_surfaces(BUNDLED_CONFIG) if "/" not in entry
+    )
+
+    # Assert: every self-hosted separator-free entry must also appear in the
+    # bundled separator-free set. The failure message names the missing
+    # entries and both config labels so a maintainer knows which copy to
+    # amend.
+    missing = sorted(self_hosted_separator_free - bundled_separator_free)
+    assert not missing, (
+        f"{SELF_HOSTED_CONFIG_LABEL} separator-free shared_surfaces entries "
+        f"{missing} are missing from {BUNDLED_CONFIG_LABEL} separator-free "
+        "shared_surfaces; every portable separator-free self-hosted surface "
+        "must reach the bundled copy."
+    )
+
+
 def test_class_three_bundled_modules_are_payload_modules_only() -> None:
     """Require the bundled module map to name payload modules only.
 

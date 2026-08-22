@@ -7,9 +7,12 @@ Task: [P7-T6]
 Command:
 
 ```
-poetry run python <scratchpad script: derive_blast_radius over every folder under
-docs/features/active/ carrying a plan*.md, against config/blast-radius.json, then conflicts() over
-all C(n,2) pairs, then a greedy lowest-index cohort colouring>
+poetry run python <scratchpad script: derive_blast_radius(plan_text, spec_text, feature_folder,
+config, computed_at=...) over every folder under docs/features/active/ carrying a plan*.md, passing
+each folder's plan*.md content as plan_text, each folder's spec.md content as spec_text (the second
+positional argument), the bare folder name as feature_folder, the parsed truth table as config, and
+the fixed computed_at constant as the keyword argument, then conflicts() over all C(n,2) pairs, then
+a greedy lowest-index cohort colouring>
 ```
 
 (working directory: worktree root. The script is a throwaway created and deleted within this
