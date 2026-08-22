@@ -125,18 +125,20 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       `evidence/remediation-baseline/typescript-typecheck.<timestamp>.md` with the same four
       fields.
       Acceptance: `EXIT_CODE: 0` is recorded.
-- [ ] [P0-T24] From `extensions/drm-copilot`, run `npm run test:unit:coverage` and record the
-      artifact at `evidence/remediation-baseline/typescript-jest-coverage.<timestamp>.md` with
-      `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail counts and
-      the line and branch coverage percentages Jest reports.
+- [ ] [P0-T24] From `extensions/drm-copilot`, run `npm run test:coverage` (resolves to
+      `node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary`;
+      `test:unit:coverage` does not exist in this package's manifest, which declares exactly
+      `test`, `test:unit`, and `test:coverage`) and record the artifact at
+      `evidence/remediation-baseline/typescript-jest-coverage.<timestamp>.md` with `Timestamp:`,
+      `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail counts and the line and
+      branch coverage percentages Jest reports.
       Acceptance: `EXIT_CODE: 0`; both coverage figures recorded, each >= the
       `.claude/rules/quality-tiers.md` thresholds (85% lines, 75% branches).
 - [ ] [P0-T25] Confirm file sizes before any edit: from the worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1 extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts`
       and record the artifact at `evidence/remediation-baseline/edit-target-line-counts.<timestamp>.md`.
-      Acceptance: the artifact records five counts, each less than 500 (measured: 461, 181, 446,
-      225, 434 at the time this plan was authored — the executor's own measurement is
-      authoritative).
+      Acceptance: the artifact records five counts, each less than 500 (measured at plan-authoring
+      time: 461, 180, 446, 224, 434 — the executor's own measurement is authoritative).
 
 ---
 
@@ -241,9 +243,14 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       constant is modified.
       Acceptance:
       `node run-jest.cjs -t "keeps SOURCE_BLAST_RADIUS in step with the committed bundled blast-radius resource"`,
-      run from `extensions/drm-copilot`, exits `0` with `1 passed` (measured before this task: the
-      test does not exist, so the command matches zero tests and exits non-zero today — confirming
-      the assertion is newly added rather than newly passing on already-covered ground).
+      run from `extensions/drm-copilot`, reports `Tests: 1 passed, 1 total`. The exit code alone
+      does not discriminate here: measured before this task, the same command exits `0` today with
+      `Tests: 2656 skipped, 2656 total` and `0 passed` — a name filter matching nothing discovers
+      every test, skips all of them, and Jest reports success (`run-jest.cjs` blocks
+      `--passWithNoTests`, `--onlyChanged`, and `--lastCommit`, but that guard does not cover a
+      name-filter miss). The state that would make this acceptance pass wrongly is exactly that
+      zero-discovery state, and it is the current one, which is why the passed count, not the exit
+      code, is the assertion.
 - [ ] [P2-T2] Confirm file size: from `extensions/drm-copilot`, run
       `(Get-Content test/lib/push-down/claude-config-carriage.test.ts).Count` or the shell
       equivalent `wc -l`.
@@ -267,7 +274,9 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       `node run-jest.cjs -t "keeps SOURCE_BLAST_RADIUS in step with the committed bundled blast-radius resource"`.
       Record the pass-after evidence artifact at
       `evidence/qa-gates/typescript-source-blast-radius-fidelity-pass-after.<timestamp>.md`.
-      Acceptance: `git status --short` produces no output; `EXIT_CODE: 0`, `1 passed`.
+      Acceptance: `git status --short` produces no output; the rerun reports `Tests: 1 passed, 1
+      total`. As in P2-T1, the exit code alone would not discriminate a genuine pass from a
+      zero-discovery no-op; the passed count is the assertion.
 
 ---
 
@@ -415,8 +424,9 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       postdates." No artifact is renamed and no existing field is altered.
       Acceptance: from the worktree root,
       `git grep -c -F "timestamp-clock-convention.2026-08-22T03-37.md" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/*/*2026-08-21T21-49*`
-      reports `18` after the edit (measured before the edit: `0` — none of the 18 references the
-      convention note today).
+      reports 18 output lines (one `path:count` line per matching file, `git grep -c` reporting a
+      per-file count rather than a single integer) after the edit, versus 0 output lines before the
+      edit — none of the 18 references the convention note today.
 
 ---
 
@@ -459,10 +469,12 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       Acceptance: `EXIT_CODE: 0`.
 - [ ] [P6-T11] From `extensions/drm-copilot`, run `npm run typecheck`.
       Acceptance: `EXIT_CODE: 0`.
-- [ ] [P6-T12] From `extensions/drm-copilot`, run `npm run test:unit:coverage` and record the
-      final-QC artifact at `evidence/qa-gates/final-typescript-jest-coverage.<timestamp>.md` with
-      `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail counts and
-      the line and branch coverage percentages.
+- [ ] [P6-T12] From `extensions/drm-copilot`, run `npm run test:coverage` (resolves to
+      `node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary`;
+      `test:unit:coverage` does not exist, per P0-T24) and record the final-QC artifact at
+      `evidence/qa-gates/final-typescript-jest-coverage.<timestamp>.md` with `Timestamp:`,
+      `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail counts and the line and
+      branch coverage percentages.
       Acceptance: `EXIT_CODE: 0`, with both coverage figures at or above the P0-T24 baseline
       figures (no regression), and the total test count at least 2657 (the 2656 present at the
       start of this cycle plus the one CR-4 case added).
@@ -483,11 +495,20 @@ perturbation's other failures do not bury the signal, per the cycle 1/2 preceden
       worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1 extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts`.
       Acceptance: all four reported counts are less than 500.
-- [ ] [P6-T16] Confirm `tests/scripts/dev_tools/test_blast_radius_config.py` and
-      `config-carriage.test-helpers.ts` are untouched (only the consuming test file changed for
-      CR-4, not the fixture helper): from the worktree root, run
-      `git diff fb30a9a58b8422e610a09b07361421e97367807a...HEAD -- tests/scripts/dev_tools/test_blast_radius_config.py extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts`.
-      Acceptance: the diff produces no output.
+- [ ] [P6-T16] Confirm `tests/scripts/dev_tools/test_blast_radius_config.py` is untouched over the
+      whole branch, and that `config-carriage.test-helpers.ts` is untouched by **this cycle**
+      specifically (only the consuming test file changes for CR-4, not the fixture helper — the
+      helper's `SOURCE_BLAST_RADIUS` and its doc comment were legitimately rewritten earlier in the
+      branch, under the original plan's P4-T3/P4-T4, so the whole-branch range is the wrong range
+      for this claim). Run two commands from the worktree root: (a)
+      `git diff fb30a9a58b8422e610a09b07361421e97367807a...HEAD -- tests/scripts/dev_tools/test_blast_radius_config.py`,
+      which must produce no output (measured: 0 diff lines over the whole branch); (b)
+      `git diff a9b0484d...HEAD -- extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts`,
+      scoped to this cycle only, using `a9b0484d`, this plan's cycle-opening commit named in its
+      header, as the base — which must also produce no output. The whole-branch diff for the helper
+      is **not** asserted to be empty: it measures 65 lines, all pre-existing and legitimate, and
+      would wrongly fail this task if used as the range for claim (b).
+      Acceptance: command (a) produces no output; command (b) produces no output.
 - [ ] [P6-T17] Write the final single-pass confirmation artifact at
       `evidence/qa-gates/remediation-toolchain-single-pass.<timestamp>.md` recording that P6-T1
       through P6-T12 executed in one uninterrupted sequence across all three languages with no
