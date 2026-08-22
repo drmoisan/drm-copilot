@@ -6,3 +6,5 @@ Output Summary: $result.PassedCount = 0, $result.FailedCount = 1. Failure messag
 empty, but got @('poetry.lock', 'package-lock.json', 'quality-tiers.yml')." This demonstrates the
 new Pester case is falsifiable: with the bundled copy reverted to the merge-base state, the
 directional invariant fails and names the three missing self-hosted separator-free entries.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

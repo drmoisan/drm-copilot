@@ -9,3 +9,5 @@ shared_surfaces; every portable separator-free self-hosted surface must reach th
 This demonstrates the new Python case is falsifiable: with the bundled copy reverted to the
 merge-base state, the directional invariant fails and names the three missing self-hosted
 separator-free entries.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

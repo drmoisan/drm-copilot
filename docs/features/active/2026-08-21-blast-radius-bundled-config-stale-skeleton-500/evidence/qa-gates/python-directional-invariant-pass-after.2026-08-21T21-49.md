@@ -4,3 +4,5 @@ EXIT_CODE: 0
 Output Summary: git status --short for the restored path produced no output, confirming a clean
 restore. The rerun collected 1 item and reported "1 passed", confirming the new Python case passes
 again once the bundled copy is restored.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

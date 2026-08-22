@@ -5,3 +5,5 @@ Output Summary: artifacts/pester/pester-junit.xml: tests=3119, errors=0, failure
 i.e. 3110 passed, 0 failed, 9 skipped. Line coverage from JaCoCo root LINE counter in
 artifacts/pester/powershell-coverage.xml: missed=228, covered=5792 -> 5792/(5792+228) = 96.21%,
 above the 85% threshold.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

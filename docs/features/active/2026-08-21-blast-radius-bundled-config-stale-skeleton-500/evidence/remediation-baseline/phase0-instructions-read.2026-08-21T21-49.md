@@ -16,3 +16,5 @@ Policy Order:
 
 All ten files were read in full, in the order listed above, before any code or test changes for
 this remediation cycle.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

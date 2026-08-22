@@ -24,3 +24,5 @@ languages is 100% of changed production lines, of which there are zero.
   touched).
 
 All figures show a delta of 0.00 or better.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

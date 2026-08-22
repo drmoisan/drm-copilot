@@ -106,6 +106,32 @@ describe("issue #462 AC6: the Claude push-down publishes the config tree", () =>
     // Assert
     expect(bundledBytes.equals(rootBytes)).toBe(true);
   });
+
+  it("keeps SOURCE_BLAST_RADIUS in step with the committed bundled blast-radius resource", () => {
+    // Arrange: SOURCE_BLAST_RADIUS is an in-memory fixture claimed to mirror
+    // the committed bundled blast-radius.json key for key (issue #500, cycle
+    // 3 CR-4). Nothing previously enforced that claim, so the fixture could
+    // drift from the real on-disk resource without any test noticing.
+    const bundledPath = path.join(
+      REPO_ROOT,
+      "extensions",
+      "drm-copilot",
+      "resources",
+      "claude-customizations",
+      "config",
+      "blast-radius.json",
+    );
+
+    // Act: read the real committed file and parse both it and the fixture,
+    // so the comparison is structural rather than byte-for-byte (both are
+    // JSON text with independent formatting and key order).
+    const bundledText = fs.readFileSync(bundledPath, "utf8");
+    const committed = JSON.parse(bundledText);
+    const fixture = JSON.parse(SOURCE_BLAST_RADIUS);
+
+    // Assert
+    expect(fixture).toEqual(committed);
+  });
 });
 
 describe("issue #462 AC7: the routing write merges rather than overwrites", () => {

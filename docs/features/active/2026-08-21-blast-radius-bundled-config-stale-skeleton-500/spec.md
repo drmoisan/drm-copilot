@@ -386,6 +386,8 @@ Seeded from issue:
   the published document. Fail open: two items citing the same separator-free root surface must
   report `conflict=True`. The natural home for the first is the TypeScript publish path; for the
   second, `tests/scripts/dev_tools/test_blast_radius_config.py` parametrized over both copies.
+  (pre-PD-1 intent; delivered under PD-1 in the sibling
+  `tests/scripts/dev_tools/test_blast_radius_config_parity.py`)
 - Unit tests (pytest) for the fixed behavior and boundaries: the three-class key-partition gate of
   research `## 4.2` and `## 4.5`, extending the existing two-copy `COMMITTED_CONFIGS` pattern at
   `tests/scripts/dev_tools/test_blast_radius_config.py:474-499`. Class 1 (`version`,
@@ -409,7 +411,7 @@ Seeded from issue:
   is excluded from measurement and no `exclude` entry is added.
 - Toolchain commands to run (format -> lint -> type-check -> test):
   - Python: `poetry run black .`; `poetry run ruff check .`; `poetry run pyright`;
-    `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py --cov=scripts.dev_tools --cov-branch --cov-report=term-missing`
+    `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py --cov=scripts.dev_tools --cov-branch --cov-report=term-missing`
   - TypeScript, from `extensions/drm-copilot`: `npm run format`; `npm run lint`;
     `npm run typecheck`; `npm run test:unit`
   - PowerShell: `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`,

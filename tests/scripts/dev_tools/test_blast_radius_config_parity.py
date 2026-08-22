@@ -42,6 +42,8 @@ from scripts.dev_tools.compute_blast_radius import conflicts, derive_blast_radiu
 from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     BUNDLED_CONFIG,
     BYTE_EQUAL_KEYS,
+    CLASS_THREE_KEYS,
+    CLASS_TWO_KEYS,
     DECLARED_TOP_LEVEL_KEYS,
     PAYLOAD_MODULE_NAMES,
     PORTABLE_SHARED_SURFACES,
@@ -244,6 +246,8 @@ def test_class_two_bundled_shared_surfaces_are_the_portable_set() -> None:
     constant fails on drift in either direction: a silently dropped entry and a
     silently added drm-copilot-specific entry both break it.
     """
+    assert "shared_surfaces" in CLASS_TWO_KEYS
+
     # Arrange / Act
     bundled = frozenset(shared_surfaces(BUNDLED_CONFIG))
     self_hosted = frozenset(shared_surfaces(SELF_HOSTED_CONFIG))
@@ -271,6 +275,8 @@ def test_class_two_bundled_shared_surface_globs_are_empty() -> None:
     none of them describes any destination. An empty list is correct rather than
     merely tolerable, because a glob is never a source of root-token acceptance.
     """
+    assert "shared_surface_globs" in CLASS_TWO_KEYS
+
     # Arrange / Act
     bundled = shared_surface_globs(BUNDLED_CONFIG)
     self_hosted = frozenset(shared_surface_globs(SELF_HOSTED_CONFIG))
@@ -333,6 +339,8 @@ def test_class_three_bundled_modules_are_payload_modules_only() -> None:
     creates. A subset relation rather than equality is asserted because
     shrinking the payload set must not require editing this test in lockstep.
     """
+    assert "modules" in CLASS_THREE_KEYS
+
     # Arrange / Act
     bundled = frozenset(module_names(BUNDLED_CONFIG))
 

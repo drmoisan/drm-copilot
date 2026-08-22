@@ -103,12 +103,21 @@ PAYLOAD_MODULE_NAMES = frozenset({"config"})
 # committed copies must carry identical values.
 BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
 
+# Class 2 key names: the portable shared-surface keys, consumed by
+# test_class_two_bundled_shared_surfaces_are_the_portable_set and
+# test_class_two_bundled_shared_surface_globs_are_empty.
+CLASS_TWO_KEYS = ("shared_surfaces", "shared_surface_globs")
+
+# Class 3 key name: the payload module-map key, consumed by
+# test_class_three_bundled_modules_are_payload_modules_only.
+CLASS_THREE_KEYS = ("modules",)
+
 # The exhaustive set of top-level keys the truth-table schema declares,
 # derived from the three declared classes rather than hardcoded: the
 # byte-equal keys plus the Class 2 and Class 3 key names. A key present in
 # either committed copy but absent from this set is unclassified.
-DECLARED_TOP_LEVEL_KEYS = frozenset(BYTE_EQUAL_KEYS) | frozenset(
-    {"shared_surfaces", "shared_surface_globs", "modules"}
+DECLARED_TOP_LEVEL_KEYS = (
+    frozenset(BYTE_EQUAL_KEYS) | frozenset(CLASS_TWO_KEYS) | frozenset(CLASS_THREE_KEYS)
 )
 
 

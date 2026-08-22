@@ -6,3 +6,5 @@ new test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle case
 14939 Stmts, 1105 Miss -> statement coverage (14939-1105)/14939 = 92.60%, unchanged from baseline.
 Branch coverage from totals.percent_branches_covered = 85.19%, unchanged from baseline. No
 regression; scripts.dev_tools carries no production changes this cycle.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

@@ -6,3 +6,5 @@ disabled(skipped)=9, i.e. 3111 passed, 0 failed, 9 skipped (one more test than t
 3119, from the new Cross-copy key partition It block). Line coverage from JaCoCo root LINE counter
 in artifacts/pester/powershell-coverage.xml: missed=228, covered=5792 -> 96.21%, unchanged from the
 P0-T18 baseline figure. No regression.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

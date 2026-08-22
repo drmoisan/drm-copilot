@@ -3,3 +3,5 @@ Command: filtered Invoke-Pester run against tests/scripts/claude-lib/blast-radiu
 EXIT_CODE: 0
 Output Summary: $result.PassedCount = 1, $result.FailedCount = 0. Confirms the new Pester case
 passes again once the bundled copy is restored to its committed state.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.

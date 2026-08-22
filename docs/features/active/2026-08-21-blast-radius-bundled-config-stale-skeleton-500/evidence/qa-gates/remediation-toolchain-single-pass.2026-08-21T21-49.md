@@ -13,3 +13,5 @@ by any stage:
 
 All seven exit codes are 0. No stage failed, no stage rewrote a file, and no restart from
 formatting was required.
+
+Note: see `evidence/other/timestamp-clock-convention.2026-08-22T03-37.md` for why this artifact's local-time stamp sorts before the UTC-stamped Phase 0 baselines it postdates.
