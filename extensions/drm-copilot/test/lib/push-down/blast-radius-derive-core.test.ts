@@ -7,6 +7,7 @@ import {
   deriveDestinationModuleMap,
   type DirectoryObservation,
   EXCLUDED_DIR_NAMES,
+  FORBIDDEN_GLOBS,
   isExcludedDirectoryName,
   isManifestFileName,
   MANIFEST_FILENAMES,
@@ -42,7 +43,6 @@ const SOURCE_DOCUMENT = `${JSON.stringify(
     ],
     shared_surface_globs: [],
     modules: {
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     },
     over_breadth_fraction: 0.25,
@@ -134,7 +134,7 @@ describe("issue #472: root-manifest exclusion", () => {
     const modules = deriveModules(observations);
 
     // Assert: the floor applies, and no glob is the universal one.
-    expect(Object.keys(modules)).toEqual(["claude-runtime", "config"]);
+    expect(Object.keys(modules)).toEqual(["config"]);
     expect(JSON.stringify(modules)).not.toContain('"**"');
   });
 
@@ -149,11 +149,7 @@ describe("issue #472: root-manifest exclusion", () => {
     const modules = deriveModules(observations);
 
     // Assert: only the nested directory becomes a module.
-    expect(Object.keys(modules)).toEqual([
-      "claude-runtime",
-      "config",
-      "service",
-    ]);
+    expect(Object.keys(modules)).toEqual(["config", "service"]);
   });
 });
 
@@ -237,7 +233,6 @@ describe("issue #472: the no-signal floor", () => {
 
     // Assert
     expect(modules).toEqual({
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     });
   });
@@ -249,7 +244,6 @@ describe("issue #472: the no-signal floor", () => {
 
     // Assert
     expect(modules).toEqual({
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     });
   });
@@ -331,13 +325,7 @@ describe("issue #472: payload precedence, ordering, and determinism", () => {
     const names = Object.keys(deriveModules(observations));
 
     // Assert
-    expect(names).toEqual([
-      "Alpha",
-      "alpha",
-      "beta",
-      "claude-runtime",
-      "config",
-    ]);
+    expect(names).toEqual(["Alpha", "alpha", "beta", "config"]);
   });
 
   it("returns byte-identical output for identical inputs", () => {
@@ -471,8 +459,24 @@ describe("issue #472: exported scan constants", () => {
     // Arrange / Act / Assert: both are contract values consumed by the scanner.
     expect(SCAN_DEPTH_LIMIT).toBe(3);
     expect(PAYLOAD_MODULES).toEqual({
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     });
+  });
+
+  it("declares no umbrella or forbidden glob in the payload module set", () => {
+    // Arrange: read the key set and the flattened glob set once, so the two
+    // assertions below report the offending value rather than a bare boolean.
+    const names = Object.keys(PAYLOAD_MODULES);
+    const globs = Object.values(PAYLOAD_MODULES).flat();
+
+    // Assert: `claude-runtime` is the live source of the false contention fixed
+    // in issue #500. This is a negative assertion distinct from the positive
+    // pin above: the pin would still pass if a maintainer edited both the
+    // constant and the pin together, whereas this case states the property that
+    // must hold for any future payload module set.
+    expect(names).not.toContain("claude-runtime");
+    for (const forbidden of FORBIDDEN_GLOBS) {
+      expect(globs).not.toContain(forbidden);
+    }
   });
 });

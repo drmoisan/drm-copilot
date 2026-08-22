@@ -418,90 +418,90 @@ Seeded from issue:
 
 ## Acceptance Criteria
 
-- [ ] `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` declares
+- [x] `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` declares
       `PAYLOAD_MODULES` as `{ config: ["config/**"] }` with no `claude-runtime` key, and its doc
       comment at lines 123-130 states why the `.claude` tree is not a module. Verified by
       `poetry run pytest`-independent inspection plus the TypeScript suite below.
-- [ ] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts` no longer
+- [x] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts` no longer
       positively pins `claude-runtime`: the expectations at lines 137, 153, 240, 252, 338, and 474
       are updated, and the file asserts that the `PAYLOAD_MODULES` key set excludes
       `claude-runtime` and that its glob set contains no member of `FORBIDDEN_GLOBS`. Verified by
       `npm run test:unit` in `extensions/drm-copilot`.
-- [ ] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` seeded expectations at
+- [x] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` seeded expectations at
       lines 44, 122, 292, and 387 are updated, and
       `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` `SOURCE_BLAST_RADIUS`
       (line 84) and its comment at lines 61-72 mirror the corrected bundled file. Verified by
       `npm run test:unit`.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
+- [x] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
       exactly the 6-entry portable `shared_surfaces` set `.claude/settings.json`,
       `config/blast-radius.json`, `config/orchestration-routing.json`, `package-lock.json`,
       `poetry.lock`, `quality-tiers.yml`; `shared_surface_globs` is `[]`; `mandate_reads` carries
       the four added entries; and `modules` is exactly `{ "config": ["config/**"] }`. Verified by
       the Class 2 and Class 3 assertions of the new gate in
       `tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [ ] `extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts` AC8
+- [x] `extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts` AC8
       forbidden-substring list at lines 284-293 no longer forbids `poetry.lock` or
       `package-lock.json`, and its rationale comment states that the exclusion targets entries
       naming this repository's directory layout rather than ecosystem-standard root lockfile names
       (DD-1). Verified by `npm run test:unit`.
-- [ ] `config/blast-radius.json` `mandate_reads` carries the four added entries
+- [x] `config/blast-radius.json` `mandate_reads` carries the four added entries
       `.claude/skills/acceptance-criteria-tracking/SKILL.md`,
       `.claude/skills/policy-compliance-order/SKILL.md`, `.claude/agent-memory/**`, and
       `.agents/skills/**`, and its `shared_surfaces`, `shared_surface_globs`, and `modules` are
       otherwise unchanged. Verified by the Class 1 byte-equality assertion of the new gate.
-- [ ] `.claude/rules/parallel-orchestration.md` records, under the Blast-Radius Contention
+- [x] `.claude/rules/parallel-orchestration.md` records, under the Blast-Radius Contention
       Doctrine, (a) that the destination module map is derived and the bundled `modules` key is not
       consumed, (b) that `PAYLOAD_MODULES` carries `config` only and `claude-runtime` is
       disqualified in a destination by the same granularity criterion that removed it here, and
       (c) that the bundled `shared_surfaces` and `shared_surface_globs` sets are the
       destination-portable subset, with the surfaces/modules asymmetry as the stated reason.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       is byte-identical to `.claude/rules/parallel-orchestration.md` after that amendment, in the
       same commit. Verified by
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`,
       whose `test_bundled_claude_payload_contains_all_repo_runtime_contracts` (lines 101-126) fails
       otherwise.
-- [ ] `tests/scripts/dev_tools/test_blast_radius_config.py` carries the three-class key-partition
+- [x] `tests/scripts/dev_tools/test_blast_radius_config.py` carries the three-class key-partition
       gate, extending the existing two-copy `COMMITTED_CONFIGS` pattern at lines 474-499: Class 1
       byte-equality of `version`, `over_breadth_fraction`, and `mandate_reads` across the two
       copies; Class 2 bundled `shared_surfaces` equal to a declared `PORTABLE_SHARED_SURFACES`
       constant and a subset of the self-hosted list, with bundled `shared_surface_globs` empty;
       Class 3 bundled `modules` key set a subset of the `PAYLOAD_MODULES` name set. Verified by
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config.py`.
-- [ ] The same file asserts that neither copy declares any of the five disqualified umbrella module
+- [x] The same file asserts that neither copy declares any of the five disqualified umbrella module
       names `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
       `agents-surface`, extending the existing two-name location-bucket pin; that every
       separator-free bundled `shared_surfaces` entry is wildcard-free; and a non-vacuity floor
       under which `COMMITTED_CONFIGS` has exactly two members and each collection intended to be
       non-empty is non-empty. Verified by the same pytest invocation.
-- [ ] `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 1
+- [x] `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 1
       equality, the Class 3 subset, the five-name umbrella denylist applied to both copies, and the
       separator-free-wildcard-free assertion, and stays under the 500-line limit. Verified by
       `mcp__drm-copilot__run_poshqc_test`.
-- [ ] The comment at `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1:96-98`
+- [x] The comment at `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1:96-98`
       no longer states that the bundled module map describes the destination repository's
       subsystems, and instead records that the bundled `modules` key is never read and that
       `PAYLOAD_MODULES` is the live source of a destination's payload modules. Verified by reading
       the file and by `mcp__drm-copilot__run_poshqc_test`.
-- [ ] A regression test fails before the fix and passes after it for the fail-closed direction: two
+- [x] A regression test fails before the fix and passes after it for the fail-closed direction: two
       radii derived from plan text citing unrelated `.claude/**` files (a hook and a skill document)
       against the published document report `conflict=False`. The failing-before run is captured
       under `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/regression-testing/`
       and the passing-after run under `.../evidence/qa-gates/`.
-- [ ] A regression test fails before the fix and passes after it for the fail-open direction: two
+- [x] A regression test fails before the fix and passes after it for the fail-open direction: two
       items citing the same separator-free root surface (for example `package-lock.json`) against
       the bundled document report `conflict=True`, with `Get-ConfigRootSurface` returning a
       non-empty set. Evidence captured in the same two locations.
-- [ ] Coverage obligations met and recorded: line coverage >= 85% and branch coverage >= 75% for
+- [x] Coverage obligations met and recorded: line coverage >= 85% and branch coverage >= 75% for
       Python (`poetry run pytest ... --cov=scripts.dev_tools --cov-branch`) and for TypeScript
       (`npm run test:coverage` in `extensions/drm-copilot`); line coverage >= 85% for
       PowerShell, which is exempt from the
       branch threshold only because Pester measures no branch coverage. No coverage regression on
       changed lines, and no `exclude` entry added. Per `.claude/rules/general-unit-test.md` and
       `.claude/rules/quality-tiers.md`.
-- [ ] Full toolchain pass in a single run for all three languages: Black, Ruff, Pyright, Pytest;
+- [x] Full toolchain pass in a single run for all three languages: Black, Ruff, Pyright, Pytest;
       Prettier, ESLint, tsc, Jest in `extensions/drm-copilot`; PoshQC format, analyze, and test.
-- [ ] `git log --follow` output for both copies of `config/blast-radius.json` is captured as
+- [x] `git log --follow` output for both copies of `config/blast-radius.json` is captured as
       evidence, confirming the parity-gate scope-gap divergence mechanism, and a byte compare
       (`Get-FileHash`) of `config/orchestration-routing.json` against
       `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`

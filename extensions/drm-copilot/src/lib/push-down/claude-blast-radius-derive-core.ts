@@ -123,14 +123,30 @@ export const SCAN_DEPTH_LIMIT = 3;
 /**
  * Modules the push-down itself creates in the destination.
  *
- * The push-down publishes a `.claude` tree and a `config` tree, so those two
- * modules are always correct for a destination that received the push
- * regardless of what the scan observed. They win on a name collision with a
- * derived module because they describe the payload, not a guess.
+ * The push-down publishes a `.claude` tree and a `config` tree, but only
+ * `config` is a module. A payload module wins on a name collision with a
+ * derived module because it describes the payload rather than a guess.
+ *
+ * @remarks
+ * The `.claude` tree is deliberately NOT a module. Every agent in the runtime
+ * is instructed to read the policy rules and process skills before doing any
+ * work, so a `.claude/**` umbrella matches nearly every radius. A level that
+ * always fires carries no contention information and only suppresses
+ * concurrency, which is exactly the module-map granularity criterion recorded
+ * in `.claude/rules/parallel-orchestration.md`.
+ *
+ * Removing it never weakens the relation below the path level: two items
+ * editing the same hook still contend on `path_overlap`, and two items editing
+ * a declared shared surface still contend on `shared_surface_overlap`.
+ *
+ * `config` is retained because `config/**` in a destination holds only the two
+ * published files, so it names a subsystem an item can plausibly not touch.
+ * Retaining it also keeps the assembled map non-empty, which gives
+ * {@link assertNoForbiddenGlob} a non-vacuous input rather than a guard that
+ * passes because it was handed nothing to check.
  */
 export const PAYLOAD_MODULES: Readonly<Record<string, ReadonlyArray<string>>> =
   {
-    "claude-runtime": [".claude/**"],
     config: ["config/**"],
   };
 
