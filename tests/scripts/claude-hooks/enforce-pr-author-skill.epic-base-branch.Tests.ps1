@@ -95,7 +95,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $json = '{"tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_BASE_BRANCH_MISMATCH'
@@ -105,7 +105,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $json = '{"command":"gh pr create --title \"foo\" --base epic/foo-integration --body-file artifacts/pr_body_1.md"}'
+            $json = '{"tool_input":{"command":"gh pr create --title \"foo\" --base epic/foo-integration --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }

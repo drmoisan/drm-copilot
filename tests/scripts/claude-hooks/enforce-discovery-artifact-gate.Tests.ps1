@@ -13,7 +13,10 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
                 [string] $FilePath,
                 [string] $Content = '{}'
             )
-            return (@{ file_path = $FilePath; content = $Content } | ConvertTo-Json -Compress -Depth 8)
+            return (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = $FilePath; content = $Content }
+                } | ConvertTo-Json -Compress -Depth 8)
         }
 
         # A required-artifact reader stub that reports the domain-profile
@@ -76,28 +79,41 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
         }
     }
 
-    Context 'malformed CLAUDE_TOOL_INPUT' {
-        It 'throws so the entrypoint surfaces Write-Error and a non-zero exit code' {
-            { Invoke-DiscoveryArtifactGateDecision -ToolInputRaw '{not-json' } | Should -Throw
-        }
-    }
+    Context 'envelope anomalies fail closed' {
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw '{not-json'
 
-    Context 'empty or absent CLAUDE_TOOL_INPUT' {
-        It 'produces a default-allow decision without invoking the validator for an empty string' {
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
+        }
+
+        It 'denies an empty payload without invoking the validator' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
             $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw ''
 
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED'
             Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
         }
 
-        It 'produces a default-allow decision without invoking the validator for $null' {
+        It 'denies an absent payload without invoking the validator' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
             $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $null
 
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+
+            $flat = '{"file_path":"discovery/coverage-ledger/coverage-ledger.json","content":"{}"}'
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $flat
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
             Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
         }
     }
@@ -117,7 +133,7 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
         It 'allows unconditionally without invoking the validator' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = '{"file_path":"discovery/coverage-ledger/coverage-ledger.json","old_string":"a","new_string":"b"}'
+            $json = '{"tool_name":"Edit","tool_input":{"file_path":"discovery/coverage-ledger/coverage-ledger.json","old_string":"a","new_string":"b"}}'
             $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -136,7 +152,7 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
         It 'allows without invoking the validator when content is present but file_path is absent' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = '{"content":"{}"}'
+            $json = '{"tool_name":"Write","tool_input":{"content":"{}"}}'
             $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $json -RequiredArtifactReader $script:PresentReader
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -155,36 +171,19 @@ Describe 'enforce-discovery-artifact-gate.ps1' {
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
+    Context 'script entrypoint transport' {
+        It 'reads the payload through the shared reader' {
+            $hookText = Get-Content -LiteralPath $script:UnderTest -Raw
+
+            $hookText | Should -BeLike '*HookPayload.psm1*'
+            $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:UnderTest
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
-        }
+        It 'denies an unparseable envelope rather than exiting 1' {
+            $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw '{not-json'
 
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+            $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
     }
 

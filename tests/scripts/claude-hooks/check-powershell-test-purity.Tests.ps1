@@ -21,20 +21,17 @@ Describe 'check-powershell-test-purity.ps1' {
                 [string] $NewString
             )
 
-            $payload = [ordered]@{ file_path = $FilePath }
+            $toolInput = [ordered]@{ file_path = $FilePath }
             if ($PSBoundParameters.ContainsKey('Content')) {
-                $payload.content = $Content
+                $toolInput.content = $Content
             }
             if ($PSBoundParameters.ContainsKey('NewString')) {
-                $payload.new_string = $NewString
+                $toolInput.new_string = $NewString
             }
 
-            return ($payload | ConvertTo-Json -Compress)
+            $envelope = [ordered]@{ tool_name = 'Write'; tool_input = $toolInput }
+            return ($envelope | ConvertTo-Json -Compress -Depth 5)
         }
-    }
-
-    AfterEach {
-        $env:CLAUDE_TOOL_INPUT = $null
     }
 
     It 'returns no decision for safe Pester test content' {
@@ -61,12 +58,31 @@ Describe 'check-powershell-test-purity.ps1' {
         $markdownResult | Should -BeNullOrEmpty
     }
 
-    It 'returns no decision for absent or malformed tool input' {
-        $absent = Invoke-PowerShellTestPurityDecision -ToolInputRaw ''
-        $malformed = Invoke-PowerShellTestPurityDecision -ToolInputRaw '{not-json'
+    It 'denies an empty payload as an envelope anomaly (fail closed)' {
+        $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw ''
 
-        $absent | Should -BeNullOrEmpty
-        $malformed | Should -BeNullOrEmpty
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*empty payload*'
+    }
+
+    It 'denies unparseable JSON as an envelope anomaly (fail closed)' {
+        $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw '{not-json'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*not parseable JSON*'
+    }
+
+    It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+        $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw '{"file_path":"tests/scripts/example.Tests.ps1"}'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*no tool_input key*'
+    }
+
+    It 'returns no decision for a well-formed tool_input carrying no file_path' {
+        $result = Invoke-PowerShellTestPurityDecision -ToolInputRaw '{"tool_name":"Bash","tool_input":{"command":"echo hi"}}'
+
+        $result | Should -BeNullOrEmpty
     }
 
     It 'denies forbidden Pester runtime and mock patterns with the PreToolUse deny shape' {
@@ -109,20 +125,28 @@ Describe 'check-powershell-test-purity.ps1' {
         $parsed.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*PowerShell unit test purity violations*'
     }
 
-    It 'emits the compact deny JSON from the entrypoint on a forbidden pattern' {
-        $env:CLAUDE_TOOL_INPUT = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'Start-Sleep -Seconds 1'
+    It 'denies a nested envelope carrying a forbidden pattern (AC-7)' {
+        $forbidden = 'Start-' + 'Sleep -Seconds 1'
+        $inputJson = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content $forbidden
 
-        $output = & $script:ScriptPath | ConvertFrom-Json
+        $output = Invoke-PowerShellTestPurityDecision -ToolInputRaw $inputJson
 
         $output.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         $output.hookSpecificOutput.permissionDecision | Should -Be 'deny'
     }
 
-    It 'emits nothing from the entrypoint for safe content' {
-        $env:CLAUDE_TOOL_INPUT = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'It "passes" { 1 | Should -Be 1 }'
+    It 'returns no decision for a nested envelope carrying safe content' {
+        $inputJson = Get-PowerShellPurityInput -FilePath 'tests/scripts/example.Tests.ps1' -Content 'It "passes" { 1 | Should -Be 1 }'
 
-        $output = & $script:ScriptPath
+        $output = Invoke-PowerShellTestPurityDecision -ToolInputRaw $inputJson
 
         $output | Should -BeNullOrEmpty
+    }
+
+    It 'reads the payload through the shared reader' {
+        $hookText = Get-Content -Path $script:ScriptPath -Raw
+
+        $hookText | Should -BeLike '*HookPayload.psm1*'
+        $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
     }
 }

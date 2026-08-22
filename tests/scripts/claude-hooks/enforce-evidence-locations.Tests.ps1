@@ -1,52 +1,84 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 <#
 .SYNOPSIS
     Pester tests for the enforce-evidence-locations.ps1 PreToolUse hook.
+
+.DESCRIPTION
+    Drives the decision function with the documented nested PreToolUse envelope
+    (issue #501). Envelope anomalies fail closed as a deny; a well-formed tool_input
+    carrying no file_path still allows, because that is the hook's scope filter.
+
+    Exit codes are asserted through the entry-point function's [int] return value,
+    which is the last element of its output pipeline; no test spawns a child process
+    or mutates the process environment.
 #>
 
 BeforeAll {
     # Dot-source the hook to load its functions without executing the entrypoint block.
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/enforce-evidence-locations.ps1'
     . $hookPath
+
+    function ConvertTo-EvidenceLocationEnvelope {
+        param(
+            [Parameter(Mandatory)]
+            [string] $FilePath,
+
+            [string] $ToolName = 'Write'
+        )
+
+        return (@{
+                tool_name  = $ToolName
+                tool_input = @{ file_path = $FilePath; content = 'body' }
+            } | ConvertTo-Json -Compress -Depth 5)
+    }
 }
 
 Describe 'enforce-evidence-locations.ps1' {
     Context 'forbidden evidence locations' {
         It 'denies writes to artifacts/baselines/ (forbidden prefix)' {
-            # Arrange
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"artifacts/baselines/foo.md"}'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'artifacts/baselines/foo.md'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert — forbidden path must produce a PreToolUse deny decision with the required reason token
             $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
             $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
+        }
+
+        It 'denies every forbidden prefix under the nested envelope' {
+            $forbidden = @(
+                'artifacts/baseline/x.md',
+                'artifacts/qa/x.md',
+                'artifacts/qa-gates/x.md',
+                'artifacts/coverage/x.md',
+                'artifacts/evidence/x.md',
+                'artifacts/regression-testing/x.md',
+                'artifacts/post-change/x.md'
+            )
+
+            foreach ($path in $forbidden) {
+                $result = Invoke-EvidenceLocationDecision -ToolInputRaw (ConvertTo-EvidenceLocationEnvelope -FilePath $path)
+                $result.hookSpecificOutput.permissionDecision | Should -Be 'deny' -Because "$path is a forbidden evidence prefix"
+            }
         }
     }
 
     Context 'allowed artifacts/ sub-paths' {
         It 'allows writes to artifacts/orchestration/ (permitted orchestration path)' {
-            # Arrange
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"artifacts/orchestration/orchestrator-state.json"}'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'artifacts/orchestration/orchestrator-state.json'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'denies writes to artifacts/research/ (retired research path)' {
-            # Arrange — research is no longer a permitted artifacts/ sub-path;
-            # it must now resolve to a tracked docs/ root and is denied here.
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"artifacts/research/notes.md"}'
+            # Research is no longer a permitted artifacts/ sub-path; it must now resolve
+            # to a tracked docs/ root and is denied here.
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'artifacts/research/notes.md'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
             $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
         }
@@ -54,118 +86,134 @@ Describe 'enforce-evidence-locations.ps1' {
 
     Context 'canonical evidence paths' {
         It 'allows writes to <FEATURE>/evidence/baseline/ (canonical evidence path)' {
-            # Arrange: a full canonical evidence path inside a feature folder
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"docs/features/active/my-feature/evidence/baseline/baseline.md"}'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/features/active/my-feature/evidence/baseline/baseline.md'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows writes to docs/features/ research subfolder (new canonical feature research path)' {
-            # Arrange: feature-associated research now resolves to a tracked docs/ root
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"docs/features/active/my-feature/research/2026-06-24T13-02-foo-research.md"}'
+        It 'allows writes to the docs/features research subfolder (canonical feature research path)' {
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/features/active/my-feature/research/2026-06-24T13-02-foo-research.md'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows writes to docs/research/ (new canonical one-off research path)' {
-            # Arrange: one-off research now resolves to the tracked docs/research/ root
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"docs/research/2026-06-24T13-02-foo-research.md"}'
+        It 'allows writes to docs/research/ (canonical one-off research path)' {
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/research/2026-06-24T13-02-foo-research.md'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'source code paths' {
         It 'allows writes to source code files (non-artifacts path)' {
-            # Arrange
-            $env:CLAUDE_TOOL_INPUT = '{"file_path":"src/hello-typescript.ts"}'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'src/hello-typescript.ts'
 
-            # Act
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
-            # Assert
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows an Edit-shaped tool_input carrying new_string rather than content' {
+            $nested = '{"tool_name":"Edit","tool_input":{"file_path":"src/hello.ts","old_string":"a","new_string":"b"}}'
+
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
+
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
-    Context 'input edge cases' {
-        It 'allows when the tool input is empty (no file_path to evaluate)' {
-            # Arrange — empty raw input represents a non-file tool call
+    Context 'envelope anomalies fail closed' {
+        It 'denies an empty payload' {
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw ''
 
-            # Assert
-            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'EVIDENCE_LOCATION_BLOCKED'
         }
 
-        It 'allows when the JSON has no file_path field' {
-            # Arrange — valid JSON object that carries no file_path
-            $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{"other":"value"}'
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{ not valid json'
 
-            # Assert
-            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
 
-        It 'throws on malformed JSON input' {
-            # Arrange — unparseable payload triggers the hard-failure path
-            { Invoke-EvidenceLocationDecision -ToolInputRaw '{ not valid json' } |
-                Should -Throw '*malformed JSON*'
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{"file_path":"artifacts/qa/x.md"}'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
+        }
+
+        It 'denies a null tool_input' {
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{"tool_name":"Write","tool_input":null}'
+
+            $result.hookSpecificOutput.permissionDecisionReason | Should -Match 'tool_input is null'
+        }
+    }
+
+    Context 'property-level tolerance inside a well-formed tool_input' {
+        It 'allows when the tool_input has no file_path field (scope filter)' {
+            $result = Invoke-EvidenceLocationDecision -ToolInputRaw '{"tool_name":"Bash","tool_input":{"command":"echo hi"}}'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'entry-point dispatch' {
         It 'returns exit code 0 and emits allow JSON for an allowed path' {
-            # Arrange — a representative allowed file_path
-            $allowedJson = '{"file_path":"src/hello-typescript.ts"}'
+            $allowed = ConvertTo-EvidenceLocationEnvelope -FilePath 'src/hello-typescript.ts'
 
-            # Act — the function emits the JSON on the output stream and returns the
-            # int exit code as the final pipeline element; collect both.
-            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $allowedJson)
+            # The function emits the JSON on the output stream and returns the int exit
+            # code as the final pipeline element; collect both.
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $allowed)
             $code = $emitted[-1]
             $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
 
-            # Assert — exit code is 0 and emitted JSON is the compact PreToolUse allow decision
             $code | Should -Be 0
             $parsed = $stdout | ConvertFrom-Json
             $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
             $parsed.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'returns exit code 1 and writes a malformed-JSON error for unparseable input' {
-            # Arrange — unparseable payload triggers the hard-failure path
-            $errorRecords = $null
-
-            # Act — capture the error stream while collecting the function output
-            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw '{ not valid json' -ErrorAction SilentlyContinue -ErrorVariable errorRecords)
-            $code = $emitted[-1]
-
-            # Assert — exit code is 1 and an error record matching the malformed-JSON message was written
-            $code | Should -Be 1
-            $errorRecords | Should -Not -BeNullOrEmpty
-            ($errorRecords | Out-String) | Should -Match 'malformed JSON'
-        }
-
-        It 'returns exit code 0 and emits deny JSON for a forbidden path' {
-            # Arrange — a retired/forbidden artifacts/research path
-            $forbiddenJson = '{"file_path":"artifacts/research/notes.md"}'
-
-            # Act — collect the function output and the returned exit code
-            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $forbiddenJson)
+        It 'returns exit code 0 and never 1 for unparseable input' {
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw '{ not valid json')
             $code = $emitted[-1]
             $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
 
-            # Assert — exit code is 0 and emitted JSON is the compact PreToolUse deny decision
+            $code | Should -Be 0
+            $code | Should -Not -Be 1
+            ($stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
+            }
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ReadPayload $emptyReader)
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
+            $code | Should -Be 0
+            ($stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'returns exit code 0 and emits deny JSON for a forbidden path' {
+            $forbidden = ConvertTo-EvidenceLocationEnvelope -FilePath 'artifacts/research/notes.md'
+
+            $emitted = @(Invoke-EvidenceLocationEntryPoint -ToolInputRaw $forbidden)
+            $code = $emitted[-1]
+            $stdout = ($emitted[0..($emitted.Count - 2)] -join '')
+
             $code | Should -Be 0
             $parsed = $stdout | ConvertFrom-Json
             $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'

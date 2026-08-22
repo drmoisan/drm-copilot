@@ -27,26 +27,26 @@ Describe 'enforce-parallel-abandon-gate.ps1' {
 
     Context 'deny an unconfirmed abandon command' {
         It 'denies PARALLEL_ABANDON_BLOCKED when the confirmation marker is absent' {
-            $json = @{ command = $script:AbandonCommand } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = $script:AbandonCommand } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
         }
 
         It 'reports the PreToolUse hook event name on the deny decision' {
-            $json = @{ command = $script:AbandonCommand } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = $script:AbandonCommand } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         }
 
         It 'denies a detach-shaped command that still names the abandon disposition' {
-            $json = @{ command = 'gh pr close 7 --disposition abandon' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'gh pr close 7 --disposition abandon' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'denies when extra whitespace separates the disposition token parts' {
-            $json = @{ command = 'run  --disposition   abandon  now' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'run  --disposition   abandon  now' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
@@ -54,79 +54,96 @@ Describe 'enforce-parallel-abandon-gate.ps1' {
 
     Context 'allow a confirmed abandon command' {
         It 'allows when both tokens are present in the same command' {
-            $json = @{ command = $script:ConfirmedCommand } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = $script:ConfirmedCommand } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when the confirmation marker precedes the disposition token' {
-            $json = @{ command = 'run --confirm-abandon --disposition abandon' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'run --confirm-abandon --disposition abandon' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'omits a deny reason from the allow decision' {
-            $json = @{ command = $script:ConfirmedCommand } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = $script:ConfirmedCommand } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.Keys | Should -Not -Contain 'permissionDecisionReason'
         }
     }
 
     Context 'commands outside scope' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw ''
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
         }
 
         It 'allows when the JSON payload has no command field' {
-            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw '{"other":"value"}'
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw '{"tool_input":{"other":"value"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows a command carrying no abandon disposition token' {
-            $json = @{ command = 'git worktree list --porcelain' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'git worktree list --porcelain' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows the detach disposition, which is not destructive' {
-            $json = @{ command = 'run --disposition detach' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'run --disposition detach' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows a command carrying only the confirmation marker' {
-            $json = @{ command = 'run --confirm-abandon' } | ConvertTo-Json -Compress
+            $json = @{ tool_name = 'Bash'; tool_input = @{ command = 'run --confirm-abandon' } } | ConvertTo-Json -Compress -Depth 5
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
     Context 'malformed tool input' {
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-ParallelAbandonGateDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
 
-        It 'names the hook in the malformed-JSON error' {
-            { Invoke-ParallelAbandonGateDecision -ToolInputRaw '{ broken' } |
-                Should -Throw -ExpectedMessage '*enforce-parallel-abandon-gate*'
+        It 'names the reason code on the malformed-JSON deny' {
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw '{ broken'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = @{ command = ('run ' + $script:AbandonDispositionToken) } | ConvertTo-Json -Compress
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
         }
     }
 
     Context 'tool-input read seam' {
         It 'reads the payload through the mocked seam rather than the environment' {
             Mock -CommandName Get-ParallelAbandonGateToolInput -MockWith {
-                @{ command = $script:AbandonCommand } | ConvertTo-Json -Compress
+                @{ tool_name = 'Bash'; tool_input = @{ command = $script:AbandonCommand } } |
+                    ConvertTo-Json -Compress -Depth 5
             }
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw (Get-ParallelAbandonGateToolInput)
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             Should -Invoke -CommandName Get-ParallelAbandonGateToolInput -Times 1 -Exactly
         }
 
-        It 'allows when the mocked seam yields no payload' {
+        It 'denies when the mocked seam yields no payload (fail closed)' {
             Mock -CommandName Get-ParallelAbandonGateToolInput -MockWith { $null }
             $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw (Get-ParallelAbandonGateToolInput)
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
+        }
+
+        It 'reads the payload through the shared reader by default' {
+            $seamBody = (Get-Command Get-ParallelAbandonGateToolInput).ScriptBlock.ToString()
+            $seamBody | Should -BeLike '*Read-ClaudeHookRawPayload*'
         }
     }
 

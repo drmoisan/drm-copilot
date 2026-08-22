@@ -22,31 +22,22 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
     }
 
     Context 'allow (no-op) when the call is out of scope' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw ''
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        }
-
         It 'allows a non-orchestrator subagent delegation' {
-            $json = '{"subagent_type":"parallel-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"parallel-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an orchestrator delegation whose prompt lacks the Parallel mode: true marker' {
-            $json = '{"subagent_type":"orchestrator","prompt":"Canonical issue number for this item is 102. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Canonical issue number for this item is 102. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an orchestrator delegation with an empty prompt' {
-            $json = '{"subagent_type":"orchestrator","prompt":""}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":""}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        }
-
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-ParallelCohortBarrierDecision -ToolInputRaw '{not-json' } | Should -Throw
         }
     }
 
@@ -58,7 +49,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -70,7 +61,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -82,7 +73,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-a-101"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-a-101"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -94,7 +85,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -106,7 +97,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101,102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -120,7 +111,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],' +
                 '"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -134,7 +125,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -147,7 +138,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -160,7 +151,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -173,7 +164,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -186,7 +177,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -198,7 +189,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -212,7 +203,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],' +
                 '"conflict_edges":[{"a":102,"b":101,"reason":"module_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -222,7 +213,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
     Context 'deny fail-closed on an unusable checkpoint or an unresolvable target' {
         It 'denies when the parallel checkpoint file is absent' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $null }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -230,14 +221,14 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
         It 'denies when the parallel checkpoint content is malformed JSON' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { '{ broken json' }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
         }
 
         It 'denies when the prompt carries no feature-folder token' {
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. no path token here"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. no path token here"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -249,7 +240,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]}],"conflict_edges":[]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -261,7 +252,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":1,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -273,7 +264,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -288,7 +279,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 1 -Exactly
@@ -301,7 +292,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
                 '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 1 -Exactly
@@ -309,7 +300,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
         It 'does not call the read seam when the call is out of scope' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $null }
-            $json = '{"subagent_type":"atomic-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"atomic-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
             $null = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 0 -Exactly
         }
@@ -459,40 +450,6 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
             Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
             Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
             Get-ParallelCohortBarrierCheckpointContent | Should -Be '{"items":[]}'
-        }
-    }
-
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
-        }
-
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
-        }
-
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
         }
     }
 }

@@ -102,8 +102,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
         . (Join-Path $script:HookRoot 'enforce-feature-folder-order.ps1')
         # All required siblings reported missing -> deny path.
         Mock -CommandName Get-FeatureFolderFileExistence -MockWith { param([string]$Path) $false }
-        $toolInput = @{ file_path = 'docs/features/active/2026-01-01-example-1/plan.md' } | ConvertTo-Json -Compress
+        $toolInput = @{
+            tool_name  = 'Write'
+            tool_input = @{ file_path = 'docs/features/active/2026-01-01-example-1/plan.md' }
+        } | ConvertTo-Json -Compress -Depth 5
         $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $toolInput
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'FEATURE_FOLDER_ORDER_BLOCKED'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 
@@ -111,8 +115,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
         . (Join-Path $script:HookRoot 'enforce-checkpoint-monotonic.ps1')
         # Advanced step present without S3_promotion / S4_atomic_planning -> deny.
         $content = '{"completed_steps":["S5_atomic_execution"]}'
-        $toolInput = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+        $toolInput = (@{
+                tool_name  = 'Write'
+                tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+            } | ConvertTo-Json -Compress -Depth 5)
         $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $toolInput
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S4_atomic_planning'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 
@@ -120,8 +128,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
         . (Join-Path $script:HookRoot 'enforce-completion-consistency.ps1')
         # Completion asserted without required evidence -> deny.
         $content = '{"next_step":"complete"}'
-        $toolInput = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+        $toolInput = (@{
+                tool_name  = 'Write'
+                tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+            } | ConvertTo-Json -Compress -Depth 5)
         $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $toolInput
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 
@@ -129,8 +141,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
         . (Join-Path $script:HookRoot 'enforce-prd-feature-before-planner.ps1')
         # atomic-planner delegation with no resolvable feature folder -> deny.
         Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
-        $toolInput = (@{ subagent_type = 'atomic-planner'; prompt = 'plan something generic' } | ConvertTo-Json -Compress)
+        $toolInput = (@{
+                tool_name  = 'Agent'
+                tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'plan something generic' }
+            } | ConvertTo-Json -Compress -Depth 5)
         $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $toolInput
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PRD_FEATURE_BLOCKED'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 
@@ -144,8 +160,12 @@ Describe 'PreToolUse deny-schema contract (all 15 hooks)' {
         . (Join-Path $script:HookRoot 'enforce-mermaid-validation.ps1')
         # A diagram file whose content carries an invalid arrow for its declared type.
         $content = "flowchart TD`n    A --> B`n    B ->> C`n"
-        $toolInput = (@{ file_path = 'docs/diagrams/contract.mmd'; content = $content } | ConvertTo-Json -Compress)
+        $toolInput = (@{
+                tool_name  = 'Write'
+                tool_input = @{ file_path = 'docs/diagrams/contract.mmd'; content = $content }
+            } | ConvertTo-Json -Compress -Depth 5)
         $decision = Invoke-MermaidValidationDecision -ToolInputRaw $toolInput
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'MERMAID_VALIDATION_BLOCKED'
         Assert-PreToolUseDenyShape -Decision $decision
     }
 }

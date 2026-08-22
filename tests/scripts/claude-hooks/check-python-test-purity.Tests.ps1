@@ -27,27 +27,36 @@ Describe 'check-python-test-purity.ps1' {
                 [string] $NewString
             )
 
-            $payload = [ordered]@{ file_path = $FilePath }
+            $toolInput = [ordered]@{ file_path = $FilePath }
             if ($PSBoundParameters.ContainsKey('Content')) {
-                $payload.content = $Content
+                $toolInput.content = $Content
             }
             if ($PSBoundParameters.ContainsKey('NewString')) {
-                $payload.new_string = $NewString
+                $toolInput.new_string = $NewString
             }
 
-            return ($payload | ConvertTo-Json -Compress)
+            $envelope = [ordered]@{ tool_name = 'Write'; tool_input = $toolInput }
+            return ($envelope | ConvertTo-Json -Compress -Depth 5)
         }
     }
 
-    AfterEach {
-        $env:CLAUDE_TOOL_INPUT = $null
+    It 'denies an empty payload as an envelope anomaly (fail closed)' {
+        $result = Invoke-PythonTestPurityDecision -ToolInputRaw ''
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*empty payload*'
     }
 
-    It 'allows (no decision) missing tool input and missing file path' {
-        $emptyResult = Invoke-PythonTestPurityDecision -ToolInputRaw ''
-        $missingPathResult = Invoke-PythonTestPurityDecision -ToolInputRaw '{}'
+    It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+        $result = Invoke-PythonTestPurityDecision -ToolInputRaw '{"file_path":"tests/unit/test_x.py"}'
 
-        $emptyResult | Should -BeNullOrEmpty
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*no tool_input key*'
+    }
+
+    It 'allows (no decision) a well-formed tool_input carrying no file_path' {
+        $missingPathResult = Invoke-PythonTestPurityDecision -ToolInputRaw '{"tool_name":"Bash","tool_input":{"command":"echo hi"}}'
+
         $missingPathResult | Should -BeNullOrEmpty
     }
 
@@ -121,24 +130,23 @@ Describe 'check-python-test-purity.ps1' {
         $result = Invoke-PythonTestPurityDecision -ToolInputRaw '{not-json'
 
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*not parseable JSON*'
     }
 
-    It 'emits a deny response from the hook entrypoint' {
-        $env:CLAUDE_TOOL_INPUT = Get-PythonPurityInput -FilePath 'tests/unit/test_bad.py' -Content 'import tempfile'
+    It 'denies a nested envelope carrying forbidden test content (AC-7)' {
+        $inputJson = Get-PythonPurityInput -FilePath 'tests/unit/test_bad.py' -Content 'import tempfile'
 
-        $result = & $script:ScriptPath | ConvertFrom-Json
+        $result = Invoke-PythonTestPurityDecision -ToolInputRaw $inputJson
 
         $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tempfile usage forbidden in unit tests*'
     }
 
-    It 'emits no output (allow) from the hook entrypoint on safe content' {
-        $env:CLAUDE_TOOL_INPUT = Get-PythonPurityInput -FilePath 'tests/unit/test_safe.py' -Content 'def test_value(): assert 1 == 1'
+    It 'reads the payload through the shared reader' {
+        $hookText = Get-Content -Path $script:ScriptPath -Raw
 
-        $output = & $script:ScriptPath
-
-        $output | Should -BeNullOrEmpty
+        $hookText | Should -BeLike '*HookPayload.psm1*'
+        $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
     }
 }

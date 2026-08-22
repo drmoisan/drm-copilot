@@ -179,6 +179,21 @@
             '.claude/lib/mermaid/MermaidLineScanner.psm1'
             '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
             '.claude/lib/mermaid/MermaidValidation.psm1'
+            # Issue #501 fixed the PreToolUse payload transport and shape across the whole
+            # hook surface. CodeCoverage.Path is an explicit per-file allow-list, so the new
+            # shared payload module, the six hooks that were changed but never registered,
+            # and the two dot-sourced helper siblings extracted for headroom are registered
+            # here. Without them the changed production surface would sit outside the
+            # coverage denominator, which the Coverage Exclusion Policy forbids.
+            '.claude/lib/hook-payload/HookPayload.psm1'
+            '.claude/hooks/enforce-promotion-mcp-only.ps1'
+            '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'
+            '.claude/hooks/enforce-evidence-locations.ps1'
+            '.claude/hooks/enforce-feature-folder-order.ps1'
+            '.claude/hooks/enforce-checkpoint-monotonic.ps1'
+            '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
+            '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

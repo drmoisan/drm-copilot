@@ -12,19 +12,28 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
                 [string] $Content = 'implementation change'
             )
 
-            return (@{ file_path = $FilePath; content = $Content } | ConvertTo-Json -Compress)
+            return (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = $FilePath; content = $Content }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
 
         function ConvertTo-CommandToolInput {
             param([Parameter(Mandatory)] [string] $Command)
 
-            return (@{ command = $Command } | ConvertTo-Json -Compress)
+            return (@{
+                    tool_name  = 'Bash'
+                    tool_input = @{ command = $Command }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
 
         function ConvertTo-DelegationToolInput {
             param([string] $AgentName = 'powershell-typed-engineer')
 
-            return (@{ subagent_type = $AgentName; prompt = 'Implement Issue #232 remediation.' } | ConvertTo-Json -Compress)
+            return (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = $AgentName; prompt = 'Implement Issue #232 remediation.' }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
 
         function ConvertTo-CheckpointRaw {
@@ -161,12 +170,32 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
     }
 
     Context 'tool input parsing and checkpoint resolution' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
 
-        It 'throws on malformed top-level JSON' {
-            { Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{not json' } | Should -Throw
+        It 'denies unparseable top-level JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{not json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = (@{ file_path = 'scripts/dev_tools/x.py'; content = 'c' } | ConvertTo-Json -Compress)
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
+        }
+
+        It 'allows a well-formed nested Bash envelope whose tool_input carries no file_path (AC-6)' {
+            # Property-level tolerance: this hook is registered on Bash, Write|Edit, and
+            # Agent, so a Bash call legitimately carries no file_path. The scope-filter
+            # early return must survive the strict envelope reader.
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"echo hello"}}'
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $nested
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows a non-implementation file write (documentation path) without a checkpoint' {
@@ -214,30 +243,33 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
     }
 
-    Context 'Entrypoint (script body)' {
-        It 'emits an allow decision JSON when CLAUDE_TOOL_INPUT is empty' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
+    Context 'Entrypoint (exit code seam, no child process)' {
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+            $emitted = Invoke-OrchestrationPreimplementationGateEntryPoint -ReadPayload $emptyReader
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $emitted[0] | Should -Match '"permissionDecision"\s*:\s*"deny"'
         }
 
-        It 'emits an allow decision JSON for a documentation write (deterministic, no checkpoint read)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $content = (@{ file_path = 'docs/features/active/feature-x/notes.md'; content = 'x' } | ConvertTo-Json -Compress)
-                $env:CLAUDE_TOOL_INPUT = $content
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits an allow decision JSON for a documentation write' {
+            $nested = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/feature-x/notes.md' -Content 'x'
+            $emitted = Invoke-OrchestrationPreimplementationGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $emitted[0] | Should -Match '"permissionDecision"\s*:\s*"allow"'
+        }
+
+        It 'returns exit code 0 and never 1 for unparseable JSON' {
+            $emitted = Invoke-OrchestrationPreimplementationGateEntryPoint -ToolInputRaw '{not json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $emitted[0] | Should -Match '"permissionDecision"\s*:\s*"deny"'
         }
     }
 
