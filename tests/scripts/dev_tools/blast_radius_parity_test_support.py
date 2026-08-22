@@ -103,6 +103,14 @@ PAYLOAD_MODULE_NAMES = frozenset({"config"})
 # committed copies must carry identical values.
 BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
 
+# The exhaustive set of top-level keys the truth-table schema declares,
+# derived from the three declared classes rather than hardcoded: the
+# byte-equal keys plus the Class 2 and Class 3 key names. A key present in
+# either committed copy but absent from this set is unclassified.
+DECLARED_TOP_LEVEL_KEYS = frozenset(BYTE_EQUAL_KEYS) | frozenset(
+    {"shared_surfaces", "shared_surface_globs", "modules"}
+)
+
 
 def config_key(config: Mapping[str, object], key: str) -> object:
     """Read one top-level key from a parsed truth table.

@@ -42,6 +42,7 @@ from scripts.dev_tools.compute_blast_radius import conflicts, derive_blast_radiu
 from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     BUNDLED_CONFIG,
     BYTE_EQUAL_KEYS,
+    DECLARED_TOP_LEVEL_KEYS,
     PAYLOAD_MODULE_NAMES,
     PORTABLE_SHARED_SURFACES,
     ROOT_SURFACE_FILENAME,
@@ -193,6 +194,43 @@ def test_class_one_keys_are_equal_across_both_committed_copies(key: str) -> None
         f"Key {key!r} must be equal across the two committed copies. "
         f"{SELF_HOSTED_CONFIG_LABEL} declares {self_hosted_value!r}; "
         f"{BUNDLED_CONFIG_LABEL} declares {bundled_value!r}."
+    )
+
+
+def test_every_top_level_key_is_classified_and_shared_by_both_copies() -> None:
+    """Require every top-level key to be shared by both copies and classified.
+
+    Exhaustiveness check closing the key-set gap the three declared classes
+    leave open by construction: each class asserts a property of the keys it
+    names, but none of them asserts that the two copies' key *sets* are
+    identical or that every key belongs to a declared class. A key added to
+    one copy only is caught by the first assertion below; a key added to both
+    copies but claimed by none of Class 1, Class 2, or Class 3 is caught by
+    the second. ``DECLARED_TOP_LEVEL_KEYS`` is derived from ``BYTE_EQUAL_KEYS``
+    plus the Class 2 and Class 3 key names, not hardcoded, so it stays in sync
+    with the declared classes above.
+    """
+    # Arrange / Act: read each copy's top-level key set.
+    self_hosted_keys = frozenset(SELF_HOSTED_CONFIG.keys())
+    bundled_keys = frozenset(BUNDLED_CONFIG.keys())
+
+    # Assert: the two copies must declare exactly the same key set. The
+    # failure message names the symmetric difference so a maintainer knows
+    # which key is missing from which copy.
+    assert self_hosted_keys == bundled_keys, (
+        f"{SELF_HOSTED_CONFIG_LABEL} and {BUNDLED_CONFIG_LABEL} must declare "
+        "the same top-level key set; symmetric difference "
+        f"{sorted(self_hosted_keys ^ bundled_keys)}."
+    )
+
+    # Assert: every declared key, across both copies, must be claimed by one
+    # of the three declared classes. The failure message names any
+    # unclassified key.
+    all_keys = self_hosted_keys | bundled_keys
+    unclassified = sorted(all_keys - DECLARED_TOP_LEVEL_KEYS)
+    assert not unclassified, (
+        "Every top-level key in either committed copy must be classified by "
+        f"DECLARED_TOP_LEVEL_KEYS; unclassified keys {unclassified}."
     )
 
 

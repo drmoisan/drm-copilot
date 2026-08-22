@@ -89,33 +89,33 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
 
 ### Phase 0 — Policy Reads and Toolchain Baselines (Python, PowerShell)
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
-- [ ] [P0-T4] Read `.claude/rules/python.md` in full.
-- [ ] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
-- [ ] [P0-T6] Read `.claude/rules/powershell.md` in full.
-- [ ] [P0-T7] Read `.claude/rules/quality-tiers.md` in full.
-- [ ] [P0-T8] Read `.claude/rules/parallel-orchestration.md` in full.
-- [ ] [P0-T9] Read `.claude/rules/plan-acceptance-gates.md` in full.
-- [ ] [P0-T10] Read `.claude/rules/tonality.md` in full.
-- [ ] [P0-T11] Write the Phase 0 policy-read evidence artifact to
+- [x] [P0-T1] Read `CLAUDE.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T4] Read `.claude/rules/python.md` in full.
+- [x] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
+- [x] [P0-T6] Read `.claude/rules/powershell.md` in full.
+- [x] [P0-T7] Read `.claude/rules/quality-tiers.md` in full.
+- [x] [P0-T8] Read `.claude/rules/parallel-orchestration.md` in full.
+- [x] [P0-T9] Read `.claude/rules/plan-acceptance-gates.md` in full.
+- [x] [P0-T10] Read `.claude/rules/tonality.md` in full.
+- [x] [P0-T11] Write the Phase 0 policy-read evidence artifact to
       `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md`
       (UTC, `yyyy-MM-ddTHH-mm` form), recording `Timestamp:`, `Policy Order:`, and the ten files
       read in P0-T1 through P0-T10, in that order.
       Acceptance: the artifact file exists and lists all ten files in order.
-- [ ] [P0-T12] From the worktree root, run `poetry run black --check .` and record the artifact at
+- [x] [P0-T12] From the worktree root, run `poetry run black --check .` and record the artifact at
       `evidence/remediation-baseline/python-black.<timestamp>.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`.
       Acceptance: `EXIT_CODE: 0` is recorded.
-- [ ] [P0-T13] From the worktree root, run `poetry run ruff check .` and record the artifact at
+- [x] [P0-T13] From the worktree root, run `poetry run ruff check .` and record the artifact at
       `evidence/remediation-baseline/python-ruff.<timestamp>.md` with the same four fields.
       Acceptance: `EXIT_CODE: 0` is recorded.
-- [ ] [P0-T14] From the worktree root, run `poetry run pyright` and record the artifact at
+- [x] [P0-T14] From the worktree root, run `poetry run pyright` and record the artifact at
       `evidence/remediation-baseline/python-pyright.<timestamp>.md` with the same four fields,
       `Output Summary:` naming the error and warning counts.
       Acceptance: `EXIT_CODE: 0` and `0 errors, 0 warnings` are recorded.
-- [ ] [P0-T15] From the worktree root, run
+- [x] [P0-T15] From the worktree root, run
       `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage.json`
       and record the artifact at `evidence/remediation-baseline/python-pytest-coverage.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail/skip
@@ -124,20 +124,20 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       `artifacts/python/coverage.json`.
       Acceptance: `EXIT_CODE: 0`; both coverage figures recorded, each >= the
       `.claude/rules/quality-tiers.md` thresholds (85% statements, 75% branches).
-- [ ] [P0-T16] Run `mcp__drm-copilot__run_poshqc_format` and record the artifact at
+- [x] [P0-T16] Run `mcp__drm-copilot__run_poshqc_format` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-format.<timestamp>.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `Output Summary:`.
       Acceptance: `EXIT_CODE: 0` and zero files rewritten are recorded.
-- [ ] [P0-T17] Run `mcp__drm-copilot__run_poshqc_analyze` and record the artifact at
+- [x] [P0-T17] Run `mcp__drm-copilot__run_poshqc_analyze` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-analyze.<timestamp>.md` with the same four
       fields.
       Acceptance: `EXIT_CODE: 0` and zero findings are recorded.
-- [ ] [P0-T18] Run `mcp__drm-copilot__run_poshqc_test` and record the artifact at
+- [x] [P0-T18] Run `mcp__drm-copilot__run_poshqc_test` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-test.<timestamp>.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail/skip counts and the line
       coverage percentage from the JaCoCo root `LINE` counter as `covered / (covered + missed)`.
       Acceptance: `EXIT_CODE: 0` and a recorded line coverage >= 85%.
-- [ ] [P0-T19] Write a scope note at
+- [x] [P0-T19] Write a scope note at
       `evidence/remediation-baseline/typescript-out-of-scope.<timestamp>.md` stating that no file
       under `extensions/drm-copilot/src/**` or `extensions/drm-copilot/test/**` is touched by R7
       through R12 this cycle, so no TypeScript baseline is recaptured, following the precedent the
@@ -148,13 +148,13 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
 
 ### Phase 1 — R7: Correct AC4's trailing verification sentence (Blocking)
 
-- [ ] [P1-T1] Re-run the reference sweep to confirm it is unchanged at execution time: from the
+- [x] [P1-T1] Re-run the reference sweep to confirm it is unchanged at execution time: from the
       worktree root, run
       `git grep -c -F "test_blast_radius_config.py" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`.
       Acceptance: reports `7` (matching the measured count in the "R7 Reference Sweep" section
       above). If the count differs, halt and re-disposition every reference before proceeding to
       P1-T2.
-- [ ] [P1-T2] In
+- [x] [P1-T2] In
       `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`,
       `## Acceptance Criteria`, AC4's trailing sentence, replace
       `the Class 2 and Class 3 assertions of the new gate in` /
@@ -174,7 +174,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       reports `5` after the edit (measured before the edit: `4`, at the four existing occurrences
       inside AC9 and AC10). Both conjuncts are false against the unedited file (`7` and `4`
       respectively) and become true only after this exact edit.
-- [ ] [P1-T3] Confirm the corrected citation collects the gate: from the worktree root, run
+- [x] [P1-T3] Confirm the corrected citation collects the gate: from the worktree root, run
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: `EXIT_CODE: 0` and `15 passed` (the count before Phase 2 adds the sixteenth
       case).
@@ -183,13 +183,13 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
 
 ### Phase 2 — R8: Close the key-set exhaustiveness gap (Major, Python + PowerShell)
 
-- [ ] [P2-T1] In `tests/scripts/dev_tools/blast_radius_parity_test_support.py`, add a module-level
+- [x] [P2-T1] In `tests/scripts/dev_tools/blast_radius_parity_test_support.py`, add a module-level
       constant `DECLARED_TOP_LEVEL_KEYS` equal to `frozenset(BYTE_EQUAL_KEYS) | frozenset({"shared_surfaces", "shared_surface_globs", "modules"})`
       — the union of all three declared classes' key names. No assertion is added to this module.
       Acceptance: from the worktree root, `git grep -c -F "DECLARED_TOP_LEVEL_KEYS" -- tests/scripts/dev_tools/blast_radius_parity_test_support.py`
       reports at least `1` after the edit (measured before the edit: `0`, this literal is absent
       from the file today).
-- [ ] [P2-T2] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, import
+- [x] [P2-T2] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, import
       `DECLARED_TOP_LEVEL_KEYS` from the support module and add a new test function
       `test_every_top_level_key_is_classified_and_shared_by_both_copies` that: (1) asserts
       `frozenset(SELF_HOSTED_CONFIG.keys()) == frozenset(BUNDLED_CONFIG.keys())`, naming the
@@ -199,10 +199,10 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       copies but claimed by no class fails assertion (2).
       Acceptance: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_top_level_key_is_classified_and_shared_by_both_copies`
       exits 0 with `1 passed`, run from the worktree root.
-- [ ] [P2-T3] Confirm file size: from the worktree root, run
+- [x] [P2-T3] Confirm file size: from the worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: the reported line count is less than 500.
-- [ ] [P2-T4] Add a mirrored Pester case to
+- [x] [P2-T4] Add a mirrored Pester case to
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, inside the existing
       `Cross-copy key partition` `Context`, titled
       `requires every top-level key in both copies to be classified and shared`. The case declares
@@ -214,10 +214,10 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       Acceptance: a targeted `Invoke-Pester` run against
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` reports the new
       `It` block passing with 0 failed.
-- [ ] [P2-T5] Confirm file size: from the worktree root, run
+- [x] [P2-T5] Confirm file size: from the worktree root, run
       `(Get-Content tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1).Count`.
       Acceptance: the reported line count is less than 500.
-- [ ] [P2-T6] [expect-fail] Demonstrate Python falsifiability: from the worktree root, run
+- [x] [P2-T6] [expect-fail] Demonstrate Python falsifiability: from the worktree root, run
       `python -c "import json,io;p='config/blast-radius.json';d=json.load(open(p,encoding='utf-8'));d['new_top_level_key']=['x'];open(p,'w',encoding='utf-8').write(json.dumps(d,indent=2)+chr(10))"`,
       injecting an unclassified top-level key into the self-hosted copy only, then run
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_top_level_key_is_classified_and_shared_by_both_copies`.
@@ -227,7 +227,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       assertion message.
       Acceptance: `EXIT_CODE: 1` and `1 failed` recorded, with the failure naming
       `new_top_level_key`.
-- [ ] [P2-T7] [expect-fail] In the same injected state, demonstrate PowerShell falsifiability using
+- [x] [P2-T7] [expect-fail] In the same injected state, demonstrate PowerShell falsifiability using
       a name filter so the signal is isolated:
       ```powershell
       $pesterConfig = New-PesterConfiguration
@@ -241,7 +241,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, `Output Summary:` quoting
       `$result.FailedCount` and the failure message.
       Acceptance: the filtered run reports `Passed=0 Failed=1`, naming `new_top_level_key`.
-- [ ] [P2-T8] Restore and confirm the Python case passes again: from the worktree root, run
+- [x] [P2-T8] Restore and confirm the Python case passes again: from the worktree root, run
       `git checkout -- config/blast-radius.json`, then
       `git status --short -- config/blast-radius.json` (expect no output), then rerun
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_top_level_key_is_classified_and_shared_by_both_copies`.
@@ -250,13 +250,13 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       required fields.
       Acceptance: `git status --short` produces no output for that path; `EXIT_CODE: 0` with
       `1 passed` recorded for the rerun.
-- [ ] [P2-T9] Rerun the identical filtered Pester configuration from P2-T7 (same `Run.Path` and
+- [x] [P2-T9] Rerun the identical filtered Pester configuration from P2-T7 (same `Run.Path` and
       `Filter.FullName`) against the restored tree. Record the pass-after evidence artifact at
       `evidence/qa-gates/powershell-key-exhaustiveness-pass-after.<timestamp>.md` with the same
       four required fields, `Output Summary:` quoting `$result.PassedCount` and
       `$result.FailedCount`.
       Acceptance: the filtered rerun reports `Passed=1 Failed=0`.
-- [ ] [P2-T10] Amend `.claude/rules/parallel-orchestration.md`, in the
+- [x] [P2-T10] Amend `.claude/rules/parallel-orchestration.md`, in the
       `### The published truth table is not a copy of this one (issue #500)` section, appending a
       short paragraph recording that the key-partition gate now asserts the union of both copies'
       top-level keys is exhaustively covered by the three declared classes, and that an
@@ -264,7 +264,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       Acceptance: from the worktree root,
       `git grep -c -F "exhaustively covered by the three declared classes" -- .claude/rules/parallel-orchestration.md`
       reports at least `1` after the edit (measured before the edit: `0`).
-- [ ] [P2-T11] Mirror the P2-T10 amendment byte-identically into
+- [x] [P2-T11] Mirror the P2-T10 amendment byte-identically into
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       in the same commit.
       Acceptance: from the worktree root,
@@ -275,7 +275,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
 
 ### Phase 3 — R12: Mirror the non-vacuity floor into the Pester file
 
-- [ ] [P3-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, inside
+- [x] [P3-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, inside
       the `Cross-copy key partition` `Context`, add a new `It` block titled
       `requires the shared-surface lists compared by the directional invariant to be non-empty`
       asserting `@($script:CommittedConfig['shared_surfaces']).Count` and
@@ -287,7 +287,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
       Acceptance: a targeted `Invoke-Pester` run against
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` reports the new
       `It` block passing with 0 failed.
-- [ ] [P3-T2] Confirm file size: from the worktree root, run
+- [x] [P3-T2] Confirm file size: from the worktree root, run
       `(Get-Content tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1).Count`.
       Acceptance: the reported line count is less than 500.
 
@@ -295,7 +295,7 @@ explicitly out of scope for the same Do-Not-Do reason and does not gate any outc
 
 ### Phase 4 — R9: Qualify the Class 2 mitigation clause in `spec.md`
 
-- [ ] [P4-T1] In `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`,
+- [x] [P4-T1] In `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`,
       `## Risks & Mitigations`, the Class 2 mitigation bullet, replace "and the residual gap is
       closed structurally by `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
       (added in Phase 2)." with "and the separator-free portion of the residual gap is closed
@@ -317,13 +317,13 @@ All five acceptance commands below run from the worktree root against
 pre-edit values are recorded in each task; none of the "after" literals introduced below exists in
 `spec.md` today (each confirmed absent, count `0`, before this phase runs).
 
-- [ ] [P5-T1] AC1: replace "comment at lines 123-130 states why" with "doc comment's @remarks
+- [x] [P5-T1] AC1: replace "comment at lines 123-130 states why" with "doc comment's @remarks
       block states why". No substantive content changes.
       Acceptance: (a) `git grep -c -F "at lines 123-130 states why" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports `0` after the edit (measured before: `1`); (b)
       `git grep -c -F "doc comment's @remarks block states why" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (measured before: `0`).
-- [ ] [P5-T2] AC2: replace "the expectations at lines 137, 153, 240, 252, 338, and 474 are
+- [x] [P5-T2] AC2: replace "the expectations at lines 137, 153, 240, 252, 338, and 474 are
       updated, and the file asserts" with "every seeded module-map expectation across the file's
       `it` cases is updated, and the case `declares no umbrella or forbidden glob in the payload
       module set` asserts". Keep "declares no umbrella or forbidden glob in the payload module
@@ -332,7 +332,7 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       reports `0` after the edit (measured before: `1`); (b)
       `git grep -c -F "declares no umbrella or forbidden glob in the payload module set" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (measured before: `0`).
-- [ ] [P5-T3] AC3: replace "seeded expectations at lines 44, 122, 292, and 387 are updated, and"
+- [x] [P5-T3] AC3: replace "seeded expectations at lines 44, 122, 292, and 387 are updated, and"
       with "seeded module-map expectations across the file's `it` cases are updated, and", and
       replace "`SOURCE_BLAST_RADIUS` (line 84) and its comment at lines 61-72 mirror" with
       "`SOURCE_BLAST_RADIUS` and its preceding doc comment mirror".
@@ -344,7 +344,7 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       touch); (c)
       `git grep -c -F "SOURCE_BLAST_RADIUS\` and its preceding doc comment mirror" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (measured before: `0`).
-- [ ] [P5-T4] AC5: replace "forbidden-substring list at lines 284-293 no longer forbids" with
+- [x] [P5-T4] AC5: replace "forbidden-substring list at lines 284-293 no longer forbids" with
       "forbidden-substring list in the `publishes a document derived from the destination's own
       layout` case no longer forbids". Keep "publishes a document derived from the destination's
       own layout" contiguous on a single line.
@@ -354,7 +354,7 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       touch); (b)
       `git grep -c -F "publishes a document derived from the destination's own layout" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (measured before: `0`).
-- [ ] [P5-T5] AC12: replace "The comment at
+- [x] [P5-T5] AC12: replace "The comment at
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1:96-98`" with "The
       comment inside the `declares no removed umbrella module in either committed copy` case in
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`". Keep "declares no
@@ -370,7 +370,7 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
 
 ### Phase 6 — R11: Record the evidence-timestamp clock convention
 
-- [ ] [P6-T1] Confirm the affected artifacts are unchanged and still present: from the worktree
+- [x] [P6-T1] Confirm the affected artifacts are unchanged and still present: from the worktree
       root, run
       `ls docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/*/*2026-08-21T21-49*`.
       Acceptance: the command lists exactly `18` paths, and none of them is modified or renamed by
@@ -379,7 +379,7 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       plan and audit documents that merely cite the timestamp in prose and 18 are files actually
       stamped with it; the discrepancy between the inputs' count and the measured count is
       recorded in P6-T2's note rather than silently reconciled.
-- [ ] [P6-T2] Write a note at
+- [x] [P6-T2] Write a note at
       `evidence/other/timestamp-clock-convention.<timestamp>.md` (UTC, `yyyy-MM-ddTHH-mm` form)
       recording: (1) the feature folder standardizes on UTC for every evidence-artifact timestamp,
       matching the clock the original cycle's artifacts and both remediation-cycle audits already
@@ -397,13 +397,13 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
 
 ### Phase 7 — Final QA Loop (Python + PowerShell) and Acceptance-Criteria Reconciliation
 
-- [ ] [P7-T1] From the worktree root, run `poetry run black --check .`.
+- [x] [P7-T1] From the worktree root, run `poetry run black --check .`.
       Acceptance: `EXIT_CODE: 0`.
-- [ ] [P7-T2] From the worktree root, run `poetry run ruff check .`.
+- [x] [P7-T2] From the worktree root, run `poetry run ruff check .`.
       Acceptance: `EXIT_CODE: 0`, zero new `noqa` present.
-- [ ] [P7-T3] From the worktree root, run `poetry run pyright`.
+- [x] [P7-T3] From the worktree root, run `poetry run pyright`.
       Acceptance: `EXIT_CODE: 0`, `0 errors, 0 warnings`.
-- [ ] [P7-T4] From the worktree root, run
+- [x] [P7-T4] From the worktree root, run
       `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage.json`
       and record the final-QC artifact at
       `evidence/qa-gates/final-python-pytest-coverage.<timestamp>.md` with `Timestamp:`,
@@ -413,17 +413,17 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       Acceptance: `EXIT_CODE: 0` for the full run, with both coverage figures at or above the
       P0-T15 baseline figures (no regression). The per-file count for the gate module is checked
       separately in P7-T12.
-- [ ] [P7-T5] Run `mcp__drm-copilot__run_poshqc_format`.
+- [x] [P7-T5] Run `mcp__drm-copilot__run_poshqc_format`.
       Acceptance: `EXIT_CODE: 0`, zero files rewritten (a clean tree after the run).
-- [ ] [P7-T6] Run `mcp__drm-copilot__run_poshqc_analyze`.
+- [x] [P7-T6] Run `mcp__drm-copilot__run_poshqc_analyze`.
       Acceptance: `EXIT_CODE: 0`, zero findings.
-- [ ] [P7-T7] Run `mcp__drm-copilot__run_poshqc_test` and record the final-QC artifact at
+- [x] [P7-T7] Run `mcp__drm-copilot__run_poshqc_test` and record the final-QC artifact at
       `evidence/qa-gates/final-powershell-poshqc-test.<timestamp>.md` with the same four required
       fields, `Output Summary:` naming the pass/fail/skip counts and the line coverage percentage
       from the JaCoCo root `LINE` counter.
       Acceptance: `EXIT_CODE: 0` and the recorded line coverage at or above the P0-T18 baseline
       figure (no regression).
-- [ ] [P7-T8] Write the coverage delta-verification artifact at
+- [x] [P7-T8] Write the coverage delta-verification artifact at
       `evidence/qa-gates/coverage-delta-verification.<timestamp>.md` reporting, for Python and for
       PowerShell: baseline coverage (Phase 0), post-change coverage (P7-T4 / P7-T7), and
       new/changed-code coverage. No production file is touched by R7 through R12, so the
@@ -431,43 +431,43 @@ pre-edit values are recorded in each task; none of the "after" literals introduc
       which there are zero.
       Acceptance: the artifact records both baseline and post-change figures for both languages
       with a delta of 0.00 or better on every figure.
-- [ ] [P7-T9] Confirm no coverage `exclude`/`omit` entry was added: from the worktree root, run
+- [x] [P7-T9] Confirm no coverage `exclude`/`omit` entry was added: from the worktree root, run
       `git diff fb30a9a58b8422e610a09b07361421e97367807a...HEAD -- pyproject.toml`.
       Acceptance: the diff produces no output.
-- [ ] [P7-T10] Confirm the file-size ceiling holds for every file touched this cycle: from the
+- [x] [P7-T10] Confirm the file-size ceiling holds for every file touched this cycle: from the
       worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`.
       Acceptance: all three reported counts are less than 500.
-- [ ] [P7-T11] Confirm `tests/scripts/dev_tools/test_blast_radius_config.py` is untouched: from the
+- [x] [P7-T11] Confirm `tests/scripts/dev_tools/test_blast_radius_config.py` is untouched: from the
       worktree root, run
       `git diff fb30a9a58b8422e610a09b07361421e97367807a...HEAD -- tests/scripts/dev_tools/test_blast_radius_config.py`.
       Acceptance: the diff produces no output.
-- [ ] [P7-T12] Re-verify the AC4 gate command collects the full set including the Phase 2 addition:
+- [x] [P7-T12] Re-verify the AC4 gate command collects the full set including the Phase 2 addition:
       from the worktree root, run
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: `EXIT_CODE: 0` and `16 passed` (the 15 present at the start of this cycle plus
       the one added in Phase 2).
-- [ ] [P7-T13] In `spec.md`, `## Acceptance Criteria`, change AC4's checkbox from `- [ ]` to
+- [x] [P7-T13] In `spec.md`, `## Acceptance Criteria`, change AC4's checkbox from `- [ ]` to
       `- [x]` (text unchanged from Phase 1). This task depends on P7-T12 passing.
       Acceptance: from the worktree root,
       `git grep -c -P "^- \[x\] \`extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json\` declares$" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports `1` after the edit (measured before this task: `0`, since AC4's line currently
       begins `- [ ] ` rather than `- [x] `).
-- [ ] [P7-T14] Confirm the acceptance-criteria count is unchanged at 17: from the worktree root, run
+- [x] [P7-T14] Confirm the acceptance-criteria count is unchanged at 17: from the worktree root, run
       `sed -n '/^## Acceptance Criteria$/,/^## Out of Scope$/p' docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md | grep -c -E "^- \[[ x]\]"`,
       which scopes the count to the `## Acceptance Criteria` section only (the file also carries
       unrelated checkbox lines in `## Repro & Evidence` and `## Test Strategy`).
       Acceptance: the reported count is `17`.
-- [ ] [P7-T15] Confirm all seventeen criteria are checked: from the worktree root, run
+- [x] [P7-T15] Confirm all seventeen criteria are checked: from the worktree root, run
       `sed -n '/^## Acceptance Criteria$/,/^## Out of Scope$/p' docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md | grep -c -E "^- \[x\]"`.
       Acceptance: the reported count is `17` (equal to P7-T14's total, meaning zero unchecked
       items remain).
-- [ ] [P7-T16] Write the final single-pass confirmation artifact at
+- [x] [P7-T16] Write the final single-pass confirmation artifact at
       `evidence/qa-gates/remediation-toolchain-single-pass.<timestamp>.md` recording that P7-T1
       through P7-T7 executed in one uninterrupted sequence with no restart and no file rewritten by
       any stage.
       Acceptance: the artifact records all seven exit codes as 0 with no intervening restart.
-- [ ] [P7-T17] Write the updated AC status summary at
+- [x] [P7-T17] Write the updated AC status summary at
       `evidence/issue-updates/ac-status-summary.<timestamp>.md` stating 17 of 17 acceptance
       criteria checked, with a one-line note that AC4 was unchecked by the cycle-2 review and
       re-checked in this cycle after the corrected verification command passed.

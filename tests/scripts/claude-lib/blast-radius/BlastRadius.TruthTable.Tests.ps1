@@ -300,6 +300,65 @@ Describe 'Committed blast-radius truth table shape' {
             # the bundled separator-free set.
             $missing.ToArray() | Should -BeNullOrEmpty
         }
+
+        It 'requires every top-level key in both copies to be classified and shared' {
+            # Arrange: exhaustiveness check closing the key-set gap the three
+            # declared classes leave open by construction (issue #500
+            # remediation, R8). Mirrors
+            # test_every_top_level_key_is_classified_and_shared_by_both_copies
+            # in tests/scripts/dev_tools/test_blast_radius_config_parity.py.
+            $declaredTopLevelKey = @('version', 'over_breadth_fraction', 'mandate_reads',
+                'shared_surfaces', 'shared_surface_globs', 'modules')
+
+            # Act: accumulate every key present in one copy's key set but
+            # absent from the other, so the failure names all missing keys
+            # rather than the first.
+            $missingKey = [System.Collections.Generic.List[string]]::new()
+            foreach ($key in @($script:CommittedConfig.Keys)) {
+                if ($script:BundledConfig.Keys -cnotcontains $key) {
+                    $missingKey.Add($key)
+                }
+            }
+            foreach ($key in @($script:BundledConfig.Keys)) {
+                if ($script:CommittedConfig.Keys -cnotcontains $key) {
+                    $missingKey.Add($key)
+                }
+            }
+
+            # Act: accumulate every key present in either copy but absent from
+            # the declared key set, so an unclassified key is named.
+            $unclassifiedKey = [System.Collections.Generic.List[string]]::new()
+            $unionKey = @($script:CommittedConfig.Keys) + @($script:BundledConfig.Keys) |
+                Select-Object -Unique
+            foreach ($key in $unionKey) {
+                if ($declaredTopLevelKey -cnotcontains $key) {
+                    $unclassifiedKey.Add($key)
+                }
+            }
+
+            # Assert: neither copy may be missing a key the other declares,
+            # and neither copy may declare a key outside the declared set.
+            $missingKey.ToArray() | Should -BeNullOrEmpty
+            $unclassifiedKey.ToArray() | Should -BeNullOrEmpty
+        }
+
+        It 'requires the shared-surface lists compared by the directional invariant to be non-empty' {
+            # Arrange: non-vacuity floor guarding the directional invariant
+            # (issue #500 remediation, R12). A renamed shared_surfaces key
+            # would make the "requires every separator-free self-hosted
+            # shared surface to reach the bundled copy" case above pass
+            # vacuously, since an empty selection satisfies containment
+            # trivially. This mirrors the same guard the Python
+            # test_the_gate_compares_non_empty_collections case already
+            # provides on the Python side.
+            $committedCount = @($script:CommittedConfig['shared_surfaces']).Count
+            $bundledCount = @($script:BundledConfig['shared_surfaces']).Count
+
+            # Assert: both lists must be non-empty for the directional
+            # invariant to carry discriminating force.
+            $committedCount | Should -BeGreaterThan 0
+            $bundledCount | Should -BeGreaterThan 0
+        }
     }
 
     Context 'Read-by-mandate exclusions' {

@@ -311,6 +311,15 @@ in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
 structurally by asserting the reverse containment for separator-free entries: every separator-free
 self-hosted `shared_surfaces` entry must also appear in the bundled separator-free set.
 
+**The key-partition gate now asserts exhaustiveness (issue #500 remediation, R8).** The three
+declared classes each assert a property of the keys they name, but none of them asserted that
+the two committed copies' top-level key sets are identical, or that every top-level key
+belongs to one of the three declared classes. `test_every_top_level_key_is_classified_and_shared_by_both_copies`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, closes that gap: the
+union of both copies' top-level keys is exhaustively covered by the three declared classes, and
+an unclassified key or a key present in only one copy fails loudly and names itself.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.

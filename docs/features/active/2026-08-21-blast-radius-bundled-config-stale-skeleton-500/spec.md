@@ -419,31 +419,35 @@ Seeded from issue:
 ## Acceptance Criteria
 
 - [x] `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` declares
-      `PAYLOAD_MODULES` as `{ config: ["config/**"] }` with no `claude-runtime` key, and its doc
-      comment at lines 123-130 states why the `.claude` tree is not a module. Verified by
+      `PAYLOAD_MODULES` as `{ config: ["config/**"] }` with no `claude-runtime` key, and its
+      doc comment's @remarks block states why the `.claude` tree is not a module. Verified by
       `poetry run pytest`-independent inspection plus the TypeScript suite below.
 - [x] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-core.test.ts` no longer
-      positively pins `claude-runtime`: the expectations at lines 137, 153, 240, 252, 338, and 474
-      are updated, and the file asserts that the `PAYLOAD_MODULES` key set excludes
-      `claude-runtime` and that its glob set contains no member of `FORBIDDEN_GLOBS`. Verified by
+      positively pins `claude-runtime`: every seeded module-map expectation across the file's
+      `it` cases is updated, and the case
+      `declares no umbrella or forbidden glob in the payload module set` asserts that the
+      `PAYLOAD_MODULES` key set excludes `claude-runtime` and that its glob set contains no
+      member of `FORBIDDEN_GLOBS`. Verified by
       `npm run test:unit` in `extensions/drm-copilot`.
-- [x] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` seeded expectations at
-      lines 44, 122, 292, and 387 are updated, and
-      `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` `SOURCE_BLAST_RADIUS`
-      (line 84) and its comment at lines 61-72 mirror the corrected bundled file. Verified by
+- [x] `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` seeded module-map
+      expectations across the file's `it` cases are updated, and
+      `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts`
+      `SOURCE_BLAST_RADIUS` and its preceding doc comment mirror the corrected bundled file.
+      Verified by
       `npm run test:unit`.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
+- [x] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
       exactly the 6-entry portable `shared_surfaces` set `.claude/settings.json`,
       `config/blast-radius.json`, `config/orchestration-routing.json`, `package-lock.json`,
       `poetry.lock`, `quality-tiers.yml`; `shared_surface_globs` is `[]`; `mandate_reads` carries
       the four added entries; and `modules` is exactly `{ "config": ["config/**"] }`. Verified by
       the Class 2 and Class 3 assertions of the new gate in
-      `tests/scripts/dev_tools/test_blast_radius_config.py`.
+      `tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
 - [x] `extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts` AC8
-      forbidden-substring list at lines 284-293 no longer forbids `poetry.lock` or
-      `package-lock.json`, and its rationale comment states that the exclusion targets entries
-      naming this repository's directory layout rather than ecosystem-standard root lockfile names
-      (DD-1). Verified by `npm run test:unit`.
+      forbidden-substring list in the
+      `publishes a document derived from the destination's own layout` case no longer forbids
+      `poetry.lock` or `package-lock.json`, and its rationale comment states that the exclusion
+      targets entries naming this repository's directory layout rather than ecosystem-standard
+      root lockfile names (DD-1). Verified by `npm run test:unit`.
 - [x] `config/blast-radius.json` `mandate_reads` carries the four added entries
       `.claude/skills/acceptance-criteria-tracking/SKILL.md`,
       `.claude/skills/policy-compliance-order/SKILL.md`, `.claude/agent-memory/**`, and
@@ -483,7 +487,9 @@ Seeded from issue:
       equality, the Class 3 subset, the five-name umbrella denylist applied to both copies, and the
       separator-free-wildcard-free assertion, and stays under the 500-line limit. Verified by
       `mcp__drm-copilot__run_poshqc_test`.
-- [x] The comment at `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1:96-98`
+- [x] The comment inside the
+      `declares no removed umbrella module in either committed copy` case in
+      `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`
       no longer states that the bundled module map describes the destination repository's
       subsystems, and instead records that the bundled `modules` key is never read and that
       `PAYLOAD_MODULES` is the live source of a destination's payload modules. Verified by reading
@@ -588,9 +594,9 @@ Additionally rejected, and not to be reintroduced (research `## 4.4`):
     the bundled set or to the declared constant, and does not by itself observe the self-hosted set
     growing away from it; the catastrophic form of the fail-open defect, a published table with no
     separator-free shared surface, is independently blocked by the non-empty precondition in
-    `test_every_separator_free_bundled_shared_surface_is_wildcard_free`; and the residual gap is
-    closed structurally by `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
-    (added in Phase 2).
+    `test_every_separator_free_bundled_shared_surface_is_wildcard_free`; and the
+    separator-free portion of the residual gap is closed structurally by
+    `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle` (added in Phase 2).
   - Rollback is a single-commit revert; there is no migration or persisted state.
 
 ## Rollout & Follow-up
