@@ -195,4 +195,214 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Find-PrdFeatureFolderFromPrompt -Prompt 'see docs/features/active/abc-1/spec.md' | Should -Be 'docs/features/active/abc-1'
         }
     }
+
+    Context 'Resolve-PrdFeatureWorkMode' {
+        It 'returns full-feature for an exact full-feature marker' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- Work Mode: full-feature`n## Overview" | Should -Be 'full-feature'
+        }
+
+        It 'returns full-bug for an exact full-bug marker' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- Work Mode: full-bug`n## Overview" | Should -Be 'full-bug'
+        }
+
+        It 'returns minor-audit for an exact minor-audit marker' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- Work Mode: minor-audit`n## Overview" | Should -Be 'minor-audit'
+        }
+
+        It 'normalizes the legacy full marker to full-feature' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- Work Mode: full`n## Overview" | Should -Be 'full-feature'
+        }
+
+        It 'is case-insensitive on the marker label' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- work mode: minor-audit`n## Overview" | Should -Be 'minor-audit'
+        }
+
+        It 'returns $null when no marker line is present' {
+            Resolve-PrdFeatureWorkMode -IssueContent "## Overview`nSome content with no marker." | Should -BeNullOrEmpty
+        }
+
+        It 'returns $null for an unrecognized marker value' {
+            Resolve-PrdFeatureWorkMode -IssueContent "- Work Mode: bogus`n## Overview" | Should -BeNullOrEmpty
+        }
+
+        It 'returns $null for empty content' {
+            Resolve-PrdFeatureWorkMode -IssueContent '' | Should -BeNullOrEmpty
+        }
+
+        It 'returns $null for $null content' {
+            Resolve-PrdFeatureWorkMode -IssueContent $null | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Get-PrdFeatureRequiredFile' {
+        It 'requires spec.md and user-story.md for full-feature' {
+            (Get-PrdFeatureRequiredFile -WorkMode 'full-feature') | Should -Be @('spec.md', 'user-story.md')
+        }
+
+        It 'requires spec.md only for full-bug' {
+            (Get-PrdFeatureRequiredFile -WorkMode 'full-bug') | Should -Be @('spec.md')
+        }
+
+        It 'requires neither file for minor-audit' {
+            @(Get-PrdFeatureRequiredFile -WorkMode 'minor-audit').Count | Should -Be 0
+        }
+
+        It 'fails closed to the strictest set when the mode is $null' {
+            (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md', 'user-story.md')
+        }
+
+        It 'fails closed to the strictest set for an unrecognized mode string' {
+            (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md', 'user-story.md')
+        }
+    }
+
+    Context 'Get-PrdFeatureIssueContent' {
+        It 'returns $null when issue.md does not exist' {
+            Get-PrdFeatureIssueContent -FeatureFolder 'C:/__nonexistent_feature_folder_for_test__' | Should -BeNullOrEmpty
+        }
+
+        It 'returns $null when issue.md exists but Get-Content throws (unreadable)' {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-Content -MockWith { throw 'simulated io error' }
+            Get-PrdFeatureIssueContent -FeatureFolder 'docs/features/active/unreadable-case' | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'work-mode aware prerequisite resolution' {
+        It 'allows full-feature mode when spec.md and user-story.md are both present' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-feature-1' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'blocks full-feature mode when spec.md is missing, naming the work mode' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                param([string]$Path)
+                return -not ($Path -match '/spec\.md$')
+            }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-feature-2' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'work mode: full-feature'
+        }
+
+        It 'allows full-bug mode when only spec.md is present (user-story.md absent)' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                param([string]$Path)
+                return $Path -match '/spec\.md$'
+            }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-bug-1' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'blocks full-bug mode when spec.md is missing and does not demand user-story.md' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-bug-2' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'user-story\.md'
+        }
+
+        It 'allows minor-audit mode even when spec.md and user-story.md are both absent' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: minor-audit`n## Acceptance Criteria" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-minor-audit-1' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'treats the legacy full marker as the full-feature requirement set' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                param([string]$Path)
+                return -not ($Path -match '/user-story\.md$')
+            }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-legacy-full-1' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'user-story\.md'
+        }
+    }
+
+    Context 'fail-closed prerequisite resolution (AC: unable to determine work mode)' {
+        # These four scenarios (marker absent, unreadable issue.md, unrecognized
+        # marker value, missing issue.md) all collapse to an undeterminable work
+        # mode. The gate MUST fail closed to the strictest prerequisite set
+        # (spec.md and user-story.md) in every case. Treating an undeterminable
+        # mode as satisfying every mode's requirement (i.e. failing open) would
+        # reintroduce the exact defect class issue #501 corrected: a PreToolUse
+        # gate that appears to enforce a prerequisite but always allows.
+        It 'fails closed when the work-mode marker line is absent from issue.md' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "## Overview`nNo marker line here." }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-marker-absent' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'user-story\.md'
+        }
+
+        It 'fails closed when issue.md exists but is unreadable' {
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-Content -MockWith { throw 'simulated io error' }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-unreadable' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
+        }
+
+        It 'fails closed when the marker value is unrecognized' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: sort-of-audit`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-marker-unrecognized' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
+        }
+
+        It 'fails closed when issue.md itself does not exist' {
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/__nonexistent_issue_md_for_test__' }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
+        }
+    }
 }
