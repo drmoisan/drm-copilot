@@ -432,7 +432,7 @@ Seeded from issue:
       `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` `SOURCE_BLAST_RADIUS`
       (line 84) and its comment at lines 61-72 mirror the corrected bundled file. Verified by
       `npm run test:unit`.
-- [x] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
+- [ ] `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json` declares
       exactly the 6-entry portable `shared_surfaces` set `.claude/settings.json`,
       `config/blast-radius.json`, `config/orchestration-routing.json`, `package-lock.json`,
       `poetry.lock`, `quality-tiers.yml`; `shared_surface_globs` is `[]`; `mandate_reads` carries
