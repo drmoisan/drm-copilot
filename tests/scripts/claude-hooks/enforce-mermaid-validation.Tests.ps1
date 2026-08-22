@@ -27,7 +27,10 @@ Describe 'enforce-mermaid-validation.ps1' {
                 [Parameter(Mandatory)][string] $FilePath,
                 [Parameter(Mandatory)][AllowEmptyString()][string] $Content
             )
-            return ([ordered]@{ file_path = $FilePath; content = $Content } | ConvertTo-Json -Compress -Depth 3)
+            return ([ordered]@{
+                    tool_name  = 'Write'
+                    tool_input = [ordered]@{ file_path = $FilePath; content = $Content }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
 
         function Get-EditToolInputJson {
@@ -36,8 +39,10 @@ Describe 'enforce-mermaid-validation.ps1' {
                 [Parameter(Mandatory)][string] $OldString,
                 [Parameter(Mandatory)][string] $NewString
             )
-            return ([ordered]@{ file_path = $FilePath; old_string = $OldString; new_string = $NewString } |
-                    ConvertTo-Json -Compress -Depth 3)
+            return ([ordered]@{
+                    tool_name  = 'Edit'
+                    tool_input = [ordered]@{ file_path = $FilePath; old_string = $OldString; new_string = $NewString }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
     }
 
@@ -254,27 +259,40 @@ flowchart LR
         }
     }
 
-    Context 'fail-open policy' {
-        It 'allows an empty tool input' {
-            Invoke-MermaidValidationDecision -ToolInputRaw '' | Should -BeNullOrEmpty
+    Context 'envelope anomalies fail closed (issue #501)' {
+        It 'denies an empty tool input' {
+            $decision = Invoke-MermaidValidationDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'MERMAID_VALIDATION_BLOCKED'
         }
 
-        It 'allows an absent tool input' {
-            Invoke-MermaidValidationDecision -ToolInputRaw $null | Should -BeNullOrEmpty
+        It 'denies an absent tool input' {
+            $decision = Invoke-MermaidValidationDecision -ToolInputRaw $null
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
-        It 'allows an unparseable tool input instead of failing hard' {
-            # Deliberately unlike enforce-evidence-locations.ps1, which exits 1 here.
-            Invoke-MermaidValidationDecision -ToolInputRaw 'this is not json {' | Should -BeNullOrEmpty
+        It 'denies an unparseable tool input' {
+            $decision = Invoke-MermaidValidationDecision -ToolInputRaw 'this is not json {'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
 
-        It 'allows a tool input with no file_path field' {
-            $json = '{"content":"flowchart TD\n    A[Start --> B\n"}'
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $json = '{"file_path":"docs/diagrams/flow.mmd","content":"flowchart TD"}'
+            $decision = Invoke-MermaidValidationDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
+        }
+    }
+
+    Context 'content-level tolerance is preserved' {
+        It 'allows a well-formed tool_input with no file_path field' {
+            $json = '{"tool_name":"Write","tool_input":{"content":"flowchart TD\n    A[Start --> B\n"}}'
             Invoke-MermaidValidationDecision -ToolInputRaw $json | Should -BeNullOrEmpty
         }
 
-        It 'allows a tool input whose file_path is an empty string' {
-            $json = '{"file_path":"","content":"flowchart TD\n    A[Start --> B\n"}'
+        It 'allows a well-formed tool_input whose file_path is an empty string' {
+            $json = '{"tool_name":"Write","tool_input":{"file_path":"","content":"flowchart TD\n    A[Start --> B\n"}}'
             Invoke-MermaidValidationDecision -ToolInputRaw $json | Should -BeNullOrEmpty
         }
 
@@ -330,60 +348,41 @@ flowchart TD
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-mermaid-validation.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
-        }
-
-        It 'emits compact deny JSON and exits 0 for an invalid diagram file' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = Get-WriteToolInputJson -FilePath 'docs/diagrams/entry.mmd' -Content @'
+    Context 'script entrypoint (no child process)' {
+        It 'emits compact deny JSON and returns exit code 0 for an invalid diagram file' {
+            $json = Get-WriteToolInputJson -FilePath 'docs/diagrams/entry.mmd' -Content @'
 flowchart TD
     A[Start --> B
 '@
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                $out | Should -Not -Match "`n"
-                $parsed = $out | ConvertFrom-Json
-                $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-                $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'MERMAID_VALIDATION_BLOCKED'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+            $out = Invoke-MermaidValidationEntryPoint -ToolInputRaw $json
+
+            $out | Should -Not -Match "`n"
+            $parsed = $out | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'MERMAID_VALIDATION_BLOCKED'
         }
 
-        It 'emits compact allow JSON and exits 0 for a valid diagram file' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = Get-WriteToolInputJson -FilePath 'docs/diagrams/entry.mmd' -Content @'
+        It 'emits compact allow JSON for a valid diagram file' {
+            $json = Get-WriteToolInputJson -FilePath 'docs/diagrams/entry.mmd' -Content @'
 flowchart TD
     A[Start] --> B
 '@
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                $parsed = $out | ConvertFrom-Json
-                $parsed.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+            $parsed = Invoke-MermaidValidationEntryPoint -ToolInputRaw $json | ConvertFrom-Json
+
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'exits 0 and emits nothing for an out-of-scope path' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = Get-WriteToolInputJson -FilePath 'scripts/foo.txt' -Content 'plain text'
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                $out | Should -BeNullOrEmpty
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'emits nothing for an out-of-scope path' {
+            $json = Get-WriteToolInputJson -FilePath 'scripts/foo.txt' -Content 'plain text'
+
+            Invoke-MermaidValidationEntryPoint -ToolInputRaw $json | Should -BeNullOrEmpty
+        }
+
+        It 'reads the payload through the shared reader' {
+            $hookText = Get-Content -Path $script:UnderTest -Raw
+
+            $hookText | Should -BeLike '*HookPayload.psm1*'
+            $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
         }
     }
 }

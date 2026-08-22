@@ -30,7 +30,7 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith {
                 @{ HasErrors = $true; ErrorText = '' }
             }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $json = '{"tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
@@ -43,7 +43,7 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith {
                 @{ HasErrors = $true; ErrorText = 'orchestrator-state: cycle 2 plan_path is empty' }
             }
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $json = '{"tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
@@ -77,7 +77,7 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             # its own; the only subprocess here is the pwsh process this test spawns.
             $prev = $env:CLAUDE_TOOL_INPUT
             try {
-                $env:CLAUDE_TOOL_INPUT = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+                $env:CLAUDE_TOOL_INPUT = '{"tool_name":"Bash","tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
                 $innerScript = @'
 . '{0}'
 $script:PrContextArtifactPath = '{0}'

@@ -301,7 +301,7 @@ Describe 'Invoke-OrchestratorStatePreflight' {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
             $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
 
-            $json = '{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}'
+            $json = '{"tool_name":"Bash","tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

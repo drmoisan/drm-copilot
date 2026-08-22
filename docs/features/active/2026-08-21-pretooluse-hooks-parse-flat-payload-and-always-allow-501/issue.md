@@ -84,4 +84,7 @@ Blocker. Every deterministic safety gate in the runtime is inert wherever this p
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template) - promoted as #501
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch - `docs/features/active/2026-08-21-pretooluse-hooks-parse-flat-payload-and-always-allow-501/`
+- [x] Fix implemented - shared payload reader at `.claude/lib/hook-payload/HookPayload.psm1`; all 24 PreToolUse hooks migrated to the stdin-first transport and the strict nested `tool_input` extraction; envelope anomalies now fail closed as an emitted deny at exit code 0
+- [x] End-to-end differential re-run post-fix - `evidence/regression-testing/2026-08-22T00-10-merge-gate-differential-postfix.md`, compared against the pre-fix baseline `evidence/baseline/2026-08-21T22-11-merge-gate-differential-prefix.md`
+- [ ] Open the pull request and land the fix

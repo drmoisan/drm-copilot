@@ -11,26 +11,36 @@ Describe 'enforce-epic-wave-barrier.ps1' {
         . $script:UnderTest
     }
 
-    Context 'allow (no-op) when the prompt lacks the epic-mode marker' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+    Context 'envelope anomalies and out-of-scope delegations' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw ''
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
         }
 
         It 'allows a non-orchestrator subagent delegation' {
-            $json = '{"subagent_type":"atomic-planner","prompt":"Epic mode: true. docs/features/active/child-b/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"atomic-planner","prompt":"Epic mode: true. docs/features/active/child-b/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an orchestrator delegation whose prompt has no epic-mode marker' {
-            $json = '{"subagent_type":"orchestrator","prompt":"Canonical issue number for this feature is 300. docs/features/active/child-a-300/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Canonical issue number for this feature is 300. docs/features/active/child-a-300/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-EpicWaveBarrierDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = '{"subagent_type":"orchestrator","prompt":"Epic mode: true."}'
+            $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
         }
     }
 
@@ -42,7 +52,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
                 '{"feature_folder":"2026-07-02-child-b-301","depends_on":["2026-07-02-child-a-300"],"merge_status":"not_started"}' +
                 ']}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. epic_feature_folder: epic-orchestrate-275. Upstream context for 2026-07-02-child-b-301: docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. epic_feature_folder: epic-orchestrate-275. Upstream context for 2026-07-02-child-b-301: docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -54,7 +64,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
                 '{"feature_folder":"2026-07-02-child-b-301","depends_on":["2026-07-02-child-a-300"],"merge_status":"not_started"}' +
                 ']}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -63,7 +73,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
             Mock -CommandName Get-EpicWaveBarrierCheckpointContent -MockWith {
                 '{"features":[{"feature_folder":"2026-07-02-child-a-300","depends_on":[],"merge_status":"not_started"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-a-300/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-a-300/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -77,7 +87,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
                 '{"feature_folder":"2026-07-02-child-b-301","depends_on":["2026-07-02-child-a-300"],"merge_status":"not_started"}' +
                 ']}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
@@ -87,14 +97,14 @@ Describe 'enforce-epic-wave-barrier.ps1' {
             Mock -CommandName Get-EpicWaveBarrierCheckpointContent -MockWith {
                 '{"features":[{"feature_folder":"2026-07-02-child-b-301","depends_on":["2026-07-02-child-a-300"],"merge_status":"not_started"}]}'
             }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
         }
 
         It 'denies when the prompt cannot be resolved to a feature folder' {
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. no path token here"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. no path token here"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
@@ -104,7 +114,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
     Context 'deny on unreadable epic checkpoint' {
         It 'denies when the epic checkpoint file is absent' {
             Mock -CommandName Get-EpicWaveBarrierCheckpointContent -MockWith { $null }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
@@ -112,7 +122,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
 
         It 'denies when the epic checkpoint content is malformed JSON' {
             Mock -CommandName Get-EpicWaveBarrierCheckpointContent -MockWith { '{ broken json' }
-            $json = '{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. docs/features/active/2026-07-02-child-b-301/spec.md"}}'
             $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
@@ -176,37 +186,73 @@ Describe 'enforce-epic-wave-barrier.ps1' {
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
+    Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
+        BeforeEach {
+            Mock -CommandName Get-EpicWaveBarrierCheckpointContent -MockWith { $null }
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
+
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ReadPayload $emptyReader
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
         }
 
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits a deny for unparseable JSON' {
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw '{not-json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not parseable JSON'
+        }
+
+        It 'returns exit code 0 and emits a deny for JSON with no tool_input key' {
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw '{"session_id":"s1","tool_name":"Bash"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
+        }
+
+        It 'returns exit code 0 and emits a deny for a null tool_input' {
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":null}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'tool_input is null'
+        }
+
+        It 'returns exit code 0 and emits a deny for a non-object tool_input' {
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":"text"}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not an object'
+        }
+
+        It 'denies the nested envelope when an epic-mode delegation names no feature folder' {
+            $nested = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Epic mode: true. no path token here"}}'
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WAVE_BARRIER_BLOCKED'
+        }
+
+        It 'allows a nested delegation whose prompt lacks the epic-mode marker' {
+            $nested = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"plain delegation"}}'
+            $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 }

@@ -14,7 +14,10 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         function Get-PowerShellToolInput {
             param([Parameter(Mandatory)][string] $FilePath)
 
-            return ([ordered]@{ file_path = $FilePath } | ConvertTo-Json -Compress)
+            return ([ordered]@{
+                    tool_name  = 'Write'
+                    tool_input = [ordered]@{ file_path = $FilePath; content = 'body' }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
     }
 
@@ -135,11 +138,32 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result.state.testFiles | Should -Contain 'tests/scripts/first.Tests.ps1'
     }
 
+    It 'denies an empty payload as an envelope anomaly (fail closed)' {
+        $result = Invoke-PowerShellBatchBudgetHook -ToolInputRaw '' -SessionId 'session-a' -Root '/repo'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*empty payload*'
+    }
+
+    It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+        $result = Invoke-PowerShellBatchBudgetHook -ToolInputRaw '{"file_path":"scripts/tool.ps1"}' -SessionId 'session-a' -Root '/repo'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*no tool_input key*'
+    }
+
+    It 'allows a well-formed tool_input carrying no file_path (scope filter)' {
+        $nested = '{"tool_name":"Bash","tool_input":{"command":"echo hi"}}'
+        $result = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $nested -SessionId 'session-a' -Root '/repo'
+
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
     It 'denies malformed tool-input JSON with a diagnostic before touching state' {
         $result = Invoke-PowerShellBatchBudgetHook -ToolInputRaw '{not-json' -SessionId 'session-a' -Root '/repo'
 
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*not parseable JSON*'
     }
 
     It 'allows valid non-PowerShell tool input without touching state' {
@@ -203,17 +227,20 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result.state.prodFiles | Should -Contain 'scripts/tool.ps1'
     }
 
-    It 'honors entrypoint environment caps while denying malformed JSON' {
-        $env:CLAUDE_TOOL_INPUT = '{not-json'
-        $env:CLAUDE_SESSION_ID = 'session-a'
-        $env:CLAUDE_POWERSHELL_BUDGET_PROD = '7'
-        $env:CLAUDE_POWERSHELL_BUDGET_TEST = '8'
+    It 'denies a nested envelope naming a PowerShell file once the production cap is full (AC-7)' {
+        $state = Get-PowerShellBatchBudgetState -ProdCap 1 -TestCap 1
+        $state.prodFiles = @('scripts/first.ps1')
 
-        $result = & $script:ScriptPath | ConvertFrom-Json
+        $decision = Invoke-PowerShellBatchBudgetDecision -FilePath 'scripts/second.ps1' -State $state -StateFile '/repo/.claude/state/x.json'
 
-        $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*malformed JSON*'
-        $result.PSObject.Properties.Name | Should -Not -Contain 'state'
+        $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+    }
+
+    It 'reads the payload through the shared reader at the entry point' {
+        $hookText = Get-Content -Path $script:ScriptPath -Raw
+
+        $hookText | Should -BeLike '*HookPayload.psm1*'
+        $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
     }
 }

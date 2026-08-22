@@ -12,25 +12,28 @@ Describe 'enforce-epic-merge-gate.ps1' {
     }
 
     Context 'commands outside scope' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw ''
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
         }
 
         It 'allows a non gh-pr-merge Bash command' {
-            $json = '{"command":"git status"}'
+            $json = '{"tool_input":{"command":"git status"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh pr merge without --merge (e.g., --squash)' {
-            $json = '{"command":"gh pr merge 10 --squash"}'
+            $json = '{"tool_input":{"command":"gh pr merge 10 --squash"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-EpicMergeGateDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
     }
 
@@ -40,7 +43,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
                 '{"epic_mode":true,"step9_status":"passed"}'
             }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -50,7 +53,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
                 '{"epic_mode":true,"step9_status":"pending"}'
             }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -63,7 +66,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"success"}}}'
             }
-            $json = '{"command":"gh pr merge 410 --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge 410 --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -73,7 +76,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"success"}}}'
             }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -86,7 +89,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"success"}}}'
             }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge 999 --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge 999 --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -100,7 +103,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
                 '{"epic_merge_pr":{"pr_number":410,"ci_gate":{"conclusion":"pending"}}}'
             }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge 410 --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge 410 --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -112,7 +115,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -122,7 +125,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { '{ broken' }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { '{ also broken' }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -136,7 +139,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
                 '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"gh pr merge --merge 501"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 501"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -149,7 +152,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
                 '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"pr_open"}]}'
             }
-            $json = '{"command":"gh pr merge --merge 501"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 501"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -161,7 +164,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
                 '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"gh pr merge --merge 777"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 777"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -173,7 +176,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
                 '{"route_id":"standard","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"gh pr merge --merge 501"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 501"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -183,7 +186,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
-            $json = '{"command":"gh pr merge --merge 501"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 501"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -193,7 +196,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { '{ broken parallel' }
-            $json = '{"command":"gh pr merge --merge 501"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge 501"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -205,7 +208,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
             Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith {
                 '{"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"gh pr merge --merge"}'
+            $json = '{"tool_input":{"command":"gh pr merge --merge"}}'
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
@@ -363,57 +366,90 @@ Describe 'enforce-epic-merge-gate.ps1' {
 
     Context 'Invoke-EpicMergeGateDecision - command field absent' {
         It 'allows when the JSON payload has no command field' {
-            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw '{"other":"value"}'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw '{"tool_input":{"other":"value"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
+    Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
+        BeforeEach {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
+            $emitted = Invoke-EpicMergeGateEntryPoint -ReadPayload $emptyReader 6> $null
+            $code = $emitted[-1]
+            $code | Should -Be 0
+            $code | Should -Not -Be 1
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
         }
 
-        It 'denies EPIC_MERGE_GATE_BLOCKED end-to-end with no checkpoints present in this repo checkout' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{"command":"gh pr merge 999999 --merge"}'
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                $parsed = $out | ConvertFrom-Json
-                $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
-                $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-                $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits a deny for unparseable JSON' {
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw '{not-json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
+        It 'returns exit code 0 and emits a deny for JSON with no tool_input key' {
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw '{"session_id":"s1","tool_name":"Bash"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
+        }
+
+        It 'returns exit code 0 and emits a deny for the legacy flat root shape' {
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw '{"command":"gh pr merge 999 --merge"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
+        }
+
+        It 'returns exit code 0 and emits a deny for a null tool_input' {
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":null}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'tool_input is null'
+        }
+
+        It 'returns exit code 0 and emits a deny for a non-object tool_input' {
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":"gh pr merge"}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not an object'
+        }
+
+        It 'denies the nested envelope end-to-end when no checkpoint satisfies the gate' {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"gh pr merge 999 --merge"}}'
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'allows the nested envelope when the child checkpoint authorizes the merge' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith {
+                '{"epic_mode":true,"step9_status":"passed"}'
             }
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"gh pr merge --merge"}}'
+            $emitted = Invoke-EpicMergeGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 }

@@ -170,10 +170,10 @@ Each of the 24 hooks imports the module `$PSScriptRoot`-relative (`Import-Module
 
 Seeded from issue (all four items are carried into the Acceptance Criteria below):
 
-- [ ] Unit coverage areas: every affected hook's payload-parse path, exercised against the nested shape; a negative test per hook proving the gate denies when it should. (AC-6, AC-7)
-- [ ] Integration scenario to retest: the differential test in Steps to Reproduce — only the nested form is honoured; the flat form is an envelope anomaly and denies. (AC-2, AC-3, AC-4)
-- [ ] Manual verification notes: confirm `enforce-epic-merge-gate` denies an unauthorised merge command under the payload Claude Code actually sends. (AC-10)
-- [ ] Regression guard: a test that fails if any hook reads a payload property directly off the parsed root instead of through the shared reader. (AC-8)
+- [x] Unit coverage areas: every affected hook's payload-parse path, exercised against the nested shape; a negative test per hook proving the gate denies when it should. (AC-6, AC-7)
+- [x] Integration scenario to retest: the differential test in Steps to Reproduce — only the nested form is honoured; the flat form is an envelope anomaly and denies. (AC-2, AC-3, AC-4)
+- [x] Manual verification notes: confirm `enforce-epic-merge-gate` denies an unauthorised merge command under the payload Claude Code actually sends. (AC-10)
+- [x] Regression guard: a test that fails if any hook reads a payload property directly off the parsed root instead of through the shared reader. (AC-8)
 
 - Regression tests to add or update:
   - Source-scanning contract suite (research Q7 guard 1; precedent: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`): derives the PreToolUse hook list by parsing `.claude/settings.json` (so a newly registered hook is automatically in scope), then asserts per hook file: (a) an `Import-Module` reference to the shared payload module and a call to its reader entry point are present; (b) the literals `$env:CLAUDE_TOOL_INPUT` and `$env:CLAUDE_HOOK_INPUT` are absent (they may appear only inside the shared module's fallback).
@@ -191,20 +191,94 @@ Seeded from issue (all four items are carried into the Acceptance Criteria below
 
 Every criterion is independently verifiable and capable of failing. Pre-fix expected results are stated where they differ, so each check discriminates.
 
-- [ ] **AC-1 (transport, unit).** `tests/scripts/claude-lib/hook-payload/HookPayload.Tests.ps1` exists and passes, including named tests asserting: a payload supplied on stdin is used even when both `CLAUDE_HOOK_INPUT` and `CLAUDE_TOOL_INPUT` are set (stdin precedence); with whitespace-only stdin the fallback order is `CLAUDE_HOOK_INPUT` then `CLAUDE_TOOL_INPUT`; a throwing stdin read falls back rather than propagating. Verify: `mcp__drm-copilot__run_poshqc_test` (or `Invoke-Pester -Path tests/scripts/claude-lib/hook-payload/HookPayload.Tests.ps1`).
-- [ ] **AC-2 (transport, end-to-end differential).** From the worktree root with `CLAUDE_TOOL_INPUT` and `CLAUDE_HOOK_INPUT` unset and no checkpoint satisfying any allow-branch, piping `{"tool_name":"Bash","tool_input":{"command":"gh pr merge 999 --merge"}}` into `pwsh -NoProfile -File .claude/hooks/enforce-epic-merge-gate.ps1` emits a deny decision whose `permissionDecisionReason` begins `EPIC_MERGE_GATE_BLOCKED:`. Pre-fix this command emits allow (research Q8), so the check fails against unfixed code.
-- [ ] **AC-3 (shape, isolated from transport).** Same checkpoint state, `CLAUDE_TOOL_INPUT` set to the nested envelope from AC-2 with empty stdin: the hook emits the same `EPIC_MERGE_GATE_BLOCKED:` deny. Pre-fix this is the issue's Step 2 and emits allow, so the check fails against shape-unfixed code even if transport were fixed via env fallback.
-- [ ] **AC-4 (fail-closed anomalies).** Named tests demonstrate that, for a gating hook (at minimum `enforce-epic-merge-gate.ps1`), each of the following produces an emitted deny JSON with process exit code 0 (or exit code 2), and in no case exit code 1: (a) empty payload on all three transports; (b) unparseable JSON; (c) JSON that parses but has no `tool_input` key — which includes the legacy flat root shape `{"command":"..."}`. Pre-fix, (a) and (c) allow and (b) exits 1, so each sub-check fails against unfixed code.
-- [ ] **AC-5 (deliberate exception pinned).** A named test asserts `validate-bash.ps1` retains allow-on-empty and continues treating unparseable raw text as the command text for denylist matching, preserving its documented manual/CLI usage.
-- [ ] **AC-6 (property-level tolerance preserved).** Named tests assert that a well-formed nested envelope whose `tool_input` lacks the hook's gated property (e.g. a Bash-call envelope with no `file_path`, evaluated by `enforce-orchestration-preimplementation-gate.ps1`) still produces allow — the scope-filter early returns survive the strict reader.
-- [ ] **AC-7 (per-hook nested deny test).** Each of the 24 PreToolUse hooks has at least one Pester test that feeds a nested envelope and asserts `permissionDecision` is `deny`, and the full `tests/scripts/claude-hooks/` tree passes with all payload fixtures migrated to the nested envelope. Verify via `mcp__drm-copilot__run_poshqc_test`.
-- [ ] **AC-8 (structural regression guard).** A source-scanning contract suite (extension of `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` or a sibling suite) passes, and by construction fails if reverted: it derives the PreToolUse hook set by parsing `.claude/settings.json` and asserts each hook file (i) imports the shared payload module and calls its reader entry point, and (ii) contains neither `$env:CLAUDE_TOOL_INPUT` nor `$env:CLAUDE_HOOK_INPUT` (permitted only inside the shared module). Falsifiability check: temporarily restoring the env read in any one hook makes the suite fail.
-- [ ] **AC-9 (mirror parity).** `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -k test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes with every changed hook and the new module copied byte-identically into `extensions/drm-copilot/resources/claude-customizations/.claude/`. This existing test is the enforcement mechanism; no new mirror guard is invented.
-- [ ] **AC-10 (end-to-end, tied to the baseline probe).** In a live Claude Code session with no checkpoint satisfying any allow-branch (same preconditions as `evidence/baseline/2026-08-21T21-58-merge-gate-inert-in-session-probe.md`), a `gh pr merge 999999 --merge` tool call is DENIED by the hook with a reason beginning `EPIC_MERGE_GATE_BLOCKED:`, and the command does not reach the `gh` CLI. The pre-fix probe recorded the command reaching `gh`; the post-fix result must differ. Record the post-fix probe under `docs/features/active/2026-08-21-pretooluse-hooks-parse-flat-payload-and-always-allow-501/evidence/qa-gates/`.
-- [ ] **AC-11 (coverage).** The PoshQC Pester run reports line coverage >= 85% with `.claude/lib/hook-payload/HookPayload.psm1` and every modified hook in the coverage denominator. No branch-coverage criterion applies (Pester does not measure branch coverage). No coverage exclusion is added for any production PowerShell file; the diff to any coverage configuration contains no new production-path exclude entry.
-- [ ] **AC-12 (file-size ceiling).** No new or modified production file exceeds 500 lines. Verify: `Get-ChildItem .claude/hooks/*.ps1, .claude/lib/hook-payload/*.psm1 | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Lines = (Get-Content $_.FullName).Count } } | Where-Object Lines -gt 500` returns no rows.
-- [ ] **AC-13 (scope boundaries held).** `git diff --name-only main...HEAD` contains no path under `.codex/hooks/`, and none of the eight SubagentStop validators (`validate-discovery-artifact-gate.ps1`, `validate-executor-output.ps1`, `validate-feature-review-coverage.ps1`, `validate-orchestrator-output.ps1`, `validate-planner-output.ps1`, `validate-pr-author-output.ps1`, `validate-required-artifact-output.ps1`, `validate-task-researcher-output.ps1`) appears in the diff.
-- [ ] **AC-14 (toolchain clean pass).** `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test` all pass in a single sequential pass with no file modified by the format stage.
+- [x] **AC-1 (transport, unit).** `tests/scripts/claude-lib/hook-payload/HookPayload.Tests.ps1` exists and passes, including named tests asserting: a payload supplied on stdin is used even when both `CLAUDE_HOOK_INPUT` and `CLAUDE_TOOL_INPUT` are set (stdin precedence); with whitespace-only stdin the fallback order is `CLAUDE_HOOK_INPUT` then `CLAUDE_TOOL_INPUT`; a throwing stdin read falls back rather than propagating. Verify: `mcp__drm-copilot__run_poshqc_test` (or `Invoke-Pester -Path tests/scripts/claude-lib/hook-payload/HookPayload.Tests.ps1`).
+- [x] **AC-2 (transport, end-to-end differential).** From the worktree root with `CLAUDE_TOOL_INPUT` and `CLAUDE_HOOK_INPUT` unset and no checkpoint satisfying any allow-branch, piping `{"tool_name":"Bash","tool_input":{"command":"gh pr merge 999 --merge"}}` into `pwsh -NoProfile -File .claude/hooks/enforce-epic-merge-gate.ps1` emits a deny decision whose `permissionDecisionReason` begins `EPIC_MERGE_GATE_BLOCKED:`. Pre-fix this command emits allow (research Q8), so the check fails against unfixed code.
+- [x] **AC-3 (shape, isolated from transport).** Same checkpoint state, `CLAUDE_TOOL_INPUT` set to the nested envelope from AC-2 with empty stdin: the hook emits the same `EPIC_MERGE_GATE_BLOCKED:` deny. Pre-fix this is the issue's Step 2 and emits allow, so the check fails against shape-unfixed code even if transport were fixed via env fallback.
+- [x] **AC-4 (fail-closed anomalies).** Named tests demonstrate that, for a gating hook (at minimum `enforce-epic-merge-gate.ps1`), each of the following produces an emitted deny JSON with process exit code 0 (or exit code 2), and in no case exit code 1: (a) empty payload on all three transports; (b) unparseable JSON; (c) JSON that parses but has no `tool_input` key — which includes the legacy flat root shape `{"command":"..."}`. Pre-fix, (a) and (c) allow and (b) exits 1, so each sub-check fails against unfixed code.
+- [x] **AC-5 (deliberate exception pinned).** A named test asserts `validate-bash.ps1` retains allow-on-empty and continues treating unparseable raw text as the command text for denylist matching, preserving its documented manual/CLI usage.
+- [x] **AC-6 (property-level tolerance preserved).** Named tests assert that a well-formed nested envelope whose `tool_input` lacks the hook's gated property (e.g. a Bash-call envelope with no `file_path`, evaluated by `enforce-orchestration-preimplementation-gate.ps1`) still produces allow — the scope-filter early returns survive the strict reader.
+- [x] **AC-7 (per-hook nested deny test).** Each of the 24 PreToolUse hooks has at least one Pester test that feeds a nested envelope and asserts `permissionDecision` is `deny`, and the full `tests/scripts/claude-hooks/` tree passes with all payload fixtures migrated to the nested envelope. Verify via `mcp__drm-copilot__run_poshqc_test`.
+- [x] **AC-8 (structural regression guard).** A source-scanning contract suite (extension of `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` or a sibling suite) passes, and by construction fails if reverted: it derives the PreToolUse hook set by parsing `.claude/settings.json` and asserts each hook file (i) imports the shared payload module and calls its reader entry point, and (ii) contains neither `$env:CLAUDE_TOOL_INPUT` nor `$env:CLAUDE_HOOK_INPUT` (permitted only inside the shared module). Falsifiability check: temporarily restoring the env read in any one hook makes the suite fail.
+- [x] **AC-9 (mirror parity).** `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -k test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes with every changed hook and the new module copied byte-identically into `extensions/drm-copilot/resources/claude-customizations/.claude/`. This existing test is the enforcement mechanism; no new mirror guard is invented.
+- [x] **AC-10 (end-to-end, tied to the baseline probe).** In a live Claude Code session with no checkpoint satisfying any allow-branch (same preconditions as `evidence/baseline/2026-08-21T21-58-merge-gate-inert-in-session-probe.md`), a `gh pr merge 999999 --merge` tool call is DENIED by the hook with a reason beginning `EPIC_MERGE_GATE_BLOCKED:`, and the command does not reach the `gh` CLI. The pre-fix probe recorded the command reaching `gh`; the post-fix result must differ. Record the post-fix probe under `docs/features/active/2026-08-21-pretooluse-hooks-parse-flat-payload-and-always-allow-501/evidence/qa-gates/`.
+- [x] **AC-11 (coverage).** The PoshQC Pester run reports line coverage >= 85% with `.claude/lib/hook-payload/HookPayload.psm1` and every modified hook in the coverage denominator. No branch-coverage criterion applies (Pester does not measure branch coverage). No coverage exclusion is added for any production PowerShell file; the diff to any coverage configuration contains no new production-path exclude entry.
+- [x] **AC-12 (file-size ceiling).** No new or modified production file exceeds 500 lines. Verify: `Get-ChildItem .claude/hooks/*.ps1, .claude/lib/hook-payload/*.psm1 | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Lines = (Get-Content $_.FullName).Count } } | Where-Object Lines -gt 500` returns no rows.
+- [x] **AC-13 (scope boundaries held).** `git diff --name-only main...HEAD` contains no path under `.codex/hooks/`, and none of the eight SubagentStop validators (`validate-discovery-artifact-gate.ps1`, `validate-executor-output.ps1`, `validate-feature-review-coverage.ps1`, `validate-orchestrator-output.ps1`, `validate-planner-output.ps1`, `validate-pr-author-output.ps1`, `validate-required-artifact-output.ps1`, `validate-task-researcher-output.ps1`) appears in the diff.
+- [x] **AC-14 (toolchain clean pass).** `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test` all pass in a single sequential pass with no file modified by the format stage.
+
+## Executed Outcome and Deviations (recorded at execution, issue #501)
+
+Implemented as specified: the shared payload reader `.claude/lib/hook-payload/HookPayload.psm1`
+(stdin-first behind two injectable scriptblock seams, then `CLAUDE_HOOK_INPUT`, then
+`CLAUDE_TOOL_INPUT`), strict nested `tool_input` extraction with no flat-root fallback, and
+fail-closed envelope anomalies emitted as a deny decision at process exit code 0. All 24
+PreToolUse hooks were migrated and mirrored. `.claude/settings.json` needed no change, as the
+research predicted.
+
+Four deviations are recorded here because the plan did not anticipate them.
+
+### 1. The mandated entry-point tail swallowed the decision JSON, and was corrected
+
+The plan mandated the file tail `exit (Invoke-<Name>EntryPoint)`, citing
+`enforce-evidence-locations.ps1` as precedent. That precedent is defective. PowerShell
+evaluates the parenthesised expression and uses its value as the exit code, so a function
+that writes its decision with `Write-Output` has that output captured INTO the exit
+expression and the hook emits nothing at all on stdout.
+
+The defect was verified empirically, both in isolation and against the pre-change
+`enforce-evidence-locations.ps1` at `HEAD`, which emits an empty stdout for a forbidden path.
+It was previously invisible because that hook was inert for the separate transport reason.
+
+Following the plan literally would have shipped hooks that emit no decision, contradicting
+AC-2, AC-3, and AC-4, which all require an EMITTED deny. The mandated
+`Invoke-<Name>EntryPoint` seam and its `[int]` return are retained unchanged; only the tail
+was corrected to write the decision before exiting:
+
+```powershell
+$entryPointResult = @(Invoke-<Name>EntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
+}
+
+exit ([int]$entryPointResult[-1])
+```
+
+The correction was applied to all eight hooks carrying that tail, including the pre-existing
+`enforce-evidence-locations.ps1` defect, which this feature therefore also fixes.
+
+### 2. `enforce-mermaid-validation.ps1`'s allow-on-unparseable note was revised, not preserved
+
+That hook carried a header note prohibiting a fail-closed change on unparseable input. The
+note conflated two different conditions. The plan's Phase 2/3 preamble requires envelope
+anomalies to fail closed in every migrated hook and names only `validate-bash.ps1` (AC-5) as
+a deliberate exception, so the hook now denies on an ENVELOPE-level anomaly (empty payload,
+unparseable envelope, missing or malformed `tool_input`) while keeping every CONTENT-level
+tolerance the original note defends: an Edit fragment, a Markdown file with no fence, an
+absent validation module, and an unclassifiable diagram all still allow. The header note was
+rewritten to state that distinction rather than left contradicting the code.
+
+### 3. Two suites outside the plan's list required migration
+
+- `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` drives five migrated
+  decision functions with flat `-ToolInputRaw` fixtures. It was migrated incrementally in the
+  batch that first changed each hook it references.
+- `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` dot-sources
+  `enforce-pr-author-skill.ps1` and feeds it a flat payload. Under the strict reader its first
+  test short-circuited on the anomaly, which also broke the two following tests: they mock a
+  command that only becomes resolvable after that first test's call triggers a lazy
+  `Import-Module`. Nesting the fixture restored both the assertion and the load order.
+
+### 4. `[P6-T2]` was not executed by the executor
+
+`[P6-T2]` requires the MCP tool `mcp__drm-copilot__new_potential_bug_entry`, which is outside
+the executor's tool allowlist. Direct file writes under `docs/features/potential/` are exactly
+what `enforce-promotion-mcp-only.ps1` exists to block, and that hook is live from batch B3
+onward, so no substitute was attempted. The task maps to no acceptance criterion. It is
+reported at handoff for the orchestrator, which holds the tool.
+
+### Note on `.claude/settings.json`
+
+No change was required or made. The contingency the Plan Overview allowed was not exercised.
 
 ## Risks & Mitigations
 

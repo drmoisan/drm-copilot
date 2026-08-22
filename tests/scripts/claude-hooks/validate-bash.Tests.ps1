@@ -80,23 +80,17 @@ Describe "validate-bash.ps1" {
         }
     }
 
-    Context "Invoke-ValidateBashDecision routes JSON and positional input" {
-        It "returns a deny decision from a blocked command in JSON 'command' field" {
-            $decision = Invoke-ValidateBashDecision -ToolInputRaw '{"command":"rm -rf /tmp"}'
+    Context "Invoke-ValidateBashDecision routes the nested envelope and positional input" {
+        It "returns a deny decision from a blocked command in the nested tool_input" {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"rm -rf /tmp"}}'
+            $decision = Invoke-ValidateBashDecision -ToolInputRaw $nested
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         }
 
-        It "returns `$null (allow) for a safe command in JSON 'command' field" {
-            Invoke-ValidateBashDecision -ToolInputRaw '{"command":"git status"}' | Should -BeNullOrEmpty
-        }
-
-        It "falls back to raw input when JSON is malformed and blocked" {
-            $decision = Invoke-ValidateBashDecision -ToolInputRaw 'not-valid-json rm -rf /danger'
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        }
-
-        It "returns `$null (allow) when malformed JSON value is safe" {
-            Invoke-ValidateBashDecision -ToolInputRaw 'not-json-but-safe' | Should -BeNullOrEmpty
+        It "returns `$null (allow) for a safe command in the nested tool_input" {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"git status"}}'
+            Invoke-ValidateBashDecision -ToolInputRaw $nested | Should -BeNullOrEmpty
         }
 
         It "uses the positional input when no tool input is provided" {
@@ -106,6 +100,55 @@ Describe "validate-bash.ps1" {
 
         It "returns `$null (allow) when no input is provided" {
             Invoke-ValidateBashDecision | Should -BeNullOrEmpty
+        }
+    }
+
+    Context "AC-5 pinned exception: allow-on-empty" {
+        # validate-bash.ps1 is a dangerous-command denylist, not a receipt gate, so it
+        # keeps allowing an empty payload where every other PreToolUse hook now denies.
+        It "returns `$null (allow) for an empty payload rather than an envelope-anomaly deny" {
+            Invoke-ValidateBashDecision -ToolInputRaw '' | Should -BeNullOrEmpty
+        }
+
+        It "returns `$null (allow) when every transport is empty" {
+            $raw = Read-ClaudeHookRawPayload `
+                -ReadStandardInput { '' } `
+                -TestStandardInputRedirected { $true } `
+                -HookInputFallback '' `
+                -ToolInputFallback ''
+            Invoke-ValidateBashDecision -ToolInputRaw $raw | Should -BeNullOrEmpty
+        }
+    }
+
+    Context "AC-5 pinned exception: unparseable raw text is the command text" {
+        # Preserves the documented manual/CLI usage, where the operator supplies the
+        # command directly rather than a JSON envelope.
+        It "denies when unparseable raw input carries a blocked pattern" {
+            $decision = Invoke-ValidateBashDecision -ToolInputRaw 'not-valid-json rm -rf /danger'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*rm -rf*'
+        }
+
+        It "returns `$null (allow) when the unparseable raw input is safe" {
+            Invoke-ValidateBashDecision -ToolInputRaw 'not-json-but-safe' | Should -BeNullOrEmpty
+        }
+    }
+
+    Context "shared payload reader is used for transport" {
+        It "imports the shared payload module" {
+            $lines = Get-Content -Path $script:ScriptPath -Raw
+            $lines | Should -BeLike '*HookPayload.psm1*'
+            $lines | Should -BeLike '*Read-ClaudeHookRawPayload*'
+        }
+
+        It "extracts the command from the nested tool_input, not the flat root" {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"git reset --hard"}}'
+            Get-BashCommandToCheck -ToolInputRaw $nested | Should -Be 'git reset --hard'
+        }
+
+        It "returns an empty command for a well-formed envelope whose tool_input has no command" {
+            $nested = '{"tool_name":"Write","tool_input":{"file_path":"src/x.ts"}}'
+            Get-BashCommandToCheck -ToolInputRaw $nested | Should -Be ''
         }
     }
 

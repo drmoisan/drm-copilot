@@ -16,22 +16,44 @@ Describe 'enforce-model-routing-receipt.ps1' {
         }
     }
 
-    Context 'graceful allow-through' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-ModelRoutingReceiptDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    Context 'envelope anomalies fail closed; out-of-scope delegations allow' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'MODEL_ROUTING_RECEIPT_BLOCKED'
         }
 
-        It 'allows on malformed JSON' {
-            (Invoke-ModelRoutingReceiptDecision -ToolInputRaw '{not-json').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = (@{ subagent_type = 'atomic-planner'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
+        }
+
+        It 'allows a well-formed tool_input carrying no subagent_type (scope filter)' {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"echo hi"}}'
+            (Invoke-ModelRoutingReceiptDecision -ToolInputRaw $nested).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'denies unparseable JSON as an envelope anomaly (fail closed)' {
+            $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
 
         It 'allows a non-delegating subagent_type' {
-            $json = (@{ subagent_type = 'commit-message'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'commit-message'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an orchestrator subagent_type (caller, not receipt-gated)' {
-            $json = (@{ subagent_type = 'orchestrator'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'orchestrator'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
@@ -39,13 +61,19 @@ Describe 'enforce-model-routing-receipt.ps1' {
     Context 'presence gating for a delegating subagent_type' {
         It 'allows when a routing receipt exists for the subagent' {
             Mock -CommandName Get-ModelRoutingCheckpoint -MockWith { Get-SyntheticCheckpoint -ReceiptAgents @('atomic-planner') }
-            $json = (@{ subagent_type = 'atomic-planner'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'denies with MODEL_ROUTING_RECEIPT_BLOCKED when no receipt exists for the subagent' {
             Mock -CommandName Get-ModelRoutingCheckpoint -MockWith { Get-SyntheticCheckpoint -ReceiptAgents @('feature-review') }
-            $json = (@{ subagent_type = 'atomic-planner'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'MODEL_ROUTING_RECEIPT_BLOCKED'
@@ -54,7 +82,10 @@ Describe 'enforce-model-routing-receipt.ps1' {
 
         It 'denies when the checkpoint is missing (no receipts at all)' {
             Mock -CommandName Get-ModelRoutingCheckpoint -MockWith { $null }
-            $json = (@{ subagent_type = 'atomic-executor'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-executor'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'MODEL_ROUTING_RECEIPT_BLOCKED'
@@ -62,7 +93,10 @@ Describe 'enforce-model-routing-receipt.ps1' {
 
         It 'denies when the checkpoint has no model_routing_receipts property' {
             Mock -CommandName Get-ModelRoutingCheckpoint -MockWith { [pscustomobject]@{ objective = 'x' } }
-            $json = (@{ subagent_type = 'feature-review'; prompt = 'x' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'feature-review'; prompt = 'x' }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }

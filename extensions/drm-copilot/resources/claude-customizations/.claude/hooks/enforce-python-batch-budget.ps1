@@ -34,6 +34,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-PythonBatchBudgetState {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -162,17 +164,15 @@ function Invoke-PythonBatchBudgetHook {
         }
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-PythonBatchBudgetBlockDecision -Reason (
+            'Python batch-budget hook received an unreadable PreToolUse envelope: ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        return Get-PythonBatchBudgetBlockDecision -Reason 'Python batch-budget hook received malformed JSON in CLAUDE_TOOL_INPUT.'
-    }
-
-    $filePath = $toolInput.file_path
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -229,7 +229,7 @@ if ($env:CLAUDE_PYTHON_BUDGET_TEST -match '^\d+$') {
     $testCap = [int]$env:CLAUDE_PYTHON_BUDGET_TEST
 }
 
-$decision = Invoke-PythonBatchBudgetHook -ToolInputRaw $env:CLAUDE_TOOL_INPUT -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
+$decision = Invoke-PythonBatchBudgetHook -ToolInputRaw (Read-ClaudeHookRawPayload) -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
 if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
     $decision.Remove('state')
     $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output

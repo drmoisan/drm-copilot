@@ -8,27 +8,38 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
     }
 
     Context 'tool input parsing' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'CHECKPOINT_MONOTONIC_BLOCKED'
         }
 
         It 'allows when file_path is missing' {
-            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '{"content":"{}"}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Invoke-CheckpointMonotonicDecision -ToolInputRaw '{"tool_input":{"content":"{}"}}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when path is not the checkpoint' {
-            $json = '{"file_path":"some/other.json","content":"{\"completed_steps\":[\"S1\"]}"}'
+            $json = '{"tool_input":{"file_path":"some/other.json","content":"{\"completed_steps\":[\"S1\"]}"}}'
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-CheckpointMonotonicDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = '{"file_path":"artifacts/orchestration/orchestrator-state.json","content":"{}"}'
+            $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
         }
     }
 
     Context 'Edit tool calls (no full content)' {
         It 'allows an Edit-style call that only supplies old_string/new_string' {
-            $json = '{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}'
+            $json = '{"tool_input":{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}}'
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
@@ -36,31 +47,46 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
     Context 'Write tool calls' {
         It 'allows when content has no completed_steps field' {
             $content = '{"objective":"x"}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when steps are in canonical order with promotion and planning present' {
             $content = '{"completed_steps":["S0_startup_checks","S1_change_budget_estimation","S3_promotion","S4_atomic_planning","S5_atomic_execution","S12_complete"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when a single canonical step is present' {
             $content = '{"completed_steps":["S0_startup_checks"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows non-canonical informational entries' {
             $content = '{"completed_steps":["S0_startup_checks","informational_note","S4_atomic_planning"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'denies when later step appears before earlier step' {
             $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'S5_atomic_execution'
@@ -69,7 +95,10 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
 
         It 'denies Issue #232 implementation completion without promotion and planning prerequisites' {
             $content = '{"issue-num":"232","completed_steps":["S5_atomic_execution"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -79,7 +108,10 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
 
         It 'denies Issue #232 PR completion without planning prerequisite' {
             $content = '{"issue-num":"232","completed_steps":["S3_promotion_issue","S8_create_pr"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -88,12 +120,18 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
 
         It 'allows out-of-order when rollback_history is non-empty' {
             $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"],"rollback_history":[{"step":"S5_atomic_execution","reason":"reset"}]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when content itself is not valid JSON (defers to downstream tools)' {
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' }
+                } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-CheckpointMonotonicDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
@@ -101,7 +139,10 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
     Context 'Part-4 prerequisite gate (serialize-then-parse contract)' {
         It 'denies an advanced step with S3_promotion and S4_atomic_planning both missing and names both prerequisites in the deny reason' {
             $content = '{"completed_steps":["S5_atomic_execution"]}'
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $json
 
             $parsed = $decision | ConvertTo-Json -Depth 5 | ConvertFrom-Json
@@ -113,32 +154,25 @@ Describe 'enforce-checkpoint-monotonic.ps1' {
         }
     }
 
-    Context 'Entrypoint (script body)' {
-        It 'emits an allow decision JSON when CLAUDE_TOOL_INPUT is empty' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+    Context 'Entrypoint transport' {
+        It 'reads the payload through the shared reader' {
+            $hookText = Get-Content -Path $script:UnderTest -Raw
+
+            $hookText | Should -BeLike '*HookPayload.psm1*'
+            $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
         }
 
-        It 'emits a deny decision JSON when steps are out of order' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"]}'
-                $payload = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-                $env:CLAUDE_TOOL_INPUT = $payload
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
-                $output | Should -Match 'CHECKPOINT_ORDER_BLOCKED'
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'emits a deny decision JSON when steps are out of order under the nested envelope' {
+            $content = '{"completed_steps":["S5_atomic_execution","S4_atomic_planning"]}'
+            $payload = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content }
+                } | ConvertTo-Json -Compress -Depth 5)
+
+            $output = Invoke-CheckpointMonotonicDecision -ToolInputRaw $payload | ConvertTo-Json -Compress -Depth 5
+
+            $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
+            $output | Should -Match 'CHECKPOINT_ORDER_BLOCKED'
         }
     }
 

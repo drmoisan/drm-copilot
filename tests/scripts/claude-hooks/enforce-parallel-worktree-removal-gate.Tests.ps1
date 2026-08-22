@@ -22,34 +22,37 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
     }
 
     Context 'commands outside scope are allowed unconditionally' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw ''
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_WORKTREE_REMOVAL_BLOCKED'
         }
 
         It 'allows when the JSON payload has no command field' {
-            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"other":"value"}'
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"other":"value"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows git worktree list' {
-            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"command":"git worktree list"}'
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"command":"git worktree list"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows git worktree add' {
-            $json = '{"command":"git worktree add /repo/worktrees/item-a origin/main"}'
+            $json = '{"tool_input":{"command":"git worktree add /repo/worktrees/item-a origin/main"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an unrelated Bash command' {
-            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"command":"git status --short"}'
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"command":"git status --short"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
     }
 
@@ -58,7 +61,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -67,7 +70,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"worktree_removed"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -76,7 +79,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101 --force"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101 --force"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -87,7 +90,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"not_started"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -97,7 +100,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"worktree_created"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -107,7 +110,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"pr_open"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -117,7 +120,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -127,7 +130,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"blocked_drift"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -137,7 +140,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"blocked_ci_loop_limit"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -147,7 +150,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -157,7 +160,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
     Context 'deny fail-closed on an unusable checkpoint or an unmatched path' {
         It 'denies when the parallel checkpoint file is absent' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { $null }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -165,7 +168,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
 
         It 'denies when the parallel checkpoint content is malformed JSON' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { '{ broken json' }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -175,7 +178,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":102,"worktree_path":"/repo/worktrees/item-b-102","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -183,7 +186,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
 
         It 'denies when the checkpoint carries no items key' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { '{"features":[]}' }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:*'
@@ -195,7 +198,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -Times 1 -Exactly
@@ -205,7 +208,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"ci_green"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             Should -Invoke -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -Times 1 -Exactly
@@ -213,7 +216,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
 
         It 'does not call the read seam for a command that is not git worktree remove' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { $null }
-            $null = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"command":"git worktree list"}'
+            $null = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"command":"git worktree list"}}'
             Should -Invoke -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -Times 0 -Exactly
         }
     }
@@ -223,7 +226,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"C:\\repo\\worktrees\\item-a-101","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove C:/repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove C:/repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -232,7 +235,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101/","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove /repo/worktrees/item-a-101"}'
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -241,7 +244,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
             Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
                 '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
             }
-            $json = '{"command":"git worktree remove \"/repo/worktrees/item-a-101\""}'
+            $json = '{"tool_input":{"command":"git worktree remove \"/repo/worktrees/item-a-101\""}}'
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -314,37 +317,76 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
+    Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
+        BeforeEach {
+            Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { $null }
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
+
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ReadPayload $emptyReader
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_WORKTREE_REMOVAL_BLOCKED'
         }
 
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
+        It 'returns exit code 0 and emits a deny for unparseable JSON' {
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw '{not-json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not parseable JSON'
+        }
+
+        It 'returns exit code 0 and emits a deny for JSON with no tool_input key' {
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw '{"session_id":"s1","tool_name":"Bash"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
+        }
+
+        It 'returns exit code 0 and emits a deny for a null tool_input' {
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":null}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'tool_input is null'
+        }
+
+        It 'returns exit code 0 and emits a deny for a non-object tool_input' {
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":"text"}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not an object'
+        }
+
+        It 'denies the nested envelope end-to-end when no checkpoint record authorizes removal' {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'allows the nested envelope when the checkpoint records the item as merged' {
+            Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
+                '{"items":[{"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
             }
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"git worktree remove /repo/worktrees/item-a-101"}}'
+            $emitted = Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 }

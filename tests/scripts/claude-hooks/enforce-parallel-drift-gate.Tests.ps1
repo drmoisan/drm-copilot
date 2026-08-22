@@ -29,7 +29,10 @@ Describe 'enforce-parallel-drift-gate.ps1' {
 
         function Get-ToolInputJson {
             param([string] $Subagent = 'feature-review', [string] $Prompt = '')
-            return (@{ subagent_type = $Subagent; prompt = $Prompt } | ConvertTo-Json -Compress)
+            return (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = $Subagent; prompt = $Prompt }
+                } | ConvertTo-Json -Compress -Depth 5)
         }
 
         function Get-CheckpointJson {
@@ -50,8 +53,17 @@ Describe 'enforce-parallel-drift-gate.ps1' {
     }
 
     Context 'allow paths that never engage the gate' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-ParallelDriftGateDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_DRIFT_GATE_BLOCKED'
+        }
+
+        It 'denies the legacy flat root shape as a missing-tool_input anomaly' {
+            $flat = '{"subagent_type":"feature-review","prompt":"Parallel mode: true."}'
+            $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw $flat
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'no tool_input key'
         }
 
         It 'allows a non-feature-review subagent_type even under the marker' {
@@ -65,12 +77,14 @@ Describe 'enforce-parallel-drift-gate.ps1' {
         }
 
         It 'allows a feature-review delegation whose prompt is absent' {
-            $payload = '{"subagent_type":"feature-review"}'
+            $payload = '{"tool_name":"Agent","tool_input":{"subagent_type":"feature-review"}}'
             (Invoke-ParallelDriftGateDecision -ToolInputRaw $payload).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-ParallelDriftGateDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
     }
 
@@ -351,36 +365,73 @@ Describe 'enforce-parallel-drift-gate.ps1' {
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
+    Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
+        BeforeEach {
+            Mock -CommandName Get-ParallelDriftGateCheckpointContent -MockWith { $null }
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, allow)' {
-            $previous = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:UnderTest
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $previous
+
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ReadPayload $emptyReader
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_DRIFT_GATE_BLOCKED'
         }
 
-        It 'exits 1 on malformed JSON' {
-            $previous = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $previous
-            }
+        It 'returns exit code 0 and emits a deny for unparseable JSON' {
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw '{not-json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not parseable JSON'
+        }
+
+        It 'returns exit code 0 and emits a deny for JSON with no tool_input key' {
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw '{"session_id":"s1","tool_name":"Bash"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
+        }
+
+        It 'returns exit code 0 and emits a deny for a null tool_input' {
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":null}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'tool_input is null'
+        }
+
+        It 'returns exit code 0 and emits a deny for a non-object tool_input' {
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":"text"}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not an object'
+        }
+
+        It 'denies the nested envelope when the parallel checkpoint is unreadable (AC-7)' {
+            $nested = Get-ToolInputJson -Prompt $script:AlphaPrompt
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_DRIFT_GATE_BLOCKED'
+        }
+
+        It 'allows a nested delegation whose subagent_type is out of scope' {
+            $nested = Get-ToolInputJson -Subagent 'atomic-planner' -Prompt $script:AlphaPrompt
+            $emitted = Invoke-ParallelDriftGateEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 }

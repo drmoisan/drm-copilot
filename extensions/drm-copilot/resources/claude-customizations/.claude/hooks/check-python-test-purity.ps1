@@ -4,10 +4,10 @@
 
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
-    operation on a file path matching tests/**/*.py. It reads the tool input from the
-    CLAUDE_TOOL_INPUT environment variable (JSON with 'file_path' and a content field:
-    'content' for Write, 'new_string' for Edit) and rejects the operation when the
-    proposed content introduces forbidden runtime dependencies.
+    operation on a file path matching tests/**/*.py. It acquires the hook payload
+    through the shared reader and reads the envelope's nested tool_input ('file_path'
+    plus a content field: 'content' for Write, 'new_string' for Edit), then rejects the
+    operation when the proposed content introduces forbidden runtime dependencies.
 
     Forbidden patterns in unit tests include:
       - temporary filesystem usage (tempfile, NamedTemporaryFile, TemporaryDirectory,
@@ -29,6 +29,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-PythonTestPurityBlockDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -65,17 +67,15 @@ function Invoke-PythonTestPurityDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return $null
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-PythonTestPurityBlockDecision -Reason (
+            'Python unit test purity hook received an unreadable PreToolUse envelope: ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        return Get-PythonTestPurityBlockDecision -Reason 'Python unit test purity hook received malformed JSON in CLAUDE_TOOL_INPUT.'
-    }
-
-    $filePath = $toolInput.file_path
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'file_path'
     if (-not $filePath) {
         return $null
     }
@@ -84,11 +84,9 @@ function Invoke-PythonTestPurityDecision {
         return $null
     }
 
-    $content = $null
-    if ($null -ne $toolInput.content) {
-        $content = [string]$toolInput.content
-    } elseif ($null -ne $toolInput.new_string) {
-        $content = [string]$toolInput.new_string
+    $content = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'content'
+    if (-not $content) {
+        $content = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'new_string'
     }
 
     if (-not $content) {
@@ -141,7 +139,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$decision = Invoke-PythonTestPurityDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+$decision = Invoke-PythonTestPurityDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
     $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 }

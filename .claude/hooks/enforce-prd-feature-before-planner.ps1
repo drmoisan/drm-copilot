@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the Agent (Task) tool. Reads
-    tool input JSON from the CLAUDE_TOOL_INPUT environment variable. Activates
+    tool input JSON from the the envelope's nested tool_input environment variable. Activates
     only when subagent_type is 'atomic-planner'.
 
     Feature folder resolution order:
@@ -34,6 +34,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-PrdFeatureFileExistence {
     <#
     .SYNOPSIS
@@ -150,7 +152,7 @@ function Get-PrdFeatureMissingFile {
 function Invoke-PrdFeatureBeforePlannerDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the envelope's nested tool_input and returns an allow-or-block decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -158,23 +160,25 @@ function Invoke-PrdFeatureBeforePlannerDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'PRD_FEATURE_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-prd-feature-before-planner hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $subagent = $toolInput.subagent_type
+    $subagent = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'subagent_type'
     if (-not $subagent -or $subagent -ne 'atomic-planner') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $prompt = [string]$toolInput.prompt
+    $prompt = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'prompt'
     $folder = Find-PrdFeatureFolderFromPrompt -Prompt $prompt
     if (-not $folder) {
         $folder = Get-PrdFeatureCheckpointFolder
@@ -211,13 +215,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

@@ -8,45 +8,48 @@ Describe 'enforce-promotion-mcp-only.ps1' {
     }
 
     Context 'tool input parsing' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
+        It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw ''
             $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PROMOTION_MCP_ONLY_BLOCKED'
         }
 
         It 'allows when JSON has no command field' {
-            $json = '{"other":"value"}'
+            $json = '{"tool_input":{"other":"value"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'throws on malformed JSON so the hook exits 1' {
-            { Invoke-PromotionMcpOnlyDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw '{not-json'
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
         }
     }
 
     Context 'legacy promotion-script tokens' {
         It 'blocks new-potential-entry.ps1' {
-            $json = '{"command":"pwsh ./scripts/new-potential-entry.ps1 -ShortName foo"}'
+            $json = '{"tool_input":{"command":"pwsh ./scripts/new-potential-entry.ps1 -ShortName foo"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PROMOTION_MCP_ONLY_BLOCKED'
         }
 
         It 'blocks new_potential_bug_entry' {
-            $json = '{"command":"some-tool new_potential_bug_entry --short bar"}'
+            $json = '{"tool_input":{"command":"some-tool new_potential_bug_entry --short bar"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'blocks potential_to_issue' {
-            $json = '{"command":"./bin/promote potential_to_issue --path foo.md"}'
+            $json = '{"tool_input":{"command":"./bin/promote potential_to_issue --path foo.md"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'blocks new_active_feature_folder' {
-            $json = '{"command":"./bin/init new_active_feature_folder --name baz"}'
+            $json = '{"tool_input":{"command":"./bin/init new_active_feature_folder --name baz"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
@@ -54,58 +57,58 @@ Describe 'enforce-promotion-mcp-only.ps1' {
 
     Context 'gh CLI issue creation bypass' {
         It 'blocks gh issue create with a flag suffix' {
-            $json = '{"command":"gh issue create --title \"foo\" --body \"bar\""}'
+            $json = '{"tool_input":{"command":"gh issue create --title \"foo\" --body \"bar\""}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'mcp__drm-copilot__new_potential_entry'
         }
 
         It 'blocks gh issue create with no flags' {
-            $json = '{"command":"gh issue create"}'
+            $json = '{"tool_input":{"command":"gh issue create"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'blocks gh issue create case-insensitively' {
-            $json = '{"command":"GH Issue Create --title hello"}'
+            $json = '{"tool_input":{"command":"GH Issue Create --title hello"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'blocks gh issue new' {
-            $json = '{"command":"gh issue new --title \"foo\""}'
+            $json = '{"tool_input":{"command":"gh issue new --title \"foo\""}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'mcp__drm-copilot__new_potential_entry'
         }
 
         It 'blocks gh api repos/owner/repo/issues -X POST -f title=foo' {
-            $json = '{"command":"gh api repos/owner/repo/issues -X POST -f title=foo"}'
+            $json = '{"tool_input":{"command":"gh api repos/owner/repo/issues -X POST -f title=foo"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'mcp__drm-copilot__new_potential_entry'
         }
 
         It 'blocks gh api repos/owner/repo/issues --method POST' {
-            $json = '{"command":"gh api repos/owner/repo/issues --method POST -f title=foo"}'
+            $json = '{"tool_input":{"command":"gh api repos/owner/repo/issues --method POST -f title=foo"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'allows gh api repos/owner/repo/issues with no method (defaults to GET)' {
-            $json = '{"command":"gh api repos/owner/repo/issues"}'
+            $json = '{"tool_input":{"command":"gh api repos/owner/repo/issues"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh issue list' {
-            $json = '{"command":"gh issue list"}'
+            $json = '{"tool_input":{"command":"gh issue list"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows gh issue view 10' {
-            $json = '{"command":"gh issue view 10"}'
+            $json = '{"tool_input":{"command":"gh issue view 10"}}'
             $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -144,52 +147,68 @@ Describe 'enforce-promotion-mcp-only.ps1' {
         }
     }
 
-    Context 'script entrypoint' {
-        BeforeAll {
-            $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-promotion-mcp-only.ps1").Path
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+    Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
+
+        It 'returns exit code 0 and emits a deny when every transport is empty' {
+            $emptyReader = {
+                Read-ClaudeHookRawPayload `
+                    -ReadStandardInput { '' } `
+                    -TestStandardInputRedirected { $true } `
+                    -HookInputFallback '' `
+                    -ToolInputFallback ''
             }
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ReadPayload $emptyReader
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'PROMOTION_MCP_ONLY_BLOCKED'
         }
 
-        It 'allows when CLAUDE_TOOL_INPUT is empty (exit 0, permissionDecision allow)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                ($out | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits a deny for unparseable JSON' {
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw '{not-json'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not parseable JSON'
         }
 
-        It 'blocks gh issue create end-to-end (exit 0, permissionDecision deny)' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{"command":"gh issue create --title foo"}'
-                $out = & $script:PwshExe -NoProfile -File $script:HookPath
-                $LASTEXITCODE | Should -Be 0
-                $decision = $out | ConvertFrom-Json
-                $decision.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
-                $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-                $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'mcp__drm-copilot__new_potential_entry'
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits a deny for JSON with no tool_input key' {
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw '{"session_id":"s1","tool_name":"Bash"}'
+            $emitted[-1] | Should -Be 0
+            $emitted[-1] | Should -Not -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'no tool_input key'
         }
 
-        It 'exits 1 on malformed JSON' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
+        It 'returns exit code 0 and emits a deny for a null tool_input' {
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":null}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'tool_input is null'
+        }
+
+        It 'returns exit code 0 and emits a deny for a non-object tool_input' {
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw '{"tool_name":"Bash","tool_input":"text"}'
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
+                Should -Match 'not an object'
+        }
+
+        It 'denies a nested envelope carrying a direct promotion-script invocation' {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"pwsh ./scripts/new-potential-entry.ps1 -ShortName foo"}}'
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            $parsed = $emitted[0] | ConvertFrom-Json
+            $parsed.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
+            $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'allows a nested envelope carrying an unrelated Bash command' {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"git status --short"}}'
+            $emitted = Invoke-PromotionMcpOnlyEntryPoint -ToolInputRaw $nested
+            $emitted[-1] | Should -Be 0
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
 }

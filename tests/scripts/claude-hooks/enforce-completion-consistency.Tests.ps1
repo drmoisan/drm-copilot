@@ -9,32 +9,30 @@ Describe 'enforce-completion-consistency.ps1' {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
 
-        # Builds a Write-style CLAUDE_TOOL_INPUT JSON string for a checkpoint payload.
+        # Builds a Write-shaped PreToolUse envelope for a checkpoint payload.
         function ConvertTo-CheckpointToolInput {
             param(
                 [hashtable] $Payload,
                 [string] $FilePath = 'artifacts/orchestration/orchestrator-state.json'
             )
             $content = $Payload | ConvertTo-Json -Compress -Depth 8
-            return (@{ file_path = $FilePath; content = $content } | ConvertTo-Json -Compress -Depth 8)
+            return (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = $FilePath; content = $content }
+                } | ConvertTo-Json -Compress -Depth 8)
         }
     }
 
     Context 'tool input parsing' {
-        It 'allows when CLAUDE_TOOL_INPUT is empty' {
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw '').hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        }
-
-        It 'allows when file_path is missing' {
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw '{"content":"{}"}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        }
-
-        It 'throws on malformed top-level JSON so the hook exits 1' {
-            { Invoke-CompletionConsistencyDecision -ToolInputRaw '{not-json' } | Should -Throw
+        It 'allows when file_path is missing from a well-formed tool_input' {
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw '{"tool_name":"Write","tool_input":{"content":"{}"}}').hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows when content itself is not valid JSON (defers to downstream tools)' {
-            $json = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' } | ConvertTo-Json -Compress)
+            $json = (@{
+                    tool_name  = 'Write'
+                    tool_input = @{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = '{broken' }
+                } | ConvertTo-Json -Compress -Depth 8)
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
@@ -48,7 +46,7 @@ Describe 'enforce-completion-consistency.ps1' {
 
     Context 'Edit tool calls (no full content)' {
         It 'allows an Edit-style call that only supplies old_string/new_string on the checkpoint path' {
-            $json = '{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}'
+            $json = '{"tool_name":"Edit","tool_input":{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}}'
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
@@ -342,10 +340,13 @@ Describe 'enforce-completion-consistency.ps1' {
             $onDisk = '{"objective":"x","next_step":"S5_atomic_execution"}'
             $reader = { param($Path) $onDisk }
             $json = @{
-                file_path  = 'artifacts/orchestration/orchestrator-state.json'
-                old_string = '"next_step":"S5_atomic_execution"'
-                new_string = '"next_step":"complete"'
-            } | ConvertTo-Json -Compress
+                tool_name  = 'Edit'
+                tool_input = @{
+                    file_path  = 'artifacts/orchestration/orchestrator-state.json'
+                    old_string = '"next_step":"S5_atomic_execution"'
+                    new_string = '"next_step":"complete"'
+                }
+            } | ConvertTo-Json -Compress -Depth 8
 
             # Act
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader
@@ -359,10 +360,13 @@ Describe 'enforce-completion-consistency.ps1' {
             $onDisk = '{"objective":"x","next_step":"S5_atomic_execution"}'
             $reader = { param($Path) $onDisk }
             $json = @{
-                file_path  = 'artifacts/orchestration/orchestrator-state.json'
-                old_string = '"next_step":"S5_atomic_execution"'
-                new_string = '"next_step":"S6_review"'
-            } | ConvertTo-Json -Compress
+                tool_name  = 'Edit'
+                tool_input = @{
+                    file_path  = 'artifacts/orchestration/orchestrator-state.json'
+                    old_string = '"next_step":"S5_atomic_execution"'
+                    new_string = '"next_step":"S6_review"'
+                }
+            } | ConvertTo-Json -Compress -Depth 8
 
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -370,10 +374,13 @@ Describe 'enforce-completion-consistency.ps1' {
         It 'allows an Edit when the on-disk checkpoint file does not exist' {
             $reader = { param($Path) $null }
             $json = @{
-                file_path  = 'artifacts/orchestration/orchestrator-state.json'
-                old_string = 'a'
-                new_string = '"next_step":"complete"'
-            } | ConvertTo-Json -Compress
+                tool_name  = 'Edit'
+                tool_input = @{
+                    file_path  = 'artifacts/orchestration/orchestrator-state.json'
+                    old_string = 'a'
+                    new_string = '"next_step":"complete"'
+                }
+            } | ConvertTo-Json -Compress -Depth 8
 
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -382,10 +389,13 @@ Describe 'enforce-completion-consistency.ps1' {
             $onDisk = '{"objective":"x","next_step":"S5_atomic_execution"}'
             $reader = { param($Path) $onDisk }
             $json = @{
-                file_path  = 'artifacts/orchestration/orchestrator-state.json'
-                old_string = 'this-substring-is-absent'
-                new_string = '"next_step":"complete"'
-            } | ConvertTo-Json -Compress
+                tool_name  = 'Edit'
+                tool_input = @{
+                    file_path  = 'artifacts/orchestration/orchestrator-state.json'
+                    old_string = 'this-substring-is-absent'
+                    new_string = '"next_step":"complete"'
+                }
+            } | ConvertTo-Json -Compress -Depth 8
 
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -393,10 +403,13 @@ Describe 'enforce-completion-consistency.ps1' {
         It 'allows an Edit on a non-checkpoint path' {
             $reader = { param($Path) '{"next_step":"complete"}' }
             $json = @{
-                file_path  = 'some/other/file.json'
-                old_string = 'a'
-                new_string = '"next_step":"complete"'
-            } | ConvertTo-Json -Compress
+                tool_name  = 'Edit'
+                tool_input = @{
+                    file_path  = 'some/other/file.json'
+                    old_string = 'a'
+                    new_string = '"next_step":"complete"'
+                }
+            } | ConvertTo-Json -Compress -Depth 8
 
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -439,34 +452,4 @@ Describe 'enforce-completion-consistency.ps1' {
             Should -Invoke -CommandName ConvertFrom-CheckpointJson -Times 1
         }
     }
-
-    Context 'Entrypoint (script body)' {
-        It 'emits an allow decision JSON when CLAUDE_TOOL_INPUT is empty' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $env:CLAUDE_TOOL_INPUT = ''
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"allow"'
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
-        }
-
-        It 'emits a block decision JSON when completion is asserted without evidence' {
-            $prev = $env:CLAUDE_TOOL_INPUT
-            try {
-                $content = '{"next_step":"complete"}'
-                $payload = (@{ file_path = 'artifacts/orchestration/orchestrator-state.json'; content = $content } | ConvertTo-Json -Compress)
-                $env:CLAUDE_TOOL_INPUT = $payload
-                $output = & $script:UnderTest
-                $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
-                $output | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
-            }
-            finally {
-                $env:CLAUDE_TOOL_INPUT = $prev
-            }
-        }
-    }
 }
-
