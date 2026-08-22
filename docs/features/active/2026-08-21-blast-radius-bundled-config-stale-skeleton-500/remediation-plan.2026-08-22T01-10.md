@@ -283,15 +283,19 @@ cycle does not change. C# and shell are likewise untouched, matching the origina
       closed structurally by `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
       (added in Phase 2). Keep the phrase "Class 2 portable-set equality" contiguous on a single
       line so a line-oriented search still matches it.
-      Acceptance, all three checked against `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`:
-      (a) `git grep -c -F "byte-equality and Class 2 portable-set equality both fail loudly" -- spec.md`
+      Acceptance, all three run from the worktree root against
+      `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`:
+      (a) `git grep -c -F "byte-equality and Class 2 portable-set equality both fail loudly" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports `0` after the edit (this substring lies entirely on the pre-edit line 581 and reports
       `1` before the edit, so the condition is false now and true only after the bullet is rewritten);
-      (b) `git grep -c -F "test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle" -- spec.md`
+      (b) `git grep -c -F "test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (this literal is absent from `spec.md` before the edit);
-      (c) `git grep -c -F "test_every_separator_free_bundled_shared_surface_is_wildcard_free" -- spec.md`
+      (c) `git grep -c -F "test_every_separator_free_bundled_shared_surface_is_wildcard_free" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (also absent before the edit). All three conjuncts are
-      false against the unedited file and can only become true by performing the rewrite.
+      false against the unedited file and can only become true by performing the rewrite. The
+      repo-relative pathspec is required in every command: a bare `-- spec.md` resolves relative to
+      the current directory and matches no tracked file when run from the worktree root, since
+      `spec.md` does not exist at the repository root.
 
 ---
 
