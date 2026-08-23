@@ -216,14 +216,18 @@ def test_unresolved_drift_quiesces_admission_and_completion() -> None:
 
 
 def test_recolor_pins_every_running_item() -> None:
-    """A current-generation recolor cannot assign an in-flight vertex."""
+    """A recolor reports pinned assignment and clears its highest cohort."""
 
     state = _resolved_halt_state()
     cohorts = cast("list[dict[str, object]]", state["cohorts"])
-    cohorts.append({"index": 0, "generation": 1, "item_keys": [101]})
+    cohorts.append({"index": 3, "generation": 1, "item_keys": [101]})
 
-    assert "Parallel checkpoint drift recolor must pin running items [101]." in (
-        validate_receipt_bound_cohort_admission(state, CONTEXT)
+    errors = validate_receipt_bound_cohort_admission(state, CONTEXT)
+
+    assert "Parallel checkpoint drift recolor must pin running items [101]." in errors
+    assert (
+        "Parallel checkpoint recomputed cohort assignments do not match "
+        "deterministic unstarted recoloring." in errors
     )
 
 

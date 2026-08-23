@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from typing import cast
 
 import pytest
 
@@ -285,9 +286,10 @@ def test_new_symbols_pass_at_exact_ninety_percent(
     symbols = result["new_symbols"]
 
     assert isinstance(symbols, list)
-    assert {item["kind"] for item in symbols} == expected_kinds
-    assert all(item["coverage_percent"] >= 90 for item in symbols)
-    assert all(item["pass"] is True for item in symbols)
+    symbol_items = cast("list[dict[str, object]]", symbols)
+    assert {cast("str", item["kind"]) for item in symbol_items} == expected_kinds
+    assert all(cast("float", item["coverage_percent"]) >= 90 for item in symbol_items)
+    assert all(item["pass"] is True for item in symbol_items)
 
 
 def test_new_symbol_below_ninety_percent_fails() -> None:
@@ -302,9 +304,10 @@ def test_new_symbol_below_ninety_percent_fails() -> None:
     )
 
     result = _analyze(snapshot, language="python", path=path, source=source)
+    verdicts = cast("dict[str, object]", result["verdicts"])
 
     assert result["overall_verdict"] == "FAIL"
-    assert result["verdicts"]["new_symbols"] is False
+    assert verdicts["new_symbols"] is False
 
 
 @pytest.mark.parametrize(
@@ -378,9 +381,11 @@ def test_changed_line_coverage_cannot_regress_from_baseline(
         new_file=False,
         baseline=baseline,
     )
+    verdicts = cast("dict[str, object]", result["verdicts"])
+    changed_files = cast("list[dict[str, object]]", result["changed_files"])
 
-    assert result["verdicts"]["changed_line_no_regression"] is False
-    assert result["changed_files"][0]["delta"] == -10.0
+    assert verdicts["changed_line_no_regression"] is False
+    assert changed_files[0]["delta"] == -10.0
 
 
 def test_compare_reports_numeric_python_and_typescript_deltas() -> None:
@@ -397,7 +402,7 @@ def test_compare_reports_numeric_python_and_typescript_deltas() -> None:
             "typescript": current_language,
         }
     }
-    baselines = [
+    baselines: list[dict[str, object]] = [
         {
             "language": language,
             "repository": {"line_percent": 85.0, "branch_percent": 75.0},
@@ -412,10 +417,11 @@ def test_compare_reports_numeric_python_and_typescript_deltas() -> None:
         repo_branch_min=75,
         new_symbol_min=90,
     )
+    languages = cast("dict[str, dict[str, object]]", result["languages"])
 
     assert result["overall_verdict"] == "PASS"
-    assert result["languages"]["python"]["line_delta"] == 1.0
-    assert result["languages"]["typescript"]["branch_delta"] == 1.0
+    assert languages["python"]["line_delta"] == 1.0
+    assert languages["typescript"]["branch_delta"] == 1.0
 
 
 def test_cli_requires_explicit_repository_thresholds() -> None:

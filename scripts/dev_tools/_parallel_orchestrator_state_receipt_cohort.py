@@ -115,6 +115,29 @@ def _cohort_assignments(
     return assignments
 
 
+def _highest_pinned_cohort(
+    assignments: Mapping[int, int], pinned: frozenset[int], current_cohort: int
+) -> int:
+    """Return the highest durable cohort occupied by a pinned item.
+
+    Args:
+        assignments: Valid current-generation item-to-cohort assignments.
+        pinned: Running item keys that recoloring must not move.
+        current_cohort: Durable scheduling frontier used for partial focused states.
+    Returns:
+        Highest assigned pinned cohort, or the current cohort when none is present.
+    Raises:
+        None.
+    Side Effects:
+        None.
+    """
+
+    return max(
+        (assignments.get(key, current_cohort) for key in pinned),
+        default=current_cohort,
+    )
+
+
 def _conflict_edges(state: Mapping[str, object]) -> list[tuple[int, int]]:
     """Return valid persisted conflict endpoints in document order.
 
@@ -411,12 +434,17 @@ def _recolor_errors(state: Mapping[str, object], context: str) -> list[str]:
         for key, record in records.items()
         if record.get("state") in UNSTARTED_ITEM_STATES
     )
+    current_cohort_index = cast("int", current_cohort)
+    highest_pinned_cohort = _highest_pinned_cohort(
+        assignments, pinned, current_cohort_index
+    )
     expected = recolor_unstarted(
         unstarted,
         _conflict_edges(state),
         pinned,
         cast("int", generation) - 1,
-        current_cohort=cast("int", current_cohort),
+        current_cohort=current_cohort_index,
+        highest_pinned_cohort=highest_pinned_cohort,
     )
     # Compare persisted assignments with the authoritative deterministic result.
     actual = {key: assignments[key] for key in unstarted if key in assignments}

@@ -1,13 +1,4 @@
-Timestamp: 2026-08-17T16-37
+Timestamp: 2026-08-23T04-18
 Command: poetry run python -c "from pathlib import Path; from timeit import repeat; from scripts.dev_tools.validate_orchestrator_state import validate_orchestrator_state_text as v; s=Path('artifacts/orchestration/orchestrator-state.json').read_text(encoding='utf-8'); [v(s) for _ in range(100)]; a=sorted(x*1000 for x in repeat(lambda:v(s),number=1,repeat=100)); print({'samples':len(a),'p50_ms':a[49],'p95_ms':a[94]})"
 EXIT_CODE: 0
-Output Summary:
-- samples=100
-- baseline_p95_ms=0.507500022649765
-- post_p50_ms=0.5611999658867717
-- post_p95_ms=0.7577999494969845
-- post_to_baseline_p95_ratio=1.4932018042883044
-- required_maximum_ratio=1.10
-- verdict=REMEDIATION_REQUIRED
-- Three confirmation runs also exceeded the threshold: p95_ms=0.6920999730937183 (ratio=1.363743728483238), p95_ms=0.7619999814778566 (ratio=1.5014777290044117), and p95_ms=0.566599948797375 (ratio=1.1164530512511837).
-- The command completed successfully, but the measured p95 ratio failed the plan's performance acceptance gate.
+Output Summary: Completed 100 timed in-process samples after 100 warm-up validations. Baseline P0-T19 p95_ms=0.507500022649765. Post-change P6-T26 samples=100, p50_ms=0.49089989624917507, p95_ms=0.5125999450683594. Ratio=1.0100491077654865, which is at most 1.10. Process startup was excluded from the measured callable.

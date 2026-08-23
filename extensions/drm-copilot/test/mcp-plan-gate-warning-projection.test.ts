@@ -18,6 +18,7 @@ const EXPECTED_SCHEMA_KEYS = [
   "artifact_type",
   "artifact_path",
   "require_complete",
+  "require_pr_creation_ready",
   "require_model_routing",
   "require_codex_model_routing",
   "require_codex_topology",

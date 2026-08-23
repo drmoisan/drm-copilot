@@ -1,0 +1,363 @@
+{
+  "changed_files": [
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 39,
+      "delta": 0.0,
+      "executable_changed_lines": 39,
+      "pass": true,
+      "path": "scripts/dev_tools/_orchestrator_state_codex_model_routing.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 28,
+      "delta": 0.0,
+      "executable_changed_lines": 28,
+      "pass": true,
+      "path": "scripts/dev_tools/_orchestrator_state_codex_topology.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 8,
+      "delta": 0.0,
+      "executable_changed_lines": 8,
+      "pass": true,
+      "path": "scripts/dev_tools/_orchestrator_state_complexity.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 4,
+      "delta": 0.0,
+      "executable_changed_lines": 4,
+      "pass": true,
+      "path": "scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "baseline_changed_line_percent": 91.666667,
+      "changed_line_percent": 91.666667,
+      "covered_changed_lines": 11,
+      "delta": 0.0,
+      "executable_changed_lines": 12,
+      "pass": true,
+      "path": "scripts/dev_tools/generate_codex_agent_variants.py"
+    },
+    {
+      "baseline_changed_line_percent": 92.592593,
+      "changed_line_percent": 92.592593,
+      "covered_changed_lines": 50,
+      "delta": 0.0,
+      "executable_changed_lines": 54,
+      "pass": true,
+      "path": "scripts/dev_tools/generate_orchestration_customization_surfaces.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "scripts/dev_tools/synchronize_customization_bundles.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 1,
+      "delta": 0.0,
+      "executable_changed_lines": 1,
+      "pass": true,
+      "path": "scripts/dev_tools/validate_orchestrator_state.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_drift_parity.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_mutation_parity.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_receipt_bound_cohort.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_synchronize_customization_bundles.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_parallel_planner_state_bounds.py"
+    }
+  ],
+  "configured_changed_files": [],
+  "language": "python",
+  "mode": "final",
+  "new_symbols": [
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_validate_one_assessment",
+      "pass": true,
+      "path": "scripts/dev_tools/_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_highest_pinned_cohort",
+      "pass": true,
+      "path": "scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py"
+    },
+    {
+      "coverage_percent": 94.117647,
+      "kind": "function",
+      "name": "_declared_surface",
+      "pass": true,
+      "path": "scripts/dev_tools/generate_orchestration_customization_surfaces.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_host_compatibility",
+      "pass": true,
+      "path": "scripts/dev_tools/generate_orchestration_customization_surfaces.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_project_payload",
+      "pass": true,
+      "path": "scripts/dev_tools/generate_orchestration_customization_surfaces.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "highest_pinned_cohort",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_drift_parity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "highest_pinned_cohort",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_mutation_parity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "recolor_reason",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_parallel_mutation_parity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_duplicate_codex_model_inputs_resolve_once_per_validation",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "counting_resolver",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_duplicate_topology_inputs_resolve_once_per_validation",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "counting_resolver",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_non_strict_route_membership_skips_validation",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "recording_validator",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_strict_route_membership_invokes_validation_and_preserves_diagnostics",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "recording_validator",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_duplicate_complexity_signals_compute_floor_once_and_preserve_index_diagnostics",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "counting_floor",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_complexity_floor_cache_is_fresh_per_validation",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "counting_floor",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_invalid_complexity_signals_do_not_compute_floor_and_preserve_index_diagnostics",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "counting_floor",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "build_ready_state",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_validate_parallel_planner_state_bounds.py"
+    }
+  ],
+  "overall_verdict": "PASS",
+  "repository": {
+    "branch_covered": 5478,
+    "branch_percent": 83.735861,
+    "branch_total": 6542,
+    "line_covered": 16023,
+    "line_percent": 91.780273,
+    "line_total": 17458
+  },
+  "schema_version": 1,
+  "thresholds": {
+    "new_symbol": 90.0,
+    "repository_branch": 75.0,
+    "repository_line": 85.0
+  },
+  "verdicts": {
+    "changed_line_no_regression": true,
+    "configured_changed_files": true,
+    "new_symbols": true,
+    "repository_branch": true,
+    "repository_line": true
+  }
+}

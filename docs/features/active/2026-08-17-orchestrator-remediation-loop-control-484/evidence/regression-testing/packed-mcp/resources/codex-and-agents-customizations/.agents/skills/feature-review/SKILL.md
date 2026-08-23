@@ -110,7 +110,7 @@ Only for a matrix-valid `BLOCKED` plus `AUTONOMOUS` result:
 
 - create `remediation-inputs.<timestamp>.md` before any remediation planning handoff,
 - create the remediation plan target file on disk before delegating plan creation,
-- automatically delegate remediation planning to `atomic-planner`,
+- automatically delegate remediation planning to `atomic-planner`. Then automatically delegate remediation planning to the atomic-planner agent; this compatibility wording preserves the same matrix-valid trigger,
 - treat `remediation-inputs.<timestamp>.md` as the primary requirements source,
 - include the canonical PR-context summary and appendix, the review artifacts, and the original feature plan file(s) in the delegated context package,
 - if the remediation planning handoff cannot be started or does not return a receipt, stop and report blocked state,

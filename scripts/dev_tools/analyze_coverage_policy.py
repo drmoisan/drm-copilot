@@ -167,7 +167,6 @@ def analyze_snapshot(
     baseline_analysis: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Evaluate one language snapshot against repository and change policy."""
-
     line_percent = _percent(snapshot.line_covered, snapshot.line_total)
     branch_percent = _percent(snapshot.branch_covered, snapshot.branch_total)
     changed = _changed_line_results(
@@ -223,7 +222,6 @@ def compare_analyses(
     new_symbol_min: float,
 ) -> dict[str, object]:
     """Compare final analysis to numeric Python and TypeScript baselines."""
-
     raw_languages = analysis.get("languages")
     current_languages = (
         object_mapping(raw_languages, "analysis languages")
@@ -291,7 +289,6 @@ def compare_analyses(
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser with explicit policy-threshold inputs."""
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode", required=True, choices=("baseline", "final", "compare")

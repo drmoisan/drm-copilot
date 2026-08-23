@@ -9,8 +9,9 @@ Each failure test asserts the literal, checkpoint-context-prefixed message.
 from __future__ import annotations
 
 import json
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
+import scripts.dev_tools._orchestrator_state_complexity as complexity_validator
 import scripts.dev_tools.validate_orchestrator_state as state_validator
 from scripts.dev_tools._orchestrator_state_complexity import (
     COMPLEXITY_ASSESSMENTS_KEY,
@@ -21,6 +22,11 @@ from scripts.dev_tools.compute_complexity_floor import compute_complexity_floor
 from tests.scripts.dev_tools.test_validate_orchestrator_state_remediation_loop import (
     build_valid_orchestrator_state,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    import pytest
 
 
 def _floor_signal() -> str:
@@ -182,6 +188,94 @@ def test_floor_not_equal_computed_violation_reported() -> None:
         "compute_complexity_floor(signals_present) C1." in error
         for error in errors
     )
+
+
+def test_duplicate_complexity_signals_compute_floor_once_and_preserve_index_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reuse one floor result while preserving both indexed diagnostics."""
+
+    first = _non_floor_only_assessment()
+    first["band"] = "C3"
+    first["floor"] = "C3"
+    duplicate = dict(first)
+    duplicate["phase"] = "P3"
+    call_count = 0
+    original_floor = complexity_validator.compute_complexity_floor
+
+    def counting_floor(signals_present: Sequence[str]) -> str:
+        nonlocal call_count
+        call_count += 1
+        return original_floor(signals_present)
+
+    monkeypatch.setattr(
+        complexity_validator, "compute_complexity_floor", counting_floor
+    )
+
+    errors = _validate_complexity_assessments([first, duplicate])
+
+    assert call_count == 1
+    assert errors == [
+        "Checkpoint complexity_assessments #0 floor C3 does not equal "
+        "compute_complexity_floor(signals_present) C1.",
+        "Checkpoint complexity_assessments #1 floor C3 does not equal "
+        "compute_complexity_floor(signals_present) C1.",
+    ]
+
+
+def test_complexity_floor_cache_is_fresh_per_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Compute once for each separate complexity-validator invocation."""
+
+    assessment = _well_formed_assessment()
+    call_count = 0
+    original_floor = complexity_validator.compute_complexity_floor
+
+    def counting_floor(signals_present: Sequence[str]) -> str:
+        nonlocal call_count
+        call_count += 1
+        return original_floor(signals_present)
+
+    monkeypatch.setattr(
+        complexity_validator, "compute_complexity_floor", counting_floor
+    )
+
+    assert _validate_complexity_assessments([assessment]) == []
+    assert _validate_complexity_assessments([assessment]) == []
+    assert call_count == 2
+
+
+def test_invalid_complexity_signals_do_not_compute_floor_and_preserve_index_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject invalid signal shapes by index without computing a floor."""
+
+    first = _well_formed_assessment()
+    first["signals_present"] = "not-a-list"
+    second = _well_formed_assessment()
+    second["signals_present"] = ["valid-string", 2]
+    call_count = 0
+    original_floor = complexity_validator.compute_complexity_floor
+
+    def counting_floor(signals_present: Sequence[str]) -> str:
+        nonlocal call_count
+        call_count += 1
+        return original_floor(signals_present)
+
+    monkeypatch.setattr(
+        complexity_validator, "compute_complexity_floor", counting_floor
+    )
+
+    errors = _validate_complexity_assessments([first, second])
+
+    assert call_count == 0
+    assert errors == [
+        "Checkpoint complexity_assessments #0 signals_present must be a list of "
+        "strings.",
+        "Checkpoint complexity_assessments #1 signals_present must be a list of "
+        "strings.",
+    ]
 
 
 def test_empty_rationale_violation_reported() -> None:

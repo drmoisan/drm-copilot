@@ -27,7 +27,6 @@ describe("validatePlanText", () => {
     (lineEnding) => {
       // Arrange
       const text = VALID_PLAN.split("\n").join(lineEnding);
-
       // Act / Assert
       expect(validatePlanText(text)).toEqual([]);
     },
@@ -36,10 +35,8 @@ describe("validatePlanText", () => {
   it("reports a malformed phase heading", () => {
     // Arrange: a phase heading without the em-dash/title contract.
     const text = ["### Phase 0 Setup", "- [ ] [P0-T1] Task"].join("\n");
-
     // Act
     const errors = validatePlanText(text);
-
     // Assert
     expect(
       errors.some((error) =>
@@ -53,10 +50,8 @@ describe("validatePlanText", () => {
     const text = ["### Phase 0 — Setup", "- [ ] [P0-T1]NoSpaceTitle"].join(
       "\n",
     );
-
     // Act
     const errors = validatePlanText(text);
-
     // Assert
     expect(
       errors.some((error) =>
@@ -68,10 +63,8 @@ describe("validatePlanText", () => {
   it("reports a task that appears before a phase heading", () => {
     // Arrange
     const text = "- [ ] [P0-T1] Orphan task";
-
     // Act
     const errors = validatePlanText(text);
-
     // Assert
     expect(
       errors.some((error) =>
@@ -83,7 +76,6 @@ describe("validatePlanText", () => {
   it("reports a task phase mismatch", () => {
     // Arrange: task labeled P1 under Phase 0.
     const text = ["### Phase 0 — Setup", "- [ ] [P1-T1] Task"].join("\n");
-
     // Act
     const errors = validatePlanText(text);
 
@@ -277,7 +269,7 @@ describe("validateArtifact dispatch", () => {
     });
 
     expect(errors).toContain(
-      "Checkpoint codex_model_routing_receipts must be a list when present.",
+      "ORCH_ROUTING_GATE_CODEX_MODEL: Checkpoint codex_model_routing_receipts must be a list when present.",
     );
   });
 
@@ -297,10 +289,10 @@ describe("validateArtifact dispatch", () => {
     });
 
     expect(ordinaryErrors).toContain(
-      "Checkpoint codex_topology_receipts must be a list when present.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint codex_topology_receipts must be a list when present.",
     );
     expect(epicErrors).toContain(
-      "Checkpoint codex_topology_receipts must be a list when present.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint codex_topology_receipts must be a list when present.",
     );
   });
 

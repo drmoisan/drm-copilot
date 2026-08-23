@@ -235,7 +235,33 @@ def close_reason(document: dict[str, object]) -> str | None:
     return None
 
 
-def recolor_reason(operation: dict[str, object], expected_code: str) -> str | None:
+def highest_pinned_cohort(
+    document: dict[str, object],
+    pinned: frozenset[int],
+    generation: int,
+    current_cohort: int,
+) -> int:
+    """Derive the highest pinned index from durable current-generation cohorts."""
+
+    assignments: dict[int, int] = {}
+    for index, value in enumerate(require_list(document.get("cohorts"), "cohorts")):
+        cohort = require_mapping(value, f"cohorts[{index}]")
+        cohort_generation = cohort.get("generation")
+        cohort_index = cohort.get("index")
+        if cohort_generation != generation or not isinstance(cohort_index, int):
+            continue
+        for key in require_list(cohort.get("item_keys"), f"cohorts[{index}].item_keys"):
+            if isinstance(key, int) and not isinstance(key, bool):
+                assignments.setdefault(key, cohort_index)
+    return max(
+        (assignments.get(key, current_cohort) for key in pinned),
+        default=current_cohort,
+    )
+
+
+def recolor_reason(
+    document: dict[str, object], operation: dict[str, object], expected_code: str
+) -> str | None:
     """Evaluate pin preservation through the Python recoloring authority."""
     integers = {
         key: require_list(operation.get(key), f"operation.{key}")
@@ -245,17 +271,20 @@ def recolor_reason(operation: dict[str, object], expected_code: str) -> str | No
     generation = operation.get("current_generation")
     if not isinstance(current_cohort, int) or not isinstance(generation, int):
         raise TypeError("recolor generation and cohort must be integers.")
+    pinned = frozenset(cast("list[int]", integers["pinned_keys"]))
     try:
         result = recolor_unstarted(
             cast("list[int]", integers["unstarted_keys"]),
             cast("list[tuple[int, int]]", integers["conflict_edges"]),
-            frozenset(cast("list[int]", integers["pinned_keys"])),
+            pinned,
             generation,
             current_cohort=current_cohort,
+            highest_pinned_cohort=highest_pinned_cohort(
+                document, pinned, generation, current_cohort
+            ),
         )
     except ParallelMutationError:
         return "MUTATION_PIN_VIOLATION"
-    pinned = set(cast("list[int]", integers["pinned_keys"]))
     if pinned.intersection(result.cohort_assignments):
         return "MUTATION_PIN_VIOLATION"
     return None if expected_code == "MUTATION_PIN_PRESERVED" else expected_code
@@ -284,7 +313,7 @@ def observed_reason(case: dict[str, object]) -> str | None:
     if authority == "close":
         return close_reason(document)
     if authority == "recolor":
-        return recolor_reason(operation, expected_code)
+        return recolor_reason(document, operation, expected_code)
     raise ValueError(f"Unsupported mutation fixture authority: {authority}.")
 
 

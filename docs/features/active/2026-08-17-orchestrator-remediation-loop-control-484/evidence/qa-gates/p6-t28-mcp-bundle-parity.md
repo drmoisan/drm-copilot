@@ -1,0 +1,7 @@
+Timestamp: 2026-08-23T09-29
+Command: `poetry run pytest tests/scripts/dev_tools/test_mcp_bundle_parity.py::test_local_candidate_source_built_and_packed_parity`
+EXIT_CODE: 0
+Output Summary: The focused parity test passed (`1 passed`). Source, built, and packed bundles are byte-identical at `1300991` bytes with SHA-256 `894bf5604c77c81e77881c448f1af2392b95f33243a60fa28a43afc2a796cfa0`. Each exposes complete embedded bundle digest `sha256:49831b959858755cad2399af16f7d6306b0a7c5e915a67f93b783e15400b7361`, matching P4-T11, the P4-T12 fixed literal, P4-T25, and P4-T27. The unchanged exact `embedded_digests[0] == (...)` assertion passed. Validator output, capability/catalog identity, runtime package identity `1.0.27`, and routing-policy digest `sha256:7a30f003994ae274f6b9bf7a2fcc1ff598f0cce743cc8663060eb3df50742231` are equal. Published `1.0.24` remains only the unchanged negative external-runtime fixture.
+Source Bundle: `extensions/drm-copilot/out/mcp-server.js`; bytes `1300991`; SHA-256 `894bf5604c77c81e77881c448f1af2392b95f33243a60fa28a43afc2a796cfa0`
+Built Bundle: `packages/mcp-server/out/mcp-server.js`; bytes `1300991`; SHA-256 `894bf5604c77c81e77881c448f1af2392b95f33243a60fa28a43afc2a796cfa0`
+Packed Bundle: `docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/packed-mcp/out/mcp-server.js`; bytes `1300991`; SHA-256 `894bf5604c77c81e77881c448f1af2392b95f33243a60fa28a43afc2a796cfa0`

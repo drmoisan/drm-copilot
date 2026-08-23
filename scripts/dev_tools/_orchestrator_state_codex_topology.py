@@ -31,6 +31,8 @@ _REQUIRED_KEYS = (
     "max_test_files",
 )
 _RESOLVED_KEYS = tuple(key for key in _REQUIRED_KEYS if key != "phase")
+_REQUIRED_KEY_SET = frozenset(_REQUIRED_KEYS)
+_TopologyInputKey = tuple[tuple[str, ...], int, int, str, bool, str | None]
 
 
 class _TopologyResolverInputs(TypedDict):
@@ -91,35 +93,58 @@ def validate_codex_topology_receipts(value: object) -> list[str]:
         ]
 
     errors: list[str] = []
-    for index, item in enumerate(cast("list[object]", value)):
+    validated_receipts: dict[_TopologyInputKey, dict[str, object]] = {}
+    last_valid_receipt: dict[str, Any] | None = None
+    items = cast("list[object]", value)
+    for index, item in enumerate(items):
         prefix = f"Checkpoint {CODEX_TOPOLOGY_RECEIPTS_KEY}[{index}]"
         if not isinstance(item, dict):
             errors.append(f"{prefix} must be an object.")
             continue
         receipt = cast("dict[str, Any]", item)
-        missing = [key for key in _REQUIRED_KEYS if key not in receipt]
-        if missing:
+        phase = receipt.get("phase")
+        if isinstance(phase, str) and phase.strip() and last_valid_receipt is not None:
+            last_valid_receipt["phase"] = phase
+            if receipt == last_valid_receipt:
+                continue
+        if not _REQUIRED_KEY_SET <= receipt.keys():
+            missing = [key for key in _REQUIRED_KEYS if key not in receipt]
             errors.append(f"{prefix} missing required keys: {', '.join(missing)}.")
             continue
-        if not isinstance(receipt.get("phase"), str) or not receipt["phase"].strip():
+        if not isinstance(phase, str) or not phase.strip():
             errors.append(f"{prefix}.phase must be a non-empty string.")
 
         input_errors, inputs = _receipt_inputs(receipt, prefix)
         errors.extend(input_errors)
         if inputs is None:
             continue
-        try:
-            expected = resolve_codex_topology(**inputs)
-        except ValueError as exc:
-            errors.append(f"{prefix} has invalid routing inputs: {exc}")
-            continue
-        expected_map = cast("dict[str, object]", expected)
+        input_key: _TopologyInputKey = (
+            tuple(inputs["languages"]),
+            inputs["production_file_count"],
+            inputs["test_file_count"],
+            inputs["execution_context"],
+            inputs["cross_cutting"],
+            inputs["root_persona"],
+        )
+        expected_map = validated_receipts.get(input_key)
+        if expected_map is None:
+            try:
+                expected = resolve_codex_topology(**inputs)
+            except ValueError as exc:
+                errors.append(f"{prefix} has invalid routing inputs: {exc}")
+                continue
+            expected_map = cast("dict[str, object]", expected)
+            validated_receipts[input_key] = expected_map
+        matches_expected = True
         for key in _RESOLVED_KEYS:
             if receipt.get(key) != expected_map[key]:
+                matches_expected = False
                 errors.append(
                     f"{prefix}.{key} must be {expected_map[key]!r}, "
                     f"found {receipt.get(key)!r}."
                 )
+        if matches_expected and isinstance(phase, str) and phase.strip():
+            last_valid_receipt = dict(receipt)
     return errors
 
 

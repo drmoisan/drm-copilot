@@ -1,6 +1,6 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
-import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
+import * as codexTopologyResolver from "../../../src/lib/validate/codex-topology-resolver";
 import { resolveCodexDeployment } from "../../../src/lib/validate/orchestrator-state-codex-model-routing";
 import {
   validateCodexTopologyGate,
@@ -65,7 +65,7 @@ function topologyReceipt(
     readonly rootPersona?: "epic-planner" | "epic-orchestrator";
   } = {},
 ): Record<string, unknown> {
-  const receipt = resolveCodexTopology(
+  const receipt = codexTopologyResolver.resolveCodexTopology(
     options.rootPersona === undefined ? [options.language ?? "python"] : [],
     options.productionFiles ?? (options.rootPersona === undefined ? 2 : 0),
     options.testFiles ?? (options.rootPersona === undefined ? 2 : 0),
@@ -99,6 +99,82 @@ describe("Codex topology checkpoint receipts", () => {
     state["codex_topology_receipts"] = [topologyReceipt()];
 
     expect(validate(state)).toEqual([]);
+  });
+
+  it("resolves duplicate topology inputs once per validation", () => {
+    const receipt = topologyReceipt();
+    receipt["languages"] = ["python"];
+    const duplicate = {
+      ...receipt,
+      languages: ["python"],
+      phase: "S6_commit_steward",
+    };
+    const resolveSpy = jest.spyOn(
+      codexTopologyResolver,
+      "resolveCodexTopology",
+    );
+
+    try {
+      expect(validateCodexTopologyReceipts([receipt, duplicate])).toEqual([]);
+      expect(resolveSpy).toHaveBeenCalledTimes(1);
+      expect(validateCodexTopologyReceipts([duplicate])).toEqual([]);
+      expect(resolveSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      resolveSpy.mockRestore();
+    }
+  });
+
+  it("does not alias distinct topology inputs in the local cache", () => {
+    const first = topologyReceipt();
+    first["languages"] = ["python"];
+    const second = topologyReceipt({
+      language: "typescript",
+      productionFiles: 4,
+      testFiles: 3,
+    });
+    second["languages"] = ["typescript"];
+    const repeatedFirst = {
+      ...first,
+      languages: ["python"],
+      phase: "S7_feature_review",
+    };
+    const resolveSpy = jest.spyOn(
+      codexTopologyResolver,
+      "resolveCodexTopology",
+    );
+
+    try {
+      expect(
+        validateCodexTopologyReceipts([first, second, repeatedFirst]),
+      ).toEqual([]);
+      expect(resolveSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      resolveSpy.mockRestore();
+    }
+  });
+
+  it("does not cache repeated invalid semantic topology inputs", () => {
+    const first = topologyReceipt();
+    first["execution_context"] = "unknown";
+    const second = { ...first, phase: "S6_commit_steward" };
+    const resolveSpy = jest.spyOn(
+      codexTopologyResolver,
+      "resolveCodexTopology",
+    );
+
+    try {
+      expect(validateCodexTopologyReceipts([first, second])).toEqual([
+        "Checkpoint codex_topology_receipts[0] has invalid routing inputs: " +
+          "execution_context must be one of ('epic_execution_child', " +
+          "'epic_preparation_child', 'standalone'), found 'unknown'.",
+        "Checkpoint codex_topology_receipts[1] has invalid routing inputs: " +
+          "execution_context must be one of ('epic_execution_child', " +
+          "'epic_preparation_child', 'standalone'), found 'unknown'.",
+      ]);
+      expect(resolveSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      resolveSpy.mockRestore();
+    }
   });
 
   it("requires topology evidence for canonical mixed agents", () => {

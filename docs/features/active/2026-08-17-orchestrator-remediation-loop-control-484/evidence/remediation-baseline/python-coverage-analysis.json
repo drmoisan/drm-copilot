@@ -1,0 +1,29 @@
+{
+  "changed_files": [],
+  "configured_changed_files": [],
+  "language": "python",
+  "mode": "baseline",
+  "new_symbols": [],
+  "overall_verdict": "PASS",
+  "repository": {
+    "branch_covered": 5429,
+    "branch_percent": 83.651772,
+    "branch_total": 6490,
+    "line_covered": 15908,
+    "line_percent": 91.715192,
+    "line_total": 17345
+  },
+  "schema_version": 1,
+  "thresholds": {
+    "new_symbol": 90.0,
+    "repository_branch": 75.0,
+    "repository_line": 85.0
+  },
+  "verdicts": {
+    "changed_line_no_regression": true,
+    "configured_changed_files": true,
+    "new_symbols": true,
+    "repository_branch": true,
+    "repository_line": true
+  }
+}

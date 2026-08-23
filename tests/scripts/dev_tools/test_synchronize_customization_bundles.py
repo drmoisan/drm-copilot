@@ -28,6 +28,9 @@ GITHUB_SURFACES: dict[str, subject.Family] = {
     ".github/skills/feature-review-workflow/SKILL.md": "reviewer",
     ".github/skills/remediation-handoff-atomic-planner/SKILL.md": "reviewer",
     ".github/agents/orchestrator.agent.md": "orchestrator",
+    ".github/agents/python-orchestrator.agent.md": "orchestrator",
+    ".github/agents/powershell-orchestrator.agent.md": "orchestrator",
+    ".github/agents/csharp-orchestrator.agent.md": "orchestrator",
     ".github/prompts/orchestrate-work.prompt.md": "orchestrator",
     ".github/prompts/orchestrate-python-work.prompt.md": "orchestrator",
     ".github/prompts/orchestrate-powershell-work.prompt.md": "orchestrator",
@@ -117,7 +120,7 @@ def _assert_stale_after_replacement(old: bytes, new: bytes, path: Path) -> None:
 
 
 def test_declares_every_exact_reviewer_and_orchestrator_mapping() -> None:
-    """Keep the complete 45-entry mapping inventory identical to P5-T8."""
+    """Keep the complete 48-entry mapping inventory exact."""
 
     actual = {
         (mapping.source, mapping.destination, mapping.family)
@@ -125,9 +128,9 @@ def test_declares_every_exact_reviewer_and_orchestrator_mapping() -> None:
     }
 
     assert actual == _expected_mapping_contract()
-    assert len(actual) == 45
+    assert len(actual) == 48
     assert sum(mapping.family == "reviewer" for mapping in subject.MAPPINGS) == 17
-    assert sum(mapping.family == "orchestrator" for mapping in subject.MAPPINGS) == 16
+    assert sum(mapping.family == "orchestrator" for mapping in subject.MAPPINGS) == 19
     assert sum(mapping.family == "researcher" for mapping in subject.MAPPINGS) == 11
 
 
@@ -138,7 +141,7 @@ def test_expected_bundle_files_copy_exact_deterministic_source_bytes() -> None:
     second = subject.expected_bundle_files()
 
     assert first == second
-    assert len(first) == 45
+    assert len(first) == 48
     for mapping in subject.MAPPINGS:
         assert first[mapping.destination] == subject.read_source(mapping.source)
 

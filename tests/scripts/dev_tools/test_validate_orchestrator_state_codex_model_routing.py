@@ -3,12 +3,23 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from scripts.dev_tools.resolve_codex_deployment import resolve_codex_deployment
+from scripts.dev_tools import (
+    _orchestrator_state_codex_model_routing as model_routing_validator,
+)
+from scripts.dev_tools.resolve_codex_deployment import (
+    CodexDeploymentReceipt,
+    resolve_codex_deployment,
+)
 from scripts.dev_tools.validate_orchestrator_state import (
     validate_orchestrator_state_text,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
+
+    import pytest
 
 
 def _delegation_receipt(agent_name: str) -> dict[str, object]:
@@ -235,3 +246,64 @@ def test_receipt_ceiling_increase_requires_bound_transition_evidence() -> None:
 
     assert any("must record a ceiling increase" in error for error in missing_errors)
     assert _validate(state) == []
+
+
+def test_duplicate_codex_model_inputs_resolve_once_per_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resolve duplicate valid model-routing inputs once per validation."""
+
+    first = _codex_receipt()
+    duplicate = dict(first)
+    duplicate["phase"] = "S6_review"
+    cached_duplicate = dict(first)
+    cached_duplicate["phase"] = "S7_audit"
+    cached_duplicate["metadata"] = "accepted-extra-field"
+    call_count = 0
+    original_resolver = model_routing_validator.resolve_codex_deployment
+
+    def counting_resolver(
+        logical_agent: str,
+        complexity_band: str,
+        execution_context: str,
+        orchestration_complexity_ceiling: str,
+        *,
+        available_models: Collection[str] | None = None,
+    ) -> CodexDeploymentReceipt:
+        nonlocal call_count
+        call_count += 1
+        return original_resolver(
+            logical_agent,
+            complexity_band,
+            execution_context,
+            orchestration_complexity_ceiling,
+            available_models=available_models,
+        )
+
+    monkeypatch.setattr(
+        model_routing_validator, "resolve_codex_deployment", counting_resolver
+    )
+
+    assert (
+        model_routing_validator.validate_codex_model_routing_receipts(
+            [first, duplicate, cached_duplicate]
+        )
+        == []
+    )
+    assert call_count == 1
+
+    invalid_first = dict(first)
+    invalid_first["execution_context"] = "unknown"
+    invalid_duplicate = dict(invalid_first)
+    invalid_duplicate["phase"] = "S7_audit"
+
+    errors = model_routing_validator.validate_codex_model_routing_receipts(
+        [invalid_first, invalid_duplicate]
+    )
+
+    assert len(errors) == 2
+    assert all(
+        f"codex_model_routing_receipts[{index}] has invalid routing inputs" in error
+        for index, error in enumerate(errors)
+    )
+    assert call_count == 3

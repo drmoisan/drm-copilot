@@ -99,6 +99,11 @@ def required_mappings() -> tuple[BundleMapping, ...]:
         _codex_mapping(".agents/skills/orchestrate/SKILL.md", "orchestrator"),
         _codex_mapping(".agents/skills/orchestrator-workflow/SKILL.md", "orchestrator"),
         _github_mapping(".github/agents/orchestrator.agent.md", "orchestrator"),
+        _github_mapping(".github/agents/python-orchestrator.agent.md", "orchestrator"),
+        _github_mapping(
+            ".github/agents/powershell-orchestrator.agent.md", "orchestrator"
+        ),
+        _github_mapping(".github/agents/csharp-orchestrator.agent.md", "orchestrator"),
         _github_mapping(".github/prompts/orchestrate-work.prompt.md", "orchestrator"),
         _github_mapping(
             ".github/prompts/orchestrate-python-work.prompt.md", "orchestrator"

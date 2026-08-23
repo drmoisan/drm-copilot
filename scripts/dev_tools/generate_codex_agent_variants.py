@@ -62,6 +62,56 @@ CANONICAL_CONTRACT_SOURCES: dict[str, tuple[Path, ...]] = {
     "task-researcher": (Path(".github/agents/task-researcher.agent.md"),),
 }
 CANONICAL_CONTRACT_MARKER = "Generated canonical workflow contract."
+CODEX_WRAPPER_LINES = (
+    "Read the canonical source agent file first and follow it exactly.",
+    "Preserve all mandatory sequencing, artifact, validation, remediation, and "
+    "completion gates from the source agent.",
+    "If the source agent defines handoffs, preserve those handoffs with the same "
+    "degree of process gating",
+    "Treat .agents/skills, .codex/agents, and .codex/prompts as the Codex runtime "
+    "surfaces for migrated behavior",
+    "Do not weaken validation-only preflight loops, QA gates, remediation triggers, "
+    "review gates, acceptance-criteria tracking, or evidence requirements that "
+    "exist in the source agent.",
+)
+CODEX_COMPATIBILITY_LINES: dict[str, tuple[str, ...]] = {
+    "feature-reviewer": (
+        "Create the remediation plan target file on disk before the planning handoff.",
+        "Remediation planning must treat remediation-inputs as the primary "
+        "requirements source.",
+        "The delegated remediation context package must include remediation "
+        "inputs, canonical PR-context artifacts, review artifacts, and the "
+        "original feature plan file(s).",
+        "Do not claim completion when remediation is triggered unless the "
+        "remediation plan file exists on disk.",
+        "All required reported artifacts must exist on disk and pass their validators.",
+    ),
+    "orchestrator": (
+        "For required delegated steps, you must delegate or stop execution.",
+        "For planning steps, do not perform planning locally when delegation is "
+        "required.",
+        "For delivery steps, do not perform preflight validation, execution, or "
+        "post-delivery validation locally when delegation is required.",
+        "For review steps, do not perform post-implementation review locally "
+        "when delegation is required.",
+        "Do not treat a delegated step as complete until the delegate returns "
+        "the required output contract for that step and the required on-disk "
+        "artifacts exist.",
+        "Do not claim mission completion unless all required delegations "
+        "completed with receipts.",
+        "Do not accept PASS outcomes that rely on stale PR-context artifacts, "
+        "missing receipts, or missing required evidence-backed QA artifacts.",
+        "If a required handoff cannot proceed, stop and report blocked state.",
+        "Do not create or edit `${feature-folder}/issue.md`, "
+        "`${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or "
+        "`plan*.md` until the canonical promotion lifecycle has completed.",
+    ),
+    "task-researcher": CODEX_WRAPPER_LINES,
+}
+CODEX_HOST_ONLY_TOKENS = (
+    "drmCopilotExtension.",
+    "delegation_receipts.promotion.",
+)
 
 
 @dataclass(frozen=True)
@@ -140,7 +190,18 @@ def _canonical_contract_payload(family: str, newline: str) -> str | None:
     sources = CANONICAL_CONTRACT_SOURCES.get(family)
     if sources is None:
         return None
-    sections = [CANONICAL_CONTRACT_MARKER, "Canonical inputs:"]
+    sections = [CANONICAL_CONTRACT_MARKER]
+    compatibility_lines = CODEX_COMPATIBILITY_LINES.get(family)
+    if compatibility_lines is not None:
+        sections.extend(
+            (
+                f"Canonical migration source: {sources[0].as_posix()}",
+                "Use the following repo-local skills as the canonical workflow source:",
+                *(f"- {source.parent.name}" for source in sources),
+                *compatibility_lines,
+            )
+        )
+    sections.append("Canonical inputs:")
     source_texts: list[tuple[Path, str]] = []
     for source in sources:
         absolute_path = REPO_ROOT / source
@@ -156,7 +217,12 @@ def _canonical_contract_payload(family: str, newline: str) -> str | None:
     for source, text in source_texts:
         normalized = newline.join(text.replace("\r\n", "\n").split("\n")).rstrip()
         sections.extend((f"## Canonical source: `{source.as_posix()}`", normalized))
-    return (newline * 2).join(sections)
+    payload = (newline * 2).join(sections)
+    if compatibility_lines is not None and any(
+        token in payload for token in CODEX_HOST_ONLY_TOKENS
+    ):
+        raise ValueError(f"Host-only identifier leaked into Codex family {family!r}.")
+    return payload
 
 
 def synchronize_canonical_contract(base_text: str, family: str) -> str:

@@ -1,8 +1,6 @@
 export const CODEX_MODEL_ROUTING_RECEIPTS_KEY = "codex_model_routing_receipts";
 const CODEX_MODEL_ROUTING_GATE_ERROR = "ORCH_ROUTING_GATE_CODEX_MODEL";
-
 export const BAND_ORDER = ["C1", "C2", "C3", "C4"] as const;
-
 export type ComplexityBand = (typeof BAND_ORDER)[number];
 export type ExecutionContext =
   | "standalone"
@@ -11,7 +9,6 @@ export type ExecutionContext =
   | "parallel_planning"
   | "parallel_execution";
 export type ModelReasoningEffort = "low" | "medium" | "high" | "max" | "ultra";
-
 export interface CodexDeploymentReceipt {
   readonly logical_agent: string;
   readonly deployment_agent: string;
@@ -23,13 +20,18 @@ export interface CodexDeploymentReceipt {
   readonly model: string;
   readonly model_reasoning_effort: ModelReasoningEffort;
 }
-
 interface DeploymentProfile {
   readonly suffix: string;
   readonly model: string;
   readonly model_reasoning_effort: ModelReasoningEffort;
 }
-
+function deploymentProfile(
+  suffix: string,
+  model: string,
+  modelReasoningEffort: ModelReasoningEffort,
+): DeploymentProfile {
+  return { suffix, model, model_reasoning_effort: modelReasoningEffort };
+}
 const VALID_EXECUTION_CONTEXTS: ReadonlySet<string> = new Set([
   "standalone",
   "epic_preparation_child",
@@ -58,39 +60,18 @@ const GENERATED_AGENT_FAMILIES: ReadonlySet<string> = new Set([
 export const LOGICAL_AGENT_ALIASES: Readonly<Record<string, string>> = {
   "feature-review": "feature-reviewer",
 };
-
 const BASE_PROFILES: Readonly<Record<ComplexityBand, DeploymentProfile>> = {
-  C1: {
-    suffix: "c1",
-    model: "gpt-5.6-luna",
-    model_reasoning_effort: "low",
-  },
-  C2: {
-    suffix: "c2",
-    model: "gpt-5.6-terra",
-    model_reasoning_effort: "medium",
-  },
-  C3: {
-    suffix: "c3",
-    model: "gpt-5.6-terra",
-    model_reasoning_effort: "high",
-  },
-  C4: {
-    suffix: "c4",
-    model: "gpt-5.6-sol",
-    model_reasoning_effort: "max",
-  },
+  C1: deploymentProfile("c1", "gpt-5.6-luna", "low"),
+  C2: deploymentProfile("c2", "gpt-5.6-terra", "medium"),
+  C3: deploymentProfile("c3", "gpt-5.6-terra", "high"),
+  C4: deploymentProfile("c4", "gpt-5.6-sol", "max"),
 };
-const C3_ELEVATED_PROFILE: DeploymentProfile = {
-  suffix: "c3-elevated",
-  model: "gpt-5.6-sol",
-  model_reasoning_effort: "high",
-};
-const FORCED_PERSONA_PROFILE: DeploymentProfile = {
-  suffix: "",
-  model: "gpt-5.6-sol",
-  model_reasoning_effort: "ultra",
-};
+const C3_ELEVATED_PROFILE = deploymentProfile(
+  "c3-elevated",
+  "gpt-5.6-sol",
+  "high",
+);
+const FORCED_PERSONA_PROFILE = deploymentProfile("", "gpt-5.6-sol", "ultra");
 const FORCED_PERSONA_PROFILES: Readonly<Record<string, DeploymentProfile>> = {
   "epic-planner": FORCED_PERSONA_PROFILE,
   "epic-orchestrator": FORCED_PERSONA_PROFILE,
@@ -102,7 +83,6 @@ export const PARALLEL_ROOT_CONTEXT_PERSONAS: Readonly<Record<string, string>> =
     parallel_planning: "parallel-planner",
     parallel_execution: "parallel-orchestrator",
   };
-
 const ROUTING_KEYS = [
   "complexity_band",
   "execution_context",
@@ -123,18 +103,15 @@ const RESOLVED_KEYS: ReadonlyArray<keyof CodexDeploymentReceipt> = [
   "deployment_agent",
   ...ROUTING_KEYS,
 ];
-
 export class ModelUnavailableError extends Error {
   public constructor(message: string) {
     super(message);
     this.name = "ModelUnavailableError";
   }
 }
-
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
-
 function pythonRepr(value: unknown): string {
   if (value === undefined || value === null) {
     return "None";
@@ -164,11 +141,9 @@ function pythonRepr(value: unknown): string {
   }
   return String(value);
 }
-
 function pythonStr(value: unknown): string {
   return typeof value === "string" ? value : pythonRepr(value);
 }
-
 function validateBand(value: string, fieldName: string): ComplexityBand {
   if (!(BAND_ORDER as ReadonlyArray<string>).includes(value)) {
     throw new Error(
@@ -178,7 +153,6 @@ function validateBand(value: string, fieldName: string): ComplexityBand {
   }
   return value as ComplexityBand;
 }
-
 function validateContext(value: string): ExecutionContext {
   if (!VALID_EXECUTION_CONTEXTS.has(value)) {
     throw new Error(
@@ -189,7 +163,6 @@ function validateContext(value: string): ExecutionContext {
   }
   return value as ExecutionContext;
 }
-
 function selectC3OverlayReason(
   executionContext: ExecutionContext,
   orchestrationComplexityCeiling: ComplexityBand,
@@ -205,7 +178,6 @@ function selectC3OverlayReason(
       ? "c4_orchestration_ceiling"
       : null;
 }
-
 export function resolveCodexDeployment(
   logicalAgent: string,
   complexityBand: string,
@@ -225,7 +197,6 @@ export function resolveCodexDeployment(
         `complexity_band, found ${ceiling} below ${band}.`,
     );
   }
-
   const parallelPersona = PARALLEL_ROOT_CONTEXT_PERSONAS[context];
   if (parallelPersona !== undefined && logicalAgent !== parallelPersona) {
     throw new Error(
@@ -242,7 +213,6 @@ export function resolveCodexDeployment(
         `${pythonRepr(parallelContext)} context.`,
     );
   }
-
   const forcedProfile = FORCED_PERSONA_PROFILES[logicalAgent];
   let profile: DeploymentProfile;
   let deploymentAgent: string;
@@ -265,7 +235,6 @@ export function resolveCodexDeployment(
       overlayReason === null ? BASE_PROFILES[band] : C3_ELEVATED_PROFILE;
     deploymentAgent = `${deploymentFamily}-${profile.suffix}`;
   }
-
   if (availableModels !== undefined && !availableModels.has(profile.model)) {
     throw new ModelUnavailableError(
       "model_unavailable: required Codex model " +
@@ -284,67 +253,125 @@ export function resolveCodexDeployment(
     model_reasoning_effort: profile.model_reasoning_effort,
   };
 }
-
-interface ReceiptValidationResult {
-  readonly errors: string[];
-  readonly resolvedCeiling?: ComplexityBand;
+interface DeploymentResolutionEntry {
+  readonly logicalAgent: string;
+  readonly complexityBand: string;
+  readonly executionContext: string;
+  readonly orchestrationComplexityCeiling: string;
+  readonly resolution: CodexDeploymentReceipt;
 }
-
-function validateReceipt(
-  value: unknown,
-  prefix: string,
-  previousCeiling?: ComplexityBand,
-): ReceiptValidationResult {
-  if (!isObject(value)) {
-    return { errors: [`${prefix} must be an object.`] };
-  }
-  const missing = REQUIRED_KEYS.filter((key) => !(key in value));
-  if (missing.length > 0) {
-    return {
-      errors: [`${prefix} missing required keys: ${missing.join(", ")}.`],
-    };
-  }
-
+function receiptPrefix(index: number, fixedPrefix?: string): string {
+  return (
+    fixedPrefix ?? `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY}[${index}]`
+  );
+}
+function validateReceiptSequence(
+  values: ReadonlyArray<unknown>,
+  fixedPrefix?: string,
+): string[] {
   const errors: string[] = [];
-  const phase = value["phase"];
-  if (typeof phase !== "string" || phase.trim() === "") {
-    errors.push(`${prefix}.phase must be a non-empty string.`);
-  }
-
-  let expected: CodexDeploymentReceipt;
-  try {
-    expected = resolveCodexDeployment(
-      pythonStr(value["logical_agent"]),
-      pythonStr(value["complexity_band"]),
-      pythonStr(value["execution_context"]),
-      pythonStr(value["orchestration_complexity_ceiling"]),
+  const successfulResolutions: DeploymentResolutionEntry[] = [];
+  let previousCeiling: ComplexityBand | undefined;
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (!isObject(value)) {
+      errors.push(`${receiptPrefix(index, fixedPrefix)} must be an object.`);
+      continue;
+    }
+    let hasMissingKey = false;
+    for (const key of REQUIRED_KEYS) {
+      if (!(key in value)) {
+        hasMissingKey = true;
+        break;
+      }
+    }
+    if (hasMissingKey) {
+      const missing = REQUIRED_KEYS.filter((key) => !(key in value));
+      errors.push(
+        `${receiptPrefix(index, fixedPrefix)} missing required keys: ` +
+          `${missing.join(", ")}.`,
+      );
+      continue;
+    }
+    const phase = value["phase"];
+    if (typeof phase !== "string" || phase.trim() === "") {
+      errors.push(
+        `${receiptPrefix(index, fixedPrefix)}.phase must be a non-empty string.`,
+      );
+    }
+    const logicalAgent = pythonStr(value["logical_agent"]);
+    const complexityBand = pythonStr(value["complexity_band"]);
+    const executionContext = pythonStr(value["execution_context"]);
+    const orchestrationComplexityCeiling = pythonStr(
+      value["orchestration_complexity_ceiling"],
     );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    errors.push(`${prefix} has invalid routing inputs: ${message}`);
-    return { errors };
-  }
-
-  const currentCeiling = expected.orchestration_complexity_ceiling;
-  if (
-    previousCeiling !== undefined &&
-    BAND_ORDER.indexOf(currentCeiling) < BAND_ORDER.indexOf(previousCeiling)
-  ) {
-    errors.push(
-      `${prefix}.orchestration_complexity_ceiling must be monotonic; ` +
-        `found ${currentCeiling} after ${previousCeiling}.`,
-    );
-  } else if (previousCeiling !== undefined) {
+    let expected: CodexDeploymentReceipt | undefined;
+    for (let offset = 0; offset < successfulResolutions.length; offset += 1) {
+      const entry =
+        successfulResolutions[
+          offset === 0 ? successfulResolutions.length - 1 : offset - 1
+        ];
+      if (
+        entry !== undefined &&
+        entry.logicalAgent === logicalAgent &&
+        entry.complexityBand === complexityBand &&
+        entry.executionContext === executionContext &&
+        entry.orchestrationComplexityCeiling === orchestrationComplexityCeiling
+      ) {
+        expected = entry.resolution;
+        break;
+      }
+    }
+    if (expected === undefined) {
+      try {
+        expected = resolveCodexDeployment(
+          logicalAgent,
+          complexityBand,
+          executionContext,
+          orchestrationComplexityCeiling,
+        );
+        successfulResolutions.push({
+          logicalAgent,
+          complexityBand,
+          executionContext,
+          orchestrationComplexityCeiling,
+          resolution: expected,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        errors.push(
+          `${receiptPrefix(index, fixedPrefix)} has invalid routing inputs: ${message}`,
+        );
+        continue;
+      }
+    }
+    const currentCeiling = expected.orchestration_complexity_ceiling;
     const transition = value["ceiling_transition"];
-    if (currentCeiling === previousCeiling) {
+    if (previousCeiling === undefined) {
       if (transition !== undefined && transition !== null) {
         errors.push(
-          `${prefix}.ceiling_transition must be absent unless the ceiling rises.`,
+          `${receiptPrefix(index, fixedPrefix)}.ceiling_transition must be ` +
+            "absent unless the ceiling rises.",
+        );
+      }
+    } else if (
+      BAND_ORDER.indexOf(currentCeiling) < BAND_ORDER.indexOf(previousCeiling)
+    ) {
+      errors.push(
+        `${receiptPrefix(index, fixedPrefix)}.orchestration_complexity_ceiling ` +
+          `must be monotonic; found ${currentCeiling} after ${previousCeiling}.`,
+      );
+    } else if (currentCeiling === previousCeiling) {
+      if (transition !== undefined && transition !== null) {
+        errors.push(
+          `${receiptPrefix(index, fixedPrefix)}.ceiling_transition must be ` +
+            "absent unless the ceiling rises.",
         );
       }
     } else if (!isObject(transition)) {
       errors.push(
-        `${prefix}.ceiling_transition must record a ceiling increase.`,
+        `${receiptPrefix(index, fixedPrefix)}.ceiling_transition must record ` +
+          "a ceiling increase.",
       );
     } else {
       if (
@@ -352,7 +379,8 @@ function validateReceipt(
         transition["to"] !== currentCeiling
       ) {
         errors.push(
-          `${prefix}.ceiling_transition must record ${previousCeiling} to ${currentCeiling}.`,
+          `${receiptPrefix(index, fixedPrefix)}.ceiling_transition must ` +
+            `record ${previousCeiling} to ${currentCeiling}.`,
         );
       }
       const affected = transition["affected_delegation_ids"];
@@ -365,58 +393,37 @@ function validateReceipt(
         new Set(affected).size !== affected.length
       ) {
         errors.push(
-          `${prefix}.ceiling_transition.affected_delegation_ids must be a ` +
-            "non-empty unique string list.",
+          `${receiptPrefix(index, fixedPrefix)}.ceiling_transition.` +
+            "affected_delegation_ids must be a non-empty unique string list.",
         );
       }
     }
-  } else if (
-    value["ceiling_transition"] !== undefined &&
-    value["ceiling_transition"] !== null
-  ) {
-    errors.push(
-      `${prefix}.ceiling_transition must be absent unless the ceiling rises.`,
-    );
-  }
-
-  for (const key of RESOLVED_KEYS) {
-    if (value[key] !== expected[key]) {
-      errors.push(
-        `${prefix}.${key} must be ${pythonRepr(expected[key])}, ` +
-          `found ${pythonRepr(value[key])}.`,
-      );
+    for (const key of RESOLVED_KEYS) {
+      if (value[key] !== expected[key]) {
+        errors.push(
+          `${receiptPrefix(index, fixedPrefix)}.${key} must be ` +
+            `${pythonRepr(expected[key])}, found ${pythonRepr(value[key])}.`,
+        );
+      }
     }
+    previousCeiling = currentCeiling;
   }
-  return { errors, resolvedCeiling: currentCeiling };
+  return errors;
 }
-
 export function validateCodexModelRoutingReceipt(
   value: unknown,
   prefix = `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY}[0]`,
 ): string[] {
-  return validateReceipt(value, prefix).errors;
+  return validateReceiptSequence([value], prefix);
 }
-
 export function validateCodexModelRoutingReceipts(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [
       `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY} must be a list when present.`,
     ];
   }
-  const errors: string[] = [];
-  let previousCeiling: ComplexityBand | undefined;
-  value.forEach((item, index) => {
-    const result = validateReceipt(
-      item,
-      `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY}[${index}]`,
-      previousCeiling,
-    );
-    errors.push(...result.errors);
-    previousCeiling = result.resolvedCeiling ?? previousCeiling;
-  });
-  return errors;
+  return validateReceiptSequence(value);
 }
-
 function delegatedAgentNames(state: Record<string, unknown>): Set<string> {
   const result = new Set<string>();
   let receipts = state["delegation_receipts"];
@@ -437,7 +444,6 @@ function delegatedAgentNames(state: Record<string, unknown>): Set<string> {
   }
   return result;
 }
-
 export function validateCodexModelRoutingGate(
   state: Record<string, unknown>,
 ): string[] {
@@ -445,13 +451,11 @@ export function validateCodexModelRoutingGate(
   if (delegated.size === 0) {
     return [];
   }
-
   const value = state[CODEX_MODEL_ROUTING_RECEIPTS_KEY];
   const errors = validateCodexModelRoutingReceipts(value);
   if (!Array.isArray(value)) {
     return errors;
   }
-
   const logicalAgents = new Set<string>();
   const deploymentAgents = new Set<string>();
   for (const item of value) {
@@ -467,7 +471,6 @@ export function validateCodexModelRoutingGate(
       deploymentAgents.add(deployment);
     }
   }
-
   for (const agent of [...delegated].sort()) {
     if (!logicalAgents.has(agent) && !deploymentAgents.has(agent)) {
       errors.push(
@@ -478,7 +481,6 @@ export function validateCodexModelRoutingGate(
   }
   return errors;
 }
-
 export function validateCodexModelRoutingState(
   state: Record<string, unknown>,
   requireGate = false,

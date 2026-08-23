@@ -3,17 +3,26 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from scripts.dev_tools import _orchestrator_state_codex_topology as topology_validator
 from scripts.dev_tools._orchestrator_state_codex_topology import (
     validate_codex_topology_gate,
     validate_codex_topology_receipts,
 )
 from scripts.dev_tools.resolve_codex_deployment import resolve_codex_deployment
-from scripts.dev_tools.resolve_codex_topology import resolve_codex_topology
+from scripts.dev_tools.resolve_codex_topology import (
+    CodexTopologyReceipt,
+    resolve_codex_topology,
+)
 from scripts.dev_tools.validate_orchestrator_state import (
     validate_orchestrator_state_text,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
+
+    import pytest
 
 
 def _delegation_receipt(agent_name: str) -> dict[str, object]:
@@ -251,7 +260,7 @@ def test_receipt_validator_reports_structural_and_typed_errors() -> None:
     )
 
     invalid_inputs = _topology_receipt()
-    invalid_inputs["languages"] = [1]
+    invalid_inputs["languages"] = [{}]
     invalid_inputs["production_file_count"] = "2"
     invalid_inputs["test_file_count"] = True
     invalid_inputs["cross_cutting"] = "false"
@@ -274,6 +283,51 @@ def test_receipt_validator_reports_invalid_context_from_resolver() -> None:
     errors = validate_codex_topology_receipts([receipt])
 
     assert any("invalid routing inputs" in error for error in errors)
+
+
+def test_duplicate_topology_inputs_resolve_once_per_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resolve duplicate valid topology inputs once within one validation."""
+
+    first = _topology_receipt()
+    duplicate = dict(first)
+    duplicate["phase"] = "S6_review"
+    cached_duplicate = dict(first)
+    cached_duplicate["phase"] = "S7_audit"
+    cached_duplicate["metadata"] = "accepted-extra-field"
+    call_count = 0
+    original_resolver = topology_validator.resolve_codex_topology
+
+    def counting_resolver(
+        languages: Collection[str],
+        production_file_count: int,
+        test_file_count: int,
+        execution_context: str,
+        *,
+        cross_cutting: bool = False,
+        root_persona: str | None = None,
+    ) -> CodexTopologyReceipt:
+        nonlocal call_count
+        call_count += 1
+        return original_resolver(
+            languages,
+            production_file_count,
+            test_file_count,
+            execution_context,
+            cross_cutting=cross_cutting,
+            root_persona=root_persona,
+        )
+
+    monkeypatch.setattr(topology_validator, "resolve_codex_topology", counting_resolver)
+
+    assert (
+        topology_validator.validate_codex_topology_receipts(
+            [first, duplicate, cached_duplicate]
+        )
+        == []
+    )
+    assert call_count == 1
 
 
 def test_gate_ignores_invalid_entries_when_matching_valid_receipt() -> None:

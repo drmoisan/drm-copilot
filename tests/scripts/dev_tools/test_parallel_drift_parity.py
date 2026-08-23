@@ -110,6 +110,29 @@ def edge_list(value: object, label: str) -> list[tuple[int, int]]:
     return edges
 
 
+def highest_pinned_cohort(
+    document: dict[str, object],
+    pinned: frozenset[int],
+    generation: int,
+    current_cohort: int,
+) -> int:
+    """Derive the highest pinned index from durable current-generation cohorts."""
+
+    assignments: dict[int, int] = {}
+    for index, value in enumerate(require_list(document.get("cohorts"), "cohorts")):
+        cohort = require_mapping(value, f"cohorts[{index}]")
+        cohort_generation = cohort.get("generation")
+        cohort_index = cohort.get("index")
+        if cohort_generation != generation or not isinstance(cohort_index, int):
+            continue
+        for key in integer_list(cohort.get("item_keys"), f"cohorts[{index}].item_keys"):
+            assignments.setdefault(key, cohort_index)
+    return max(
+        (assignments.get(key, current_cohort) for key in pinned),
+        default=current_cohort,
+    )
+
+
 def materialize_document(case: dict[str, object]) -> dict[str, object]:
     """Apply one case's top-level checkpoint overrides to the shared base."""
     document = clone_mapping(BASE_DOCUMENT)
@@ -185,12 +208,20 @@ def recomputed_schedule() -> dict[str, object]:
         raise TypeError(
             "scheduler generation, cohort, and concurrency must be integers."
         )
+    generation_index = cast("int", generation)
+    current_cohort_index = cast("int", current_cohort)
     result = recolor_unstarted(
         unstarted,
         edges,
         pinned,
-        cast("int", generation),
-        current_cohort=cast("int", current_cohort),
+        generation_index,
+        current_cohort=current_cohort_index,
+        highest_pinned_cohort=highest_pinned_cohort(
+            BASE_DOCUMENT,
+            pinned,
+            generation_index,
+            current_cohort_index,
+        ),
     )
     assignments = [
         {"item_key": key, "cohort_index": index}

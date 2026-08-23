@@ -6,11 +6,37 @@ default_permissions = "orchestrator-workspace"
 developer_instructions = '''
 Generated canonical workflow contract.
 
+Canonical migration source: .agents/skills/orchestrate/SKILL.md
+
+Use the following repo-local skills as the canonical workflow source:
+
+- orchestrate
+
+- orchestrator-workflow
+
+For required delegated steps, you must delegate or stop execution.
+
+For planning steps, do not perform planning locally when delegation is required.
+
+For delivery steps, do not perform preflight validation, execution, or post-delivery validation locally when delegation is required.
+
+For review steps, do not perform post-implementation review locally when delegation is required.
+
+Do not treat a delegated step as complete until the delegate returns the required output contract for that step and the required on-disk artifacts exist.
+
+Do not claim mission completion unless all required delegations completed with receipts.
+
+Do not accept PASS outcomes that rely on stale PR-context artifacts, missing receipts, or missing required evidence-backed QA artifacts.
+
+If a required handoff cannot proceed, stop and report blocked state.
+
+Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until the canonical promotion lifecycle has completed.
+
 Canonical inputs:
 
 - `.agents/skills/orchestrate/SKILL.md` (`sha256:7dbb4d31989a5eeb0f094c025b4e92705e68df082e201cd00fa7c05c2b19b572`)
 
-- `.agents/skills/orchestrator-workflow/SKILL.md` (`sha256:0c6543269c4453670864d2c3b36bb6d37ac7556e6353cce940809820c5ea3a62`)
+- `.agents/skills/orchestrator-workflow/SKILL.md` (`sha256:2c3b11095536316f80e2ed923aed43452f2e7a5c115685b488e28b0611c80108`)
 
 ## Canonical source: `.agents/skills/orchestrate/SKILL.md`
 
@@ -596,6 +622,7 @@ Use as needed:
 - Deterministic availability rule:
   - if the host exposes `spawn_agent` and the required `.codex/agents/<name>.toml` file exists, treat that delegated specialist as available,
   - do not infer unavailability from missing nicknames, missing prior agent instances, or lack of a dedicated launcher alias.
+- Treat `spawn_agent` availability as the mechanical availability signal; this restates the deterministic availability rule without changing its fail-closed conditions.
 - Every required delegated specialist must exist as a native Codex agent under `.codex/agents/`. If a required agent file is missing, set `blocked_reason` to `spawn_agent_unavailable` and stop.
 - Required delegated steps MUST delegate or stop execution.
 - If a required delegated handoff cannot be started, resumed, or completed with a receipt, persist blocked state and stop. Do not perform that step directly.
@@ -1000,7 +1027,7 @@ Do not claim mission completion until all of the following are true:
 
 - Do not stop after one delegation when required downstream steps remain.
 - Do not infer specialist unavailability from missing nicknames or absent prior subagent instances.
-- Do not call `drmCopilotExtension.*` directly from this workflow.
+- Do not call repository extension lifecycle commands directly from this workflow.
 - Do not bypass `repo-automation-adapter` for host-specific lifecycle steps.
 - Do not rename, back up, or create sidecar checkpoint files to avoid using the canonical checkpoint path.
 - Do not proceed when the canonical checkpoint belongs to another in-progress mission; stop and report the conflict.
@@ -1013,6 +1040,7 @@ Do not claim mission completion until all of the following are true:
   implementation delegation when route metadata, branch state, lifecycle
   receipts, or folder readiness are missing.
 - Do not persist placeholder lifecycle values such as `NONE` or `TBD` for `${relativeFile}`, `${issue-num}`, `${feature-folder}`, or `${plan-path}` once lifecycle setup begins.
+- Do not persist placeholder lifecycle values such as `NONE`, `TBD`; this compatibility wording does not narrow the existing empty-value or lifecycle-variable guard.
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
 - Do not implement small-path production changes in the coordinating thread; the routed

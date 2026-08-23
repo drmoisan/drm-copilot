@@ -35,6 +35,7 @@ from typing import Any, cast
 
 from scripts.dev_tools.compute_complexity_floor import (
     BAND_ORDER,
+    ComplexityBand,
     compute_complexity_floor,
 )
 
@@ -50,7 +51,7 @@ __all__ = [
 COMPLEXITY_ASSESSMENTS_KEY = "complexity_assessments"
 # The permitted band vocabulary, reused from the floor reference implementation
 # so the enum and the ordering stay in one place.
-_VALID_BANDS = frozenset(BAND_ORDER)
+_BAND_RANK: dict[object, int] = {band: rank for rank, band in enumerate(BAND_ORDER)}
 
 
 def _validate_complexity_assessments(value: object) -> list[str]:
@@ -91,6 +92,7 @@ def _validate_complexity_assessments(value: object) -> list[str]:
         errors.append("Checkpoint complexity_assessments must be a list when present.")
         return errors
     assessment_list = cast("list[object]", value)
+    floor_cache: dict[tuple[str, ...], ComplexityBand] = {}
 
     # Validate each assessment independently so callers receive a complete
     # error list instead of stopping at the first malformed entry.
@@ -101,12 +103,16 @@ def _validate_complexity_assessments(value: object) -> list[str]:
             )
             continue
         assessment_map = cast("dict[str, Any]", assessment)
-        errors.extend(_validate_one_assessment(index, assessment_map))
+        errors.extend(_validate_one_assessment(index, assessment_map, floor_cache))
 
     return errors
 
 
-def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str]:
+def _validate_one_assessment(
+    index: int,
+    assessment: dict[str, Any],
+    floor_cache: dict[tuple[str, ...], ComplexityBand],
+) -> list[str]:
     """Validate a single complexity-assessment entry.
 
     Purpose:
@@ -118,6 +124,8 @@ def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str
         index (int): The assessment's position in the array, used to build a
             checkpoint-context-prefixed error message.
         assessment (dict[str, Any]): The parsed assessment object.
+        floor_cache (dict[tuple[str, ...], ComplexityBand]): Successful floor
+            computations already completed during this invocation.
 
     Returns:
         list[str]: One error string per violated invariant for this entry.
@@ -136,7 +144,8 @@ def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str
     rationale = assessment.get("rationale")
 
     # Invariant: band must be within the permitted enum.
-    if band not in _VALID_BANDS:
+    band_rank = _BAND_RANK.get(band)
+    if band_rank is None:
         errors.append(
             f"Checkpoint complexity_assessments #{index} band must be one of "
             f"C1, C2, C3, C4; got: {band}."
@@ -144,7 +153,14 @@ def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str
 
     # Invariant: signals_present must be a list of strings so the floor can be
     # recomputed; without it the floor-equality check cannot run.
-    signal_names = _string_list(signals_present)
+    signal_names: list[str] | None = None
+    if isinstance(signals_present, list):
+        candidate_names = cast("list[Any]", signals_present)
+        for item in candidate_names:
+            if not isinstance(item, str):
+                break
+        else:
+            signal_names = candidate_names
     if signal_names is None:
         errors.append(
             f"Checkpoint complexity_assessments #{index} signals_present must "
@@ -152,7 +168,12 @@ def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str
         )
     else:
         # Invariant: floor must equal the deterministic recomputed floor.
-        expected_floor = compute_complexity_floor(signal_names)
+        signal_key = tuple(signal_names)
+        try:
+            expected_floor = floor_cache[signal_key]
+        except KeyError:
+            expected_floor = compute_complexity_floor(signal_names)
+            floor_cache[signal_key] = expected_floor
         if floor != expected_floor:
             errors.append(
                 f"Checkpoint complexity_assessments #{index} floor {floor} does "
@@ -162,46 +183,19 @@ def _validate_one_assessment(index: int, assessment: dict[str, Any]) -> list[str
 
     # Invariant: band >= floor lower-bound ordering; both must be valid bands
     # to compare, so a prior enum error suppresses a spurious ordering error.
-    if (
-        band in _VALID_BANDS
-        and floor in _VALID_BANDS
-        and BAND_ORDER.index(cast("str", band)) < BAND_ORDER.index(cast("str", floor))
-    ):
-        errors.append(
-            f"Checkpoint complexity_assessments #{index} band {band} is below "
-            f"its floor {floor}."
-        )
+    if band_rank is not None:
+        floor_rank = _BAND_RANK.get(floor)
+        if floor_rank is not None and band_rank < floor_rank:
+            errors.append(
+                f"Checkpoint complexity_assessments #{index} band {band} is below "
+                f"its floor {floor}."
+            )
 
     # Invariant: rationale must be a non-empty string.
-    if not isinstance(rationale, str) or not rationale.strip():
+    if not isinstance(rationale, str) or not rationale or rationale.isspace():
         errors.append(
             f"Checkpoint complexity_assessments #{index} rationale must be a "
             "non-empty string."
         )
 
     return errors
-
-
-def _string_list(value: object) -> list[str] | None:
-    """Return a list of strings only when the value has that exact shape.
-
-    Args:
-        value (object): The candidate value.
-
-    Returns:
-        list[str] | None: The value as a list of strings, or None when it is
-        not a list or contains a non-string element.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    if not isinstance(value, list):
-        return None
-    items = cast("list[object]", value)
-    if not all(isinstance(item, str) for item in items):
-        return None
-    return cast("list[str]", items)

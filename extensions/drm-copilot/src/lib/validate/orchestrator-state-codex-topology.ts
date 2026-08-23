@@ -33,6 +33,16 @@ const FORCED_ROOT_PERSONAS: ReadonlySet<unknown> = new Set([
   "epic-planner",
 ]);
 
+interface TopologyResolutionEntry {
+  readonly languages: ReadonlyArray<unknown>;
+  readonly productionFileCount: unknown;
+  readonly testFileCount: unknown;
+  readonly executionContext: unknown;
+  readonly crossCutting: unknown;
+  readonly rootPersona: unknown;
+  readonly resolution: CodexTopologyReceipt;
+}
+
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -75,11 +85,30 @@ function valuesEqual(actual: unknown, expected: unknown): boolean {
   return actual === expected;
 }
 
-function validateReceiptInputs(
+function receiptInputsAreValid(receipt: Record<string, unknown>): boolean {
+  const languages = receipt["languages"];
+  return (
+    Array.isArray(languages) &&
+    !languages.some(
+      (language) =>
+        typeof language !== "string" || language.trim().length === 0,
+    ) &&
+    typeof receipt["production_file_count"] === "number" &&
+    Number.isInteger(receipt["production_file_count"]) &&
+    typeof receipt["test_file_count"] === "number" &&
+    Number.isInteger(receipt["test_file_count"]) &&
+    typeof receipt["cross_cutting"] === "boolean" &&
+    typeof receipt["execution_context"] === "string" &&
+    (receipt["root_persona"] === null ||
+      FORCED_ROOT_PERSONAS.has(receipt["root_persona"]))
+  );
+}
+
+function appendReceiptInputErrors(
   receipt: Record<string, unknown>,
   prefix: string,
-): string[] {
-  const errors: string[] = [];
+  errors: string[],
+): void {
   const languages = receipt["languages"];
   if (
     !Array.isArray(languages) ||
@@ -109,56 +138,137 @@ function validateReceiptInputs(
         "('epic-orchestrator', 'epic-planner').",
     );
   }
-  return errors;
 }
 
-function validateReceipt(value: unknown, prefix: string): string[] {
-  if (!isObject(value)) {
-    return [`${prefix} must be an object.`];
+function hasRequiredKeys(receipt: Record<string, unknown>): boolean {
+  for (const key of REQUIRED_KEYS) {
+    if (!(key in receipt)) {
+      return false;
+    }
   }
-  const missing = REQUIRED_KEYS.filter((key) => !(key in value));
-  if (missing.length > 0) {
-    return [`${prefix} missing required keys: ${missing.join(", ")}.`];
+  return true;
+}
+
+function languagesEqual(
+  left: ReadonlyArray<unknown>,
+  right: ReadonlyArray<unknown>,
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((language, index) => language === right[index])
+  );
+}
+
+function entryMatches(
+  entry: TopologyResolutionEntry,
+  receipt: Record<string, unknown>,
+  languages: ReadonlyArray<unknown>,
+): boolean {
+  return (
+    languagesEqual(entry.languages, languages) &&
+    entry.productionFileCount === receipt["production_file_count"] &&
+    entry.testFileCount === receipt["test_file_count"] &&
+    entry.executionContext === receipt["execution_context"] &&
+    entry.crossCutting === receipt["cross_cutting"] &&
+    entry.rootPersona === receipt["root_persona"]
+  );
+}
+
+function findResolution(
+  entries: ReadonlyArray<TopologyResolutionEntry>,
+  receipt: Record<string, unknown>,
+  languages: ReadonlyArray<unknown>,
+): CodexTopologyReceipt | undefined {
+  const lastIndex = entries.length - 1;
+  const lastEntry = entries[lastIndex];
+  if (lastEntry !== undefined && entryMatches(lastEntry, receipt, languages)) {
+    return lastEntry.resolution;
+  }
+  for (let index = 0; index < lastIndex; index += 1) {
+    const entry = entries[index];
+    if (entry !== undefined && entryMatches(entry, receipt, languages)) {
+      return entry.resolution;
+    }
+  }
+  return undefined;
+}
+
+function receiptPrefix(index: number, fixedPrefix?: string): string {
+  return fixedPrefix ?? `Checkpoint ${CODEX_TOPOLOGY_RECEIPTS_KEY}[${index}]`;
+}
+
+function validateReceipt(
+  value: unknown,
+  index: number,
+  errors: string[],
+  successfulResolutions: TopologyResolutionEntry[],
+  fixedPrefix?: string,
+): void {
+  if (!isObject(value)) {
+    errors.push(`${receiptPrefix(index, fixedPrefix)} must be an object.`);
+    return;
+  }
+  if (!hasRequiredKeys(value)) {
+    const missing = REQUIRED_KEYS.filter((key) => !(key in value));
+    errors.push(
+      `${receiptPrefix(index, fixedPrefix)} missing required keys: ` +
+        `${missing.join(", ")}.`,
+    );
+    return;
   }
 
-  const errors: string[] = [];
   const phase = value["phase"];
   if (typeof phase !== "string" || phase.trim().length === 0) {
-    errors.push(`${prefix}.phase must be a non-empty string.`);
+    errors.push(
+      `${receiptPrefix(index, fixedPrefix)}.phase must be a non-empty string.`,
+    );
   }
-  const inputErrors = validateReceiptInputs(value, prefix);
-  errors.push(...inputErrors);
-  if (inputErrors.length > 0) {
-    return errors;
+  if (!receiptInputsAreValid(value)) {
+    appendReceiptInputErrors(value, receiptPrefix(index, fixedPrefix), errors);
+    return;
   }
 
-  let expected: CodexTopologyReceipt;
-  try {
-    expected = resolveCodexTopology(
-      value["languages"],
-      value["production_file_count"],
-      value["test_file_count"],
-      value["execution_context"],
-      {
+  const languages = value["languages"] as ReadonlyArray<unknown>;
+  let expected = findResolution(successfulResolutions, value, languages);
+  if (expected === undefined) {
+    try {
+      expected = resolveCodexTopology(
+        value["languages"],
+        value["production_file_count"],
+        value["test_file_count"],
+        value["execution_context"],
+        {
+          crossCutting: value["cross_cutting"],
+          rootPersona: value["root_persona"],
+        },
+      );
+      successfulResolutions.push({
+        languages: [...languages],
+        productionFileCount: value["production_file_count"],
+        testFileCount: value["test_file_count"],
+        executionContext: value["execution_context"],
         crossCutting: value["cross_cutting"],
         rootPersona: value["root_persona"],
-      },
-    );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    errors.push(`${prefix} has invalid routing inputs: ${message}`);
-    return errors;
+        resolution: expected,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      errors.push(
+        `${receiptPrefix(index, fixedPrefix)} has invalid routing inputs: ${message}`,
+      );
+      return;
+    }
   }
 
   for (const key of RESOLVED_KEYS) {
     if (!valuesEqual(value[key], expected[key])) {
       errors.push(
-        `${prefix}.${key} must be ${pythonRepr(expected[key])}, ` +
+        `${receiptPrefix(index, fixedPrefix)}.${key} must be ` +
+          `${pythonRepr(expected[key])}, ` +
           `found ${pythonRepr(value[key])}.`,
       );
     }
   }
-  return errors;
 }
 
 /** Validate one receipt with a caller-selected diagnostic prefix. */
@@ -166,7 +276,9 @@ export function validateCodexTopologyReceipt(
   value: unknown,
   prefix = `Checkpoint ${CODEX_TOPOLOGY_RECEIPTS_KEY}[0]`,
 ): string[] {
-  return validateReceipt(value, prefix);
+  const errors: string[] = [];
+  validateReceipt(value, 0, errors, [], prefix);
+  return errors;
 }
 
 /** Validate every present topology receipt against the canonical resolver. */
@@ -176,12 +288,12 @@ export function validateCodexTopologyReceipts(value: unknown): string[] {
       `Checkpoint ${CODEX_TOPOLOGY_RECEIPTS_KEY} must be a list when present.`,
     ];
   }
-  return value.flatMap((item, index) =>
-    validateReceipt(
-      item,
-      `Checkpoint ${CODEX_TOPOLOGY_RECEIPTS_KEY}[${index}]`,
-    ),
-  );
+  const errors: string[] = [];
+  const successfulResolutions: TopologyResolutionEntry[] = [];
+  value.forEach((item, index) => {
+    validateReceipt(item, index, errors, successfulResolutions);
+  });
+  return errors;
 }
 
 function delegatedAgentNames(state: Record<string, unknown>): Set<string> {

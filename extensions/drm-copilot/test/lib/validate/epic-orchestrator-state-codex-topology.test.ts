@@ -82,7 +82,7 @@ describe("epic Codex topology gate", () => {
         requireCodexTopology: true,
       }),
     ).toContain(
-      "Checkpoint codex_topology_receipts is missing the forced root persona receipt for epic-orchestrator.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint codex_topology_receipts is missing the forced root persona receipt for epic-orchestrator.",
     );
   });
 
@@ -95,7 +95,7 @@ describe("epic Codex topology gate", () => {
         requireCodexTopology: true,
       }),
     ).toContain(
-      "Checkpoint codex_topology_receipts is missing a child topology receipt for recorded delegations.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint codex_topology_receipts is missing a child topology receipt for recorded delegations.",
     );
   });
 

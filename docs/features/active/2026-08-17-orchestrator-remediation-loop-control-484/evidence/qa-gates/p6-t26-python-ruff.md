@@ -1,0 +1,9 @@
+# P6-T26 Python Ruff QA Gate
+
+Timestamp: 2026-08-23T04:06:45-04:00
+
+Command: `poetry run ruff check scripts/dev_tools/_orchestrator_state_codex_topology.py scripts/dev_tools/_orchestrator_state_codex_model_routing.py scripts/dev_tools/validate_orchestrator_state.py scripts/dev_tools/_orchestrator_state_complexity.py scripts/dev_tools/analyze_coverage_policy.py scripts/dev_tools/_parallel_orchestrator_state_receipt_cohort.py scripts/dev_tools/synchronize_customization_bundles.py scripts/dev_tools/generate_codex_agent_variants.py scripts/dev_tools/generate_orchestration_customization_surfaces.py tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py tests/scripts/dev_tools/test_validate_orchestrator_state_complexity.py tests/scripts/dev_tools/test_analyze_coverage_policy.py tests/scripts/dev_tools/test_parallel_drift_parity.py tests/scripts/dev_tools/test_parallel_mutation_parity.py tests/scripts/dev_tools/test_parallel_receipt_bound_cohort.py tests/scripts/dev_tools/test_validate_parallel_planner_state_bounds.py tests/scripts/dev_tools/test_synchronize_customization_bundles.py tests/scripts/dev_tools/test_generate_codex_agent_variants.py tests/scripts/dev_tools/test_generate_orchestration_customization_surfaces.py`
+
+EXIT_CODE: 0
+
+Output Summary: Ruff reported `All checks passed!` with zero diagnostics across all 21 named Python files.

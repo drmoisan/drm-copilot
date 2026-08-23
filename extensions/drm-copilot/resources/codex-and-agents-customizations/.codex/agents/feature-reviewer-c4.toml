@@ -6,9 +6,29 @@ model_reasoning_effort = "max"
 developer_instructions = '''
 Generated canonical workflow contract.
 
+Canonical migration source: .agents/skills/feature-review/SKILL.md
+
+Use the following repo-local skills as the canonical workflow source:
+
+- feature-review
+
+- feature-review-workflow
+
+- remediation-handoff-atomic-planner
+
+Create the remediation plan target file on disk before the planning handoff.
+
+Remediation planning must treat remediation-inputs as the primary requirements source.
+
+The delegated remediation context package must include remediation inputs, canonical PR-context artifacts, review artifacts, and the original feature plan file(s).
+
+Do not claim completion when remediation is triggered unless the remediation plan file exists on disk.
+
+All required reported artifacts must exist on disk and pass their validators.
+
 Canonical inputs:
 
-- `.agents/skills/feature-review/SKILL.md` (`sha256:2df4462e7fac1f9684881a462b6fec79176e081ca57ce82e7ace78b3799e81df`)
+- `.agents/skills/feature-review/SKILL.md` (`sha256:a52dc54cd520aa42ac8cc6cf527245948e8f84989b253d95184dbc9db4723655`)
 
 - `.agents/skills/feature-review-workflow/SKILL.md` (`sha256:c1c524ad6f13480448428d1b753dcfe8d883b342e08fd6ea97c0251c05dd500a`)
 
@@ -128,7 +148,7 @@ Only for a matrix-valid `BLOCKED` plus `AUTONOMOUS` result:
 
 - create `remediation-inputs.<timestamp>.md` before any remediation planning handoff,
 - create the remediation plan target file on disk before delegating plan creation,
-- automatically delegate remediation planning to `atomic-planner`,
+- automatically delegate remediation planning to `atomic-planner`. Then automatically delegate remediation planning to the atomic-planner agent; this compatibility wording preserves the same matrix-valid trigger,
 - treat `remediation-inputs.<timestamp>.md` as the primary requirements source,
 - include the canonical PR-context summary and appendix, the review artifacts, and the original feature plan file(s) in the delegated context package,
 - if the remediation planning handoff cannot be started or does not return a receipt, stop and report blocked state,

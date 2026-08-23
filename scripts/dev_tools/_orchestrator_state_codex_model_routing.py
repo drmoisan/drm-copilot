@@ -21,6 +21,8 @@ _REQUIRED_KEYS = (
     "model_reasoning_effort",
 )
 _RESOLVED_KEYS = tuple(key for key in _REQUIRED_KEYS if key != "phase")
+_REQUIRED_KEY_SET = frozenset(_REQUIRED_KEYS)
+_ModelInputKey = tuple[str, str, str, str]
 
 
 def _validate_ceiling_transition(
@@ -74,32 +76,75 @@ def validate_codex_model_routing_receipts(value: object) -> list[str]:
 
     errors: list[str] = []
     previous_ceiling: ComplexityBand | None = None
-    for index, item in enumerate(cast("list[object]", value)):
+    validated_receipts: dict[
+        _ModelInputKey, tuple[dict[str, object], ComplexityBand]
+    ] = {}
+    validated_templates: dict[str, tuple[dict[str, Any], ComplexityBand]] = {}
+    items = cast("list[object]", value)
+    for index, item in enumerate(items):
+        receipt_error_count = len(errors)
         prefix = f"Checkpoint {CODEX_MODEL_ROUTING_RECEIPTS_KEY}[{index}]"
         if not isinstance(item, dict):
             errors.append(f"{prefix} must be an object.")
             continue
         receipt = cast("dict[str, Any]", item)
-        missing = [key for key in _REQUIRED_KEYS if key not in receipt]
-        if missing:
+        phase = receipt.get("phase")
+        logical_agent = receipt.get("logical_agent")
+        cached_template = (
+            validated_templates.get(logical_agent)
+            if isinstance(logical_agent, str)
+            else None
+        )
+        if isinstance(phase, str) and phase.strip() and cached_template is not None:
+            expected_receipt, current_ceiling = cached_template
+            expected_receipt["phase"] = phase
+            if (
+                receipt == expected_receipt
+                and previous_ceiling == current_ceiling
+                and receipt.get("ceiling_transition") is None
+            ):
+                previous_ceiling = current_ceiling
+                continue
+        if not _REQUIRED_KEY_SET <= receipt.keys():
+            missing = [key for key in _REQUIRED_KEYS if key not in receipt]
             errors.append(f"{prefix} missing required keys: {', '.join(missing)}.")
             continue
-        if not isinstance(receipt.get("phase"), str) or not receipt["phase"].strip():
+        if not isinstance(phase, str) or not phase.strip():
             errors.append(f"{prefix}.phase must be a non-empty string.")
 
-        try:
-            expected = resolve_codex_deployment(
-                str(receipt["logical_agent"]),
-                str(receipt["complexity_band"]),
-                str(receipt["execution_context"]),
-                str(receipt["orchestration_complexity_ceiling"]),
-            )
-        except ValueError as exc:
-            errors.append(f"{prefix} has invalid routing inputs: {exc}")
-            continue
+        input_key: _ModelInputKey = (
+            str(receipt["logical_agent"]),
+            str(receipt["complexity_band"]),
+            str(receipt["execution_context"]),
+            str(receipt["orchestration_complexity_ceiling"]),
+        )
+        cached_expected = validated_receipts.get(input_key)
+        if cached_expected is None:
+            try:
+                expected = resolve_codex_deployment(*input_key)
+            except ValueError as exc:
+                errors.append(f"{prefix} has invalid routing inputs: {exc}")
+                continue
 
-        current_ceiling = expected["orchestration_complexity_ceiling"]
-        if previous_ceiling is not None and BAND_ORDER.index(
+            current_ceiling = expected["orchestration_complexity_ceiling"]
+            expected_map = cast("dict[str, object]", expected)
+            validated_receipts[input_key] = expected_map, current_ceiling
+        else:
+            expected_map, current_ceiling = cached_expected
+
+        for key in _RESOLVED_KEYS:
+            if receipt.get(key) != expected_map[key]:
+                errors.append(
+                    f"{prefix}.{key} must be {expected_map[key]!r}, "
+                    f"found {receipt.get(key)!r}."
+                )
+
+        if (
+            previous_ceiling == current_ceiling
+            and receipt.get("ceiling_transition") is None
+        ):
+            pass
+        elif previous_ceiling is not None and BAND_ORDER.index(
             current_ceiling
         ) < BAND_ORDER.index(previous_ceiling):
             errors.append(
@@ -122,13 +167,8 @@ def validate_codex_model_routing_receipts(value: object) -> list[str]:
                 )
             )
         previous_ceiling = current_ceiling
-
-        for key in _RESOLVED_KEYS:
-            if receipt.get(key) != expected[key]:
-                errors.append(
-                    f"{prefix}.{key} must be {expected[key]!r}, "
-                    f"found {receipt.get(key)!r}."
-                )
+        if len(errors) == receipt_error_count and isinstance(logical_agent, str):
+            validated_templates[logical_agent] = dict(receipt), current_ceiling
     return errors
 
 

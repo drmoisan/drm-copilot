@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on Write or Edit operations
-    (matcher "Write|Edit"). The hook reads $env:CLAUDE_TOOL_INPUT JSON
+    (matcher "Write|Edit"). The hook reads the PreToolUse envelope JSON
     containing file_path, and either content (Write) or old_string/new_string
     (Edit).
 
@@ -25,20 +25,36 @@
     interprets the CLI's exit code and captured output.
 
 .NOTES
-    Compatible with PowerShell 7+. Read-only validation gate; the validator
-    subprocess is the only external process invoked.
+    Requires PowerShell 7.4+ (the shared validation module uses
+    `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
+    invokes NO external process: validation runs in-process through
+    `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
 #>
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Invoke-DiscoveryValidatorExe {
     <#
     .SYNOPSIS
-        Wrapper around the discovery-artifact validator CLI. Mockable seam.
+        Wrapper around the discovery-artifact validator. Mockable seam.
     .DESCRIPTION
-        Invokes `python -m scripts.dev_tools.validate_discovery_artifacts` with
-        the supplied arguments and captures both stdout and stderr. Tests mock
-        this function directly; production code must never mock `python`.
+        Delegates to the portable PowerShell implementation in
+        `.claude/lib/discovery-validation/DiscoveryValidation.psm1`, keeping this
+        function's name, its `-ValidatorArgs <string[]>` parameter, and its
+        `@{ ExitCode; Output }` return shape unchanged so existing mocks and
+        `Should -Invoke` assertions continue to bind.
+
+        This no longer invokes a Python interpreter (issue #475). The `.claude/**`
+        payload ships to destinations with no guaranteed Python, Poetry, or
+        `scripts/dev_tools`, where the previous `python -m ...` call failed
+        obscurely or blocked every operation.
+
+        Success is SILENT by contract: a passing validation returns `ExitCode = 0`
+        with an EMPTY `Output`. The caller denies on a non-zero exit code OR on
+        non-empty output, so any success chatter here would deny a passing
+        validation (defect D-2).
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -47,8 +63,14 @@ function Invoke-DiscoveryValidatorExe {
         [string[]] $ValidatorArgs
     )
 
-    $output = & python -m scripts.dev_tools.validate_discovery_artifacts @ValidatorArgs 2>&1
-    return @{ ExitCode = $LASTEXITCODE; Output = ($output | Out-String).Trim() }
+    $modulePath = Join-Path -Path $PSScriptRoot `
+        -ChildPath '../lib/discovery-validation/DiscoveryValidation.psm1'
+    if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
+        return @{ ExitCode = 1; Output = "Discovery-validation module not found: $modulePath" }
+    }
+
+    Import-Module -Name $modulePath -Force -ErrorAction Stop
+    return Invoke-DiscoveryArtifactValidation -ValidatorArgs $ValidatorArgs
 }
 
 function Get-DiscoveryArtifactType {
@@ -131,7 +153,7 @@ function Get-RequiredDiscoveryArtifactDeclaration {
 function Invoke-DiscoveryArtifactGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-deny decision for a
+        Parses the PreToolUse envelope and returns an allow-or-deny decision for a
         discovery-artifact completion gate.
     #>
     [CmdletBinding()]
@@ -143,18 +165,21 @@ function Invoke-DiscoveryArtifactGateDecision {
         [scriptblock] $RequiredArtifactReader = { Get-RequiredDiscoveryArtifactDeclaration }
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-discovery-artifact-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $filePath = $toolInput.file_path
+    $toolInput = $envelope.Value
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -200,13 +225,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

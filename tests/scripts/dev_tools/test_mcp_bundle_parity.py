@@ -66,7 +66,7 @@ def test_local_candidate_source_built_and_packed_parity() -> None:
     assert bundle_payloads.count(bundle_payloads[0]) == len(BUNDLE_PATHS)
     assert embedded_digests.count(embedded_digests[0]) == len(BUNDLE_PATHS)
     assert embedded_digests[0] == (
-        "sha256:72937c91d2cf0ad6809dd1c970ffa38f06eae4248c73222aa45f47266d63b0f4"
+        "sha256:49831b959858755cad2399af16f7d6306b0a7c5e915a67f93b783e15400b7361"
     )
 
 

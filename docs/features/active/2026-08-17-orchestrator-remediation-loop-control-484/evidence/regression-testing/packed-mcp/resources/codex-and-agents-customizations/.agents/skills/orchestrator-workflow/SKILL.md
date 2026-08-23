@@ -45,6 +45,7 @@ Use as needed:
 - Deterministic availability rule:
   - if the host exposes `spawn_agent` and the required `.codex/agents/<name>.toml` file exists, treat that delegated specialist as available,
   - do not infer unavailability from missing nicknames, missing prior agent instances, or lack of a dedicated launcher alias.
+- Treat `spawn_agent` availability as the mechanical availability signal; this restates the deterministic availability rule without changing its fail-closed conditions.
 - Every required delegated specialist must exist as a native Codex agent under `.codex/agents/`. If a required agent file is missing, set `blocked_reason` to `spawn_agent_unavailable` and stop.
 - Required delegated steps MUST delegate or stop execution.
 - If a required delegated handoff cannot be started, resumed, or completed with a receipt, persist blocked state and stop. Do not perform that step directly.
@@ -449,7 +450,7 @@ Do not claim mission completion until all of the following are true:
 
 - Do not stop after one delegation when required downstream steps remain.
 - Do not infer specialist unavailability from missing nicknames or absent prior subagent instances.
-- Do not call `drmCopilotExtension.*` directly from this workflow.
+- Do not call repository extension lifecycle commands directly from this workflow.
 - Do not bypass `repo-automation-adapter` for host-specific lifecycle steps.
 - Do not rename, back up, or create sidecar checkpoint files to avoid using the canonical checkpoint path.
 - Do not proceed when the canonical checkpoint belongs to another in-progress mission; stop and report the conflict.
@@ -462,6 +463,7 @@ Do not claim mission completion until all of the following are true:
   implementation delegation when route metadata, branch state, lifecycle
   receipts, or folder readiness are missing.
 - Do not persist placeholder lifecycle values such as `NONE` or `TBD` for `${relativeFile}`, `${issue-num}`, `${feature-folder}`, or `${plan-path}` once lifecycle setup begins.
+- Do not persist placeholder lifecycle values such as `NONE`, `TBD`; this compatibility wording does not narrow the existing empty-value or lifecycle-variable guard.
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
 - Do not implement small-path production changes in the coordinating thread; the routed

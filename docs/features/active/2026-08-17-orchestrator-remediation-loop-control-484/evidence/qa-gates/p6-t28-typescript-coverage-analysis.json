@@ -1,0 +1,178 @@
+{
+  "changed_files": [
+    {
+      "baseline_changed_line_percent": 97.163121,
+      "changed_line_percent": 97.163121,
+      "covered_changed_lines": 137,
+      "delta": 0.0,
+      "executable_changed_lines": 141,
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 153,
+      "delta": 0.0,
+      "executable_changed_lines": 153,
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-codex-topology.test.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing-coverage.test.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-topology.test.ts"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "extensions/drm-copilot/test/mcp-plan-gate-warning-projection.test.ts"
+    }
+  ],
+  "configured_changed_files": [],
+  "language": "typescript",
+  "mode": "final",
+  "new_symbols": [
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "deploymentProfile",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "receiptPrefix",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts"
+    },
+    {
+      "coverage_percent": 93.103448,
+      "kind": "function",
+      "name": "validateReceiptSequence",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "receiptInputsAreValid",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "appendReceiptInputErrors",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "hasRequiredKeys",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "languagesEqual",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "entryMatches",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "findResolution",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "receiptPrefix",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "validateReceipt",
+      "pass": true,
+      "path": "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "repeatedModelReceipts",
+      "pass": true,
+      "path": "extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing-coverage.test.ts"
+    }
+  ],
+  "overall_verdict": "PASS",
+  "repository": {
+    "branch_covered": 7210,
+    "branch_percent": 89.654315,
+    "branch_total": 8042,
+    "line_covered": 47745,
+    "line_percent": 96.273668,
+    "line_total": 49593
+  },
+  "schema_version": 1,
+  "thresholds": {
+    "new_symbol": 90.0,
+    "repository_branch": 75.0,
+    "repository_line": 85.0
+  },
+  "verdicts": {
+    "changed_line_no_regression": true,
+    "configured_changed_files": true,
+    "new_symbols": true,
+    "repository_branch": true,
+    "repository_line": true
+  }
+}

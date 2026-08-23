@@ -5,7 +5,7 @@
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Bash" matcher before any Bash
     command runs. Regex-matches gh pr merge with a --merge flag against
-    CLAUDE_TOOL_INPUT.command and, when matched, allows the merge only when one of two
+    the envelope's tool_input.command and, when matched, allows the merge only when one of three
     checkpoint-only conditions holds:
 
       1. Child-feature path: artifacts/orchestration/orchestrator-state.json exists,
@@ -14,11 +14,17 @@
       2. Epic-integration path: artifacts/orchestration/epic-orchestrator-state.json exists,
          epic_merge_pr.ci_gate.conclusion == "success", and, when the command names an
          explicit PR number, that number matches epic_merge_pr.pr_number.
+      3. Parallel path: artifacts/orchestration/parallel-orchestrator-state.json exists,
+         route_id == "parallel", and the command's explicit PR number matches an items[]
+         entry whose merge_status == "ci_green". A parallel run always names an explicit PR
+         number (each item merges from its own isolated worktree), so a bare command with no
+         PR number cannot satisfy this branch.
 
     Otherwise the command is denied with reason EPIC_MERGE_GATE_BLOCKED. A missing or
-    unreadable checkpoint in either branch fails closed (denies); standalone (non-epic)
-    orchestration never sets epic_mode or populates epic_merge_pr, so it is structurally
-    prevented from invoking gh pr merge --merge at all.
+    unreadable checkpoint in any branch fails closed (denies); standalone (non-epic,
+    non-parallel) orchestration never sets epic_mode, populates epic_merge_pr, or writes a
+    parallel checkpoint with route_id == "parallel", so it is structurally prevented from
+    invoking gh pr merge --merge at all.
 
     Design decision: this gate trusts the on-disk checkpoint rather than shelling out live
     to gh pr view for a real-time head-SHA check, matching the same non-adversarial,
@@ -33,8 +39,11 @@
 [CmdletBinding()]
 param()
 
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+
 $script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
+$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 
 function Get-ChildOrchestratorCheckpointContent {
     <#
@@ -70,6 +79,24 @@ function Get-EpicOrchestratorCheckpointContent {
         return $null
     }
     return (Get-Content -LiteralPath $script:EpicCheckpointPath -Raw)
+}
+
+function Get-ParallelOrchestratorCheckpointContent {
+    <#
+    .SYNOPSIS
+        Read the raw JSON text of the parallel-orchestrator checkpoint. Tests mock
+        this function (read seam).
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param()
+
+    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
+        return $null
+    }
+    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
 }
 
 function ConvertFrom-EpicMergeGateJson {
@@ -113,7 +140,18 @@ function Get-EpicMergeGateCommandPrNumber {
         [string] $CommandText
     )
 
+    # Original form: the PR number appears immediately after "merge"
+    # (e.g. "gh pr merge 410 --merge"). Preserved verbatim so epic-path outcomes
+    # for the forms the epic path uses are unchanged.
     if ($CommandText -match '(?i)\bgh\s+pr\s+merge\s+(\d+)\b') {
+        return [int]$Matches[1]
+    }
+    # Broadened, additive form: the parallel command places the flag before the
+    # number (e.g. "gh pr merge --merge 410"). Once "gh pr merge" is confirmed,
+    # capture the first standalone run of digits that is not preceded by "-" or a
+    # word character, so a flag token such as "--merge" is not treated as a number
+    # and a bare "gh pr merge --merge" still yields $null.
+    if ($CommandText -match '(?i)\bgh\s+pr\s+merge\b' -and $CommandText -match '(?<![-\w])(\d+)\b') {
         return [int]$Matches[1]
     }
     return $null
@@ -206,6 +244,69 @@ function Test-EpicCheckpointAllowsMerge {
     return $true
 }
 
+function Test-ParallelCheckpointAllowsMerge {
+    <#
+    .SYNOPSIS
+        Decision logic for the parallel-orchestrator checkpoint path (branch 3).
+    .PARAMETER Checkpoint
+        Parsed parallel-orchestrator checkpoint, or $null when absent/unreadable.
+    .PARAMETER CommandPrNumber
+        The explicit PR number parsed from the command, or $null when the command
+        does not name one. A parallel run always names an explicit PR number because
+        each item merges from its own isolated worktree, so a $null value denies.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [AllowNull()]
+        $Checkpoint,
+
+        [AllowNull()]
+        [Nullable[int]] $CommandPrNumber
+    )
+
+    if ($null -eq $Checkpoint) {
+        return $false
+    }
+    $props = @($Checkpoint.PSObject.Properties.Name)
+    if ($props -notcontains 'route_id' -or ([string]$Checkpoint.route_id) -ne 'parallel') {
+        return $false
+    }
+    # A parallel merge always names an explicit PR number; without one the target
+    # item cannot be identified, so fail closed.
+    if ($null -eq $CommandPrNumber) {
+        return $false
+    }
+    if ($props -notcontains 'items' -or $null -eq $Checkpoint.items) {
+        return $false
+    }
+
+    foreach ($item in @($Checkpoint.items)) {
+        if ($null -eq $item) {
+            continue
+        }
+        $itemProps = @($item.PSObject.Properties.Name)
+        if ($itemProps -notcontains 'pr_number') {
+            continue
+        }
+        $itemPrNumber = 0
+        if (-not [int]::TryParse([string]$item.pr_number, [ref] $itemPrNumber)) {
+            continue
+        }
+        if ($itemPrNumber -ne $CommandPrNumber) {
+            continue
+        }
+        if ($itemProps -notcontains 'merge_status') {
+            return $false
+        }
+        return ([string]$item.merge_status) -eq 'ci_green'
+    }
+
+    return $false
+}
+
 function Get-EpicMergeGateAllowDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -239,29 +340,34 @@ function Get-EpicMergeGateBlockDecision {
 function Invoke-EpicMergeGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the PreToolUse envelope and returns an allow-or-block decision.
+    .DESCRIPTION
+        Envelope-level anomalies (empty payload, unparseable JSON, missing or
+        malformed tool_input) fail closed as a deny; the legacy flat root shape is
+        one such anomaly. Property-level absence of command inside a well-formed
+        tool_input remains an allow, because that is this gate's scope filter.
     .PARAMETER ToolInputRaw
-        The raw JSON tool payload supplied by Claude Code.
+        The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
+        [AllowNull()]
+        [AllowEmptyString()]
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return Get-EpicMergeGateAllowDecision
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-EpicMergeGateBlockDecision -Reason (
+            'EPIC_MERGE_GATE_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-epic-merge-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $commandText = $toolInput.command
+    $commandText = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'command'
     if (-not $commandText) {
         return Get-EpicMergeGateAllowDecision
     }
@@ -284,7 +390,50 @@ function Invoke-EpicMergeGateDecision {
         return Get-EpicMergeGateAllowDecision
     }
 
-    return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", or an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number. Neither checkpoint satisfied this gate.'
+    $parallelCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ParallelOrchestratorCheckpointContent)
+    if (Test-ParallelCheckpointAllowsMerge -Checkpoint $parallelCheckpoint -CommandPrNumber $commandPrNumber) {
+        return Get-EpicMergeGateAllowDecision
+    }
+
+    return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
+}
+
+function Invoke-EpicMergeGateEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the merge-gate decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.
@@ -292,13 +441,12 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-EpicMergeGateEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit ([int]$entryPointResult[-1])

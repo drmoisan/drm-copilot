@@ -6,11 +6,17 @@
     "config/blast-radius.json"
   ],
   "shared_surface_globs": [],
+  "mandate_reads": [
+    ".claude/rules/**",
+    ".claude/skills/atomic-plan-contract/SKILL.md",
+    ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+    ".github/instructions/**",
+    "artifacts/**",
+    "quality-tiers.yml"
+  ],
   "modules": {
     "claude-runtime": [".claude/**"],
-    "config": ["config/**"],
-    "docs": ["docs/**"],
-    "tests": ["tests/**"]
+    "config": ["config/**"]
   },
   "over_breadth_fraction": 0.25
 }

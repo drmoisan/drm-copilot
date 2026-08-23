@@ -14,6 +14,8 @@ from tests.scripts.dev_tools.orchestrator_state_test_support import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    import pytest
+
 _build_complete_small_state = cast(
     "Callable[[], dict[str, object]]",
     vars(state_test_support)["_build_complete_small_state"],
@@ -243,6 +245,59 @@ def test_strict_route_membership_rejects_unknown_route() -> None:
         "is not a routing-matrix route: direct_powershell_engineer_remediation" in error
         for error in errors
     )
+
+
+def test_non_strict_route_membership_skips_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Skip route-membership evaluation when strict mode is not requested."""
+
+    calls = 0
+    sentinel = "sentinel route-membership diagnostic"
+
+    def recording_validator(_state: dict[str, object]) -> list[str]:
+        nonlocal calls
+        calls += 1
+        return [sentinel]
+
+    monkeypatch.setattr(
+        state_validator, "validate_route_membership", recording_validator
+    )
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(build_valid_orchestrator_state())
+    )
+
+    assert calls == 0
+    assert sentinel not in errors
+
+
+def test_strict_route_membership_invokes_validation_and_preserves_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Invoke strict route membership once and preserve diagnostic ordering."""
+
+    calls = 0
+    sentinels = [
+        "first route-membership diagnostic",
+        "second route-membership diagnostic",
+    ]
+
+    def recording_validator(_state: dict[str, object]) -> list[str]:
+        nonlocal calls
+        calls += 1
+        return sentinels
+
+    monkeypatch.setattr(
+        state_validator, "validate_route_membership", recording_validator
+    )
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(build_valid_orchestrator_state()), strict_route_membership=True
+    )
+
+    assert calls == 1
+    assert errors == sentinels
 
 
 def test_non_strict_route_membership_allows_missing_route_id() -> None:

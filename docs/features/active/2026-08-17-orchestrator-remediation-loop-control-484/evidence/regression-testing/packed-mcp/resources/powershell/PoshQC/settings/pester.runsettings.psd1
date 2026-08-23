@@ -90,6 +90,27 @@
             # coverage.
             '.claude/hooks/enforce-discovery-artifact-gate.ps1'
             '.claude/hooks/validate-discovery-artifact-gate.ps1'
+            # Issue #475 added the portable discovery-validation module so both discovery
+            # hooks stop invoking a Python interpreter; measured here so the new production
+            # module is not excluded from coverage.
+            '.claude/lib/discovery-validation/DiscoveryValidation.psm1'
+            # Issue #475 added the portable orchestrator-state parity modules so the
+            # completion hook validates the checkpoint without a Python interpreter;
+            # measured here so the new production modules are not excluded from coverage.
+            '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1'
+            # Issue #475 added the portable Codex routing resolvers so the U6.X and U6.T
+            # checkpoint checks resolve deployments and topologies without a Python
+            # interpreter; measured here so the new production modules are not excluded.
+            '.claude/lib/codex-routing/CodexDeployment.psm1'
+            '.claude/lib/codex-routing/CodexTopology.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1'
+            '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
             # Issue #392 changed the Invoke-PoshQCTest default seams ($EnsureModule -Global
             # import and the global-session-state $InvokePester trampoline) so the bundled
             # entry path hosts the Pester run in the global session state; measured here so
@@ -156,14 +177,20 @@
             '.codex/hooks/enforce-epic-planning-only.ps1'
             # Issue #447 added the .claude-resident PowerShell blast-radius library, the
             # two-language mirror of scripts/dev_tools/compute_blast_radius.py and its
-            # helper modules. The set is split across five files only to satisfy the
+            # helper modules. The set is split across six files only to satisfy the
             # 500-line limit; measured here so no new production module is excluded from
             # coverage.
+            # Issue #489 added BlastRadiusNormalization.psm1, which holds the
+            # read-by-mandate exclusion plus Get-ContractIdentifier and
+            # Resolve-BlastRadiusModule relocated out of the two modules that had run
+            # out of headroom. The relocation moves already-measured lines, so the new
+            # file is registered here to keep them in the coverage denominator.
             '.claude/lib/blast-radius/BlastRadiusExtraction.psm1'
             '.claude/lib/blast-radius/BlastRadiusGlob.psm1'
             '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
             '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
             '.claude/lib/blast-radius/BlastRadius.psm1'
+            '.claude/lib/blast-radius/BlastRadiusNormalization.psm1'
             # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
             # barrier and the worktree removal gate) and extended the invocation-origin
             # hook with the parallel-agent family; measured here so no new or changed
@@ -183,6 +210,30 @@
             # excluded from coverage. The test suite dot-sources the file (guarded body) so
             # line attribution is valid.
             '.claude/hooks/enforce-parallel-abandon-gate.ps1'
+            # Issue #491 added the Mermaid validation PreToolUse hook and its dependency-free
+            # validator library; measured here so the new production files are not excluded from
+            # coverage. The hook's test suite dot-sources the file (guarded body) and the library
+            # suites import the modules, so line attribution is valid.
+            '.claude/hooks/enforce-mermaid-validation.ps1'
+            '.claude/lib/mermaid/MermaidGrammar.psm1'
+            '.claude/lib/mermaid/MermaidLineScanner.psm1'
+            '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
+            '.claude/lib/mermaid/MermaidValidation.psm1'
+            # Issue #501 fixed the PreToolUse payload transport and shape across the whole
+            # hook surface. CodeCoverage.Path is an explicit per-file allow-list, so the new
+            # shared payload module, the six hooks that were changed but never registered,
+            # and the two dot-sourced helper siblings extracted for headroom are registered
+            # here. Without them the changed production surface would sit outside the
+            # coverage denominator, which the Coverage Exclusion Policy forbids.
+            '.claude/lib/hook-payload/HookPayload.psm1'
+            '.claude/hooks/enforce-promotion-mcp-only.ps1'
+            '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'
+            '.claude/hooks/enforce-evidence-locations.ps1'
+            '.claude/hooks/enforce-feature-folder-order.ps1'
+            '.claude/hooks/enforce-checkpoint-monotonic.ps1'
+            '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
+            '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

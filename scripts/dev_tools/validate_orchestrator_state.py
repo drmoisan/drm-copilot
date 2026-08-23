@@ -428,12 +428,10 @@ def validate_orchestrator_state_text(
         if optional_key in state_map and not selected:
             errors.extend(optional_validator(state_map.get(optional_key)))
 
-    # Route membership is evaluated unconditionally so the opt-in strict caller
-    # (the completion gate) can reject unknown routes; non-strict callers ignore
-    # the result, preserving backward compatibility for legacy checkpoints.
-    route_membership_errors = validate_route_membership(state_map)
+    # The opt-in strict caller evaluates route membership so the completion gate
+    # can reject unknown routes; non-strict legacy validation skips this work.
     if strict_route_membership:
-        errors.extend(route_membership_errors)
+        errors.extend(validate_route_membership(state_map))
 
     if require_complete:
         # Enforce completion-safe lifecycle states only when the caller opts into

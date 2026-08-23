@@ -1,0 +1,4 @@
+Timestamp: 2026-08-23T04-20
+Command: npm --prefix extensions/drm-copilot exec -- tsc --project tsconfig.json --outDir ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/qa-gates/typescript-benchmark-build --sourceMap false
+EXIT_CODE: 0
+Output Summary: TypeScript compilation completed without diagnostics. As in P0-T20, npm exec retained the caller working directory on the first invocation, which exited 1 with TS2688 because the repository root has no installed Node type definitions. The successful exact-command invocation supplied npm_config_node_options to set the child Node process working directory to extensions/drm-copilot without modifying source or configuration. Compiled validator path: docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/qa-gates/typescript-benchmark-build/lib/validate/orchestrator-state-core.js (16,194 bytes).

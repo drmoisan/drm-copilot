@@ -21,12 +21,57 @@ temporary file is created and no external process is started.
 
 from __future__ import annotations
 
+import json
+from typing import TYPE_CHECKING, cast
+
 import pytest
 
+from scripts.dev_tools.validate_parallel_planner_state import (
+    validate_parallel_planner_state_text,
+)
+from tests.scripts.dev_tools.test_validate_parallel_codex_readiness import (
+    build_evidence,
+)
 from tests.scripts.dev_tools.test_validate_parallel_planner_state import (
     build_valid_planner_state,
+    item_at,
     validate,
 )
+
+if TYPE_CHECKING:
+    from scripts.dev_tools.validate_parallel_codex_readiness import (
+        ParallelCodexReadinessEvidence,
+    )
+
+
+def build_ready_state(
+    concurrency: int,
+) -> tuple[dict[str, object], ParallelCodexReadinessEvidence]:
+    """Build prepared state and matching in-memory Codex readiness evidence."""
+
+    state = build_valid_planner_state()
+    state["max_concurrency"] = concurrency
+    for index in (0, 1):
+        item = item_at(state, index)
+        issue = cast("int", item["issue_num"])
+        item.update(
+            {
+                "complexity_band": "C2",
+                "cohort": 0,
+                "batch": index // concurrency,
+                "branch": f"feature/parallel-{issue}",
+                "worktree_path": f"C:/worktrees/parallel-{issue}",
+                "launch_receipt_path": (
+                    "artifacts/orchestration/parallel-child-launches/"
+                    f"wave-one/{issue}.receipt.json"
+                ),
+                "launch_status_path": (
+                    "artifacts/orchestration/parallel-child-launches/"
+                    f"wave-one/{issue}.status.json"
+                ),
+            }
+        )
+    return state, build_evidence(state)
 
 
 @pytest.mark.parametrize("concurrency", [1, 4, 32])
@@ -58,8 +103,14 @@ def test_invariant_p2_accepts_in_range_concurrency_under_the_ready_gate(
     """
 
     # Arrange
-    state = build_valid_planner_state()
-    state["max_concurrency"] = concurrency
+    state, evidence = build_ready_state(concurrency)
 
     # Act / Assert
-    assert validate(state, ready=True) == []
+    assert (
+        validate_parallel_planner_state_text(
+            json.dumps(state),
+            require_ready_for_execution=True,
+            readiness_context=evidence,
+        )
+        == []
+    )
