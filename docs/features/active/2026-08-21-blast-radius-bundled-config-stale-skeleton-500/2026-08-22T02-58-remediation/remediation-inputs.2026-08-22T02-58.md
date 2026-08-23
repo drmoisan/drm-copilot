@@ -241,7 +241,7 @@ Plan authorship is routed to `atomic-planner` per `.claude/skills/remediation-ha
 
 A specific caution for the plan's own acceptance gates, carried forward from cycle 1's preflight finding RP-1 and from `.claude/rules/plan-acceptance-gates.md`: do not state an acceptance condition as a search for a phrase that wraps across a line in the target file, and do not state a conjunction whose conjuncts already hold against the unedited file. The R7 verification above uses `git grep -c` with an expected count rather than an absence assertion for exactly this reason, because the string legitimately appears elsewhere in the same document.
 
-Note on artifact layout: `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` describes a folder-per-cycle layout of `remediation/<entry-ts>/` and `audit/<exit-ts>/`. The `feature-review` agent contract in force for this run specifies flat, timestamp-suffixed filenames at the feature root, and the delegating prompt asked for the artifacts in the active feature folder. This artifact and the three audit artifacts therefore use the flat form, matching cycle 1.
+Note on artifact layout: these artifacts were initially authored as flat, timestamp-suffixed files at the feature root. They are now organized into the sibling `2026-08-22T02-58-audit/` and `2026-08-22T02-58-remediation/` folders, preserving the original filenames and timestamps.
 
 ---
 

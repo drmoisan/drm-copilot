@@ -28,9 +28,9 @@ No other trigger condition fired:
 
 ## Audit Artifacts That Produced These Findings
 
-- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/policy-audit.2026-08-22T00-52.md`
-- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/code-review.2026-08-22T00-52.md`
-- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/feature-audit.2026-08-22T00-52.md`
+- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T00-52-audit/policy-audit.2026-08-22T00-52.md`
+- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T00-52-audit/code-review.2026-08-22T00-52.md`
+- `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T00-52-audit/feature-audit.2026-08-22T00-52.md`
 - `docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/qa-gates/reviewer-toolchain-rerun.2026-08-22T00-52.md`
 
 ---
@@ -211,7 +211,7 @@ If R4 or R6 is taken, the full toolchain loop must be rerun for the affected lan
 
 Plan authorship is routed to `atomic-planner` per `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`. That skill assigns authorship of `remediation-plan.md` to `atomic-planner` and prohibits the orchestrator from acting on the delta itself; `feature-review` likewise does not author the plan, so no plan stub was created by this review. The plan must conform to `.claude/skills/atomic-plan-contract/SKILL.md`, must pass `validate_orchestration_artifacts` with `artifact_type: "plan"`, and must clear `atomic-executor` preflight before execution.
 
-Note on artifact layout: `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` describes a folder-per-cycle layout of `remediation/<entry-ts>/` and `audit/<exit-ts>/`. The `feature-review` agent contract in force for this run specifies flat, timestamp-suffixed filenames at the feature root, and the delegating prompt asked for the artifacts in the active feature folder. This artifact and the three audit artifacts therefore use the flat form. Should the orchestrator adopt the folder-per-cycle layout for cycle 1, this file is the cycle-entry inputs artifact and `policy-audit.2026-08-22T00-52.md`, `code-review.2026-08-22T00-52.md`, and `feature-audit.2026-08-22T00-52.md` are the cycle-opening audit artifacts.
+Note on artifact layout: these artifacts were initially authored as flat, timestamp-suffixed files at the feature root. They are now organized into the sibling `2026-08-22T00-52-audit/` and `2026-08-22T00-52-remediation/` folders, preserving the original filenames and timestamps.
 
 ---
 

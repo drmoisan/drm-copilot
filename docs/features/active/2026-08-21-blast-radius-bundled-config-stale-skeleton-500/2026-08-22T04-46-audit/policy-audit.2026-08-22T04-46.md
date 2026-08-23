@@ -490,9 +490,9 @@ node run-jest.cjs test/lib/push-down
 ```
 poetry run python scripts/dev_tools/validate_evidence_locations.py --root .
 poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json
-poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/policy-audit.2026-08-22T04-46.md
-poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/code-review.2026-08-22T04-46.md
-poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/feature-audit.2026-08-22T04-46.md
+poetry run python -m scripts.dev_tools.validate_orchestration_artifacts policy-audit docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T04-46-audit/policy-audit.2026-08-22T04-46.md
+poetry run python -m scripts.dev_tools.validate_orchestration_artifacts code-review docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T04-46-audit/code-review.2026-08-22T04-46.md
+poetry run python -m scripts.dev_tools.validate_orchestration_artifacts feature-audit docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/2026-08-22T04-46-audit/feature-audit.2026-08-22T04-46.md
 ```
 
 ### Byte-identity checks
