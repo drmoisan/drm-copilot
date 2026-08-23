@@ -41,7 +41,6 @@ const SOURCE_DOCUMENT = `${JSON.stringify(
     shared_surfaces: [".claude/settings.json", "config/blast-radius.json"],
     shared_surface_globs: [],
     modules: {
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     },
     over_breadth_fraction: 0.25,
@@ -119,7 +118,6 @@ const SOURCE_DOCUMENT_WITH_MANDATE_READS = `${JSON.stringify(
     shared_surface_globs: [],
     mandate_reads: MANDATE_READS,
     modules: {
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     },
     over_breadth_fraction: 0.25,
@@ -289,7 +287,6 @@ describe("issue #472: the guard is unreachable through the composed scan", () =>
 
     // Assert
     expect(writtenModules(seeded)).toEqual({
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     });
     expect(seeded.readTextFile(TARGET)).not.toContain('"**"');
@@ -384,7 +381,6 @@ describe("issue #472: unreadable-directory tolerance", () => {
 
     // Assert
     expect(writtenModules(seeded)).toEqual({
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     });
   });

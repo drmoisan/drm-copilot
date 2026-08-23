@@ -88,22 +88,54 @@ Describe 'Committed blast-radius truth table shape' {
             $actual | Should -Be $expected
         }
 
-        It 'declares no removed umbrella module in the repository truth table' {
+        It 'declares no removed umbrella module in either committed copy' {
             # Arrange: an umbrella bucket that essentially every work item writes
             # into is not a coherent unit of contention, so these five were
-            # removed (issue #489, extending the #472 rationale). The scope is
-            # the repository truth table only: the bundled base document is a
-            # push-down template whose module map describes the DESTINATION
-            # repository's subsystems, so it is not held to this repository's
-            # granularity decision.
+            # removed (issue #489, extending the #472 rationale).
+            #
+            # The scope is BOTH committed copies. The bundled base document's
+            # module map is never read: a destination's map is derived from the
+            # destination's OWN layout by assembleModules, and PAYLOAD_MODULES in
+            # extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts
+            # is the live source of a destination's payload modules. The former
+            # comment here exempted the bundled copy on the ground that its map
+            # describes the destination repository's subsystems, which was not
+            # true, and the exemption let a claude-runtime umbrella survive in
+            # the published document (issue #500).
             $removed = @('python-dev-tools', 'vscode-extension', 'claude-runtime',
                 'copilot-surface', 'agents-surface')
 
-            # Act: comparison is ordinal, matching the case-sensitive semantics
-            # of the Python reference.
+            # Act: walk both committed copies. Comparison is ordinal, matching
+            # the case-sensitive semantics of the Python reference.
+            $offending = [System.Collections.Generic.List[string]]::new()
+            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
+                foreach ($name in @($config['modules'].Keys)) {
+                    if ($removed -ccontains $name) {
+                        $offending.Add($name)
+                    }
+                }
+            }
+
+            # Assert
+            $offending.ToArray() | Should -BeNullOrEmpty
+        }
+
+        It 'declares only payload modules in the bundled copy' {
+            # Arrange: Class 3 of the three-class key partition (issue #500).
+            # The bundled modules key set must be a subset of the payload module
+            # names the push-down itself creates in a destination. The
+            # authoritative source is PAYLOAD_MODULES in
+            # extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts.
+            # A subset relation rather than equality is asserted so shrinking the
+            # payload set does not require editing this test in lockstep.
+            # Mirrors test_class_three_bundled_modules_are_payload_modules_only
+            # in tests/scripts/dev_tools/test_blast_radius_config_parity.py.
+            $script:PayloadModuleName = @('config')
+
+            # Act: comparison is ordinal, matching the Python reference.
             $offending = @(
-                $script:CommittedConfig['modules'].Keys |
-                    Where-Object { $removed -ccontains $_ }
+                $script:BundledConfig['modules'].Keys |
+                    Where-Object { -not ($script:PayloadModuleName -ccontains $_) }
             )
 
             # Assert
@@ -180,6 +212,30 @@ Describe 'Committed blast-radius truth table shape' {
             )
 
             # Assert: no separator-free surface may carry either wildcard.
+            $offending | Should -BeNullOrEmpty
+        }
+
+        It 'gives every separator-free bundled shared surface no wildcard' {
+            # Arrange: the same constraint applied to the published copy
+            # (issue #500). A separator-free entry is the sole gate on whether
+            # the extractor accepts a separator-free token at all, so a published
+            # table with none of them cannot detect two items rewriting the same
+            # root build file. Mirrors
+            # test_every_separator_free_bundled_shared_surface_is_wildcard_free
+            # in tests/scripts/dev_tools/test_blast_radius_config_parity.py.
+            $separatorFree = @(
+                $script:BundledConfig['shared_surfaces'] |
+                    Where-Object { -not $_.Contains('/') }
+            )
+
+            # Act
+            $offending = @(
+                $separatorFree | Where-Object { $_.Contains('*') -or $_.Contains('?') }
+            )
+
+            # Assert: the selection must be non-empty, otherwise the wildcard
+            # check would pass vacuously while the fail-open defect remained.
+            $separatorFree.Count | Should -BeGreaterThan 0
             $offending | Should -BeNullOrEmpty
         }
     }

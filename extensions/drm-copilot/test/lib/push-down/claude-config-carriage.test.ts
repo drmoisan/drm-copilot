@@ -106,6 +106,32 @@ describe("issue #462 AC6: the Claude push-down publishes the config tree", () =>
     // Assert
     expect(bundledBytes.equals(rootBytes)).toBe(true);
   });
+
+  it("keeps SOURCE_BLAST_RADIUS in step with the committed bundled blast-radius resource", () => {
+    // Arrange: SOURCE_BLAST_RADIUS is an in-memory fixture claimed to mirror
+    // the committed bundled blast-radius.json key for key (issue #500, cycle
+    // 3 CR-4). Nothing previously enforced that claim, so the fixture could
+    // drift from the real on-disk resource without any test noticing.
+    const bundledPath = path.join(
+      REPO_ROOT,
+      "extensions",
+      "drm-copilot",
+      "resources",
+      "claude-customizations",
+      "config",
+      "blast-radius.json",
+    );
+
+    // Act: read the real committed file and parse both it and the fixture,
+    // so the comparison is structural rather than byte-for-byte (both are
+    // JSON text with independent formatting and key order).
+    const bundledText = fs.readFileSync(bundledPath, "utf8");
+    const committed = JSON.parse(bundledText);
+    const fixture = JSON.parse(SOURCE_BLAST_RADIUS);
+
+    // Assert
+    expect(fixture).toEqual(committed);
+  });
 });
 
 describe("issue #462 AC7: the routing write merges rather than overwrites", () => {
@@ -277,8 +303,23 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
 
     // Assert: genericity is asserted as a property rather than as equality with
     // a seeded constant (issue #472). The published map must name the
-    // destination's own module, must carry no location bucket or universal
-    // glob, and must carry no drm-copilot-only entry.
+    // destination's own module and must carry no location bucket or universal
+    // glob.
+    //
+    // The retained criterion is what must never reach a destination: an entry
+    // naming THIS repository's directory layout. `scripts/dev_tools` and
+    // `packages/mcp-server` are directories only drm-copilot has, so a
+    // destination that received one would carry a module or surface pointing at
+    // nothing.
+    //
+    // An ecosystem-standard root filename is a different case, and
+    // `poetry.lock` and `package-lock.json` were removed from this list for
+    // that reason (issue #500, DD-1). Any Python or Node destination may
+    // legitimately carry them, and under the governing surfaces-versus-modules
+    // asymmetry the cost of a surface entry a destination lacks is zero: an
+    // over-matching module glob costs concurrency on every pair it touches,
+    // whereas an unmatched surface entry is inert. Their presence is therefore
+    // not evidence of a leaked repository layout.
     expect(published).toContain('"src/App"');
     expect(published).toContain('"src/App/**"');
     for (const forbidden of [
@@ -287,11 +328,29 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
       '"tests/**"',
       "scripts/dev_tools",
       "packages/mcp-server",
-      "poetry.lock",
-      "package-lock.json",
     ]) {
       expect(published).not.toContain(forbidden);
     }
+  });
+
+  it("publishes no claude-runtime module into a layout-free destination", () => {
+    // Arrange: a destination whose layout reports no entry at any path, so the
+    // scan contributes nothing and the assembled map is exactly the payload
+    // module set. That isolates the assertion to `PAYLOAD_MODULES`.
+    const seeded = seedTree();
+
+    // Act
+    publish(seeded, null, layoutLister({}));
+    const published = JSON.parse(
+      seeded.readTextFile(`${DEST}/config/blast-radius.json`),
+    ) as { modules: Record<string, ReadonlyArray<string>> };
+
+    // Assert: `.claude/**` is an umbrella that matches nearly every radius in a
+    // destination, because every agent in the runtime is instructed to read the
+    // policy rules and process skills before doing any work. A module that
+    // always fires carries no contention information and only suppresses
+    // concurrency, so it must never reach a published document (issue #500).
+    expect(Object.keys(published.modules)).not.toContain("claude-runtime");
   });
 
   it("overwrites the destination blast-radius rather than merging it", () => {

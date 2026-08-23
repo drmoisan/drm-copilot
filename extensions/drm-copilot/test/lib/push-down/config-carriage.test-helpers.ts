@@ -63,25 +63,51 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  *
  * This is the derivation's base document, not the bytes a destination receives:
  * {@link BlastRadiusDeriveFileSystem} replaces the module map with one computed
- * from the destination's own layout. The constant mirrors the shape of the
- * corrected bundled copy at
- * `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`,
- * which declares only the two payload modules. The `docs` and `tests` location
- * buckets it previously carried were removed in issue #472 because a bucket
- * keyed on where a file lives attaches to nearly every work item and makes
- * every pair of items contend at the module level.
+ * from the destination's own layout. The constant mirrors the corrected bundled
+ * copy at
+ * `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`
+ * key for key, so a case that asserts against it asserts against the shape a
+ * destination actually receives.
+ *
+ * The corrected copy declares **one** payload module, `config`. The `docs` and
+ * `tests` location buckets were removed in issue #472 because a bucket keyed on
+ * where a file lives attaches to nearly every work item, and `claude-runtime`
+ * was removed in issue #500 for the same reason: every agent in the runtime is
+ * instructed to read the policy rules before doing any work, so a `.claude/**`
+ * umbrella matches nearly every radius and only suppresses concurrency.
+ *
+ * `shared_surfaces` carries the six-entry destination-portable set, of which
+ * three — `package-lock.json`, `poetry.lock`, and `quality-tiers.yml` — are
+ * separator-free. That matters: a separator-free shared surface is the sole
+ * gate on whether the extractor accepts a separator-free token at all, so
+ * without one no destination can detect two items rewriting the same root build
+ * file. `mandate_reads` carries the ten-entry read-by-mandate exclusion set.
  */
 export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
   {
     version: 1,
     shared_surfaces: [
       ".claude/settings.json",
-      "config/orchestration-routing.json",
       "config/blast-radius.json",
+      "config/orchestration-routing.json",
+      "package-lock.json",
+      "poetry.lock",
+      "quality-tiers.yml",
     ],
     shared_surface_globs: [],
+    mandate_reads: [
+      ".claude/rules/**",
+      ".claude/skills/atomic-plan-contract/SKILL.md",
+      ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+      ".github/instructions/**",
+      "artifacts/**",
+      "quality-tiers.yml",
+      ".claude/skills/acceptance-criteria-tracking/SKILL.md",
+      ".claude/skills/policy-compliance-order/SKILL.md",
+      ".claude/agent-memory/**",
+      ".agents/skills/**",
+    ],
     modules: {
-      "claude-runtime": [".claude/**"],
       config: ["config/**"],
     },
     over_breadth_fraction: 0.25,

@@ -23,7 +23,11 @@
     ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
     ".github/instructions/**",
     "artifacts/**",
-    "quality-tiers.yml"
+    "quality-tiers.yml",
+    ".claude/skills/acceptance-criteria-tracking/SKILL.md",
+    ".claude/skills/policy-compliance-order/SKILL.md",
+    ".claude/agent-memory/**",
+    ".agents/skills/**"
   ],
   "modules": {
     "powershell-dev-tools": ["scripts/dev-tools/**"],
