@@ -1,0 +1,45 @@
+{
+  "description": "Placeholder-marker variants. One plan task line per marker under repair — the angle-open bracket, the angle-close bracket, the delimited-variable form, the subexpression form, and the percent form — so the five-marker determination is executable in both runtimes from the shared corpus. Every marker-bearing token is rejected and only the own-feature-folder documentation glob remains (issue #502).",
+  "input": {
+    "plan_text": "### Phase 1 — Markers\n- [ ] [P1-T1] Cite `docs/features/active/<feature/plan.md`.\n- [ ] [P1-T2] Cite `docs/features/active/feature>/plan.md`.\n- [ ] [P1-T3] Cite `.claude/state/${session_id}.json`.\n- [ ] [P1-T4] Cite `.claude/state/$(session).json`.\n- [ ] [P1-T5] Cite `.claude/state/%SESSION%.json`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-22-placeholder-marker-variants-502",
+    "computed_at": "2026-08-22T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-22-placeholder-marker-variants-502/**"
+      ],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-22T12-00"
+    },
+    "findings": []
+  }
+}

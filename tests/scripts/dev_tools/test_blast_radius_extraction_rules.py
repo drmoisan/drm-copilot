@@ -1,10 +1,11 @@
-"""Unit tests for the unconditional extraction rules added by issue #489.
+"""Unit tests for the unconditional extraction rules of the path classifier.
 
-Cover the three shape rules the extractor gained so that a plan citation is
-admitted only when it is evidence of a write: directory-shaped token rejection,
-cross-corpus documentation-glob rejection, and letterless contract-token
-rejection. Every input is an in-memory literal; no temporary file is created
-and no external process is started.
+Cover the four shape rules the extractor applies so that a plan citation is
+admitted only when it is evidence of a write: directory-shaped token rejection
+and cross-corpus documentation-glob rejection plus letterless contract-token
+rejection (issue #489), and placeholder-marker rejection (issue #502). Every
+input is an in-memory literal; no temporary file is created and no external
+process is started.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from scripts.dev_tools._blast_radius_extraction import (
     PATH_KIND_GLOB,
     classify_path_token,
     extract_contract_identifiers,
+    extract_plan_paths,
 )
 
 # A minimal spec whose single qualifying heading puts every following inline
@@ -154,3 +156,70 @@ def test_extract_contract_identifiers_retains_a_letterless_adjacent_identifier()
 
     # Assert
     assert identifiers == ("normalize_declared_radius",)
+
+
+# One probe per placeholder or interpolation marker under repair (issue #502).
+# Each probe carries exactly one marker so a failure names the marker that
+# regressed rather than a token that happens to carry several. The angle-bracket
+# probes are deliberately not a matched pair: a single bracket is enough to
+# prove the marker is what the guard reads, and a matched pair would make the
+# two cases indistinguishable. Every literal is written out in full rather than
+# assembled, because a Python string literal performs no interpolation and the
+# text below is exactly what reaches the classifier.
+PLACEHOLDER_MARKER_PROBES = [
+    pytest.param("docs/features/active/<feature/plan.md", id="angle-open"),
+    pytest.param("docs/features/active/feature>/plan.md", id="angle-close"),
+    pytest.param(".claude/state/${session_id}.json", id="dollar-brace"),
+    pytest.param(".claude/state/$(session).json", id="dollar-paren"),
+    pytest.param(".claude/state/%SESSION%.json", id="percent"),
+]
+
+
+@pytest.mark.parametrize("token", PLACEHOLDER_MARKER_PROBES)
+def test_classify_path_token_rejects_placeholder_marker(token: str) -> None:
+    """Reject a token carrying a placeholder or interpolation marker.
+
+    A marker-bearing token is a command or artifact *shape*, not a write
+    claim: it names no file, and on Windows the angle brackets cannot appear
+    in a path at all. Admitting one made every item that cited the same
+    mandated artifact shape contend at the path level on a string that
+    resolves to nothing (issue #502).
+    """
+    # Arrange / Act
+    kind = classify_path_token(token)
+
+    # Assert
+    assert kind is None, f"Expected {token!r} to be rejected; observed {kind!r}."
+
+
+def test_real_path_on_same_task_line_survives_placeholder_rejection() -> None:
+    """A real path cited beside a placeholder token is still harvested.
+
+    The guard must drop the marker-bearing token only. Dropping the whole line,
+    or the whole task, would silently narrow a genuine write claim, so this is
+    the positive control that pins the rejection's scope to one token.
+
+    This control asserts survival only, and deliberately makes no claim about
+    the placeholder token itself. That is what lets it hold both before and
+    after the guard exists: the rejection is asserted by the parametrized
+    marker cases, so duplicating it here would turn the positive control into a
+    second copy of the same negative assertion and it could no longer show that
+    the guard's scope stayed narrow across the change.
+    """
+    # Arrange
+    plan_text = (
+        "### Phase 0 - Baseline\n"
+        "\n"
+        "- [ ] [P0-T1] Write the evidence artifact "
+        "`<FEATURE>/evidence/baseline/phase0-instructions-read.md` and edit "
+        "`scripts/dev_tools/compute_blast_radius.py`.\n"
+    )
+
+    # Act
+    paths = extract_plan_paths(plan_text)
+
+    # Assert
+    assert "scripts/dev_tools/compute_blast_radius.py" in paths, (
+        "Expected the real path cited on the same task line to survive; observed "
+        f"{paths}."
+    )

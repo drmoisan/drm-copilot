@@ -11,9 +11,11 @@ Responsibilities:
     classify tokens as concrete repository paths or globs, and extract contract
     identifiers from a spec's interface sections. Glob translation, subsumption,
     and entry-pair overlap belong to
-    ``scripts/dev_tools/_blast_radius_glob.py``. Building radius objects,
-    resolving modules and shared surfaces, and emitting findings belong to the
-    facade, not here.
+    ``scripts/dev_tools/_blast_radius_glob.py``. The context-free token-shape
+    rejections — the placeholder-marker test and the feature-corpus-span test —
+    belong to ``scripts/dev_tools/_blast_radius_token_shapes.py``, which is a
+    leaf this module imports. Building radius objects, resolving modules and
+    shared surfaces, and emitting findings belong to the facade, not here.
 
 Usage:
     The facade calls ``extract_plan_paths`` for both derivation and validation
@@ -42,6 +44,11 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
+
+from scripts.dev_tools._blast_radius_token_shapes import (
+    contains_placeholder_marker,
+    spans_multiple_feature_folders,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -79,12 +86,6 @@ KNOWN_TOP_LEVEL_SEGMENTS: tuple[str, ...] = tuple(
 # suffix is stripped before the extension test so a line-anchored citation keeps
 # the acceptance its unanchored form has; the token itself is recorded verbatim.
 LINE_SUFFIX_RE = re.compile(r":\d+$")
-
-# Documentation-corpus root and the index, counted after that prefix, of the
-# segment that names one feature folder. A glob whose wildcard reaches this
-# segment or any earlier one claims every feature folder in the corpus.
-FEATURE_CORPUS_PREFIX = "docs/features/"
-FEATURE_FOLDER_SEGMENT_INDEX = 1
 
 # Fallback acceptance rule: a token shaped ``<segment>/.../<name>.<ext>`` counts
 # as a repository path when its final component carries one of these extensions.
@@ -239,48 +240,6 @@ def extract_inline_code_tokens(line: str) -> tuple[str, ...]:
     return tuple(tokens)
 
 
-def spans_multiple_feature_folders(token: str) -> bool:
-    """Report whether a glob claims more than one documentation feature folder.
-
-    The documentation corpus is laid out as
-    ``docs/features/<bucket>/<feature-folder>/...``. A glob whose wildcard
-    occupies or truncates the feature-folder segment therefore claims every
-    feature folder in the corpus, which made two unrelated work items contend
-    purely because both wrote documentation (issue #489). A glob that carries a
-    complete, wildcard-free feature-folder segment claims one folder and is
-    retained.
-
-    Args:
-        token (str): A wildcard-bearing token already accepted by the shape
-            rules of ``classify_path_token``.
-
-    Returns:
-        bool: ``True`` when the token is rooted in the documentation corpus and
-        its wildcard reaches the feature-folder segment or any earlier one;
-        ``False`` for every other token, including one rooted elsewhere.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-    if not token.startswith(FEATURE_CORPUS_PREFIX):
-        return False
-
-    segments = token[len(FEATURE_CORPUS_PREFIX) :].split("/")
-
-    # A token that stops at or before the feature-folder segment has had that
-    # segment truncated away by the wildcard, so it spans the whole corpus.
-    if len(segments) <= FEATURE_FOLDER_SEGMENT_INDEX:
-        return True
-
-    # Every segment up to and including the feature-folder name must be a
-    # literal for the claim to resolve to exactly one folder.
-    naming = segments[: FEATURE_FOLDER_SEGMENT_INDEX + 1]
-    return any("*" in segment for segment in naming)
-
-
 def classify_path_token(
     token: str, *, root_surfaces: Sequence[str] = ()
 ) -> PathTokenKind | None:
@@ -301,6 +260,9 @@ def classify_path_token(
         token is accepted only when it names a file: it must be a configured
         root surface or carry a recognized extension, optionally followed by a
         ``:<line>`` suffix. A directory-shaped token is rejected (issue #489).
+        A token carrying any member of ``PLACEHOLDER_MARKERS`` is rejected
+        wherever the marker sits, because it documents a shape rather than
+        naming a file (issue #502).
 
     Raises:
         None.
@@ -318,6 +280,22 @@ def classify_path_token(
     # substring semantics if a caller ever passed a bare string.
     if any(token == surface for surface in root_surfaces):
         return PATH_KIND_CONCRETE
+
+    # A token carrying a placeholder or interpolation marker documents a shape
+    # rather than naming a file, so it is not a write claim (issue #502).
+    #
+    # Ordering, both directions. This runs AFTER the root-surface test because
+    # that test is exact ordinal equality against a configured surface name: a
+    # configured surface cannot contain a marker, so the two tests can never
+    # disagree, and putting the cheaper marker scan first would only add work to
+    # the common accepted case. It runs BEFORE the separator guard because a
+    # marker-bearing token frequently does carry a separator and would otherwise
+    # sail past that guard and reach the extension rule, which accepts it: the
+    # dominant corpus shape is an angle-bracketed leading segment followed by a
+    # real ``.md`` tail, and that is exactly the token this guard exists to
+    # reject.
+    if contains_placeholder_marker(token):
+        return None
 
     # A path reference must name a separator; a bare word such as a function
     # name is a contract identifier, not a path. It must also be

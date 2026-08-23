@@ -137,7 +137,7 @@
             '.codex/hooks/enforce-epic-planning-only.ps1'
             # Issue #447 added the .claude-resident PowerShell blast-radius library, the
             # two-language mirror of scripts/dev_tools/compute_blast_radius.py and its
-            # helper modules. The set is split across six files only to satisfy the
+            # helper modules. The set is split across seven files only to satisfy the
             # 500-line limit; measured here so no new production module is excluded from
             # coverage.
             # Issue #489 added BlastRadiusNormalization.psm1, which holds the
@@ -145,12 +145,20 @@
             # Resolve-BlastRadiusModule relocated out of the two modules that had run
             # out of headroom. The relocation moves already-measured lines, so the new
             # file is registered here to keep them in the coverage denominator.
+            # Issue #502 added BlastRadiusTokenShape.psm1, the seventh file. It holds the
+            # new placeholder-marker predicate plus Test-MultipleFeatureFolderSpan
+            # relocated out of BlastRadiusExtraction.psm1, which had two lines of
+            # headroom left. CodeCoverage.Path is an explicit per-file allow-list, so
+            # without this entry the new production module and the relocated
+            # already-measured lines would both sit outside the coverage denominator,
+            # which the Coverage Exclusion Policy forbids.
             '.claude/lib/blast-radius/BlastRadiusExtraction.psm1'
             '.claude/lib/blast-radius/BlastRadiusGlob.psm1'
             '.claude/lib/blast-radius/BlastRadiusConfig.psm1'
             '.claude/lib/blast-radius/BlastRadiusValidation.psm1'
             '.claude/lib/blast-radius/BlastRadius.psm1'
             '.claude/lib/blast-radius/BlastRadiusNormalization.psm1'
+            '.claude/lib/blast-radius/BlastRadiusTokenShape.psm1'
             # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
             # barrier and the worktree removal gate) and extended the invocation-origin
             # hook with the parallel-agent family; measured here so no new or changed

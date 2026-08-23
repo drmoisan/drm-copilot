@@ -19,6 +19,7 @@ from scripts.dev_tools._blast_radius_normalization import (
 )
 from scripts.dev_tools.compute_blast_radius import (
     BlastRadius,
+    conflicts,
     normalize_declared_radius,
 )
 
@@ -205,3 +206,160 @@ def test_normalize_declared_radius_drops_every_rejected_entry_class() -> None:
     assert result.contracts == ("normalize_declared_radius",)
     assert result.source == "declared"
     assert result.computed_at == COMPUTED_AT
+
+
+def test_normalize_declared_radius_strips_a_placeholder_entry() -> None:
+    """Strip a placeholder entry from an already-recorded radius (issue #502).
+
+    This is the retrospective-cleaning path. The guard lives in the classifier,
+    and ``normalize_declared_radius`` re-runs the classifier over each recorded
+    entry, so a radius that was recorded before the guard existed is cleaned by
+    normalization rather than by re-derivation, which is not always possible.
+
+    The assertions cover all three dependent levels, not just ``paths``,
+    because the module and shared-surface levels are re-resolved from the
+    surviving paths. A normalizer that dropped the entry from ``paths`` while
+    leaving a stale module or shared surface behind would still make two
+    unrelated items contend, one level up from where the entry was removed.
+    """
+    # Arrange: a recorded radius carrying one placeholder entry whose shape
+    # matches the configured shared surface, one placeholder entry that resolves
+    # into the configured module, and two real entries that must survive.
+    radius = declared_radius(
+        paths=[
+            "<FEATURE>/spec.md",
+            "config/blast-radius.json",
+            "config/${environment}.json",
+            "scripts/dev_tools/compute_blast_radius.py",
+        ],
+        modules=["config"],
+        shared_surfaces=["config/blast-radius.json"],
+        contracts=["normalize_declared_radius"],
+    )
+
+    # Act
+    result = normalize_declared_radius(radius, NORMALIZER_CONFIG)
+
+    # Assert: both placeholder entries are gone and both real entries survive.
+    assert result.paths == (
+        "config/blast-radius.json",
+        "scripts/dev_tools/compute_blast_radius.py",
+    )
+    # The module level is re-resolved from the surviving paths, so the module the
+    # placeholder entry would have contributed is present only because a real
+    # entry also resolves to it.
+    assert result.modules == ("config",)
+    # The shared-surface level is likewise re-resolved from the surviving
+    # concrete entries.
+    assert result.shared_surfaces == ("config/blast-radius.json",)
+    assert result.contracts == ("normalize_declared_radius",)
+    assert result.source == "declared"
+    assert result.computed_at == COMPUTED_AT
+
+
+def test_normalize_declared_radius_clears_a_level_a_placeholder_alone_supplied() -> (
+    None
+):
+    """Re-resolution removes a level no surviving real entry supports.
+
+    The companion above keeps ``config`` because a real entry also resolves to
+    it, which cannot distinguish re-resolution from passthrough. Here the only
+    entry that reached the module and shared-surface levels is the placeholder,
+    so both levels must come back empty. Without this case a normalizer that
+    copied the recorded levels verbatim would satisfy the companion.
+    """
+    # Arrange
+    radius = declared_radius(
+        paths=[
+            "config/${environment}.json",
+            "scripts/dev_tools/compute_blast_radius.py",
+        ],
+        modules=["config"],
+        shared_surfaces=["config/blast-radius.json"],
+        contracts=["normalize_declared_radius"],
+    )
+
+    # Act
+    result = normalize_declared_radius(radius, NORMALIZER_CONFIG)
+
+    # Assert
+    assert result.paths == ("scripts/dev_tools/compute_blast_radius.py",)
+    assert result.modules == ()
+    assert result.shared_surfaces == ()
+
+
+def test_placeholder_only_overlap_stops_conflicting_after_normalization() -> None:
+    """Two radii sharing only a placeholder token stop contending (issue #502).
+
+    This is the pair-level regression test for the placeholder guard, and the
+    normalization step is what places the assertion on the classifier's path.
+    ``conflicts`` compares recorded path entries by string equality, glob match,
+    and directory containment; it never calls ``classify_path_token``. So a pair
+    of hand-authored radii contends on a shared placeholder token whether or not
+    the guard exists, and asserting the raw pair proves nothing about the fix.
+    ``normalize_declared_radius`` re-runs the classifier over each recorded
+    entry, so normalizing first is what routes the comparison through the guard
+    and makes the second assertion below fail on a tree where the classifier was
+    never fixed.
+
+    Both halves are required. The pre-normalization assertion is the control that
+    proves the two radii really do share an entry: without it, a construction
+    error that left the pair disjoint from the start would satisfy the
+    post-normalization assertion vacuously. The post-normalization assertion is
+    the one that pins the fix.
+    """
+    # Arrange: the only shared entry is a placeholder feature-document token.
+    # Real files are disjoint and sit under different feature folders, and the
+    # module, shared-surface, and contract levels are disjoint too, so no other
+    # level can produce a conflict reason.
+    placeholder = "<FEATURE>/spec.md"
+    radius_a = declared_radius(
+        paths=[
+            placeholder,
+            "docs/features/active/2026-08-23-alpha-item-9001/plan.md",
+            "scripts/dev_tools/alpha_only_module.py",
+        ],
+        modules=["alpha"],
+        shared_surfaces=[],
+        contracts=["Alpha"],
+    )
+    radius_b = declared_radius(
+        paths=[
+            placeholder,
+            "docs/features/active/2026-08-23-beta-item-9002/plan.md",
+            "scripts/dev_tools/beta_only_module.py",
+        ],
+        modules=["beta"],
+        shared_surfaces=[],
+        contracts=["Beta"],
+    )
+
+    # Assert first half: the pre-normalization pair DOES conflict, on the shared
+    # placeholder token and on nothing else.
+    before = conflicts(radius_a, radius_b, NORMALIZER_CONFIG)
+    assert before.conflict is True, (
+        "Expected the un-normalized pair to conflict on the shared placeholder "
+        f"token; observed {before}."
+    )
+    assert [reason.kind for reason in before.reasons] == ["path_overlap"], (
+        "Expected exactly one path_overlap reason before normalization; observed "
+        f"{[(r.kind, r.detail) for r in before.reasons]}."
+    )
+    assert placeholder in before.reasons[0].detail
+
+    # Act: route both radii through the classifier via normalization.
+    normalized_a = normalize_declared_radius(radius_a, NORMALIZER_CONFIG)
+    normalized_b = normalize_declared_radius(radius_b, NORMALIZER_CONFIG)
+
+    # Assert second half: the normalized pair does NOT conflict.
+    after = conflicts(normalized_a, normalized_b, NORMALIZER_CONFIG)
+    assert after.conflict is False, (
+        "Expected the normalized pair not to conflict once the placeholder token "
+        f"is dropped; observed {after}."
+    )
+    assert after.reasons == ()
+    # The placeholder is gone from both radii and every real entry survived.
+    assert placeholder not in normalized_a.paths
+    assert placeholder not in normalized_b.paths
+    assert "scripts/dev_tools/alpha_only_module.py" in normalized_a.paths
+    assert "scripts/dev_tools/beta_only_module.py" in normalized_b.paths
