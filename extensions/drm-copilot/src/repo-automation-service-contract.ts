@@ -143,6 +143,7 @@ export interface RepoAutomationService {
       readonly artifactType: string;
       readonly artifactPath: string;
       readonly requireComplete?: boolean;
+      readonly requirePrCreationReady?: boolean;
       readonly requireModelRouting?: boolean;
       readonly requireCodexModelRouting?: boolean;
       readonly requireCodexTopology?: boolean;

@@ -1,0 +1,14 @@
+Timestamp: 2026-08-17T11:28:00-04:00
+Command: rg -n --hidden --glob '!**/node_modules/**' --glob '!**/out/**' --glob '!docs/features/**/evidence/**' '@danmoisan/drm-copilot-mcp|drm-copilot-mcp@' package.json package-lock.json packages/mcp-server extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json extensions/drm-copilot/resources config artifacts/orchestration .agents .codex .claude .github
+EXIT_CODE: 0
+Output Summary: Found 10 package-name references across 6 files. Two runtime configuration references are version-bearing and both pin @danmoisan/drm-copilot-mcp@1.0.24; the remaining eight matches are package metadata or unversioned usage documentation/configuration.
+packages/mcp-server/README.md:1:# @danmoisan/drm-copilot-mcp
+packages/mcp-server/README.md:10:npx -y @danmoisan/drm-copilot-mcp
+packages/mcp-server/README.md:16:npm install -g @danmoisan/drm-copilot-mcp
+packages/mcp-server/README.md:29:      "args": ["-y", "@danmoisan/drm-copilot-mcp"],
+packages/mcp-server/package.json:2:  "name": "@danmoisan/drm-copilot-mcp",
+packages/mcp-server/package-lock.json:2:  "name": "@danmoisan/drm-copilot-mcp",
+packages/mcp-server/package-lock.json:8:      "name": "@danmoisan/drm-copilot-mcp",
+extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml:5:args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.24"]
+.codex/config.toml:5:args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.24"]
+extensions/drm-copilot/resources/claude-dir-customizations/.mcp.json:5:      "args": ["-y", "@danmoisan/drm-copilot-mcp"]

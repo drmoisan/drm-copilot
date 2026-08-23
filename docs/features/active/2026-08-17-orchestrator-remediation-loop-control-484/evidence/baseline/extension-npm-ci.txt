@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:20:23-04:00
+Command: npm --prefix extensions/drm-copilot ci
+EXIT_CODE: 0
+Output Summary: Installed 457 packages and audited 458 packages in 5s; 0 vulnerabilities. The command emitted one deprecation warning for glob@10.5.0. extensions/drm-copilot/package.json SHA-256 remained 16C2925EEE9AC882C8264B63626DF90AE7C144D1230BC74F880B8EF7DDAF659E and package-lock.json SHA-256 remained 455EBC959D29C258395A461963646B3611A94811EABCD16FB4DF2F94B127A8AD.

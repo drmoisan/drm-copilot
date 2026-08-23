@@ -2,16 +2,26 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_epic_orchestrator_state as epic_state_validator
 import scripts.dev_tools.validate_orchestration_artifacts as validator
 import scripts.dev_tools.validate_orchestration_review_artifacts as review_validator
 import scripts.dev_tools.validate_orchestrator_state as state_validator
+import tests.scripts.dev_tools.orchestrator_state_test_support as remediation_support
+from scripts.dev_tools.resolve_codex_deployment import resolve_codex_deployment
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
+
+    from pytest import MonkeyPatch
+
+deduplicate_selected_routing_diagnostics = cast(
+    "Callable[[list[str]], list[str]]",
+    vars(validator)["_deduplicate_selected_routing_diagnostics"],
+)
 
 
 def build_valid_orchestrator_state() -> dict[str, object]:
@@ -147,25 +157,7 @@ def build_read_text_stub(text: str) -> Callable[[Path], str]:
 
 
 def build_complete_large_orchestrator_state() -> dict[str, object]:
-    """Return a completion-safe large-route checkpoint for CLI require-complete.
-
-    Purpose:
-        Provide a checkpoint that satisfies the full completion contract for the
-        `large` route (including route-driven PR-gate evidence and routing-matrix
-        receipts) so the CLI require-complete success path can be exercised.
-
-    Args:
-        None.
-
-    Returns:
-        dict[str, object]: A completion-safe large-route checkpoint payload.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Return a completion-safe large-route checkpoint for CLI tests."""
 
     from scripts.dev_tools._orchestrator_state_routing import load_routing_matrix
 
@@ -339,25 +331,7 @@ def test_validate_feature_audit_text_requires_canonical_headings() -> None:
 
 
 def test_entrypoint_reexports_split_validator_functions() -> None:
-    """Require the stable entrypoint module to re-export the split validators.
-
-    Purpose:
-        Lock in the split-module layout while preserving the existing import
-        contract for callers that still import from the stable CLI entrypoint.
-
-    Args:
-        None.
-
-    Returns:
-        None: Assertions verify that the entrypoint aliases the extracted
-        review-artifact and orchestrator-state validators.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Require the stable entrypoint to re-export the split validators."""
 
     assert (
         validator.validate_policy_audit_text
@@ -379,3 +353,148 @@ def test_entrypoint_reexports_split_validator_functions() -> None:
         validator.validate_epic_orchestrator_state_text
         is epic_state_validator.validate_epic_orchestrator_state_text
     )
+
+
+def test_require_pr_creation_ready_is_independent_from_require_complete() -> None:
+    """Keep pre-PR readiness independent from completion-only gates."""
+
+    state = build_complete_large_orchestrator_state()
+    state.pop("pr_gate")
+    state.pop("ci_gate")
+    state["delegation_receipts"] = [
+        receipt
+        for receipt in cast("list[dict[str, object]]", state["delegation_receipts"])
+        if receipt["agent_name"] != "pr-author"
+    ]
+    text = json.dumps(state)
+
+    readiness_errors = state_validator.validate_orchestrator_state_text(
+        text, require_pr_creation_ready=True
+    )
+    completion_errors = state_validator.validate_orchestrator_state_text(
+        text, require_complete=True
+    )
+
+    assert readiness_errors == []
+    assert completion_errors == [
+        "Checkpoint completion validation failed: pr_gate must be an object "
+        "with keys: pr_number, pr_url, head_branch, head_sha.",
+        "Checkpoint completion validation failed: ci_gate must be an object "
+        "with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint missing required agent receipt: pr-author.",
+    ]
+
+
+def test_codex_commit_steward_receipt_does_not_require_legacy_routing() -> None:
+    """Accept Codex commit stewardship without legacy routing receipts."""
+
+    state = build_valid_orchestrator_state()
+    delegation = cast("list[dict[str, object]]", state["delegation_receipts"])[0]
+    delegation.update(step="S6_commit_steward", agent_name="commit-steward-c4")
+    receipt: dict[str, object] = dict(
+        resolve_codex_deployment("commit-steward", "C4", "standalone", "C4")
+    )
+    receipt["phase"] = "S6_commit_steward"
+    state["codex_model_routing_receipts"] = [receipt]
+
+    errors = state_validator.validate_orchestrator_state_text(
+        json.dumps(state), require_codex_model_routing=True
+    )
+
+    assert "model_routing_receipts" not in state
+    assert errors == []
+
+
+def test_selected_routing_diagnostics_are_unique() -> None:
+    """Retain the first occurrence and distinct selected routing gates."""
+
+    legacy = "ORCH_ROUTING_GATE_LEGACY: failure for phase S5."
+    codex = "ORCH_ROUTING_GATE_CODEX_MODEL: failure for phase S5."
+    unrelated = "Checkpoint unrelated failure."
+
+    errors = deduplicate_selected_routing_diagnostics(
+        [legacy, legacy, codex, unrelated, codex]
+    )
+
+    assert errors == [legacy, codex, unrelated]
+
+
+def test_pre_and_post_validation_use_identical_flags(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Forward the same selected flags across repeated validation boundaries."""
+
+    calls: list[dict[str, bool]] = []
+
+    def _spy(_text: str, **kwargs: bool) -> list[str]:
+        calls.append(kwargs)
+        return []
+
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub("{}"))
+    monkeypatch.setattr(validator, "validate_orchestrator_state_text", _spy)
+    argv = [
+        "orchestrator-state",
+        "ignored.json",
+        "--require-complete",
+        "--require-pr-creation-ready",
+        "--require-model-routing",
+        "--require-codex-model-routing",
+        "--require-codex-topology",
+    ]
+
+    pre_result = validator.main(argv)
+    post_result = validator.main(argv)
+
+    expected = {
+        "require_complete": True,
+        "require_pr_creation_ready": True,
+        "require_model_routing": True,
+        "require_codex_model_routing": True,
+        "require_codex_topology": True,
+    }
+    assert [pre_result, post_result] == [0, 0]
+    assert calls == [expected, expected]
+
+
+def test_remediation_limit_status_has_ordered_canonical_diagnostics() -> None:
+    """Accept the three-cycle terminal and reject its legacy alias once."""
+
+    fingerprints = (
+        remediation_support.BLOCKER_FINGERPRINT_A,
+        remediation_support.BLOCKER_FINGERPRINT_B,
+    ) * 2
+    attempts = [
+        remediation_support.build_remediation_attempt(
+            attempt_id=index,
+            source_review_fingerprint=fingerprints[index - 1],
+        )
+        for index in range(1, 4)
+    ]
+    cycles = [
+        remediation_support.build_remediation_cycle(
+            cycle_id=index,
+            attempt_id=index,
+            review_verdict="BLOCKED",
+            remediation_action="AUTONOMOUS",
+            blocker_fingerprint_before=fingerprints[index - 1],
+            blocker_fingerprint_after=fingerprints[index],
+            blocking_count=1,
+            exit_condition_met=False,
+        )
+        for index in range(1, 4)
+    ]
+    state = remediation_support.build_valid_orchestrator_state()
+    loop = remediation_support.build_remediation_loop(
+        status="blocked_remediation_loop_limit", attempts=attempts, cycles=cycles
+    )
+    state["remediation_loop"] = loop
+
+    canonical_errors = validator.validate_orchestrator_state_text(json.dumps(state))
+    assert loop["status"] == "blocked_remediation_loop_limit"
+    loop["status"] = "blocked_cycle_limit"
+    legacy_errors = validator.validate_orchestrator_state_text(json.dumps(state))
+
+    assert canonical_errors == []
+    assert legacy_errors == [
+        "ORCH_REMEDIATION_SCHEMA: remediation_loop.status must be a documented status."
+    ]

@@ -38,6 +38,26 @@ export const PROMOTION_RECEIPT_KEYS = [
   "feature_folder",
 ] as const;
 
+/** Upstream lifecycle steps that must be clear before initial PR creation. */
+export const PR_CREATION_READY_STEP_KEYS = [
+  "step5_status",
+  "step6_status",
+  "step7_status",
+  "step8_status",
+] as const;
+
+/** Override fields that must be absent or empty before initial PR creation. */
+export const PR_CREATION_READY_EMPTY_LIST_KEYS = [
+  "local_execution_overrides",
+  "delegation_bypasses",
+] as const;
+
+const PR_CREATION_BLOCKING_STEP_STATUS: ReadonlySet<unknown> = new Set([
+  "pending",
+  "blocked",
+  "blocked_remediation_loop_limit",
+]);
+
 /**
  * Type guard for a plain object (non-null, non-array).
  *
@@ -152,6 +172,48 @@ export function validateCompletionCiGate(
       "Checkpoint completion validation failed: ci_gate.head_sha must match " +
         "pr_gate.head_sha.",
     );
+  }
+  return errors;
+}
+
+/** Validate readiness for the first PR without applying final PR/CI gates. */
+export function validateOrchestratorStatePrCreationReadiness(
+  state: Record<string, unknown>,
+): string[] {
+  const errors: string[] = [];
+  for (const key of PR_CREATION_READY_STEP_KEYS) {
+    const value = state[key];
+    if (PR_CREATION_BLOCKING_STEP_STATUS.has(value)) {
+      errors.push(
+        `Checkpoint PR-creation readiness validation failed: ${key} is ${String(value)}.`,
+      );
+    }
+  }
+
+  const blockedReason = state["blocked_reason"];
+  if (
+    blockedReason !== undefined &&
+    blockedReason !== null &&
+    blockedReason !== "none"
+  ) {
+    errors.push(
+      "Checkpoint PR-creation readiness validation failed: " +
+        "blocked_reason is not `none`.",
+    );
+  }
+
+  for (const key of PR_CREATION_READY_EMPTY_LIST_KEYS) {
+    const value = state[key];
+    if (
+      value !== undefined &&
+      value !== null &&
+      (!Array.isArray(value) || value.length > 0)
+    ) {
+      errors.push(
+        "Checkpoint PR-creation readiness validation failed: " +
+          `${key} must be an empty list when present.`,
+      );
+    }
   }
   return errors;
 }

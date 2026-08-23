@@ -1,0 +1,11 @@
+Timestamp: 2026-08-17T16-13
+Command: poetry run pytest tests/scripts/dev_tools/test_mcp_bundle_parity.py::test_local_candidate_source_built_and_packed_parity
+EXIT_CODE: 0
+Output Summary: PASS. 1 test collected and 1 passed; canonical, source-resource, and packaged routing bytes match, and source, built, and packed executable bundle bytes plus embedded identities match.
+Prerequisites: P6-T11 source build EXIT_CODE 0; P6-T12 prepack EXIT_CODE 0; P6-T13 package build EXIT_CODE 0; P6-T14 local pack EXIT_CODE 0; P6-T15 source smoke EXIT_CODE 0; P6-T16 built smoke EXIT_CODE 0; P6-T17 packed smoke EXIT_CODE 0.
+Prerequisite Evidence: source-mcp-build.txt, mcp-prepack.txt, mcp-build.txt, mcp-pack.txt, source-mcp-smoke.txt, built-mcp-smoke.txt, packed-mcp-smoke.txt
+Routing Payload SHA256: 7a30f003994ae274f6b9bf7a2fcc1ff598f0cce743cc8663060eb3df50742231 for config/orchestration-routing.json, extensions/drm-copilot/resources/config/orchestration-routing.json, and packages/mcp-server/resources/config/orchestration-routing.json.
+Executable Bundle File SHA256: 3042c76a069963c5bb5820171545f67c3543dea1478a5bdc80d83961ecf921ff for extensions/drm-copilot/out/mcp-server.js, packages/mcp-server/out/mcp-server.js, and evidence/regression-testing/packed-mcp/out/mcp-server.js.
+Embedded Capability Bundle SHA256: sha256:72937c91d2cf0ad6809dd1c970ffa38f06eae4248c73222aa45f47266d63b0f4 for all three local candidates.
+Capability Object SHA256: 23cd92582f27dda32320d42d451047b6662527ee557d19db28802ab9a538e2ed for P6-T15 source, P6-T16 built, and P6-T17 packed capability JSON.
+Published Runtime Data Loaded: false

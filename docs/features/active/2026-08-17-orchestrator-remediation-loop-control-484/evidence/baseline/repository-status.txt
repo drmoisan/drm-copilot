@@ -1,0 +1,7 @@
+Timestamp: 2026-08-17T10-56
+Command: git status --short --branch
+EXIT_CODE: 0
+Output Summary: Branch bug/orchestrator-remediation-loop-control-484. The issue #484 feature folder was already an untracked scoped path before atomic execution; current executor changes remain within that folder. No unrelated worktree changes were reported.
+
+## bug/orchestrator-remediation-loop-control-484
+?? docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/

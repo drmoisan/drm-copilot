@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:20:56-04:00
+Command: npm --prefix packages/mcp-server ci
+EXIT_CODE: 0
+Output Summary: Installed 95 packages and audited 96 packages in 2s; 0 vulnerabilities. packages/mcp-server/package.json SHA-256 remained 7D50075312D3B22A1B557B3CB60662D8685DAFADBF3562582FC2661446CB772A and package-lock.json SHA-256 remained FBAFC99C4698AB17CCF9C44BD09503889C8060D96FE7E57CA7DDD3F707F8302E.

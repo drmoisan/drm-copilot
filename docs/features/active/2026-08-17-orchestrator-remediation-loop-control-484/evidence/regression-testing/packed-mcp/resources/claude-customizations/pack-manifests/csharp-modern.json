@@ -1,0 +1,12 @@
+{
+  "name": "csharp-modern",
+  "label": "C# (modern)",
+  "paths": [
+    ".claude/rules/csharp.md",
+    ".claude/agents/csharp-typed-engineer.md",
+    ".claude/skills/csharp-qa-gate/SKILL.md",
+    ".claude/skills/invoke-csharp-engineer/SKILL.md",
+    ".claude/skills/csharp-change-budget-router/SKILL.md",
+    ".claude/skills/csharp-orchestration-state-machine/SKILL.md"
+  ]
+}

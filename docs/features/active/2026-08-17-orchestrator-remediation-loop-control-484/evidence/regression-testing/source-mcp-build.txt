@@ -1,0 +1,7 @@
+Timestamp: 2026-08-17T16-05
+Command: npm --prefix extensions/drm-copilot run bundle:mcp-server
+EXIT_CODE: 0
+Output Summary: PASS. Source MCP bundle built successfully.
+MCP_PACKAGE_VERSION: 1.0.24
+MCP_ROUTING_POLICY_SHA256: sha256:7a30f003994ae274f6b9bf7a2fcc1ff598f0cce743cc8663060eb3df50742231
+MCP_BUNDLE_SHA256: sha256:72937c91d2cf0ad6809dd1c970ffa38f06eae4248c73222aa45f47266d63b0f4

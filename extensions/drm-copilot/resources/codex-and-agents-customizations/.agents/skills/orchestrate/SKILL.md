@@ -284,7 +284,7 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `atomic-executor` — executes approved plans task-by-task
 - `feature-reviewer` — produces policy, code, and feature audit artifacts by
   applying the `feature-review` workflow skill
-- `task-researcher` — performs deep research and writes findings to `artifacts/research/`
+- `task-researcher` — performs deep research in the exact tracked output root supplied by the orchestrator: `<feature-folder>/research/` for feature-associated work or `docs/research/` for one-off work
 - `prd-feature` — produces issue, specification, and user-story artifacts when required by the selected workflow
 - `staged-review` — reviews staged changes when a pre-commit review is required
 - `epic-review` — reviews epic-level artifacts when the work item is an epic
@@ -293,6 +293,8 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `powershell-typed-engineer` — performs delegated PowerShell implementation work
 - `csharp-typed-engineer` — performs delegated C# implementation work
 - `typescript-engineer` — performs delegated TypeScript implementation work
+
+Every `task-researcher` handoff MUST include exactly one resolved research root. Derive feature-associated research from the checkpoint's tracked `feature-folder` as `<feature-folder>/research/`; use `docs/research/` only when the work is not associated with a feature. Do not delegate research with an inferred or artifacts-rooted output directory.
 - `commit-steward` — writes commit messages from commit-context artifacts
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
@@ -326,13 +328,14 @@ All evidence artifacts produced during orchestration MUST comply with the canoni
 
 Permitted `artifacts/`-rooted sub-paths (non-evidence orchestration use only):
 - `artifacts/orchestration/` — orchestrator state and checkpoints
-- `artifacts/research/` — research outputs from task-researcher
 - `artifacts/pr_context` — PR context artifacts
 - `artifacts/reviews/` — review staging artifacts
 - `artifacts/status/` — status update artifacts
 - `artifacts/python/` — Python coverage and lcov outputs
 - `artifacts/pester/` — Pester coverage outputs
 - `artifacts/csharp/` — C# coverage outputs
+
+Research outputs are tracked documentation, not evidence or orchestration state. Write them only to `<feature-folder>/research/` or `docs/research/`, as resolved and supplied in the researcher handoff.
 
 All other `artifacts/` sub-paths (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`) are FORBIDDEN for evidence output and will be blocked by the `enforce-evidence-locations.ps1` PreToolUse hook.
 
@@ -362,23 +365,120 @@ The review subagent compares against a base branch; uncommitted changes are invi
 
 After each `feature-reviewer` delegation returns:
 
-1. Read the exact terminal status lines from the review result.
-2. If the result does not include `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`, stop and record blocked state.
-3. If the result is `REVIEW_STATUS: PASS`, advance to the PR creation gate.
-4. If the result is `REVIEW_STATUS: REMEDIATION_REQUIRED`, require both `REMEDIATION_INPUTS: <path>` and `REMEDIATION_PLAN: <path>` and then enter the remediation loop.
+1. Read the exact `REVIEW_VERDICT`, `REMEDIATION_ACTION`, `BLOCKER_FINGERPRINT`, `REMEDIATION_INPUTS`, and `REMEDIATION_PLAN` terminal lines from the review result.
+2. Fail closed if any field is missing, duplicated, malformed, or outside the canonical verdict/action/path matrix.
+3. For `REVIEW_VERDICT: PASS`, require all of the following exact companion values:
+   - `REMEDIATION_ACTION: NONE`
+   - `BLOCKER_FINGERPRINT: NONE`
+   - `REMEDIATION_INPUTS: NONE`
+   - `REMEDIATION_PLAN: NONE`
+4. Validate PR-creation readiness through `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"` and `require_pr_creation_ready: true`. Advance to the PR creation gate only when this validation passes.
+5. The `PASS` plus `NONE` transition exits remediation without creating or resolving a remediation plan, allocating an attempt, appending a completed cycle, or incrementing `attempt_count`, `completed_cycle_count`, or the compatibility `remediation-pass` field.
+6. A canonical `BLOCKED` result proceeds to the action-specific evaluation below; it MUST NOT use the `PASS` transition.
+
+### Pre-R1 Blocked Terminal and Wait Transitions
+
+For every row below, require `REVIEW_VERDICT: BLOCKED`, the listed action, a complete aggregate `BLOCKER_FINGERPRINT`, and both `REMEDIATION_INPUTS: NONE` and `REMEDIATION_PLAN: NONE`:
+
+| `REMEDIATION_ACTION` | Persisted transition |
+|---|---|
+| `NO_CANDIDATE` | `blocked_no_candidate` |
+| `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `AWAITING_CI` | `awaiting_ci` |
+| `HUMAN_DECISION` | `blocked_human_decision` |
+
+Each transition occurs before R1 and preserves the latest review as the terminal or waiting evidence. It forbids remediation-input or plan creation, R1/R2 work, R3 delegation, staging, commit-context collection, commit, R4 review, attempt allocation, completed-cycle creation, and attempt/cycle count consumption. `awaiting_ci` may resume only after an observed external-state change; a poll, retry, or resume without that change consumes no attempt or cycle.
+
+### Pre-R1 MCP Runtime Compatibility Gate
+
+Before accepting or creating a remediation plan, revising a plan, entering R1, or mutating attempt/cycle state, read the active local MCP initialize response and require `capabilities.experimental["drm-copilot/validator"]`. Validate all compatibility data in one local, read-only decision:
+
+1. The capability object and every required field exist: `validator_contract_version`, `remediation_loop_schema_versions`, `supported_artifact_types`, `supported_validation_flags`, `routing_policy_sha256`, `package_version`, and `bundle_sha256`.
+2. `validator_contract_version` equals the repository-required contract version and `remediation_loop_schema_versions` includes schema version `2`.
+3. `supported_validation_flags` includes every flag selected by the current route, including `require_pr_creation_ready`, and `supported_artifact_types` includes every artifact type required by the current workflow, including `orchestrator-state`.
+4. `serverInfo.version`, capability `package_version`, and the active package manifest version are identical.
+5. Capability `bundle_sha256` is a valid SHA-256 and equals the digest of the executing MCP bundle.
+6. Capability `routing_policy_sha256` equals the SHA-256 of canonical `config/orchestration-routing.json` and the executing bundle's distributed routing policy.
+
+Map every capability comparison code to the same non-remediable result:
+
+| Capability comparison code | Review result | Persisted transition |
+|---|---|---|
+| `ORCH_VALIDATOR_CAPABILITY_MISSING` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_VERSION_INCOMPATIBLE:CONTRACT` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_VERSION_INCOMPATIBLE:SCHEMA` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_CAPABILITY_MISSING:FLAG` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_CAPABILITY_MISSING:ARTIFACT` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_VERSION_INCOMPATIBLE:PACKAGE` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_VALIDATOR_VERSION_INCOMPATIBLE:BUNDLE` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+| `ORCH_ROUTING_POLICY_DIGEST_MISMATCH` | `BLOCKED` + `EXTERNAL_RUNTIME` | `blocked_external_runtime` |
+
+Every mapped result sets both remediation paths to `NONE` and stops before plan creation or revision, R1/R2, R3 delegation, staging, commit, or R4. Leave `attempt_count`, `completed_cycle_count`, `attempts`, `cycles`, and the prior review unchanged. Do not query a registry, silently fall back to another runtime, allocate an attempt or cycle, or consume an attempt or cycle.
+
+### R1 Entry Gate — Autonomous Review Result
+
+Only `REVIEW_VERDICT: BLOCKED` plus `REMEDIATION_ACTION: AUTONOMOUS` may enter R1. Before any remediation mutation:
+
+1. Require `BLOCKER_FINGERPRINT: sha256:<64-lowercase-hex>` over the complete blocker aggregate.
+2. Require exactly one `REMEDIATION_INPUTS` line containing a non-`NONE` path and exactly one `REMEDIATION_PLAN` line containing a non-`NONE` path.
+3. Normalize each path relative to the workspace root, resolve it without following the path outside the workspace, and require both resolved paths to be files beneath the active feature folder.
+4. Treat the resolved `REMEDIATION_PLAN` path as the single plan of record. Reject alternate, sibling, newly substituted, or multiple plan paths for the same remediation loop.
+5. Fail closed when either field is absent, duplicated, `NONE`, malformed, missing on disk, or not feature-local. This failure occurs before R1, plan creation or revision, checkpoint mutation, attempt allocation, cycle allocation, staging, or delegation.
 
 ## Remediation Loop (R1–R5)
 
-A bounded loop consisting of five steps. The loop variable `remediation_pass` starts at 1 and increments at R5 before returning to R1.
+A bounded loop consisting of five steps. Identifiers and compatibility counts are derived only from the persisted arrays:
 
-- **R1 — Remediation plan of record:** Use the exact `REMEDIATION_PLAN: <path>` returned by the review as the starting plan of record for the loop.
+- Before R3 delegation, validate that existing `attempt_id` values equal the one-based, gap-free sequence `1..attempts.length`. After clear preflight, allocate the current attempt as `attempts.length + 1` in the same checkpoint mutation that starts R3; never reserve an identifier during R1, R2, a preflight revision, a poll, or a resume.
+- Before appending a completed cycle after R4, validate that existing `cycle_id` values equal the one-based, gap-free sequence `1..cycles.length`. Allocate the new cycle as `cycles.length + 1` in the same atomic append and link it to the eligible current attempt.
+- After every mutation, require `attempt_count == attempts.length` and `completed_cycle_count == cycles.length`.
+- `remediation-pass` is a deprecated compatibility mirror of `completed_cycle_count` only. It MUST NOT identify the current attempt, seed either identifier, reserve work, or control loop continuation.
+
+- **R1 — Remediation plan of record:** Use only the exact, validated, feature-local `REMEDIATION_PLAN: <path>` returned by the review as the single plan of record for the loop. Keep that path unchanged across all preflight revisions.
 - **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 by re-delegating to `atomic-planner` against the same remediation-plan path with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
-- **Pre-R4 commit:** Stage all changes (`git add -A`), run MCP tool `collect_commit_context`, delegate to `commit_steward` using the resulting artifact, and commit with the generated message. Advance to R4 only after a successful commit.
-- **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
-- **R5 — Loop-exit decision:** If the re-audit returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. Otherwise, record `remediation_pass` increment in the checkpoint and return to R1.
+- **Pre-R4 candidate gate:** Require the R3 result to state `execution_status`, `candidate_applied`, and `terminal_disposition` before any staging operation.
+  - When `candidate_applied: false`, finish and record the current attempt exactly once with its non-candidate terminal disposition. Increment `attempt_count` once for that recorded attempt, but do not append a cycle or increment `completed_cycle_count` or `remediation-pass`.
+  - A false candidate MUST stop before `git add`, commit-context collection, commit, PR-context refresh, or R4 review. It MUST NOT allocate a replacement attempt, create a completed-cycle record, or continue to R5.
+  - Persist the matching terminal or waiting status from `no_candidate`, `external_runtime`, `awaiting_ci`, `human_decision`, or `execution_failed`; retain the last completed review and execution receipt as evidence.
+  - When `candidate_applied: true`, require `execution_status: complete` and `terminal_disposition: candidate_applied`. Any other execution status fails closed before staging and cannot create a cycle.
+- **Pre-R4 commit:** Only for `candidate_applied: true` plus `execution_status: complete`, finish the current attempt, stage all changes (`git add -A`), run MCP tool `collect_commit_context`, delegate to `commit_steward` using the resulting artifact, and commit with the generated message. Require and persist a nonempty commit SHA before advancing to R4.
+- **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included. Require the completed re-audit's feature-local artifact path. Only after both the nonempty commit SHA and re-audit path exist may the orchestrator append exactly one completed cycle linked to the current attempt and increment `completed_cycle_count` and `remediation-pass` exactly once.
+- **R5 — Loop-exit decision:** Evaluate the re-audit recorded in that completed cycle. If it returns the canonical `PASS` plus `NONE` result with `BLOCKER_FINGERPRINT`, `REMEDIATION_INPUTS`, and `REMEDIATION_PLAN` all `NONE`, exit the loop and advance to the PR creation gate. Otherwise, return to the action-specific decision without appending a second cycle for the same attempt.
 
-**Termination guard:** If `remediation_pass` reaches 3 without resolution, the orchestrator records `step6_status: "blocked_remediation_loop_limit"` in the checkpoint and halts. No further automation is attempted.
+### Canonical Post-R4 Fingerprint and Exception Gate
+
+`.agents/skills/orchestrate/SKILL.md` is the sole owner of exception evaluation. Other skills and generated orchestrator surfaces MUST delegate to this gate and MUST NOT copy, weaken, or independently reinterpret its algorithm.
+
+After R4 has produced the complete aggregate review and the completed cycle has been appended, perform these steps before creating another remediation plan or allocating another attempt:
+
+1. Read `blocker_fingerprint_before` from the source review and `blocker_fingerprint_after` from the complete R4 aggregate. Both values MUST use `sha256:<64-lowercase-hex>` for a blocked review.
+2. If the fingerprints differ, no stagnation exception is required; continue only through the action-specific R5 transition.
+3. If the fingerprints are equal, calculate the next gap-free `attempt_id` without allocating it and evaluate whether one exact unused exception authorizes the documented unchanged-fingerprint continuation to R1.
+4. The exception object MUST contain exactly `exception_id`, `issue_number`, `blocker_fingerprint`, `routing_policy_sha256`, `allowed_transition`, `single_use`, `consumed_at`, and `consumed_by_attempt_id`. Require:
+   - `issue_number` equals the canonical issue number;
+   - `blocker_fingerprint` equals both compared fingerprints;
+   - `routing_policy_sha256` equals the current SHA-256 of `config/orchestration-routing.json`;
+   - `allowed_transition` exactly names the pending unchanged-fingerprint continuation;
+   - `single_use` is exactly `true`;
+   - `consumed_at` and `consumed_by_attempt_id` are both null before use;
+   - `exception_id` has never appeared in any prior attempt, cycle, or exception-consumption record.
+5. Reject missing or extra fields, null or empty required values, wildcard or pattern values, partial bindings, issue/fingerprint/digest/transition mismatches, inconsistent consumption fields, an already-consumed binding, or any reused `exception_id`. Rejection allocates no new plan, attempt, or cycle and leaves the just-appended completed-cycle counts unchanged.
+6. When no exact unused valid exception exists, persist `blocked_stagnation` and stop before any new remediation plan, preflight, attempt, execution, staging, commit, or R4 review.
+7. For one exact unused valid exception, atomically set `consumed_at` to the consumption timestamp and `consumed_by_attempt_id` to the calculated next attempt ID in the same checkpoint update that binds the exception to that attempt. Only after this atomic write may the orchestrator permit the documented continuation to R1 once. The consumed exception can never authorize another transition.
+
+**Termination guard:** After the R4 cycle is appended and the PASS, terminal-action, fingerprint, and exception decisions are evaluated, an unresolved third completed cycle (`completed_cycle_count == max_completed_cycles == 3`) transitions only to `blocked_remediation_loop_limit`, records `step6_status: "blocked_remediation_loop_limit"`, and halts. Preflight revisions, retries, CI polls, resume delegations, and attempts with `candidate_applied: false` consume zero completed cycles. The compatibility `remediation-pass` mirrors `completed_cycle_count` and is never the limit authority or an attempt identifier. `blocked_cycle_limit` is rejected legacy input only and MUST NOT be emitted or executed by updated writers.
+
+## Release-Boundary Validator Parity
+
+Positive parity MUST compare the same review/remediation contract, schema, validation flags, routing-policy content and SHA-256, package identity, bundle identity, ordered diagnostics, and substantive validation result across all of these locally controlled surfaces:
+
+1. The repository source Python and TypeScript validator implementations.
+2. Generated configuration and customization mirrors derived from canonical sources.
+3. The locally built MCP bundle launched as the executing JSON-RPC runtime.
+4. The locally packed candidate installed or launched from the produced package archive.
+
+Each positive surface MUST execute locally and report matching capability and validation values; file-presence or static-string checks alone are insufficient for the built bundle and packed candidate. Immutable published `@danmoisan/drm-copilot-mcp@1.0.24` is a negative `EXTERNAL_RUNTIME` compatibility fixture only. Its expected incompatibility verifies the pre-R1 terminal path and consumes no remediation attempt or cycle; it MUST NOT be treated as a positive parity target or changed in place.
 
 ## Issue Number Consistency
 
@@ -404,7 +504,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 
 1. `blocking_findings_resolved: true` — the most recent `feature-reviewer`
    result produced zero blocking findings.
-   Equivalent deterministic gate: the latest review returned `REVIEW_STATUS: PASS`.
+   Equivalent deterministic gate: the latest review returned `REVIEW_VERDICT: PASS`, `REMEDIATION_ACTION: NONE`, `BLOCKER_FINGERPRINT: NONE`, `REMEDIATION_INPUTS: NONE`, and `REMEDIATION_PLAN: NONE`.
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr`.

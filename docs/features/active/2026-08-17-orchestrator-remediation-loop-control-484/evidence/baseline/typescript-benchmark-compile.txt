@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:26:05-04:00
+Command: npm --prefix extensions/drm-copilot exec -- tsc --project tsconfig.json --outDir ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/typescript-benchmark-build --sourceMap false
+EXIT_CODE: 0
+Output Summary: TypeScript compilation completed without diagnostics. npm exec retained the caller working directory on the first invocation, so the successful invocation supplied npm_config_node_options to set the child Node process working directory to extensions/drm-copilot without modifying source or configuration. Compiled validator path: docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/typescript-benchmark-build/lib/validate/orchestrator-state-core.js.

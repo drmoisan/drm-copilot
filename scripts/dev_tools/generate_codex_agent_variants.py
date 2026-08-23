@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from dataclasses import dataclass
@@ -48,6 +49,19 @@ PACK_FAMILIES: dict[str, tuple[str, ...]] = {
     "csharp-modern.json": ("csharp-typed-engineer",),
     "csharp-legacy.json": ("csharp-typed-engineer",),
 }
+CANONICAL_CONTRACT_SOURCES: dict[str, tuple[Path, ...]] = {
+    "orchestrator": (
+        Path(".agents/skills/orchestrate/SKILL.md"),
+        Path(".agents/skills/orchestrator-workflow/SKILL.md"),
+    ),
+    "feature-reviewer": (
+        Path(".agents/skills/feature-review/SKILL.md"),
+        Path(".agents/skills/feature-review-workflow/SKILL.md"),
+        Path(".agents/skills/remediation-handoff-atomic-planner/SKILL.md"),
+    ),
+    "task-researcher": (Path(".github/agents/task-researcher.agent.md"),),
+}
+CANONICAL_CONTRACT_MARKER = "Generated canonical workflow contract."
 
 
 @dataclass(frozen=True)
@@ -120,6 +134,73 @@ def _write_text_preserving_newlines(path: Path, text: str) -> None:
         stream.write(text)
 
 
+def _canonical_contract_payload(family: str, newline: str) -> str | None:
+    """Render the exact canonical workflow sources for a routed agent family."""
+
+    sources = CANONICAL_CONTRACT_SOURCES.get(family)
+    if sources is None:
+        return None
+    sections = [CANONICAL_CONTRACT_MARKER, "Canonical inputs:"]
+    source_texts: list[tuple[Path, str]] = []
+    for source in sources:
+        absolute_path = REPO_ROOT / source
+        if not absolute_path.is_file():
+            raise FileNotFoundError(
+                f"Canonical agent contract source is missing: {source.as_posix()}"
+            )
+        raw = absolute_path.read_bytes()
+        text = raw.decode("utf-8")
+        digest = hashlib.sha256(raw).hexdigest()
+        sections.append(f"- `{source.as_posix()}` (`sha256:{digest}`)")
+        source_texts.append((source, text))
+    for source, text in source_texts:
+        normalized = newline.join(text.replace("\r\n", "\n").split("\n")).rstrip()
+        sections.extend((f"## Canonical source: `{source.as_posix()}`", normalized))
+    return (newline * 2).join(sections)
+
+
+def synchronize_canonical_contract(base_text: str, family: str) -> str:
+    """Replace a routed agent body with its deterministic canonical contract."""
+
+    newline = _detect_newline(base_text)
+    payload = _canonical_contract_payload(family, newline)
+    if payload is None:
+        return base_text
+    if "'''" in payload:
+        raise ValueError(
+            f"Canonical contract for {family!r} contains a TOML literal delimiter."
+        )
+    field = "developer_instructions = "
+    field_index = base_text.find(field)
+    if field_index < 0:
+        raise ValueError(f"Canonical agent {family!r} has no developer instructions.")
+    value_index = field_index + len(field)
+    if base_text.startswith("'''", value_index):
+        delimiter = "'''"
+    elif base_text.startswith('"""', value_index):
+        delimiter = '"""'
+    else:
+        raise ValueError(
+            f"Canonical agent {family!r} must use multiline developer instructions."
+        )
+    closing_index = base_text.rfind(delimiter)
+    if closing_index <= value_index:
+        raise ValueError(
+            f"Canonical agent {family!r} has unterminated developer instructions."
+        )
+    suffix = base_text[closing_index + len(delimiter) :]
+    return (
+        base_text[:field_index]
+        + field
+        + "'''"
+        + newline
+        + payload
+        + newline
+        + "'''"
+        + suffix
+    )
+
+
 def render_agent_variant(base_text: str, family: str, profile: AgentProfile) -> str:
     """Render one profile while preserving the logical agent contract body."""
 
@@ -185,7 +266,9 @@ def expected_variant_files() -> dict[Path, str]:
     files: dict[Path, str] = {}
     for family in sorted(GENERATED_AGENT_FAMILIES):
         base_path = REPO_ROOT / ".codex" / "agents" / f"{family}.toml"
-        base_text = _read_text_preserving_newlines(base_path)
+        base_text = synchronize_canonical_contract(
+            _read_text_preserving_newlines(base_path), family
+        )
         for profile in PROFILES:
             relative_path = generated_agent_relative_path(family, profile)
             files[relative_path] = render_agent_variant(base_text, family, profile)
@@ -226,7 +309,9 @@ def _synchronize(*, check: bool) -> list[str]:
         relative_base = Path(".codex") / "agents" / f"{family}.toml"
         root_text = _read_text_preserving_newlines(REPO_ROOT / relative_base)
         bundle_text = _read_text_preserving_newlines(BUNDLE_ROOT / relative_base)
-        expected_base = render_base_alias(root_text, family)
+        expected_base = render_base_alias(
+            synchronize_canonical_contract(root_text, family), family
+        )
         if check:
             if root_text != expected_base or bundle_text != expected_base:
                 errors.append(

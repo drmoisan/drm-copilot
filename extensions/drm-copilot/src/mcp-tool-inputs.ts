@@ -18,6 +18,11 @@ import {
   validateShortName,
   validateWorkMode,
 } from "./workflow-command-arguments";
+import {
+  selectValidatorFlags,
+  VALIDATOR_ARTIFACT_TYPES,
+  VALIDATOR_VALIDATION_FLAGS,
+} from "./mcp-validator-catalog";
 
 export interface WorkspaceToolInput {
   readonly workspaceRoot: string;
@@ -80,6 +85,7 @@ export interface ValidateOrchestrationArtifactsToolInput extends WorkspaceToolIn
   readonly artifactType: string;
   readonly artifactPath: string;
   readonly requireComplete?: boolean;
+  readonly requirePrCreationReady?: boolean;
   readonly requireModelRouting?: boolean;
   readonly requireCodexModelRouting?: boolean;
   readonly requireCodexTopology?: boolean;
@@ -424,18 +430,12 @@ export function resolveRunPoshQCSuiteToolInput(
   };
 }
 
-const VALID_ARTIFACT_TYPES = new Set([
-  "plan",
-  "policy-audit",
-  "code-review",
-  "feature-audit",
-  "orchestrator-state",
-  "epic-orchestrator-state",
-  "epic-planner-state",
-  "epic-kickoff",
-  "parallel-orchestrator-state",
-  "parallel-planner-state",
-  "parallel-kickoff",
+const VALID_ARTIFACT_TYPES = new Set<string>(VALIDATOR_ARTIFACT_TYPES);
+const VALIDATE_ORCHESTRATION_ARTIFACT_INPUT_KEYS = new Set([
+  "workspace_root",
+  "artifact_type",
+  "artifact_path",
+  ...VALIDATOR_VALIDATION_FLAGS,
 ]);
 
 export function resolveValidateOrchestrationArtifactsToolInput(
@@ -443,6 +443,11 @@ export function resolveValidateOrchestrationArtifactsToolInput(
   fallbackWorkspaceRoot?: string,
 ): ValidateOrchestrationArtifactsToolInput {
   const args = asToolArgumentObject(rawInput);
+  for (const key of Object.keys(args)) {
+    if (!VALIDATE_ORCHESTRATION_ARTIFACT_INPUT_KEYS.has(key)) {
+      throw new Error(`Field '${key}' is not supported.`);
+    }
+  }
   const artifactType = normalizeRequiredText(
     args["artifact_type"],
     "artifact_type",
@@ -454,12 +459,6 @@ export function resolveValidateOrchestrationArtifactsToolInput(
     );
   }
 
-  const requireComplete = args["require_complete"];
-  const requireModelRouting = args["require_model_routing"];
-  const requireCodexModelRouting = args["require_codex_model_routing"];
-  const requireCodexTopology = args["require_codex_topology"];
-  const requireReadyForExecution = args["require_ready_for_execution"];
-
   return {
     workspaceRoot: normalizeWorkspaceRoot(
       args["workspace_root"],
@@ -467,14 +466,6 @@ export function resolveValidateOrchestrationArtifactsToolInput(
     ),
     artifactType,
     artifactPath: normalizeRequiredText(args["artifact_path"], "artifact_path"),
-    ...(requireComplete === true ? { requireComplete: true } : {}),
-    ...(requireModelRouting === true ? { requireModelRouting: true } : {}),
-    ...(requireCodexModelRouting === true
-      ? { requireCodexModelRouting: true }
-      : {}),
-    ...(requireCodexTopology === true ? { requireCodexTopology: true } : {}),
-    ...(requireReadyForExecution === true
-      ? { requireReadyForExecution: true }
-      : {}),
+    ...selectValidatorFlags(args),
   };
 }

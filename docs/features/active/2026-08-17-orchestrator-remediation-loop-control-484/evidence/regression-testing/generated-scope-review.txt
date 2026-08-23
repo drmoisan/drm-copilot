@@ -1,0 +1,117 @@
+Timestamp: 2026-08-17T15:37:55-04:00
+Command: git diff -- .agents/skills .codex/agents .github/agents .github/prompts .github/skills .claude extensions/drm-copilot/resources
+EXIT_CODE: 0
+Output Summary:
+- Reviewed 15,329 diff output lines across 88 modified paths: 6 canonical .agents paths, 8 generated Claude paths, 19 generated Codex paths, 11 generated GitHub paths, 8 packaged Claude paths, 25 packaged Codex/Agents paths, and 11 packaged GitHub paths.
+- Added paths: 0. Deleted paths: 0. Paths outside the declared command scope: 0.
+- Both canonical reviewer skills and the remediation-handoff skill contain the aggregate verdict/action/path contract and remain the sources for every reviewer mirror.
+- blocked_remediation_loop_limit is the sole executable three-completed-cycle terminal enum. blocked_cycle_limit appears only in explicit rejected-legacy-input documentation.
+- Binary-only REVIEW_STATUS decision paths: 0, verified by 49 passing Python contract/generator tests and 30 passing TypeScript push-down tests.
+- Exact packaged mappings: 45/45 verified. Codex variants: 18/18 relevant P5-T12 profiles verified.
+- Route/model selection identity: unchanged. Review severity policy: unchanged. Accepted pre-R4 no-delta terminal architecture: preserved. Engineer toolchains: unchanged.
+- git diff --check exited 0. Git emitted CRLF normalization warnings for six unchanged pack-manifest working-tree paths; none has a content diff in this scope.
+- The orchestration-surface check classified the six P5-T12 task-researcher profiles as unexpected marked surfaces after P5-T12 generation. They are listed below as intentional P5-T12 outputs, not unrelated paths. The 20 declared P5-T4 outputs themselves are current; package and variant checks pass.
+
+Canonical sources — path-by-path disposition:
+- PASS MODIFIED .agents/skills/feature-review/SKILL.md — canonical aggregate review contract; severity and no-delta handling preserved.
+- PASS MODIFIED .agents/skills/feature-review-workflow/SKILL.md — canonical aggregate review workflow; autonomous/actionable-only handoff preserved.
+- PASS MODIFIED .agents/skills/remediation-handoff-atomic-planner/SKILL.md — canonical remediation-handoff matrix.
+- PASS MODIFIED .agents/skills/orchestrate/SKILL.md — canonical transition, exception, loop-limit, runtime, and research-root contract.
+- PASS MODIFIED .agents/skills/orchestrator-workflow/SKILL.md — canonical R1-R5 workflow parity without route/model selection changes.
+- PASS MODIFIED .agents/skills/research-issue/SKILL.md — feature-local research or docs/research destinations; retired artifacts/research rejected.
+
+P5-T4 generated surfaces — path-by-path disposition:
+- PASS MODIFIED .claude/agents/feature-review.md
+- PASS MODIFIED .claude/agents/orchestrator.md
+- PASS MODIFIED .claude/agents/task-researcher.md
+- PASS MODIFIED .claude/rules/orchestrator-state.md
+- PASS MODIFIED .claude/skills/feature-review-workflow/SKILL.md
+- PASS MODIFIED .claude/skills/orchestrate/SKILL.md
+- PASS MODIFIED .claude/skills/remediation-handoff-atomic-planner/SKILL.md
+- PASS MODIFIED .claude/skills/research-issue/SKILL.md
+- PASS MODIFIED .codex/agents/feature-review.toml
+- PASS MODIFIED .github/agents/feature-review.agent.md
+- PASS MODIFIED .github/agents/orchestrator.agent.md
+- PASS MODIFIED .github/agents/task-researcher.agent.md
+- PASS MODIFIED .github/prompts/orchestrate-csharp-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-powershell-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-python-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-work.prompt.md
+- PASS MODIFIED .github/prompts/research-issue.prompt.md
+- PASS MODIFIED .github/prompts/review-feature.prompt.md
+- PASS MODIFIED .github/skills/feature-review-workflow/SKILL.md
+- PASS MODIFIED .github/skills/remediation-handoff-atomic-planner/SKILL.md
+
+P5-T12 Codex variants — path-by-path disposition:
+- PASS MODIFIED .codex/agents/feature-reviewer.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c1.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c2.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c3.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c3-elevated.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c4.toml
+- PASS MODIFIED .codex/agents/orchestrator.toml
+- PASS MODIFIED .codex/agents/orchestrator-c1.toml
+- PASS MODIFIED .codex/agents/orchestrator-c2.toml
+- PASS MODIFIED .codex/agents/orchestrator-c3.toml
+- PASS MODIFIED .codex/agents/orchestrator-c3-elevated.toml
+- PASS MODIFIED .codex/agents/orchestrator-c4.toml
+- PASS MODIFIED .codex/agents/task-researcher.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+- PASS MODIFIED .codex/agents/task-researcher-c1.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+- PASS MODIFIED .codex/agents/task-researcher-c2.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+- PASS MODIFIED .codex/agents/task-researcher-c3.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+- PASS MODIFIED .codex/agents/task-researcher-c3-elevated.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+- PASS MODIFIED .codex/agents/task-researcher-c4.toml — intentional P5-T12 output; overlaps the P5-T4 generated-marker inventory.
+
+P5-T8 packaged mappings — path-by-path disposition:
+- PASS MODIFIED .codex/agents/feature-review.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml
+- PASS MODIFIED .codex/agents/feature-reviewer.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c1.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c1.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c2.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c2.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c3.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c3-elevated.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3-elevated.toml
+- PASS MODIFIED .codex/agents/feature-reviewer-c4.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c4.toml
+- PASS MODIFIED .agents/skills/feature-review/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review/SKILL.md
+- PASS MODIFIED .agents/skills/feature-review-workflow/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md
+- PASS MODIFIED .agents/skills/remediation-handoff-atomic-planner/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/remediation-handoff-atomic-planner/SKILL.md
+- PASS MODIFIED .github/agents/feature-review.agent.md -> extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md
+- PASS MODIFIED .github/prompts/review-feature.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md
+- PASS MODIFIED .github/skills/feature-review-workflow/SKILL.md -> extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
+- PASS MODIFIED .github/skills/remediation-handoff-atomic-planner/SKILL.md -> extensions/drm-copilot/resources/customizations/.github/skills/remediation-handoff-atomic-planner/SKILL.md
+- PASS MODIFIED .claude/agents/feature-review.md -> extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md
+- PASS MODIFIED .claude/skills/feature-review-workflow/SKILL.md -> extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md
+- PASS MODIFIED .claude/skills/remediation-handoff-atomic-planner/SKILL.md -> extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
+- PASS MODIFIED .codex/agents/orchestrator.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator.toml
+- PASS MODIFIED .codex/agents/orchestrator-c1.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c1.toml
+- PASS MODIFIED .codex/agents/orchestrator-c2.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c2.toml
+- PASS MODIFIED .codex/agents/orchestrator-c3.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3.toml
+- PASS MODIFIED .codex/agents/orchestrator-c3-elevated.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3-elevated.toml
+- PASS MODIFIED .codex/agents/orchestrator-c4.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c4.toml
+- PASS MODIFIED .agents/skills/orchestrate/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md
+- PASS MODIFIED .agents/skills/orchestrator-workflow/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-workflow/SKILL.md
+- PASS MODIFIED .github/agents/orchestrator.agent.md -> extensions/drm-copilot/resources/customizations/.github/agents/orchestrator.agent.md
+- PASS MODIFIED .github/prompts/orchestrate-work.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/orchestrate-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-python-work.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/orchestrate-python-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-powershell-work.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/orchestrate-powershell-work.prompt.md
+- PASS MODIFIED .github/prompts/orchestrate-csharp-work.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/orchestrate-csharp-work.prompt.md
+- PASS MODIFIED .claude/agents/orchestrator.md -> extensions/drm-copilot/resources/claude-customizations/.claude/agents/orchestrator.md
+- PASS MODIFIED .claude/skills/orchestrate/SKILL.md -> extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md
+- PASS MODIFIED .claude/rules/orchestrator-state.md -> extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md
+- PASS MODIFIED .codex/agents/task-researcher.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher.toml
+- PASS MODIFIED .codex/agents/task-researcher-c1.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c1.toml
+- PASS MODIFIED .codex/agents/task-researcher-c2.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c2.toml
+- PASS MODIFIED .codex/agents/task-researcher-c3.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3.toml
+- PASS MODIFIED .codex/agents/task-researcher-c3-elevated.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c3-elevated.toml
+- PASS MODIFIED .codex/agents/task-researcher-c4.toml -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/task-researcher-c4.toml
+- PASS MODIFIED .agents/skills/research-issue/SKILL.md -> extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/research-issue/SKILL.md
+- PASS MODIFIED .github/agents/task-researcher.agent.md -> extensions/drm-copilot/resources/customizations/.github/agents/task-researcher.agent.md
+- PASS MODIFIED .github/prompts/research-issue.prompt.md -> extensions/drm-copilot/resources/customizations/.github/prompts/research-issue.prompt.md
+- PASS MODIFIED .claude/agents/task-researcher.md -> extensions/drm-copilot/resources/claude-customizations/.claude/agents/task-researcher.md
+- PASS MODIFIED .claude/skills/research-issue/SKILL.md -> extensions/drm-copilot/resources/claude-customizations/.claude/skills/research-issue/SKILL.md
+- PASS UNCHANGED config/orchestration-routing.json -> extensions/drm-copilot/resources/config/orchestration-routing.json — exact bytes verified; no route or model policy change.
+
+Verification commands:
+- poetry run python -m scripts.dev_tools.synchronize_customization_bundles --check — EXIT_CODE 0, VERIFIED 45 packaged customization mappings.
+- poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check — EXIT_CODE 0.
+- poetry run pytest tests/scripts/dev_tools/test_feature_review_remediation_handoff_contract.py tests/scripts/dev_tools/test_generate_codex_agent_variants.py tests/scripts/dev_tools/test_generate_orchestration_customization_surfaces.py tests/scripts/dev_tools/test_synchronize_customization_bundles.py — EXIT_CODE 0, 49 passed.
+- npm --prefix extensions/drm-copilot run test:unit -- --runTestsByPath test/lib/push-down/copilot-customizations.test.ts test/lib/push-down/codex-agents-customizations.test.ts test/lib/push-down/claude-customizations.test.ts --runInBand — EXIT_CODE 0, 30 passed.
+- git diff --check -- .agents/skills .codex/agents .github/agents .github/prompts .github/skills .claude extensions/drm-copilot/resources — EXIT_CODE 0.

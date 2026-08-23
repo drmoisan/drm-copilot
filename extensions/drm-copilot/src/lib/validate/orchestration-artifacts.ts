@@ -69,6 +69,45 @@ export const PLAN_PHASE_RE = /^### Phase (?<phase>\d+) — (?<title>.+)$/;
 export const PLAN_TASK_RE =
   /^- \[(?<state>[ xX])\] \[P(?<phase>\d+)-T(?<task>\d+)\] (?<title>.+)$/;
 
+const ROUTING_GATE_BY_CODE: ReadonlyMap<string, string> = new Map([
+  ["ORCH_ROUTING_GATE_LEGACY", "legacy"],
+  ["ORCH_ROUTING_GATE_CODEX_MODEL", "codex_model"],
+  ["ORCH_ROUTING_GATE_CODEX_TOPOLOGY", "codex_topology"],
+]);
+const ROUTING_RECORD_RE = /(?:\[\d+\]|phase [^ .]+|delegated agent: [^.]+)/u;
+
+function routingDiagnosticIdentity(error: string): string | undefined {
+  for (const [code, gate] of ROUTING_GATE_BY_CODE) {
+    const prefix = `${code}: `;
+    if (!error.startsWith(prefix)) {
+      continue;
+    }
+    const subject = error.slice(prefix.length);
+    const recordId = ROUTING_RECORD_RE.exec(subject)?.[0] ?? "checkpoint";
+    return JSON.stringify([gate, recordId, code, subject]);
+  }
+  return undefined;
+}
+
+/** Preserve order while removing only identical selected-routing identities. */
+export function deduplicateSelectedRoutingDiagnostics(
+  errors: readonly string[],
+): string[] {
+  const result: string[] = [];
+  const seen = new Set<string>();
+  for (const error of errors) {
+    const identity = routingDiagnosticIdentity(error);
+    if (identity !== undefined && seen.has(identity)) {
+      continue;
+    }
+    if (identity !== undefined) {
+      seen.add(identity);
+    }
+    result.push(error);
+  }
+  return result;
+}
+
 /**
  * Validate canonical atomic-plan structure.
  *
@@ -168,6 +207,8 @@ export interface ValidateArtifactInput {
   readonly text: string;
   /** Require completion-safe state (orchestrator-state route only). */
   readonly requireComplete?: boolean;
+  /** Require readiness for initial PR creation without final PR/CI gates. */
+  readonly requirePrCreationReady?: boolean;
   /** Require model-routing receipts once delegated (orchestrator-state route). */
   readonly requireModelRouting?: boolean;
   /** Require canonical Codex deployment receipts for delegated agents. */
@@ -309,6 +350,9 @@ function dispatchValidatorErrors(input: ValidateArtifactInput): string[] {
         ...(input.requireComplete === undefined
           ? {}
           : { requireComplete: input.requireComplete }),
+        ...(input.requirePrCreationReady === undefined
+          ? {}
+          : { requirePrCreationReady: input.requirePrCreationReady }),
         ...(input.requireModelRouting === undefined
           ? {}
           : { requireModelRouting: input.requireModelRouting }),
@@ -324,7 +368,9 @@ function dispatchValidatorErrors(input: ValidateArtifactInput): string[] {
           ? {}
           : { routingMatrix: input.routingMatrix }),
       };
-      return validateOrchestratorStateText(input.text, options);
+      return deduplicateSelectedRoutingDiagnostics(
+        validateOrchestratorStateText(input.text, options),
+      );
     }
     case "epic-orchestrator-state": {
       const options: ValidateEpicOrchestratorStateOptions = {

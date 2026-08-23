@@ -34,11 +34,13 @@ Write timestamped artifacts into the active feature folder:
 - `policy-audit.<timestamp>.md`
 - `code-review.<timestamp>.md`
 - `feature-audit.<timestamp>.md`
-- `remediation-inputs.<timestamp>.md` when remediation is required
-- `remediation-plan.<timestamp>.md` when remediation is required
+- `remediation-inputs.<timestamp>.md` only when the aggregate review result permits an autonomous remediation handoff
+- `remediation-plan.<timestamp>.md` only when the aggregate review result permits an autonomous remediation handoff
 
 The final review report MUST end with these exact single-line fields:
-- `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+- `REVIEW_VERDICT: PASS` or `REVIEW_VERDICT: BLOCKED`
+- `REMEDIATION_ACTION: NONE`, `AUTONOMOUS`, `NO_CANDIDATE`, `EXTERNAL_RUNTIME`, `AWAITING_CI`, or `HUMAN_DECISION`
+- `BLOCKER_FINGERPRINT: NONE` or `BLOCKER_FINGERPRINT: sha256:<64-lowercase-hex>`
 - `FEATURE_FOLDER: <path>`
 - `POLICY_AUDIT: <path>`
 - `CODE_REVIEW: <path>`
@@ -63,15 +65,48 @@ Each required review artifact MUST pass the matching validator command before re
 5. Create the policy audit, code review, and feature audit.
    - validate each artifact immediately after writing it
 6. Check off passing acceptance criteria in the authoritative requirement sources per `acceptance-criteria-tracking`.
-7. If remediation is required, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`.
-8. In the final report:
-   - set `REVIEW_STATUS: PASS` only when no remediation artifact is required,
-   - set `REVIEW_STATUS: REMEDIATION_REQUIRED` when remediation inputs or a remediation plan were required,
-   - include every required artifact-path field exactly once.
+7. Aggregate every known blocking finding from the completed policy audit, code review, and feature audit before deriving any terminal result field.
+   - Do not return after the first failing audit, toolchain failure, blocking code finding, or unmet acceptance criterion.
+   - Do not compute or emit a fingerprint from a partial audit or any blocker subset.
+8. If the aggregate result permits autonomous remediation, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`.
+9. In the final report, emit the canonical aggregate result and include every required artifact-path field exactly once.
+
+### Canonical Aggregate Review Result
+
+Complete and validate the policy audit, code review, and feature audit before emitting any of the five terminal result fields. Normalize every known blocking finding to stable `audit_kind`, `rule_id`, workspace-relative `path`, and `message` values; sort the complete set deterministically; and compute one SHA-256 fingerprint over its UTF-8 canonical JSON. Exclude timestamps, generated artifact names, and discovery order. A fingerprint computed before all three audits are complete, or from an early-return subset, is invalid.
+
+Use this exact enum and path grammar:
+
+```text
+REVIEW_VERDICT: PASS | BLOCKED
+REMEDIATION_ACTION: NONE | AUTONOMOUS | NO_CANDIDATE | EXTERNAL_RUNTIME | AWAITING_CI | HUMAN_DECISION
+BLOCKER_FINGERPRINT: NONE | sha256:<64-lowercase-hex>
+REMEDIATION_INPUTS: <feature-local-path> | NONE
+REMEDIATION_PLAN: <feature-local-path> | NONE
+```
+
+`NONE` is the literal uppercase token. A feature-local path MUST resolve beneath the active feature folder. `PASS` uses `BLOCKER_FINGERPRINT: NONE`; `BLOCKED` uses the fingerprint of the complete aggregated blocker set.
+
+Preserve the review-level pre-R4 no-delta terminal architecture: when the complete aggregate is blocked but yields no actionable repository candidate, emit `BLOCKED` with `NO_CANDIDATE` and both remediation paths as `NONE`. This result terminates before R1, creates no remediation plan, and consumes neither a remediation attempt nor a completed cycle.
+
+### Verdict/Action/Path and Remediation-Handoff Matrix
+
+Validate the aggregate result against this exact matrix before creating remediation artifacts or delegating planning:
+
+| Review verdict | Remediation action | `REMEDIATION_INPUTS` | `REMEDIATION_PLAN` | Required handling |
+|---|---|---|---|---|
+| `PASS` | `NONE` | `NONE` | `NONE` | Accept the review result; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AUTONOMOUS` | `<feature-local-path>` | `<feature-local-path>` | Permit `atomic-planner` handoff only when the complete blocker set has an actionable, repository-remediable disposition. |
+| `BLOCKED` | `NO_CANDIDATE` | `NONE` | `NONE` | Stop for the non-remediable or no-delta disposition; do not delegate `atomic-planner`. |
+| `BLOCKED` | `EXTERNAL_RUNTIME` | `NONE` | `NONE` | Stop for external-runtime remediation; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AWAITING_CI` | `NONE` | `NONE` | Wait for CI or other external state; do not delegate `atomic-planner`. |
+| `BLOCKED` | `HUMAN_DECISION` | `NONE` | `NONE` | Stop for a human decision; do not delegate `atomic-planner`. |
+
+Every combination not listed in the matrix is invalid and MUST fail closed without creating either remediation artifact or delegating a planner. Only `BLOCKED` plus `AUTONOMOUS`, with both paths resolving beneath the active feature folder and an actionable remediable disposition, permits remediation artifact creation and `atomic-planner` delegation.
 
 ### Enforced Remediation Handoff Contract
 
-When remediation is required:
+Only for a matrix-valid `BLOCKED` plus `AUTONOMOUS` result:
 
 - create `remediation-inputs.<timestamp>.md` before any remediation planning handoff,
 - create the remediation plan target file on disk before delegating plan creation,

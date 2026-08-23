@@ -8,6 +8,10 @@ import {
   DISCOVERY_ARTIFACT_TYPES,
   DISCOVERY_REPORT_TYPES,
 } from "../src/mcp-tool-inputs-discovery";
+import {
+  VALIDATOR_ARTIFACT_TYPE_PROPERTY,
+  VALIDATOR_FLAG_SCHEMA_PROPERTIES,
+} from "../src/mcp-validator-catalog";
 
 const DISCOVERY_TOOL_NAMES = [
   "validate_discovery_artifacts",
@@ -205,6 +209,30 @@ describe("repo automation MCP tool definitions", () => {
 
     expect(properties?.["artifact_type"]?.enum).toContain(
       "epic-orchestrator-state",
+    );
+  });
+
+  it("uses the exact canonical validator schema on the repo-automation surface", () => {
+    const definition = findRepoDefinition("validate_orchestration_artifacts");
+    const expectedProperties = {
+      workspace_root: workspaceRootProperty,
+      artifact_type: VALIDATOR_ARTIFACT_TYPE_PROPERTY,
+      artifact_path: {
+        type: "string",
+        description:
+          "Workspace-relative or absolute path to the artifact file.",
+      },
+      ...VALIDATOR_FLAG_SCHEMA_PROPERTIES,
+    };
+
+    expect(definition?.inputSchema).toEqual({
+      type: "object",
+      properties: expectedProperties,
+      required: ["workspace_root", "artifact_type", "artifact_path"],
+      additionalProperties: false,
+    });
+    expect(findBaseDefinition("validate_orchestration_artifacts")).toEqual(
+      definition,
     );
   });
 });

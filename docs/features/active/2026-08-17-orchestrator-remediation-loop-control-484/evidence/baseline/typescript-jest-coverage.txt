@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:23:31-04:00
+Command: npm --prefix extensions/drm-copilot run test:unit -- --coverage --coverageDirectory ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/typescript-coverage --coverageReporters=lcov --coverageReporters=text --coverageReporters=text-summary --coverageReporters=json-summary --coverageReporters=json
+EXIT_CODE: 0
+Output Summary: 194 of 194 test suites passed; 2690 tests passed, 0 failed, and 0 snapshots were recorded in 11.611s. Statements and lines were 96.47% (44127/45740), branches were 89.79% (6589/7338), and functions were 90.93% (1304/1434). Coverage reports were written only under the feature evidence baseline directory.

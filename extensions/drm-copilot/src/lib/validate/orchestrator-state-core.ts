@@ -6,6 +6,7 @@ import {
   PROMOTION_RECEIPT_NAMESPACE_KEY,
   validateCompletionCiGate,
   validateCompletionPrGate,
+  validateOrchestratorStatePrCreationReadiness,
 } from "./orchestrator-state-completion";
 import {
   HUMAN_INTERACTION_KEY,
@@ -15,6 +16,7 @@ import {
   REMEDIATION_LOOP_KEY,
   validateRemediationLoop,
 } from "./orchestrator-state-remediation";
+import { validateLegacyRemediationState } from "./orchestrator-state-remediation-legacy";
 import { validatePreparationTerminalContract } from "./orchestrator-state-preparation-terminal";
 import { validateModelRoutingExistence } from "./orchestrator-state-model-routing-existence";
 import {
@@ -23,6 +25,8 @@ import {
   validatePhaseCompleteness,
   validateRoutingContract,
 } from "./orchestrator-state-routing";
+
+const LEGACY_ROUTING_GATE_ERROR = "ORCH_ROUTING_GATE_LEGACY";
 
 // Re-export the completion-gate constants the core ports historically carried so
 // callers and tests can continue to import them from this module.
@@ -175,6 +179,8 @@ function isValidStepStatus(key: string, value: string): boolean {
 export interface ValidateOrchestratorStateOptions {
   /** When true, enforce completion-safe lifecycle states and gates. */
   readonly requireComplete?: boolean;
+  /** Require readiness for initial PR creation without final PR/CI gates. */
+  readonly requirePrCreationReady?: boolean;
   /**
    * When true, run the existence-only model-routing check: once the checkpoint
    * records a delegation, the routing-receipt-agent set must be a superset of
@@ -337,6 +343,14 @@ export function validateOrchestratorStateText(
   text: string,
   options: ValidateOrchestratorStateOptions = {},
 ): string[] {
+  const flags = Object.freeze({
+    requireComplete: options.requireComplete === true,
+    requirePrCreationReady: options.requirePrCreationReady === true,
+    requireModelRouting: options.requireModelRouting === true,
+    requireCodexModelRouting: options.requireCodexModelRouting === true,
+    requireCodexTopology: options.requireCodexTopology === true,
+  });
+  const strictRemediation = Object.values(flags).some(Boolean);
   const errors: string[] = [];
   let state: unknown;
   try {
@@ -399,9 +413,15 @@ export function validateOrchestratorStateText(
     }
   }
 
+  errors.push(...validateLegacyRemediationState(stateMap, strictRemediation));
+
   // Apply the additive remediation-cycle invariants only when present.
   if (REMEDIATION_LOOP_KEY in stateMap) {
-    errors.push(...validateRemediationLoop(stateMap[REMEDIATION_LOOP_KEY]));
+    errors.push(
+      ...validateRemediationLoop(stateMap[REMEDIATION_LOOP_KEY], {
+        strict: strictRemediation,
+      }),
+    );
   }
 
   // Apply the additive human_interaction invariants only when present.
@@ -409,7 +429,7 @@ export function validateOrchestratorStateText(
     errors.push(...validateHumanInteraction(stateMap[HUMAN_INTERACTION_KEY]));
   }
 
-  if (options.requireComplete === true) {
+  if (flags.requireComplete) {
     // Enforce completion-safe lifecycle states only when the caller opts into
     // the stricter completion gate.
     for (const key of STEP_STATUS_KEYS) {
@@ -444,23 +464,25 @@ export function validateOrchestratorStateText(
     );
   }
 
+  if (flags.requirePrCreationReady) {
+    errors.push(...validateOrchestratorStatePrCreationReadiness(stateMap));
+  }
+
   // Existence-only model-routing gate; independent of requireComplete and a
   // no-op for delegation-free checkpoints, preserving backward compatibility.
-  if (options.requireModelRouting === true) {
-    errors.push(...validateModelRoutingExistence(stateMap));
+  if (flags.requireModelRouting) {
+    errors.push(
+      ...validateModelRoutingExistence(stateMap).map(
+        (error) => `${LEGACY_ROUTING_GATE_ERROR}: ${error}`,
+      ),
+    );
   }
 
   errors.push(
-    ...validateCodexModelRoutingState(
-      stateMap,
-      options.requireCodexModelRouting === true,
-    ),
+    ...validateCodexModelRoutingState(stateMap, flags.requireCodexModelRouting),
   );
   errors.push(
-    ...validateCodexTopologyState(
-      stateMap,
-      options.requireCodexTopology === true,
-    ),
+    ...validateCodexTopologyState(stateMap, flags.requireCodexTopology),
   );
 
   return errors;

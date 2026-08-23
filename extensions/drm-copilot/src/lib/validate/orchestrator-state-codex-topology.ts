@@ -4,12 +4,11 @@ import {
   resolveCodexTopology,
   type CodexTopologyReceipt,
 } from "./codex-topology-resolver";
-import {
-  CODEX_MODEL_ROUTING_RECEIPTS_KEY,
-  validateCodexModelRoutingReceipt,
-} from "./orchestrator-state-codex-model-routing";
 
 export const CODEX_TOPOLOGY_RECEIPTS_KEY = "codex_topology_receipts";
+const CODEX_TOPOLOGY_GATE_ERROR = "ORCH_ROUTING_GATE_CODEX_TOPOLOGY";
+
+const DEPLOYMENT_PROFILE_SUFFIX = /-c(?:1|2|3(?:-elevated)?|4)$/u;
 
 const REQUIRED_KEYS = [
   "phase",
@@ -200,7 +199,7 @@ function delegatedAgentNames(state: Record<string, unknown>): Set<string> {
     }
     const agentName = item["agent_name"];
     if (typeof agentName === "string" && agentName.trim().length > 0) {
-      result.add(agentName);
+      result.add(agentName.replace(DEPLOYMENT_PROFILE_SUFFIX, ""));
     }
   }
   return result;
@@ -211,31 +210,6 @@ function validReceipts(value: ReadonlyArray<unknown>): CodexTopologyReceipt[] {
     (item): item is Record<string, unknown> =>
       isObject(item) && validateCodexTopologyReceipts([item]).length === 0,
   ) as unknown as CodexTopologyReceipt[];
-}
-
-function modelDeployments(
-  state: Record<string, unknown>,
-  logicalAgent: string,
-): Set<string> {
-  const result = new Set<string>();
-  const receipts = state[CODEX_MODEL_ROUTING_RECEIPTS_KEY];
-  if (!Array.isArray(receipts)) {
-    return result;
-  }
-  for (const item of receipts) {
-    if (
-      !isObject(item) ||
-      validateCodexModelRoutingReceipt(item).length > 0 ||
-      item["logical_agent"] !== logicalAgent
-    ) {
-      continue;
-    }
-    const deployment = item["deployment_agent"];
-    if (typeof deployment === "string") {
-      result.add(deployment);
-    }
-  }
-  return result;
 }
 
 export interface ValidateCodexTopologyGateOptions {
@@ -290,9 +264,8 @@ export function validateCodexTopologyGate(
           `the resolved Codex topology route ${pythonRepr(receipt.route)}.`,
       );
     }
-    const allowedNames = modelDeployments(state, receipt.logical_agent);
-    allowedNames.add(receipt.logical_agent);
-    if ([...delegated].every((agent) => !allowedNames.has(agent))) {
+    const allowedNames = new Set([receipt.logical_agent]);
+    if (!delegated.has(receipt.logical_agent)) {
       errors.push(
         "Checkpoint delegation_receipts is missing the exact resolved " +
           `topology agent for ${receipt.logical_agent}: ` +
@@ -303,20 +276,19 @@ export function validateCodexTopologyGate(
   return errors;
 }
 
-/** Apply always-on present-receipt validation and the optional topology gate. */
+/** Apply either selected-gate or always-on present-receipt validation once. */
 export function validateCodexTopologyState(
   state: Record<string, unknown>,
   requireGate = false,
   options: ValidateCodexTopologyGateOptions = {},
 ): string[] {
-  const errors: string[] = [];
-  if (CODEX_TOPOLOGY_RECEIPTS_KEY in state) {
-    errors.push(
-      ...validateCodexTopologyReceipts(state[CODEX_TOPOLOGY_RECEIPTS_KEY]),
+  if (requireGate) {
+    return validateCodexTopologyGate(state, options).map(
+      (error) => `${CODEX_TOPOLOGY_GATE_ERROR}: ${error}`,
     );
   }
-  if (requireGate) {
-    errors.push(...validateCodexTopologyGate(state, options));
+  if (CODEX_TOPOLOGY_RECEIPTS_KEY in state) {
+    return validateCodexTopologyReceipts(state[CODEX_TOPOLOGY_RECEIPTS_KEY]);
   }
-  return errors;
+  return [];
 }

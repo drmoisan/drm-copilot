@@ -1,5 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
+import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
+import { resolveCodexDeployment } from "../../../src/lib/validate/orchestrator-state-codex-model-routing";
 import { validateOrchestratorStateText } from "../../../src/lib/validate/orchestrator-state-core";
 import { validateModelRoutingExistence } from "../../../src/lib/validate/orchestrator-state-model-routing-existence";
 
@@ -162,7 +164,8 @@ describe("validateOrchestratorStateText model-routing existence check", () => {
 
     // Assert
     expect(missing).toContain(
-      "Checkpoint model_routing_receipts is missing a receipt for " +
+      "ORCH_ROUTING_GATE_LEGACY: Checkpoint model_routing_receipts is " +
+        "missing a receipt for " +
         "delegated agent: atomic-planner.",
     );
     state["model_routing_receipts"] = [receipt("atomic-planner")];
@@ -183,6 +186,67 @@ describe("validateOrchestratorStateText model-routing existence check", () => {
     expect(
       validateOrchestratorStateText(JSON.stringify(state), {
         requireModelRouting: true,
+      }),
+    ).toEqual([]);
+  });
+
+  it("does not accept a Codex receipt as legacy routing evidence", () => {
+    const state = buildValidState();
+    state["codex_model_routing_receipts"] = [
+      {
+        ...resolveCodexDeployment("atomic-planner", "C3", "standalone", "C3"),
+        phase: "7",
+      },
+    ];
+
+    expect(
+      validateOrchestratorStateText(JSON.stringify(state), {
+        requireModelRouting: true,
+      }),
+    ).toContain(
+      "ORCH_ROUTING_GATE_LEGACY: Checkpoint model_routing_receipts is " +
+        "missing a receipt for " +
+        "delegated agent: atomic-planner.",
+    );
+  });
+
+  it("does not require legacy receipts for the Codex model-routing gate", () => {
+    const state = buildValidState();
+    state["codex_model_routing_receipts"] = [
+      {
+        ...resolveCodexDeployment("atomic-planner", "C3", "standalone", "C3"),
+        phase: "7",
+      },
+    ];
+
+    expect("model_routing_receipts" in state).toBe(false);
+    expect(
+      validateOrchestratorStateText(JSON.stringify(state), {
+        requireCodexModelRouting: true,
+      }),
+    ).toEqual([]);
+  });
+
+  it("does not require legacy receipts for the Codex topology gate", () => {
+    const state = buildValidState();
+    state["path_selected"] = "small";
+    const delegation = (
+      state["delegation_receipts"] as Record<string, unknown>[]
+    )[0];
+    if (delegation !== undefined) {
+      delegation["agent_name"] = "python-typed-engineer";
+    }
+    state["codex_topology_receipts"] = [
+      {
+        ...resolveCodexTopology(["python"], 2, 2, "standalone"),
+        phase: "7",
+      },
+    ];
+
+    expect("model_routing_receipts" in state).toBe(false);
+    expect(
+      validateOrchestratorStateText(JSON.stringify(state), {
+        requireCodexTopology: true,
       }),
     ).toEqual([]);
   });

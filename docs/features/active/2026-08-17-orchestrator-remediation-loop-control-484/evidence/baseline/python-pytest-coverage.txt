@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:19:01-04:00
+Command: $env:COVERAGE_FILE='docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/.coverage'; poetry run pytest -o "addopts=" --cov=src --cov=scripts/dev_tools --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/python-coverage.json
+EXIT_CODE: 0
+Output Summary: 3997 passed, 0 failed, 5 skipped in 23.01s. Coverage collected 15915 statements and 5916 branches; the terminal report rounded total coverage to 90%. Coverage JSON and coverage data were written only under the feature evidence baseline directory.

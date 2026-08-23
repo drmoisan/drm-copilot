@@ -2,6 +2,14 @@ import * as path from "node:path";
 import { type FileSystem, toPosixPath } from "../file-system";
 import type { CommandRunner } from "../subprocess-runner";
 import { validateArtifactWithWarnings } from "./orchestration-artifacts";
+import {
+  selectDefinedValidatorFlagValues,
+  VALIDATOR_FLAG_DEFINITIONS,
+  type ValidatorFlagValues,
+} from "../../mcp-validator-catalog";
+
+export const VALIDATE_ORCHESTRATION_SERVICE_CALL_FLAG_OPTIONS =
+  VALIDATOR_FLAG_DEFINITIONS.map(({ optionName }) => optionName);
 
 /**
  * In-process orchestration-artifact validation wiring.
@@ -24,7 +32,7 @@ import { validateArtifactWithWarnings } from "./orchestration-artifacts";
  */
 
 /** Input for the in-process validation wiring. */
-export interface ValidateOrchestrationServiceCallInput {
+export type ValidateOrchestrationServiceCallInput = ValidatorFlagValues & {
   /** Injected filesystem used to read the artifact and route orchestrator-state. */
   readonly fileSystem: FileSystem;
   /** Injected runner used for readiness Git integrity checks. */
@@ -35,17 +43,7 @@ export interface ValidateOrchestrationServiceCallInput {
   readonly artifactType: string;
   /** Artifact path relative to `workspaceRoot`. */
   readonly artifactPath: string;
-  /** Require completion-safe state (orchestrator-state route only). */
-  readonly requireComplete?: boolean;
-  /** Require model-routing receipts once delegated (orchestrator-state route). */
-  readonly requireModelRouting?: boolean;
-  /** Require canonical Codex deployment receipts for delegated agents. */
-  readonly requireCodexModelRouting?: boolean;
-  /** Require canonical Codex topology receipts for delegated agents. */
-  readonly requireCodexTopology?: boolean;
-  /** Require every planned epic child to be execution-ready. */
-  readonly requireReadyForExecution?: boolean;
-}
+};
 
 /** Preserved success result of a successful in-process validation. */
 export interface ValidateOrchestrationServiceCallResult {
@@ -84,21 +82,7 @@ export function validateOrchestrationServiceCall(
   const { errors, warnings } = validateArtifactWithWarnings({
     artifactType: input.artifactType,
     text,
-    ...(input.requireComplete === undefined
-      ? {}
-      : { requireComplete: input.requireComplete }),
-    ...(input.requireModelRouting === undefined
-      ? {}
-      : { requireModelRouting: input.requireModelRouting }),
-    ...(input.requireCodexModelRouting === undefined
-      ? {}
-      : { requireCodexModelRouting: input.requireCodexModelRouting }),
-    ...(input.requireCodexTopology === undefined
-      ? {}
-      : { requireCodexTopology: input.requireCodexTopology }),
-    ...(input.requireReadyForExecution === undefined
-      ? {}
-      : { requireReadyForExecution: input.requireReadyForExecution }),
+    ...selectDefinedValidatorFlagValues(input),
     artifactPath: artifactFullPath,
     ...(input.runner === undefined ? {} : { runner: input.runner }),
     fs: input.fileSystem,

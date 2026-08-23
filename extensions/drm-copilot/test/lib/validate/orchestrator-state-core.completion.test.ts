@@ -80,6 +80,13 @@ function validateComplete(state: Record<string, unknown>): string[] {
   });
 }
 
+/** Validate only the independent pre-PR-creation readiness gate. */
+function validateReady(state: Record<string, unknown>): string[] {
+  return validateOrchestratorStateText(JSON.stringify(state), {
+    requirePrCreationReady: true,
+  });
+}
+
 describe("validateOrchestratorStateText completion gates", () => {
   it("rejects pending or blocked step statuses under requireComplete", () => {
     // Arrange
@@ -242,6 +249,79 @@ describe("validateOrchestratorStateText completion gates", () => {
     // Assert
     expect(errors.some((error) => error.includes("required_agents"))).toBe(
       true,
+    );
+  });
+
+  it("accepts pre-PR readiness without PR, CI, or pr-author evidence", () => {
+    const state = buildValidState();
+    state["step9_status"] = "pending";
+
+    const errors = validateReady(state);
+
+    expect(errors).toEqual([]);
+    expect(
+      errors.some(
+        (error) =>
+          error.includes("pr_gate") ||
+          error.includes("ci_gate") ||
+          error.includes("pr-author"),
+      ),
+    ).toBe(false);
+  });
+
+  it.each([
+    ["step6_status", "pending"],
+    ["step8_status", "blocked"],
+    ["step6_status", "blocked_remediation_loop_limit"],
+  ] as const)("rejects readiness when %s is %s", (key, value) => {
+    const state = buildValidState();
+    state[key] = value;
+
+    expect(validateReady(state)).toContain(
+      `Checkpoint PR-creation readiness validation failed: ${key} is ${value}.`,
+    );
+  });
+
+  it("rejects a non-none blocked reason during readiness", () => {
+    const state = buildValidState();
+    state["blocked_reason"] = "delegate_no_receipt";
+
+    expect(validateReady(state)).toContain(
+      "Checkpoint PR-creation readiness validation failed: " +
+        "blocked_reason is not `none`.",
+    );
+  });
+
+  it.each(["local_execution_overrides", "delegation_bypasses"])(
+    "rejects non-empty readiness override field %s",
+    (key) => {
+      const state = buildValidState();
+      state[key] = ["recorded"];
+
+      expect(validateReady(state)).toContain(
+        "Checkpoint PR-creation readiness validation failed: " +
+          `${key} must be an empty list when present.`,
+      );
+    },
+  );
+
+  it("returns the deterministic union when readiness and completion are selected", () => {
+    const state = buildValidState();
+    state["step9_status"] = "pending";
+    const completionErrors = validateComplete(state);
+
+    const combinedErrors = validateOrchestratorStateText(
+      JSON.stringify(state),
+      {
+        requireComplete: true,
+        requirePrCreationReady: true,
+        routingMatrix: ROUTING_MATRIX,
+      },
+    );
+
+    expect(combinedErrors).toEqual(completionErrors);
+    expect(combinedErrors).toContain(
+      "Checkpoint completion validation failed: step9_status is pending.",
     );
   });
 });

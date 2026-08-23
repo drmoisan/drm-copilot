@@ -1,0 +1,16 @@
+Timestamp: 2026-08-17T16-20
+Command: poetry run pytest tests/scripts/dev_tools/test_mcp_bundle_parity.py::test_published_1_0_24_is_rejected_as_external_runtime
+EXIT_CODE: 0
+Output Summary: PASS. One immutable-published-runtime compatibility test passed in 0.06 seconds and classified the fixture as EXTERNAL_RUNTIME without treating it as a positive local candidate.
+Immutable Fixture: tests/fixtures/mcp-server/published-1.0.24-validator-capabilities.json
+Package Identity: @danmoisan/drm-copilot-mcp@1.0.24
+Tarball SHA-256: sha256:82602d79acb8dd6ca3b7ebeaa4de300fc6947ce543ea4be0cbf42dae39284d9d
+Published Bundle File SHA-256: sha256:1eed10e79424395901d9dd57a4937ebb4263cb0949a1fea9c00812cf7cec5dfa
+Published Routing Policy SHA-256: sha256:d9c6657cbdbe15413e0fb9bc1be700ce1a8f892d0db413c3bbc253ea24ea7bda
+Mismatch Reasons: ORCH_VALIDATOR_CAPABILITY_MISSING; ORCH_VALIDATOR_VERSION_INCOMPATIBLE:BUNDLE; ORCH_ROUTING_POLICY_DIGEST_MISMATCH; ORCH_VALIDATOR_CAPABILITY_MISSING:FLAG:require_pr_creation_ready
+Disposition: EXTERNAL_RUNTIME
+Positive Local Candidate Parity: excluded
+Attempt Count Before: 2
+Attempt Count After: 2
+Cycle Count Before: 1
+Cycle Count After: 1

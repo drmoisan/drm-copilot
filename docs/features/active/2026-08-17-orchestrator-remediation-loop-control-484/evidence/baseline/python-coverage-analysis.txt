@@ -1,0 +1,66 @@
+Timestamp: 2026-08-17T11:19:01-04:00
+Command: poetry run python -m scripts.dev_tools.analyze_coverage_policy --mode baseline --language python --coverage-json docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/python-coverage.json --base-ref HEAD --working-tree --coverage-config pyproject.toml --repo-line-min 85 --repo-branch-min 75 --new-symbol-min 90 --require-configured-changed-files --require-no-changed-line-regression --output docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/python-coverage-analysis.json
+EXIT_CODE: 1
+Output Summary: Overall baseline verdict FAIL. Repository line coverage is 92.126924% (14662/15915) against 85.0%, verdict PASS. Repository branch coverage is 84.398242% (4993/5916) against 75.0%, verdict PASS. New-symbol coverage is evaluated against 90.0%; 54 symbols were evaluated and the aggregate verdict is FAIL. Configured changed-file numeric result count is 0 and verdict PASS. Changed-line no-regression evaluated 4 files and verdict PASS. The structured JSON report is in the same feature evidence baseline directory. The analyzer used pyproject.toml and did not read or create quality-tiers.yml.
+New-symbol values:
+- scripts/dev_tools/analyze_coverage_policy.py::module:<module> coverage=60.115607% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:_percent coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_file_percent coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_baseline_changed_lines coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_changed_line_results coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_configured_results coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_new_symbol_results coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:analyze_snapshot coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:compare_analyses coverage=95.454545% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:build_parser coverage=100% verdict=PASS
+- scripts/dev_tools/analyze_coverage_policy.py::function:_read_json coverage=50% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:_working_tree_changes coverage=5.555556% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:_coverage_inputs coverage=7.142857% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:_baseline coverage=33.333333% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:_run_analysis coverage=5.263158% verdict=FAIL
+- scripts/dev_tools/analyze_coverage_policy.py::function:main coverage=5.555556% verdict=FAIL
+- scripts/dev_tools/coverage_policy_inputs.py::module:<module> coverage=95.852535% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::class:FileCoverage coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::class:CoverageSnapshot coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::class:SymbolRange coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:object_mapping coverage=85.714286% verdict=FAIL
+- scripts/dev_tools/coverage_policy_inputs.py::function:object_items coverage=75% verdict=FAIL
+- scripts/dev_tools/coverage_policy_inputs.py::function:number coverage=75% verdict=FAIL
+- scripts/dev_tools/coverage_policy_inputs.py::function:_integer coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:normalize_path coverage=63.636364% verdict=FAIL
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_coverage_py_json coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:_parse_lcov coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:finish coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_jest_coverage coverage=95.833333% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_python_symbols coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:_brace_end coverage=92.307692% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_typescript_symbols coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_unified_diff coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_python_thresholds coverage=100% verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py::function:parse_jest_thresholds coverage=100% verdict=PASS
+- tests/scripts/dev_tools/coverage_policy_test_support.py::module:<module> coverage=100% verdict=PASS
+- tests/scripts/dev_tools/coverage_policy_test_support.py::function:coverage_py_text coverage=100% verdict=PASS
+- tests/scripts/dev_tools/coverage_policy_test_support.py::function:snapshot coverage=100% verdict=PASS
+- tests/scripts/dev_tools/coverage_policy_test_support.py::function:analyze coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::module:<module> coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_parse_coverage_py_json_reads_lines_and_branches coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_parse_jest_coverage_uses_all_three_in_memory_reports coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_normalize_path_is_stable coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_symbol_parsers_find_modules_classes_functions_and_methods coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_unified_diff_returns_changed_lines_and_new_files coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_threshold_parsers_read_python_toml_and_jest_source coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_repository_threshold_boundaries coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_new_symbols_pass_at_exact_ninety_percent coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_new_symbol_below_ninety_percent_fails coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_configured_changed_file_threshold_boundaries coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_changed_line_coverage_cannot_regress_from_baseline coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_compare_reports_numeric_python_and_typescript_deltas coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_cli_requires_explicit_repository_thresholds coverage=100% verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py::function:test_invalid_coverage_py_shapes_fail_closed coverage=100% verdict=PASS
+Configured changed-file values:
+- Evaluated files=0; verdict=PASS.
+Changed-line values:
+- scripts/dev_tools/analyze_coverage_policy.py changed=60.115607% baseline=60.115607% delta=0 covered=104/173 verdict=PASS
+- scripts/dev_tools/coverage_policy_inputs.py changed=95.852535% baseline=95.852535% delta=0 covered=208/217 verdict=PASS
+- tests/scripts/dev_tools/coverage_policy_test_support.py changed=100% baseline=100% delta=0 covered=0/0 verdict=PASS
+- tests/scripts/dev_tools/test_analyze_coverage_policy.py changed=100% baseline=100% delta=0 covered=0/0 verdict=PASS

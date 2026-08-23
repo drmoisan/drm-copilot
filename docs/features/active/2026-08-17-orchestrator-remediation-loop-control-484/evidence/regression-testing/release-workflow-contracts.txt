@@ -1,0 +1,11 @@
+Timestamp: 2026-08-17T16-35
+Command: poetry run pytest tests/scripts/dev_tools/test_publish_mcp_server_workflow.py
+EXIT_CODE: 0
+Output Summary:
+- 20 tests collected; 20 passed in 0.07s.
+- The workflow contract tests require the exact SOURCE_READY -> BUILT -> TESTED -> PUBLISHED -> PINNED job dependency graph.
+- SOURCE_READY source-bundle smoke, BUILT prepack/two-bundle/local-pack ordering, and TESTED built/packed standalone smoke gates passed static verification.
+- Both built and packed smoke commands occur before the only npm publish command.
+- Publication is restricted to mcp-server-v* tag pushes, and PINNED requires exact registry evidence for the target version after PUBLISHED.
+- The deliberately non-matching PowerShell pin search records and resets the nested command exit code before an explicit exit 0.
+- Tests read the tracked workflow only; they performed no workflow execution, publication, tag creation, registry call, or package-pin mutation.

@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:16:00-04:00
+Command: poetry run pyright
+EXIT_CODE: 1
+Output Summary: 2974 errors, 8 warnings, and 0 informations. The full-repository baseline is nonzero because the current Poetry environment does not resolve several repository dependencies and their type information. A focused run over scripts/dev_tools/analyze_coverage_policy.py and scripts/dev_tools/coverage_policy_inputs.py completed with 0 errors, 0 warnings, and 0 informations.

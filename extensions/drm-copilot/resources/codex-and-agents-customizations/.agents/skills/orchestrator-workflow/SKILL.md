@@ -226,8 +226,9 @@ Required-delegation step map:
 Do not advance on summaries alone when an exact result signal is required.
 
 - feature review result:
-  - `REVIEW_STATUS: PASS`
-  - `REVIEW_STATUS: REMEDIATION_REQUIRED`
+  - `REVIEW_VERDICT: PASS` or `REVIEW_VERDICT: BLOCKED`
+  - `REMEDIATION_ACTION: NONE`, `AUTONOMOUS`, `NO_CANDIDATE`, `EXTERNAL_RUNTIME`, `AWAITING_CI`, or `HUMAN_DECISION`
+  - `BLOCKER_FINGERPRINT: NONE` or `BLOCKER_FINGERPRINT: sha256:<64-lowercase-hex>`
   - `FEATURE_FOLDER: <path>`
   - `POLICY_AUDIT: <path>`
   - `CODE_REVIEW: <path>`
@@ -241,6 +242,21 @@ Do not advance on summaries alone when an exact result signal is required.
   - one fenced `text` code block only
 
 If an exact signal or required path field is missing, set the relevant step to `blocked`, set `blocked_reason` to `delegate_contract_incomplete`, and stop.
+
+### Verdict/Action/Path and Remediation-Handoff Matrix
+
+Validate the aggregate result against this exact matrix before creating remediation artifacts or delegating planning:
+
+| Review verdict | Remediation action | `REMEDIATION_INPUTS` | `REMEDIATION_PLAN` | Required handling |
+|---|---|---|---|---|
+| `PASS` | `NONE` | `NONE` | `NONE` | Accept the review result; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AUTONOMOUS` | `<feature-local-path>` | `<feature-local-path>` | Permit `atomic-planner` handoff only when the complete blocker set has an actionable, repository-remediable disposition. |
+| `BLOCKED` | `NO_CANDIDATE` | `NONE` | `NONE` | Stop for the non-remediable or no-delta disposition; do not delegate `atomic-planner`. |
+| `BLOCKED` | `EXTERNAL_RUNTIME` | `NONE` | `NONE` | Stop for external-runtime remediation; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AWAITING_CI` | `NONE` | `NONE` | Wait for CI or other external state; do not delegate `atomic-planner`. |
+| `BLOCKED` | `HUMAN_DECISION` | `NONE` | `NONE` | Stop for a human decision; do not delegate `atomic-planner`. |
+
+Every combination not listed in the matrix is invalid and MUST fail closed without creating either remediation artifact or delegating a planner. Only `BLOCKED` plus `AUTONOMOUS`, with both paths resolving beneath the active feature folder and an actionable remediable disposition, permits remediation artifact creation and `atomic-planner` delegation.
 
 ## Resume Rules
 
@@ -317,11 +333,12 @@ Required behavior:
    - If the handoff cannot be started or does not return a receipt, set `step9_status` to `blocked`, set `blocked_reason`, and stop
 11. Run reduced audit:
    - MUST delegate to `feature-reviewer`
-   - require the exact `REVIEW_STATUS` and artifact-path fields from the review result
+   - require the exact verdict, action, fingerprint, and artifact-path fields from the review result
    - Record a delegation receipt and set `step10_status` to `verified` before continuing
    - If the handoff cannot be started or does not return a receipt, set `step10_status` to `blocked`, set `blocked_reason`, and stop
-12. If review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, run the shared remediation loop.
+12. If review returns `BLOCKED` plus `AUTONOMOUS`, run the shared remediation loop.
    - Treat the returned `REMEDIATION_INPUTS` and `REMEDIATION_PLAN` paths as mandatory inputs
+   - Apply the matrix terminal or wait transition for every other canonical result without entering R1
    - If any required remediation handoff cannot be started or does not return a receipt, set `blocked_reason` and stop
 
 ## Large Path
@@ -370,30 +387,35 @@ Required behavior:
     Hard enforcement for Step 9:
     - Resolve the base branch through `pr-base-branch-merge-base` unless an explicit base was already supplied.
     - Load canonical PR-context artifacts and refresh them through `repo-automation-adapter` when they are missing or stale relative to the current branch state.
-    - Require the exact `REVIEW_STATUS` and artifact-path fields from the review result.
+    - Require the exact verdict, action, fingerprint, and artifact-path fields from the review result.
     - Do not mark Step 9 complete until expected review artifacts are present on disk in `${feature-folder}`.
     - Do not accept PASS review outcomes when required coverage fields are left unverified, when PR-context artifacts are missing or stale relative to the current branch state, or when required remediation artifacts are missing.
     - Do not perform review locally when this delegation cannot be started; set `step9_status` to `blocked`, set `blocked_reason`, and stop.
     - Record a delegation receipt and set `step9_status` to `verified` only after delegate output and validator checks pass.
-11. If review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, run the shared remediation loop until the latest review returns `REVIEW_STATUS: PASS`.
+11. If review returns `BLOCKED` plus `AUTONOMOUS`, run the shared remediation loop until its ordered R5 decision exits or stops.
     - remediation planning, preflight clearance, remediation execution, remediation commit-message generation, and re-review delegations are all mandatory; if any cannot be started, set `blocked_reason` and stop
+    - apply the matrix `PASS` or blocked terminal/wait transition directly when autonomous remediation is not selected
 
 ## Shared Remediation Loop
 
-Apply this loop after any required review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`.
+Apply this loop only after a matrix-valid `BLOCKED` plus `AUTONOMOUS` aggregate review.
 
-1. Persist `review-status`, `remediation-inputs-path`, `remediation-plan-path`, and `remediation-pass` in the checkpoint.
-2. Delegate `atomic-executor` in validation-only mode against the exact `remediation-plan-path`.
-3. If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, delegate `atomic-planner` to update the same `remediation-plan-path` in place and then repeat preflight clearance.
-4. Only after `PREFLIGHT: ALL CLEAR`, delegate `atomic-executor` to execute the remediation plan exactly as written.
-5. Stage all files with `git add -A`.
-6. If staging is empty after execution, set `blocked_reason` to `no_staged_changes` and stop.
-7. Use `repo-automation-adapter` to run MCP tool `collect_commit_context`, capture the returned on-disk artifact path as `commit-context-path`, and stop with `blocked_reason: commit_context_missing` if that path is unavailable.
-8. Delegate `commit-steward` using `commit-context-path` as the authoritative staged-change input.
-9. Commit the staged work with the exact message returned by `commit-steward`.
-10. Use `repo-automation-adapter` to refresh PR-context artifacts through MCP tool `collect_pr_context` with the resolved base branch.
-11. Delegate `feature-reviewer` again with the refreshed PR context.
-12. If the new review still returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, increment `remediation-pass` and repeat the loop. Exit only when the latest review returns `REVIEW_STATUS: PASS`.
+1. **Pre-R1:** Apply the MCP runtime compatibility gate owned by `.agents/skills/orchestrate/SKILL.md`, require one feature-local remediation-inputs path and one feature-local plan path, and stop without count mutation on incompatibility or invalid paths.
+2. **R1 — Plan of record:** Persist the exact returned plan as the single plan of record. Planner revisions MUST update that same path in place.
+3. **R2 — Preflight clearance:** Delegate `atomic-executor` in validation-only mode. On `PREFLIGHT: REVISIONS REQUIRED`, delegate `atomic-planner` against the same path and repeat R2. Preflight revisions allocate no attempt or cycle.
+4. **R3 — Remediation execution:** Only after `PREFLIGHT: ALL CLEAR`, allocate the next gap-free attempt ID and delegate `atomic-executor` to execute the plan exactly as written.
+5. **Pre-R4 candidate gate:** If `candidate_applied: false`, finish one terminal attempt and stop before staging, commit-context collection, commit, R4, or cycle creation. If `candidate_applied: true`, require `execution_status: complete` before continuing.
+6. **Pre-R4 commit:** Stage all files with `git add -A`; require a nonempty staged candidate; collect commit context through `repo-automation-adapter`; delegate `commit-steward`; commit the exact staged candidate; and require a nonempty commit SHA.
+7. **R4 — Re-audit:** Refresh PR context for the resolved base, delegate `feature-reviewer` with unchanged scope, require the complete aggregate result and feature-local re-audit path, then append exactly one completed cycle linked to the attempt. A cycle is appended only after both commit SHA and re-audit path exist.
+8. **R5 — Ordered decision:** Evaluate the appended cycle in this order:
+   1. A matrix-valid `PASS` plus `NONE` result exits remediation and validates PR readiness.
+   2. A blocked terminal or wait action enters its documented state without another plan, attempt, or cycle.
+   3. A changed `BLOCKED` plus `AUTONOMOUS` fingerprint becomes a continuation candidate.
+   4. An unchanged autonomous fingerprint may become a continuation candidate only when the canonical exact-unused-exception gate permits it.
+   5. An unchanged fingerprint with no exact unused valid exception stops as `blocked_stagnation`.
+   6. Finally, a continuation candidate stops as `blocked_remediation_loop_limit` after the third unresolved completed cycle; otherwise it returns to R1.
+
+Exception evaluation is delegated exclusively to the `Canonical Post-R4 Fingerprint and Exception Gate` in `.agents/skills/orchestrate/SKILL.md`. This workflow MUST NOT duplicate exception field validation, binding comparison, atomic-consumption, or reuse-rejection logic.
 
 ## Completion Gates
 
@@ -418,7 +440,7 @@ Do not claim mission completion until all of the following are true:
 - large path has policy, code, and feature audit artifacts
 - required baseline and final-QA evidence artifacts referenced by the approved plan exist on disk
 - any required remediation artifacts exist on disk and the latest re-review is clean
-- any required remediation loop run also includes a remediation execution receipt, a remediation commit receipt, and a final `REVIEW_STATUS: PASS`
+- any resolved remediation loop run also includes a remediation execution receipt, a remediation commit receipt, and a final matrix-valid `PASS` plus `NONE` result
 - validator-backed checks for the approved plan, policy audit, code review, feature audit, and checkpoint state pass
 - the canonical checkpoint passes `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"`, `require_complete: true`, `require_codex_topology: true`, and `require_codex_model_routing: true`
 - required GitHub checks pass for the current PR head SHA before PR/DONE completion

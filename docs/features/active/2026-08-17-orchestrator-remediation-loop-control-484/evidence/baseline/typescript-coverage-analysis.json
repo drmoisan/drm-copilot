@@ -1,0 +1,29 @@
+{
+  "changed_files": [],
+  "configured_changed_files": [],
+  "language": "typescript",
+  "mode": "baseline",
+  "new_symbols": [],
+  "overall_verdict": "PASS",
+  "repository": {
+    "branch_covered": 6589,
+    "branch_percent": 89.792859,
+    "branch_total": 7338,
+    "line_covered": 44127,
+    "line_percent": 96.473546,
+    "line_total": 45740
+  },
+  "schema_version": 1,
+  "thresholds": {
+    "new_symbol": 90.0,
+    "repository_branch": 75.0,
+    "repository_line": 85.0
+  },
+  "verdicts": {
+    "changed_line_no_regression": true,
+    "configured_changed_files": true,
+    "new_symbols": true,
+    "repository_branch": true,
+    "repository_line": true
+  }
+}

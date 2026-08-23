@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:26:38-04:00
+Command: node -e "const fs=require('node:fs');const {performance}=require('node:perf_hooks');const {validateOrchestratorStateText:v}=require('./docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/baseline/typescript-benchmark-build/lib/validate/orchestrator-state-core.js');const s=fs.readFileSync('artifacts/orchestration/orchestrator-state.json','utf8');for(let i=0;i<100;i++)v(s);const a=[];for(let i=0;i<100;i++){const t=performance.now();v(s);a.push(performance.now()-t)}a.sort((x,y)=>x-y);console.log(JSON.stringify({samples:100,p50_ms:a[49],p95_ms:a[94]}))"
+EXIT_CODE: 0
+Output Summary: Completed 100 timed in-process samples after 100 warm-up validations. samples=100, p50_ms=0.11479999999999535, p95_ms=0.23170000000000357. Process startup was excluded from the measured callable.

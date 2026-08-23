@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:28:48-04:00
+Command: git rev-parse HEAD
+EXIT_CODE: 0
+Output Summary: Baseline HEAD is c460b6a827b6031daa75dffa51bf1e0bbcc30758. This unchanged 40-character commit remains the P0-T12 and P0-T18 analysis base while the P0-T8 coverage-analyzer instrumentation is uncommitted.

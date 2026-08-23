@@ -1,0 +1,14 @@
+{
+  "name": "powershell",
+  "label": "PowerShell",
+  "paths": [
+    ".claude/rules/powershell.md",
+    ".claude/agents/powershell-typed-engineer.md",
+    ".claude/hooks/check-powershell-test-purity.ps1",
+    ".claude/hooks/enforce-powershell-batch-budget.ps1",
+    ".claude/skills/invoke-powershell-engineer/SKILL.md",
+    ".claude/skills/powershell-change-budget-router/SKILL.md",
+    ".claude/skills/powershell-orchestration-state-machine/SKILL.md",
+    ".claude/skills/powershell-qa-gate/SKILL.md"
+  ]
+}

@@ -1,6 +1,14 @@
 import { type FileSystem } from "../file-system";
 import type { CommandRunner } from "../subprocess-runner";
 import { type ValidateOrchestrationServiceCallInput } from "./validate-orchestration-service-call";
+import {
+  selectDefinedValidatorFlagValues,
+  VALIDATOR_FLAG_DEFINITIONS,
+  type ValidatorFlagValues,
+} from "../../mcp-validator-catalog";
+
+export const VALIDATE_ORCHESTRATION_BUILDER_FLAG_OPTIONS =
+  VALIDATOR_FLAG_DEFINITIONS.map(({ optionName }) => optionName);
 
 /**
  * Assemble the {@link ValidateOrchestrationServiceCallInput} for an in-process
@@ -27,12 +35,7 @@ export function buildValidateOrchestrationServiceCallInput(
     readonly workspaceRoot: string;
     readonly artifactType: string;
     readonly artifactPath: string;
-    readonly requireComplete?: boolean;
-    readonly requireModelRouting?: boolean;
-    readonly requireCodexModelRouting?: boolean;
-    readonly requireCodexTopology?: boolean;
-    readonly requireReadyForExecution?: boolean;
-  },
+  } & ValidatorFlagValues,
   runner?: CommandRunner,
 ): ValidateOrchestrationServiceCallInput {
   return {
@@ -41,20 +44,6 @@ export function buildValidateOrchestrationServiceCallInput(
     workspaceRoot: input.workspaceRoot,
     artifactType: input.artifactType,
     artifactPath: input.artifactPath,
-    ...(input.requireComplete === undefined
-      ? {}
-      : { requireComplete: input.requireComplete }),
-    ...(input.requireModelRouting === undefined
-      ? {}
-      : { requireModelRouting: input.requireModelRouting }),
-    ...(input.requireCodexModelRouting === undefined
-      ? {}
-      : { requireCodexModelRouting: input.requireCodexModelRouting }),
-    ...(input.requireCodexTopology === undefined
-      ? {}
-      : { requireCodexTopology: input.requireCodexTopology }),
-    ...(input.requireReadyForExecution === undefined
-      ? {}
-      : { requireReadyForExecution: input.requireReadyForExecution }),
+    ...selectDefinedValidatorFlagValues(input),
   };
 }

@@ -1,0 +1,11 @@
+Timestamp: 2026-08-17T16-08
+Command: npm pack --pack-destination ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing
+Working Directory: C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-17T07-01\packages\mcp-server
+EXIT_CODE: 0
+Output Summary: PASS. The local package tarball was created in the canonical feature evidence directory without registry access; 570 files, 1,282,580 bytes.
+Tarball: danmoisan-drm-copilot-mcp-1.0.24.tgz
+SHA256: 3aa6299bb4332f70fc115d392f46798381bc15b9e151e112ad1469e3821c60ac
+Package: @danmoisan/drm-copilot-mcp@1.0.24
+Initial Plan Invocation: npm --prefix packages/mcp-server pack --pack-destination ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing
+Initial Plan Invocation EXIT_CODE: 1
+Initial Plan Invocation Diagnostic: npm resolved the relative pack destination from the repository process working directory instead of the prefix directory and targeted C:\Users\DanMoisan\repos\docs; no tarball or other file was created there. Running the same pack from packages/mcp-server resolved the destination to the canonical feature evidence path.

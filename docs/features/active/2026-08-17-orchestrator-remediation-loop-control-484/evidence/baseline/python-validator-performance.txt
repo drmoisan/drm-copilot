@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:24:26-04:00
+Command: poetry run python -c "from pathlib import Path; from timeit import repeat; from scripts.dev_tools.validate_orchestrator_state import validate_orchestrator_state_text as v; s=Path('artifacts/orchestration/orchestrator-state.json').read_text(encoding='utf-8'); [v(s) for _ in range(100)]; a=sorted(x*1000 for x in repeat(lambda:v(s),number=1,repeat=100)); print({'samples':len(a),'p50_ms':a[49],'p95_ms':a[94]})"
+EXIT_CODE: 0
+Output Summary: Completed 100 timed in-process samples after 100 warm-up validations. samples=100, p50_ms=0.42590004159137607, p95_ms=0.507500022649765. Process startup was excluded from the measured callable.

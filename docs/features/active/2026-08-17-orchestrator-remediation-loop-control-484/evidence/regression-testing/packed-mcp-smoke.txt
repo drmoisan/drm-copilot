@@ -1,0 +1,18 @@
+Timestamp: 2026-08-17T16-10
+Command: node packages/mcp-server/test/mcp-json-rpc-smoke.cjs --tarball docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/danmoisan-drm-copilot-mcp-1.0.24.tgz --mode packed --extract-to docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/packed-mcp --require-pr-creation-ready
+EXIT_CODE: 0
+Output Summary: PASS. The locally packed MCP candidate accepted PR-creation readiness, returned the source/built-equivalent capability and shared-fixture result, and shut down cleanly without network access.
+Prerequisite Command: npm pack --pack-destination ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing
+Prerequisite Working Directory: C:\Users\DanMoisan\repos\drm-copilot-wt\2026-08-17T07-01\packages\mcp-server
+Prerequisite EXIT_CODE: 0
+Prerequisite Evidence: docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/mcp-pack.txt
+Tarball: docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/danmoisan-drm-copilot-mcp-1.0.24.tgz
+Extracted Candidate: docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/packed-mcp/out/mcp-server.js
+MCP_PROTOCOL_VERSION: 2025-06-18
+MCP_VALIDATOR_CAPABILITY: {"validator_contract_version":1,"remediation_loop_schema_versions":[2],"supported_artifact_types":["plan","policy-audit","code-review","feature-audit","orchestrator-state","epic-orchestrator-state","epic-planner-state","epic-kickoff","parallel-orchestrator-state","parallel-planner-state","parallel-kickoff"],"supported_validation_flags":["require_complete","require_pr_creation_ready","require_model_routing","require_codex_model_routing","require_codex_topology","require_ready_for_execution"],"routing_policy_sha256":"sha256:7a30f003994ae274f6b9bf7a2fcc1ff598f0cce743cc8663060eb3df50742231","package_version":"1.0.24","bundle_sha256":"sha256:72937c91d2cf0ad6809dd1c970ffa38f06eae4248c73222aa45f47266d63b0f4"}
+Shared Fixture Result: {"ok":true,"tool":"validate_orchestration_artifacts","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-17T07-01","summary":"Validated plan artifact at 'docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/plan.2026-08-17T07-06.md'."}
+MCP_REQUIRE_PR_CREATION_READY: true
+Local Source/Built/Packed Parity: PASS. Protocol version, validator capability object, shared-fixture result, deterministic result, network-access result, and shutdown result match P6-T15 and P6-T16; readiness is enabled for the built and packed local candidates.
+MCP_VALIDATION_DETERMINISTIC: true
+MCP_NETWORK_ACCESS: false
+MCP_SHUTDOWN: clean

@@ -1,9 +1,14 @@
-"""Validate orchestration plan, review, and checkpoint artifacts.
+"""Validate orchestration artifacts under the v2 remediation contract.
 
-Purpose:
-    Provide the stable CLI entrypoint for deterministic orchestration artifact
-    validation while delegating review- and checkpoint-specific logic to smaller
-    modules that remain under the repository file-size limit.
+The public checkpoint contract separates review verdict/action/path fields,
+attempts, and completed cycles. It uses ``blocked_remediation_loop_limit`` for
+the unresolved third cycle and rejects ``blocked_cycle_limit`` as legacy input.
+Stable ``ORCH_*`` diagnostics retain independent gate identity. Tracked research
+uses a feature ``research/`` folder or ``docs/research/``. PR-creation readiness
+excludes PR, CI, and pr-author gates; completion retains final lifecycle gates.
+Local source/built/packed parity is required before release, while incompatible
+published runtimes are external-runtime evidence and do not authorize a publish
+or consumer pin.
 """
 
 from __future__ import annotations
@@ -51,6 +56,57 @@ PLAN_TASK_RE = re.compile(
     r"^- \[(?P<state>[ xX])\] \[P(?P<phase>\d+)-T(?P<task>\d+)\] (?P<title>.+)$"
 )
 PLAN_GATE_WARNING_PREFIX = "PLAN GATE WARNING: "
+ORCHESTRATOR_STATE_HELP = (
+    "Validate REVIEW_VERDICT, REMEDIATION_ACTION, BLOCKER_FINGERPRINT, remediation "
+    "paths, and remediation_loop schema version 2 attempt/cycle accounting. "
+    "PASS/NONE enters PR readiness; non-actionable results "
+    "stop before R1; candidate_applied gates commit/R4; only completed "
+    "R4 adds a cycle. "
+    "The third unresolved cycle is blocked_remediation_loop_limit; blocked_cycle_limit "
+    "is rejected legacy input. ORCH_* diagnostics preserve independent gate identity. "
+    "Research uses a tracked feature research/ folder or docs/research/. PR readiness "
+    "excludes PR, CI, and pr-author gates; completion retains final lifecycle gates. "
+    "Local source/built/packed parity precedes release; incompatible published "
+    "runtimes "
+    "are external-runtime evidence and never authorize publication or a consumer pin."
+)
+ROUTING_GATE_BY_CODE = {
+    "ORCH_ROUTING_GATE_LEGACY": "legacy",
+    "ORCH_ROUTING_GATE_CODEX_MODEL": "codex_model",
+    "ORCH_ROUTING_GATE_CODEX_TOPOLOGY": "codex_topology",
+}
+ROUTING_RECORD_RE = re.compile(
+    r"(?:\[(?P<index>\d+)\]|phase (?P<phase>[^ .]+)|delegated agent: (?P<agent>[^.]+))"
+)
+
+
+def _routing_diagnostic_identity(error: str) -> tuple[str, str, str, str] | None:
+    """Return the canonical identity for a selected routing diagnostic."""
+
+    for code, gate in ROUTING_GATE_BY_CODE.items():
+        prefix = f"{code}: "
+        if not error.startswith(prefix):
+            continue
+        subject = error[len(prefix) :]
+        record_match = ROUTING_RECORD_RE.search(subject)
+        record_id = record_match.group(0) if record_match is not None else "checkpoint"
+        return gate, record_id, code, subject
+    return None
+
+
+def _deduplicate_selected_routing_diagnostics(errors: list[str]) -> list[str]:
+    """Preserve order while removing only identical routing identities."""
+
+    result: list[str] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for error in errors:
+        identity = _routing_diagnostic_identity(error)
+        if identity is not None and identity in seen:
+            continue
+        if identity is not None:
+            seen.add(identity)
+        result.append(error)
+    return result
 
 
 def _read_text(path: Path) -> str:
@@ -197,25 +253,7 @@ def _plan_structure_errors(text: str) -> list[str]:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Create the CLI parser.
-
-    Purpose:
-        Define the stable command-line contract for orchestration artifact
-        validation.
-
-    Args:
-        None.
-
-    Returns:
-        argparse.ArgumentParser: Configured parser for the supported artifact
-        types.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Create the stable orchestration-artifact CLI parser."""
 
     parser = argparse.ArgumentParser(
         description="Validate deterministic orchestration artifacts."
@@ -249,12 +287,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Require consistent version-1 committed kickoff identity.",
     )
 
-    state_parser = subparsers.add_parser("orchestrator-state")
+    state_parser = subparsers.add_parser(
+        "orchestrator-state", description=ORCHESTRATOR_STATE_HELP
+    )
     state_parser.add_argument("path")
     state_parser.add_argument(
         "--require-complete",
         action="store_true",
-        help="Require all tracked statuses to be complete-state safe.",
+        help=(
+            "Require the final lifecycle gate, including route-appropriate PR, CI, "
+            "pr-author, phase-completeness, and routing requirements."
+        ),
     )
     state_parser.add_argument(
         "--require-pr-creation-ready",
@@ -438,15 +481,19 @@ def _validate_errors_only(args: argparse.Namespace, text: str) -> list[str]:
     if args.artifact_type == "epic-kickoff":
         return validate_epic_kickoff_text(text)
     if args.artifact_type == "orchestrator-state":
-        return validate_orchestrator_state_text(
-            text,
-            require_complete=bool(args.require_complete),
-            require_pr_creation_ready=bool(args.require_pr_creation_ready),
-            require_model_routing=bool(args.require_model_routing),
-            require_codex_model_routing=bool(
-                getattr(args, "require_codex_model_routing", False)
-            ),
-            require_codex_topology=bool(getattr(args, "require_codex_topology", False)),
+        return _deduplicate_selected_routing_diagnostics(
+            validate_orchestrator_state_text(
+                text,
+                require_complete=bool(args.require_complete),
+                require_pr_creation_ready=bool(args.require_pr_creation_ready),
+                require_model_routing=bool(args.require_model_routing),
+                require_codex_model_routing=bool(
+                    getattr(args, "require_codex_model_routing", False)
+                ),
+                require_codex_topology=bool(
+                    getattr(args, "require_codex_topology", False)
+                ),
+            )
         )
     if args.artifact_type == "epic-orchestrator-state":
         return validate_epic_orchestrator_state_text(

@@ -9,20 +9,43 @@ Shared remediation workflow and handoff expectations for agents that delegate to
 
 ## When to Use This Skill
 
-Use this skill when:
-- Audit findings require remediation.
-- You must create remediation inputs and delegate plan creation to `atomic_planner`.
+Use this skill only when the aggregate review result is `BLOCKED` plus `AUTONOMOUS`, its complete blocker set has an actionable repository-remediable disposition, and both remediation paths resolve beneath the active feature folder.
+
+## Canonical Review Result Grammar
+
+```text
+REVIEW_VERDICT: PASS | BLOCKED
+REMEDIATION_ACTION: NONE | AUTONOMOUS | NO_CANDIDATE | EXTERNAL_RUNTIME | AWAITING_CI | HUMAN_DECISION
+BLOCKER_FINGERPRINT: NONE | sha256:<64-lowercase-hex>
+REMEDIATION_INPUTS: <feature-local-path> | NONE
+REMEDIATION_PLAN: <feature-local-path> | NONE
+```
+
+## Verdict/Action/Path and Remediation-Handoff Matrix
+
+Validate the aggregate result against this exact matrix before creating remediation artifacts or delegating planning:
+
+| Review verdict | Remediation action | `REMEDIATION_INPUTS` | `REMEDIATION_PLAN` | Required handling |
+|---|---|---|---|---|
+| `PASS` | `NONE` | `NONE` | `NONE` | Accept the review result; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AUTONOMOUS` | `<feature-local-path>` | `<feature-local-path>` | Permit `atomic-planner` handoff only when the complete blocker set has an actionable, repository-remediable disposition. |
+| `BLOCKED` | `NO_CANDIDATE` | `NONE` | `NONE` | Stop for the non-remediable or no-delta disposition; do not delegate `atomic-planner`. |
+| `BLOCKED` | `EXTERNAL_RUNTIME` | `NONE` | `NONE` | Stop for external-runtime remediation; do not delegate `atomic-planner`. |
+| `BLOCKED` | `AWAITING_CI` | `NONE` | `NONE` | Wait for CI or other external state; do not delegate `atomic-planner`. |
+| `BLOCKED` | `HUMAN_DECISION` | `NONE` | `NONE` | Stop for a human decision; do not delegate `atomic-planner`. |
+
+Every combination not listed in the matrix is invalid and MUST fail closed without creating either remediation artifact or delegating a planner. Only `BLOCKED` plus `AUTONOMOUS`, with both paths resolving beneath the active feature folder and an actionable remediable disposition, permits remediation artifact creation and `atomic-planner` delegation.
 
 ## Trigger Conditions (Generic)
 
-Trigger remediation when any of these are true:
+The following findings make the aggregate review `BLOCKED`; they do not by themselves authorize a planner handoff:
 - Audit artifacts contain FAIL or meaningful PARTIAL findings.
 - Toolchain checks fail.
 - Acceptance criteria are not met.
 
 ## Required Remediation Inputs
 
-Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; reaudit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder, per the canonical pattern documented in the Claude-side `remediation-handoff-atomic-planner` skill) with:
+For a matrix-valid autonomous result, create the feature-local `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; re-audit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder) with:
 - Enumerated fix list with file paths, expected behavior, and verification commands.
 - A “do not do” list (no scope creep, no policy weakening, no silent skips).
 

@@ -101,7 +101,8 @@ describe("Codex model-routing checkpoint receipts", () => {
     state["codex_model_routing_receipts"] = [];
 
     expect(validate(state)).toContain(
-      "Checkpoint codex_model_routing_receipts is missing a receipt for " +
+      "ORCH_ROUTING_GATE_CODEX_MODEL: Checkpoint " +
+        "codex_model_routing_receipts is missing a receipt for " +
         "delegated agent: parallel-orchestrator.",
     );
   });
@@ -111,7 +112,8 @@ describe("Codex model-routing checkpoint receipts", () => {
     state["codex_model_routing_receipts"] = [codexReceipt("epic-orchestrator")];
 
     expect(validate(state)).toContain(
-      "Checkpoint codex_model_routing_receipts is missing a receipt for " +
+      "ORCH_ROUTING_GATE_CODEX_MODEL: Checkpoint " +
+        "codex_model_routing_receipts is missing a receipt for " +
         "delegated agent: parallel-orchestrator.",
     );
   });
@@ -198,7 +200,16 @@ describe("Codex model-routing checkpoint receipts", () => {
       model_reasoning_effort: "max",
       c3_overlay_applied: false,
     });
+    expect("model_routing_receipts" in state).toBe(false);
     expect(validate(state)).toEqual([]);
+
+    receipt.deployment_agent = "commit-steward";
+    state["delegation_receipts"] = [delegationReceipt("commit-steward")];
+    expect(
+      validate(state).some((error) =>
+        error.includes("deployment_agent must be 'commit-steward-c4'"),
+      ),
+    ).toBe(true);
   });
 
   it("matches the feature-review route alias to its reviewer deployment", () => {
@@ -221,7 +232,8 @@ describe("Codex model-routing checkpoint receipts", () => {
 
     // Assert
     expect(errors).toContain(
-      "Checkpoint codex_model_routing_receipts must be a list when present.",
+      "ORCH_ROUTING_GATE_CODEX_MODEL: Checkpoint " +
+        "codex_model_routing_receipts must be a list when present.",
     );
   });
 
@@ -297,7 +309,8 @@ describe("Codex model-routing checkpoint receipts", () => {
 
     // Assert
     expect(errors).toContain(
-      "Checkpoint codex_model_routing_receipts[1]." +
+      "ORCH_ROUTING_GATE_CODEX_MODEL: Checkpoint " +
+        "codex_model_routing_receipts[1]." +
         "orchestration_complexity_ceiling must be monotonic; " +
         "found C3 after C4.",
     );

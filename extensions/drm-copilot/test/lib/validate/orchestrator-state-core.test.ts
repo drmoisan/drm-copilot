@@ -3,6 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import {
   REQUIRED_STATE_KEYS,
   validateOrchestratorStateText,
+  type ValidateOrchestratorStateOptions,
 } from "../../../src/lib/validate/orchestrator-state-core";
 
 /** Return a minimally valid orchestrator-state payload for mutation. */
@@ -376,6 +377,82 @@ describe("validateOrchestratorStateText mixed delegation receipts", () => {
     // Act / Assert
     expect(validateOrchestratorStateText(JSON.stringify(state))).toContain(
       expected,
+    );
+  });
+});
+
+describe("validateOrchestratorStateText option boundaries", () => {
+  const migrationError =
+    "ORCH_REMEDIATION_SCHEMA: legacy remediation state requires evidence-backed " +
+    "schema version 2 migration before strict validation.";
+
+  function legacyActionableState(): Record<string, unknown> {
+    return {
+      ...buildValidState(),
+      "review-status": "REMEDIATION_REQUIRED",
+      "remediation-inputs-path": "remediation-inputs.md",
+      "remediation-plan-path": "remediation-plan.md",
+    };
+  }
+
+  it("treats omitted and explicitly false options identically", () => {
+    const text = JSON.stringify(legacyActionableState());
+    const explicitFalse: ValidateOrchestratorStateOptions = {
+      requireComplete: false,
+      requirePrCreationReady: false,
+      requireModelRouting: false,
+      requireCodexModelRouting: false,
+      requireCodexTopology: false,
+    };
+
+    expect(validateOrchestratorStateText(text)).toEqual([]);
+    expect(validateOrchestratorStateText(text, explicitFalse)).toEqual([]);
+  });
+
+  it.each([
+    { requireComplete: true },
+    { requirePrCreationReady: true },
+    { requireModelRouting: true },
+    { requireCodexModelRouting: true },
+    { requireCodexTopology: true },
+  ] as const)("applies selected strict option %# to legacy state", (option) => {
+    const errors = validateOrchestratorStateText(
+      JSON.stringify(legacyActionableState()),
+      option,
+    );
+
+    expect(errors.filter((error) => error === migrationError)).toEqual([
+      migrationError,
+    ]);
+  });
+
+  it("reads each caller-selected flag exactly once", () => {
+    const reads = new Map<string, number>();
+    const options = {} as ValidateOrchestratorStateOptions;
+    const flags = [
+      "requireComplete",
+      "requirePrCreationReady",
+      "requireModelRouting",
+      "requireCodexModelRouting",
+      "requireCodexTopology",
+    ] as const;
+    for (const flag of flags) {
+      Object.defineProperty(options, flag, {
+        get: () => {
+          reads.set(flag, (reads.get(flag) ?? 0) + 1);
+          return flag === "requirePrCreationReady";
+        },
+      });
+    }
+
+    const errors = validateOrchestratorStateText(
+      JSON.stringify(legacyActionableState()),
+      options,
+    );
+
+    expect(errors).toContain(migrationError);
+    expect(Object.fromEntries(reads)).toEqual(
+      Object.fromEntries(flags.map((flag) => [flag, 1])),
     );
   });
 });

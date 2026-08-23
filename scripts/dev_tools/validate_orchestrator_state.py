@@ -1,28 +1,25 @@
-"""Validate orchestration checkpoint state artifacts.
+"""Validate canonical orchestrator checkpoint and remediation state.
 
-Purpose:
-    Hold the orchestrator-state validation logic and receipt-namespace rules so
-    the stable CLI entrypoint can remain small while preserving the existing
-    validator contract.
+Version 2 requires ``status``, cycle limits/counts, last fingerprint, attempts,
+and cycles. ``REVIEW_VERDICT``, ``REMEDIATION_ACTION``, fingerprint, and path
+fields drive pre-R1 terminal handling;
+candidate application gates commit and R4, and only a completed R4 adds a cycle.
+An unchanged fingerprint stops at ``blocked_stagnation`` unless one exact unused
+exception applies. The third unresolved cycle uses only
+``blocked_remediation_loop_limit``; ``blocked_cycle_limit`` is rejected legacy
+input. Stable ``ORCH_*`` diagnostics preserve independent routing-gate identity.
 
-Usage:
-    Import ``validate_orchestrator_state_text`` from
-    ``scripts.dev_tools.validate_orchestration_artifacts`` or this module.
-
-Flow:
-    Parse the checkpoint JSON, validate required top-level keys and status
-    values, then validate the legacy list, top-level promotion, or additive
-    ``delegation_receipts.promotion.*`` receipt forms.
-
-Invariants / Constraints:
-    - The validator accepts the legacy list, top-level promotion receipts, and
-      the additive promotion namespace forms for receipt evidence.
-    - Unsupported namespace keys are rejected.
-    - The validator returns error strings and never mutates the checkpoint.
+Research belongs below a tracked feature ``research/`` folder or
+``docs/research/``. ``require_pr_creation_ready`` excludes PR, CI, and pr-author
+gates; ``require_complete`` retains those final lifecycle gates. Source, built,
+and locally packed
+candidates must agree before release; an incompatible published runtime is an
+external-runtime result, not local parity or authorization to publish or pin.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 from typing import Any, cast
 
@@ -54,6 +51,7 @@ from scripts.dev_tools._orchestrator_state_preparation_terminal import (
     validate_preparation_terminal_contract,
 )
 from scripts.dev_tools._orchestrator_state_routing import (
+    ROUTING_MATRIX_PATH,
     route_requires_ci_gate,
     validate_completion_pr_gate,
     validate_phase_completeness,
@@ -64,6 +62,12 @@ from scripts.dev_tools._orchestrator_state_step_status import (
     STEP_STATUS_KEYS,
     collect_completion_blocking_step_errors,
     collect_step_status_errors,
+)
+from scripts.dev_tools.validate_orchestrator_state_remediation import (
+    REMEDIATION_LOOP_KEY,
+    is_versioned_remediation_loop,
+    validate_legacy_remediation_state,
+    validate_remediation_loop,
 )
 
 REQUIRED_STATE_KEYS = (
@@ -127,105 +131,15 @@ PROMOTION_RECEIPT_KEYS = (
     "feature_folder",
 )
 CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
-REMEDIATION_LOOP_KEY = "remediation_loop"
-REMEDIATION_CYCLES_KEY = "cycles"
-# Execution statuses that may only be recorded once a cycle's preflight gate has
-# cleared; recording any of these before preflight clears is a malformed cycle.
-EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT = {
-    "in_progress",
-    "complete",
-    "failed",
-}
-PREFLIGHT_CLEARED_STATUS = "clear"
+ROUTING_GATE_LEGACY_ERROR = "ORCH_ROUTING_GATE_LEGACY"
+ROUTING_GATE_CODEX_MODEL_ERROR = "ORCH_ROUTING_GATE_CODEX_MODEL"
+ROUTING_GATE_CODEX_TOPOLOGY_ERROR = "ORCH_ROUTING_GATE_CODEX_TOPOLOGY"
 
 
-def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
-    """Validate the three invariants for one remediation cycle.
+def _coded_routing_gate_errors(code: str, errors: list[str]) -> list[str]:
+    """Prefix one selected routing gate's diagnostics with its stable code."""
 
-    Purpose:
-        Enforce the orchestrator-state remediation-cycle invariants documented
-        in `.claude/rules/orchestrator-state.md` for a single cycle object:
-        non-empty `plan_path`, execution only after a cleared preflight, and a
-        satisfied exit gate only with zero blocking findings.
-
-    Args:
-        index (int): Zero-based position of this cycle within the
-            `remediation_loop.cycles` array, used for error context.
-        cycle (dict[str, Any]): The raw cycle object extracted from the
-            checkpoint JSON.
-
-    Returns:
-        list[str]: One error string per violated invariant; an empty list when
-        the cycle satisfies all three invariants.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    errors: list[str] = []
-
-    # Invariant 1: plan_path must be a non-empty, non-whitespace string.
-    plan_path = cycle.get("plan_path")
-    if not isinstance(plan_path, str) or not plan_path.strip():
-        errors.append(
-            f"Checkpoint remediation cycle #{index} plan_path must be a "
-            "non-empty string."
-        )
-
-    # Invariant 2: an execution status in the blocked set requires that the
-    # cycle's preflight gate reports exactly the cleared status.
-    execution_status = cycle.get("execution_status")
-    if execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT:
-        preflight = cycle.get("preflight")
-        # Read the nested preflight final status defensively; a missing or
-        # non-object preflight cannot satisfy the cleared requirement.
-        preflight_status: object = (
-            cast("dict[str, Any]", preflight).get("final_status")
-            if isinstance(preflight, dict)
-            else None
-        )
-        if preflight_status != PREFLIGHT_CLEARED_STATUS:
-            errors.append(
-                f"Checkpoint remediation cycle #{index} execution_status is "
-                f"{execution_status} but preflight.final_status is not 'clear'."
-            )
-
-    # Invariant 3: a satisfied exit gate requires zero blocking findings.
-    if cycle.get("exit_condition_met") is True and cycle.get("blocking_count") != 0:
-        errors.append(
-            f"Checkpoint remediation cycle #{index} exit_condition_met is true "
-            "but blocking_count is not 0."
-        )
-
-    return errors
-
-
-def _validate_remediation_loop(remediation_loop: object) -> list[str]:
-    errors: list[str] = []
-
-    # A non-object remediation_loop carries no cycles to validate; treat it as
-    # nothing to enforce rather than fabricating a structural error here.
-    if not isinstance(remediation_loop, dict):
-        return errors
-    loop_map = cast("dict[str, Any]", remediation_loop)
-
-    cycles = loop_map.get(REMEDIATION_CYCLES_KEY)
-    if not isinstance(cycles, list):
-        return errors
-    cycle_list = cast("list[object]", cycles)
-
-    # Validate each cycle independently so callers receive a complete error
-    # list instead of stopping at the first malformed cycle.
-    for index, cycle in enumerate(cycle_list):
-        if not isinstance(cycle, dict):
-            errors.append(f"Checkpoint remediation cycle #{index} must be an object.")
-            continue
-        errors.extend(_validate_remediation_cycle(index, cast("dict[str, Any]", cycle)))
-
-    return errors
+    return [f"{code}: {error}" for error in errors]
 
 
 def _missing_object_keys(value: object, keys: tuple[str, ...]) -> list[str]:
@@ -394,12 +308,7 @@ def validate_orchestrator_state_text(
     require_codex_model_routing: bool = False,
     require_codex_topology: bool = False,
 ) -> list[str]:
-    """Validate checkpoint structure and opt-in completion/routing gates.
-
-    The Codex flag requires deployment receipts once a delegation is recorded;
-    the existing model-routing flag preserves the independent Claude policy.
-    Route checks may read the central routing matrix. The input is never mutated.
-    """
+    """Validate v2 remediation plus independent readiness, completion, and routing."""
 
     errors: list[str] = []
     try:
@@ -444,22 +353,79 @@ def validate_orchestrator_state_text(
                 "Checkpoint delegation_receipts must be a list or object namespace."
             )
 
+    strict_remediation = any(
+        (
+            require_complete,
+            strict_route_membership,
+            require_pr_creation_ready,
+            require_model_routing,
+            require_codex_model_routing,
+            require_codex_topology,
+        )
+    )
+    errors.extend(
+        validate_legacy_remediation_state(
+            review_status=state_map.get("review-status"),
+            remediation_inputs_path=state_map.get("remediation-inputs-path"),
+            remediation_plan_path=state_map.get("remediation-plan-path"),
+            remediation_pass=state_map.get("remediation-pass"),
+            strict=strict_remediation,
+            versioned_remediation=is_versioned_remediation_loop(
+                state_map.get(REMEDIATION_LOOP_KEY)
+            ),
+        )
+    )
+
+    if REMEDIATION_LOOP_KEY in state_map:
+        remediation_pass = state_map.get("remediation-pass")
+        routing_policy_sha256 = (
+            f"sha256:{hashlib.sha256(ROUTING_MATRIX_PATH.read_bytes()).hexdigest()}"
+        )
+        if "remediation-pass" in state_map:
+            errors.extend(
+                validate_remediation_loop(
+                    state_map.get(REMEDIATION_LOOP_KEY),
+                    remediation_pass=remediation_pass,
+                    issue_number=state_map.get("issue-num"),
+                    routing_policy_sha256=routing_policy_sha256,
+                    strict=strict_remediation,
+                )
+            )
+        else:
+            errors.extend(
+                validate_remediation_loop(
+                    state_map.get(REMEDIATION_LOOP_KEY),
+                    issue_number=state_map.get("issue-num"),
+                    routing_policy_sha256=routing_policy_sha256,
+                    strict=strict_remediation,
+                )
+            )
+
     optional_key_validators = (
-        (REMEDIATION_LOOP_KEY, _validate_remediation_loop),
-        (HUMAN_INTERACTION_KEY, _validate_human_interaction),
-        (COMPLEXITY_ASSESSMENTS_KEY, _validate_complexity_assessments),
-        (MODEL_ROUTING_RECEIPTS_KEY, _validate_model_routing_receipts),
+        (HUMAN_INTERACTION_KEY, _validate_human_interaction, False),
+        (
+            COMPLEXITY_ASSESSMENTS_KEY,
+            _validate_complexity_assessments,
+            require_model_routing,
+        ),
+        (
+            MODEL_ROUTING_RECEIPTS_KEY,
+            _validate_model_routing_receipts,
+            require_model_routing,
+        ),
         (
             CODEX_MODEL_ROUTING_RECEIPTS_KEY,
             validate_codex_model_routing_receipts,
+            require_codex_model_routing,
         ),
         (
             codex_topology.CODEX_TOPOLOGY_RECEIPTS_KEY,
             codex_topology.validate_codex_topology_receipts,
+            require_codex_topology,
         ),
     )
-    for optional_key, optional_validator in optional_key_validators:
-        if optional_key in state_map:
+    for optional_key, optional_validator, selected in optional_key_validators:
+        if optional_key in state_map and not selected:
             errors.extend(optional_validator(state_map.get(optional_key)))
 
     # Route membership is evaluated unconditionally so the opt-in strict caller
@@ -497,11 +463,26 @@ def validate_orchestrator_state_text(
 
     if require_model_routing:
         # Fires only once a delegation is recorded; else matches the plain call.
-        errors.extend(validate_model_routing_gate(state_map))
+        errors.extend(
+            _coded_routing_gate_errors(
+                ROUTING_GATE_LEGACY_ERROR,
+                validate_model_routing_gate(state_map),
+            )
+        )
 
     if require_codex_model_routing:
-        errors.extend(validate_codex_model_routing_gate(state_map))
+        errors.extend(
+            _coded_routing_gate_errors(
+                ROUTING_GATE_CODEX_MODEL_ERROR,
+                validate_codex_model_routing_gate(state_map),
+            )
+        )
     if require_codex_topology:
-        errors.extend(codex_topology.validate_codex_topology_gate(state_map))
+        errors.extend(
+            _coded_routing_gate_errors(
+                ROUTING_GATE_CODEX_TOPOLOGY_ERROR,
+                codex_topology.validate_codex_topology_gate(state_map),
+            )
+        )
 
     return errors

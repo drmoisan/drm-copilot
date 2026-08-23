@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11-11
+Command: poetry run pytest tests/scripts/dev_tools/test_analyze_coverage_policy.py
+EXIT_CODE: 0
+Output Summary: 26 tests passed in 0.08 seconds. The table-driven suite uses only in-memory coverage.py JSON, Jest coverage-final JSON, Jest coverage-summary JSON, LCOV, Python and TypeScript source text, unified diff hunks, and Python/Jest threshold configuration. It verifies inclusive repository line 85%, repository branch 75%, and per-new-module/class/function/method 90% boundaries; configured changed-file line/branch boundaries; and changed-line no-regression for Python and TypeScript. Tests use no network, external process, mutable global state, temporary file, or quality-tiers.yml.

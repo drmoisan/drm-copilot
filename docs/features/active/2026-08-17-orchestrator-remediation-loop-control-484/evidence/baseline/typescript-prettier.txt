@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11:21:29-04:00
+Command: npm --prefix extensions/drm-copilot exec -- prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"
+EXIT_CODE: 1
+Output Summary: Prettier reported that all matched files use Prettier code style, then exited 1 because it found no files matching the literal pattern "test/**/*.ts" under this npm exec invocation. Formatting diagnostics: 0 mismatched matched files; unmatched-pattern errors: 1.

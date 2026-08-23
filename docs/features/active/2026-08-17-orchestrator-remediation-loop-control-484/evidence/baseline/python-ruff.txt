@@ -1,0 +1,4 @@
+Timestamp: 2026-08-17T11-12
+Command: poetry run ruff check scripts tests
+EXIT_CODE: 0
+Output Summary: PASS with 0 diagnostics on the final clean run. The first run found 7 diagnostics and auto-fixed 6; the remaining E501 line was wrapped, Black was restarted and passed with 436 unchanged files, and the exact Ruff command then reported all checks passed.

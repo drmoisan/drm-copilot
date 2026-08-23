@@ -7,6 +7,10 @@ import {
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
+import {
+  VALIDATOR_ARTIFACT_TYPE_PROPERTY,
+  VALIDATOR_FLAG_SCHEMA_PROPERTIES,
+} from "./mcp-validator-catalog";
 
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
@@ -398,53 +402,13 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       type: "object",
       properties: {
         workspace_root: workspaceRootProperty,
-        artifact_type: {
-          type: "string",
-          enum: [
-            "plan",
-            "policy-audit",
-            "code-review",
-            "feature-audit",
-            "orchestrator-state",
-            "epic-orchestrator-state",
-            "epic-planner-state",
-            "epic-kickoff",
-            "parallel-orchestrator-state",
-            "parallel-planner-state",
-            "parallel-kickoff",
-          ],
-          description: "The type of orchestration artifact to validate.",
-        },
+        artifact_type: VALIDATOR_ARTIFACT_TYPE_PROPERTY,
         artifact_path: {
           type: "string",
           description:
             "Workspace-relative or absolute path to the artifact file.",
         },
-        require_complete: {
-          type: "boolean",
-          description:
-            "When true and artifact_type is 'orchestrator-state', 'epic-orchestrator-state', or 'parallel-orchestrator-state', require all phases to be complete.",
-        },
-        require_model_routing: {
-          type: "boolean",
-          description:
-            "When true and artifact_type is 'orchestrator-state', require a model_routing_receipts entry per delegated agent once a delegation is recorded. The TypeScript side performs the existence check only; the Python validator is authoritative for full per-receipt correctness.",
-        },
-        require_codex_model_routing: {
-          type: "boolean",
-          description:
-            "When true for an orchestrator checkpoint, require canonical Codex deployment receipts for delegated agents.",
-        },
-        require_codex_topology: {
-          type: "boolean",
-          description:
-            "When true for an orchestrator checkpoint, require canonical Codex topology receipts for delegated agents and epic roots.",
-        },
-        require_ready_for_execution: {
-          type: "boolean",
-          description:
-            "When true for 'epic-planner-state', 'parallel-planner-state', or 'parallel-kickoff', require complete preparation and committed execution-readiness evidence.",
-        },
+        ...VALIDATOR_FLAG_SCHEMA_PROPERTIES,
       },
       required: ["workspace_root", "artifact_type", "artifact_path"],
       additionalProperties: false,

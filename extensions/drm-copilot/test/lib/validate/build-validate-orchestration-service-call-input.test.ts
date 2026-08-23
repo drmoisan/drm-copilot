@@ -70,6 +70,7 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
 
     // Assert: keys are absent, not present-with-undefined.
     expect("requireComplete" in result).toBe(false);
+    expect("requirePrCreationReady" in result).toBe(false);
     expect("requireModelRouting" in result).toBe(false);
     expect("requireCodexModelRouting" in result).toBe(false);
     expect("requireCodexTopology" in result).toBe(false);
@@ -83,6 +84,7 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
       artifactType: "orchestrator-state",
       artifactPath: "docs/state.json",
       requireComplete: undefined,
+      requirePrCreationReady: undefined,
       requireModelRouting: undefined,
       requireCodexModelRouting: undefined,
       requireCodexTopology: undefined,
@@ -97,6 +99,7 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
 
     // Assert
     expect("requireComplete" in result).toBe(false);
+    expect("requirePrCreationReady" in result).toBe(false);
     expect("requireModelRouting" in result).toBe(false);
     expect("requireCodexModelRouting" in result).toBe(false);
     expect("requireCodexTopology" in result).toBe(false);
@@ -162,6 +165,39 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
     expect(routingOnly.requireModelRouting).toBe(true);
     expect("requireComplete" in routingOnly).toBe(false);
   });
+
+  it.each([true, false])(
+    "preserves every validator flag when all source values are %s",
+    (value) => {
+      const result = buildValidateOrchestrationServiceCallInput(
+        fileSystemStub,
+        {
+          workspaceRoot: "C:/workspace",
+          artifactType: "orchestrator-state",
+          artifactPath: "docs/state.json",
+          requireComplete: value,
+          requirePrCreationReady: value,
+          requireModelRouting: value,
+          requireCodexModelRouting: value,
+          requireCodexTopology: value,
+          requireReadyForExecution: value,
+        },
+      );
+
+      expect(result).toEqual({
+        fileSystem: fileSystemStub,
+        workspaceRoot: "C:/workspace",
+        artifactType: "orchestrator-state",
+        artifactPath: "docs/state.json",
+        requireComplete: value,
+        requirePrCreationReady: value,
+        requireModelRouting: value,
+        requireCodexModelRouting: value,
+        requireCodexTopology: value,
+        requireReadyForExecution: value,
+      });
+    },
+  );
 
   it("preserves parallel readiness flags and existing evidence seams exactly", () => {
     const result = buildValidateOrchestrationServiceCallInput(

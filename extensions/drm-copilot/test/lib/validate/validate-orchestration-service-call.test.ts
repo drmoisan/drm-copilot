@@ -135,8 +135,8 @@ describe("validateOrchestrationServiceCall", () => {
       run: jest.fn(() => ({ stdout: "", stderr: "", code: 0 })),
     };
     const dispatch = jest
-      .spyOn(orchestrationArtifacts, "validateArtifact")
-      .mockReturnValueOnce([]);
+      .spyOn(orchestrationArtifacts, "validateArtifactWithWarnings")
+      .mockReturnValueOnce({ errors: [], warnings: [] });
 
     const result = validateOrchestrationServiceCall({
       fileSystem,
@@ -159,6 +159,46 @@ describe("validateOrchestrationServiceCall", () => {
     );
     dispatch.mockRestore();
   });
+
+  it.each([true, false])(
+    "passes every validator flag to the validator with the same %s value",
+    (value) => {
+      const fileSystem = new VirtualFileSystem({
+        "C:/workspace/docs/plan.md": VALID_PLAN,
+      });
+      const dispatch = jest
+        .spyOn(orchestrationArtifacts, "validateArtifactWithWarnings")
+        .mockReturnValueOnce({ errors: [], warnings: [] });
+
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "C:/workspace",
+        artifactType: "plan",
+        artifactPath: "docs/plan.md",
+        requireComplete: value,
+        requirePrCreationReady: value,
+        requireModelRouting: value,
+        requireCodexModelRouting: value,
+        requireCodexTopology: value,
+        requireReadyForExecution: value,
+      });
+
+      expect(dispatch).toHaveBeenCalledWith({
+        artifactType: "plan",
+        text: VALID_PLAN,
+        requireComplete: value,
+        requirePrCreationReady: value,
+        requireModelRouting: value,
+        requireCodexModelRouting: value,
+        requireCodexTopology: value,
+        requireReadyForExecution: value,
+        artifactPath: "C:/workspace/docs/plan.md",
+        fs: fileSystem,
+        root: "C:/workspace",
+      });
+      dispatch.mockRestore();
+    },
+  );
 
   it("fails closed when parallel readiness lacks the Git evidence seam", () => {
     const fileSystem = new VirtualFileSystem({

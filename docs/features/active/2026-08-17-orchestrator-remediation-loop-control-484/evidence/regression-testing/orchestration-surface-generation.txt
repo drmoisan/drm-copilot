@@ -1,0 +1,39 @@
+Timestamp: 2026-08-17T15-03-04:00
+Command: poetry run python -m scripts.dev_tools.generate_orchestration_customization_surfaces
+EXIT_CODE: 0
+Output Summary:
+- Updated and verified exactly 20 orchestration customization surfaces.
+- Exact reviewer outputs generated:
+  - .codex/agents/feature-review.toml
+  - .github/agents/feature-review.agent.md
+  - .github/prompts/review-feature.prompt.md
+  - .github/skills/feature-review-workflow/SKILL.md
+  - .github/skills/remediation-handoff-atomic-planner/SKILL.md
+  - .claude/agents/feature-review.md
+  - .claude/skills/feature-review-workflow/SKILL.md
+  - .claude/skills/remediation-handoff-atomic-planner/SKILL.md
+- Exact orchestrator/researcher outputs generated: 12.
+- Binary-only REVIEW_STATUS decision paths emitted: 0.
+- Canonical exception-free stagnation, exact one-time exception consumption and reuse rejection, blocked_remediation_loop_limit, rejected blocked_cycle_limit, autonomous/actionable-only handoff, and no-delta terminal handling passed the generator's fail-closed validation.
+Command Output:
+UPDATED .codex/agents/feature-review.toml
+UPDATED .github/agents/feature-review.agent.md
+UPDATED .github/prompts/review-feature.prompt.md
+UPDATED .github/skills/feature-review-workflow/SKILL.md
+UPDATED .github/skills/remediation-handoff-atomic-planner/SKILL.md
+UPDATED .claude/agents/feature-review.md
+UPDATED .claude/skills/feature-review-workflow/SKILL.md
+UPDATED .claude/skills/remediation-handoff-atomic-planner/SKILL.md
+UPDATED .github/agents/orchestrator.agent.md
+UPDATED .github/agents/task-researcher.agent.md
+UPDATED .github/prompts/orchestrate-work.prompt.md
+UPDATED .github/prompts/orchestrate-python-work.prompt.md
+UPDATED .github/prompts/orchestrate-powershell-work.prompt.md
+UPDATED .github/prompts/orchestrate-csharp-work.prompt.md
+UPDATED .github/prompts/research-issue.prompt.md
+UPDATED .claude/agents/orchestrator.md
+UPDATED .claude/agents/task-researcher.md
+UPDATED .claude/skills/orchestrate/SKILL.md
+UPDATED .claude/skills/research-issue/SKILL.md
+UPDATED .claude/rules/orchestrator-state.md
+VERIFIED 20 orchestration customization surfaces

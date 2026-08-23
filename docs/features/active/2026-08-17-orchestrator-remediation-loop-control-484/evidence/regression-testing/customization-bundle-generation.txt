@@ -1,0 +1,27 @@
+Timestamp: 2026-08-17T15:14:22-04:00
+Command: poetry run python -m scripts.dev_tools.synchronize_customization_bundles
+EXIT_CODE: 0
+Output Summary: Updated 26 stale packaged files and verified all 45 exact source-to-bundle mappings. Nineteen packaged files already matched their canonical source bytes. Packaged binary-only REVIEW_STATUS decision paths: 0.
+
+Exact reviewer bundle mappings:
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c1.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c2.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c3-elevated.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-reviewer-c4.toml
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review/SKILL.md
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/remediation-handoff-atomic-planner/SKILL.md
+- extensions/drm-copilot/resources/customizations/.github/agents/feature-review.agent.md
+- extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md
+- extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
+- extensions/drm-copilot/resources/customizations/.github/skills/remediation-handoff-atomic-planner/SKILL.md
+- extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md
+- extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md
+- extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
+
+Command output:
+UPDATED 26 packaged customization files
+VERIFIED 45 packaged customization mappings

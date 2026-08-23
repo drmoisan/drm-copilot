@@ -143,7 +143,7 @@ describe("Codex topology checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
-  it("does not trust an invalid model receipt as deployment evidence", () => {
+  it("keeps invalid model evidence independent from topology evidence", () => {
     const model = modelReceipt();
     const state = baseState(String(model["deployment_agent"]));
     model["model"] = "gpt-5.6-sol";
@@ -157,13 +157,26 @@ describe("Codex topology checkpoint receipts", () => {
       errors.some((error) =>
         error.includes("missing the exact resolved topology agent"),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("requires a receipt once a delegation is recorded", () => {
     expect(validate(baseState())).toContain(
-      "Checkpoint codex_topology_receipts must be a list when present.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint " +
+        "codex_topology_receipts must be a list when present.",
     );
+  });
+
+  it("invokes the selected topology gate once with deterministic diagnostics", () => {
+    const state = baseState();
+    state["codex_topology_receipts"] = "invalid";
+    const expected = [
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint " +
+        "codex_topology_receipts must be a list when present.",
+    ];
+
+    expect(validate(state)).toEqual(expected);
+    expect(validate(state)).toEqual(expected);
   });
 
   it("rejects an orchestrator delegation for a small receipt", () => {
@@ -171,7 +184,8 @@ describe("Codex topology checkpoint receipts", () => {
     state["codex_topology_receipts"] = [topologyReceipt()];
 
     expect(validate(state)).toContain(
-      "Checkpoint delegation_receipts is missing the exact resolved topology " +
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint delegation_receipts is " +
+        "missing the exact resolved topology " +
         "agent for python-typed-engineer: python-typed-engineer.",
     );
   });
@@ -183,7 +197,8 @@ describe("Codex topology checkpoint receipts", () => {
     ];
 
     expect(validate(state)).toContain(
-      "Checkpoint path_selected 'small' does not match the resolved Codex topology route 'large'.",
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: Checkpoint path_selected 'small' " +
+        "does not match the resolved Codex topology route 'large'.",
     );
   });
 

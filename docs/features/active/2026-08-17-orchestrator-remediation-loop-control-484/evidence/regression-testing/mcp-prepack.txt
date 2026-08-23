@@ -1,0 +1,7 @@
+Timestamp: 2026-08-17T16-06
+Command: npm --prefix packages/mcp-server run prepack
+EXIT_CODE: 0
+Output Summary: PASS. Package resources were synchronized for prepack.
+Resource Inventory: 566 packaged resources
+MCP_RESOURCE_COUNT: 566
+MCP_ROUTING_POLICY_SHA256: sha256:7a30f003994ae274f6b9bf7a2fcc1ff598f0cce743cc8663060eb3df50742231

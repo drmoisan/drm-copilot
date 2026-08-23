@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 
+import { deduplicateSelectedRoutingDiagnostics } from "../../../src/lib/validate/orchestration-artifacts";
 import { validateRoutingContract } from "../../../src/lib/validate/orchestrator-state-routing";
 
 /**
@@ -297,5 +298,51 @@ describe("validateRoutingContract", () => {
 
     // Act / Assert
     expect(validate(state)).toEqual([]);
+  });
+
+  it("keeps routing-contract evidence independent from model receipt families", () => {
+    const state = buildCompleteLargeState();
+    state["model_routing_receipts"] = "legacy-invalid";
+    state["codex_model_routing_receipts"] = "codex-model-invalid";
+    state["codex_topology_receipts"] = "codex-topology-invalid";
+
+    expect(validate(state)).toEqual([]);
+  });
+
+  it("retains the first routing diagnostic and every distinct gate", () => {
+    const legacy =
+      "ORCH_ROUTING_GATE_LEGACY: failure for phase S5_atomic_execution.";
+    const codexModel =
+      "ORCH_ROUTING_GATE_CODEX_MODEL: failure for phase S5_atomic_execution.";
+    const codexTopology =
+      "ORCH_ROUTING_GATE_CODEX_TOPOLOGY: failure for phase S5_atomic_execution.";
+
+    expect(
+      deduplicateSelectedRoutingDiagnostics([
+        legacy,
+        legacy,
+        codexModel,
+        codexTopology,
+        codexModel,
+      ]),
+    ).toEqual([legacy, codexModel, codexTopology]);
+  });
+
+  it("keeps distinct records and unrelated duplicate diagnostics", () => {
+    const phaseFive =
+      "ORCH_ROUTING_GATE_LEGACY: failure for phase S5_atomic_execution.";
+    const phaseSix =
+      "ORCH_ROUTING_GATE_LEGACY: failure for phase S6_commit_steward.";
+    const unrelated = "Checkpoint unrelated failure.";
+
+    expect(
+      deduplicateSelectedRoutingDiagnostics([
+        phaseFive,
+        phaseSix,
+        phaseFive,
+        unrelated,
+        unrelated,
+      ]),
+    ).toEqual([phaseFive, phaseSix, unrelated, unrelated]);
   });
 });

@@ -1,0 +1,445 @@
+{
+  "changed_files": [
+    {
+      "baseline_changed_line_percent": 60.115607,
+      "changed_line_percent": 60.115607,
+      "covered_changed_lines": 104,
+      "delta": 0.0,
+      "executable_changed_lines": 173,
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "baseline_changed_line_percent": 95.852535,
+      "changed_line_percent": 95.852535,
+      "covered_changed_lines": 208,
+      "delta": 0.0,
+      "executable_changed_lines": 217,
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/coverage_policy_test_support.py"
+    },
+    {
+      "baseline_changed_line_percent": 100.0,
+      "changed_line_percent": 100.0,
+      "covered_changed_lines": 0,
+      "delta": 0.0,
+      "executable_changed_lines": 0,
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    }
+  ],
+  "configured_changed_files": [],
+  "language": "python",
+  "mode": "baseline",
+  "new_symbols": [
+    {
+      "coverage_percent": 60.115607,
+      "kind": "module",
+      "name": "<module>",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_percent",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_file_percent",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_baseline_changed_lines",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_changed_line_results",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_configured_results",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_new_symbol_results",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "analyze_snapshot",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 95.454545,
+      "kind": "function",
+      "name": "compare_analyses",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "build_parser",
+      "pass": true,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 50.0,
+      "kind": "function",
+      "name": "_read_json",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 5.555556,
+      "kind": "function",
+      "name": "_working_tree_changes",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 7.142857,
+      "kind": "function",
+      "name": "_coverage_inputs",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 33.333333,
+      "kind": "function",
+      "name": "_baseline",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 5.263158,
+      "kind": "function",
+      "name": "_run_analysis",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 5.555556,
+      "kind": "function",
+      "name": "main",
+      "pass": false,
+      "path": "scripts/dev_tools/analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 95.852535,
+      "kind": "module",
+      "name": "<module>",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "class",
+      "name": "FileCoverage",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "class",
+      "name": "CoverageSnapshot",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "class",
+      "name": "SymbolRange",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 85.714286,
+      "kind": "function",
+      "name": "object_mapping",
+      "pass": false,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 75.0,
+      "kind": "function",
+      "name": "object_items",
+      "pass": false,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 75.0,
+      "kind": "function",
+      "name": "number",
+      "pass": false,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_integer",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 63.636364,
+      "kind": "function",
+      "name": "normalize_path",
+      "pass": false,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_coverage_py_json",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "_parse_lcov",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "finish",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 95.833333,
+      "kind": "function",
+      "name": "parse_jest_coverage",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_python_symbols",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 92.307692,
+      "kind": "function",
+      "name": "_brace_end",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_typescript_symbols",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_unified_diff",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_python_thresholds",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "parse_jest_thresholds",
+      "pass": true,
+      "path": "scripts/dev_tools/coverage_policy_inputs.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "module",
+      "name": "<module>",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/coverage_policy_test_support.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "coverage_py_text",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/coverage_policy_test_support.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "snapshot",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/coverage_policy_test_support.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "analyze",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/coverage_policy_test_support.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "module",
+      "name": "<module>",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_parse_coverage_py_json_reads_lines_and_branches",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_parse_jest_coverage_uses_all_three_in_memory_reports",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_normalize_path_is_stable",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_symbol_parsers_find_modules_classes_functions_and_methods",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_unified_diff_returns_changed_lines_and_new_files",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_threshold_parsers_read_python_toml_and_jest_source",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_repository_threshold_boundaries",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_new_symbols_pass_at_exact_ninety_percent",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_new_symbol_below_ninety_percent_fails",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_configured_changed_file_threshold_boundaries",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_changed_line_coverage_cannot_regress_from_baseline",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_compare_reports_numeric_python_and_typescript_deltas",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_cli_requires_explicit_repository_thresholds",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    },
+    {
+      "coverage_percent": 100.0,
+      "kind": "function",
+      "name": "test_invalid_coverage_py_shapes_fail_closed",
+      "pass": true,
+      "path": "tests/scripts/dev_tools/test_analyze_coverage_policy.py"
+    }
+  ],
+  "overall_verdict": "FAIL",
+  "repository": {
+    "branch_covered": 4993,
+    "branch_percent": 84.398242,
+    "branch_total": 5916,
+    "line_covered": 14662,
+    "line_percent": 92.126924,
+    "line_total": 15915
+  },
+  "schema_version": 1,
+  "thresholds": {
+    "new_symbol": 90.0,
+    "repository_branch": 75.0,
+    "repository_line": 85.0
+  },
+  "verdicts": {
+    "changed_line_no_regression": true,
+    "configured_changed_files": true,
+    "new_symbols": false,
+    "repository_branch": true,
+    "repository_line": true
+  }
+}

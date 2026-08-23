@@ -38,6 +38,64 @@ const VALID_PLAN = [
   "### Phase 0 — Setup",
   "- [ ] [P0-T1] First task",
 ].join("\n");
+const RUNTIME_BLOCKER_FINGERPRINT = `sha256:${"a".repeat(64)}`;
+
+/** Return a public checkpoint with a runtime-incompatibility loop outcome. */
+function externalRuntimeState(
+  status: string,
+  includeAttempt = false,
+): Record<string, unknown> {
+  const attempts = includeAttempt
+    ? [
+        {
+          attempt_id: 1,
+          source_review_fingerprint: RUNTIME_BLOCKER_FINGERPRINT,
+          plan_path: "NONE",
+          preflight: { final_status: "pending" },
+          execution_status: "blocked",
+          candidate_applied: false,
+          terminal_disposition: "external_runtime",
+          started_at: "2026-08-17T12:00:00Z",
+          finished_at: "2026-08-17T12:00:01Z",
+          exception_binding: null,
+        },
+      ]
+    : [];
+  return {
+    objective: "obj",
+    change_budget_estimate: "large",
+    path_selected: "large",
+    "promotion-type": "feature",
+    "short-name": "short",
+    relativeFile: "docs/features/potential/x.md",
+    "long-name": "feature-1",
+    "issue-num": "1",
+    "feature-folder": "docs/features/active/feature-1",
+    "work-mode": "full-feature",
+    "plan-path": "docs/features/active/feature-1/plan.md",
+    completed_steps: [],
+    next_step: "blocked_external_runtime",
+    last_updated: "2026-08-17T12:00:01Z",
+    step5_status: "not-applicable",
+    step6_status: "not-applicable",
+    step7_status: "verified",
+    step8_status: "not-applicable",
+    step9_status: "verified",
+    step10_status: "not-applicable",
+    delegation_receipts: [],
+    blocked_reason: "validator_failed",
+    remediation_loop: {
+      schema_version: 2,
+      status,
+      max_completed_cycles: 3,
+      attempt_count: attempts.length,
+      completed_cycle_count: 0,
+      last_blocker_fingerprint: RUNTIME_BLOCKER_FINGERPRINT,
+      attempts,
+      cycles: [],
+    },
+  };
+}
 
 /** Return a public-path fixture carrying mutation and unresolved-drift defects. */
 function semanticFalseAcceptText(): string {
@@ -166,6 +224,62 @@ describe("repo automation orchestration validation", () => {
         requireComplete: true,
       }),
     ).rejects.toThrow("Checkpoint root must be a JSON object.");
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("accepts the pre-remediation external-runtime transition without count mutation", async () => {
+    const state = externalRuntimeState("blocked_external_runtime");
+    const loop = state["remediation_loop"] as Record<string, unknown>;
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/state.json": JSON.stringify(state),
+    });
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+      fileSystem,
+    });
+
+    const result = await service.validateOrchestrationArtifacts({
+      workspaceRoot: "C:/workspace",
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "orchestrator-state",
+      artifactPath: "docs/state.json",
+    });
+
+    expect(result.summary).toBe(
+      "Validated orchestrator-state artifact at 'docs/state.json'.",
+    );
+    expect(loop).toMatchObject({
+      attempt_count: 0,
+      completed_cycle_count: 0,
+      attempts: [],
+      cycles: [],
+    });
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("rejects an active status after an external-runtime attempt disposition", async () => {
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/docs/state.json": JSON.stringify(
+        externalRuntimeState("active", true),
+      ),
+    });
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+      fileSystem,
+    });
+
+    await expect(
+      service.validateOrchestrationArtifacts({
+        workspaceRoot: "C:/workspace",
+        invocationId: "validate_orchestration_artifacts",
+        artifactType: "orchestrator-state",
+        artifactPath: "docs/state.json",
+      }),
+    ).rejects.toThrow(
+      "ORCH_REMEDIATION_TRANSITION: remediation_loop.status active does not match the latest remediation outcome.",
+    );
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
   });
 

@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  drm-copilot-extension-tests:
-    name: Extension Tests (${{ matrix.os }})
+  SOURCE_READY:
+    name: SOURCE_READY (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,12 +25,151 @@ jobs:
       - name: Install extension dependencies
         run: npm --prefix extensions/drm-copilot ci
 
+      - name: Install MCP server dependencies
+        run: npm --prefix packages/mcp-server ci
+
       - name: Run extension tests
         run: npm --prefix extensions/drm-copilot run test
 
-  publish:
-    name: Publish to npm
-    needs: drm-copilot-extension-tests
+      - name: Reject a target-version pin before publication
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $tagName = '${{ github.ref_name }}'
+          if ($tagName -notmatch '^mcp-server-v(?<version>.+)$') {
+            throw "Unauthorized MCP release tag '$tagName'."
+          }
+
+          $manifest = Get-Content -Raw -LiteralPath 'packages/mcp-server/package.json' |
+            ConvertFrom-Json
+          if ([string]$manifest.version -ne $Matches.version) {
+            throw "Tag version '$($Matches.version)' does not match package version '$($manifest.version)'."
+          }
+
+          $pin = "@danmoisan/drm-copilot-mcp@$($manifest.version)"
+          $matches = @(& git grep -n --fixed-strings -- $pin)
+          $grepExitCode = $LASTEXITCODE
+          if ($grepExitCode -notin @(0, 1)) {
+            throw "git grep failed while checking unpublished package pins (exit $grepExitCode)."
+          }
+
+          $runtimeMatches = @(
+            $matches | Where-Object { $_ -notmatch '^(docs|tests)[\\/]' }
+          )
+          if ($runtimeMatches.Count -gt 0) {
+            throw "Target version is pinned before exact publication evidence: $($runtimeMatches -join '; ')"
+          }
+
+          $LASTEXITCODE = 0
+          exit 0
+
+      - name: Build source MCP server bundle
+        run: npm --prefix extensions/drm-copilot run bundle:mcp-server
+
+      - name: Run source JSON-RPC smoke test
+        run: >-
+          node packages/mcp-server/test/mcp-json-rpc-smoke.cjs
+          --server extensions/drm-copilot/out/mcp-server.js
+          --mode source
+
+  BUILT:
+    name: BUILT
+    needs: SOURCE_READY
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install extension dependencies
+        run: npm --prefix extensions/drm-copilot ci
+
+      - name: Install MCP server dependencies
+        run: npm --prefix packages/mcp-server ci
+
+      - name: Copy resources (prepack)
+        run: npm --prefix packages/mcp-server run prepack
+
+      - name: Build source MCP server bundle
+        run: npm --prefix extensions/drm-copilot run bundle:mcp-server
+
+      - name: Build packaged MCP server bundle
+        run: npm --prefix packages/mcp-server run build
+
+      - name: Pack local MCP release candidate
+        run: >-
+          npm --prefix packages/mcp-server pack
+          --pack-destination
+          ../../docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing
+
+      - name: Upload local MCP release candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: mcp-release-candidate
+          if-no-files-found: error
+          path: |
+            extensions/drm-copilot/out/mcp-server.js
+            packages/mcp-server/out/mcp-server.js
+            docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/*.tgz
+
+  TESTED:
+    name: TESTED
+    needs: BUILT
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Download local MCP release candidate
+        uses: actions/download-artifact@v7
+        with:
+          name: mcp-release-candidate
+          path: .
+
+      - name: Resolve the single packed candidate
+        shell: pwsh
+        run: |
+          $candidateDirectory = 'docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing'
+          $tarballs = @(
+            Get-ChildItem -LiteralPath $candidateDirectory -Filter '*.tgz' -File
+          )
+          if ($tarballs.Count -ne 1) {
+            throw "Expected exactly one packed MCP candidate, found $($tarballs.Count)."
+          }
+          "MCP_TARBALL_PATH=$($tarballs[0].FullName)" >> $env:GITHUB_ENV
+
+      - name: Run built JSON-RPC smoke test
+        run: >-
+          node packages/mcp-server/test/mcp-json-rpc-smoke.cjs
+          --server packages/mcp-server/out/mcp-server.js
+          --mode built
+          --require-pr-creation-ready
+
+      - name: Run packed JSON-RPC smoke test
+        shell: pwsh
+        run: |
+          node packages/mcp-server/test/mcp-json-rpc-smoke.cjs `
+            --tarball "$env:MCP_TARBALL_PATH" `
+            --mode packed `
+            --extract-to docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing/packed-mcp `
+            --require-pr-creation-ready
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+  PUBLISHED:
+    name: PUBLISHED
+    needs: TESTED
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/mcp-server-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,16 +187,83 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npm install -g npm@11.18.0
 
-      - name: Install MCP server dependencies
-        run: npm --prefix packages/mcp-server ci
+      - name: Download tested MCP release candidate
+        uses: actions/download-artifact@v7
+        with:
+          name: mcp-release-candidate
+          path: .
 
-      - name: Copy resources (prepack)
-        run: npm --prefix packages/mcp-server run prepack
+      - name: Verify authorized tag and exact candidate version
+        shell: pwsh
+        run: |
+          $tagName = '${{ github.ref_name }}'
+          if ($tagName -notmatch '^mcp-server-v(?<version>.+)$') {
+            throw "Unauthorized MCP release tag '$tagName'."
+          }
 
-      - name: Build MCP server bundle
-        run: npm --prefix packages/mcp-server run build
+          $manifest = Get-Content -Raw -LiteralPath 'packages/mcp-server/package.json' |
+            ConvertFrom-Json
+          $targetVersion = [string]$manifest.version
+          if ($targetVersion -ne $Matches.version) {
+            throw "Tag version '$($Matches.version)' does not match package version '$targetVersion'."
+          }
 
-      - name: Publish to npm
-        if: github.event_name == 'push'
-        working-directory: packages/mcp-server
-        run: npm publish --provenance --access public
+          $candidateDirectory = 'docs/features/active/2026-08-17-orchestrator-remediation-loop-control-484/evidence/regression-testing'
+          $tarballs = @(
+            Get-ChildItem -LiteralPath $candidateDirectory -Filter '*.tgz' -File
+          )
+          if ($tarballs.Count -ne 1) {
+            throw "Expected exactly one tested MCP candidate, found $($tarballs.Count)."
+          }
+          if ($tarballs[0].Name -notmatch [regex]::Escape($targetVersion)) {
+            throw "Packed candidate '$($tarballs[0].Name)' does not identify version '$targetVersion'."
+          }
+
+          "MCP_TARBALL_PATH=$($tarballs[0].FullName)" >> $env:GITHUB_ENV
+          "MCP_TARGET_VERSION=$targetVersion" >> $env:GITHUB_ENV
+
+      - name: Publish tested candidate to npm
+        shell: pwsh
+        run: npm publish "$env:MCP_TARBALL_PATH" --provenance --access public
+
+  PINNED:
+    name: PINNED
+    needs: PUBLISHED
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/mcp-server-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Require exact registry publication evidence
+        shell: pwsh
+        run: |
+          $tagName = '${{ github.ref_name }}'
+          if ($tagName -notmatch '^mcp-server-v(?<version>.+)$') {
+            throw "Unauthorized MCP release tag '$tagName'."
+          }
+          $targetVersion = $Matches.version
+
+          $manifest = Get-Content -Raw -LiteralPath 'packages/mcp-server/package.json' |
+            ConvertFrom-Json
+          if ([string]$manifest.version -ne $targetVersion) {
+            throw "Tag version '$targetVersion' does not match package version '$($manifest.version)'."
+          }
+
+          $registryOutput = & npm view "@danmoisan/drm-copilot-mcp@$targetVersion" version --json
+          if ($LASTEXITCODE -ne 0) {
+            throw "Registry publication evidence is unavailable for exact version '$targetVersion'."
+          }
+          $publishedVersion = $registryOutput | ConvertFrom-Json
+          if ([string]$publishedVersion -ne $targetVersion) {
+            throw "Registry returned '$publishedVersion' instead of exact version '$targetVersion'."
+          }
+
+          "PINNED is eligible only after exact publication evidence for @danmoisan/drm-copilot-mcp@$targetVersion." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8

@@ -1,0 +1,49 @@
+{
+  "name": "invalid-count-sequence",
+  "loop": {
+    "schema_version": 2,
+    "status": "resolved",
+    "max_completed_cycles": 3,
+    "attempt_count": 2,
+    "completed_cycle_count": 2,
+    "last_blocker_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "attempts": [
+      {
+        "attempt_id": 2,
+        "source_review_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "plan_path": "plan-1.md",
+        "preflight": {
+          "final_status": "clear"
+        },
+        "execution_status": "complete",
+        "candidate_applied": true,
+        "terminal_disposition": "candidate_applied",
+        "started_at": "2026-08-17T12:01:00Z",
+        "finished_at": "2026-08-17T12:01:30Z",
+        "exception_binding": null
+      }
+    ],
+    "cycles": [
+      {
+        "cycle_id": 2,
+        "attempt_id": 2,
+        "commit_sha": "commit-1",
+        "re_audit_path": "audit-1.md",
+        "review_verdict": "PASS",
+        "remediation_action": "NONE",
+        "blocker_fingerprint_before": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "blocker_fingerprint_after": "NONE",
+        "blocking_count": 0,
+        "exit_condition_met": true,
+        "completed_at": "2026-08-17T13:01:00Z"
+      }
+    ]
+  },
+  "expected_errors": [
+    "ORCH_REMEDIATION_COUNT: remediation_loop.attempt_count must equal attempts length 1.",
+    "ORCH_REMEDIATION_SEQUENCE: remediation_loop attempt_id sequence must be [1]; received [2].",
+    "ORCH_REMEDIATION_COUNT: remediation_loop.completed_cycle_count must equal cycles length 1.",
+    "ORCH_REMEDIATION_SEQUENCE: remediation_loop cycle_id sequence must be [1]; received [2]."
+  ],
+  "expected_normalized": "{\"name\":\"invalid-count-sequence\",\"errors\":[\"ORCH_REMEDIATION_COUNT: remediation_loop.attempt_count must equal attempts length 1.\",\"ORCH_REMEDIATION_SEQUENCE: remediation_loop attempt_id sequence must be [1]; received [2].\",\"ORCH_REMEDIATION_COUNT: remediation_loop.completed_cycle_count must equal cycles length 1.\",\"ORCH_REMEDIATION_SEQUENCE: remediation_loop cycle_id sequence must be [1]; received [2].\"]}"
+}

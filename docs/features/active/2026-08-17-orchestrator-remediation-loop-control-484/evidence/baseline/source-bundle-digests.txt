@@ -1,0 +1,9 @@
+Timestamp: 2026-08-17T11:27:19-04:00
+Command: @('config/orchestration-routing.json','extensions/drm-copilot/resources/config/orchestration-routing.json','extensions/drm-copilot/package.json','packages/mcp-server/package.json','packages/mcp-server/out/mcp-server.js') | ForEach-Object { $path=$_; if (Test-Path -LiteralPath $path -PathType Leaf) { [pscustomobject]@{Path=$path;Exists=$true;SHA256=(Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash} } else { [pscustomobject]@{Path=$path;Exists=$false;SHA256=$null} } }
+EXIT_CODE: 0
+Output Summary: Evaluated 5 source, packaged, manifest, and generated bundle paths; 4 exist and 1 is absent.
+- Path: config/orchestration-routing.json; Exists: true; SHA256: 7A30F003994AE274F6B9BF7A2FCC1FF598F0CCE743CC8663060EB3DF50742231
+- Path: extensions/drm-copilot/resources/config/orchestration-routing.json; Exists: true; SHA256: 7A30F003994AE274F6B9BF7A2FCC1FF598F0CCE743CC8663060EB3DF50742231
+- Path: extensions/drm-copilot/package.json; Exists: true; SHA256: 16C2925EEE9AC882C8264B63626DF90AE7C144D1230BC74F880B8EF7DDAF659E
+- Path: packages/mcp-server/package.json; Exists: true; SHA256: 7D50075312D3B22A1B557B3CB60662D8685DAFADBF3562582FC2661446CB772A
+- Path: packages/mcp-server/out/mcp-server.js; Exists: false; SHA256: null

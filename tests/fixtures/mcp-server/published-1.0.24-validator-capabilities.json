@@ -1,0 +1,23 @@
+{
+  "fixture_schema_version": 1,
+  "identity": {
+    "package_name": "@danmoisan/drm-copilot-mcp",
+    "package_version": "1.0.24",
+    "tarball_integrity": "sha512-4L2uHaO9dvzEuKGQMMzY6fTDKLP5PpnRrZzpkAOmdH7LMvONTtttzPXies9GX7jiZ8gfRSUXEVDCMKvJ/Cpe/A==",
+    "tarball_sha256": "sha256:82602d79acb8dd6ca3b7ebeaa4de300fc6947ce543ea4be0cbf42dae39284d9d",
+    "bundle_file_sha256": "sha256:1eed10e79424395901d9dd57a4937ebb4263cb0949a1fea9c00812cf7cec5dfa",
+    "routing_policy_sha256": "sha256:d9c6657cbdbe15413e0fb9bc1be700ce1a8f892d0db413c3bbc253ea24ea7bda"
+  },
+  "provenance": "npm cache tarball for immutable published package version 1.0.24",
+  "validator_capability": null,
+  "validator_catalog": {
+    "supported_validation_flags": [
+      "require_complete",
+      "require_model_routing",
+      "require_codex_model_routing",
+      "require_codex_topology",
+      "require_ready_for_execution"
+    ]
+  },
+  "expected_disposition": "EXTERNAL_RUNTIME"
+}

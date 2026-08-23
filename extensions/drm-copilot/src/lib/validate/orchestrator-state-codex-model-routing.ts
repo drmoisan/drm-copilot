@@ -1,4 +1,5 @@
 export const CODEX_MODEL_ROUTING_RECEIPTS_KEY = "codex_model_routing_receipts";
+const CODEX_MODEL_ROUTING_GATE_ERROR = "ORCH_ROUTING_GATE_CODEX_MODEL";
 
 export const BAND_ORDER = ["C1", "C2", "C3", "C4"] as const;
 
@@ -482,16 +483,15 @@ export function validateCodexModelRoutingState(
   state: Record<string, unknown>,
   requireGate = false,
 ): string[] {
-  const errors: string[] = [];
-  if (CODEX_MODEL_ROUTING_RECEIPTS_KEY in state) {
-    errors.push(
-      ...validateCodexModelRoutingReceipts(
-        state[CODEX_MODEL_ROUTING_RECEIPTS_KEY],
-      ),
+  if (requireGate) {
+    return validateCodexModelRoutingGate(state).map(
+      (error) => `${CODEX_MODEL_ROUTING_GATE_ERROR}: ${error}`,
     );
   }
-  if (requireGate) {
-    errors.push(...validateCodexModelRoutingGate(state));
+  if (CODEX_MODEL_ROUTING_RECEIPTS_KEY in state) {
+    return validateCodexModelRoutingReceipts(
+      state[CODEX_MODEL_ROUTING_RECEIPTS_KEY],
+    );
   }
-  return errors;
+  return [];
 }

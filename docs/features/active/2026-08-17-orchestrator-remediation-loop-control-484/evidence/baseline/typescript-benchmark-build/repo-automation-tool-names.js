@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.REPO_AUTOMATION_TOOLS = void 0;
+exports.REPO_AUTOMATION_TOOLS = [
+    "collect_commit_context",
+    "collect_pr_context",
+    "run_codex_native_converter",
+    "push_down_copilot_customizations",
+    "push_down_codex_and_agents_customizations",
+    "push_down_claude_customizations",
+    "new_potential_bug_entry",
+    "new_potential_entry",
+    "link_parent_child",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "run_poshqc_format",
+    "run_poshqc_analyze",
+    "run_poshqc_test",
+    "run_poshqc_analyze_autofix",
+    "run_poshqc_suite",
+    "resolve_policy_audit_template_asset",
+    "resolve_execute_hard_lock_prompt",
+    "resolve_atomic_plan_prompt",
+    "validate_orchestration_artifacts",
+    "render_subagent_tree",
+    "validate_discovery_artifacts",
+    "run_discovery_init",
+    "run_discovery_repo_inventory",
+    "run_discovery_dotnet_analyzer",
+    "run_discovery_vsto_analyzer",
+    "run_discovery_scenario_generation",
+    "run_discovery_report",
+];
