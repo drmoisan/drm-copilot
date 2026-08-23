@@ -57,6 +57,14 @@ Add an increment selector, defaulting to `patch` so every existing invocation is
    `Get-McpServerTagName` helpers, so it is already increment-agnostic. Confirming that rather than
    modifying it is part of the work.
 
+6. **A test that guarantees Codex pins the correct MCP server version.** Both `.codex/config.toml`
+   copies must pin the same version the `packages/mcp-server/package.json` manifest declares, and a
+   test in the per-commit suite must enforce it. This is in scope because the increment work adds a
+   new way to reach those pins, but the guard is deliberately broader than that: today nothing at
+   all verifies them, so a stale pin from any source ships silently. It is the one item here that
+   prevents a wrong artifact rather than merely enabling a workflow, and it is worth landing even if
+   the increment parameter is deferred.
+
 One design question to settle at spec time rather than now: whether `Invoke-MarketplacePublish.ps1`
 should also gain the parameter. It bumps the extension manifest only and does not touch the Codex
 pins, so using it for a joint release already breaks lockstep. The options are to give it the same
@@ -72,6 +80,8 @@ parameter, or to leave it patch-only and document it as extension-only. Do not a
 - [ ] All six version-bearing files are updated consistently for a `minor` and for a `major` run, including both `.codex/config.toml` MCP pins.
 - [ ] `Invoke-ReleaseTagPush.ps1` is confirmed unchanged and still derives both tag names from the merged manifests.
 - [ ] Every existing caller that passes no `-Increment` produces the same result as before the change.
+- [ ] **A standing test asserts that Codex pins the correct MCP server version.** For both `.codex/config.toml` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml`, the version in `args = ["-y", "@danmoisan/drm-copilot-mcp@<version>"]` must equal the `version` field of `packages/mcp-server/package.json`. The test runs on every commit as part of the normal suite, not only during a release, so a stale pin fails the build instead of shipping.
+- [ ] That test is proven non-vacuous: perturbing either pin to a version that does not match the manifest makes it fail, and the failure message names the offending file and both versions.
 
 ## Constraints & Risks
 
@@ -89,6 +99,8 @@ parameter, or to leave it patch-only and document it as extension-only. Do not a
 - [ ] Assert the default: invoking with no `-Increment` still passes `patch`.
 - [ ] Assert rejection of an out-of-set value, and that no file was written when it is rejected.
 - [ ] Integration scenarios: a full dry run for `minor` and for `major` verifying all six files, with a specific assertion on both Codex pins, since nothing else catches those.
+- [ ] **The Codex pin test is a repository invariant, not a release-time assertion, and is the highest-value test in this entry.** It reads the two config files and `packages/mcp-server/package.json` and asserts the pinned version equals the manifest version, in both copies. Two properties matter. First, it must run in the normal per-commit suite so it catches a stale pin introduced by ANY path — the release tasks, a hand edit, a push-down, or a merge — not just by the increment work this entry proposes. Second, it must be independent of the release scripts: asserting that `Set-CodexMcpVersionPin` was called proves only that a function ran, whereas comparing committed file content to the committed manifest proves the shipped artifact is correct. Prefer the latter.
+- [ ] Decide where that test lives and state it in the spec. A Pester suite under `tests/scripts/dev-tools/` sits beside the release-script tests, but the invariant is about repository contents rather than about those scripts, so a location that does not imply release-script scope may read better. Either way it must be in the per-commit suite, and both config copies must be covered — a test that checks only `.codex/config.toml` leaves the published copy under `extensions/drm-copilot/resources/` unguarded, which is the copy that reaches destinations.
 - [ ] Verify the derived commit message and the two derived tag names are correct for a `minor` and a `major` result.
 - [ ] CLI/API examples: `Invoke-FullRelease.ps1 -ConfirmToken yes -Increment minor`, and the `ReleaseIncrement` task input defaulting to `patch`.
 - [ ] Guard against the gate-that-cannot-fail class per `.claude/rules/plan-acceptance-gates.md`: every assertion above must be shown to fail when the increment is wired incorrectly. A test that passes whether or not the token is threaded through asserts nothing.
