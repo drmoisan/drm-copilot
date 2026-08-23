@@ -1,9 +1,12 @@
-# release-flow-supports-only-patch-increment (Potential)
+# release-flow-supports-only-patch-increment (Issue #522)
 
 - Date captured: 2026-08-23
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/release-flow-supports-only-patch-increment/ (Issue #522)
 
+- Issue: #522
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/522
+- Last Updated: 2026-08-23
 ## Problem / Why
 
 The release automation can only produce a patch release. Every task that bumps a version hardcodes
