@@ -183,33 +183,33 @@ by this cycle.)
 
 ### Phase 0 — Policy Reads and Toolchain Baselines (Python, PowerShell)
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
-- [ ] [P0-T4] Read `.claude/rules/python.md` in full.
-- [ ] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
-- [ ] [P0-T6] Read `.claude/rules/powershell.md` in full.
-- [ ] [P0-T7] Read `.claude/rules/quality-tiers.md` in full.
-- [ ] [P0-T8] Read `.claude/rules/plan-acceptance-gates.md` in full.
-- [ ] [P0-T9] Read `.claude/rules/self-explanatory-code-commenting.md` in full.
-- [ ] [P0-T10] Read `.claude/rules/tonality.md` in full.
-- [ ] [P0-T11] Write the Phase 0 policy-read evidence artifact to
+- [x] [P0-T1] Read `CLAUDE.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T4] Read `.claude/rules/python.md` in full.
+- [x] [P0-T5] Read `.claude/rules/python-suppressions.md` in full.
+- [x] [P0-T6] Read `.claude/rules/powershell.md` in full.
+- [x] [P0-T7] Read `.claude/rules/quality-tiers.md` in full.
+- [x] [P0-T8] Read `.claude/rules/plan-acceptance-gates.md` in full.
+- [x] [P0-T9] Read `.claude/rules/self-explanatory-code-commenting.md` in full.
+- [x] [P0-T10] Read `.claude/rules/tonality.md` in full.
+- [x] [P0-T11] Write the Phase 0 policy-read evidence artifact to
       `evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md` (UTC,
       `yyyy-MM-ddTHH-mm` form), recording `Timestamp:`, `Policy Order:`, and the ten files read in
       P0-T1 through P0-T10, in that order.
       Acceptance: the artifact file exists and lists all ten files in order.
-- [ ] [P0-T12] From the worktree root, run `poetry run black --check .` and record the artifact at
+- [x] [P0-T12] From the worktree root, run `poetry run black --check .` and record the artifact at
       `evidence/remediation-baseline/python-black.<timestamp>.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`.
       Acceptance: `EXIT_CODE: 0` is recorded.
-- [ ] [P0-T13] From the worktree root, run `poetry run ruff check .` and record the artifact at
+- [x] [P0-T13] From the worktree root, run `poetry run ruff check .` and record the artifact at
       `evidence/remediation-baseline/python-ruff.<timestamp>.md` with the same four fields.
       Acceptance: `EXIT_CODE: 0` is recorded.
-- [ ] [P0-T14] From the worktree root, run `poetry run pyright` and record the artifact at
+- [x] [P0-T14] From the worktree root, run `poetry run pyright` and record the artifact at
       `evidence/remediation-baseline/python-pyright.<timestamp>.md` with the same four fields,
       `Output Summary:` naming the error and warning counts.
       Acceptance: `EXIT_CODE: 0` and `0 errors, 0 warnings` are recorded.
-- [ ] [P0-T15] From the worktree root, run
+- [x] [P0-T15] From the worktree root, run
       `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage.json`
       and record the artifact at `evidence/remediation-baseline/python-pytest-coverage.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail/skip
@@ -217,25 +217,25 @@ by this cycle.)
       branch percentage from `totals.percent_branches_covered` in `artifacts/python/coverage.json`.
       Acceptance: `EXIT_CODE: 0`; both coverage figures recorded, each >= the
       `.claude/rules/quality-tiers.md` thresholds (85% statements, 75% branches).
-- [ ] [P0-T16] Run `mcp__drm-copilot__run_poshqc_format` and record the artifact at
+- [x] [P0-T16] Run `mcp__drm-copilot__run_poshqc_format` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-format.<timestamp>.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `Output Summary:`.
       Acceptance: `EXIT_CODE: 0` and zero files rewritten are recorded.
-- [ ] [P0-T17] Run `mcp__drm-copilot__run_poshqc_analyze` and record the artifact at
+- [x] [P0-T17] Run `mcp__drm-copilot__run_poshqc_analyze` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-analyze.<timestamp>.md` with the same four
       fields.
       Acceptance: `EXIT_CODE: 0` and zero findings are recorded.
-- [ ] [P0-T18] Run `mcp__drm-copilot__run_poshqc_test` and record the artifact at
+- [x] [P0-T18] Run `mcp__drm-copilot__run_poshqc_test` and record the artifact at
       `evidence/remediation-baseline/powershell-poshqc-test.<timestamp>.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the pass/fail/skip counts and the line
       coverage percentage from the JaCoCo root `LINE` counter as `covered / (covered + missed)`.
       Acceptance: `EXIT_CODE: 0` and a recorded line coverage >= 85%.
-- [ ] [P0-T19] Write a scope note at `evidence/remediation-baseline/typescript-out-of-scope.<timestamp>.md`
+- [x] [P0-T19] Write a scope note at `evidence/remediation-baseline/typescript-out-of-scope.<timestamp>.md`
       stating that no TypeScript file is touched by R1 through R6 this cycle (R1 is confined to the
       Python and PowerShell test sources; R2 through R6 touch only Markdown and the two Pester
       files), so no TypeScript baseline is captured and none is required in Final QA.
       Acceptance: the artifact file exists and names the reason above.
-- [ ] [P0-T20] Confirm file sizes before any edit: from the worktree root, run
+- [x] [P0-T20] Confirm file sizes before any edit: from the worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1 tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`
       and record the artifact at `evidence/remediation-baseline/edit-target-line-counts.<timestamp>.md`.
       Acceptance: the artifact records four counts, each less than 500 (measured at plan-authoring
@@ -245,7 +245,7 @@ by this cycle.)
 
 ### Phase 1 — R1: Close the CR-3 residual by asserting consumption, not membership (Major)
 
-- [ ] [P1-T1] In `tests/scripts/dev_tools/blast_radius_parity_test_support.py`, replace the
+- [x] [P1-T1] In `tests/scripts/dev_tools/blast_radius_parity_test_support.py`, replace the
       standalone `CLASS_TWO_KEYS = ("shared_surfaces", "shared_surface_globs")` and
       `CLASS_THREE_KEYS = ("modules",)` declarations with two registries mapping each key name to
       the name of the test function that is supposed to consume it:
@@ -265,7 +265,7 @@ by this cycle.)
       `git grep -c -F "CLASS_TWO_KEY_ASSERTIONS = {" -- tests/scripts/dev_tools/blast_radius_parity_test_support.py`
       reports `1` after the edit (measured before the edit: `0`, this literal is absent from the
       file today).
-- [ ] [P1-T2] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, import
+- [x] [P1-T2] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, import
       `CLASS_TWO_KEY_ASSERTIONS`, `CLASS_THREE_KEY_ASSERTIONS`, and `unconsumed_class_keys` from the
       support module, and add a new test function
       `test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion` that calls
@@ -277,10 +277,10 @@ by this cycle.)
       Acceptance:
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion`
       exits `0` with `1 passed`, run from the worktree root.
-- [ ] [P1-T3] Confirm file sizes: from the worktree root, run
+- [x] [P1-T3] Confirm file sizes: from the worktree root, run
       `wc -l tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: both reported counts are less than 500.
-- [ ] [P1-T4] In `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, in the
+- [x] [P1-T4] In `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, in the
       file-level `BeforeAll`, replace the `$script:ClassTwoKeys` and `$script:ClassThreeKeys` literal
       arrays with two registries mapping each key name to the sibling file that actually indexes it
       via the PowerShell indexer syntax (both Class 2 keys and the Class 3 key are read by
@@ -296,7 +296,7 @@ by this cycle.)
       Acceptance: from the worktree root,
       `git grep -c -F "ClassTwoKeyConsumerFile = @{" -- tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
       reports `1` after the edit (measured before the edit: `0`).
-- [ ] [P1-T5] In the same file, add a new `It` case to the `Cross-copy key partition` `Context`,
+- [x] [P1-T5] In the same file, add a new `It` case to the `Cross-copy key partition` `Context`,
       titled `requires every Class 2 and Class 3 key to be indexed by name in its registered
       consumer file`, that reads each distinct consumer file named in the two registries once (via
       `Get-Content -Raw`, resolved with `Join-Path $PSScriptRoot <file>`), and for every
@@ -306,10 +306,10 @@ by this cycle.)
       Acceptance: a targeted `Invoke-Pester` run against
       `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1` reports the new
       `It` block passing with 0 failed, run from the worktree root.
-- [ ] [P1-T6] Confirm file size: from the worktree root, run
+- [x] [P1-T6] Confirm file size: from the worktree root, run
       `(Get-Content tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1).Count`.
       Acceptance: the reported count is less than 500.
-- [ ] [P1-T7] Capture pre-perturbation hashes of the two files just edited, per the Do-Not-Do
+- [x] [P1-T7] Capture pre-perturbation hashes of the two files just edited, per the Do-Not-Do
       restore-mechanism requirement: from the worktree root, run
       `Get-FileHash tests/scripts/dev_tools/blast_radius_parity_test_support.py, tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
       (or the `sha256sum` equivalent) and record both SHA-256 values in an evidence artifact at
@@ -317,7 +317,7 @@ by this cycle.)
       **fixed** state (after P1-T1 through P1-T6, before any perturbation), so the later restore is
       checked against this recorded fix, not against `git checkout --`, which would discard it.
       Acceptance: the artifact records two distinct SHA-256 values, one per file.
-- [ ] [P1-T8] [expect-fail] Demonstrate the repair with the reviewer's own residual, adapted to the
+- [x] [P1-T8] [expect-fail] Demonstrate the repair with the reviewer's own residual, adapted to the
       registry shape this task introduces (a bare string append to a tuple is no longer meaningful;
       the equivalent perturbation is a registry entry with no real consuming assertion). Using a
       script **file** (not a multi-line `poetry run python -c`, per the Do-Not-Do constraint),
@@ -356,7 +356,7 @@ by this cycle.)
       the state the pre-fix registry passed on silently in all three languages (recorded in
       `evidence/regression-testing/reviewer-perturbation-battery.2026-08-22T17-20.md` Group D2), and
       it is not the current, unperturbed state.
-- [ ] [P1-T9] Restore without `git checkout --` on the two files carrying in-cycle work: for
+- [x] [P1-T9] Restore without `git checkout --` on the two files carrying in-cycle work: for
       `config/blast-radius.json` and its bundled copy (which carry no other in-cycle edit), run
       `git checkout --` on both from the worktree root — safe here, since nothing else in this cycle
       touches either JSON file. For `blast_radius_parity_test_support.py` and
@@ -376,7 +376,7 @@ by this cycle.)
 
 ### Phase 2 — R2 & R3 (source numbering): Correct AC11 and the four stale rule-file pointers (Major)
 
-- [ ] [P2-T1] Re-run the reference sweep to confirm it is unchanged at execution time. **Scope of
+- [x] [P2-T1] Re-run the reference sweep to confirm it is unchanged at execution time. **Scope of
       this sweep, stated explicitly so it cannot be misread as repo-wide: `spec.md` and the two
       `parallel-orchestration.md` copies only** — the three documents this plan is authorized to
       edit. The literal `BlastRadius.KeyPartition.Tests.ps1` is known to appear in ten other
@@ -396,7 +396,7 @@ by this cycle.)
       the comment AC12 describes still lives in `BlastRadius.TruthTable.Tests.ps1` after the split,
       confirmed by reading the file). If any of these four counts differs, halt and re-disposition
       every reference before proceeding.
-- [ ] [P2-T2] In `spec.md`, `## Acceptance Criteria`, uncheck AC11's box, changing `- [x]` to
+- [x] [P2-T2] In `spec.md`, `## Acceptance Criteria`, uncheck AC11's box, changing `- [x]` to
       `- [ ]` on the line beginning `` `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 1 ``.
       The text is left unchanged in this task; only the checkbox marker changes, because the
       criterion is currently checked while its text is false for the file it names, and it must not
@@ -405,7 +405,7 @@ by this cycle.)
       `git grep -c -P "^- \[ \] \`tests/scripts/claude-lib/blast-radius/BlastRadius\.TruthTable\.Tests\.ps1\` mirrors the Class 1" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports `1` after the edit (measured before the edit: `0`, since AC11's line currently begins
       `- [x] ` rather than `- [ ] `).
-- [ ] [P2-T3] In the same file, rewrite AC11's text so it attributes each mirror to the file that
+- [x] [P2-T3] In the same file, rewrite AC11's text so it attributes each mirror to the file that
       actually carries it: `` `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1` mirrors the Class 1 equality; ``
       on one line, followed by
       `` `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 3
@@ -421,7 +421,7 @@ by this cycle.)
       `git grep -c -F "BlastRadius.KeyPartition.Tests.ps1\` mirrors the Class 1 equality" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports at least `1` after the edit (measured before the edit: `0`, this literal is absent
       from `spec.md` today).
-- [ ] [P2-T4] In `.claude/rules/parallel-orchestration.md`, replace both occurrences of
+- [x] [P2-T4] In `.claude/rules/parallel-orchestration.md`, replace both occurrences of
       `` `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, closes that gap ``
       (the directional-invariant paragraph and the exhaustiveness-gate paragraph) with
       `` `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap ``,
@@ -431,13 +431,13 @@ by this cycle.)
       reports `2` after the edit (measured before the edit: `0`); and
       `git grep -c -F "BlastRadius.TruthTable.Tests.ps1\`, closes that gap" -- .claude/rules/parallel-orchestration.md`
       reports `0` after the edit (measured before the edit: `2`).
-- [ ] [P2-T5] Mirror the P2-T4 amendment byte-identically into
+- [x] [P2-T5] Mirror the P2-T4 amendment byte-identically into
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`,
       in the same commit.
       Acceptance: from the worktree root,
       `diff .claude/rules/parallel-orchestration.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       produces no output and exits 0.
-- [ ] [P2-T6] Confirm the mirrored-resource contract is unaffected: from the worktree root, run
+- [x] [P2-T6] Confirm the mirrored-resource contract is unaffected: from the worktree root, run
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
       Acceptance: `EXIT_CODE: 0`.
 
@@ -448,7 +448,7 @@ independently reverified against both Pester files' actual `It` inventories.)*
 
 ### Phase 3 — R4 & R5 (source numbering): Correct the KeyPartition header and give it its own `Describe` name (Minor)
 
-- [ ] [P3-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, in the
+- [x] [P3-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, in the
       `.DESCRIPTION` block (lines 5-14), replace "carries the 'Cross-copy key partition' Context
       verbatim" with a statement that three cases moved unchanged and the fourth — originally
       `requires the shared-surface lists compared by the directional invariant to be non-empty` —
@@ -457,24 +457,24 @@ independently reverified against both Pester files' actual `It` inventories.)*
       Acceptance: from the worktree root,
       `git grep -c -F "verbatim" -- tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
       reports `0` after the edit (measured before the edit: `1`, at the current header sentence).
-- [ ] [P3-T2] In the same file, rename its `Describe 'Committed blast-radius truth table shape'` to
+- [x] [P3-T2] In the same file, rename its `Describe 'Committed blast-radius truth table shape'` to
       `Describe 'Committed blast-radius truth table cross-copy key partition'`, leaving
       `BlastRadius.TruthTable.Tests.ps1`'s `Describe` name unchanged.
       Acceptance: from the worktree root,
       `grep -n "^Describe " tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1 tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
       reports two lines whose quoted `Describe` strings differ (measured before the edit: the two
       strings are identical, both `Committed blast-radius truth table shape`).
-- [ ] [P3-T3] Confirm the directory run is unaffected in count: from the worktree root, run
+- [x] [P3-T3] Confirm the directory run is unaffected in count: from the worktree root, run
       `mcp__drm-copilot__run_poshqc_test`.
       Acceptance: `EXIT_CODE: 0`; the `tests/scripts/claude-lib/blast-radius` directory total is
-      unchanged in count from its pre-cycle-4 value plus the two cases added in Phase 1 (P1-T5 and,
-      transitively, none removed), with 0 failed.
+      the pre-cycle-4 value (383, per `evidence/regression-testing/reviewer-perturbation-battery.2026-08-22T17-20.md`,
+      Group D) plus the one case added in Phase 1 (P1-T5), for a total of 384, with 0 failed.
 
 ---
 
 ### Phase 4 — R6 (source numbering): Document the Python floor's actual mechanism (Minor)
 
-- [ ] [P4-T1] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, extend
+- [x] [P4-T1] In `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, extend
       `test_the_gate_compares_non_empty_collections`'s docstring to state that an absent, null, or
       renamed `shared_surfaces` in the self-hosted copy, and an absent, null, or renamed `modules` in
       either copy, are caught upstream — most as a module-level collection error — by
@@ -487,7 +487,7 @@ independently reverified against both Pester files' actual `It` inventories.)*
       from the file today, since the function is currently imported only inside
       `blast_radius_parity_test_support.py` and `test_blast_radius_config.py`, not named in this
       file's own docstrings).
-- [ ] [P4-T2] Confirm file size: from the worktree root, run
+- [x] [P4-T2] Confirm file size: from the worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: the reported count is less than 500.
 
@@ -495,13 +495,13 @@ independently reverified against both Pester files' actual `It` inventories.)*
 
 ### Phase 5 — Final QA Loop (Python, PowerShell) and Acceptance-Criteria Reconciliation
 
-- [ ] [P5-T1] From the worktree root, run `poetry run black --check .`.
+- [x] [P5-T1] From the worktree root, run `poetry run black --check .`.
       Acceptance: `EXIT_CODE: 0`.
-- [ ] [P5-T2] From the worktree root, run `poetry run ruff check .`.
+- [x] [P5-T2] From the worktree root, run `poetry run ruff check .`.
       Acceptance: `EXIT_CODE: 0`, zero new `noqa` present.
-- [ ] [P5-T3] From the worktree root, run `poetry run pyright`.
+- [x] [P5-T3] From the worktree root, run `poetry run pyright`.
       Acceptance: `EXIT_CODE: 0`, `0 errors, 0 warnings`.
-- [ ] [P5-T4] From the worktree root, run
+- [x] [P5-T4] From the worktree root, run
       `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage.json`
       and record the final-QC artifact at
       `evidence/qa-gates/final-python-pytest-coverage.<timestamp>.md` with `Timestamp:`,
@@ -510,21 +510,21 @@ independently reverified against both Pester files' actual `It` inventories.)*
       `totals.percent_branches_covered` in `artifacts/python/coverage.json`.
       Acceptance: `EXIT_CODE: 0`, with both coverage figures at or above the P0-T15 baseline figures
       (no regression).
-- [ ] [P5-T5] Re-verify the parity module's collected count: from the worktree root, run
+- [x] [P5-T5] Re-verify the parity module's collected count: from the worktree root, run
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
       Acceptance: `EXIT_CODE: 0` and `17 passed` (the 16 present at the start of this cycle plus the
       one consumption test added in Phase 1).
-- [ ] [P5-T6] Run `mcp__drm-copilot__run_poshqc_format`.
+- [x] [P5-T6] Run `mcp__drm-copilot__run_poshqc_format`.
       Acceptance: `EXIT_CODE: 0`, zero files rewritten (a clean tree after the run).
-- [ ] [P5-T7] Run `mcp__drm-copilot__run_poshqc_analyze`.
+- [x] [P5-T7] Run `mcp__drm-copilot__run_poshqc_analyze`.
       Acceptance: `EXIT_CODE: 0`, zero findings.
-- [ ] [P5-T8] Run `mcp__drm-copilot__run_poshqc_test` and record the final-QC artifact at
+- [x] [P5-T8] Run `mcp__drm-copilot__run_poshqc_test` and record the final-QC artifact at
       `evidence/qa-gates/final-powershell-poshqc-test.<timestamp>.md` with the same four required
       fields, `Output Summary:` naming the pass/fail/skip counts and the line coverage percentage
       from the JaCoCo root `LINE` counter.
       Acceptance: `EXIT_CODE: 0` and the recorded line coverage at or above the P0-T18 baseline
       figure (no regression).
-- [ ] [P5-T9] Write the coverage delta-verification artifact at
+- [x] [P5-T9] Write the coverage delta-verification artifact at
       `evidence/qa-gates/coverage-delta-verification.<timestamp>.md` reporting, for Python and
       PowerShell: baseline coverage (Phase 0), post-change coverage (P5-T4 / P5-T8), and
       new/changed-code coverage. No production file is touched by R1 through R6, so the
@@ -532,11 +532,11 @@ independently reverified against both Pester files' actual `It` inventories.)*
       which there are zero.
       Acceptance: the artifact records both baseline and post-change figures for both languages with
       a delta of 0.00 or better on every figure.
-- [ ] [P5-T10] Confirm no coverage `exclude`/`omit` entry was added: from the worktree root, run
+- [x] [P5-T10] Confirm no coverage `exclude`/`omit` entry was added: from the worktree root, run
       `git diff "$(git merge-base main HEAD)"...HEAD -- pyproject.toml`, resolving the merge-base
       dynamically rather than citing a fixed commit.
       Acceptance: the diff produces no output.
-- [ ] [P5-T11] Confirm the file-size ceiling holds for every file touched this cycle: from the
+- [x] [P5-T11] Confirm the file-size ceiling holds for every file touched this cycle: from the
       worktree root, run
       `wc -l tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/blast_radius_parity_test_support.py tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`.
       Acceptance: all three reported counts are less than 500.
@@ -547,7 +547,7 @@ independently reverified against both Pester files' actual `It` inventories.)*
       Acceptance: the command produces no output (no changed lines under `scripts/dev_tools/` or
       `extensions/drm-copilot/src/`, and no change to the untouched
       `test_blast_radius_config.py`).
-- [ ] [P5-T13] Re-verify AC11's two named cases each resolve in the file the corrected text now
+- [x] [P5-T13] Re-verify AC11's two named cases each resolve in the file the corrected text now
       attributes them to: from the worktree root, run
       `grep -nE "^\s*It " tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
       and confirm `declares equal values for the runtime-describing keys in both copies` appears in
@@ -558,26 +558,26 @@ independently reverified against both Pester files' actual `It` inventories.)*
       `gives every separator-free bundled shared surface no wildcard` all appear in that list.
       Acceptance: all four named cases are present in their respectively attributed file's `It`
       list.
-- [ ] [P5-T14] Re-check AC11's checkbox: in `spec.md`, `## Acceptance Criteria`, change AC11's
+- [x] [P5-T14] Re-check AC11's checkbox: in `spec.md`, `## Acceptance Criteria`, change AC11's
       checkbox from `- [ ]` (set in P2-T2) to `- [x]` (text unchanged from P2-T3). This task depends
       on P5-T13 passing.
       Acceptance: from the worktree root,
       `git grep -c -P "^- \[x\] \`tests/scripts/claude-lib/blast-radius/BlastRadius\.KeyPartition\.Tests\.ps1\` mirrors the Class 1 equality;" -- docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md`
       reports `1` after the edit (measured before this task: `0`, since AC11's line reads `- [ ] `
       after P2-T2 and P2-T3).
-- [ ] [P5-T15] Confirm the acceptance-criteria count and full-checked state are unchanged at 17:
+- [x] [P5-T15] Confirm the acceptance-criteria count and full-checked state are unchanged at 17:
       from the worktree root, run
       `sed -n '/^## Acceptance Criteria$/,/^## Out of Scope$/p' docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md | grep -c -E "^- \[[ x]\]"`
       and
       `sed -n '/^## Acceptance Criteria$/,/^## Out of Scope$/p' docs/features/active/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/spec.md | grep -c -E "^- \[x\]"`.
       Acceptance: both commands report `17`, meaning the total count is unchanged and every
       criterion is checked.
-- [ ] [P5-T16] Write the final single-pass confirmation artifact at
+- [x] [P5-T16] Write the final single-pass confirmation artifact at
       `evidence/qa-gates/remediation-toolchain-single-pass.<timestamp>.md` recording that P5-T1
       through P5-T8 executed in one uninterrupted sequence with no restart and no file rewritten by
       any stage.
       Acceptance: the artifact records all eight exit codes as 0 with no intervening restart.
-- [ ] [P5-T17] Write the updated AC status summary at
+- [x] [P5-T17] Write the updated AC status summary at
       `evidence/issue-updates/ac-status-summary.<timestamp>.md` stating 17 of 17 acceptance criteria
       checked, with a one-line note that AC11 was unchecked by this cycle's P2-T2, corrected by
       P2-T3, and re-checked by P5-T14 after P5-T13's file-attribution reverification.

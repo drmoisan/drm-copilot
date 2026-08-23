@@ -25,6 +25,7 @@ Naming:
 
 from __future__ import annotations
 
+import inspect
 from typing import TYPE_CHECKING, cast
 
 from tests.scripts.dev_tools.test_blast_radius_config import (
@@ -103,14 +104,29 @@ PAYLOAD_MODULE_NAMES = frozenset({"config"})
 # committed copies must carry identical values.
 BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
 
-# Class 2 key names: the portable shared-surface keys, consumed by
-# test_class_two_bundled_shared_surfaces_are_the_portable_set and
-# test_class_two_bundled_shared_surface_globs_are_empty.
-CLASS_TWO_KEYS = ("shared_surfaces", "shared_surface_globs")
+# Class 2 key-to-assertion registry: each portable shared-surface key mapped to
+# the name of the test function that is supposed to consume it. Registering the
+# consuming assertion by name, rather than declaring a bare key tuple, is what
+# lets ``unconsumed_class_keys`` verify a key is actually read by a real
+# assertion rather than merely present in a membership tuple.
+CLASS_TWO_KEY_ASSERTIONS = {
+    "shared_surfaces": "test_class_two_bundled_shared_surfaces_are_the_portable_set",
+    "shared_surface_globs": "test_class_two_bundled_shared_surface_globs_are_empty",
+}
 
-# Class 3 key name: the payload module-map key, consumed by
-# test_class_three_bundled_modules_are_payload_modules_only.
-CLASS_THREE_KEYS = ("modules",)
+# Class 3 key-to-assertion registry: the payload module-map key mapped to the
+# name of the test function that is supposed to consume it.
+CLASS_THREE_KEY_ASSERTIONS = {
+    "modules": "test_class_three_bundled_modules_are_payload_modules_only",
+}
+
+# Class 2 key names, derived from the registry above so every existing
+# consumer of ``CLASS_TWO_KEYS`` (the membership asserts and
+# ``DECLARED_TOP_LEVEL_KEYS``) is unaffected by the registry's introduction.
+CLASS_TWO_KEYS = tuple(CLASS_TWO_KEY_ASSERTIONS)
+
+# Class 3 key names, derived from the registry above for the same reason.
+CLASS_THREE_KEYS = tuple(CLASS_THREE_KEY_ASSERTIONS)
 
 # The exhaustive set of top-level keys the truth-table schema declares,
 # derived from the three declared classes rather than hardcoded: the
@@ -187,3 +203,47 @@ def shared_surface_globs(config: Mapping[str, object]) -> tuple[str, ...]:
         return ()
     entries = cast("list[object]", value)
     return tuple(entry for entry in entries if isinstance(entry, str))
+
+
+def unconsumed_class_keys(
+    registry: Mapping[str, str], namespace: Mapping[str, object]
+) -> tuple[tuple[str, str], ...]:
+    """Find every registered key whose named assertion does not consume it.
+
+    Closes the CR-3 residual: a key added to a class-key registry (and to both
+    committed copies) with no assertion that genuinely references it must be
+    reported, not merely a key whose name is absent from the registry.
+    Membership in ``CLASS_TWO_KEYS`` / ``CLASS_THREE_KEYS`` proves only that the
+    key was *added* to the registry; it proves nothing about whether any test
+    function actually reads it. This helper checks consumption instead.
+
+    Args:
+        registry (Mapping[str, str]): Maps a key name to the name of the test
+            function that is supposed to consume it (for example
+            ``CLASS_TWO_KEY_ASSERTIONS``).
+        namespace (Mapping[str, object]): Namespace to resolve each assertion
+            name in, typically the caller's ``globals()``.
+
+    Returns:
+        tuple[tuple[str, str], ...]: One ``(key, assertion_name)`` pair per
+        registry entry that is unresolved, in registry iteration order. A pair
+        is unresolved when the assertion name is not callable in ``namespace``,
+        or when the assertion's source text never references the key literal.
+        An empty tuple means every registered key is genuinely consumed.
+
+    Side Effects:
+        None. Reads only the supplied mappings and, for a callable found in
+        ``namespace``, its source text via ``inspect.getsource``.
+    """
+    unresolved: list[tuple[str, str]] = []
+    # Walk each registered (key, assertion_name) pair and confirm the named
+    # assertion both exists and actually mentions the key in its own source,
+    # so a registry entry that reuses an unrelated test's name is caught.
+    for key, assertion_name in registry.items():
+        candidate = namespace.get(assertion_name)
+        if not callable(candidate):
+            unresolved.append((key, assertion_name))
+            continue
+        if key not in inspect.getsource(candidate):
+            unresolved.append((key, assertion_name))
+    return tuple(unresolved)

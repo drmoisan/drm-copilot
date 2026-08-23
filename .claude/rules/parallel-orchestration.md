@@ -307,7 +307,7 @@ relation together do not observe the self-hosted copy gaining a portable separat
 that never reaches the bundle: both checks are satisfied by a bundled set that stays fixed while
 the self-hosted set grows around it. `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
 in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
-`tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, closes that gap
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap
 structurally by asserting the reverse containment for separator-free entries: every separator-free
 self-hosted `shared_surfaces` entry must also appear in the bundled separator-free set.
 
@@ -316,7 +316,7 @@ declared classes each assert a property of the keys they name, but none of them 
 the two committed copies' top-level key sets are identical, or that every top-level key
 belongs to one of the three declared classes. `test_every_top_level_key_is_classified_and_shared_by_both_copies`
 in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
-`tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, closes that gap: the
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap: the
 union of both copies' top-level keys is exhaustively covered by the three declared classes, and
 an unclassified key or a key present in only one copy fails loudly and names itself.
 

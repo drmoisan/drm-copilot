@@ -5,12 +5,17 @@
 .DESCRIPTION
     Split out of BlastRadius.TruthTable.Tests.ps1 (issue #500, cycle 3): that file
     reached 496 of the 500-line limit after the CR-1/CR-2 non-vacuity-floor
-    repair, crossing the 480-line split trigger. This file carries the
-    'Cross-copy key partition' Context verbatim: Class 1 byte-equality of the
-    runtime-describing keys, the top-level key-set exhaustiveness gate, and the
-    repaired four-state non-vacuity floor over shared_surfaces and modules in
-    both committed copies. The tests read the two committed configurations
-    read-only, invoke no external process, and create no temporary files.
+    repair, crossing the 480-line split trigger. Three of the four moved cases
+    (Class 1 byte-equality of the runtime-describing keys, the directional
+    separator-free invariant, and the top-level key-set exhaustiveness gate)
+    moved unchanged; the fourth, originally named
+    'requires the shared-surface lists compared by the directional invariant to
+    be non-empty', was renamed to
+    'requires a populated shared-surface list and module map in both copies' and
+    rewritten as the cycle-3 CR-1/CR-2 repair. A fifth case, closing the CR-3
+    key-consumption residual, was added in cycle 4. The tests read the two
+    committed configurations read-only, invoke no external process, and create
+    no temporary files.
 #>
 
 BeforeAll {
@@ -24,15 +29,28 @@ BeforeAll {
     # values for the runtime-describing keys in both copies' case.
     $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads')
 
-    # Class 2 key names. Read by the 'requires every top-level key in both
-    # copies to be classified and shared' case (as part of the declared set).
-    $script:ClassTwoKeys = @('shared_surfaces', 'shared_surface_globs')
+    # Class 2 key-to-consumer-file registry (issue #500, cycle 4 R1). Both keys
+    # are indexed by name in BlastRadius.TruthTable.Tests.ps1, not in this
+    # file, so the registry maps each key to the file that actually consumes
+    # it -- closing the CR-3 residual, in which a key added to a bare
+    # membership tuple passed silently with no consuming assertion.
+    $script:ClassTwoKeyConsumerFile = @{
+        'shared_surfaces'      = 'BlastRadius.TruthTable.Tests.ps1'
+        'shared_surface_globs' = 'BlastRadius.TruthTable.Tests.ps1'
+    }
 
-    # Class 3 key name. Read by the same exhaustiveness case.
-    $script:ClassThreeKeys = @('modules')
+    # Class 3 key-to-consumer-file registry, same rationale.
+    $script:ClassThreeKeyConsumerFile = @{
+        'modules' = 'BlastRadius.TruthTable.Tests.ps1'
+    }
+
+    # Class 2 and Class 3 key names, derived from the registries above so the
+    # exhaustiveness case's declared-key-set computation is unaffected.
+    $script:ClassTwoKeys = @($script:ClassTwoKeyConsumerFile.Keys)
+    $script:ClassThreeKeys = @($script:ClassThreeKeyConsumerFile.Keys)
 }
 
-Describe 'Committed blast-radius truth table shape' {
+Describe 'Committed blast-radius truth table cross-copy key partition' {
     BeforeAll {
         # Read the authoritative truth table as the pinning source, mirroring the
         # constraints tests/scripts/dev_tools/test_blast_radius_config.py asserts.
@@ -212,6 +230,39 @@ Describe 'Committed blast-radius truth table shape' {
 
             # Assert: no combination may be absent, null, or empty.
             $offending.ToArray() | Should -BeNullOrEmpty
+        }
+
+        It 'requires every Class 2 and Class 3 key to be indexed by name in its registered consumer file' {
+            # Arrange: closes the CR-3 residual (issue #500 remediation, cycle
+            # 4 R1). Membership in $script:ClassTwoKeys / $script:ClassThreeKeys
+            # proves only that a key was added to the registry, not that any
+            # assertion actually reads it. Read each distinct consumer file
+            # named in the two registries once, and check every (key, file)
+            # pair for the literal indexer substring the consuming assertion
+            # uses to read it.
+            $registries = @($script:ClassTwoKeyConsumerFile, $script:ClassThreeKeyConsumerFile)
+            $consumerFileNames = $registries.Values | Select-Object -Unique
+            $fileText = @{}
+            foreach ($fileName in $consumerFileNames) {
+                $fileText[$fileName] = Get-Content -Raw -Path (Join-Path $PSScriptRoot $fileName)
+            }
+
+            # Act: accumulate every (key, file) pair whose consumer file never
+            # indexes the key by name, so the failure names every unresolved
+            # pair rather than the first.
+            $unresolved = [System.Collections.Generic.List[string]]::new()
+            foreach ($registry in $registries) {
+                foreach ($key in $registry.Keys) {
+                    $fileName = $registry[$key]
+                    if (-not $fileText[$fileName].Contains("['$key']")) {
+                        $unresolved.Add("${key} -> ${fileName}")
+                    }
+                }
+            }
+
+            # Assert: every registered key must be indexed by name in its
+            # registered consumer file.
+            $unresolved.ToArray() | Should -BeNullOrEmpty
         }
     }
 }

@@ -485,9 +485,10 @@ Seeded from issue:
       entry is wildcard-free; and a non-vacuity floor under which `COMMITTED_CONFIGS` has exactly
       two members and each collection intended to be non-empty is non-empty. Verified by
       `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`.
-- [x] `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 1
-      equality, the Class 3 subset, the five-name umbrella denylist applied to both copies, and the
-      separator-free-wildcard-free assertion, and stays under the 500-line limit. Verified by
+- [x] `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1` mirrors the Class 1 equality;
+      `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` mirrors the Class 3
+      subset, the five-name umbrella denylist applied to both copies, and the
+      separator-free-wildcard-free assertion; and both files stay under the 500-line limit. Verified by
       `mcp__drm-copilot__run_poshqc_test`.
 - [x] The comment inside the
       `declares no removed umbrella module in either committed copy` case in

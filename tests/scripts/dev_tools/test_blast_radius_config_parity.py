@@ -42,7 +42,9 @@ from scripts.dev_tools.compute_blast_radius import conflicts, derive_blast_radiu
 from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     BUNDLED_CONFIG,
     BYTE_EQUAL_KEYS,
+    CLASS_THREE_KEY_ASSERTIONS,
     CLASS_THREE_KEYS,
+    CLASS_TWO_KEY_ASSERTIONS,
     CLASS_TWO_KEYS,
     DECLARED_TOP_LEVEL_KEYS,
     PAYLOAD_MODULE_NAMES,
@@ -55,6 +57,7 @@ from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     module_names,
     shared_surface_globs,
     shared_surfaces,
+    unconsumed_class_keys,
 )
 from tests.scripts.dev_tools.test_blast_radius_config import (
     BUNDLED_CONFIG_LABEL,
@@ -352,6 +355,29 @@ def test_class_three_bundled_modules_are_payload_modules_only() -> None:
     )
 
 
+def test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion() -> (  # noqa: E501
+    None
+):
+    """Require every Class 2 and Class 3 key to be consumed, not merely present.
+
+    Closes the CR-3 residual (cycle 4, R1): a key added to a registry and to
+    both committed copies, with no assertion that genuinely references it,
+    previously passed silently because the only check was membership in
+    ``CLASS_TWO_KEYS`` / ``CLASS_THREE_KEYS`` — a tuple the key was just added
+    to. ``unconsumed_class_keys`` checks consumption instead. The three
+    existing membership lines are left unchanged; this adds a check.
+    """
+    # Check both registries against this module's namespace, where the
+    # registered assertion functions live.
+    unresolved = unconsumed_class_keys(
+        CLASS_TWO_KEY_ASSERTIONS, globals()
+    ) + unconsumed_class_keys(CLASS_THREE_KEY_ASSERTIONS, globals())
+    assert not unresolved, (
+        "Every Class 2 and Class 3 registry key must be consumed by its "
+        f"registered assertion; unresolved pairs {unresolved}."
+    )
+
+
 @pytest.mark.parametrize(("label", "path"), COMMITTED_CONFIGS)
 def test_no_committed_copy_declares_an_umbrella_module(label: str, path: Path) -> None:
     """Reject a disqualified umbrella module in either committed truth table.
@@ -410,6 +436,10 @@ def test_the_gate_compares_non_empty_collections() -> None:
     assertion into one that holds trivially. This case states that each
     collection the gate compares and intends to be non-empty is in fact
     non-empty, and that the parametrized cases cover exactly two copies.
+
+    Most tested cells are pre-empted upstream by ``require_string_list`` and
+    ``load_module_globs`` (from ``test_blast_radius_config.py``) raising
+    ``TypeError``; only the remaining states reach this assertion directly.
     """
     # Arrange: name each collection so the failure identifies which one emptied.
     populated: dict[str, tuple[str, ...] | frozenset[str]] = {
