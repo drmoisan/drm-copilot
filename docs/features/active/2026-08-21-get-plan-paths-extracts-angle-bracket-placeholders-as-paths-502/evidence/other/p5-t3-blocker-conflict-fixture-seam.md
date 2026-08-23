@@ -4,7 +4,14 @@ Timestamp: 2026-08-23T02-34
 
 Feature: 2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502 (issue #502)
 Task: [P5-T3]
-Status: **NOT COMPLETED — reported rather than worked around**
+Status: **RESOLVED IN REVISION 6.** This report was accepted in full and the seam analysis was
+verified independently by the coordinator: `classify_path_token` has exactly two callers, the
+extraction module and the declared-radius normalization entry point, and the conflict chain calls
+neither. The task was rewritten to add a named normalization-plus-conflict test to each runtime
+instead of a fixture. Both tests pass and are recorded at
+`evidence/regression-testing/placeholder-pair-normalization-tests.md`. The analysis below is retained
+unchanged as the record of why the original form was unsatisfiable; the resolution is appended at the
+end.
 
 ## The task and its acceptance
 
@@ -124,3 +131,41 @@ governs. Either of these is satisfiable and discriminating:
 2. A named normalization-plus-conflict test in each runtime (not a corpus fixture): build two radii
    carrying a shared placeholder token, normalize both, assert the conflict verdict is false, and
    assert that the same two radii un-normalized still overlap, which pins the seam explicitly.
+
+---
+
+## Resolution as executed (revision 6)
+
+The requested plan revision was applied. Option 2 of the two proposals below was taken: a named
+normalization-plus-conflict test in each runtime rather than a corpus fixture.
+
+**What was added.** One test per runtime, in the two files [P5-T8] and [P5-T9] already edit, so no
+file was created and the created-path list stayed at eight:
+
+- `tests/scripts/dev_tools/test_blast_radius_normalization.py::test_placeholder_only_overlap_stops_conflicting_after_normalization`
+- `tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1` — `conflicts before normalization and stops conflicting after it`
+
+**Why this form is both satisfiable and discriminating**, which the fixture could not be. The test
+normalizes both radii before conflicting them, and normalization is one of the classifier's two
+callers. The post-normalization assertion therefore fails on a tree where the classifier was never
+fixed, because the pre-fix classifier accepted the placeholder as `'concrete'` (measured at [P0-T12]
+and [P0-T13]) and normalization would have retained it. The test additionally asserts that the
+**pre-normalization** pair does conflict, which is the control proving the two radii really share an
+entry; without it a construction error leaving the pair disjoint would satisfy the post-normalization
+assertion vacuously.
+
+**Why the derivation-pair alternative of proposal 1 was not taken.** The derivation handler in both
+parity harnesses takes a single plan text, spec text, and feature folder and returns one radius, so a
+two-item pair would require adding a third fixture shape to both harnesses. That is redesign rather
+than execution. The `verification-integrity` precedent is not a counterexample: that file sits in a
+subdirectory the top-level fixture glob does not reach and is consumed by a hand-written test that
+loads it by explicit path and walks the pairs itself, which is structurally this option with a data
+file attached.
+
+**AC-8 disposition.** The literal clause requiring
+`tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` to exist is **withdrawn as
+unsatisfiable** on the analysis above. The substance of AC-8 is discharged twice over: by the two
+named tests as a regression test in each runtime, and by the [P7-T7] post-fix repro as an executed
+integration probe in both runtimes, which is the issue's own Steps to Reproduce. The withdrawal and
+its reason are recorded against AC-8 in the [P8-T16] acceptance-criteria status artifact rather than
+left as an unmet criterion.

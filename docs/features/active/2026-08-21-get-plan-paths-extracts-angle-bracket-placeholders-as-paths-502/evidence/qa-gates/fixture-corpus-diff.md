@@ -1,11 +1,9 @@
 # QA Gate — Fixture-Corpus Diff — [P5-T12]
 
-Timestamp: 2026-08-23T02-55
+Timestamp: 2026-08-23T05-08
 
 Feature: 2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502 (issue #502)
-Task: [P5-T12]
-Status: **PARTIAL — the path count is three, not the four the acceptance names. See the deviation
-section; the cause is the [P5-T3] blocker, not a fixture this task failed to record.**
+Task: [P5-T12] (revision 6 expectation: three paths)
 
 ## Command 1 — porcelain status
 
@@ -14,88 +12,90 @@ Command: `git status --porcelain -- tests/fixtures/blast_radius`
 EXIT_CODE: 0
 
 ```text
-?? tests/fixtures/blast_radius/derivation-placeholder-marker-variants.json
-?? tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json
-?? tests/fixtures/blast_radius/validation-placeholder-self-consistent.json
 ```
 
-## Command 2 — main-anchored diff
+Empty.
+
+## Command 2 — anchored diff
 
 Command: `git diff --name-status main -- tests/fixtures/blast_radius`
 
 EXIT_CODE: 0
 
 ```text
+A	tests/fixtures/blast_radius/derivation-placeholder-marker-variants.json
+A	tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json
+A	tests/fixtures/blast_radius/validation-placeholder-self-consistent.json
 ```
 
-Empty. Resolved `main` SHA: `d782ee1c8b05192ed1bda40936ba5e37d9a5512e`.
+Resolved `main` SHA: `d782ee1c8b05192ed1bda40936ba5e37d9a5512e`
 
-## Why the union of the two commands is required
+The same diff taken against the merge base `bee15c0660d382ed74c642d2e028fd136051046f` returns the
+identical three-entry result, so this gate's outcome does not depend on the ref position. That second
+anchor is taken because `main` is no longer an ancestor of `HEAD`: `origin/main` is 27 commits ahead
+after issue #500 merged as pull request #514, and `HEAD` is 9 ahead. This pathspec is untouched by
+#500, which is why the two anchors agree here where they diverge elsewhere.
 
-Neither command alone suffices, and the reason is commit state:
-
-- The **porcelain** form reports the new fixtures while they are untracked, but goes empty once they
-  are committed.
-- The **`main`-anchored diff** reports them once they are committed, but never reports an untracked
-  file.
-
-Taking the union makes the gate independent of whether the executor has committed. In this run the
-fixtures are untracked, so the porcelain form carries all three entries and the anchored diff is
-empty; after a commit the two would swap. Either way the union is the same set.
-
-`git add --intent-to-add` was deliberately not substituted for either command: it mutates the index,
-and the union form needs no such side effect. That prohibition is scoped to this task alone and does
-not conflict with the `git add -A` step the five Phase 8 audits require. The two situations differ:
-this gate asserts a file *set* and the union supplies it without touching the index, whereas those
-audits need diff *content* and line counts, which no union of status output can supply. This task
-also runs several phases earlier, before any staging step, and works in either state, so requiring
-staging later does not disturb it.
-
-## Union of the two outputs
+## The union, and why this run is the proof the union form was needed
 
 | Path | Status | Created by |
 | --- | --- | --- |
-| `tests/fixtures/blast_radius/derivation-placeholder-marker-variants.json` | untracked (`??`) | [P5-T2] |
-| `tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json` | untracked (`??`) | [P5-T1] |
-| `tests/fixtures/blast_radius/validation-placeholder-self-consistent.json` | untracked (`??`) | [P5-T4] |
+| `tests/fixtures/blast_radius/derivation-placeholder-marker-variants.json` | added (`A`) | [P5-T2] |
+| `tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json` | added (`A`) | [P5-T1] |
+| `tests/fixtures/blast_radius/validation-placeholder-self-consistent.json` | added (`A`) | [P5-T4] |
 
-**Three paths.** Every entry is one of the fixtures created in this phase and every entry carries an
-untracked status.
+**Three paths.** Every entry is one of the three fixtures created by [P5-T1], [P5-T2], and [P5-T4],
+and every entry carries an added status.
 
-## Zero modified entries — the pre-existing corpus is intact
+The commit state **inverted between the two executions of this gate**, which is the clearest possible
+demonstration that neither command alone would do:
+
+| Run | Fixture state | Porcelain output | Anchored-diff output |
+| --- | --- | --- | --- |
+| first execution | untracked | 3 entries, `??` | empty |
+| this execution, after commit `fd20019d` | committed | empty | 3 entries, `A` |
+
+Had this gate relied on the porcelain form alone it would now report zero paths and pass vacuously;
+had it relied on the anchored diff alone it would have reported zero paths on the first run. The union
+returns the same three-path set in both states. This is exactly the vacuity the task text warned
+about, observed rather than hypothesised.
+
+`git add --intent-to-add` was again not substituted for either command: it mutates the index, and the
+union needs no such side effect. That prohibition is scoped to this task and does not conflict with
+the `git add -A` step the five Phase 8 audits require, which need diff *content* and line counts that
+no union of status output can supply.
+
+## Zero modified entries — the clause that carries the substantive proof
 
 The union carries **zero** entries with a modified status. Neither command reported an `M` or ` M`
-entry under `tests/fixtures/blast_radius`, which proves all **32** pre-existing fixtures are
-unmodified in both commit states. That includes
-`tests/fixtures/blast_radius/conflict-path-overlap.json`, the reused negative control, whose
-unmodified state is separately and more strongly established by [P5-T7]'s `--exit-code` diff against
-`main`.
+entry under `tests/fixtures/blast_radius`, which proves all **32** pre-existing top-level fixtures are
+unmodified in both commit states. The nested
+`verification-integrity/verification-integrity-485-486-487.json` capture is likewise unreported and
+therefore unmodified, so the stronger statement holds across all 33 pre-existing fixture files.
 
-This is the half of the gate that carries the real risk. A change that quietly adjusted an existing
-fixture's `expected` block to accommodate the new guard would be invisible to the parity suites,
-because both suites read the fixture as their own source of truth. The zero-modified-entry
-observation is what forecloses that.
+This is the half of the gate that carries the real risk, and revision 6 left it untouched for that
+reason. A change that quietly adjusted an existing fixture's `expected` block to accommodate the new
+guard would be invisible to both parity suites, because each suite reads the fixture as its own source
+of truth and neither can detect that the truth moved. The zero-modified-entry observation forecloses
+that. It is corroborated by [P5-T7]'s dedicated `--exit-code` diff for the reused negative control and
+by [P8-T14]'s whole-tree audit.
 
-## Deviation — three paths where the acceptance names four
+## Why the count is three and not four
 
-The acceptance requires the union to name "exactly four paths". It names three. The missing fourth
-is the conflict fixture of [P5-T3], which was not created because its acceptance condition is
-unreachable: a conflict fixture is compared as literal recorded radii and the conflict relation never
-invokes the classifier the guard lives in, so its verdict is invariant under this item's fix. The
-full analysis, the measurement that establishes it, and a requested plan revision are recorded at
-`docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/other/p5-t3-blocker-conflict-fixture-seam.md`.
+Revision 6 replaced [P5-T3]'s conflict fixture with a named normalization-plus-conflict test per
+runtime. Those tests edit two pre-existing files, both outside this pathspec, and create nothing, so
+the fixture count fell from four to three and the created-path list from nine to eight. The original
+fixture was unsatisfiable in the parity harness; the seam analysis is at
+`evidence/other/p5-t3-blocker-conflict-fixture-seam.md` and the replacement tests are recorded at
+`evidence/regression-testing/placeholder-pair-normalization-tests.md`.
 
-The deviation is confined to the count. Both substantive conditions of this gate hold in full:
-
-- every path in the union is a fixture this phase created, and each carries an added or untracked
-  status;
-- the union carries zero modified entries, so all 32 pre-existing fixtures are unmodified.
-
-The count is recorded as observed rather than adjusted, and this task is **not** marked complete.
+The on-disk corpus stands at **35** JSON fixtures, so the floors of 30 set by [P5-T5] and [P5-T6]
+remain non-vacuous.
 
 ## Output Summary
 
-The union of the porcelain status and the `main`-anchored diff names three paths, each a fixture
-created in this phase and each untracked. Zero entries carry a modified status, proving all 32
-pre-existing fixtures are unmodified in both commit states. The acceptance names four paths; the
-count is three because [P5-T3] was blocked, and the shortfall is attributed rather than absorbed.
+The union of the porcelain status and the `main`-anchored diff names **exactly three** paths, each one
+of the three fixtures created by [P5-T1], [P5-T2], and [P5-T4], each carrying an added status. The
+union carries **zero** entries with a modified status, proving all 32 pre-existing fixtures are
+unmodified in both commit states. Both anchors agree. The commit state inverted between this run and
+the previous one, so both halves of the union have now been observed carrying the result on their own.

@@ -317,3 +317,103 @@ Describe 'Get-NormalizedDeclaredRadius placeholder stripping (issue #502)' {
         }
     }
 }
+
+Describe 'Placeholder-only overlap after normalization (issue #502)' {
+    BeforeAll {
+        # A minimal truth table: one module keyed on the configuration tree and
+        # one shared surface inside it, so neither test radius below can reach the
+        # module or shared-surface level and no reason other than a path overlap
+        # is possible. Every literal is single-quoted, per the constraint recorded
+        # in tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1.
+        $script:PairConfig = @{
+            version               = 1
+            shared_surfaces       = @('config/blast-radius.json')
+            shared_surface_globs  = @()
+            modules               = @{ 'config' = @('config/**') }
+            over_breadth_fraction = 0.25
+        }
+        $script:PairComputedAt = '2026-08-23T05-00'
+        # Built by concatenation so the marker cannot be consumed by any quoting
+        # change a later edit might introduce.
+        $script:PairPlaceholder = '<' + 'FEATURE' + '>' + '/spec.md'
+    }
+
+    Context 'Pair-level regression for the placeholder guard' {
+        It 'conflicts before normalization and stops conflicting after it' {
+            # Arrange: the only shared entry is a placeholder feature-document
+            # token. Real files are disjoint and sit under different feature
+            # folders, and the module and contract levels are disjoint too.
+            #
+            # The normalization step is what places the assertion on the
+            # classifier's path. Test-BlastRadiusConflict compares recorded path
+            # entries by string equality, glob match, and directory containment;
+            # it never calls Get-PathTokenKind. So a pair of hand-authored radii
+            # contends on a shared placeholder token whether or not the guard
+            # exists, and asserting the raw pair proves nothing about the fix.
+            # Get-NormalizedDeclaredRadius re-runs the classifier over each
+            # recorded entry, so normalizing first is what routes the comparison
+            # through the guard and makes the second assertion below fail on a
+            # tree where the classifier was never fixed.
+            #
+            # Both halves are required. The pre-normalization assertion is the
+            # control proving the two radii really do share an entry: without it,
+            # a construction error leaving the pair disjoint from the start would
+            # satisfy the post-normalization assertion vacuously.
+            $radiusA = @{
+                paths           = @(
+                    $script:PairPlaceholder,
+                    'docs/features/active/2026-08-23-alpha-item-9001/plan.md',
+                    'scripts/dev_tools/alpha_only_module.py'
+                )
+                modules         = @('alpha')
+                shared_surfaces = @()
+                contracts       = @('Alpha')
+                source          = 'declared'
+                computed_at     = $script:PairComputedAt
+            }
+            $radiusB = @{
+                paths           = @(
+                    $script:PairPlaceholder,
+                    'docs/features/active/2026-08-23-beta-item-9002/plan.md',
+                    'scripts/dev_tools/beta_only_module.py'
+                )
+                modules         = @('beta')
+                shared_surfaces = @()
+                contracts       = @('Beta')
+                source          = 'declared'
+                computed_at     = $script:PairComputedAt
+            }
+            # Assert the probe literal survived construction before it is used.
+            $script:PairPlaceholder | Should -Be '<FEATURE>/spec.md'
+            $script:PairPlaceholder.Length | Should -Be 17
+
+            # Assert first half: the pre-normalization pair DOES conflict, on the
+            # shared placeholder token and on nothing else.
+            $before = Test-BlastRadiusConflict -RadiusA $radiusA -RadiusB $radiusB `
+                -Config $script:PairConfig
+            $before['conflict'] | Should -BeTrue
+            @($before['reasons']).Count | Should -Be 1
+            @($before['reasons'])[0]['kind'] | Should -Be 'path_overlap'
+            @($before['reasons'])[0]['detail'] |
+                Should -BeLike ('*' + $script:PairPlaceholder + '*')
+
+            # Act: route both radii through the classifier via normalization.
+            $normalizedA = Get-NormalizedDeclaredRadius -Radius $radiusA `
+                -Config $script:PairConfig
+            $normalizedB = Get-NormalizedDeclaredRadius -Radius $radiusB `
+                -Config $script:PairConfig
+
+            # Assert second half: the normalized pair does NOT conflict.
+            $after = Test-BlastRadiusConflict -RadiusA $normalizedA -RadiusB $normalizedB `
+                -Config $script:PairConfig
+            $after['conflict'] | Should -BeFalse
+            @($after['reasons']).Count | Should -Be 0
+
+            # The placeholder is gone from both radii and every real entry survived.
+            $normalizedA['paths'] | Should -Not -Contain $script:PairPlaceholder
+            $normalizedB['paths'] | Should -Not -Contain $script:PairPlaceholder
+            $normalizedA['paths'] | Should -Contain 'scripts/dev_tools/alpha_only_module.py'
+            $normalizedB['paths'] | Should -Contain 'scripts/dev_tools/beta_only_module.py'
+        }
+    }
+}

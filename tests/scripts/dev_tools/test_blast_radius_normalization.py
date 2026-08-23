@@ -19,6 +19,7 @@ from scripts.dev_tools._blast_radius_normalization import (
 )
 from scripts.dev_tools.compute_blast_radius import (
     BlastRadius,
+    conflicts,
     normalize_declared_radius,
 )
 
@@ -285,3 +286,80 @@ def test_normalize_declared_radius_clears_a_level_a_placeholder_alone_supplied()
     assert result.paths == ("scripts/dev_tools/compute_blast_radius.py",)
     assert result.modules == ()
     assert result.shared_surfaces == ()
+
+
+def test_placeholder_only_overlap_stops_conflicting_after_normalization() -> None:
+    """Two radii sharing only a placeholder token stop contending (issue #502).
+
+    This is the pair-level regression test for the placeholder guard, and the
+    normalization step is what places the assertion on the classifier's path.
+    ``conflicts`` compares recorded path entries by string equality, glob match,
+    and directory containment; it never calls ``classify_path_token``. So a pair
+    of hand-authored radii contends on a shared placeholder token whether or not
+    the guard exists, and asserting the raw pair proves nothing about the fix.
+    ``normalize_declared_radius`` re-runs the classifier over each recorded
+    entry, so normalizing first is what routes the comparison through the guard
+    and makes the second assertion below fail on a tree where the classifier was
+    never fixed.
+
+    Both halves are required. The pre-normalization assertion is the control that
+    proves the two radii really do share an entry: without it, a construction
+    error that left the pair disjoint from the start would satisfy the
+    post-normalization assertion vacuously. The post-normalization assertion is
+    the one that pins the fix.
+    """
+    # Arrange: the only shared entry is a placeholder feature-document token.
+    # Real files are disjoint and sit under different feature folders, and the
+    # module, shared-surface, and contract levels are disjoint too, so no other
+    # level can produce a conflict reason.
+    placeholder = "<FEATURE>/spec.md"
+    radius_a = declared_radius(
+        paths=[
+            placeholder,
+            "docs/features/active/2026-08-23-alpha-item-9001/plan.md",
+            "scripts/dev_tools/alpha_only_module.py",
+        ],
+        modules=["alpha"],
+        shared_surfaces=[],
+        contracts=["Alpha"],
+    )
+    radius_b = declared_radius(
+        paths=[
+            placeholder,
+            "docs/features/active/2026-08-23-beta-item-9002/plan.md",
+            "scripts/dev_tools/beta_only_module.py",
+        ],
+        modules=["beta"],
+        shared_surfaces=[],
+        contracts=["Beta"],
+    )
+
+    # Assert first half: the pre-normalization pair DOES conflict, on the shared
+    # placeholder token and on nothing else.
+    before = conflicts(radius_a, radius_b, NORMALIZER_CONFIG)
+    assert before.conflict is True, (
+        "Expected the un-normalized pair to conflict on the shared placeholder "
+        f"token; observed {before}."
+    )
+    assert [reason.kind for reason in before.reasons] == ["path_overlap"], (
+        "Expected exactly one path_overlap reason before normalization; observed "
+        f"{[(r.kind, r.detail) for r in before.reasons]}."
+    )
+    assert placeholder in before.reasons[0].detail
+
+    # Act: route both radii through the classifier via normalization.
+    normalized_a = normalize_declared_radius(radius_a, NORMALIZER_CONFIG)
+    normalized_b = normalize_declared_radius(radius_b, NORMALIZER_CONFIG)
+
+    # Assert second half: the normalized pair does NOT conflict.
+    after = conflicts(normalized_a, normalized_b, NORMALIZER_CONFIG)
+    assert after.conflict is False, (
+        "Expected the normalized pair not to conflict once the placeholder token "
+        f"is dropped; observed {after}."
+    )
+    assert after.reasons == ()
+    # The placeholder is gone from both radii and every real entry survived.
+    assert placeholder not in normalized_a.paths
+    assert placeholder not in normalized_b.paths
+    assert "scripts/dev_tools/alpha_only_module.py" in normalized_a.paths
+    assert "scripts/dev_tools/beta_only_module.py" in normalized_b.paths
