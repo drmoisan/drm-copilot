@@ -56,7 +56,16 @@ Note the asymmetry with the sibling rule set. `.claude/rules/plan-acceptance-gat
 
 - [x] Attached minimal logs or screenshot
 - Snippet is inlined under **Actual Behavior** above.
-- Scope correction to an earlier report: `${VAR}/y.cs` was **not** reproduced as extracting — that form is already rejected. The defect is specific to the angle-bracket shape, so a fix should not assume the interpolation forms are also affected without re-testing each one.
+- ~~Scope correction to an earlier report: `${VAR}/y.cs` was **not** reproduced as extracting — that form is already rejected. The defect is specific to the angle-bracket shape, so a fix should not assume the interpolation forms are also affected without re-testing each one.~~
+- **RETRACTED 2026-08-22 — the scope correction above is wrong.** It instructed re-testing each form, and that re-test overturned it. All five markers are accepted as `concrete` by both runtimes. Measured with single-quoted probes against `classify_path_token` (`scripts/dev_tools/_blast_radius_extraction.py`) and `Get-PathTokenKind` (`.claude/lib/blast-radius/BlastRadiusExtraction.psm1`):
+
+  ```text
+  <FEATURE>/spec.md   -> concrete      ${FEATURE}/spec.md -> concrete
+  ${VAR}/y.cs         -> concrete      $(VAR)/y.cs        -> concrete
+  %VAR%/y.cs          -> concrete
+  ```
+
+  The original probe most likely used a PowerShell double-quoted string, in which `"${VAR}/y.cs"` interpolates to `/y.cs` and is then rejected by the leading-separator guard — an artifact of the probe, not of the classifier. The defect is therefore **not** specific to the angle-bracket shape: the fix must reject the full marker set `<`, `>`, `${`, `$(`, `%`, matching the set already specified in `.claude/rules/plan-acceptance-gates.md`, so the two subsystems agree.
 
 ## Impact / Severity
 
