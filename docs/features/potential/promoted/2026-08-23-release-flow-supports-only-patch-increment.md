@@ -85,6 +85,7 @@ parameter, or to leave it patch-only and document it as extension-only. Do not a
 - [ ] Every existing caller that passes no `-Increment` produces the same result as before the change.
 - [ ] **A standing test asserts that Codex pins the correct MCP server version.** For both `.codex/config.toml` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml`, the version in `args = ["-y", "@danmoisan/drm-copilot-mcp@<version>"]` must equal the `version` field of `packages/mcp-server/package.json`. The test runs on every commit as part of the normal suite, not only during a release, so a stale pin fails the build instead of shipping.
 - [ ] That test is proven non-vacuous: perturbing either pin to a version that does not match the manifest makes it fail, and the failure message names the offending file and both versions.
+- [ ] **The pinned version must also be verified to EXIST on the npm registry, after publish.** Matching the manifest is necessary but not sufficient. Release v1.0.25 pinned `@danmoisan/drm-copilot-mcp@1.0.25` in both configs, which correctly matched its manifest, while that version was never published — so the shipped Codex integration failed on `npx -y @danmoisan/drm-copilot-mcp@1.0.25` for two days until 1.0.26. A pin-equals-manifest test passes on exactly that case. The post-publish check must resolve the pinned version against the registry and fail loudly when it is absent. Tracked separately for the publish-side root cause; this criterion covers the pin-side guard.
 
 ## Constraints & Risks
 
