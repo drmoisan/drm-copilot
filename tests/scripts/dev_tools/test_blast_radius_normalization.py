@@ -205,3 +205,83 @@ def test_normalize_declared_radius_drops_every_rejected_entry_class() -> None:
     assert result.contracts == ("normalize_declared_radius",)
     assert result.source == "declared"
     assert result.computed_at == COMPUTED_AT
+
+
+def test_normalize_declared_radius_strips_a_placeholder_entry() -> None:
+    """Strip a placeholder entry from an already-recorded radius (issue #502).
+
+    This is the retrospective-cleaning path. The guard lives in the classifier,
+    and ``normalize_declared_radius`` re-runs the classifier over each recorded
+    entry, so a radius that was recorded before the guard existed is cleaned by
+    normalization rather than by re-derivation, which is not always possible.
+
+    The assertions cover all three dependent levels, not just ``paths``,
+    because the module and shared-surface levels are re-resolved from the
+    surviving paths. A normalizer that dropped the entry from ``paths`` while
+    leaving a stale module or shared surface behind would still make two
+    unrelated items contend, one level up from where the entry was removed.
+    """
+    # Arrange: a recorded radius carrying one placeholder entry whose shape
+    # matches the configured shared surface, one placeholder entry that resolves
+    # into the configured module, and two real entries that must survive.
+    radius = declared_radius(
+        paths=[
+            "<FEATURE>/spec.md",
+            "config/blast-radius.json",
+            "config/${environment}.json",
+            "scripts/dev_tools/compute_blast_radius.py",
+        ],
+        modules=["config"],
+        shared_surfaces=["config/blast-radius.json"],
+        contracts=["normalize_declared_radius"],
+    )
+
+    # Act
+    result = normalize_declared_radius(radius, NORMALIZER_CONFIG)
+
+    # Assert: both placeholder entries are gone and both real entries survive.
+    assert result.paths == (
+        "config/blast-radius.json",
+        "scripts/dev_tools/compute_blast_radius.py",
+    )
+    # The module level is re-resolved from the surviving paths, so the module the
+    # placeholder entry would have contributed is present only because a real
+    # entry also resolves to it.
+    assert result.modules == ("config",)
+    # The shared-surface level is likewise re-resolved from the surviving
+    # concrete entries.
+    assert result.shared_surfaces == ("config/blast-radius.json",)
+    assert result.contracts == ("normalize_declared_radius",)
+    assert result.source == "declared"
+    assert result.computed_at == COMPUTED_AT
+
+
+def test_normalize_declared_radius_clears_a_level_a_placeholder_alone_supplied() -> (
+    None
+):
+    """Re-resolution removes a level no surviving real entry supports.
+
+    The companion above keeps ``config`` because a real entry also resolves to
+    it, which cannot distinguish re-resolution from passthrough. Here the only
+    entry that reached the module and shared-surface levels is the placeholder,
+    so both levels must come back empty. Without this case a normalizer that
+    copied the recorded levels verbatim would satisfy the companion.
+    """
+    # Arrange
+    radius = declared_radius(
+        paths=[
+            "config/${environment}.json",
+            "scripts/dev_tools/compute_blast_radius.py",
+        ],
+        modules=["config"],
+        shared_surfaces=["config/blast-radius.json"],
+        contracts=["normalize_declared_radius"],
+    )
+
+    # Act
+    result = normalize_declared_radius(radius, NORMALIZER_CONFIG)
+
+    # Assert
+    assert result.paths == ("scripts/dev_tools/compute_blast_radius.py",)
+    assert result.modules == ()
+    assert result.shared_surfaces == ()

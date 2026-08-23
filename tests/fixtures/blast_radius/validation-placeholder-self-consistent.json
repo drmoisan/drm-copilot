@@ -1,0 +1,48 @@
+{
+  "description": "Symmetric rejection. A radius derived from a placeholder-citing plan validates clean against that same plan, because V1 and V2 apply the identical shape rejection to the plan-side extraction that derivation applied to the harvest. Without the symmetry the derived radius would fail V1 against its own plan (issue #502).",
+  "input": {
+    "plan_text": "### Phase 1 — Work\n- [ ] [P1-T1] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md`.\n- [ ] [P1-T2] Edit `scripts/dev_tools/compute_blast_radius.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-22-placeholder-self-consistent-502",
+    "computed_at": "2026-08-22T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-22-placeholder-self-consistent-502/**",
+        "scripts/dev_tools/compute_blast_radius.py"
+      ],
+      "modules": [
+        "python-dev-tools"
+      ],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-22T12-00"
+    },
+    "findings": []
+  }
+}

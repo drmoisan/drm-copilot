@@ -268,3 +268,87 @@ def test_derivation_rejects_a_non_string_module_name() -> None:
 
     with pytest.raises(TypeError, match="must be a string"):
         derive_blast_radius("", "", "f", bad_config, computed_at="t")
+
+
+def test_placeholder_shaped_shared_surface_glob_match_is_dropped() -> None:
+    """Pin the accepted fail-open trade of the placeholder guard (issue #502).
+
+    **This is the accepted trade, not a defect.** A token whose shape matches a
+    configured shared-surface glob is dropped by the placeholder guard before
+    surface resolution ever sees it, so it is no longer reported as a touched
+    shared surface. The guard runs in the classifier, which is upstream of
+    ``resolve_shared_surfaces``, and the trade is inherent to putting it there:
+    a guard placed downstream of surface resolution would leave the placeholder
+    in ``paths`` and reintroduce the path-level false edge the guard exists to
+    remove.
+
+    **Corpus exposure was measured empty.** Across the 58-plan corpus examined
+    for this change, no plan cited a marker-bearing token whose shape matched a
+    configured shared-surface glob, so the trade cost nothing on the corpus it
+    was measured against. The measurement is what makes this a trade rather
+    than a guess, and it is the figure a later change must re-take before
+    widening the marker set.
+
+    **The planner remains obliged to append a concrete path.** The exclusion
+    describes the default relationship between a plan and a shape it merely
+    documents; it is not a licence to express a genuine write as a shape. When
+    an item's plan will actually write a shared surface, the planner appends
+    that exact concrete path to the declared radius after normalization, and
+    the surface is then resolved from the concrete entry. Drift detection is
+    the backstop: it compares the declared radius against the paths a diff
+    actually touched, so an item that wrote a surface it expressed only as a
+    shape is caught against observed evidence rather than against prose.
+    """
+    # Arrange: a plan citing a token that matches the configured shared-surface
+    # glob in shape but carries a placeholder in its filename position, plus a
+    # real file that resolves to no shared surface.
+    plan_text = (
+        "### Phase 1 - Work\n"
+        "- [ ] [P1-T1] Edit `scripts/dev_tools/validate_${target}.py` and "
+        "`scripts/dev_tools/compute_blast_radius.py`.\n"
+    )
+
+    # Act
+    radius = derive_blast_radius(
+        plan_text,
+        "",
+        "2026-08-22-fail-open-trade-502",
+        CONFIG,
+        computed_at=COMPUTED_AT,
+    )
+
+    # Assert: the marker-bearing token is absent from paths, so the shared
+    # surface it would have matched is not reported.
+    assert "scripts/dev_tools/validate_${target}.py" not in radius.paths
+    assert radius.shared_surfaces == ()
+    # The real path on the same task line survives, which is what shows the
+    # trade is scoped to the marker-bearing token rather than to the citation.
+    assert "scripts/dev_tools/compute_blast_radius.py" in radius.paths
+
+
+def test_concrete_shared_surface_glob_match_is_still_reported() -> None:
+    """The fail-open trade is scoped to marker-bearing tokens only.
+
+    Without this control the companion above could be satisfied by a change
+    that stopped resolving shared-surface globs altogether, which would be a
+    far larger regression than the trade it documents. Here the identical
+    citation carries a concrete filename, and the surface must still resolve.
+    """
+    # Arrange: the same glob shape with a real filename in place of the marker.
+    plan_text = (
+        "### Phase 1 - Work\n"
+        "- [ ] [P1-T1] Edit `scripts/dev_tools/validate_json.py`.\n"
+    )
+
+    # Act
+    radius = derive_blast_radius(
+        plan_text,
+        "",
+        "2026-08-22-fail-open-control-502",
+        CONFIG,
+        computed_at=COMPUTED_AT,
+    )
+
+    # Assert
+    assert "scripts/dev_tools/validate_json.py" in radius.paths
+    assert radius.shared_surfaces == ("scripts/dev_tools/validate_json.py",)

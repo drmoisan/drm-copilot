@@ -54,7 +54,11 @@ $conflictCase = @($fixtureCase | Where-Object { $_['IsConflict'] })
 # suite. An empty or partially matched glob would make every case below disappear
 # and the suite would pass vacuously, so the count is asserted twice: against
 # this floor and against the files on disk.
-$minimumFixtureCount = 26
+# Raised from 26 by issue #502, which added placeholder-shape fixtures. The two
+# floors must stay equal: they guard the same shared corpus, so a divergence
+# would let one runtime read a smaller corpus than the other while both suites
+# reported a pass.
+$minimumFixtureCount = 30
 
 BeforeAll {
     # Resolve the modules four levels up: blast-radius -> claude-lib -> scripts ->

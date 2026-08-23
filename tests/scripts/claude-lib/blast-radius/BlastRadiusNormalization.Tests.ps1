@@ -225,3 +225,95 @@ Describe 'Read-by-mandate exclusion through the facade (issue #489)' {
         }
     }
 }
+
+Describe 'Get-NormalizedDeclaredRadius placeholder stripping (issue #502)' {
+    BeforeAll {
+        # A minimal truth table sufficient for the normalizer: one module keyed on
+        # the configuration tree, one shared surface inside it, and no mandate
+        # reads, so the only rule that can drop an entry is the shape guard under
+        # test. Every literal is single-quoted, per the constraint recorded in
+        # tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1.
+        $script:ShapeConfig = @{
+            version               = 1
+            shared_surfaces       = @('config/blast-radius.json')
+            shared_surface_globs  = @()
+            modules               = @{ 'config' = @('config/**') }
+            over_breadth_fraction = 0.25
+        }
+        $script:ShapeComputedAt = '2026-08-22T10-00'
+    }
+
+    Context 'Retrospective cleaning of an already-recorded radius' {
+        It 'strips placeholder entries and preserves the real entries' {
+            # Arrange: a recorded radius carrying one placeholder entry shaped
+            # like a feature document and one shaped like an interpolated
+            # configuration file, plus two real entries that must survive. The
+            # interpolation form is single-quoted so the classifier receives the
+            # marker rather than an expansion.
+            $recorded = @{
+                paths           = @(
+                    '<FEATURE>/spec.md',
+                    'config/blast-radius.json',
+                    'config/${environment}.json',
+                    'scripts/dev_tools/compute_blast_radius.py'
+                )
+                modules         = @('config')
+                shared_surfaces = @('config/blast-radius.json')
+                contracts       = @('Get-NormalizedDeclaredRadius')
+                source          = 'declared'
+                computed_at     = $script:ShapeComputedAt
+            }
+            # Assert the probe literals before normalization, so an expansion
+            # cannot make this case measure a different radius than it states.
+            $recorded['paths'][0] | Should -Be ('<' + 'FEATURE' + '>' + '/spec.md')
+            $recorded['paths'][2].Length | Should -Be 26
+
+            # Act
+            $result = Get-NormalizedDeclaredRadius -Radius $recorded -Config $script:ShapeConfig
+
+            # Assert: both placeholder entries are gone and both real entries
+            # survive. All three dependent levels are asserted, not just paths,
+            # because the module and shared-surface levels are re-resolved from
+            # the surviving paths; a normalizer that dropped the entry from paths
+            # while leaving a stale module behind would still make two unrelated
+            # items contend one level up.
+            $result['paths'] | Should -Not -Contain '<FEATURE>/spec.md'
+            $result['paths'] | Should -Not -Contain 'config/${environment}.json'
+            $result['paths'] | Should -Contain 'config/blast-radius.json'
+            $result['paths'] | Should -Contain 'scripts/dev_tools/compute_blast_radius.py'
+            $result['modules'] | Should -Be @('config')
+            $result['shared_surfaces'] | Should -Be @('config/blast-radius.json')
+            $result['contracts'] | Should -Be @('Get-NormalizedDeclaredRadius')
+            $result['source'] | Should -Be 'declared'
+            $result['computed_at'] | Should -Be $script:ShapeComputedAt
+        }
+
+        It 'clears a level that only a placeholder entry supplied' {
+            # Arrange: the companion above keeps the config module because a real
+            # entry also resolves to it, which cannot distinguish re-resolution
+            # from passthrough. Here the only entry reaching the module and
+            # shared-surface levels is the placeholder, so both levels must come
+            # back empty.
+            $recorded = @{
+                paths           = @(
+                    'config/${environment}.json',
+                    'scripts/dev_tools/compute_blast_radius.py'
+                )
+                modules         = @('config')
+                shared_surfaces = @('config/blast-radius.json')
+                contracts       = @('Get-NormalizedDeclaredRadius')
+                source          = 'declared'
+                computed_at     = $script:ShapeComputedAt
+            }
+            $recorded['paths'][0].Length | Should -Be 26
+
+            # Act
+            $result = Get-NormalizedDeclaredRadius -Radius $recorded -Config $script:ShapeConfig
+
+            # Assert
+            $result['paths'] | Should -Be @('scripts/dev_tools/compute_blast_radius.py')
+            @($result['modules']).Count | Should -Be 0
+            @($result['shared_surfaces']).Count | Should -Be 0
+        }
+    }
+}

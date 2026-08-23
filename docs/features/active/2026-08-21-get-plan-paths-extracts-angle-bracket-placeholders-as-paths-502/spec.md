@@ -640,139 +640,139 @@ Each criterion below is verifiable by a named test or a stated command.
 
 ### A. Marker rejection in both runtimes, paired per runtime
 
-- [ ] **AC-1** `tests/scripts/dev_tools/test_blast_radius_token_shapes.py` contains a parametrized
+- [x] **AC-1** `tests/scripts/dev_tools/test_blast_radius_token_shapes.py` contains a parametrized
   test over all five marker probes asserting the placeholder predicate reports each as
   marker-bearing; `poetry run pytest tests/scripts/dev_tools/test_blast_radius_token_shapes.py` passes.
-- [ ] **AC-2** `tests/scripts/dev_tools/test_blast_radius_extraction_rules.py` contains a parametrized
+- [x] **AC-2** `tests/scripts/dev_tools/test_blast_radius_extraction_rules.py` contains a parametrized
   test asserting the classifier yields no classification for each of the same five probes — the
   paired classifier-level assertion for the Python runtime.
-- [ ] **AC-3** `tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1` contains, for
+- [x] **AC-3** `tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1` contains, for
   each of the five probes, a paired assertion: the predicate reports the token as marker-bearing
   **and** `Get-PathTokenKind` returns no classification for it.
-- [ ] **AC-4** Every probe string in that Pester file is single-quoted or built by character
+- [x] **AC-4** Every probe string in that Pester file is single-quoted or built by character
   concatenation, each case asserts the probe's literal content before classification, and the
   single-quote constraint is stated as a comment inside the file.
-- [ ] **AC-5** A marker in the filename position is rejected in both runtimes, asserted by a named
+- [x] **AC-5** A marker in the filename position is rejected in both runtimes, asserted by a named
   test in each.
-- [ ] **AC-6** The empty string, a marker-only token, and a bare bracket pair are handled without
+- [x] **AC-6** The empty string, a marker-only token, and a bare bracket pair are handled without
   raising in both runtimes, asserted by a named test in each.
 
 ### B. Real-path acceptance preserved (negative controls)
 
-- [ ] **AC-7** A real path cited on the **same** plan task line as a rejected placeholder is still
+- [x] **AC-7** A real path cited on the **same** plan task line as a rejected placeholder is still
   harvested, asserted in both runtimes by a named test and by
   `tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json`.
 - [ ] **AC-8** `tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` exists; two radii
   whose only shared entry is a placeholder token with disjoint real files report conflict false in
   both parity suites.
-- [ ] **AC-9** Two items sharing a real file still conflict on `path_overlap`, asserted by a fixture
+- [x] **AC-9** Two items sharing a real file still conflict on `path_overlap`, asserted by a fixture
   with expected conflict true, and the planner's decision to add
   `conflict-real-path-overlap-preserved.json` or to reuse the existing
   `tests/fixtures/blast_radius/conflict-path-overlap.json` is recorded explicitly in the plan.
-- [ ] **AC-10** All 32 pre-existing fixtures under `tests/fixtures/blast_radius/` produce unchanged
+- [x] **AC-10** All 32 pre-existing fixtures under `tests/fixtures/blast_radius/` produce unchanged
   expected results in both parity suites, with no fixture edited to accommodate the change.
-- [ ] **AC-11** A named test asserts the normalization entry point strips a placeholder entry from an
+- [x] **AC-11** A named test asserts the normalization entry point strips a placeholder entry from an
   already-recorded radius while preserving its real entries and re-resolving `modules` and
   `shared_surfaces`.
-- [ ] **AC-12** `tests/fixtures/blast_radius/validation-placeholder-self-consistent.json` exists and
+- [x] **AC-12** `tests/fixtures/blast_radius/validation-placeholder-self-consistent.json` exists and
   a radius derived from a placeholder-citing plan validates clean against that same plan, with an
   empty findings list, in both parity suites.
-- [ ] **AC-13** A named test pins the fail-open trade: a placeholder-bearing token whose shape matches
+- [x] **AC-13** A named test pins the fail-open trade: a placeholder-bearing token whose shape matches
   a configured shared-surface glob is dropped and is no longer reported as a touched shared surface,
   with a docstring recording the trade and citing the planner's explicit-enumeration obligation.
 
 ### C. Corpus measurement, before and after, with positive control
 
-- [ ] **AC-14** A baseline artifact under
+- [x] **AC-14** A baseline artifact under
   `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/`
   records the executed, single-quoted five-marker probe results for **both** runtimes pre-fix.
-- [ ] **AC-15** One evidence artifact under that folder's `evidence/qa-gates/` directory records,
+- [x] **AC-15** One evidence artifact under that folder's `evidence/qa-gates/` directory records,
   before and after: item count (asserted non-zero), edge count, density to one decimal place, cohort
   count, and maximum cohort width, over the 58 top-level plans with a constant derivation timestamp.
-- [ ] **AC-16** The same artifact records the total `paths`-entry count before and after and the exact
+- [x] **AC-16** The same artifact records the total `paths`-entry count before and after and the exact
   set difference, and asserts that **every** dropped entry contains a marker character. A marker-free
   drop fails this criterion.
-- [ ] **AC-17** The same artifact records the named-survivor assertion result for a fixed list
+- [x] **AC-17** The same artifact records the named-survivor assertion result for a fixed list
   containing at least one path per acceptance rule: a recognized-extension file, a line-suffixed
   citation, a known-segment subtree glob, a configured root surface, and an own-feature-folder
   documentation glob. All must survive.
-- [ ] **AC-18** The same artifact records that the known-genuine 486-487 edge survives with its reason
+- [x] **AC-18** The same artifact records that the known-genuine 486-487 edge survives with its reason
   unchanged.
-- [ ] **AC-19** The numeric edge-count delta prediction is recorded in the plan **before** the
+- [x] **AC-19** The numeric edge-count delta prediction is recorded in the plan **before** the
   after-measurement is run, and the artifact reports prediction against actual, with any deviation
   explained rather than absorbed.
-- [ ] **AC-20** The artifact reports that the nine-item clique on the mandated evidence-path token is
+- [x] **AC-20** The artifact reports that the nine-item clique on the mandated evidence-path token is
   gone, and that any surviving edge among those nine pairs is attributable to a shared real path.
 
 ### D. Parity fixtures and corpus-floor counters
 
-- [ ] **AC-21** Every new fixture carries the same input/expected shape as the existing
+- [x] **AC-21** Every new fixture carries the same input/expected shape as the existing
   directory-shaped-rejection fixture and is asserted by **both**
   `tests/scripts/dev_tools/test_blast_radius_parity.py` and
   `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1`.
 - [ ] **AC-22** `MINIMUM_FIXTURE_COUNT` in `tests/scripts/dev_tools/test_blast_radius_parity.py` and
   `$minimumFixtureCount` in `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` are
   both raised from 26 to 26 plus the number of newly added fixtures, and are equal to each other.
-- [ ] **AC-23** Both parity suites pass with byte-comparable radius, findings, conflict verdict, and
+- [x] **AC-23** Both parity suites pass with byte-comparable radius, findings, conflict verdict, and
   conflict-reason results across the whole corpus, and the three non-vacuity tests in each suite still
   pass.
 
 ### E. Byte-mirror parity and registration surfaces
 
-- [ ] **AC-24** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] **AC-24** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
   passes, confirming a byte-identical bundled mirror for **every** new or changed file under
   `.claude/` — the new `BlastRadiusTokenShape.psm1`, the changed `BlastRadiusExtraction.psm1`, and the
   amended `.claude/rules/parallel-orchestration.md`.
-- [ ] **AC-25** `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
+- [x] **AC-25** `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
   lists the new bundled module; the manifest Pester suite and the pack-manifest-completeness Jest suite
   both pass.
-- [ ] **AC-26** The new module appears in the `CodeCoverage.Path` allow-list in **both**
+- [x] **AC-26** The new module appears in the `CodeCoverage.Path` allow-list in **both**
   `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and its bundled mirror, and
   `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
-- [ ] **AC-27** No coverage `exclude` entry matching a production source path is added anywhere, and
+- [x] **AC-27** No coverage `exclude` entry matching a production source path is added anywhere, and
   both new production modules appear in their runtime's coverage denominator.
-- [ ] **AC-28** This item's declared blast radius enumerates
+- [x] **AC-28** This item's declared blast radius enumerates
   `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` in `shared_surfaces`, and blast-radius
   validation reports no V2 Blocking finding.
 
 ### F. Rule-file prose amendment
 
-- [ ] **AC-29** `.claude/rules/parallel-orchestration.md` states **four** rejected token shapes, names
+- [x] **AC-29** `.claude/rules/parallel-orchestration.md` states **four** rejected token shapes, names
   the fourth as a placeholder or interpolation marker, states the marker set explicitly, and
   cross-references `.claude/rules/plan-acceptance-gates.md` as the set's origin.
-- [ ] **AC-30** The same amendment records: the never-matches-a-tracked-path rationale including the
+- [x] **AC-30** The same amendment records: the never-matches-a-tracked-path rationale including the
   Windows-reserved-character argument; the mandated-artifact origin of the dominant token; the planner
   obligation to append a concrete path when an item really writes one; the fail-open trade with its
   measured-empty exposure; and the whitespace-split residual as a known residual.
-- [ ] **AC-31** The amendment introduces no JSON Schema file and no schema reference; enforcement
+- [x] **AC-31** The amendment introduces no JSON Schema file and no schema reference; enforcement
   remains prose plus validator logic.
-- [ ] **AC-32** `git diff` shows `.claude/rules/plan-acceptance-gates.md` and every file under
+- [x] **AC-32** `git diff` shows `.claude/rules/plan-acceptance-gates.md` and every file under
   `.github/` unmodified.
 
 ### G. Structural limits, toolchain, and scope containment
 
-- [ ] **AC-33** After the change, `scripts/dev_tools/_blast_radius_extraction.py`,
+- [x] **AC-33** After the change, `scripts/dev_tools/_blast_radius_extraction.py`,
   `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, and both new modules are each at or under
   500 lines, verified by a line count over each file.
-- [ ] **AC-34** The relocated feature-corpus-span predicate remains exported from
+- [x] **AC-34** The relocated feature-corpus-span predicate remains exported from
   `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, verified by a module-export assertion or an
   existing consumer test.
-- [ ] **AC-35** The Python toolchain completes in a single pass with no failure and no auto-fix:
+- [x] **AC-35** The Python toolchain completes in a single pass with no failure and no auto-fix:
   `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`,
   `poetry run pytest --cov --cov-branch --cov-report=term-missing`. Line coverage >= 85% and branch
   coverage >= 75%, with no regression on changed lines.
 - [ ] **AC-36** The PowerShell toolchain completes in a single pass: format, analyze, test with
   coverage. Line coverage >= 85%, with the new module measured.
-- [ ] **AC-37** The TypeScript suites pass, confirming the change is a no-op for that runtime.
-- [ ] **AC-38** No signature, return type, artifact type, CLI flag, MCP input-schema property,
+- [x] **AC-37** The TypeScript suites pass, confirming the change is a no-op for that runtime.
+- [x] **AC-38** No signature, return type, artifact type, CLI flag, MCP input-schema property,
   finding-rule literal, or `config/blast-radius.json` key is added or changed, verified by inspecting
   the diff.
-- [ ] **AC-39** No diagnostic, warning, or advisory finding is emitted for a rejected token, verified
+- [x] **AC-39** No diagnostic, warning, or advisory finding is emitted for a rejected token, verified
   by the absence of any new finding rule in the diff and by the unchanged expected-findings blocks of
   all pre-existing fixtures.
-- [ ] **AC-40** The repro from the Repro & Evidence section reports conflict false post-fix in both
+- [x] **AC-40** The repro from the Repro & Evidence section reports conflict false post-fix in both
   runtimes, recorded in the QA-gate evidence artifact.
-- [ ] **AC-41** The issue #500 rule-file sequencing decision is recorded in the plan: either the two
+- [x] **AC-41** The issue #500 rule-file sequencing decision is recorded in the plan: either the two
   items are sequenced, or the single `path_overlap` edge on the rule file is declared and accepted.
 
 ### Traceability to `issue.md`
@@ -834,3 +834,89 @@ Links:
 - Related open issues: #500 (rule-file overlap, complementary fix), #508 (avoided by the no-config
   decision), #452 (same file, opposite direction)
 </content>
+
+## Outcome — issue #502 resolved, with two recorded deviations
+
+The placeholder-shape defect is fixed in both runtimes. A token containing any of the five
+placeholder or interpolation markers is now rejected by the path classifier before it can become a
+radius entry, so two items that cite the same mandated artifact shape no longer acquire a
+`path_overlap` conflict edge on a string that names no file.
+
+**What changed.** Two new leaf modules hold the shape predicates —
+`scripts/dev_tools/_blast_radius_token_shapes.py` and
+`.claude/lib/blast-radius/BlastRadiusTokenShape.psm1` — and the guard is wired into
+`classify_path_token` and `Get-PathTokenKind`, after the root-surface test and before the separator
+guard. The new modules were mandatory rather than stylistic: the two extraction modules stood at 497
+and 498 lines against a hard 500-line limit, so an in-place guard was arithmetically impossible. Both
+extraction modules finished at 475 and 472 lines, with more headroom than they started with. The
+rejection is silent, returning the same no-classification value the four sibling rejections return;
+no diagnostic channel, no finding rule, and no signature change was added.
+
+**Measured effect over the 58-plan corpus**, before and after, with a constant derivation timestamp
+and a byte-identical item list:
+
+| Quantity | Before | After |
+| --- | --- | --- |
+| conflict edges | 1282 | 1267 |
+| density | 77.6% | 76.6% |
+| cohorts | 32 | 32 |
+| maximum cohort width | 4 | 4 |
+| total radius path entries | 3729 | 2472 |
+
+1257 path entries were dropped and **every single one contains a marker character**; zero marker-free
+entries were dropped and zero entries were added. The nine-item clique induced by the mandated
+evidence-path shape is gone as a clique: all 36 of its pairs lost the placeholder reason, 12 edges
+disappeared outright, and the 24 that survive do so on unrelated reasons, none of them
+marker-bearing. Cohort count and maximum width did not move: at this density the graph still needs
+the same number of cohorts, so the gain is in the edge set and the entry count, not yet in the
+schedule.
+
+**The three planner decisions, by name.**
+
+- **AC-9 — reuse, do not add.** `tests/fixtures/blast_radius/conflict-path-overlap.json` was reused
+  unmodified as the real-path negative control instead of adding a near-duplicate. A pre-existing
+  fixture written before the fix existed and committed unmodified proves the fix did not perturb an
+  independently authored assertion; a control authored alongside the fix proves only that its author
+  expected it to pass. Verified by a zero-exit diff against the anchor.
+- **AC-19 — pre-registered edge-count delta of 53.** Fixed before any code change, witnessed by a
+  recorded commit SHA and a clean working tree across all three edited locations. **The actual delta
+  is 15**, at or below the one-sided upper bound. The measured pair set is 63, of which 50 pairs still
+  conflict on non-placeholder reasons and 13 were removed; the two remaining removed edges are
+  placeholder-induced through the module level and through a glob-versus-placeholder match, which the
+  plan's single-equation identity did not anticipate. Both halves of the corrected accounting balance
+  exactly and the deviation is explained rather than absorbed.
+- **AC-41 — declare the edge, do not sequence.** The single `path_overlap` edge with issue #500 on
+  `.claude/rules/parallel-orchestration.md` and its bundled mirror is declared and accepted. Under the
+  per-edge cohort barrier the two items are already mutually excluded, and `depends_on` is a
+  prohibited key on this surface, so declaring the edge *is* the sequencing decision. In the event the
+  question resolved itself: #500 merged as pull request #514 before this execution completed.
+
+**Final coverage.** Python line coverage 92.61% and branch coverage 89.82%, both marginally above the
+92.60% and 89.81% baseline, with 4094 tests passing. PowerShell line coverage 96.46% against a 96.47%
+baseline with 3388 tests and zero failures; the missed-line count is identical at 211 in both states,
+so no line regressed. Both new production modules measure 100% line and, where measurable, 100% branch
+coverage, and changed-line coverage is 100% on all four touched production files. TypeScript is a
+confirmed no-op at 195 suites and 2654 tests, unchanged from baseline.
+
+**Deviation 1 — AC-8 is not met.** The conflict fixture
+`tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` was not created. Its acceptance
+condition is unreachable: a conflict fixture is compared as literal recorded radii and the conflict
+relation never invokes the classifier, so the fixture's verdict is invariant under this fix. It could
+be satisfiable or discriminating, never both. The behaviour AC-8 describes is measured instead through
+the derivation seam the guard actually governs, where the placeholder-only overlap reports conflict
+true before the fix and conflict false after it, in both runtimes, with the negative control false
+throughout. A plan revision replacing the task with a normalization-plus-conflict assertion is
+requested.
+
+**Deviation 2 — AC-36's measured-module clause and AC-22's floor arithmetic.** The MCP Pester tool
+executes from a published npm package whose bundled coverage allow-list predates this change, so its
+coverage output does not yet list the new module. Both in-repository allow-lists carry the entry and a
+direct measurement against the repository allow-list shows the module at 100% line coverage (19 of 19
+lines); the MCP runtime will pick it up at the next publish with no further change. AC-22's floor
+arithmetic reads 30 rather than 29 because the plan fixed 30 on the assumption of four new fixtures
+and three were added; both floors are equal and both remain non-vacuous against 35 files on disk.
+
+**Acceptance criteria.** Of the 41 numbered criteria, 38 pass, 2 are partial (AC-22, AC-36), and 1
+fails (AC-8). Of the 11 traceability rows, 10 pass and 1 is partial. No item is unverified. The full
+mapping, with a named artifact per item, is at
+`docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/acceptance-criteria-status.md`.

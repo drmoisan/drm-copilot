@@ -1,0 +1,48 @@
+{
+  "description": "Placeholder-token rejection. Two mandated-artifact shapes cited with angle-bracketed placeholder segments name no file, so they are rejected; the real path cited on the same task line stays admitted alongside the own-feature-folder documentation glob (issue #502).",
+  "input": {
+    "plan_text": "### Phase 1 — Work\n- [ ] [P1-T1] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` and `<FEATURE>/spec.md`.\n- [ ] [P1-T2] Edit `scripts/dev_tools/compute_blast_radius.py`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-08-22-placeholder-token-rejected-502",
+    "computed_at": "2026-08-22T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        "docs/features/active/2026-08-22-placeholder-token-rejected-502/**",
+        "scripts/dev_tools/compute_blast_radius.py"
+      ],
+      "modules": [
+        "python-dev-tools"
+      ],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-08-22T12-00"
+    },
+    "findings": []
+  }
+}
