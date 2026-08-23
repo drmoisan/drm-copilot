@@ -662,9 +662,17 @@ Each criterion below is verifiable by a named test or a stated command.
 - [x] **AC-7** A real path cited on the **same** plan task line as a rejected placeholder is still
   harvested, asserted in both runtimes by a named test and by
   `tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json`.
-- [ ] **AC-8** `tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` exists; two radii
-  whose only shared entry is a placeholder token with disjoint real files report conflict false in
-  both parity suites.
+- [x] **AC-8** Two radii whose only shared entry is a placeholder token, with disjoint real files,
+  report conflict false in both runtimes, asserted by a named normalization-plus-conflict test in
+  each. ~~`tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` exists~~ —
+  **the fixture clause is withdrawn as unsatisfiable.** A conflict fixture supplies literal recorded
+  radii to a harness that never invokes `classify_path_token`, whose only two callers are
+  `_blast_radius_extraction.py` and `normalize_declared_radius`; the conflict chain calls neither.
+  Such a fixture's verdict is therefore invariant under this fix — satisfiable or discriminating,
+  never both. A derivation-pair fixture cannot carry it either: the parity harness dispatches on
+  exactly two fixture shapes and `derive_fixture_radius` returns a single radius. The named tests
+  are strictly stronger than the fixture would have been, because each also asserts the
+  pre-normalization pair does conflict, so the test fails on a tree without the guard.
 - [x] **AC-9** Two items sharing a real file still conflict on `path_overlap`, asserted by a fixture
   with expected conflict true, and the planner's decision to add
   `conflict-real-path-overlap-preserved.json` or to reuse the existing
@@ -712,7 +720,12 @@ Each criterion below is verifiable by a named test or a stated command.
   `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1`.
 - [x] **AC-22** `MINIMUM_FIXTURE_COUNT` in `tests/scripts/dev_tools/test_blast_radius_parity.py` and
   `$minimumFixtureCount` in `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` are
-  both raised from 26 to 26 plus the number of newly added fixtures, and are equal to each other.
+  both raised from 26 to 30 and are equal to each other. The value was fixed at 30 when four
+  fixtures were planned; three were added, so a literal reading of the original wording gives 29.
+  30 is retained deliberately as the stricter bound: it is non-vacuous against the 35 fixtures on
+  disk, exceeds the pre-change 26, and satisfies the floor's purpose — anti-vacuity plus
+  cross-runtime equality — more strictly than 29 would. Lowering it to match the arithmetic would
+  weaken a live gate to satisfy prose.
 - [x] **AC-23** Both parity suites pass with byte-comparable radius, findings, conflict verdict, and
   conflict-reason results across the whole corpus, and the three non-vacuity tests in each suite still
   pass.
@@ -761,7 +774,7 @@ Each criterion below is verifiable by a named test or a stated command.
   `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`,
   `poetry run pytest --cov --cov-branch --cov-report=term-missing`. Line coverage >= 85% and branch
   coverage >= 75%, with no regression on changed lines.
-- [ ] **AC-36** The PowerShell toolchain completes in a single pass: format, analyze, test with
+- [x] **AC-36** The PowerShell toolchain completes in a single pass: format, analyze, test with
   coverage. Line coverage >= 85%, with the new module measured.
 - [x] **AC-37** The TypeScript suites pass, confirming the change is a no-op for that runtime.
 - [x] **AC-38** No signature, return type, artifact type, CLI flag, MCP input-schema property,
