@@ -904,7 +904,9 @@ so the gain is in the edge set and the entry count, not yet in the schedule.
   prohibited on this surface, so declaring the edge *is* the sequencing decision. In the event the
   question resolved itself: #500 merged as pull request #514 before this execution completed.
 
-**Final toolchain state.** Python: 4095 tests passing, line coverage 92.61% and branch coverage 89.82%,
+**Final toolchain state.** Python: 4112 tests passing, line coverage 92.61% and branch coverage 89.82%,
+the execution pass having recorded 4095 before the branch was rebased onto `main`, whose newly merged
+commits contributed the additional 17 tests,
 both marginally above the 92.60% and 89.81% baseline, with changed-line coverage 100% on both touched
 modules. PowerShell: 3389 tests, zero failures, line coverage 96.46% against a 96.47% baseline with the
 missed-line count identical at 211, so no line regressed. TypeScript: a confirmed no-op at 195 suites
