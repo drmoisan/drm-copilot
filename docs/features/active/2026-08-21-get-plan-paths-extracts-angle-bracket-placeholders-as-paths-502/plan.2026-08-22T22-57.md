@@ -4,41 +4,263 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-22T22-57
-- **Status:** Draft
-- **Version:** 0.1
+- **Status:** Ready for preflight
+- **Version:** 1.0
+- **Work Mode:** full-bug — `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/spec.md` is the sole acceptance-criteria source of record (46 criteria, groups A through G). A `user-story.md` is intentionally absent and its absence is not a blocker. Full QA-loop obligations apply.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** every evidence-producing task below names its exact artifact path. If any required baseline artifact, QA-gate artifact, or coverage-comparison artifact is missing or lacks its required fields, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Evidence accounting rule:** each command-bearing task records `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` in its named artifact. Baseline and final-QA test artifacts additionally record numeric coverage headline values.
 
+**No-SKIPPED rule:** every command-bearing task in this plan must execute its stated command. `EXIT_CODE: SKIPPED` is not a passing outcome; no task below carries a skip branch.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+---
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+## Token-hygiene contract for this document
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#502-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+`derive_blast_radius` harvests inline-code tokens from plan text, and this plan is authored against the pre-fix classifier. Two conventions therefore hold throughout, and the executor must preserve them when editing this file:
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+1. **Inline-code spans are reserved for paths this item genuinely writes.** A read-only reference to a file this item does not write is written in plain prose without backticks, so it is not harvested. Files referenced this way include config/blast-radius.json, the acceptance-gate coverage module under scripts/dev_tools, the blast-radius facade and validation modules under scripts/dev_tools, the PowerShell facade, normalization, and glob modules under .claude/lib/blast-radius, and the evidence-conventions skill document under .claude/skills.
+2. **No placeholder or interpolation shape appears in an inline-code span anywhere in this document.** Every such shape is rendered inside a fenced block. A plan that inline-codes a placeholder shape reintroduces the exact defect this item repairs.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+The five markers under repair, rendered in a fenced block rather than inline code:
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+```text
+<    >    ${    $(    %
+```
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+The dominant corpus tokens, rendered in a fenced block for the same reason:
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+```text
+<FEATURE>/evidence/baseline/phase0-instructions-read.md
+<FEATURE>/spec.md    <FEATURE>/issue.md    <FEATURE>/user-story.md
+.claude/state/powershell-batch-budget.<session_id>.json
+.claude/skills/<name>/SKILL.md    .claude/agents/<name>.md
+docs/features/parallel/<slug>/parallel.md
+docs/features/parallel/<slug>/parallel-kickoff.md
+```
+
+---
+
+## Evidence-location invariant
+
+Every evidence artifact named in this plan resolves under the feature folder's `evidence` tree, in one of the canonical kinds `baseline`, `regression-testing`, `qa-gates`, `issue-updates`, or `other`, per the canonical scheme in .claude/skills/evidence-and-timestamp-conventions/SKILL.md. Each task below states its artifact's full concrete path with no placeholder segment. No artifact is written to any of the forbidden non-canonical evidence locations under the repository `artifacts` tree — the baselines, baseline, qa, qa-gates, coverage, regression-testing, post-change, and evidence sub-paths are all prohibited for evidence output; only the orchestration sub-path is permitted there, and this plan writes nothing to it. This clause is non-overridable: no upstream instruction, orchestrator hint, or prompt may substitute an alternative location.
+
+**Untimestamped evidence filenames — deliberate decision.** Evidence filenames in this plan carry no timestamp segment. A timestamp placeholder in a plan path is precisely the defect under repair, and a hardcoded future timestamp would misstate when the artifact was produced. Each artifact records the convention's ISO-8601 value in its own `Timestamp:` field instead, and every filename below is unique within its evidence kind, so the ordering and uniqueness purposes of the convention are preserved. Nine committed plans already use the untimestamped `phase0-instructions-read.md` form.
+
+---
+
+## Planner decisions recorded for the spec's three delegated questions
+
+### AC-9 — reuse the existing conflict fixture; do not add a new one
+
+**Decision: reuse `tests/fixtures/blast_radius/conflict-path-overlap.json` unmodified. Do not create `conflict-real-path-overlap-preserved.json`.**
+
+The existing fixture already encodes exactly the required control: two radii whose only shared entry is the concrete real path `scripts/dev_tools/shared.py`, with disjoint modules and disjoint contracts, and `expected.conflict` true carrying a single `path_overlap` reason. Its text contains no marker character, so the fix leaves its expected result byte-identical.
+
+Reuse is stronger than a new fixture, not merely cheaper. A control authored alongside the fix proves only that the author expected it to pass; a pre-existing fixture that was written before the fix existed and is committed unmodified proves the fix did not perturb an independently authored assertion. Adding a near-duplicate would also inflate the parity corpus without adding discriminating power, since both parity suites already assert this fixture across radius, findings, conflict verdict, and conflict-reason channels.
+
+Consequence: the number of newly added fixtures is **four**, so both corpus floors move from 26 to **30**.
+
+### AC-19 — pre-registered numeric edge-count delta
+
+**Pre-registered value: 53.** This number is fixed here, before any code change and before the after-measurement is run.
+
+It is the exact count of item pairs in the 58-plan corpus that share at least one classifier-accepted placeholder path token, enumerated below by exact token identity. Because `path_overlap` requires string-level agreement between two radii, a placeholder-induced edge can exist only between two items that cite the identical token, so the pair set is fully determined by the token-to-file map.
+
+| Shared token (rendered in the fenced block above) | Items | Pairs | Contribution |
+| --- | --- | --- | --- |
+| phase0 evidence artifact | 334, 344 (`plan.md`), 369, 396, 413, 423, 442, 462, 479 | C(9,2) = 36 | 36 |
+| feature spec document | 334, 369, 413, 423, 442, 462, 479, 491 | C(8,2) = 28 | 28 |
+| overlap of the two sets above | 334, 369, 413, 423, 442, 462, 479 | C(7,2) = 21 | −21 (double-counted) |
+| feature issue document | 479, 491 | 1 | 0 (subset of the spec-document pairs) |
+| feature user-story document | 442, 462, 491 | 3 | 0 (subset of the spec-document pairs) |
+| eight further shared evidence-artifact tokens between 344 and 442 | 344, 442 | 1 | 0 (subset of the phase0 pairs) |
+| PowerShell batch-budget state file | 440, 475, 491, 501 | 6 | 6 |
+| skill document template | repo-housekeeping-audit, 367, 372 | 3 | 3 |
+| agent document template | repo-housekeeping-audit, 372 | 1 | 0 (subset of the skill-document pairs) |
+| parallel manifest and kickoff documents | 441, 443 | 1 | 1 |
+| **Total pre-registered pair count** | | | **53** |
+
+Enumeration method, so a deviation is diagnosable: the map was built by exhaustive fixed-string file-set queries over `docs/features/active/*/plan*.md` for (a) every marker-bearing token whose marker lies in its first path segment and whose tail carries no further marker, (b) every marker-bearing token rooted at `.claude/`, `.codex/`, `.github/`, `.agents/`, `scripts/`, `tests/`, `extensions/`, `config/`, `schemas/`, `packages/`, (c) every marker-bearing token rooted at `docs/` whose marker occupies the bucket or feature-folder segment, and (d) every marker-bearing token rooted at `artifacts/`. Measured zero corpus occurrences of a percent-bearing accepted token; the two interpolation-form-bearing plans (485 and 487) share no token with each other or with any other plan. One residual class was not exhaustively enumerated: two plans citing the same *third* feature folder's evidence path with a placeholder timestamp. Sampling the canonical name across the corpus found each such citation qualified by its own feature folder, so the residual is measured empty.
+
+**Prediction and its hard falsification, both one-sided:**
+
+- **Upper bound, Blocking if exceeded.** The actual edge-count delta must be at or below 53. A delta above 53 means the fix removed an edge that no shared placeholder token accounts for — that is, a real path was dropped. This is the pair-level positive control and it fails loudly.
+- **Exact conservation identity.** `Δ_actual + |S| = |P_measured|`, where `S` is the subset of the pair set that still conflicts after the fix and `P_measured` is the executor's own measurement of the pair set. Every member of `S` must be itemized with its surviving reason kind and detail. Every unit of shortfall below 53 must be attributed to a named surviving pair; none may be absorbed as success.
+- **Deviation in `P_measured`.** If `P_measured` exceeds 53, each additional pair must be itemized and shown to be induced by a shared placeholder token, which localizes the deviation to the residual class named above rather than to the fix.
+- **Sub-prediction.** All 36 pairs among the nine-item phase0 set lose their placeholder-derived `path_overlap` reason. Any pair among those 36 that remains in the edge set must show a non-placeholder reason.
+
+### AC-41 — issue #500 sequencing
+
+**Decision: do not sequence. Declare and accept the single `path_overlap` edge on `.claude/rules/parallel-orchestration.md` and its bundled mirror.**
+
+Rationale, in three parts:
+
+1. **The edge is unavoidable if both items run, and correct.** `.claude/rules/**` is a configured mandate-read path, so a mere citation of the rule file is removed from the harvest and produces no edge. Both #502 and #500 genuinely *write* that file, so both are obliged by mandate-read constraint 1 to append the concrete path to their declared radius after normalization. The resulting edge is a true contention signal, not an artifact.
+2. **Hand-sequencing would duplicate a mechanism that already exists and is stronger.** Under the per-edge cohort barrier, a conflicting neighbour in a strictly prior current-generation cohort must be merged or its worktree removed before the other item starts, so the two items are already mutually excluded by the derived edge. A textual merge conflict on the rule file is therefore impossible without any additional arrangement.
+3. **An explicit dependency cannot be expressed.** `depends_on` is a prohibited key at every level of the parallel manifest, the planner checkpoint, and the orchestrator checkpoint. Ordering on this surface is expressed only as blast-radius overlap, so declaring the edge *is* the sequencing decision.
+
+The two amendments are also textually non-adjacent: #500 amends the module-map granularity criterion, #502 amends the read-by-mandate token-shape paragraph. The edge serializes them anyway, which is the desired outcome.
+
+---
+
+## Design constraints the executor must not violate
+
+- **The new leaf module per runtime is mandatory, not stylistic.** `scripts/dev_tools/_blast_radius_extraction.py` is 497 lines and `.claude/lib/blast-radius/BlastRadiusExtraction.psm1` is 498 lines, against the hard 500-line limit. An in-place guard is arithmetically impossible. Module creation and the relocation-out are sequenced *before* the guard is added, so no task ever leaves a file over the limit.
+- **.claude/lib/blast-radius/BlastRadiusNormalization.psm1 cannot host the PowerShell predicate.** It imports the extraction module, so hosting the predicate there would create an import cycle. The new module is a leaf that imports nothing from the blast-radius library.
+- **The seam is the classifier, not the extractor.** The guard goes inside `classify_path_token` and `Get-PathTokenKind`, after the root-surface test and before the separator guard. `normalize_declared_radius` calls the classifier directly per recorded entry, so a guard at the extraction entry point would leave already-recorded declared radii dirty and would miss the spec-text harvest in derivation.
+- **Silent drop.** The rejection returns the same no-classification value the four sibling rejections return. No diagnostic channel, no new finding rule, no signature change.
+- **The marker set is a module constant, not a configuration key.** config/blast-radius.json is not modified.
+- **Every PowerShell probe string is single-quoted or built by character concatenation, and each case asserts the probe's literal content before classification.** A double-quoted interpolation-form probe silently reproduces the original mis-measurement.
+- **No coverage exclusion.** No `exclude` entry matching a production source path may be added anywhere. Both new production modules enter their runtime's coverage denominator.
+- **Enforcement stays prose plus validator logic.** No JSON Schema is authored, imported, or read.
+
+---
+
+### Phase 0 — Baseline capture
+
+- [ ] [P0-T1] Read the policy files in the required order — `CLAUDE.md`, .claude/rules/general-code-change.md, .claude/rules/general-unit-test.md, .claude/rules/quality-tiers.md, .claude/rules/self-explanatory-code-commenting.md, .claude/rules/python.md, .claude/rules/python-suppressions.md, .claude/rules/powershell.md, .claude/rules/typescript.md, .claude/rules/parallel-orchestration.md, .claude/rules/plan-acceptance-gates.md, quality-tiers.yml — then write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:`, and the explicit list of files read. Acceptance: the artifact exists and names every file above.
+- [ ] [P0-T2] Run `poetry run black --check .` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/python-format.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records the exit code and the reformatted-file count.
+- [ ] [P0-T3] Run `poetry run ruff check .` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/python-lint.md` with the four required fields. Acceptance: the artifact records the exit code and the finding count.
+- [ ] [P0-T4] Run `poetry run pyright` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/python-typecheck.md` with the four required fields. Acceptance: the artifact records the error and warning counts.
+- [ ] [P0-T5] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/python-test-coverage.md` with the four required fields plus numeric baseline line-coverage and branch-coverage percentages in `Output Summary:`. Acceptance: both percentages are recorded as numbers, not placeholders.
+- [ ] [P0-T6] Run the PoshQC formatter via `mcp__drm-copilot__run_poshqc_format` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/powershell-format.md` with the four required fields. Acceptance: the artifact records the changed-file count.
+- [ ] [P0-T7] Run the PoshQC analyzer via `mcp__drm-copilot__run_poshqc_analyze` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/powershell-analyze.md` with the four required fields. Acceptance: the artifact records the diagnostic count by severity.
+- [ ] [P0-T8] Run the Pester suite with coverage via `mcp__drm-copilot__run_poshqc_test` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/powershell-test-coverage.md` with the four required fields plus the numeric baseline line-coverage percentage in `Output Summary:`. Acceptance: the percentage is recorded as a number; note that no branch-coverage threshold applies to Pester.
+- [ ] [P0-T9] Run the TypeScript format, lint, type-check, and Jest suites and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/typescript-suites.md` with the four required fields plus the pass and fail counts. Acceptance: the artifact records a green pre-change state for the pack-manifest-completeness suite specifically.
+- [ ] [P0-T10] Count the lines of `scripts/dev_tools/_blast_radius_extraction.py`, `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, `tests/scripts/claude-lib/blast-radius/BlastRadiusExtraction.Path.Tests.ps1`, `tests/scripts/dev_tools/test_blast_radius_extraction_rules.py`, `tests/scripts/dev_tools/test_blast_radius_normalization.py`, `tests/scripts/dev_tools/test_blast_radius_validation.py`, and `tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1`, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/file-size-headroom.md`. Acceptance: the artifact records 497 and 498 for the two extraction modules and states the remaining headroom for each of the seven files.
+- [ ] [P0-T11] Execute the five-marker probe against `classify_path_token` in the Python runtime using single-quoted literals, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/marker-probe-python.md` recording, per marker, the probe literal and the returned classification. Acceptance: the artifact records an executed result for all five markers, converting the code-trace determination into a measurement. If any marker is already rejected, record it and narrow the marker tuple accordingly in Phase 2.
+- [ ] [P0-T12] Execute the same five-marker probe against `Get-PathTokenKind` in the PowerShell runtime using single-quoted literals only, asserting each probe's literal content before classification, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/marker-probe-powershell.md`. Acceptance: the artifact records the probe literal alongside its classification for all five markers and states explicitly that no double-quoted string was used.
+- [ ] [P0-T13] Enumerate the top-level plan documents under `docs/features/active/` deterministically and sorted, derive one radius per document with a single constant derivation timestamp and the sibling spec text when present, compute every canonical ascending pair, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/conflict-graph-density-before.md` recording the item count, the full sorted item list, the edge count with each edge's reason kind and detail, the density to one decimal place, the cohort count, the maximum cohort width, and the total number of radius path entries across all radii. Acceptance: the item count is non-zero and is recorded; a deviation from 58 is recorded rather than silently accepted; the item list is stored verbatim so the after-measurement can be run over a byte-identical set.
+- [ ] [P0-T14] Copy the AC-19 pre-registration table from this plan into `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/edge-delta-prediction.md`, together with the pre-registered value 53, the one-sided upper bound, and the conservation identity. Acceptance: the artifact exists and is written before any production file is modified, establishing that the prediction preceded the measurement.
+- [ ] [P0-T15] Reproduce the defect in both runtimes: build two radii from structured plan text whose only shared entry is a placeholder feature-document token, with disjoint real files under different feature folders, and record the conflict verdict in `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/repro-before.md`, together with the negative-control run with the placeholder removed. Acceptance: the artifact records conflict true for the placeholder-only overlap and conflict false for the control, in both runtimes.
+
+### Phase 1 — Fail-before regression evidence
+
+- [ ] [P1-T1] [expect-fail] Add to `tests/scripts/dev_tools/test_blast_radius_extraction_rules.py` a parametrized test named `test_classify_path_token_rejects_placeholder_marker` covering one probe per marker, asserting `classify_path_token` returns no classification for each, plus a companion test named `test_real_path_on_same_task_line_survives_placeholder_rejection` asserting a real path cited on the same plan task line is still harvested. Acceptance: both tests exist in that file and the parametrized case count is five.
+- [ ] [P1-T2] [expect-fail] Run `poetry run pytest tests/scripts/dev_tools/test_blast_radius_extraction_rules.py` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/regression-testing/python-classifier-marker-fail-before.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`. Acceptance: the five parametrized rejection cases fail and the companion real-path case passes, both recorded by node ID.
+- [ ] [P1-T3] [expect-fail] Create `tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1` containing, for each of the five markers, a case that first asserts the probe's literal content and then asserts `Get-PathTokenKind` returns no classification for it. Every probe string is single-quoted or built by character concatenation, and the file carries a comment stating that constraint and the reason for it. The file imports only `.claude/lib/blast-radius/BlastRadiusExtraction.psm1` at this stage. Acceptance: the file exists, the single-quote constraint comment is present, and no double-quoted probe string appears in the file.
+- [ ] [P1-T4] [expect-fail] Run the Pester file created in P1-T3 via `mcp__drm-copilot__run_poshqc_test` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/regression-testing/powershell-classifier-marker-fail-before.md` with the four required fields plus `ExpectedExitCode: 1`. Acceptance: all five classifier-level cases fail, recorded by test name.
+
+### Phase 2 — Python leaf module, relocation, and classifier guard
+
+- [ ] [P2-T1] Create `scripts/dev_tools/_blast_radius_token_shapes.py` holding a module docstring in the repository's Purpose/Responsibilities/Usage/Invariants/Side-Effects form, the placeholder marker tuple as a module constant, a pure predicate reporting whether a token contains any marker, and the relocated feature-corpus-span predicate together with its two relocated constants. The file must not import any other blast-radius module. Acceptance: the file exists, is at or under 500 lines, and `poetry run pyright` reports zero errors for it.
+- [ ] [P2-T2] Create `tests/scripts/dev_tools/test_blast_radius_token_shapes.py` covering: a parametrized case per marker asserting the predicate reports the token as marker-bearing; a case with a marker in the filename position; a case asserting a marker-free real repository path is not reported as marker-bearing; cases for the empty string, a marker-only token, and a bare bracket pair asserting no exception is raised; and the relocated span predicate's retained and rejected cases. Add one further test asserting the new module's marker tuple is equal to the acceptance-gate marker tuple exported by scripts/dev_tools/plan_gate_coverage.py, so the two subsystems are pinned to agree by test rather than by convention. Acceptance: `poetry run pytest --cov=scripts.dev_tools._blast_radius_token_shapes --cov-branch tests/scripts/dev_tools/test_blast_radius_token_shapes.py` passes and reports line coverage at or above 85 percent and branch coverage at or above 75 percent for that module.
+- [ ] [P2-T3] Remove the feature-corpus-span predicate and its two constants from `scripts/dev_tools/_blast_radius_extraction.py` and import them from `scripts/dev_tools/_blast_radius_token_shapes.py` instead, leaving the module's public behaviour unchanged. Acceptance: the file's line count is strictly less than 497, and `poetry run pytest tests/scripts/dev_tools` passes with no new failure relative to the P0-T5 baseline.
+- [ ] [P2-T4] Add the marker guard inside `classify_path_token` in `scripts/dev_tools/_blast_radius_extraction.py`, positioned after the root-surface membership test and before the separator guard, returning the same no-classification value the sibling rejections return. Include the mandatory decision-logic comment explaining why the guard runs after the root-surface test and before the separator test, and amend the function's `Returns:` docstring section to state the new rejection. Acceptance: the five parametrized cases added in P1-T1 now pass, the companion real-path case still passes, and `scripts/dev_tools/_blast_radius_extraction.py` is at or under 500 lines.
+- [ ] [P2-T5] Run `poetry run pytest tests/scripts/dev_tools/test_blast_radius_extraction_rules.py tests/scripts/dev_tools/test_blast_radius_token_shapes.py` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/regression-testing/python-classifier-marker-pass-after.md` with the four required fields. Acceptance: exit code 0, and the artifact names the same node IDs that failed in P1-T2 as now passing.
+
+### Phase 3 — PowerShell leaf module, relocation, and classifier guard
+
+- [ ] [P3-T1] Create `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1` as the character-for-character port of the Python leaf module: a comment-based help block in the module's established form, `Set-StrictMode -Version Latest`, the placeholder marker array as a script-scoped constant, an advanced function implementing the marker predicate with `AllowEmptyString` on its token parameter, and the relocated feature-corpus-span function with its two relocated script-scoped constants. The module imports no sibling blast-radius module, so no cycle is introduced. Acceptance: the file exists, is at or under 500 lines, and exports both functions.
+- [ ] [P3-T2] Edit `.claude/lib/blast-radius/BlastRadiusExtraction.psm1` to remove the relocated span function and its two script-scoped constants, import `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`, and re-export both the relocated span function and the new marker predicate, following the established re-import-and-re-export precedent for the relocated ordinal-sort helper. Acceptance: the file's line count is strictly less than 498, and a module-export assertion confirms the relocated span function is still resolvable from the extraction module.
+- [ ] [P3-T3] Add the marker guard inside `Get-PathTokenKind` in `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, positioned after the root-surface loop and before the separator guard, returning the same null value the sibling rejections return, with the matching decision-logic comment and an amendment to the function's `.DESCRIPTION` block. Acceptance: the five classifier-level cases from P1-T3 now pass, and the file is at or under 500 lines.
+- [ ] [P3-T4] Extend `tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1` with the predicate half of each paired assertion so that, for each of the five markers, the file asserts both that the predicate reports the token as marker-bearing and that the classifier returns no classification for it; add the filename-position case, the marker-free-real-path case, the empty-string, marker-only, and bare-bracket-pair cases, the relocated span function's cases, and a module-export assertion for the re-exported span function. Every probe remains single-quoted or concatenated with a content assertion before classification. Acceptance: the file passes via `mcp__drm-copilot__run_poshqc_test`, contains no double-quoted probe string, is at or under 500 lines, and retains the single-quote constraint comment.
+- [ ] [P3-T5] Write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/regression-testing/powershell-classifier-marker-pass-after.md` recording the run of the extended Pester file with the four required fields. Acceptance: exit code 0, and the artifact names the same test names that failed in P1-T4 as now passing.
+
+### Phase 4 — Bundled mirrors and registration surfaces
+
+- [ ] [P4-T1] Create `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusTokenShape.psm1` byte-identical to the repository module created in P3-T1. Acceptance: a text comparison of the two files reports no difference.
+- [ ] [P4-T2] Update `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusExtraction.psm1` to be byte-identical to the repository module as edited in P3-T2 and P3-T3. Acceptance: a text comparison of the two files reports no difference.
+- [ ] [P4-T3] Add the new bundled module path to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, alongside the six existing blast-radius library entries. Acceptance: the manifest lists the new module exactly once, and no existing entry is reordered or duplicated.
+- [ ] [P4-T4] Add the new module path to the `CodeCoverage.Path` allow-list in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and update the adjacent comment that currently states the blast-radius library is split across six files so it states the correct count and records the reason for this addition. Acceptance: the allow-list contains the new module path, and no existing allow-list entry is removed.
+- [ ] [P4-T5] Apply the identical edit to `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`. Acceptance: a text comparison against `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` reports no difference.
+- [ ] [P4-T6] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_poshqc_bundled_parity.py`, the manifest Pester suite `tests/scripts/claude-lib/blast-radius/BlastRadius.Manifest.Tests.ps1`, and the pack-manifest-completeness Jest suite, then write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/registration-surfaces.md` with the four required fields per command. Acceptance: all four suites report exit code 0, and the artifact names each suite and its result separately.
+
+### Phase 5 — Fixtures, corpus floors, retrospective cleaning, and the fail-open trade
+
+- [ ] [P5-T1] Create `tests/fixtures/blast_radius/derivation-placeholder-token-rejected.json` in the same input-and-expected shape as `tests/fixtures/blast_radius/derivation-directory-shaped-rejected.json`: a plan whose task lines cite two placeholder feature-document tokens and one real path, with expected radius paths containing the real path and the own-feature-folder documentation glob only. Acceptance: both parity suites assert the fixture and its expected radius, findings, and derived module levels match in both runtimes.
+- [ ] [P5-T2] Create `tests/fixtures/blast_radius/derivation-placeholder-marker-variants.json` with one plan task line per marker, all rejected, so the five-marker determination is executable in both runtimes from the shared corpus. Acceptance: both parity suites assert the fixture and its expected radius paths exclude every marker-bearing token.
+- [ ] [P5-T3] Create `tests/fixtures/blast_radius/conflict-placeholder-only-overlap.json` with two radii whose only shared entry is a placeholder token and whose real files are disjoint, and expected conflict false. Acceptance: both parity suites report conflict false for the fixture.
+- [ ] [P5-T4] Create `tests/fixtures/blast_radius/validation-placeholder-self-consistent.json` in which a radius derived from a placeholder-citing plan validates clean against that same plan, with an empty expected findings list. Acceptance: both parity suites report an empty findings list for the fixture.
+- [ ] [P5-T5] Raise `MINIMUM_FIXTURE_COUNT` in `tests/scripts/dev_tools/test_blast_radius_parity.py` from 26 to 30. Acceptance: the constant reads 30 and the suite's fixture-count non-vacuity assertion passes against the files on disk.
+- [ ] [P5-T6] Raise the minimum fixture count in `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` from 26 to 30. Acceptance: the value reads 30, equals the Python constant, and the suite's fixture-count non-vacuity assertion passes.
+- [ ] [P5-T7] Verify the AC-9 reuse decision holds on disk by running `git diff --exit-code -- tests/fixtures/blast_radius/conflict-path-overlap.json` and recording the result in `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/negative-control-reuse.md` together with the reuse rationale from this plan. Acceptance: exit code 0, proving the reused negative control was not edited to accommodate the change.
+- [ ] [P5-T8] Add to `tests/scripts/dev_tools/test_blast_radius_normalization.py` a named test asserting the declared-radius normalization entry point strips a placeholder entry from an already-recorded radius while preserving its real entries and re-resolving the derived module and shared-surface levels. Acceptance: the test passes and its assertions cover all three of paths, modules, and shared surfaces.
+- [ ] [P5-T9] Add the PowerShell counterpart of P5-T8 to `tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1`, using single-quoted probe literals. Acceptance: the test passes, the file is at or under 500 lines, and no double-quoted probe string is introduced.
+- [ ] [P5-T10] Add to `tests/scripts/dev_tools/test_blast_radius_validation.py` a named test pinning the accepted fail-open trade: a placeholder-bearing token whose shape matches a configured shared-surface glob is dropped and is therefore no longer reported as a touched shared surface. The test's docstring must record that this is the accepted trade, state that its corpus exposure was measured empty, and cite the planner's obligation to append a concrete path when an item really writes one. Acceptance: the test passes and its docstring contains all three elements.
+- [ ] [P5-T11] Run both parity suites in full — `poetry run pytest tests/scripts/dev_tools/test_blast_radius_parity.py` and the Pester suite `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` — and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/parity-corpus.md` with the four required fields per suite. Acceptance: both suites report exit code 0 with byte-comparable radius, findings, conflict-verdict, and conflict-reason results across the whole corpus, and the three non-vacuity tests in each suite pass.
+- [ ] [P5-T12] Run `git diff --name-only -- tests/fixtures/blast_radius` and record the result in `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/fixture-corpus-diff.md`. Acceptance: the output lists exactly the four fixtures added in P5-T1 through P5-T4 and no other fixture path, proving all 32 pre-existing fixtures are unmodified.
+
+### Phase 6 — Rule-file prose amendment
+
+- [ ] [P6-T1] Amend the read-by-mandate paragraph in `.claude/rules/parallel-orchestration.md` — the paragraph currently beginning at line 236 that states the extractor rejects three token shapes — so that it states **four token shapes**, names the fourth as a token containing a placeholder or interpolation marker, states the marker set explicitly, and cross-references .claude/rules/plan-acceptance-gates.md as the set's origin. The amendment must additionally record: the never-matches-a-tracked-path rationale including the Windows-reserved-character argument for the angle brackets; the mandated-artifact origin of the dominant token, citing the non-overridable evidence-path scheme; the planner obligation to append a concrete path when an item will actually write a path it expressed as a shape; the fail-open shared-surface-glob trade with its measured-empty corpus exposure; and the whitespace-split residual as a known residual. Enforcement must remain prose plus validator logic. Acceptance: the file contains the literal `four token shapes` on a single line; no JSON Schema file is added and no schema reference is introduced; the foreign-schema prohibition already in the file is unchanged.
+- [ ] [P6-T2] Apply the byte-identical amendment to `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`. Acceptance: a text comparison of the two files reports no difference.
+- [ ] [P6-T3] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/rule-file-mirror.md` with the four required fields. Acceptance: exit code 0, confirming a byte-identical bundled mirror for the new module, the changed extraction module, and the amended rule file.
+- [ ] [P6-T4] Run `git diff --exit-code -- .claude/rules/plan-acceptance-gates.md .github` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/policy-file-untouched.md` with the four required fields. Acceptance: exit code 0, proving the acceptance-gate rule file and every file under the Copilot instruction tree are unmodified.
+
+### Phase 7 — After-state corpus measurement with the positive controls
+
+- [ ] [P7-T1] Re-run the corpus measurement over the byte-identical item list stored by P0-T13, with the same constant derivation timestamp, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/conflict-graph-density.md` recording, before and after: item count with a non-zero assertion, edge count, density to one decimal place, cohort count, and maximum cohort width. Acceptance: the item set used for the after-measurement is identical to the before-measurement's stored list, and all five quantities are recorded for both states.
+- [ ] [P7-T2] Extend the same artifact with total-entry accounting: the total number of radius path entries across all radii before and after, and the exact set difference. Assert that every dropped entry contains a marker character. Acceptance: the set difference is enumerated in full, and the artifact states explicitly that zero marker-free entries were dropped. A marker-free drop is a Blocking defect and must halt the phase.
+- [ ] [P7-T3] Extend the same artifact with the named-survivor assertion over a fixed list carrying at least one path per acceptance rule — a recognized-extension file, a line-suffixed citation, a known-segment subtree glob, a configured root surface, and an own-feature-folder documentation glob. Acceptance: every listed path is present in the after-state radius entries, and the artifact records the per-path result.
+- [ ] [P7-T4] Extend the same artifact with the surviving-edge identity check: the known-genuine pair from the earlier false-conflict-edge capture must still conflict, with its reason kind and detail unchanged, on the shared MCP tools source file. Acceptance: the edge is present after the fix and its reason is recorded verbatim for comparison against the before-state.
+- [ ] [P7-T5] Extend the same artifact with the prediction-against-actual report: the pre-registered pair count 53 from P0-T14, the executor's measured pair count, the actual edge-count delta, the itemized set of pairs that still conflict with each surviving reason, and the arithmetic showing the conservation identity holds. Acceptance: the actual delta is at or below 53; the identity balances exactly; every unit of shortfall below 53 is attributed to a named surviving pair; any excess in the measured pair count over 53 is itemized and shown to be induced by a shared placeholder token. A delta above 53 is a Blocking defect and must halt the phase.
+- [ ] [P7-T6] Extend the same artifact with the clique report: state that the nine-item component induced by the mandated evidence-path token is gone, and for each of its 36 pairs record either that the edge is removed or, if it survives, the shared real path or other reason that accounts for it. Acceptance: all 36 pairs are accounted for individually.
+- [ ] [P7-T7] Re-run the P0-T15 repro in both runtimes post-fix and record the result in the same artifact. Acceptance: the placeholder-only overlap now reports conflict false in both runtimes, and the negative control still reports conflict false.
+
+### Phase 8 — Final QA loop, structural limits, and scope containment
+
+If any task in this phase fails or changes a file, restart the phase from P8-T1 and re-record every artifact. The phase is complete only when P8-T1 through P8-T10 all pass in a single uninterrupted pass.
+
+- [ ] [P8-T1] Run `poetry run black .` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-python-format.md` with the four required fields. Acceptance: exit code 0 and zero files reformatted.
+- [ ] [P8-T2] Run `poetry run ruff check .` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-python-lint.md` with the four required fields. Acceptance: exit code 0 and zero findings.
+- [ ] [P8-T3] Run `poetry run pyright` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-python-typecheck.md` with the four required fields. Acceptance: exit code 0 and zero errors.
+- [ ] [P8-T4] Run `poetry run pytest --cov --cov-branch --cov-report=term-missing` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-python-test-coverage.md` with the four required fields plus numeric post-change line-coverage and branch-coverage percentages. Acceptance: exit code 0, line coverage at or above 85 percent, branch coverage at or above 75 percent.
+- [ ] [P8-T5] Compute the Python coverage delta and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/python-coverage-delta.md` recording the P0-T5 baseline percentages, the P8-T4 post-change percentages, and the coverage of the changed and newly added lines in `scripts/dev_tools/_blast_radius_token_shapes.py` and `scripts/dev_tools/_blast_radius_extraction.py`. Acceptance: no regression against the baseline on either metric, and changed-line coverage is recorded as a number.
+- [ ] [P8-T6] Run `mcp__drm-copilot__run_poshqc_format` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-powershell-format.md` with the four required fields. Acceptance: exit code 0 and zero files changed.
+- [ ] [P8-T7] Run `mcp__drm-copilot__run_poshqc_analyze` and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-powershell-analyze.md` with the four required fields. Acceptance: exit code 0 and zero diagnostics.
+- [ ] [P8-T8] Run `mcp__drm-copilot__run_poshqc_test` with coverage and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-powershell-test-coverage.md` with the four required fields plus the numeric post-change line-coverage percentage. Acceptance: exit code 0, line coverage at or above 85 percent, and the artifact confirms `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1` appears in the measured file set.
+- [ ] [P8-T9] Compute the PowerShell coverage delta and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/powershell-coverage-delta.md` recording the P0-T8 baseline percentage, the P8-T8 post-change percentage, and the coverage of the changed and newly added lines in `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1` and `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`. Acceptance: no regression against the baseline, and changed-line coverage is recorded as a number.
+- [ ] [P8-T10] Run the TypeScript format, lint, type-check, and Jest suites and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/final-typescript-suites.md` with the four required fields. Acceptance: exit code 0, and the artifact states that the pass and fail counts are unchanged from the P0-T9 baseline, confirming the change is a no-op for that runtime.
+- [ ] [P8-T11] Count the lines of `scripts/dev_tools/_blast_radius_token_shapes.py`, `scripts/dev_tools/_blast_radius_extraction.py`, `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`, `.claude/lib/blast-radius/BlastRadiusExtraction.psm1`, `tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1`, and `tests/scripts/claude-lib/blast-radius/BlastRadiusNormalization.Tests.ps1`, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/file-size-limit.md`. Acceptance: every one of the six counts is at or under 500.
+- [ ] [P8-T12] Audit the coverage configuration of both runtimes for exclusion entries and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/coverage-exclusion-audit.md`. Acceptance: the artifact shows no coverage exclusion entry matching a production source path was added anywhere in the diff, and both new production modules appear in their runtime's coverage denominator.
+- [ ] [P8-T13] Audit the full diff for contract changes and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/contract-scope-audit.md`. Acceptance: the artifact shows the diff adds or changes no function signature, no return type, no artifact type, no CLI flag, no MCP input-schema property, no finding-rule literal, and no config/blast-radius.json key.
+- [ ] [P8-T14] Audit the diff for any diagnostic channel and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/silent-drop-audit.md`. Acceptance: the artifact shows no new finding rule, no new warning or advisory emission, and that the expected-findings blocks of all 32 pre-existing fixtures are unchanged.
+- [ ] [P8-T15] Declare this item's blast radius: enumerate `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` in `shared_surfaces`, append the concrete paths `.claude/rules/parallel-orchestration.md` and `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md` to the declared `paths` after normalization because this item genuinely writes them and the rule tree is otherwise excluded as a mandate-read, then run blast-radius validation over the declared radius against this plan and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/declared-radius-validation.md` with the four required fields. Acceptance: validation reports no Blocking finding, and the artifact records the accepted `path_overlap` edge with issue #500 on the rule-file pair per the AC-41 decision above.
+- [ ] [P8-T16] Map all 46 acceptance criteria from `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/spec.md` to the task and evidence artifact that satisfies each, and write `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/qa-gates/acceptance-criteria-status.md`. Acceptance: every criterion from AC-1 through AC-41 plus the traceability table rows is present with a named artifact path and a pass, fail, or blocked verdict; no criterion is recorded as unverified.
+- [ ] [P8-T17] Update `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/issue.md` and `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/spec.md` with the outcome, the three planner decisions, and any deviation from scope, and mirror the issue update to `docs/features/active/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/issue-updates/issue-502.md` with `Timestamp:`, the exact posted text, and `PostedAs:`. Acceptance: both documents reflect the landed state and the mirror artifact exists with all three required fields.
+
+---
+
+## Acceptance-criteria coverage map
+
+| Criteria | Tasks |
+| --- | --- |
+| AC-1, AC-5, AC-6 | P2-T1, P2-T2, P3-T1, P3-T4 |
+| AC-2 | P1-T1, P1-T2, P2-T4, P2-T5 |
+| AC-3, AC-4 | P1-T3, P1-T4, P3-T3, P3-T4, P3-T5 |
+| AC-7 | P1-T1, P5-T1 |
+| AC-8 | P5-T3 |
+| AC-9 | Planner decision above, P5-T7 |
+| AC-10 | P5-T11, P5-T12 |
+| AC-11 | P5-T8, P5-T9 |
+| AC-12 | P5-T4 |
+| AC-13 | P5-T10 |
+| AC-14 | P0-T11, P0-T12 |
+| AC-15 | P0-T13, P7-T1 |
+| AC-16 | P7-T2 |
+| AC-17 | P7-T3 |
+| AC-18 | P7-T4 |
+| AC-19 | Planner decision above, P0-T14, P7-T5 |
+| AC-20 | P7-T6 |
+| AC-21 | P5-T1 through P5-T4, P5-T11 |
+| AC-22 | P5-T5, P5-T6 |
+| AC-23 | P5-T11 |
+| AC-24 | P4-T1, P4-T2, P4-T6, P6-T2, P6-T3 |
+| AC-25 | P4-T3, P4-T6 |
+| AC-26 | P4-T4, P4-T5, P4-T6 |
+| AC-27 | P8-T12 |
+| AC-28 | P8-T15 |
+| AC-29, AC-30, AC-31 | P6-T1, P6-T2, P6-T3 |
+| AC-32 | P6-T4 |
+| AC-33 | P0-T10, P2-T3, P2-T4, P3-T2, P3-T3, P8-T11 |
+| AC-34 | P3-T2, P3-T4 |
+| AC-35 | P8-T1 through P8-T5 |
+| AC-36 | P8-T6 through P8-T9 |
+| AC-37 | P0-T9, P8-T10 |
+| AC-38 | P8-T13 |
+| AC-39 | P8-T14 |
+| AC-40 | P0-T15, P7-T7 |
+| AC-41 | Planner decision above, P8-T15 |
