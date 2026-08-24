@@ -62,7 +62,13 @@ function Test-FeatureDocumentationOrEvidencePath {
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $NormalizedPath)
 
-    return $NormalizedPath.StartsWith('docs/features/active/')
+    # The segment anchor (^|/) admits both the repo-relative spelling and an
+    # absolute spelling of the same feature document, which the Write tool
+    # supplies by contract. -cmatch is deliberate and must not be normalized into
+    # -match: String.StartsWith is case-sensitive, so the case-sensitive operator
+    # is what preserves the previous semantics exactly. PowerShell -match is
+    # case-insensitive and would widen this predicate.
+    return $NormalizedPath -cmatch '(^|/)docs/features/active/'
 }
 
 function Test-ImplementationPath {
@@ -73,8 +79,33 @@ function Test-ImplementationPath {
     if (Test-FeatureDocumentationOrEvidencePath -NormalizedPath $NormalizedPath) {
         return $false
     }
-    if ($script:CheckpointPaths -contains $NormalizedPath) {
-        return $false
+    # Segment-anchored and end-anchored, so an absolute spelling of a checkpoint is
+    # exempt exactly as its repo-relative spelling already was. -match is
+    # deliberate here and must not be narrowed into -cmatch: -contains was
+    # case-insensitive, so the case-insensitive operator is what preserves the
+    # previous semantics exactly.
+    #
+    # Accepted widening: this also exempts a path OUTSIDE the workspace whose tail
+    # is an artifacts/orchestration/ segment followed by one of the seven names.
+    # Measured exposure in this repository is one matching file, the real
+    # checkpoint; there is no nested or vendored second copy. The same widening is
+    # already accepted for the identical literal in four other hooks. Resolving a
+    # workspace root instead would reintroduce every root-resolution failure mode
+    # (8.3 short names, drive-letter case, symlinks, linked worktrees), and a strip
+    # that failed to match would leave the path absolute and deny, reinstating the
+    # reported defect in a subtler form.
+    #
+    # Known deliberate miss: a path reaching a checkpoint name only through a '..'
+    # hop stays denied. The Write tool does not emit '..' segments, and a
+    # canonicalizer would reintroduce filesystem dependence for no measured gain.
+    #
+    # Idempotence for the apply_patch call site: (^|/) matches at ^, so a
+    # repo-relative path harvested from a file marker by Test-ImplementationCommand
+    # classifies exactly as it does today.
+    foreach ($checkpoint in $script:CheckpointPaths) {
+        if ($NormalizedPath -match ('(^|/)' + [regex]::Escape($checkpoint) + '$')) {
+            return $false
+        }
     }
     return $NormalizedPath -match '\.(py|ps1|psm1|ts|tsx|js|jsx|cs|json|yml|yaml)$'
 }
