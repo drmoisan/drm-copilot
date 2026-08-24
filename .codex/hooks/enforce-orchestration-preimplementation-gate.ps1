@@ -57,6 +57,80 @@ function Get-StringProperty {
     return ([string]$Value.$Name).Trim()
 }
 
+function ConvertTo-WorkspaceRelativePath {
+    <#
+    .SYNOPSIS
+        Reduces a tool file path to its repo-relative form when it can be confidently
+        resolved under the supplied workspace root.
+    .DESCRIPTION
+        Pure string operation: no filesystem access, no subprocess, no environment read.
+        The exemption checks downstream compare against repo-relative forms, so an
+        absolute spelling of an exempt path must be reduced before they run.
+
+        The function is deliberately conservative. Any spelling it cannot confidently
+        resolve is returned separator-normalized but otherwise unchanged, so the
+        unchanged classifier keeps failing closed on it. In particular a path carrying a
+        '..' segment is never resolved textually, and the root-prefix test is
+        segment-aligned so that root 'C:/repo' does not match 'C:/repository/...'.
+
+        Only the root-prefix comparison ignores case. The returned tail keeps its
+        original case so the downstream checks retain their existing semantics.
+    .PARAMETER FilePath
+        The raw tool path to reduce.
+    .PARAMETER WorkspaceRoot
+        The workspace root to strip. An empty root strips nothing.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $FilePath,
+        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $WorkspaceRoot
+    )
+
+    # Step 1: unify separators on both operands.
+    $path = ([string]$FilePath) -replace '\\', '/'
+    $root = ([string]$WorkspaceRoot) -replace '\\', '/'
+
+    # Step 2: collapse duplicate separators, preserving a leading '//' UNC server prefix.
+    $path = $path -replace '(?<!^)/{2,}', '/'
+    $root = $root -replace '(?<!^)/{2,}', '/'
+
+    # Step 3: remove identity dot segments.
+    while ($path.StartsWith('./')) {
+        $path = $path.Substring(2)
+    }
+    while ($path -match '/\./') {
+        $path = $path -replace '/\./', '/'
+    }
+    if ($path.EndsWith('/.')) {
+        $path = $path.Substring(0, $path.Length - 2)
+    }
+
+    # Step 4: fail-closed guard. A remaining parent-directory segment is never resolved.
+    if ($path -match '^\.\./' -or $path -match '/\.\./' -or $path -match '/\.\.$') {
+        return $path
+    }
+
+    # Step 5: trim trailing separators from the root.
+    $root = $root -replace '/+$', ''
+
+    # Step 6: segment-aligned, case-insensitive root-prefix strip.
+    if ($root) {
+        $prefix = $root + '/'
+        if ($path.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $tail = $path.Substring($prefix.Length)
+            if ($tail) {
+                return $tail
+            }
+        }
+    }
+
+    # Step 7: everything else passes through unchanged.
+    return $path
+}
+
 function Test-FeatureDocumentationOrEvidencePath {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -82,7 +156,14 @@ function Test-ImplementationPath {
 function Test-ImplementationCommand {
     [CmdletBinding()]
     [OutputType([bool])]
-    param([Parameter(Mandatory)][string] $Command)
+    param(
+        [Parameter(Mandatory)][string] $Command,
+
+        # Optional so every existing caller binds unchanged. Apply-patch hunk paths are
+        # handed to the same exemption classifier as a tool file_path, so they take the
+        # same workspace-root normalization.
+        [string] $WorkspaceRoot = (Get-Location).Path
+    )
 
     $normalizedCommand = $Command.Trim()
     if (-not $normalizedCommand) {
@@ -90,13 +171,13 @@ function Test-ImplementationCommand {
     }
 
     foreach ($match in [regex]::Matches($normalizedCommand, '(?m)^\*\*\* (?:Add|Update|Delete) File:\s*(?<path>.+?)\s*$')) {
-        $path = (([string]$match.Groups['path'].Value).Trim()) -replace '\\', '/'
+        $path = ConvertTo-WorkspaceRelativePath -FilePath (([string]$match.Groups['path'].Value).Trim()) -WorkspaceRoot $WorkspaceRoot
         if (Test-ImplementationPath -NormalizedPath $path) {
             return $true
         }
     }
     foreach ($match in [regex]::Matches($normalizedCommand, '(?m)^\*\*\* Move to:\s*(?<path>.+?)\s*$')) {
-        $path = (([string]$match.Groups['path'].Value).Trim()) -replace '\\', '/'
+        $path = ConvertTo-WorkspaceRelativePath -FilePath (([string]$match.Groups['path'].Value).Trim()) -WorkspaceRoot $WorkspaceRoot
         if (Test-ImplementationPath -NormalizedPath $path) {
             return $true
         }
@@ -254,7 +335,15 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [string] $ToolInputRaw,
-        [string] $CheckpointRaw
+        [string] $CheckpointRaw,
+
+        # Injection seam for the workspace root. The default relies on the existing
+        # runtime guarantee that hook processes start in the project root, which the
+        # cwd-relative checkpoint read already depends on. Tests supply a synthetic
+        # root so no assertion depends on the current directory. The mapped Edit/Write
+        # loop in the entry point needs no edit: it calls this function, so the default
+        # supplies the root on that path too.
+        [string] $WorkspaceRoot = (Get-Location).Path
     )
 
     if (-not $ToolInputRaw) {
@@ -269,12 +358,12 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     $requiresReadyCheckpoint = $false
     $filePath = Get-StringProperty -Value $toolInput -Name 'file_path'
     if ($filePath) {
-        $normalized = ([string]$filePath) -replace '\\', '/'
+        $normalized = ConvertTo-WorkspaceRelativePath -FilePath $filePath -WorkspaceRoot $WorkspaceRoot
         $requiresReadyCheckpoint = Test-ImplementationPath -NormalizedPath $normalized
     } else {
         $command = Get-StringProperty -Value $toolInput -Name 'command'
         if ($command) {
-            $requiresReadyCheckpoint = Test-ImplementationCommand -Command $command
+            $requiresReadyCheckpoint = Test-ImplementationCommand -Command $command -WorkspaceRoot $WorkspaceRoot
         } else {
             $requiresReadyCheckpoint = Test-ImplementationDelegation -ToolInput $toolInput
         }
