@@ -2,7 +2,7 @@
 
 - Date captured: 2026-08-24
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/preimplementation-gate-blocks-planner-integration-commits/ (Issue #539)
+- Status: Active -> docs/features/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/ (Issue #539)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -74,4 +74,4 @@
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
