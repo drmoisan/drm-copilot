@@ -196,6 +196,10 @@
             '.claude/lib/hook-payload/HookPayload.psm1'
             '.claude/hooks/enforce-promotion-mcp-only.ps1'
             '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'
+            # Issue #539 extracted the command-branch pathspec classifier into this
+            # dot-sourced sibling for headroom; registered so the new production file stays
+            # in the coverage denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
