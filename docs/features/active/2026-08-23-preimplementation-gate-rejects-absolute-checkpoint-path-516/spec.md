@@ -358,74 +358,115 @@ None are required. Every verification step is a non-interactive command: allow/d
 
 Each criterion below is decidable PASS or FAIL from a named command output or a named file inspection.
 
+Evidence annotations below use paths relative to this feature folder, `docs/features/active/2026-08-23-preimplementation-gate-rejects-absolute-checkpoint-path-516/`. Every named artifact exists on disk. One criterion is deliberately left unticked; the reason is stated inline.
+
 ### Positive half — absolute checkpoint spellings are allowed
 
-- [ ] For each of the seven literals in `$script:CheckpointPaths`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1` contains a passing case that calls `Invoke-OrchestrationPreimplementationGateDecision` with a `Write` payload whose `file_path` is a synthetic forward-slash absolute prefix joined to that literal, together with an explicit not-ready `-CheckpointRaw`, and asserts `permissionDecision` equals `allow`. Seven passing cases, one per literal, verified from the Pester run output.
-- [ ] The same suite contains a passing case per literal using a synthetic **backslash** absolute prefix, asserting `permissionDecision` equals `allow`, proving the upstream separator normalization still feeds the new predicate.
-- [ ] The same suite contains at least one passing case using a synthetic **POSIX-shaped** absolute prefix (leading `/`), asserting `permissionDecision` equals `allow`.
-- [ ] `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` contains the equivalent absolute-spelling allow cases against the dot-sourced `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, all passing.
-- [ ] A case with the relative spelling `./artifacts/orchestration/orchestrator-state.json` asserts `permissionDecision` equals `allow`, confirming the leading `./` form is admitted by the segment anchor.
+- [x] For each of the seven literals in `$script:CheckpointPaths`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1` contains a passing case that calls `Invoke-OrchestrationPreimplementationGateDecision` with a `Write` payload whose `file_path` is a synthetic forward-slash absolute prefix joined to that literal, together with an explicit not-ready `-CheckpointRaw`, and asserts `permissionDecision` equals `allow`. Seven passing cases, one per literal, verified from the Pester run output.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — the seven "allows the forward-slash absolute spelling of ..." cases all report pass.
+- [x] The same suite contains a passing case per literal using a synthetic **backslash** absolute prefix, asserting `permissionDecision` equals `allow`, proving the upstream separator normalization still feeds the new predicate.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — the seven "allows the backslash absolute spelling of ..." cases all report pass.
+- [x] The same suite contains at least one passing case using a synthetic **POSIX-shaped** absolute prefix (leading `/`), asserting `permissionDecision` equals `allow`.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "admits the POSIX-shaped absolute spelling of artifacts/orchestration/orchestrator-state.json" reports pass.
+- [x] `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` contains the equivalent absolute-spelling allow cases against the dot-sourced `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, all passing.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — Codex suite, 35 of 35 cases pass; `evidence/regression-testing/pass-after-codex-batch.2026-08-23T23-25.md`.
+- [x] A case with the relative spelling `./artifacts/orchestration/orchestrator-state.json` asserts `permissionDecision` equals `allow`, confirming the leading `./` form is admitted by the segment anchor.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "admits the leading dot-slash relative spelling of ..." reports pass in both suites.
 
 ### No regression on the relative spellings
 
-- [ ] For each of the seven literals, a passing case asserts that the plain repo-relative spelling still yields `permissionDecision` equal to `allow` under an explicit not-ready `-CheckpointRaw`.
-- [ ] `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` passes with zero modifications; `git diff` against the branch base shows no change to that file.
-- [ ] `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes with zero modifications; `git diff` against the branch base shows no change to that file. Its pre-existing deny cases for an `artifacts/orchestration/` file outside the seven literals and for a checkpoint-named file outside `artifacts/orchestration/` both still report pass.
+- [x] For each of the seven literals, a passing case asserts that the plain repo-relative spelling still yields `permissionDecision` equal to `allow` under an explicit not-ready `-CheckpointRaw`.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — the seven "allows the repo-relative spelling of ..." cases pass in both suites, and they also passed in the fail-before capture, confirming no regression.
+- [x] `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` passes with zero modifications; `git diff` against the branch base shows no change to that file.
+  - Evidence: `evidence/qa-gates/final-poshqc-test.2026-08-23T23-25.md` (35/35 pass) and `evidence/qa-gates/file-set-discipline.2026-08-23T23-25.md` ([P5-T2] section: absent from the changed-path union).
+- [x] `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes with zero modifications; `git diff` against the branch base shows no change to that file. Its pre-existing deny cases for an `artifacts/orchestration/` file outside the seven literals and for a checkpoint-named file outside `artifacts/orchestration/` both still report pass.
+  - Evidence: `evidence/regression-testing/pass-after-codex-batch.2026-08-23T23-25.md` (43/43 pass, zero failures, so every case including the two named deny cases passes) and `evidence/qa-gates/file-set-discipline.2026-08-23T23-25.md` ([P5-T2] section: absent from the union).
 
 ### Negative half — absolute production paths are still denied
 
-- [ ] A passing case asserts that a synthetic absolute path ending in a production `.ps1` file yields `permissionDecision` equal to `deny` under an explicit not-ready `-CheckpointRaw`.
-- [ ] A passing case asserts the same for a synthetic absolute path ending in a production `.py` file.
-- [ ] A passing case asserts `deny` for a synthetic absolute path ending in an `artifacts/orchestration/` JSON file whose name is not one of the seven literals.
-- [ ] A passing case asserts `deny` for a synthetic absolute path ending in a checkpoint-named JSON file that is not preceded by an `artifacts/orchestration/` segment.
-- [ ] A passing case asserts `deny` for a synthetic absolute path that reaches a checkpoint name only through a `..` segment, recording the accepted fail-closed miss as an asserted behavior rather than an undocumented gap.
-- [ ] Every negative-half case above reports **pass in both the fail-before and the pass-after capture**, demonstrating the fix did not open the gate.
+- [x] A passing case asserts that a synthetic absolute path ending in a production `.ps1` file yields `permissionDecision` equal to `deny` under an explicit not-ready `-CheckpointRaw`.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies a synthetic absolute path ending in a production .ps1 file" passes in both suites.
+- [x] A passing case asserts the same for a synthetic absolute path ending in a production `.py` file.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies a synthetic absolute path ending in a production .py file" passes in both suites.
+- [x] A passing case asserts `deny` for a synthetic absolute path ending in an `artifacts/orchestration/` JSON file whose name is not one of the seven literals.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies ... an orchestration JSON whose name is not one of the seven literals" passes in both suites.
+- [x] A passing case asserts `deny` for a synthetic absolute path ending in a checkpoint-named JSON file that is not preceded by an `artifacts/orchestration/` segment.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies ... a checkpoint-named JSON with no preceding artifacts/orchestration segment" passes in both suites.
+- [x] A passing case asserts `deny` for a synthetic absolute path that reaches a checkpoint name only through a `..` segment, recording the accepted fail-closed miss as an asserted behavior rather than an undocumented gap.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies ... a checkpoint name reached only through a parent-directory hop" passes in both suites. The `..` hop sits inside the `artifacts/orchestration/` segment itself, so the case denies both before and after the fix.
+- [x] Every negative-half case above reports **pass in both the fail-before and the pass-after capture**, demonstrating the fix did not open the gate.
+  - Evidence: `evidence/regression-testing/fail-before-new-suites.2026-08-23T23-25.md` (all five deny cases listed among the passing cases in a run with 38 failures) and `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` (all five pass again).
 
 ### Documentation exemption and case sensitivity
 
-- [ ] A passing case asserts `permissionDecision` equals `allow` for a repo-relative `.json` artifact path beginning with `docs/features/active/`, under an explicit not-ready `-CheckpointRaw`.
-- [ ] Passing cases assert `allow` for the same artifact expressed with a synthetic forward-slash absolute prefix and with a synthetic backslash absolute prefix.
-- [ ] A passing case asserts `permissionDecision` equals `deny` for a synthetic absolute path whose feature-documentation prefix differs only in letter case, confirming `-cmatch` preserved the case-sensitive `StartsWith` semantics exactly.
-- [ ] A passing case asserts `permissionDecision` equals `allow` for a synthetic absolute checkpoint path whose literal differs only in letter case, confirming the case-insensitive `-match` preserved the `-contains` semantics exactly.
+- [x] A passing case asserts `permissionDecision` equals `allow` for a repo-relative `.json` artifact path beginning with `docs/features/active/`, under an explicit not-ready `-CheckpointRaw`.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "allows the repo-relative spelling of a feature-folder .json artifact" passes in both suites.
+- [x] Passing cases assert `allow` for the same artifact expressed with a synthetic forward-slash absolute prefix and with a synthetic backslash absolute prefix.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — both absolute documentation spellings pass in both suites, having failed in the fail-before capture.
+- [x] A passing case asserts `permissionDecision` equals `deny` for a synthetic absolute path whose feature-documentation prefix differs only in letter case, confirming `-cmatch` preserved the case-sensitive `StartsWith` semantics exactly.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "denies an absolute path whose documentation prefix differs only in letter case" passes in both suites, and passed in the fail-before capture as well.
+- [x] A passing case asserts `permissionDecision` equals `allow` for a synthetic absolute checkpoint path whose literal differs only in letter case, confirming the case-insensitive `-match` preserved the `-contains` semantics exactly.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — "allows an absolute checkpoint path whose literal differs only in letter case" passes in both suites, having failed in the fail-before capture.
 
 ### Idempotence and untouched behavior
 
-- [ ] `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` contains passing cases proving that a repo-relative `apply_patch` file-marker path routed through `Test-ImplementationCommand` produces the same classification as before the change, in both the allow and the deny direction.
-- [ ] `git diff` against the branch base shows that within each of the four hook copies, the only modified function bodies are `Test-FeatureDocumentationOrEvidencePath` and `Test-ImplementationPath`. `Test-OrchestrationReady`, including its `StartsWith('docs/features/active/')` on the checkpoint's own `feature-folder` field, `Test-PreparationModeDelegation`, `Test-ImplementationDelegation`, `Get-CheckpointContent`, the payload-anomaly path, the `PREIMPLEMENTATION_GATE_BLOCKED` reason text, and the entry points are all byte-unchanged.
-- [ ] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` and `tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1` both pass with zero modifications.
-- [ ] `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with zero modifications, confirming no interpreter invocation was introduced into any hook copy.
+- [x] `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` contains passing cases proving that a repo-relative `apply_patch` file-marker path routed through `Test-ImplementationCommand` produces the same classification as before the change, in both the allow and the deny direction.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — both `apply_patch` idempotence cases pass, and both also passed in the fail-before capture, which is what makes them an idempotence proof.
+- [x] `git diff` against the branch base shows that within each of the four hook copies, the only modified function bodies are `Test-FeatureDocumentationOrEvidencePath` and `Test-ImplementationPath`. `Test-OrchestrationReady`, including its `StartsWith('docs/features/active/')` on the checkpoint's own `feature-folder` field, `Test-PreparationModeDelegation`, `Test-ImplementationDelegation`, `Get-CheckpointContent`, the payload-anomaly path, the `PREIMPLEMENTATION_GATE_BLOCKED` reason text, and the entry points are all byte-unchanged.
+  - Evidence: `evidence/qa-gates/scope-confinement.2026-08-23T23-25.md` — exactly two hunks per copy, both inside the two target functions, plus a direct brace-balanced body extraction reporting BYTE-UNCHANGED for every named symbol in both canonical copies.
+- [x] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` and `tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1` both pass with zero modifications.
+  - Evidence: `evidence/regression-testing/pass-after-claude-batch.2026-08-23T23-25.md` (15/15), `evidence/regression-testing/pass-after-codex-batch.2026-08-23T23-25.md` (56/56), and `evidence/qa-gates/file-set-discipline.2026-08-23T23-25.md` ([P5-T2]: both absent from the union).
+- [x] `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with zero modifications, confirming no interpreter invocation was introduced into any hook copy.
+  - Evidence: `evidence/qa-gates/no-python-invocation.2026-08-23T23-25.md` — 27/27 pass, including the empty-allowlist repository scan over both guarded hook roots.
 
 ### Four-copy parity
 
-- [ ] All four hook copies listed in **Scope & Non-Goals** contain the segment-anchored predicates; `git diff --stat` against the branch base lists all four paths as modified.
-- [ ] `Get-FileHash` reports identical SHA256 values for `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`.
+- [x] All four hook copies listed in **Scope & Non-Goals** contain the segment-anchored predicates; `git diff --stat` against the branch base lists all four paths as modified.
+  - Evidence: `evidence/qa-gates/scope-confinement.2026-08-23T23-25.md` — `git diff --stat` reports "4 files changed, 128 insertions(+), 12 deletions(-)" across all four copies.
+- [x] `Get-FileHash` reports identical SHA256 values for `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`.
+  - Evidence: `evidence/qa-gates/four-copy-parity-hashes.2026-08-23T23-25.md` — both `658C50A98FB14EA06CC6705A384CF46ECE11A5793DE0E8E854CDF18C34FE6207`.
 - [ ] `Get-FileHash` reports identical SHA256 values for `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, and the Codex pair lands in a single commit so the byte-identity assertion in `legacy-codex-hook-contracts.Tests.ps1` never observes a split state.
-- [ ] `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` exits 0, confirming Claude root-to-bundle content equality.
+  - **Deliberately left unticked.** The hash half is satisfied — `evidence/qa-gates/four-copy-parity-hashes.2026-08-23T23-25.md` records both Codex copies at `98DC6917AE5AE3239DBE89C31391960D260AB74B83A51D93FA9D575AA16DBABD`, and both were made byte-identical in the working tree before any commit existed. The single-commit half is satisfied by orchestrator-side commit sequencing, which lies outside plan execution, so no executor evidence can prove it. Tick this only after the Codex pair has actually landed in one commit.
+- [x] `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` exits 0, confirming Claude root-to-bundle content equality.
+  - Evidence: `evidence/qa-gates/final-pytest-pushdown-parity.2026-08-23T23-25.md` — 10 passed, EXIT_CODE 0.
 
 ### Toolchain
 
-- [ ] `mcp__drm-copilot__run_poshqc_format` reports no files requiring reformatting on a final clean pass.
-- [ ] `mcp__drm-copilot__run_poshqc_analyze` reports zero PSScriptAnalyzer findings across the six changed PowerShell files.
-- [ ] `mcp__drm-copilot__run_poshqc_test`, using `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, reports zero failed and zero errored tests in `artifacts/pester/pester-junit.xml`.
-- [ ] The format, analyze, and test stages all complete in a single pass in that order with no stage failing or rewriting a file.
+- [x] `mcp__drm-copilot__run_poshqc_format` reports no files requiring reformatting on a final clean pass.
+  - Evidence: `evidence/qa-gates/final-poshqc-format.2026-08-23T23-25.md` — zero files rewritten, confirmed by SHA256 comparison of all six PowerShell files before and after the run.
+- [x] `mcp__drm-copilot__run_poshqc_analyze` reports zero PSScriptAnalyzer findings across the six changed PowerShell files.
+  - Evidence: `evidence/qa-gates/final-poshqc-analyze.2026-08-23T23-25.md` — per-file counts of 0 for each of the six files, total 0.
+- [x] `mcp__drm-copilot__run_poshqc_test`, using `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, reports zero failed and zero errored tests in `artifacts/pester/pester-junit.xml`.
+  - Evidence: `evidence/qa-gates/final-poshqc-test.2026-08-23T23-25.md` — 3476 tests, 0 failures, 0 errors.
+- [x] The format, analyze, and test stages all complete in a single pass in that order with no stage failing or rewriting a file.
+  - Evidence: `evidence/qa-gates/final-clean-pass.2026-08-23T23-25.md` — the confirmed pass, with the two earlier abandoned attempts and their causes recorded.
 
 ### Coverage
 
-- [ ] The per-file line-coverage percentages read from `artifacts/pester/powershell-coverage.xml` for `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` are each at or above 85%.
-- [ ] Every line changed by this diff in either canonical hook copy is reported as covered in `artifacts/pester/powershell-coverage.xml`, so there is no coverage regression on changed lines.
+- [x] The per-file line-coverage percentages read from `artifacts/pester/powershell-coverage.xml` for `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` are each at or above 85%.
+  - Evidence: `evidence/qa-gates/final-powershell-coverage.2026-08-23T23-25.md` — 90.09% (100/111) and 99.19% (122/123).
+- [x] Every line changed by this diff in either canonical hook copy is reported as covered in `artifacts/pester/powershell-coverage.xml`, so there is no coverage regression on changed lines.
+  - Evidence: `evidence/qa-gates/coverage-delta.2026-08-23T23-25.md` — 4 instrumented changed lines per canonical copy, all COVERED, zero uncovered; neither per-file percentage decreased against the `evidence/baseline/baseline-powershell-coverage.2026-08-23T23-25.md` baseline.
 - [ ] The spec records, and the reviewer confirms, that PowerShell is exempt from the >= 75% branch-coverage threshold under `.claude/rules/quality-tiers.md` because Pester does not measure branch coverage, and that this exemption does not remove either hook copy from the coverage denominator. Neither hook copy appears in any coverage exclusion list.
+  - Evidence: this spec records the exemption in its **Coverage** section under **Test Strategy**, and `evidence/qa-gates/final-powershell-coverage.2026-08-23T23-25.md` restates it and confirms both copies are measured. `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` carries no coverage exclusion list at all — it uses an inclusion list, `CodeCoverage.Path`, in which both canonical copies are registered, which is why both appear with counters in `artifacts/pester/powershell-coverage.xml`. Note: the "reviewer confirms" clause remains an independent reviewer action; the executor-verifiable content is fully evidenced above. The orchestrator reverted this checkbox to unticked, because the criterion names the reviewer as a required actor and the `acceptance-criteria-tracking` skill permits a tick only once the work satisfying the criterion is verified. `feature-review` is the correct actor to tick it.
 
 ### Regression evidence
 
-- [ ] A fail-before capture exists under `docs/features/active/2026-08-23-preimplementation-gate-rejects-absolute-checkpoint-path-516/evidence/regression-testing/` showing the positive-half absolute cases reporting `deny` and failing against the unmodified hook copies, with the negative-half cases passing in the same run.
-- [ ] A pass-after capture exists in the same directory showing every case in both new suites passing against the fixed hook copies.
-- [ ] Every case in both fail-before and pass-after captures supplied an explicit not-ready `-CheckpointRaw`; no case relies on the on-disk `artifacts/orchestration/orchestrator-state.json`, so no allow assertion passes vacuously.
+- [x] A fail-before capture exists under `docs/features/active/2026-08-23-preimplementation-gate-rejects-absolute-checkpoint-path-516/evidence/regression-testing/` showing the positive-half absolute cases reporting `deny` and failing against the unmodified hook copies, with the negative-half cases passing in the same run.
+  - Evidence: `evidence/regression-testing/fail-before-new-suites.2026-08-23T23-25.md` — EXIT_CODE 38, 19 failed cases in each new suite, all 38 named, with every negative-half case passing in the same run.
+- [x] A pass-after capture exists in the same directory showing every case in both new suites passing against the fixed hook copies.
+  - Evidence: `evidence/regression-testing/pass-after-new-suites.2026-08-23T23-25.md` — EXIT_CODE 0, all 68 cases named and passing, against the identical 1600-test population as the fail-before run.
+- [x] Every case in both fail-before and pass-after captures supplied an explicit not-ready `-CheckpointRaw`; no case relies on the on-disk `artifacts/orchestration/orchestrator-state.json`, so no allow assertion passes vacuously.
+  - Evidence: `evidence/regression-testing/fail-before-new-suites.2026-08-23T23-25.md`, [P1-T13] section — a structural audit shows the Claude suite has exactly one call site to the decision function and the Codex suite exactly two, each supplying `-CheckpointRaw (ConvertTo-NotReadyCheckpointRaw)` unconditionally, so no case can reach the on-disk checkpoint by any path.
 
 ### File-set discipline
 
-- [ ] `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1` and `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` each exist and each contains fewer than 500 lines.
-- [ ] Every absolute path string in both new suites is a literal constant declared in the suite. A search of both files finds no use of `$PSScriptRoot`, `$PWD`, `Resolve-Path`, `Get-Location`, or a `git` invocation to construct a test path.
-- [ ] The union of `git diff --name-only` against the branch base and `git status --porcelain --untracked-files=all` contains all seven paths listed under **Scope & Non-Goals**, and every other path in that union lies under `docs/features/active/2026-08-23-preimplementation-gate-rejects-absolute-checkpoint-path-516/`, which holds this item's own planning documents and its `evidence/` tree. No file under `.claude/rules/`, no file under `.github/instructions/`, and no `quality-tiers.yml` appears in that union.
+- [x] `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1` and `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1` each exist and each contains fewer than 500 lines.
+  - Evidence: `evidence/qa-gates/synthetic-path-constant-audit.2026-08-23T23-25.md` — 223 lines and 242 lines respectively, both under the 500-line cap.
+- [x] Every absolute path string in both new suites is a literal constant declared in the suite. A search of both files finds no use of `$PSScriptRoot`, `$PWD`, `Resolve-Path`, `Get-Location`, or a `git` invocation to construct a test path.
+  - Evidence: `evidence/qa-gates/synthetic-path-constant-audit.2026-08-23T23-25.md` — `Get-Location`, `PWD`, and the source-control executable name each occur **zero** times in both suites. `Resolve-Path` and `PSScriptRoot` each occur **exactly once per suite**, together on the single `BeforeAll` hook-locating line (line 141 in the Claude suite, line 132 in the Codex suite). That line resolves only the file to dot-source and constructs no path that any case asserts against, so it is not test-path construction, which is the qualifier this criterion carries. All three synthetic absolute prefixes in each suite are bare string literals.
+- [x] The union of `git diff --name-only` against the branch base and `git status --porcelain --untracked-files=all` contains all seven paths listed under **Scope & Non-Goals**, and every other path in that union lies under `docs/features/active/2026-08-23-preimplementation-gate-rejects-absolute-checkpoint-path-516/`, which holds this item's own planning documents and its `evidence/` tree. No file under `.claude/rules/`, no file under `.github/instructions/`, and no `quality-tiers.yml` appears in that union.
+  - Evidence: `evidence/qa-gates/file-set-discipline.2026-08-23T23-25.md` — all seven declared paths present, every other path under this feature folder, and zero paths under `.claude/rules/`, `.github/instructions/`, or named `quality-tiers.yml`.
 
 ## Risks & Mitigations
 - Technical or operational risks:
