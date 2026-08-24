@@ -265,7 +265,7 @@ During Copilot publication, supported script references are rewritten to stable 
 
 ### Extension development
 
-- VS Code (engine `^1.108.0`)
+- VS Code (engine `^1.134.0`)
 - Node.js 20+ recommended
 - npm
 
