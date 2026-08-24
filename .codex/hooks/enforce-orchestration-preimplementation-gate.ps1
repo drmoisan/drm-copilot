@@ -10,7 +10,31 @@ param()
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
 . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
 
+# The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+
+# Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
+# of these is orchestration bookkeeping, not implementation, so the gate must not
+# require a ready checkpoint before the checkpoint itself can be created. The set is a
+# list of repo-relative literals behind a single membership check: no directory prefix,
+# no glob, and no absolute-path entry.
+$script:CheckpointPaths = @(
+    'artifacts/orchestration/orchestrator-state.json'
+    'artifacts/orchestration/parallel-planner-state.json'
+    'artifacts/orchestration/parallel-orchestrator-state.json'
+    'artifacts/orchestration/epic-planner-state.json'
+    'artifacts/orchestration/epic-orchestrator-state.json'
+    'artifacts/orchestration/powershell-orchestrator-state.json'
+    'artifacts/orchestration/csharp-orchestrator-state.json'
+)
+
+# Both markers must appear in the field-scoped prompt for a delegation to qualify as a
+# preparation-mode kickoff. The literals are reused verbatim from
+# .claude/skills/parallel-plan/SKILL.md and .claude/skills/epic-plan/SKILL.md.
+$script:PreparationModeMarkers = @(
+    'Preparation mode: true.'
+    'route_id: preparation.'
+)
 
 function ConvertFrom-CheckpointJson {
     [CmdletBinding()]
@@ -49,7 +73,7 @@ function Test-ImplementationPath {
     if (Test-FeatureDocumentationOrEvidencePath -NormalizedPath $NormalizedPath) {
         return $false
     }
-    if ($NormalizedPath -eq $script:CheckpointPath) {
+    if ($script:CheckpointPaths -contains $NormalizedPath) {
         return $false
     }
     return $NormalizedPath -match '\.(py|ps1|psm1|ts|tsx|js|jsx|cs|json|yml|yaml)$'
@@ -94,6 +118,42 @@ function Test-ImplementationCommand {
     return $false
 }
 
+function Test-PreparationModeDelegation {
+    <#
+    .SYNOPSIS
+        Identifies an orchestrator delegation that is a preparation-mode kickoff.
+    .DESCRIPTION
+        Returns true only when all three conjuncts hold: the payload is present, the
+        delegated agent is exactly 'orchestrator', and the field-scoped prompt carries
+        both preparation markers. The prompt is read as a named field via this file's
+        own Get-StringProperty helper rather than from the serialized payload, so that
+        marker text planted in an unrelated field cannot exempt an implementation
+        delegation.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowNull()] $ToolInput)
+
+    if ($null -eq $ToolInput) {
+        return $false
+    }
+
+    $subagentType = Get-StringProperty -Value $ToolInput -Name 'subagent_type'
+    if ($subagentType -ne 'orchestrator') {
+        return $false
+    }
+
+    $prompt = Get-StringProperty -Value $ToolInput -Name 'prompt'
+    foreach ($marker in $script:PreparationModeMarkers) {
+        if (-not $prompt.Contains($marker)) {
+            return $false
+        }
+    }
+    return $true
+}
+
 function Test-ImplementationDelegation {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -101,6 +161,17 @@ function Test-ImplementationDelegation {
 
     if ($null -eq $ToolInput) {
         return $false
+    }
+
+    try {
+        if (Test-PreparationModeDelegation -ToolInput $ToolInput) {
+            return $false
+        }
+    } catch {
+        # An envelope the field reader cannot probe falls through to the unchanged
+        # whole-payload regex below. An extraction failure must never become an
+        # exemption, so the gate stays closed on the stricter classifier.
+        Write-Debug "Preparation-mode probe failed: $($_.Exception.Message)"
     }
 
     $payloadText = ($ToolInput | ConvertTo-Json -Depth 20 -Compress)
