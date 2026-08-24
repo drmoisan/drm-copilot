@@ -234,6 +234,22 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         $powerShellDecision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
     }
 
+    It 'allows exempt checkpoint writes and preparation-mode delegations (issue #535)' {
+        . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
+        $preparationPrompt = 'Preparation mode: true. route_id: preparation. Hand off to atomic-executor later.'
+        foreach ($case in @(
+                @{ Name = 'exempt checkpoint literal'; ToolInput = @{ file_path = 'artifacts/orchestration/parallel-planner-state.json' } },
+                @{ Name = 'preparation-mode delegation'; ToolInput = @{ subagent_type = 'orchestrator'; prompt = $preparationPrompt } }
+            )) {
+            $raw = $case.ToolInput | ConvertTo-Json -Compress
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $raw -CheckpointRaw '{}'
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because "the $($case.Name) case is orchestration bookkeeping, not implementation"
+        }
+        Test-PreparationModeDelegation -ToolInput $null | Should -BeFalse
+        Test-PreparationModeDelegation -ToolInput ([pscustomobject]@{ subagent_type = 'orchestrator'; prompt = 'Preparation mode: true.' }) | Should -BeFalse
+    }
+
     It 'reconstructs update patches in memory and includes move destinations' {
         # Update reconstruction now comes from the shared module and runs only for
         # the governed path, so the governed path is supplied explicitly here.

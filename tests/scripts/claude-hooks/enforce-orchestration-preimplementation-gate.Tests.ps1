@@ -243,6 +243,162 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
     }
 
+    Context 'issue #535 checkpoint write exemptions' {
+        BeforeAll {
+            $script:ExemptCheckpointLiterals = @(
+                'artifacts/orchestration/orchestrator-state.json'
+                'artifacts/orchestration/parallel-planner-state.json'
+                'artifacts/orchestration/parallel-orchestrator-state.json'
+                'artifacts/orchestration/epic-planner-state.json'
+                'artifacts/orchestration/epic-orchestrator-state.json'
+                'artifacts/orchestration/powershell-orchestrator-state.json'
+                'artifacts/orchestration/csharp-orchestrator-state.json'
+            )
+        }
+
+        It 'allows a Write to every exempt checkpoint literal with no ready checkpoint' {
+            # An explicit not-ready checkpoint is supplied so the assertion measures the
+            # exemption itself. Omitting it would fall back to the on-disk checkpoint,
+            # which is ready during an orchestrated run, so the case would allow whether
+            # or not the exemption exists.
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            foreach ($literal in $script:ExemptCheckpointLiterals) {
+                $json = ConvertTo-ImplementationWriteToolInput -FilePath $literal
+
+                $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+                $decision.hookSpecificOutput.permissionDecision |
+                    Should -Be 'allow' -Because "$literal is an orchestration checkpoint, not an implementation file"
+            }
+        }
+
+        It 'allows the backslash spelling of every exempt checkpoint literal' {
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            foreach ($literal in $script:ExemptCheckpointLiterals) {
+                $backslashPath = $literal.Replace('/', '\')
+                $json = ConvertTo-ImplementationWriteToolInput -FilePath $backslashPath
+
+                $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+                $decision.hookSpecificOutput.permissionDecision |
+                    Should -Be 'allow' -Because "$backslashPath normalizes to an exempt checkpoint literal"
+            }
+        }
+
+        It 'denies a non-checkpoint .json under artifacts/orchestration/ (literal set, not directory prefix)' {
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'artifacts/orchestration/some-other-file.json'
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+
+        It 'denies a checkpoint-named file outside artifacts/orchestration/ (full-path equality)' {
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'scripts/parallel-planner-state.json'
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
+
+    Context 'issue #535 preparation-mode delegation exemption' {
+        BeforeAll {
+            # Verbatim kickoff line from .claude/skills/parallel-plan/SKILL.md.
+            $script:ParallelKickoffPrompt = 'Preparation mode: true. route_id: preparation. parallel_slug: <slug>. Perform promotion, research, feature documents (spec.md, user-story.md), atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope for this run and are executed later by parallel-orchestrator. After the atomic-executor preflight returns PREFLIGHT: ALL CLEAR, commit the feature folder and plan to the current branch, push the current branch to origin, set out-of-scope step statuses to not-applicable, set next_step to S5_atomic_execution, and stop, reporting the plan-path and preflight status.'
+            # Verbatim kickoff line from .claude/skills/epic-plan/SKILL.md.
+            $script:EpicKickoffPrompt = 'Preparation mode: true. route_id: preparation. epic_feature_folder: <epic-slug>. integration_branch: epic/<epic-slug>-integration. Perform promotion, research, feature documents (spec.md, user-story.md), atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope for this run and are executed later by epic-orchestrator. After the atomic-executor preflight returns PREFLIGHT: ALL CLEAR, commit the feature folder and plan to the current branch, set out-of-scope step statuses to not-applicable, set next_step to S5_atomic_execution, and stop, reporting the plan-path and preflight status.'
+            # An execution-style prompt that matches the unchanged implementation regex.
+            $script:ImplementationPrompt = 'Delegate to atomic-executor and begin implementation now.'
+
+            function ConvertTo-PreparationDelegationToolInput {
+                param(
+                    [string] $AgentName = 'orchestrator',
+                    [Parameter(Mandatory)] [string] $Prompt,
+                    [string] $Description = ''
+                )
+
+                $toolInput = [ordered]@{ subagent_type = $AgentName; prompt = $Prompt }
+                if ($Description) {
+                    $toolInput['description'] = $Description
+                }
+
+                return (@{ tool_name = 'Agent'; tool_input = $toolInput } | ConvertTo-Json -Compress -Depth 5)
+            }
+        }
+
+        It 'allows the verbatim parallel-plan preparation kickoff delegation with no ready checkpoint' {
+            # As above, the explicit not-ready checkpoint keeps the assertion independent
+            # of the on-disk checkpoint, so it measures the delegation exemption itself.
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt $script:ParallelKickoffPrompt
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows the verbatim epic-plan preparation kickoff delegation with no ready checkpoint' {
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt $script:EpicKickoffPrompt
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'denies both markers when subagent_type is not orchestrator' {
+            $json = ConvertTo-PreparationDelegationToolInput -AgentName 'atomic-executor' -Prompt $script:ParallelKickoffPrompt
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'denies an orchestrator delegation whose prompt matches the implementation regex without the markers' {
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt $script:ImplementationPrompt
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'denies an orchestrator delegation carrying only one preparation marker' {
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt ('Preparation mode: true. ' + $script:ImplementationPrompt)
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'denies an orchestrator delegation whose first marker is missing its trailing period' {
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt ('Preparation mode: true route_id: preparation. ' + $script:ImplementationPrompt)
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'denies markers placed in a non-prompt field while prompt matches the implementation regex' {
+            $json = ConvertTo-PreparationDelegationToolInput -Prompt $script:ImplementationPrompt -Description $script:ParallelKickoffPrompt
+            $checkpoint = ConvertTo-CheckpointRaw -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+    }
+
     Context 'Entrypoint (exit code seam, no child process)' {
         It 'returns exit code 0 and emits a deny when every transport is empty' {
             $emptyReader = {
