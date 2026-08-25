@@ -156,13 +156,6 @@ From `spec.md` of issue #539, design decision D8, recorded as out of scope for t
     `enforce-epic-worktree-removal-gate.ps1`, `enforce-parallel-worktree-removal-gate.ps1`,
     `enforce-parallel-abandon-gate.ps1`, and `validate-bash.ps1`. The follow-up covers `gh` and
     `git` global-option relocation in the merge and removal gates.
-  - **`gh` global-option relocation in `enforce-promotion-mcp-only.ps1`.** Decision D5 scopes the
-    promotion hook to masking only, because its confirmed instance is the over-match direction and
-    that direction is the checkpoint-bootstrap blocker. `gh --repo <o/r> issue create` continues to
-    pass by non-match there, exactly as today — no denial is weakened — and the closure is grouped
-    into the same follow-up candidate. The marginal design cost will be low once the structural
-    `gh` classifier exists in the shared helper; that observation is recorded for the follow-up's
-    priority, not as licence to widen this change.
   - Obfuscated respellings (`git${IFS}add`, `\git add`). Ungated today, ungated after this fix
     (D4 residual risk 2).
   - Any change to the five trigger pattern strings themselves, to the block-reason texts, to the
@@ -359,7 +352,7 @@ test.
 | Hook | Trigger expressions moved onto segment scan text | Structural relocation classifier | Downstream logic |
 | --- | --- | --- | --- |
 | `enforce-orchestration-preimplementation-gate.ps1` (4 copies) | All five patterns | git leg (`add` / `commit`) | #539 exemption unchanged; `Test-ImplementationPath`, `Test-OrchestrationReady`, delegation classifiers, block-reason text, decision JSON all unchanged. Codex `apply_patch` marker legs sit upstream of the pattern loop and are untouched. |
-| `enforce-promotion-mcp-only.ps1` (4 copies) | Four forbidden-token `IndexOf` scan; `\bgh\s+issue\s+(?:create\|new)\b`; the `gh api … POST` lookahead conjunction | Not in scope (see Non-Goals) | Block-reason getters and decision shape unchanged. |
+| `enforce-promotion-mcp-only.ps1` (4 copies) | Four forbidden-token `IndexOf` scan; `\bgh\s+issue\s+(?:create\|new)\b`; the `gh api … POST` lookahead conjunction | gh leg (`issue create` / `issue new`), per D10 | Block-reason getters and decision shape unchanged. |
 | `enforce-pr-author-skill-helpers.ps1` (2 copies, Claude side only) | `\bgh\s+pr\s+create\b` and `\bgh\s+pr\s+edit\b` | gh leg (`pr create` / `pr edit`) | `--body-file` / `--body` flag parsing, receipt verification, and every `PR_*` reason code stay on raw text and are unchanged. Because the receipt path is reachable only after `isPrCreate`/`isPrEdit` is true, gating the trigger closes the reported `PR_BODY_PATH_NONCANONICAL` over-match without touching any receipt check. |
 
 Note on the promotion hook's `gh api … POST` pattern: it is a whole-text lookahead conjunction, so
@@ -389,11 +382,17 @@ the test surface.
 | `(git add .)`, `$(git add .)`, `` `git add .` `` | allow by non-match | deny — openers are segment delimiters | fail-closed |
 | `npx --yes prettier`, `npx -p <pkg> eslint` | allow by non-match | deny — modeled option absorption | fail-closed |
 | `gh --repo <o/r> pr create` / `gh -R <o/r> pr edit` | allow by non-match | deny — structural gh classifier (D6) | fail-closed |
+| `gh --repo <o/r> issue create` / `gh -R <o/r> issue new` | allow by non-match | deny — structural gh classifier (D10) | fail-closed |
 | `echo "run git add docs/x"`; heredoc prose; JSON receipt values; the word `black` in prose (all in non-wrapper segments) | **deny** — the confirmed over-match | **allow** — masked; the quoted span is an argument, not an execution | deliberate allowance, not a bypass: nothing on the line executes a governed command |
 | `npm --version && echo lint` | deny (`.*` bridges segments) | allow — per-segment evaluation ends the bridge | deliberate allowance; no governed command executes |
 | `git${IFS}add`, `\git add`, other obfuscated respellings | allow (no whitespace boundary / escaped name) | unchanged — already ungated; this model widens nothing here | neutral |
 
-**Conclusion.** The net change is fail-closed. Every wrapper form D8 cited keeps today's denial.
+**Conclusion.** The net change is fail-closed. Every wrapper form D8 cited **that denies today**
+keeps its denial. Three of the forms D8 cited — `bash -c 'git add .'`, `sh -c "git add ."`, and
+`echo "$(git add .)"` — were **already ungated before this change**, as the preflight measurement
+of 2026-08-25 against an explicitly not-ready checkpoint established; they are ungated after it as
+well, so they move from an incorrectly-recorded neutral to a correctly-recorded neutral and no
+denial is lost. See residual risk D4.4 for the boundary reason and the accepted-residual ruling.
 Four classes of genuine bypass newly deny: git global-option relocation, subshell and command-group
 openers, command substitution, and adjacency-defeating options on `npx` and `gh`. The only forms
 that newly pass are quoted or heredoc mentions in non-wrapper segments — text the shell never
@@ -534,6 +533,34 @@ Mechanisms that enforce each pair, all of which must be green in the same change
 `legacy-codex-hook-contracts.Tests.ps1` is at 494 of 500 lines. Registration 3 appends to an
 existing single-line array and adds no line, which fits. **Any new scenario for that side must go
 in a new test file**, not into that suite.
+
+### D10 — Promotion-hook gh relocation is IN SCOPE (orchestrator decision, settled, reverses the prior Non-Goal)
+
+This decision **supersedes D5's masking-only scoping** of `enforce-promotion-mcp-only.ps1`. D5
+brought the promotion hook into scope for masking alone and left its `gh` global-option relocation
+deferred to the follow-up candidate. That deferral is overruled: the structural `gh` classifier of
+D2 Piece 3 is applied to the promotion hook's issue-creation subcommands in this change, in all
+four copies.
+
+The rationale has two parts, and both are load-bearing.
+
+**First, the promotion hook's adjacency-requiring `gh` issue-creation expression admits exactly the
+same relocating bypass as its siblings.** `.claude/hooks/enforce-promotion-mcp-only.ps1` line 101
+carries `\bgh\s+issue\s+(?:create|new)\b`, which requires `issue` to be adjacent to `gh`. A
+relocating spelling such as `gh --repo <o/r> issue create` therefore passes there by non-match,
+precisely as `gh --repo <o/r> pr create` passes in the pr-author hook and as `git -C <dir> add`
+passes in the preimplementation gate. It is one defect class in one hook family, not a distinct
+condition peculiar to the promotion surface.
+
+**Second, closing three of four relocation bypasses while leaving the fourth open — in the very
+change that builds the classifier that closes it — would be arbitrary.** This change already
+closes the relocation under-match in the preimplementation gate (D2 Piece 3, the `git` leg) and in
+the pr-author hook (D6, the `gh` leg). The classifier those two require is the same one the
+promotion hook needs, so the marginal cost here is applying an existing constant table to a third
+call site rather than designing anything new. The consistency argument that put the pr-author
+relocation in scope under D6 applies unchanged to the promotion hook.
+
+This decision is settled and is not to be reopened at planning, execution, or review.
 
 ### Boundaries and invariants to preserve
 
@@ -782,8 +809,8 @@ denies against a not-ready checkpoint.
       `enforce-parallel-abandon-gate.ps1`, and `validate-bash.ps1` carry no diff, and no file under
       `.github/instructions/` or `.claude/rules/` is modified.
 - [ ] A single follow-up candidate is filed covering the out-of-scope family members and `gh`/`git`
-      global-option relocation in the merge and removal gates, plus `gh` relocation in
-      `enforce-promotion-mcp-only.ps1`, citing this specification and the #545 research.
+      global-option relocation in the merge and removal gates, citing this specification and the
+      #545 research.
 - [ ] The PoshQC toolchain passes clean in a single pass over all changed and added PowerShell
       files: `mcp__drm-copilot__run_poshqc_format` → `mcp__drm-copilot__run_poshqc_analyze` →
       `mcp__drm-copilot__run_poshqc_test`, restarting from format on any failure or auto-fix, with
@@ -791,6 +818,10 @@ denies against a not-ready checkpoint.
 - [ ] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
       `git -C <dir> add .` denies against a not-ready checkpoint, with results recorded under
       `…-545/evidence/qa-gates/`.
+- [ ] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
+      issue-creation spelling through the structural `gh` classifier of D2 Piece 3, per D10, so
+      that `gh --repo <o/r> issue create` and `gh -R <o/r> issue new` are denied where they pass by
+      non-match today; a named Pester case per side — Claude and Codex — asserts the deny.
 
 ## Risks & Mitigations
 
@@ -843,9 +874,8 @@ denies against a not-ready checkpoint.
 - Follow-up candidate to file (single issue): `gh` and `git` global-option relocation in
   `enforce-epic-merge-gate.ps1`, `enforce-epic-worktree-removal-gate.ps1`, and
   `enforce-parallel-worktree-removal-gate.ps1`; token-anywhere semantics in
-  `enforce-parallel-abandon-gate.ps1`; the substring blocklist in `validate-bash.ps1`; and `gh`
-  relocation in `enforce-promotion-mcp-only.ps1`. The shared helper delivered here is the intended
-  mechanism for all of them.
+  `enforce-parallel-abandon-gate.ps1`; and the substring blocklist in `validate-bash.ps1`. The
+  shared helper delivered here is the intended mechanism for all of them.
 - Known deferrals recorded, not fixed here: over-match inside wrapper-led segments (D4.1),
   obfuscated respellings (D4.2), and unlisted wrappers whose quoted argument is a command line
   (D4.3).
