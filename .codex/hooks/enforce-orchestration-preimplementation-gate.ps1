@@ -10,6 +10,11 @@ param()
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
 . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
 
+# Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
+# Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
+# the headroom-split precedent already used on this side by enforce-completion-helpers.ps1.
+. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1')
+
 # The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
@@ -141,10 +146,20 @@ function Test-ImplementationCommand {
         '(^|\s)pwsh\s+.*(Invoke-Pester|tests/scripts/)'
     )
 
-    foreach ($pattern in $implementationCommandPatterns) {
-        if ($normalizedCommand -match $pattern) {
-            return $true
+    for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
+        if ($normalizedCommand -notmatch $implementationCommandPatterns[$index]) {
+            continue
         }
+        # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
+        # text is unchanged. It is the sole leg the orchestration-bookkeeping exemption may
+        # clear, and only when no other implementation pattern matches the same line: the
+        # loop continues rather than returning, so a chained line carrying any non-git
+        # implementation segment still classifies as implementation. The apply_patch marker
+        # legs above are upstream of this loop and are unmodified.
+        if ($index -eq 0 -and (Test-ExemptOrchestrationStagingCommand -CommandText $normalizedCommand)) {
+            continue
+        }
+        return $true
     }
     return $false
 }
