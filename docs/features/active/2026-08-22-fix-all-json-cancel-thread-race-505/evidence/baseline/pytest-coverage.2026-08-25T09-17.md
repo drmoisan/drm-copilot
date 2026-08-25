@@ -70,3 +70,53 @@ tree, is a push-down bundled-payload parity defect concerning
 `.claude/state/python-batch-budget.default.json`, and is unrelated to the `fix_all` cancel-race fix.
 The five skips are pre-existing parametrized parity cases in
 `test_parallel_manifest_bash_parity.py` that declare no accessor expectation.
+
+**See the CORRECTION section below.** The attribution in the preceding paragraph and in the
+"Pre-Existing Failure" section is superseded. The observed failure was real, but it was not a defect
+in `main`.
+
+---
+
+## CORRECTION — appended 2026-08-25T09-53 (attribution of the observed failure was wrong)
+
+Timestamp: 2026-08-25T09-53
+
+The observed failure recorded above is retained verbatim and is **not** rewritten: the run genuinely
+produced it. What was wrong is the **attribution**. The failure was not a pre-existing push-down
+payload-parity defect in `main`. It was caused by gitignored, untracked local state written by this
+agent session's own PreToolUse hook.
+
+### Corrected attribution (verified)
+
+1. **The named path is gitignored and untracked.** `.claude/state/` is ignored at `.gitignore` line
+   68. `git check-ignore -v .claude/state/python-batch-budget.default.json` reports
+   `.gitignore:68:.claude/state/`, exit code 0. `git ls-files .claude/state/` returns no output, so
+   the file was never tracked and has no git history.
+2. **It was written by this session, not by any commit.** The file was produced by this session's
+   `enforce-python-batch-budget` PreToolUse hook (observed mtime 2026-08-25 09:40, during the
+   Phases 0-3 run), after the baseline command above was executed.
+3. **The test enumerates the filesystem, not the git index.** `test_push_down_claude_resource_contracts.py`
+   walks `.claude` on disk, so **any** gitignored local file under `.claude/` fails it. A clean
+   checkout — including CI, which never runs this repository's PreToolUse hooks — does not have the
+   file and therefore does not see this failure.
+4. **Verified by removing the local file and rerunning.** Command:
+   `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`.
+   Result: `10 passed in 0.14s`, EXIT_CODE 0. The whole module passes.
+
+### Consequence for Phase 6 (supersedes the paragraph above)
+
+The "Consequence for Phase 6" paragraph above is **withdrawn**. The full suite is **not** blocked by
+a defect in `main`, and [P6-T4]'s `EXIT_CODE: 0` / zero-failures acceptance condition **is
+achievable**. The operational requirement is only that the gitignored local file
+`.claude/state/python-batch-budget.default.json` be deleted before a full-suite run if the hook has
+recreated it. Deleting it is safe: it is untracked, gitignored, hook-regenerated local state. It must
+**not** be added to the repository, and neither the test nor `.gitignore` may be modified to
+accommodate it.
+
+### Out-of-scope observation (recorded, not actioned)
+
+`tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+enumerates `.claude` files from the **filesystem** rather than from the set of git-tracked files.
+That makes it sensitive to any gitignored local file placed under `.claude/`, so locally generated
+hook state produces a failure that is not reproducible in a clean checkout or in CI. This is recorded
+as an observation only. It is outside the scope of issue #505 and is not actioned by this change.
