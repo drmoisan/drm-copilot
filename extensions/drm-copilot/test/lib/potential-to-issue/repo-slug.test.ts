@@ -5,7 +5,10 @@ import {
   type CommandRunOptions,
   type CommandRunner,
 } from "../../../src/lib/subprocess-runner";
-import { resolveRepoSlug } from "../../../src/lib/potential-to-issue/repo-slug";
+import {
+  REPO_SLUG_UNRESOLVED_PREFIX,
+  resolveRepoSlug,
+} from "../../../src/lib/potential-to-issue/repo-slug";
 
 /**
  * Tests for the target-repository slug resolver used by the potential-to-issue
@@ -79,5 +82,125 @@ describe("resolveRepoSlug — success", () => {
       "nameWithOwner",
     ]);
     expect(recorded[0]?.options?.cwd).toBe(WORKSPACE_ROOT);
+  });
+});
+
+/**
+ * Invoke the resolver against a seeded command result.
+ *
+ * @param result Result the injected runner returns for the resolution call.
+ * @returns The resolver invocation, deferred so it can be asserted to throw.
+ */
+function callWithResult(result: CommandResult): () => string {
+  const runner = makeRecordingRunner([], result);
+  return () =>
+    resolveRepoSlug({
+      runner,
+      workspaceRoot: WORKSPACE_ROOT,
+      ghPathLookup: () => GH_PATH,
+    });
+}
+
+describe("resolveRepoSlug — unresolvable conditions fail closed", () => {
+  it("throws when the checkout has no origin remote", () => {
+    // Arrange: the CLI reports the absent remote on stderr and exits non-zero.
+    const call = callWithResult({
+      stdout: "",
+      stderr: "no git remotes found",
+      code: 1,
+    });
+
+    // Act + Assert: the failure is classified as unresolvable and the CLI's own
+    // diagnostic is carried through.
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("no git remotes found");
+  });
+
+  it("throws when the resolution command exits non-zero", () => {
+    // Arrange: a non-zero exit carrying no stderr detail.
+    const call = callWithResult({ stdout: "", stderr: "", code: 4 });
+
+    // Act + Assert: the exit code alone is sufficient to fail closed.
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("exited 4");
+  });
+
+  it("throws when the command produces empty output", () => {
+    // Arrange: a zero exit with no payload on stdout.
+    const call = callWithResult({ stdout: "", stderr: "", code: 0 });
+
+    // Act + Assert
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("empty output");
+  });
+
+  it("throws when the output is not valid JSON", () => {
+    // Arrange: stdout that JSON.parse rejects.
+    const call = callWithResult({
+      stdout: "not json at all",
+      stderr: "",
+      code: 0,
+    });
+
+    // Act + Assert
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("unparseable output");
+  });
+
+  it("throws when the payload is parseable but is not an object", () => {
+    // Arrange: `null` parses successfully yet carries no fields.
+    const call = callWithResult({ stdout: "null", stderr: "", code: 0 });
+
+    // Act + Assert
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("is not an object");
+  });
+
+  it("throws when the owner and name field is missing", () => {
+    // Arrange: an object payload carrying a different field.
+    const call = callWithResult({
+      stdout: '{"name":"drm-copilot"}',
+      stderr: "",
+      code: 0,
+    });
+
+    // Act + Assert
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("no nameWithOwner field");
+  });
+
+  it("throws when the owner and name field is not a string", () => {
+    // Arrange: the expected field is present but carries a numeric value.
+    const call = callWithResult({
+      stdout: '{"nameWithOwner":42}',
+      stderr: "",
+      code: 0,
+    });
+
+    // Act + Assert
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow("is not a string");
+  });
+
+  it("names the workspace root in the thrown message", () => {
+    // Arrange: a workspace root distinct from the one used by the other tests,
+    // so the assertion cannot pass on an incidental substring.
+    const distinctRoot = "/checkout-that-cannot-be-resolved";
+    const runner = makeRecordingRunner([], {
+      stdout: "",
+      stderr: "",
+      code: 1,
+    });
+    const call = (): string =>
+      resolveRepoSlug({
+        runner,
+        workspaceRoot: distinctRoot,
+        ghPathLookup: () => GH_PATH,
+      });
+
+    // Act + Assert: the message carries the shared prefix and names the exact
+    // workspace root that could not be resolved.
+    expect(call).toThrow(REPO_SLUG_UNRESOLVED_PREFIX);
+    expect(call).toThrow(distinctRoot);
   });
 });
