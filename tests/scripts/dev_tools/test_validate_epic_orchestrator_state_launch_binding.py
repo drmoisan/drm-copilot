@@ -133,22 +133,52 @@ def test_launch_binding_is_dormant_without_an_enforcement_gate() -> None:
     assert errors == []
 
 
-def test_require_complete_requires_binding_for_every_feature() -> None:
-    """Require launch evidence for all features at the completion boundary."""
+def test_require_complete_skips_feature_without_launch_paths() -> None:
+    """Skip launch binding for a feature that records no launch evidence."""
 
-    feature = _feature(merge_status="not_started")
-    feature.pop("model_routing_receipt")
+    # Arrange: a merged feature in the Claude shape, which records no launch
+    # receipt, no launch status, and neither per-feature receipt.
+    feature = _feature(merge_status="merged")
+    for key in (
+        "launch_receipt_path",
+        "launch_status_path",
+        "delegation_receipt",
+        "model_routing_receipt",
+    ):
+        feature.pop(key)
     state = _state(feature)
     state["epic_merge_pr"] = {"merge_commit_sha": "abc123"}
 
+    # Act: request completion only, leaving both Codex gates at their defaults.
     errors = validate_epic_orchestrator_state_text(
         json.dumps(state), require_complete=True
     )
 
-    assert (
-        "Epic checkpoint feature 'child-a' launch binding.model_routing_receipt "
-        "must be an object." in errors
+    # Assert: a complete epic with no launch evidence satisfies the gate.
+    assert errors == []
+
+
+def test_require_complete_rejects_partial_launch_binding() -> None:
+    """Reject a half-written launch binding that records only one launch path."""
+
+    # Arrange: a merged feature keeping launch_receipt_path but not
+    # launch_status_path, which is the partial binding the either-key
+    # presence test is designed to catch.
+    feature = _feature(merge_status="merged")
+    feature.pop("launch_status_path")
+    state = _state(feature)
+    state["epic_merge_pr"] = {"merge_commit_sha": "abc123"}
+
+    # Act: request completion only, leaving both Codex gates at their defaults.
+    errors = validate_epic_orchestrator_state_text(
+        json.dumps(state), require_complete=True
     )
+
+    # Assert: the one absent launch path key produces exactly its own error.
+    assert _launch_errors(errors) == [
+        "Epic checkpoint feature 'child-a' launch binding.launch_status_path "
+        "must be under artifacts/orchestration/epic-child-launches/."
+    ]
 
 
 def test_require_complete_accepts_complete_persisted_binding() -> None:

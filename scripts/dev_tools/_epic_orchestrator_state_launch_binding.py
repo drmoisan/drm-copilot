@@ -199,6 +199,12 @@ def _validate_model_receipt(
     return errors
 
 
+def _carries_launch_path(feature: dict[str, Any]) -> bool:
+    """Return whether the feature records either launch path key."""
+
+    return "launch_receipt_path" in feature or "launch_status_path" in feature
+
+
 def _validate_launch_bindings(
     features: list[object],
     *,
@@ -206,6 +212,7 @@ def _validate_launch_bindings(
     expected_execution_context: str,
     require_generated_orchestrator: bool,
     skip_not_started: bool,
+    require_launch_paths: bool = False,
 ) -> list[str]:
     """Validate launch evidence using persona-specific context and prefixes."""
 
@@ -217,6 +224,8 @@ def _validate_launch_bindings(
             continue
         feature = cast("dict[str, Any]", item)
         if skip_not_started and feature.get("merge_status") == "not_started":
+            continue
+        if require_launch_paths and not _carries_launch_path(feature):
             continue
         prefix = (
             f"Epic planner checkpoint features[{index}] launch binding"
@@ -258,6 +267,7 @@ def validate_epic_planner_child_launch_bindings(
         expected_execution_context="epic_preparation_child",
         require_generated_orchestrator=True,
         skip_not_started=False,
+        require_launch_paths=False,
     )
 
 
@@ -282,4 +292,7 @@ def validate_epic_child_launch_bindings(
         expected_execution_context="epic_execution_child",
         require_generated_orchestrator=False,
         skip_not_started=not require_complete,
+        require_launch_paths=not (
+            require_codex_model_routing or require_codex_topology
+        ),
     )
