@@ -260,9 +260,9 @@ Seeded from issue (retained for traceability; item 1 is answered by the correcte
 - [x] A direct, single-threaded unit test calls `scripts.dev_tools.fix_all_branches.run_json_branch` with the cancel event pre-set and `complete_all=False`, and asserts the recorded calls equal `["JSON: format"]` and `failed_step == "Canceled"`.
 - [x] A direct, single-threaded unit test calls `run_json_branch` with an event stand-in whose `wait` transitions the flag to set and returns `True`, and asserts the lane returns `failed_step == "Canceled"` without calling `JSON: validate`.
 - [x] A direct, single-threaded unit test calls `run_json_branch` with the event set and `complete_all=True`, and asserts both `JSON: format` and `JSON: validate` are called.
-- [ ] `_runner` in `scripts/dev_tools/fix_all_runtime.py` records a failing `BranchResult` when a branch function raises, and still sets `cancel_event` when `complete_all` is off.
-- [ ] A named regression test asserts that when one lane's branch function raises, `run_fix_all` returns exit code 1, that lane is reported as `FAIL` in the branch-results summary, and the exception text appears in that branch's logged output.
-- [ ] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_runtime_reports_missing_result_when_branch_absent` passes unmodified, including its `exit_code == 0` assertion.
+- [x] `_runner` in `scripts/dev_tools/fix_all_runtime.py` records a failing `BranchResult` when a branch function raises, and still sets `cancel_event` when `complete_all` is off.
+- [x] A named regression test asserts that when one lane's branch function raises, `run_fix_all` returns exit code 1, that lane is reported as `FAIL` in the branch-results summary, and the exception text appears in that branch's logged output.
+- [x] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_runtime_reports_missing_result_when_branch_absent` passes unmodified, including its `exit_code == 0` assertion.
 - [x] `tests/scripts/dev_tools/test_fix_all.py::test_complete_all_allows_json_validate_after_python_failure` passes unmodified.
 - [ ] `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all.py` are unchanged by the diff, confirmed by inspecting the changed-file list.
 - [ ] No file under `.claude/rules/`, no file under `.github/instructions/`, no CI workflow file, and `pyproject.toml` are changed by the diff, confirmed by inspecting the changed-file list.

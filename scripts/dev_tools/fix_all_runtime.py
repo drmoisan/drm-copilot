@@ -139,7 +139,22 @@ def run_fix_all(
     threads: list[threading.Thread] = []
 
     def _runner(name: str, func: Callable[[], BranchResult]) -> None:
-        result = func()
+        try:
+            result = func()
+        except Exception as exc:
+            # Hardening: a branch function that raises must be recorded as a
+            # failing result rather than terminating its thread silently. Left
+            # unhandled, results[name] stays unset, the aggregation below skips
+            # the lane, and the exit-code expression computes over the surviving
+            # lanes only -- returning 0 for a run in which a lane crashed. The
+            # exception text is carried into the branch output so the operator
+            # still sees the cause in the per-branch log section (issue #505).
+            result = api.BranchResult(
+                name=name,
+                success=False,
+                output=f"Branch {name} raised {type(exc).__name__}: {exc}",
+                failed_step=f"{name}: raised {type(exc).__name__}",
+            )
         results[name] = result
         if not result.success and not complete_all:
             cancel_event.set()
