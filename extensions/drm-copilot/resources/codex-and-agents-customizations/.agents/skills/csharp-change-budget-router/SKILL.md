@@ -1,6 +1,6 @@
 ---
 name: csharp-change-budget-router
-description: Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, enforce orchestration-first routing for larger changes, and use the VS Code extension command surface for promotion lifecycle steps when available.
+description: 'Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, enforce orchestration-first routing for larger changes, and use the VS Code extension command surface for promotion lifecycle steps when available.'
 ---
 
 # C# Change Budget Router

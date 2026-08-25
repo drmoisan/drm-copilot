@@ -1,7 +1,5 @@
 ---
 name: typescript-suppressions
-paths:
-  - "**/*.ts"
 description: TypeScript suppression policy for linting and type-checking exceptions.
 ---
 

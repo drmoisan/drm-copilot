@@ -1,7 +1,5 @@
 ---
 name: python-suppressions
-paths:
-  - "**/*.py"
 description: Python suppression policy for linting and type-checking exceptions.
 ---
 

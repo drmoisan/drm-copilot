@@ -1,8 +1,6 @@
 ---
 name: tonality
 description: Required communication tone policy for all files and responses.
-paths:
-  - "**"
 ---
 
 # Converted rule

@@ -1,6 +1,6 @@
 ---
 name: translate-copilot-to-claude
-description: Translate one or more GitHub Copilot native files (AGENTS.md, .agents/skills/*.instructions.md, .codex/agents/*.agent.md, .agents/skills/*.prompt.md, .agents/skills/<name>/SKILL.md) into the native Claude runtime. Classify each section into agent/rule/skill/hook surfaces, diff against existing .claude/ state, produce a translation plan for user approval, and then apply the plan.
+description: Translate GitHub Copilot native files, including instructions, agents, prompts, and skills, into the native Claude runtime. Classify each section, diff against existing Claude state, produce a translation plan for approval, then apply it.
 ---
 
 # Translate Copilot to Claude

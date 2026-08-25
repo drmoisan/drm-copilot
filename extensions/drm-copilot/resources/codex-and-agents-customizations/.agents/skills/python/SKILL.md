@@ -1,7 +1,5 @@
 ---
 name: python
-paths:
-  - "**/*.py"
 description: Python-specific toolchain and coding standards.
 ---
 
