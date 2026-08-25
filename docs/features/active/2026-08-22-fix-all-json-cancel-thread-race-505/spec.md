@@ -254,7 +254,7 @@ Seeded from issue (retained for traceability; item 1 is answered by the correcte
 - [x] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_json_cancel_before_validate_returns_canceled_result` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
 - [x] `tests/scripts/dev_tools/test_fix_all.py::test_fail_fast_cancels_json_before_validate` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
 - [x] Both repaired tests keep their existing node ids and keep asserting `exit_code == 1` and that `JSON: validate` is absent from the JSON lane's recorded calls.
-- [ ] Neither repaired test, nor any test added by this change, contains `time.sleep`, a bounded `Event.wait` used as a synchronization delay, or any assertion whose outcome depends on elapsed time. Confirmed by inspection of the diff.
+- [x] Neither repaired test, nor any test added by this change, contains `time.sleep`, a bounded `Event.wait` used as a synchronization delay, or any assertion whose outcome depends on elapsed time. Confirmed by inspection of the diff.
 - [x] A pytest run of both repaired node ids emits no `PytestUnhandledThreadExceptionWarning`, verified by running with warnings visible and inspecting the run output.
 - [x] An ordered, synchronous `threading.Thread` stand-in exists in `tests/scripts/dev_tools/fix_all_thread_stubs.py` and is consumed by both `tests/scripts/dev_tools/test_fix_all_failure_paths.py` and `tests/scripts/dev_tools/test_fix_all.py`. Its per-test state is isolated (for example by a factory returning a fresh class) rather than held as class-level mutable state shared across tests.
 - [x] A direct, single-threaded unit test calls `scripts.dev_tools.fix_all_branches.run_json_branch` with the cancel event pre-set and `complete_all=False`, and asserts the recorded calls equal `["JSON: format"]` and `failed_step == "Canceled"`.
@@ -264,14 +264,14 @@ Seeded from issue (retained for traceability; item 1 is answered by the correcte
 - [x] A named regression test asserts that when one lane's branch function raises, `run_fix_all` returns exit code 1, that lane is reported as `FAIL` in the branch-results summary, and the exception text appears in that branch's logged output.
 - [x] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_runtime_reports_missing_result_when_branch_absent` passes unmodified, including its `exit_code == 0` assertion.
 - [x] `tests/scripts/dev_tools/test_fix_all.py::test_complete_all_allows_json_validate_after_python_failure` passes unmodified.
-- [ ] `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all.py` are unchanged by the diff, confirmed by inspecting the changed-file list.
-- [ ] No file under `.claude/rules/`, no file under `.github/instructions/`, no CI workflow file, and `pyproject.toml` are changed by the diff, confirmed by inspecting the changed-file list.
-- [ ] No file written by this change exceeds 500 lines, confirmed by a line count of every file in the diff.
-- [ ] `poetry run black .` reports no reformatting needed.
-- [ ] `poetry run ruff check .` reports zero findings.
-- [ ] `poetry run pyright` reports zero errors.
-- [ ] `poetry run pytest --cov --cov-branch --cov-report=term-missing` passes with zero failures, reports line coverage of at least 85 percent, and reports branch coverage of at least 75 percent.
-- [ ] The four toolchain stages above complete in a single consecutive pass with no stage auto-fixing a file, per the mandatory toolchain loop in `.claude/rules/general-code-change.md`.
+- [x] `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all.py` are unchanged by the diff, confirmed by inspecting the changed-file list.
+- [x] No file under `.claude/rules/`, no file under `.github/instructions/`, no CI workflow file, and `pyproject.toml` are changed by the diff, confirmed by inspecting the changed-file list.
+- [x] No file written by this change exceeds 500 lines, confirmed by a line count of every file in the diff.
+- [x] `poetry run black .` reports no reformatting needed.
+- [x] `poetry run ruff check .` reports zero findings.
+- [x] `poetry run pyright` reports zero errors.
+- [x] `poetry run pytest --cov --cov-branch --cov-report=term-missing` passes with zero failures, reports line coverage of at least 85 percent, and reports branch coverage of at least 75 percent.
+- [x] The four toolchain stages above complete in a single consecutive pass with no stage auto-fixing a file, per the mandatory toolchain loop in `.claude/rules/general-code-change.md`.
 
 ## Blast Radius — files the implementation diff will write
 
