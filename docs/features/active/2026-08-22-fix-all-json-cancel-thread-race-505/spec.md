@@ -251,19 +251,19 @@ Seeded from issue (retained for traceability; item 1 is answered by the correcte
 
 
 ## Acceptance Criteria
-- [ ] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_json_cancel_before_validate_returns_canceled_result` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
-- [ ] `tests/scripts/dev_tools/test_fix_all.py::test_fail_fast_cancels_json_before_validate` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
-- [ ] Both repaired tests keep their existing node ids and keep asserting `exit_code == 1` and that `JSON: validate` is absent from the JSON lane's recorded calls.
+- [x] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_json_cancel_before_validate_returns_canceled_result` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
+- [x] `tests/scripts/dev_tools/test_fix_all.py::test_fail_fast_cancels_json_before_validate` passes on 50 consecutive runs, including runs executed while the machine is under artificial load, with zero failures.
+- [x] Both repaired tests keep their existing node ids and keep asserting `exit_code == 1` and that `JSON: validate` is absent from the JSON lane's recorded calls.
 - [ ] Neither repaired test, nor any test added by this change, contains `time.sleep`, a bounded `Event.wait` used as a synchronization delay, or any assertion whose outcome depends on elapsed time. Confirmed by inspection of the diff.
-- [ ] A pytest run of both repaired node ids emits no `PytestUnhandledThreadExceptionWarning`, verified by running with warnings visible and inspecting the run output.
-- [ ] An ordered, synchronous `threading.Thread` stand-in exists in `tests/scripts/dev_tools/fix_all_thread_stubs.py` and is consumed by both `tests/scripts/dev_tools/test_fix_all_failure_paths.py` and `tests/scripts/dev_tools/test_fix_all.py`. Its per-test state is isolated (for example by a factory returning a fresh class) rather than held as class-level mutable state shared across tests.
+- [x] A pytest run of both repaired node ids emits no `PytestUnhandledThreadExceptionWarning`, verified by running with warnings visible and inspecting the run output.
+- [x] An ordered, synchronous `threading.Thread` stand-in exists in `tests/scripts/dev_tools/fix_all_thread_stubs.py` and is consumed by both `tests/scripts/dev_tools/test_fix_all_failure_paths.py` and `tests/scripts/dev_tools/test_fix_all.py`. Its per-test state is isolated (for example by a factory returning a fresh class) rather than held as class-level mutable state shared across tests.
 - [ ] A direct, single-threaded unit test calls `scripts.dev_tools.fix_all_branches.run_json_branch` with the cancel event pre-set and `complete_all=False`, and asserts the recorded calls equal `["JSON: format"]` and `failed_step == "Canceled"`.
 - [ ] A direct, single-threaded unit test calls `run_json_branch` with an event stand-in whose `wait` transitions the flag to set and returns `True`, and asserts the lane returns `failed_step == "Canceled"` without calling `JSON: validate`.
 - [ ] A direct, single-threaded unit test calls `run_json_branch` with the event set and `complete_all=True`, and asserts both `JSON: format` and `JSON: validate` are called.
 - [ ] `_runner` in `scripts/dev_tools/fix_all_runtime.py` records a failing `BranchResult` when a branch function raises, and still sets `cancel_event` when `complete_all` is off.
 - [ ] A named regression test asserts that when one lane's branch function raises, `run_fix_all` returns exit code 1, that lane is reported as `FAIL` in the branch-results summary, and the exception text appears in that branch's logged output.
 - [ ] `tests/scripts/dev_tools/test_fix_all_failure_paths.py::test_runtime_reports_missing_result_when_branch_absent` passes unmodified, including its `exit_code == 0` assertion.
-- [ ] `tests/scripts/dev_tools/test_fix_all.py::test_complete_all_allows_json_validate_after_python_failure` passes unmodified.
+- [x] `tests/scripts/dev_tools/test_fix_all.py::test_complete_all_allows_json_validate_after_python_failure` passes unmodified.
 - [ ] `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all.py` are unchanged by the diff, confirmed by inspecting the changed-file list.
 - [ ] No file under `.claude/rules/`, no file under `.github/instructions/`, no CI workflow file, and `pyproject.toml` are changed by the diff, confirmed by inspecting the changed-file list.
 - [ ] No file written by this change exceeds 500 lines, confirmed by a line count of every file in the diff.
