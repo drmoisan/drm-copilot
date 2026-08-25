@@ -17,11 +17,16 @@ Responsibilities:
     where a branch function raises.
 
 Key invariants/constraints:
-    No test in this module creates a thread, calls ``time.sleep``, waits on a
-    real clock, or asserts anything about elapsed time, per the Determinism
-    Infrastructure section of ``.claude/rules/general-unit-test.md``. The grace
-    wait is exercised through an event stand-in whose ``wait`` returns
-    immediately.
+    The three direct ``run_json_branch`` tests call the branch function
+    directly with no thread creation. ``time.sleep`` is never called, no test
+    waits on a real clock, and no test asserts anything about elapsed time,
+    per the Determinism Infrastructure section of
+    ``.claude/rules/general-unit-test.md``. The grace wait is exercised
+    through an event stand-in whose ``wait`` returns immediately.
+    ``test_runner_records_failing_result_when_branch_raises`` deliberately
+    drives the real ``fix_all.run_fix_all``, which spawns one thread per
+    lane; determinism there comes from asserting only on recorded results,
+    never on timing.
 
     The helper block below is local on purpose. It is deliberately NOT imported
     from ``tests/scripts/dev_tools/test_fix_all_failure_paths.py``: that module
