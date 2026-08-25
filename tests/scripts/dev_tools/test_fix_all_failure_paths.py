@@ -15,9 +15,12 @@ from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools import fix_all
 from scripts.dev_tools import fix_all_branches as branches
+from tests.scripts.dev_tools.fix_all_thread_stubs import (
+    SkipBranchThread as _SkipBranchThread,
+)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Iterable, Mapping, Sequence
 
     from pytest import MonkeyPatch
 
@@ -420,45 +423,6 @@ def test_runtime_emits_no_output_for_empty_branch_output(
     # Assert
     assert exit_code == 0
     assert "(no output)" in read_log(logger)
-
-
-class _SkipBranchThread:
-    """Thread stand-in that runs every branch target except a skipped one.
-
-    Purpose:
-        Deterministically leave one branch's result unrecorded (without raising
-        an exception in a worker thread) so the runtime aggregation hits its
-        missing/None-result path.
-
-    Attributes:
-        skip_branch: Name of the branch whose ``_runner`` target is suppressed.
-    """
-
-    skip_branch = "json"
-
-    def __init__(
-        self,
-        *,
-        target: Callable[[str, Callable[[], fix_all.BranchResult]], None],
-        args: tuple[str, Callable[[], fix_all.BranchResult]],
-        daemon: bool,
-    ) -> None:
-        self._target = target
-        self._args = args
-        self._daemon = daemon
-
-    def start(self) -> None:
-        """Run the target synchronously unless it is the skipped branch."""
-        branch_name = self._args[0]
-        # Routing: suppress only the configured branch so its result stays unset;
-        # all other branches run their target synchronously.
-        if branch_name == self.skip_branch:
-            return
-        self._target(*self._args)
-
-    def join(self) -> None:
-        """No-op join; targets already ran synchronously in ``start``."""
-        return
 
 
 def test_runtime_reports_missing_result_when_branch_absent(
