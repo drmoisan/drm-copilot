@@ -27,7 +27,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
 
