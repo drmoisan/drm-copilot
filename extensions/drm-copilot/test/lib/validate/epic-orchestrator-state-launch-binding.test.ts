@@ -123,19 +123,48 @@ describe("epic child launch binding", () => {
     expect(errors).toEqual([]);
   });
 
-  it("requires evidence for every feature under requireComplete", () => {
-    const item = feature(101, "child-a", "not_started");
-    delete item["model_routing_receipt"];
+  it("skips launch binding for a feature with no launch paths under requireComplete", () => {
+    // Arrange: a merged feature in the Claude shape, which records no launch
+    // receipt, no launch status, and neither per-feature receipt.
+    const item = feature(101, "child-a", "merged");
+    for (const key of [
+      "launch_receipt_path",
+      "launch_status_path",
+      "delegation_receipt",
+      "model_routing_receipt",
+    ]) {
+      delete item[key];
+    }
     const value = state(item);
     value["epic_merge_pr"] = { merge_commit_sha: "abc123" };
 
+    // Act: request completion only, leaving both Codex gates at their defaults.
     const errors = validateEpicOrchestratorStateText(JSON.stringify(value), {
       requireComplete: true,
     });
 
-    expect(errors).toContain(
-      "Epic checkpoint feature 'child-a' launch binding.model_routing_receipt must be an object.",
-    );
+    // Assert: a complete epic with no launch evidence satisfies the gate.
+    expect(errors).toEqual([]);
+  });
+
+  it("rejects a partial launch binding under requireComplete", () => {
+    // Arrange: a merged feature keeping launch_receipt_path but not
+    // launch_status_path, which is the partial binding the either-key
+    // presence test is designed to catch.
+    const item = feature(101, "child-a", "merged");
+    delete item["launch_status_path"];
+    const value = state(item);
+    value["epic_merge_pr"] = { merge_commit_sha: "abc123" };
+
+    // Act: request completion only, leaving both Codex gates at their defaults.
+    const errors = validateEpicOrchestratorStateText(JSON.stringify(value), {
+      requireComplete: true,
+    });
+
+    // Assert: the one absent launch path key produces exactly its own error.
+    expect(launchErrors(errors)).toEqual([
+      "Epic checkpoint feature 'child-a' launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.",
+    ]);
   });
 
   it("accepts complete persisted evidence at completion", () => {

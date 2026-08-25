@@ -27,7 +27,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
 
@@ -232,6 +232,22 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         $powerShellState.prodFiles = @('scripts/first.ps1')
         $powerShellDecision = Invoke-PowerShellBatchBudgetDecision -FilePath 'scripts/second.ps1' -State $powerShellState -StateFile '.codex/state/powershell.json'
         $powerShellDecision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+    }
+
+    It 'allows exempt checkpoint writes and preparation-mode delegations (issue #535)' {
+        . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
+        $preparationPrompt = 'Preparation mode: true. route_id: preparation. Hand off to atomic-executor later.'
+        foreach ($case in @(
+                @{ Name = 'exempt checkpoint literal'; ToolInput = @{ file_path = 'artifacts/orchestration/parallel-planner-state.json' } },
+                @{ Name = 'preparation-mode delegation'; ToolInput = @{ subagent_type = 'orchestrator'; prompt = $preparationPrompt } }
+            )) {
+            $raw = $case.ToolInput | ConvertTo-Json -Compress
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $raw -CheckpointRaw '{}'
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because "the $($case.Name) case is orchestration bookkeeping, not implementation"
+        }
+        Test-PreparationModeDelegation -ToolInput $null | Should -BeFalse
+        Test-PreparationModeDelegation -ToolInput ([pscustomobject]@{ subagent_type = 'orchestrator'; prompt = 'Preparation mode: true.' }) | Should -BeFalse
     }
 
     It 'reconstructs update patches in memory and includes move destinations' {
