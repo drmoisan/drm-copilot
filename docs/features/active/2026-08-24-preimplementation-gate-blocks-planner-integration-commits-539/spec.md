@@ -125,7 +125,7 @@ This table is the behavioral contract for the command-branch classifier. Every r
 | 11 | Quoted operands / operands with spaces | Strip balanced quotes, then apply the prefix test; unbalanced quoting ⇒ DENY |
 | 12 | Operand containing `$` or a backtick, or the segment containing redirection (`>`, `<`) | DENY | Interpolation/redirection not resolvable statically |
 | 13 | Chained/compound lines (`&&`, `;`, `\|\|`, `\|`, newline) | Split into segments outside quotes; every trigger-matching segment must independently pass (a non-git segment matching any other implementation pattern still requires readiness); unsplittable or ambiguous text ⇒ DENY |
-| 14 | Anything between the command name and the subcommand (`-C <dir>`, `--git-dir=`, `--work-tree=`, env-style prefixes) | DENY | Pathspec base relocated; the repo-relative prefix test is no longer sound |
+| 14 | Anything between the command name and the subcommand (`-C <dir>`, `--git-dir=`, `--work-tree=`, env-style prefixes) | NEVER EXEMPT — the parser rejects the segment, so any trigger-matching line containing such a segment is denied. A bare relocating spelling that the trigger regex does not match (`git -C ../x add ...` with no other trigger-matching text on the line) never reaches this classifier and passes by non-match — a pre-existing trigger limitation recorded with D8, unchanged by this fix. | Pathspec base relocated; the repo-relative prefix test is no longer sound |
 | 15 | Glob operands (`*`, `?`, `[`) | Allow only when the literal prefix before the first wildcard is strictly inside an exempt tree and the token has no `..` segment; otherwise DENY (`docs/features/*` DENIES — it can match siblings outside the exempt set) |
 | 16 | Absolute operands (`/...`, `C:\...`, `\\...`) | DENY | Base not provably the repository root (mirrors the #516 posture: exempt prefixes stay repo-relative) |
 | 17 | Any `..` segment | DENY | Escapes the prefix |
@@ -146,7 +146,8 @@ Post-fix decision table on the command branch, no ready checkpoint present:
 | `git add .` / `git add -A` / `git add :/` | deny |
 | `git commit -m "msg"` (pathless) | deny |
 | `git commit -a -m "msg"` / `--amend` / `--include` | deny |
-| `git -C ../x add docs/...` / `--git-dir` / `--work-tree` | deny |
+| `git -C ../x add docs/...` / `--git-dir` / `--work-tree` chained with a trigger-matching segment, or with an env-style prefix (`GIT_DIR=... git add ...`) | deny (exemption withheld; unchanged deny) |
+| bare `git -C ../x add docs/...` / `--git-dir` / `--work-tree` where the trigger regex does not match the line | allow-by-non-match (pre-existing trigger limitation, recorded with D8; unchanged by this fix) |
 | `git add ':(exclude)scripts/' docs/...` or any `:`-magic operand | deny |
 | `git add docs/... && poetry run pytest` (chained, non-exempt segment) | deny |
 | Heredoc/message body containing the literal `git add` | deny (unchanged; residual known limitation per D8) |
@@ -182,7 +183,7 @@ Because a pathless integration invocation denies (rule 4), the planner skills mu
 
 ### D8 — Whole-command-text over-match: out of scope, with reason
 
-Recorded under Scope & Non-Goals. The trigger regex is not narrowed in this fix because trigger scoping to a segment-leading command name is a fail-open change (wrapper bypasses via `xargs`, nested shells). D3 bounds the practical interaction. Follow-up candidate for a separate issue; not filed here.
+Recorded under Scope & Non-Goals. The trigger regex is not narrowed in this fix because trigger scoping to a segment-leading command name is a fail-open change (wrapper bypasses via `xargs`, nested shells). D3 bounds the practical interaction. The same trigger property produces an under-match in the opposite direction: a relocating spelling that separates the command name from the subcommand is never classified at all and passes by non-match; this direction is part of the same follow-up candidate. Follow-up candidate for a separate issue; not filed here.
 
 ### Boundaries and invariants to preserve
 
