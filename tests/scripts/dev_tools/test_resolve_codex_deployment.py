@@ -59,6 +59,64 @@ def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
     assert receipt["c3_overlay_reason"] == "c4_orchestration_ceiling"
 
 
+@pytest.mark.parametrize(
+    (
+        "execution_context",
+        "ceiling",
+        "expected_deployment_agent",
+        "expected_model",
+        "expected_overlay_applied",
+        "expected_overlay_reason",
+    ),
+    [
+        (
+            "standalone",
+            "C3",
+            "task-researcher-c3",
+            "gpt-5.6-terra",
+            False,
+            None,
+        ),
+        (
+            "epic_execution_child",
+            "C3",
+            "task-researcher-c3-elevated",
+            "gpt-5.6-sol",
+            True,
+            "epic_context",
+        ),
+        (
+            "standalone",
+            "C4",
+            "task-researcher-c3-elevated",
+            "gpt-5.6-sol",
+            True,
+            "c4_orchestration_ceiling",
+        ),
+    ],
+)
+def test_resolves_task_researcher_c3_selection_by_context_and_ceiling(
+    execution_context: str,
+    ceiling: str,
+    expected_deployment_agent: str,
+    expected_model: str,
+    expected_overlay_applied: bool,
+    expected_overlay_reason: str | None,
+) -> None:
+    """Route task-researcher C3 by its exact context and orchestration ceiling."""
+
+    receipt = resolve_codex_deployment(
+        "task-researcher", "C3", execution_context, ceiling
+    )
+
+    assert receipt["logical_agent"] == "task-researcher"
+    assert receipt["deployment_agent"] == expected_deployment_agent
+    assert receipt["model"] == expected_model
+    assert receipt["model_reasoning_effort"] == "high"
+    assert receipt["c3_overlay_applied"] is expected_overlay_applied
+    assert receipt["c3_overlay_reason"] == expected_overlay_reason
+
+
 def test_records_combined_c3_overlay_reason() -> None:
     """Record both deterministic triggers when epic context also has C4 scope."""
 

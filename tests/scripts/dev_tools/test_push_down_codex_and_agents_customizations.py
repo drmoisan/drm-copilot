@@ -179,6 +179,52 @@ def test_push_down_customizations_copies_codex_and_agents_paths() -> None:
     ]
 
 
+def test_push_down_customizations_excludes_ephemeral_codex_state() -> None:
+    """Exclude runtime-only Codex state while retaining source customizations."""
+
+    module = _load_module()
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
+    state_path = (
+        repo_root / ".codex" / "state" / "powershell-batch-budget.ephemeral.json"
+    )
+    fs = RecordingFileSystem(
+        files={
+            repo_root / ".codex" / "config.toml": MemoryFile("trusted = true\n"),
+            repo_root
+            / ".agents"
+            / "skills"
+            / "policy-compliance-order"
+            / "SKILL.md": MemoryFile("# Policy\n"),
+            state_path: MemoryFile('{"runtime": true}\n'),
+        }
+    )
+    fs.directories.update(
+        {
+            repo_root,
+            repo_root / ".codex",
+            repo_root / ".codex" / "state",
+            repo_root / ".agents",
+            repo_root / ".agents" / "skills",
+            repo_root / ".agents" / "skills" / "policy-compliance-order",
+            destination_root,
+        }
+    )
+
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    published_paths = [result.relative_path for result in summary.files]
+    assert ".codex/config.toml" in published_paths
+    assert ".agents/skills/policy-compliance-order/SKILL.md" in published_paths
+    assert ".codex/state/powershell-batch-budget.ephemeral.json" not in published_paths
+
+
 def test_no_argument_push_down_publishes_full_tree_and_artifact_path() -> None:
     """Verify omitted packs keeps full `.codex` and `.agents` behavior."""
 
