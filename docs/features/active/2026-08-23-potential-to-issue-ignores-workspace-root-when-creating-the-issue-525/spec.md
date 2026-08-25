@@ -3,8 +3,8 @@
 - **Issue:** #525
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-23T23-55
-- **Status:** Specified
+- **Last Updated:** 2026-08-25T10-14
+- **Status:** Implemented
 - **Work Mode:** full-bug
 - **Version:** 1.0
 
@@ -200,7 +200,15 @@ The following conditions are all "cannot resolve" and all take the E1 path:
 - the resolution command produces empty output;
 - the output is unparseable, or is parseable but is not an object;
 - the expected owner/name field is missing, or is present but is not a string;
-- the remote URL is in an **unrecognized form** (see E4).
+- the remote URL is in an **unrecognized form** (see E4). **UNREACHABLE under the adopted
+  mechanism.** E4 is retired: the resolver required by R1 runs the GitHub CLI repository-view
+  operation and reads no remote URL on any leg, so there is no point at which a URL form could be
+  encountered, and this condition cannot arise. The bullet is annotated rather than deleted because
+  deleting it would silently shrink a stated requirement enumeration; retaining it preserves the
+  audit trail and records that no implementation branch and no test exists for it, so a later reader
+  does not implement a branch that cannot be reached. This annotation becomes void if a future
+  change introduces a leg that parses a remote URL, at which point E4's stated condition for
+  becoming binding again applies.
 
 The tolerance behaviour for the middle four conditions mirrors the proven behaviour of the existing
 PR-context resolver, with one deliberate difference: where that resolver converts an unusable
@@ -362,49 +370,49 @@ The two together cover the chain end to end (research §6).
 
 ## Acceptance Criteria
 
-- [ ] The argument vector for issue creation carries an explicit `--repo <owner/name>` selector whose
+- [x] The argument vector for issue creation carries an explicit `--repo <owner/name>` selector whose
       slug was resolved from the call's `workspace_root`, asserted at the injected CLI boundary by a
       recording fake with no live GitHub call.
-- [ ] The label-create recovery call and the issue-view call carry the same `--repo <owner/name>`
+- [x] The label-create recovery call and the issue-view call carry the same `--repo <owner/name>`
       selector as the issue-creation call.
-- [ ] The re-created issue on the missing-label recovery leg carries the same `--repo <owner/name>`
+- [x] The re-created issue on the missing-label recovery leg carries the same `--repo <owner/name>`
       selector as the initial creation attempt.
-- [ ] The slug-resolution operation is performed against the checkout at the resolved
+- [x] The slug-resolution operation is performed against the checkout at the resolved
       `workspace_root`, asserted through an injected seam that records the workspace value it was
       handed; the recorded value equals the `workspace_root` supplied to the call and is not the
       process working directory.
-- [ ] With no repository binding supplied to the GitHub client, the three repository-scoped argument
+- [x] With no repository binding supplied to the GitHub client, the three repository-scoped argument
       vectors are byte-identical to their pre-change form, so the existing default construction in
       the promotion workflow module is unaffected.
-- [ ] A promotion whose `workspace_root` equals the server's own checkout produces unchanged summary
+- [x] A promotion whose `workspace_root` equals the server's own checkout produces unchanged summary
       text, `destination_path`, and `artifacts` values, and echoes that checkout's slug; every
       pre-existing assertion in the affected test suites passes without modification to its expected
       values.
-- [ ] A successful promotion result exposes the resolved `owner/name` slug in a dedicated field that
+- [x] A successful promotion result exposes the resolved `owner/name` slug in a dedicated field that
       reaches the MCP surface snake-cased, verified through the full result projection chain rather
       than only at the service-call return.
-- [ ] The echoed field is optional on the shared execution-result contract, and results returned by
+- [x] The echoed field is optional on the shared execution-result contract, and results returned by
       tools other than `potential_to_issue` are unchanged, with the field absent.
-- [ ] When the slug cannot be resolved, the call fails with an explicit error whose message names
+- [x] When the slug cannot be resolved, the call fails with an explicit error whose message names
       the `workspace_root` that could not be resolved; no `--repo`-less GitHub invocation and no
       implicit-resolution fallback occurs on that path.
-- [ ] On a resolution failure, no issue-creation invocation is made and the potential record is not
+- [x] On a resolution failure, no issue-creation invocation is made and the potential record is not
       moved, asserted against the recording CLI fake and the in-memory filesystem fake.
-- [ ] The slug resolver has unit tests covering, at minimum: successful resolution; a checkout with
+- [x] The slug resolver has unit tests covering, at minimum: successful resolution; a checkout with
       no `origin` remote; non-zero exit of the resolution command; empty output; unparseable output;
       a parseable payload that is not an object; and a missing or non-string owner/name field.
-- [ ] The docstring in the TypeScript GitHub client no longer asserts byte-identical argument vectors
+- [x] The docstring in the TypeScript GitHub client no longer asserts byte-identical argument vectors
       with the Python sibling, and states the divergence and its reason.
-- [ ] `scripts/dev_tools/potential_to_issue.py` and its three dedicated pytest modules are unmodified
+- [x] `scripts/dev_tools/potential_to_issue.py` and its three dedicated pytest modules are unmodified
       in the branch diff.
-- [ ] No file under `.claude/skills/feature-promotion-lifecycle/`, no bundled copy of it, no file
+- [x] No file under `.claude/skills/feature-promotion-lifecycle/`, no bundled copy of it, no file
       under `.claude/rules/`, and no tool-definition module appears in the branch diff.
-- [ ] Per-changed-file Jest coverage thresholds of 85% line and 75% branch are configured for and met
+- [x] Per-changed-file Jest coverage thresholds of 85% line and 75% branch are configured for and met
       by every changed extension source file, including the new resolver module.
-- [ ] New and updated tests create no temporary files, mock the child-process boundary, and inject
+- [x] New and updated tests create no temporary files, mock the child-process boundary, and inject
       the CLI path lookup, so the suite passes with no network access and no real GitHub CLI
       execution.
-- [ ] The full seven-stage toolchain (format → lint → type-check → architecture → unit tests →
+- [x] The full seven-stage toolchain (format → lint → type-check → architecture → unit tests →
       contract checks → integration tests) completes without errors in a single pass.
 
 ## Risks & Mitigations
