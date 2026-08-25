@@ -1,6 +1,6 @@
 ---
 name: invoke-csharp-engineer
-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates.
+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier, .NET analyzers, nullable analysis, and MSTest with the one-to-three production-file small-path budget and zero-regression quality gates.
 ---
 
 # Implement C# Skill

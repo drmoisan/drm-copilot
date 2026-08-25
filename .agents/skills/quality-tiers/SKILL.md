@@ -1,8 +1,6 @@
 ---
 name: quality-tiers
 description: Module rigor tier system and uniform coverage thresholds.
-paths:
-  - "**"
 ---
 
 # Converted rule
