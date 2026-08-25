@@ -76,6 +76,42 @@ function seedFeature(fs: FakePotentialFileSystem, path: string): void {
 
 const POTENTIAL = "/workspace/docs/features/potential/sample.md";
 
+/** Slug returned by the injected resolver seam in the resolution tests. */
+const RESOLVED_SLUG = "drmoisan/drm-copilot";
+
+/** Workspace root that is not the process working directory. */
+const DIFFERING_WORKSPACE = "/other-checkout";
+
+/** Potential record living under {@link DIFFERING_WORKSPACE}. */
+const DIFFERING_POTENTIAL = `${DIFFERING_WORKSPACE}/docs/features/potential/sample.md`;
+
+/**
+ * Workspace root equal to the process working directory.
+ *
+ * The promotion workflow joins the workspace root with forward slashes, so the
+ * host separator is normalized here and every expected value below is derived
+ * from this one constant. That keeps the assertions deterministic on any host.
+ */
+const PROCESS_ROOT = process.cwd().replace(/\\/g, "/");
+
+/** Potential record living under {@link PROCESS_ROOT}. */
+const PROCESS_POTENTIAL = `${PROCESS_ROOT}/docs/features/potential/sample.md`;
+
+/**
+ * Recording resolver seam that captures the workspace value it was handed.
+ *
+ * @param recorded Sink that receives one entry per resolver invocation.
+ * @returns A resolver returning {@link RESOLVED_SLUG}.
+ */
+function makeRecordingResolver(
+  recorded: string[],
+): (workspaceRoot: string) => string {
+  return (workspaceRoot: string): string => {
+    recorded.push(workspaceRoot);
+    return RESOLVED_SLUG;
+  };
+}
+
 describe("potentialToIssueServiceCall — success", () => {
   it("returns the preserved tool, workspaceRoot, summary, destinationPath, and artifacts", () => {
     // Arrange
@@ -169,6 +205,79 @@ describe("potentialToIssueServiceCall — success", () => {
     expect(result.summary).toBe(
       `Promoted '${POTENTIAL}' as a refactor workflow in full mode.`,
     );
+  });
+});
+
+describe("potentialToIssueServiceCall — target repository resolution", () => {
+  it("resolves the target repository from a workspace root that differs from the process working directory", () => {
+    // Arrange: an injected fake gh client (so no RealGhClient is constructed and
+    // no real gh is located or executed), the in-memory filesystem fake, the
+    // recording command runner, and a resolver seam that records the workspace
+    // value it was handed.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, DIFFERING_POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const recordedWorkspaces: string[] = [];
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: DIFFERING_WORKSPACE,
+      potentialPath: DIFFERING_POTENTIAL,
+      promotionType: "feature",
+      workMode: "full",
+      repoSlugResolver: makeRecordingResolver(recordedWorkspaces),
+    });
+
+    // Assert: resolution ran exactly once against the supplied workspace root,
+    // and the resolved slug is echoed on the returned record.
+    expect(recordedWorkspaces).toEqual([DIFFERING_WORKSPACE]);
+    expect(result.targetRepository).toBe(RESOLVED_SLUG);
+  });
+
+  it("resolves the target repository when the workspace root matches the process working directory", () => {
+    // Arrange: the same-repository case (R3). The workspace root is the process
+    // working directory, and the gh client is again an injected fake, so no
+    // RealGhClient is constructed and no real gh is located or executed.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, PROCESS_POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const recordedWorkspaces: string[] = [];
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: PROCESS_ROOT,
+      potentialPath: PROCESS_POTENTIAL,
+      promotionType: "feature",
+      workMode: "full",
+      repoSlugResolver: makeRecordingResolver(recordedWorkspaces),
+    });
+
+    // Assert: resolution ran against that checkout and its slug is echoed.
+    expect(recordedWorkspaces).toEqual([PROCESS_ROOT]);
+    expect(result.targetRepository).toBe(RESOLVED_SLUG);
+
+    // Assert: every pre-existing element of the result is unchanged in form and
+    // value. These three assertions carry the same expected values as the
+    // pre-existing success test, rebased only on the workspace root in use.
+    expect(result.summary).toBe(
+      `Promoted '${PROCESS_POTENTIAL}' as a feature workflow in full mode.`,
+    );
+    expect(result.destinationPath).toBe(
+      `${PROCESS_ROOT}/docs/features/potential/promoted/sample.md`,
+    );
+    expect(result.artifacts).toEqual(["https://example.com/issues/123"]);
   });
 });
 

@@ -61,6 +61,9 @@ function makeRunner(
 const GH_PATH = "/usr/bin/gh";
 const lookup = (): string => GH_PATH;
 
+/** Repository slug bound to the client under the selector tests. */
+const REPO = "drmoisan/drm-copilot";
+
 describe("RealGhClient — construction", () => {
   it("throws the byte-identical message when gh is not found", () => {
     // Arrange / Act / Assert
@@ -179,6 +182,86 @@ describe("RealGhClient — issueView", () => {
     expect(calls[0]?.args).toEqual([
       "issue",
       "view",
+      "123",
+      "--json",
+      "number,title,url,author,updatedAt",
+    ]);
+  });
+});
+
+describe("RealGhClient — repository selector binding", () => {
+  it("binds the repo selector into the issue create vector", () => {
+    // Arrange: the client is bound to an explicit repository slug.
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.issueCreate("My Title", "Body text", "feature");
+
+    // Assert: the selector sits immediately after the subcommand words, so the
+    // process working directory cannot influence repository selection.
+    expect(calls[0]?.args).toEqual([
+      "issue",
+      "create",
+      "--repo",
+      REPO,
+      "--title",
+      "My Title",
+      "--body-file",
+      "-",
+      "--label",
+      "feature",
+    ]);
+  });
+
+  it("binds the repo selector into the label create vector", () => {
+    // Arrange
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.ensureLabel("feature");
+
+    // Assert
+    expect(calls[0]?.args).toEqual([
+      "label",
+      "create",
+      "--repo",
+      REPO,
+      "feature",
+      "--color",
+      FEATURE_LABEL_COLOR,
+      "--description",
+      FEATURE_LABEL_DESCRIPTION,
+    ]);
+  });
+
+  it("binds the repo selector into the issue view vector", () => {
+    // Arrange
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.issueView("123");
+
+    // Assert
+    expect(calls[0]?.args).toEqual([
+      "issue",
+      "view",
+      "--repo",
+      REPO,
       "123",
       "--json",
       "number,title,url,author,updatedAt",
