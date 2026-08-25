@@ -18,6 +18,7 @@ from scripts.dev_tools import fix_all_branches as branches
 from tests.scripts.dev_tools.fix_all_thread_stubs import (
     SkipBranchThread as _SkipBranchThread,
 )
+from tests.scripts.dev_tools.fix_all_thread_stubs import make_ordered_thread_class
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
@@ -144,10 +145,25 @@ def test_json_format_failure_returns_fail_result() -> None:
     assert "STATUS|branch=json|status=FAIL" in read_log(logger)
 
 
-def test_json_cancel_before_validate_returns_canceled_result() -> None:
+def test_json_cancel_before_validate_returns_canceled_result(
+    monkeypatch: MonkeyPatch,
+) -> None:
     """JSON cancels before validate when a sibling fails and complete_all is off."""
     # Arrange: Python fails (sets cancel); JSON has only a format response so
     # validate must never run. complete_all defaults to False.
+    #
+    # Ordering: run the python branch to completion before the json branch, so
+    # the cancel event is already set when json reaches its first cancel check.
+    # Without this the assertion below depends on whether python's failure beats
+    # a 10 ms wall-clock grace period in fix_all_branches, which is a scheduler
+    # race rather than a property of the inputs (issue #505).
+    import scripts.dev_tools.fix_all_runtime as runtime
+
+    monkeypatch.setattr(
+        runtime.threading,
+        "Thread",
+        make_ordered_thread_class(order=("python", "json")),
+    )
     responses = base_success_responses()
     responses["python"]["Black: format"] = [
         make_result(1, "err"),
