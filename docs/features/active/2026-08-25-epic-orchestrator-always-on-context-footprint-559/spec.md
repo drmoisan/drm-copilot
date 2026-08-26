@@ -678,7 +678,7 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 - [x] Every `skills:` entry in every `.claude/agents/*.md` file resolves to an existing
       `.claude/skills/` directory containing a `SKILL.md`. Asserted by the new structural test over
       all agent files, not only `epic-orchestrator.md`.
-- [ ] Each of the eight files under
+- [x] Each of the eight files under
       `extensions/drm-copilot/resources/claude-customizations/.claude/` listed in "Files to Change"
       is byte-identical to its repository original, verified by
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
@@ -696,14 +696,14 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/`,
       stating the before total, the after total, and the per-component breakdown. The before total
       is 2,158 lines.
-- [ ] The new structural regression test has a recorded fail-before result and a pass-after result
+- [x] The new structural regression test has a recorded fail-before result and a pass-after result
       under
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/regression-testing/`.
-- [ ] The full applicable toolchain passes in a single pass: `black --check`, `ruff check`,
+- [x] The full applicable toolchain passes in a single pass: `black --check`, `ruff check`,
       `pyright`, and `pytest`; PoshQC additionally if a PowerShell file was added or edited. Gate
       output is recorded under
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/`.
-- [ ] No file under `.agents/`, `.codex/`, or
+- [x] No file under `.agents/`, `.codex/`, or
       `extensions/drm-copilot/resources/codex-and-agents-customizations/` is modified, verified by
       `git diff --exit-code` over those three paths returning exit code 0.
 

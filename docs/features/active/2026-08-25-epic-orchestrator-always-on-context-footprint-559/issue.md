@@ -65,13 +65,13 @@ Planner notes: F1, F2, F4 are independent single-file edits plannable as separat
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Every `.claude/rules/*.md` frontmatter block parses as valid YAML.
-- [ ] `epic-orchestrator.md` frontmatter parses and every `skills:` entry resolves to an existing `.claude/skills/<name>/SKILL.md`.
+- [x] Every `.claude/rules/*.md` frontmatter block parses as valid YAML.
+- [x] `epic-orchestrator.md` frontmatter parses and every `skills:` entry resolves to an existing `.claude/skills/<name>/SKILL.md`.
 - [ ] No cross-reference in the two epic files points at a non-existent path.
 - [ ] Markdown and PowerShell gates run for the files actually changed.
-- [ ] Measured before-and-after always-on line count for `epic-orchestrator` (agent file + preloaded skills + unconditionally-loaded rules + `CLAUDE.md`) recorded under the feature's canonical evidence path.
+- [x] Measured before-and-after always-on line count for `epic-orchestrator` (agent file + preloaded skills + unconditionally-loaded rules + `CLAUDE.md`) recorded under the feature's canonical evidence path.
 
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch

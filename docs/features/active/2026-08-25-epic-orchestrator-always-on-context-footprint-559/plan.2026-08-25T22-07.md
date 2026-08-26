@@ -125,6 +125,31 @@ mandate-read prefix and is not a known top-level segment):
 **Total declared writes: 52 concrete files** (10 runtime + 8 mirrors + 2 new tests + 3 feature
 documents + 29 evidence artifacts), plus the orchestration checkpoint.
 
+Pre-plan feature-lifecycle documents (3 files; **amended by `[P6-T9]`**, which requires any
+difference between the branch's changed-file set and this list to be reconciled here before the
+change is reported complete). These three files are changed by the branch but are **not written by
+any task in this plan**. They were authored by the feature-lifecycle steps that ran before the plan
+existed, and each is traceable to a commit that predates the plan's own commit `b164857e`:
+
+- `docs/features/potential/promoted/2026-08-25-epic-orchestrator-always-on-context-footprint.md`
+  — added by `86afec17`, the promoted-potential publication step.
+- `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/research/2026-08-25T23-10-epic-orchestrator-context-footprint-research.md`
+  — added by `066e5bec`, the research step. Cited in this plan's header as **Research** and named as
+  the authoritative source under the source-precedence rule.
+- `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/user-story.md`
+  — added by `aa93ff0c`, the spec-and-user-story step. Cited in this plan's header as **Narrative**.
+
+They are recorded here rather than added to the `paths` list above because that list is defined as
+"every file this implementation writes", and no implementation task writes them. Listing them as
+implementation writes would over-report the radius and would create conflict edges against
+concurrent items on files this change never touches. Both surviving classes are inert for
+scheduling: the `docs/features/**` shape is not a shared surface, and neither path is a mandate-read
+entry.
+
+**Total files changed by the branch: 55** (the 52 declared writes plus these 3 pre-plan lifecycle
+documents). The orchestration checkpoint is gitignored-adjacent run state and is counted separately
+as above.
+
 ### Four extraction notes the scheduler must apply by hand
 
 1. **`CLAUDE.md` is separator-free.** `classify_path_token` admits a separator-free token only when
@@ -787,21 +812,21 @@ The loop below runs formatting, then linting, then type checking, then testing. 
 or changes a file, restart the loop from `[P6-T1]`.** Do not proceed past `[P6-T5]` until all four
 stages complete without error in a single uninterrupted pass.
 
-- [ ] [P6-T1] Run `poetry run black --check .` and write
+- [x] [P6-T1] Run `poetry run black --check .` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-black.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. If the check reports a file
       needing reformatting, run `poetry run black .`, then restart the loop from this task.
       Acceptance: `EXIT_CODE: 0`.
-- [ ] [P6-T2] Run `poetry run ruff check` and write
+- [x] [P6-T2] Run `poetry run ruff check` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-ruff.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. If any fix changes a file,
       restart the loop from `[P6-T1]`. Acceptance: `EXIT_CODE: 0` with zero diagnostics.
-- [ ] [P6-T3] Run `poetry run pyright` and write
+- [x] [P6-T3] Run `poetry run pyright` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-pyright.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. If any change is made to
       satisfy the type checker, restart the loop from `[P6-T1]`. Acceptance: `EXIT_CODE: 0` with zero
       errors, and the error count is not greater than the baseline recorded in P0-T5.
-- [ ] [P6-T4] Run `poetry run pytest --cov=scripts.dev_tools --cov-report=term-missing` and write
+- [x] [P6-T4] Run `poetry run pytest --cov=scripts.dev_tools --cov-report=term-missing` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-pytest-coverage.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the numeric
       passed and failed counts and the numeric total line-coverage percentage for
@@ -813,7 +838,7 @@ stages complete without error in a single uninterrupted pass.
       zero failures applies with no exception. Under the exception branch the artifact must name the
       single tolerated failure explicitly and cite the `[P0-T11]` baseline record; a summary that
       reports a non-zero failure count without naming the failing test does not satisfy this task.
-- [ ] [P6-T5] Run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check` and
+- [x] [P6-T5] Run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check` and
       write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-codex-agent-variants.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. This stage is run because
@@ -823,7 +848,7 @@ stages complete without error in a single uninterrupted pass.
       `.claude/agents/epic-orchestrator.md` or `.claude/skills/` changes this plan makes. The
       assertion that `.codex/` is untouched is carried by `[P6-T8]`, not by this task. Acceptance:
       `EXIT_CODE: 0`.
-- [ ] [P6-T6] Write
+- [x] [P6-T6] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/coverage-delta.2026-08-26T00-00.md`
       recording the baseline coverage percentage from P0-T6, the post-change coverage percentage from
       P6-T4, the signed delta, and the changed-code coverage statement: no file under `src` or
@@ -831,7 +856,7 @@ stages complete without error in a single uninterrupted pass.
       exactly those two roots, so the coverage denominator is unchanged and the metric cannot
       regress. Acceptance: the artifact records two numeric percentages and a delta of zero, or names
       each file responsible if the delta is non-zero.
-- [ ] [P6-T7] Write
+- [x] [P6-T7] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/not-applicable-gates.2026-08-26T00-00.md`
       recording, with a reason for each, the gates that do not apply: PoshQC, because Decision 2
       chose pytest and no PowerShell file is added or edited; the extension TypeScript test workflow,
@@ -845,7 +870,7 @@ stages complete without error in a single uninterrupted pass.
       than a policy-file gate, and the prettier globs in `package.json` cover no Markdown file — so
       no Markdown gate is claimed, invented, or run. Acceptance: the artifact names every gate above
       with its reason and states the Markdown finding explicitly.
-- [ ] [P6-T8] Verify scope containment by running
+- [x] [P6-T8] Verify scope containment by running
       `git diff HEAD --exit-code -- .agents/ .codex/ extensions/drm-copilot/resources/codex-and-agents-customizations/ AGENTS.md .github/instructions/ config/orchestration-routing.json extensions/drm-copilot/resources/config/orchestration-routing.json config/blast-radius.json .claude/settings.json docs/engineering/claude-code-architecture.md`
       and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/scope-containment.2026-08-26T00-00.md`
@@ -857,23 +882,23 @@ stages complete without error in a single uninterrupted pass.
       carried by `[P6-T9]`, which reconciles `git status --porcelain` — untracked entries included —
       against the declared radius. Acceptance: exit code 0, confirming every declared non-write
       stayed a non-write and that no declared shared surface with a file behind it was touched.
-- [ ] [P6-T9] Verify that the set of files changed by this branch equals the declared blast radius,
+- [x] [P6-T9] Verify that the set of files changed by this branch equals the declared blast radius,
       by running `git status --porcelain` and comparing the result against the path list in the
       `## DECLARED BLAST RADIUS` section of this plan. Acceptance: every changed path appears in the
       declared list and every declared runtime, mirror, and test path that was expected to change has
       changed; any difference is reconciled by amending this plan's radius section before the change
       is reported complete.
-- [ ] [P6-T10] Run `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py` and
+- [x] [P6-T10] Run `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py` and
       write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/regression-testing/pass-after-rules-frontmatter.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: `EXIT_CODE: 0`
       with eight passed, pairing with the fail-before artifact from P1-T3.
-- [ ] [P6-T11] Run `poetry run pytest tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
+- [x] [P6-T11] Run `poetry run pytest tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/regression-testing/pass-after-epic-contract.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: `EXIT_CODE: 0`
       with seven passed, pairing with the fail-before artifact from P1-T4.
-- [ ] [P6-T12] Reconcile every checkbox under `## Acceptance Criteria` in
+- [x] [P6-T12] Reconcile every checkbox under `## Acceptance Criteria` in
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/spec.md`
       against the evidence artifacts produced by this plan, and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/ac-reconciliation.2026-08-26T00-00.md`
@@ -889,12 +914,12 @@ stages complete without error in a single uninterrupted pass.
       `human_interaction` halt entry at spec line 652, is recorded as delivered by `[P4-T7]` with its
       evidence artifact path; and exactly one criterion of the 38 is recorded as unchecked and
       blocked.
-- [ ] [P6-T13] Update
+- [x] [P6-T13] Update
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/issue.md`
       to check the delivered items under `## Proposed Fix / Validation Ideas` and `## Next Step`,
       leaving unchecked anything not delivered. Acceptance: no checkbox is checked without a
       corresponding evidence artifact path recorded in the AC reconciliation artifact.
-- [ ] [P6-T14] Record the required follow-ups without acting on them: regenerating the `.agents/`
+- [x] [P6-T14] Record the required follow-ups without acting on them: regenerating the `.agents/`
       converted copies of the changed `.claude/` originals and mirroring the result into
       `extensions/drm-copilot/resources/codex-and-agents-customizations/`; adding a converter-parity
       test so `.claude/` to `.agents/` staleness fails loudly; reconciling the stale embedded rule
