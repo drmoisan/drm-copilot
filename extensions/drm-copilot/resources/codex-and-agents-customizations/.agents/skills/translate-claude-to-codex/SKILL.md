@@ -1,6 +1,6 @@
 ---
 name: translate-claude-to-codex
-description: Translate the native Claude Code runtime (CLAUDE.md, .claude/rules/*.md, .claude/skills/<name>/SKILL.md, .claude/agents/*.md, .claude/hooks/*.ps1, .claude/settings.json) into the native Codex ecosystem (AGENTS.md, .codex/config.toml, .codex/agents/*.toml, .agents/skills/<name>/SKILL.md, .codex/hooks.json). Classify each Claude surface into its Codex-native equivalent, preserve mechanical enforceability of every hardening element, diff against existing Codex state, produce a translation plan with an enforceability-preservation ledger for user approval, then apply.
+description: Translate the native Claude Code runtime, including Claude rules, skills, agents, hooks, and settings, into the native Codex ecosystem. Preserve mechanical enforceability, diff against existing Codex state, produce an approval plan with an enforceability ledger, then apply it.
 ---
 
 # Translate Claude to Codex
@@ -21,7 +21,7 @@ Use this skill when:
 
 ## Authoritative Inputs
 
-This skill consumes the Codex ecosystem mapping recorded in `artifacts/research/codex-native-ecosystem.2026-06-16T13-32.md`. That artifact is the source of truth for Codex primitive behavior, discovery order, and enforceability. Do not restate Codex documentation from memory; cite the research artifact.
+This skill consumes the Codex ecosystem mapping recorded in `docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md`. That artifact is the source of truth for Codex primitive behavior, discovery order, and enforceability. Do not restate Codex documentation from memory; cite the research artifact.
 
 Required source paths under `.claude/` (one or more). Accepted types:
 
@@ -172,7 +172,7 @@ Plan structure:
 
 Generated: <timestamp>
 Mode: <plan-only | apply>
-Research basis: artifacts/research/codex-native-ecosystem.2026-06-16T13-32.md
+Research basis: docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md
 
 ## Inputs
 - <source path 1>

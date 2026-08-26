@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 import pytest
 
 from scripts.dev_tools import fix_all
+from tests.scripts.dev_tools.fix_all_thread_stubs import make_ordered_thread_class
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
@@ -379,8 +380,20 @@ def test_parse_args_complete_all_sets_true() -> None:
     assert args.complete_all is True
 
 
-def test_fail_fast_cancels_json_before_validate() -> None:
+def test_fail_fast_cancels_json_before_validate(monkeypatch: MonkeyPatch) -> None:
     """Ensure JSON validation does not start after another branch fails."""
+    # Ordering: run the python branch to completion before the json branch, so
+    # the cancel event is already set when json reaches its first cancel check.
+    # Without this the assertion below depends on whether python's failure beats
+    # a 10 ms wall-clock grace period in fix_all_branches, which is a scheduler
+    # race rather than a property of the inputs (issue #505).
+    import scripts.dev_tools.fix_all_runtime as runtime
+
+    monkeypatch.setattr(
+        runtime.threading,
+        "Thread",
+        make_ordered_thread_class(order=("python", "json")),
+    )
     responses = base_success_responses()
     responses["python"]["Pyright: type-check"] = [make_result(1, "type errors")]
     responses["json"] = {
