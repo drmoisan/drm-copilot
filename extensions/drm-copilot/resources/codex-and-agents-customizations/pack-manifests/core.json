@@ -86,6 +86,12 @@
     ".codex/agents/pr-author-c2.toml",
     ".codex/agents/pr-author-c3.toml",
     ".codex/agents/pr-author-c3-elevated.toml",
-    ".codex/agents/pr-author-c4.toml"
+    ".codex/agents/pr-author-c4.toml",
+    ".codex/agents/commit-steward.toml",
+    ".codex/agents/commit-steward-c1.toml",
+    ".codex/agents/commit-steward-c2.toml",
+    ".codex/agents/commit-steward-c3.toml",
+    ".codex/agents/commit-steward-c3-elevated.toml",
+    ".codex/agents/commit-steward-c4.toml"
   ]
 }
