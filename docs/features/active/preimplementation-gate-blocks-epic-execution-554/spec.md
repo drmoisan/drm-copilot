@@ -660,6 +660,14 @@ Parallel-mode cases mirror rows 1 through 4 against
   `.claude/rules/general-unit-test.md`), no filesystem access, no wall clock, no network, no
   external process.
 
+  **One sanctioned exception, and only one.** The Codex transport-gap assertion (decision D5,
+  deliverable ii) must read the tracked repository file `.codex/config.toml`, because the fact it
+  records is a property of that file and cannot be expressed any other way. That single read is
+  permitted. It is not a temporary file, its content is committed and therefore fixed for a given
+  checkout, and it must be resolved through a `$PSScriptRoot`-relative `Resolve-Path` so the test
+  introduces no working-directory assumption. The substantive prohibitions — temporary files, wall
+  clock, network, external process — remain intact, and no other test may read from disk.
+
 ### Two hard invariants that keep five pre-existing cases passing
 
 Research G2 identified five pre-existing cases in
@@ -806,8 +814,9 @@ change**. Deleting the state file is not a durable fix and must not be attempted
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/qa-gates/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/regression-testing/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/issue-updates/`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/other/`
 
-The four `evidence/` entries are directory prefixes, not files; the concrete artifact filenames are
+The five `evidence/` entries are directory prefixes, not files; the concrete artifact filenames are
 timestamp-bearing and are fixed by the plan. They are recorded at directory granularity because the
 feature folder is unique to this item and therefore cannot contend with any other item.
 
@@ -890,7 +899,7 @@ This section is the **sole** authoritative acceptance-criteria source for this f
 - [ ] The full PowerShell toolchain passes in a single pass: format, then analyze with zero findings, then Pester with coverage.
 - [ ] The plan document records the batch sequencing required by decision D6 and states explicitly that each `extensions/drm-copilot/resources/` file is treated as a mechanical byte-copy of an already-reviewed source rather than an independent production edit.
 - [ ] Every production `.ps1` file written by this change is at or under 500 lines, verified by line count.
-- [ ] A follow-up issue is filed for the epic kickoff contract gap described in decision D3, and its number is recorded in this feature's evidence.
+- [ ] A follow-up record for the epic kickoff contract gap described in decision D3 is written under `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/other/`, stating the gap, the recommended contract amendment, and the reason it is out of scope here. Filing the GitHub issue itself is a maintainer action outside this branch: `gh issue create` is denied by a PreToolUse hook, and the sanctioned MCP promotion path writes files under `docs/features/potential/` that are deliberately not in the declared blast radius, so filing it from this branch would make the undeclared-path check fail. This criterion is satisfied by the evidence record; the issue number is appended later if and when one exists.
 
 **Total acceptance-criteria items: 35.** All are unchecked at authoring time. Items are checked off
 only under the protocol in `.claude/skills/acceptance-criteria-tracking/SKILL.md`, one at a time,
