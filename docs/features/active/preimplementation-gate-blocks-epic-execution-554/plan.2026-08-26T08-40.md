@@ -3,9 +3,9 @@
 - **Issue:** #554
 - **Work Mode:** `full-bug`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-26T08-40
+- **Last Updated:** 2026-08-26T08-40 (revision 2, applying the preflight delta set R1 through R13)
 - **Status:** Ready for preflight
-- **Version:** 1.0
+- **Version:** 1.1
 - **Plan path (canonical, updated in place):** `docs/features/active/preimplementation-gate-blocks-epic-execution-554/plan.2026-08-26T08-40.md`
 
 ## Requirements Source
@@ -59,7 +59,21 @@ Batch sequencing, each batch at or under the per-batch cap:
   suite).
 - **Batch C (Phase 4)** — production: 0 new logic. Four mechanical byte-copies into
   `extensions/drm-copilot/resources/`, plus two coverage-settings files and two pack manifests, all
-  under the treatment stated above.
+  under the treatment stated above. Six of those files are `.ps1` or `.psd1` and therefore count
+  against the per-batch budget, so Batch C is split by a second counter reset placed at the head of
+  P4-T4: P4-T1 through P4-T3 form the first three-file group, and P4-T4 through P4-T6 form the
+  second. The two `pack-manifests/core.json` files are JSON and are not counted by the hook.
+
+**Batch-budget counter reset (operational, required).** `.claude/hooks/enforce-powershell-batch-budget.ps1`
+is registered on the `Write|Edit` PreToolUse matcher and counts every `.ps1`, `.psm1`, and `.psd1`
+write against a session-scoped cap of 3 production and 3 test files. It classifies a file as a test
+only when its path matches a `tests/` prefix or a `.Tests.ps1` suffix, so both
+`pester.runsettings.psd1` copies count as PRODUCTION. Cumulative production writes across this plan
+are the 8 physical `.ps1` files plus those two `.psd1` copies, so 10 counted writes in total against
+a cap of 3. The counter is therefore reset at each batch boundary by deleting every file matching
+`.claude/state/powershell-batch-budget.*.json`. That deletion is the mechanism the hook's own block
+reason prescribes. The path is gitignored, never appears in a diff, and is unrelated to the issue
+#510 condition recorded below; do not conflate the two.
 
 ## Declared Blast Radius (binding)
 
@@ -71,8 +85,12 @@ there. In particular:
   forbids modifying. If any task appears to require such an edit, execution stops and reports blocked.
 - **The four `-helpers.ps1` copies are not touched.** Leaving them byte-untouched is the proof that
   the issue #539 staging exemption is behaviourally unchanged (decision D1).
-- **No existing test file is edited.** The four pre-existing suites plus
-  `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` must pass unmodified.
+- **No existing test file is edited.** Six pre-existing suites must pass unmodified: the spec's four
+  named suites, plus `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, plus
+  `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`. The last of these dot-sources
+  `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` and pins
+  `Test-ImplementationDelegation` to true for `atomic-executor` and false for `task-researcher`, so
+  it is the suite most directly exposed to the Codex classifier replacement in P3-T9 and P3-T10.
   `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` is at 461 of
   500 lines and must not grow; all new Claude-side cases go in the new sibling suite.
 
@@ -115,10 +133,10 @@ change must stay at or under **500 lines**.
 
 - [ ] [P0-T1] Read the repository policy files in the order defined by the policy-compliance-order skill — `CLAUDE.md`, then `.claude/rules/general-code-change.md`, then `.claude/rules/general-unit-test.md`, then `.claude/rules/powershell.md`, then `.claude/rules/quality-tiers.md`, then `.claude/rules/plan-acceptance-gates.md` — and write `${feature-folder}/evidence/baseline/phase0-instructions-read.<timestamp>.md` carrying `Timestamp:`, `Policy Order:`, and the explicit list of the six files read.
   - Acceptance: the artifact exists, contains all three required field labels, and names all six policy files in the stated order.
-- [ ] [P0-T2] Read `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md` in full, `docs/features/active/preimplementation-gate-blocks-epic-execution-554/issue.md`, and `docs/features/active/preimplementation-gate-blocks-epic-execution-554/research/2026-08-26T09-30-preimplementation-gate-epic-execution-554-research.md`, then write `${feature-folder}/evidence/baseline/phase0-requirements-sources.<timestamp>.md` recording that `spec.md` is the sole acceptance-criteria source, that `user-story.md` is deliberately absent, and the count of acceptance-criteria items found in the spec's `## Acceptance Criteria` section.
+- [ ] [P0-T2] Read `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md` in full, `docs/features/active/preimplementation-gate-blocks-epic-execution-554/issue.md`, and `docs/features/active/preimplementation-gate-blocks-epic-execution-554/research/2026-08-26T09-30-preimplementation-gate-epic-execution-554-research.md`, then write `${feature-folder}/evidence/baseline/phase0-requirements-sources.<timestamp>.md` carrying `Timestamp:` and recording that `spec.md` is the sole acceptance-criteria source, that `user-story.md` is deliberately absent, and the count of acceptance-criteria items found in the spec's `## Acceptance Criteria` section.
   - Acceptance: the artifact records the acceptance-criteria item count as the integer 35 and states that `user-story.md` is deliberately absent and is not a blocker.
 - [ ] [P0-T3] Record the merge base of the working branch against `main` by running `git merge-base origin/main HEAD` and write `${feature-folder}/evidence/baseline/phase0-merge-base.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying the resolved commit SHA.
-  - Acceptance: `EXIT_CODE:` is 0 and `Output Summary:` contains a 40-character hexadecimal commit SHA that every later diff task reuses.
+  - Acceptance: `EXIT_CODE:` is 0 and `Output Summary:` contains a 40-character hexadecimal commit SHA. The SHA is recorded as branch-point context only; the Phase 5 diff tasks use the equivalent `origin/main...HEAD` three-dot form and do not substitute the recorded SHA.
 - [ ] [P0-T4] Capture the PowerShell formatting baseline by invoking the MCP tool `mcp__drm-copilot__run_poshqc_format` and write `${feature-folder}/evidence/baseline/phase0-poshqc-format.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` stating the number of files reformatted.
   - Acceptance: the artifact exists with all four field labels and `Output Summary:` states a numeric reformatted-file count.
 - [ ] [P0-T5] Capture the PSScriptAnalyzer baseline by invoking the MCP tool `mcp__drm-copilot__run_poshqc_analyze` and write `${feature-folder}/evidence/baseline/phase0-poshqc-analyze.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` stating the numeric finding count by severity.
@@ -167,8 +185,8 @@ change must stay at or under **500 lines**.
   - Acceptance: the predicate consumes the parallel item-state and merge-status member sets without adding any member, and a `merge_status` of `blocked_drift` or `blocked_ci_loop_limit` does not fail the last conjunct.
 - [ ] [P2-T11] Create `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` as a copy of the reviewed `.claude` modes file, adjusting only the header's surface reference, and confirm the file introduces no dependency on `HookPayload.psm1` or on any Claude-surface field reader.
   - Acceptance: the Codex modes file defines the same function names as the Claude modes file and contains no `Import-Module` statement.
-- [ ] [P2-T12] Add predicate-level Pester cases for mode resolution to `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, covering the four mode names, the preparation-first precedence, the empty-prompt default, and the canonical-path cross-check in its absent, matching, and mismatching forms.
-  - Acceptance: every added case uses literal string fixtures only, and all added cases pass when the suite is run.
+- [ ] [P2-T12] First add to the suite's `BeforeAll` a `$PSScriptRoot`-relative `Resolve-Path` dot-source of `.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1`, so the predicate-level cases resolve the modes functions during Batch A, before the main gate hook dot-sources that sibling in P3-T1. Then add predicate-level Pester cases for mode resolution to `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, covering the four mode names, the preparation-first precedence, the empty-prompt default, and the canonical-path cross-check in its absent, matching, and mismatching forms.
+  - Acceptance: every added case uses literal string fixtures only, and all added cases pass when the suite is run; and the suite resolves `Resolve-OrchestrationDelegationMode` when run at the end of Batch A, with no Batch B edit applied.
 - [ ] [P2-T13] Add predicate-level Pester cases for the epic readiness predicate to the same suite, covering each of the seven conjuncts failing individually, the fully ready case, the absent `merge_status` case, the terminal-merged deny case, and the failure-status allow case required by decision D8.
   - Acceptance: at least one case exists per conjunct, and every added case passes when the suite is run.
 - [ ] [P2-T14] Add predicate-level Pester cases for the parallel readiness predicate to the same suite, covering each of the six conjuncts failing individually, the fully ready case, the terminal-merged deny case, and the blocked-status allow case.
@@ -177,6 +195,10 @@ change must stay at or under **500 lines**.
   - Acceptance: both recorded counts are integers at or below 500.
 - [ ] [P2-T16] Run the PowerShell toolchain over Batch A in order — the MCP tools `mcp__drm-copilot__run_poshqc_format` then `mcp__drm-copilot__run_poshqc_analyze` — restarting from format if formatting changes a file, and record the result in `${feature-folder}/evidence/qa-gates/batch-a-format-analyze.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: `Output Summary:` records zero analyzer findings for the two new modes files in the final pass.
+- [ ] [P2-T17] Run the test stage of the Batch A toolchain over the new suite only, with `Invoke-Pester -Path tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, and record the result in `${feature-folder}/evidence/qa-gates/batch-a-test.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying the numeric passed, failed, and skipped counts. Restart the Batch A toolchain at P2-T16 if this stage fails or changes a file.
+  - Acceptance: `Output Summary:` records a numeric passed count greater than 0 and a failed count of the integer 0 for that suite.
+- [ ] [P2-T18] Reset the PowerShell per-batch budget counter before Batch B begins by deleting every file matching `.claude/state/powershell-batch-budget.*.json`, and record the reset in `${feature-folder}/evidence/qa-gates/batch-a-budget-reset.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the files deleted or stating that no counter file existed.
+  - Acceptance: `Output Summary:` records the counter contents observed before deletion and confirms no `powershell-batch-budget` counter file remains under `.claude/state/` afterwards.
 
 ### Phase 3 — Batch B: the Two Main Gate Hooks and the Decision-Level Tests
 
@@ -186,8 +208,8 @@ change must stay at or under **500 lines**.
   - Acceptance: the function retains its `[AllowNull()]` parameter and returns false for a `$null` tool input; the file no longer contains a `ConvertTo-Json` call inside this function; and marker text placed in a non-`prompt` field cannot change the classification in either direction.
 - [ ] [P3-T3] Add the two per-mode read seams `Get-EpicCheckpointContent` and `Get-ParallelCheckpointContent` to `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, each mirroring the shape of the existing `Get-CheckpointContent` and each reading only its mode's canonical path constant.
   - Acceptance: each seam returns an empty string when its file is absent, and neither seam derives its path from any prompt text.
-- [ ] [P3-T4] Add the two optional parameters `-EpicCheckpointRaw` and `-ParallelCheckpointRaw` to `Invoke-OrchestrationPreimplementationGateDecision` in the Claude hook, each overriding the corresponding read seam when supplied and falling through to the seam when not, leaving the existing `-ToolInputRaw` and `-CheckpointRaw` parameters unchanged in name, position, and attributes.
-  - Acceptance: an invocation supplying only `-ToolInputRaw` and `-CheckpointRaw` behaves exactly as before, and an invocation supplying only `-EpicCheckpointRaw` while leaving `-CheckpointRaw` unset proves the epic source was the one consulted.
+- [ ] [P3-T4] Add the two optional parameters `-EpicCheckpointRaw` and `-ParallelCheckpointRaw` to `Invoke-OrchestrationPreimplementationGateDecision` in the Claude hook, each carrying `[AllowNull()]` and `[AllowEmptyString()]`, and each overriding the corresponding read seam whenever the caller BINDS it — decided with `$PSBoundParameters.ContainsKey('EpicCheckpointRaw')` and `$PSBoundParameters.ContainsKey('ParallelCheckpointRaw')`, never with a truthiness test — so that an explicitly supplied empty string suppresses the seam instead of falling through to disk. The existing `-ToolInputRaw` and `-CheckpointRaw` parameters are unchanged in name, position, attributes, and truthiness-based fall-through behaviour.
+  - Acceptance: an invocation supplying only `-ToolInputRaw` and `-CheckpointRaw` behaves exactly as before; an invocation supplying `-EpicCheckpointRaw` bound to the empty string returns a deny without reading any file from disk; and an invocation supplying only `-EpicCheckpointRaw` while leaving `-CheckpointRaw` unset proves the epic source was the one consulted.
 - [ ] [P3-T5] Add the mode-aware dispatch and mode-specific deny-reason construction to `Invoke-OrchestrationPreimplementationGateDecision` in the Claude hook, so the resolved mode selects the readiness source, the readiness predicate, and a reason that names the checkpoint actually consulted and the failed predicate, preserving the `PREIMPLEMENTATION_GATE_BLOCKED:` prefix, and so that a failed canonical-path cross-check denies.
   - Acceptance: an epic-mode deny reason contains the literal `epic-orchestrator-state.json`, a parallel-mode deny reason contains the literal `parallel-orchestrator-state.json`, and every deny reason retains the `PREIMPLEMENTATION_GATE_BLOCKED:` prefix.
 - [ ] [P3-T6] Preserve the default single-feature deny wording in the Claude hook so it continues to contain both substrings `route metadata` and `lifecycle readiness`, which an existing unmodified test asserts.
@@ -203,7 +225,7 @@ change must stay at or under **500 lines**.
 - [ ] [P3-T11] Verify that `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` remains at or under 500 lines after the Batch B edits by counting its lines and recording the count in `${feature-folder}/evidence/qa-gates/batch-b-codex-line-count.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: the recorded count is an integer at or below 500.
 - [ ] [P3-T12] Add matrix cases 1 through 4 to the Claude mode-resolution suite: an epic-mode delegation with a ready epic checkpoint injected through `-EpicCheckpointRaw` yields allow; the same with empty injected epic-checkpoint content yields deny whose reason names the epic checkpoint file; the same whose injected checkpoint's `features` array lacks the target record yields deny naming the failed predicate; and the same declaring a non-canonical `epic_checkpoint_path` in its prompt yields deny.
-  - Acceptance: all four cases pass, and the case-2 assertion checks the deny reason for the literal `epic-orchestrator-state.json`.
+  - Acceptance: all four cases pass, and the case-2 assertion checks the deny reason for the literal `epic-orchestrator-state.json`; and case 2 binds `-EpicCheckpointRaw` to the empty string explicitly, so the assertion never reads the on-disk epic checkpoint.
 - [ ] [P3-T13] Add matrix case 5 to the Claude mode-resolution suite: an epic-mode marker placed in a non-`prompt` field, with a clean prompt, resolves to the default single-feature mode rather than epic mode.
   - Acceptance: the case passes and asserts the decision was evaluated against the single-feature source rather than the epic source.
 - [ ] [P3-T14] Add matrix cases 6a, 7, and 8 to the Claude mode-resolution suite: an allow-listed implementation `subagent_type` with a prompt containing none of the seven legacy tokens and an unready single-feature checkpoint yields deny; a delegation carrying both preparation markers yields allow; and a standalone orchestrator yields allow against a ready single-feature checkpoint and deny against an unready one.
@@ -212,16 +234,20 @@ change must stay at or under **500 lines**.
   - Acceptance: all three cases pass and none of them extends any checkpoint enum member set.
 - [ ] [P3-T16] Add the parallel decision-level cases to the Claude mode-resolution suite: a parallel-mode delegation with a ready parallel checkpoint injected through `-ParallelCheckpointRaw` yields allow; one whose injected checkpoint's `items` array lacks the target record yields deny naming the parallel checkpoint file; and one declaring a non-canonical `parallel_checkpoint_path` in its prompt yields deny.
   - Acceptance: all three cases pass, and the negative case asserts the deny reason contains the literal `parallel-orchestrator-state.json`.
-- [ ] [P3-T17] Add the deny-by-default cases to the Claude mode-resolution suite: an unparseable payload yields deny, a payload with no tool-input key yields deny, and a mode-resolved delegation whose injected checkpoint content is empty yields deny.
+- [ ] [P3-T17] Add the deny-by-default cases to the Claude mode-resolution suite: an unparseable payload yields deny, a payload with no tool-input key yields deny, and an epic-mode delegation with `-EpicCheckpointRaw` bound to the empty string yields deny without any filesystem read.
   - Acceptance: all three cases pass, and no new permissive path is introduced by any of them.
 - [ ] [P3-T18] Create `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1` that dot-sources the Codex gate hook and its modes sibling through `$PSScriptRoot`-relative `Resolve-Path` and asserts, with the same constructed literal inputs used on the Claude side, that `Resolve-OrchestrationDelegationMode` and both readiness predicates return the same outcomes; no `Agent` envelope is fabricated on this surface.
   - Acceptance: the suite passes, and it contains no case that constructs an `Agent` tool payload for the Codex decision function.
 - [ ] [P3-T19] Add to the Codex mode-resolution suite one case that reads `.codex/config.toml` through a `$PSScriptRoot`-relative `Resolve-Path` and asserts that no PreToolUse matcher admits an Agent or Task tool name, with a comment cross-referencing issue #555.
   - Acceptance: the case passes and its comment names issue #555 as the owner of the transport gap.
-- [ ] [P3-T20] Run all four pre-existing suites plus `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` without editing any of them and record the result in `${feature-folder}/evidence/qa-gates/pre-existing-suites.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying per-suite passed and failed counts.
-  - Acceptance: `EXIT_CODE:` is 0, every per-suite failed count is 0, and none of the five files appears in the branch diff.
+- [ ] [P3-T20] Run all four pre-existing suites, `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` — the last of which dot-sources the Codex gate hook and pins `Test-ImplementationDelegation` to true for `atomic-executor` and false for `task-researcher` — without editing any of them and record the result in `${feature-folder}/evidence/qa-gates/pre-existing-suites.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying per-suite passed and failed counts.
+  - Acceptance: `EXIT_CODE:` is 0, every per-suite failed count is 0, and none of the six files appears in the branch diff.
 - [ ] [P3-T21] Run the PowerShell toolchain over Batch B in order — `mcp__drm-copilot__run_poshqc_format` then `mcp__drm-copilot__run_poshqc_analyze` — restarting from format if formatting changes a file, and record the result in `${feature-folder}/evidence/qa-gates/batch-b-format-analyze.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: `Output Summary:` records zero analyzer findings for the two main gate hooks in the final pass.
+- [ ] [P3-T22] Run the test stage of the Batch B toolchain over both new suites, with `Invoke-Pester -Path tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1,tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, and record the result in `${feature-folder}/evidence/qa-gates/batch-b-test.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying the numeric passed and failed counts per suite. Restart the Batch B toolchain at P3-T21 if this stage fails or changes a file.
+  - Acceptance: `Output Summary:` records a failed count of the integer 0 for each of the two suites and a numeric passed count greater than 0 for each.
+- [ ] [P3-T23] Reset the PowerShell per-batch budget counter before Batch C begins by deleting every file matching `.claude/state/powershell-batch-budget.*.json`, and record the reset in `${feature-folder}/evidence/qa-gates/batch-b-budget-reset.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: `Output Summary:` records the counter contents observed before deletion and confirms no `powershell-batch-budget` counter file remains under `.claude/state/` afterwards.
 
 ### Phase 4 — Batch C: Mechanical Mirror Copies, Coverage Registration, and Pack Manifests
 
@@ -231,7 +257,7 @@ change must stay at or under **500 lines**.
   - Acceptance: `Get-FileHash -Algorithm SHA256` reports the same hash for both paths.
 - [ ] [P4-T3] Copy the reviewed `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` as a mechanical byte-copy.
   - Acceptance: `Get-FileHash -Algorithm SHA256` reports the same hash for both paths.
-- [ ] [P4-T4] Copy the reviewed `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` as a mechanical byte-copy.
+- [ ] [P4-T4] Before copying, reset the PowerShell per-batch budget counter a second time by deleting every file matching `.claude/state/powershell-batch-budget.*.json`, so that this copy and the two `pester.runsettings.psd1` edits in P4-T5 and P4-T6 form a three-file production batch. Then copy the reviewed `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` as a mechanical byte-copy.
   - Acceptance: `Get-FileHash -Algorithm SHA256` reports the same hash for both paths.
 - [ ] [P4-T5] Append the two new production hook paths to the `CodeCoverage.Path` allow-list in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, placing each beside the existing entry for its surface and adding a registering comment that names issue #554.
   - Acceptance: the file lists both `.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` and `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1`, and the list remains an explicit per-file allow-list with no directory wildcard introduced.
@@ -241,8 +267,8 @@ change must stay at or under **500 lines**.
   - Acceptance: the manifest lists the new modes hook and remains valid JSON.
 - [ ] [P4-T8] Add `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`, adjacent to the existing `-helpers.ps1` entry, without adding any entry to the pre-existing-unrelated-hook exception set.
   - Acceptance: the manifest lists the new modes hook, remains valid JSON, and the exception set in `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` is unchanged.
-- [ ] [P4-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` and record the result in `${feature-folder}/evidence/qa-gates/pack-manifest-and-payload-parity.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying numeric passed and failed counts.
-  - Acceptance: the pack-manifest completeness test and the codex payload contract test both pass, and any failure of the bundled-Claude-payload whole-tree test is annotated as the pre-existing issue #510 condition with the baseline artifact from P0-T9 cited as proof it predates this change.
+- [ ] [P4-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` and record the result in `${feature-folder}/evidence/qa-gates/pack-manifest-and-payload-parity.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying numeric passed and failed counts.
+  - Acceptance: the pack-manifest completeness test and the codex payload contract test both pass, and any failure of the bundled-Claude-payload whole-tree test is annotated as the pre-existing issue #510 condition with the baseline artifact from P0-T9 cited as proof it predates this change; and the Claude pack-manifest completeness test passes, proving the bundled modes hook was registered by P4-T7.
 - [ ] [P4-T10] Compute the SHA-256 of each of the four mirrored production pairs with `Get-FileHash -Algorithm SHA256` and write `${feature-folder}/evidence/qa-gates/mirror-pair-hashes.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording all four pair hashes and a per-pair MATCH or DIFFER verdict.
   - Acceptance: the artifact records exactly four pairs and all four verdicts are MATCH.
 - [ ] [P4-T11] Verify the new `CodeCoverage.Path` entries take effect by importing `scripts/powershell/PoshQC/PoshQC.psd1` and running `Invoke-PoshQCTest -Root . -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, then confirming both new production hook files appear as measured files in the resulting Pester coverage report; record the result in `${feature-folder}/evidence/qa-gates/coverage-registration-selfhosted.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The MCP PoshQC test runner must not be used for this verification because it reads settings from the installed extension and would ignore the new entries.
@@ -256,18 +282,18 @@ change must stay at or under **500 lines**.
   - Acceptance: none of the four helpers paths appears in the diff output, and each still hashes to `45c339fd4b4b1702230518b6fcdeb863a08bcb7a7540f46c5f7851c730765c0b`.
 - [ ] [P5-T2] Verify the branch diff contains no path beginning with `.claude/rules/`, `.claude/skills/`, or `.github/` by piping `git diff --name-only origin/main...HEAD` into `Select-String -Pattern '^\.claude/rules/|^\.claude/skills/|^\.github/'` and recording the result in `${feature-folder}/evidence/qa-gates/policy-paths-untouched.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: the recorded match count is the integer 0.
-- [ ] [P5-T3] Verify every file in the branch diff appears in the `## DECLARED BLAST RADIUS` section of `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md`, treating the four `evidence/` entries as directory prefixes, and record the comparison in `${feature-folder}/evidence/qa-gates/blast-radius-conformance.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` listing every diff path with a DECLARED or UNDECLARED verdict.
+- [ ] [P5-T3] Verify every file in the branch diff appears in the `## DECLARED BLAST RADIUS` section of `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md`, treating the `research/` entry and the five `evidence/` entries as directory prefixes, and record the comparison in `${feature-folder}/evidence/qa-gates/blast-radius-conformance.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` listing every diff path with a DECLARED or UNDECLARED verdict.
   - Acceptance: the count of UNDECLARED paths is the integer 0.
-- [ ] [P5-T4] Verify no existing test file was edited by confirming that none of the five pre-existing suite paths — the three Claude preimplementation-gate suites, the Codex command-exemption suite, and `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` — appears in `git diff --name-only origin/main...HEAD`, and record the result in `${feature-folder}/evidence/qa-gates/existing-suites-unmodified.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - Acceptance: none of the five paths appears in the diff output.
+- [ ] [P5-T4] Verify no existing test file was edited by confirming that none of the six pre-existing suite paths — the three Claude preimplementation-gate suites, the Codex command-exemption suite, `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` — appears in `git diff --name-only origin/main...HEAD`, and record the result in `${feature-folder}/evidence/qa-gates/existing-suites-unmodified.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: none of the six paths appears in the diff output.
 - [ ] [P5-T5] Verify this plan document records the decision D6 batch sequencing and the mechanical-copy treatment by running `Select-String -SimpleMatch 'mechanical byte-copy' -LiteralPath docs/features/active/preimplementation-gate-blocks-epic-execution-554/plan.2026-08-26T08-40.md` and recording the result in `${feature-folder}/evidence/qa-gates/plan-budget-statement.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The asserted literal is written verbatim here as `mechanical byte-copy` so the assertion targets text this plan itself states.
   - Acceptance: the recorded match count is an integer greater than 0 and the artifact quotes the matched line.
 - [ ] [P5-T6] Re-run the Fault-1 case 6b assertion after the fix and write the pass-after artifact `${feature-folder}/evidence/regression-testing/pass-after-case-6b.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording that the case now yields deny, and cross-referencing the fail-before artifact from P1-T3.
   - Acceptance: `EXIT_CODE:` is 0, the case passes, and the artifact names the fail-before artifact path it supersedes.
 - [ ] [P5-T7] Draft the follow-up issue for the epic kickoff contract gap described in decision D3 — the epic child kickoff prompt carries no contractually guaranteed `docs/features/active/` basename token and no issue-number key — and write the draft to `${feature-folder}/evidence/other/followup-epic-kickoff-contract-gap.<timestamp>.md` with a title, a body, the rationale, and an explicit statement that no `.claude/skills/` file is modified by this feature.
   - Acceptance: the draft exists, names the gap, and states that closing it is out of scope for issue #554.
-- [ ] [P5-T8] File the drafted follow-up issue and record its number in `${feature-folder}/evidence/other/followup-issue-number.<timestamp>.md`. `gh issue create` is denied by a PreToolUse hook in this repository, so this task is a report-and-record task: hand the draft to the maintainer, or use the MCP promotion-lifecycle path executed so that it adds no file to this branch's diff. If no issue number is obtainable at execution time, record a `POSTING BLOCKED` header with the reason.
-  - Acceptance: the artifact records either a numeric issue number or a `POSTING BLOCKED` header with a stated reason, and in the blocked case P5-T3 still reports zero UNDECLARED paths.
+- [ ] [P5-T8] Record that filing the follow-up issue is a maintainer action outside this branch by writing `${feature-folder}/evidence/other/followup-issue-filing-deferred.<timestamp>.md` with `Timestamp:`, a `POSTING BLOCKED` header, and both reasons the spec's final acceptance criterion states: `gh issue create` is denied by a PreToolUse hook in this repository, and the sanctioned MCP promotion-lifecycle path writes files under `docs/features/potential/`, which is deliberately not in the declared blast radius. Do not run `gh issue create`, and do not invoke the MCP promotion-lifecycle path from this branch.
+  - Acceptance: the artifact carries the `POSTING BLOCKED` header and both stated reasons, and `git diff --name-only origin/main...HEAD` contains no path beginning with `docs/features/potential/`.
 - [ ] [P5-T9] Record the known pre-existing local failure condition in `${feature-folder}/evidence/other/known-preexisting-failure-510.<timestamp>.md`, naming the test node, citing open issue #510, and stating that CI is unaffected and that deleting the gitignored state file is not a durable fix and must not be attempted.
   - Acceptance: the artifact names issue #510 and states the non-regression conclusion with the P0-T9 baseline artifact cited as its evidence.
 
@@ -280,8 +306,8 @@ change must stay at or under **500 lines**.
 - [ ] [P6-T3] Record that the type-checking stage is not applicable to PowerShell by writing `${feature-folder}/evidence/qa-gates/final-typecheck-not-applicable.<timestamp>.md` with `Timestamp:`, `Command:` set to the literal text stating no type checker runs for PowerShell, `EXIT_CODE:` 0, and `Output Summary:` citing the PowerShell rule file's step 3.
   - Acceptance: the artifact exists with all four field labels and cites `.claude/rules/powershell.md` as the authority for skipping type checking.
 - [ ] [P6-T4] Run the coverage-bearing test stage using the self-hosted invocation, importing `scripts/powershell/PoshQC/PoshQC.psd1` and running `Invoke-PoshQCTest -Root . -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and write `${feature-folder}/evidence/qa-gates/final-poshqc-test-coverage.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording the numeric passed count, the numeric failed count, and the numeric post-change line-coverage headline percentage.
-  - Acceptance: `EXIT_CODE:` is 0, the failed count is the integer 0, and `Output Summary:` records a numeric post-change line-coverage percentage at or above 85; a placeholder value leaves this task unchecked.
-- [ ] [P6-T5] Run the Python verification suites that gate this change by running `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and write `${feature-folder}/evidence/qa-gates/final-python-verification.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying numeric passed and failed counts.
+  - Acceptance: `EXIT_CODE:` is 0, the failed count is the integer 0, and `Output Summary:` records a numeric post-change line-coverage percentage at or above 85; a placeholder value leaves this task unchecked; if a failure is recorded, this task stays unchecked unless the identical test node is present as a failure in the P0-T6 baseline artifact and is annotated in `Output Summary:` as pre-existing and out of scope for issue #554.
+- [ ] [P6-T5] Run the Python verification suites that gate this change by running `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and write `${feature-folder}/evidence/qa-gates/final-python-verification.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying numeric passed and failed counts.
   - Acceptance: every test passes except a failure of the bundled-Claude-payload whole-tree test attributable to issue #510, which must be annotated against the P0-T9 baseline; any other failure restarts the loop at P6-T1.
 - [ ] [P6-T6] Compute and record the coverage delta by writing `${feature-folder}/evidence/qa-gates/coverage-delta.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` reporting the baseline line-coverage percentage from P0-T6, the post-change line-coverage percentage from P6-T4, and the changed-line coverage for the two modified gate hooks and the two new modes files.
   - Acceptance: all three values are numeric, the post-change percentage is at or above 85, and no changed line in either modified hook is reported as uncovered; Pester measures no branch coverage, so no branch-coverage value is reported and none is required.
@@ -289,6 +315,8 @@ change must stay at or under **500 lines**.
   - Acceptance: the three cited artifact timestamps are monotonically ordered within one loop iteration and each cited artifact records `EXIT_CODE:` 0.
 - [ ] [P6-T8] Re-verify every production `.ps1` file written by this change is at or under 500 lines by counting the lines in the four self-hosted files and their four mirrors, and write `${feature-folder}/evidence/qa-gates/final-line-counts.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` carrying all eight integer counts.
   - Acceptance: all eight recorded counts are integers at or below 500.
+- [ ] [P6-T9] Re-verify the four mirrored production pairs after the final format pass by recomputing `Get-FileHash -Algorithm SHA256` for each pair and writing `${feature-folder}/evidence/qa-gates/final-mirror-pair-hashes.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording all four pair hashes and a per-pair MATCH or DIFFER verdict.
+  - Acceptance: the artifact records exactly four pairs and all four verdicts are MATCH; a DIFFER verdict restarts the loop at P6-T1 after re-copying from the self-hosted source.
 
 ---
 
@@ -301,15 +329,21 @@ change must stay at or under **500 lines**.
   merge-status hardening are carried by P2-T10, P2-T14, P3-T15, and P3-T16.
 - Codex logic parity and the recorded transport gap are carried by P3-T18 and P3-T19.
 - Unmodified pre-existing suites, the untouched helpers files, and the mirror pair hashes are carried
-  by P3-T20, P5-T1, P5-T4, and P4-T10.
+  by P3-T20, P5-T1, P5-T4, P4-T10, and P6-T9. Six pre-existing suites are in the verification set, not
+  five: the spec's four, plus `PreToolUseSchema.Contract.Tests.ps1`, plus
+  `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`.
 - Coverage registration, the self-hosted coverage verification, and the coverage threshold are carried
   by P4-T5, P4-T6, P4-T11, P6-T4, and P6-T6.
-- Pack-manifest registration is carried by P4-T7, P4-T8, and P4-T9.
+- Pack-manifest registration is carried by P4-T7, P4-T8, P4-T9, and P6-T5; both pack-manifest
+  completeness tests — the Codex one and the Claude one — are in the argument list of P4-T9 and P6-T5.
+- Per-batch test evidence is carried by P2-T17 and P3-T22; the batch-budget counter resets that make
+  the batch sequence executable are carried by P2-T18, P3-T23, and the P4-T4 preamble.
 - The blast-radius and policy-path constraints are carried by P5-T2 and P5-T3.
 - Deny-by-default preservation is carried by P3-T17.
 - The plan's own batch-sequencing statement is carried by P5-T5 and by the change-budget section above.
 - The 500-line cap is carried by P2-T15, P3-T7, P3-T11, and P6-T8.
-- The decision D3 follow-up issue is carried by P5-T7 and P5-T8.
+- The decision D3 follow-up record is carried by P5-T7, and the deferral of the GitHub filing itself
+  to a maintainer action outside this branch is carried by P5-T8.
 
 ## Execution Notes
 

@@ -810,15 +810,19 @@ change**. Deleting the state file is not a durable fix and must not be attempted
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/issue.md`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/plan.2026-08-26T08-40.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/research/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/baseline/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/qa-gates/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/regression-testing/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/issue-updates/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/other/`
 
-The five `evidence/` entries are directory prefixes, not files; the concrete artifact filenames are
-timestamp-bearing and are fixed by the plan. They are recorded at directory granularity because the
-feature folder is unique to this item and therefore cannot contend with any other item.
+The `research/` entry and the five `evidence/` entries are directory prefixes, not files; the
+concrete artifact filenames are timestamp-bearing and are fixed by the plan. They are recorded at
+directory granularity because the feature folder is unique to this item and therefore cannot
+contend with any other item. `research/` is declared because the research artifact committed at the
+branch point is already in this branch's diff against `origin/main`, so an undeclared-path check
+would otherwise report it.
 
 Four statements about this list, made explicitly because a parent process computes conflict edges
 from it and an under-declaration is a correctness failure:
