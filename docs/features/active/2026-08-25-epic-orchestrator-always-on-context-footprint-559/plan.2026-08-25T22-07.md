@@ -692,27 +692,27 @@ the preceding edits.
 
 ### Phase 4 — F5 Mechanical Half and Reserved-Decision Guard
 
-- [ ] [P4-T1] In `CLAUDE.md`, replace the four duplicated tone-policy bullets at lines 11 through 14
+- [x] [P4-T1] In `CLAUDE.md`, replace the four duplicated tone-policy bullets at lines 11 through 14
       with a single-line pointer naming `.claude/rules/tonality.md` as the runtime-loaded
       authoritative source. Retain the lead-in sentence at line 9 and the existing authority sentence
       at line 16. Change nothing else in the file. Acceptance: the `## Tone Policy` section no longer
       restates the bullet list and names `.claude/rules/tonality.md`.
-- [ ] [P4-T2] Verify that the `## Policy Compliance Reading Order` section of `CLAUDE.md` is
+- [x] [P4-T2] Verify that the `## Policy Compliance Reading Order` section of `CLAUDE.md` is
       byte-unchanged, by inspecting `git diff HEAD --unified=0 -- CLAUDE.md` and confirming no hunk
       overlaps lines 18 through 32 of the original file. The `HEAD` operand is required: a bare
       `git diff` compares the worktree against the index and is falsely clean once a change is
       staged. Acceptance: no diff hunk touches that section, so the compliance order is preserved
       verbatim.
-- [ ] [P4-T3] Verify that the C#-specific toolchain command list is preserved by running
+- [x] [P4-T3] Verify that the C#-specific toolchain command list is preserved by running
       `git diff HEAD --exit-code -- .claude/rules/csharp.md`. That list lives in
       `.claude/rules/csharp.md`, not in `CLAUDE.md`; leaving the file untouched satisfies the
       preservation requirement. Acceptance: exit code 0.
-- [ ] [P4-T4] Verify that `## Language-Specific Rules` and `## Architecture` in `CLAUDE.md` are
+- [x] [P4-T4] Verify that `## Language-Specific Rules` and `## Architecture` in `CLAUDE.md` are
       unchanged, by confirming that `git diff HEAD --unified=0 -- CLAUDE.md` contains no hunk
       overlapping lines 34 through 59 of the original file. The `HEAD` operand is required for the
       reason given in `[P4-T2]`. Acceptance: the only hunk in the `CLAUDE.md` diff is the tone-policy
       replacement from P4-T1.
-- [ ] [P4-T5] Verify that no coverage threshold value and no toolchain stage count was altered
+- [x] [P4-T5] Verify that no coverage threshold value and no toolchain stage count was altered
       anywhere by this change, by running
       `git diff HEAD --exit-code -- .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/general-code-change.md .claude/rules/python.md .claude/rules/typescript.md .claude/rules/powershell.md .claude/rules/shell.md .claude/skills/feature-review-workflow/SKILL.md .claude/skills/python-qa-gate/SKILL.md .claude/skills/powershell-qa-gate/SKILL.md AGENTS.md .github/instructions/ extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-code-change.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/python.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/typescript.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/powershell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md`
       and writing
@@ -729,7 +729,7 @@ the preceding edits.
       `.claude/skills/python-qa-gate/SKILL.md` (line 46), and
       `.claude/skills/powershell-qa-gate/SKILL.md` (line 45). Acceptance: exit code 0 over every path
       above, proving no threshold and no stage count in the enumerated set changed.
-- [ ] [P4-T6] Write
+- [x] [P4-T6] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/f5-reserved-human-decision.2026-08-26T00-00.md`
       recording the two open questions with their file-and-line evidence and no recommendation, and
       stating that this change selected neither value, that `AGENTS.md` and `.github/instructions/`
@@ -738,7 +738,7 @@ the preceding edits.
       both questions,
       cites their locations, and contains no recommendation, preference, or characterization of
       either option as obvious, likely, or correct.
-- [ ] [P4-T7] Record a `human_interaction.requirements[]` entry with `response: "halt"` in
+- [x] [P4-T7] Record a `human_interaction.requirements[]` entry with `response: "halt"` in
       `artifacts/orchestration/orchestrator-state.json`, whose text is the requirement text from
       P4-T6. Per the human-interaction invariants in `.claude/rules/orchestrator-state.md`, a `halt`
       requirement carries no `runbook_path`. Validate with the subcommand form
@@ -746,7 +746,7 @@ the preceding edits.
       not the module-direct form, which exits 0 without validating and would gate nothing.
       Acceptance: that command exits 0, reports no `human_interaction` error, and the entry's
       `response` value is `halt`.
-- [ ] [P4-T8] Leave the **first** `spec.md` acceptance criterion under `### F5 — decision half`, at
+- [x] [P4-T8] Leave the **first** `spec.md` acceptance criterion under `### F5 — decision half`, at
       spec line 644 (the BLOCKED coverage-floor and stage-count selection), unchecked, and annotate
       the `spec.md` `## Acceptance Criteria` section, if annotation is needed, to record that the
       criterion is blocked on the reserved human decision. The second criterion under that heading,
@@ -756,7 +756,7 @@ the preceding edits.
 
 ### Phase 5 — Post-Change Measurement
 
-- [ ] [P5-T1] Capture the after-half of the always-on line-count measurement by running
+- [x] [P5-T1] Capture the after-half of the always-on line-count measurement by running
       `poetry run python -c "import sys,pathlib;c=[(p,len(pathlib.Path(p).read_bytes().splitlines())) for p in sys.argv[1:]];[print(n,p) for p,n in c];print('TOTAL',sum(n for _,n in c))" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md`
       — the `-c` payload is byte-identical to the one in `[P0-T9]` and only the file operands differ,
       and it is likewise a **single line**, so the before and after halves are measured by the same
@@ -768,14 +768,14 @@ the preceding edits.
       are excluded because they are no longer preloaded. Acceptance: the artifact records an after
       total and a three-component breakdown covering standing instructions plus agent file, three
       preloaded skills, and the four deliberate unconditional rules.
-- [ ] [P5-T2] Write
+- [x] [P5-T2] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/always-on-line-count-comparison.2026-08-26T00-00.md`
       comparing the before total from P0-T9 against the after total from P5-T1, stating the absolute
       line reduction and the percentage reduction, attributing the reduction to F1, F2, F3, and F5
       individually, and stating explicitly which components are excluded from the after-state list
       and why. Acceptance: the artifact states a before total, an after total, and a signed
       difference; the after total is strictly less than the before total.
-- [ ] [P5-T3] Record in the same comparison artifact the one un-measured component: the
+- [x] [P5-T3] Record in the same comparison artifact the one un-measured component: the
       `memory: project` declaration on `.claude/agents/epic-orchestrator.md` loads
       `.claude/agent-memory/epic-orchestrator/`, which is gitignored and therefore machine-local and
       not measurable from committed files. Acceptance: the artifact states that the measured totals

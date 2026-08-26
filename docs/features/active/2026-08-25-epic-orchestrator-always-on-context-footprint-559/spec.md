@@ -626,17 +626,17 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 
 ### F5 — mechanical half
 
-- [ ] `CLAUDE.md` `## Policy Compliance Reading Order` is byte-identical to its pre-change content,
+- [x] `CLAUDE.md` `## Policy Compliance Reading Order` is byte-identical to its pre-change content,
       verified by a diff showing no hunk within that section.
-- [ ] The `## Tone Policy` section of `CLAUDE.md` no longer restates the tonality bullet list and
+- [x] The `## Tone Policy` section of `CLAUDE.md` no longer restates the tonality bullet list and
       instead names `.claude/rules/tonality.md` as the runtime-loaded authoritative source.
-- [ ] `git diff -- CLAUDE.md` contains no added or removed line matching any of the literals `80%`,
+- [x] `git diff -- CLAUDE.md` contains no added or removed line matching any of the literals `80%`,
       `85%`, `75%`, `90%`, `four-step`, `four steps`, `seven-stage`, or `seven stages`.
-- [ ] `.claude/rules/csharp.md` is unmodified, verified by
+- [x] `.claude/rules/csharp.md` is unmodified, verified by
       `git diff --exit-code -- .claude/rules/csharp.md` returning exit code 0.
-- [ ] `AGENTS.md` is unmodified, verified by `git diff --exit-code -- AGENTS.md` returning exit
+- [x] `AGENTS.md` is unmodified, verified by `git diff --exit-code -- AGENTS.md` returning exit
       code 0.
-- [ ] No file under `.github/instructions/` is modified, verified by
+- [x] No file under `.github/instructions/` is modified, verified by
       `git diff --exit-code -- .github/instructions/` returning exit code 0.
 
 ### F5 — decision half (BLOCKED ON A HUMAN DECISION; CANNOT BE SATISFIED BY THIS RUN)
@@ -649,7 +649,7 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
       be satisfied by this change.** This change must not select either value, must not infer one,
       and must not change any coverage threshold or toolchain stage count anywhere. The criterion
       remains unchecked at delivery, and that is the expected outcome.
-- [ ] `artifacts/orchestration/orchestrator-state.json` carries a `human_interaction.requirements[]`
+- [x] `artifacts/orchestration/orchestrator-state.json` carries a `human_interaction.requirements[]`
       entry with `response: "halt"` whose text states both open questions with file-and-line
       evidence and carries no recommendation, and the checkpoint validates against
       `scripts/dev_tools/validate_orchestrator_state.py`.
@@ -690,7 +690,7 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
       together; either way
       `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`
       passes. The plan records which resolution it chose and why.
-- [ ] A measured before-and-after always-on line count for the `epic-orchestrator` surface (agent
+- [x] A measured before-and-after always-on line count for the `epic-orchestrator` surface (agent
       file, preloaded skills, unconditionally-loaded rules, and `CLAUDE.md`) is recorded as a
       timestamped artifact under
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/`,
