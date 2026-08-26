@@ -67,9 +67,12 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
             # seam is the observable proof that deduplication collapsed the three
             # citations to a single candidate.
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-08-23-other-9' }
-            $prompt = 'Folder docs/features/active/2026-08-23-dedupe-1, research ' +
-            'docs/features/active/2026-08-23-dedupe-1/research/notes.md, and evidence ' +
-            'docs/features/active/2026-08-23-dedupe-1/evidence/baseline/capture.md.'
+            # No token carries trailing prose punctuation: the matching regex
+            # captures an adjacent comma or period into the token, which is a
+            # separate known limitation this case is not about.
+            $prompt = 'Folder docs/features/active/2026-08-23-dedupe-1 and research ' +
+            'docs/features/active/2026-08-23-dedupe-1/research/notes.md and evidence ' +
+            'docs/features/active/2026-08-23-dedupe-1/evidence/baseline/capture.md are in scope'
             Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
                 Should -Be 'docs/features/active/2026-08-23-dedupe-1'
             Should -Invoke -CommandName Get-PrdFeatureCheckpointFolder -Times 0 -Exactly
@@ -154,8 +157,11 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
             }
 
             $folder = 'docs/features/active/2026-08-23-differential-1'
-            $folderRelative = "Feature $folder. Research at research/2026-08-23T23-40-findings.md."
-            $repoRelative = "Feature $folder. Research at $folder/research/2026-08-23T23-40-findings.md."
+            # The two prompts differ ONLY in whether the research path is written
+            # folder-relative or repo-relative. No token carries trailing prose
+            # punctuation, which the matching regex would capture into the token.
+            $folderRelative = "Feature $folder with research at research/2026-08-23T23-40-findings.md"
+            $repoRelative = "Feature $folder with research at $folder/research/2026-08-23T23-40-findings.md"
 
             $decisions = foreach ($p in @($folderRelative, $repoRelative)) {
                 $json = (@{
