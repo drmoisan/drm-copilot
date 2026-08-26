@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-26
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** `full-bug` — `spec.md` is the sole acceptance-criteria source. This is a full-bug
   plan; the three-phase minimal-audit contract does not apply.
 - **Spec:** `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/spec.md`
@@ -84,7 +84,7 @@ Feature-folder documents (3 files):
 - `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/spec.md`
 - `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/issue.md`
 
-Evidence artifacts (28 files, all concrete literals, no placeholder markers):
+Evidence artifacts (29 files, all concrete literals, no placeholder markers):
 
 - `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/phase0-instructions-read.2026-08-26T00-00.md`
 - `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-git-state.2026-08-26T00-00.md`
@@ -122,10 +122,10 @@ mandate-read prefix and is not a known top-level segment):
 
 - `artifacts/orchestration/orchestrator-state.json`
 
-**Total declared writes: 51 concrete files** (10 runtime + 8 mirrors + 2 new tests + 3 feature
-documents + 28 evidence artifacts), plus the orchestration checkpoint.
+**Total declared writes: 52 concrete files** (10 runtime + 8 mirrors + 2 new tests + 3 feature
+documents + 29 evidence artifacts), plus the orchestration checkpoint.
 
-### Two extraction notes the scheduler must apply by hand
+### Four extraction notes the scheduler must apply by hand
 
 1. **`CLAUDE.md` is separator-free.** `classify_path_token` admits a separator-free token only when
    it is an exact ordinal member of the configured root-surface set in `config/blast-radius.json`,
@@ -138,6 +138,24 @@ documents + 28 evidence artifacts), plus the orchestration checkpoint.
    mandate-read doctrine in `.claude/rules/parallel-orchestration.md` requires the planner to append
    the exact path when the item genuinely writes an excluded path. This change genuinely writes five
    of them, so all five appear above as explicit entries after normalization.
+3. **`[P4-T5]` and `[P6-T8]` cite many paths as NON-writes, and none of them belongs in the radius.**
+   Both tasks are `git diff HEAD --exit-code` guards whose entire purpose is to prove a path was left
+   alone; a path appearing in one of those pathspecs is evidence of the opposite of a write. This is
+   the largest source of cited-but-not-written tokens in the plan, and `[P4-T5]` in particular cites
+   twenty-one operands, nine of which are bundled mirrors. Two classes of them survive the
+   mandate-read exclusion
+   and would be harvested by automatic derivation: `.claude/skills/python-qa-gate/SKILL.md` and
+   `.claude/skills/powershell-qa-gate/SKILL.md`, which are not mandate-read entries; and every
+   `extensions/drm-copilot/resources/claude-customizations/` mirror path, because the `mandate_reads`
+   glob `.claude/rules/**` is anchored at the start of the path and does not match a mirror. The
+   scheduler must drop all of them by hand. The eight bundled mirrors that ARE genuine writes are
+   listed explicitly in the mirror block above; no other mirror path in this document is a write.
+4. **`.claude/state/python-batch-budget.default.json` is cited by `[P0-T11]` and is NOT a write.**
+   It is the gitignored, untracked, machine-local file named in the pre-existing baseline failure
+   `[P0-T11]` records. It is cited so the recorded observation is specific rather than vague. No task
+   in this plan creates, edits, moves, or deletes it, and it must not enter the radius. Deleting it
+   was considered and rejected: it is a mutation of the developer's environment outside this
+   change's scope, and tooling may regenerate it mid-run.
 
 ### modules
 
@@ -161,7 +179,10 @@ claimed. An empty `modules` list is valid under parallel-orchestration invariant
 - `.claude/settings.json` — not written.
 - `poetry.lock`, `package-lock.json`, `extensions/drm-copilot/package-lock.json`,
   `packages/mcp-server/package-lock.json` — no dependency change.
-- `quality-tiers.yml` — read by mandate only; not written. No tier classification changes.
+- `quality-tiers.yml` — declared as a shared surface and a mandate-read entry in
+  `config/blast-radius.json`, but **no file of that name exists in this repository**; the path is a
+  declared surface with no current file behind it. Not written, and not created by this change. No
+  tier classification changes.
 - `config/blast-radius.json` — read only.
 - `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` — not written; no PowerShell file is
   added or edited by this change (see Decision 2).
@@ -202,11 +223,13 @@ Four cross-surface contracts are altered or re-baselined:
 `extensions/drm-copilot/resources/codex-and-agents-customizations/`;
 `config/orchestration-routing.json` and its resources mirror; `.claude/rules/csharp.md`;
 `.claude/rules/general-unit-test.md`; `.claude/rules/quality-tiers.md`;
-`.claude/rules/general-code-change.md`; `.claude/skills/feature-review-workflow/SKILL.md`; the
+`.claude/rules/general-code-change.md`; `.claude/skills/feature-review-workflow/SKILL.md`;
+`.claude/skills/python-qa-gate/SKILL.md`; `.claude/skills/powershell-qa-gate/SKILL.md`; the
 fourteen already-scoped rules files; `tests/scripts/claude-runtime/claude-runtime-structure.Tests.ps1`;
 `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`;
 `docs/engineering/claude-code-architecture.md`; the six other skills carrying the same F1
-`## Prerequisites` defect. Each exclusion is asserted by a task in Phase 6.
+`## Prerequisites` defect. Each exclusion is asserted by a task in Phase 4 or Phase 6: the
+threshold-and-stage-count set by `[P4-T5]`, the remainder by `[P6-T8]` and `[P6-T9]`.
 
 ---
 
@@ -280,9 +303,16 @@ No task in this plan changes a coverage threshold value. No task changes a toolc
 task edits `AGENTS.md`, and no task edits any file under `.github/instructions/`. Task `[P4-T5]`
 exists specifically to verify that neither class of value was altered.
 
-The corresponding acceptance criterion in `spec.md` under the heading `### F5 — decision half`
-**remains unchecked at delivery.** That is the expected and correct outcome, not a delivery failure.
-The decision is recorded as a `human_interaction` requirement with `response: "halt"` in
+The heading `### F5 — decision half` in `spec.md` carries **two** acceptance criteria, not one, and
+they have different dispositions:
+
+- The first, at `spec.md` line 644, is the BLOCKED coverage-floor and toolchain-stage-count
+  selection. It **remains unchecked at delivery.** That is the expected and correct outcome, not a
+  delivery failure.
+- The second, at `spec.md` line 652, requires the checkpoint to carry a `human_interaction`
+  requirement with `response: "halt"`. That criterion **is** delivered, by task `[P4-T7]`.
+
+The decision is therefore recorded as a `human_interaction` requirement with `response: "halt"` in
 `artifacts/orchestration/orchestrator-state.json`; per the human-interaction invariants in
 `.claude/rules/orchestrator-state.md`, a `halt` requirement needs no `runbook_path`.
 
@@ -356,11 +386,17 @@ argument uses the importable dotted form with `=`.
       lists nineteen files, identifies exactly five as carrying no frontmatter block, and identifies
       exactly four as carrying an unconditional entry.
 - [ ] [P0-T9] Capture the before-half of the always-on line-count measurement by running
-      `rg -c "^" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/feature-promotion-lifecycle/SKILL.md .claude/skills/atomic-plan-contract/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/skills/evidence-and-timestamp-conventions/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md .claude/rules/parallel-orchestration.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md`
+      `poetry run python -c "import sys,pathlib;c=[(p,len(pathlib.Path(p).read_bytes().splitlines())) for p in sys.argv[1:]];[print(n,p) for p,n in c];print('TOTAL',sum(n for _,n in c))" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/feature-promotion-lifecycle/SKILL.md .claude/skills/atomic-plan-contract/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/skills/evidence-and-timestamp-conventions/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md .claude/rules/parallel-orchestration.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md`
       and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/always-on-line-count-before.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the per-file
-      counts and the four component subtotals. Acceptance: the artifact records a before total of
+      counts and the four component subtotals. The command payload is a **single line**: a
+      multi-line `python -c` payload is a known silent no-op in this environment that exits 0 without
+      executing, which would fabricate the measurement rather than take it. Do not reformat the
+      payload across lines. `bytes.splitlines()` is used rather than `str.splitlines()` so the line
+      boundaries are the three ASCII forms — line feed, carriage return, and the pair — and not the
+      wider Unicode set that the text method would also split on. Acceptance: the artifact records a
+      before total of
       2158 lines with subtotals 221, 936, 316, and 685; if the observed total differs, the artifact
       records the observed value and names each file whose count differs from research §1.
 - [ ] [P0-T10] Confirm the feature-document preconditions: `spec.md` exists in the feature folder and
@@ -369,6 +405,22 @@ argument uses the importable dotted form with `=`.
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/phase0-instructions-read.2026-08-26T00-00.md`
       as an appended `Preconditions:` block. Acceptance: all three statements are confirmed true, and
       the count of checkboxes under `## Acceptance Criteria` in `spec.md` is recorded.
+- [ ] [P0-T11] Establish whether the known unrelated bundled-payload failure is present at baseline
+      on this worktree. Run `poetry run pytest` and append to the existing artifact
+      `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-pytest-coverage.2026-08-26T00-00.md`
+      a block headed `Known Baseline Failure:` recording, in this order: (a) whether the test
+      `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, in
+      `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, failed at baseline —
+      recorded as exactly `PRESENT` or exactly `ABSENT`; (b) if `PRESENT`, the exact untracked
+      repository path the failure names, expected to be
+      `.claude/state/python-batch-budget.default.json`; and (c) the full baseline pass, fail, and
+      skip counts. The known cause is that `list_scoped_files` enumerates the filesystem rather than
+      consulting git, so a gitignored, untracked, machine-local state file enters the repo-side set
+      and has no bundled counterpart. That defect is **out of scope**: no task in this plan fixes it,
+      and no task deletes, moves, or otherwise mutates that file or any other gitignored file. This
+      task only records the observed baseline. Acceptance: the artifact carries a
+      `Known Baseline Failure:` block whose first field is exactly `PRESENT` or exactly `ABSENT`, and
+      the baseline pass, fail, and skip counts are numeric.
 
 ### Phase 1 — Regression Tests Authored and Failing
 
@@ -380,8 +432,17 @@ argument uses the importable dotted form with `=`.
       `test_parallel_orchestration_rule_paths_cover_blast_radius_config`,
       `test_every_agent_preloaded_skill_resolves_to_an_existing_skill_file`,
       `test_epic_orchestrator_preloads_exactly_three_skills`, and
-      `test_no_unqualified_spec_section_citation_under_claude`. The file must be under 500 lines and
-      must not create temporary files. Acceptance: the file exists and
+      `test_no_unqualified_spec_section_citation_under_claude`. **A rules file that carries no YAML
+      frontmatter block at all counts as unconditional** for the purposes of
+      `test_unconditional_rule_set_is_exactly_the_four_deliberate_files`: a file with no `paths:`
+      scoping loads on every turn, so it is unconditional in effect, and the test must classify it
+      that way. Without this definition the pre-change repository — where five files carry no
+      frontmatter and four carry an unconditional entry — would satisfy a four-file expectation that
+      counted only explicit unconditional entries, the test would pass before the fix, and the
+      `[expect-fail]` acceptance of `[P1-T3]` would be wrong. Under this definition the pre-change
+      unconditional set has nine members, the test fails before `[P2-T1]` through `[P2-T5]`, and it
+      passes after. The file must be under 500 lines and must not create temporary files. Acceptance:
+      the file exists and
       `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py --collect-only`
       collects exactly eight test items.
 - [ ] [P1-T2] Create `tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py` containing
@@ -471,9 +532,11 @@ argument uses the importable dotted form with `=`.
       passes.
 - [ ] [P2-T6] Verify that each of the five edited rules files has exactly one diff hunk and that the
       hunk is the insertion at the top of the file, by inspecting
-      `git diff --unified=0 -- .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/parallel-orchestration.md`.
-      Acceptance: every hunk header in that diff begins at line 0 of the original file and no hunk
-      removes an original line.
+      `git diff HEAD --unified=0 -- .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/parallel-orchestration.md`.
+      The `HEAD` operand is required: a bare `git diff` compares the worktree against the index and
+      reports nothing once a change is staged, so it would read as clean whether or not the edits
+      were correct. Acceptance: every hunk header in that diff begins at line 0 of the original file
+      and no hunk removes an original line.
 - [ ] [P2-T7] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/f3-glob-justification.2026-08-26T00-00.md`
       recording, per rules file, the quotation from that file's own scope or enforcement section that
@@ -501,7 +564,11 @@ argument uses the importable dotted form with `=`.
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
 - [ ] [P2-T13] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
-      Acceptance: exit code 0, confirming the five mirrors satisfy the byte-identity contract.
+      Acceptance: exit code 0, confirming the five mirrors satisfy the byte-identity contract; **or**,
+      only if the `[P0-T11]` artifact recorded `PRESENT`, exactly one failure, that failure being
+      `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, and no other. If `[P0-T11]`
+      recorded `ABSENT`, strict exit code 0 applies with no exception. Any second failure fails this
+      task under either branch.
 
 ### Phase 3 — F1, F2, F4, F6: Epic Surface Edits, Digest Re-baseline, and Mirrors
 
@@ -531,10 +598,16 @@ the preceding edits.
       epic file references a removed skill, so no `Skill` invocation is inserted. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_epic_orchestrator_preloads_exactly_three_skills"`
       passes.
-- [ ] [P3-T5] Confirm that `.claude/agents/epic-orchestrator.md` lines 85 through 97, the
-      `## Prepared-Epic Execution` section, are unchanged and unreflowed, by running
-      `poetry run pytest tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py`.
-      Acceptance: exit code 0.
+- [ ] [P3-T5] Confirm that the `## Prepared-Epic Execution (epic-planner Handoff)` section of
+      `.claude/agents/epic-orchestrator.md` is unchanged and unreflowed. That section spans lines 78
+      through 99 before this phase's edits, and shifts to lines 76 through 97 once `[P3-T3]` has
+      removed the two `## Startup Protocol` steps above it. Run the single node ID
+      `poetry run pytest "tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py::test_epic_orchestrator_precondition_establishes_kickoff_presence"`.
+      Only that one node is run here: the same module also contains
+      `test_discovery_fix_is_mirrored_into_bundled_payload`, which asserts the agent file is
+      byte-identical to its bundled copy and therefore cannot pass at this point, because the mirror
+      is not written until `[P3-T15]`. The full module is run at `[P3-T18]`, after every mirror.
+      Acceptance: one passed.
 - [ ] [P3-T6] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the F4 clause at line 268 that
       cites an unqualified section for the checkpoint schema. The surrounding
       `## Epic-Level Checkpoint` section is itself the schema statement and already names the
@@ -560,7 +633,9 @@ the preceding edits.
       passes.
 - [ ] [P3-T9] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the `## Prerequisites` block. The
       block occupies lines 22 through 28; delete lines 22 through 29 so that exactly one blank line
-      separates the paragraph ending at line 21 from the `## Epic Dependency Manifest` heading. Add
+      separates the paragraph ending at line 20 from the `## Epic Dependency Manifest` heading. Line
+      21 is already that blank line and is retained; line 29 is the blank line below the block and is
+      what the deletion removes, which is why the range ends at 29 rather than 28. Add
       no replacement text. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_epic_orchestrate_skill_has_no_prerequisites_heading"`
       passes and no two consecutive blank lines precede that heading.
@@ -605,7 +680,12 @@ the preceding edits.
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/push-down-mirror-parity.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: exit code 0,
-      confirming all eight mirrors are byte-identical to their originals.
+      confirming all eight mirrors are byte-identical to their originals; **or**, only if the
+      `[P0-T11]` artifact recorded `PRESENT`, exactly one failure, that failure being
+      `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, and no other. If `[P0-T11]`
+      recorded `ABSENT`, strict exit code 0 applies with no exception. Under the exception branch
+      every test in `test_epic_run_kickoff_discovery_contract.py` must still pass, including
+      `test_discovery_fix_is_mirrored_into_bundled_payload`.
 - [ ] [P3-T19] Run `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_no_unqualified_spec_section_citation_under_claude" "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_every_agent_preloaded_skill_resolves_to_an_existing_skill_file"`.
       Acceptance: two passed, confirming F4's criterion holds across `.claude/` and that every
       `skills:` entry of every agent file resolves.
@@ -618,31 +698,44 @@ the preceding edits.
       at line 16. Change nothing else in the file. Acceptance: the `## Tone Policy` section no longer
       restates the bullet list and names `.claude/rules/tonality.md`.
 - [ ] [P4-T2] Verify that the `## Policy Compliance Reading Order` section of `CLAUDE.md` is
-      byte-unchanged, by inspecting `git diff --unified=0 -- CLAUDE.md` and confirming no hunk
-      overlaps lines 18 through 32 of the original file. Acceptance: no diff hunk touches that
-      section, so the compliance order is preserved verbatim.
+      byte-unchanged, by inspecting `git diff HEAD --unified=0 -- CLAUDE.md` and confirming no hunk
+      overlaps lines 18 through 32 of the original file. The `HEAD` operand is required: a bare
+      `git diff` compares the worktree against the index and is falsely clean once a change is
+      staged. Acceptance: no diff hunk touches that section, so the compliance order is preserved
+      verbatim.
 - [ ] [P4-T3] Verify that the C#-specific toolchain command list is preserved by running
-      `git diff --exit-code -- .claude/rules/csharp.md`. That list lives in
+      `git diff HEAD --exit-code -- .claude/rules/csharp.md`. That list lives in
       `.claude/rules/csharp.md`, not in `CLAUDE.md`; leaving the file untouched satisfies the
       preservation requirement. Acceptance: exit code 0.
 - [ ] [P4-T4] Verify that `## Language-Specific Rules` and `## Architecture` in `CLAUDE.md` are
-      unchanged, by confirming that `git diff --unified=0 -- CLAUDE.md` contains no hunk overlapping
-      lines 34 through 59 of the original file. Acceptance: the only hunk in the `CLAUDE.md` diff is
-      the tone-policy replacement from P4-T1.
+      unchanged, by confirming that `git diff HEAD --unified=0 -- CLAUDE.md` contains no hunk
+      overlapping lines 34 through 59 of the original file. The `HEAD` operand is required for the
+      reason given in `[P4-T2]`. Acceptance: the only hunk in the `CLAUDE.md` diff is the tone-policy
+      replacement from P4-T1.
 - [ ] [P4-T5] Verify that no coverage threshold value and no toolchain stage count was altered
       anywhere by this change, by running
-      `git diff --exit-code -- .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/general-code-change.md .claude/skills/feature-review-workflow/SKILL.md AGENTS.md .github/instructions/ extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-code-change.md`
+      `git diff HEAD --exit-code -- .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/general-code-change.md .claude/rules/python.md .claude/rules/typescript.md .claude/rules/powershell.md .claude/rules/shell.md .claude/skills/feature-review-workflow/SKILL.md .claude/skills/python-qa-gate/SKILL.md .claude/skills/powershell-qa-gate/SKILL.md AGENTS.md .github/instructions/ extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-code-change.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/python.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/typescript.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/powershell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md`
       and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/f5-threshold-invariance.2026-08-26T00-00.md`
-      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Those nine paths are the
-      complete set of files in this repository that state a coverage threshold or a toolchain stage
-      count. Acceptance: exit code 0, proving no threshold and no stage count changed.
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The `HEAD` operand is
+      required: a bare `git diff` compares the worktree against the index and is falsely clean once a
+      change is staged, which on this task in particular would report the F5 reservation intact when
+      it had been violated. Those paths are the files known to state a coverage threshold or a
+      toolchain stage count that this change does not write. This is an enumeration, **not** a
+      completeness assertion: no claim is made that the repository contains no other such file. The
+      six additions beyond the original nine, and their bundled mirrors, are
+      `.claude/rules/python.md` (lines 16, 88, 89), `.claude/rules/typescript.md` (line 50),
+      `.claude/rules/powershell.md` (lines 63, 64), `.claude/rules/shell.md` (lines 28, 68),
+      `.claude/skills/python-qa-gate/SKILL.md` (line 46), and
+      `.claude/skills/powershell-qa-gate/SKILL.md` (line 45). Acceptance: exit code 0 over every path
+      above, proving no threshold and no stage count in the enumerated set changed.
 - [ ] [P4-T6] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/f5-reserved-human-decision.2026-08-26T00-00.md`
       recording the two open questions with their file-and-line evidence and no recommendation, and
       stating that this change selected neither value, that `AGENTS.md` and `.github/instructions/`
-      were not written, and that the corresponding `spec.md` acceptance criterion under
-      `### F5 — decision half` remains unchecked. Acceptance: the artifact states both questions,
+      were not written, and that the first `spec.md` acceptance criterion under
+      `### F5 — decision half`, at spec line 644, remains unchecked. Acceptance: the artifact states
+      both questions,
       cites their locations, and contains no recommendation, preference, or characterization of
       either option as obvious, likely, or correct.
 - [ ] [P4-T7] Record a `human_interaction.requirements[]` entry with `response: "halt"` in
@@ -653,16 +746,21 @@ the preceding edits.
       not the module-direct form, which exits 0 without validating and would gate nothing.
       Acceptance: that command exits 0, reports no `human_interaction` error, and the entry's
       `response` value is `halt`.
-- [ ] [P4-T8] Leave the `spec.md` acceptance criterion under `### F5 — decision half` unchecked and
-      annotate the `spec.md` `## Acceptance Criteria` section, if annotation is needed, to record
-      that the criterion is blocked on the reserved human decision. Acceptance: that checkbox is
-      unchecked at delivery and no task in this plan has selected a coverage floor or a stage count.
+- [ ] [P4-T8] Leave the **first** `spec.md` acceptance criterion under `### F5 — decision half`, at
+      spec line 644 (the BLOCKED coverage-floor and stage-count selection), unchecked, and annotate
+      the `spec.md` `## Acceptance Criteria` section, if annotation is needed, to record that the
+      criterion is blocked on the reserved human decision. The second criterion under that heading,
+      at spec line 652, is the `human_interaction` halt entry and is delivered by `[P4-T7]`; this
+      task does not leave it unchecked. Acceptance: the line-644 checkbox is unchecked at delivery
+      and no task in this plan has selected a coverage floor or a stage count.
 
 ### Phase 5 — Post-Change Measurement
 
 - [ ] [P5-T1] Capture the after-half of the always-on line-count measurement by running
-      `rg -c "^" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md`
-      and writing
+      `poetry run python -c "import sys,pathlib;c=[(p,len(pathlib.Path(p).read_bytes().splitlines())) for p in sys.argv[1:]];[print(n,p) for p,n in c];print('TOTAL',sum(n for _,n in c))" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md`
+      — the `-c` payload is byte-identical to the one in `[P0-T9]` and only the file operands differ,
+      and it is likewise a **single line**, so the before and after halves are measured by the same
+      counting rule — and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/always-on-line-count-after.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the per-file
       counts and the component subtotals. The five now-scoped rules files are excluded from the
@@ -708,13 +806,23 @@ stages complete without error in a single uninterrupted pass.
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the numeric
       passed and failed counts and the numeric total line-coverage percentage for
       `scripts.dev_tools`. If any change is made in response, restart the loop from `[P6-T1]`.
-      Acceptance: `EXIT_CODE: 0`, zero failures, and a numeric coverage headline recorded.
+      Acceptance: `EXIT_CODE: 0`, zero failures, and a numeric coverage headline recorded; **or**,
+      only if the `[P0-T11]` artifact recorded `PRESENT`, exactly one failure, that failure being
+      `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, no other failure, and a
+      numeric coverage headline recorded. If `[P0-T11]` recorded `ABSENT`, strict `EXIT_CODE: 0` with
+      zero failures applies with no exception. Under the exception branch the artifact must name the
+      single tolerated failure explicitly and cite the `[P0-T11]` baseline record; a summary that
+      reports a non-zero failure count without naming the failing test does not satisfy this task.
 - [ ] [P6-T5] Run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check` and
       write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/final-codex-agent-variants.2026-08-26T00-00.md`
-      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. This stage is part of the
-      repository quality-checks workflow and is run to confirm that the epic-orchestrator edits left
-      the Codex agent profiles unaffected. Acceptance: `EXIT_CODE: 0`.
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. This stage is run because
+      it is part of the repository quality-checks workflow and must be green for the branch, **not**
+      because it verifies anything about the epic edits: `generate_codex_agent_variants.py` reads
+      only `.codex/agents/*.toml` and never reads any path under `.claude/`, so it cannot observe the
+      `.claude/agents/epic-orchestrator.md` or `.claude/skills/` changes this plan makes. The
+      assertion that `.codex/` is untouched is carried by `[P6-T8]`, not by this task. Acceptance:
+      `EXIT_CODE: 0`.
 - [ ] [P6-T6] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/coverage-delta.2026-08-26T00-00.md`
       recording the baseline coverage percentage from P0-T6, the post-change coverage percentage from
@@ -738,12 +846,17 @@ stages complete without error in a single uninterrupted pass.
       no Markdown gate is claimed, invented, or run. Acceptance: the artifact names every gate above
       with its reason and states the Markdown finding explicitly.
 - [ ] [P6-T8] Verify scope containment by running
-      `git diff --exit-code -- .agents/ .codex/ extensions/drm-copilot/resources/codex-and-agents-customizations/ AGENTS.md .github/instructions/ config/orchestration-routing.json extensions/drm-copilot/resources/config/orchestration-routing.json quality-tiers.yml config/blast-radius.json .claude/settings.json docs/engineering/claude-code-architecture.md`
+      `git diff HEAD --exit-code -- .agents/ .codex/ extensions/drm-copilot/resources/codex-and-agents-customizations/ AGENTS.md .github/instructions/ config/orchestration-routing.json extensions/drm-copilot/resources/config/orchestration-routing.json config/blast-radius.json .claude/settings.json docs/engineering/claude-code-architecture.md`
       and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/scope-containment.2026-08-26T00-00.md`
-      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: exit code 0,
-      confirming every declared non-write stayed a non-write and that no declared shared surface was
-      touched.
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The `HEAD` operand is
+      required: a bare `git diff` compares the worktree against the index and is falsely clean once a
+      change is staged. `quality-tiers.yml` is deliberately **removed** from this pathspec: no file
+      of that name exists in the repository, so that operand could never contribute a difference and
+      the assertion over it could not fail. The guarantee that this change creates no such file is
+      carried by `[P6-T9]`, which reconciles `git status --porcelain` — untracked entries included —
+      against the declared radius. Acceptance: exit code 0, confirming every declared non-write
+      stayed a non-write and that no declared shared surface with a file behind it was touched.
 - [ ] [P6-T9] Verify that the set of files changed by this branch equals the declared blast radius,
       by running `git status --porcelain` and comparing the result against the path list in the
       `## DECLARED BLAST RADIUS` section of this plan. Acceptance: every changed path appears in the
@@ -764,11 +877,18 @@ stages complete without error in a single uninterrupted pass.
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/spec.md`
       against the evidence artifacts produced by this plan, and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/ac-reconciliation.2026-08-26T00-00.md`
-      mapping each criterion to its evidence artifact path or to its blocking reason. Acceptance: the
-      artifact covers all 41 acceptance criteria; exactly one — the F5 decision-half criterion —
-      is recorded as unchecked and blocked on the reserved human decision; the severity marker
-      checkbox under `## Context` is excluded as an inherited template marker and is not an
-      acceptance criterion.
+      mapping each criterion to its evidence artifact path or to its blocking reason. `spec.md`
+      carries 42 checkboxes in total, which partition as follows and must be reconciled on that
+      basis. Acceptance: the artifact covers all 38 acceptance criteria (spec lines 559-706); the
+      four severity markers at spec lines 56-59 are excluded as inherited template markers and are
+      not acceptance criteria, with spec line 57 already carrying a checked `High` marker and the
+      other three at lines 56, 58, and 59 unchecked; the heading
+      `### F5 — decision half` carries **two** criteria, not one, and they are recorded separately —
+      the first, the BLOCKED coverage-floor and stage-count selection at spec line 644, is recorded
+      as unchecked and blocked on the reserved human decision, and the second, the
+      `human_interaction` halt entry at spec line 652, is recorded as delivered by `[P4-T7]` with its
+      evidence artifact path; and exactly one criterion of the 38 is recorded as unchecked and
+      blocked.
 - [ ] [P6-T13] Update
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/issue.md`
       to check the delivered items under `## Proposed Fix / Validation Ideas` and `## Next Step`,
@@ -779,9 +899,17 @@ stages complete without error in a single uninterrupted pass.
       `extensions/drm-copilot/resources/codex-and-agents-customizations/`; adding a converter-parity
       test so `.claude/` to `.agents/` staleness fails loudly; reconciling the stale embedded rule
       copies in `AGENTS.md`, which is blocked on the same reserved human decision as F5; scoping the
-      six other skills that carry the same `## Prerequisites` re-read defect; and the possible split
-      of `.claude/rules/parallel-orchestration.md` into a schema rule and a blast-radius rule. Record
+      six other skills that carry the same `## Prerequisites` re-read defect; the possible split
+      of `.claude/rules/parallel-orchestration.md` into a schema rule and a blast-radius rule; and
+      the bundled-payload parity defect observed at baseline by `[P0-T11]` —
+      `test_bundled_claude_payload_contains_all_repo_runtime_contracts` fails because
+      `list_scoped_files` enumerates the filesystem rather than consulting git, so a gitignored,
+      untracked, machine-local file such as `.claude/state/python-batch-budget.default.json` enters
+      the repo-side set and is reported as missing from the bundle. Record that last item as an
+      observation for a future issue, stating that the correct fix is for the scan to consult git
+      rather than for a developer to delete a machine-local file, and stating explicitly that this
+      change does **not** widen its scope to fix it and deletes no gitignored file. Record all of
       them in
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/ac-reconciliation.2026-08-26T00-00.md`
-      under a `Follow-ups:` heading. Acceptance: all five follow-ups are recorded and none is acted
+      under a `Follow-ups:` heading. Acceptance: all six follow-ups are recorded and none is acted
       on by this change.
