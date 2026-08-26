@@ -161,6 +161,24 @@ def test_maps_route_feature_review_name_to_codex_reviewer_family() -> None:
     assert receipt["deployment_agent"] == "feature-reviewer-c2"
 
 
+def test_resolves_commit_steward_standalone_c3_without_overlay() -> None:
+    """Route commit-steward standalone C3 to its exact Terra/high profile."""
+
+    receipt = resolve_codex_deployment("commit-steward", "C3", "standalone", "C3")
+
+    assert receipt == {
+        "logical_agent": "commit-steward",
+        "deployment_agent": "commit-steward-c3",
+        "complexity_band": "C3",
+        "execution_context": "standalone",
+        "orchestration_complexity_ceiling": "C3",
+        "c3_overlay_applied": False,
+        "c3_overlay_reason": None,
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "high",
+    }
+
+
 @pytest.mark.parametrize(
     ("agent", "band", "context", "ceiling", "message"),
     [

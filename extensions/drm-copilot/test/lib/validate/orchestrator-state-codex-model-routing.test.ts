@@ -119,6 +119,20 @@ describe("Codex model-routing checkpoint receipts", () => {
     expect(validate(state)).toEqual([]);
   });
 
+  it("accepts a standalone C3 commit-steward receipt for its deployment", () => {
+    // Arrange
+    const state = baseState("commit-steward-c3");
+    state["codex_model_routing_receipts"] = [
+      {
+        ...resolveCodexDeployment("commit-steward", "C3", "standalone", "C3"),
+        phase: "S9_ci_remediation_commit_steward",
+      },
+    ];
+
+    // Act / Assert
+    expect(validate(state)).toEqual([]);
+  });
+
   it("requires a receipt list after delegation when the gate is enabled", () => {
     // Arrange / Act
     const errors = validate(baseState());

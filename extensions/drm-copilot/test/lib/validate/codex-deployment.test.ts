@@ -122,6 +122,21 @@ describe("resolveCodexDeployment", () => {
     expect(receipt.deployment_agent).toBe("feature-reviewer-c2");
   });
 
+  it("routes standalone C3 commit-steward work to its Terra high profile", () => {
+    // Arrange / Act
+    const receipt = resolveCodexDeployment(
+      "commit-steward",
+      "C3",
+      "standalone",
+      "C3",
+    );
+
+    // Assert
+    expect(receipt.deployment_agent).toBe("commit-steward-c3");
+    expect(receipt.model).toBe("gpt-5.6-terra");
+    expect(receipt.model_reasoning_effort).toBe("high");
+  });
+
   it.each([
     ["unknown", "C1", "standalone", "C1", "Unsupported Codex logical agent"],
     ["orchestrator", "C5", "standalone", "C4", "complexity_band"],
