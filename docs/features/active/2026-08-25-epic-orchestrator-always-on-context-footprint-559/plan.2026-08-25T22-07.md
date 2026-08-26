@@ -341,7 +341,7 @@ argument uses the importable dotted form with `=`.
 
 ### Phase 0 — Policy Reads and Baseline Capture
 
-- [ ] [P0-T1] Read `CLAUDE.md`, `.claude/rules/general-code-change.md`, and
+- [x] [P0-T1] Read `CLAUDE.md`, `.claude/rules/general-code-change.md`, and
       `.claude/rules/general-unit-test.md` in that order, then the Python rules
       `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, and
       `.claude/rules/self-explanatory-code-commenting.md`, then
@@ -350,42 +350,42 @@ argument uses the importable dotted form with `=`.
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/phase0-instructions-read.2026-08-26T00-00.md`
       containing `Timestamp:`, `Policy Order:`, and the explicit list of files read. Acceptance: the
       artifact exists and lists every file above in the stated order.
-- [ ] [P0-T2] Record the branch and commit baseline by running `git rev-parse --abbrev-ref HEAD` and
+- [x] [P0-T2] Record the branch and commit baseline by running `git rev-parse --abbrev-ref HEAD` and
       `git rev-parse HEAD` and `git status --porcelain`, writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-git-state.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       records a branch name, a full commit SHA, and the working-tree status.
-- [ ] [P0-T3] Run `poetry run black --check .` and write
+- [x] [P0-T3] Run `poetry run black --check .` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-black.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       exists and its `EXIT_CODE:` is the observed baseline exit code.
-- [ ] [P0-T4] Run `poetry run ruff check` and write
+- [x] [P0-T4] Run `poetry run ruff check` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-ruff.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       exists and records the baseline diagnostic count.
-- [ ] [P0-T5] Run `poetry run pyright` and write
+- [x] [P0-T5] Run `poetry run pyright` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-pyright.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       exists and records the baseline error and warning counts.
-- [ ] [P0-T6] Run `poetry run pytest --cov=scripts.dev_tools --cov-report=term-missing` and write
+- [x] [P0-T6] Run `poetry run pytest --cov=scripts.dev_tools --cov-report=term-missing` and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-pytest-coverage.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the numeric
       passed and failed counts and the numeric total line-coverage percentage for
       `scripts.dev_tools`. Acceptance: the artifact records a numeric coverage headline, not a
       placeholder.
-- [ ] [P0-T7] Run `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_frozen_epic_surface_matches_pinned_baseline_digest`
+- [x] [P0-T7] Run `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_frozen_epic_surface_matches_pinned_baseline_digest`
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-digest-pin.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       records `EXIT_CODE: 0`, proving the pin is live before Phase 3 breaks it.
-- [ ] [P0-T8] Record the current frontmatter inventory of all nineteen files matching
+- [x] [P0-T8] Record the current frontmatter inventory of all nineteen files matching
       `.claude/rules/*.md` — for each file, whether a YAML frontmatter block is present and, when
       present, its `paths:` entries — into
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-rules-frontmatter-inventory.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       lists nineteen files, identifies exactly five as carrying no frontmatter block, and identifies
       exactly four as carrying an unconditional entry.
-- [ ] [P0-T9] Capture the before-half of the always-on line-count measurement by running
+- [x] [P0-T9] Capture the before-half of the always-on line-count measurement by running
       `poetry run python -c "import sys,pathlib;c=[(p,len(pathlib.Path(p).read_bytes().splitlines())) for p in sys.argv[1:]];[print(n,p) for p,n in c];print('TOTAL',sum(n for _,n in c))" CLAUDE.md .claude/agents/epic-orchestrator.md .claude/skills/policy-compliance-order/SKILL.md .claude/skills/epic-orchestrate/SKILL.md .claude/skills/feature-promotion-lifecycle/SKILL.md .claude/skills/atomic-plan-contract/SKILL.md .claude/skills/acceptance-criteria-tracking/SKILL.md .claude/skills/evidence-and-timestamp-conventions/SKILL.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md .claude/rules/quality-tiers.md .claude/rules/tonality.md .claude/rules/parallel-orchestration.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md`
       and writing
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/always-on-line-count-before.2026-08-26T00-00.md`
@@ -399,13 +399,13 @@ argument uses the importable dotted form with `=`.
       before total of
       2158 lines with subtotals 221, 936, 316, and 685; if the observed total differs, the artifact
       records the observed value and names each file whose count differs from research §1.
-- [ ] [P0-T10] Confirm the feature-document preconditions: `spec.md` exists in the feature folder and
+- [x] [P0-T10] Confirm the feature-document preconditions: `spec.md` exists in the feature folder and
       carries an `## Acceptance Criteria` section; `user-story.md` exists and carries no acceptance
       criteria; `issue.md` records `- Work Mode: full-bug`. Record the confirmation in
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/phase0-instructions-read.2026-08-26T00-00.md`
       as an appended `Preconditions:` block. Acceptance: all three statements are confirmed true, and
       the count of checkboxes under `## Acceptance Criteria` in `spec.md` is recorded.
-- [ ] [P0-T11] Establish whether the known unrelated bundled-payload failure is present at baseline
+- [x] [P0-T11] Establish whether the known unrelated bundled-payload failure is present at baseline
       on this worktree. Run `poetry run pytest` and append to the existing artifact
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/baseline/baseline-pytest-coverage.2026-08-26T00-00.md`
       a block headed `Known Baseline Failure:` recording, in this order: (a) whether the test
