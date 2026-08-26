@@ -3,6 +3,14 @@
 Timestamp: 2026-08-26T00-52
 Task: [P6-T6]
 
+## Evidence Schema Classification (Remediation R3, Issue #559)
+
+This artifact is a derived comparison record: it compares two prior command-step artifacts
+(`evidence/baseline/baseline-pytest-coverage.2026-08-26T00-00.md` and
+`evidence/qa-gates/final-pytest-coverage.2026-08-26T00-00.md`) and runs no command of its own.
+It therefore carries no `Command:` or `EXIT_CODE:` field; the underlying command those two
+artifacts record is `poetry run pytest --cov=scripts.dev_tools --cov-report=term-missing`.
+
 ## Sources compared
 
 | Side | Task | Artifact |

@@ -11,6 +11,12 @@ The change's actual file inventory, against which every reason below is checked,
 committed diff of this branch versus its merge base with `origin/main` (`b36179b2`), enumerated at
 `[P6-T6]` and re-asserted at `[P6-T9]`.
 
+## Evidence Schema Classification (Remediation R3, Issue #559)
+
+This artifact is a narrative record: it enumerates gates that do not apply to this change and
+states the reason each does not apply. It runs no single command of its own and therefore
+carries no `Command:` or `EXIT_CODE:` field.
+
 ## Gates that do not apply
 
 | # | Gate | Reason it does not apply |

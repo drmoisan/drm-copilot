@@ -32,9 +32,9 @@ RULES_DIR = CLAUDE_ROOT / "rules"
 AGENTS_DIR = CLAUDE_ROOT / "agents"
 SKILLS_DIR = CLAUDE_ROOT / "skills"
 
-# `.claude/agent-memory/` is gitignored and machine-local, so its content varies
-# per workstation. Excluding it keeps the `.claude/` scan deterministic.
-EXCLUDED_CLAUDE_SUBDIRS = frozenset({"agent-memory"})
+# `.claude/agent-memory/`, `.claude/worktrees/`, and `.claude/state/` are gitignored,
+# machine-local subtrees excluded here for determinism.
+EXCLUDED_CLAUDE_SUBDIRS = frozenset({"agent-memory", "worktrees", "state"})
 
 # A `paths:` entry that matches every file scopes nothing, so a rule carrying one
 # loads unconditionally exactly as an unscoped rule does.

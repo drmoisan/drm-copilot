@@ -6,6 +6,25 @@ AC source: `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-
 Work Mode: `full-bug` — `spec.md` is the sole acceptance-criteria source; `user-story.md` carries no
 acceptance criteria and is not an AC source under this mode.
 
+## Evidence Schema Classification (Remediation R3, Issue #559)
+
+Timestamp: 2026-08-26T01-11
+
+This artifact is a narrative reconciliation record: it maps acceptance criteria to prior
+command-step evidence artifacts and records no command of its own. It therefore carries no
+`Command:` or `EXIT_CODE:` field.
+
+Output Summary: 38 acceptance criteria reconciled; 36 checked, 2 left unchecked (spec lines 623
+and 644) for the reasons adjudicated below.
+
+Of the 29 evidence artifacts this feature produced, 26 conform to the full four-field schema
+(`Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`). The remaining three are narrative
+or derivation records that record no single command: this artifact,
+`evidence/qa-gates/coverage-delta.2026-08-26T00-00.md`, and
+`evidence/qa-gates/not-applicable-gates.2026-08-26T00-00.md`. This paragraph supersedes any
+earlier statement in this feature's evidence claiming uniform four-field conformance across all
+29 artifacts.
+
 ## Checkbox partition — 42 total, 38 acceptance criteria
 
 `spec.md` carries 42 Markdown checkboxes. They partition as follows, and the reconciliation is
