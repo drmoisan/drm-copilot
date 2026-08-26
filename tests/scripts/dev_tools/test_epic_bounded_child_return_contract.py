@@ -234,18 +234,26 @@ def blockquote_block(text: str, marker: str) -> str | None:
     return None
 
 
-def test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions() -> (  # noqa: E501
-    None
-):
+def test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions(
+    agent_path: Path = EPIC_ORCHESTRATOR_AGENT,
+) -> None:
     """Require the startup protocol to be three steps carrying no read orders.
 
     The runtime already injects `CLAUDE.md` and the path-scoped rule files, so a
     step ordering the agent to read them buys nothing and costs context on every
     turn. Removing them must leave the remaining steps numbered contiguously,
     because a gap in the ordinals reads as a lost step.
+
+    Args:
+        agent_path (Path): The agent document to read. The default is the
+            repository copy, which is what the assertion is about; the
+            defaulted seam follows the dependency-seam guidance in
+            `.claude/rules/python.md`. Pytest excludes a parameter that
+            carries a default from its fixture request set, so this does not
+            declare a fixture.
     """
 
-    body = section_body(read_text(EPIC_ORCHESTRATOR_AGENT), STARTUP_PROTOCOL_HEADING)
+    body = section_body(read_text(agent_path), STARTUP_PROTOCOL_HEADING)
     assert body is not None, (
         f"`{STARTUP_PROTOCOL_HEADING}` is absent from .claude/agents/"
         "epic-orchestrator.md"

@@ -68,18 +68,32 @@ wrapped across several quoted lines.
 
 ## Post-Format Re-run
 
-`[P1-T5]` reformatted this module with Black and added one `# noqa: E501` on the wrapped `def`
-line of `test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions`. The
-test name is fixed by `[P1-T2]` and Black's own wrapped form of that signature is 90 characters,
-two over the configured 88-character limit, so the line cannot be shortened without renaming the
-test. The suppression follows the established form already used for the same situation in
-`tests/scripts/dev_tools/test_blast_radius_config_parity.py`,
-`tests/scripts/dev_tools/test_potential_to_issue_content.py`,
-`tests/scripts/dev_tools/codex_native_converter/test_section_intent.py`, and
-`tests/scripts/dev_tools/codex_native_converter/test_intermediate_state.py`. It is recorded here
-because `E501` is not on the pre-authorized list in `.claude/rules/python-suppressions.md`. The
-command above was re-run after that change and produced an identical result — exit code 1, all
-seven tests failing, same names. The file is 429 lines, inside the 500-line limit.
+`[P1-T5]` reformatted this module with Black. The module carries no suppression of any kind.
+
+The signature of `test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions`
+does not fit the configured 88-character limit on one line: the name alone is 79 characters, so
+`def <name>() -> None:` is 94 characters and Black's parenthesized wrap of it still opens with a
+90-character line. The test name is fixed by `[P1-T2]` and is named verbatim in the `[P3-T3]`
+acceptance condition, so it cannot be shortened. `E501` is not on the pre-authorized list in
+`.claude/rules/python-suppressions.md` and no user approval for it exists, so `# noqa: E501` was
+not used, notwithstanding the four pre-existing instances of that pattern elsewhere in the
+repository, which are precedent rather than authorization.
+
+The signature instead carries a defaulted `agent_path: Path = EPIC_ORCHESTRATOR_AGENT` seam,
+which is the dependency-seam form `.claude/rules/python.md` endorses. The trailing comma puts
+Black into its exploded parameter form, so the `def` line is 84 characters and both the parameter
+line and the closing `) -> None:` line are well inside the limit. The `-> None` annotation is
+retained, which the same rule file requires of all Python code; dropping it would have produced
+an 86-character `def` line that passes Black, Ruff, and Pyright but leaves the function
+unannotated, trading one policy violation for another. Pytest excludes a parameter that carries a
+default from its fixture request set, so the seam declares no fixture; the recorded run confirms
+this, passing `WindowsPath('.../.claude/agents/epic-orchestrator.md')` and reporting the ordinal
+assertion rather than a fixture-lookup error.
+
+The command above was re-run after that change and produced an identical result — exit code 1,
+seven collected, all seven failing, with the same test names and the same seven assertion
+messages listed in the table above. No line in the module exceeds 88 characters. The file is 437
+lines, inside the 500-line limit.
 
 ## Collection Count
 
