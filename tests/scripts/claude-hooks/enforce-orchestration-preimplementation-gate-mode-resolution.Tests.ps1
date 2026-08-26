@@ -6,33 +6,29 @@
     Mode-resolution and per-mode readiness cases for the Claude preimplementation gate.
 .DESCRIPTION
     Issue #554. The gate classified an Agent delegation by matching seven tokens
-    against the whole serialized tool_input, two of which are ordinary English
-    words, and then evaluated readiness against a single hard-coded single-feature
-    checkpoint that no epic or parallel execution surface can satisfy. These cases
-    cover the structural replacement: mode resolution from a fixed table keyed on
-    the field-scoped prompt, the canonical-path cross-check, and the epic and
-    parallel readiness predicates.
+    against the whole serialized tool_input, two of which are ordinary English words,
+    and then evaluated readiness against one hard-coded single-feature checkpoint that
+    no epic or parallel execution surface can satisfy. These cases cover the structural
+    replacement: mode resolution from a fixed table keyed on the field-scoped prompt,
+    the canonical-path cross-check, and the epic and parallel readiness predicates.
 
-    These cases live in a new sibling suite rather than in
-    enforce-orchestration-preimplementation-gate.Tests.ps1 because that file is
-    already at 461 content lines against the 500-line cap, leaving 39 lines of
-    headroom. It must not grow, and no existing test file is edited by this
-    change: the four pre-existing suites passing unmodified is the proof
-    obligation for the guardrail that the Edit/Write and Bash legs, including the
-    issue #539 staging exemption, are behaviourally unchanged.
+    New sibling suite, not an addition to enforce-orchestration-preimplementation-gate.
+    Tests.ps1: that file is at 461 of 500 lines and must not grow, and no existing test
+    file is edited by this change, because the pre-existing suites passing unmodified is
+    the proof obligation for the guardrail that the Edit/Write and Bash legs, including
+    the issue #539 staging exemption, are behaviourally unchanged.
 
-    Determinism. Every fixture in this suite is a literal string. The suite makes
-    no temporary file, performs no filesystem write, reads no wall clock, opens no
-    network connection, and starts no external process. Checkpoint content is
-    supplied through the decision function's injection parameters or passed
-    directly to a predicate as an already-parsed object, so each result is a pure
-    function of its arguments and no Mock is required.
+    Determinism. Every fixture is a literal string. The suite makes no temporary file,
+    performs no filesystem write, reads no wall clock, opens no network connection, and
+    starts no external process. Checkpoint content is supplied through the decision
+    function's injection parameters or passed directly to a predicate as an
+    already-parsed object, so each result is a pure function of its arguments and no
+    Mock is required.
 
-    Fixture-encoding constraint. The JSON fixtures below are assembled by literal
-    string concatenation rather than by ConvertTo-Json, so that the exact payload
-    text under test is visible in this file. No fixture value may contain a double
-    quote or a backslash; every value used here is plain ASCII prose or a
-    forward-slash path.
+    Fixture encoding. The JSON fixtures are assembled by literal string concatenation
+    rather than by serialization, so the exact payload text under test is visible here.
+    No fixture value may carry a double quote or a backslash; every value is plain ASCII
+    prose or a forward-slash path.
 #>
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
@@ -41,18 +37,16 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         . $script:UnderTest
 
         # The modes sibling is dot-sourced explicitly so the predicate-level cases
-        # below resolve its functions during Batch A, before the main gate hook
-        # dot-sources it. Once the hook carries that dot-source line, this one is
-        # redundant but harmless: dot-sourcing the same pure file twice redefines
-        # identical functions and identical constants.
+        # resolved its functions during Batch A, before the main gate hook carried that
+        # line. It is now redundant but harmless: dot-sourcing the same pure file twice
+        # redefines identical functions and identical constants.
         $script:ModesUnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1").Path
         . $script:ModesUnderTest
 
         function ConvertTo-DelegationToolInputJson {
-            # Builds an Agent delegation envelope as a literal JSON string. A
-            # Description value, when supplied, is written into a non-prompt field
-            # so field-scoping assertions can plant marker text where the
-            # classifier must not read it.
+            # An Agent delegation envelope as a literal JSON string. A Description value,
+            # when supplied, is written into a non-prompt field so field-scoping cases can
+            # plant marker text where the classifier must not read it.
             param(
                 [string] $SubagentType = 'orchestrator',
                 [string] $Prompt = '',
@@ -66,11 +60,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         }
 
         function ConvertTo-SingleFeatureCheckpointJson {
-            # The default single-feature orchestrator checkpoint, ready by default.
-            # Every case asserting a deny must supply an explicit checkpoint: one
-            # that omitted it would fall through to the on-disk checkpoint, which
-            # is ready during an orchestrated run, and the assertion would pass
-            # vacuously.
+            # The default single-feature orchestrator checkpoint, ready by default. Every
+            # case asserting a deny must supply an explicit checkpoint: one that omitted it
+            # would fall through to the on-disk checkpoint, which is ready during an
+            # orchestrated run, and the assertion would pass vacuously.
             param(
                 [string] $IssueNum = '554',
                 [string] $FeatureFolder = 'docs/features/active/preimplementation-gate-blocks-epic-execution-554',
@@ -84,8 +77,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         }
 
         function ConvertTo-EpicCheckpointJson {
-            # A ready epic orchestrator checkpoint by default. Blank a field, or
-            # set a switch, to violate exactly one conjunct.
+            # A ready epic checkpoint by default; blank a field or set a switch to violate
+            # exactly one conjunct.
             param(
                 [string] $RouteId = 'epic',
                 [string] $EpicFeatureFolder = 'quickfiler-bug-family',
@@ -110,8 +103,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         }
 
         function ConvertTo-ParallelCheckpointJson {
-            # A ready parallel orchestrator checkpoint by default, carrying only
-            # the keys the readiness predicate reads.
+            # A ready parallel checkpoint by default, carrying only the read keys.
             param(
                 [string] $RouteId = 'parallel',
                 [string] $ParallelSlug = 'critical-bug-fixes',
@@ -137,20 +129,16 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
 
     Context 'Fault-1 wording independence, direction (b): the new allow-to-deny change' {
         It 'denies an orchestrator delegation phrased with "atomic execution" and no mode markers against an unready single-feature checkpoint' {
-            # Matrix case 6b. This is the case that INCORRECTLY ALLOWS today, and
-            # it is the one behaviour change this fix introduces in the
-            # allow-to-deny direction rather than a preservation.
-            #
-            # The prompt is phrased with the words "atomic execution" and carries
-            # NEITHER legacy free-text token: the word "execution" does not contain
-            # the bare token "execute", and "implementation" does not appear. No
-            # allow-listed agent name appears either. The pre-fix classifier
-            # serializes the whole tool_input and matches seven tokens against it,
-            # matches none, and the gate ALLOWS. After the structural fix,
-            # subagent_type is exactly 'orchestrator' and the prompt carries no
-            # recognized mode marker, so the resolved mode is the default
-            # single-feature mode, the delegation is implementation, and the
-            # unready checkpoint supplied below DENIES.
+            # Matrix case 6b: the case that INCORRECTLY ALLOWED before the fix, and the
+            # one behaviour change this fix makes in the allow-to-deny direction rather
+            # than a preservation. The prompt is phrased with "atomic execution" and
+            # carries NEITHER legacy free-text token - "execution" does not contain the
+            # bare token "execute", and "implementation" does not appear - and no
+            # allow-listed agent name appears either, so the pre-fix seven-token scan
+            # over the serialized payload matched nothing and allowed. After the fix
+            # subagent_type is exactly 'orchestrator' and the prompt carries no mode
+            # marker, so the mode is the default, the delegation is implementation, and
+            # the unready checkpoint supplied below denies.
             $json = ConvertTo-DelegationToolInputJson -SubagentType 'orchestrator' -Prompt 'Begin atomic execution of the approved plan for this feature.'
             $checkpoint = ConvertTo-SingleFeatureCheckpointJson -RouteId '' -LifecycleReady $false
 
@@ -391,6 +379,116 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             @{ SubagentType = '' }
         ) {
             Test-OrchestrationImplementationAgent -SubagentType $SubagentType | Should -BeFalse
+        }
+    }
+
+    Context 'the decision-level epic matrix' {
+        # Every case here binds -EpicCheckpointRaw explicitly, including the empty-content
+        # case, so no assertion falls through to the on-disk epic checkpoint.
+        It '<Case>: <Label>' -ForEach @(
+            @{ Case = 'matrix case 1'; Label = 'a ready epic checkpoint allows'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
+            @{ Case = 'matrix case 2'; Label = 'empty injected epic content denies, naming the epic checkpoint'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = $null; Expect = 'deny'; Reason = 'epic-orchestrator-state.json' }
+            @{ Case = 'matrix case 3'; Label = 'a features array lacking the target record denies, naming the failed predicate'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = "'target-record'" }
+            @{ Case = 'matrix case 4'; Label = 'a non-canonical declared epic_checkpoint_path denies'; Prompt = 'Epic mode: true. epic_checkpoint_path: artifacts/orchestration/rogue-epic-state.json. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = "'declared-checkpoint-path'" }
+            @{ Case = 'epic target unresolvable'; Label = 'a prompt with no resolvable target token and no issue number denies'; Prompt = 'Epic mode: true. Begin the wave-0 child now.'; Fixture = @{}; Expect = 'deny'; Reason = "'target-record'" }
+            @{ Case = 'decision D8'; Label = 'a target record in a terminal-merged state denies'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ MergeStatus = 'merged' }; Expect = 'deny'; Reason = "'merge_status'" }
+            @{ Case = 'decision D8'; Label = 'a target record in a failure state allows, as legitimate remediation'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ MergeStatus = 'merge_conflict' }; Expect = 'allow'; Reason = '' }
+        ) {
+            $raw = if ($null -eq $Fixture) { '' } else { ConvertTo-EpicCheckpointJson @Fixture }
+            $json = ConvertTo-DelegationToolInputJson -Prompt $Prompt
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -EpicCheckpointRaw $raw
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be $Expect
+            if ($Reason) { $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike ('*' + $Reason + '*') }
+        }
+
+        It 'matrix case 5: an epic marker in a non-prompt field resolves to the default single-feature mode' {
+            # The marker is planted in 'description' and the prompt is clean. Had the mode
+            # resolved to epic, the empty bound epic content would have denied naming the
+            # epic checkpoint; naming the single-feature one proves the source consulted.
+            $json = ConvertTo-DelegationToolInputJson -Prompt 'Begin atomic execution of the approved plan.' -Description 'Epic mode: true.'
+            $unready = ConvertTo-SingleFeatureCheckpointJson -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $unready -EpicCheckpointRaw ''
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*orchestrator-state.json*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike '*epic-orchestrator-state.json*'
+        }
+
+    }
+
+    Context 'the decision-level single-feature matrix' {
+        It 'matrix case <Case>: <Label>' -ForEach @(
+            @{ Case = '6a'; Label = 'an allow-listed implementation agent denies against an unready checkpoint whatever its prompt says'; SubagentType = 'atomic-executor'; Prompt = 'Carry out the approved plan for this feature.'; Expect = 'deny' }
+            @{ Case = '7'; Label = 'both preparation markers exempt the delegation'; SubagentType = 'orchestrator'; Prompt = 'Preparation mode: true. route_id: preparation. Perform promotion only.'; Expect = 'allow' }
+        ) {
+            # Case 6a carries none of the seven legacy tokens: no allow-listed agent name
+            # appears in the prompt text, and neither free-text token does either.
+            $json = ConvertTo-DelegationToolInputJson -SubagentType $SubagentType -Prompt $Prompt
+            $unready = ConvertTo-SingleFeatureCheckpointJson -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $unready
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be $Expect
+        }
+
+        It 'matrix case 8: a standalone orchestrator allows against a ready single-feature checkpoint' {
+            $json = ConvertTo-DelegationToolInputJson -Prompt 'Execute the approved plan for this feature.'
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw (ConvertTo-SingleFeatureCheckpointJson)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'matrix case 8: a standalone orchestrator denies against an unready single-feature checkpoint' {
+            $json = ConvertTo-DelegationToolInputJson -Prompt 'Execute the approved plan for this feature.'
+            $unready = ConvertTo-SingleFeatureCheckpointJson -RouteId '' -LifecycleReady $false
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $unready
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+    }
+
+    Context 'the decision-level parallel matrix' {
+        It '<Label>' -ForEach @(
+            @{ Label = 'a ready parallel checkpoint allows'; Prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
+            @{ Label = 'an items array lacking the target record denies, naming the parallel checkpoint'; Prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
+            @{ Label = 'a non-canonical declared parallel_checkpoint_path denies'; Prompt = 'Parallel mode: true. parallel_checkpoint_path: artifacts/orchestration/rogue-parallel-state.json. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
+        ) {
+            $json = ConvertTo-DelegationToolInputJson -Prompt $Prompt
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -ParallelCheckpointRaw (ConvertTo-ParallelCheckpointJson @Fixture)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be $Expect
+            if ($Reason) { $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike ('*' + $Reason + '*') }
+        }
+    }
+
+    Context 'deny-by-default is preserved, with no new permissive path' {
+        It 'denies <Label>' -ForEach @(
+            @{ Label = 'an unparseable payload'; Raw = '{not json' }
+            @{ Label = 'a payload carrying no tool_input key'; Raw = '{"tool_name":"Agent","subagent_type":"orchestrator"}' }
+        ) {
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $Raw -CheckpointRaw '{}'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PREIMPLEMENTATION_GATE_BLOCKED*'
+        }
+
+        It 'denies an epic-mode delegation whose injected epic content is empty, with no filesystem read' {
+            # The read seam is shadowed by a throwing definition in this case's own scope.
+            # PowerShell resolves a call through the caller's dynamic scope chain, so had
+            # the empty string fallen through to the seam this case would error rather than
+            # pass. Binding suppresses the seam: ContainsKey, not a truthiness test.
+            function Get-EpicCheckpointContent { throw 'the epic read seam was consulted' }
+            $json = ConvertTo-DelegationToolInputJson -Prompt 'Epic mode: true. Execute docs/features/active/child-b-301.'
+
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -EpicCheckpointRaw ''
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
     }
 }
