@@ -5,6 +5,14 @@ on:
     tags:
       - "mcp-server-v*"
   workflow_dispatch:
+  # Validate build/package on PRs that touch the mcp-server package or this workflow.
+  # Every tag-dependent step below is ref-guarded, so a PR run publishes nothing and
+  # consumes no version number; this provides the green branch-head run required by
+  # the modified-workflow-needs-green-run rule for a diff to this file (issue #526).
+  pull_request:
+    paths:
+      - "packages/mcp-server/**"
+      - ".github/workflows/publish-mcp-npm.yml"
 
 jobs:
   drm-copilot-extension-tests:
@@ -57,7 +65,64 @@ jobs:
       - name: Build MCP server bundle
         run: npm --prefix packages/mcp-server run build
 
+      # Ref-guarded (issue #526). A pull_request run carries no tag ref, so an unguarded
+      # version parse here would fail and no green branch-head run could exist, which the
+      # modified-workflow-needs-green-run rule requires before this file may change.
+      - name: Verify tag version matches the mcp-server manifest
+        id: resolve-publish-version
+        if: startsWith(github.ref, 'refs/tags/mcp-server-v')
+        shell: pwsh
+        run: |
+          $tagVersion = $env:GITHUB_REF_NAME -replace '^mcp-server-v', ''
+          $manifestPath = 'packages/mcp-server/package.json'
+          $manifestVersion = (Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json).version
+          Write-Host "Tag version:      $tagVersion"
+          Write-Host "Manifest version: $manifestVersion"
+          if ($tagVersion -ne $manifestVersion) {
+            Write-Host "::error::Tag version '$tagVersion' does not equal the $manifestPath version '$manifestVersion'."
+            exit 1
+          }
+          "publishVersion=$tagVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          exit 0
+
+      # Ref guard, not an event-name guard (issue #526). An event-name guard passes on any
+      # push event and cannot distinguish a release tag from a branch push; the ref guard
+      # also keeps this step from running on the pull_request ref declared above, which is
+      # what makes a re-dispatch of this workflow non-destructive.
       - name: Publish to npm
-        if: github.event_name == 'push'
+        if: startsWith(github.ref, 'refs/tags/mcp-server-v')
         working-directory: packages/mcp-server
         run: npm publish --provenance --access public
+
+      # Ref-guarded (issue #526). On a pull_request run the publish step above is skipped by
+      # its own ref guard while this job still runs, because its `needs` is satisfied. An
+      # unguarded poll would then query a version that was never published, exhaust its
+      # budget and fail the job, making the required green branch-head run unobtainable.
+      - name: Verify the published version resolves on the registry
+        if: startsWith(github.ref, 'refs/tags/mcp-server-v')
+        shell: pwsh
+        run: |
+          $version = '${{ steps.resolve-publish-version.outputs.publishVersion }}'
+          $packageOperand = "@danmoisan/drm-copilot-mcp@$version"
+          $maxAttempts = 18
+          $intervalSeconds = 10
+          $resolved = $false
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            $observed = (npm view $packageOperand version 2>$null | Select-Object -First 1)
+            # The exact-version query is EXPECTED to fail on every attempt before the version
+            # appears on the registry, so the residual exit code is reset here rather than
+            # leaked to the runner, per .claude/rules/ci-workflows.md.
+            $LASTEXITCODE = 0
+            if ($observed -eq $version) {
+              $resolved = $true
+              Write-Host "Resolved $packageOperand on attempt $attempt."
+              break
+            }
+            Write-Host "Attempt $attempt of ${maxAttempts}: $packageOperand not resolvable yet."
+            Start-Sleep -Seconds $intervalSeconds
+          }
+          if (-not $resolved) {
+            Write-Host "::error::$packageOperand did not resolve within $maxAttempts attempts; the tag push did not publish."
+            exit 1
+          }
+          exit 0

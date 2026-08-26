@@ -210,6 +210,28 @@
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
             '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
+            # Issue #526 added this out-of-band release-verification module (Layer B of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerification.ps1'
+            # Issue #526 split the pure helpers of the verification module into this sibling
+            # file, because the parent stood one line under the 500-line cap. CodeCoverage.Path
+            # is an explicit per-file allow-list, so the new production file must be registered
+            # here to stay inside the coverage denominator; without it the relocated lines would
+            # leave the denominator entirely, which the Coverage Exclusion Policy forbids. Its
+            # Pester suite dot-sources the file, and the file declares no entry-point block, so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1'
+            # Issue #526 added this release-reconciliation module (Layer C of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseReconciliation.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
