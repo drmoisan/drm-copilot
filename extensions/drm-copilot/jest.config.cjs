@@ -209,6 +209,15 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // `plan-gate-observability.ts` carries the G7, G8, G8b, and G9 rule group
+    // added by issue #519. It is a new production file under `src/`, and the
+    // coverage-exclusion policy in `.claude/rules/general-unit-test.md` forbids
+    // leaving such a file behind no gate, so it sits behind the same per-file
+    // threshold as the plan-gate modules it was added alongside.
+    "./src/lib/validate/plan-gate-observability.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #525 changed files. `gh-client.ts` gained the optional `repo`
     // selector, `repo-slug.ts` is the new target-repository resolver, and
     // `potential-to-issue-service-call.ts` resolves the slug and threads it
