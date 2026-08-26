@@ -6,6 +6,8 @@
 - **Work Mode:** `full-bug` (`spec.md` is the sole acceptance-criteria source)
 - **Findings in scope:** R1 (Blocking), R3 (Major), R4 (Major), R5 (Major)
 - **Findings out of scope:** R2, and the six minor findings m1 through m6
+- **Version:** 3
+- **Status:** Revised — preflight deltas R-A (extraction rationale corrected) and R-B (P5-T1 probe-output recording) applied; Scope Statement accounting sentence corrected (density characterization dropped, removal count stated exactly at 133 lines, headroom tightened to approximately 104 lines)
 
 ---
 
@@ -44,13 +46,20 @@ constraints that the inputs did not size together:
   block. That count of nine does not fall when covered lines are moved out.
 - AC24 asserts at least 85 percent line coverage for that file. With nine fixed misses the file
   needs at least 60 measured lines to satisfy the floor. The pre-split file measures 92 lines with
-  83 covered. `Resolve-PublishStepConclusion` is by a wide margin the densest of the five candidates
-  in measured lines per source line, so relocating it removes the most covered lines for the least
-  source-line relief, and it is the single candidate that pushes the ratio under the floor.
+  83 covered. `Resolve-PublishStepConclusion` contributes 13 measured lines, more than any other
+  candidate (`Get-RecoveryInstruction` 11, `Get-CodexPinnedMcpVersion` 7,
+  `ConvertTo-VerificationResult` 6, `ConvertFrom-JsonSafely` 4), so retaining it preserves the
+  largest block of covered measured lines. Retaining it leaves 64 measured lines with 55 covered,
+  which is 85.94 percent; retaining any of `ConvertFrom-JsonSafely`, `ConvertTo-VerificationResult`,
+  or `Get-CodexPinnedMcpVersion` instead falls below the floor at 83.64, 84.21, and 84.48 percent
+  respectively. Retaining `Get-RecoveryInstruction` also clears the floor, at 85.48 percent, but
+  with a thinner margin, so `Resolve-PublishStepConclusion` is retained.
 
-Extracting the four low-density helpers removes roughly 129 source lines, leaving roughly 100 lines
-of headroom under the 500-line cap after the additions R1 and R3 make, while retaining the covered
-measured lines the floor needs. `Resolve-PublishStepConclusion` remains a pure function and remains
+Extracting the four helpers removes exactly 133 source lines (129 function lines plus the 4 blank
+separator lines between them), leaving approximately 104 lines of headroom under the 500-line cap
+after the additions R1 and R3 make and landing the file near 396 lines; the headroom figure stays
+approximate because the addition size is an estimate, while the removal count is exact. The
+extraction retains the covered measured lines the floor needs. `Resolve-PublishStepConclusion` remains a pure function and remains
 fully tested; it is simply not relocated. Phase 1 measures the actual post-split figure and carries
 an explicit branch (P1-T8, P1-T9) for the case where the measurement contradicts this estimate, so
 no downstream task depends on the estimate being right.
@@ -206,7 +215,7 @@ content is supplied as in-memory string literals.
 
 ### Phase 5 — AC21 network-isolation evidence (R4) and the deviation record (R5)
 
-- [ ] [P5-T1] Establish network isolation, run the complete Pester suite inside it, and write `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/network-isolated-suite.2026-08-26T02-36.md`. Take the preferred branch first: in a single `pwsh` session set `HTTP_PROXY`, `HTTPS_PROXY`, and `ALL_PROXY` to the discard endpoint `http://127.0.0.1:9`, set `NO_PROXY` to the empty string, set `NPM_CONFIG_REGISTRY` to the same discard endpoint, prove the isolation is real by running `npm view @danmoisan/drm-copilot-mcp version` and requiring a non-zero exit code, then run the mandatory coverage-route command in that same session. If the isolation probe exits 0 the isolation is not real in this environment: take the recorded-limitation branch instead, change no environment variable, run no suite under isolation, and record that a network-isolated run is impractical here together with the probe output that showed it. Acceptance: that file exists and contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, `IsolationMethod:`, `IsolationProbeExitCode:`, `NetworkIsolationBranch:`, and `Output Summary:`, where `NetworkIsolationBranch:` carries exactly one of the two literal values `EXECUTED` or `RECORDED_LIMITATION`, and where the `Output Summary:` section records the suite passed count and failed count under the `EXECUTED` branch, or the probe output and the reason isolation could not be established under the `RECORDED_LIMITATION` branch.
+- [ ] [P5-T1] Establish network isolation, run the complete Pester suite inside it, and write `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/network-isolated-suite.2026-08-26T02-36.md`. Take the preferred branch first: in a single `pwsh` session set `HTTP_PROXY`, `HTTPS_PROXY`, and `ALL_PROXY` to the discard endpoint `http://127.0.0.1:9`, set `NO_PROXY` to the empty string, set `NPM_CONFIG_REGISTRY` to the same discard endpoint, prove the isolation is real by running `npm view @danmoisan/drm-copilot-mcp version` and requiring a non-zero exit code, then run the mandatory coverage-route command in that same session. If the isolation probe exits 0 the isolation is not real in this environment: take the recorded-limitation branch instead, change no environment variable, run no suite under isolation, and record that a network-isolated run is impractical here together with the probe output that showed it. Acceptance: that file exists and contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, `IsolationMethod:`, `IsolationProbeExitCode:`, `NetworkIsolationBranch:`, and `Output Summary:`, where `NetworkIsolationBranch:` carries exactly one of the two literal values `EXECUTED` or `RECORDED_LIMITATION`, and where the `Output Summary:` section records the verbatim probe output under **both** branches, additionally recording the suite passed count and failed count under the `EXECUTED` branch, or the reason isolation could not be established under the `RECORDED_LIMITATION` branch. Under `EXECUTED` the recorded probe output must show a connection-level failure against the discard endpoint; a non-zero exit whose output shows any other cause, such as a missing `npm` executable or a configuration parse error, does not establish isolation and requires the `RECORDED_LIMITATION` branch instead.
 
 - [ ] [P5-T2] Reconcile AC21 in `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/spec.md` against the branch P5-T1 recorded. Under `EXECUTED`, leave AC21's text unchanged and append a sentence naming `evidence/qa-gates/network-isolated-suite.2026-08-26T02-36.md` as the evidence for its first clause. Under `RECORDED_LIMITATION`, narrow AC21's first clause so it asserts only that no test added or modified by this change reaches the network, and append a sentence naming the same artifact as the record of why the whole-suite isolation clause was narrowed. Acceptance: the command `pwsh -NoProfile -Command 'if (Select-String -SimpleMatch -Path ./docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/spec.md -Pattern "network-isolated-suite.2026-08-26T02-36.md") { exit 0 } else { exit 1 }'` exits with code 0.
 
@@ -243,6 +252,6 @@ of them.
 
 - [ ] [P7-T6] Run the file-size check across all seven paths named in P1-T10 and write `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/final-file-size-check.2026-08-26T02-36.md`. Acceptance: that file exists, contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and its `Output Summary:` section records an integer line count of at most 500 for each of the seven paths.
 
-- [ ] [P7-T7] Verify test purity across the four test files this cycle adds or modifies (`tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1`, `tests/scripts/dev-tools/Invoke-ReleaseVerificationHelpers.Tests.ps1`, `tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1`, and `tests/scripts/dev-tools/Invoke-ReleaseReconciliation.Tests.ps1`) and write `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/final-test-purity.2026-08-26T02-36.md`. Acceptance: that file exists, contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and its `Output Summary:` section records, per file, a match count of 0 for each of `New-TemporaryFile`, `GetTempFileName`, `TestDrive`, and `Start-Sleep`, and a classification of every textual `npm`, `gh`, or `git` match as a mock payload, a test title, a mock declaration, or an assertion pattern.
+- [ ] [P7-T7] Verify test purity across the four release-tooling test files (`tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1`, `tests/scripts/dev-tools/Invoke-ReleaseVerificationHelpers.Tests.ps1`, `tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1`, and `tests/scripts/dev-tools/Invoke-ReleaseReconciliation.Tests.ps1`) and write `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/final-test-purity.2026-08-26T02-36.md`. Acceptance: that file exists, contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and its `Output Summary:` section records, per file, a match count of 0 for each of `New-TemporaryFile`, `GetTempFileName`, `TestDrive`, and `Start-Sleep`, and a classification of every textual `npm`, `gh`, or `git` match as a mock payload, a test title, a mock declaration, or an assertion pattern.
 
 - [ ] [P7-T8] Record the loop outcome in `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/toolchain-loop.2026-08-26T02-36.md`. Acceptance: that file exists, contains the fields `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and its `Output Summary:` section records the number of loop iterations performed, states which iteration was the first in which P7-T1 through P7-T7 all passed consecutively with no file changed, and names the stages in the order they ran.
