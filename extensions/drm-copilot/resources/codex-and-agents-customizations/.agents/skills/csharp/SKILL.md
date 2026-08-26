@@ -1,8 +1,5 @@
 ---
 name: csharp
-paths:
-  - "**/*.cs"
-  - "**/*.csproj"
 description: C#-specific toolchain and coding standards.
 ---
 
