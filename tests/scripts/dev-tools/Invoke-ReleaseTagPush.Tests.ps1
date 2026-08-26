@@ -71,6 +71,40 @@ Describe "Invoke-ReleaseTagPush.ps1 - Invoke-ReleaseTagPushGuarded" {
         }
     }
 
+    Context "tag push ordering" {
+        It "pushes the mcp-server tag before the extension tag" {
+            Mock -CommandName Test-Path -MockWith { param($LiteralPath) $null = $LiteralPath; return $true }
+            Mock -CommandName Write-StderrLine -MockWith { param([string]$Message) $null = $Message }
+            Mock -CommandName Get-NpmVersion -MockWith {
+                param([string]$ManifestPath)
+                if ($ManifestPath -match 'mcp-server') { return "0.0.2" }
+                return "0.0.3"
+            }
+            Mock -CommandName Invoke-GitExe -MockWith {
+                param([string[]]$GitArgs)
+                $script:capturedGitArgsList.Add($GitArgs)
+                return @{ Output = @(); ExitCode = 0 }
+            }
+
+            $result = Invoke-ReleaseTagPushGuarded -ConfirmToken "yes" -RepoRoot "/repo"
+
+            $result | Should -Be 0
+            # The mcp-server tag is the dependency the extension consumes, so it must be
+            # pushed first: if its publish fails, the extension consumer tag is never
+            # created and no artifact pinning an unpublished version reaches a user.
+            $pushLines = @(
+                $script:capturedGitArgsList |
+                    ForEach-Object { $_ -join " " } |
+                        Where-Object { $_ -match "^push " }
+            )
+            $mcpPushIndex = [array]::IndexOf([object[]]$pushLines, [object]"push origin mcp-server-v0.0.2")
+            $extensionPushIndex = [array]::IndexOf([object[]]$pushLines, [object]"push origin v0.0.3")
+            $mcpPushIndex | Should -BeGreaterOrEqual 0
+            $extensionPushIndex | Should -BeGreaterOrEqual 0
+            $mcpPushIndex | Should -BeLessThan $extensionPushIndex
+        }
+    }
+
     Context "missing manifest" {
         It "reports a missing extension manifest and returns 1 (not silently ignored)" {
             Mock -CommandName Write-StderrLine -MockWith {
