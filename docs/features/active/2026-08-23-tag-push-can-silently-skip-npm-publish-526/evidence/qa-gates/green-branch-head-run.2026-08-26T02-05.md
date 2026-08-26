@@ -16,6 +16,15 @@ per-workflow section below.
 
 DEFERRED_TO: pr-author
 
+## Deferral discharged — 2026-08-26T09-05
+
+The deferral recorded below was discharged once pull request #564 opened and its `pull_request`
+runs completed against the branch head. The discharge observations are recorded in
+`evidence/qa-gates/ac18-verification.2026-08-26T09-05.md`; that artifact is authoritative for AC18.
+The literal `DEFERRED` values in Section 1 and Section 2 below are replaced with the observed values
+in place, and the original deferral text is preserved unedited above and below for the record of
+what was and was not knowable at execution time.
+
 ## Why this is a deferral and not an observation
 
 The feature-review policy rule `modified-workflow-needs-green-run` makes a workflow diff Blocking
@@ -36,9 +45,9 @@ Branch at the time of measurement: `bug/tag-push-can-silently-skip-npm-publish-5
 
 Workflow: `.github/workflows/publish-mcp-npm.yml`
 
-Run URL: `DEFERRED`
+Run URL: `https://github.com/drmoisan/drm-copilot/actions/runs/32949401667` (observed 2026-08-26T09-05)
 
-Run Conclusion: `DEFERRED`
+Run Conclusion: `success`, with the `Publish to npm` job's `Publish to npm` step concluding `skipped` (observed 2026-08-26T09-05)
 
 Listing invocation run by the executor:
 
@@ -86,9 +95,9 @@ consumes no version number. `pr-author` checks that expectation against the obse
 
 Workflow: `.github/workflows/verify-published-releases.yml`
 
-Run URL: `DEFERRED`
+Run URL: `https://github.com/drmoisan/drm-copilot/actions/runs/32949401794` (observed 2026-08-26T09-05)
 
-Run Conclusion: `DEFERRED`
+Run Conclusion: `success`, with the `Reconcile pushed tags against published versions` step concluding `skipped` (gated off the pull-request event as designed) and `Validate the reconciliation comparison offline` concluding `success` (observed 2026-08-26T09-05)
 
 Listing invocation run by the executor:
 
@@ -135,21 +144,39 @@ divergence (such as the known `1.0.12` gap) cannot make the branch-head run red.
 AC18 requires a green run of `publish-mcp-npm.yml` against the branch head, produced by the new
 `pull_request` trigger, with the run's publish-step conclusion recorded as `skipped`.
 
-Section 1 records the literal `DEFERRED` for both `Run URL:` and `Run Conclusion:`. Per the plan
-task text, the executor therefore **leaves the AC18 checkbox unchecked** in
-`docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/spec.md` and reports
+**Update, 2026-08-26T09-05 — deferral discharged.** Pull request #564 opened against `main` from
+branch `bug/tag-push-can-silently-skip-npm-publish-526`, and its `pull_request`-triggered runs have
+completed. Section 1 above now records the observed run
+(`https://github.com/drmoisan/drm-copilot/actions/runs/32949401667`, `event: pull_request`,
+`headSha: c8867713453c25ec749bc412308b5516de402616`, matching the branch head at the time of
+observation) with overall conclusion `success` and the `Publish to npm` job's `Publish to npm` step
+concluding `skipped`. Every clause of AC18 is satisfied. The AC18 checkbox is now checked in
+`docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/spec.md`. The full
+per-clause record is `evidence/qa-gates/ac18-verification.2026-08-26T09-05.md`.
+
+The original deferral text below (per the plan task text at execution time) is preserved unedited as
+the record of what was and was not knowable when this task ran: no branch existed, no pull request
+existed, and the executor was prohibited from pushing a branch or opening one, so a branch-head run
+could not exist and this task correctly recorded a deferral rather than an observation.
+
+Original disposition text (unedited): Section 1 records the literal `DEFERRED` for both `Run URL:`
+and `Run Conclusion:` as they stood at execution time. Per the plan task text, the executor therefore
+left the AC18 checkbox unchecked in
+`docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/spec.md` and reported
 AC18 in the completion report as an outstanding acceptance criterion owned by `pr-author`.
 
-Completing this task records the AC18 deferral and its owner. It does **not** itself satisfy AC18.
-The AC18 checkbox is checked only when an observed green branch-head run with a publish-step
-conclusion of `skipped` is recorded for `.github/workflows/publish-mcp-npm.yml`.
+Completing the original task recorded the AC18 deferral and its owner; it did not itself satisfy
+AC18. AC18 is satisfied now that an observed green branch-head run with a publish-step conclusion of
+`skipped` is recorded for `.github/workflows/publish-mcp-npm.yml`, as recorded above.
 
-Output Summary: Both per-workflow sections record the literal `DEFERRED` for `Run URL:` and
-`Run Conclusion:`, because no branch-head run exists for either workflow. The first listing
-invocation returned exit code 0 with five runs, all against `mcp-server-v*` tag refs and none against
-the feature branch; the second returned exit code 1 with `HTTP 404: workflow
-verify-published-releases.yml not found on the default branch`. One `DEFERRED_TO: pr-author` line is
-present. Each section names its workflow path, its `Run URL:` and `Run Conclusion:` values, the
+Output Summary: Both per-workflow sections originally recorded the literal `DEFERRED` for `Run URL:`
+and `Run Conclusion:`, because no branch-head run existed for either workflow at execution time. The
+first listing invocation returned exit code 0 with five runs, all against `mcp-server-v*` tag refs
+and none against the feature branch; the second returned exit code 1 with `HTTP 404: workflow
+verify-published-releases.yml not found on the default branch`. One `DEFERRED_TO: pr-author` line was
+present. Each section named its workflow path, its `Run URL:` and `Run Conclusion:` values, the
 deferral owner `pr-author`, the exact deferred read-only invocation `gh run view RUN_IDENTIFIER
---json conclusion`, and the expected deferred outcome. AC18 remains unchecked and outstanding, owned
-by `pr-author`. No branch push, tag push, or publish was performed by this task.
+--json conclusion`, and the expected deferred outcome. That deferral is now discharged: AC18 is
+checked, and both `Run URL:` and `Run Conclusion:` above record observed values rather than
+`DEFERRED`. No branch push, tag push, or publish was performed by this discharge; only read-only
+`gh run list` and `gh run view` invocations were used.
