@@ -191,3 +191,111 @@ Output Summary: ABSENT. The anticipated bundled-payload failure
 worktree; `poetry run pytest` exited 0 with 4136 passed, 0 failed, 5 skipped. The untracked
 file `.claude/state/python-batch-budget.default.json` that would trigger it does not exist here.
 The strict branch of `[P2-T13]` therefore applies.
+
+---
+
+## Superseding Observation:
+
+Timestamp: 2026-08-26T00-19
+
+**The `Known Baseline Failure:` block above is preserved verbatim and is not rewritten.** Its
+`ABSENT` verdict was accurate at the moment it was taken (2026-08-25T23-44). It is superseded
+here because it was not the steady state of this worktree, and the divergence is explained by
+evidence rather than asserted.
+
+### What was observed
+
+`.claude/state/python-batch-budget.default.json` **exists in this worktree now**:
+
+```
+stat -c '%n size=%s birth=%w mtime=%y' .claude/state/python-batch-budget.default.json
+-> STAT_EXIT=0
+
+.claude/state/python-batch-budget.default.json size=380 birth=2026-08-25 23:48:01.431378200 -0400 mtime=2026-08-25 23:49:13.851072500 -0400
+```
+
+| Property | Observed value |
+|---|---|
+| Size | 380 bytes |
+| Created | 2026-08-25 23:48:01 -0400 |
+| Last modified | 2026-08-25 23:49:13 -0400 |
+
+### Git status of the file — gitignored and untracked
+
+```
+git ls-files --error-unmatch .claude/state/python-batch-budget.default.json
+-> TRACKED_EXIT=1        (not tracked)
+
+git check-ignore -v .claude/state/python-batch-budget.default.json
+-> IGNORE_EXIT=0
+.gitignore:68:.claude/state/	.claude/state/python-batch-budget.default.json
+```
+
+The ignoring rule is `.gitignore` line 68, `.claude/state/`, which ignores the whole directory.
+
+### The writer is this repository's own PreToolUse hook
+
+The file is written by `.claude/hooks/enforce-python-batch-budget.ps1`, which composes the path
+at its line 190:
+
+```
+$stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")
+```
+
+That hook is registered in `.claude/settings.json` under the `"matcher": "Write|Edit"` PreToolUse
+block (settings line 128 for the matcher, line 136 for the hook command). It therefore fires on
+the **first Write or Edit any agent performs** in a fresh worktree, and creates the file as a
+side effect.
+
+### Why the original reading was unrepresentative
+
+The `[P0-T11]` baseline ran at approximately 23:40, during Phase 0, which is a read-and-measure
+phase that performs no source Write or Edit. No `Write|Edit` PreToolUse hook had yet fired in
+this worktree, so the state file had not yet been created. The file's own birth timestamp,
+23:48:01, falls in Phase 1 — the first phase that authors files — and is eight minutes after the
+baseline reading. The `ABSENT` verdict was thus a true observation of a transient pre-hook
+condition, not of the worktree's steady state. Any phase from Phase 1 onward runs with the file
+present.
+
+This matches the defect `[P0-T11]` itself describes: `list_scoped_files` enumerates the
+filesystem rather than consulting git, so a gitignored, untracked, machine-local state file
+enters the repo-side set and has no bundled counterpart.
+
+### Scope — nothing was mutated
+
+No gitignored file was created, deleted, moved, or otherwise mutated to produce this observation.
+It was established by `stat`, `git ls-files`, `git check-ignore`, and by reading the hook and
+settings files. Deleting the file is **rejected** as a remedy, per extraction note 4 of the plan:
+it is a mutation of the developer's environment outside this change's scope, and the registered
+hook regenerates it on the next Write or Edit regardless. The underlying `list_scoped_files`
+defect remains out of scope for this plan.
+
+### OPERATIVE VERDICT
+
+The operative verdict for downstream branch selection is **PRESENT**.
+
+This supersedes the `### Consequence for [P2-T13]` subsection of the preserved block above, which
+concluded that the strict branch applied. It does not apply. The **exception branch** applies,
+under which exactly one failure is permitted and only if that failure is
+`test_bundled_claude_payload_contains_all_repo_runtime_contracts`; any second failure fails the
+task outright.
+
+The three tasks this verdict governs are:
+
+| Task | Effect of the PRESENT verdict |
+|---|---|
+| `[P2-T13]` | Exception branch: exactly one tolerated failure, named above, and no other. |
+| `[P3-T18]` | Exception branch: same single tolerated failure. Every test in `test_epic_run_kickoff_discovery_contract.py` must still pass, including `test_discovery_fix_is_mirrored_into_bundled_payload`. |
+| `[P6-T4]` | Exception branch on the same terms. |
+
+Both readings remain legible above: the original `ABSENT` observation with its own timestamp, and
+this `PRESENT` correction with its own. A later auditor can reconstruct why the two differ.
+
+Output Summary: SUPERSEDED to PRESENT. `.claude/state/python-batch-budget.default.json` (380
+bytes, created 2026-08-25T23:48:01) exists in this worktree, is untracked, and is gitignored by
+`.gitignore:68`. It is written by the repository's own `Write|Edit` PreToolUse hook
+`.claude/hooks/enforce-python-batch-budget.ps1` registered in `.claude/settings.json`, so it
+regenerates as soon as any agent performs a Write or Edit. The Phase 0 baseline at ~23:40 preceded
+any such hook firing, which is why it correctly read the file as absent. The operative verdict for
+`[P2-T13]`, `[P3-T18]`, and `[P6-T4]` is PRESENT, selecting the one-tolerated-failure exception
+branch in each.

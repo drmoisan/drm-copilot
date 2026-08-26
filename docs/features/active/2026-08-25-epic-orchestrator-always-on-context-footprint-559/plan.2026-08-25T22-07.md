@@ -563,7 +563,7 @@ argument uses the importable dotted form with `=`.
 - [x] [P2-T12] Copy `.claude/rules/parallel-orchestration.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P2-T13] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
+- [x] [P2-T13] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
       Acceptance: exit code 0, confirming the five mirrors satisfy the byte-identity contract; **or**,
       only if the `[P0-T11]` artifact recorded `PRESENT`, exactly one failure, that failure being
       `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, and no other. If `[P0-T11]`
@@ -575,30 +575,30 @@ argument uses the importable dotted form with `=`.
 Edits within a shared file are applied bottom-up so that each edit's line numbers are unaffected by
 the preceding edits.
 
-- [ ] [P3-T1] In `.claude/agents/epic-orchestrator.md`, replace the F4 citation at line 136 so the
+- [x] [P3-T1] In `.claude/agents/epic-orchestrator.md`, replace the F4 citation at line 136 so the
       checkpoint schema authority is `validate_epic_orchestrator_state_text`, implemented in
       `scripts/dev_tools/validate_epic_orchestrator_state.py`, and the unqualified section citation
       is removed. Acceptance: the sentence names `validate_epic_orchestrator_state_text` and no
       longer carries an unqualified section reference.
-- [ ] [P3-T2] In `.claude/agents/epic-orchestrator.md`, replace the F4 citation at line 107 so the
+- [x] [P3-T2] In `.claude/agents/epic-orchestrator.md`, replace the F4 citation at line 107 so the
       authority is `.claude/skills/epic-orchestrate/SKILL.md`, naming the two headings
       `## Merge-on-Green Kickoff Parameter` and `## Context Handoff to Dependent Features`, and the
       unqualified section citation is removed. Acceptance: both heading literals appear in the
       replaced sentence and both exist in `.claude/skills/epic-orchestrate/SKILL.md`.
-- [ ] [P3-T3] In `.claude/agents/epic-orchestrator.md`, delete the two `## Startup Protocol` steps at
+- [x] [P3-T3] In `.claude/agents/epic-orchestrator.md`, delete the two `## Startup Protocol` steps at
       lines 57 and 58 that instruct reading `CLAUDE.md` and reading `.claude/rules/` files, then
       renumber the remaining three steps contiguously to `1.`, `2.`, `3.`, changing only the leading
       ordinals and leaving every continuation line unchanged. Add no replacement text. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions"`
       passes.
-- [ ] [P3-T4] In the `.claude/agents/epic-orchestrator.md` frontmatter, delete the three `skills:`
+- [x] [P3-T4] In the `.claude/agents/epic-orchestrator.md` frontmatter, delete the three `skills:`
       entries `feature-promotion-lifecycle`, `atomic-plan-contract`, and
       `evidence-and-timestamp-conventions`, leaving exactly `policy-compliance-order`,
       `epic-orchestrate`, and `acceptance-criteria-tracking`. Make no other edit; no prose in either
       epic file references a removed skill, so no `Skill` invocation is inserted. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_epic_orchestrator_preloads_exactly_three_skills"`
       passes.
-- [ ] [P3-T5] Confirm that the `## Prepared-Epic Execution (epic-planner Handoff)` section of
+- [x] [P3-T5] Confirm that the `## Prepared-Epic Execution (epic-planner Handoff)` section of
       `.claude/agents/epic-orchestrator.md` is unchanged and unreflowed. That section spans lines 78
       through 99 before this phase's edits, and shifts to lines 76 through 97 once `[P3-T3]` has
       removed the two `## Startup Protocol` steps above it. Run the single node ID
@@ -608,12 +608,12 @@ the preceding edits.
       byte-identical to its bundled copy and therefore cannot pass at this point, because the mirror
       is not written until `[P3-T15]`. The full module is run at `[P3-T18]`, after every mirror.
       Acceptance: one passed.
-- [ ] [P3-T6] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the F4 clause at line 268 that
+- [x] [P3-T6] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the F4 clause at line 268 that
       cites an unqualified section for the checkpoint schema. The surrounding
       `## Epic-Level Checkpoint` section is itself the schema statement and already names the
       validator and its module path, so no replacement text is added. Acceptance: the sentence reads
       correctly without the clause and carries no unqualified section reference.
-- [ ] [P3-T7] In `.claude/skills/epic-orchestrate/SKILL.md`, insert a new section headed
+- [x] [P3-T7] In `.claude/skills/epic-orchestrate/SKILL.md`, insert a new section headed
       `## Bounded Child Return Contract` immediately after the `## Merge-on-Green Kickoff Parameter`
       section and immediately before `## Model Selection`. The section must name the eight fields of
       the fixed return shape — `issue_num`, `feature_folder`, `merge_status`, `pr_number`,
@@ -624,14 +624,14 @@ the preceding edits.
       `.claude/rules/parallel-orchestration.md` rather than restating it. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_epic_skill_documents_bounded_child_return_contract_section" "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_bounded_return_shape_names_every_required_field" "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_bounded_return_section_states_discard_and_rederivation"`
       reports three passed.
-- [ ] [P3-T8] In `.claude/skills/epic-orchestrate/SKILL.md`, append the child-facing half of the
+- [x] [P3-T8] In `.claude/skills/epic-orchestrate/SKILL.md`, append the child-facing half of the
       constraint to the epic-mode kickoff line at line 126, in the same imperative form as the
       existing trailing directive, requiring the child's final report to be exactly the bounded
       return shape and nothing else and stating that additional narrative is discarded because the
       parent re-derives authoritative state regardless. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_epic_mode_kickoff_line_carries_child_facing_constraint"`
       passes.
-- [ ] [P3-T9] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the `## Prerequisites` block. The
+- [x] [P3-T9] In `.claude/skills/epic-orchestrate/SKILL.md`, delete the `## Prerequisites` block. The
       block occupies lines 22 through 28; delete lines 22 through 29 so that exactly one blank line
       separates the paragraph ending at line 20 from the `## Epic Dependency Manifest` heading. Line
       21 is already that blank line and is retained; line 29 is the blank line below the block and is
@@ -639,44 +639,44 @@ the preceding edits.
       no replacement text. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_epic_orchestrate_skill_has_no_prerequisites_heading"`
       passes and no two consecutive blank lines precede that heading.
-- [ ] [P3-T10] In `.claude/skills/orchestrate/SKILL.md`, add a new section headed
+- [x] [P3-T10] In `.claude/skills/orchestrate/SKILL.md`, add a new section headed
       `## Epic Mode Bounded Return`, placed adjacent to the existing `## Preparation Mode` section,
       stating the same eight-field bounded return shape and that content beyond it is discarded. The
       section must be ten lines or fewer, because this is a context-reduction change. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py::test_orchestrate_skill_carries_matching_child_side_statement"`
       passes and the section body is ten lines or fewer.
-- [ ] [P3-T11] Recompute the SHA-256 digest of `.claude/agents/epic-orchestrator.md` from the exact
+- [x] [P3-T11] Recompute the SHA-256 digest of `.claude/agents/epic-orchestrator.md` from the exact
       working-tree bytes that will be committed, using
       `poetry run python -c "import hashlib,pathlib;print(hashlib.sha256(pathlib.Path('.claude/agents/epic-orchestrator.md').read_bytes()).hexdigest())"`,
       and record the value in
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/frozen-epic-digest-repin.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: the artifact
       records a 64-character hexadecimal digest.
-- [ ] [P3-T12] Recompute the SHA-256 digest of `.claude/skills/epic-orchestrate/SKILL.md` using
+- [x] [P3-T12] Recompute the SHA-256 digest of `.claude/skills/epic-orchestrate/SKILL.md` using
       `poetry run python -c "import hashlib,pathlib;print(hashlib.sha256(pathlib.Path('.claude/skills/epic-orchestrate/SKILL.md').read_bytes()).hexdigest())"`
       and append the value to the same artifact
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/frozen-epic-digest-repin.2026-08-26T00-00.md`.
       Acceptance: the artifact records both digests, each 64 hexadecimal characters.
-- [ ] [P3-T13] Update the two pinned digest constants in
+- [x] [P3-T13] Update the two pinned digest constants in
       `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` to the two values
       recorded in P3-T11 and P3-T12, and rewrite the block comment above them so it records that
       issue #559 re-baselined the pin, why the epic surface legitimately changed, and that the pin
       remains live as a guard against an unintended future edit. Do not remove the constants and do
       not remove the consuming test. Acceptance: the file contains both new digests and the rewritten
       comment names issue #559.
-- [ ] [P3-T14] Run `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`.
+- [x] [P3-T14] Run `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`.
       Acceptance: exit code 0, confirming the re-baselined pin matches the edited epic files and that
       no other assertion in that module regressed.
-- [ ] [P3-T15] Copy `.claude/agents/epic-orchestrator.md` to
+- [x] [P3-T15] Copy `.claude/agents/epic-orchestrator.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P3-T16] Copy `.claude/skills/epic-orchestrate/SKILL.md` to
+- [x] [P3-T16] Copy `.claude/skills/epic-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P3-T17] Copy `.claude/skills/orchestrate/SKILL.md` to
+- [x] [P3-T17] Copy `.claude/skills/orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P3-T18] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py`
+- [x] [P3-T18] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py`
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/qa-gates/push-down-mirror-parity.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Acceptance: exit code 0,
@@ -686,7 +686,7 @@ the preceding edits.
       recorded `ABSENT`, strict exit code 0 applies with no exception. Under the exception branch
       every test in `test_epic_run_kickoff_discovery_contract.py` must still pass, including
       `test_discovery_fix_is_mirrored_into_bundled_payload`.
-- [ ] [P3-T19] Run `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_no_unqualified_spec_section_citation_under_claude" "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_every_agent_preloaded_skill_resolves_to_an_existing_skill_file"`.
+- [x] [P3-T19] Run `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_no_unqualified_spec_section_citation_under_claude" "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_every_agent_preloaded_skill_resolves_to_an_existing_skill_file"`.
       Acceptance: two passed, confirming F4's criterion holds across `.claude/` and that every
       `skills:` entry of every agent file resolves.
 

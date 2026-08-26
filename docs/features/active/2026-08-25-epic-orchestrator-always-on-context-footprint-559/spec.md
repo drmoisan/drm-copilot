@@ -556,24 +556,24 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 
 ### F1 — startup protocol no longer instructs re-reading injected content
 
-- [ ] `.claude/agents/epic-orchestrator.md` `## Startup Protocol` contains exactly three steps,
+- [x] `.claude/agents/epic-orchestrator.md` `## Startup Protocol` contains exactly three steps,
       numbered contiguously `1.`, `2.`, `3.`, and no step instructs reading `CLAUDE.md` or reading
       `.claude/rules/`.
-- [ ] `.claude/skills/epic-orchestrate/SKILL.md` contains no `## Prerequisites` heading, verified by
+- [x] `.claude/skills/epic-orchestrate/SKILL.md` contains no `## Prerequisites` heading, verified by
       `git grep -n -F "## Prerequisites" -- .claude/skills/epic-orchestrate/SKILL.md` returning no
       matches (exit code 1).
-- [ ] Exactly one blank line separates the paragraph preceding the deleted block from the
+- [x] Exactly one blank line separates the paragraph preceding the deleted block from the
       `## Epic Dependency Manifest` heading in `.claude/skills/epic-orchestrate/SKILL.md`; no two
       consecutive blank lines are introduced by the deletion.
 
 ### F2 — preloaded skill set reduced from six to three
 
-- [ ] The `skills:` list in `.claude/agents/epic-orchestrator.md` frontmatter contains exactly three
+- [x] The `skills:` list in `.claude/agents/epic-orchestrator.md` frontmatter contains exactly three
       entries: `policy-compliance-order`, `epic-orchestrate`, `acceptance-criteria-tracking`.
-- [ ] `git grep -n -F "feature-promotion-lifecycle" -- .claude/agents/epic-orchestrator.md .claude/skills/epic-orchestrate/SKILL.md`
+- [x] `git grep -n -F "feature-promotion-lifecycle" -- .claude/agents/epic-orchestrator.md .claude/skills/epic-orchestrate/SKILL.md`
       returns no matches, and the same command returns no matches for `atomic-plan-contract` and for
       `evidence-and-timestamp-conventions`.
-- [ ] `config/orchestration-routing.json` is unmodified, verified by
+- [x] `config/orchestration-routing.json` is unmodified, verified by
       `git diff --exit-code -- config/orchestration-routing.json` returning exit code 0.
 
 ### F3 — all nineteen rules files carry scoped frontmatter
@@ -610,13 +610,13 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 
 ### F4 — no unqualified section citation remains under `.claude/`
 
-- [ ] `git grep -n -F "spec.md §" -- .claude/` returns no matches (exit code 1). The criterion is
+- [x] `git grep -n -F "spec.md §" -- .claude/` returns no matches (exit code 1). The criterion is
       scoped to `.claude/`; occurrences in this feature's own documents, in the promoted lifecycle
       record, and in `docs/features/completed/**` are out of scope and are not modified.
-- [ ] `.claude/agents/epic-orchestrator.md` line 136's replacement names
+- [x] `.claude/agents/epic-orchestrator.md` line 136's replacement names
       `validate_epic_orchestrator_state_text`, and
       `scripts/dev_tools/validate_epic_orchestrator_state.py` exists.
-- [ ] `.claude/agents/epic-orchestrator.md` line 107's replacement names two headings that exist in
+- [x] `.claude/agents/epic-orchestrator.md` line 107's replacement names two headings that exist in
       `.claude/skills/epic-orchestrate/SKILL.md`: `## Merge-on-Green Kickoff Parameter` and
       `## Context Handoff to Dependent Features`. Verified by a test asserting both heading literals
       are present in that file.
@@ -656,26 +656,26 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 
 ### F6 — bounded child return contract
 
-- [ ] `.claude/skills/epic-orchestrate/SKILL.md` contains a `## Bounded Child Return Contract`
+- [x] `.claude/skills/epic-orchestrate/SKILL.md` contains a `## Bounded Child Return Contract`
       heading, positioned after `## Merge-on-Green Kickoff Parameter` and before `## Model
       Selection`.
-- [ ] That section names all six required fields as the fixed return shape: `issue_num`,
+- [x] That section names all six required fields as the fixed return shape: `issue_num`,
       `feature_folder`, `merge_status`, `pr_number`, `merge_commit_sha`, `blocked_reason`. Asserted
       by a test checking each of the six literals is present within the section.
-- [ ] That section states that content beyond the fixed shape is discarded, and states that
+- [x] That section states that content beyond the fixed shape is discarded, and states that
       authoritative state is re-derived regardless from `git worktree list --porcelain`,
       `git branch`, and `gh pr view --json state,mergedAt,headRefOid`.
-- [ ] The epic-mode kickoff line in `.claude/skills/epic-orchestrate/SKILL.md` carries the
+- [x] The epic-mode kickoff line in `.claude/skills/epic-orchestrate/SKILL.md` carries the
       child-facing half of the constraint, asserted by a placeholder-free literal-fragment test.
-- [ ] `.claude/skills/orchestrate/SKILL.md` carries the matching child-side statement of the bounded
+- [x] `.claude/skills/orchestrate/SKILL.md` carries the matching child-side statement of the bounded
       return shape and of the discard rule, and that statement is ten lines or fewer.
-- [ ] `.claude/agents/epic-orchestrator.md` lines 85-97 (`## Prepared-Epic Execution`) are unchanged,
+- [x] `.claude/agents/epic-orchestrator.md` lines 85-97 (`## Prepared-Epic Execution`) are unchanged,
       verified by `poetry run pytest tests/scripts/dev_tools/test_epic_run_kickoff_discovery_contract.py`
       passing.
 
 ### Cross-cutting
 
-- [ ] Every `skills:` entry in every `.claude/agents/*.md` file resolves to an existing
+- [x] Every `skills:` entry in every `.claude/agents/*.md` file resolves to an existing
       `.claude/skills/` directory containing a `SKILL.md`. Asserted by the new structural test over
       all agent files, not only `epic-orchestrator.md`.
 - [ ] Each of the eight files under
@@ -683,7 +683,7 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
       is byte-identical to its repository original, verified by
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
       passing.
-- [ ] The pinned SHA-256 digests in
+- [x] The pinned SHA-256 digests in
       `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` are consistent with the
       committed contents of `.claude/agents/epic-orchestrator.md` and
       `.claude/skills/epic-orchestrate/SKILL.md`, or the pin and its consuming test have been removed
