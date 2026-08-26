@@ -36,6 +36,7 @@ from scripts.dev_tools.plan_gate_coverage import (
     evaluate_cov_value,
     is_placeholder,
 )
+from scripts.dev_tools.plan_gate_observability import evaluate_observability_gates
 from scripts.dev_tools.pr_context.git import SubprocessRunner
 
 if TYPE_CHECKING:
@@ -380,6 +381,10 @@ def evaluate_plan_gates(
                 space_separated=space_separated,
                 context=context,
             )
+
+    # The observability group runs G7, G8, and G8b unconditionally and G9 only
+    # when a context is supplied, absorbing any repository-seam failure itself.
+    evaluate_observability_gates(report, commands, context=context)
 
     if context is not None:
         _evaluate_literal_rules(report, text, commands, context)
