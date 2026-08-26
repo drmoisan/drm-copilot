@@ -383,7 +383,8 @@ function Invoke-PrdFeatureBeforePlannerDecision {
 
     # Derive the prerequisite set from the persisted work-mode marker rather
     # than a fixed spec.md/user-story.md pair. A marker that cannot be read or
-    # recognized must fail closed to the strictest set, not fail open.
+    # recognized must fail closed, not fail open: it denies on its own branch
+    # below, naming no prerequisite set and probing for no required file.
     $issueContent = Get-PrdFeatureIssueContent -FeatureFolder $folderNormalized
     $workMode = Resolve-PrdFeatureWorkMode -IssueContent $issueContent
 

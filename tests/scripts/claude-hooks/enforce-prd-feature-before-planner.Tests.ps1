@@ -264,11 +264,11 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         # is denied by its own decision path without a required-file probe, so no
         # reachable path can demand a document the lifecycle contract requires to
         # be absent for full-bug and minor-audit work.
-        It 'fails closed to the strictest set when the mode is $null' {
+        It 'returns spec.md alone for a $null mode so no reachable path can demand user-story.md' {
             (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md')
         }
 
-        It 'fails closed to the strictest set for an unrecognized mode string' {
+        It 'returns spec.md alone for an unrecognized mode string so no reachable path can demand user-story.md' {
             (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md')
         }
     }
@@ -367,11 +367,12 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
     Context 'fail-closed prerequisite resolution (AC: unable to determine work mode)' {
         # These four scenarios (marker absent, unreadable issue.md, unrecognized
         # marker value, missing issue.md) all collapse to an undeterminable work
-        # mode. The gate MUST fail closed to the strictest prerequisite set
-        # (spec.md and user-story.md) in every case. Treating an undeterminable
-        # mode as satisfying every mode's requirement (i.e. failing open) would
-        # reintroduce the exact defect class issue #501 corrected: a PreToolUse
-        # gate that appears to enforce a prerequisite but always allows.
+        # mode. An undeterminable mode denies on its own distinct decision path,
+        # which names no prerequisite document and runs no required-file probe,
+        # because no prerequisite set is knowable when the mode is unknown. The
+        # decision is still deny, so the fail-open defect class issue #501
+        # corrected (a PreToolUse gate that appears to enforce a prerequisite
+        # but always allows) remains locked.
         It 'fails closed when the work-mode marker line is absent from issue.md' {
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "## Overview`nNo marker line here." }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }

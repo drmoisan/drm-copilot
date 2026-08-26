@@ -328,68 +328,68 @@ None required. The reproduction is a differential over two prompt strings, which
 
 ### Folder resolution
 
-- [ ] `Find-PrdFeatureFolderFromPrompt` returns the same four-segment folder path for all four prompt forms: the feature folder alone; the folder plus a `research/` artifact path; the folder plus an `evidence/` artifact path under a kind subdirectory; and a nested artifact path alone with the folder never cited. A passing Pester case exists for each of the four.
-- [ ] `Invoke-PrdFeatureBeforePlannerDecision` returns the same decision (allow or deny, and the same reason) for all four prompt forms above, given identical mocked filesystem and checkpoint state.
-- [ ] The reproduction differential passes: two delegations differing only in whether the research path is written folder-relative or full repo-relative produce identical decisions.
-- [ ] `Sort-Object -Property Length -Descending` no longer appears in `.claude/hooks/enforce-prd-feature-before-planner.ps1` or in its bundled mirror.
-- [ ] The `.md`-implies-parent branch is removed, and the existing case at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1:194-196` still passes because truncation produces the same result.
-- [ ] Candidate deduplication uses an order-preserving collection, not a `[hashtable]`. A Pester case asserts that a prompt citing one folder at three different depths yields exactly one distinct candidate.
-- [ ] A matched token that truncates to fewer than four segments is rejected rather than returned as a folder, with a passing case for a degenerate token such as `docs/features/active/.`.
+- [x] `Find-PrdFeatureFolderFromPrompt` returns the same four-segment folder path for all four prompt forms: the feature folder alone; the folder plus a `research/` artifact path; the folder plus an `evidence/` artifact path under a kind subdirectory; and a nested artifact path alone with the folder never cited. A passing Pester case exists for each of the four.
+- [x] `Invoke-PrdFeatureBeforePlannerDecision` returns the same decision (allow or deny, and the same reason) for all four prompt forms above, given identical mocked filesystem and checkpoint state.
+- [x] The reproduction differential passes: two delegations differing only in whether the research path is written folder-relative or full repo-relative produce identical decisions.
+- [x] `Sort-Object -Property Length -Descending` no longer appears in `.claude/hooks/enforce-prd-feature-before-planner.ps1` or in its bundled mirror.
+- [x] The `.md`-implies-parent branch is removed, and the existing case at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1:194-196` still passes because truncation produces the same result.
+- [x] Candidate deduplication uses an order-preserving collection, not a `[hashtable]`. A Pester case asserts that a prompt citing one folder at three different depths yields exactly one distinct candidate.
+- [x] A matched token that truncates to fewer than four segments is rejected rather than returned as a folder, with a passing case for a degenerate token such as `docs/features/active/.`.
 
 ### Deterministic selection among two feature folders
 
-- [ ] When a prompt names two distinct feature folders and the orchestrator checkpoint records one of them, the checkpoint-recorded folder is selected. A passing case exists in which the checkpoint-recorded folder occurs **later** in the prompt than the other candidate, so this rule is distinguished from the earliest-occurrence rule rather than coincidentally agreeing with it.
-- [ ] When a prompt names two distinct feature folders and `Get-PrdFeatureCheckpointFolder` returns a null value, or returns a folder that is not among the candidates, the earliest-occurring candidate in the prompt text is selected. A passing case exists for each of those two conditions.
+- [x] When a prompt names two distinct feature folders and the orchestrator checkpoint records one of them, the checkpoint-recorded folder is selected. A passing case exists in which the checkpoint-recorded folder occurs **later** in the prompt than the other candidate, so this rule is distinguished from the earliest-occurrence rule rather than coincidentally agreeing with it.
+- [x] When a prompt names two distinct feature folders and `Get-PrdFeatureCheckpointFolder` returns a null value, or returns a folder that is not among the candidates, the earliest-occurring candidate in the prompt text is selected. A passing case exists for each of those two conditions.
 
 ### Work mode and prerequisite sets
 
-- [ ] A `full-bug` folder whose `issue.md` carries the `- Work Mode: full-bug` marker, whose `spec.md` is present, and whose `user-story.md` is correctly absent is **ALLOWED**, including when the delegation prompt cites a nested `research/` artifact. This is the case that cannot pass today.
-- [ ] A `full-feature` folder with no `spec.md` still **DENIES**. A passing negative case asserts this.
-- [ ] A `full-bug` folder with no `spec.md` still **DENIES**. A passing negative case asserts this.
-- [ ] A `full-feature` folder with `spec.md` present and `user-story.md` absent still **DENIES**, naming `user-story.md` as missing.
-- [ ] A `minor-audit` folder is allowed with neither `spec.md` nor `user-story.md` present, and legacy `full` is still normalized to `full-feature`.
-- [ ] No decision path returns an empty prerequisite set as a fail-closed default. The existing fail-open regression lock at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1:350-357` still passes.
+- [x] A `full-bug` folder whose `issue.md` carries the `- Work Mode: full-bug` marker, whose `spec.md` is present, and whose `user-story.md` is correctly absent is **ALLOWED**, including when the delegation prompt cites a nested `research/` artifact. This is the case that cannot pass today.
+- [x] A `full-feature` folder with no `spec.md` still **DENIES**. A passing negative case asserts this.
+- [x] A `full-bug` folder with no `spec.md` still **DENIES**. A passing negative case asserts this.
+- [x] A `full-feature` folder with `spec.md` present and `user-story.md` absent still **DENIES**, naming `user-story.md` as missing.
+- [x] A `minor-audit` folder is allowed with neither `spec.md` nor `user-story.md` present, and legacy `full` is still normalized to `full-feature`.
+- [x] No decision path returns an empty prerequisite set as a fail-closed default. The existing fail-open regression lock at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1:350-357` still passes.
 
 ### Indeterminate work-mode marker
 
-- [ ] An indeterminate `- Work Mode:` marker — absent, unreadable, or unrecognized — produces a **distinct block reason** that is not the missing-prerequisite reason. A passing case asserts each of the three indeterminate conditions.
-- [ ] The indeterminate-marker reason names the resolved feature folder and the `issue.md` path that was probed, and states adding or correcting the `- Work Mode:` marker as the remedy.
-- [ ] The indeterminate-marker reason contains no missing-file list and mentions neither `spec.md` nor `user-story.md`. A passing case asserts the absence of `user-story.md` from the reason text.
-- [ ] The required-file probe is not executed in the indeterminate branch. A passing case asserts that the `Get-PrdFeatureFileExistence` mock records zero invocations on that path.
-- [ ] The indeterminate branch still **DENIES** the delegation.
+- [x] An indeterminate `- Work Mode:` marker — absent, unreadable, or unrecognized — produces a **distinct block reason** that is not the missing-prerequisite reason. A passing case asserts each of the three indeterminate conditions.
+- [x] The indeterminate-marker reason names the resolved feature folder and the `issue.md` path that was probed, and states adding or correcting the `- Work Mode:` marker as the remedy.
+- [x] The indeterminate-marker reason contains no missing-file list and mentions neither `spec.md` nor `user-story.md`. A passing case asserts the absence of `user-story.md` from the reason text.
+- [x] The required-file probe is not executed in the indeterminate branch. A passing case asserts that the `Get-PrdFeatureFileExistence` mock records zero invocations on that path.
+- [x] The indeterminate branch still **DENIES** the delegation.
 
 ### Block message
 
-- [ ] The missing-prerequisite reason names the resolved feature folder before any remedy text, so a misresolved path is visible in the headline. A passing case asserts the folder path appears ahead of the prd-feature remedy phrase.
-- [ ] Every deny reason retains the `PRD_FEATURE_BLOCKED:` prefix.
+- [x] The missing-prerequisite reason names the resolved feature folder before any remedy text, so a misresolved path is visible in the headline. A passing case asserts the folder path appears ahead of the prd-feature remedy phrase.
+- [x] Every deny reason retains the `PRD_FEATURE_BLOCKED:` prefix.
 
 ### Bundle parity
 
-- [ ] `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1` are textually identical after the change.
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes without modification to the test.
+- [x] `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1` are textually identical after the change.
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes without modification to the test.
 
 ### Scope containment
 
-- [ ] `.claude/hooks/enforce-epic-wave-barrier.ps1`, `.claude/hooks/enforce-parallel-cohort-barrier.ps1`, `.claude/hooks/enforce-parallel-drift-gate.ps1`, their three bundled mirrors, and their three test files are unmodified by this change.
-- [ ] `.claude/hooks/enforce-feature-folder-order.ps1`, its bundled mirror, and `tests/scripts/claude-hooks/enforce-feature-folder-order.Tests.ps1` are unmodified.
-- [ ] `.claude/settings.json`, its bundled mirror, `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and both copies of `pester.runsettings.psd1` are unmodified.
-- [ ] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes without modification.
-- [ ] Three follow-up issues are filed for the sibling hooks named above, and one follow-up issue is filed for the two `enforce-feature-folder-order.ps1` defects recorded in Scope & Non-Goals.
+- [x] `.claude/hooks/enforce-epic-wave-barrier.ps1`, `.claude/hooks/enforce-parallel-cohort-barrier.ps1`, `.claude/hooks/enforce-parallel-drift-gate.ps1`, their three bundled mirrors, and their three test files are unmodified by this change.
+- [x] `.claude/hooks/enforce-feature-folder-order.ps1`, its bundled mirror, and `tests/scripts/claude-hooks/enforce-feature-folder-order.Tests.ps1` are unmodified.
+- [x] `.claude/settings.json`, its bundled mirror, `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and both copies of `pester.runsettings.psd1` are unmodified.
+- [x] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes without modification.
+- [x] Three follow-up issues are filed for the sibling hooks named above, and one follow-up issue is filed for the two `enforce-feature-folder-order.ps1` defects recorded in Scope & Non-Goals.
 
 ### Toolchain, coverage, and file size
 
-- [ ] `mcp__drm-copilot__run_poshqc_format` reports no reformatting needed on a clean pass.
-- [ ] `mcp__drm-copilot__run_poshqc_analyze` reports zero PSScriptAnalyzer findings.
-- [ ] `mcp__drm-copilot__run_poshqc_test` reports zero Pester failures, and all three stages pass in a single consecutive run with no re-fix in between.
-- [ ] Line coverage is at or above 85% overall and for `.claude/hooks/enforce-prd-feature-before-planner.ps1`, read from `artifacts/pester/powershell-coverage.xml` and recorded in evidence. No branch-coverage threshold applies, per `.claude/rules/quality-tiers.md`.
-- [ ] No coverage regression on changed lines, demonstrated by comparing the post-change per-file figure against the pre-change baseline capture.
-- [ ] Baseline, regression, and QA-gate evidence are written under `docs/features/active/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/evidence/baseline/`, `.../evidence/regression-testing/`, and `.../evidence/qa-gates/`.
-- [ ] Every changed file is under 500 lines, per `.claude/rules/general-code-change.md`. If adding the new cases to `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1` (408 lines today, roughly 80 new lines estimated) would bring it to 500 or more, the new cases live in the companion file `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1` instead.
-- [ ] The change touches at most 2 production PowerShell files, within the direct-mode budget in `.claude/rules/powershell.md:37-40`, with no override requested.
+- [x] `mcp__drm-copilot__run_poshqc_format` reports no reformatting needed on a clean pass.
+- [x] `mcp__drm-copilot__run_poshqc_analyze` reports zero PSScriptAnalyzer findings.
+- [x] `mcp__drm-copilot__run_poshqc_test` reports zero Pester failures, and all three stages pass in a single consecutive run with no re-fix in between.
+- [x] Line coverage is at or above 85% overall and for `.claude/hooks/enforce-prd-feature-before-planner.ps1`, read from `artifacts/pester/powershell-coverage.xml` and recorded in evidence. No branch-coverage threshold applies, per `.claude/rules/quality-tiers.md`.
+- [x] No coverage regression on changed lines, demonstrated by comparing the post-change per-file figure against the pre-change baseline capture.
+- [x] Baseline, regression, and QA-gate evidence are written under `docs/features/active/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/evidence/baseline/`, `.../evidence/regression-testing/`, and `.../evidence/qa-gates/`.
+- [x] Every changed file is under 500 lines, per `.claude/rules/general-code-change.md`. If adding the new cases to `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1` (408 lines today, roughly 80 new lines estimated) would bring it to 500 or more, the new cases live in the companion file `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1` instead.
+- [x] The change touches at most 2 production PowerShell files, within the direct-mode budget in `.claude/rules/powershell.md:37-40`, with no override requested.
 
 ### Documentation
 
-- [ ] The hook's comment-based help (self-hosted lines 14-19 and the bundled equivalent) no longer describes the longest-match and `.md`-parent strategy, and instead states two-segment truncation, the checkpoint-then-earliest-occurrence selection rule, and the known version-folder limitation.
+- [x] The hook's comment-based help (self-hosted lines 14-19 and the bundled equivalent) no longer describes the longest-match and `.md`-parent strategy, and instead states two-segment truncation, the checkpoint-then-earliest-occurrence selection rule, and the known version-folder limitation.
 
 ## Risks & Mitigations
 
