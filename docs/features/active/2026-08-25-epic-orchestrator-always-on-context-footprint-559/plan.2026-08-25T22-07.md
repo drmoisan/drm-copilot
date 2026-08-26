@@ -481,17 +481,17 @@ argument uses the importable dotted form with `=`.
 
 ### Phase 2 — F3: Scope the Five Unscoped Rules Files and Mirror Them
 
-- [ ] [P2-T1] Insert a YAML frontmatter block at the top of `.claude/rules/ci-workflows.md` whose
+- [x] [P2-T1] Insert a YAML frontmatter block at the top of `.claude/rules/ci-workflows.md` whose
       `paths:` list is the single double-quoted entry `.github/workflows/**` and whose
       `description:` is a non-empty single-line scalar containing no colon, followed by a closing
       `---`, one blank line, then the existing `# CI Workflow Authoring` heading. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_every_claude_rule_carries_parseable_paths_and_description"`
       no longer reports this file, and the file's body below the block is byte-unchanged.
-- [ ] [P2-T2] Insert a frontmatter block at the top of `.claude/rules/benchmark-baselines.md` whose
+- [x] [P2-T2] Insert a frontmatter block at the top of `.claude/rules/benchmark-baselines.md` whose
       `paths:` list is `scripts/benchmarks/**` and `**/baseline*.json`, in the same shape as P2-T1.
       Acceptance: the block parses as YAML, `paths:` holds two non-empty strings, and the file's body
       below the block is byte-unchanged. No task asserts that this glob set matches any file.
-- [ ] [P2-T3] Insert a frontmatter block at the top of `.claude/rules/plan-acceptance-gates.md` whose
+- [x] [P2-T3] Insert a frontmatter block at the top of `.claude/rules/plan-acceptance-gates.md` whose
       `paths:` list is `scripts/dev_tools/plan_gate_*`,
       `scripts/dev_tools/validate_orchestration_artifacts.py`,
       `extensions/drm-copilot/src/lib/validate/plan-gate-*`,
@@ -500,7 +500,7 @@ argument uses the importable dotted form with `=`.
       `.claude/skills/atomic-plan-contract/SKILL.md`, in the same shape as P2-T1. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_plan_acceptance_gates_rule_paths_cover_both_dispatchers"`
       passes.
-- [ ] [P2-T4] Insert a frontmatter block at the top of `.claude/rules/orchestrator-state.md` whose
+- [x] [P2-T4] Insert a frontmatter block at the top of `.claude/rules/orchestrator-state.md` whose
       `paths:` list names the checkpoint artifacts `artifacts/orchestration/*orchestrator-state.json`
       and `artifacts/orchestration/*planner-state.json`; the validators
       `scripts/dev_tools/*orchestrator_state*`,
@@ -517,7 +517,7 @@ argument uses the importable dotted form with `=`.
       `.claude/skills/parallel-plan/SKILL.md`. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_orchestrator_state_rule_paths_reach_every_checkpoint_writer"`
       passes.
-- [ ] [P2-T5] Insert a frontmatter block at the top of `.claude/rules/parallel-orchestration.md` whose
+- [x] [P2-T5] Insert a frontmatter block at the top of `.claude/rules/parallel-orchestration.md` whose
       `paths:` list is the four parallel-artifact globs `artifacts/orchestration/parallel-*`,
       `docs/features/parallel/**`, `scripts/dev_tools/*parallel*`,
       `extensions/drm-copilot/src/lib/validate/parallel-*`, plus the blast-radius doctrine surface
@@ -530,14 +530,14 @@ argument uses the importable dotted form with `=`.
       `.claude/agents/parallel-planner.md`, and `.claude/skills/parallel-*/SKILL.md`. Acceptance:
       `poetry run pytest "tests/scripts/dev_tools/test_claude_rules_frontmatter.py::test_parallel_orchestration_rule_paths_cover_blast_radius_config"`
       passes.
-- [ ] [P2-T6] Verify that each of the five edited rules files has exactly one diff hunk and that the
+- [x] [P2-T6] Verify that each of the five edited rules files has exactly one diff hunk and that the
       hunk is the insertion at the top of the file, by inspecting
       `git diff HEAD --unified=0 -- .claude/rules/ci-workflows.md .claude/rules/benchmark-baselines.md .claude/rules/plan-acceptance-gates.md .claude/rules/orchestrator-state.md .claude/rules/parallel-orchestration.md`.
       The `HEAD` operand is required: a bare `git diff` compares the worktree against the index and
       reports nothing once a change is staged, so it would read as clean whether or not the edits
       were correct. Acceptance: every hunk header in that diff begins at line 0 of the original file
       and no hunk removes an original line.
-- [ ] [P2-T7] Write
+- [x] [P2-T7] Write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/other/f3-glob-justification.2026-08-26T00-00.md`
       recording, per rules file, the quotation from that file's own scope or enforcement section that
       justifies each glob; recording explicitly that the glob set for
@@ -547,20 +547,20 @@ argument uses the importable dotted form with `=`.
       `.claude/rules/`, so glob correctness is unverifiable in-repository and only structural
       assertions are made. Acceptance: the artifact covers all five files and both recorded
       limitations.
-- [ ] [P2-T8] Copy `.claude/rules/ci-workflows.md` to
+- [x] [P2-T8] Copy `.claude/rules/ci-workflows.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/ci-workflows.md` so the
       two files are byte-identical. Acceptance: a byte comparison of the two files reports no
       difference.
-- [ ] [P2-T9] Copy `.claude/rules/benchmark-baselines.md` to
+- [x] [P2-T9] Copy `.claude/rules/benchmark-baselines.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/benchmark-baselines.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P2-T10] Copy `.claude/rules/plan-acceptance-gates.md` to
+- [x] [P2-T10] Copy `.claude/rules/plan-acceptance-gates.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P2-T11] Copy `.claude/rules/orchestrator-state.md` to
+- [x] [P2-T11] Copy `.claude/rules/orchestrator-state.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
-- [ ] [P2-T12] Copy `.claude/rules/parallel-orchestration.md` to
+- [x] [P2-T12] Copy `.claude/rules/parallel-orchestration.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`
       so the two files are byte-identical. Acceptance: a byte comparison reports no difference.
 - [ ] [P2-T13] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.

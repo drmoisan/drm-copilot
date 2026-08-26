@@ -578,13 +578,13 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
 
 ### F3 — all nineteen rules files carry scoped frontmatter
 
-- [ ] All nineteen files matching `.claude/rules/*.md` carry a YAML frontmatter block that parses
+- [x] All nineteen files matching `.claude/rules/*.md` carry a YAML frontmatter block that parses
       successfully, whose `paths:` value is a list of one or more non-empty strings and whose
       `description:` value is a non-empty string. Asserted by the new structural test.
-- [ ] The set of `.claude/rules/*.md` files whose `paths:` list contains the entry `"**"` is exactly
+- [x] The set of `.claude/rules/*.md` files whose `paths:` list contains the entry `"**"` is exactly
       `{general-code-change.md, general-unit-test.md, quality-tiers.md, tonality.md}` — four files,
       no more and no fewer. Asserted by the new structural test.
-- [ ] The `paths:` list in `.claude/rules/orchestrator-state.md` names all ten checkpoint-writer
+- [x] The `paths:` list in `.claude/rules/orchestrator-state.md` names all ten checkpoint-writer
       surfaces explicitly: the five files
       `.claude/agents/orchestrator.md`, `.claude/agents/epic-orchestrator.md`,
       `.claude/agents/parallel-orchestrator.md`, `.claude/agents/epic-planner.md`,
@@ -594,17 +594,17 @@ All evidence is written to the canonical `evidence/<kind>/` paths under the feat
       `.claude/skills/parallel-plan/SKILL.md`. Each entry is present as a literal path or is matched
       by an explicit glob in that list. Asserted by a test that resolves each of the ten paths
       against the recorded `paths:` list.
-- [ ] The `paths:` list in `.claude/rules/plan-acceptance-gates.md` includes
+- [x] The `paths:` list in `.claude/rules/plan-acceptance-gates.md` includes
       `scripts/dev_tools/validate_orchestration_artifacts.py`,
       `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts`, and
       `docs/features/**/remediation-plan.*.md`.
-- [ ] The `paths:` list in `.claude/rules/parallel-orchestration.md` includes at least one entry
+- [x] The `paths:` list in `.claude/rules/parallel-orchestration.md` includes at least one entry
       covering the blast-radius derivation surface, specifically `config/blast-radius.json`.
-- [ ] The plan document records, in prose, that the glob set for
+- [x] The plan document records, in prose, that the glob set for
       `.claude/rules/benchmark-baselines.md` matches zero current files because
       `scripts/benchmarks/` does not exist in this repository, and that this is the correct outcome
       under that rule's own scope statement. No test asserts a non-empty match for that rule.
-- [ ] The five edited rules files each retain their original body content unchanged below the
+- [x] The five edited rules files each retain their original body content unchanged below the
       inserted frontmatter block, verified by a diff whose only hunk in each file is the insertion at
       the top.
 
