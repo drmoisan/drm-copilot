@@ -68,6 +68,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly rendered_tree?: string;
   readonly summary: string;
   readonly stderr_excerpt?: string;
+  readonly target_repository?: string;
   readonly warnings?: ReadonlyArray<string>;
 }
 
@@ -105,6 +106,9 @@ function toMcpToolResult(
     ...(result.renderedTree === undefined
       ? {}
       : { rendered_tree: result.renderedTree }),
+    ...(result.targetRepository === undefined
+      ? {}
+      : { target_repository: result.targetRepository }),
     ...(result.warnings === undefined ? {} : { warnings: result.warnings }),
   };
 }
