@@ -84,6 +84,25 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
         }
     }
 
+    Context "JSON parse tolerance" {
+        It "returns null for whitespace-only JSON text" {
+            # An empty or whitespace-only seam response means "nothing found yet",
+            # which a bounded poll must treat as a retryable attempt.
+            $parsed = ConvertFrom-JsonSafely -Text '   '
+
+            $parsed | Should -BeNullOrEmpty
+        }
+
+        It "returns null instead of throwing for malformed JSON text" {
+            # A transient non-JSON response must retry rather than abort the poll,
+            # so a parse failure is returned as a value and never raised as a
+            # terminating error.
+            $parsed = ConvertFrom-JsonSafely -Text '{"databaseId":'
+
+            $parsed | Should -BeNullOrEmpty
+        }
+    }
+
     Context "registry resolution check (c)" {
         It "passes the package operand in exact-version form to the npm seam" {
             $null = Test-NpmVersionResolved -Version '1.1.2' -PackageName $script:package
@@ -186,6 +205,29 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
         }
     }
 
+    Context "publish-step classification" {
+        It "returns STEP_MISSING when the named job is absent from the run payload" {
+            # The absent-JOB path, distinct from the absent-STEP path asserted by
+            # "returns STEP_MISSING when the named step is absent from the payload".
+            # Every property the classifier reads is present, because this file sets
+            # strict mode and an omitted property would throw before the branch
+            # under test is reached.
+            $payload = '{"status":"completed","conclusion":"success","jobs":[{"name":"Build MCP server bundle","steps":[{"name":"Publish to npm","conclusion":"success"}]}]}' | ConvertFrom-Json
+
+            Resolve-PublishStepConclusion -Run $payload -JobName 'Publish to npm' -StepName 'Publish to npm' |
+                Should -Be 'STEP_MISSING'
+        }
+
+        It "returns RUN_FAILED when the publish step concluded neither skipped nor success" {
+            # A successful run conclusion with a cancelled publish step reaches the
+            # fall-through return past both the skipped and the success branches.
+            $payload = '{"status":"completed","conclusion":"success","jobs":[{"name":"Publish to npm","steps":[{"name":"Publish to npm","conclusion":"cancelled"}]}]}' | ConvertFrom-Json
+
+            Resolve-PublishStepConclusion -Run $payload -JobName 'Publish to npm' -StepName 'Publish to npm' |
+                Should -Be 'RUN_FAILED'
+        }
+    }
+
     Context "operator recovery instructions" {
         It "emits pairwise distinct recovery instructions for NO_RUN, STEP_SKIPPED, and UNRESOLVED" {
             $noRun = Get-RecoveryInstruction -State 'NO_RUN'
@@ -200,6 +242,15 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
             $noRun | Should -Not -Be $skipped
             $noRun | Should -Not -Be $unresolved
             $skipped | Should -Not -Be $unresolved
+        }
+
+        It "returns an empty instruction for an unrecognized state token" {
+            # The lookup miss is the branch a future state token lands on before
+            # its instruction is authored.
+            $instruction = Get-RecoveryInstruction -State 'NOT_A_STATE_TOKEN'
+
+            $instruction | Should -BeNullOrEmpty
+            ($instruction -eq '') | Should -BeTrue
         }
     }
 
@@ -274,6 +325,22 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
             $pinned = Get-CodexPinnedMcpVersion -ConfigContent $script:codexConfig -PackageName $script:package
 
             Test-NpmVersionResolved -Version $pinned -PackageName $script:package | Should -BeFalse
+        }
+
+        It "returns null when the Codex config content is empty" {
+            # The AllowEmptyString attribute admits the empty operand, so the
+            # whitespace guard is what decides the result.
+            $pinned = Get-CodexPinnedMcpVersion -ConfigContent '' -PackageName $script:package
+
+            $pinned | Should -BeNullOrEmpty
+        }
+
+        It "returns null when the Codex config pins no mcp-server package" {
+            # The regex-miss path. Content is supplied in memory; neither this test
+            # nor the function reads a path on disk or opens a temporary file.
+            $pinned = Get-CodexPinnedMcpVersion -ConfigContent 'args = ["-y", "@scope/other-package@9.9.9"]' -PackageName $script:package
+
+            $pinned | Should -BeNullOrEmpty
         }
     }
 }
