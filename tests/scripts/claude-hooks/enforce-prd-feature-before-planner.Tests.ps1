@@ -45,7 +45,14 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
     }
 
     Context 'atomic-planner delegation' {
+        # Every case in this context supplies the work-mode marker its assertions
+        # were written against. Without it the folder's issue.md is unreadable on
+        # disk, the work mode is indeterminate, and the decision is taken by the
+        # indeterminate-marker path rather than by the prerequisite probe these
+        # cases exercise. full-feature is the mode whose prerequisite set is the
+        # spec.md/user-story.md pair the cases assert against.
         It 'allows when both spec.md and user-story.md exist in the target folder (prompt path)' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
@@ -55,6 +62,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'blocks when spec.md is missing' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
                 return -not ($Path -match '/spec\.md$')
@@ -70,6 +78,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'blocks when user-story.md is missing' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
                 return -not ($Path -match '/user-story\.md$')
@@ -96,6 +105,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'falls back to orchestrator-state.json when prompt has no folder reference' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-05-10-bar-2' }
             $json = (@{
@@ -106,6 +116,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'prefers the prompt-derived folder over the checkpoint folder' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             $script:capturedPaths = @()
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
@@ -123,6 +134,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'treats a path ending in .md as a file and uses its parent directory' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             $script:capturedPaths = @()
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
@@ -142,6 +154,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'accepts backslash separators inside the prompt path' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
@@ -247,12 +260,16 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             @(Get-PrdFeatureRequiredFile -WorkMode 'minor-audit').Count | Should -Be 0
         }
 
+        # The default arm no longer returns user-story.md. An indeterminate mode
+        # is denied by its own decision path without a required-file probe, so no
+        # reachable path can demand a document the lifecycle contract requires to
+        # be absent for full-bug and minor-audit work.
         It 'fails closed to the strictest set when the mode is $null' {
-            (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md', 'user-story.md')
+            (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md')
         }
 
         It 'fails closed to the strictest set for an unrecognized mode string' {
-            (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md', 'user-story.md')
+            (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md')
         }
     }
 
@@ -365,8 +382,13 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'user-story\.md'
+            # The reason is the distinct indeterminate-marker reason: it names the
+            # resolved folder and the issue.md path it probed, and it names neither
+            # prerequisite document, because no prerequisite set is knowable when
+            # the mode is unknown.
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -BeLike '*docs/features/active/2026-08-22-marker-absent/issue.md*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'user-story\.md'
         }
 
         It 'fails closed when issue.md exists but is unreadable' {
