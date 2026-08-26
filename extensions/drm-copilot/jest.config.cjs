@@ -209,5 +209,28 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #525 changed files. `gh-client.ts` gained the optional `repo`
+    // selector, `repo-slug.ts` is the new target-repository resolver, and
+    // `potential-to-issue-service-call.ts` resolves the slug and threads it
+    // into the client. All three are production runtime code, so the
+    // coverage-exclusion policy in `.claude/rules/general-unit-test.md` puts
+    // them behind the same per-file gate as the rest of this map.
+    "./src/lib/potential-to-issue/gh-client.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/potential-to-issue/repo-slug.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/potential-to-issue/potential-to-issue-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Still no entry for "./src/repo-automation-service-contract.ts" after
+    // issue #525 added the optional `targetRepository` property to it: the file
+    // remains interface-only with no executable behavior, so it stays omitted
+    // from the threshold gate for exactly the reason recorded against it above,
+    // while remaining included in `collectCoverageFrom`.
   },
 };

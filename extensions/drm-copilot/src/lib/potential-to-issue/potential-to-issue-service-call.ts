@@ -51,6 +51,7 @@ import {
   promotePotential,
   RealPotentialFileSystem,
 } from "./promotion";
+import { resolveRepoSlug } from "./repo-slug";
 
 /** Input for {@link potentialToIssueServiceCall}. */
 export interface PotentialToIssueServiceCallInput {
@@ -76,6 +77,14 @@ export interface PotentialToIssueServiceCallInput {
   readonly workMode: WorkModeOption;
   /** Optional log sink wired to the service output channel. */
   readonly log?: (message: string) => void;
+  /**
+   * Optional injected target-repository resolver (test seam).
+   *
+   * Defaults to {@link resolveRepoSlug} driven by {@link runner}. The seam takes
+   * the resolved workspace root and returns its `owner/name` slug, or throws
+   * when the slug cannot be resolved.
+   */
+  readonly repoSlugResolver?: (workspaceRoot: string) => string;
 }
 
 /** Preserved result of the potential-to-issue service call. */
@@ -85,6 +94,8 @@ export interface PotentialToIssueServiceCallResult {
   readonly summary: string;
   readonly artifacts?: readonly string[];
   readonly destinationPath?: string;
+  /** `owner/name` slug of the repository the issue was created in. */
+  readonly targetRepository?: string;
 }
 
 /**
@@ -140,21 +151,38 @@ class CommandRunnerGhAdapter implements GhCommandRunner {
  * preserved service result record.
  *
  * @param input Filesystem (optional), runner, workspace root, potential path,
- *   promotion type, work mode, and optional log sink.
+ *   promotion type, work mode, optional log sink, and optional resolver seam.
  * @returns The preserved result record (`tool`, `workspaceRoot`, exact
- *   `summary`) enriched with `destinationPath` and `artifacts` on success.
- * @throws Error When the promotion outcome is non-zero (message includes the
- *   emitted gh output lines), or a `PromotionError` from the workflow.
+ *   `summary`) enriched with `destinationPath`, `artifacts`, and
+ *   `targetRepository` on success.
+ * @throws Error When the target repository cannot be resolved (thrown before any
+ *   GitHub write and before the filesystem move), when the promotion outcome is
+ *   non-zero (message includes the emitted gh output lines), or a
+ *   `PromotionError` from the workflow.
  */
 export function potentialToIssueServiceCall(
   input: PotentialToIssueServiceCallInput,
 ): PotentialToIssueServiceCallResult {
+  // Resolve the target repository FIRST, before any GitHub write and before the
+  // filesystem move, so an unresolvable slug fails closed with nothing done. The
+  // resolution is unconditional — it runs whether or not a fake gh client is
+  // injected — so this expression must precede the gh-client construction below.
+  const resolveSlug =
+    input.repoSlugResolver ??
+    ((workspaceRoot: string): string =>
+      resolveRepoSlug({ runner: input.runner, workspaceRoot }));
+  const targetRepository = resolveSlug(input.workspaceRoot);
+
   // Use the injected gh client when provided (test seam); otherwise construct a
-  // RealGhClient whose non-stdin calls route through the injected F1 runner and
-  // whose stdin create call uses the stdin-capable spawn runner.
+  // RealGhClient bound to the resolved repository, whose non-stdin calls route
+  // through the injected F1 runner and whose stdin create call uses the
+  // stdin-capable spawn runner.
   const ghClient =
     input.gh ??
-    new RealGhClient({ runner: new CommandRunnerGhAdapter(input.runner) });
+    new RealGhClient({
+      runner: new CommandRunnerGhAdapter(input.runner),
+      repo: targetRepository,
+    });
 
   // Hoisted so the post-condition below observes the SAME filesystem the
   // workflow wrote to, rather than a second instance.
@@ -201,6 +229,7 @@ export function potentialToIssueServiceCall(
     tool: "potential_to_issue",
     workspaceRoot: input.workspaceRoot,
     summary,
+    targetRepository,
     ...(outcome.destination === undefined
       ? {}
       : { destinationPath: normalizeGeneratedPath(outcome.destination) }),

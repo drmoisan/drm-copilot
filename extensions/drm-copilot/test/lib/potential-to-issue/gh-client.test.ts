@@ -61,6 +61,9 @@ function makeRunner(
 const GH_PATH = "/usr/bin/gh";
 const lookup = (): string => GH_PATH;
 
+/** Repository slug bound to the client under the selector tests. */
+const REPO = "drmoisan/drm-copilot";
+
 describe("RealGhClient — construction", () => {
   it("throws the byte-identical message when gh is not found", () => {
     // Arrange / Act / Assert
@@ -177,6 +180,160 @@ describe("RealGhClient — issueView", () => {
 
     // Assert
     expect(calls[0]?.args).toEqual([
+      "issue",
+      "view",
+      "123",
+      "--json",
+      "number,title,url,author,updatedAt",
+    ]);
+  });
+});
+
+describe("RealGhClient — repository selector binding", () => {
+  it("binds the repo selector into the issue create vector", () => {
+    // Arrange: the client is bound to an explicit repository slug.
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.issueCreate("My Title", "Body text", "feature");
+
+    // Assert: the selector sits immediately after the subcommand words, so the
+    // process working directory cannot influence repository selection.
+    expect(calls[0]?.args).toEqual([
+      "issue",
+      "create",
+      "--repo",
+      REPO,
+      "--title",
+      "My Title",
+      "--body-file",
+      "-",
+      "--label",
+      "feature",
+    ]);
+  });
+
+  it("binds the repo selector into the label create vector", () => {
+    // Arrange
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.ensureLabel("feature");
+
+    // Assert
+    expect(calls[0]?.args).toEqual([
+      "label",
+      "create",
+      "--repo",
+      REPO,
+      "feature",
+      "--color",
+      FEATURE_LABEL_COLOR,
+      "--description",
+      FEATURE_LABEL_DESCRIPTION,
+    ]);
+  });
+
+  it("binds the repo selector into the issue view vector", () => {
+    // Arrange
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.issueView("123");
+
+    // Assert
+    expect(calls[0]?.args).toEqual([
+      "issue",
+      "view",
+      "--repo",
+      REPO,
+      "123",
+      "--json",
+      "number,title,url,author,updatedAt",
+    ]);
+  });
+
+  it("carries the same repo selector on the missing-label recovery retry", () => {
+    // Arrange: one bound client drives the whole missing-label recovery leg —
+    // the first create fails because the label is absent, the label is created,
+    // and the create is retried. The retry must target the same repository as
+    // the first attempt, otherwise the recovery path escapes the binding.
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+      repo: REPO,
+    });
+
+    // Act
+    client.issueCreate("My Title", "Body text", "feature");
+    client.ensureLabel("feature");
+    client.issueCreate("My Title", "Body text", "feature");
+
+    // Assert: all three vectors carry the identical selector, and each selector
+    // sits immediately after its own subcommand words.
+    const selectors = calls.map((call) => {
+      const index = call.args.indexOf("--repo");
+      return [index, call.args[index + 1]];
+    });
+    expect(calls).toHaveLength(3);
+    expect(selectors).toEqual([
+      [2, REPO],
+      [2, REPO],
+      [2, REPO],
+    ]);
+  });
+
+  it("leaves the three vectors unchanged when no repo is supplied", () => {
+    // Arrange: an unbound client must reproduce the pre-change vectors exactly,
+    // so the selector is additive rather than a change to the default shape.
+    const calls: RecordedCall[] = [];
+    const client = new RealGhClient({
+      runner: makeRunner(calls),
+      ghPathLookup: lookup,
+    });
+
+    // Act
+    client.issueCreate("My Title", "Body text", "feature");
+    client.ensureLabel("feature");
+    client.issueView("123");
+
+    // Assert: each vector equals its pre-change form, with no selector present.
+    expect(calls[0]?.args).toEqual([
+      "issue",
+      "create",
+      "--title",
+      "My Title",
+      "--body-file",
+      "-",
+      "--label",
+      "feature",
+    ]);
+    expect(calls[1]?.args).toEqual([
+      "label",
+      "create",
+      "feature",
+      "--color",
+      FEATURE_LABEL_COLOR,
+      "--description",
+      FEATURE_LABEL_DESCRIPTION,
+    ]);
+    expect(calls[2]?.args).toEqual([
       "issue",
       "view",
       "123",
