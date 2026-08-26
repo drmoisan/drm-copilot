@@ -1,8 +1,22 @@
 # Post-Rebase Toolchain Re-Verification
 
-Timestamp: 2026-08-26T06-55
+Timestamp: 2026-08-26T06-38
 
 Author: orchestrator (not a plan task; supplementary evidence)
+
+## Timestamp correction (NB-6)
+
+The filename segment reads `06-55`. That is wrong: this artifact was committed in `2ae27c01`, whose
+author date is `2026-08-26 06:44:29 -0400`, so a 06:55 capture time is 11 minutes after the commit
+that introduced it. The `Timestamp:` field above has been corrected to `06-38`, which is inside the
+window bounded by the preceding commit `c90d2587` (06:34) and the containing commit `2ae27c01`
+(06:44), and matches when the four stages below actually ran.
+
+The filename is deliberately NOT renamed. Three review artifacts —
+`policy-audit.2026-08-26T06-55.md`, `code-review.2026-08-26T06-55.md`, and
+`feature-audit.2026-08-26T06-55.md` — plus `remediation-inputs.2026-08-26T06-55.md` cite this file by
+path. Breaking four citations to correct an 11-minute label is a net loss in auditability, so the
+divergence is recorded here instead, per the alternative the finding allows.
 
 ## Why this artifact exists
 
@@ -75,16 +89,51 @@ Output Summary: **10 passed, 0 failed** in 0.10 seconds, test file unmodified.
 `test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes, confirming the self-hosted
 hook and its bundled mirror remain textually identical after the rebase.
 
-## Incidental finding recorded for the reviewer
+## Stage 4 is environment-conditional — corrected (NB-1)
 
-`.claude/state/` was verified empty immediately before Stage 1 and again immediately after Stage 4.
-The three MCP PoshQC runs above did **not** regenerate the gitignored batch-budget counters that
-caused the [P0-T6] baseline failure. This narrows the cause: those counters are written by the
-`Write`/`Edit` PreToolUse batch-budget hooks, not by a PoshQC invocation. The consequence is that the
-Stage 4 result above is reproducible for any run that does not interleave an agent file edit, and the
-underlying test defect — `list_scoped_files` enumerating the filesystem without excluding the
-gitignored `.claude/state/**` subtree, the way it already excludes `.claude/agent-memory/**` — is
-unchanged by this item and is carried to a follow-up issue.
+An earlier revision of this artifact claimed the Stage 4 result was "reproducible for any run that
+does not interleave an agent file edit". That claim was too strong and is retracted. The reviewer
+disproved it and the orchestrator reproduced the disproof.
+
+Timeline, in this worktree:
+
+| Time | Event |
+| --- | --- |
+| ~06:19 | `.claude/state/` cleared during [P2-T7] |
+| ~06:38 | Stages 1-4 above run; directory confirmed empty before Stage 1 and after Stage 4; Stage 4 is 10 passed / 0 failed |
+| 06:47 | `powershell-batch-budget.default.json` regenerated |
+| 06:49 | `python-batch-budget.default.json` regenerated |
+| ~06:50 | Reviewer re-runs the suite: **1 failed / 9 passed**, identical assertion |
+| 07:00 | Orchestrator re-runs the suite: **1 failed / 9 passed**, identical assertion |
+
+What is true is narrower than what was claimed: an MCP PoshQC invocation does not by itself write the
+counters. They are written by the `Write`/`Edit` PreToolUse batch-budget hooks, which fire on ordinary
+agent file edits — and this run necessarily performs those. The [P2-T7] clearance is therefore **not
+durable**, and Stage 4's exit code is conditional on the state of a gitignored directory at the moment
+it runs.
+
+**The underlying defect is already tracked as open issue #510**, "Bug:
+claude-resource-parity-enumerates-gitignored-state". No new issue was required and none was filed;
+the earlier phrasing "carried to a follow-up issue" wrongly implied an undischarged obligation and is
+withdrawn. #510 records that `list_scoped_files` enumerates the filesystem without excluding the
+gitignored `.claude/state/**` subtree the way it already excludes `.claude/agent-memory/**`, and its
+own Impact section anticipates this exact situation: "the natural response is a per-plan workaround
+rather than a repository fix."
+
+**The durable evidence for the parity property is not this test.** It is the direct byte comparison of
+the two hook copies, which does not depend on `.claude/state/` at all:
+
+```text
+git hash-object .claude/hooks/enforce-prd-feature-before-planner.ps1
+git hash-object extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1
+```
+
+Both return `469fecca912e3be687a123b8a3e33ce8a7f327c6`. The self-hosted hook and its bundled mirror
+are byte-identical, which is the property acceptance criterion 23 asserts, and it holds unconditionally.
+
+CI is unaffected in either direction: a CI checkout is fresh and does not run the batch-budget hooks,
+so `.claude/state/` does not exist there and the test passes. `main` CI is green at `b5a7490b`, the
+base of this branch, with the test file unchanged.
 
 ## Verdict
 
