@@ -1,0 +1,57 @@
+{
+  "objective": "execute prepared epic",
+  "route_id": "epic",
+  "epic_feature_folder": "sample-epic",
+  "integration_branch": "epic/sample-epic-integration",
+  "max_parallel_features": 4,
+  "completed_steps": ["manifest_parsed"],
+  "next_step": "wave_0",
+  "last_updated": "2026-07-10T10:00:00Z",
+  "epic_merge_pr": {
+    "merge_commit_sha": "abc123"
+  },
+  "waves": [
+    {
+      "wave_number": 0,
+      "feature_folders": ["child-a", "child-b", "child-c", "child-d"]
+    }
+  ],
+  "features": [
+    {
+      "issue_num": 101,
+      "feature_folder": "child-a",
+      "depends_on": [],
+      "wave_number": 0,
+      "merge_status": "merged",
+      "branch_name": "feature/child-a",
+      "worktree_path": "C:/repo/worktrees/child-a"
+    },
+    {
+      "issue_num": 102,
+      "feature_folder": "child-b",
+      "depends_on": [],
+      "wave_number": 0,
+      "merge_status": "merged",
+      "branch_name": "feature/child-b",
+      "worktree_path": "C:/repo/worktrees/child-b"
+    },
+    {
+      "issue_num": 103,
+      "feature_folder": "child-c",
+      "depends_on": [],
+      "wave_number": 0,
+      "merge_status": "merged",
+      "branch_name": "feature/child-c",
+      "worktree_path": "C:/repo/worktrees/child-c"
+    },
+    {
+      "issue_num": 104,
+      "feature_folder": "child-d",
+      "depends_on": [],
+      "wave_number": 0,
+      "merge_status": "worktree_created",
+      "branch_name": "feature/child-d",
+      "worktree_path": "C:/repo/worktrees/child-d"
+    }
+  ]
+}

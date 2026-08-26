@@ -88,7 +88,6 @@ target-version = ["py310"]
 [tool.ruff]
 line-length = 88
 target-version = "py310"
-fix = true
 show-fixes = true
 
 [tool.ruff.lint]

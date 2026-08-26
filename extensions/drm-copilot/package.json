@@ -3,7 +3,7 @@
   "displayName": "drm-copilot",
   "description": "Repository automation, customization publishing, and MCP bridge for drm-copilot workflows.",
   "icon": "resources/icon.png",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "publisher": "DanMoisan",
   "license": "MIT",
   "repository": {
@@ -27,7 +27,7 @@
     "workflow"
   ],
   "engines": {
-    "vscode": "^1.108.0"
+    "vscode": "^1.134.0"
   },
   "main": "./out/extension.js",
   "activationEvents": [
@@ -230,7 +230,7 @@
     "@jest/globals": "^30.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "26.x",
-    "@types/vscode": "^1.108.1",
+    "@types/vscode": "^1.134.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.8.1",
     "jest": "^30.0.0",

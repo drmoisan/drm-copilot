@@ -96,6 +96,7 @@ jest.mock("node:child_process", () => ({
 }));
 
 import { activate } from "../src/extension";
+import { createInProcessSeamInstaller } from "./extension-potential-to-issue-test-support";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
@@ -113,71 +114,15 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   execSync: jest.Mock;
 };
 
-/** Minimal feature potential content used by the in-process scenarios. */
-const FEATURE_CONTENT = [
-  "# Feature Title",
-  "## Problem / Why",
-  "why",
-  "## Proposed Behavior",
-  "behave",
-].join("\n");
-
 /**
- * Configure the in-process seams so the promotion workflow runs hermetically:
- * `gh` resolves on PATH (execSync), `gh` calls return a seeded create result
- * (spawnSync), and the potential file exists with feature content.
- *
- * @param createExitCode Exit code returned by the seeded `gh issue create`.
+ * Seam arrangement lives in the sibling support module so this suite stays
+ * under the 500-line repository file-size limit; the call sites below are
+ * unchanged.
  */
-function installInProcessSeams(createExitCode = 0): {
-  readonly spawnSyncArgs: string[][];
-} {
-  const spawnSyncArgs: string[][] = [];
-
-  // `gh` path lookup uses execSync; resolve it to a fake path.
-  childProcessMock.execSync.mockReturnValue("/usr/bin/gh\n");
-
-  // `gh` invocations route through spawnSync. Seed auth-success and a create
-  // result; the workflow inspects exit codes itself.
-  childProcessMock.spawnSync.mockImplementation((...rawArgs: unknown[]) => {
-    const exe = rawArgs[0] as string;
-    const args = (rawArgs[1] as string[] | undefined) ?? [];
-    if (exe === "/usr/bin/gh") {
-      spawnSyncArgs.push([...args]);
-      if (args[0] === "auth") {
-        return { status: 0, stdout: "ok", stderr: "" };
-      }
-      if (args[0] === "issue" && args[1] === "create") {
-        return {
-          status: createExitCode,
-          stdout:
-            createExitCode === 0
-              ? "Created: https://example.com/issues/123"
-              : "gh: create failed",
-          stderr: "",
-        };
-      }
-      if (args[0] === "issue" && args[1] === "view") {
-        return {
-          status: 0,
-          stdout: '{"number":123,"updatedAt":"2024-01-02T00:00:00Z"}',
-          stderr: "",
-        };
-      }
-    }
-    return { status: 0, stdout: "", stderr: "" };
-  });
-
-  // The potential file exists and holds feature content; metadata writes and
-  // the move are recorded by the fs mock (no real disk access).
-  fsMock.existsSync.mockReturnValue(true);
-  fsMock.readFileSync.mockReturnValue(FEATURE_CONTENT);
-  fsMock.writeFileSync.mockReturnValue(undefined);
-  fsMock.mkdirSync.mockReturnValue(undefined);
-  fsMock.renameSync.mockReturnValue(undefined);
-
-  return { spawnSyncArgs };
-}
+const installInProcessSeams = createInProcessSeamInstaller(
+  fsMock,
+  childProcessMock,
+);
 
 function activateAndGetHandler(commandId: string): CommandHandler {
   const context = {

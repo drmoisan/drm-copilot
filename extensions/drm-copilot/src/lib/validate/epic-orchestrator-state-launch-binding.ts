@@ -231,11 +231,17 @@ function validateModelReceipt(
   return errors;
 }
 
+/** Return whether the feature records either launch path key. */
+function featureCarriesLaunchPath(feature: Record<string, unknown>): boolean {
+  return "launch_receipt_path" in feature || "launch_status_path" in feature;
+}
+
 interface LaunchBindingContext {
   readonly expectedExecutionContext: string;
   readonly planner: boolean;
   readonly requireGeneratedOrchestrator: boolean;
   readonly skipNotStarted: boolean;
+  readonly requireLaunchPaths: boolean;
 }
 
 function validateLaunchBindings(
@@ -250,6 +256,9 @@ function validateLaunchBindings(
       return;
     }
     if (context.skipNotStarted && item["merge_status"] === "not_started") {
+      return;
+    }
+    if (context.requireLaunchPaths && !featureCarriesLaunchPath(item)) {
       return;
     }
     const prefix = context.planner
@@ -284,6 +293,7 @@ export function validateEpicPlannerChildLaunchBindings(
     planner: true,
     requireGeneratedOrchestrator: true,
     skipNotStarted: false,
+    requireLaunchPaths: false,
   });
 }
 
@@ -308,5 +318,8 @@ export function validateEpicChildLaunchBindings(
     planner: false,
     requireGeneratedOrchestrator: false,
     skipNotStarted: options.requireComplete !== true,
+    requireLaunchPaths:
+      options.requireCodexModelRouting !== true &&
+      options.requireCodexTopology !== true,
   });
 }

@@ -1,9 +1,6 @@
 ---
 name: architecture-boundaries
 description: Architecture boundary enforcement rules for the No-COM architecture.
-paths:
-  - "**/*.ts"
-  - "**/*.cs"
 ---
 
 # Converted rule

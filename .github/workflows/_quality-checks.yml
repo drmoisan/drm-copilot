@@ -73,14 +73,24 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          poetry run pytest --cov=src/lexile_corpus_tuner --cov-report=xml --cov-report=term-missing
+          poetry run pytest --cov --cov-branch \
+            --cov-report=xml \
+            --cov-report=json:artifacts/python/coverage.json \
+            --cov-report=term-missing
+        continue-on-error: false
+
+      - name: Enforce Python coverage thresholds
+        run: |
+          poetry run python -m scripts.dev_tools.check_python_coverage_thresholds \
+            --report artifacts/python/coverage.json \
+            --min-line 85 --min-branch 75
         continue-on-error: false
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.13'
         uses: codecov/codecov-action@v7
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
