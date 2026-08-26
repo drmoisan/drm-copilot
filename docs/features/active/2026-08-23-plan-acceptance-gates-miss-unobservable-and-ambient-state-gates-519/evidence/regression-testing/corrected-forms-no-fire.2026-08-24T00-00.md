@@ -203,6 +203,14 @@ The single evaluation of the whole `5a8ede0f` extraction produced 0 blocking fin
 
 Two of the three findings are the pre-existing G4 space-separated coverage-argument rule and are not new-rule findings. The one new-rule finding is the G7 on `5a8ede0f` task `P0-T10`. Under the prescribed derivation that task is an **unmatched addition** and is therefore excluded by step 4, and it is enumerated in the exclusion table below. Under the supplementary diagnostic it is likewise an addition rather than a corrected form. It is not a member of the derived list under either derivation, and no corrected form under either derivation carries any new-rule finding.
 
+### Classification of that single G7 finding, examined independently
+
+`docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md` records this same finding as its last G7 Class 2 row and cites this artifact for the classification. The classification is stated here so that citation resolves.
+
+**The finding is a FALSE POSITIVE, by the false-positive definition the corpus measurement applies.** That definition makes a finding a false positive when the acceptance condition it reports is in fact falsifiable by a mechanism the rule's predicate does not recognise. The `5a8ede0f` task `P0-T10` opens by capturing `git status --porcelain -- extensions/drm-copilot` as a before snapshot, runs `npm run format` and three further commands, then captures the same porcelain status again as an after snapshot, and requires both snapshots to be recorded verbatim even when empty. Comparing those two snapshots distinguishes a clean formatter run from a repairing one, so the acceptance condition can fail. G7's observation-marker set reads the tool's own stdout only, so it does not see a task that observes the tree instead. That gap is G7 Class 2 in the corpus measurement, and it is the reason G7 recorded a non-zero false-positive count and therefore ships in the warning channel.
+
+The classification does not change the derived list. The task is an unmatched addition under both derivations and is excluded by step 4 either way.
+
 ## Excluded tasks — the complete enumeration
 
 Every excluded task is listed, so the exclusion set is auditable and no case is omitted silently. There are 40 deletions and 41 additions, 81 excluded tasks in total. For each, the identifier, the single commit it appears at, its exclusion reason, and its description text are given.
