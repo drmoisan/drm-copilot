@@ -424,7 +424,7 @@ argument uses the importable dotted form with `=`.
 
 ### Phase 1 — Regression Tests Authored and Failing
 
-- [ ] [P1-T1] Create `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` containing exactly
+- [x] [P1-T1] Create `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` containing exactly
       these test functions and no others: `test_every_claude_rule_carries_parseable_paths_and_description`,
       `test_unconditional_rule_set_is_exactly_the_four_deliberate_files`,
       `test_orchestrator_state_rule_paths_reach_every_checkpoint_writer`,
@@ -445,7 +445,7 @@ argument uses the importable dotted form with `=`.
       the file exists and
       `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py --collect-only`
       collects exactly eight test items.
-- [ ] [P1-T2] Create `tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py` containing
+- [x] [P1-T2] Create `tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py` containing
       exactly these test functions and no others:
       `test_epic_startup_protocol_has_three_contiguous_steps_without_read_instructions`,
       `test_epic_orchestrate_skill_has_no_prerequisites_heading`,
@@ -459,7 +459,7 @@ argument uses the importable dotted form with `=`.
       lines and must not create temporary files. Acceptance: the file exists and
       `poetry run pytest tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py --collect-only`
       collects exactly seven test items.
-- [ ] [P1-T3] [expect-fail] Run `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
+- [x] [P1-T3] [expect-fail] Run `poetry run pytest tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/regression-testing/fail-before-rules-frontmatter.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and an `Output Summary:`
@@ -468,13 +468,13 @@ argument uses the importable dotted form with `=`.
       `test_unconditional_rule_set_is_exactly_the_four_deliberate_files`,
       `test_epic_orchestrator_preloads_exactly_three_skills`, and
       `test_no_unqualified_spec_section_citation_under_claude` fail.
-- [ ] [P1-T4] [expect-fail] Run `poetry run pytest tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
+- [x] [P1-T4] [expect-fail] Run `poetry run pytest tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
       and write
       `docs/features/active/2026-08-25-epic-orchestrator-always-on-context-footprint-559/evidence/regression-testing/fail-before-epic-contract.2026-08-26T00-00.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and an `Output Summary:`
       naming each failing test. Acceptance: all seven tests fail, because none of the F1 or F6 edits
       has been applied yet.
-- [ ] [P1-T5] Run `poetry run black --check tests/scripts/dev_tools/test_claude_rules_frontmatter.py tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
+- [x] [P1-T5] Run `poetry run black --check tests/scripts/dev_tools/test_claude_rules_frontmatter.py tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
       and `poetry run ruff check tests/scripts/dev_tools/test_claude_rules_frontmatter.py tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`;
       apply any formatting change the first command reports and re-run both. Acceptance: both
       commands exit 0 on the same pass over both new files.
