@@ -16,6 +16,7 @@ without failing its job. Only an exact-version registry query settles whether a 
 | State | Meaning | Is the version consumed? | Section |
 |---|---|---|---|
 | `NO_RUN` | Check (a) budget exhausted; no run observed for the tag ref. | Almost certainly not. | [NO_RUN](#no_run) |
+| `RUN_INCOMPLETE` | Check (b) budget expired while the run was still in progress; no conclusion was observed. | Unknown, and the run may still complete. | [RUN_INCOMPLETE](#run_incomplete) |
 | `RUN_FAILED` | The run reached conclusion `failure` or `cancelled`. | Unknown. | [RUN_FAILED](#run_failed) |
 | `STEP_SKIPPED` | The job concluded `success` but the publish step concluded `skipped`. | No. | [STEP_SKIPPED](#step_skipped) |
 | `STEP_MISSING` | The named job or step was absent from the run payload. | Unknown. | [STEP_MISSING](#step_missing) |
@@ -53,9 +54,30 @@ Substitute the tag name. Then confirm the resulting run and re-run the verifier.
 Delete-and-re-push of the tag is **not** the first response and is never automated. It is gated on
 the two preconditions below and is a human procedure.
 
+## RUN_INCOMPLETE
+
+**Meaning.** A run existed for the tag ref, but the publish-step polling budget expired while the run
+was still in progress. The verifier never observed a terminal conclusion, so nothing is known about
+whether the publish step succeeded, failed, or has yet to execute. This is not a failure of the run;
+it is an expiry of the observation window.
+
+**Is the version consumed?** Unknown, and the run may still complete. The run was live when the
+verifier stopped watching, so the registry state can change after this report is produced.
+
+**Recovery.** Re-run the verifier before reading any run log. The logs of a run that has not concluded
+cannot answer whether the publish succeeded, and reading them invites a conclusion the evidence does
+not support. A second verification run against the same tag is non-destructive and consumes no version
+number. If the re-run reports `RUN_INCOMPLETE` again, raise the check (b) budget with
+`-StepMaxAttempts` or `-StepIntervalSeconds` rather than treating the run as failed.
+
+Do **not** re-dispatch the workflow and do **not** delete and re-push the tag from this state. A run
+is still in progress; a second publishing run against the same version would race the first.
+
 ## RUN_FAILED
 
-**Meaning.** A run existed for the tag ref and reached conclusion `failure` or `cancelled`.
+**Meaning.** A run existed for the tag ref and reached conclusion `failure` or `cancelled`. The
+conclusion was observed; this section does not cover a run that never concluded, which is
+`RUN_INCOMPLETE` above.
 
 **Is the version consumed?** Unknown. The failure may have occurred before or after the registry
 write.

@@ -36,11 +36,17 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
         $script:npmResolvesOnAttempt = 1
         $script:viewPayload = $script:viewStepSuccess
         $script:capturedNpmArgs = [System.Collections.Generic.List[object]]::new()
+        # Each check carries its own attempt budget, so a test that asserts a
+        # sleep count must set the budget of the check it is exercising. All three
+        # are pinned to 3 here so the existing sleep-count assertions, which were
+        # written against a single shared budget of 3, remain valid unchanged.
         $script:verifyArgs = @{
-            TagName     = $script:tag
-            Version     = '1.1.2'
-            PackageName = $script:package
-            MaxAttempts = 3
+            TagName         = $script:tag
+            Version         = '1.1.2'
+            PackageName     = $script:package
+            RunMaxAttempts  = 3
+            StepMaxAttempts = 3
+            NpmMaxAttempts  = 3
         }
 
         Mock -CommandName Invoke-GhExe -MockWith {
@@ -81,25 +87,6 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
             Should -Invoke -CommandName Invoke-GhExe -Times 1 -Exactly
             Should -Invoke -CommandName Invoke-NpmExe -Times 1 -Exactly
             Should -Invoke -CommandName Invoke-Sleep -Times 1 -Exactly
-        }
-    }
-
-    Context "JSON parse tolerance" {
-        It "returns null for whitespace-only JSON text" {
-            # An empty or whitespace-only seam response means "nothing found yet",
-            # which a bounded poll must treat as a retryable attempt.
-            $parsed = ConvertFrom-JsonSafely -Text '   '
-
-            $parsed | Should -BeNullOrEmpty
-        }
-
-        It "returns null instead of throwing for malformed JSON text" {
-            # A transient non-JSON response must retry rather than abort the poll,
-            # so a parse failure is returned as a value and never raised as a
-            # terminating error.
-            $parsed = ConvertFrom-JsonSafely -Text '{"databaseId":'
-
-            $parsed | Should -BeNullOrEmpty
         }
     }
 
@@ -190,6 +177,29 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
             $result.ExitCode | Should -Not -Be 0
         }
 
+        It "distinguishes an exhausted publish-step budget from a failed run conclusion" {
+            # Two different facts must not collapse onto one token. An exhausted
+            # check (b) budget means no conclusion was ever observed and the run
+            # may still succeed; a failure conclusion means a terminal failure was
+            # observed. The first calls for a re-run of the verifier, the second
+            # for reading the run logs, so a shared token would send the operator
+            # to the wrong action half the time.
+            $script:viewCompletedOnAttempt = $script:neverAttempt
+            $incomplete = Invoke-TagPublishVerification @script:verifyArgs
+
+            $script:viewCompletedOnAttempt = 1
+            $script:viewAttempt = 0
+            $script:listAttempt = 0
+            $script:viewPayload = $script:viewRunFailure
+            $failed = Invoke-TagPublishVerification @script:verifyArgs
+
+            $incomplete.State | Should -Not -Be $failed.State
+            $incomplete.State | Should -Be 'RUN_INCOMPLETE'
+            $failed.State | Should -Be 'RUN_FAILED'
+            $incomplete.ExitCode | Should -Not -Be 0
+            $failed.ExitCode | Should -Not -Be 0
+        }
+
         It "distinguishes an exhausted run-existence budget from a negative publish-step result" {
             $script:listFoundOnAttempt = $script:neverAttempt
             $exhausted = Invoke-TagPublishVerification @script:verifyArgs
@@ -228,32 +238,6 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
         }
     }
 
-    Context "operator recovery instructions" {
-        It "emits pairwise distinct recovery instructions for NO_RUN, STEP_SKIPPED, and UNRESOLVED" {
-            $noRun = Get-RecoveryInstruction -State 'NO_RUN'
-            $skipped = Get-RecoveryInstruction -State 'STEP_SKIPPED'
-            $unresolved = Get-RecoveryInstruction -State 'UNRESOLVED'
-
-            $noRun | Should -Not -BeNullOrEmpty
-            $skipped | Should -Not -BeNullOrEmpty
-            $unresolved | Should -Not -BeNullOrEmpty
-            # A single generic failure message would not tell the operator whether
-            # the version number was consumed, which is what decides retry safety.
-            $noRun | Should -Not -Be $skipped
-            $noRun | Should -Not -Be $unresolved
-            $skipped | Should -Not -Be $unresolved
-        }
-
-        It "returns an empty instruction for an unrecognized state token" {
-            # The lookup miss is the branch a future state token lands on before
-            # its instruction is authored.
-            $instruction = Get-RecoveryInstruction -State 'NOT_A_STATE_TOKEN'
-
-            $instruction | Should -BeNullOrEmpty
-            ($instruction -eq '') | Should -BeTrue
-        }
-    }
-
     Context "bounded polling budgets" {
         It "check (a) finds the run on the first attempt without sleeping" {
             Wait-ForWorkflowRun -TagName $script:tag -MaxAttempts 4 | Should -Be '42'
@@ -283,20 +267,20 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
             Should -Invoke -CommandName Invoke-Sleep -Times 2 -Exactly
         }
 
-        It "check (b) returns RUN_FAILED when its attempt budget is exhausted" {
+        It "check (b) returns RUN_INCOMPLETE when its attempt budget is exhausted" {
             $script:viewCompletedOnAttempt = $script:neverAttempt
-            Test-PublishStepConclusion -RunIdentifier '42' -MaxAttempts 3 | Should -Be 'RUN_FAILED'
+            Test-PublishStepConclusion -RunIdentifier '42' -MaxAttempts 3 | Should -Be 'RUN_INCOMPLETE'
             Should -Invoke -CommandName Invoke-Sleep -Times 2 -Exactly
         }
 
         It "check (c) resolves the version on the first attempt without sleeping" {
-            $script:verifyArgs.MaxAttempts = 4
+            $script:verifyArgs.NpmMaxAttempts = 4
             (Invoke-TagPublishVerification @script:verifyArgs).State | Should -Be 'RESOLVED'
             Should -Invoke -CommandName Invoke-Sleep -Times 0 -Exactly
         }
 
         It "check (c) resolves the version on a later attempt and sleeps once per prior attempt" {
-            $script:verifyArgs.MaxAttempts = 4
+            $script:verifyArgs.NpmMaxAttempts = 4
             $script:npmResolvesOnAttempt = 3
             (Invoke-TagPublishVerification @script:verifyArgs).State | Should -Be 'RESOLVED'
             Should -Invoke -CommandName Invoke-Sleep -Times 2 -Exactly
@@ -326,21 +310,55 @@ Describe "Invoke-ReleaseVerification.ps1 - out-of-band tag publish verification"
 
             Test-NpmVersionResolved -Version $pinned -PackageName $script:package | Should -BeFalse
         }
+    }
 
-        It "returns null when the Codex config content is empty" {
-            # The AllowEmptyString attribute admits the empty operand, so the
-            # whitespace guard is what decides the result.
-            $pinned = Get-CodexPinnedMcpVersion -ConfigContent '' -PackageName $script:package
+    Context "per-check polling budgets" {
+        # Each test invokes the composition entry point supplying only TagName,
+        # Version, and PackageName, so every budget takes its default and the
+        # assertion reads the value the entry point actually forwarded. Before
+        # issue #526 R1 was fixed, one shared pair of 10 seconds by 18 attempts
+        # reached all three checks, so checks (b) and (c) each ran at 3 minutes
+        # instead of their specified 20-minute and 10-minute ceilings.
+        It "forwards the check (a) interval and attempt budget to Wait-ForWorkflowRun" {
+            Mock -CommandName Wait-ForWorkflowRun -MockWith {
+                param([string]$TagName, [string]$WorkflowFileName, [int]$IntervalSeconds, [int]$MaxAttempts)
+                $null = $TagName, $WorkflowFileName, $IntervalSeconds, $MaxAttempts
+                return 'NO_RUN'
+            } -ParameterFilter { $IntervalSeconds -eq 10 -and $MaxAttempts -eq 18 }
 
-            $pinned | Should -BeNullOrEmpty
+            $result = Invoke-TagPublishVerification -TagName $script:tag -Version '1.1.2' -PackageName $script:package
+
+            $result.State | Should -Be 'NO_RUN'
+            Should -Invoke -CommandName Wait-ForWorkflowRun -Times 1 -Exactly `
+                -ParameterFilter { $IntervalSeconds -eq 10 -and $MaxAttempts -eq 18 }
         }
 
-        It "returns null when the Codex config pins no mcp-server package" {
-            # The regex-miss path. Content is supplied in memory; neither this test
-            # nor the function reads a path on disk or opens a temporary file.
-            $pinned = Get-CodexPinnedMcpVersion -ConfigContent 'args = ["-y", "@scope/other-package@9.9.9"]' -PackageName $script:package
+        It "forwards the check (b) interval and attempt budget to Test-PublishStepConclusion" {
+            Mock -CommandName Test-PublishStepConclusion -MockWith {
+                param([string]$RunIdentifier, [string]$JobName, [string]$StepName, [int]$IntervalSeconds, [int]$MaxAttempts)
+                $null = $RunIdentifier, $JobName, $StepName, $IntervalSeconds, $MaxAttempts
+                return 'STEP_SKIPPED'
+            } -ParameterFilter { $IntervalSeconds -eq 20 -and $MaxAttempts -eq 60 }
 
-            $pinned | Should -BeNullOrEmpty
+            $result = Invoke-TagPublishVerification -TagName $script:tag -Version '1.1.2' -PackageName $script:package
+
+            $result.State | Should -Be 'STEP_SKIPPED'
+            Should -Invoke -CommandName Test-PublishStepConclusion -Times 1 -Exactly `
+                -ParameterFilter { $IntervalSeconds -eq 20 -and $MaxAttempts -eq 60 }
+        }
+
+        It "polls the registry with the check (c) interval and attempt budget" {
+            # The npm seam never resolves, so check (c) runs its full default
+            # budget: 40 attempts with a sleep between each adjacent pair, which
+            # is 39 sleeps. The interval filter binds the sleep to 15 seconds and
+            # so excludes check (a)'s 10-second and check (b)'s 20-second sleeps.
+            $script:npmResolvesOnAttempt = $script:neverAttempt
+
+            $result = Invoke-TagPublishVerification -TagName $script:tag -Version '1.1.2' -PackageName $script:package
+
+            $result.State | Should -Be 'UNRESOLVED'
+            Should -Invoke -CommandName Invoke-NpmExe -Times 40 -Exactly
+            Should -Invoke -CommandName Invoke-Sleep -Times 39 -Exactly -ParameterFilter { $Seconds -eq 15 }
         }
     }
 }

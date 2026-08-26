@@ -20,9 +20,10 @@
 .PARAMETER TagName
     Short name of the release tag to verify, for example 'mcp-server-v1.1.2'.
     The remaining script parameters name the workflow file, the publish job and
-    step, the exact version and package for check (c), the polling interval and
-    attempt budget, and the SkipRegistryResolutionCheck switch that omits check
-    (c) for the extension path, which publishes to the VS Code Marketplace.
+    step, the exact version and package for check (c), a separate polling
+    interval and attempt budget for each of the three checks, and the
+    SkipRegistryResolutionCheck switch that omits check (c) for the extension
+    path, which publishes to the VS Code Marketplace.
 
 .EXAMPLE
     pwsh ./scripts/dev-tools/Invoke-ReleaseVerification.ps1 -TagName mcp-server-v1.1.2 -Version 1.1.2
@@ -36,10 +37,21 @@ param(
     [string]$StepName = 'Publish to npm',
     [string]$Version,
     [string]$PackageName = '@danmoisan/drm-copilot-mcp',
-    [int]$IntervalSeconds = 10,
-    [int]$MaxAttempts = 18,
+    [int]$RunIntervalSeconds = 10,
+    [int]$RunMaxAttempts = 18,
+    [int]$StepIntervalSeconds = 20,
+    [int]$StepMaxAttempts = 60,
+    [int]$NpmIntervalSeconds = 15,
+    [int]$NpmMaxAttempts = 40,
     [switch]$SkipRegistryResolutionCheck
 )
+
+# The pure helpers live in a sibling file because this one stood one line under
+# the 500-line cap. They are dot-sourced rather than imported as a module so
+# their functions resolve in every consumer scope, including the scope of
+# scripts/dev-tools/Invoke-ReleaseTagPush.ps1, which dot-sources this file in
+# turn and calls Get-CodexPinnedMcpVersion transitively.
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Invoke-ReleaseVerificationHelpers.ps1')
 
 function Invoke-GhExe {
     <#
@@ -90,36 +102,6 @@ function Invoke-Sleep {
         [int]$Seconds
     )
     Start-Sleep -Seconds $Seconds
-}
-
-function ConvertFrom-JsonSafely {
-    <#
-    .SYNOPSIS
-        Parses JSON text, returning $null instead of throwing when the text is
-        empty or malformed. Pure helper; performs no external call.
-    .DESCRIPTION
-        The gh seam returns whatever the CLI wrote, which on a transient error is
-        not JSON. A poll must treat that attempt as "nothing found yet" and retry
-        rather than terminate, so a parse failure is a value here, not a throw.
-    .OUTPUTS
-        The deserialized object, or $null when the text is empty or unparseable.
-    #>
-    [CmdletBinding()]
-    [OutputType([object])]
-    param(
-        [string]$Text
-    )
-
-    if ([string]::IsNullOrWhiteSpace($Text)) {
-        return $null
-    }
-
-    try {
-        return ($Text | ConvertFrom-Json)
-    }
-    catch {
-        return $null
-    }
 }
 
 function Test-NpmVersionResolved {
@@ -264,13 +246,21 @@ function Test-PublishStepConclusion {
         Check (b). Reports how the named publish step of a run concluded.
     .DESCRIPTION
         A run found by check (a) may still be in progress, so this check polls
-        until the run reports status 'completed', on the same bounded schedule as
-        check (a). Classification of a completed payload is delegated to
-        Resolve-PublishStepConclusion. Budget exhaustion, meaning the run never
-        completed, returns 'RUN_FAILED': the run did not reach a successful
-        conclusion, and that state's recovery instruction is the correct one.
+        until the run reports status 'completed', on its own bounded schedule.
+        Classification of a completed payload is delegated to
+        Resolve-PublishStepConclusion. Budget exhaustion returns
+        'RUN_INCOMPLETE', which is not a failure of the run: the run never
+        completed, so no conclusion was ever observed and the polling budget is
+        what expired. The correct operator action is to re-run the verifier,
+        because the run may still be in progress and may still succeed. Reporting
+        that case as 'RUN_FAILED' would send the operator to read the logs of a
+        run that has not concluded, and would assert a failure that was never
+        observed.
     .OUTPUTS
-        One of 'SUCCESS', 'RUN_FAILED', 'STEP_SKIPPED', or 'STEP_MISSING'.
+        One of 'SUCCESS', 'RUN_FAILED', 'RUN_INCOMPLETE', 'STEP_SKIPPED', or
+        'STEP_MISSING'. 'RUN_FAILED' means a terminal failure conclusion was
+        observed; 'RUN_INCOMPLETE' means the budget expired before any conclusion
+        was observed.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -301,110 +291,9 @@ function Test-PublishStepConclusion {
         }
     }
 
-    return 'RUN_FAILED'
-}
-
-function Get-RecoveryInstruction {
-    <#
-    .SYNOPSIS
-        Maps a state token to its operator recovery instruction. Pure lookup.
-    .DESCRIPTION
-        Each non-success state carries its own instruction and no two of them are
-        the same string. A single generic failure message would say that
-        something went wrong without saying whether the version number was
-        consumed, which is the one fact that decides whether a retry is safe. The
-        table mirrors section 3.2 of the feature spec for issue #526.
-    .OUTPUTS
-        The instruction string, or an empty string for an unrecognized token.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$State
-    )
-
-    $instructions = @{
-        VERSION_CONSUMED_ELSEWHERE = 'Abort before pushing anything. The target version number is already taken on the registry; bump the version again and re-run the release.'
-        NO_RUN                     = 'No run started for the tag ref. With the ref-based publish guard in place, re-dispatch non-destructively with "gh workflow run publish-mcp-npm.yml --ref" against the tag; that consumes no version number. Delete-and-re-push of the tag is precondition-gated and runbook-only.'
-        RUN_FAILED                 = 'The run did not reach a successful conclusion. Read the run logs. The version may or may not be consumed; evaluate the registry-resolution check before any retry.'
-        STEP_SKIPPED               = 'The job concluded success but the publish step was skipped, so the publish guard did not match and the version is NOT consumed. Fix the guard or the trigger, then re-dispatch.'
-        STEP_MISSING               = 'The named job or step was not found in the run payload, which means the workflow was renamed. Treat this as a failure, never as absence of evidence, and reconcile the job and step names before retrying.'
-        UNRESOLVED                 = 'The publish step succeeded but the version did not appear on the registry within the polling budget. This is most likely registry propagation delay. Re-run the verifier before concluding, and do NOT retry the publish.'
-        RESOLVED                   = ''
-    }
-
-    if ($instructions.ContainsKey($State)) {
-        return [string]$instructions[$State]
-    }
-    return ''
-}
-
-function ConvertTo-VerificationResult {
-    <#
-    .SYNOPSIS
-        Builds the verification result object for one state token. Pure
-        constructor; performs no external call and changes no state outside the
-        object it returns.
-    .OUTPUTS
-        A PSCustomObject with State, ExitCode, RunExistence, StepConclusion, and
-        Instruction. ExitCode is 0 only for RESOLVED.
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$State,
-        [Parameter(Mandatory = $true)]
-        [string]$RunExistence,
-        [Parameter(Mandatory = $true)]
-        [string]$StepConclusion
-    )
-
-    return [pscustomobject]@{
-        State          = $State
-        ExitCode       = $(if ($State -eq 'RESOLVED') { 0 } else { 1 })
-        RunExistence   = $RunExistence
-        StepConclusion = $StepConclusion
-        Instruction    = (Get-RecoveryInstruction -State $State)
-    }
-}
-
-function Get-CodexPinnedMcpVersion {
-    <#
-    .SYNOPSIS
-        Reads the mcp-server version pinned in the npx argument array of a
-        .codex/config.toml document. Pure function over an in-memory string that
-        performs no filesystem access and opens no temporary file.
-    .DESCRIPTION
-        The content is a parameter rather than a disk read so the caller owns the
-        single read and the function stays testable without a temporary file,
-        which repo test policy prohibits outright. The pin appears in the
-        exact-version form, so the version is whatever follows the at sign up to
-        the closing quote.
-    .OUTPUTS
-        The pinned version string, or $null when the package is not pinned.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string]$ConfigContent,
-        [string]$PackageName = '@danmoisan/drm-copilot-mcp'
-    )
-
-    if ([string]::IsNullOrWhiteSpace($ConfigContent)) {
-        return $null
-    }
-
-    $pattern = [regex]::Escape($PackageName) + '@([^"'']+)'
-    $match = [regex]::Match($ConfigContent, $pattern)
-    if (-not $match.Success) {
-        return $null
-    }
-
-    return $match.Groups[1].Value.Trim()
+    # The budget expired without the run ever reporting status 'completed', so no
+    # conclusion was observed. That is not the same fact as an observed failure.
+    return 'RUN_INCOMPLETE'
 }
 
 function Invoke-TagPublishVerification {
@@ -422,10 +311,34 @@ function Invoke-TagPublishVerification {
         which publishes to the VS Code Marketplace rather than to the npm
         registry and so has no npm version for check (c) to resolve. One
         composition entry point therefore serves both release paths.
+    .PARAMETER RunIntervalSeconds
+        Polling interval for check (a). With RunMaxAttempts this forms the check
+        (a) budget, whose default of 10 seconds by 18 attempts is the 3-minute
+        ceiling of section 3.4 of the feature spec for issue #526.
+    .PARAMETER RunMaxAttempts
+        Attempt budget for check (a). See RunIntervalSeconds.
+    .PARAMETER StepIntervalSeconds
+        Polling interval for check (b). With StepMaxAttempts this forms the check
+        (b) budget, whose default of 20 seconds by 60 attempts is the 20-minute
+        ceiling of section 3.4. A workflow run takes far longer to reach a
+        terminal conclusion than it takes to appear, so this budget is much wider
+        than check (a)'s. Sharing one pair across all three checks was the issue
+        526 R1 defect: it ran check (b) at 3 minutes.
+    .PARAMETER StepMaxAttempts
+        Attempt budget for check (b). See StepIntervalSeconds.
+    .PARAMETER NpmIntervalSeconds
+        Polling interval for check (c). With NpmMaxAttempts this forms the check
+        (c) budget, whose default of 15 seconds by 40 attempts is the 10-minute
+        ceiling of section 3.4, sized for registry propagation delay.
+    .PARAMETER NpmMaxAttempts
+        Attempt budget for check (c). See NpmIntervalSeconds.
     .OUTPUTS
-        A PSCustomObject whose State is exactly one of RESOLVED, NO_RUN,
-        RUN_FAILED, STEP_SKIPPED, STEP_MISSING, or UNRESOLVED, with ExitCode 0
-        only for RESOLVED.
+        A PSCustomObject whose State is exactly one of the seven tokens RESOLVED,
+        NO_RUN, RUN_FAILED, RUN_INCOMPLETE, STEP_SKIPPED, STEP_MISSING, or
+        UNRESOLVED, with ExitCode 0 only for RESOLVED. RUN_FAILED and
+        RUN_INCOMPLETE are distinct: the first means a terminal failure
+        conclusion was observed, the second that the check (b) budget expired
+        before any conclusion was observed.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -437,16 +350,20 @@ function Invoke-TagPublishVerification {
         [string]$StepName = 'Publish to npm',
         [string]$Version,
         [string]$PackageName = '@danmoisan/drm-copilot-mcp',
-        [int]$IntervalSeconds = 10,
-        [int]$MaxAttempts = 18,
+        [int]$RunIntervalSeconds = 10,
+        [int]$RunMaxAttempts = 18,
+        [int]$StepIntervalSeconds = 20,
+        [int]$StepMaxAttempts = 60,
+        [int]$NpmIntervalSeconds = 15,
+        [int]$NpmMaxAttempts = 40,
         [switch]$SkipRegistryResolutionCheck
     )
 
     $runIdentifier = Wait-ForWorkflowRun `
         -TagName $TagName `
         -WorkflowFileName $WorkflowFileName `
-        -IntervalSeconds $IntervalSeconds `
-        -MaxAttempts $MaxAttempts
+        -IntervalSeconds $RunIntervalSeconds `
+        -MaxAttempts $RunMaxAttempts
 
     if ($runIdentifier -eq 'NO_RUN') {
         return (ConvertTo-VerificationResult -State 'NO_RUN' -RunExistence 'NO_RUN' -StepConclusion 'NOT_REACHED')
@@ -456,8 +373,8 @@ function Invoke-TagPublishVerification {
         -RunIdentifier $runIdentifier `
         -JobName $JobName `
         -StepName $StepName `
-        -IntervalSeconds $IntervalSeconds `
-        -MaxAttempts $MaxAttempts
+        -IntervalSeconds $StepIntervalSeconds `
+        -MaxAttempts $StepMaxAttempts
 
     if ($stepConclusion -ne 'SUCCESS') {
         return (ConvertTo-VerificationResult -State $stepConclusion -RunExistence $runIdentifier -StepConclusion $stepConclusion)
@@ -467,12 +384,12 @@ function Invoke-TagPublishVerification {
         return (ConvertTo-VerificationResult -State 'RESOLVED' -RunExistence $runIdentifier -StepConclusion $stepConclusion)
     }
 
-    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+    for ($attempt = 1; $attempt -le $NpmMaxAttempts; $attempt++) {
         if (Test-NpmVersionResolved -Version $Version -PackageName $PackageName) {
             return (ConvertTo-VerificationResult -State 'RESOLVED' -RunExistence $runIdentifier -StepConclusion $stepConclusion)
         }
-        if ($attempt -lt $MaxAttempts) {
-            Invoke-Sleep -Seconds $IntervalSeconds
+        if ($attempt -lt $NpmMaxAttempts) {
+            Invoke-Sleep -Seconds $NpmIntervalSeconds
         }
     }
 
@@ -482,6 +399,7 @@ function Invoke-TagPublishVerification {
 # Entry point: skipped when the script is dot-sourced for testing or for reuse
 # by a sibling release script.
 if ($MyInvocation.InvocationName -ne '.') {
+    # Forward all six per-check budgets; one shared pair was the issue 526 R1 defect.
     $verification = Invoke-TagPublishVerification `
         -TagName $TagName `
         -WorkflowFileName $WorkflowFileName `
@@ -489,8 +407,12 @@ if ($MyInvocation.InvocationName -ne '.') {
         -StepName $StepName `
         -Version $Version `
         -PackageName $PackageName `
-        -IntervalSeconds $IntervalSeconds `
-        -MaxAttempts $MaxAttempts `
+        -RunIntervalSeconds $RunIntervalSeconds `
+        -RunMaxAttempts $RunMaxAttempts `
+        -StepIntervalSeconds $StepIntervalSeconds `
+        -StepMaxAttempts $StepMaxAttempts `
+        -NpmIntervalSeconds $NpmIntervalSeconds `
+        -NpmMaxAttempts $NpmMaxAttempts `
         -SkipRegistryResolutionCheck:$SkipRegistryResolutionCheck
 
     Write-Output "State: $($verification.State); RunExistence: $($verification.RunExistence); StepConclusion: $($verification.StepConclusion)"
