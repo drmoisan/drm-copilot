@@ -1,8 +1,6 @@
 ---
 name: general-unit-test
 description: Cross-language unit test policy for all files.
-paths:
-  - "**"
 ---
 
 # Converted rule
