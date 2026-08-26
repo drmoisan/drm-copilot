@@ -217,6 +217,13 @@
             # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
             # line attribution is valid.
             'scripts/dev-tools/Invoke-ReleaseVerification.ps1'
+            # Issue #526 added this release-reconciliation module (Layer C of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseReconciliation.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
