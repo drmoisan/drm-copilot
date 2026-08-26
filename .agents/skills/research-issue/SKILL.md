@@ -1,6 +1,6 @@
 ---
 name: research-issue
-description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to artifacts/research/.
+description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the applicable tracked research folder.
 ---
 
 # Research Issue Skill
@@ -17,9 +17,10 @@ Accept one or more feature documents as context:
 
 ## Output
 
-Create or update a single research file:
+Create or update a single research file in the applicable tracked research root:
 
-- Path: `artifacts/research/<timestamp>-<short-name>-research.md`
+- Feature-associated path: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md`
+- One-off path: `docs/research/<timestamp>-<short-name>-research.md`
 - Use the Task Researcher template from the repository exactly.
 - Place rejected-alternatives summaries inside `## Recommended Approach`, not as a separate top-level header.
 

@@ -1,7 +1,5 @@
 ---
 name: self-explanatory-code-commenting
-paths:
-  - "**/*.py"
 description: Intent-first docstring and commenting standards.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: policy-audit-template-usage
-description: 'Policy audit template usage and output requirements. Use when creating policy-audit.<timestamp>.md artifacts from the repo templates.'
+description: Policy audit template usage and output requirements. Use when creating timestamped policy-audit artifacts from the repository templates.
 ---
 
 # Policy Audit Template Usage
