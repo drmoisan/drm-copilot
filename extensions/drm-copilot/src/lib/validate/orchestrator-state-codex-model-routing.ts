@@ -41,6 +41,7 @@ const GENERATED_AGENT_FAMILIES: ReadonlySet<string> = new Set([
   "atomic-planner",
   "atomic-executor",
   "feature-reviewer",
+  "commit-steward",
   "task-researcher",
   "prd-feature",
   "pr-author",
