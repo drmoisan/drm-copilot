@@ -165,6 +165,7 @@ PUSH_ACCEPTED      git push exited 0        (necessary; proves nothing further)
 |---|---|---|
 | `VERSION_CONSUMED_ELSEWHERE` | Pre-push check (c) **succeeded**: the target version already exists on the registry | Abort before pushing anything. The version number is already taken; bump again. |
 | `NO_RUN` | Check (a) budget exhausted; no run observed for the tag ref | With the ref-based guard in place: `gh workflow run publish-mcp-npm.yml --ref <tag>` — non-destructive, consumes no version number. Without it: precondition-gated tag delete and re-push (runbook only). |
+| `RUN_INCOMPLETE` | Check (b) budget exhausted; the run had not reached a terminal conclusion | Re-run the verifier. The run may still complete; do not read the run logs as though it had failed. |
 | `RUN_FAILED` | The run reached conclusion `failure` or `cancelled` | Read the run logs. The version may or may not be consumed; evaluate check (c) before any retry. |
 | `STEP_SKIPPED` | Job concluded `success` but the publish step concluded `skipped` | The publish guard did not match. The version is **not** consumed. Fix the guard or the trigger and re-dispatch. |
 | `STEP_MISSING` | The named job or step was not found in the run | The workflow was renamed. Treat as failure, never as absence of evidence. |
@@ -379,6 +380,8 @@ added for Layer C.
 | File | Change |
 |---|---|
 | `scripts/dev-tools/Invoke-ReleaseVerification.ps1` (new) | Checks (a), (b), (c) with bounded polling behind mock seams; per-tag state machine. |
+| `scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1` (new) | Pure helpers (`ConvertFrom-JsonSafely`, `Get-RecoveryInstruction`, `ConvertTo-VerificationResult`, `Get-CodexPinnedMcpVersion`). The file exists because the 500-line cap forced the pure helpers out of the verification module. |
+| `tests/scripts/dev-tools/Invoke-ReleaseVerificationHelpers.Tests.ps1` (new) | Unit tests for those pure helpers. The file exists because the 500-line cap forced the pure helpers out of the verification module, and tests mirror the production tree. |
 | `scripts/dev-tools/Invoke-ReleaseTagPush.ps1` | Reverse the push order; pre-push inverted check; inter-push gate; post-push verification. |
 | `.github/workflows/publish-mcp-npm.yml` | `pull_request` trigger; ref-based publish guard; tag/manifest equality assertion; post-publish registry poll. |
 | `.github/workflows/verify-published-releases.yml` (new) | Layer C scheduled reconciliation sweep. |
@@ -411,14 +414,16 @@ added for Layer C.
 - [ ] AC18 — A green run of `publish-mcp-npm.yml` against the branch head exists, produced by the new `pull_request` trigger, and the run's publish-step conclusion is `skipped`. The run URL and the step conclusion are recorded under `docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/evidence/qa-gates/`. This satisfies `modified-workflow-needs-green-run` and consumes no version number.
 - [x] AC19 — A scheduled reconciliation workflow exists at `.github/workflows/verify-published-releases.yml`, and its divergence computation is a pure function over a tag-version collection and a published-version collection, unit-tested offline with at least three cases: every tag published, one tag unpublished, and an empty tag set.
 - [x] AC20 — `tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1` no longer asserts the previous five-git-invocation shape or the extension-first push order, and the whole file passes under the repository Pester runner.
-- [x] AC21 — The complete Pester suite passes with no network access available, and no test added or modified by this change invokes `npm`, `gh`, or `git` as a real external process.
+- [x] AC21 — The complete Pester suite passes with no network access available, and no test added or modified by this change invokes `npm`, `gh`, or `git` as a real external process. The first clause is evidenced by `evidence/qa-gates/network-isolated-suite.2026-08-26T02-36.md`, which records the verbatim `ECONNREFUSED` isolation probe against the discard endpoint and the 3646-passed, 0-failed suite run executed inside that same isolated session.
 - [x] AC22 — No test file added or modified by this change references a temporary-path facility (`New-TemporaryFile`, `GetTempFileName`, `$env:TEMP`, `TestDrive`), and no test calls `Start-Sleep`.
 - [x] AC23 — Every `.ps1` file added or modified by this change is at most 500 lines.
-- [x] AC24 — The repository Pester coverage report shows line coverage of at least 85% for `scripts/dev-tools/Invoke-ReleaseVerification.ps1` and for `scripts/dev-tools/Invoke-ReleaseTagPush.ps1`, and neither file is added to any coverage exclusion list.
+- [x] AC24 — The repository Pester coverage report shows line coverage of at least 85% for `scripts/dev-tools/Invoke-ReleaseVerification.ps1`, for `scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1`, and for `scripts/dev-tools/Invoke-ReleaseTagPush.ps1`, and no such file is added to any coverage exclusion list.
 - [x] AC25 — `scripts/dev-tools/run-actionlint.ps1` completes with exit code 0 against the changed and added workflow files.
 - [x] AC26 — The PowerShell toolchain — format, PSScriptAnalyzer, Pester — completes with no errors and no auto-fixes in a single consecutive pass.
 - [x] AC27 — An operator runbook exists at `docs/engineering/missed-npm-publish.runbook.md` documenting, for each state in the spec's failure-state table, the corresponding recovery; the two preconditions that must both hold before any tag delete-and-re-push is considered; and the statement that the disposition of an already-consumed version number is a human decision.
 - [x] AC28 — The diff modifies no line of `README.md` (owned by #528) and adds no `quality-tiers.yml`, confirming both remain out of scope.
+- [x] AC29 — `Invoke-TagPublishVerification` accepts and forwards a separate interval and attempt budget for each of the three checks — the run-existence check (a), the publish-step check (b), and the registry check (c) — rather than one shared pair, and each pair is defaulted to its own `## 3.4` ceiling (10 s / 18 attempts, 20 s / 60 attempts, 15 s / 40 attempts). `tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1` asserts the forwarded budget of each check individually. Verified by the three P2-T4 tests recorded as passed in `evidence/regression-testing/pass-after-per-check-budgets.2026-08-26T02-36.md`.
+- [x] AC30 — An exhausted check (b) budget returns the distinct token `RUN_INCOMPLETE`, which carries its own operator recovery instruction and its own section in `docs/engineering/missed-npm-publish.runbook.md`, rather than reusing `RUN_FAILED`. A test asserts that the token returned for an exhausted check (b) budget differs from the token returned for a concluded-failure run, and that both results carry a non-zero exit code. Verified by the P3-T3, P3-T4, and P3-T5 tests recorded as passed in `evidence/regression-testing/pass-after-per-check-budgets.2026-08-26T02-36.md`.
 
 ---
 

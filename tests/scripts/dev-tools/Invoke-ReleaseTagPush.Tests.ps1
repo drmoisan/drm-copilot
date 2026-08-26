@@ -46,11 +46,17 @@ Describe "Invoke-ReleaseTagPush.ps1 - Invoke-ReleaseTagPushGuarded" {
                 [string]$StepName,
                 [string]$Version,
                 [string]$PackageName,
-                [int]$IntervalSeconds,
-                [int]$MaxAttempts,
+                [int]$RunIntervalSeconds,
+                [int]$RunMaxAttempts,
+                [int]$StepIntervalSeconds,
+                [int]$StepMaxAttempts,
+                [int]$NpmIntervalSeconds,
+                [int]$NpmMaxAttempts,
                 [switch]$SkipRegistryResolutionCheck
             )
-            $null = $JobName, $StepName, $Version, $PackageName, $IntervalSeconds, $MaxAttempts
+            $null = $JobName, $StepName, $Version, $PackageName
+            $null = $RunIntervalSeconds, $RunMaxAttempts, $StepIntervalSeconds
+            $null = $StepMaxAttempts, $NpmIntervalSeconds, $NpmMaxAttempts
             $script:capturedVerificationCalls.Add([pscustomobject]@{
                     TagName                     = $TagName
                     WorkflowFileName            = $WorkflowFileName
