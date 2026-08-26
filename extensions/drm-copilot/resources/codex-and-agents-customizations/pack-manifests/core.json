@@ -38,6 +38,7 @@
     ".codex/hooks/enforce-epic-wave-barrier.ps1",
     ".codex/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
     ".codex/hooks/record-subagent-routing-attestation.ps1",
     ".codex/hooks/validate-codex-subagent-routing.ps1",
     ".codex/scripts/epic-child-launch-contract.ps1",
