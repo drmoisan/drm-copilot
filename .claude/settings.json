@@ -10,8 +10,7 @@
       "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)",
       "Read",
       "Edit(/docs/**)",
-      "Write(/docs/**)",
-      "Write(/artifacts/**)",
+      "Edit(/artifacts/**)",
       "mcp__drm-copilot__run_poshqc_format",
       "mcp__drm-copilot__run_poshqc_analyze",
       "mcp__drm-copilot__run_poshqc_test",
@@ -73,8 +72,7 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
-      "Edit(./secrets/**)",
-      "Write(./secrets/**)"
+      "Edit(./secrets/**)"
     ],
     "additionalDirectories": [
       "c:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\skills\\execute-hard-lock"
