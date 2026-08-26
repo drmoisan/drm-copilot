@@ -18,6 +18,14 @@ from scripts.dev_tools.resolve_codex_deployment import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+BUNDLED_ROUTING_CONFIG = (
+    REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "resources"
+    / "config"
+    / "orchestration-routing.json"
+)
 
 
 def _load_policy() -> dict[str, Any]:
@@ -63,3 +71,13 @@ def test_agent_families_and_contexts_match_routing_config() -> None:
     assert set(policy["generated_agent_families"]) == GENERATED_AGENT_FAMILIES
     assert set(policy["execution_contexts"]) == VALID_EXECUTION_CONTEXTS
     assert policy["logical_agent_aliases"] == LOGICAL_AGENT_ALIASES
+
+
+def test_commit_steward_generated_family_has_byte_identical_bundle_config() -> None:
+    """Keep commit-steward in the resolver inventory and bundled policy mirror."""
+
+    routing_config = REPO_ROOT / "config" / "orchestration-routing.json"
+
+    assert routing_config.read_bytes() == BUNDLED_ROUTING_CONFIG.read_bytes()
+    assert "commit-steward" in GENERATED_AGENT_FAMILIES
+    assert "commit-steward" in _load_policy()["generated_agent_families"]
