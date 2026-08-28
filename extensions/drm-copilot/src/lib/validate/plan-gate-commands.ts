@@ -86,6 +86,13 @@ export interface PlanCommand {
   readonly argv: readonly string[];
   /** One of `grep`, `pytest_cov`, or `other`. */
   readonly kind: PlanCommandKind;
+  /**
+   * Newline-joined text of the command's whole attribution window — the owning
+   * task line plus every following line up to, but not including, the line that
+   * closes the window. Empty for a record built outside any window. The field
+   * is trailing, so every existing construction of this record keeps working.
+   */
+  readonly taskText: string;
 }
 
 /**
@@ -253,7 +260,19 @@ export function classifyKind(argv: readonly string[]): PlanCommandKind {
  * @returns Lines without their terminators.
  */
 function splitLines(text: string): string[] {
-  return text.split(/\r\n|\n|\r/);
+  if (text === "") {
+    return [];
+  }
+  const lines = text.split(/\r\n|\n|\r/);
+  // Python `str.splitlines()` yields no trailing empty line for text that ends
+  // with a line terminator, while `String.prototype.split` does. Dropping that
+  // element keeps every record field identical across the two runtimes,
+  // including the newline-joined whole-window task text. No record was ever
+  // produced from the dropped element, so no existing finding changes.
+  if (lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+  return lines;
 }
 
 /**
@@ -305,7 +324,39 @@ function appendCommand(
     rawSpan,
     argv,
     kind: classifyKind(argv),
+    taskText: "",
   });
+}
+
+/**
+ * Assign the closing window's whole text to every record it produced.
+ *
+ * Applies the whole-window definition of attributed task text at the single
+ * moment the window closes, so the extractor still walks the document exactly
+ * once and no second implementation of the window invariant is created.
+ *
+ * @param commands Accumulator holding every record so far.
+ * @param windowStart Index of the first record the closing window produced;
+ *     records before it belong to an earlier window.
+ * @param windowLines Verbatim lines of the closing window, in source order.
+ * @returns Nothing. Mutates the supplied accumulator.
+ */
+function closeWindow(
+  commands: PlanCommand[],
+  windowStart: number,
+  windowLines: readonly string[],
+): void {
+  if (windowStart >= commands.length) {
+    return;
+  }
+  const taskText = windowLines.join("\n");
+  for (let index = windowStart; index < commands.length; index += 1) {
+    const record = commands[index];
+    if (record === undefined) {
+      continue;
+    }
+    commands[index] = { ...record, taskText };
+  }
 }
 
 /**
@@ -324,6 +375,8 @@ export function extractPlanCommands(text: string): PlanCommand[] {
   const commands: PlanCommand[] = [];
   let currentTask: string | null = null;
   let inFence = false;
+  let windowLines: string[] = [];
+  let windowStart = 0;
 
   const lines = splitLines(text);
   // Walk the plan in source order, maintaining the attribution window so each
@@ -334,13 +387,20 @@ export function extractPlanCommands(text: string): PlanCommand[] {
 
     if (FENCE_RE.test(line)) {
       inFence = !inFence;
+      if (currentTask !== null) {
+        windowLines.push(line);
+      }
       continue;
     }
 
     // Inside a fence every non-blank line is a whole-line command candidate.
     if (inFence) {
+      if (currentTask === null) {
+        continue;
+      }
+      windowLines.push(line);
       const fenced = line.trim();
-      if (currentTask !== null && fenced !== "") {
+      if (fenced !== "") {
         appendCommand(commands, currentTask, lineNumber, fenced);
       }
       continue;
@@ -348,12 +408,19 @@ export function extractPlanCommands(text: string): PlanCommand[] {
 
     // A heading closes the current attribution window.
     if (PLAN_GATE_HEADING_PATTERN.test(line)) {
+      closeWindow(commands, windowStart, windowLines);
+      windowStart = commands.length;
+      windowLines = [];
       currentTask = null;
       continue;
     }
 
     const taskMatch = PLAN_GATE_TASK_PATTERN.exec(line);
     if (taskMatch !== null) {
+      // A task line closes the preceding window and opens the next one.
+      closeWindow(commands, windowStart, windowLines);
+      windowStart = commands.length;
+      windowLines = [];
       const phase = taskMatch.groups?.["phase"] ?? "";
       const task = taskMatch.groups?.["task"] ?? "";
       currentTask = `P${phase}-T${task}`;
@@ -363,11 +430,14 @@ export function extractPlanCommands(text: string): PlanCommand[] {
       continue;
     }
 
+    windowLines.push(line);
     // Collect each backticked span on the line as a separate candidate.
     for (const span of inlineSpans(line)) {
       appendCommand(commands, currentTask, lineNumber, span);
     }
   }
 
+  // The end of the document closes the final window.
+  closeWindow(commands, windowStart, windowLines);
   return commands;
 }

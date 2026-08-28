@@ -194,9 +194,13 @@ describe("validateArtifact plan acceptance gates", () => {
       runner,
     });
 
-    // Assert
+    // Assert: the exact tracked-tree query is asserted by membership rather
+    // than by position. G9 reads the project configuration once per
+    // context-bearing evaluation, exactly as the Python runtime does, so a
+    // `git show HEAD:pyproject.toml` call precedes the literal query and the
+    // position of the grep call is not a property this test is about.
     expect(runner.calls.length).toBeGreaterThanOrEqual(1);
-    expect(runner.calls[0]).toEqual([
+    expect(runner.calls).toContainEqual([
       "git",
       "grep",
       "-F",
