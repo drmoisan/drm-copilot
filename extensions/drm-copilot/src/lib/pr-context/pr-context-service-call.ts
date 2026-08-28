@@ -56,6 +56,7 @@ function verifyWrittenArtifact(
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(
       `Failed to verify PR context artifact '${artifactPath}': the file could not be read back after writing (${detail}).`,
+      { cause: error },
     );
   }
   if (actual !== expected) {
