@@ -389,7 +389,7 @@ Compute and record SHA-256 digests for each of the three source/bundled pairs af
 
 ## Acceptance Criteria
 
-- [ ] A named test `tests/scripts/dev_tools/test_blast_radius_conflicts.py::test_bool_is_false_for_a_disjoint_pair` exists and passes, asserting that the boolean projection of the relation's result for two provably disjoint radii is `False`.
+- [x] A named test `tests/scripts/dev_tools/test_blast_radius_conflicts.py::test_bool_is_false_for_a_disjoint_pair` exists and passes, asserting that the boolean projection of the relation's result for two provably disjoint radii is `False`.
 - [ ] A named test `tests/scripts/dev_tools/test_blast_radius_conflicts.py::test_bool_is_true_for_an_overlapping_pair` exists and passes, asserting that the boolean projection for two overlapping radii is `True`.
 - [ ] A named test `tests/scripts/dev_tools/test_blast_radius_conflicts.py::test_bool_matches_the_conflict_field_on_constructed_results` exists and passes, asserting that a directly constructed result projects to its own `conflict` field in both the true and the false direction.
 - [ ] A named parametrized test `tests/scripts/dev_tools/test_blast_radius_invariants.py::test_boolean_projection_agrees_with_the_conflict_field` exists and passes for every entry of the existing `RADIUS_PAIRS` matrix, asserting that the boolean projection equals the `conflict` field.
@@ -407,7 +407,7 @@ Compute and record SHA-256 digests for each of the three source/bundled pairs af
 - [ ] The four-stage Python toolchain completes without error in a single pass: `poetry run black .`, then `poetry run ruff check .`, then `poetry run pyright`, then `poetry run pytest --cov --cov-branch --cov-report=term-missing`.
 - [ ] The three-stage PowerShell toolchain completes without error in a single pass using `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test`.
 - [ ] `git diff --name-only main...HEAD` lists only paths from the declared file scope in this specification, and lists no path under the extension TypeScript source tree extensions/drm-copilot/src, no path under the policy-rule directory .claude/rules, and none of the facade module compute_blast_radius.py under scripts/dev_tools, the drift-detection module parallel_drift_detection.py under scripts/dev_tools, the blast-radius truth table config/blast-radius.json, or the PoshQC Pester run-settings file pester.runsettings.psd1 under scripts/powershell/PoshQC/settings.
-- [ ] `scripts/dev_tools/_blast_radius_conflicts.py` defines no `__len__` on `ConflictResult`, and the class docstring and construction validation are otherwise behaviorally unchanged.
+- [x] `scripts/dev_tools/_blast_radius_conflicts.py` defines no `__len__` on `ConflictResult`, and the class docstring and construction validation are otherwise behaviorally unchanged.
 - [ ] Neither the Python parity suite test_blast_radius_parity.py under tests/scripts/dev_tools nor the PowerShell parity suite BlastRadius.Parity.Tests.ps1 under tests/scripts/claude-lib/blast-radius is modified, and both pass unchanged, confirming the shared fixture corpus was not extended with a truthiness assertion the two runtimes cannot both satisfy.
 - [ ] Neither `.claude/lib/blast-radius/BlastRadius.psm1` nor its bundled copy exceeds 500 lines after the comment-based-help addition.
 

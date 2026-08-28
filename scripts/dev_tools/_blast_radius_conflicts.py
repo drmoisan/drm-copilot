@@ -133,6 +133,21 @@ class ConflictResult:
                 f"conflict reasons must follow the order {CONFLICT_KINDS}."
             )
 
+    def __bool__(self) -> bool:
+        """Project the verdict so a boolean test agrees with ``conflict``.
+
+        Without this method ``bool`` falls through to ``object.__bool__``, which
+        is unconditionally ``True``, so the natural ``if conflicts(a, b, cfg):``
+        form treats every pair as contending. ``__len__`` is deliberately not
+        defined: ``__bool__`` takes precedence over it, and a length would make
+        this record look sized, which it is not.
+
+        Returns:
+            bool: The ``conflict`` field, so the projection is total and agrees
+                with the already-validated verdict the instance carries.
+        """
+        return self.conflict
+
 
 def conflicts(
     a: BlastRadius, b: BlastRadius, config: Mapping[str, object]
