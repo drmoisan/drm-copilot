@@ -148,6 +148,7 @@ export function buildSummaryText(
   collected: CollectedPrContext,
   fs: FileSystem,
   appendixPath: string,
+  generatedSection: string,
 ): string {
   const ctx = collected.contextResult;
   const ghStatusText = resolveGhStatusText(collected);
@@ -161,6 +162,7 @@ export function buildSummaryText(
   ].join("\n");
 
   const summarySections: string[] = [
+    generatedSection,
     section("GitHub CLI status"),
     ghStatusText,
     intentBlock,
@@ -270,7 +272,7 @@ export function buildSummaryText(
  */
 export function buildAppendixText(
   collected: CollectedPrContext,
-  clock: () => Date,
+  generatedSection: string,
 ): string {
   const featureBlock = collected.featureDocs
     .map((doc) => doc.excerpt)
@@ -283,7 +285,7 @@ export function buildAppendixText(
     prAppendix(detail),
   );
   const appendixParts: string[] = [
-    appendGenerationTimestamp(clock),
+    generatedSection,
     collected.contextResult.text,
     "",
     section("Issue details"),
@@ -366,12 +368,22 @@ export function collectAndWrite(
   const clock = options.clock ?? (() => new Date());
   const collected = collectPrContext(options);
 
+  // Render the freshness header exactly once per invocation and hand the same
+  // string to both builders, so the two documents cannot disagree on the
+  // timestamp. The head SHA is already on the collected record, so no
+  // additional git call is made.
+  const generatedSection = appendGenerationTimestamp(
+    clock,
+    collected.contextResult.headSha,
+  );
+
   const summaryText = buildSummaryText(
     collected,
     options.fs,
     options.appendixOut,
+    generatedSection,
   );
-  const appendixText = buildAppendixText(collected, clock);
+  const appendixText = buildAppendixText(collected, generatedSection);
 
   writeOutput(options.fs, summaryText, options.out, options.append);
   writeOutput(options.fs, appendixText, options.appendixOut, options.append);

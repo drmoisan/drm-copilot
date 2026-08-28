@@ -200,27 +200,27 @@ Both tasks in this phase add an assertion that the current code cannot satisfy, 
 
 ### Phase 3 — Freshness Marker, TypeScript
 
-- [ ] [P3-T1] Extend the generation-timestamp helper to carry the head SHA.
+- [x] [P3-T1] Extend the generation-timestamp helper to carry the head SHA.
   - Edit `extensions/drm-copilot/src/lib/pr-context/summary-helpers.ts` so the generation-timestamp helper accepts the head SHA in addition to the injected clock and emits, after the timestamp line, a line whose prefix is the literal `Head SHA:` followed by the SHA. When no head SHA is available the line renders the literal `(unknown)` in place of the SHA. The existing section title `Context generated` is reused unchanged, and the clock stays injected. The head-SHA parameter is declared optional with a default, so the single production call site at extensions/drm-copilot/src/lib/pr-context/collector-output.ts line 286 continues to compile unchanged and this task's type-check acceptance is reachable before P3-T2 updates that call site.
   - Acceptance: `npm run typecheck` exits 0 and the file stays at or under 500 lines.
 
-- [ ] [P3-T2] Render one shared generated-context section first in both documents from a single timestamp.
+- [x] [P3-T2] Render one shared generated-context section first in both documents from a single timestamp.
   - Edit `extensions/drm-copilot/src/lib/pr-context/collector-output.ts` so that `collectAndWrite` renders the generated-context section exactly once per invocation and passes that same string to both builders; `buildSummaryText` gains the parameters it needs to place that section as the first entry of the summary sections, ahead of the GitHub CLI status section; and `buildAppendixText` places the same string first, replacing its current timestamp-only section. The head SHA supplied is the one already on the collected record, so no new git call is made.
   - Acceptance: `npm run typecheck` exits 0, the file stays at or under 500 lines, and the summary and appendix builders receive the identical rendered section string rather than each calling the clock.
 
-- [ ] [P3-T3] Update the generation-timestamp helper test for the new signature and the head-SHA line.
+- [x] [P3-T3] Update the generation-timestamp helper test for the new signature and the head-SHA line.
   - Edit `extensions/drm-copilot/test/lib/pr-context/summary-helpers.test.ts` so the existing deterministic-clock test passes the new head-SHA input and additionally asserts the rendered head-SHA line for a concrete forty-character fixture SHA supplied by the test.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/summary-helpers.test.ts` exits 0.
 
-- [ ] [P3-T4] Extend the summary section-ordering assertion to place the generated-context section first.
+- [x] [P3-T4] Extend the summary section-ordering assertion to place the generated-context section first.
   - Edit `extensions/drm-copilot/test/lib/pr-context/collector-output.test.ts` so the ordering array in the canonical-section-order test begins with the generated-context section banner and every section entry it already asserted stays present in its existing relative order.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/collector-output.test.ts` exits 0, and the ordering array contains one more entry than it did at baseline with all previous entries retained in the same relative order.
 
-- [ ] [P3-T5] Add the freshness-header tests for both rendered documents.
+- [x] [P3-T5] Add the freshness-header tests for both rendered documents.
   - Create `extensions/drm-copilot/test/lib/pr-context/collector-output-freshness.test.ts` carrying three named tests: one that, with a fixed injected clock and a fixed head SHA, asserts the first section of the rendered summary text and the first section of the rendered appendix text are both the generated-context section and that the timestamp line extracted from each text is byte-identical; one that asserts both rendered texts contain the head-SHA line built from a concrete forty-character fixture SHA supplied by the test; and one that asserts the head-SHA line renders the unknown token when the collected context carries no head SHA and that no error is raised in that case.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/collector-output-freshness.test.ts` exits 0 with three passing tests, and the new file is at or under 500 lines.
 
-- [ ] [P3-T6] Update the two integration suites that observe the rendered artifact text and the written paths.
+- [x] [P3-T6] Update the two integration suites that observe the rendered artifact text and the written paths.
   - Edit `extensions/drm-copilot/test/lib/pr-context/collector-integration.test.ts` and `extensions/drm-copilot/test/extension.integration.test.ts` so every assertion that names a repository-relative artifact key names the workspace-joined path instead, and every assertion that observes the rendered summary or appendix accommodates the new leading generated-context section without deleting an assertion it previously carried.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/collector-integration.test.ts test/extension.integration.test.ts` exits 0, and neither file retains an assertion expecting a repository-relative artifact path.
 

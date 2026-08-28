@@ -68,7 +68,14 @@ jest.mock("node:fs", () => ({
     throw new Error("ENOENT");
   }),
   readdirSync: jest.fn(() => []),
-  readFileSync: jest.fn(() => {
+  readFileSync: jest.fn((filePath: string) => {
+    // Serve reads consistently with writes. The service call verifies each
+    // write by reading the file back, so a double that records a write but
+    // refuses to serve the read would report a false verification failure.
+    const written = inProcessWrites.get(filePath.replace(/\\/g, "/"));
+    if (written !== undefined) {
+      return written;
+    }
     throw new Error("ENOENT");
   }),
   writeFileSync: jest.fn((filePath: string, content: string) => {
@@ -299,8 +306,12 @@ describe("drm-copilot integration behavior", () => {
     // The in-process port (F9) never spawns a Python process.
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
     // Both artifacts are written through node:fs against the workspace root.
-    expect(inProcessWrites.has("artifacts/pr_context.summary.txt")).toBe(true);
-    expect(inProcessWrites.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    expect(
+      inProcessWrites.has("C:/workspace/artifacts/pr_context.summary.txt"),
+    ).toBe(true);
+    expect(
+      inProcessWrites.has("C:/workspace/artifacts/pr_context.appendix.txt"),
+    ).toBe(true);
   });
 
   it("collectPrContext handles workspace paths with spaces or unicode", async () => {
@@ -316,10 +327,18 @@ describe("drm-copilot integration behavior", () => {
     await handlerFor("drmCopilotExtension.collectPrContext")();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
-    // The collector writes both artifacts (relative paths) without failing on
-    // the unicode/space workspace path.
-    expect(inProcessWrites.has("artifacts/pr_context.summary.txt")).toBe(true);
-    expect(inProcessWrites.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    // The collector writes both artifacts against the workspace root without
+    // failing on the unicode/space workspace path.
+    expect(
+      inProcessWrites.has(
+        "C:/workspace/Repo Δ with spaces/artifacts/pr_context.summary.txt",
+      ),
+    ).toBe(true);
+    expect(
+      inProcessWrites.has(
+        "C:/workspace/Repo Δ with spaces/artifacts/pr_context.appendix.txt",
+      ),
+    ).toBe(true);
   });
 
   it("collectPrContext writes summary and appendix artifacts in-process", async () => {
@@ -329,14 +348,21 @@ describe("drm-copilot integration behavior", () => {
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
     const summaryText =
-      inProcessWrites.get("artifacts/pr_context.summary.txt") ?? "";
+      inProcessWrites.get("C:/workspace/artifacts/pr_context.summary.txt") ??
+      "";
     const appendixText =
-      inProcessWrites.get("artifacts/pr_context.appendix.txt") ?? "";
+      inProcessWrites.get("C:/workspace/artifacts/pr_context.appendix.txt") ??
+      "";
     // The summary carries the canonical PR-intent and base/head sections.
     expect(summaryText).toContain("===== PR Intent =====");
     expect(summaryText).toContain("===== Base/Head =====");
     // The appendix begins with the generated-timestamp section.
     expect(appendixText).toContain("===== Context generated =====");
+    // Both documents now carry the shared freshness header, so the summary
+    // carries the generated-context section too.
+    expect(summaryText).toContain("===== Context generated =====");
+    expect(summaryText).toContain("Head SHA:");
+    expect(appendixText).toContain("Head SHA:");
   });
 
   // NOTE: The push-down copilot and codex/agents integration cases previously

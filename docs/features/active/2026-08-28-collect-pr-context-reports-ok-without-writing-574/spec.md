@@ -339,10 +339,10 @@ Seeded from issue:
 - [ ] A named Jest test asserts that when the summary write succeeds and the appendix write fails, the service call raises and the raised message names the appendix artifact path.
 - [ ] A named Jest test at the tool-dispatch boundary asserts that when the service call raises, the tool result carries `ok` false and the failure text appears in the result record.
 - [ ] A named Jest test asserts that a successful invocation returns `ok` true and an `artifacts` array whose two entries are equal to the two paths written during that same test run.
-- [ ] A named Jest test with a fixed injected clock and a fixed head SHA asserts that the first section of the rendered summary text and the first section of the rendered appendix text are both the generated-context section, and that the timestamp line extracted from each text is byte-identical.
-- [ ] A named Jest test asserts that both rendered texts contain the head-SHA line built from a concrete forty-character fixture SHA supplied by the test.
-- [ ] A named Jest test asserts that the head-SHA line renders the explicit unknown token when the collected context carries no head SHA, and that no error is raised in that case.
-- [ ] The section-ordering assertion in `extensions/drm-copilot/test/lib/pr-context/collector-output.test.ts` asserts that the generated-context section is the first entry of the summary ordering and that the relative order of every section it previously asserted is unchanged.
+- [x] A named Jest test with a fixed injected clock and a fixed head SHA asserts that the first section of the rendered summary text and the first section of the rendered appendix text are both the generated-context section, and that the timestamp line extracted from each text is byte-identical.
+- [x] A named Jest test asserts that both rendered texts contain the head-SHA line built from a concrete forty-character fixture SHA supplied by the test.
+- [x] A named Jest test asserts that the head-SHA line renders the explicit unknown token when the collected context carries no head SHA, and that no error is raised in that case.
+- [x] The section-ordering assertion in `extensions/drm-copilot/test/lib/pr-context/collector-output.test.ts` asserts that the generated-context section is the first entry of the summary ordering and that the relative order of every section it previously asserted is unchanged.
 - [x] A named Jest test asserts that the two collector log lines emitted after the writes carry the absolute workspace-joined artifact paths.
 - [ ] A named Jest test asserts that when the GitHub CLI is reported unavailable, both artifacts are still written and the service call returns successfully.
 - [ ] A named pytest test invokes the Python `collect_and_write` with a stubbed runner and asserts that the summary text and the appendix text it writes each open with the generated-context section, and that the generated-context block is byte-identical between the two texts.
