@@ -88,6 +88,36 @@ def test_bool_is_false_for_a_disjoint_pair() -> None:
     assert bool(result) is False
 
 
+def test_bool_is_true_for_an_overlapping_pair() -> None:
+    """Project an overlapping pair's result to ``True`` under ``bool``."""
+    radius = make_radius(paths=["scripts/dev_tools/a.py"])
+
+    result = conflicts(radius, radius, CONFIG)
+
+    assert result.conflict is True
+    assert bool(result) is True
+
+
+def test_bool_matches_the_conflict_field_on_constructed_results() -> None:
+    """Project a directly constructed result to its own ``conflict`` field."""
+    negative = ConflictResult(conflict=False, reasons=())
+    positive = ConflictResult(
+        conflict=True,
+        reasons=(ConflictReason(kind="path_overlap", detail="a ~ a"),),
+    )
+
+    assert bool(negative) is negative.conflict
+    assert bool(negative) is False
+    assert bool(positive) is positive.conflict
+    assert bool(positive) is True
+
+
+def test_conflict_reason_defines_no_boolean_projection() -> None:
+    """Pin that the reason record receives neither dunder of truthiness."""
+    assert "__bool__" not in vars(ConflictReason)
+    assert "__len__" not in vars(ConflictReason)
+
+
 def test_path_overlap_triggers_on_identical_concrete_paths() -> None:
     """Report path overlap when both radii name the same file."""
     radius = make_radius(paths=["scripts/dev_tools/a.py"])
