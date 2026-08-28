@@ -804,27 +804,34 @@ change**. Deleting the state file is not a durable fix and must not be attempted
 
 - `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`
 - `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`
+- `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classifier.Tests.ps1`
 
 ### Feature documents and evidence
 
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/spec.md`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/issue.md`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/plan.2026-08-26T08-40.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/policy-audit.2026-08-27T22-47.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/code-review.2026-08-27T22-47.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/feature-audit.2026-08-27T22-47.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/remediation-inputs.2026-08-27T22-47.md`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/remediation-plan.2026-08-27T22-47.md`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/research/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/baseline/`
+- `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/remediation-baseline/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/qa-gates/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/regression-testing/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/issue-updates/`
 - `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/other/`
 
-The `research/` entry and the five `evidence/` entries are directory prefixes, not files; the
+The `research/` entry and the six `evidence/` entries are directory prefixes, not files; the
 concrete artifact filenames are timestamp-bearing and are fixed by the plan. They are recorded at
 directory granularity because the feature folder is unique to this item and therefore cannot
 contend with any other item. `research/` is declared because the research artifact committed at the
 branch point is already in this branch's diff against `origin/main`, so an undeclared-path check
 would otherwise report it.
 
-Four statements about this list, made explicitly because a parent process computes conflict edges
+Five statements about this list, made explicitly because a parent process computes conflict edges
 from it and an under-declaration is a correctness failure:
 
 **(a)** `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` and its three
@@ -862,6 +869,32 @@ the exclusion is confined to a gitignored path, and `detect_escaped_paths` compa
 radius against the paths a diff actually touched, so a genuine write to a tracked path remains
 observable.
 
+**(e)** Root-level review and remediation artifacts of this feature folder are in this radius:
+the timestamp-bearing `policy-audit`, `code-review`, `feature-audit`, `remediation-inputs`, and
+`remediation-plan` Markdown files written directly under
+`docs/features/active/preimplementation-gate-blocks-epic-execution-554/`. The five concrete
+cycle-1 files are enumerated above; this rule covers any later cycle's set, which differs from
+the cycle-1 set only in its timestamp.
+
+**Amendment, 2026-08-27.** Three additions and two numeral corrections were made to this section
+after the cycle-1 review. The classifier test suite was added because the named Claude-side edit
+target
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`
+stood at 494 lines against the 500-line cap in `.claude/rules/general-code-change.md`, leaving six
+lines of headroom against the roughly fifty lines the remaining cases require, so those cases went
+into a new sibling suite. The five root-level artifacts were added because a `full-bug`
+review-and-remediation cycle necessarily produces them. The
+`evidence/remediation-baseline/` prefix was added because the remediation cycle writes its Phase 0
+baseline artifacts there and the section previously declared only the five other `evidence/`
+prefixes. All three are genuine writes, and
+`.claude/rules/parallel-orchestration.md` states that the planner remains obliged to enumerate a
+genuine write explicitly and to append that exact path to the declared radius after normalization.
+The two numeral corrections are consequences of those additions and nothing else: the `evidence/`
+entry count reads six rather than five, and this list of lettered statements reads five rather than
+four. Apart from those two numerals the amendment is additive: no pre-existing entry is removed,
+narrowed, or reworded, and no acceptance criterion and no checkbox is touched. Narrowing a radius
+to suppress a conflict edge is prohibited by the same rule file.
+
 ---
 
 ## Acceptance Criteria
@@ -896,7 +929,7 @@ This section is the **sole** authoritative acceptance-criteria source for this f
 - [x] `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1` each list both new production hook files in `CodeCoverage.Path`, and the PoshQC bundled-parity Python test passes.
 - [x] The two pack manifests each list the new modes hook for their surface, and the push-down pack-manifest completeness Python tests pass.
 - [x] The new production hook files appear in the Pester coverage report produced by the self-hosted invocation `Invoke-PoshQCTest` against the repository settings file, confirming the new `CodeCoverage.Path` entries take effect.
-- [ ] Line coverage across the PowerShell suite remains at or above 85%, and no changed line in either modified hook loses coverage.
+- [x] Line coverage across the PowerShell suite remains at or above 85%, and no changed line in either modified hook loses coverage.
 - [x] No file whose path begins with `.claude/rules/`, `.claude/skills/`, or `.github/` appears in `git diff --name-only` against the merge base.
 - [x] Deny-by-default is preserved with no new permissive path: Pester tests assert deny for an unparseable payload, for a payload with no tool input key, and for a mode-resolved delegation whose injected checkpoint content is empty, and all pass.
 - [x] Every file written by the branch appears in the `## DECLARED BLAST RADIUS` section of this document, verified by comparing `git diff --name-only` against the merge base with the declared list.
