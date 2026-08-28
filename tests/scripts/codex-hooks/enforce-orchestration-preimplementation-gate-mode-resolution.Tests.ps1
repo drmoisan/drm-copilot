@@ -267,6 +267,36 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
         }
     }
 
+    Context 'the preparation-mode delegation predicate on the Codex surface' {
+        # Cycle-2 finding B5, the Codex twin of cycle-1 finding R2. Lines 197 and 206 of
+        # .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 were COVERED at the
+        # merge base 1e991b86, through Test-ImplementationDelegation's call to this predicate
+        # at merge-base line 213. This branch removed that call site, orphaning the function
+        # on BOTH surfaces. The two surviving direct callers in
+        # tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 supply a null payload
+        # and an orchestrator payload carrying one marker, so they reach only the null branch
+        # and the marker-loop return. These two cases close the residual.
+        #
+        # Decision D5 is not engaged: the predicate takes a [pscustomobject] and returns a
+        # [bool], constructs no Agent envelope, and claims no transport. It is the same
+        # category as the classifier parity cases above.
+
+        It 'returns false for a non-orchestrator subagent type carrying both preparation markers on the Codex surface' {
+            # Second conjunct, closing line 197. Both markers are present, with their trailing
+            # periods, so only the subagent-type check can produce the false.
+            $toolInput = [pscustomobject]@{ subagent_type = 'task-researcher'; prompt = 'Preparation mode: true. route_id: preparation. Promote only.' }
+            Test-PreparationModeDelegation -ToolInput $toolInput | Should -BeFalse
+        }
+
+        It 'returns true for an orchestrator carrying both preparation markers on the Codex surface' {
+            # All three conjuncts hold, closing line 206. The marker set is
+            # @('Preparation mode: true.', 'route_id: preparation.') and both members carry their
+            # trailing period, so the containment loop completes without returning.
+            $toolInput = [pscustomobject]@{ subagent_type = 'orchestrator'; prompt = 'Preparation mode: true. route_id: preparation. Promote only.' }
+            Test-PreparationModeDelegation -ToolInput $toolInput | Should -BeTrue
+        }
+    }
+
     Context 'the recorded Agent-transport gap (decision D5, deliverable ii)' {
         It 'registers no PreToolUse matcher admitting an Agent or Task tool name' {
             # Issue #555 owns this gap. It is recorded here as a deliberate, tested fact
