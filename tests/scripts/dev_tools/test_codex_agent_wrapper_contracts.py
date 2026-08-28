@@ -201,3 +201,33 @@ def test_orchestrator_role_excludes_role_local_mcp_transport() -> None:
         read_bundle_toml(ORCHESTRATOR_ROLE_PATH),
     ):
         assert "mcp_servers" not in role
+
+
+def test_routed_delegation_launch_binding() -> None:
+    """Require durable exact routing receipt persistence before nested launch."""
+
+    root_text = read_repo_text(ORCHESTRATOR_ROLE_PATH)
+    bundle_text = read_bundle_text(ORCHESTRATOR_ROLE_PATH)
+
+    assert_contains_all(
+        root_text,
+        (
+            "codex_model_routing_receipts",
+            "resolve independently",
+            (
+                "validate the generated profile name, model, reasoning effort, "
+                "path, and SHA-256"
+            ),
+            "selected checkpoint",
+            "durably flush",
+            "before every normal nested `spawn_agent` call",
+            "resolver-returned `deployment_agent`",
+            "generic aliases",
+            "ambiguous checkpoints",
+            "failed profile validation",
+            "failed persistence",
+            "`routing_valid: false`",
+            "child output and mutations",
+        ),
+    )
+    assert root_text == bundle_text

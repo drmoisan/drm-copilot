@@ -15,9 +15,13 @@ from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools import fix_all
 from scripts.dev_tools import fix_all_branches as branches
+from tests.scripts.dev_tools.fix_all_thread_stubs import (
+    SkipBranchThread as _SkipBranchThread,
+)
+from tests.scripts.dev_tools.fix_all_thread_stubs import make_ordered_thread_class
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Iterable, Mapping, Sequence
 
     from pytest import MonkeyPatch
 
@@ -141,10 +145,25 @@ def test_json_format_failure_returns_fail_result() -> None:
     assert "STATUS|branch=json|status=FAIL" in read_log(logger)
 
 
-def test_json_cancel_before_validate_returns_canceled_result() -> None:
+def test_json_cancel_before_validate_returns_canceled_result(
+    monkeypatch: MonkeyPatch,
+) -> None:
     """JSON cancels before validate when a sibling fails and complete_all is off."""
     # Arrange: Python fails (sets cancel); JSON has only a format response so
     # validate must never run. complete_all defaults to False.
+    #
+    # Ordering: run the python branch to completion before the json branch, so
+    # the cancel event is already set when json reaches its first cancel check.
+    # Without this the assertion below depends on whether python's failure beats
+    # a 10 ms wall-clock grace period in fix_all_branches, which is a scheduler
+    # race rather than a property of the inputs (issue #505).
+    import scripts.dev_tools.fix_all_runtime as runtime
+
+    monkeypatch.setattr(
+        runtime.threading,
+        "Thread",
+        make_ordered_thread_class(order=("python", "json")),
+    )
     responses = base_success_responses()
     responses["python"]["Black: format"] = [
         make_result(1, "err"),
@@ -420,45 +439,6 @@ def test_runtime_emits_no_output_for_empty_branch_output(
     # Assert
     assert exit_code == 0
     assert "(no output)" in read_log(logger)
-
-
-class _SkipBranchThread:
-    """Thread stand-in that runs every branch target except a skipped one.
-
-    Purpose:
-        Deterministically leave one branch's result unrecorded (without raising
-        an exception in a worker thread) so the runtime aggregation hits its
-        missing/None-result path.
-
-    Attributes:
-        skip_branch: Name of the branch whose ``_runner`` target is suppressed.
-    """
-
-    skip_branch = "json"
-
-    def __init__(
-        self,
-        *,
-        target: Callable[[str, Callable[[], fix_all.BranchResult]], None],
-        args: tuple[str, Callable[[], fix_all.BranchResult]],
-        daemon: bool,
-    ) -> None:
-        self._target = target
-        self._args = args
-        self._daemon = daemon
-
-    def start(self) -> None:
-        """Run the target synchronously unless it is the skipped branch."""
-        branch_name = self._args[0]
-        # Routing: suppress only the configured branch so its result stays unset;
-        # all other branches run their target synchronously.
-        if branch_name == self.skip_branch:
-            return
-        self._target(*self._args)
-
-    def join(self) -> None:
-        """No-op join; targets already ran synchronously in ``start``."""
-        return
 
 
 def test_runtime_reports_missing_result_when_branch_absent(

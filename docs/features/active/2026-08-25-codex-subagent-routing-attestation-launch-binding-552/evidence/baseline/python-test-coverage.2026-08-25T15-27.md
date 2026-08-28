@@ -1,0 +1,4 @@
+Timestamp: 2026-08-25T15-27
+Command: poetry run pytest tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py tests/scripts/dev_tools/test_resolve_codex_deployment.py tests/scripts/dev_tools/test_generate_codex_agent_variants.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py --cov=scripts.dev_tools.resolve_codex_deployment --cov=scripts.dev_tools.generate_codex_agent_variants --cov-branch --cov-report=term-missing
+EXIT_CODE: 1
+Output Summary: 45 passed and 1 failed. `test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts` treated the ignored runtime file `.codex/state/powershell-batch-budget.01a03a40-eb5b-7e63-9c04-94ca4f0590d0.json` as a required bundle file. Coverage: `resolve_codex_deployment.py` 100%; `generate_codex_agent_variants.py` 89%; total 93% line coverage. Branch coverage was enabled; pytest reported 64 branches with 8 partial branches across the two measured modules.

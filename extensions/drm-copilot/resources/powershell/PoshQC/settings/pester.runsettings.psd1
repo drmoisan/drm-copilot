@@ -133,6 +133,10 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
@@ -204,19 +208,45 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
             '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
+            # Issue #526 added this out-of-band release-verification module (Layer B of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerification.ps1'
+            # Issue #526 split the pure helpers of the verification module into this sibling
+            # file, because the parent stood one line under the 500-line cap. CodeCoverage.Path
+            # is an explicit per-file allow-list, so the new production file must be registered
+            # here to stay inside the coverage denominator; without it the relocated lines would
+            # leave the denominator entirely, which the Coverage Exclusion Policy forbids. Its
+            # Pester suite dot-sources the file, and the file declares no entry-point block, so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1'
+            # Issue #526 added this release-reconciliation module (Layer C of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseReconciliation.ps1'
+            # Issue #552 validates start-time routing attestation coverage for this hook.
+            '.codex/hooks/record-subagent-routing-attestation.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
     }
 }
-
-
 
 
 

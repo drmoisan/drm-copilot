@@ -38,7 +38,14 @@ _G1_PLAN = "\n".join(
     [
         "### Phase 1 — Work",
         "- [ ] [P1-T1] Do the thing",
-        "  - Acceptance: `poetry run pytest -q --cov=scripts/dev_tools/foo.py` passes.",
+        # The explicit terminal reporter keeps this fixture exercising G1 alone.
+        # Without it the command supplies no reporter and the project `addopts`
+        # supplies none either, so G9 reports it correctly and the extra warning
+        # breaks the stderr assertion of the `main` test below. The `--cov`
+        # value is deliberately left exactly as it stands, because it is the
+        # filesystem-path spelling G1 exists to reject.
+        "  - Acceptance: `poetry run pytest -q --cov-report=term-missing "
+        "--cov=scripts/dev_tools/foo.py` passes.",
         "",
     ]
 )

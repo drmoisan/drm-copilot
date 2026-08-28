@@ -32,6 +32,12 @@ export interface RepoAutomationExecutionResult {
   readonly destinationPath?: string;
   readonly renderedTree?: string;
   readonly warnings?: ReadonlyArray<string>;
+  /**
+   * `owner/name` slug of the repository a tool targeted, when the tool resolves
+   * one. Present for the potential-to-issue promotion; absent for tools that
+   * perform no repository-scoped GitHub operation.
+   */
+  readonly targetRepository?: string;
 }
 
 export interface WorkspaceExecutionInput {

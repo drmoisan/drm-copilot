@@ -1,9 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
 
-import {
-  type CommandResult,
-  type CommandRunner,
-} from "../../../src/lib/subprocess-runner";
 import { potentialToIssueServiceCall } from "../../../src/lib/potential-to-issue/potential-to-issue-service-call";
 import { resolvePotentialToIssueToolInput } from "../../../src/mcp-tool-inputs";
 import {
@@ -12,69 +8,28 @@ import {
   type RecordedGhCall,
   WORKSPACE,
 } from "./promotion-test-support";
+import {
+  BlockedPathPotentialFileSystem,
+  DIFFERING_POTENTIAL,
+  DIFFERING_WORKSPACE,
+  makeRecordingResolver,
+  makeRunner,
+  POTENTIAL,
+  PROCESS_POTENTIAL,
+  PROCESS_ROOT,
+  RESOLVED_SLUG,
+  seedFeature,
+} from "./potential-to-issue-service-call-test-support";
 
 /**
  * Tests for the in-process `potentialToIssueServiceCall` helper (F7). The helper
  * preserves the prior service return contract and the prior non-zero-exit
  * failure surface. All external interactions are injected: a fake
  * {@link FakePotentialFileSystem}, an injected fake gh client, and a recording
- * {@link CommandRunner} stub. No real subprocess, filesystem, or temp file runs.
+ * command-runner stub. No real subprocess, filesystem, or temp file runs. The
+ * seam helpers and fixed paths live in the sibling `-test-support` module so
+ * this file stays within the 500-line limit.
  */
-
-/** Recording {@link CommandRunner} stub (never reached when gh is injected). */
-function makeRunner(recorded: string[][]): CommandRunner {
-  return {
-    run(args: readonly string[]): CommandResult {
-      recorded.push([...args]);
-      return { stdout: "", stderr: "", code: 0 };
-    },
-  };
-}
-
-/**
- * Filesystem fake that reports one designated path as absent.
- *
- * Used to drive the receipt post-condition: the promotion still moves the file
- * normally, but the reported destination fails its existence check.
- */
-class BlockedPathPotentialFileSystem extends FakePotentialFileSystem {
-  /**
-   * @param blockedPath Path whose existence check always reports false.
-   */
-  constructor(private readonly blockedPath: string) {
-    super();
-  }
-
-  /**
-   * @param path Path to test.
-   * @returns False for the blocked path; otherwise the inherited answer.
-   */
-  override exists(path: string): boolean {
-    return path === this.blockedPath ? false : super.exists(path);
-  }
-}
-
-/** Seed a feature potential with all required sections. */
-function seedFeature(fs: FakePotentialFileSystem, path: string): void {
-  fs.files.set(
-    path,
-    [
-      "# Feature Title",
-      "## Problem / Why",
-      "why",
-      "## Proposed Behavior",
-      "behave",
-      "## Acceptance Criteria (early draft)",
-      "criteria",
-      "## Constraints & Risks",
-      "risk",
-      "## Test Conditions to Consider",
-      "tests",
-    ].join("\n"),
-  );
-}
-
-const POTENTIAL = "/workspace/docs/features/potential/sample.md";
 
 describe("potentialToIssueServiceCall — success", () => {
   it("returns the preserved tool, workspaceRoot, summary, destinationPath, and artifacts", () => {
@@ -169,6 +124,121 @@ describe("potentialToIssueServiceCall — success", () => {
     expect(result.summary).toBe(
       `Promoted '${POTENTIAL}' as a refactor workflow in full mode.`,
     );
+  });
+});
+
+describe("potentialToIssueServiceCall — target repository resolution", () => {
+  it("resolves the target repository from a workspace root that differs from the process working directory", () => {
+    // Arrange: an injected fake gh client (so no RealGhClient is constructed and
+    // no real gh is located or executed), the in-memory filesystem fake, the
+    // recording command runner, and a resolver seam that records the workspace
+    // value it was handed.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, DIFFERING_POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const recordedWorkspaces: string[] = [];
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: DIFFERING_WORKSPACE,
+      potentialPath: DIFFERING_POTENTIAL,
+      promotionType: "feature",
+      workMode: "full",
+      repoSlugResolver: makeRecordingResolver(recordedWorkspaces),
+    });
+
+    // Assert: resolution ran exactly once against the supplied workspace root,
+    // and the resolved slug is echoed on the returned record.
+    expect(recordedWorkspaces).toEqual([DIFFERING_WORKSPACE]);
+    expect(result.targetRepository).toBe(RESOLVED_SLUG);
+  });
+
+  it("resolves the target repository when the workspace root matches the process working directory", () => {
+    // Arrange: the same-repository case (R3). The workspace root is the process
+    // working directory, and the gh client is again an injected fake, so no
+    // RealGhClient is constructed and no real gh is located or executed.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, PROCESS_POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const recordedWorkspaces: string[] = [];
+
+    // Act
+    const result = potentialToIssueServiceCall({
+      fileSystem: fs,
+      runner: makeRunner([]),
+      gh,
+      workspaceRoot: PROCESS_ROOT,
+      potentialPath: PROCESS_POTENTIAL,
+      promotionType: "feature",
+      workMode: "full",
+      repoSlugResolver: makeRecordingResolver(recordedWorkspaces),
+    });
+
+    // Assert: resolution ran against that checkout and its slug is echoed.
+    expect(recordedWorkspaces).toEqual([PROCESS_ROOT]);
+    expect(result.targetRepository).toBe(RESOLVED_SLUG);
+
+    // Assert: every pre-existing element of the result is unchanged in form and
+    // value. These three assertions carry the same expected values as the
+    // pre-existing success test, rebased only on the workspace root in use.
+    expect(result.summary).toBe(
+      `Promoted '${PROCESS_POTENTIAL}' as a feature workflow in full mode.`,
+    );
+    expect(result.destinationPath).toBe(
+      `${PROCESS_ROOT}/docs/features/potential/promoted/sample.md`,
+    );
+    expect(result.artifacts).toEqual(["https://example.com/issues/123"]);
+  });
+});
+
+describe("potentialToIssueServiceCall — fail-closed slug resolution", () => {
+  it("fails closed without creating an issue or moving the record when the slug cannot be resolved", () => {
+    // Arrange: the resolver throws, mirroring an unresolvable workspace root.
+    const fs = new FakePotentialFileSystem();
+    seedFeature(fs, DIFFERING_POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+    const recorded: string[][] = [];
+
+    // Act / Assert: the thrown message names the workspace root that failed.
+    expect(() =>
+      potentialToIssueServiceCall({
+        fileSystem: fs,
+        runner: makeRunner(recorded),
+        gh,
+        workspaceRoot: DIFFERING_WORKSPACE,
+        potentialPath: DIFFERING_POTENTIAL,
+        promotionType: "feature",
+        workMode: "full",
+        repoSlugResolver: (workspaceRoot: string): string => {
+          throw new Error(
+            `Unable to resolve the target repository from workspace root ${workspaceRoot}: no origin remote`,
+          );
+        },
+      }),
+    ).toThrow(DIFFERING_WORKSPACE);
+
+    // Assert: no issue was created on either seam. The runner recorded no
+    // issue-creation vector, and the injected client recorded no call at all.
+    expect(
+      recorded.filter((args) => args[1] === "issue" && args[2] === "create"),
+    ).toEqual([]);
+    expect(gh.calls).toEqual([]);
+
+    // Assert: the record still sits at its original path and nothing moved.
+    expect(fs.exists(DIFFERING_POTENTIAL)).toBe(true);
+    expect(fs.moves).toEqual([]);
   });
 });
 

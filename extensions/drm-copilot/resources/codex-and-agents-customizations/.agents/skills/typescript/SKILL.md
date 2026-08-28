@@ -1,7 +1,5 @@
 ---
 name: typescript
-paths:
-  - "**/*.ts"
 description: TypeScript-specific toolchain and coding standards.
 ---
 

@@ -116,6 +116,61 @@ Describe 'Codex routed model profile attestation' {
         $attestation.expected_model | Should -BeNullOrEmpty
     }
 
+    It 'requires the exact task-researcher C3 receipt before its first mutation' {
+        $payload = [pscustomobject]@{
+            session_id = 'session-task-researcher'; turn_id = 'turn-task-researcher'
+            agent_id = 'agent-task-researcher'; agent_type = 'task-researcher-c3'
+            model = 'gpt-5.6-terra'; transcript_path = 'task-researcher.jsonl'
+        }
+        $validCheckpoint = @{ codex_model_routing_receipts = @(@{
+                    deployment_agent = 'task-researcher-c3'; model = 'gpt-5.6-terra'
+                    model_reasoning_effort = 'high'
+                }) } | ConvertTo-Json -Depth 4 | ConvertFrom-Json
+        $valid = Get-CodexSubagentAttestation -Payload $payload -RootReceipt $null `
+            -Checkpoints @($validCheckpoint) -RepositoryRoot $script:RepoRoot `
+            -CurrentHeadSha $script:HeadSha -Now $script:Now
+        $valid.routing_valid | Should -BeTrue
+
+        $absent = Get-CodexSubagentAttestation -Payload $payload -RootReceipt $null `
+            -Checkpoints @() -RepositoryRoot $script:RepoRoot `
+            -CurrentHeadSha $script:HeadSha -Now $script:Now
+        $absent.routing_valid | Should -BeFalse
+        $absent.routing_valid | Should -BeFalse -Because 'a late receipt cannot authorize the initial attestation'
+
+        $genericCheckpoint = @{ codex_model_routing_receipts = @(@{
+                    deployment_agent = 'task-researcher'; model = 'gpt-5.6-terra'
+                    model_reasoning_effort = 'high'
+                }) } | ConvertTo-Json -Depth 4 | ConvertFrom-Json
+        $generic = Get-CodexSubagentAttestation -Payload $payload -RootReceipt $null `
+            -Checkpoints @($genericCheckpoint) -RepositoryRoot $script:RepoRoot `
+            -CurrentHeadSha $script:HeadSha -Now $script:Now
+        $generic.routing_valid | Should -BeFalse
+    }
+
+    It 'rejects task-researcher C3 model reasoning profile-path and SHA mismatches' {
+        $agentProfile = Get-CodexAgentProfileAttestation `
+            -RepositoryRoot $script:RepoRoot -AgentType 'task-researcher-c3'
+
+        Test-CodexAgentProfileBinding -AgentProfile $agentProfile `
+            -AgentType 'task-researcher-c3' -ActualModel 'gpt-5.6-sol' `
+            -ExpectedModel 'gpt-5.6-terra' -ExpectedReasoningEffort 'high' |
+            Should -BeFalse
+        Test-CodexAgentProfileBinding -AgentProfile $agentProfile `
+            -AgentType 'task-researcher-c3' -ActualModel 'gpt-5.6-terra' `
+            -ExpectedModel 'gpt-5.6-terra' -ExpectedReasoningEffort 'medium' |
+            Should -BeFalse
+        Test-CodexAgentProfileBinding -AgentProfile $agentProfile `
+            -AgentType 'task-researcher-c3' -ActualModel 'gpt-5.6-terra' `
+            -ExpectedModel 'gpt-5.6-terra' -ExpectedReasoningEffort 'high' `
+            -ExpectedProfilePath '.codex/agents/task-researcher-c3-elevated.toml' |
+            Should -BeFalse
+        Test-CodexAgentProfileBinding -AgentProfile $agentProfile `
+            -AgentType 'task-researcher-c3' -ActualModel 'gpt-5.6-terra' `
+            -ExpectedModel 'gpt-5.6-terra' -ExpectedReasoningEffort 'high' `
+            -ExpectedProfileSha256 ('0' * 64) |
+            Should -BeFalse
+    }
+
     It 'rehashes the current profile before allowing a routed mutation' {
         $checkpoint = @{
             codex_model_routing_receipts = @(@{

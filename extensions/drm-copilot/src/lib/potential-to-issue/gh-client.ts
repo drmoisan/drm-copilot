@@ -11,10 +11,18 @@
  * Parity:
  *     Argument vectors for `auth status`, `issue create`, `label create`, and
  *     `issue view`, the `--json` field list, the label color/description, and
- *     the missing-`gh` error message are byte-identical to the Python source.
- *     Every invocation runs with `allowError: true` (Python uses `check=False`
- *     and inspects the return code), and `GhResult.output` is the combined
- *     stdout+stderr split into lines.
+ *     the missing-`gh` error message match the Python source, with one
+ *     deliberate TypeScript-only divergence: when the optional `repo` option is
+ *     supplied, `issue create`, `label create`, and `issue view` carry an
+ *     explicit `--repo <owner/name>` selector immediately after their subcommand
+ *     words. The divergence exists because the Python command-line surface
+ *     exposes no workspace parameter, so it can only ever target the process
+ *     working directory, whereas this port is invoked with a caller-supplied
+ *     workspace root that may name a different checkout. When `repo` is omitted
+ *     the three vectors are unchanged. Every invocation runs with
+ *     `allowError: true` (Python uses `check=False` and inspects the return
+ *     code), and `GhResult.output` is the combined stdout+stderr split into
+ *     lines.
  *
  * Design choice (parity-note option b):
  *     The F1 `CommandRunner.run` signature does not accept stdin. Rather than
@@ -226,18 +234,24 @@ function splitCombinedOutput(combined: string): string[] {
 export class RealGhClient implements GhClient {
   private readonly ghPath: string;
   private readonly runner: GhCommandRunner;
+  private readonly repo: string | undefined;
 
   /**
    * Construct a client, resolving and validating the `gh` executable.
    *
    * @param options Optional injected `runner` (defaults to
-   *   {@link SpawnSyncGhCommandRunner}) and `ghPathLookup` (defaults to
-   *   {@link defaultGhPathLookup}) so tests never touch the real PATH.
+   *   {@link SpawnSyncGhCommandRunner}), `ghPathLookup` (defaults to
+   *   {@link defaultGhPathLookup}) so tests never touch the real PATH, and
+   *   `repo` — an explicit `owner/name` target repository. When `repo` is
+   *   supplied, every repository-scoped invocation names it explicitly so the
+   *   process working directory cannot influence repository selection; when it
+   *   is omitted the argument vectors are unchanged.
    * @throws Error With {@link GH_NOT_FOUND_MESSAGE} when `gh` cannot be resolved.
    */
   constructor(options?: {
     readonly runner?: GhCommandRunner;
     readonly ghPathLookup?: () => string | null;
+    readonly repo?: string;
   }) {
     const lookup = options?.ghPathLookup ?? defaultGhPathLookup;
     const resolved = lookup();
@@ -247,6 +261,17 @@ export class RealGhClient implements GhClient {
     }
     this.ghPath = resolved;
     this.runner = options?.runner ?? new SpawnSyncGhCommandRunner();
+    this.repo = options?.repo;
+  }
+
+  /**
+   * Repository selector fragment spliced after the subcommand words.
+   *
+   * @returns `["--repo", "<owner/name>"]` when bound, otherwise an empty vector
+   *   so an unbound client keeps its pre-change argument vectors exactly.
+   */
+  private repoSelector(): readonly string[] {
+    return this.repo === undefined ? [] : ["--repo", this.repo];
   }
 
   /**
@@ -282,6 +307,7 @@ export class RealGhClient implements GhClient {
     const args = [
       "issue",
       "create",
+      ...this.repoSelector(),
       "--title",
       title,
       "--body-file",
@@ -302,6 +328,7 @@ export class RealGhClient implements GhClient {
     const args = [
       "label",
       "create",
+      ...this.repoSelector(),
       label,
       "--color",
       FEATURE_LABEL_COLOR,
@@ -321,6 +348,7 @@ export class RealGhClient implements GhClient {
     const args = [
       "issue",
       "view",
+      ...this.repoSelector(),
       issueNumber,
       "--json",
       "number,title,url,author,updatedAt",

@@ -38,6 +38,7 @@
     ".codex/hooks/enforce-epic-wave-barrier.ps1",
     ".codex/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
     ".codex/hooks/record-subagent-routing-attestation.ps1",
     ".codex/hooks/validate-codex-subagent-routing.ps1",
     ".codex/scripts/epic-child-launch-contract.ps1",
@@ -86,6 +87,12 @@
     ".codex/agents/pr-author-c2.toml",
     ".codex/agents/pr-author-c3.toml",
     ".codex/agents/pr-author-c3-elevated.toml",
-    ".codex/agents/pr-author-c4.toml"
+    ".codex/agents/pr-author-c4.toml",
+    ".codex/agents/commit-steward.toml",
+    ".codex/agents/commit-steward-c1.toml",
+    ".codex/agents/commit-steward-c2.toml",
+    ".codex/agents/commit-steward-c3.toml",
+    ".codex/agents/commit-steward-c3-elevated.toml",
+    ".codex/agents/commit-steward-c4.toml"
   ]
 }

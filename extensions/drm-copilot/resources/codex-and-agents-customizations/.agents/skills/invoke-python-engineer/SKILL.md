@@ -1,6 +1,6 @@
 ---
 name: invoke-python-engineer
-description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 3-production + 3-test per-batch budget, and zero-regression quality gates.
+description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black, Ruff, Pyright, and Pytest with a three-production plus three-test per-batch budget and zero-regression quality gates.
 ---
 
 # Implement Python Skill

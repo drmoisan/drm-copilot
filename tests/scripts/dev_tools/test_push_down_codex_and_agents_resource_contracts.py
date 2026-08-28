@@ -103,6 +103,12 @@ APPROVED_DRM_COPILOT_TOOLS = tuple(
 )
 
 
+def is_publishable_runtime_path(relative_path: Path) -> bool:
+    """Return whether a source-relative runtime path belongs in a payload."""
+
+    return relative_path.parts[:2] != (".codex", "state")
+
+
 def list_scoped_files(root: Path) -> list[Path]:
     """Return scoped files in deterministic relative-path order."""
 
@@ -111,7 +117,9 @@ def list_scoped_files(root: Path) -> list[Path]:
         scoped_path = root / scoped_root
         for path in scoped_path.rglob("*"):
             if path.is_file():
-                files.append(path.relative_to(root))
+                relative_path = path.relative_to(root)
+                if is_publishable_runtime_path(relative_path):
+                    files.append(relative_path)
     return sorted(files)
 
 
@@ -218,6 +226,33 @@ def test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts() 
             REPO_ROOT,
             relative_path,
         )
+
+
+def test_root_and_bundle_payload_contract_excludes_ephemeral_codex_state() -> None:
+    """Treat only source-relative `.codex/state` files as non-publishable."""
+
+    root_files = list_scoped_files(REPO_ROOT)
+    bundle_files = list_scoped_files(BUNDLED_ROOT)
+    state_path = Path(".codex/state/powershell-batch-budget.ephemeral.json")
+
+    assert is_publishable_runtime_path(Path(".codex/config.toml"))
+    assert is_publishable_runtime_path(Path(".agents/skills/atomic-executor/SKILL.md"))
+    assert not is_publishable_runtime_path(state_path)
+    assert Path(".codex/config.toml") in root_files
+    assert Path(".agents/skills/atomic-executor/SKILL.md") in root_files
+    assert read_text(REPO_ROOT, Path(".codex/config.toml")) == read_text(
+        BUNDLED_ROOT,
+        Path(".codex/config.toml"),
+    )
+    assert read_text(
+        REPO_ROOT,
+        Path(".agents/skills/atomic-executor/SKILL.md"),
+    ) == read_text(
+        BUNDLED_ROOT,
+        Path(".agents/skills/atomic-executor/SKILL.md"),
+    )
+    assert state_path not in root_files
+    assert state_path not in bundle_files
 
 
 def test_codex_config_files_retain_full_drm_copilot_transport() -> None:

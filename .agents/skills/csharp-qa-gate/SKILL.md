@@ -1,6 +1,6 @@
 ---
 name: csharp-qa-gate
-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, compares against a captured baseline, enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+description: Final QA gate for C# changes. Runs CSharpier, .NET analyzers, nullable analysis, and MSTest; compares a captured baseline, enforces zero-regression deltas, and produces the required reporting block before completion.
 ---
 
 # C# QA Gate
