@@ -18,6 +18,12 @@ import { collectPrContextServiceCall } from "../../../src/lib/pr-context/pr-cont
 const ROOT = "/workspace";
 const GH_PATH = "/usr/bin/gh";
 
+/** The two workspace-joined artifact paths, in sorted order. */
+const SORTED_WORKSPACE_JOINED_PAIR = [
+  `${ROOT}/artifacts/pr_context.appendix.txt`,
+  `${ROOT}/artifacts/pr_context.summary.txt`,
+];
+
 const ok = (stdout: string): CommandResult => ({ stdout, stderr: "", code: 0 });
 const fail = (stderr: string): CommandResult => ({
   stdout: "",
@@ -110,6 +116,27 @@ describe("collectPrContextServiceCall", () => {
     // Assert: both files were written (relative to the workspace root).
     expect(fs.isFile("artifacts/pr_context.summary.txt")).toBe(true);
     expect(fs.isFile("artifacts/pr_context.appendix.txt")).toBe(true);
+  });
+
+  it("writes exactly the paths it reports in result.artifacts", () => {
+    // Arrange
+    const fs = seedWorkspace();
+    const runner = new ScriptRunner();
+
+    // Act
+    const result = collectPrContextServiceCall({
+      runner,
+      fileSystem: fs,
+      workspaceRoot: ROOT,
+      base: "main",
+    });
+
+    // Assert: one equality between the written set and the reported set, so the
+    // two expressions cannot drift apart again.
+    const writtenSorted = [...fs.writtenPaths].sort();
+    expect(writtenSorted).toEqual([...result.artifacts].sort());
+    // That single value is the workspace-joined summary and appendix pair.
+    expect(writtenSorted).toEqual(SORTED_WORKSPACE_JOINED_PAIR);
   });
 
   it("forwards log lines to the injected sink", () => {

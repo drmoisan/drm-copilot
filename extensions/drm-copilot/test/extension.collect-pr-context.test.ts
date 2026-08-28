@@ -444,4 +444,29 @@ describe("drm-copilot collectPrContext command behavior", () => {
       "artifacts/pr_context.summary.txt",
     ]);
   });
+
+  it("collectPrContext passes workspace-joined paths to the node:fs write boundary", async () => {
+    // Arrange
+    setExecutablePresence({ python: true });
+
+    // Act
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
+    await handler();
+
+    // Assert: the recorded write arguments are exactly the two workspace-joined
+    // artifact paths. This observes the exact argument RealFileSystem hands to
+    // Node, which is where a repository-relative path resolves against the
+    // server process cwd rather than the workspace.
+    const writeArguments = [...writtenFiles.keys()].sort();
+    expect(writeArguments).toEqual([
+      "C:/workspace/artifacts/pr_context.appendix.txt",
+      "C:/workspace/artifacts/pr_context.summary.txt",
+    ]);
+    // No recorded write argument is a repository-relative path.
+    expect(
+      writeArguments.filter((value) => !value.startsWith("C:/workspace/")),
+    ).toEqual([]);
+  });
 });

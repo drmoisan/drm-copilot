@@ -162,16 +162,16 @@ Baseline capture precedes every source edit. Both write-mode formatter tasks in 
 
 Both tasks in this phase add an assertion that the current code cannot satisfy, and run only the single test file that carries it. No whole-suite run occurs between this phase and P2-T5, so no gate in between is made unsatisfiable by the deliberately failing cases.
 
-- [ ] [P1-T1] Record every written path on the in-memory filesystem double so a set-equality assertion is expressible.
+- [x] [P1-T1] Record every written path on the in-memory filesystem double so a set-equality assertion is expressible.
   - Edit `extensions/drm-copilot/test/lib/pr-context/tree-file-system.ts` to add a public readonly array field that `writeTextFile` appends its `path` argument to on every call, in call order, without changing any existing method's behaviour or signature.
   - Acceptance: `npm run test:unit -- test/lib/pr-context` exits 0, proving the recorder is additive and broke no existing pr-context test.
 
-- [ ] [P1-T2] [expect-fail] Add the service-seam path-identity test and record its failure.
+- [x] [P1-T2] [expect-fail] Add the service-seam path-identity test and record its failure.
   - Add a named test to `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call.test.ts` that invokes `collectPrContextServiceCall` with the in-memory filesystem and a fixed workspace root, then asserts one equality between the sorted array of paths recorded by the P1-T1 recorder and the sorted `artifacts` array of the returned record, and asserts that this single value equals the sorted workspace-joined summary and appendix pair. Two independent literal assertions are not acceptable; the assertion must be the set equality itself.
   - Run `npm run test:unit -- test/lib/pr-context/pr-context-service-call.test.ts`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/regression-testing/fail-first-service-seam.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 1, `ExpectedExitCode: 1`, and an `Output Summary:` naming the new test and quoting the reported difference between the written set and the reported set.
 
-- [ ] [P1-T3] [expect-fail] Add the node:fs boundary path-identity test and record its failure.
+- [x] [P1-T3] [expect-fail] Add the node:fs boundary path-identity test and record its failure.
   - Add a named test to `extensions/drm-copilot/test/extension.collect-pr-context.test.ts` that asserts the recorded `node:fs` write arguments for a collect-pr-context invocation are exactly the two workspace-joined artifact paths, and that no recorded write argument is a repository-relative path.
   - Run `npm run test:unit -- test/extension.collect-pr-context.test.ts`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/regression-testing/fail-first-nodefs-boundary.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 1, `ExpectedExitCode: 1`, and an `Output Summary:` naming the new test and quoting the recorded write arguments that failed the assertion.
