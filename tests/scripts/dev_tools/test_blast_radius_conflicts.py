@@ -76,6 +76,18 @@ def test_conflict_result_rejects_reasons_out_of_the_fixed_order() -> None:
         ConflictResult(conflict=True, reasons=reasons)
 
 
+def test_bool_is_false_for_a_disjoint_pair() -> None:
+    """Project a disjoint pair's result to ``False`` under ``bool``."""
+    result = conflicts(
+        make_radius(paths=["scripts/dev_tools/a.py"]),
+        make_radius(paths=["scripts/dev_tools/b.py"]),
+        CONFIG,
+    )
+
+    assert result.conflict is False
+    assert bool(result) is False
+
+
 def test_path_overlap_triggers_on_identical_concrete_paths() -> None:
     """Report path overlap when both radii name the same file."""
     radius = make_radius(paths=["scripts/dev_tools/a.py"])
