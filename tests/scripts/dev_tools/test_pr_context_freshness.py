@@ -40,6 +40,8 @@ if TYPE_CHECKING:
 FIXTURE_HEAD_SHA = "0123456789abcdef0123456789abcdef01234567"
 GENERATED_CONTEXT_BANNER = f"===== {GENERATED_CONTEXT_SECTION_TITLE} ====="
 CHANGED_PATH = "docs/features/active/2025-12-18-docs-v3-upgrade/spec.md"
+#: A changed path matching none of the collector's changed-file buckets.
+UNBUCKETED_PATH = "assets/logo.svg"
 
 #: Path of the TypeScript helper whose literals the parity test reads.
 TYPESCRIPT_SUMMARY_HELPERS = Path(
@@ -91,10 +93,14 @@ class StubGit:
         return ""
 
     def diff_range(self, args: Sequence[str]) -> str:
+        # Two changed paths, chosen so the collector's changed-file bucketing
+        # exercises both a bucketed path and one that matches no bucket. The
+        # docs path lands in the docs bucket; the asset path is neither a
+        # rename, nor Python or PowerShell, nor docs, so it falls through.
         if "--name-status" in args:
-            return f"M\t{CHANGED_PATH}"
+            return f"M\t{CHANGED_PATH}\nM\t{UNBUCKETED_PATH}"
         if "--numstat" in args:
-            return f"1\t0\t{CHANGED_PATH}"
+            return f"1\t0\t{CHANGED_PATH}\n2\t1\t{UNBUCKETED_PATH}"
         return ""
 
     def run(self, args: Sequence[str], *, allow_error: bool = False) -> object:
