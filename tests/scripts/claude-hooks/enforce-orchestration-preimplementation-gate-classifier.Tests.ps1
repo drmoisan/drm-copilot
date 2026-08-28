@@ -41,7 +41,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
         $script:ModesUnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1").Path
         . $script:ModesUnderTest
 
-        function New-ClassifierToolInput {
+        function ConvertTo-ClassifierToolInput {
             # A flat tool_input object, which is the shape the classifier consumes after
             # the envelope has been unwrapped. Both reads it performs are field-scoped,
             # so a value placed anywhere other than 'prompt' cannot influence the result.
@@ -92,18 +92,18 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
         It 'returns false for a non-orchestrator subagent type carrying both preparation markers' {
             # Second conjunct: the delegated agent must be exactly 'orchestrator'. Both
             # markers are present, so only the subagent-type check can produce the false.
-            $toolInput = New-ClassifierToolInput -SubagentType 'task-researcher' -Prompt 'Preparation mode: true. route_id: preparation. Promote only.'
+            $toolInput = ConvertTo-ClassifierToolInput -SubagentType 'task-researcher' -Prompt 'Preparation mode: true. route_id: preparation. Promote only.'
             Test-PreparationModeDelegation -ToolInput $toolInput | Should -BeFalse
         }
 
         It 'returns false for an orchestrator carrying only one preparation marker' {
             # Third conjunct: BOTH markers must appear, with their trailing periods.
-            $toolInput = New-ClassifierToolInput -SubagentType 'orchestrator' -Prompt 'Preparation mode: true. Do the work.'
+            $toolInput = ConvertTo-ClassifierToolInput -SubagentType 'orchestrator' -Prompt 'Preparation mode: true. Do the work.'
             Test-PreparationModeDelegation -ToolInput $toolInput | Should -BeFalse
         }
 
         It 'returns true for an orchestrator carrying both preparation markers' {
-            $toolInput = New-ClassifierToolInput -SubagentType 'orchestrator' -Prompt 'Preparation mode: true. route_id: preparation. Promote only.'
+            $toolInput = ConvertTo-ClassifierToolInput -SubagentType 'orchestrator' -Prompt 'Preparation mode: true. route_id: preparation. Promote only.'
             Test-PreparationModeDelegation -ToolInput $toolInput | Should -BeTrue
         }
     }
@@ -132,7 +132,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
             # serialized payload would have matched; the structural classifier reads
             # subagent_type instead, so the tokens no longer narrow the decision. This
             # documents the Fault-1 fix in the widening direction.
-            $toolInput = New-ClassifierToolInput -SubagentType 'task-researcher' -Prompt 'Research the implementation and report before we execute anything.'
+            $toolInput = ConvertTo-ClassifierToolInput -SubagentType 'task-researcher' -Prompt 'Research the implementation and report before we execute anything.'
             Test-ImplementationDelegation -ToolInput $toolInput | Should -BeFalse
         }
 
