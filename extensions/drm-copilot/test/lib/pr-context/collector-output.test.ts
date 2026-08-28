@@ -9,6 +9,7 @@ import {
   renderVerificationEvidenceSection,
   writeOutput,
 } from "../../../src/lib/pr-context/collector-output";
+import { appendGenerationTimestamp } from "../../../src/lib/pr-context/summary-helpers";
 
 /**
  * Tests for the collector output builder (`collector.py` rendering/write half).
@@ -20,6 +21,13 @@ import {
 
 const ROOT = "/repo";
 const FIXED_CLOCK = (): Date => new Date(Date.UTC(2026, 5, 26, 10, 2, 3));
+/** Concrete forty-character fixture SHA supplied by these tests. */
+const FIXTURE_HEAD_SHA = "0123456789abcdef0123456789abcdef01234567";
+/** The single freshness header both builders receive, rendered once. */
+const GENERATED_SECTION = appendGenerationTimestamp(
+  FIXED_CLOCK,
+  FIXTURE_HEAD_SHA,
+);
 
 /** Build a base context result with overridable fields. */
 function contextResult(
@@ -86,10 +94,13 @@ describe("buildSummaryText", () => {
       collected(),
       fs,
       "artifacts/pr_context.appendix.txt",
+      GENERATED_SECTION,
     );
 
-    // Section ordering is preserved.
+    // Section ordering is preserved, with the generated-context freshness
+    // header added as the first entry ahead of the GitHub CLI status section.
     const order = [
+      "===== Context generated =====",
       "===== GitHub CLI status =====",
       "===== PR Intent =====",
       "===== Base/Head =====",
@@ -128,6 +139,7 @@ describe("buildSummaryText", () => {
       }),
       new TreeFileSystem(),
       "appendix.txt",
+      GENERATED_SECTION,
     );
     expect(text).toContain(
       "WARNING: Requested base is local and may be stale; prefer origin/main",
@@ -207,6 +219,7 @@ describe("buildSummaryText", () => {
       }),
       fs,
       "appendix.txt",
+      GENERATED_SECTION,
     );
     expect(text).toContain("Feature: feat-x");
     expect(text).toContain("EXCERPT-X");
@@ -228,6 +241,7 @@ describe("buildSummaryText", () => {
       }),
       new TreeFileSystem(),
       "appendix.txt",
+      GENERATED_SECTION,
     );
     expect(text).toContain("NOTE: Unverified (GitHub unavailable)");
     expect(text).toContain("GitHub CLI unavailable: offline");
@@ -236,9 +250,10 @@ describe("buildSummaryText", () => {
 
 describe("buildAppendixText", () => {
   it("starts with the timestamp and embeds the context text", () => {
-    const text = buildAppendixText(collected(), FIXED_CLOCK);
+    const text = buildAppendixText(collected(), GENERATED_SECTION);
     expect(text).toContain("===== Context generated =====");
     expect(text).toContain("2026-06-26 10:02:03 UTC");
+    expect(text).toContain(`Head SHA: ${FIXTURE_HEAD_SHA}`);
     expect(text).toContain("PR-CONTEXT-TEXT-BODY");
     expect(text).toContain("===== Issue details =====");
     expect(text).toContain("===== Contributing pull requests =====");
@@ -259,7 +274,7 @@ describe("buildAppendixText", () => {
           },
         ],
       }),
-      FIXED_CLOCK,
+      GENERATED_SECTION,
     );
     expect(text).toContain("FEATURE-EXCERPT-BLOCK");
   });

@@ -6,6 +6,18 @@ import argparse
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .collector_documents import (
+    APPENDIX_CHAR_BUDGET as APPENDIX_CHAR_BUDGET,
+)
+from .collector_documents import (
+    SUMMARY_CHAR_BUDGET as SUMMARY_CHAR_BUDGET,
+)
+from .collector_documents import (
+    build_appendix_document,
+    build_feature_summary,
+    build_summary_document,
+    render_verification_evidence_section,
+)
 from .feature_docs import (
     completed_plan_tasks,
     extract_issue_references,
@@ -20,7 +32,6 @@ from .models import (
     PRContextResult,
     PullRequestDetails,
     find_user_story_link,
-    format_list,
     section,
     truncate_lines,
 )
@@ -37,13 +48,7 @@ from .render import (
     select_default_base,
 )
 from .render_pr_helpers import build_issues_to_autoclose_section
-from .summary_helpers import (
-    append_generation_timestamp,
-    bucket_text,
-)
-from .summary_helpers import (
-    issue_appendix as _issue_appendix,
-)
+from .summary_helpers import append_generation_timestamp
 from .summary_helpers import (
     issue_digest as _issue_digest,
 )
@@ -54,17 +59,10 @@ from .summary_helpers import (
     parse_numstat_detailed as _parse_numstat_detailed,
 )
 from .summary_helpers import (
-    pr_appendix as _pr_appendix,
-)
-from .summary_helpers import (
     pr_digest as _pr_digest,
 )
 from .summary_helpers import (
     scoping_doc_changes as _scoping_doc_changes,
-)
-from .verification_evidence import (
-    VerificationEvidenceRecord,
-    parse_verification_evidence_file,
 )
 
 if TYPE_CHECKING:
@@ -102,8 +100,6 @@ __all__ = [
 
 SUMMARY_PATH_DEFAULT = "artifacts/pr_context.summary.txt"
 APPENDIX_PATH_DEFAULT = "artifacts/pr_context.appendix.txt"
-SUMMARY_CHAR_BUDGET = 160000  # 10x increase: ~2300 lines at 70 chars/line avg
-APPENDIX_CHAR_BUDGET = 480000  # 10x increase: ~6900 lines at 70 chars/line avg
 ISSUE_SUMMARY_LINE_BUDGET = 25
 ISSUE_APPENDIX_LINE_BUDGET = 120
 COMMENT_SUMMARY_LIMIT = 3
@@ -112,65 +108,15 @@ PR_BODY_SUMMARY_LINES = 25
 PR_BODY_APPENDIX_LINES = 120
 
 
-def _render_verification_evidence_section(
-    *, resolved_root: Path, feature_docs: list[FeatureDocExcerpt]
-) -> str:
-    """Render canonical verification evidence rows for summary output.
-
-    Args:
-        resolved_root: Repository root used to read discovered evidence files.
-        feature_docs: Feature excerpts whose context files may include evidence paths.
-
-    Returns:
-        A formatted section body containing parsed evidence rows or fallback text.
-
-    Side Effects:
-        Reads evidence files from disk and tolerates unreadable artifacts.
-    """
-    records: list[VerificationEvidenceRecord] = []
-    # Parse only canonical evidence files already enumerated in context files.
-    for doc in feature_docs:
-        for raw_path in doc.context_files:
-            normalized = raw_path.replace("\\", "/")
-            if "/evidence/" not in normalized:
-                continue
-            try:
-                record: VerificationEvidenceRecord = parse_verification_evidence_file(
-                    root=resolved_root,
-                    feature=doc.feature,
-                    relative_path=Path(normalized),
-                )
-            except OSError:
-                continue
-            records.append(record)
-
-    parseable_records = [
-        item for item in records if item.normalized_result in {"pass", "fail"}
-    ]
-    if not parseable_records:
-        return "No canonical verification evidence parsed"
-
-    lines: list[str] = []
-    # Render deterministic rows sorted by source path for stable artifacts.
-    for record in sorted(parseable_records, key=lambda item: item.source_file):
-        # Show a declared expectation only when non-zero; other rows render as before.
-        expected = record.expected_exit_code
-        expected_rows = [f"  - Expected EXIT_CODE: {expected}"] if expected else []
-        lines.extend(
-            [
-                f"- Feature: {record.feature}",
-                f"  - Source: {record.source_file}",
-                f"  - Timestamp: {record.timestamp}",
-                f"  - Command: {record.command}",
-                f"  - EXIT_CODE: {record.exit_code}",
-                *expected_rows,
-                f"  - Normalized result: {record.normalized_result}",
-            ]
-        )
-    return "\n".join(lines)
+# Re-exported so importers that reach the private name directly keep working.
+# `tests/scripts/dev_tools/test_collect_pr_context_expected_exit.py` imports it
+# from this module deliberately rather than through a public wrapper, and its
+# own docstring records that choice, so moving the function without this alias
+# would leave a dangling import.
+_render_verification_evidence_section = render_verification_evidence_section
 
 
-# helper functions moved to summary_helpers
+# helper functions moved to summary_helpers and collector_documents
 
 
 def write_output(text: str, out_path: Path, append: bool) -> None:
@@ -406,22 +352,8 @@ def collect_and_write(
     issue_digests = "\n\n".join(_issue_digest(detail) for detail in issue_details)
     pr_digests = "\n\n".join(_pr_digest(detail) for detail in pr_details_list)
 
-    feature_summary_lines: list[str] = []
-    for doc in feature_docs:
-        feature_summary_lines.extend(
-            [
-                f"Feature: {doc.feature}",
-                "Excerpt:",
-                truncate_lines(doc.excerpt, 80),
-                "Context files:",
-                format_list(doc.context_files, "(none)"),
-                "",
-            ]
-        )
-    feature_summary = (
-        "\n".join(feature_summary_lines).rstrip() if feature_summary_lines else "(none)"
-    )
-    verification_evidence_section = _render_verification_evidence_section(
+    feature_summary = build_feature_summary(feature_docs)
+    verification_evidence_section = render_verification_evidence_section(
         resolved_root=resolved_root,
         feature_docs=feature_docs,
     )
@@ -439,125 +371,44 @@ def collect_and_write(
     )
     if not gh_available and not gh_status_override:
         gh_status_text = "GitHub CLI unavailable; references unverified."
-    intent_block = "\n".join(
-        [
-            section("PR Intent"),
-            "Primary outcome:",
-            "User/dev impact:",
-            "Risks:",
-            "Author-asserted autoclose issues:",
-        ]
+    # Render the freshness header exactly once per invocation and hand the same
+    # string to both document builders, so the two documents cannot disagree on
+    # the timestamp. The head SHA is already on the collected record, so no
+    # additional git call is made.
+    generated_section = append_generation_timestamp(context_result.head_sha)
+
+    summary_text = build_summary_document(
+        generated_section=generated_section,
+        gh_status_text=gh_status_text,
+        gh_available=gh_available,
+        context_result=context_result,
+        head=head,
+        issues_to_autoclose_section=issues_to_autoclose_section,
+        close_candidates=close_candidates,
+        additional_context_files=additional_context_files,
+        feature_summary=feature_summary,
+        referenced_issues=referenced_issues,
+        referenced_prs=referenced_prs,
+        invalid_refs=invalid_refs,
+        scoping_summary_lines=scoping_summary_lines,
+        bucket_core=bucket_core,
+        bucket_renames=bucket_renames,
+        bucket_docs=bucket_docs,
+        issue_digests=issue_digests,
+        pr_digests=pr_digests,
+        verification_evidence_section=verification_evidence_section,
+        ci_status=ci_status,
+        ci_jobs=ci_jobs,
+        appendix_path=appendix_path,
     )
 
-    summary_sections = [
-        section("GitHub CLI status"),
-        gh_status_text,
-        intent_block,
-        section("Base/Head"),
-        f"Base ref (requested): {context_result.base_ref or '(default)'}",
-        (
-            f"Base ref (resolved): {context_result.resolved_base or '(unknown)'} @ "
-            f"{context_result.base_sha or '(unknown)'}"
-        ),
-        (
-            f"Head ref (resolved): {context_result.head_ref or head or '(unknown)'} @ "
-            f"{context_result.head_sha or '(unknown)'}"
-        ),
-        f"Merge base: {context_result.merge_base or '(unknown)'}",
-        f"Range: {context_result.rev_range or '(unknown)'}",
-    ]
-    if (
-        context_result.base_ref
-        and context_result.resolved_base
-        and not str(context_result.resolved_base).startswith("origin/")
-    ):
-        summary_sections.append(
-            "WARNING: Requested base is local and may be stale; prefer "
-            f"origin/{context_result.base_ref}"
-        )
-    summary_sections.extend(
-        [
-            "",
-            issues_to_autoclose_section,
-            "",
-            close_candidates,
-            "",
-            section("Additional context files"),
-            format_list(additional_context_files, "(none)"),
-            "",
-            section("Feature doc excerpts"),
-            feature_summary,
-            "",
-            section("Referenced issues (classified)"),
-            format_list(referenced_issues, "(none)")
-            + ("\nNOTE: Unverified (GitHub unavailable)" if not gh_available else ""),
-            "",
-            section("PRs in range (classified)"),
-            format_list(referenced_prs, "(none)"),
-            "",
-            section("Invalid references (not found)"),
-            format_list(invalid_refs, "(none)"),
-            "",
-            section("Scoping docs changed"),
-            "\n".join(scoping_summary_lines),
-            "",
-            section("Changed files overview"),
-            bucket_text("Core logic changes", bucket_core),
-            "",
-            bucket_text("Mechanical moves/renames", bucket_renames),
-            "",
-            bucket_text("Docs/templates/agents/tooling", bucket_docs),
-            "",
-            section("Issue digests"),
-            issue_digests or "(none)",
-            "",
-            section("PR digests"),
-            pr_digests or "(none)",
-            "",
-            section("Verification evidence (feature docs + canonical artifacts)"),
-            verification_evidence_section,
-            "",
-            section("CI status (HEAD)"),
-            (
-                f"Status: {ci_status}\n"
-                + (f"Failing jobs: {', '.join(ci_jobs)}" if ci_jobs else "")
-                if ci_status
-                else "(not available)"
-            ),
-            "",
-            section("Appendix pointer"),
-            f"See {appendix_path}",
-        ]
+    appendix_text = build_appendix_document(
+        generated_section=generated_section,
+        context_result=context_result,
+        issue_details=issue_details,
+        pr_details_list=pr_details_list,
+        feature_docs=feature_docs,
     )
-
-    summary_text = "\n".join(summary_sections)
-    if len(summary_text) > SUMMARY_CHAR_BUDGET:
-        summary_text = (
-            summary_text[:SUMMARY_CHAR_BUDGET] + "\nTRUNCATED: summary budget exceeded"
-        )
-
-    feature_block = "\n".join(doc.excerpt for doc in feature_docs)
-
-    issue_sections = [_issue_appendix(detail) for detail in issue_details]
-    pr_sections = [_pr_appendix(detail) for detail in pr_details_list]
-    appendix_parts = [
-        append_generation_timestamp(),
-        context_result.text,
-        "",
-        section("Issue details"),
-        "\n\n".join(issue_sections) if issue_sections else "(none)",
-        "",
-        section("Contributing pull requests"),
-        "\n\n".join(pr_sections) if pr_sections else "(none)",
-    ]
-    if feature_block:
-        appendix_parts.extend(["", feature_block])
-    appendix_text = "\n".join(appendix_parts)
-    if len(appendix_text) > APPENDIX_CHAR_BUDGET:
-        appendix_text = (
-            appendix_text[:APPENDIX_CHAR_BUDGET]
-            + "\nTRUNCATED: appendix budget exceeded"
-        )
 
     write_output(summary_text, summary_path, append)
     write_output(appendix_text, appendix_path, append)

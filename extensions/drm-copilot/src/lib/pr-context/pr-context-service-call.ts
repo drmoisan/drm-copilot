@@ -31,6 +31,41 @@ const SUMMARY_OUT = "artifacts/pr_context.summary.txt";
 /** Repo-relative appendix artifact path written by the collector. */
 const APPENDIX_OUT = "artifacts/pr_context.appendix.txt";
 
+/**
+ * Verify one artifact write by reading the file back and comparing content.
+ *
+ * This is a read-back comparison against the exact text this invocation
+ * rendered, not an existence check. An existence check is satisfied by a file
+ * left behind by a prior invocation, which is the hazard under repair: a stale
+ * pair at the expected paths passes existence and misdescribes the branch.
+ *
+ * @param fileSystem Filesystem the write was performed through.
+ * @param artifactPath Absolute path this invocation wrote.
+ * @param expected The exact text this invocation rendered for that path.
+ * @throws Error naming `artifactPath` when the read fails or content differs.
+ */
+function verifyWrittenArtifact(
+  fileSystem: FileSystem,
+  artifactPath: string,
+  expected: string,
+): void {
+  let actual: string;
+  try {
+    actual = fileSystem.readTextFile(artifactPath);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to verify PR context artifact '${artifactPath}': the file could not be read back after writing (${detail}).`,
+      { cause: error },
+    );
+  }
+  if (actual !== expected) {
+    throw new Error(
+      `Failed to verify PR context artifact '${artifactPath}': the content read back is not the content this invocation rendered (expected ${String(expected.length)} characters, read back ${String(actual.length)}).`,
+    );
+  }
+}
+
 /** Input for {@link collectPrContextServiceCall}. */
 export interface CollectPrContextServiceCallInput {
   /** Command runner used for git/gh invocations. */
@@ -68,11 +103,26 @@ export interface CollectPrContextServiceCallResult {
 export function collectPrContextServiceCall(
   input: CollectPrContextServiceCallInput,
 ): CollectPrContextServiceCallResult {
-  collectAndWrite({
+  // Each absolute output path is evaluated exactly once, here. The same
+  // variable is the write target, the verification read target, the log-line
+  // value, and the reported artifact entry, so the written set and the reported
+  // set cannot drift apart. Normalizing before the write rather than after it is
+  // required: `join` emits backslash separators on Windows, so a write using the
+  // raw joined value while the report used the normalized value would remain two
+  // different strings. Node accepts forward-slash separators on Windows, so the
+  // write is unaffected.
+  const summaryOut = normalizeGeneratedPath(
+    join(input.workspaceRoot, SUMMARY_OUT),
+  );
+  const appendixOut = normalizeGeneratedPath(
+    join(input.workspaceRoot, APPENDIX_OUT),
+  );
+
+  const rendered = collectAndWrite({
     base: input.base,
     repoRoot: input.workspaceRoot,
-    out: SUMMARY_OUT,
-    appendixOut: APPENDIX_OUT,
+    out: summaryOut,
+    appendixOut,
     append: false,
     includeUntracked: true,
     fs: input.fileSystem,
@@ -80,13 +130,13 @@ export function collectPrContextServiceCall(
     ...(input.log === undefined ? {} : { log: input.log }),
   });
 
+  verifyWrittenArtifact(input.fileSystem, summaryOut, rendered.summaryText);
+  verifyWrittenArtifact(input.fileSystem, appendixOut, rendered.appendixText);
+
   return {
     tool: "collect_pr_context",
     workspaceRoot: input.workspaceRoot,
     summary: `Collected PR context against base '${input.base}'.`,
-    artifacts: [
-      normalizeGeneratedPath(join(input.workspaceRoot, SUMMARY_OUT)),
-      normalizeGeneratedPath(join(input.workspaceRoot, APPENDIX_OUT)),
-    ],
+    artifacts: [summaryOut, appendixOut],
   };
 }

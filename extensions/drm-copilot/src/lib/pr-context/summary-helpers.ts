@@ -321,23 +321,49 @@ export function formatDiffPath(pathText: string | null): string {
   return pathText !== null ? renderFormatDiffPath(pathText) : "";
 }
 
+/** Section title of the generated-context freshness header, both runtimes. */
+export const GENERATED_CONTEXT_SECTION_TITLE = "Context generated";
+/** Prefix of the head-SHA line in the freshness header, both runtimes. */
+export const HEAD_SHA_LABEL = "Head SHA:";
+/** Rendered in place of the SHA when the collected context carries none. */
+export const UNKNOWN_HEAD_SHA_PLACEHOLDER = "(unknown)";
+
 /**
- * Generate a timestamp section showing when context was collected.
+ * Generate the freshness header showing when context was collected and which
+ * head it describes.
  *
  * Mirrors Python `append_generation_timestamp`: format the current UTC time as
- * `%Y-%m-%d %H:%M:%S %Z` (with `%Z` rendered as `UTC`). The clock is injected
- * (`() => Date`, defaulting to the real clock) so wall-clock reads do not occur
- * directly, per the TypeScript determinism rule.
+ * `%Y-%m-%d %H:%M:%S %Z` (with `%Z` rendered as `UTC`), then emit the head-SHA
+ * line beneath it. The clock is injected (`() => Date`, defaulting to the real
+ * clock) so wall-clock reads do not occur directly, per the TypeScript
+ * determinism rule. The Python helper takes no clock parameter; that divergence
+ * is pre-existing and deliberate and is not corrected in either direction.
+ *
+ * The head-SHA parameter is optional so existing call sites compile unchanged.
+ * When no head SHA is available the line renders
+ * {@link UNKNOWN_HEAD_SHA_PLACEHOLDER}, matching the unknown-value convention used
+ * elsewhere in the summary.
  *
  * @param clock Clock returning the current `Date` (defaults to `() => new Date()`).
- * @returns The formatted timestamp section.
+ * @param headSha Head SHA of the branch the context describes, when known.
+ * @returns The formatted freshness header section.
  */
 export function appendGenerationTimestamp(
   clock: () => Date = () => new Date(),
+  headSha: string | null = null,
 ): string {
   const now = clock();
   const timestamp = formatUtcTimestamp(now);
-  return section("Context generated") + "\n" + timestamp + "\n";
+  const shaText =
+    headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_PLACEHOLDER;
+  return (
+    section(GENERATED_CONTEXT_SECTION_TITLE) +
+    "\n" +
+    timestamp +
+    "\n" +
+    `${HEAD_SHA_LABEL} ${shaText}` +
+    "\n"
+  );
 }
 
 /** Format a Date as `YYYY-MM-DD HH:MM:SS UTC` (Python `%Y-%m-%d %H:%M:%S %Z`). */

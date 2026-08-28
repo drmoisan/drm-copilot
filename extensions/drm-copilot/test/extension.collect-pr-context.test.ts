@@ -99,6 +99,12 @@ const childProcessMock = jest.requireMock("node:child_process") as {
 /** Files written through the mocked node:fs during a collector run. */
 const writtenFiles = new Map<string, string>();
 
+/** Workspace-joined summary artifact path for the `C:/workspace` fixture. */
+const WORKSPACE_SUMMARY_PATH = "C:/workspace/artifacts/pr_context.summary.txt";
+/** Workspace-joined appendix artifact path for the `C:/workspace` fixture. */
+const WORKSPACE_APPENDIX_PATH =
+  "C:/workspace/artifacts/pr_context.appendix.txt";
+
 /**
  * Configure the node:fs mock so the in-process collector's RealFileSystem can
  * read the (empty) repo tree and capture the artifact writes. Branch-discovery
@@ -113,6 +119,13 @@ function setCollectorFileSystemState(): void {
   });
   fsMock.readdirSync.mockReturnValue([]);
   fsMock.readFileSync.mockImplementation((filePath: string) => {
+    // Serve reads consistently with writes. The service call verifies each
+    // write by reading the file back, so a double that records a write but
+    // refuses to serve the read would report a false verification failure.
+    const written = writtenFiles.get(filePath);
+    if (written !== undefined) {
+      return written;
+    }
     throw new Error(`ENOENT: ${filePath}`);
   });
   fsMock.mkdirSync.mockReturnValue(undefined);
@@ -319,11 +332,12 @@ describe("drm-copilot collectPrContext command behavior", () => {
 
     // No Python (or any) process is spawned via child_process.spawn.
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
-    // The in-process collector wrote both artifacts through node:fs.
-    expect(writtenFiles.has("artifacts/pr_context.summary.txt")).toBe(true);
-    expect(writtenFiles.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    // The in-process collector wrote both artifacts through node:fs, at the
+    // workspace-joined paths.
+    expect(writtenFiles.has(WORKSPACE_SUMMARY_PATH)).toBe(true);
+    expect(writtenFiles.has(WORKSPACE_APPENDIX_PATH)).toBe(true);
     // The summary references the selected base.
-    expect(writtenFiles.get("artifacts/pr_context.summary.txt")).toContain(
+    expect(writtenFiles.get(WORKSPACE_SUMMARY_PATH)).toContain(
       "Base ref (requested): origin/main",
     );
   });
@@ -339,7 +353,7 @@ describe("drm-copilot collectPrContext command behavior", () => {
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
     // The in-process collector used the explicit base in the written summary.
-    expect(writtenFiles.get("artifacts/pr_context.summary.txt")).toContain(
+    expect(writtenFiles.get(WORKSPACE_SUMMARY_PATH)).toContain(
       "Base ref (requested): origin/release/1.0",
     );
   });
@@ -396,16 +410,12 @@ describe("drm-copilot collectPrContext command behavior", () => {
     const logs = appendLineMock.mock.calls.map(([line]) => line);
     expect(
       logs.some((line) =>
-        line.includes(
-          "Wrote context summary to: artifacts/pr_context.summary.txt",
-        ),
+        line.includes(`Wrote context summary to: ${WORKSPACE_SUMMARY_PATH}`),
       ),
     ).toBe(true);
     expect(
       logs.some((line) =>
-        line.includes(
-          "Wrote context appendix to: artifacts/pr_context.appendix.txt",
-        ),
+        line.includes(`Wrote context appendix to: ${WORKSPACE_APPENDIX_PATH}`),
       ),
     ).toBe(true);
   });
@@ -438,10 +448,36 @@ describe("drm-copilot collectPrContext command behavior", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
-    // The collector wrote both repo-relative artifacts via node:fs.
+    // The collector wrote both artifacts via node:fs, against the workspace
+    // root the command was invoked for.
     expect([...writtenFiles.keys()].sort()).toEqual([
-      "artifacts/pr_context.appendix.txt",
-      "artifacts/pr_context.summary.txt",
+      WORKSPACE_APPENDIX_PATH,
+      WORKSPACE_SUMMARY_PATH,
     ]);
+  });
+
+  it("collectPrContext passes workspace-joined paths to the node:fs write boundary", async () => {
+    // Arrange
+    setExecutablePresence({ python: true });
+
+    // Act
+    const handler = activateAndGetHandler(
+      "drmCopilotExtension.collectPrContext",
+    );
+    await handler();
+
+    // Assert: the recorded write arguments are exactly the two workspace-joined
+    // artifact paths. This observes the exact argument RealFileSystem hands to
+    // Node, which is where a repository-relative path resolves against the
+    // server process cwd rather than the workspace.
+    const writeArguments = [...writtenFiles.keys()].sort();
+    expect(writeArguments).toEqual([
+      WORKSPACE_APPENDIX_PATH,
+      WORKSPACE_SUMMARY_PATH,
+    ]);
+    // No recorded write argument is a repository-relative path.
+    expect(
+      writeArguments.filter((value) => !value.startsWith("C:/workspace/")),
+    ).toEqual([]);
   });
 });

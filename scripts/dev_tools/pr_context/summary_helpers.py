@@ -376,11 +376,41 @@ def format_diff_path(path_text: str | None) -> str:
     return _fmt(path_text) if path_text is not None else ""
 
 
-def append_generation_timestamp() -> str:
-    """Generate a timestamp section showing when context was collected.
+GENERATED_CONTEXT_SECTION_TITLE = "Context generated"
+"""Section title of the generated-context freshness header, both runtimes."""
+
+HEAD_SHA_LABEL = "Head SHA:"
+"""Prefix of the head-SHA line in the freshness header, both runtimes."""
+
+UNKNOWN_HEAD_SHA_PLACEHOLDER = "(unknown)"
+"""Rendered in place of the SHA when the collected context carries none."""
+
+
+def append_generation_timestamp(head_sha: str | None = None) -> str:
+    """Generate the freshness header showing when context was collected.
+
+    The header carries the generation timestamp and the head SHA the context
+    describes, so a consumer can check pair identity and head binding without
+    parsing either document body.
+
+    This helper deliberately takes no clock parameter. The TypeScript twin
+    injects a clock because `.claude/rules/typescript.md` requires wall-clock
+    reads to flow through an injected clock; that divergence is pre-existing and
+    is not corrected in either direction.
+
+    Args:
+        head_sha: Head SHA of the branch the context describes, when known.
 
     Returns:
-        Formatted timestamp section with UTC time
+        Formatted freshness header with UTC time and the head-SHA line.
     """
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
-    return section("Context generated") + "\n" + timestamp + "\n"
+    sha_text = head_sha if head_sha else UNKNOWN_HEAD_SHA_PLACEHOLDER
+    return (
+        section(GENERATED_CONTEXT_SECTION_TITLE)
+        + "\n"
+        + timestamp
+        + "\n"
+        + f"{HEAD_SHA_LABEL} {sha_text}"
+        + "\n"
+    )
