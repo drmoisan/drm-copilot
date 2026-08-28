@@ -326,7 +326,7 @@ export const GENERATED_CONTEXT_SECTION_TITLE = "Context generated";
 /** Prefix of the head-SHA line in the freshness header, both runtimes. */
 export const HEAD_SHA_LABEL = "Head SHA:";
 /** Rendered in place of the SHA when the collected context carries none. */
-export const UNKNOWN_HEAD_SHA_TOKEN = "(unknown)";
+export const UNKNOWN_HEAD_SHA_PLACEHOLDER = "(unknown)";
 
 /**
  * Generate the freshness header showing when context was collected and which
@@ -341,7 +341,7 @@ export const UNKNOWN_HEAD_SHA_TOKEN = "(unknown)";
  *
  * The head-SHA parameter is optional so existing call sites compile unchanged.
  * When no head SHA is available the line renders
- * {@link UNKNOWN_HEAD_SHA_TOKEN}, matching the unknown-value convention used
+ * {@link UNKNOWN_HEAD_SHA_PLACEHOLDER}, matching the unknown-value convention used
  * elsewhere in the summary.
  *
  * @param clock Clock returning the current `Date` (defaults to `() => new Date()`).
@@ -354,7 +354,7 @@ export function appendGenerationTimestamp(
 ): string {
   const now = clock();
   const timestamp = formatUtcTimestamp(now);
-  const shaText = headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_TOKEN;
+  const shaText = headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_PLACEHOLDER;
   return (
     section(GENERATED_CONTEXT_SECTION_TITLE) +
     "\n" +
