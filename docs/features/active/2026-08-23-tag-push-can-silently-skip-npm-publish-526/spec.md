@@ -483,3 +483,28 @@ added for Layer C.
   (`README.md` credential correction). The absent `quality-tiers.yml` remains unfiled here.
 - **Links.** Issue: https://github.com/drmoisan/drm-copilot/issues/526. Research:
   `research/research.2026-08-24T12-45.md`.
+
+## Correction — 2026-08-28 (issue #575)
+
+This section is an append-only correction. AC21's original sentence and its `[x]` checkbox above
+(line 417) are unchanged; nothing above this heading was edited to produce this correction.
+
+**Original claim.** AC21's first clause states: "the complete Pester suite passes with no network
+access available."
+
+**Mechanism actually verified.** The cited evidence (`evidence/qa-gates/network-isolated-suite.2026-08-26T02-36.md`)
+demonstrates only proxy-environment-variable isolation: `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`,
+and `NPM_CONFIG_REGISTRY` are pointed at an unreachable discard endpoint, blocking `npm`, `gh`, and
+other proxy-aware clients. It does not block a raw socket: this same isolation session class was
+reproduced under issue #575 and a raw `TcpClient` connection to `registry.npmjs.org:443` succeeded
+from inside it, confirming the #526 reaudit's own R4 probe finding.
+
+**Corrected, narrower claim.** The complete Pester suite passes with all proxy-aware network clients
+redirected to an unreachable discard endpoint; a raw socket is not blocked by this mechanism. AC21's
+second clause — that no test added or modified by #526 invokes `npm`, `gh`, or `git` as a real
+external process — is untouched by this correction and was independently reaffirmed under issue
+#575 across all four release-verification test files, including the new one added by that issue.
+
+**Evidence.** See `docs/features/active/2026-08-28-release-poll-budgets-unpinned-and-isolation-evidence-proxy-level-575/evidence/qa-gates/proxy-level-isolation-correction.2026-08-28T21-05.md`
+for the reproduced probe output and the reaffirmed clause-2 result. See issue #575 for the full
+disposition of this gap.

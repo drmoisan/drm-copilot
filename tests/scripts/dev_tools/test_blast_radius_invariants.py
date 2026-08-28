@@ -142,6 +142,16 @@ def test_conflict_reasons_are_symmetric(left: BlastRadius, right: BlastRadius) -
     )
 
 
+@pytest.mark.parametrize(("left", "right"), RADIUS_PAIRS)
+def test_boolean_projection_agrees_with_the_conflict_field(
+    left: BlastRadius, right: BlastRadius
+) -> None:
+    """Project every result to the verdict its ``conflict`` field carries."""
+    result = conflicts(left, right, CONFIG)
+
+    assert bool(result) is result.conflict
+
+
 @pytest.mark.parametrize("radius", NON_EMPTY_RADII)
 def test_a_radius_with_a_non_empty_level_conflicts_with_itself(
     radius: BlastRadius,
