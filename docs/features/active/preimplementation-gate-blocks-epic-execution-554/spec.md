@@ -900,9 +900,9 @@ This section is the **sole** authoritative acceptance-criteria source for this f
 - [x] No file whose path begins with `.claude/rules/`, `.claude/skills/`, or `.github/` appears in `git diff --name-only` against the merge base.
 - [x] Deny-by-default is preserved with no new permissive path: Pester tests assert deny for an unparseable payload, for a payload with no tool input key, and for a mode-resolved delegation whose injected checkpoint content is empty, and all pass.
 - [x] Every file written by the branch appears in the `## DECLARED BLAST RADIUS` section of this document, verified by comparing `git diff --name-only` against the merge base with the declared list.
-- [ ] The full PowerShell toolchain passes in a single pass: format, then analyze with zero findings, then Pester with coverage.
+- [x] The full PowerShell toolchain passes in a single pass: format, then analyze with zero findings, then Pester with coverage.
 - [x] The plan document records the batch sequencing required by decision D6 and states explicitly that each `extensions/drm-copilot/resources/` file is treated as a mechanical byte-copy of an already-reviewed source rather than an independent production edit.
-- [ ] Every production `.ps1` file written by this change is at or under 500 lines, verified by line count.
+- [x] Every production `.ps1` file written by this change is at or under 500 lines, verified by line count.
 - [x] A follow-up record for the epic kickoff contract gap described in decision D3 is written under `docs/features/active/preimplementation-gate-blocks-epic-execution-554/evidence/other/`, stating the gap, the recommended contract amendment, and the reason it is out of scope here. Filing the GitHub issue itself is a maintainer action outside this branch: `gh issue create` is denied by a PreToolUse hook, and the sanctioned MCP promotion path writes files under `docs/features/potential/` that are deliberately not in the declared blast radius, so filing it from this branch would make the undeclared-path check fail. This criterion is satisfied by the evidence record; the issue number is appended later if and when one exists.
 
 **Total acceptance-criteria items: 35.** All are unchecked at authoring time. Items are checked off
