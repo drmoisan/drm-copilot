@@ -83,6 +83,39 @@ Describe 'Test-BlastRadiusConflict result shape' {
             { Test-BlastRadiusConflict -RadiusA (Get-TestRadius) -RadiusB (Get-TestRadius) `
                     -Config 'not-a-mapping' } | Should -Throw '*must be a mapping*'
         }
+
+        It 'is unconditionally truthy even when its conflict key is false' {
+            # Pins the behavioral divergence from the Python port, which returns a
+            # ConflictResult whose __bool__ agrees with its conflict field. The
+            # cause is PowerShell's boolean-conversion rule: the count-based rule
+            # applies only to IList implementations, and System.Collections.Hashtable
+            # implements IDictionary and ICollection but not IList, so the result
+            # falls under the rule for any other non-collection type and is always
+            # $true. Both halves are asserted in one It deliberately: a test
+            # asserting only one half would keep passing while the other drifted.
+
+            # Arrange: two provably disjoint radii naming distinct concrete paths.
+            $left = Get-TestRadius -Paths @('scripts/a.py')
+            $right = Get-TestRadius -Paths @('tests/b.py')
+
+            # Act: evaluate the relation and coerce the whole result to a boolean.
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:TestConfig
+            $coerced = [bool]$result
+
+            # Assert: the verdict is false while the object itself is true.
+            $result['conflict'] | Should -BeFalse
+            $coerced | Should -BeTrue
+        }
+
+        It 'documents the truthiness divergence in its comment-based help' {
+            # Arrange: read the help through Get-Help so the assertion covers the
+            # rendered help a caller actually sees. Out-String is width-pinned so
+            # the host console width cannot wrap the literal across two lines.
+            $helpText = Get-Help -Name 'Test-BlastRadiusConflict' -Full | Out-String -Width 500
+
+            # Act / Assert: the documentation obligation is enforced by a test.
+            $helpText | Should -BeLike '*the conflict key of the returned hashtable*'
+        }
     }
 }
 
