@@ -135,3 +135,35 @@ lines are 8 read-seam plus 2 group-2 accepted residual lines plus the **15-line 
 exception at lines 426-443**, which is the exact end state the remediation inputs projected and
 declared checkable. The asymmetric wording of the clause and the reading applied to it are recorded
 above. The criterion's text is byte-identical apart from the single checkbox character.
+
+---
+
+## Correction Notice — 2026-08-28, remediation cycle 2
+
+The section above headed "The criterion's own text is satisfied outright" contains one incorrect
+statement of fact, at lines 100 through 102. It is corrected here by appended notice rather than by
+rewriting the text above, so the record shows what was believed and when it was corrected. The
+original text is left byte-untouched.
+
+**Incorrect.** "its two uncovered pre-existing lines, 197 and 206, were uncovered at the merge base
+as well, which is why the audit's derived-baseline calculation restored only the ten", and "On that
+basis no line that was covered at the merge base is uncovered now."
+
+**Corrected.** Both lines were COVERED at the merge base `1e991b86`. Merge-base line 213, inside
+`Test-ImplementationDelegation`, called `Test-PreparationModeDelegation`, and merge-base
+`tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` reached both the
+non-`orchestrator` return and the all-conjuncts return through that call site. This branch removed
+the call site, orphaning the function on both surfaces, and the two lines lost coverage. The
+corrected derived Codex baseline is 120 of 120 pre-existing measurable lines covered. The error
+originated in `policy-audit.2026-08-27T22-47.md` and was faithfully reproduced here; that artifact
+now carries its own correction notice.
+
+**This loss is remediation-cycle-2 finding B5, and it is CLOSED** by the two cases added to
+`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`
+in remediation cycle 2. Lines 197 and 206 are covered.
+
+**The verdict on the acceptance criterion is UNCHANGED and the checkbox stays checked.** The
+criterion is scoped to *changed* lines and neither 197 nor 206 is a changed line, a reading
+confirmed by `feature-audit.2026-08-28T00-30.md` on the criterion's literal text. Arguments 1 and 2
+of the section above are accepted in full and are untouched by this notice. Only the second half of
+the third argument — the claim about merge-base coverage — is withdrawn.

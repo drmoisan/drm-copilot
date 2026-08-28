@@ -78,11 +78,16 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
     Context 'the preparation-mode delegation predicate' {
         # Finding R2. Test-PreparationModeDelegation lost its only production call site
         # when this branch replaced Test-ImplementationDelegation, so its body became
-        # uncovered on the Claude surface while the Codex copy kept coverage from
-        # tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1. The function
-        # is deliberately retained: spec.md lists it under "Not modified", and removing
-        # it would break that passing Codex legacy-contract test. These four cases
-        # restore coverage of all three conjuncts.
+        # uncovered on BOTH surfaces. The Codex copy kept only PARTIAL coverage from
+        # tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1: its two
+        # surviving direct callers reach the null branch and the marker-loop return,
+        # but neither the non-orchestrator return nor the all-conjuncts return, both of
+        # which were covered at the merge base through the removed call site. That
+        # residual is cycle-2 finding B5 and is closed by the two cases in
+        # tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1.
+        # The function is deliberately retained: spec.md lists it under "Not modified",
+        # and removing it would break that passing Codex legacy-contract test. These
+        # four cases restore coverage of all three conjuncts.
 
         It 'returns false for a null tool input' {
             # The null-tolerance contract spec.md pins at decision D2.

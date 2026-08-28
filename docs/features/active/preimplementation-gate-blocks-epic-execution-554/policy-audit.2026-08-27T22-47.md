@@ -330,3 +330,35 @@ checkpoint schemas the new predicates consume); `.claude/rules/plan-acceptance-g
 unfalsifiable-gate argument the executor invokes); `.claude/rules/tonality.md`.
 
 No policy document was modified by this audit or by the branch.
+
+---
+
+## Correction Notice — 2026-08-28, remediation cycle 2
+
+This artifact is SUPERSEDED by `policy-audit.2026-08-28T00-30.md` and is retained above with its
+original text byte-untouched, for audit continuity. One statement of fact in it is incorrect. It is
+corrected here by appended notice rather than by rewriting the text above, so the record shows what
+was believed and when it was corrected.
+
+**Incorrect, at line 173 and at the derived-baseline figure at line 181.** Line 173 states that the
+Codex copy of `Test-PreparationModeDelegation` retains coverage, "which is why only lines 197 and
+206 are uncovered there". Line 181 derives a Codex baseline of approximately 98.3 percent, 118 of
+120 pre-existing measurable lines covered, on that assumption.
+
+**Corrected.** Lines 197 and 206 of
+`.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` were COVERED at the merge base
+`1e991b86`. Merge-base line 213, inside `Test-ImplementationDelegation`, called
+`Test-PreparationModeDelegation`, and merge-base
+`tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` reached both the
+non-`orchestrator` return and the all-conjuncts return through that call site. This branch removed
+the call site, orphaning the function on both surfaces, and the two lines lost coverage as a direct
+consequence. **The corrected derived Codex baseline is 120 of 120 pre-existing measurable lines
+covered.**
+
+This is remediation-cycle-2 finding **B5**, recorded in `remediation-inputs.2026-08-28T00-30.md`
+and in `policy-audit.2026-08-28T00-30.md`. It is closed by the two cases added to
+`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`
+in remediation cycle 2.
+
+Nothing else in this artifact is withdrawn. Its four cycle-1 closure verdicts, its scope-constraint
+table, its mirror-pair hashes, and its accepted-shipping-exception statement all stand.
