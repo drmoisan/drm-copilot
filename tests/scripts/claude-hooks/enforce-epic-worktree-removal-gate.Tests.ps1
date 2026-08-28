@@ -3,6 +3,22 @@
 <#
 .SYNOPSIS
     Pester tests for the enforce-epic-worktree-removal-gate.ps1 PreToolUse hook.
+
+.DESCRIPTION
+    Determinism rule for this suite: the hook reads two checkpoints through two
+    named read seams, Get-EpicWorktreeGateCheckpointContent for the epic checkpoint
+    and Get-EpicWorktreeGateParallelCheckpointContent for the parallel-orchestrator
+    checkpoint. Every checkpoint fixture is a literal JSON string injected through
+    one of those mocked seams. No test reads the real gitignored
+    artifacts/orchestration/epic-orchestrator-state.json or
+    artifacts/orchestration/parallel-orchestrator-state.json, and no test writes a
+    temporary file, so the suite is deterministic regardless of live orchestration
+    state on the machine.
+
+    Every deny-expecting test MUST mock BOTH seams. A deny test that leaves the
+    parallel seam unmocked would read live local state and pass or fail depending on
+    whether a parallel run happens to be in flight. A contributor adding a deny test
+    inherits this rule.
 #>
 
 Describe 'enforce-epic-worktree-removal-gate.ps1' {
@@ -13,6 +29,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
     Context 'commands outside scope' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw ''
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
@@ -29,6 +46,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
         }
 
         It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw '{not-json'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
@@ -60,6 +78,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
     Context 'deny on unreadable checkpoint' {
         It 'denies EPIC_WORKTREE_REMOVAL_BLOCKED when the checkpoint file is absent' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -68,6 +87,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
         It 'denies EPIC_WORKTREE_REMOVAL_BLOCKED when the checkpoint content is malformed JSON' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { '{ broken json' }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -80,6 +100,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
                 '{"features":[{"worktree_path":"/repo/worktrees/child-b","merge_status":"merged"}]}'
             }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -92,6 +113,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
                 '{"features":[{"worktree_path":"/repo/worktrees/child-a","merge_status":"pr_open"}]}'
             }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -164,6 +186,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
     Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
         BeforeEach {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
         }
 
 
