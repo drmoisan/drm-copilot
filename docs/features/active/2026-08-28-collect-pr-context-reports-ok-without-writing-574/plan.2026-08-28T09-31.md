@@ -309,48 +309,48 @@ Both tasks in this phase add an assertion that the current code cannot satisfy, 
 
 Run every task in this phase unconditionally. If any task fails, or any write-mode task rewrites a tracked file, restart this phase from P8-T1 and rerun every task in order until one uninterrupted pass completes with all tasks exiting 0 and no file rewritten. The single exception is the bounded exemption stated at the head of this plan: a P8-T9 or P8-T10 run that exits 1 with exactly that one failure, recorded to the standard that exemption sets, does not trigger a restart. Both tasks invoke pytest with no test-path operand, so each collects the whole repository suite and each encounters that pre-existing failure; measured on this branch each reports `1 failed, 4194 passed, 5 skipped`. Every other failure triggers a restart. No task in this phase may be recorded as skipped.
 
-- [ ] [P8-T1] Run the TypeScript formatter and record a tree observation beyond the exit code.
+- [x] [P8-T1] Run the TypeScript formatter and record a tree observation beyond the exit code.
   - Run `git status --porcelain`, then `npm run format`, then `git status --porcelain` again.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-ts-format.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying both porcelain listings and stating that the two listings are identical, which is what proves the run left every matched file unchanged. A differing pair requires a restart of this phase.
 
-- [ ] [P8-T2] Run the TypeScript linter.
+- [x] [P8-T2] Run the TypeScript linter.
   - Run `npm run lint`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-ts-lint.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the integer error and warning counts, with the error count at 0. A clean run of this command prints no summary line at all; record empty output plus exit code 0 as the counts 0 and 0, and quote the output verbatim when it is non-empty.
 
-- [ ] [P8-T3] Run the TypeScript type checker.
+- [x] [P8-T3] Run the TypeScript type checker.
   - Run `npm run typecheck`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-ts-typecheck.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the integer diagnostic count at 0. A clean run of this command prints no summary line at all; record empty output plus exit code 0 as the counts 0 and 0, and quote the output verbatim when it is non-empty.
 
-- [ ] [P8-T4] Run the TypeScript unit suite.
+- [x] [P8-T4] Run the TypeScript unit suite.
   - Run `npm run test:unit`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-ts-test-unit.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the passed, failed, and total counts and the suite count, with the failed count at 0.
 
-- [ ] [P8-T5] Run the TypeScript coverage gate.
+- [x] [P8-T5] Run the TypeScript coverage gate.
   - Run `npm run test:coverage -- --coverageReporters=text`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-ts-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the numeric overall statement, branch, function, and line percentages plus the numeric per-file line and branch percentages for each of the three pr-context production files, each at or above 85 lines and 75 branches. Placeholder values are not acceptable.
 
-- [ ] [P8-T6] Run the Python formatter and record a tree observation beyond the exit code.
+- [x] [P8-T6] Run the Python formatter and record a tree observation beyond the exit code.
   - Run `git status --porcelain`, then `poetry run black .`, then `git status --porcelain` again.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-py-black.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying both porcelain listings, the integer count of files reformatted at 0, and the integer count of files the run reported as left unchanged. A non-zero reformat count requires a restart of this phase.
 
-- [ ] [P8-T7] Run the Python linter.
+- [x] [P8-T7] Run the Python linter.
   - Run `poetry run ruff check .`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-py-ruff.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` recording verbatim the final line the run printed, which must be `All checks passed!`. `ruff check .` is read-only under this repository's configuration, so no fixed-file count is printed and none is recorded; the restart trigger for this task is a non-zero exit code or a `Found N errors.` line.
 
-- [ ] [P8-T8] Run the Python type checker.
+- [x] [P8-T8] Run the Python type checker.
   - Run `poetry run pyright`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-py-pyright.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the integer error count at 0 alongside the warning and information counts.
 
-- [ ] [P8-T9] Run the repository-wide Python test and coverage gate.
+- [x] [P8-T9] Run the repository-wide Python test and coverage gate.
   - Run `poetry run pytest --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/cov-p8t9.json --cov`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-py-pytest-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, the observed `EXIT_CODE:`, and an `Output Summary:` carrying the passed and failed counts, the node ID and assertion message of every failed test, and, for the `TOTAL` row of the terminal coverage table, the `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values recorded verbatim together with the `percent_statements_covered` and `percent_branches_covered` values read from the `totals` object of `artifacts/python/cov-p8t9.json`, per the Python coverage-reading convention stated at the head of this plan. Placeholder values are not acceptable. The task passes when the run exits 0 with zero failures, or when it exits 1 with exactly one failure satisfying every condition of the bounded exemption stated at the head of this plan, in which case the artifact also carries `ExpectedExitCode: 1`.
 
-- [ ] [P8-T10] Run the targeted Python coverage gate for the two modules the spec names, and for the new module.
+- [x] [P8-T10] Run the targeted Python coverage gate for the two modules the spec names, and for the new module.
   - Run `poetry run pytest --cov=scripts.dev_tools.pr_context.collector --cov=scripts.dev_tools.pr_context.summary_helpers --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/cov-p8t10-a.json`.
   - Run `poetry run pytest --cov=scripts.dev_tools.pr_context.collector_documents --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/cov-p8t10-b.json`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/final-py-pr-context-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, the observed `EXIT_CODE:`, and `Output Summary:` for both runs, carrying the passed and failed counts and the node ID and assertion message of every failed test, and carrying for each of the rows printed for `scripts/dev_tools/pr_context/collector.py`, `scripts/dev_tools/pr_context/summary_helpers.py`, and `scripts/dev_tools/pr_context/collector_documents.py` the `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values recorded verbatim, together with the `percent_statements_covered` and `percent_branches_covered` values read from the `summary` object of that file's entry under `files` in the JSON that run wrote, per the Python coverage-reading convention stated at the head of this plan, with `percent_statements_covered` at or above 85 and `percent_branches_covered` at or above 75 for every one of the three rows. Placeholder values are not acceptable. Neither command carries a test-path operand, so each collects the whole repository suite. The task passes when both runs exit 0 with zero failures, or when both exit 1 with exactly one failure satisfying every condition of the bounded exemption stated at the head of this plan, in which case the artifact also carries `ExpectedExitCode: 1`. One artifact suffices for both runs because both declare the same expectation; a run pair with differing expectations must be split into two artifacts, as P5-T1 does.
 
-- [ ] [P8-T11] Record the coverage delta comparison for both runtimes.
+- [x] [P8-T11] Record the coverage delta comparison for both runtimes.
   - Read the baseline artifacts written by P0-T8, P0-T12, and P0-T13, and the final artifacts written by P8-T5, P8-T9, and P8-T10.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/coverage-delta.TIMESTAMP.md` records, as numeric values with no placeholders, the baseline and post-change overall line and branch percentages for each runtime, the baseline and post-change per-file line and branch percentages for each of the five production files in scope that existed at baseline, the post-change percentages for the one production file created by this change, and an explicit statement for each file that its post-change line coverage is at or above 85, its post-change branch coverage is at or above 75, and neither value regressed against its baseline. Python line and branch percent values are the `percent_statements_covered` and `percent_branches_covered` values defined by the Python coverage-reading convention stated at the head of this plan, carried over from the source artifacts together with the raw terminal columns recorded beside them; TypeScript line and branch percent values are read directly from the line and branch columns of the Jest text reporter, which prints them separately. A regression on any changed file is a failure of this task, not a note.
 
