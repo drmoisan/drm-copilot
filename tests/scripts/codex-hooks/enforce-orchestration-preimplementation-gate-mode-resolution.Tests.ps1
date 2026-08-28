@@ -112,6 +112,13 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             Get-OrchestrationDelegationCheckpointPath -Mode $Mode | Should -Be $Path
         }
 
+        It 'returns an empty checkpoint path for a mode name that is not in the table' {
+            # The Codex counterpart of the Claude case at mode-resolution suite line 187.
+            # An unrecognized name must yield the empty string rather than a usable path,
+            # so no caller can manufacture a readiness source by inventing a mode.
+            Get-OrchestrationDelegationCheckpointPath -Mode 'invented-mode' | Should -Be ''
+        }
+
         It '<Verdict> the declared checkpoint path for <Mode> mode' -ForEach @(
             @{ Verdict = 'accepts'; Mode = 'epic'; Expect = $true; Prompt = 'Epic mode: true. epic_feature_folder: quickfiler-bug-family.' }
             @{ Verdict = 'accepts'; Mode = 'epic'; Expect = $true; Prompt = 'Epic mode: true. epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json.' }
@@ -120,6 +127,66 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             @{ Verdict = 'rejects'; Mode = 'parallel'; Expect = $false; Prompt = 'Parallel mode: true. parallel_checkpoint_path: artifacts/orchestration/rogue-parallel-state.json.' }
         ) {
             Test-OrchestrationDelegationDeclaredCheckpointPath -Prompt $Prompt -Mode $Mode | Should -Be $Expect
+        }
+    }
+
+    Context 'target folder resolution parity' {
+        # Both functions exercised here take a [string] and return a [string]. Calling one
+        # constructs no Agent envelope and claims no transport, so decision D5's prohibition
+        # is not engaged; these are the same category as the mode resolution parity cases
+        # above. The fixtures mirror the Claude-side cases at mode-resolution suite lines
+        # 221-231 and 233-242.
+
+        It 'returns nothing for a prompt carrying no feature-folder token' {
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Epic mode: true. Begin the work.' | Should -BeNullOrEmpty
+        }
+
+        It 'returns the parent basename for a token ending in a Markdown file' {
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Plan: docs/features/active/child-b-301/plan.md now.' | Should -Be 'child-b-301'
+        }
+
+        It 'returns the basename for a bare directory token' {
+            # No trailing punctuation, so the strip loop is a no-op on this input.
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Target docs/features/active/child-b-301 is next' | Should -Be 'child-b-301'
+        }
+
+        It 'returns the basename for a token followed by sentence punctuation' {
+            # Exercises the trailing-period strip, which must not fire on a .md suffix.
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Target docs/features/active/child-b-301.' | Should -Be 'child-b-301'
+        }
+
+        It 'returns nothing for a prompt carrying no issue number' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Epic mode: true. Begin the work.' | Should -BeNullOrEmpty
+        }
+
+        It 'returns the numeric string for a keyed issue number' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Epic mode: true. issue_num: 301.' | Should -Be '301'
+        }
+
+        It 'returns the numeric string for a bare-hash issue number' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Deliver the fix for issue #301 in this wave.' | Should -Be '301'
+        }
+    }
+
+    Context 'the mode deny-reason builder' {
+        # Closes finding R3 against lines 352-353 of the Codex gate hook. The function is
+        # a pure string builder with two mandatory string parameters; no envelope and no
+        # transport are involved, so decision D5 does not apply. It is the implementation
+        # of acceptance criterion (Amendment 3), which requires a denied delegation's
+        # reason to name the checkpoint actually consulted and the failed predicate.
+
+        It 'builds an epic deny reason naming the epic checkpoint and the failed predicate' {
+            $reason = Get-OrchestrationModeDenyReason -Mode 'epic' -Failure 'target-record'
+            $reason | Should -BeLike 'PREIMPLEMENTATION_GATE_BLOCKED:*'
+            $reason | Should -BeLike '*artifacts/orchestration/epic-orchestrator-state.json*'
+            $reason | Should -BeLike "*'target-record'*"
+        }
+
+        It 'builds a parallel deny reason naming the parallel checkpoint and the failed predicate' {
+            $reason = Get-OrchestrationModeDenyReason -Mode 'parallel' -Failure 'items'
+            $reason | Should -BeLike 'PREIMPLEMENTATION_GATE_BLOCKED:*'
+            $reason | Should -BeLike '*artifacts/orchestration/parallel-orchestrator-state.json*'
+            $reason | Should -BeLike "*'items'*"
         }
     }
 
