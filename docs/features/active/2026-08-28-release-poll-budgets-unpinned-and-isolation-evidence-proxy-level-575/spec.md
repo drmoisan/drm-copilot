@@ -165,12 +165,12 @@ Seeded from issue:
 
 ## Acceptance Criteria
 
-- [ ] AC1 — A new file `tests/scripts/dev-tools/Invoke-ReleaseTagPushCallSiteBudgets.Tests.ps1` exists, dot-sources `scripts/dev-tools/Invoke-ReleaseTagPush.ps1`, and contains no `Mock -CommandName Invoke-TagPublishVerification` line.
-- [ ] AC2 — In that file, an `It` test invoking `Invoke-ReleaseTagPushGuarded -ConfirmToken yes` asserts, via a `-ParameterFilter` on a mock of `Wait-ForWorkflowRun`, that the call site forwards `IntervalSeconds 10` and `MaxAttempts 18` for check (a).
-- [ ] AC3 — In the same file, an `It` test asserts, via a `-ParameterFilter` on a mock of `Test-PublishStepConclusion`, that the call site forwards `IntervalSeconds 20` and `MaxAttempts 60` for check (b).
-- [ ] AC4 — In the same file, an `It` test asserts exactly 41 calls to `Invoke-NpmExe` and exactly 39 calls to `Invoke-Sleep` filtered to `$Seconds -eq 15` for check (c), mirroring the assertion pattern at `tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1:315-363`.
-- [ ] AC5 — `tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1` passes with zero failures after the new file is added, without requiring any of its own existing assertions to change.
-- [ ] AC6 — `tests/scripts/dev-tools/Invoke-ReleaseTagPushCallSiteBudgets.Tests.ps1` is at most 500 lines, and no other new file added by this fix exceeds 500 lines.
+- [x] AC1 — A new file `tests/scripts/dev-tools/Invoke-ReleaseTagPushCallSiteBudgets.Tests.ps1` exists, dot-sources `scripts/dev-tools/Invoke-ReleaseTagPush.ps1`, and contains no `Mock -CommandName Invoke-TagPublishVerification` line.
+- [x] AC2 — In that file, an `It` test invoking `Invoke-ReleaseTagPushGuarded -ConfirmToken yes` asserts, via a `-ParameterFilter` on a mock of `Wait-ForWorkflowRun`, that the call site forwards `IntervalSeconds 10` and `MaxAttempts 18` for check (a).
+- [x] AC3 — In the same file, an `It` test asserts, via a `-ParameterFilter` on a mock of `Test-PublishStepConclusion`, that the call site forwards `IntervalSeconds 20` and `MaxAttempts 60` for check (b).
+- [x] AC4 — In the same file, an `It` test asserts exactly 41 calls to `Invoke-NpmExe` and exactly 39 calls to `Invoke-Sleep` filtered to `$Seconds -eq 15` for check (c), mirroring the assertion pattern at `tests/scripts/dev-tools/Invoke-ReleaseVerification.Tests.ps1:315-363`.
+- [x] AC5 — `tests/scripts/dev-tools/Invoke-ReleaseTagPush.Tests.ps1` passes with zero failures after the new file is added, without requiring any of its own existing assertions to change.
+- [x] AC6 — `tests/scripts/dev-tools/Invoke-ReleaseTagPushCallSiteBudgets.Tests.ps1` is at most 500 lines, and no other new file added by this fix exceeds 500 lines.
 - [ ] AC7 — PoshQC format (`Invoke-PoshQCFormat` or the equivalent MCP tool) completes against every file changed or added by this fix with zero auto-fixes applied.
 - [ ] AC8 — PSScriptAnalyzer (`Invoke-PoshQCAnalyze` or the equivalent MCP tool) reports zero findings against every file changed or added by this fix.
 - [ ] AC9 — The complete repository Pester suite (`Invoke-PoshQCTest`) passes with zero failed tests after this fix lands.
