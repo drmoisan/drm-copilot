@@ -94,64 +94,64 @@ The executor writes these exact strings; they are quoted here so acceptance cond
 
 Baseline capture precedes every source edit. Both write-mode formatter tasks in this phase record the working-tree state immediately before and immediately after the run, so that drift the formatter repaired here is visible and is not silently credited to the final QC loop.
 
-- [ ] [P0-T1] Read the repository policy files in the canonical order and record the read.
+- [x] [P0-T1] Read the repository policy files in the canonical order and record the read.
   - Read, in this order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/plan-acceptance-gates.md`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/phase0-instructions-read.TIMESTAMP.md` exists and carries `Timestamp:`, `Policy Order:`, and the explicit list of the nine files read, each as a repo-relative path.
 
-- [ ] [P0-T2] Read the requirements and research inputs and record the read.
+- [x] [P0-T2] Read the requirements and research inputs and record the read.
   - Read `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/issue.md`, `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/spec.md`, and `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/research/2026-08-28T12-00-collect-pr-context-silent-write-failure-research.md`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/phase0-requirements-read.TIMESTAMP.md` exists, records the three paths, records that the persisted work mode read from `issue.md` is full-bug, and records the count of acceptance criteria found in the spec's `## Acceptance Criteria` section as the integer 23.
 
-- [ ] [P0-T3] Record the branch and base-commit baseline.
+- [x] [P0-T3] Record the branch and base-commit baseline.
   - Run `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, `git rev-parse origin/main`, and `git status --porcelain`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/git-baseline.TIMESTAMP.md` records all four commands with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, the branch name is `bug/collect-pr-context-reports-ok-without-writing-574`, and both resolved SHAs are recorded verbatim as forty-character values.
 
-- [ ] [P0-T4] Capture the TypeScript formatter baseline with a before-and-after tree observation.
+- [x] [P0-T4] Capture the TypeScript formatter baseline with a before-and-after tree observation.
   - Run `git status --porcelain`, then `npm run format`, then `git status --porcelain` again.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/ts-format.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying both porcelain listings verbatim plus the explicit list of tracked files the run rewrote. When the two listings are identical the summary states that the run left every matched file unchanged; when they differ the summary names each rewritten file. If the two listings differ, the run repaired pre-existing drift. Revert every rewritten file that is not in the "Scope of the diff" enumeration with git checkout -- and record both the rewritten list and the revert in the artifact; do not carry unrelated formatting into this change set.
 
-- [ ] [P0-T5] Capture the TypeScript lint baseline.
+- [x] [P0-T5] Capture the TypeScript lint baseline.
   - Run `npm run lint`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/ts-lint.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the integer error count and the integer warning count reported by the run. A clean run of this command prints no summary line at all; record empty output plus exit code 0 as the counts 0 and 0, and quote the output verbatim when it is non-empty.
 
-- [ ] [P0-T6] Capture the TypeScript type-check baseline.
+- [x] [P0-T6] Capture the TypeScript type-check baseline.
   - Run `npm run typecheck`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/ts-typecheck.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the integer diagnostic count reported by the run. A clean run of this command prints no summary line at all; record empty output plus exit code 0 as the counts 0 and 0, and quote the output verbatim when it is non-empty.
 
-- [ ] [P0-T7] Capture the TypeScript unit-test baseline.
+- [x] [P0-T7] Capture the TypeScript unit-test baseline.
   - Run `npm run test:unit`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/ts-test-unit.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the passed, failed, and total test counts and the suite count reported by the run.
 
-- [ ] [P0-T8] Capture the TypeScript coverage baseline including per-file rows for the three production files in scope.
+- [x] [P0-T8] Capture the TypeScript coverage baseline including per-file rows for the three production files in scope.
   - Run `npm run test:coverage -- --coverageReporters=text`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/ts-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the numeric overall statement, branch, function, and line percentages printed by the run, plus the numeric per-file row printed for each of `src/lib/pr-context/pr-context-service-call.ts`, `src/lib/pr-context/collector-output.ts`, and `src/lib/pr-context/summary-helpers.ts`. Placeholder values are not acceptable.
 
-- [ ] [P0-T9] Capture the Python formatter baseline with a before-and-after tree observation.
+- [x] [P0-T9] Capture the Python formatter baseline with a before-and-after tree observation.
   - Run `git status --porcelain`, then `poetry run black .`, then `git status --porcelain` again.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/py-black.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying both porcelain listings verbatim plus the integer count of files the run reformatted and the integer count it left unchanged. If the two listings differ, the run repaired pre-existing drift. Revert every rewritten file that is not in the "Scope of the diff" enumeration with git checkout -- and record both the rewritten list and the revert in the artifact; do not carry unrelated formatting into this change set.
 
-- [ ] [P0-T10] Capture the Python lint baseline.
+- [x] [P0-T10] Capture the Python lint baseline.
   - Run `poetry run ruff check .`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/py-ruff.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording verbatim the final line the run printed — `All checks passed!` on a clean run, otherwise the `Found N errors.` line — together with the integer diagnostic count that line reports. This repository's Ruff configuration sets no `fix` key, so `ruff check .` never rewrites a file and prints no fixed-file count; do not record one.
 
-- [ ] [P0-T11] Capture the Python type-check baseline.
+- [x] [P0-T11] Capture the Python type-check baseline.
   - Run `poetry run pyright`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/py-pyright.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the integer error, warning, and information counts reported by the run.
 
-- [ ] [P0-T12] Capture the repository-wide Python coverage baseline.
+- [x] [P0-T12] Capture the repository-wide Python coverage baseline.
   - Run `poetry run pytest --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/cov-p0t12.json --cov`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/py-pytest-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the passed and failed test counts, the node ID of every failed test so the bounded exemption stated at the head of this plan is anchored in baseline evidence, and, for the `TOTAL` row of the terminal coverage table, the `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values recorded verbatim together with the `percent_statements_covered` and `percent_branches_covered` values read from the `totals` object of `artifacts/python/cov-p0t12.json`, per the Python coverage-reading convention stated at the head of this plan. Placeholder values are not acceptable.
 
-- [ ] [P0-T13] Capture the targeted Python coverage baseline for the two pr-context modules named by the spec.
+- [x] [P0-T13] Capture the targeted Python coverage baseline for the two pr-context modules named by the spec.
   - Run `poetry run pytest --cov=scripts.dev_tools.pr_context.collector --cov=scripts.dev_tools.pr_context.summary_helpers --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/cov-p0t13.json`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/py-pr-context-coverage.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying, for the row printed for `scripts/dev_tools/pr_context/collector.py` and for the row printed for `scripts/dev_tools/pr_context/summary_helpers.py`, the `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values recorded verbatim together with the `percent_statements_covered` and `percent_branches_covered` values read from the `summary` object of that file's entry under `files` in `artifacts/python/cov-p0t13.json`, per the Python coverage-reading convention stated at the head of this plan. Placeholder values are not acceptable.
 
-- [ ] [P0-T14] Capture the baseline line count of every production and test file this diff will write.
+- [x] [P0-T14] Capture the baseline line count of every production and test file this diff will write.
   - Write into `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/other/scope-files.txt`, one repo-relative path per line, the twenty paths drawn from items 1 through 24 of the "Scope of the diff" enumeration that exist at baseline. Items 6, 17, 23, and 24 are the four paths marked new; they do not yet exist and are omitted.
   - Run `pwsh -NoProfile -Command "Get-Content docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/other/scope-files.txt | ForEach-Object { [pscustomobject]@{ Path = $_; Lines = (Get-Content -LiteralPath $_).Count } }"`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/baseline/file-line-counts.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` listing every path with its integer line count, and explicitly records that `scripts/dev_tools/pr_context/collector.py` exceeds the 500-line limit at baseline. That pre-existing overage is what P4-T1 repairs.
 
-- [ ] [P0-T15] Verify the Python batch-budget hook allows the three production Python files this plan writes.
+- [x] [P0-T15] Verify the Python batch-budget hook allows the three production Python files this plan writes.
   - Read `.claude/state/python-batch-budget.default.json`. The `PreToolUse` hook `.claude/hooks/enforce-python-batch-budget.ps1` is registered on matcher `Write|Edit` and denies a Write or Edit of a distinct production `.py` path once `prodFiles` holds `prodCap` entries. Classification is textual: only a path matching `(^|/)tests/.*\.py$` or `(^|/)test_[^/]+\.py$` counts as a test file, and every other `.py` path counts as production. `CLAUDE_SESSION_ID` is unset in this workspace, so the session id resolves to `default` and entries left by any earlier agent count against this plan.
   - Run `pwsh -NoProfile -Command "Get-Content -LiteralPath .claude/state/python-batch-budget.default.json"`.
   - This plan writes three distinct production Python paths — `scripts/dev_tools/pr_context/collector_documents.py`, `scripts/dev_tools/pr_context/collector.py`, and `scripts/dev_tools/pr_context/summary_helpers.py` — and one test path, `tests/scripts/dev_tools/test_pr_context_freshness.py`. A path already listed in `prodFiles` is free; each of the three that is absent consumes one slot.
