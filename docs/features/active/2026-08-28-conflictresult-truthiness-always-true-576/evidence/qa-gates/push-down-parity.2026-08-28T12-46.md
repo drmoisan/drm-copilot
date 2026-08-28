@@ -61,6 +61,29 @@ execution run. It is not produced by any edit this change makes. This is recorde
 [P6-T4] is judged against the [P0-T10] baseline failing set, which is empty; the reconciliation is
 carried out in the [P6-T4] artifact.
 
+## Addendum — Confirming Run After Environment-Parity Restoration ([P6-T4])
+
+This section is an addendum recorded after [P6-T4]. It does not alter the [P5-T8] result above, which
+stands as branch (b) with `EXIT_CODE: 1` and no remediation attempted.
+
+At [P6-T4] the untracked, gitignored `.claude/state/` directory — session state created by the
+batch-budget hooks after the [P0-T10] baseline was captured — was removed to restore the environment
+the baseline was taken in. The same node ID was then re-run:
+
+```
+Command: poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts
+EXIT_CODE: 0
+
+tests\scripts\dev_tools\test_push_down_claude_resource_contracts.py .    [100%]
+
+============================== 1 passed in 0.09s ==============================
+```
+
+The bundle itself was never changed between the two runs. The confirming run establishes the
+substantive claim the acceptance criterion makes: every edited file under `.claude` matches its
+bundled counterpart, and the earlier failure was caused solely by session-generated local state
+outside this change's file scope.
+
 Output Summary: `EXIT_CODE: 1` with `ExpectedExitCode: 1`, taking branch (b) of this task's
 acceptance. The run reports `1 failed`. The assertion message is `Repo file missing from bundle:
 .claude\state\powershell-batch-budget.default.json`, which names exactly the default PowerShell
