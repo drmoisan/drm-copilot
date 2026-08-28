@@ -113,9 +113,12 @@ describe("collectPrContextServiceCall", () => {
       base: "main",
     });
 
-    // Assert: both files were written (relative to the workspace root).
-    expect(fs.isFile("artifacts/pr_context.summary.txt")).toBe(true);
-    expect(fs.isFile("artifacts/pr_context.appendix.txt")).toBe(true);
+    // Assert: both files were written at the workspace-joined absolute paths.
+    // The collector resolves the path it is given against the host's cwd, so a
+    // repository-relative key here would mean the write landed outside the
+    // workspace the tool was asked to describe.
+    expect(fs.isFile(`${ROOT}/artifacts/pr_context.summary.txt`)).toBe(true);
+    expect(fs.isFile(`${ROOT}/artifacts/pr_context.appendix.txt`)).toBe(true);
   });
 
   it("writes exactly the paths it reports in result.artifacts", () => {
@@ -149,9 +152,11 @@ describe("collectPrContextServiceCall", () => {
       base: "main",
       log: (message) => logs.push(message),
     });
+    // The two collector log lines carry the absolute workspace-joined paths,
+    // because they log the value actually written to.
     expect(logs).toEqual([
-      "Wrote context summary to: artifacts/pr_context.summary.txt",
-      "Wrote context appendix to: artifacts/pr_context.appendix.txt",
+      `Wrote context summary to: ${ROOT}/artifacts/pr_context.summary.txt`,
+      `Wrote context appendix to: ${ROOT}/artifacts/pr_context.appendix.txt`,
     ]);
   });
 });

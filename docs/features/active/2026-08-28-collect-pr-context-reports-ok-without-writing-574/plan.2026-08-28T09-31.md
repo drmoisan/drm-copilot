@@ -178,23 +178,23 @@ Both tasks in this phase add an assertion that the current code cannot satisfy, 
 
 ### Phase 2 — Path Identity and Read-Back Verification at the Service Seam
 
-- [ ] [P2-T1] Compute each absolute output path once in the service call and use that one value for both the write and the report.
+- [x] [P2-T1] Compute each absolute output path once in the service call and use that one value for both the write and the report.
   - Edit `extensions/drm-copilot/src/lib/pr-context/pr-context-service-call.ts` so that each repo-relative constant is joined to `input.workspaceRoot` and passed through `normalizeGeneratedPath` exactly once, producing two local variables that already carry the normalized forward-slash form. Those same two variables are the values passed to `collectAndWrite` as the summary and appendix output paths, the values read back in P2-T3, the values the two collector log lines carry, and the entries of the returned `artifacts` array, with no further joining or normalizing anywhere in the file. Normalizing before the write rather than after it is required, not stylistic: `join` emits backslash separators on Windows, so a write that used the raw joined value while the report used the normalized value would remain two different strings and the P1-T2 set-equality assertion would fail on Windows. Node accepts forward-slash separators on Windows, so the write is unaffected.
   - Acceptance: the file contains exactly two `join` call sites and exactly two `normalizeGeneratedPath` call sites, each applied to its value before that value is used for anything; the returned `artifacts` array references the two local variables directly rather than re-joining or re-normalizing the constants; `npm run typecheck` exits 0.
 
-- [ ] [P2-T2] Return the two rendered strings from the collector write entry point.
+- [x] [P2-T2] Return the two rendered strings from the collector write entry point.
   - Edit `extensions/drm-copilot/src/lib/pr-context/collector-output.ts` so that `collectAndWrite` returns an object carrying the rendered summary text and the rendered appendix text instead of returning void. Write ordering stays summary first then appendix, and no root-joining logic is introduced into `collectAndWrite` or `writeOutput`.
   - Acceptance: `npm run typecheck` exits 0 and `npm run test:unit -- test/lib/pr-context/collector-output.test.ts` exits 0.
 
-- [ ] [P2-T3] Verify both writes by reading each file back through the injected filesystem.
+- [x] [P2-T3] Verify both writes by reading each file back through the injected filesystem.
   - Edit `extensions/drm-copilot/src/lib/pr-context/pr-context-service-call.ts` so that, after `collectAndWrite` returns and before the result record is built, each of the two absolute paths is read back through `input.fileSystem` and compared to the corresponding string that this invocation rendered. A read that throws, or content that differs, raises an error whose message names the offending absolute artifact path. This is a read-back comparison against the rendered text; an existence check is not acceptable, because a stale file satisfies it and that is the defect under repair.
   - Acceptance: `npm run typecheck` exits 0, and the file contains no call to the filesystem existence predicate on either output path.
 
-- [ ] [P2-T4] Correct the two pre-existing service-call assertions that pin the defective behaviour.
+- [x] [P2-T4] Correct the two pre-existing service-call assertions that pin the defective behaviour.
   - Edit `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call.test.ts` so that the existing write assertion names the workspace-joined pair rather than the repository-relative pair, its stale comment is corrected, and the existing log-line assertion expects the two collector log lines to carry the absolute workspace-joined artifact paths.
   - Acceptance: the assertion that previously named a repository-relative key now names an absolute path, and no assertion in the file expects a repository-relative artifact path.
 
-- [ ] [P2-T5] Record pass-after evidence for both fail-first tests.
+- [x] [P2-T5] Record pass-after evidence for both fail-first tests.
   - Run `npm run test:unit -- test/lib/pr-context/pr-context-service-call.test.ts test/extension.collect-pr-context.test.ts`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/regression-testing/pass-after-path-identity.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` naming both tests added in P1-T2 and P1-T3 and recording the passed and failed counts for the two files.
 

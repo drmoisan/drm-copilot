@@ -335,6 +335,14 @@ export function writeOutput(
   }
 }
 
+/** The two documents one {@link collectAndWrite} invocation rendered. */
+export interface CollectAndWriteResult {
+  /** The exact summary text this invocation wrote. */
+  readonly summaryText: string;
+  /** The exact appendix text this invocation wrote. */
+  readonly appendixText: string;
+}
+
 /**
  * Run the collector and write both output files.
  *
@@ -343,9 +351,18 @@ export function writeOutput(
  * `Wrote context ...` log lines through the injected sink (matching the Python
  * `print` statements).
  *
+ * Returns the two rendered strings so a caller can verify each write by reading
+ * the file back and comparing against the exact text this invocation rendered,
+ * without re-rendering. No root-joining logic is introduced here: the output
+ * paths are used exactly as supplied, preserving the Python `write_output`
+ * contract.
+ *
  * @param options Collector options plus output paths, append flag, and log sink.
+ * @returns The rendered summary and appendix text.
  */
-export function collectAndWrite(options: CollectAndWriteOptions): void {
+export function collectAndWrite(
+  options: CollectAndWriteOptions,
+): CollectAndWriteResult {
   const clock = options.clock ?? (() => new Date());
   const collected = collectPrContext(options);
 
@@ -362,6 +379,8 @@ export function collectAndWrite(options: CollectAndWriteOptions): void {
   const log = options.log ?? (() => undefined);
   log(`Wrote context summary to: ${options.out}`);
   log(`Wrote context appendix to: ${options.appendixOut}`);
+
+  return { summaryText, appendixText };
 }
 
 /** Resolve the GitHub CLI status text shown in the summary. */
