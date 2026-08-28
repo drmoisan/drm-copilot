@@ -252,24 +252,24 @@ Both tasks in this phase add an assertion that the current code cannot satisfy, 
 
 ### Phase 5 — Verification Tests and Coverage Configuration
 
-- [ ] [P5-T1] Add the three read-back negative tests at the service seam.
+- [x] [P5-T1] Add the three read-back negative tests at the service seam.
   - Add three named tests to `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call.test.ts`, each using an in-memory filesystem and no temporary file: one injecting a filesystem whose write method accepts the call and discards the content, asserting the service call raises; one that pre-seeds both target paths with prior-invocation content, injects the same discarding write, and asserts the service call raises, which is the scenario an existence-only check would pass; and one in which the summary write succeeds and the appendix write fails, asserting the service call raises and the raised message names the appendix artifact path.
   - Prove the verification is what makes those tests pass, by mutation. Temporarily remove the read-back verification added in P2-T3 from `extensions/drm-copilot/src/lib/pr-context/pr-context-service-call.ts`, run `npm run test:unit -- test/lib/pr-context/pr-context-service-call.test.ts` and record that failing run; then restore the verification exactly as P2-T3 left it, run the same command again, and record that passing run.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/pr-context-service-call.test.ts` exits 0 with the verification in place; `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/regression-testing/readback-mutation-check.TIMESTAMP.md` records the removed-verification run with `Timestamp:`, `Command:`, `EXIT_CODE:` 1, `ExpectedExitCode: 1`, and an `Output Summary:` naming the two tests that failed while the verification was absent; and `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/regression-testing/readback-mutation-check-restored.TIMESTAMP.md` records the restored run with `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` recording the passed and failed counts. The two runs are recorded in two artifacts rather than one because a single evidence artifact carries exactly one `ExpectedExitCode` value, and these two runs declare different expectations.
 
-- [ ] [P5-T2] Add the degradation-is-not-failure test.
+- [x] [P5-T2] Add the degradation-is-not-failure test.
   - Add a named test to `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call.test.ts` asserting that when the GitHub CLI is reported unavailable, both artifacts are still written and the service call returns successfully.
   - Acceptance: `npm run test:unit -- test/lib/pr-context/pr-context-service-call.test.ts` exits 0, and the file is at or under 500 lines.
 
-- [ ] [P5-T3] Correct the dispatch-level test that encodes the defect.
+- [x] [P5-T3] Correct the dispatch-level test that encodes the defect.
   - Edit `extensions/drm-copilot/test/repo-automation-dispatch.test.ts` so the assertion that today names a repository-relative write key and the assertion that names the workspace-joined reported path both name the same workspace-joined pair.
   - Acceptance: `npm run test:unit -- test/repo-automation-dispatch.test.ts` exits 0, the file retains both assertions rather than deleting one, and the file is at or under 500 lines.
 
-- [ ] [P5-T4] Add the tool-dispatch boundary contract tests.
+- [x] [P5-T4] Add the tool-dispatch boundary contract tests.
   - Create `extensions/drm-copilot/test/repo-automation-dispatch-pr-context-verification.test.ts` carrying two named tests: one asserting that when the service call raises, the tool result carries an `ok` value of false and the failure text appears in the result record; and one asserting that a successful invocation returns an `ok` value of true and an `artifacts` array whose two entries are equal to the two paths written during that same test run. Neither test invokes the live MCP tool; both exercise the in-process dispatch path against this branch's source.
   - Acceptance: `npm run test:unit -- test/repo-automation-dispatch-pr-context-verification.test.ts` exits 0 with two passing tests, and the new file is at or under 500 lines.
 
-- [ ] [P5-T5] Add the per-file coverage thresholds for the three touched production modules and prove the gate runs.
+- [x] [P5-T5] Add the per-file coverage thresholds for the three touched production modules and prove the gate runs.
   - Edit `extensions/drm-copilot/jest.config.cjs` to add three entries to the existing `coverageThreshold` map, keyed `./src/lib/pr-context/pr-context-service-call.ts`, `./src/lib/pr-context/collector-output.ts`, and `./src/lib/pr-context/summary-helpers.ts`, each specifying 85 lines and 75 branches, matching every existing entry in that map. Add no `global` key.
   - Run `npm run test:coverage -- --coverageReporters=text`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/ts-coverage-thresholds.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the numeric per-file line and branch percentages printed for each of the three files and stating that the run reported no coverage threshold failure. Placeholder values are not acceptable.

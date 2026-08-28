@@ -23,6 +23,21 @@ module.exports = {
   // unrelated legacy coverage. Zero-branch definition modules report 100% branch
   // by convention and therefore satisfy the branch gate.
   coverageThreshold: {
+    // Issue #574: the three pr-context modules changed by the collect-pr-context
+    // path-identity and freshness fix. The map carried no entry for any
+    // src/lib/pr-context/ file before this change.
+    "./src/lib/pr-context/pr-context-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/collector-output.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/summary-helpers.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,

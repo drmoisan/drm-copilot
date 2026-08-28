@@ -98,7 +98,10 @@ describe("repo automation dispatch", () => {
         exists: (p: string) => p.replace(/\\/g, "/").endsWith("/.git"),
         isDirectory: () => false,
         listDirectory: () => [],
-        readTextFile: () => "",
+        // Serve reads consistently with writes. The service call verifies each
+        // write by reading the file back, so a double that records a write but
+        // refuses to serve the read would report a false verification failure.
+        readTextFile: (p: string) => writes.get(p.replace(/\\/g, "/")) ?? "",
         writeTextFile: (p: string, c: string) =>
           void writes.set(p.replace(/\\/g, "/"), c),
         ensureDir: (d: string) => void ensured.push(d.replace(/\\/g, "/")),
@@ -126,8 +129,9 @@ describe("repo automation dispatch", () => {
     const appendix = "C:/workspace/artifacts/pr_context.appendix.txt";
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
     expect(gitCwds.length).toBeGreaterThan(0);
-    expect(writes.has("artifacts/pr_context.summary.txt")).toBe(true);
-    expect(writes.has("artifacts/pr_context.appendix.txt")).toBe(true);
+    // The written keys and the reported artifacts are the same pair.
+    expect(writes.has(summary)).toBe(true);
+    expect(writes.has(appendix)).toBe(true);
     expect(result.tool).toBe("collect_pr_context");
     expect(result.summary).toBe(
       "Collected PR context against base 'origin/main'.",

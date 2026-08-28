@@ -75,6 +75,38 @@ function seedWorkspace(): TreeFileSystem {
   return fs;
 }
 
+/**
+ * Tree filesystem whose `writeTextFile` accepts the call and discards the
+ * content for the selected artifact paths.
+ *
+ * The write succeeds, nothing throws, and any content already at the path is
+ * left untouched. This reproduces the defect's shape: a write that reports
+ * success while the file at the reported path is not what this invocation
+ * rendered.
+ */
+class DiscardingFileSystem extends TreeFileSystem {
+  constructor(private readonly discard: (path: string) => boolean) {
+    super();
+  }
+
+  override writeTextFile(path: string, content: string): void {
+    if (this.discard(path)) {
+      // Record the call so path identity stays observable, then drop the bytes.
+      this.writtenPaths.push(path);
+      return;
+    }
+    super.writeTextFile(path, content);
+  }
+}
+
+/** Seed the `.git` marker and discovery directories on any tree filesystem. */
+function seedInto<T extends TreeFileSystem>(fs: T): T {
+  fs.addFile(`${ROOT}/.git`, "");
+  fs.addDir(`${ROOT}/docs/features/active`);
+  fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+  return fs;
+}
+
 describe("collectPrContextServiceCall", () => {
   it("returns the preserved contract and the two normalized artifact paths", () => {
     // Arrange
@@ -140,6 +172,88 @@ describe("collectPrContextServiceCall", () => {
     expect(writtenSorted).toEqual([...result.artifacts].sort());
     // That single value is the workspace-joined summary and appendix pair.
     expect(writtenSorted).toEqual(SORTED_WORKSPACE_JOINED_PAIR);
+  });
+
+  it("raises when the write is accepted and the content is discarded", () => {
+    // Arrange: a filesystem whose write accepts the call and drops the bytes.
+    const fs = seedInto(new DiscardingFileSystem(() => true));
+
+    // Act / Assert
+    expect(() =>
+      collectPrContextServiceCall({
+        runner: new ScriptRunner(),
+        fileSystem: fs,
+        workspaceRoot: ROOT,
+        base: "main",
+      }),
+    ).toThrow(/Failed to verify PR context artifact/u);
+  });
+
+  it("raises when a stale file is present and the write is discarded", () => {
+    // Arrange: both target paths already hold a prior invocation's content, and
+    // the write discards. An existence-only check passes this scenario, which is
+    // exactly the hazard read-back verification exists to catch.
+    const fs = seedInto(new DiscardingFileSystem(() => true));
+    fs.addFile(
+      `${ROOT}/artifacts/pr_context.summary.txt`,
+      "PRIOR INVOCATION SUMMARY",
+    );
+    fs.addFile(
+      `${ROOT}/artifacts/pr_context.appendix.txt`,
+      "PRIOR INVOCATION APPENDIX",
+    );
+
+    // Act / Assert: both files exist, yet the call raises.
+    expect(fs.isFile(`${ROOT}/artifacts/pr_context.summary.txt`)).toBe(true);
+    expect(fs.isFile(`${ROOT}/artifacts/pr_context.appendix.txt`)).toBe(true);
+    expect(() =>
+      collectPrContextServiceCall({
+        runner: new ScriptRunner(),
+        fileSystem: fs,
+        workspaceRoot: ROOT,
+        base: "main",
+      }),
+    ).toThrow(/Failed to verify PR context artifact/u);
+  });
+
+  it("raises naming the appendix when the summary write succeeds and the appendix write fails", () => {
+    // Arrange: only the appendix write discards, so the summary verifies.
+    const appendixPath = `${ROOT}/artifacts/pr_context.appendix.txt`;
+    const fs = seedInto(
+      new DiscardingFileSystem((path) => path === appendixPath),
+    );
+
+    // Act / Assert: the raised message names the appendix artifact path.
+    expect(() =>
+      collectPrContextServiceCall({
+        runner: new ScriptRunner(),
+        fileSystem: fs,
+        workspaceRoot: ROOT,
+        base: "main",
+      }),
+    ).toThrow(appendixPath);
+  });
+
+  it("writes both artifacts and succeeds when the GitHub CLI is unavailable", () => {
+    // Arrange: the scripted runner already reports gh as failing, which is the
+    // GitHub-CLI-unavailable degradation path.
+    const fs = seedWorkspace();
+
+    // Act
+    const result = collectPrContextServiceCall({
+      runner: new ScriptRunner(),
+      fileSystem: fs,
+      workspaceRoot: ROOT,
+      base: "main",
+    });
+
+    // Assert: degradation is not failure. Both artifacts are written and the
+    // call returns successfully.
+    expect(result.tool).toBe("collect_pr_context");
+    expect([...fs.writtenPaths].sort()).toEqual(SORTED_WORKSPACE_JOINED_PAIR);
+    expect(
+      fs.readTextFile(`${ROOT}/artifacts/pr_context.summary.txt`),
+    ).toContain("GitHub CLI unavailable");
   });
 
   it("forwards log lines to the injected sink", () => {
