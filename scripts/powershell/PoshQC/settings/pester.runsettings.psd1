@@ -133,6 +133,10 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
@@ -204,6 +208,10 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
