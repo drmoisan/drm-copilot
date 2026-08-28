@@ -49,7 +49,8 @@ function buildFileSystem(discardWrites: boolean): WriteRecordingFileSystem {
       exists: (path: string) => path.replace(/\\/g, "/").endsWith("/.git"),
       isDirectory: () => false,
       listDirectory: () => [],
-      readTextFile: (path: string) => writes.get(path.replace(/\\/g, "/")) ?? "",
+      readTextFile: (path: string) =>
+        writes.get(path.replace(/\\/g, "/")) ?? "",
       writeTextFile: (path: string, content: string) => {
         const key = path.replace(/\\/g, "/");
         attempted.set(key, content);

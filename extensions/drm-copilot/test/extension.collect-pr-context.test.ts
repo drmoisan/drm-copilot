@@ -410,16 +410,12 @@ describe("drm-copilot collectPrContext command behavior", () => {
     const logs = appendLineMock.mock.calls.map(([line]) => line);
     expect(
       logs.some((line) =>
-        line.includes(
-          `Wrote context summary to: ${WORKSPACE_SUMMARY_PATH}`,
-        ),
+        line.includes(`Wrote context summary to: ${WORKSPACE_SUMMARY_PATH}`),
       ),
     ).toBe(true);
     expect(
       logs.some((line) =>
-        line.includes(
-          `Wrote context appendix to: ${WORKSPACE_APPENDIX_PATH}`,
-        ),
+        line.includes(`Wrote context appendix to: ${WORKSPACE_APPENDIX_PATH}`),
       ),
     ).toBe(true);
   });

@@ -354,7 +354,8 @@ export function appendGenerationTimestamp(
 ): string {
   const now = clock();
   const timestamp = formatUtcTimestamp(now);
-  const shaText = headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_PLACEHOLDER;
+  const shaText =
+    headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_PLACEHOLDER;
   return (
     section(GENERATED_CONTEXT_SECTION_TITLE) +
     "\n" +
