@@ -276,16 +276,16 @@ Both tasks in this phase add an assertion that the current code cannot satisfy, 
 
 ### Phase 6 — Consumer Documentation Across the Six Skill Copies
 
-- [ ] [P6-T1] Document the two-step freshness cross-check in the three self-hosted skill copies.
+- [x] [P6-T1] Document the two-step freshness cross-check in the three self-hosted skill copies.
   - Edit `.claude/skills/pr-context-artifacts/SKILL.md`, `.github/skills/pr-context-artifacts/SKILL.md`, and `.agents/skills/pr-context-artifacts/SKILL.md` so each gains, inside its refresh rule, a level-3 heading whose text is Freshness Cross-Check, stating the two-step check: pair identity, meaning the generated-context timestamp is byte-identical in the summary and the appendix; and head binding, meaning the head SHA recorded in both files equals the current head of the branch under review. The section states explicitly that file existence and file modification time are not freshness signals.
   - Acceptance: all three files carry the heading and both steps, and the wording added is identical across the three copies.
 
-- [ ] [P6-T2] Mirror the same edit byte-identically into the three bundled skill copies.
+- [x] [P6-T2] Mirror the same edit byte-identically into the three bundled skill copies.
   - Edit `extensions/drm-copilot/resources/claude-customizations/.claude/skills/pr-context-artifacts/SKILL.md`, `extensions/drm-copilot/resources/customizations/.github/skills/pr-context-artifacts/SKILL.md`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/pr-context-artifacts/SKILL.md` so each bundled copy is byte-identical to its self-hosted counterpart after the P6-T1 edit.
   - Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`.
   - Acceptance: the command above runs, and `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/push-down-parity.TIMESTAMP.md` records `Timestamp:`, `Command:`, the observed `EXIT_CODE:`, and an `Output Summary:` carrying the passed and failed counts, the node ID of every failed test, and the assertion message of every failed test. The task passes when the run exits 0, or when it exits 1 and satisfies every condition of the bounded exemption stated at the head of this plan, in which case the artifact also carries `ExpectedExitCode: 1`.
 
-- [ ] [P6-T3] Prove all six copies carry the cross-check.
+- [x] [P6-T3] Prove all six copies carry the cross-check.
   - Run `git grep -F -l "Freshness Cross-Check" -- .claude/skills/pr-context-artifacts/SKILL.md .github/skills/pr-context-artifacts/SKILL.md .agents/skills/pr-context-artifacts/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/pr-context-artifacts/SKILL.md extensions/drm-copilot/resources/customizations/.github/skills/pr-context-artifacts/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/pr-context-artifacts/SKILL.md`.
   - Acceptance: `docs/features/active/2026-08-28-collect-pr-context-reports-ok-without-writing-574/evidence/qa-gates/skill-copies-cross-check.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` listing exactly six paths, one per copy.
 
