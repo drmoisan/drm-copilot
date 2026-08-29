@@ -30,6 +30,8 @@ move each child checkpoint out of preparation mode.
 | 597 | docs/features/active/2026-08-29-caller-site-invocation-correctness-597 | 1 | C2 | docs/features/active/2026-08-29-caller-site-invocation-correctness-597/plan.2026-08-29T16-05.md |
 | 599 | docs/features/active/2026-08-29-remove-remaining-python-invocations-599 | 2 | C3 | docs/features/active/2026-08-29-remove-remaining-python-invocations-599/plan.2026-08-29T16-06.md |
 
+## Plan validation
+
 Every plan passed `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "plan"`, verified independently by the epic planner after fan-in, not only by the
 child that authored it.
