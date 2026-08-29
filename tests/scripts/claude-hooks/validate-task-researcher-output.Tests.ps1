@@ -277,5 +277,80 @@ Describe 'validate-task-researcher-output.ps1' {
             # Assert
             $value | Should -Be 'docs/research/2026-05-04T00-00-foo-research.md'
         }
+
+        It 'returns null for a whitespace-only markdown-link path' {
+            $value = Get-ResearchPathFromOutput -AgentOutput '[research-path](   )'
+
+            $value | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'numeric derivation evidence' {
+        It 'accepts research without a numeric spec criterion' {
+            $result = Test-NumericDerivationEvidence -Content '## Research Notes'
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'blocks a numeric spec claim without numeric derivation evidence' {
+            $result = Test-NumericDerivationEvidence -Content '- Numeric spec.md acceptance criterion: 8 reflection call sites'
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'Numeric Derivation Evidence'
+        }
+
+        It 'blocks an incomplete family record and missing inclusion rules' {
+            $content = @'
+- Numeric spec.md acceptance criterion: 8 reflection call sites
+## Numeric Derivation Evidence
+- Family:
+- Exclusion Rules: generated calls
+- Member Set: A, B
+- Primary Count: 8
+- Cross-check Count: 8
+'@
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'Family|Inclusion Rules'
+        }
+
+        It 'blocks disagreeing independent cross-check counts' {
+            $content = @'
+- Numeric spec.md acceptance criterion: 8 reflection call sites
+## Numeric Derivation Evidence
+- Family: GetMethod, GetField, GetProperty
+- Inclusion Rules: variable arguments only
+- Exclusion Rules: generated calls
+- Member Set: A, B, C, D, E, F, G, H
+- Primary Count: 8
+- Cross-check Count: 7
+'@
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'disagree'
+        }
+
+        It 'accepts a complete matching dual derivation' {
+            $content = @'
+- Numeric spec.md acceptance criterion: 8 reflection call sites
+## Numeric Derivation Evidence
+- Family: GetMethod, GetField, GetProperty
+- Inclusion Rules: variable arguments only
+- Exclusion Rules: generated calls
+- Member Set: A, B, C, D, E, F, G, H
+- Primary Count: 8
+- Cross-check Count: 8
+'@
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
     }
 }

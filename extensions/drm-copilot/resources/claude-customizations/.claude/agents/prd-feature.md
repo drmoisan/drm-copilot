@@ -16,6 +16,8 @@ hooks:
       hooks:
         - type: command
           command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName prd-feature -RequiredArtifact 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact' -RequiredArtifact 'user-story-path|^docs/features/active/.+/user-story\.md$|feature user story artifact'
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1
 ---
 
 # PRD Feature Agent
@@ -27,12 +29,15 @@ Produce feature-document outputs for the active feature folder.
 - `docs/features/active/<feature>/spec.md`
 - `docs/features/active/<feature>/user-story.md`
 
+When an approved `spec.md` acceptance criterion contains a numeric count, enumeration, or population, require the supplied research record to include complete `## Numeric Derivation Evidence`: `Family`, `Inclusion Rules`, `Exclusion Rules`, `Member Set`, `Primary Count`, and an independently constructed agreeing `Cross-check Count`. Omit the numeric assertion when the record is absent, incomplete, or disagrees.
+
 ## Output Reporting
 
 Report the final artifact paths as:
 
 - `spec-path: docs/features/active/<feature>/spec.md`
 - `user-story-path: docs/features/active/<feature>/user-story.md`
+- `research-path: docs/features/active/<feature>/research/<timestamp>-<short-name>-research.md` when numeric acceptance criteria are present
 
 ## Evidence Location Invariant
 

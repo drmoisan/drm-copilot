@@ -155,6 +155,10 @@ Declaration requirement. Every plan handoff MUST carry exactly one of these two 
 
 ## Preflight Validation (Planner ↔ Executor)
 
+## Planner Adversarial Self-Review (Mandatory)
+
+Before executor preflight, the planner must record `PLANNER-INTERNAL-REVIEW:` with passing results for citation-to-tree verification, acceptance-criterion-to-implementation traceability, and scope-boundary consistency. Re-derive citations against the current tree, enumerate the citations reviewed, map each acceptance criterion to implementation, tests, and evidence, and resolve gaps before handoff. If any dimension is absent or blocked, emit `SELF-REVIEW: BLOCKED` and do not hand the plan to preflight. `SELF-REVIEW: RE-DERIVED THIS PASS` remains a distinct declaration and does not replace executor clearance.
+
 When validating or handing off plans for execution:
 - Use the directive line: `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.
 - Require one of the exact signals:

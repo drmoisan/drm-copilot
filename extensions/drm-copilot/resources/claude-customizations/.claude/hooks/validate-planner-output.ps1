@@ -110,6 +110,15 @@ function Test-HasPreflightSignal {
     )
 }
 
+function Test-HasPlannerInternalReview {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory = $true)][string] $AgentOutput)
+
+    $required = @('PLANNER-INTERNAL-REVIEW:', 'citation-to-tree', 'acceptance-criterion-to-implementation', 'scope-boundary')
+    return (@($required | Where-Object { $AgentOutput -notmatch [regex]::Escape($_) }).Count -eq 0)
+}
+
 function Get-PlanStructureValidationReport {
     [CmdletBinding()]
     [OutputType([string[]])]
@@ -270,6 +279,10 @@ function Invoke-PlannerOutputValidation {
     if ($errors.Count -gt 0) {
         $message = "atomic-planner hook: plan '$planPath' violates the atomic plan contract:`n  - " + ($errors -join "`n  - ")
         return @{ Ok = $false; Message = $message }
+    }
+
+    if (-not (Test-HasPlannerInternalReview -AgentOutput $agentOutput)) {
+        return @{ Ok = $false; Message = 'atomic-planner hook: planner output must include the three-dimensional PLANNER-INTERNAL-REVIEW with citation enumeration and traceability.' }
     }
 
     return @{ Ok = $true; Message = $null }

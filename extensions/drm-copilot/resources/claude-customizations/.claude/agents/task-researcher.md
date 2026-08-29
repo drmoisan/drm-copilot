@@ -64,6 +64,7 @@ The orchestrator resolves which root to use from whether an active feature folde
 ### 4. Requirements Mapping
 
 - Map acceptance criteria into a concrete design with proposed state model, transitions, and required file changes.
+- Before a numeric count, enumeration, or population can be proposed for an approved `spec.md` acceptance criterion, add a `## Numeric Derivation Evidence` section. For each numeric claim, record `Family`, `Inclusion Rules`, `Exclusion Rules`, `Member Set`, `Primary Count`, and an independently constructed `Cross-check Count` that agrees. A single grep or named-pattern search is insufficient.
 
 ### 5. Testing Implications
 
@@ -75,6 +76,7 @@ The orchestrator resolves which root to use from whether an active feature folde
 - Ground all findings in verified evidence.
 - Keep discussion of non-selected approaches brief.
 - Do not claim nested worker delegation.
+- Do not present a numeric `spec.md` acceptance criterion when the required numeric derivation evidence is absent, incomplete, or has disagreeing counts.
 
 ## Evidence Location Invariant
 

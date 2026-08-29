@@ -53,6 +53,7 @@
     ".claude/hooks/validate-feature-review-coverage.ps1",
     ".claude/hooks/validate-orchestrator-output.ps1",
     ".claude/hooks/validate-planner-output.ps1",
+    ".claude/hooks/validate-prd-feature-output.ps1",
     ".claude/hooks/validate-required-artifact-output.ps1",
     ".claude/hooks/validate-task-researcher-output.ps1",
     ".claude/rules/architecture-boundaries.md",

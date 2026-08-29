@@ -91,12 +91,29 @@ Describe 'validate-planner-output.ps1' {
             $file.Exists | Should -BeTrue
             $file.Lines.Count | Should -BeGreaterThan 0
         }
+
+        It 'normalizes null and scalar content to line arrays' {
+            Mock -CommandName Test-Path -MockWith { $true }
+            Mock -CommandName Get-Content -MockWith { $null }
+
+            $nullContent = Get-PlanFileContent -Path 'null-content.md'
+
+            $nullContent.Exists | Should -BeTrue
+            $nullContent.Lines.Count | Should -Be 0
+
+            Mock -CommandName Get-Content -MockWith { 'single line' }
+
+            $scalarContent = Get-PlanFileContent -Path 'scalar-content.md'
+
+            $scalarContent.Exists | Should -BeTrue
+            $scalarContent.Lines | Should -Be @('single line')
+        }
     }
 
     Context 'plan structure validation' {
         It 'blocks when the advertised plan-path does not exist on disk' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -116,7 +133,7 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -178,7 +195,7 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -272,6 +289,20 @@ Describe 'validate-planner-output.ps1' {
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
 
             ($errors -match 'QA or toolchain validation').Count | Should -BeGreaterThan 0
+        }
+    }
+
+    Context 'planner internal review' {
+        It 'blocks each missing review dimension while preserving valid path and preflight data' {
+            foreach ($missing in @('citation-to-tree', 'acceptance-criterion-to-implementation', 'scope-boundary')) {
+                $output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR"
+                $result = Test-HasPlannerInternalReview -AgentOutput ($output -replace [regex]::Escape($missing), '')
+                $result | Should -BeFalse
+            }
+        }
+
+        It 'accepts a complete three-dimensional declaration' {
+            Test-HasPlannerInternalReview -AgentOutput 'PLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary' | Should -BeTrue
         }
     }
 }

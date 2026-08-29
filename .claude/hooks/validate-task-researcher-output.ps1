@@ -161,6 +161,41 @@ function Test-AutomationFeasibilitySection {
     return @{ Ok = $true; Message = $null }
 }
 
+function Test-NumericDerivationEvidence {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Content
+    )
+
+    $numericClaimPattern = '(?im)^\s*[-*]\s*Numeric\s+spec\.md\s+acceptance\s+criterion:\s*.*\b\d+\b'
+    if (-not [regex]::IsMatch($Content, $numericClaimPattern)) {
+        return @{ Ok = $true; Message = $null }
+    }
+
+    $section = [regex]::Match($Content, '(?ims)^##\s+Numeric\s+Derivation\s+Evidence\s*$.*?(?=^##\s|\z)')
+    if (-not $section.Success) {
+        return @{ Ok = $false; Message = 'task-researcher hook: numeric spec.md acceptance criterion is missing ## Numeric Derivation Evidence.' }
+    }
+
+    $requiredLabels = @('Family', 'Inclusion Rules', 'Exclusion Rules', 'Member Set', 'Primary Count', 'Cross-check Count')
+    foreach ($label in $requiredLabels) {
+        if (-not [regex]::IsMatch($section.Value, "(?im)^\s*[-*]?\s*$([regex]::Escape($label))\s*:\s*\S")) {
+            return @{ Ok = $false; Message = "task-researcher hook: numeric derivation evidence is missing $label." }
+        }
+    }
+
+    $primary = [regex]::Match($section.Value, '(?im)^\s*[-*]?\s*Primary Count\s*:\s*(?<count>\d+)\s*$')
+    $crossCheck = [regex]::Match($section.Value, '(?im)^\s*[-*]?\s*Cross-check Count\s*:\s*(?<count>\d+)\s*$')
+    if ($primary.Groups['count'].Value -ne $crossCheck.Groups['count'].Value) {
+        return @{ Ok = $false; Message = 'task-researcher hook: numeric derivation primary and independent cross-check counts disagree.' }
+    }
+
+    return @{ Ok = $true; Message = $null }
+}
+
 function Invoke-TaskResearcherOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -209,6 +244,13 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
 
+    if (Test-Path -LiteralPath $researchPath -PathType Leaf) {
+        $numericEvidenceResult = Test-NumericDerivationEvidence -Content (Get-Content -LiteralPath $researchPath -Raw -ErrorAction Stop)
+        if (-not $numericEvidenceResult.Ok) {
+            return $numericEvidenceResult
+        }
+    }
+
     return @{ Ok = $true; Message = $null }
 }
 
@@ -223,4 +265,3 @@ if (-not $result.Ok) {
 }
 
 exit 0
-

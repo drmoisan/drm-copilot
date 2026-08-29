@@ -57,6 +57,8 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 
 ## Preflight Validation
 
+Before handing the plan to executor preflight, return `PLANNER-INTERNAL-REVIEW:` with citation-to-tree verification, acceptance-criterion-to-implementation traceability, and scope-boundary consistency results, re-derived citations, acceptance-criterion mappings, and unresolved gaps. A missing or blocked dimension requires `SELF-REVIEW: BLOCKED` and stops handoff.
+
 Return the finalized plan for validation-only preflight through `atomic-executor` and preserve the same target file path across revision loops. Do not claim nested worker delegation from within planner execution.
 
 ## Output

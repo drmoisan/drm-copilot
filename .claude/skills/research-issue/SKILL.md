@@ -55,6 +55,7 @@ Create or update a single research file at one of the two tracked research roots
 
 - Map acceptance criteria into a concrete design.
 - Propose state model, transitions, internal API boundaries, and required file changes.
+- For every numeric count, enumeration, or population proposed for an approved `spec.md` acceptance criterion, add `## Numeric Derivation Evidence`. Each record must identify `Family`, `Inclusion Rules`, `Exclusion Rules`, `Member Set`, `Primary Count`, and an independently constructed `Cross-check Count` that agrees. Do not derive a spec number from a single grep or a narrower named pattern.
 
 ### 5. Testing Implications
 
@@ -67,3 +68,4 @@ Create or update a single research file at one of the two tracked research roots
 - Ground all findings in verified evidence from the codebase and authoritative external sources.
 - Keep discussion of non-selected approaches brief.
 - Do not claim or perform nested worker delegation.
+- Omit numeric acceptance-criterion facts when the numeric derivation record is absent, incomplete, or disagrees.
