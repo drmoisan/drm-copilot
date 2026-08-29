@@ -102,10 +102,57 @@ def test_planner_review_contract_requires_all_three_dimensions() -> None:
     remediation = read(".claude/skills/remediation-handoff-atomic-planner/SKILL.md")
 
     for text in (contract, planner, hook):
-        assert "citation-to-tree" in text
-        assert "acceptance-criterion-to-implementation" in text
-        assert "scope-boundary" in text
+        assert "CITATION-TO-TREE" in text
+        assert "AC-TRACEABILITY" in text
+        assert "SCOPE-BOUNDARY" in text
     assert "preflight.iterations > 1" in remediation
+
+
+def test_planner_review_record_contract_is_parseable_and_scoped() -> None:
+    """Require matching static record contracts without duplicating Pester behavior."""
+
+    contract = read(".claude/skills/atomic-plan-contract/SKILL.md")
+    planner = read(".claude/agents/atomic-planner.md")
+    hook = read(".claude/hooks/validate-planner-output.ps1")
+    pester = read("tests/scripts/claude-hooks/validate-planner-output.Tests.ps1")
+
+    schema_tokens = (
+        "PLANNER-INTERNAL-REVIEW: PASS",
+        "CITATION-TO-TREE",
+        "AC-TRACEABILITY",
+        "SCOPE-BOUNDARY",
+        "CITATION",
+        "AC-INVENTORY",
+        "AC-MAPPING",
+        "IMPLEMENTATION",
+        "TESTS",
+        "EVIDENCE",
+        "UNRESOLVED-GAPS",
+    )
+    for text in (contract, planner, hook):
+        for token in schema_tokens:
+            assert token in text
+
+    for token in ("IMPLEMENTATION\\s*:", "TESTS\\s*:", "EVIDENCE\\s*:"):
+        assert token in hook
+    assert "UNRESOLVED-GAPS\\s*:\\s*NONE" in hook
+
+    assert "Get-PlannerInternalReviewValidation" in hook
+    assert "## Planner Adversarial Self-Review (Mandatory)" in contract
+    assert "### Planner Internal Review Record" in contract
+    assert "Review the entire plan in one pass" in contract
+    assert "CONVERGENCE:" not in hook
+
+    fixture_tokens = (
+        "accepts both preflight signals",
+        "duplicate review record fixture",
+        "duplicate unresolved-gap fixture",
+        "duplicate inventory-ID fixture",
+        "review label before bounded record fixture",
+        "review label after bounded record fixture",
+    )
+    for token in fixture_tokens:
+        assert token in pester
 
 
 def test_generated_document_counter_requires_named_section_boundaries() -> None:

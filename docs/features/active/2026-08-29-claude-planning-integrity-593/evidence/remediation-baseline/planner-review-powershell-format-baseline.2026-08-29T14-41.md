@@ -12,3 +12,10 @@ Effective inventory inclusion:
 - `tests/scripts/claude-hooks/validate-planner-output.Tests.ps1`: included
 
 `config/poshqc-scan.json` lists `tests/powershell`, which does not exist. The explicit full-root `.` scan is the executable superset used for this gate.
+
+Restart after P0-T5
+
+Timestamp: 2026-08-29T21:54:38.320Z to 2026-08-29T21:54:45.211Z
+Command: `mcp__drm-copilot__run_poshqc_format(workspace_root: C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-29T11-55, scan_folders: ['.'])`; independent full-root PoshQC inventory command.
+EXIT_CODE: 0
+Output Summary: Restarted bundled format returned non-error `ok: true`; inventory contained 428 files and all three required hook/test paths. The explicit `.` scan remains the executable full-root superset because `tests/powershell` is absent.

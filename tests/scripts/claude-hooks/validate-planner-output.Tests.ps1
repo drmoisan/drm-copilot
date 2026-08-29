@@ -7,6 +7,23 @@
 BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'
     . $hookPath
+
+    function Get-ValidPlannerReviewRecord {
+        param([string] $Preflight = 'ALL CLEAR')
+
+        @"
+PLANNER-INTERNAL-REVIEW: PASS
+CITATION-TO-TREE: PASS
+CITATION: .claude/hooks/validate-planner-output.ps1 | planner review parser
+AC-TRACEABILITY: PASS
+AC-INVENTORY: AC1, AC2
+AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 | EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md
+AC-MAPPING: AC2 | IMPLEMENTATION: .claude/agents/atomic-planner.md | TESTS: tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py | EVIDENCE: docs/features/active/foo/evidence/qa-gates/contracts.md
+SCOPE-BOUNDARY: PASS
+UNRESOLVED-GAPS: NONE
+PREFLIGHT: $Preflight
+"@.Trim()
+    }
 }
 
 Describe 'validate-planner-output.ps1' {
@@ -113,7 +130,7 @@ Describe 'validate-planner-output.ps1' {
     Context 'plan structure validation' {
         It 'blocks when the advertised plan-path does not exist on disk' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -133,7 +150,7 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -154,7 +171,8 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: REVISIONS REQUIRED" } | ConvertTo-Json -Compress
+            # Intentional structural negative: review validation is masked by the malformed task path.
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight 'REVISIONS REQUIRED')" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -172,7 +190,8 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            # Intentional structural negative: review validation is masked by the malformed phase heading.
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -195,7 +214,7 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -RawPayload $raw
 
@@ -293,16 +312,71 @@ Describe 'validate-planner-output.ps1' {
     }
 
     Context 'planner internal review' {
-        It 'blocks each missing review dimension while preserving valid path and preflight data' {
-            foreach ($missing in @('citation-to-tree', 'acceptance-criterion-to-implementation', 'scope-boundary')) {
-                $output = "plan-path: docs/features/active/foo/plan.md`nPLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary`nPREFLIGHT: ALL CLEAR"
-                $result = Test-HasPlannerInternalReview -AgentOutput ($output -replace [regex]::Escape($missing), '')
-                $result | Should -BeFalse
+        It 'accepts both preflight signals, multiple citations and mappings, and unrelated prose' {
+            Mock -CommandName Get-PlanFileContent -MockWith {
+                @{
+                    Exists = $true
+                    Lines  = @(
+                        "### Phase 0 `u{2014} Baseline",
+                        '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
+                        "### Phase 1 `u{2014} QA",
+                        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                    )
+                }
+            }
+            foreach ($signal in @('ALL CLEAR', 'REVISIONS REQUIRED')) {
+                $output = "Unrelated prose.`nplan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight $signal)`nMore unrelated prose."
+                $result = Invoke-PlannerOutputValidation -RawPayload (@{ output = $output } | ConvertTo-Json -Compress)
+
+                $result.Ok | Should -BeTrue
             }
         }
 
-        It 'accepts a complete three-dimensional declaration' {
-            Test-HasPlannerInternalReview -AgentOutput 'PLANNER-INTERNAL-REVIEW: citation-to-tree; acceptance-criterion-to-implementation; scope-boundary' | Should -BeTrue
+        It 'rejects every malformed planner internal review fixture' {
+            $valid = Get-ValidPlannerReviewRecord
+            $dimensions = @('CITATION-TO-TREE', 'AC-TRACEABILITY', 'SCOPE-BOUNDARY')
+            $cases = @(
+                @{ Name = 'no record fixture'; Text = 'PREFLIGHT: ALL CLEAR' },
+                @{ Name = 'label-only record fixture'; Text = 'PLANNER-INTERNAL-REVIEW: citation-to-tree; ac-traceability; scope-boundary`nPREFLIGHT: ALL CLEAR' },
+                @{ Name = 'blank review record fixture'; Text = $valid -replace 'PLANNER-INTERNAL-REVIEW: PASS', 'PLANNER-INTERNAL-REVIEW: ' },
+                @{ Name = 'failed review record fixture'; Text = $valid -replace 'PLANNER-INTERNAL-REVIEW: PASS', 'PLANNER-INTERNAL-REVIEW: FAILED' },
+                @{ Name = 'duplicate review record fixture'; Text = "PLANNER-INTERNAL-REVIEW: PASS`n$valid" },
+                @{ Name = 'no citation fixture'; Text = $valid -replace '(?m)^CITATION:.*\r?\n', '' },
+                @{ Name = 'citation path fixture'; Text = $valid -replace 'CITATION: .claude/hooks/validate-planner-output.ps1', 'CITATION: C:\\invalid.ps1' },
+                @{ Name = 'citation locator fixture'; Text = $valid -replace ' \| planner review parser', ' | ' },
+                @{ Name = 'no inventory fixture'; Text = $valid -replace '(?m)^AC-INVENTORY:.*\r?\n', '' },
+                @{ Name = 'blank inventory fixture'; Text = $valid -replace 'AC-INVENTORY: AC1, AC2', 'AC-INVENTORY: ' },
+                @{ Name = 'duplicate inventory-ID fixture'; Text = $valid -replace 'AC-INVENTORY: AC1, AC2', 'AC-INVENTORY: AC1, AC1' },
+                @{ Name = 'duplicate inventory declaration fixture'; Text = $valid -replace 'AC-INVENTORY: AC1, AC2', "AC-INVENTORY: AC1, AC2`nAC-INVENTORY: AC1, AC2" },
+                @{ Name = 'no mapping fixture'; Text = $valid -replace '(?m)^AC-MAPPING:.*\r?\n', '' },
+                @{ Name = 'blank mapping fixture'; Text = $valid -replace 'AC-MAPPING: AC1 \| IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 \| TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 \| EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md', 'AC-MAPPING: ' },
+                @{ Name = 'blank mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC1 \|', 'AC-MAPPING:  |' },
+                @{ Name = 'blank implementation fixture'; Text = $valid -replace 'IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1', 'IMPLEMENTATION: ' },
+                @{ Name = 'blank tests fixture'; Text = $valid -replace 'TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1', 'TESTS: ' },
+                @{ Name = 'blank evidence fixture'; Text = $valid -replace 'EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md', 'EVIDENCE: ' },
+                @{ Name = 'duplicate mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC2', 'AC-MAPPING: AC1' },
+                @{ Name = 'missing mapping ID fixture'; Text = $valid -replace '(?m)^AC-MAPPING: AC2.*\r?\n', '' },
+                @{ Name = 'extra mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC2', 'AC-MAPPING: AC3' },
+                @{ Name = 'missing unresolved-gap fixture'; Text = $valid -replace '(?m)^UNRESOLVED-GAPS:.*\r?\n', '' },
+                @{ Name = 'blank unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', 'UNRESOLVED-GAPS: ' },
+                @{ Name = 'failed unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', 'UNRESOLVED-GAPS: BLOCKED' },
+                @{ Name = 'duplicate unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', "UNRESOLVED-GAPS: NONE`nUNRESOLVED-GAPS: NONE" },
+                @{ Name = 'review label before bounded record fixture'; Text = "CITATION: docs/features/active/foo/plan.md | outside`n$valid" },
+                @{ Name = 'review label after bounded record fixture'; Text = "$valid`nAC-INVENTORY: AC1" }
+            )
+            foreach ($dimension in $dimensions) {
+                $cases += @(
+                    @{ Name = "missing $dimension fixture"; Text = $valid -replace "(?m)^${dimension}:.*\r?\n", '' },
+                    @{ Name = "blank $dimension fixture"; Text = $valid -replace "${dimension}: PASS", "${dimension}: " },
+                    @{ Name = "duplicate $dimension fixture"; Text = $valid -replace "${dimension}: PASS", "${dimension}: PASS`n${dimension}: PASS" },
+                    @{ Name = "failed $dimension fixture"; Text = $valid -replace "${dimension}: PASS", "${dimension}: BLOCKED" }
+                )
+            }
+            foreach ($case in $cases) {
+                $result = Get-PlannerInternalReviewValidation -AgentOutput $case.Text
+
+                $result.Ok | Should -BeFalse -Because $case.Name
+            }
         }
     }
 }
