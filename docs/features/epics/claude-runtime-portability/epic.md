@@ -2,16 +2,16 @@
 epic: claude-runtime-portability
 integration_branch: epic/claude-runtime-portability-integration
 created_at: 2026-08-29T15:07:00Z
-# PLACEHOLDER MANIFEST. The issue_num values 901-904 are placeholders assigned at
-# authoring time because no child issue exists yet. Each is back-filled with the real
-# GitHub issue number from that child's promotion receipt as preparation completes, and
-# the manifest is committed in resolved form before the kickoff artifact is written.
-# depends_on uses issue_num values (the canonical primary-key form).
+# RESOLVED MANIFEST. issue_num values are the real GitHub issue numbers returned by each
+# child's promotion receipt, back-filled on 2026-08-29 over the authoring-time placeholders
+# 901-904. feature_folder values are the concrete active-folder basenames under
+# docs/features/active/. depends_on uses issue_num values (the canonical primary-key form).
+# The DAG is cycle-free and every depends_on entry resolves.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: The .claude/** runtime payload ships to consumer repositories that guarantee no Python interpreter, no Poetry, and no scripts/dev_tools tree. Removing the remaining executable Python invocations from that payload, and correcting the PowerShell calling conventions its callers use, makes every mandatory step of the parallel and epic orchestration surfaces executable on a destination runtime rather than silently unavailable there.
   leading_indicators:
-    - No file under .claude/** contains an executable python or poetry invocation that a mandatory procedure step depends on.
+    - Of the five infrastructure-class executable Python invocation sites under .claude/**, the three in scope (epic-orchestrate/SKILL.md, parallel-orchestrate/SKILL.md validator, parallel-plan/SKILL.md lane assertion) no longer require an interpreter. Two remain by explicit design and are named non-goals: the drift-detection CLI and the mutation-abandon CLI, both of which are gate-coupled and cannot be replaced without co-designing their hooks. This indicator was narrowed on 2026-08-29; its earlier absolute form would not have held on delivery.
     - The lane-assertion diagnostic runs to completion on a destination runtime with no Python interpreter present.
     - A fresh clone of a consumer repository that received a push-down contains no tracked batch-budget session-state file.
   nfrs:
@@ -19,18 +19,18 @@ intent:
     - The PowerShell/bash lane-assertion port produces output identical to scripts/dev_tools/parallel_lane_assertion.py over a shared parity corpus.
     - Every edit to a .claude/** file is mirrored byte-identically into extensions/drm-copilot/resources/claude-customizations/.claude/**, as enforced by tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py.
 features:
-  - issue_num: 901
-    feature_folder: blast-radius-powershell-calling-convention
+  - issue_num: 598
+    feature_folder: 2026-08-29-blast-radius-powershell-calling-convention-598
     depends_on: []
-  - issue_num: 902
-    feature_folder: batch-budget-state-portability
+  - issue_num: 596
+    feature_folder: 2026-08-29-batch-budget-state-portability-596
     depends_on: []
-  - issue_num: 903
-    feature_folder: caller-site-invocation-correctness
-    depends_on: [901]
-  - issue_num: 904
-    feature_folder: remove-remaining-python-invocations
-    depends_on: [903]
+  - issue_num: 597
+    feature_folder: 2026-08-29-caller-site-invocation-correctness-597
+    depends_on: [598]
+  - issue_num: 599
+    feature_folder: 2026-08-29-remove-remaining-python-invocations-599
+    depends_on: [597]
 ---
 
 # Epic: Claude Runtime Portability
@@ -50,12 +50,12 @@ Computed by longest-path layering over the dependency DAG per the `epic-orchestr
 
 | wave | features |
 | --- | --- |
-| 0 | 901 (Feature A), 902 (Feature B) |
-| 1 | 903 (Feature C) |
-| 2 | 904 (Feature D) |
+| 0 | 598 (Feature A), 596 (Feature B) |
+| 1 | 597 (Feature C) |
+| 2 | 599 (Feature D) |
 
-`wave(901) = 0` and `wave(902) = 0` (empty `depends_on`); `wave(903) = 1 + wave(901) = 1`;
-`wave(904) = 1 + wave(903) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
+`wave(598) = 0` and `wave(596) = 0` (empty `depends_on`); `wave(597) = 1 + wave(598) = 1`;
+`wave(599) = 1 + wave(597) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
 
 Waves 1 and 2 are serialized because Feature C and Feature D both rewrite
 `.claude/skills/parallel-plan/SKILL.md` — C at its `Import-Module` call site, D at its
@@ -77,7 +77,7 @@ so that no child feature rediscovers it during execution.
 
 ## Decomposition Rationale and Per-Feature Scope
 
-### Feature A (901, wave 0, C3) — Blast-radius PowerShell calling-convention hardening
+### Feature A (issue 598, wave 0, C3) — Blast-radius PowerShell calling-convention hardening
 
 Establishes the fail-fast import convention for the shared `.claude/lib/**` modules and corrects the
 JSON date-coercion hazard at the parse sites that actually exist.
@@ -113,7 +113,7 @@ Verified scope inputs:
 checkpoint parse site alters a value contract consumed across module boundaries, and adding a
 fail-fast preference to shared library modules changes error propagation for every caller.
 
-### Feature B (902, wave 0, C3) — Batch-budget state portability
+### Feature B (issue 596, wave 0, C3) — Batch-budget state portability
 
 Verified scope inputs:
 
@@ -144,7 +144,7 @@ Verified scope inputs:
 destination-side ignore-file obligation) and `concurrency_or_ordering` (the shared-counter defect is
 a session-state collision).
 
-### Feature C (903, wave 1, C2) — Caller-site invocation correctness
+### Feature C (issue 597, wave 1, C2) — Caller-site invocation correctness
 
 Depends on Feature A because these call sites must reflect the import convention A establishes.
 
@@ -180,7 +180,7 @@ out of scope.
 **Complexity C2.** These are localized prose corrections to agent and skill instruction files with no
 new logic, bounded to three files plus their three bundle mirrors.
 
-### Feature D (904, wave 2, C3) — Remove remaining Python invocations
+### Feature D (issue 599, wave 2, C3) — Remove remaining Python invocations
 
 Depends on Feature C because both rewrite `.claude/skills/parallel-plan/SKILL.md`.
 
