@@ -159,6 +159,24 @@ Each is corrected to use `pwsh`, a root-anchored module path, `-ErrorAction Stop
 `.psm1` is blocked under the default PS5.1 policy, so `pwsh` is mandatory — is documented at each of
 the three sites.
 
+**Known incomplete enumeration (recorded 2026-08-29, after Feature C was prepared).** An exhaustive
+re-derivation over the full family of module-load spellings (`Import-Module`, `using module`, `ipmo`,
+`-Name`, and bare `.psm1` path references) found a **fourth** site of the identical defect class that
+Feature C does not cover: `.claude/skills/mermaid-diagram/SKILL.md:28`, which reads
+`Import-Module ./.claude/lib/mermaid/MermaidValidation.psm1 -Force` — a relative path with no `pwsh`
+qualifier and no `-ErrorAction Stop`, plus a byte-identical bundle mirror at the same line.
+
+Feature C's own count of three is not wrong for what its acceptance criteria enumerate: they are
+scoped specifically to the `BlastRadius.psm1` relative-import instruction text. The mermaid site
+loads a different module and therefore falls outside that wording. It is nonetheless the same bug,
+and it is currently addressed by no feature in this epic. It requires an explicit disposition —
+either an amendment to Feature C's scope or a separate follow-up issue — before the epic is
+considered to have closed the relative-import defect class.
+
+For completeness: all 33 `Import-Module` call sites inside `.ps1`/`.psm1` files use
+`$PSScriptRoot`-anchored `Join-Path` forms. Those are working-directory independent and are correctly
+out of scope.
+
 **Complexity C2.** These are localized prose corrections to agent and skill instruction files with no
 new logic, bounded to three files plus their three bundle mirrors.
 
@@ -166,16 +184,33 @@ new logic, bounded to three files plus their three bundle mirrors.
 
 Depends on Feature C because both rewrite `.claude/skills/parallel-plan/SKILL.md`.
 
-Verified scope inputs. There are exactly four executable Python invocation sites under `.claude/**`,
-but they are distributed differently than the epic intake stated and are not equal in cost.
-`parallel-plan/SKILL.md` contains **one** such site, not two:
+Verified scope inputs. There are **five** infrastructure-class executable Python invocation sites
+under `.claude/**`, not the four the epic intake stated, and they are distributed differently than it
+claimed. `parallel-plan/SKILL.md` contains **one** such site, not two.
+
+This table was corrected on 2026-08-29 after an exhaustive re-derivation using the full family of
+Python invocation spellings (`python`, `python3`, `py -3`, `poetry run`, `python -m`, `uv run`,
+`pipx`, and fenced-block `scripts/dev_tools` references) cross-checked by two independently
+constructed searches. The original four-site table came from a single-pass search and both
+under-counted and mis-cited.
 
 | # | site | fix |
 | --- | --- | --- |
 | 1 | `.claude/skills/epic-orchestrate/SKILL.md:296` | Trivial. The MCP form is already offered alongside it; delete the CLI spelling. |
 | 2 | `.claude/skills/parallel-orchestrate/SKILL.md:482` | Trivial. Already introduced as "or the equivalent CLI invocation"; delete the alternative. |
 | 3 | `.claude/skills/parallel-orchestrate/SKILL.md:817` | `parallel_drift_detection_cli`. **Non-goal — see below.** |
-| 4 | `.claude/skills/parallel-plan/SKILL.md:317` | `parallel_lane_assertion`. Requires the new port. |
+| 4 | `.claude/skills/parallel-plan/SKILL.md:315` | `parallel_lane_assertion`. Requires the new port. Note the line is 315, not the 317 originally cited; the earlier figure was derived from a branch carrying unmerged commits. |
+| 5 | `.claude/skills/parallel-remove/SKILL.md:112` | `parallel_mutation_abandon_cli`. **Newly identified.** A fenced `bash` block introduced by the words "the single deterministic CLI invocation below and through nothing else" — a mandatory, hook-gated procedure step of the same infrastructure class as site 3. Requires an explicit disposition before Feature D can be considered complete. |
+
+Each of the five has a byte-identical bundle mirror that must receive the same edit.
+
+A separate class of Python invocation exists under `.claude/**` and is deliberately excluded: the
+`poetry run black|ruff|pyright|pytest` toolchain commands in `.claude/rules/python.md:13-16`,
+`.claude/skills/python-qa-gate/SKILL.md:30-33`, and
+`.claude/skills/feature-review-workflow/SKILL.md:108`. Those run only when Python source is being
+edited and are not an infrastructure dependency of the harness itself. Feature D's acceptance
+criteria must state this exclusion explicitly, because the literal phrase "executable Python
+invocations under `.claude/**`" does not exclude them on its own.
 
 **The lane-assertion problem is not the rule contradiction the intake described.**
 `.claude/rules/parallel-orchestration.md` (invariant M8) and `.claude/skills/parallel-plan/SKILL.md`
