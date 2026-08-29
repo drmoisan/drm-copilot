@@ -2,6 +2,32 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-prd-feature-output.ps1')
+
+    function Get-CompleteNumericDerivationEvidence {
+        param(
+            [string] $PrimaryStrategy = "rg '(GetMethod|GetField)\\(' entire repository",
+            [string] $CrossCheckStrategy = 'AST traversal of GetMethod and GetField across entire repository',
+            [string] $PrimaryMembers = 'A, B',
+            [string] $CrossCheckMembers = 'A, B',
+            [int] $PrimaryCount = 2,
+            [int] $CrossCheckCount = 2
+        )
+
+        return @"
+## Numeric Derivation Evidence
+- Complete Family: GetMethod, GetField
+- Exhaustive Search Scope: entire repository source tree
+- Inclusion Rules: variable arguments only
+- Exclusion Rules: generated calls
+- Primary Search Strategy or Query Expression: $PrimaryStrategy
+- Primary Member Set: $PrimaryMembers
+- Primary Count: $PrimaryCount
+- Cross-check Search Strategy or Query Expression: $CrossCheckStrategy
+- Cross-check Member Set: $CrossCheckMembers
+- Cross-check Count: $CrossCheckCount
+- Member-set Comparison: normalized sets match
+"@
+    }
 }
 
 Describe 'validate-prd-feature-output.ps1' {
@@ -31,15 +57,7 @@ Describe 'validate-prd-feature-output.ps1' {
     }
 
     It 'rejects a research record whose independent cross-check disagrees' {
-        $content = @'
-## Numeric Derivation Evidence
-- Family: GetMethod, GetField
-- Inclusion Rules: variable arguments
-- Exclusion Rules: generated calls
-- Member Set: A, B
-- Primary Count: 2
-- Cross-check Count: 3
-'@
+        $content = Get-CompleteNumericDerivationEvidence -CrossCheckMembers 'A, B, C' -CrossCheckCount 3
 
         $result = Test-NumericDerivationEvidence -Content $content
 
@@ -47,16 +65,8 @@ Describe 'validate-prd-feature-output.ps1' {
         $result.Message | Should -Match 'disagree'
     }
 
-    It 'accepts a complete matching research record' {
-        $content = @'
-## Numeric Derivation Evidence
-- Family: GetMethod, GetField
-- Inclusion Rules: variable arguments
-- Exclusion Rules: generated calls
-- Member Set: A, B
-- Primary Count: 2
-- Cross-check Count: 2
-'@
+    It 'accepts an independently exhaustive complete-family research record' {
+        $content = Get-CompleteNumericDerivationEvidence
 
         $result = Test-NumericDerivationEvidence -Content $content
 
@@ -92,7 +102,7 @@ Describe 'validate-prd-feature-output.ps1' {
     }
 
     It 'accepts matching numeric provenance and extracts artifact labels' {
-        $complete = "## Numeric Derivation Evidence`n- Family: GetMethod`n- Inclusion Rules: all`n- Exclusion Rules: none`n- Member Set: A`n- Primary Count: 1`n- Cross-check Count: 1"
+        $complete = Get-CompleteNumericDerivationEvidence
         Mock Test-Path { $true }
         Mock Get-Content { param($LiteralPath) if ($LiteralPath -eq 'numeric.md') { "## Acceptance Criteria`n- [ ] 1 call" } else { $complete } }
 
@@ -101,21 +111,25 @@ Describe 'validate-prd-feature-output.ps1' {
     }
 
     It 'rejects every missing numeric-evidence field and a missing section' {
-        $fields = @('Family', 'Inclusion Rules', 'Exclusion Rules', 'Member Set', 'Primary Count', 'Cross-check Count')
+        $fields = @('Complete Family', 'Exhaustive Search Scope', 'Inclusion Rules', 'Exclusion Rules', 'Primary Search Strategy or Query Expression', 'Primary Member Set', 'Primary Count', 'Cross-check Search Strategy or Query Expression', 'Cross-check Member Set', 'Cross-check Count', 'Member-set Comparison')
         foreach ($field in $fields) {
-            $content = @(
-                '## Numeric Derivation Evidence',
-                '- Family: GetMethod',
-                '- Inclusion Rules: all',
-                '- Exclusion Rules: none',
-                '- Member Set: A',
-                '- Primary Count: 1',
-                '- Cross-check Count: 1'
-            ) | Where-Object { $_ -notmatch "^- $([regex]::Escape($field)):" }
+            $content = (Get-CompleteNumericDerivationEvidence) -replace "- $([regex]::Escape($field)): .+", "- $($field):"
 
-            (Test-NumericDerivationEvidence -Content ($content -join [Environment]::NewLine)).Ok | Should -BeFalse
+            (Test-NumericDerivationEvidence -Content $content).Ok | Should -BeFalse
         }
 
         (Test-NumericDerivationEvidence -Content '## Other Evidence').Ok | Should -BeFalse
+    }
+
+    It 'rejects copied-count, duplicate-search, member-set, scope, and narrow-pattern records' {
+        $copiedCount = Get-CompleteNumericDerivationEvidence -CrossCheckCount 3
+        $duplicateSearch = Get-CompleteNumericDerivationEvidence -CrossCheckStrategy "rg '(GetMethod|GetField)\\(' entire repository"
+        $memberMismatch = Get-CompleteNumericDerivationEvidence -CrossCheckMembers 'A, C'
+        $scopeMissing = (Get-CompleteNumericDerivationEvidence) -replace '- Exhaustive Search Scope: .+', '- Exhaustive Search Scope: focused directory'
+        $narrowSearch = Get-CompleteNumericDerivationEvidence -PrimaryStrategy 'narrow named-pattern GetMethod('
+
+        foreach ($content in @($copiedCount, $duplicateSearch, $memberMismatch, $scopeMissing, $narrowSearch)) {
+            (Test-NumericDerivationEvidence -Content $content).Ok | Should -BeFalse
+        }
     }
 }

@@ -26,16 +26,35 @@ function Test-NumericDerivationEvidence {
 
     $section = [regex]::Match($Content, '(?ims)^##\s+Numeric\s+Derivation\s+Evidence\s*$.*?(?=^##\s|\z)')
     if (-not $section.Success) { return @{ Ok = $false; Message = 'prd-feature hook: numeric criterion requires ## Numeric Derivation Evidence.' } }
-    foreach ($label in @('Family', 'Inclusion Rules', 'Exclusion Rules', 'Member Set', 'Primary Count', 'Cross-check Count')) {
-        if (-not [regex]::IsMatch($section.Value, "(?im)^\s*[-*]?\s*$([regex]::Escape($label))\s*:\s*\S")) {
-            return @{ Ok = $false; Message = "prd-feature hook: numeric derivation evidence is missing $label." }
-        }
+    $requiredLabels = @(
+        'Complete Family', 'Exhaustive Search Scope', 'Inclusion Rules', 'Exclusion Rules',
+        'Primary Search Strategy or Query Expression', 'Primary Member Set', 'Primary Count',
+        'Cross-check Search Strategy or Query Expression', 'Cross-check Member Set', 'Cross-check Count',
+        'Member-set Comparison'
+    )
+    $values = @{}
+    foreach ($label in $requiredLabels) {
+        $match = [regex]::Match($section.Value, "(?im)^[\t ]*[-*]?[\t ]*$([regex]::Escape($label))[\t ]*:[\t ]*(?<value>\S(?:.*\S)?)[\t ]*$")
+        if (-not $match.Success) { return @{ Ok = $false; Message = "prd-feature hook: numeric derivation evidence is missing $label." } }
+        $values[$label] = $match.Groups['value'].Value.Trim()
     }
-    $primary = [regex]::Match($section.Value, '(?im)^\s*[-*]?\s*Primary Count\s*:\s*(?<count>\d+)\s*$')
-    $crossCheck = [regex]::Match($section.Value, '(?im)^\s*[-*]?\s*Cross-check Count\s*:\s*(?<count>\d+)\s*$')
-    if ($primary.Groups['count'].Value -ne $crossCheck.Groups['count'].Value) {
-        return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation primary and independent cross-check counts disagree.' }
+    if ($values['Exhaustive Search Scope'] -notmatch '(?i)\b(entire|all|complete)\b.*\b(repository|repo|source tree|tree)\b') { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation evidence does not declare an exhaustive repository search scope.' } }
+    $primaryStrategy = $values['Primary Search Strategy or Query Expression']
+    $crossCheckStrategy = $values['Cross-check Search Strategy or Query Expression']
+    if ($primaryStrategy -match '(?i)\b(single|narrow|named[- ]?pattern)\b' -or $crossCheckStrategy -match '(?i)\b(single|narrow|named[- ]?pattern)\b') { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation evidence uses a narrow named-pattern search.' } }
+    if ([regex]::Replace($primaryStrategy, '\s+', '').ToLowerInvariant() -eq [regex]::Replace($crossCheckStrategy, '\s+', '').ToLowerInvariant()) { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation cross-check repeats the primary search strategy or query expression.' } }
+    $familyMembers = @($values['Complete Family'].Split(',') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    foreach ($familyMember in $familyMembers) {
+        if ($primaryStrategy -notmatch [regex]::Escape($familyMember) -or $crossCheckStrategy -notmatch [regex]::Escape($familyMember)) { return @{ Ok = $false; Message = "prd-feature hook: numeric derivation search does not cover complete family member '$familyMember'." } }
     }
+    if ($values['Primary Count'] -notmatch '^\d+$' -or $values['Cross-check Count'] -notmatch '^\d+$') { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation counts must be numeric.' } }
+    $primaryMembers = @($values['Primary Member Set'].Split(',') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $crossCheckMembers = @($values['Cross-check Member Set'].Split(',') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    if ([int]$values['Primary Count'] -ne $primaryMembers.Count -or [int]$values['Cross-check Count'] -ne $crossCheckMembers.Count) { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation count does not match its independently enumerated member set.' } }
+    $normalizedPrimaryMembers = @($primaryMembers | ForEach-Object { $_.ToLowerInvariant() } | Sort-Object -Unique) -join '|'
+    $normalizedCrossCheckMembers = @($crossCheckMembers | ForEach-Object { $_.ToLowerInvariant() } | Sort-Object -Unique) -join '|'
+    if ($normalizedPrimaryMembers -ne $normalizedCrossCheckMembers) { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation primary and cross-check member sets disagree.' } }
+    if ($values['Member-set Comparison'] -notmatch '(?i)\b(equal|match|identical)\b') { return @{ Ok = $false; Message = 'prd-feature hook: numeric derivation evidence is missing an explicit member-set comparison.' } }
     return @{ Ok = $true; Message = $null }
 }
 

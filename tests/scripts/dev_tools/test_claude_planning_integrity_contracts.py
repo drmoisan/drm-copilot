@@ -30,13 +30,27 @@ def test_numeric_provenance_contract_requires_full_family_and_cross_check() -> N
         prd_hook,
     ):
         assert "Numeric Derivation Evidence" in text
-        assert "Family" in text
+        assert "Complete Family" in text
+        assert "Exhaustive Search Scope" in text
         assert "Inclusion Rules" in text
         assert "Exclusion Rules" in text
-        assert "Member Set" in text
+        assert "Primary Search Strategy or Query Expression" in text
+        assert "Cross-check Search Strategy or Query Expression" in text
+        assert "Primary Member Set" in text
+        assert "Cross-check Member Set" in text
+        assert "Member-set Comparison" in text
+        assert "Primary Count" in text
         assert "Cross-check Count" in text
 
     assert "single grep" in researcher
+    assert "narrow named-pattern" in research_hook
+    assert "narrow named-pattern" in prd_hook
+    assert "repeats the primary search strategy or query expression" in research_hook
+    assert "repeats the primary search strategy or query expression" in prd_hook
+    assert (
+        "count does not match its independently enumerated member set" in research_hook
+    )
+    assert "count does not match its independently enumerated member set" in prd_hook
     assert "numeric acceptance criterion requires an existing research-path" in prd_hook
 
 

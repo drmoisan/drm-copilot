@@ -64,7 +64,8 @@ The orchestrator resolves which root to use from whether an active feature folde
 ### 4. Requirements Mapping
 
 - Map acceptance criteria into a concrete design with proposed state model, transitions, and required file changes.
-- Before a numeric count, enumeration, or population can be proposed for an approved `spec.md` acceptance criterion, add a `## Numeric Derivation Evidence` section. For each numeric claim, record `Family`, `Inclusion Rules`, `Exclusion Rules`, `Member Set`, `Primary Count`, and an independently constructed `Cross-check Count` that agrees. A single grep or named-pattern search is insufficient.
+- Before a numeric count, enumeration, or population can be proposed for an approved `spec.md` acceptance criterion, add a complete `## Numeric Derivation Evidence` section. For each numeric claim, record `Complete Family`, `Exhaustive Search Scope`, `Inclusion Rules`, `Exclusion Rules`, `Primary Search Strategy or Query Expression`, `Primary Member Set`, `Primary Count`, `Cross-check Search Strategy or Query Expression`, `Cross-check Member Set`, `Cross-check Count`, and `Member-set Comparison`.
+- The primary and cross-check records must both be non-empty, independently enumerate their member sets, and name distinct search strategies or query expressions. The exhaustive scope must cover the complete family, including every relevant overload or member; a single grep or query that matches only one named pattern in the declared family is insufficient even if it yields the same count. Explicitly compare the normalized primary and cross-check member sets before proposing the numeric assertion. Withhold the assertion if either record is missing, incomplete, duplicated, non-exhaustive, narrow, or disagrees.
 
 ### 5. Testing Implications
 

@@ -29,7 +29,7 @@ Produce feature-document outputs for the active feature folder.
 - `docs/features/active/<feature>/spec.md`
 - `docs/features/active/<feature>/user-story.md`
 
-When an approved `spec.md` acceptance criterion contains a numeric count, enumeration, or population, require the supplied research record to include complete `## Numeric Derivation Evidence`: `Family`, `Inclusion Rules`, `Exclusion Rules`, `Member Set`, `Primary Count`, and an independently constructed agreeing `Cross-check Count`. Omit the numeric assertion when the record is absent, incomplete, or disagrees.
+When an approved `spec.md` acceptance criterion contains a numeric count, enumeration, or population, require the supplied research record to include complete `## Numeric Derivation Evidence`: `Complete Family`, `Exhaustive Search Scope`, `Inclusion Rules`, `Exclusion Rules`, `Primary Search Strategy or Query Expression`, `Primary Member Set`, `Primary Count`, `Cross-check Search Strategy or Query Expression`, `Cross-check Member Set`, `Cross-check Count`, and `Member-set Comparison`. The two derivations must be non-empty, independently constructed, use distinct search strategies or query expressions, independently enumerate member sets, and explicitly compare those sets. The exhaustive scope must cover the complete family, including all relevant overloads and members. Omit the numeric assertion when the record is missing, repeated, incomplete, non-exhaustive, narrow, or disagrees; equal totals, distinct query text, or equal member sets alone are insufficient.
 
 ## Output Reporting
 
