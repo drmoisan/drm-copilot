@@ -192,7 +192,12 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
     It 'leaves no Codex batch-budget state behind' {
         # Convention C4: every payload above targets README.md or a read-only
         # command, so the batch-budget entrypoints must never write state.
-        Test-Path -LiteralPath (Join-Path $script:RepoRoot '.codex/state') |
-            Should -BeFalse -Because 'benign payloads must not create batch-budget state'
+        $syntheticPythonState = Join-Path $script:RepoRoot '.codex/state/python-batch-budget.native-hook-contract.json'
+        $syntheticPowerShellState = Join-Path $script:RepoRoot '.codex/state/powershell-batch-budget.native-hook-contract.json'
+
+        Test-Path -LiteralPath $syntheticPythonState |
+            Should -BeFalse -Because 'benign payloads must not create Python batch-budget state for the synthetic session'
+        Test-Path -LiteralPath $syntheticPowerShellState |
+            Should -BeFalse -Because 'benign payloads must not create PowerShell batch-budget state for the synthetic session'
     }
 }
