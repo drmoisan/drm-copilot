@@ -1318,7 +1318,7 @@ Constraint 1.
 The loop below runs in the order format, lint, type-check, test for each language. If any step fails
 or rewrites a file, restart that language's loop at its format step.
 
-- [ ] [P6-T1] Run the bash format step:
+- [x] [P6-T1] Run the bash format step:
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record it in `evidence/qa-gates/final-bash-format.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
@@ -1339,25 +1339,25 @@ or rewrites a file, restart that language's loop at its format step.
     run produces identical digests but does not re-mirror the file the first run rewrote, and the
     mirror guard is a byte comparison.
 
-- [ ] [P6-T2] Run the bash lint step:
+- [x] [P6-T2] Run the bash lint step:
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/qa-gates/final-bash-check.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty output.
 
-- [ ] [P6-T3] Confirm both new files are inside the shell-QC discovery set by running
+- [x] [P6-T3] Confirm both new files are inside the shell-QC discovery set by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | grep -c -F -e .claude/lib/bash/parallel-lane-assertion.sh -e .claude/lib/bash/report-lane-assertion.sh'`
       and record it in `evidence/qa-gates/bash-discovery.<timestamp>.md`.
   - Acceptance: the command prints `2` and exits 0. `discover_shell_scripts`
     (`scripts/bash/shell_qc_lib.sh:75-102`) emits root-relative paths, so both new files appear with
     the spellings asserted here.
 
-- [ ] [P6-T4] Run the bash coverage step:
+- [x] [P6-T4] Run the bash coverage step:
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/qa-gates/final-bash-coverage.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, 0 bats failures, and an `Output Summary:` recording the numeric
     headline `Bash coverage (lines): NN.N%` with `NN.N` at least 85.0.
 
-- [ ] [P6-T5] Extract the per-file coverage rows for the two new bash files by running
+- [x] [P6-T5] Extract the per-file coverage rows for the two new bash files by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && grep -n -F -e parallel-lane-assertion.sh -e report-lane-assertion.sh artifacts/pester/kcov/cov.xml'`
       and record every matching line verbatim in
       `evidence/qa-gates/bash-new-file-coverage.<timestamp>.md`.
@@ -1376,7 +1376,7 @@ or rewrites a file, restart that language's loop at its format step.
     pattern is the three directory roots `tools`, `scripts`, and `.claude/lib/bash` (`:335`), so no
     per-file exclusion mechanism exists on the bash path.
 
-- [ ] [P6-T6] Run the Python format step: `poetry run black .` from the worktree root, preceded and
+- [x] [P6-T6] Run the Python format step: `poetry run black .` from the worktree root, preceded and
       followed by `git status --porcelain`, and record it in
       `evidence/qa-gates/final-python-black.<timestamp>.md`.
   - Acceptance, all three clauses: `EXIT_CODE: 0`; the artifact records the two
@@ -1394,7 +1394,7 @@ or rewrites a file, restart that language's loop at its format step.
     whether or not black rewrote it. The listing identity clause is retained as supplementary
     context; the `reformatted ` absence is the load-bearing observation.
 
-- [ ] [P6-T7] Run the Python lint step: `poetry run ruff check .` from the worktree root, and record
+- [x] [P6-T7] Run the Python lint step: `poetry run ruff check .` from the worktree root, and record
       it in `evidence/qa-gates/final-python-ruff.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and a recorded stdout of exactly `All checks passed!`, which is the
     success-case output observed on this worktree against the clean tree before planning.
@@ -1405,11 +1405,11 @@ or rewrites a file, restart that language's loop at its format step.
     task and is not a defect. The `All checks passed!` line is recorded alongside the exit code so
     the acceptance does not rest on the exit code alone.
 
-- [ ] [P6-T8] Run the Python type-check step: `poetry run pyright` from the worktree root, and record
+- [x] [P6-T8] Run the Python type-check step: `poetry run pyright` from the worktree root, and record
       it in `evidence/qa-gates/final-python-pyright.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, and the artifact reproduces the run's summary line verbatim.
 
-- [ ] [P6-T9] Run the Python coverage step:
+- [x] [P6-T9] Run the Python coverage step:
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py tests/scripts/dev_tools/test_parallel_lane_assertion.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py --cov=scripts.dev_tools.parallel_lane_assertion --cov-report=term-missing -p no:cacheprovider`
       and record it in `evidence/qa-gates/final-python-coverage.<timestamp>.md`.
   - Acceptance, part 1 (unconditional): the pytest pass count is recorded, and the numeric percentage
@@ -1438,7 +1438,7 @@ or rewrites a file, restart that language's loop at its format step.
     `black` does not remove the state file, and deleting the file is not a remedy because it
     regenerates the next time the hook fires within the session.
 
-- [ ] [P6-T10] Run the TypeScript format step from `extensions/drm-copilot` as two recorded
+- [x] [P6-T10] Run the TypeScript format step from `extensions/drm-copilot` as two recorded
       commands, in this order: first `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"`,
       then `npm run format`. Record both commands and their full output in
       `evidence/qa-gates/final-ts-format.<timestamp>.md`.
@@ -1457,12 +1457,12 @@ or rewrites a file, restart that language's loop at its format step.
     `prettier --write` rewrites it. The listing is identical on a clean run and on a repairing run
     for exactly the files at risk.
 
-- [ ] [P6-T11] Run the TypeScript lint and type-check steps: `npm run lint` then `npm run typecheck`
+- [x] [P6-T11] Run the TypeScript lint and type-check steps: `npm run lint` then `npm run typecheck`
       from `extensions/drm-copilot`, and record both in
       `evidence/qa-gates/final-ts-lint-typecheck.<timestamp>.md`.
   - Acceptance: both `EXIT_CODE:` values are 0.
 
-- [ ] [P6-T12] Run the TypeScript coverage step: `npm run test:coverage` from
+- [x] [P6-T12] Run the TypeScript coverage step: `npm run test:coverage` from
       `extensions/drm-copilot`, and record it in
       `evidence/qa-gates/final-ts-coverage.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the Jest `Tests:` line recorded verbatim with 0 failed, and the four
@@ -1479,7 +1479,7 @@ or rewrites a file, restart that language's loop at its format step.
     no-overlap confirmation. Matching the baseline exit code alone is not sufficient, because this
     feature edits two TypeScript test files (P4-T6 and P4-T7) and could itself be the cause.
 
-- [ ] [P6-T13] Run the PowerShell regression check:
+- [x] [P6-T13] Run the PowerShell regression check:
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 -CI"`
       from the worktree root, and record it in
       `evidence/qa-gates/final-powershell-no-python-invocation.<timestamp>.md`.
@@ -1491,7 +1491,7 @@ or rewrites a file, restart that language's loop at its format step.
     (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1:65-66`), so the
     two new bash files are outside its guarded tree.
 
-- [ ] [P6-T14] Write the coverage delta artifact
+- [x] [P6-T14] Write the coverage delta artifact
       `evidence/other/coverage-delta.<timestamp>.md`, reporting for each in-scope language the
       baseline value, the post-change value, and the new-code value.
   - Acceptance: the artifact records, for bash, the P0-T3 baseline percentage, the P6-T4 post-change
@@ -1513,7 +1513,7 @@ or rewrites a file, restart that language's loop at its format step.
   - Any decrease in any of the three language comparisons — bash, Python, or TypeScript — is a
     blocking finding.
 
-- [ ] [P6-T15] Verify the non-goals are untouched by running
+- [x] [P6-T15] Verify the non-goals are untouched by running
       `git diff --stat origin/main...HEAD -- .claude/rules/parallel-orchestration.md .claude/skills/parallel-remove/SKILL.md .claude/hooks/enforce-discovery-artifact-gate.ps1 .claude/hooks/validate-discovery-artifact-gate.ps1`
       together with
       `git status --porcelain -- .claude/rules .claude/skills/parallel-remove .claude/hooks`,
@@ -1523,13 +1523,13 @@ or rewrites a file, restart that language's loop at its format step.
     The status companion is required because a name-listing or stat diff against a ref cannot observe
     an untracked or unstaged edit.
 
-- [ ] [P6-T16] Verify that no file under `.claude/lib/bash/` other than the entry point sources the
+- [x] [P6-T16] Verify that no file under `.claude/lib/bash/` other than the entry point sources the
       diagnostic, and that the diagnostic feeds no scheduling module, by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
       and record it in `evidence/qa-gates/no-production-consumer.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` with 0 failures.
 
-- [ ] [P6-T17] Reconcile every acceptance criterion in `spec.md` and `user-story.md` against the
+- [x] [P6-T17] Reconcile every acceptance criterion in `spec.md` and `user-story.md` against the
       evidence artifacts produced by this plan, record the mapping in
       `evidence/qa-gates/acceptance-criteria-reconciliation.<timestamp>.md`, **and check off the
       satisfied criteria in the source documents themselves** by changing `- [ ]` to `- [x]` on the
@@ -1613,7 +1613,7 @@ or rewrites a file, restart that language's loop at its format step.
       quotes for the two inner single-quoted arguments and escape the `$` in the awk range pattern as
       `\$` so bash leaves it literal for awk.
 
-- [ ] [P6-T18] Record the epic-owner action for the Known Residual in
+- [x] [P6-T18] Record the epic-owner action for the Known Residual in
       `evidence/other/known-residual.<timestamp>.md`: the epic manifest's broad leading indicator at
       manifest line 14 is not fully satisfied after this feature lands, because non-goals 1 and 2
       remain by deliberate decision, while the narrow indicator at manifest line 15 is fully
@@ -1622,7 +1622,7 @@ or rewrites a file, restart that language's loop at its format step.
     action is a manifest rewording owned by the epic owner, and states that no implementation change
     is made here.
 
-- [ ] [P6-T19] Verify the 500-line file cap over **all five files this feature creates** by running
+- [x] [P6-T19] Verify the 500-line file cap over **all five files this feature creates** by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh tests/shell/parallel_lane_assertion.bats tests/shell/parallel_lane_assertion_parity.bats tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py'`
       and recording every output line verbatim, including the `total` line, in
       `evidence/qa-gates/new-file-sizes.<timestamp>.md`.
