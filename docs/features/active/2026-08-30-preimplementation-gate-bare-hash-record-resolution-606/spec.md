@@ -132,11 +132,11 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] `Find-OrchestrationDelegationIssueNumber` returns `644` for `Issue number: 644` while preserving case-insensitive parsing, existing underscore/hyphen keyed forms, optional `#`, colon/equal separators, and bare-hash fallback.
-- [ ] `Find-OrchestrationModeRecord` searches all normalized `feature_folder` records before issue-number fallback, so a later exact-folder record is selected over an earlier issue-only record; if no folder matches, it returns the first matching issue record.
-- [ ] The focused Pester suite tests mixed prose with bare `#638` and records ordered with an earlier issue-only terminal sibling before a later exact-folder non-terminal sibling in both epic `features` and parallel `items` readiness paths.
-- [ ] The root and bundled `enforce-orchestration-preimplementation-gate-modes.ps1` hook copies are raw-byte identical, and the existing Claude resource parity test passes.
-- [ ] The gate retains the established `PREIMPLEMENTATION_GATE_BLOCKED` diagnostic prefix and predicate-based error contract; resolution details are not appended to the error.
+- [x] `Find-OrchestrationDelegationIssueNumber` returns `644` for `Issue number: 644` while preserving case-insensitive parsing, existing underscore/hyphen keyed forms, optional `#`, colon/equal separators, and bare-hash fallback.
+- [x] `Find-OrchestrationModeRecord` searches all normalized `feature_folder` records before issue-number fallback, so a later exact-folder record is selected over an earlier issue-only record; if no folder matches, it returns the first matching issue record.
+- [x] The focused Pester suite tests mixed prose with bare `#638` and records ordered with an earlier issue-only terminal sibling before a later exact-folder non-terminal sibling in both epic `features` and parallel `items` readiness paths.
+- [x] The root and bundled `enforce-orchestration-preimplementation-gate-modes.ps1` hook copies are raw-byte identical, and the existing Claude resource parity test passes.
+- [x] The gate retains the established `PREIMPLEMENTATION_GATE_BLOCKED` diagnostic prefix and predicate-based error contract; resolution details are not appended to the error.
 
 ## Risks & Mitigations
 - Technical or operational risks: Broadening the parser could inadvertently alter existing capture behavior; changing selection order could remove valid fallback; updating only one hook copy would violate resource publication parity; changing denial text could break downstream reason matching.
