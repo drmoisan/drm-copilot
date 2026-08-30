@@ -744,7 +744,7 @@ Defect 4 — destination-side ignore delivery:
       from the fake filesystem's recorded writes for the second publish.
 - [x] A passing Jest test seeds a destination `.gitignore` containing unrelated entries and asserts
       every one of those lines is present and in its original relative order after the publish.
-- [ ] `extensions/drm-copilot/jest.config.cjs` contains a `coverageThreshold` entry for
+- [x] `extensions/drm-copilot/jest.config.cjs` contains a `coverageThreshold` entry for
       `./src/lib/push-down/claude-gitignore-merge.ts` with `lines: 85` and `branches: 75`, and
       `npx jest --coverage` run from `extensions/drm-copilot` passes with that entry present.
 

@@ -43,7 +43,8 @@ export const CLAUDE_GITIGNORE_BEGIN_SENTINEL =
   "# BEGIN drm-copilot managed ignores";
 
 /** Line that closes the drm-copilot managed ignore block. */
-export const CLAUDE_GITIGNORE_END_SENTINEL = "# END drm-copilot managed ignores";
+export const CLAUDE_GITIGNORE_END_SENTINEL =
+  "# END drm-copilot managed ignores";
 
 /**
  * Ignore entries the push-down manages, in the order they are emitted.
