@@ -86,7 +86,7 @@ function Test-PythonBatchBudgetPathInRoot {
         return $true
     }
 
-    return $normalizedPath.StartsWith($normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase)
+    return ([string]::Equals($normalizedPath, $normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase) -or $normalizedPath.StartsWith($normalizedRoot + '/', [System.StringComparison]::OrdinalIgnoreCase))
 }
 
 function ConvertTo-PythonBatchBudgetSafeSegment {

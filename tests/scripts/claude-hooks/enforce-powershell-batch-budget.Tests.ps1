@@ -427,6 +427,28 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             $script:budgetDecisions[2].state.prodFiles | Should -Not -Contain $script:OutOfRootFixture
             $script:budgetDecisions[2].state.prodFiles | Should -Contain 'scripts/three.ps1'
         }
+
+        It 'discards an absolute candidate path in a sibling directory whose name extends the root' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath '/repo-sibling/scripts/tool.ps1' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'admits a candidate path that is exactly the resolved root' {
+            (Test-PowerShellBatchBudgetPathInRoot -Path '/repo' -Root '/repo') | Should -BeTrue
+        }
+
+        It 'falls through to the worktree-derived id when the session-id file is unreadable' {
+            $env:CLAUDE_SESSION_ID = ''
+            $resolved = Get-PowerShellBatchBudgetSessionId -SessionId '' -Root '/repo' -SessionIdFilePath '/repo/.claude/state/current-session-id' -ReadSessionIdFile { param([string] $Path) [void] $Path; throw 'unreadable session-id file' }
+
+            $resolved | Should -Match '^worktree-repo-[0-9a-f]{8}$'
+        }
     }
 
     Context 'entry-point dispatch' {

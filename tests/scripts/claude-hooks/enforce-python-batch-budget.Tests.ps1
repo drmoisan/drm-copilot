@@ -417,6 +417,28 @@ Describe 'enforce-python-batch-budget.ps1' {
             $script:budgetDecisions[2].state.prodFiles | Should -Not -Contain $script:OutOfRootFixture
             $script:budgetDecisions[2].state.prodFiles | Should -Contain 'src/three.py'
         }
+
+        It 'discards an absolute candidate path in a sibling directory whose name extends the root' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath '/repo-sibling/src/app.py' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'admits a candidate path that is exactly the resolved root' {
+            (Test-PythonBatchBudgetPathInRoot -Path '/repo' -Root '/repo') | Should -BeTrue
+        }
+
+        It 'falls through to the worktree-derived id when the session-id file is unreadable' {
+            $env:CLAUDE_SESSION_ID = ''
+            $resolved = Get-PythonBatchBudgetSessionId -SessionId '' -Root '/repo' -SessionIdFilePath '/repo/.claude/state/current-session-id' -ReadSessionIdFile { param([string] $Path) [void] $Path; throw 'unreadable session-id file' }
+
+            $resolved | Should -Match '^worktree-repo-[0-9a-f]{8}$'
+        }
     }
 
     Context 'entry-point dispatch' {
