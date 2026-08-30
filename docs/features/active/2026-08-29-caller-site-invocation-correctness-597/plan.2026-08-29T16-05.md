@@ -245,7 +245,7 @@ seven-stage mandatory toolchain loop in `.claude/rules/general-code-change.md` h
 stage here beyond the two targeted regression commands below. This IS the final QC gate for this
 feature.
 
-- [ ] [P3-T1] Run the bundle-parity pytest node:
+- [x] [P3-T1] Run the bundle-parity pytest node:
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts -v`.
       This node ID is a real, nameable test confirmed present in
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py:101`. No `--cov` argument
@@ -255,7 +255,7 @@ feature.
       pass/fail count line (e.g. "1 passed").
       Acceptance: `EXIT_CODE: 0` and `Output Summary:` reports `1 passed`.
 
-- [ ] [P3-T2] Run the existing PowerShell regression pair for the `$result['conflict']` truthiness
+- [x] [P3-T2] Run the existing PowerShell regression pair for the `$result['conflict']` truthiness
       hazard:
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1"`.
       This is the correct invocation form for this feature: the repo's established PowerShell
