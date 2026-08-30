@@ -13,6 +13,19 @@
     persisted under .claude/state/python-batch-budget.<session_id>.json. Only distinct
     file paths are counted; repeated edits to the same file consume one slot.
 
+    The session id is resolved from the first non-empty of: the CLAUDE_SESSION_ID
+    environment variable; the contents of <root>/.claude/state/current-session-id;
+    a worktree-derived identifier built from the root's leaf name and a short
+    stable hash of its normalized path. The resolved value is sanitized before it
+    is composed into a file name, so a hostile id cannot escape the state
+    directory. Resolving the id never creates the state directory.
+
+    Candidate paths are contained to the resolved root. A candidate that resolves
+    outside it is discarded: the decision is 'allow', no slot is consumed, and no
+    state is written. Persisted entries that fail the same containment test are
+    dropped when state is rehydrated, so a state file carried between worktrees
+    cannot spend this worktree's budget.
+
     Test files are those matching:
       - tests/**/*.py
       - test_*.py
@@ -36,6 +49,127 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+
+function Test-PythonBatchBudgetPathInRoot {
+    <#
+    .SYNOPSIS
+        Reports whether a candidate path belongs to the batch-budget root.
+    .DESCRIPTION
+        Compares forward-slash-normalized forms of the candidate and the root,
+        case-insensitively. A relative candidate carries no root of its own and is
+        admitted, which is what keeps a relative path recorded by one worktree from
+        being treated as foreign by another.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Path,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Root
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return $false
+    }
+
+    $normalizedPath = $Path -replace '\\', '/'
+    if ($normalizedPath -notmatch '^(/|[A-Za-z]:/)') {
+        return $true
+    }
+
+    $normalizedRoot = ($Root -replace '\\', '/').TrimEnd('/')
+    if ([string]::IsNullOrWhiteSpace($normalizedRoot)) {
+        return $true
+    }
+
+    return ([string]::Equals($normalizedPath, $normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase) -or $normalizedPath.StartsWith($normalizedRoot + '/', [System.StringComparison]::OrdinalIgnoreCase))
+}
+
+function ConvertTo-PythonBatchBudgetSafeSegment {
+    <#
+    .SYNOPSIS
+        Reduces a session id to characters that are safe in a file name.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Value
+    )
+
+    return ($Value -replace '[^A-Za-z0-9._-]', '_')
+}
+
+function Get-PythonBatchBudgetSessionId {
+    <#
+    .SYNOPSIS
+        Resolves the session id used to compose the batch-budget state-file name.
+    .DESCRIPTION
+        Returns the first non-empty of: the explicit SessionId argument; the
+        CLAUDE_SESSION_ID environment variable; the contents of the session-id state
+        file; a worktree-derived identifier. The result is sanitized so it cannot
+        escape the state directory. The session-id state file is read through the
+        ReadSessionIdFile seam and is never created, so resolution performs no write.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $SessionId,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Root,
+
+        [Parameter(Mandatory)]
+        [string] $SessionIdFilePath,
+
+        [scriptblock] $ReadSessionIdFile
+    )
+
+    $candidates = @(
+        $SessionId
+        $env:CLAUDE_SESSION_ID
+    )
+
+    foreach ($candidate in $candidates) {
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+            return (ConvertTo-PythonBatchBudgetSafeSegment -Value $candidate.Trim())
+        }
+    }
+
+    $fromFile = ''
+    try {
+        $fromFile = [string](& $ReadSessionIdFile $SessionIdFilePath)
+    } catch {
+        Write-Verbose "Ignoring unreadable session-id file '$SessionIdFilePath': $($_.Exception.Message)"
+        $fromFile = ''
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($fromFile)) {
+        return (ConvertTo-PythonBatchBudgetSafeSegment -Value $fromFile.Trim())
+    }
+
+    $normalizedRoot = ($Root -replace '\\', '/').TrimEnd('/')
+    $leaf = ConvertTo-PythonBatchBudgetSafeSegment -Value (Split-Path -Path $normalizedRoot -Leaf)
+
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hashBytes = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($normalizedRoot))
+    } finally {
+        $sha.Dispose()
+    }
+    $shortHash = -join (@($hashBytes[0..3]) | ForEach-Object { $_.ToString('x2') })
+
+    return "worktree-$leaf-$shortHash"
+}
+
 function Get-PythonBatchBudgetState {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -66,14 +200,26 @@ function ConvertTo-PythonBatchBudgetState {
         [int] $ProdCap,
 
         [Parameter(Mandatory)]
-        [int] $TestCap
+        [int] $TestCap,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
     )
 
     $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
     if ($null -ne $InputObject.prodCap) { $state.prodCap = [int]$InputObject.prodCap }
     if ($null -ne $InputObject.testCap) { $state.testCap = [int]$InputObject.testCap }
-    if ($null -ne $InputObject.prodFiles) { $state.prodFiles = @($InputObject.prodFiles) }
-    if ($null -ne $InputObject.testFiles) { $state.testFiles = @($InputObject.testFiles) }
+
+    # Persisted entries that resolve outside this root belong to another worktree
+    # and are dropped, so a state file carried across worktrees cannot spend this
+    # worktree's budget.
+    if ($null -ne $InputObject.prodFiles) {
+        $state.prodFiles = @(@($InputObject.prodFiles) | Where-Object { Test-PythonBatchBudgetPathInRoot -Path $_ -Root $Root })
+    }
+    if ($null -ne $InputObject.testFiles) {
+        $state.testFiles = @(@($InputObject.testFiles) | Where-Object { Test-PythonBatchBudgetPathInRoot -Path $_ -Root $Root })
+    }
 
     return $state
 }
@@ -113,11 +259,22 @@ function Invoke-PythonBatchBudgetDecision {
         [System.Collections.IDictionary] $State,
 
         [Parameter(Mandatory)]
-        [string] $StateFile
+        [string] $StateFile,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
     )
 
     $normalized = $FilePath -replace '\\', '/'
     if ($normalized -notmatch '\.py$') {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
+    }
+
+    # An out-of-root candidate is discarded rather than denied: it consumes no
+    # slot and writes no state, so this hook stays deny-only for real overruns.
+    if (-not (Test-PythonBatchBudgetPathInRoot -Path $normalized -Root $Root)) {
+        Write-Verbose "Discarding batch-budget candidate '$normalized': it resolves outside the batch-budget root '$Root'."
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
@@ -151,10 +308,17 @@ function Invoke-PythonBatchBudgetHook {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [string] $ToolInputRaw,
-        [string] $SessionId = 'default',
-        [string] $Root = (Get-Location).Path,
+        [string] $SessionId = '',
+        [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
         [int] $ProdCap = 3,
         [int] $TestCap = 3,
+        [scriptblock] $ReadSessionIdFile = {
+            param([string] $Path)
+            if (Test-Path -LiteralPath $Path -PathType Leaf) {
+                return (Get-Content -LiteralPath $Path -Raw)
+            }
+            return ''
+        },
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path -Path $Path },
         [scriptblock] $EnsureDirectory = { param([string] $Path) New-Item -ItemType Directory -Path $Path -Force | Out-Null },
         [scriptblock] $ReadState = { param([string] $Path) Get-Content -Path $Path -Raw },
@@ -183,23 +347,32 @@ function Invoke-PythonBatchBudgetHook {
     }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.claude/state'
+
+    # Resolved before the directory is ensured, because reading the session-id
+    # file must never be what creates the state directory.
+    $resolvedSessionId = Get-PythonBatchBudgetSessionId `
+        -SessionId $SessionId `
+        -Root $Root `
+        -SessionIdFilePath (Join-Path -Path $stateDir -ChildPath 'current-session-id') `
+        -ReadSessionIdFile $ReadSessionIdFile
+
     if (-not (& $TestPathExists $stateDir)) {
         & $EnsureDirectory $stateDir
     }
 
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")
+    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$resolvedSessionId.json")
     $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
 
     if (& $TestPathExists $stateFile) {
         try {
             $loaded = & $ReadState $stateFile | ConvertFrom-Json -ErrorAction Stop
-            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap
+            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap -Root $Root
         } catch {
             Write-Verbose "Ignoring unreadable Python batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
-    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile
+    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -Root $Root
     if ($decision.shouldWriteState) {
         try {
             & $WriteState $stateFile $decision.state
@@ -242,10 +415,10 @@ function Invoke-PythonBatchBudgetEntryPoint {
         $ToolInputRaw = [string](& $ReadPayload)
     }
 
-    $sessionId = $env:CLAUDE_SESSION_ID
-    if (-not $sessionId) {
-        $sessionId = 'default'
-    }
+    # No literal fallback here: an empty value routes through the hook's session
+    # resolution, which falls back to the session-id state file and then to a
+    # worktree-derived identifier.
+    $sessionId = [string]$env:CLAUDE_SESSION_ID
 
     $prodCap = 3
     $testCap = 3
