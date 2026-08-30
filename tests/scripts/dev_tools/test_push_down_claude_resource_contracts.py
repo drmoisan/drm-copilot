@@ -139,9 +139,9 @@ def test_planner_review_resources_exist_and_are_byte_identical() -> None:
         bundled_path = BUNDLED_ROOT / relative_path
         assert canonical_path.is_file(), f"Canonical resource missing: {relative_path}"
         assert bundled_path.is_file(), f"Bundled resource missing: {relative_path}"
-        assert canonical_path.read_bytes() == bundled_path.read_bytes(), (
-            f"Planner-review resource differs from bundle: {relative_path}"
-        )
+        assert (
+            canonical_path.read_bytes() == bundled_path.read_bytes()
+        ), f"Planner-review resource differs from bundle: {relative_path}"
 
 
 def test_pack_manifests_are_outside_the_parity_scope() -> None:
