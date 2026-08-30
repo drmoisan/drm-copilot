@@ -2,6 +2,14 @@
 
 Timestamp: 2026-08-30T00-37
 
+Output Summary: Expect-fail run of the scoped Python hook suite. Form A exited 1 against a declared
+`ExpectedExitCode: 1`; Form B reported exactly one failing testcase,
+`discards an absolute candidate path in a sibling directory whose name extends the root`, aborting
+at `$result.shouldWriteState | Should -BeFalse` with `Expected $false, but got $true`. Failure
+count, failing-name set, and aborting assertion all match the plan's prediction. The other two
+added tests were absent from the failing set. No test was corrected and no recorded expectation was
+adjusted to match an observation.
+
 Task: [P2-T3] `[expect-fail]` of the cycle-1 remediation plan.
 
 ## Execution context

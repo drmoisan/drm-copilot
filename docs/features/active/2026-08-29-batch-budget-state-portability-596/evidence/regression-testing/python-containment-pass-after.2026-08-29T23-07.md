@@ -2,6 +2,12 @@
 
 Timestamp: 2026-08-30T00-46
 
+Output Summary: Pass-after run of the scoped Python hook suite. Form A exited 0 with the passed
+count exactly 3 above the baseline and 0 failures. Form B reported 0 failures with all three new
+test titles present and unfailed. Form C reports 95.3 percent line coverage, above the 85 floor and
+above the 93.8 percent baseline (covered 121 to 123, missed 8 to 6, instrumented total unchanged at
+129). Form D shows both B-3 catch-body lines, 151 and 152, now covered. No BLOCKED branch taken.
+
 Task: [P2-T6] of the cycle-1 remediation plan.
 
 ## Execution context
