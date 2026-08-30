@@ -617,7 +617,7 @@ Item 1 — fail-fast import guard:
 - [ ] `It 'keeps every claude library module within the five hundred line limit'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: no discovered module
       exceeds 500 lines.
-- [ ] `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1`
+- [x] `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1`
       passes unchanged, and `.claude/lib/discovery-validation/DiscoveryValidation.psm1` still contains
       the token `Draft 2020-12 support in PowerShell 7.4`, so the condensation that freed room for the
       guard did not remove the version-floor rationale.
@@ -633,11 +633,11 @@ Item 2 — date-coercion contract:
       in-memory fixture supplying `"last_updated": "2026-08-29T20:38:00Z"`, the value returned in
       `State` is `System.DateTime`, and a non-date string key in the same fixture is
       `System.String`.
-- [ ] A search for the token `-DateKind` across `.claude/lib/` returns zero matches, and a search for
+- [x] A search for the token `-DateKind` across `.claude/lib/` returns zero matches, and a search for
       the token `MinimumPowerShellVersion` across `.claude/lib/orchestrator-state/` returns zero
       matches. The PowerShell floor was not raised and no version guard was added to the
       orchestrator-state modules.
-- [ ] A search for the token `ToString(` across `.claude/lib/orchestrator-state/` returns zero
+- [x] A search for the token `ToString(` across `.claude/lib/orchestrator-state/` returns zero
       matches. No post-parse datetime-to-string repair was introduced.
 
 Item 3 — truthiness verification:
