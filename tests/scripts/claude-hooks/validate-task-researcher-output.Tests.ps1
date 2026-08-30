@@ -10,6 +10,33 @@ param()
 BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1'
     . $hookPath
+
+    function Get-CompleteNumericDerivationEvidence {
+        param(
+            [string] $PrimaryStrategy = "rg '(GetMethod|GetField)\\(' entire repository",
+            [string] $CrossCheckStrategy = 'AST traversal of GetMethod and GetField across entire repository',
+            [string] $PrimaryMembers = 'A, B',
+            [string] $CrossCheckMembers = 'A, B',
+            [int] $PrimaryCount = 2,
+            [int] $CrossCheckCount = 2
+        )
+
+        return @"
+- Numeric spec.md acceptance criterion: 2 reflection call sites
+## Numeric Derivation Evidence
+- Complete Family: GetMethod, GetField
+- Exhaustive Search Scope: entire repository source tree
+- Inclusion Rules: variable arguments only
+- Exclusion Rules: generated calls
+- Primary Search Strategy or Query Expression: $PrimaryStrategy
+- Primary Member Set: $PrimaryMembers
+- Primary Count: $PrimaryCount
+- Cross-check Search Strategy or Query Expression: $CrossCheckStrategy
+- Cross-check Member Set: $CrossCheckMembers
+- Cross-check Count: $CrossCheckCount
+- Member-set Comparison: normalized sets match
+"@
+    }
 }
 
 Describe 'validate-task-researcher-output.ps1' {
@@ -276,6 +303,121 @@ Describe 'validate-task-researcher-output.ps1' {
 
             # Assert
             $value | Should -Be 'docs/research/2026-05-04T00-00-foo-research.md'
+        }
+
+        It 'returns null for a whitespace-only markdown-link path' {
+            $value = Get-ResearchPathFromOutput -AgentOutput '[research-path](   )'
+
+            $value | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'numeric derivation evidence' {
+        It 'accepts research without a numeric spec criterion' {
+            $result = Test-NumericDerivationEvidence -Content '## Research Notes'
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'blocks a numeric spec claim without numeric derivation evidence' {
+            $result = Test-NumericDerivationEvidence -Content '- Numeric spec.md acceptance criterion: 8 reflection call sites'
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'Numeric Derivation Evidence'
+        }
+
+        It 'blocks an incomplete family record and missing inclusion rules' {
+            $content = @'
+- Numeric spec.md acceptance criterion: 8 reflection call sites
+## Numeric Derivation Evidence
+- Family:
+- Exclusion Rules: generated calls
+- Member Set: A, B
+- Primary Count: 8
+- Cross-check Count: 8
+'@
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'Family|Inclusion Rules'
+        }
+
+        It 'blocks disagreeing independent cross-check counts' {
+            $content = Get-CompleteNumericDerivationEvidence -CrossCheckMembers 'A, B, C' -CrossCheckCount 3
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'disagree'
+        }
+
+        It 'accepts an independently exhaustive complete-family derivation' {
+            $content = Get-CompleteNumericDerivationEvidence
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'rejects a copied count that does not match the cross-check member set' {
+            $content = Get-CompleteNumericDerivationEvidence -CrossCheckCount 3
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'count does not match'
+        }
+
+        It 'rejects a normalized duplicate search strategy' {
+            $content = Get-CompleteNumericDerivationEvidence -CrossCheckStrategy "rg '(GetMethod|GetField)\\(' entire repository"
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'repeats the primary'
+        }
+
+        It 'rejects missing primary or cross-check evidence' {
+            foreach ($label in @('Primary Search Strategy or Query Expression', 'Cross-check Search Strategy or Query Expression')) {
+                $content = (Get-CompleteNumericDerivationEvidence) -replace "- $($label): .+", "- $($label):"
+
+                $result = Test-NumericDerivationEvidence -Content $content
+
+                $result.Ok | Should -BeFalse
+                $result.Message | Should -Match ([regex]::Escape($label))
+            }
+        }
+
+        It 'rejects mismatched member sets and missing comparison' {
+            $memberMismatch = Get-CompleteNumericDerivationEvidence -CrossCheckMembers 'A, C'
+            $comparisonMissing = (Get-CompleteNumericDerivationEvidence) -replace '- Member-set Comparison: .+', '- Member-set Comparison:'
+
+            (Test-NumericDerivationEvidence -Content $memberMismatch).Ok | Should -BeFalse
+            (Test-NumericDerivationEvidence -Content $memberMismatch).Message | Should -Match 'member sets disagree'
+            (Test-NumericDerivationEvidence -Content $comparisonMissing).Ok | Should -BeFalse
+            (Test-NumericDerivationEvidence -Content $comparisonMissing).Message | Should -Match 'Member-set Comparison'
+        }
+
+        It 'rejects missing complete-family declaration and exhaustive scope' {
+            $familyMissing = (Get-CompleteNumericDerivationEvidence) -replace '- Complete Family: .+', '- Complete Family:'
+            $scopeMissing = (Get-CompleteNumericDerivationEvidence) -replace '- Exhaustive Search Scope: .+', '- Exhaustive Search Scope: focused directory'
+
+            (Test-NumericDerivationEvidence -Content $familyMissing).Ok | Should -BeFalse
+            (Test-NumericDerivationEvidence -Content $familyMissing).Message | Should -Match 'Complete Family'
+            (Test-NumericDerivationEvidence -Content $scopeMissing).Ok | Should -BeFalse
+            (Test-NumericDerivationEvidence -Content $scopeMissing).Message | Should -Match 'exhaustive repository'
+        }
+
+        It 'rejects a narrow named-pattern search that does not cover the declared family' {
+            $content = Get-CompleteNumericDerivationEvidence -PrimaryStrategy 'narrow named-pattern GetMethod('
+
+            $result = Test-NumericDerivationEvidence -Content $content
+
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Match 'narrow named-pattern'
         }
     }
 }
