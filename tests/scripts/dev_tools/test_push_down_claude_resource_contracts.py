@@ -29,6 +29,11 @@ REQUIRED_BUNDLED_FILES = (
     Path(".claude/rules/typescript.md"),
     Path(".claude/agents/orchestrator.md"),
 )
+PLANNER_REVIEW_RESOURCE_PATHS = (
+    Path(".claude/skills/atomic-plan-contract/SKILL.md"),
+    Path(".claude/hooks/validate-planner-output.ps1"),
+    Path(".claude/agents/atomic-planner.md"),
+)
 
 
 def list_scoped_files(root: Path) -> list[Path]:
@@ -124,6 +129,19 @@ def test_bundled_claude_payload_contains_all_repo_runtime_contracts() -> None:
             REPO_ROOT,
             relative_path,
         ), f"Bundle content differs from repo for: {relative_path}"
+
+
+def test_planner_review_resources_exist_and_are_byte_identical() -> None:
+    """Require the three changed planner-review resources in both payloads."""
+
+    for relative_path in PLANNER_REVIEW_RESOURCE_PATHS:
+        canonical_path = REPO_ROOT / relative_path
+        bundled_path = BUNDLED_ROOT / relative_path
+        assert canonical_path.is_file(), f"Canonical resource missing: {relative_path}"
+        assert bundled_path.is_file(), f"Bundled resource missing: {relative_path}"
+        assert (
+            canonical_path.read_bytes() == bundled_path.read_bytes()
+        ), f"Planner-review resource differs from bundle: {relative_path}"
 
 
 def test_pack_manifests_are_outside_the_parity_scope() -> None:
