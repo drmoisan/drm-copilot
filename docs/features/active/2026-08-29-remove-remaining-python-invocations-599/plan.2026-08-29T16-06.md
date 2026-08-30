@@ -330,7 +330,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
 
 ### Phase 0 — Baseline Capture and Policy Reads
 
-- [ ] [P0-T1] Read the policy files in the order defined by `policy-compliance-order` and record the
+- [x] [P0-T1] Read the policy files in the order defined by `policy-compliance-order` and record the
       read in `evidence/baseline/phase0-instructions-read.<timestamp>.md`. Order: `CLAUDE.md`,
       `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/quality-tiers.md`, `.claude/rules/shell.md`, `.claude/rules/python.md`,
@@ -340,7 +340,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
   - Acceptance: the artifact exists and contains `Timestamp:`, `Policy Order:`, and the eleven file
     paths above listed in that exact order.
 
-- [ ] [P0-T2] Capture the bash format-and-lint baseline by running
+- [x] [P0-T2] Capture the bash format-and-lint baseline by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/baseline/bash-check.<timestamp>.md`.
   - Acceptance: the artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` that
@@ -352,7 +352,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     other result at this baseline is pre-existing drift and must be reported before Phase 1 begins,
     because P4-T1's attribution argument depends on this baseline being clean.
 
-- [ ] [P0-T3] Capture the bash coverage baseline by running
+- [x] [P0-T3] Capture the bash coverage baseline by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/baseline/bash-coverage.<timestamp>.md`.
   - Acceptance: the artifact's `Output Summary:` records the numeric headline the run prints in the
@@ -365,13 +365,13 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     percentage and the case count will move. The no-regression comparison in P6-T14 is against the
     value this task actually records, and the gate in P6-T4 is the >= 85.0 floor.
 
-- [ ] [P0-T4] Capture the Python format baseline by running `poetry run black --check .` from the
+- [x] [P0-T4] Capture the Python format baseline by running `poetry run black --check .` from the
       worktree root and record it in `evidence/baseline/python-black-check.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim in
     `Output Summary:`. `--check` makes the command read-only, so the exit code is the discriminator
     and no file is rewritten before the baseline is taken.
 
-- [ ] [P0-T5] Capture the Python lint baseline by running `poetry run ruff check .` from the worktree
+- [x] [P0-T5] Capture the Python lint baseline by running `poetry run ruff check .` from the worktree
       root and record it in `evidence/baseline/python-ruff.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE: 0` and an `Output Summary:` whose stdout is exactly
     `All checks passed!`. That value was observed on this worktree against the clean tree before
@@ -383,12 +383,12 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     is expected here and is not a defect. The exit code plus the `All checks passed!` line are both
     recorded so the acceptance does not rest on the exit code alone.
 
-- [ ] [P0-T6] Capture the Python type-check baseline by running `poetry run pyright` from the
+- [x] [P0-T6] Capture the Python type-check baseline by running `poetry run pyright` from the
       worktree root and record it in `evidence/baseline/python-pyright.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the summary line the run prints,
     verbatim, in `Output Summary:`.
 
-- [ ] [P0-T7] Capture the Python coverage baseline over the reference module by running
+- [x] [P0-T7] Capture the Python coverage baseline over the reference module by running
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion.py --cov=scripts.dev_tools.parallel_lane_assertion --cov-report=term-missing -p no:cacheprovider`
       and record it in `evidence/baseline/python-lane-assertion-coverage.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE: 0`, the pytest pass count, and the numeric
@@ -397,7 +397,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     `--cov-report=term-missing` is supplied because the project `addopts` value at
     `pyproject.toml:115` provides an LCOV reporter only.
 
-- [ ] [P0-T8] Capture the bundle-mirror baseline by running
+- [x] [P0-T8] Capture the bundle-mirror baseline by running
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q -p no:cacheprovider`
       and record it in `evidence/baseline/python-pushdown-contracts.<timestamp>.md`.
   - Acceptance: the artifact records the observed `EXIT_CODE:` and the observed pytest summary line
@@ -419,21 +419,21 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
   - The durable, environment-independent mirror gate is the `cmp -s` loop in P5-T11; this baseline
     records the starting condition only.
 
-- [ ] [P0-T9] Capture the TypeScript format baseline by running
+- [x] [P0-T9] Capture the TypeScript format baseline by running
       `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-prettier-check.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
     `--check` makes the command read-only.
 
-- [ ] [P0-T10] Capture the TypeScript lint baseline by running `npm run lint` from
+- [x] [P0-T10] Capture the TypeScript lint baseline by running `npm run lint` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-eslint.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
 
-- [ ] [P0-T11] Capture the TypeScript type-check baseline by running `npm run typecheck` from
+- [x] [P0-T11] Capture the TypeScript type-check baseline by running `npm run typecheck` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-typecheck.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
 
-- [ ] [P0-T12] Capture the TypeScript coverage baseline by running `npm run test:coverage` from
+- [x] [P0-T12] Capture the TypeScript coverage baseline by running `npm run test:coverage` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-coverage.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` as observed, the Jest `Tests:` line verbatim, and
     the four numeric percentages from the `text-summary` reporter block (Statements, Branches,
@@ -443,7 +443,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     at line 259 of that 260-line file, so a subset run reports 0% for every untested production file
     and fails thresholds for reasons unrelated to this feature.
 
-- [ ] [P0-T13] Capture the PowerShell no-Python-invocation regression baseline by running
+- [x] [P0-T13] Capture the PowerShell no-Python-invocation regression baseline by running
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 -CI"`
       from the worktree root and record it in
       `evidence/baseline/powershell-no-python-invocation.<timestamp>.md`.
