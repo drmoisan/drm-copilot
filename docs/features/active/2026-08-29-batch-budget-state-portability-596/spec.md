@@ -685,7 +685,7 @@ the change, so it is demonstrated capable of failing.
 
 Defect 1 — shared session identity (both hooks and the sibling Python hook):
 
-- [ ] `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1` contains three passing
+- [x] `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1` contains three passing
       tests that assert the composed state-file name for (a) `$env:CLAUDE_SESSION_ID` set, (b) the
       environment variable empty and `.claude/state/current-session-id` supplying the id through the
       new read seam, and (c) both sources empty, yielding the worktree-derived identifier. The three
@@ -701,7 +701,7 @@ Defect 1 — shared session identity (both hooks and the sibling Python hook):
 - [ ] Each hook suite contains a passing test asserting that a session id containing characters
       outside `[A-Za-z0-9._-]` produces a state-file name matching
       `^(powershell|python)-batch-budget\.[A-Za-z0-9._-]+\.json$`.
-- [ ] `tests/scripts/claude-hooks/persist-session-id.Tests.ps1` contains a passing test asserting the
+- [x] `tests/scripts/claude-hooks/persist-session-id.Tests.ps1` contains a passing test asserting the
       `WriteStateFile` seam is invoked with the session id when `CLAUDE_ENV_FILE` **is** set, and a
       passing test asserting the `AppendLine` seam is still invoked in that same case. Both suites'
       pre-existing tests remain green.
