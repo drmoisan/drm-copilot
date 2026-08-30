@@ -1033,7 +1033,7 @@ Constraint 1.
 
 ### Phase 5 — Payload documentation edits and their bundle mirrors
 
-- [ ] [P5-T1] Edit `.claude/skills/epic-orchestrate/SKILL.md` to delete the CLI spelling at line 296
+- [x] [P5-T1] Edit `.claude/skills/epic-orchestrate/SKILL.md` to delete the CLI spelling at line 296
       and rewrite the surrounding sentence at lines 295-299 so the MCP form
       `mcp__drm-copilot__validate_orchestration_artifacts` with
       `artifact_type: "epic-orchestrator-state"` is the primary spelling and the completion-gate
@@ -1070,7 +1070,7 @@ Constraint 1.
     literal is present at line 297), so it cannot fail whatever the executor does. It is retained
     only in P5-T12, where it serves as a preservation check rather than a change check.
 
-- [ ] [P5-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` to delete the CLI spelling at lines
+- [x] [P5-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` to delete the CLI spelling at lines
       481-482 and rewrite lines 480-483 so only the MCP form remains and the completion-gate option
       reads as the MCP argument `require_complete`. Do not touch line 817 or the
       `#### CLI Invocation` heading at line 809.
@@ -1114,7 +1114,7 @@ Constraint 1.
     non-zero before any edit and the clause cannot fail. Clause (d) is the non-goal preservation
     check and is falsifiable in the other direction — an over-broad deletion would drop it to zero.
 
-- [ ] [P5-T3] Edit `.claude/skills/parallel-plan/SKILL.md` to replace the invocation at line 315 with
+- [x] [P5-T3] Edit `.claude/skills/parallel-plan/SKILL.md` to replace the invocation at line 315 with
       `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
       and to replace the parenthetical grant note at line 316, which today reads "(covered by the
       planner's existing `Bash(poetry run *)` grant)". Leave lines 322-329 and 569-573 semantically
@@ -1137,7 +1137,7 @@ Constraint 1.
     returns no match, where it returns exactly one match at line 316 today. Clause (c) asserts the
     grant note was actually rewritten rather than left beside the new invocation.
 
-- [ ] [P5-T4] Edit `.claude/agents/parallel-planner.md` to add
+- [x] [P5-T4] Edit `.claude/agents/parallel-planner.md` to add
       `"Bash(bash .claude/lib/bash/report-lane-assertion.sh*)"` to the `tools:` list at lines 5-20,
       beside the three existing entry-point grants at lines 17-19; to document the new entry point in
       the bash paragraph at lines 158-168; and to correct the two counts that paragraph carries.
@@ -1182,7 +1182,7 @@ Constraint 1.
     committed and is therefore not the discriminator. No criterion text is edited to accommodate
     this; P6-T17 forbids that.
 
-- [ ] [P5-T5] Edit `.claude/agents/parallel-orchestrator.md` lines 92-97 so the grant rationale names
+- [x] [P5-T5] Edit `.claude/agents/parallel-orchestrator.md` lines 92-97 so the grant rationale names
       only consumers that still exist after site 2 is deleted, and so its counts are internally
       consistent with that. Re-derived this pass, the paragraph today reads: line 92 opens with
       "The two `poetry run` grants remain for the repository-local paths that still need an
@@ -1220,37 +1220,37 @@ Constraint 1.
     escaping backticks inside a markdown code span. The two backtick-free tokens are each
     single-line and are asserted verbatim instead.
 
-- [ ] [P5-T6] Copy the edited `.claude/skills/epic-orchestrate/SKILL.md` to
+- [x] [P5-T6] Copy the edited `.claude/skills/epic-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`.
   - Acceptance:
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T7] Copy the edited `.claude/skills/parallel-orchestrate/SKILL.md` to
+- [x] [P5-T7] Copy the edited `.claude/skills/parallel-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`.
   - Acceptance:
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T8] Copy the edited `.claude/skills/parallel-plan/SKILL.md` to
+- [x] [P5-T8] Copy the edited `.claude/skills/parallel-plan/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`.
   - Acceptance:
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T9] Copy the edited `.claude/agents/parallel-planner.md` to
+- [x] [P5-T9] Copy the edited `.claude/agents/parallel-planner.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`.
   - Acceptance:
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md'`
     exits 0.
 
-- [ ] [P5-T10] Copy the edited `.claude/agents/parallel-orchestrator.md` to
+- [x] [P5-T10] Copy the edited `.claude/agents/parallel-orchestrator.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md`.
   - Acceptance:
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md'`
     exits 0.
 
-- [ ] [P5-T11] Verify the complete bundle mirror by running
+- [x] [P5-T11] Verify the complete bundle mirror by running
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q -p no:cacheprovider`
       and record the result in `evidence/regression-testing/pushdown-contracts.<timestamp>.md`.
   - Acceptance, part 1 (environment-conditional, same condition as P0-T8): `EXIT_CODE: 0` with the
@@ -1278,7 +1278,7 @@ Constraint 1.
     `.claude/**` files (P5-T6 through P5-T10). This loop is a byte comparison over a fixed,
     enumerated file list, so it is unaffected by `.claude/state/` and by any other untracked file.
 
-- [ ] [P5-T12] Verify the three in-scope invocation sites are closed and the two non-goal sites are
+- [x] [P5-T12] Verify the three in-scope invocation sites are closed and the two non-goal sites are
       untouched by running all three of
       `git grep -n -F "python -m scripts.dev_tools." -- .claude/skills/`,
       `git grep -n -F "poetry run python" -- .claude/skills/`, and
