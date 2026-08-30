@@ -692,7 +692,7 @@ Defect 1 — shared session identity (both hooks and the sibling Python hook):
       composed names are asserted to be pairwise different.
 - [ ] `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1` contains the same three
       passing tests for `enforce-python-batch-budget.ps1`.
-- [ ] A case-sensitive search for the literal `'default'` across
+- [x] A case-sensitive search for the literal `'default'` across
       `.claude/hooks/enforce-powershell-batch-budget.ps1`,
       `.claude/hooks/enforce-python-batch-budget.ps1`, and their two bundle mirrors under
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` returns no matching
@@ -722,7 +722,7 @@ Defect 3 — unscoped recorded paths:
       absolute path under the resolved root is recorded, (c) an absolute path outside the resolved
       root yields `permissionDecision = 'allow'` with `shouldWriteState` false and an unchanged
       recorded-file list, and (d) an in-root absolute path differing only in letter case is recorded.
-- [ ] A search for `(Get-Location).Path` across `.claude/hooks/enforce-powershell-batch-budget.ps1`,
+- [x] A search for `(Get-Location).Path` across `.claude/hooks/enforce-powershell-batch-budget.ps1`,
       `.claude/hooks/enforce-python-batch-budget.ps1`, and their two bundle mirrors returns no
       matching lines; the same search returns one match per file before the change. Neither hook
       introduces `Resolve-Path` or `[System.IO.Path]::GetFullPath`.
@@ -750,13 +750,13 @@ Defect 4 — destination-side ignore delivery:
 
 Cross-cutting gates:
 
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes when no `.claude/state/` directory is present — the state a fresh checkout and CI are
       in — with every edited `.claude/**` file byte-identically mirrored under
       `extensions/drm-copilot/resources/claude-customizations/.claude/**`. A working tree in which
       the batch-budget hooks have already run will instead show the open issue #510 failure on
       `.claude/state/**`; that failure is unrelated to this feature and is recorded in Non-Goals.
-- [ ] Mirror parity is additionally proven by an environment-independent hash comparison that does
+- [x] Mirror parity is additionally proven by an environment-independent hash comparison that does
       not depend on `.claude/state/` and therefore holds in any tree state: for each of the three
       file pairs below, `git hash-object` reports the same object id for the repository file and its
       bundle mirror. (a) `.claude/hooks/enforce-powershell-batch-budget.ps1` and
@@ -768,7 +768,7 @@ Cross-cutting gates:
       The pairs are enumerated explicitly so a third party re-running the check obtains the same set
       rather than selecting its own evidence. The check fails on a genuine mirroring miss and cannot
       pass vacuously, because each named pair must yield a hash and the two hashes must match.
-- [ ] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes with no change to its
+- [x] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes with no change to its
       assertions, confirming the deny-envelope shape for both batch-budget hooks is unaltered.
 - [ ] `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and
       `mcp__drm-copilot__run_poshqc_test` all pass in a single consecutive run with no file
