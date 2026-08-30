@@ -553,17 +553,17 @@ implementation work here, and no acceptance criterion in this document depends o
 
 ## Acceptance Criteria
 
-- [ ] `.claude/lib/bash/parallel-lane-assertion.sh` and `.claude/lib/bash/report-lane-assertion.sh`
+- [x] `.claude/lib/bash/parallel-lane-assertion.sh` and `.claude/lib/bash/report-lane-assertion.sh`
       both exist, and `bash scripts/bash/shell-qc.sh check` exits 0 with the two files present in its
       shfmt and shellcheck scan output.
-- [ ] `tests/shell/parallel_lane_assertion.bats` passes, and its case set includes a case asserting the
+- [x] `tests/shell/parallel_lane_assertion.bats` passes, and its case set includes a case asserting the
       entry point resolves its own directory before sourcing, a case asserting `pc_enforce_c_locale` is
       called before any output is produced, and a case asserting the entry point's first executable
       line establishes `set -euo pipefail`.
-- [ ] `tests/shell/parallel_lane_assertion.bats` contains a case asserting
+- [x] `tests/shell/parallel_lane_assertion.bats` contains a case asserting
       `bash .claude/lib/bash/report-lane-assertion.sh --keys "101 102" --manifest <fixture>` exits **2**
       with usage text on stderr, pinning that no `--keys` flag was added.
-- [ ] `tests/shell/parallel_lane_assertion.bats` contains a case pinning divergence class 3: for an
+- [x] `tests/shell/parallel_lane_assertion.bats` contains a case pinning divergence class 3: for an
       `--edges` value whose endpoint token bears a leading zero, a leading `+`, an underscore digit
       separator, or a non-ASCII decimal digit — the four reachable members of the class — the port drops
       the edge token, and the resulting report differs from the Python reference's report for the same
@@ -573,29 +573,29 @@ implementation work here, and no acceptance criterion in this document depends o
       carrying interior whitespace inside an endpoint, both parity lanes reproduce that fixture's
       `expected_stdout` byte-for-byte, and that `expected_stdout` is identical to the report the same
       manifest produces with an empty `--edges` value.
-- [ ] `tests/shell/parallel_lane_assertion.bats` contains a case asserting that an out-of-subset
+- [x] `tests/shell/parallel_lane_assertion.bats` contains a case asserting that an out-of-subset
       manifest (one for which `pm_parse_manifest` returns status 2) produces the distinct refusal line
       and exit status **0**, and that the corresponding input appears in no file under
       `tests/fixtures/parallel_lane_assertion/`.
-- [ ] `tests/shell/parallel_lane_assertion_parity.bats` and
+- [x] `tests/shell/parallel_lane_assertion_parity.bats` and
       `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` both pass over
       `tests/fixtures/parallel_lane_assertion/*.json`; each declares a `MINIMUM_FIXTURE_COUNT` floor and
       asserts it in a dedicated case; and the bats lane carries a case asserting `python3` is available
       so the suite cannot pass vacuously.
-- [ ] A parity-lane case asserts that each of the four `kind` tokens
+- [x] A parity-lane case asserts that each of the four `kind` tokens
       `expected_together_derived_apart`, `expected_apart_derived_together`, `member_names_no_item`, and
       `item_covered_by_no_component` appears in the `expected_stdout` of at least one corpus fixture.
-- [ ] A parity-lane case asserts `expected_status` is 0 for every corpus fixture, and
+- [x] A parity-lane case asserts `expected_status` is 0 for every corpus fixture, and
       `tests/shell/parallel_lane_assertion_parity.bats` compares the subprocess exit status against it,
       including for at least one fixture whose `expected_stdout` contains an `ADVISORY` line.
-- [ ] `tests/shell/parallel_lane_assertion.bats` contains a case asserting that no file under
+- [x] `tests/shell/parallel_lane_assertion.bats` contains a case asserting that no file under
       `.claude/lib/bash/` other than `report-lane-assertion.sh` sources `parallel-lane-assertion.sh`,
       and that no file under `.claude/lib/bash/` sources `report-lane-assertion.sh`, pinning that the
       diagnostic feeds no cohort, validation, or scheduling module.
-- [ ] `tests/shell/parallel_payload_only.bats` passes and contains at least one case invoking
+- [x] `tests/shell/parallel_payload_only.bats` passes and contains at least one case invoking
       `.claude/lib/bash/report-lane-assertion.sh` from the bundle root under the four-shim `PATH`,
       asserting exit 0 and the expected report text.
-- [ ] `git grep -n -F "python -m scripts.dev_tools." -- .claude/skills/` returns exactly **one** match,
+- [x] `git grep -n -F "python -m scripts.dev_tools." -- .claude/skills/` returns exactly **one** match,
       at `.claude/skills/parallel-orchestrate/SKILL.md:817` for the drift-detection CLI. The same
       command returns **four** matches before this feature — sites 1, 2, and 3 plus line 817 — so the
       drop from four to one is the evidence that all three in-scope sites are closed. Separately,
@@ -605,34 +605,34 @@ implementation work here, and no acceptance criterion in this document depends o
       feature. And
       `git grep -c -F "mcp__drm-copilot__validate_orchestration_artifacts" -- .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md`
       reports a non-zero count for both files.
-- [ ] `git grep -n -F "parallel_lane_assertion" -- .claude/skills/parallel-plan/SKILL.md` returns no
+- [x] `git grep -n -F "parallel_lane_assertion" -- .claude/skills/parallel-plan/SKILL.md` returns no
       executable invocation, and the same file contains the literal
       `bash .claude/lib/bash/report-lane-assertion.sh` inside the seeding-procedure step.
-- [ ] `.claude/agents/parallel-planner.md` `tools:` list contains
+- [x] `.claude/agents/parallel-planner.md` `tools:` list contains
       `Bash(bash .claude/lib/bash/report-lane-assertion.sh*)`, its `## Upstream Library Invocation`
       section documents the entry point, and
       `git diff --stat origin/main...HEAD -- .claude/agents/parallel-planner.md` shows no changed line
       inside the PowerShell paragraph at lines 147-156.
-- [ ] `git grep -n -F "checkpoint-validator CLI fallback" -- .claude/agents/parallel-orchestrator.md`
+- [x] `git grep -n -F "checkpoint-validator CLI fallback" -- .claude/agents/parallel-orchestrator.md`
       returns no match, and the grant-rationale paragraph in that file names only consumers that still
       exist after site 2 is deleted.
-- [ ] `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` lists both
+- [x] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` lists both
       `.claude/lib/bash/parallel-lane-assertion.sh` and `.claude/lib/bash/report-lane-assertion.sh` in
       its `paths` array, and `tests/shell/parallel_bash_manifest_membership.bats` passes with
       `MINIMUM_LIB_FILE_COUNT` raised from 9 to 11.
-- [ ] The entry-point enumerations at
+- [x] The entry-point enumerations at
       `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts:242-244` and
       `extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts:451-453` each include
       `.claude/lib/bash/report-lane-assertion.sh`, and both suites pass.
-- [ ] `bash scripts/bash/shell-qc.sh test --coverage` reports bash line coverage >= 85%, and
+- [x] `bash scripts/bash/shell-qc.sh test --coverage` reports bash line coverage >= 85%, and
       `artifacts/pester/kcov/cov.xml` contains per-file rows for both new bash files with neither file
       appearing in any coverage `exclude` configuration. The coverage run output is recorded under
       `docs/features/active/2026-08-29-remove-remaining-python-invocations-599/evidence/qa-gates/`.
-- [ ] `wc -l` reports at most 500 lines for each of `.claude/lib/bash/parallel-lane-assertion.sh` and
+- [x] `wc -l` reports at most 500 lines for each of `.claude/lib/bash/parallel-lane-assertion.sh` and
       `.claude/lib/bash/report-lane-assertion.sh`.
-- [ ] `git diff --stat origin/main...HEAD` shows no changed line in
+- [x] `git diff --stat origin/main...HEAD` shows no changed line in
       `.claude/rules/parallel-orchestration.md`, `.claude/skills/parallel-remove/SKILL.md`, or
       `.claude/skills/parallel-orchestrate/SKILL.md` line 817's drift-detection invocation, and
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with its
