@@ -2,7 +2,7 @@
 
 - Date captured: 2026-08-29
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/caller-site-invocation-correctness/ (Issue #597)
+- Status: Delivered — six-file caller-site invocation correction landed and verified (Issue #597)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -96,4 +96,4 @@ their entirety.
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch

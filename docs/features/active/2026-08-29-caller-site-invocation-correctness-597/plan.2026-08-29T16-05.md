@@ -277,71 +277,71 @@ feature.
 
 ### Phase 4 — Documentation & Handoff
 
-- [ ] [P4-T1] After [P2-T1] passes, in
+- [x] [P4-T1] After [P2-T1] passes, in
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/spec.md`, change the
       Acceptance Criteria checkbox beginning "`.claude/skills/parallel-plan/SKILL.md:183` (fenced"
       from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked and no other AC checkbox in `spec.md` changes as a
       side effect of this task.
 
-- [ ] [P4-T2] After [P2-T2] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T2] After [P2-T2] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`
       is byte-identical" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T3] After [P2-T3] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T3] After [P2-T3] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`.claude/skills/parallel-add/SKILL.md:62` (inline parenthetical" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T4] After [P2-T4] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T4] After [P2-T4] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`
       is byte-identical" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T5] After [P2-T5] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T5] After [P2-T5] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`.claude/agents/parallel-planner.md:151` (fenced" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T6] After [P2-T6] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T6] After [P2-T6] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`
       is byte-identical" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T7] After [P2-T3] and [P2-T4] pass (both confirm the `$result['conflict']` token), in
+- [x] [P4-T7] After [P2-T3] and [P2-T4] pass (both confirm the `$result['conflict']` token), in
       `spec.md`, change the Acceptance Criteria checkbox beginning "Where the surrounding prose at a
       corrected site discusses reading" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T8] After [P2-T7] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T8] After [P2-T7] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`.claude/lib/blast-radius/BlastRadius.psm1:432-441` (the existing truthiness warning)" from
       `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T9] After [P2-T8] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T9] After [P2-T8] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`.claude/skills/parallel-plan/SKILL.md:307-311` (the sibling truthiness warning)" from
       `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T10] After [P2-T9] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T10] After [P2-T9] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`.claude/skills/parallel-plan/SKILL.md:315` (the out-of-scope" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T11] After [P2-T10] passes, in `spec.md`, change the Acceptance Criteria checkbox
+- [x] [P4-T11] After [P2-T10] passes, in `spec.md`, change the Acceptance Criteria checkbox
       beginning "`.claude/skills/parallel-orchestrate/SKILL.md` and
       `.claude/skills/epic-orchestrate/SKILL.md`" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T12] After [P3-T1] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T12] After [P3-T1] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes" from `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T13] After [P3-T2] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
+- [x] [P4-T13] After [P3-T2] passes, in `spec.md`, change the Acceptance Criteria checkbox beginning
       "`tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1` (the existing" from
       `- [ ]` to `- [x]`.
       Acceptance: this single checkbox is checked.
 
-- [ ] [P4-T14] After all 13 spec.md Acceptance Criteria checkboxes are checked, update
+- [x] [P4-T14] After all 13 spec.md Acceptance Criteria checkboxes are checked, update
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/issue.md`: change
       `- Status: Promoted -> ...` to reflect delivered state, and check the `- [ ] Move to active fix
       folder / branch` box under `## Next Step`. Write an issue-update mirror artifact at

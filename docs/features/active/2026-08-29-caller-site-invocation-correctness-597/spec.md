@@ -312,38 +312,38 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] `.claude/skills/parallel-plan/SKILL.md:183` (fenced ```powershell block, opened at 182, closed
+- [x] `.claude/skills/parallel-plan/SKILL.md:183` (fenced ```powershell block, opened at 182, closed
       at 184) is corrected to a `pwsh`-qualified, root-anchored `Import-Module` invocation using
       `$repoRoot = git rev-parse --show-toplevel` + `Join-Path` + `-ErrorAction Stop`, with adjacent
       prose documenting the PowerShell 5.1 execution-policy trap.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`
       is byte-identical to the corrected repo file above.
-- [ ] `.claude/skills/parallel-add/SKILL.md:62` (inline parenthetical prose fragment) is corrected to
+- [x] `.claude/skills/parallel-add/SKILL.md:62` (inline parenthetical prose fragment) is corrected to
       express the `pwsh` qualifier, the root-anchored `git rev-parse --show-toplevel` path, and
       `-ErrorAction Stop` in prose form, preserving the existing parenthetical sentence structure
       (not replaced with a fenced code block), with adjacent prose documenting the PowerShell 5.1
       execution-policy trap.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`
       is byte-identical to the corrected repo file above.
-- [ ] `.claude/agents/parallel-planner.md:151` (fenced ```powershell block, opened at 150, closed at
+- [x] `.claude/agents/parallel-planner.md:151` (fenced ```powershell block, opened at 150, closed at
       152) is corrected identically to the `parallel-plan/SKILL.md` form above, with adjacent prose
       documenting the PowerShell 5.1 execution-policy trap.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md` is
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md` is
       byte-identical to the corrected repo file above.
-- [ ] Where the surrounding prose at a corrected site discusses reading
+- [x] Where the surrounding prose at a corrected site discusses reading
       `Test-BlastRadiusConflict`'s return value, the documented read pattern is `$result['conflict']`,
       not a bare `if ($result)` truthiness check.
-- [ ] `.claude/lib/blast-radius/BlastRadius.psm1:432-441` (the existing truthiness warning) is
+- [x] `.claude/lib/blast-radius/BlastRadius.psm1:432-441` (the existing truthiness warning) is
       unchanged.
-- [ ] `.claude/skills/parallel-plan/SKILL.md:307-311` (the sibling truthiness warning) is unchanged.
-- [ ] `.claude/skills/parallel-plan/SKILL.md:315` (the out-of-scope `parallel_lane_assertion` Python
+- [x] `.claude/skills/parallel-plan/SKILL.md:307-311` (the sibling truthiness warning) is unchanged.
+- [x] `.claude/skills/parallel-plan/SKILL.md:315` (the out-of-scope `parallel_lane_assertion` Python
       invocation) and its surrounding prose are unchanged.
-- [ ] `.claude/skills/parallel-orchestrate/SKILL.md` and `.claude/skills/epic-orchestrate/SKILL.md`
+- [x] `.claude/skills/parallel-orchestrate/SKILL.md` and `.claude/skills/epic-orchestrate/SKILL.md`
       are not modified.
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes after all six file edits land in the same change, confirming byte-identical repo/bundle
       mirror pairs.
-- [ ] `tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1` (the existing
+- [x] `tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1` (the existing
       `$result['conflict']` truthiness regression pair) remains green and unmodified.
 
 ## Risks & Mitigations
