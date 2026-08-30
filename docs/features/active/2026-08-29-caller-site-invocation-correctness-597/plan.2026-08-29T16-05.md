@@ -147,21 +147,26 @@ occurs later during epic execution.
 
 ### Phase 2 — Verification (post-edit literal-token and unchanged-content checks)
 
-- [ ] [P2-T1] Confirm the corrected text landed at `.claude/skills/parallel-plan/SKILL.md`. Run
+- [x] [P2-T1] Confirm the corrected text landed at `.claude/skills/parallel-plan/SKILL.md`. Run
       fixed-string searches restricted to this file for each of the three tokens
-      `git rev-parse --show-toplevel`, `-ErrorAction Stop`, and `` `pwsh` is mandatory ``. Write
+      `git rev-parse --show-toplevel`, `-ErrorAction Stop`, and `mandatory here.` (corrected from the
+      wrap-fragile `` `pwsh` is mandatory `` token originally specified here: the execution-policy
+      sentence Phase 1 inserts wraps across two physical lines in the target file, so a single-line
+      fixed-string search must use the single-line tail `mandatory here.` per the
+      `atomic-plan-contract` wrap-tolerant assertion rule G6). Write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/qa-gates/verify-parallel-plan-skill.<TIMESTAMP>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` reporting one match per token.
       Acceptance: all three tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T2] Confirm the corrected text landed at
+- [x] [P2-T2] Confirm the corrected text landed at
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`
-      using the identical three-token search from [P2-T1] restricted to this mirror path. Write
+      using the identical three-token search from [P2-T1] (as corrected: `mandatory here.` in place of
+      `` `pwsh` is mandatory ``) restricted to this mirror path. Write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/qa-gates/verify-parallel-plan-skill-mirror.<TIMESTAMP>.md`
       with the four required fields.
       Acceptance: all three tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T3] Confirm the corrected text landed at `.claude/skills/parallel-add/SKILL.md`. Run
+- [x] [P2-T3] Confirm the corrected text landed at `.claude/skills/parallel-add/SKILL.md`. Run
       fixed-string searches restricted to this file for each of the four tokens
       `git rev-parse --show-toplevel`, `-ErrorAction Stop`, `` `pwsh` is mandatory ``, and
       `$result['conflict']`. Write
@@ -169,28 +174,31 @@ occurs later during epic execution.
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` reporting one match per token.
       Acceptance: all four tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T4] Confirm the corrected text landed at
+- [x] [P2-T4] Confirm the corrected text landed at
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`
       using the identical four-token search from [P2-T3] restricted to this mirror path. Write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/qa-gates/verify-parallel-add-skill-mirror.<TIMESTAMP>.md`
       with the four required fields.
       Acceptance: all four tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T5] Confirm the corrected text landed at `.claude/agents/parallel-planner.md`. Run
+- [x] [P2-T5] Confirm the corrected text landed at `.claude/agents/parallel-planner.md`. Run
       fixed-string searches restricted to this file for each of the three tokens
-      `git rev-parse --show-toplevel`, `-ErrorAction Stop`, and `` `pwsh` is mandatory ``. Write
+      `git rev-parse --show-toplevel`, `-ErrorAction Stop`, and `mandatory here.` (corrected from the
+      wrap-fragile `` `pwsh` is mandatory `` token originally specified here, per the same rationale
+      recorded at [P2-T1]). Write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/qa-gates/verify-parallel-planner-agent.<TIMESTAMP>.md`
       with the four required fields, reporting one match per token.
       Acceptance: all three tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T6] Confirm the corrected text landed at
+- [x] [P2-T6] Confirm the corrected text landed at
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`
-      using the identical three-token search from [P2-T5] restricted to this mirror path. Write
+      using the identical three-token search from [P2-T5] (as corrected: `mandatory here.` in place of
+      `` `pwsh` is mandatory ``) restricted to this mirror path. Write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/qa-gates/verify-parallel-planner-agent-mirror.<TIMESTAMP>.md`
       with the four required fields.
       Acceptance: all three tokens match exactly once; `EXIT_CODE: 0`.
 
-- [ ] [P2-T7] Confirm `.claude/lib/blast-radius/BlastRadius.psm1:432-441` is byte-unchanged. Run a
+- [x] [P2-T7] Confirm `.claude/lib/blast-radius/BlastRadius.psm1:432-441` is byte-unchanged. Run a
       fixed-string search restricted to this file for the literal token `unconditionally truthy
       under PowerShell boolean coercion, so` (the same token searched at baseline in [P0-T4]) and
       confirm an identical single match. Write
@@ -199,7 +207,7 @@ occurs later during epic execution.
       the [P0-T4] baseline count.
       Acceptance: exactly one match, unchanged from [P0-T4]; `EXIT_CODE: 0`.
 
-- [ ] [P2-T8] Confirm `.claude/skills/parallel-plan/SKILL.md:307-311` (the sibling truthiness
+- [x] [P2-T8] Confirm `.claude/skills/parallel-plan/SKILL.md:307-311` (the sibling truthiness
       warning) is byte-unchanged. Run a fixed-string search restricted to this file for the literal
       token `The hashtable itself is always truthy, so a bare boolean test on the result treats
       every pair as` (the same token searched at baseline in [P0-T4]) and confirm an identical
@@ -208,7 +216,7 @@ occurs later during epic execution.
       with the four required fields, explicitly comparing against the [P0-T4] baseline count.
       Acceptance: exactly one match, unchanged from [P0-T4]; `EXIT_CODE: 0`.
 
-- [ ] [P2-T9] Confirm `.claude/skills/parallel-plan/SKILL.md:315` and its surrounding
+- [x] [P2-T9] Confirm `.claude/skills/parallel-plan/SKILL.md:315` and its surrounding
       `parallel_lane_assertion` list item (lines 313-325) are byte-unchanged. Run a fixed-string
       search restricted to this file for the literal token `parallel_lane_assertion` (the same
       token searched at baseline in [P0-T4]) and confirm an identical single match. Write
@@ -216,7 +224,7 @@ occurs later during epic execution.
       with the four required fields, explicitly comparing against the [P0-T4] baseline count.
       Acceptance: exactly one match, unchanged from [P0-T4]; `EXIT_CODE: 0`.
 
-- [ ] [P2-T10] Confirm `.claude/skills/parallel-orchestrate/SKILL.md`,
+- [x] [P2-T10] Confirm `.claude/skills/parallel-orchestrate/SKILL.md`,
       `.claude/skills/epic-orchestrate/SKILL.md`, and their two bundle mirrors
       (`extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`,
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`)
