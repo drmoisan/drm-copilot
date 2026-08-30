@@ -690,7 +690,7 @@ Defect 1 — shared session identity (both hooks and the sibling Python hook):
       environment variable empty and `.claude/state/current-session-id` supplying the id through the
       new read seam, and (c) both sources empty, yielding the worktree-derived identifier. The three
       composed names are asserted to be pairwise different.
-- [ ] `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1` contains the same three
+- [x] `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1` contains the same three
       passing tests for `enforce-python-batch-budget.ps1`.
 - [x] A case-sensitive search for the literal `'default'` across
       `.claude/hooks/enforce-powershell-batch-budget.ps1`,
@@ -698,7 +698,7 @@ Defect 1 — shared session identity (both hooks and the sibling Python hook):
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` returns no matching
       lines. The same search returns matches in all four files before the change (2 per file: the
       parameter default and the entry-point assignment).
-- [ ] Each hook suite contains a passing test asserting that a session id containing characters
+- [x] Each hook suite contains a passing test asserting that a session id containing characters
       outside `[A-Za-z0-9._-]` produces a state-file name matching
       `^(powershell|python)-batch-budget\.[A-Za-z0-9._-]+\.json$`.
 - [x] `tests/scripts/claude-hooks/persist-session-id.Tests.ps1` contains a passing test asserting the
@@ -708,7 +708,7 @@ Defect 1 — shared session identity (both hooks and the sibling Python hook):
 
 Defect 2 — never-resetting inheritance of a poisoned counter:
 
-- [ ] Each hook suite contains a passing test in which the persisted state's `prodFiles` already
+- [x] Each hook suite contains a passing test in which the persisted state's `prodFiles` already
       contains an out-of-root absolute path, and three distinct in-root production files are still
       admitted without a deny — proving the rehydrate-time containment filter drops the poisoned
       entry from the cap arithmetic. The out-of-root path is the fixed synthetic constant
@@ -718,7 +718,7 @@ Defect 2 — never-resetting inheritance of a poisoned counter:
 
 Defect 3 — unscoped recorded paths:
 
-- [ ] Each hook suite contains passing tests asserting that (a) a relative path is recorded, (b) an
+- [x] Each hook suite contains passing tests asserting that (a) a relative path is recorded, (b) an
       absolute path under the resolved root is recorded, (c) an absolute path outside the resolved
       root yields `permissionDecision = 'allow'` with `shouldWriteState` false and an unchanged
       recorded-file list, and (d) an in-root absolute path differing only in letter case is recorded.
@@ -729,7 +729,7 @@ Defect 3 — unscoped recorded paths:
 
 Defect 4 — destination-side ignore delivery:
 
-- [ ] `extensions/drm-copilot/src/lib/push-down/claude-gitignore-merge.ts` exists, exports a merge
+- [x] `extensions/drm-copilot/src/lib/push-down/claude-gitignore-merge.ts` exists, exports a merge
       function that performs no I/O, and its suite
       `extensions/drm-copilot/test/lib/push-down/claude-gitignore-merge.test.ts` passes under
       `npx jest` with cases for: absent input, present without a managed block, present with an
