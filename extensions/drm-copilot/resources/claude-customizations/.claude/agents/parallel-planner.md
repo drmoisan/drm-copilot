@@ -148,8 +148,12 @@ plan a parallel run.
 relation come from `.claude/lib/blast-radius/BlastRadius.psm1`:
 
 ```powershell
-Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
+$repoRoot = git rev-parse --show-toplevel
+Import-Module (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 ```
+
+The default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1` file, so `pwsh` is
+mandatory here.
 
 The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObservedPaths`,
 `Test-BlastRadius`, and `Test-BlastRadiusConflict`. Its truth table is

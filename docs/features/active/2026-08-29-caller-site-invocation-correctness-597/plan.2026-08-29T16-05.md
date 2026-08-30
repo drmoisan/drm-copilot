@@ -84,7 +84,7 @@ occurs later during epic execution.
 
 ### Phase 1 — Implementation (six file edits)
 
-- [ ] [P1-T1] In `.claude/skills/parallel-plan/SKILL.md`, replace the fenced ```powershell block
+- [x] [P1-T1] In `.claude/skills/parallel-plan/SKILL.md`, replace the fenced ```powershell block
       content at line 183 (block opened at line 182, closed at line 184):
       `Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force`
       with the two-line root-anchored, fail-fast form:
@@ -99,11 +99,11 @@ occurs later during epic execution.
       Acceptance: the file contains the two corrected lines and the new sentence at the stated
       location, and no other line in the file differs from its Phase 0 baseline state.
 
-- [ ] [P1-T2] Apply the identical edit from [P1-T1], byte-for-byte, to
+- [x] [P1-T2] Apply the identical edit from [P1-T1], byte-for-byte, to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`.
       Acceptance: this file is byte-identical to the repo file edited in [P1-T1] after the edit.
 
-- [ ] [P1-T3] In `.claude/skills/parallel-add/SKILL.md`, make two corrections within the same
+- [x] [P1-T3] In `.claude/skills/parallel-add/SKILL.md`, make two corrections within the same
       numbered list item (item 3, lines 59-69):
       (a) at line 62, replace the parenthetical
       `` (`Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force`) ``
@@ -121,11 +121,11 @@ occurs later during epic execution.
       Acceptance: the file contains both corrected passages at the stated locations, and no other
       line in the file differs from its Phase 0 baseline state.
 
-- [ ] [P1-T4] Apply the identical edit from [P1-T3], byte-for-byte, to
+- [x] [P1-T4] Apply the identical edit from [P1-T3], byte-for-byte, to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`.
       Acceptance: this file is byte-identical to the repo file edited in [P1-T3] after the edit.
 
-- [ ] [P1-T5] In `.claude/agents/parallel-planner.md`, replace the fenced ```powershell block
+- [x] [P1-T5] In `.claude/agents/parallel-planner.md`, replace the fenced ```powershell block
       content at line 151 (block opened at line 150, closed at line 152):
       `Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force`
       with the two-line root-anchored, fail-fast form:
@@ -139,7 +139,7 @@ occurs later during epic execution.
       Acceptance: the file contains the two corrected lines and the new sentence at the stated
       location, and no other line in the file differs from its Phase 0 baseline state.
 
-- [ ] [P1-T6] Apply the identical edit from [P1-T5], byte-for-byte, to
+- [x] [P1-T6] Apply the identical edit from [P1-T5], byte-for-byte, to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`.
       Acceptance: this file is byte-identical to the repo file edited in [P1-T5] after the edit.
 

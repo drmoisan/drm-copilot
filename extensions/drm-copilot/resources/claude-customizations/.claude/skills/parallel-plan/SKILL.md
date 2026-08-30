@@ -182,8 +182,12 @@ PowerShell port** under `.claude/lib/blast-radius/`, which is published by push-
 Python interpreter:
 
 ```powershell
-Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
+$repoRoot = git rev-parse --show-toplevel
+Import-Module (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 ```
+
+The default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1` file, so `pwsh` is
+mandatory here.
 
 The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port of
 `extract_plan_paths`), `Get-BlastRadius` (port of `derive_blast_radius`),
