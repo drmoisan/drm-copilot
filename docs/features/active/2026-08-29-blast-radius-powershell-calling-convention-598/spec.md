@@ -595,26 +595,26 @@ Pester, then the pytest bundle-parity test. Restart from format if any stage cha
 
 Item 1 — fail-fast import guard:
 
-- [ ] `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` exists, discovers its module list
+- [x] `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` exists, discovers its module list
       from disk with `Get-ChildItem -Filter '*.psm1' -File -Recurse` under the `.claude/lib` root and
       does not restate any module name, and its anti-vacuity `It 'discovers the claude library modules on disk'`
       passes by asserting the discovered count is greater than zero.
-- [ ] `It 'sets the fail-fast error preference at module scope in every discovered module'` in
+- [x] `It 'sets the fail-fast error preference at module scope in every discovered module'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: for every discovered
       module, the line immediately following its `Set-StrictMode -Version Latest` line is
       `$ErrorActionPreference = 'Stop'`.
-- [ ] `It 'guards every load-time sibling import with an explicit stop preference'` in
+- [x] `It 'guards every load-time sibling import with an explicit stop preference'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: every column-0
       `Import-Module` line in every discovered module contains `-ErrorAction Stop`.
-- [ ] `It 'states the fail-fast convention in the module help block'` in
+- [x] `It 'states the fail-fast convention in the module help block'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: every discovered module
       contains the token `imports its siblings with -ErrorAction Stop` on a line preceding its
       `Set-StrictMode -Version Latest` line.
-- [ ] `It 'leaves the caller error preference unchanged after import'` in
+- [x] `It 'leaves the caller error preference unchanged after import'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: the caller-scope
       `$ErrorActionPreference` after importing a guarded module equals the value captured before the
       import.
-- [ ] `It 'keeps every claude library module within the five hundred line limit'` in
+- [x] `It 'keeps every claude library module within the five hundred line limit'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: no discovered module
       exceeds 500 lines.
 - [x] `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1`
@@ -624,11 +624,11 @@ Item 1 — fail-fast import guard:
 
 Item 2 — date-coercion contract:
 
-- [ ] `It 'documents the checkpoint date-coercion contract in its comment-based help'` in
+- [x] `It 'documents the checkpoint date-coercion contract in its comment-based help'` in
       `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` passes: the rendered
       help for `Get-OrchestratorStateCheckpoint`, read through `Get-Help -Full | Out-String -Width 500`,
       contains the token `date-coerced by ConvertFrom-Json`.
-- [ ] `It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling'` in
+- [x] `It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling'` in
       `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` passes: with the
       in-memory fixture supplying `"last_updated": "2026-08-29T20:38:00Z"`, the value returned in
       `State` is `System.DateTime`, and a non-date string key in the same fixture is
