@@ -4,8 +4,8 @@
 - **Parent (optional):** epic `claude-runtime-portability-integration`
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-29T23-07
-- **Status:** Preflight round 1 revisions applied
-- **Version:** 1.1
+- **Status:** Preflight round 2 revisions applied; cleared by an independent read-only round 3
+- **Version:** 1.2
 - **Work Mode:** full-bug
 - **Remediation cycle:** 1
 - **Remediation anchor commit:** `7840ecc3` on branch `feature/batch-budget-state-portability-596`.
