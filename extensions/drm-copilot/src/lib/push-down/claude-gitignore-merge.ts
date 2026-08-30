@@ -120,10 +120,12 @@ export function mergeClaudeGitignore(currentText: string): string {
 
   // An end sentinel that precedes the begin sentinel belongs to an earlier,
   // malformed block; only a closer at or after the opener delimits this one.
+  // When no closer follows the opener the block is the opening line alone, so
+  // every line after it is preserved as ordinary unmanaged content.
   const endOffset = lines
     .slice(beginIndex)
     .indexOf(CLAUDE_GITIGNORE_END_SENTINEL);
-  const endIndex = endOffset === -1 ? lines.length - 1 : beginIndex + endOffset;
+  const endIndex = endOffset === -1 ? beginIndex : beginIndex + endOffset;
 
   const merged = [
     ...lines.slice(0, beginIndex),

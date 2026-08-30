@@ -142,4 +142,36 @@ describe("mergeClaudeGitignore", () => {
     expect(merged.startsWith("node_modules/\ndist/\n")).toBe(true);
     expect(mergeClaudeGitignore(merged)).toBe(merged);
   });
+
+  it("preserves content following an opening sentinel that has no closing sentinel", () => {
+    // Arrange
+    const unterminated = [
+      "a/",
+      CLAUDE_GITIGNORE_BEGIN_SENTINEL,
+      ".old/",
+      "b/",
+      "c/",
+      "",
+    ].join("\n");
+
+    // Act
+    const merged = mergeClaudeGitignore(unterminated);
+
+    // Assert
+    expect(merged).toBe(
+      [
+        "a/",
+        CLAUDE_GITIGNORE_BEGIN_SENTINEL,
+        ...CLAUDE_MANAGED_IGNORE_ENTRIES,
+        CLAUDE_GITIGNORE_END_SENTINEL,
+        ".old/",
+        "b/",
+        "c/",
+        "",
+      ].join("\n"),
+    );
+    expect(countOccurrences(merged, CLAUDE_GITIGNORE_BEGIN_SENTINEL)).toBe(1);
+    expect(countOccurrences(merged, CLAUDE_GITIGNORE_END_SENTINEL)).toBe(1);
+    expect(mergeClaudeGitignore(merged)).toBe(merged);
+  });
 });
