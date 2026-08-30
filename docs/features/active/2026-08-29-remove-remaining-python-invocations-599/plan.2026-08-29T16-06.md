@@ -714,7 +714,7 @@ Constraint 1.
 
 ### Phase 3 — Shared parity corpus and the two parity lanes
 
-- [ ] [P3-T1] Create the manifest fixtures
+- [x] [P3-T1] Create the manifest fixtures
       `tests/fixtures/parallel_lane_assertion/manifests/*.md` covering the assertion-free shapes: a
       manifest with two items declaring exactly `issue_num` 101 and 202 and no
       `expected_conflict_components` key, a manifest with an empty `items` list and no assertion, and
@@ -734,7 +734,7 @@ Constraint 1.
     valid one and can never fail. The header line is what distinguishes a fixture the diagnostic
     actually compared from one it refused.
 
-- [ ] [P3-T2] Create the manifest fixtures under
+- [x] [P3-T2] Create the manifest fixtures under
       `tests/fixtures/parallel_lane_assertion/manifests/` covering the component-shape edge cases: a
       component with `name` absent, a component with `name: ''`, a component whose members include a
       non-positive value, a component whose members include a boolean, a component whose members are
@@ -746,7 +746,7 @@ Constraint 1.
     on every non-usage path, so its exit status cannot distinguish a compared fixture from a
     refused one.
 
-- [ ] [P3-T3] Create the corpus records
+- [x] [P3-T3] Create the corpus records
       `tests/fixtures/parallel_lane_assertion/*.json` for the assertion-free and component-shape
       fixtures, each carrying `name`, `notes`, `manifest_path`, `manifest_text`, `edges`,
       `expected_stdout`, and `expected_status: 0`, with `expected_stdout` derived by running the
@@ -755,7 +755,7 @@ Constraint 1.
   - Acceptance: at least ten `*.json` records exist at depth 1 under
     `tests/fixtures/parallel_lane_assertion/`, and every record's `expected_status` is 0.
 
-- [ ] [P3-T4] Create the remaining corpus records covering the edge-derivation cases: a self-loop
+- [x] [P3-T4] Create the remaining corpus records covering the edge-derivation cases: a self-loop
       edge, an edge naming an undeclared key, reversed and duplicated edges, a token with no colon,
       a token with two colons, a token with a non-integer endpoint, an empty `edges` value, a
       whitespace-only `edges` value, a merged-class disagreement, a split-class disagreement, a
@@ -779,7 +779,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && find tests/fixtures/parallel_lane_assertion -maxdepth 1 -name "*.json" -type f | wc -l'`
     printing a value of 20 or greater.
 
-- [ ] [P3-T5] Create `tests/shell/parallel_lane_assertion_parity.bats` with a header declaring all
+- [x] [P3-T5] Create `tests/shell/parallel_lane_assertion_parity.bats` with a header declaring all
       five divergence classes — recording that class 3 has exactly four members and that whitespace
       inside an endpoint is a convergence case carried in the corpus, not a class-3 member — a
       `MINIMUM_FIXTURE_COUNT` constant set to 20, a case named
@@ -794,7 +794,7 @@ Constraint 1.
     exits 0, its TAP plan line reports `1..3` or a higher count, and its output contains no line
     beginning `not ok`.
 
-- [ ] [P3-T6] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
+- [x] [P3-T6] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
       `every finding class appears in the corpus`, asserting that each of
       `expected_together_derived_apart`, `expected_apart_derived_together`, `member_names_no_item`,
       and `item_covered_by_no_component` appears in the `expected_stdout` of at least one corpus
@@ -812,7 +812,7 @@ Constraint 1.
     exits 0, its TAP plan line reports `1..7` or a higher count, and its output contains no line
     beginning `not ok`.
 
-- [ ] [P3-T7] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
+- [x] [P3-T7] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
       `no corpus fixture carries an excluded edges endpoint form`, asserting that no colon-bearing
       token in any record's `edges` value has an endpoint matching any of the four excluded forms of
       divergence class 3: a leading zero followed by a further digit, a leading `+`, an underscore
@@ -836,7 +836,7 @@ Constraint 1.
     exits 0, its TAP output carries a plan line of `1..1`, and it contains no line beginning
     `not ok`.
 
-- [ ] [P3-T8] Create `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` with the
+- [x] [P3-T8] Create `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` with the
       same five declared divergence classes in its module docstring, stated in the same corrected
       form as the bats lane header (class 3 has exactly four members; whitespace inside an endpoint
       is a convergence case carried in the corpus), a `MINIMUM_FIXTURE_COUNT`
@@ -851,7 +851,7 @@ Constraint 1.
     `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py -q -p no:cacheprovider`
     exits 0 and reports a pass count of at least 22.
 
-- [ ] [P3-T9] Verify the two parity lanes agree over the same corpus by running both in sequence:
+- [x] [P3-T9] Verify the two parity lanes agree over the same corpus by running both in sequence:
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py -q -p no:cacheprovider`
       then
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`,

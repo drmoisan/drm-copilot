@@ -1,0 +1,9 @@
+{
+  "name": "component_member_boolean_dropped",
+  "notes": "A boolean member is excluded even though bool subclasses int in the reference implementation.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/component-member-boolean.md",
+  "manifest_text": "---\nparallel: lane-assertion-component-member-boolean\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n  - issue_num: 202\n    feature_folder: docs/features/active/beta-202\n    kind: bug\n    state: admitted\nexpected_conflict_components:\n  - name: lane-boolean\n    members:\n      - true\n      - 101\n---\n\n# Parallel Run — lane-assertion-component-member-boolean\n\nShared parity-corpus manifest for the lane-assertion diagnostic. Its asserted\nlane lists a boolean member. Python's `bool` subclasses `int`, so a naive\npositive-integer test would accept `true` as the key 1; both lanes exclude it\nexplicitly, and this fixture pins that exclusion. The lane resolves to the single\nmember 101 and item 202 is left covered by no expected component.\n",
+  "edges": "",
+  "expected_stdout": "Lane assertion: 2 derived conflict component(s); 0 disagreement(s).\nADVISORY [item_covered_by_no_component] manifest item 202 is covered by no expected component.\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0
+}
