@@ -43,7 +43,7 @@ Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and 
 `Ubuntu` distribution, where `shfmt`, `shellcheck`, `bats`, and `kcov` are present at `/usr/bin`.
 Every bash command in this plan is therefore written in the form:
 
-`wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && <command>'`
+`wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && <command>'`
 
 **bats output form (observed this pass).** `bats` emits its pretty format only when stdout is a
 terminal. Every command in this plan is captured to an evidence artifact, so every `bats` run here
@@ -341,7 +341,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     paths above listed in that exact order.
 
 - [ ] [P0-T2] Capture the bash format-and-lint baseline by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh check'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/baseline/bash-check.<timestamp>.md`.
   - Acceptance: the artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` that
     reproduces the command's stdout and stderr verbatim. `shell-qc.sh check` is read-only (it runs
@@ -353,7 +353,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     because P4-T1's attribution argument depends on this baseline being clean.
 
 - [ ] [P0-T3] Capture the bash coverage baseline by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test --coverage'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/baseline/bash-coverage.<timestamp>.md`.
   - Acceptance: the artifact's `Output Summary:` records the numeric headline the run prints in the
     form produced by `scripts/bash/shell_qc_lib.sh:290-291`, `Bash coverage (lines): NN.N%`, with
@@ -470,7 +470,7 @@ Constraint 1.
       `the library declares the four finding-class tokens` that sources the library and asserts each
       constant's value.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the library declares the four finding-class tokens"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the library declares the four finding-class tokens"'`
     exits 0, and the captured output carries the TAP plan line `1..1`, exactly one line beginning
     `ok 1`, and no line beginning `not ok`.
   - Output-form note, observed this pass: bats emits its pretty format only when stdout is a
@@ -487,7 +487,7 @@ Constraint 1.
       tokens` covering an empty value, a whitespace-only value, a token with no colon, a token with
       two colons, and a token with a non-integer endpoint.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "parse_edges"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "parse_edges"'`
     exits 0 with 0 failures.
 
 - [ ] [P1-T3] Add `pla_read_manifest_inputs` to `.claude/lib/bash/parallel-lane-assertion.sh`,
@@ -501,7 +501,7 @@ Constraint 1.
       ascending with `sort -n`. Add the bats case `read_manifest_inputs skips malformed entries
       without raising`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "read_manifest_inputs"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "read_manifest_inputs"'`
     exits 0 with 0 failures.
 
 - [ ] [P1-T4] Add `pla_derive_components` to `.claude/lib/bash/parallel-lane-assertion.sh`, seeding
@@ -513,7 +513,7 @@ Constraint 1.
       `derive_components partitions declared keys deterministically` covering an isolated vertex, a
       self-loop, an undeclared endpoint, and reversed plus duplicated edges.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "derive_components"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "derive_components"'`
     exits 0 with 0 failures.
 
 - [ ] [P1-T5] Add `pla_find_split_lanes`, `pla_find_merged_lanes`, and `pla_compare` to
@@ -526,7 +526,7 @@ Constraint 1.
       `compare emits findings in the fixed class order` covering one finding of each of the four
       classes and a repeated key across two expected components.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "compare emits findings"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "compare emits findings"'`
     exits 0 with 0 failures.
 
 - [ ] [P1-T6] Add `pla_format_report` to `.claude/lib/bash/parallel-lane-assertion.sh`, emitting the
@@ -541,19 +541,19 @@ Constraint 1.
       `format_report renders the header, findings, and closing line` covering an absent name, an
       empty-string name, and a two-member derived component.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "format_report"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "format_report"'`
     exits 0 with 0 failures.
 
 - [ ] [P1-T7] Verify `.claude/lib/bash/parallel-lane-assertion.sh` is inside the 500-line cap by
       running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/parallel-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the count in `evidence/qa-gates/bash-file-size.<timestamp>.md`.
   - Acceptance: the recorded line count is 500 or fewer. If it exceeds 500, split derivation from
     comparison-and-formatting along the `parallel-yaml-scan.sh` / `parallel-yaml-emit.sh` precedent
     named in `spec.md` and re-run this task.
 
 - [ ] [P1-T8] Verify the library is shellcheck-clean and shfmt-clean by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && shfmt -d .claude/lib/bash/parallel-lane-assertion.sh && shellcheck .claude/lib/bash/parallel-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && shfmt -d .claude/lib/bash/parallel-lane-assertion.sh && shellcheck .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-library-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty stdout. `shfmt -d` prints a unified diff and returns
     non-zero when the file needs reformatting, so both halves are read-only and falsifiable.
@@ -581,7 +581,7 @@ Constraint 1.
     set that matches its enumeration. A single case asserting all three would leave P6-T17 marking
     a three-property criterion against a one-case set.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point"'`
     exits 0, and the captured output carries the TAP plan line `1..3`, exactly three lines beginning
     `ok`, and no line beginning `not ok`.
   - The filter selects exactly these three cases: no case name added by Phase 1 (P1-T1 through
@@ -597,7 +597,7 @@ Constraint 1.
       `the entry point exits 2 only on a usage error` covering an unknown flag, a missing
       `--manifest`, and `--help`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point exits 2 only on a usage error"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point exits 2 only on a usage error"'`
     exits 0 with 0 failures.
 
 - [ ] [P2-T3] Add the bats case `the entry point rejects a --keys flag` to
@@ -606,7 +606,7 @@ Constraint 1.
       and asserting exit status 2 with the usage text written to stderr, pinning that no `--keys`
       flag was added.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "rejects a --keys flag"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "rejects a --keys flag"'`
     exits 0 with 0 failures.
 
 - [ ] [P2-T4] Implement the manifest-unreadable path in
@@ -619,7 +619,7 @@ Constraint 1.
       reproduce, so only the prefix is parity-scoped and the class is excluded from the shared
       corpus.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an unreadable manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an unreadable manifest"'`
     exits 0 with 0 failures.
 
 - [ ] [P2-T5] Implement the manifest-unparseable path in
@@ -631,7 +631,7 @@ Constraint 1.
       fixture `tests/fixtures/parallel_lane_assertion_bash/not-a-mapping.md` and add the bats case
       `an unparseable manifest prints the M1 error and exits 0`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an unparseable manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an unparseable manifest"'`
     exits 0 with 0 failures, and the asserted output is exactly
     `Lane assertion: manifest unparseable (Parallel manifest frontmatter must be a mapping.).`
 
@@ -654,7 +654,7 @@ Constraint 1.
       The independent, non-vacuous assertion that no corpus record carries an excluded `--edges`
       form is P3-T7, which runs against a populated corpus.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an out-of-subset manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an out-of-subset manifest"'`
     exits 0 with 0 failures, and the asserted stdout begins with the literal
     `Lane assertion: manifest outside the supported YAML subset (` and the asserted exit status is 0.
 
@@ -677,7 +677,7 @@ Constraint 1.
       any file under `tests/fixtures/parallel_lane_assertion/` — is discharged by P3-T7, which runs
       against a populated corpus. P6-T17 maps that criterion to both task IDs.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "outside the strict integer lexis"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "outside the strict integer lexis"'`
     exits 0 with 0 failures.
 
 - [ ] [P2-T8] Add the bats case `no library file sources the diagnostic` to
@@ -686,18 +686,18 @@ Constraint 1.
       under `.claude/lib/bash/` sources `report-lane-assertion.sh`, pinning that the diagnostic feeds
       no cohort, validation, or scheduling module.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
     exits 0 with 0 failures.
 
 - [ ] [P2-T9] Verify `.claude/lib/bash/report-lane-assertion.sh` is inside the 500-line cap and is
       lint-clean by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/report-lane-assertion.sh && shfmt -d .claude/lib/bash/report-lane-assertion.sh && shellcheck .claude/lib/bash/report-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/report-lane-assertion.sh && shfmt -d .claude/lib/bash/report-lane-assertion.sh && shellcheck .claude/lib/bash/report-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-entry-point-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the recorded line count is 500 or fewer, and the `shfmt -d` and
     `shellcheck` halves produce empty output.
 
 - [ ] [P2-T10] Run the whole bash unit suite once by
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats'`
       and record the result in `evidence/regression-testing/bash-unit-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`; the recorded TAP output carries a plan line of `1..16` or a higher
     count; and it contains no line beginning `not ok`. Sixteen is the floor because Phases 1 and 2
@@ -725,7 +725,7 @@ Constraint 1.
     stdout matches the extended regular expression
     `^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$`,
     verified by
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && rc=0; for f in tests/fixtures/parallel_lane_assertion/manifests/*.md; do bash .claude/lib/bash/report-lane-assertion.sh --manifest "$f" | head -n 1 | grep -Eq "^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$" || { echo "BAD HEADER: $f"; rc=1; }; done; exit $rc'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && rc=0; for f in tests/fixtures/parallel_lane_assertion/manifests/*.md; do bash .claude/lib/bash/report-lane-assertion.sh --manifest "$f" | head -n 1 | grep -Eq "^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$" || { echo "BAD HEADER: $f"; rc=1; }; done; exit $rc'`
     exiting 0 with no `BAD HEADER:` line in its output.
   - Why the exit status is not the discriminator: `.claude/lib/bash/report-lane-assertion.sh` exits
     0 on every non-usage path by design (Fixed Design Decision 4 and the spec's exit-code contract),
@@ -776,7 +776,7 @@ Constraint 1.
       equality.
   - Acceptance: the corpus holds at least 20 `*.json` records at depth 1 under
     `tests/fixtures/parallel_lane_assertion/`, verified by
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && find tests/fixtures/parallel_lane_assertion -maxdepth 1 -name "*.json" -type f | wc -l'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && find tests/fixtures/parallel_lane_assertion -maxdepth 1 -name "*.json" -type f | wc -l'`
     printing a value of 20 or greater.
 
 - [ ] [P3-T5] Create `tests/shell/parallel_lane_assertion_parity.bats` with a header declaring all
@@ -790,7 +790,7 @@ Constraint 1.
       as a subprocess per fixture and compares both `$output` against `expected_stdout` and `$status`
       against `expected_status`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`
     exits 0, its TAP plan line reports `1..3` or a higher count, and its output contains no line
     beginning `not ok`.
 
@@ -808,7 +808,7 @@ Constraint 1.
       same `manifest_path` and carry byte-identical `expected_stdout` values, which is the
       convergence property `spec.md:566-575` requires.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`
     exits 0, its TAP plan line reports `1..7` or a higher count, and its output contains no line
     beginning `not ok`.
 
@@ -832,7 +832,7 @@ Constraint 1.
     reason. A record-level exemption would be unnecessary and would weaken the check: it would allow
     a genuine class-3 form to sit inside an exempted record undetected.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats -f "excluded edges endpoint form"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats -f "excluded edges endpoint form"'`
     exits 0, its TAP output carries a plan line of `1..1`, and it contains no line beginning
     `not ok`.
 
@@ -854,7 +854,7 @@ Constraint 1.
 - [ ] [P3-T9] Verify the two parity lanes agree over the same corpus by running both in sequence:
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py -q -p no:cacheprovider`
       then
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`,
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`,
       and record both in `evidence/regression-testing/parity-lanes.<timestamp>.md`.
   - Acceptance: both `EXIT_CODE:` values are 0, and the artifact records the pytest pass count and
     the bats case count.
@@ -862,7 +862,7 @@ Constraint 1.
 ### Phase 4 — Bundle mirror, pack manifest, payload-only proof, and TypeScript enumerations
 
 - [ ] [P4-T1] Format the new bash files by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record the result in `evidence/qa-gates/bash-format-preseal.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
     `AFTER=` values.
@@ -908,7 +908,7 @@ Constraint 1.
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh`.
       No script performs this copy; research section 5.2 confirms the mirroring is manual.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/lib/bash/parallel-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh && cmp -s .claude/lib/bash/report-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/lib/bash/parallel-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh && cmp -s .claude/lib/bash/report-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh'`
     exits 0.
 
 - [ ] [P4-T3] Add `".claude/lib/bash/parallel-lane-assertion.sh"` and
@@ -945,7 +945,7 @@ Constraint 1.
       without this change; it is updated because its title and list are documentation of the
       entry-point set and become stale otherwise.
   - Acceptance, all four clauses:
-    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_bash_manifest_membership.bats'`
+    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_bash_manifest_membership.bats'`
     exits 0, its TAP plan line reads `1..6`, and its output contains no line beginning `not ok`;
     (b) `git grep -c -F "report-lane-assertion.sh" -- tests/shell/parallel_bash_manifest_membership.bats`
     reports 1;
@@ -1006,7 +1006,7 @@ Constraint 1.
       which reads "Invokes the three published bash entry points from the bundle root", so that it
       reads `the four published bash entry points`.
   - Acceptance, all five clauses:
-    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_payload_only.bats'`
+    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_payload_only.bats'`
     exits 0, its TAP plan line reads `1..11`, and its output contains no line beginning `not ok`.
     Eleven is one more than the ten `@test` blocks the file carries today at lines 45, 52, 58, 67,
     74, 80, 86, 92, 98, and 107;
@@ -1024,7 +1024,7 @@ Constraint 1.
     both regions are green either way, so a passing suite alone cannot evidence them.
 
 - [ ] [P4-T9] Run the whole bash test suite for the first time since Phase 0 by
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test'`
       and record the result in `evidence/regression-testing/bash-full-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and 0 bats failures. This is the first whole-tree run after
     Phase 1 created a `.claude/lib/bash/` file, so it is the first point at which
@@ -1058,7 +1058,7 @@ Constraint 1.
     inside the rewritten passage at lines 295-299. That command returns exactly one match today, so
     the rise from one to two is the evidence that the completion-gate option was respelled as the
     MCP argument; and
-    (d) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/skills/epic-orchestrate/SKILL.md'`
+    (d) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/skills/epic-orchestrate/SKILL.md'`
     reports a line count of 310, which is the count it reports today, so the file length is unchanged
     and `require_complete=True` still sits at line 310 as clause (c) records. `wc -l <file>` prints
     the count followed by the path, so the asserted value is the count on that line, not the whole
@@ -1103,7 +1103,7 @@ Constraint 1.
     rewritten passage at lines 480-483. That command returns exactly one match today; and
     (d) `git grep -n -F "poetry run python -m scripts.dev_tools.parallel_drift_detection_cli" -- .claude/skills/parallel-orchestrate/SKILL.md`
     still returns exactly one match, at line 817; and
-    (e) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/skills/parallel-orchestrate/SKILL.md'`
+    (e) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/skills/parallel-orchestrate/SKILL.md'`
     reports a line count of 1055, which is the count it reports today, so the file length is
     unchanged and line 817 still holds the drift-detection invocation that clause (d) and four
     acceptance criteria name. `wc -l <file>` prints the count followed by the path, so the asserted
@@ -1223,31 +1223,31 @@ Constraint 1.
 - [ ] [P5-T6] Copy the edited `.claude/skills/epic-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md'`
     exits 0.
 
 - [ ] [P5-T7] Copy the edited `.claude/skills/parallel-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md'`
     exits 0.
 
 - [ ] [P5-T8] Copy the edited `.claude/skills/parallel-plan/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md'`
     exits 0.
 
 - [ ] [P5-T9] Copy the edited `.claude/agents/parallel-planner.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md'`
     exits 0.
 
 - [ ] [P5-T10] Copy the edited `.claude/agents/parallel-orchestrator.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md'`
     exits 0.
 
 - [ ] [P5-T11] Verify the complete bundle mirror by running
@@ -1272,7 +1272,7 @@ Constraint 1.
     P3-T8 additionally creates a `.py` file in this run, which is one of the triggers for the
     Python batch-budget hook that writes `.claude/state/`.
   - Acceptance, part 2 (durable gate, no dependence on `.claude/state/`): run
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && rc=0; for f in .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md .claude/skills/parallel-plan/SKILL.md .claude/agents/parallel-planner.md .claude/agents/parallel-orchestrator.md; do cmp -s "$f" "extensions/drm-copilot/resources/claude-customizations/$f" || { echo "DIFFERS: $f"; rc=1; }; done; exit $rc'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && rc=0; for f in .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md .claude/skills/parallel-plan/SKILL.md .claude/agents/parallel-planner.md .claude/agents/parallel-orchestrator.md; do cmp -s "$f" "extensions/drm-copilot/resources/claude-customizations/$f" || { echo "DIFFERS: $f"; rc=1; }; done; exit $rc'`
     and record it in the same artifact with `EXIT_CODE: 0` and empty stdout. Any `DIFFERS:` line is
     a blocking finding. The seven files are the two new bash files (P4-T2) and the five edited
     `.claude/**` files (P5-T6 through P5-T10). This loop is a byte comparison over a fixed,
@@ -1319,7 +1319,7 @@ The loop below runs in the order format, lint, type-check, test for each languag
 or rewrites a file, restart that language's loop at its format step.
 
 - [ ] [P6-T1] Run the bash format step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record it in `evidence/qa-gates/final-bash-format.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
     `AFTER=` values. That equality is the observation that distinguishes a clean run from a
@@ -1340,25 +1340,25 @@ or rewrites a file, restart that language's loop at its format step.
     mirror guard is a byte comparison.
 
 - [ ] [P6-T2] Run the bash lint step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh check'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/qa-gates/final-bash-check.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty output.
 
 - [ ] [P6-T3] Confirm both new files are inside the shell-QC discovery set by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | grep -c -F -e .claude/lib/bash/parallel-lane-assertion.sh -e .claude/lib/bash/report-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | grep -c -F -e .claude/lib/bash/parallel-lane-assertion.sh -e .claude/lib/bash/report-lane-assertion.sh'`
       and record it in `evidence/qa-gates/bash-discovery.<timestamp>.md`.
   - Acceptance: the command prints `2` and exits 0. `discover_shell_scripts`
     (`scripts/bash/shell_qc_lib.sh:75-102`) emits root-relative paths, so both new files appear with
     the spellings asserted here.
 
 - [ ] [P6-T4] Run the bash coverage step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test --coverage'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/qa-gates/final-bash-coverage.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, 0 bats failures, and an `Output Summary:` recording the numeric
     headline `Bash coverage (lines): NN.N%` with `NN.N` at least 85.0.
 
 - [ ] [P6-T5] Extract the per-file coverage rows for the two new bash files by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && grep -n -F -e parallel-lane-assertion.sh -e report-lane-assertion.sh artifacts/pester/kcov/cov.xml'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && grep -n -F -e parallel-lane-assertion.sh -e report-lane-assertion.sh artifacts/pester/kcov/cov.xml'`
       and record every matching line verbatim in
       `evidence/qa-gates/bash-new-file-coverage.<timestamp>.md`.
   - Acceptance: the command exits 0; the recorded output carries at least one line naming
@@ -1525,7 +1525,7 @@ or rewrites a file, restart that language's loop at its format step.
 
 - [ ] [P6-T16] Verify that no file under `.claude/lib/bash/` other than the entry point sources the
       diagnostic, and that the diagnostic feeds no scheduling module, by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
       and record it in `evidence/qa-gates/no-production-consumer.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` with 0 failures.
 
@@ -1623,7 +1623,7 @@ or rewrites a file, restart that language's loop at its format step.
     is made here.
 
 - [ ] [P6-T19] Verify the 500-line file cap over **all five files this feature creates** by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh tests/shell/parallel_lane_assertion.bats tests/shell/parallel_lane_assertion_parity.bats tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh tests/shell/parallel_lane_assertion.bats tests/shell/parallel_lane_assertion_parity.bats tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py'`
       and recording every output line verbatim, including the `total` line, in
       `evidence/qa-gates/new-file-sizes.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the artifact carries one recorded line per file for all five files,
