@@ -30,7 +30,7 @@ occurs later during epic execution.
 
 ### Phase 0 — Context & Baseline
 
-- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
       `.claude/rules/general-unit-test.md`, and `.claude/rules/powershell.md` (the last read for
       contextual background only — no `.claude/lib/**` `.psm1`/`.ps1` file is edited by this
       feature; the six touched files are PowerShell-invocation instruction text inside markdown).
@@ -40,7 +40,7 @@ occurs later during epic execution.
       beyond PowerShell applies because no source file is edited.
       Acceptance: the artifact file exists and contains all four required fields.
 
-- [ ] [P0-T2] Capture the pre-edit git state as fail-before evidence. Run
+- [x] [P0-T2] Capture the pre-edit git state as fail-before evidence. Run
       `git status --porcelain -- .claude/skills/parallel-plan/SKILL.md .claude/skills/parallel-add/SKILL.md .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`
       and write
       `docs/features/active/2026-08-29-caller-site-invocation-correctness-597/evidence/baseline/git-status-baseline.<TIMESTAMP>.md`
@@ -49,7 +49,7 @@ occurs later during epic execution.
       porcelain output, confirming no pre-existing uncommitted changes to the six target files).
       Acceptance: the artifact exists with all four required fields and `EXIT_CODE: 0`.
 
-- [ ] [P0-T3] Capture fail-before literal-token evidence that the CURRENT (uncorrected) invocation
+- [x] [P0-T3] Capture fail-before literal-token evidence that the CURRENT (uncorrected) invocation
       text is present at all six target files before any edit lands. Run, as a fixed-string
       (`-F`) search restricted to each of the six paths, the literal token
       `Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force` against:
@@ -67,7 +67,7 @@ occurs later during epic execution.
       Acceptance: the artifact exists, reports six matches (one per file), and `EXIT_CODE: 0`
       (grep/rg exit 0 = matches found).
 
-- [ ] [P0-T4] Confirm the two existing truthiness-warning passages and the out-of-scope
+- [x] [P0-T4] Confirm the two existing truthiness-warning passages and the out-of-scope
       `parallel_lane_assertion` line are present in their pre-edit form, as a second fail-before
       reference point for Phase 2's unchanged-content verification. Run, as fixed-string searches:
       the literal token `unconditionally truthy under PowerShell boolean coercion, so` against
