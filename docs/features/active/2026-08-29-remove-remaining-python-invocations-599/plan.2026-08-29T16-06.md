@@ -460,7 +460,7 @@ Each task in this phase adds one function group to the library and the bats case
 then runs only those cases. No whole-tree bash test run occurs in this phase; see Ordering
 Constraint 1.
 
-- [ ] [P1-T1] Create `.claude/lib/bash/parallel-lane-assertion.sh` carrying the module header, the
+- [x] [P1-T1] Create `.claude/lib/bash/parallel-lane-assertion.sh` carrying the module header, the
       self-directory resolution and `source` of `.claude/lib/bash/parallel-manifest-validate.sh` in
       the form `.claude/lib/bash/compute-cohorts.sh:29-32` uses, the four class-token constants
       holding the exact strings `expected_together_derived_apart`,
@@ -480,7 +480,7 @@ Constraint 1.
     33, 38, 43, 56, 73, and 84) and prints `1..6` followed by six `ok` lines on a captured run.
     Every bats acceptance in this plan is stated over TAP output for that reason.
 
-- [ ] [P1-T2] Add `pla_parse_edges` to `.claude/lib/bash/parallel-lane-assertion.sh`, splitting the
+- [x] [P1-T2] Add `pla_parse_edges` to `.claude/lib/bash/parallel-lane-assertion.sh`, splitting the
       `--edges` value on whitespace, partitioning each token on its first colon, dropping a token
       with no colon and a token whose endpoint falls outside the lexis `^-?(0|[1-9][0-9]*)$`, and
       preserving input order. Add the bats case `parse_edges keeps input order and drops malformed
@@ -490,7 +490,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "parse_edges"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T3] Add `pla_read_manifest_inputs` to `.claude/lib/bash/parallel-lane-assertion.sh`,
+- [x] [P1-T3] Add `pla_read_manifest_inputs` to `.claude/lib/bash/parallel-lane-assertion.sh`,
       consuming the node table already populated by `pm_parse_manifest` and reading
       `expected_conflict_components` through `yp_has`, `yp_type_of`, `yp_count_of`, and `yp_value_of`
       in the manner `.claude/lib/bash/parallel-manifest-validate.sh:203-237` already does, and
@@ -504,7 +504,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "read_manifest_inputs"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T4] Add `pla_derive_components` to `.claude/lib/bash/parallel-lane-assertion.sh`, seeding
+- [x] [P1-T4] Add `pla_derive_components` to `.claude/lib/bash/parallel-lane-assertion.sh`, seeding
       adjacency from every declared key so an isolated vertex survives, skipping an edge whose
       endpoints are equal or whose endpoint is not a declared key, building symmetric set-valued
       adjacency so direction and duplicates collapse, running BFS from each unvisited root in
@@ -516,7 +516,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "derive_components"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T5] Add `pla_find_split_lanes`, `pla_find_merged_lanes`, and `pla_compare` to
+- [x] [P1-T5] Add `pla_find_split_lanes`, `pla_find_merged_lanes`, and `pla_compare` to
       `.claude/lib/bash/parallel-lane-assertion.sh`, emitting findings grouped by class in the fixed
       order split, merged, unknown-member, uncovered-item; visiting expected components in manifest
       order within the split class and derived components in derived order within the merged class;
@@ -529,7 +529,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "compare emits findings"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T6] Add `pla_format_report` to `.claude/lib/bash/parallel-lane-assertion.sh`, emitting the
+- [x] [P1-T6] Add `pla_format_report` to `.claude/lib/bash/parallel-lane-assertion.sh`, emitting the
       header `Lane assertion: {N} derived conflict component(s); {D} disagreement(s).`, one
       `ADVISORY [{kind}] {detail}.` line per finding using the four detail templates recorded in
       `spec.md`, and the closing line
@@ -544,7 +544,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "format_report"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T7] Verify `.claude/lib/bash/parallel-lane-assertion.sh` is inside the 500-line cap by
+- [x] [P1-T7] Verify `.claude/lib/bash/parallel-lane-assertion.sh` is inside the 500-line cap by
       running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the count in `evidence/qa-gates/bash-file-size.<timestamp>.md`.
@@ -552,7 +552,7 @@ Constraint 1.
     comparison-and-formatting along the `parallel-yaml-scan.sh` / `parallel-yaml-emit.sh` precedent
     named in `spec.md` and re-run this task.
 
-- [ ] [P1-T8] Verify the library is shellcheck-clean and shfmt-clean by running
+- [x] [P1-T8] Verify the library is shellcheck-clean and shfmt-clean by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && shfmt -d .claude/lib/bash/parallel-lane-assertion.sh && shellcheck .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-library-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty stdout. `shfmt -d` prints a unified diff and returns
