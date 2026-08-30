@@ -560,7 +560,7 @@ Constraint 1.
 
 ### Phase 2 — Entry point `.claude/lib/bash/report-lane-assertion.sh`
 
-- [ ] [P2-T1] Create `.claude/lib/bash/report-lane-assertion.sh` with `set -euo pipefail` as its
+- [x] [P2-T1] Create `.claude/lib/bash/report-lane-assertion.sh` with `set -euo pipefail` as its
       first executable line, self-directory resolution before sourcing
       `.claude/lib/bash/parallel-lane-assertion.sh`, a `pc_enforce_c_locale` call before any work in
       the manner `.claude/lib/bash/compute-cohorts.sh:34` uses, the usage text, `--manifest` and
@@ -591,7 +591,7 @@ Constraint 1.
     run matches more than three cases, so this acceptance is stated for the state of the suite at
     this task only and is not re-used later.
 
-- [ ] [P2-T2] Implement the exit-code contract in `.claude/lib/bash/report-lane-assertion.sh`: exit 2
+- [x] [P2-T2] Implement the exit-code contract in `.claude/lib/bash/report-lane-assertion.sh`: exit 2
       with usage text on stderr for an unknown flag or a missing `--manifest`; exit 0 with usage text
       on stdout for `--help`; exit 0 on every other path. Add the bats case
       `the entry point exits 2 only on a usage error` covering an unknown flag, a missing
@@ -600,7 +600,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point exits 2 only on a usage error"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T3] Add the bats case `the entry point rejects a --keys flag` to
+- [x] [P2-T3] Add the bats case `the entry point rejects a --keys flag` to
       `tests/shell/parallel_lane_assertion.bats`, invoking
       `bash .claude/lib/bash/report-lane-assertion.sh --keys "101 102" --manifest tests/fixtures/parallel_manifest_payload/parallel.md`
       and asserting exit status 2 with the usage text written to stderr, pinning that no `--keys`
@@ -609,7 +609,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "rejects a --keys flag"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T4] Implement the manifest-unreadable path in
+- [x] [P2-T4] Implement the manifest-unreadable path in
       `.claude/lib/bash/report-lane-assertion.sh`, printing
       `Lane assertion: manifest unreadable ({detail}); no comparison made.` and exiting 0. Add the
       bats case `an unreadable manifest prints the unreadable line and exits 0`, which asserts the
@@ -622,7 +622,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an unreadable manifest"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T5] Implement the manifest-unparseable path in
+- [x] [P2-T5] Implement the manifest-unparseable path in
       `.claude/lib/bash/report-lane-assertion.sh`, printing
       `Lane assertion: manifest unparseable ({first M1 error}).` and exiting 0, reusing the M1
       message text that `pm_parse_manifest` appends to `PC_ERRORS` with `PM_CONTEXT` left at its
@@ -635,7 +635,7 @@ Constraint 1.
     exits 0 with 0 failures, and the asserted output is exactly
     `Lane assertion: manifest unparseable (Parallel manifest frontmatter must be a mapping.).`
 
-- [ ] [P2-T6] Implement the out-of-subset path in `.claude/lib/bash/report-lane-assertion.sh`,
+- [x] [P2-T6] Implement the out-of-subset path in `.claude/lib/bash/report-lane-assertion.sh`,
       printing the distinct refusal line
       `Lane assertion: manifest outside the supported YAML subset ({detail}); no comparison made.`
       and exiting 0 when `pm_parse_manifest` returns status 2, using `PM_SUBSET_DETAIL` as the
@@ -658,7 +658,7 @@ Constraint 1.
     exits 0 with 0 failures, and the asserted stdout begins with the literal
     `Lane assertion: manifest outside the supported YAML subset (` and the asserted exit status is 0.
 
-- [ ] [P2-T7] Add the bats case `the port drops an --edges endpoint outside the strict integer lexis`
+- [x] [P2-T7] Add the bats case `the port drops an --edges endpoint outside the strict integer lexis`
       to `tests/shell/parallel_lane_assertion.bats`, pinning divergence class 3. Using the
       checked-in manifest `tests/fixtures/parallel_manifest_payload/parallel.md`, which declares
       exactly `issue_num` 101 and 202, invoke the entry point once per excluded form —
@@ -680,7 +680,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "outside the strict integer lexis"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T8] Add the bats case `no library file sources the diagnostic` to
+- [x] [P2-T8] Add the bats case `no library file sources the diagnostic` to
       `tests/shell/parallel_lane_assertion.bats`, asserting that no file under `.claude/lib/bash/`
       other than `report-lane-assertion.sh` sources `parallel-lane-assertion.sh`, and that no file
       under `.claude/lib/bash/` sources `report-lane-assertion.sh`, pinning that the diagnostic feeds
@@ -689,14 +689,14 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T9] Verify `.claude/lib/bash/report-lane-assertion.sh` is inside the 500-line cap and is
+- [x] [P2-T9] Verify `.claude/lib/bash/report-lane-assertion.sh` is inside the 500-line cap and is
       lint-clean by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/report-lane-assertion.sh && shfmt -d .claude/lib/bash/report-lane-assertion.sh && shellcheck .claude/lib/bash/report-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-entry-point-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the recorded line count is 500 or fewer, and the `shfmt -d` and
     `shellcheck` halves produce empty output.
 
-- [ ] [P2-T10] Run the whole bash unit suite once by
+- [x] [P2-T10] Run the whole bash unit suite once by
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats'`
       and record the result in `evidence/regression-testing/bash-unit-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`; the recorded TAP output carries a plan line of `1..16` or a higher

@@ -8,6 +8,14 @@
 #
 # Every input is a literal in this file or a checked-in fixture; no temporary
 # file is created.
+#
+# Divergence class 4 -- the unreadable manifest. The Python authority prints
+# str(OSError) inside the parentheses of its `manifest unreadable` line, which
+# names a Python errno string that bash cannot reproduce. Only the line's prefix
+# `Lane assertion: manifest unreadable (` is therefore parity scoped, and the
+# class is excluded from the shared corpus at
+# tests/fixtures/parallel_lane_assertion/. Its bash-only fixture path lives
+# under tests/fixtures/parallel_lane_assertion_bash/ for the same reason.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
@@ -218,4 +226,233 @@ rendering_body() {
         "Lane assertion: 1 derived conflict component(s); 0 disagreement(s)." \
         "Advisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.")"
     [ "$PLA_REPORT" = "$expected" ]
+}
+
+# The entry point .claude/lib/bash/report-lane-assertion.sh. Every case below
+# invokes it as a separate process, so the exit status it reports is the
+# contract's exit status and not this suite's.
+ENTRY_POINT() {
+    printf -- '%s' "${LIB_DIR}/report-lane-assertion.sh"
+}
+
+# The checked-in payload manifest declares exactly issue_num 101 and 202 and
+# asserts no expected_conflict_components, so with no edges it derives two
+# single-member components and reports no disagreement.
+PAYLOAD_MANIFEST() {
+    printf -- '%s' "${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel.md"
+}
+
+@test "the entry point resolves its own directory before sourcing" {
+    # Run from the filesystem root rather than the repository root. A source
+    # written relative to the caller's working directory would fail to find
+    # parallel-lane-assertion.sh here, so a successful report proves the script
+    # resolved its own directory first.
+    run bash -c "cd / && bash '$(ENTRY_POINT)' --manifest '$(PAYLOAD_MANIFEST)'"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Lane assertion: 2 derived conflict component(s); 0 disagreement(s)." ]
+}
+
+@test "the entry point calls pc_enforce_c_locale before any output is produced" {
+    # Read the file and compare source positions: the top-level locale call must
+    # precede the first printf, so every sort and character class the report
+    # depends on is byte ordered before a byte of output is written.
+    local script locale_line printf_line
+    script="$(ENTRY_POINT)"
+    locale_line="$(grep -n -- '^pc_enforce_c_locale$' "$script" | head -n 1 | cut -d: -f1)"
+    printf_line="$(grep -n -- 'printf' "$script" | head -n 1 | cut -d: -f1)"
+    [ -n "$locale_line" ]
+    [ -n "$printf_line" ]
+    [ "$locale_line" -lt "$printf_line" ]
+}
+
+@test "the entry point establishes set -euo pipefail as its first executable line" {
+    # The shebang is a comment line, so the first line that is neither blank nor
+    # a comment is the first line bash executes.
+    local first
+    first="$(grep -v -E -- '^[[:space:]]*(#|$)' "$(ENTRY_POINT)" | head -n 1)"
+    [ "$first" = "set -euo pipefail" ]
+}
+
+@test "the entry point exits 2 only on a usage error" {
+    # An unknown flag is a usage error: usage text on stderr, exit 2.
+    run bash "$(ENTRY_POINT)" --unknown-flag --manifest "$(PAYLOAD_MANIFEST)"
+    [ "$status" -eq 2 ]
+    [ "${lines[0]}" = "Usage: report-lane-assertion.sh --manifest <path> [--edges \"<a>:<b> ...\"]" ]
+
+    # A missing --manifest is a usage error even when --edges is supplied.
+    run bash "$(ENTRY_POINT)" --edges "101:202"
+    [ "$status" -eq 2 ]
+    [ "${lines[0]}" = "Usage: report-lane-assertion.sh --manifest <path> [--edges \"<a>:<b> ...\"]" ]
+
+    # No arguments at all is the same usage error.
+    run bash "$(ENTRY_POINT)"
+    [ "$status" -eq 2 ]
+
+    # --help is a successful request for the usage text: stdout, exit 0.
+    run bash "$(ENTRY_POINT)" --help
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Usage: report-lane-assertion.sh --manifest <path> [--edges \"<a>:<b> ...\"]" ]
+
+    # The usage text of a usage error goes to stderr and not to stdout, so it
+    # can never be mistaken for a report.
+    run bash -c "bash '$(ENTRY_POINT)' --unknown-flag 2>/dev/null"
+    [ "$status" -eq 2 ]
+    [ "${#lines[@]}" -eq 0 ]
+
+    # A well-formed invocation is not a usage error.
+    run bash "$(ENTRY_POINT)" --manifest "$(PAYLOAD_MANIFEST)"
+    [ "$status" -eq 0 ]
+}
+
+@test "the entry point rejects a --keys flag" {
+    # The CLI surface is exactly --manifest and --edges. Item keys are read from
+    # the manifest's items[].issue_num, never supplied on the command line, so a
+    # --keys flag borrowed from compute-cohorts.sh is an unknown flag here. This
+    # case pins that no --keys flag was added.
+    run bash -c "cd '${REPO_ROOT}' && bash .claude/lib/bash/report-lane-assertion.sh --keys \"101 102\" --manifest tests/fixtures/parallel_manifest_payload/parallel.md"
+    [ "$status" -eq 2 ]
+    [ "${lines[0]}" = "Usage: report-lane-assertion.sh --manifest <path> [--edges \"<a>:<b> ...\"]" ]
+
+    # The usage text went to stderr, so stdout carried nothing.
+    run bash -c "cd '${REPO_ROOT}' && bash .claude/lib/bash/report-lane-assertion.sh --keys \"101 102\" --manifest tests/fixtures/parallel_manifest_payload/parallel.md 2>/dev/null"
+    [ "$status" -eq 2 ]
+    [ "${#lines[@]}" -eq 0 ]
+}
+
+@test "an unreadable manifest prints the unreadable line and exits 0" {
+    # Divergence class 4, declared in this file's header: only the prefix is
+    # parity scoped, because the parenthesised detail is str(OSError) in the
+    # Python authority. The path is deliberately absent from the tree.
+    local missing="${REPO_ROOT}/tests/fixtures/parallel_lane_assertion_bash/no-such-manifest.md"
+    [ ! -e "$missing" ]
+
+    run bash "$(ENTRY_POINT)" --manifest "$missing"
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 1 ]
+    case "${lines[0]}" in
+    "Lane assertion: manifest unreadable ("*) ;;
+    *) return 1 ;;
+    esac
+    # The line ends with the fixed suffix, so the detail is the only free text.
+    case "${lines[0]}" in
+    *"); no comparison made.") ;;
+    *) return 1 ;;
+    esac
+
+    # A directory is unreadable as a manifest for the same reason and takes the
+    # same path, so the class is not limited to a missing file.
+    run bash "$(ENTRY_POINT)" --manifest "${REPO_ROOT}/tests/fixtures"
+    [ "$status" -eq 0 ]
+    case "${lines[0]}" in
+    "Lane assertion: manifest unreadable ("*) ;;
+    *) return 1 ;;
+    esac
+}
+
+@test "an unparseable manifest prints the M1 error and exits 0" {
+    # The parenthesised text is the M1 message pm_parse_manifest appends to
+    # PC_ERRORS, reused byte for byte rather than restated, so the assertion
+    # below is the full line and not a prefix.
+    run bash "$(ENTRY_POINT)" \
+        --manifest "${REPO_ROOT}/tests/fixtures/parallel_lane_assertion_bash/not-a-mapping.md"
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 1 ]
+    [ "${lines[0]}" = "Lane assertion: manifest unparseable (Parallel manifest frontmatter must be a mapping.)." ]
+}
+
+@test "an out-of-subset manifest prints the refusal line and exits 0" {
+    # A non-empty flow collection is outside the scanner's modelled subset, so
+    # pm_parse_manifest returns status 2 and the entry point refuses rather than
+    # guessing a parse the Python authority might read differently.
+    run bash "$(ENTRY_POINT)" \
+        --manifest "${REPO_ROOT}/tests/fixtures/parallel_lane_assertion_bash/out-of-subset.md"
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 1 ]
+    case "${lines[0]}" in
+    "Lane assertion: manifest outside the supported YAML subset ("*) ;;
+    *) return 1 ;;
+    esac
+    case "${lines[0]}" in
+    *"); no comparison made.") ;;
+    *) return 1 ;;
+    esac
+    # The refusal line is distinct from the unparseable line, so a reader can
+    # tell a manifest bash declined to read from one it read and rejected.
+    case "${lines[0]}" in
+    *"manifest unparseable"*) return 1 ;;
+    esac
+
+    # The out-of-subset construct appears in no file under the shared corpus
+    # directory. While that directory does not yet exist the assertion holds
+    # trivially; it becomes load-bearing once the corpus is populated.
+    local corpus="${REPO_ROOT}/tests/fixtures/parallel_lane_assertion"
+    if [ -d "$corpus" ]; then
+        run grep -r -F -- "items: [101, 202]" "$corpus"
+        [ "$status" -ne 0 ]
+    fi
+}
+
+@test "the port drops an --edges endpoint outside the strict integer lexis" {
+    # Divergence class 3, and its complete membership. Python's int() accepts a
+    # leading zero, a leading '+', an underscore digit separator, and a
+    # non-ASCII decimal digit, coercing each of the four first endpoints below
+    # to 101 and merging the two items into one derived component. The port
+    # applies the strict lexis ^-?(0|[1-9][0-9]*)$ that compute-cohorts.sh
+    # already uses, drops the edge, and derives two components. The class has
+    # exactly these four members.
+    #
+    # Interior or surrounding whitespace inside an endpoint is NOT a member of
+    # this class. Both implementations split the --edges value on whitespace
+    # before partitioning on the colon, so neither can see an endpoint carrying
+    # interior whitespace and the two converge on that input. It is pinned as a
+    # convergence record inside the shared corpus, not here.
+    local manifest split_header merged_header form
+    manifest="$(PAYLOAD_MANIFEST)"
+    split_header="Lane assertion: 2 derived conflict component(s); 0 disagreement(s)."
+    merged_header="Lane assertion: 1 derived conflict component(s); 0 disagreement(s)."
+
+    # The fourth form is Arabic-Indic 101 (U+0661 U+0660 U+0661), written as its
+    # explicit UTF-8 bytes so this file stays ASCII and the value does not
+    # depend on the locale in which the suite is read.
+    for form in "0101:202" "+101:202" "1_01:202" $'\xd9\xa1\xd9\xa0\xd9\xa1:202'; do
+        run bash "$(ENTRY_POINT)" --manifest "$manifest" --edges "$form"
+        [ "$status" -eq 0 ]
+        [ "${lines[0]}" = "$split_header" ]
+    done
+
+    # Control: a well-formed edge over the same manifest is not dropped. Without
+    # it the four assertions above would also pass against an entry point that
+    # ignored --edges entirely.
+    run bash "$(ENTRY_POINT)" --manifest "$manifest" --edges "101:202"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "$merged_header" ]
+}
+
+@test "no library file sources the diagnostic" {
+    # The diagnostic is advisory and one-directional: the entry point sources
+    # the library, and nothing else in .claude/lib/bash/ sources either file. If
+    # a cohort, validation, or scheduling module sourced one of them, its
+    # findings could reach a decision the diagnostic must never influence.
+    local file base offenders=0
+    for file in "${LIB_DIR}"/*.sh; do
+        base="$(basename -- "$file")"
+        # Only the entry point may source the pure library.
+        if [ "$base" != "report-lane-assertion.sh" ]; then
+            if grep -q -E -- '^[[:space:]]*(\.|source)[[:space:]].*parallel-lane-assertion\.sh' "$file"; then
+                echo "sources the library: $base" >&2
+                offenders=$((offenders + 1))
+            fi
+        fi
+        # Nothing at all may source the entry point.
+        if grep -q -E -- '^[[:space:]]*(\.|source)[[:space:]].*report-lane-assertion\.sh' "$file"; then
+            echo "sources the entry point: $base" >&2
+            offenders=$((offenders + 1))
+        fi
+    done
+    [ "$offenders" -eq 0 ]
+
+    # Control: the entry point does source the library, so the loop above is
+    # searching for a pattern that the tree really contains somewhere.
+    grep -q -E -- '^[[:space:]]*(\.|source)[[:space:]].*parallel-lane-assertion\.sh' \
+        "${LIB_DIR}/report-lane-assertion.sh"
 }
