@@ -472,3 +472,28 @@ Describe 'Get-OrchestratorStateBasePresenceError per-step-key status vocabulary'
     }
 }
 
+Describe 'Get-OrchestratorStateCheckpoint value contract' {
+    It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling' {
+        # Arrange: a real parseable instant; the template value 2026-07-06T00-00 is not one and is never coerced.
+        $checkpoint = New-ReadyCheckpoint
+        $checkpoint.last_updated = '2026-08-29T20:38:00Z'
+        Set-CheckpointFixture -Json ($checkpoint | ConvertTo-Json -Depth 5)
+
+        # Act
+        $result = Get-OrchestratorStateCheckpoint -CheckpointPath 'x.json'
+
+        # Assert: ConvertFrom-Json coerces the instant; a non-date string key is not.
+        $result.Ok | Should -BeTrue
+        $result.State.last_updated | Should -BeOfType [System.DateTime]
+        $result.State.objective | Should -BeOfType [System.String]
+    }
+
+    It 'documents the checkpoint date-coercion contract in its comment-based help' {
+        # Arrange / Act: the rendered help, width-pinned so console width cannot wrap the literal.
+        $helpText = Get-Help -Name 'Get-OrchestratorStateCheckpoint' -Full | Out-String -Width 500
+
+        # Assert: the documentation obligation is enforced by a test.
+        $helpText | Should -BeLike '*date-coerced by ConvertFrom-Json*'
+    }
+}
+
