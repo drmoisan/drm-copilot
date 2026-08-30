@@ -19,6 +19,16 @@ Describe 'enforce-python-batch-budget.ps1' {
                     tool_input = [ordered]@{ file_path = $FilePath; content = 'body' }
                 } | ConvertTo-Json -Compress -Depth 5)
         }
+
+        # Fixed synthetic out-of-root constant. It is defined by this suite rather
+        # than read from the environment so the containment and rehydrate tests
+        # carry no dependence on transient local state. The path is never created,
+        # opened, or otherwise touched on disk. Its .py extension is deliberate:
+        # the hook's extension filter precedes its containment check, so a path
+        # with any other extension would short-circuit before containment and the
+        # containment assertion would hold identically before and after the fix.
+        $script:OutOfRootFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.py'
+        $script:ContainmentStateFile = '/repo/.claude/state/python-batch-budget.s.json'
     }
 
     AfterEach {
@@ -230,6 +240,205 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $hookText | Should -BeLike '*HookPayload.psm1*'
         $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
+    }
+
+    Context 'session identity, containment, and rehydrate filter' {
+        It 'composes the state-file name from CLAUDE_SESSION_ID when the environment supplies it' {
+            $env:CLAUDE_SESSION_ID = 'env-session-42'
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Be 'python-batch-budget.env-session-42.json'
+        }
+
+        It 'composes the state-file name from the session-id state file when the environment is empty' {
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $script:sessionIdFileRequested = $null
+
+            $result = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) $script:sessionIdFileRequested = $Path; return "  file-session-7  " } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Be 'python-batch-budget.file-session-7.json'
+            ($script:sessionIdFileRequested -replace '\\', '/') | Should -Be '/repo/.claude/state/current-session-id'
+        }
+
+        It 'composes a worktree-derived state-file name when both sources are empty' {
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Match '^python-batch-budget\.worktree-repo-[0-9a-f]{8}\.json$'
+        }
+
+        It 'composes pairwise different state-file names across the three session sources' {
+            $script:composedNames = [System.Collections.ArrayList]::new()
+
+            $env:CLAUDE_SESSION_ID = 'env-session-42'
+            $script:writtenStateFile = $null
+            $null = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $null = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $null = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return '' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $script:composedNames | Should -HaveCount 3
+            (@($script:composedNames) | Select-Object -Unique) | Should -HaveCount 3
+        }
+
+        It 'sanitizes a hostile session id into the state-file name pattern' {
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PythonBatchBudgetHook `
+                -ToolInputRaw (Get-PythonToolInput -FilePath 'src/app.py') `
+                -SessionId '../../etc/passwd' `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $leaf = Split-Path -Path $script:writtenStateFile -Leaf
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $leaf | Should -Match '^python-batch-budget\.[A-Za-z0-9._-]+\.json$'
+            $leaf | Should -Be 'python-batch-budget..._.._etc_passwd.json'
+        }
+
+        It 'records a relative candidate path' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath 'src/app.py' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain 'src/app.py'
+        }
+
+        It 'records an absolute candidate path under the resolved root' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath '/repo/src/app.py' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain '/repo/src/app.py'
+        }
+
+        It 'discards an absolute candidate path outside the resolved root' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath $script:OutOfRootFixture -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'records an in-root absolute path that differs from the root only in letter case' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath '/REPO/src/app.py' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain '/REPO/src/app.py'
+        }
+
+        It 'admits three in-root production files when the persisted state already holds an out-of-root entry' {
+            $script:persistedState = ([ordered]@{
+                    prodCap   = 3
+                    testCap   = 3
+                    prodFiles = @($script:OutOfRootFixture)
+                    testFiles = @()
+                } | ConvertTo-Json -Compress -Depth 5)
+            $script:budgetDecisions = [System.Collections.ArrayList]::new()
+
+            foreach ($candidate in @('src/one.py', 'src/two.py', 'src/three.py')) {
+                $decision = Invoke-PythonBatchBudgetHook `
+                    -ToolInputRaw (Get-PythonToolInput -FilePath $candidate) `
+                    -SessionId 'session-a' `
+                    -Root '/repo' `
+                    -TestPathExists { param([string] $Path) [void] $Path; return $true } `
+                    -EnsureDirectory { param([string] $Path) [void] $Path } `
+                    -ReadState { param([string] $Path) [void] $Path; return $script:persistedState } `
+                    -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $Path; $script:persistedState = ($State | ConvertTo-Json -Compress -Depth 5) }
+                [void]$script:budgetDecisions.Add($decision)
+            }
+
+            $script:budgetDecisions[0].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[1].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[2].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[2].state.prodFiles | Should -Not -Contain $script:OutOfRootFixture
+            $script:budgetDecisions[2].state.prodFiles | Should -Contain 'src/three.py'
+        }
+
+        It 'discards an absolute candidate path in a sibling directory whose name extends the root' {
+            $state = Get-PythonBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PythonBatchBudgetDecision -FilePath '/repo-sibling/src/app.py' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'admits a candidate path that is exactly the resolved root' {
+            (Test-PythonBatchBudgetPathInRoot -Path '/repo' -Root '/repo') | Should -BeTrue
+        }
+
+        It 'falls through to the worktree-derived id when the session-id file is unreadable' {
+            $env:CLAUDE_SESSION_ID = ''
+            $resolved = Get-PythonBatchBudgetSessionId -SessionId '' -Root '/repo' -SessionIdFilePath '/repo/.claude/state/current-session-id' -ReadSessionIdFile { param([string] $Path) [void] $Path; throw 'unreadable session-id file' }
+
+            $resolved | Should -Match '^worktree-repo-[0-9a-f]{8}$'
+        }
     }
 
     Context 'entry-point dispatch' {

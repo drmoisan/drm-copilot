@@ -207,6 +207,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #596: the pure destination-gitignore merge. This map carries no
+    // `global` key, so a new production file without its own entry would be
+    // completely ungated.
+    "./src/lib/push-down/claude-gitignore-merge.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/plan-gate-commands.ts": {
       lines: 85,
       branches: 75,

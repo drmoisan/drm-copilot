@@ -685,30 +685,30 @@ the change, so it is demonstrated capable of failing.
 
 Defect 1 — shared session identity (both hooks and the sibling Python hook):
 
-- [ ] `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1` contains three passing
+- [x] `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1` contains three passing
       tests that assert the composed state-file name for (a) `$env:CLAUDE_SESSION_ID` set, (b) the
       environment variable empty and `.claude/state/current-session-id` supplying the id through the
       new read seam, and (c) both sources empty, yielding the worktree-derived identifier. The three
       composed names are asserted to be pairwise different.
-- [ ] `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1` contains the same three
+- [x] `tests/scripts/claude-hooks/enforce-python-batch-budget.Tests.ps1` contains the same three
       passing tests for `enforce-python-batch-budget.ps1`.
-- [ ] A case-sensitive search for the literal `'default'` across
+- [x] A case-sensitive search for the literal `'default'` across
       `.claude/hooks/enforce-powershell-batch-budget.ps1`,
       `.claude/hooks/enforce-python-batch-budget.ps1`, and their two bundle mirrors under
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` returns no matching
       lines. The same search returns matches in all four files before the change (2 per file: the
       parameter default and the entry-point assignment).
-- [ ] Each hook suite contains a passing test asserting that a session id containing characters
+- [x] Each hook suite contains a passing test asserting that a session id containing characters
       outside `[A-Za-z0-9._-]` produces a state-file name matching
       `^(powershell|python)-batch-budget\.[A-Za-z0-9._-]+\.json$`.
-- [ ] `tests/scripts/claude-hooks/persist-session-id.Tests.ps1` contains a passing test asserting the
+- [x] `tests/scripts/claude-hooks/persist-session-id.Tests.ps1` contains a passing test asserting the
       `WriteStateFile` seam is invoked with the session id when `CLAUDE_ENV_FILE` **is** set, and a
       passing test asserting the `AppendLine` seam is still invoked in that same case. Both suites'
       pre-existing tests remain green.
 
 Defect 2 — never-resetting inheritance of a poisoned counter:
 
-- [ ] Each hook suite contains a passing test in which the persisted state's `prodFiles` already
+- [x] Each hook suite contains a passing test in which the persisted state's `prodFiles` already
       contains an out-of-root absolute path, and three distinct in-root production files are still
       admitted without a deny — proving the rehydrate-time containment filter drops the poisoned
       entry from the cap arithmetic. The out-of-root path is the fixed synthetic constant
@@ -718,45 +718,45 @@ Defect 2 — never-resetting inheritance of a poisoned counter:
 
 Defect 3 — unscoped recorded paths:
 
-- [ ] Each hook suite contains passing tests asserting that (a) a relative path is recorded, (b) an
+- [x] Each hook suite contains passing tests asserting that (a) a relative path is recorded, (b) an
       absolute path under the resolved root is recorded, (c) an absolute path outside the resolved
       root yields `permissionDecision = 'allow'` with `shouldWriteState` false and an unchanged
       recorded-file list, and (d) an in-root absolute path differing only in letter case is recorded.
-- [ ] A search for `(Get-Location).Path` across `.claude/hooks/enforce-powershell-batch-budget.ps1`,
+- [x] A search for `(Get-Location).Path` across `.claude/hooks/enforce-powershell-batch-budget.ps1`,
       `.claude/hooks/enforce-python-batch-budget.ps1`, and their two bundle mirrors returns no
       matching lines; the same search returns one match per file before the change. Neither hook
       introduces `Resolve-Path` or `[System.IO.Path]::GetFullPath`.
 
 Defect 4 — destination-side ignore delivery:
 
-- [ ] `extensions/drm-copilot/src/lib/push-down/claude-gitignore-merge.ts` exists, exports a merge
+- [x] `extensions/drm-copilot/src/lib/push-down/claude-gitignore-merge.ts` exists, exports a merge
       function that performs no I/O, and its suite
       `extensions/drm-copilot/test/lib/push-down/claude-gitignore-merge.test.ts` passes under
       `npx jest` with cases for: absent input, present without a managed block, present with an
       identical block, present with a stale block, a managed entry already present outside the block
       (no duplicate block emitted), input without a trailing newline, and CRLF input.
-- [ ] A passing Jest test drives the push-down against `InMemoryPushDownFileSystem` and asserts that
+- [x] A passing Jest test drives the push-down against `InMemoryPushDownFileSystem` and asserts that
       `<destination>/.gitignore` contains `.claude/state/` between the two sentinel lines, on both an
       unscoped publish and a pack-scoped publish (`packs: ["core"]`).
-- [ ] **Idempotency.** A passing Jest test publishes, reads `<destination>/.gitignore`, publishes
+- [x] **Idempotency.** A passing Jest test publishes, reads `<destination>/.gitignore`, publishes
       again, reads again, and asserts (a) the two reads are byte-identical, (b) each sentinel line
       occurs exactly once in the final content, and (c) the destination `.gitignore` path is absent
       from the fake filesystem's recorded writes for the second publish.
-- [ ] A passing Jest test seeds a destination `.gitignore` containing unrelated entries and asserts
+- [x] A passing Jest test seeds a destination `.gitignore` containing unrelated entries and asserts
       every one of those lines is present and in its original relative order after the publish.
-- [ ] `extensions/drm-copilot/jest.config.cjs` contains a `coverageThreshold` entry for
+- [x] `extensions/drm-copilot/jest.config.cjs` contains a `coverageThreshold` entry for
       `./src/lib/push-down/claude-gitignore-merge.ts` with `lines: 85` and `branches: 75`, and
       `npx jest --coverage` run from `extensions/drm-copilot` passes with that entry present.
 
 Cross-cutting gates:
 
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes when no `.claude/state/` directory is present — the state a fresh checkout and CI are
       in — with every edited `.claude/**` file byte-identically mirrored under
       `extensions/drm-copilot/resources/claude-customizations/.claude/**`. A working tree in which
       the batch-budget hooks have already run will instead show the open issue #510 failure on
       `.claude/state/**`; that failure is unrelated to this feature and is recorded in Non-Goals.
-- [ ] Mirror parity is additionally proven by an environment-independent hash comparison that does
+- [x] Mirror parity is additionally proven by an environment-independent hash comparison that does
       not depend on `.claude/state/` and therefore holds in any tree state: for each of the three
       file pairs below, `git hash-object` reports the same object id for the repository file and its
       bundle mirror. (a) `.claude/hooks/enforce-powershell-batch-budget.ps1` and
@@ -768,7 +768,7 @@ Cross-cutting gates:
       The pairs are enumerated explicitly so a third party re-running the check obtains the same set
       rather than selecting its own evidence. The check fails on a genuine mirroring miss and cannot
       pass vacuously, because each named pair must yield a hash and the two hashes must match.
-- [ ] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes with no change to its
+- [x] `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes with no change to its
       assertions, confirming the deny-envelope shape for both batch-budget hooks is unaltered.
 - [ ] `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and
       `mcp__drm-copilot__run_poshqc_test` all pass in a single consecutive run with no file
