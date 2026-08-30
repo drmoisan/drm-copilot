@@ -735,14 +735,14 @@ Defect 4 — destination-side ignore delivery:
       `npx jest` with cases for: absent input, present without a managed block, present with an
       identical block, present with a stale block, a managed entry already present outside the block
       (no duplicate block emitted), input without a trailing newline, and CRLF input.
-- [ ] A passing Jest test drives the push-down against `InMemoryPushDownFileSystem` and asserts that
+- [x] A passing Jest test drives the push-down against `InMemoryPushDownFileSystem` and asserts that
       `<destination>/.gitignore` contains `.claude/state/` between the two sentinel lines, on both an
       unscoped publish and a pack-scoped publish (`packs: ["core"]`).
-- [ ] **Idempotency.** A passing Jest test publishes, reads `<destination>/.gitignore`, publishes
+- [x] **Idempotency.** A passing Jest test publishes, reads `<destination>/.gitignore`, publishes
       again, reads again, and asserts (a) the two reads are byte-identical, (b) each sentinel line
       occurs exactly once in the final content, and (c) the destination `.gitignore` path is absent
       from the fake filesystem's recorded writes for the second publish.
-- [ ] A passing Jest test seeds a destination `.gitignore` containing unrelated entries and asserts
+- [x] A passing Jest test seeds a destination `.gitignore` containing unrelated entries and asserts
       every one of those lines is present and in its original relative order after the publish.
 - [ ] `extensions/drm-copilot/jest.config.cjs` contains a `coverageThreshold` entry for
       `./src/lib/push-down/claude-gitignore-merge.ts` with `lines: 85` and `branches: 75`, and
