@@ -861,7 +861,7 @@ Constraint 1.
 
 ### Phase 4 — Bundle mirror, pack manifest, payload-only proof, and TypeScript enumerations
 
-- [ ] [P4-T1] Format the new bash files by running
+- [x] [P4-T1] Format the new bash files by running
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record the result in `evidence/qa-gates/bash-format-preseal.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
@@ -901,7 +901,7 @@ Constraint 1.
     records that baseline), so any divergence observed here is attributable to a file this feature
     created, not to pre-existing drift.
 
-- [ ] [P4-T2] Copy `.claude/lib/bash/parallel-lane-assertion.sh` and
+- [x] [P4-T2] Copy `.claude/lib/bash/parallel-lane-assertion.sh` and
       `.claude/lib/bash/report-lane-assertion.sh` byte-identically to
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh`
       and
@@ -911,7 +911,7 @@ Constraint 1.
     `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/lib/bash/parallel-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh && cmp -s .claude/lib/bash/report-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh'`
     exits 0.
 
-- [ ] [P4-T3] Add `".claude/lib/bash/parallel-lane-assertion.sh"` and
+- [x] [P4-T3] Add `".claude/lib/bash/parallel-lane-assertion.sh"` and
       `".claude/lib/bash/report-lane-assertion.sh"` to the `paths` array in
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, beside the
       nine existing `.claude/lib/bash/` entries at lines 137-145. This file is bundle-only and sits
@@ -923,7 +923,7 @@ Constraint 1.
     `git grep -n -F ".claude/lib/bash/parallel-lane-assertion.sh" -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
     returns exactly one match.
 
-- [ ] [P4-T4] Raise `MINIMUM_LIB_FILE_COUNT` in `tests/shell/parallel_bash_manifest_membership.bats`
+- [x] [P4-T4] Raise `MINIMUM_LIB_FILE_COUNT` in `tests/shell/parallel_bash_manifest_membership.bats`
       from 9 to 11 at line 21, and update the comment at lines 19-20, which currently reads
       "The library is a nine-file module", so the prose agrees with the constant. The replacement
       phrase is `eleven-file module`.
@@ -938,7 +938,7 @@ Constraint 1.
     returns exactly one match. Clauses (c) and (d) are what make the prose edit asserted rather than
     merely instructed; without them the comment could be left stale and the task would still pass.
 
-- [ ] [P4-T5] Update the case at `tests/shell/parallel_bash_manifest_membership.bats:84-89`, titled
+- [x] [P4-T5] Update the case at `tests/shell/parallel_bash_manifest_membership.bats:84-89`, titled
       "the three CLI entry points are present in both trees", so its title and its enumeration name
       all four entry points, adding `report-lane-assertion.sh` to the loop list at line 85. The
       replacement title is `the four CLI entry points are present in both trees`. The case is green
@@ -957,7 +957,7 @@ Constraint 1.
     Clauses (c) and (d) assert the title change, which the `ok` line alone would not distinguish
     from the unedited title on a run that passes either way.
 
-- [ ] [P4-T6] Add `".claude/lib/bash/report-lane-assertion.sh"` to the `it.each` enumeration at
+- [x] [P4-T6] Add `".claude/lib/bash/report-lane-assertion.sh"` to the `it.each` enumeration at
       `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts:237-245`,
       whose seven entries occupy lines 238-244, placing the new entry after
       `".claude/lib/bash/validate-parallel-manifest.sh"` at line 244.
@@ -975,7 +975,7 @@ Constraint 1.
   - The acceptance is stated over the `Tests:` summary rather than over an individual case name
     because Jest's default reporter prints per-case names only under `--verbose`.
 
-- [ ] [P4-T7] Add `.claude/lib/bash/report-lane-assertion.sh` to the seeded file map at
+- [x] [P4-T7] Add `.claude/lib/bash/report-lane-assertion.sh` to the seeded file map at
       `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts:144-148` and to the
       `core.json` stub `paths` array, which spans lines 154-163 and whose three existing
       `.claude/lib/bash/` entries occupy lines 158-160, then add the same path to the enumeration at
@@ -990,7 +990,7 @@ Constraint 1.
     `core.json` stub entry. This edit adds no new case, so a passed-count delta is not available and
     the enumeration is verified by the grep instead.
 
-- [ ] [P4-T8] Add to `tests/shell/parallel_payload_only.bats` a case named
+- [x] [P4-T8] Add to `tests/shell/parallel_payload_only.bats` a case named
       `the payload runs the lane-assertion diagnostic without Python on PATH` that invokes
       `report-lane-assertion.sh` from the bundle root through the existing `run_payload` helper under
       the four-shim `PATH`, passing
@@ -1023,7 +1023,7 @@ Constraint 1.
     returns exactly one match. Clauses (c) through (e) are what make the two prose edits asserted;
     both regions are green either way, so a passing suite alone cannot evidence them.
 
-- [ ] [P4-T9] Run the whole bash test suite for the first time since Phase 0 by
+- [x] [P4-T9] Run the whole bash test suite for the first time since Phase 0 by
       `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test'`
       and record the result in `evidence/regression-testing/bash-full-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and 0 bats failures. This is the first whole-tree run after

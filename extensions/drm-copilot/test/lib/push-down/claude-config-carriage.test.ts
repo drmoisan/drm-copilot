@@ -451,6 +451,7 @@ describe("issue #462 AC16: a payload-only publish clears all four blockers", () 
       ".claude/lib/bash/compute-cohorts.sh",
       ".claude/lib/bash/compute-concurrency-batches.sh",
       ".claude/lib/bash/validate-parallel-manifest.sh",
+      ".claude/lib/bash/report-lane-assertion.sh",
       "config/orchestration-routing.json",
       "config/blast-radius.json",
     ]) {

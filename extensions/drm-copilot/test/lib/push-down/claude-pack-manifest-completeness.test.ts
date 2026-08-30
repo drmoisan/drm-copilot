@@ -242,6 +242,7 @@ describe("claude pack manifest completeness (real filesystem)", () => {
     ".claude/lib/bash/compute-cohorts.sh",
     ".claude/lib/bash/compute-concurrency-batches.sh",
     ".claude/lib/bash/validate-parallel-manifest.sh",
+    ".claude/lib/bash/report-lane-assertion.sh",
   ])(
     "issue #462: %s is present in the union of pack-manifest paths",
     (expectedPath) => {
