@@ -595,58 +595,58 @@ Pester, then the pytest bundle-parity test. Restart from format if any stage cha
 
 Item 1 — fail-fast import guard:
 
-- [ ] `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` exists, discovers its module list
+- [x] `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` exists, discovers its module list
       from disk with `Get-ChildItem -Filter '*.psm1' -File -Recurse` under the `.claude/lib` root and
       does not restate any module name, and its anti-vacuity `It 'discovers the claude library modules on disk'`
       passes by asserting the discovered count is greater than zero.
-- [ ] `It 'sets the fail-fast error preference at module scope in every discovered module'` in
+- [x] `It 'sets the fail-fast error preference at module scope in every discovered module'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: for every discovered
       module, the line immediately following its `Set-StrictMode -Version Latest` line is
       `$ErrorActionPreference = 'Stop'`.
-- [ ] `It 'guards every load-time sibling import with an explicit stop preference'` in
+- [x] `It 'guards every load-time sibling import with an explicit stop preference'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: every column-0
       `Import-Module` line in every discovered module contains `-ErrorAction Stop`.
-- [ ] `It 'states the fail-fast convention in the module help block'` in
+- [x] `It 'states the fail-fast convention in the module help block'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: every discovered module
       contains the token `imports its siblings with -ErrorAction Stop` on a line preceding its
       `Set-StrictMode -Version Latest` line.
-- [ ] `It 'leaves the caller error preference unchanged after import'` in
+- [x] `It 'leaves the caller error preference unchanged after import'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: the caller-scope
       `$ErrorActionPreference` after importing a guarded module equals the value captured before the
       import.
-- [ ] `It 'keeps every claude library module within the five hundred line limit'` in
+- [x] `It 'keeps every claude library module within the five hundred line limit'` in
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes: no discovered module
       exceeds 500 lines.
-- [ ] `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1`
+- [x] `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.VersionFloor.Tests.ps1`
       passes unchanged, and `.claude/lib/discovery-validation/DiscoveryValidation.psm1` still contains
       the token `Draft 2020-12 support in PowerShell 7.4`, so the condensation that freed room for the
       guard did not remove the version-floor rationale.
 
 Item 2 — date-coercion contract:
 
-- [ ] `It 'documents the checkpoint date-coercion contract in its comment-based help'` in
+- [x] `It 'documents the checkpoint date-coercion contract in its comment-based help'` in
       `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` passes: the rendered
       help for `Get-OrchestratorStateCheckpoint`, read through `Get-Help -Full | Out-String -Width 500`,
       contains the token `date-coerced by ConvertFrom-Json`.
-- [ ] `It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling'` in
+- [x] `It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling'` in
       `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` passes: with the
       in-memory fixture supplying `"last_updated": "2026-08-29T20:38:00Z"`, the value returned in
       `State` is `System.DateTime`, and a non-date string key in the same fixture is
       `System.String`.
-- [ ] A search for the token `-DateKind` across `.claude/lib/` returns zero matches, and a search for
+- [x] A search for the token `-DateKind` across `.claude/lib/` returns zero matches, and a search for
       the token `MinimumPowerShellVersion` across `.claude/lib/orchestrator-state/` returns zero
       matches. The PowerShell floor was not raised and no version guard was added to the
       orchestrator-state modules.
-- [ ] A search for the token `ToString(` across `.claude/lib/orchestrator-state/` returns zero
+- [x] A search for the token `ToString(` across `.claude/lib/orchestrator-state/` returns zero
       matches. No post-parse datetime-to-string repair was introduced.
 
 Item 3 — truthiness verification:
 
-- [ ] `It 'is unconditionally truthy even when its conflict key is false'` and
+- [x] `It 'is unconditionally truthy even when its conflict key is false'` and
       `It 'documents the truthiness divergence in its comment-based help'` in
       `tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1` both pass, and that file
       appears nowhere in this feature's change set.
-- [ ] An evidence artifact under
+- [x] An evidence artifact under
       `docs/features/active/2026-08-29-blast-radius-powershell-calling-convention-598/evidence/qa-gates/`
       records the item 3 verification with the fields `Timestamp:`, `Command:`, and `EXIT_CODE:` per
       `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and its recorded `EXIT_CODE` is
@@ -654,26 +654,26 @@ Item 3 — truthiness verification:
 
 Cross-cutting — bundle mirror, scope, and toolchain:
 
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes. Every `.claude/**` file this feature edits has the identical edit in its counterpart
       under `extensions/drm-copilot/resources/claude-customizations/.claude/**`, covering all 54
       production files (27 repository modules and 27 mirrors).
-- [ ] The change set contains no modification to `.claude/skills/parallel-plan/SKILL.md`,
+- [x] The change set contains no modification to `.claude/skills/parallel-plan/SKILL.md`,
       `.claude/skills/parallel-add/SKILL.md`, or `.claude/agents/parallel-planner.md`. Those files are
       Feature C.
-- [ ] The change set contains no modification to any file under `.claude/rules/` or
+- [x] The change set contains no modification to any file under `.claude/rules/` or
       `.github/instructions/`, and none to
       `scripts/powershell/PoshQC/settings/pssa.settings.psd1` or
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
-- [ ] The full PowerShell toolchain — PoshQC format, then PoshQC analyze, then Pester — completes with
+- [x] The full PowerShell toolchain — PoshQC format, then PoshQC analyze, then Pester — completes with
       zero failures in a single pass over the final tree, with the result recorded as an evidence
       artifact under
       `docs/features/active/2026-08-29-blast-radius-powershell-calling-convention-598/evidence/qa-gates/`
       carrying `Timestamp:`, `Command:`, and `EXIT_CODE:`.
-- [ ] Every Pester test that failed as a consequence of the new error preference is repaired inside
+- [x] Every Pester test that failed as a consequence of the new error preference is repaired inside
       this feature. The final Pester run reports zero failed tests and zero skipped tests that were
       not skipped before the change.
-- [ ] Line coverage for the PowerShell suite is at or above 85% and no changed line lost coverage,
+- [x] Line coverage for the PowerShell suite is at or above 85% and no changed line lost coverage,
       with the coverage figure recorded in the toolchain evidence artifact.
 
 ## Risks & Mitigations
@@ -727,3 +727,58 @@ Mitigations and rollbacks:
 - Links: issue https://github.com/drmoisan/drm-copilot/issues/598; epic manifest
   `docs/features/epics/claude-runtime-portability/epic.md`; research artifact
   `docs/features/active/2026-08-29-blast-radius-powershell-calling-convention-598/research/2026-08-29T20-30-blast-radius-powershell-calling-convention-598-research.md`.
+
+### Execution deviations
+
+The following deviations from the approved plan occurred during execution. They are recorded as
+plain prose entries rather than checkboxes, because the acceptance conditions for this section are
+whole-file checkbox counts and an added checkbox would shift them.
+
+1. **The epic integration branch was merged into this feature branch mid-execution.** After batch
+   B07 completed, `origin/epic/claude-runtime-portability-integration` was merged into this branch as
+   merge commit `f4d4f958808a5a420f11189f6fa02ee007a66525`, bringing 14 commits and 152 changed
+   paths with no conflicts. The merge added a 28th module,
+   `.claude/lib/requirements/GeneratedDocumentCounters.psm1`, together with its bundle mirror at
+   `extensions/drm-copilot/resources/claude-customizations/.claude/lib/requirements/GeneratedDocumentCounters.psm1`
+   and its test file `tests/scripts/claude-lib/requirements/GeneratedDocumentCounters.Tests.ps1`.
+   The plan was revised to version 1.3 and re-cleared executor preflight before execution resumed.
+
+2. **Eight Phase 0 tasks were added to re-establish baselines the merge superseded.** Tasks
+   `[P0-T11]` through `[P0-T18]` re-derived the change-set attribution refs, the bundle-parity
+   comparand, the module inventory, the formatter and analyzer baselines, the Pester suite counts,
+   the line-coverage figure, and the per-module coverage rows against the merged tree. Every
+   comparand used by Phases 4 through 10 is read from those post-merge artifacts. The pre-merge
+   figures recorded by `[P0-T7]`, `[P0-T8]`, and `[P0-T10]` remain on disk as audit history and are
+   correct for the tree they were taken against, but they are not comparands for any post-merge
+   assertion.
+
+3. **The production-file figure is restated from 54 across 27 pairs to 56 across 28 pairs.** The
+   `54 production files (27 repository modules and 27 mirrors)` parenthetical in the cross-cutting
+   bundle-mirror acceptance criterion above, and the equivalent figures in the Repro & Evidence and
+   Proposed Fix tables, were all derived before the merge. The executed figure is 56 production
+   files across 28 pairs. The added pair is
+   `.claude/lib/requirements/GeneratedDocumentCounters.psm1` and its bundle mirror, covered by batch
+   B28. The criterion's operative clause — that every `.claude/**` file this feature edits has the
+   identical edit in its counterpart — is count-independent and is satisfied by 28 pairs. The
+   criterion text is deliberately not rewritten in place, so the audit trail for the substitution is
+   preserved.
+
+4. **The 28th module required a new module-level comment-based-help block rather than an extension
+   of an existing one.** The other 27 modules each carry a leading comment-based-help block above
+   their `Set-StrictMode -Version Latest` line, so the convention sentence extends an existing
+   block. `.claude/lib/requirements/GeneratedDocumentCounters.psm1` carried none: its first `#>`
+   belonged to the help block of the function `Get-NamedSectionCheckboxCount` and followed rather
+   than preceded the `Set-StrictMode` line. An 11-line module-level help block was therefore created
+   above the file's first line, using text fixed verbatim in the plan rather than chosen by the
+   executor. The function's own help block is unchanged and `Get-Help
+   Get-NamedSectionCheckboxCount` still resolves to it.
+
+5. **The 28th module is outside the coverage denominator, and this feature did not remedy it.**
+   `.claude/lib/requirements/GeneratedDocumentCounters.psm1` is absent from `CodeCoverage.Path` in
+   `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, so Pester measures no coverage for
+   it and it produces no coverage row. The condition arrived with the merge and was not created by
+   this feature. Adding the missing entry would modify `pester.runsettings.psd1`, which this
+   document lists under "Out of scope / non-goals" and which the third cross-cutting acceptance
+   criterion requires to be unmodified. No line lost coverage for the module, because it was
+   unmeasured both before and after the change. The remedy is left as a follow-up for the owner of
+   that settings file.
