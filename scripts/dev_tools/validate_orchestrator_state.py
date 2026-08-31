@@ -1,25 +1,4 @@
-"""Validate orchestration checkpoint state artifacts.
-
-Purpose:
-    Hold the orchestrator-state validation logic and receipt-namespace rules so
-    the stable CLI entrypoint can remain small while preserving the existing
-    validator contract.
-
-Usage:
-    Import ``validate_orchestrator_state_text`` from
-    ``scripts.dev_tools.validate_orchestration_artifacts`` or this module.
-
-Flow:
-    Parse the checkpoint JSON, validate required top-level keys and status
-    values, then validate the legacy list, top-level promotion, or additive
-    ``delegation_receipts.promotion.*`` receipt forms.
-
-Invariants / Constraints:
-    - The validator accepts the legacy list, top-level promotion receipts, and
-      the additive promotion namespace forms for receipt evidence.
-    - Unsupported namespace keys are rejected.
-    - The validator returns error strings and never mutates the checkpoint.
-"""
+"""Validate provider-native and portable orchestration checkpoint artifacts."""
 
 from __future__ import annotations
 
@@ -27,6 +6,7 @@ import json
 from typing import Any, cast
 
 from scripts.dev_tools import _orchestrator_state_codex_topology as codex_topology
+from scripts.dev_tools import orchestration_handoff_contract as handoff
 from scripts.dev_tools._orchestrator_state_codex_model_routing import (
     CODEX_MODEL_ROUTING_RECEIPTS_KEY,
     validate_codex_model_routing_gate,
@@ -129,8 +109,6 @@ PROMOTION_RECEIPT_KEYS = (
 CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
 REMEDIATION_LOOP_KEY = "remediation_loop"
 REMEDIATION_CYCLES_KEY = "cycles"
-# Execution statuses that may only be recorded once a cycle's preflight gate has
-# cleared; recording any of these before preflight clears is a malformed cycle.
 EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT = {
     "in_progress",
     "complete",
@@ -140,34 +118,10 @@ PREFLIGHT_CLEARED_STATUS = "clear"
 
 
 def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
-    """Validate the three invariants for one remediation cycle.
-
-    Purpose:
-        Enforce the orchestrator-state remediation-cycle invariants documented
-        in `.claude/rules/orchestrator-state.md` for a single cycle object:
-        non-empty `plan_path`, execution only after a cleared preflight, and a
-        satisfied exit gate only with zero blocking findings.
-
-    Args:
-        index (int): Zero-based position of this cycle within the
-            `remediation_loop.cycles` array, used for error context.
-        cycle (dict[str, Any]): The raw cycle object extracted from the
-            checkpoint JSON.
-
-    Returns:
-        list[str]: One error string per violated invariant; an empty list when
-        the cycle satisfies all three invariants.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Validate one remediation cycle without changing checkpoint state."""
 
     errors: list[str] = []
 
-    # Invariant 1: plan_path must be a non-empty, non-whitespace string.
     plan_path = cycle.get("plan_path")
     if not isinstance(plan_path, str) or not plan_path.strip():
         errors.append(
@@ -175,13 +129,9 @@ def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
             "non-empty string."
         )
 
-    # Invariant 2: an execution status in the blocked set requires that the
-    # cycle's preflight gate reports exactly the cleared status.
     execution_status = cycle.get("execution_status")
     if execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT:
         preflight = cycle.get("preflight")
-        # Read the nested preflight final status defensively; a missing or
-        # non-object preflight cannot satisfy the cleared requirement.
         preflight_status: object = (
             cast("dict[str, Any]", preflight).get("final_status")
             if isinstance(preflight, dict)
@@ -193,7 +143,6 @@ def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
                 f"{execution_status} but preflight.final_status is not 'clear'."
             )
 
-    # Invariant 3: a satisfied exit gate requires zero blocking findings.
     if cycle.get("exit_condition_met") is True and cycle.get("blocking_count") != 0:
         errors.append(
             f"Checkpoint remediation cycle #{index} exit_condition_met is true "
@@ -275,25 +224,7 @@ def _validate_completion_ci_gate(state: dict[str, Any]) -> list[str]:
 
 
 def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
-    """Validate the legacy list-based delegation receipt payload.
-
-    Purpose:
-        Preserve compatibility with older checkpoints that store delegation
-        receipts as a list of receipt objects.
-
-    Args:
-        receipts (list[object]): Raw receipt payload extracted from the
-            checkpoint JSON.
-
-    Returns:
-        list[str]: Validation errors for any malformed receipt objects.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Validate legacy list receipts without normalizing their payloads."""
 
     errors: list[str] = []
 
@@ -319,25 +250,7 @@ def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
 
 
 def _validate_namespaced_delegation_receipts(receipts: dict[str, Any]) -> list[str]:
-    """Validate the additive object namespace form of delegation receipts.
-
-    Purpose:
-        Enforce the reviewed ``delegation_receipts.promotion.*`` contract while
-        keeping the raw receipt payloads opaque to the validator.
-
-    Args:
-        receipts (dict[str, Any]): Object-form receipt payload extracted from
-            the checkpoint JSON.
-
-    Returns:
-        list[str]: Validation errors for unsupported object-shape keys.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
+    """Validate namespaced receipts while retaining opaque receipt values."""
 
     errors: list[str] = []
     unsupported_keys = sorted(
@@ -384,6 +297,74 @@ def _validate_namespaced_delegation_receipts(receipts: dict[str, Any]) -> list[s
     return errors
 
 
+def _build_portable_envelope(state: dict[str, Any]) -> handoff.HandoffEnvelope:
+    source = cast("dict[str, Any]", state["source"])
+    checkpoint = cast("dict[str, Any]", source["checkpoint"])
+    expression = cast("dict[str, Any]", source["expression"])
+    receipt_container = cast("dict[str, Any]", expression["historical_receipts"])
+    references = tuple(
+        handoff.ReceiptReference(**cast("dict[str, Any]", item))
+        for item in cast("list[object]", receipt_container["references"])
+    )
+    provenance = handoff.ProviderProvenance(
+        source["provider"],
+        checkpoint["path"],
+        checkpoint["sha256"],
+        checkpoint["archive_path"],
+        expression["schema_id"],
+        expression["schema_version"],
+        references,
+    )
+    history = tuple(
+        handoff.HistoryEntry(**cast("dict[str, Any]", item))
+        for item in cast("list[object]", state["handoff_history"])
+    )
+    destination = cast("dict[str, Any]", state["destination"])
+    return handoff.HandoffEnvelope(
+        state["schema_version"],
+        state["kind"],
+        state["handoff_id"],
+        handoff.ObjectiveIdentity(**cast("dict[str, Any]", state["identity"])),
+        handoff.WorkspaceBinding(**cast("dict[str, Any]", state["binding"])),
+        provenance,
+        destination["provider"],
+        destination["checkpoint_path"],
+        handoff.PlanIdentity(**cast("dict[str, Any]", state["plan"])),
+        handoff.LifecycleState(**cast("dict[str, Any]", state["lifecycle"])),
+        handoff.CapabilityRequirements(**cast("dict[str, Any]", state["capabilities"])),
+        handoff.SchedulerContext(**cast("dict[str, Any]", state["scheduler_context"])),
+        history,
+    )
+
+
+def _validate_portable_envelope(state: dict[str, Any]) -> list[str]:
+    try:
+        envelope = _build_portable_envelope(state)
+        handoff.validate_history_chain(envelope.handoff_history)
+    except (KeyError, TypeError, ValueError) as exc:
+        return [f"Portable handoff envelope is invalid: {exc}"]
+    return []
+
+
+def _validate_portable_projection(state: dict[str, Any]) -> list[str]:
+    try:
+        link = cast("dict[str, Any]", state["portable_handoff"])
+        plan = handoff.PlanIdentity(**cast("dict[str, Any]", link["plan"]))
+        lifecycle = handoff.LifecycleState(**cast("dict[str, Any]", link["lifecycle"]))
+        handoff.SchedulerContext(**cast("dict[str, Any]", link["scheduler_context"]))
+        for key in ("envelope_sha256", "history_entry_sha256"):
+            if handoff.SHA256_PATTERN.fullmatch(link[key]) is None:
+                raise handoff.HandoffContractError(f"portable_handoff.{key}", "invalid")
+        if (
+            state.get("plan-path") != plan.path
+            or state.get("next_step") != lifecycle.next_transition
+        ):
+            raise handoff.HandoffContractError("portable_handoff", "projection drift")
+    except (KeyError, TypeError, ValueError) as exc:
+        return [f"Portable destination projection is invalid: {exc}"]
+    return []
+
+
 def validate_orchestrator_state_text(
     text: str,
     *,
@@ -410,6 +391,10 @@ def validate_orchestrator_state_text(
     if not isinstance(state, dict):
         return ["Checkpoint root must be a JSON object."]
     state_map = cast("dict[str, Any]", state)
+    if state_map.get("kind") == "portable_orchestration_handoff":
+        return _validate_portable_envelope(state_map)
+    if "portable_handoff" in state_map:
+        errors.extend(_validate_portable_projection(state_map))
 
     # Require the canonical top-level fields before evaluating deeper state and
     # receipt invariants.
