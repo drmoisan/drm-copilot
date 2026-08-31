@@ -85,43 +85,43 @@ ecosystem must continue the same work.
 
 ## Acceptance Criteria
 
-- [ ] A versioned provider-neutral handoff validates objective, repository, workspace, branch
+- [x] A versioned provider-neutral handoff validates objective, repository, workspace, branch
   lineage, issue, feature, work mode, completed phases, exact next transition, logical complexity,
   capability requirements, and exact plan path/hash before a destination may continue.
-- [ ] A valid handoff archives the original source checkpoint bytes by raw SHA-256, preserves source
+- [x] A valid handoff archives the original source checkpoint bytes by raw SHA-256, preserves source
   receipts as immutable or opaque evidence, appends digest-linked history, and never synthesizes
   destination receipts for completed source-runtime work.
 - [x] Claude-to-Codex and Codex-to-Claude adapters preserve logical complexity, route, lifecycle,
   plan, and ownership semantics while each destination independently resolves model, reasoning,
   profile, topology, and launch evidence for new work only.
-- [ ] A completed preparation state advances to its recorded execution transition without replaying
+- [x] A completed preparation state advances to its recorded execution transition without replaying
   promotion, research, feature-document authoring, atomic planning, or preflight, and any attempted
   replay is rejected before mutation.
-- [ ] A parallel or epic child can be completed piecemeal by an ordinary destination orchestrator,
+- [x] A parallel or epic child can be completed piecemeal by an ordinary destination orchestrator,
   but the parent scheduler retains cohort/wave ordering, barriers, fan-in, integration, cleanup, and
   overall completion authority.
 - [x] Hook and validator allowlists resolve both supported `drm-copilot` MCP transport spellings to
   the same registered semantic operation and reject malformed identifiers, unrelated tools, and
   unregistered operations.
-- [ ] A consumer repository can perform workspace-explicit validation, topology resolution, and
+- [x] A consumer repository can perform workspace-explicit validation, topology resolution, and
   destination routing through published runtime authority without importing unshipped drm-copilot
   source modules; missing authority produces one deterministic blocked result before delegation.
-- [ ] Dry-run transition changes no canonical checkpoint or user file. Materialization validates a
+- [x] Dry-run transition changes no canonical checkpoint or user file. Materialization validates a
   same-directory destination candidate and atomically replaces the canonical checkpoint only after
   every contract, binding, capability, and clean-worktree check passes.
-- [ ] An unrelated dirty worktree is reported separately as `HANDOFF_DIRTY_WORKTREE` after earlier
+- [x] An unrelated dirty worktree is reported separately as `HANDOFF_DIRTY_WORKTREE` after earlier
   validation succeeds; the result lists affected paths and does not stage, stash, reset, delete, or
   modify them.
-- [ ] Unsupported schema versions, tampered source or history, wrong repository/workspace/branch/
+- [x] Unsupported schema versions, tampered source or history, wrong repository/workspace/branch/
   issue/feature, invalid or stale plan identity, scheduler mismatch, invalid transition, and missing
   capabilities or authorities each fail closed with the contract's deterministic primary code.
-- [ ] TaskMaster issue #469 fixtures prove the original Claude-prepared checkpoint reaches Codex
+- [x] TaskMaster issue #469 fixtures prove the original Claude-prepared checkpoint reaches Codex
   execution readiness with its pinned source and plan hashes, no completed-phase replay, and no
   historical-receipt fabrication; symmetric fixtures prove Codex-to-Claude continuation.
-- [ ] Root, bundled, packed, and installed-consumer tests demonstrate that the schema, registry,
+- [x] Root, bundled, packed, and installed-consumer tests demonstrate that the schema, registry,
   adapters, hooks, skills, validators, and transition authority remain synchronized and usable from
   a consumer checkout.
-- [ ] Regression coverage confirms issue #467 remains the owner of full Codex-native parallel
+- [x] Regression coverage confirms issue #467 remains the owner of full Codex-native parallel
   scheduling and issue #543 remains the owner of the provider-specific epic-planner ready-gate
   defect; this feature changes neither behavior.
 

@@ -1,0 +1,67 @@
+{
+  "fixture_version": "1.0.0",
+  "source_provider": "claude",
+  "destination_provider": "codex",
+  "source_checkpoint": {
+    "file": "source-checkpoint.json",
+    "path": "artifacts/orchestration/orchestrator-state.json",
+    "sha256": "558de827d94b8f51fc135227a7f70a0933807e2c558f7c0f40a8bff1181e0fdd",
+    "expression": {
+      "schema_id": "claude.orchestrator-state",
+      "schema_version": "legacy-v1",
+      "historical_receipts": {
+        "mode": "opaque",
+        "references": []
+      }
+    }
+  },
+  "plan": {
+    "file": "plan.2026-08-29T12-22.md",
+    "path": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/plan.2026-08-29T12-22.md",
+    "sha256": "54c9718097de0a151947ca2e639856e67fe1b7abfbf9edc75adac80ea3c9ba2f",
+    "contract_version": "atomic-plan-v1"
+  },
+  "identity": {
+    "objective_id": "github:drmoisan/TaskMaster#469",
+    "issue_number": 469,
+    "feature_folder": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469",
+    "work_mode": "full-bug"
+  },
+  "binding": {
+    "repository_id": "github.com/drmoisan/TaskMaster",
+    "workspace_root": "C:/workspaces/TaskMaster",
+    "branch": "bug/qfc-collection-move-diagnostics-defects-469",
+    "source_head_sha": "30d2aeb298c9b2689dc69b38a5c733512c6e22f5",
+    "allowed_head_relationship": "equal_or_descendant"
+  },
+  "lifecycle": {
+    "logical_complexity": "C3",
+    "route_intent": "prepared_to_ordinary_execution",
+    "completed_phases": [
+      "promotion",
+      "research",
+      "feature_documents",
+      "atomic_planning",
+      "preflight"
+    ],
+    "next_transition": "atomic_execution",
+    "replay_policy": "forbid_completed_phases"
+  },
+  "capabilities": {
+    "vocabularies": ["portable-orchestration-handoff-core-v1"],
+    "required": [
+      "handoff-schema:2",
+      "plan-contract:atomic-plan-v1",
+      "transition:prepared_to_atomic_execution",
+      "workspace-explicit-validation",
+      "atomic-checkpoint-materialization",
+      "semantic-tool:drm-copilot.transition_prepared_orchestration",
+      "workspace-explicit-routing",
+      "scheduler-context:ordinary"
+    ]
+  },
+  "scheduler_context": {
+    "kind": "ordinary"
+  },
+  "requested_at": "2026-08-31T01:58:26Z"
+}

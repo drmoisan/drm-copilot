@@ -15,6 +15,7 @@
     ".agents/skills/epic-run/SKILL.md",
     ".agents/skills/evidence-and-timestamp-conventions/SKILL.md",
     ".agents/skills/orchestrate/SKILL.md",
+    ".agents/skills/orchestrator-state/SKILL.md",
     ".agents/skills/orchestrator-workflow/SKILL.md",
     ".agents/skills/policy-compliance-order/SKILL.md",
     ".agents/skills/repo-automation-adapter/SKILL.md",
@@ -93,6 +94,8 @@
     ".codex/agents/commit-steward-c2.toml",
     ".codex/agents/commit-steward-c3.toml",
     ".codex/agents/commit-steward-c3-elevated.toml",
-    ".codex/agents/commit-steward-c4.toml"
+    ".codex/agents/commit-steward-c4.toml",
+    "config/orchestration-handoff-registry.json",
+    "config/orchestration-handoff.schema.json"
   ]
 }
