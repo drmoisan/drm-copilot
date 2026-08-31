@@ -37,18 +37,18 @@
     "test": "node run-jest.cjs"
   },
   "devDependencies": {
-    "@jest/globals": "^30.4.1",
+    "@jest/globals": "^30.5.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "26.x",
     "@types/vscode": "^1.134.0",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^3.1.0",
-    "eslint": "^10.8.1",
-    "jest": "^30.4.2",
+    "eslint": "^10.9.1",
+    "jest": "^30.5.0",
     "prettier": "^3.9.6",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.67.0"
+    "typescript-eslint": "^8.68.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0"
