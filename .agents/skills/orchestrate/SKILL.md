@@ -39,6 +39,36 @@ On every invocation, the main session must:
    selected route's required agents, skills, and MCP tools into checkpoint
    state.
 
+## Prepared-State Portable Handoff Intake
+
+Treat a portable prepared-state checkpoint as a resume request, not as a new
+orchestration intake. Before delegation:
+
+1. Validate the portable envelope through the published, workspace-explicit
+   orchestration authority. Require the repository, workspace, branch lineage,
+   issue, feature folder, work mode, scheduler context, capabilities, and exact
+   next transition to match the current checkout.
+2. Prove the plan from the envelope's normalized repository-relative path and
+   raw-byte SHA-256. Do not search for another plan, rewrite the path, follow a
+   symlink outside the repository, or substitute a newer plan.
+3. Use `transition_prepared_orchestration` as the only authority permitted to
+   materialize the provider-native destination checkpoint. A dry run may
+   validate and project the destination state but must not archive or replace
+   checkpoint bytes.
+4. Preserve the ordered completed phases and reject any request to replay one
+   of them. Do not rerun promotion, research, feature-document authoring,
+   atomic planning, or preflight when the envelope records them as complete.
+5. Preserve source-provider model, profile, topology, launch, and receipt data
+   as opaque historical evidence. Resolve Codex topology, model routing, and
+   launch evidence only for the first new destination delegation after
+   materialization; never synthesize Codex receipts for source-provider work.
+
+For an ordinary handoff whose recorded next transition is `atomic_execution`,
+resume the exact approved plan through the ordinary Codex atomic-executor path
+at `atomic_execution`. Do not invoke a parent scheduler or rediscover lifecycle
+work. Any contract, authority, plan, replay, or materialization failure returns
+the deterministic blocked result before destination delegation.
+
 ## Epic Entry Boundary
 
 This standalone workflow must not invoke `epic-planner` or `epic-orchestrator`. If intake names

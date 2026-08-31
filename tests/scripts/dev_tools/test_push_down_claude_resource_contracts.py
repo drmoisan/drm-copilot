@@ -10,8 +10,13 @@ which is distributed by scope rather than mirrored byte-for-byte.
 from __future__ import annotations
 
 import importlib
+import json
 import re
 from pathlib import Path
+
+from tests.scripts.dev_tools.push_down_handoff_test_support import (
+    assert_installed_consumer_authority,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BUNDLED_ROOT = (
@@ -33,6 +38,13 @@ PLANNER_REVIEW_RESOURCE_PATHS = (
     Path(".claude/skills/atomic-plan-contract/SKILL.md"),
     Path(".claude/hooks/validate-planner-output.ps1"),
     Path(".claude/agents/atomic-planner.md"),
+)
+HANDOFF_RUNTIME_PACKS = (
+    (Path(".claude/skills/orchestrate/SKILL.md"), "core"),
+    (
+        Path(".claude/skills/powershell-orchestration-state-machine/SKILL.md"),
+        "powershell",
+    ),
 )
 
 
@@ -142,6 +154,24 @@ def test_planner_review_resources_exist_and_are_byte_identical() -> None:
         assert (
             canonical_path.read_bytes() == bundled_path.read_bytes()
         ), f"Planner-review resource differs from bundle: {relative_path}"
+
+
+def test_handoff_runtime_has_bundle_pack_and_effective_install_parity() -> None:
+    """Claude handoff files are identical and included by each applicable pack."""
+
+    manifest_root = BUNDLED_ROOT / "pack-manifests"
+    core = json.loads((manifest_root / "core.json").read_text(encoding="utf-8"))
+    core_paths = set(core["paths"])
+
+    for relative_path, pack_name in HANDOFF_RUNTIME_PACKS:
+        assert (REPO_ROOT / relative_path).read_bytes() == (
+            BUNDLED_ROOT / relative_path
+        ).read_bytes()
+        manifest = json.loads(
+            (manifest_root / f"{pack_name}.json").read_text(encoding="utf-8")
+        )
+        assert relative_path.as_posix() in manifest["paths"]
+        assert relative_path.as_posix() in core_paths.union(manifest["paths"])
 
 
 def test_pack_manifests_are_outside_the_parity_scope() -> None:
@@ -448,3 +478,13 @@ def test_claude_modern_csharp_profile_retains_modern_gate_commands() -> None:
             assert (
                 forbidden not in content
             ), f"Modern profile must not contain {forbidden}: {relative_path}"
+
+
+def test_claude_consumer_uses_published_typescript_handoff_authority() -> None:
+    """Claude installs consume all four tools without a Python runtime import."""
+
+    assert_installed_consumer_authority(
+        REPO_ROOT,
+        BUNDLED_ROOT,
+        Path(".claude/skills/orchestrate/SKILL.md"),
+    )

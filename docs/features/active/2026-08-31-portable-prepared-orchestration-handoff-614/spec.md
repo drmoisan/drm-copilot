@@ -328,53 +328,53 @@ unknown, and stops if the exact plan, lifecycle, or scheduler binding cannot be 
 
 ## Acceptance Criteria
 
-- [ ] AC1: A Draft 2020-12, semantically versioned portable handoff envelope validates schema
+- [x] AC1: A Draft 2020-12, semantically versioned portable handoff envelope validates schema
   identity, objective, repository, workspace, branch lineage, issue, feature folder, work mode,
   ordered completed phases, exact next transition, logical complexity, capabilities, and exact plan
   path/hash before a destination runtime may continue.
-- [ ] AC2: Source checkpoint identity uses the raw-byte SHA-256, the original bytes are archived by
+- [x] AC2: Source checkpoint identity uses the raw-byte SHA-256, the original bytes are archived by
   content digest before canonical replacement, prior provider receipts remain opaque and unchanged,
   and handoff history is monotonic and digest-linked.
-- [ ] AC3: Plan validation accepts only the pinned normalized repository-relative path and raw-byte
+- [x] AC3: Plan validation accepts only the pinned normalized repository-relative path and raw-byte
   hash; it rejects absolute paths, `..`, symlink escape, directory rediscovery, and stale content.
 - [x] AC4: Claude-to-Codex and Codex-to-Claude adapters carry portable complexity, lifecycle, route,
   plan, and ownership semantics while retaining provider-specific model, reasoning, profile,
   topology, launch, and receipt evidence only in the expression that produced it.
-- [ ] AC5: A destination projection resumes the exact recorded transition and rejects replay of
+- [x] AC5: A destination projection resumes the exact recorded transition and rejects replay of
   every listed completed phase; destination receipts begin only with the first new destination
   delegation and never represent historical source work.
-- [ ] AC6: Parallel and epic child handoffs validate run/item, kickoff or manifest, parent checkpoint,
+- [x] AC6: Parallel and epic child handoffs validate run/item, kickoff or manifest, parent checkpoint,
   cohort/wave, owner, and result bindings; an ordinary child can return its bounded result but cannot
   assume scheduler, barrier, fan-in, integration, cleanup, or parent-completion authority.
 - [x] AC7: Hook and validator allowlists share one semantic MCP alias registry, accept both
   `mcp__drm-copilot__validate_orchestration_artifacts` and
   `mcp__drm_copilot__validate_orchestration_artifacts` as the same registered operation, and reject
   malformed identifiers, unrelated servers, and approximate or unregistered operations.
-- [ ] AC8: Consumer repositories can perform workspace-explicit handoff validation, destination
+- [x] AC8: Consumer repositories can perform workspace-explicit handoff validation, destination
   topology resolution, and provider routing through the published extension authority without
   importing unshipped drm-copilot Python modules; unavailable authority returns the specified single
   blocked result before delegation.
-- [ ] AC9: `transition_prepared_orchestration` is the only preparation-gate operation permitted to
+- [x] AC9: `transition_prepared_orchestration` is the only preparation-gate operation permitted to
   materialize a destination checkpoint; ordinary shell and patch route changes remain denied, and
   dry-run mode performs no canonical-checkpoint or user-file mutation.
-- [ ] AC10: Materialization repeats validation, performs a read-only clean-worktree preflight, writes
+- [x] AC10: Materialization repeats validation, performs a read-only clean-worktree preflight, writes
   and validates a same-directory candidate, archives source bytes, and atomically replaces the
   canonical checkpoint; any failure leaves the source checkpoint intact and records no completed
   transition.
-- [ ] AC11: Python, TypeScript, MCP, and hook tests select the same primary failure using the ordered
+- [x] AC11: Python, TypeScript, MCP, and hook tests select the same primary failure using the ordered
   `HANDOFF_*` precedence. The TaskMaster fixture's unrelated `.csproj` changes produce only
   `HANDOFF_DIRTY_WORKTREE` after all earlier contract and authority checks pass, with the dirty paths
   reported and unmodified.
-- [ ] AC12: Legacy-v1 migration requires an explicit source provider and independently proven plan,
+- [x] AC12: Legacy-v1 migration requires an explicit source provider and independently proven plan,
   lifecycle, and scheduled-parent facts. The four-field TaskMaster checkpoint cannot fabricate
   missing history; ambiguous migration stops before source archive or active-checkpoint change.
-- [ ] AC13: End-to-end TaskMaster issue #469 fixtures pin source and plan raw-byte hashes, prove
+- [x] AC13: End-to-end TaskMaster issue #469 fixtures pin source and plan raw-byte hashes, prove
   Claude-prepared to Codex-execution-ready continuation without completed-phase replay or historical
   receipt fabrication, and prove the symmetric Codex-to-Claude transition.
-- [ ] AC14: Root, extension-resource, core/variant-pack, and installed-consumer parity tests prove all
+- [x] AC14: Root, extension-resource, core/variant-pack, and installed-consumer parity tests prove all
   required runtime files ship together and the consumer flow works without drm-copilot source
   modules.
-- [ ] AC15: Regression tests demonstrate that issue #467 remains the sole owner of full Codex-native
+- [x] AC15: Regression tests demonstrate that issue #467 remains the sole owner of full Codex-native
   parallel scheduling and issue #543 remains the sole owner of the provider-specific epic-planner
   ready-gate defect; #614 changes neither behavior.
 
