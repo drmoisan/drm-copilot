@@ -5,30 +5,8 @@
 .SYNOPSIS
     Mode-resolution and per-mode readiness cases for the Claude preimplementation gate.
 .DESCRIPTION
-    Issue #554. The gate classified an Agent delegation by matching seven tokens
-    against the whole serialized tool_input, two of which are ordinary English words,
-    and then evaluated readiness against one hard-coded single-feature checkpoint that
-    no epic or parallel execution surface can satisfy. These cases cover the structural
-    replacement: mode resolution from a fixed table keyed on the field-scoped prompt,
-    the canonical-path cross-check, and the epic and parallel readiness predicates.
-
-    New sibling suite, not an addition to enforce-orchestration-preimplementation-gate.
-    Tests.ps1: that file is at 461 of 500 lines and must not grow, and no existing test
-    file is edited by this change, because the pre-existing suites passing unmodified is
-    the proof obligation for the guardrail that the Edit/Write and Bash legs, including
-    the issue #539 staging exemption, are behaviourally unchanged.
-
-    Determinism. Every fixture is a literal string. The suite makes no temporary file,
-    performs no filesystem write, reads no wall clock, opens no network connection, and
-    starts no external process. Checkpoint content is supplied through the decision
-    function's injection parameters or passed directly to a predicate as an
-    already-parsed object, so each result is a pure function of its arguments and no
-    Mock is required.
-
-    Fixture encoding. The JSON fixtures are assembled by literal string concatenation
-    rather than by serialization, so the exact payload text under test is visible here.
-    No fixture value may carry a double quote or a backslash; every value is plain ASCII
-    prose or a forward-slash path.
+    Literal JSON mode-resolution and readiness cases. They perform no I/O or external
+    process execution; checkpoint content is supplied as a function input.
 #>
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
@@ -146,6 +124,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'resolved issue|merge_status'
         }
     }
 
@@ -235,10 +214,28 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         }
 
         It 'returns the numeric string for a prompt carrying an <Label> issue number' -ForEach @(
-            @{ Label = 'keyed'; Prompt = 'Epic mode: true. issue_num: 301.' }
-            @{ Label = 'hash-form'; Prompt = 'Deliver the fix for issue #301 in this wave.' }
+            @{ Label = 'keyed'; Prompt = 'Epic mode: true. issue_num: 301.'; Expected = '301' }
+            @{ Label = 'Issue number wording'; Prompt = 'Implement Issue number: 644 now.'; Expected = '644' }
+            @{ Label = 'mixed-prose hash-form'; Prompt = 'Keep prior #638 evidence while resolving this task.'; Expected = '638' }
         ) {
-            Find-OrchestrationDelegationIssueNumber -Prompt $Prompt | Should -Be '301'
+            Find-OrchestrationDelegationIssueNumber -Prompt $Prompt | Should -Be $Expected
+        }
+    }
+
+    Context 'ordered mode record resolution' {
+        It 'selects the later exact folder record in epic readiness' {
+            $checkpoint = '{"route_id":"epic","epic_feature_folder":"family","epic_manifest_path":"docs/features/epics/family/epic.md","integration_branch":"epic/family","features":[{"feature_folder":"docs/features/active/other-644","issue_num":644,"merge_status":"merged"},{"feature_folder":"docs/features/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
+            Test-EpicOrchestrationReady -Checkpoint $checkpoint -TargetFolder 'child-644' -IssueNumber '644' | Should -BeTrue
+        }
+
+        It 'selects the later exact folder record in parallel readiness' {
+            $checkpoint = '{"route_id":"parallel","parallel_slug":"family","parallel_manifest_path":"docs/features/parallel/family/parallel.md","items":[{"feature_folder":"docs/features/active/other-644","issue_num":644,"merge_status":"worktree_removed"},{"feature_folder":"docs/features/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
+            Test-ParallelOrchestrationReady -Checkpoint $checkpoint -TargetFolder 'child-644' -IssueNumber '644' | Should -BeTrue
+        }
+
+        It 'retains first matching issue fallback when no folder matches' {
+            $records = '[{"feature_folder":"docs/features/active/first-644","issue_num":644},{"feature_folder":"docs/features/active/second-644","issue_num":644}]' | ConvertFrom-Json
+            (Find-OrchestrationModeRecord -Records $records -TargetFolder 'no-match' -IssueNumber '644').feature_folder | Should -Be 'docs/features/active/first-644'
         }
     }
 
