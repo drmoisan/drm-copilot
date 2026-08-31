@@ -127,7 +127,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "d8d3425b5cc70bccfa1d1ab19266f9c90a0134d98a510aedcea636d24d5d078b",
+        "42cd106c1dc6982cfe4fb15fb3439bdde4eb1bbbc6a1a2db26a8739587ab4ca7",
     ),
 )
 
