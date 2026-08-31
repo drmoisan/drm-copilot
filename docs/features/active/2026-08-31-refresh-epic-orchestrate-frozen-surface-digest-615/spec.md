@@ -119,11 +119,11 @@ Seeded from issue #615:
 
 
 ## Acceptance Criteria
-- [ ] The tuple for `.claude/skills/epic-orchestrate/SKILL.md` is updated to `42cd106c1dc6982cfe4fb15fb3439bdde4eb1bbbc6a1a2db26a8739587ab4ca7`, and the focused frozen-surface contract passes.
-- [ ] The unchanged frozen-file pin, all section/fragment expectations, and runtime/mirror bytes remain unchanged.
-- [ ] The required Python format, lint, type-check, and pytest gates pass without new failures.
+- [x] The tuple for `.claude/skills/epic-orchestrate/SKILL.md` is updated to `42cd106c1dc6982cfe4fb15fb3439bdde4eb1bbbc6a1a2db26a8739587ab4ca7`, and the focused frozen-surface contract passes.
+- [x] The unchanged frozen-file pin, all section/fragment expectations, and runtime/mirror bytes remain unchanged.
+- [x] The required Python format, lint, type-check, and pytest gates pass without new failures.
 - [ ] CI passes for the exact resulting commit SHA, including the previously failing Python 3.11 quality job.
-- [ ] No production files, runtime behavior, APIs, configuration, or unrelated test-support expectations change.
+- [x] No production files, runtime behavior, APIs, configuration, or unrelated test-support expectations change.
 
 ## Risks & Mitigations
 - Technical or operational risks: A digest copied from a different file revision could mask a frozen-document change; unrelated tuple edits could weaken coverage of another frozen surface.
