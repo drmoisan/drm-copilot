@@ -6,7 +6,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:ConfigPath = Join-Path $script:RepoRoot '.codex/config.toml'
-        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
 
         # Candidate tool names probed against each matcher regex. A future
         # registration cannot silently escape coverage, because the registration

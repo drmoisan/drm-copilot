@@ -5,7 +5,7 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
-        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
 
         # The eight handlers registered under the ^(apply_patch|Edit|Write)$ matcher.
         $script:GroupHookNames = @(
