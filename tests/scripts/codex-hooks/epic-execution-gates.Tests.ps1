@@ -5,10 +5,50 @@ Describe 'Codex epic preparation, wave, merge, and worktree gates' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
+        $script:PwshPath = (
+            Get-Command pwsh -CommandType Application -ErrorAction Stop |
+                Select-Object -First 1
+        ).Source
         . (Join-Path $script:HookRoot 'enforce-epic-planning-only.ps1')
         . (Join-Path $script:HookRoot 'enforce-epic-wave-barrier.ps1')
         . (Join-Path $script:HookRoot 'enforce-epic-merge-gate.ps1')
         . (Join-Path $script:HookRoot 'enforce-epic-worktree-removal-gate.ps1')
+
+        function Invoke-EpicPlanningDecisionProcess {
+            [CmdletBinding()]
+            param([Parameter(Mandatory)][string] $PayloadRaw)
+
+            $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
+            $startInfo.FileName = $script:PwshPath
+            $startInfo.ArgumentList.Add('-NoProfile')
+            $startInfo.ArgumentList.Add('-Command')
+            $startInfo.ArgumentList.Add(@'
+. $env:EPIC_PLANNING_HOOK_PATH
+$decision = Invoke-EpicPlanningOnlyDecision `
+    -PayloadRaw $env:EPIC_PLANNING_PAYLOAD `
+    -CheckpointRaw '{"route_id":"preparation"}'
+if ($null -ne $decision) {
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+}
+exit 0
+'@)
+            $startInfo.WorkingDirectory = $script:RepoRoot
+            $startInfo.RedirectStandardOutput = $true
+            $startInfo.RedirectStandardError = $true
+            $startInfo.UseShellExecute = $false
+            $startInfo.Environment['EPIC_PLANNING_HOOK_PATH'] = Join-Path $script:HookRoot 'enforce-epic-planning-only.ps1'
+            $startInfo.Environment['EPIC_PLANNING_PAYLOAD'] = $PayloadRaw
+
+            $process = [System.Diagnostics.Process]::Start($startInfo)
+            $stdout = $process.StandardOutput.ReadToEnd()
+            $stderr = $process.StandardError.ReadToEnd()
+            $process.WaitForExit()
+            return [pscustomobject]@{
+                ExitCode = $process.ExitCode
+                Stdout   = $stdout.Trim()
+                Stderr   = $stderr.Trim()
+            }
+        }
     }
 
     Context 'preparation route' {
@@ -197,6 +237,59 @@ Describe 'Codex epic preparation, wave, merge, and worktree gates' {
                 Should -BeNullOrEmpty
             (Invoke-EpicPlanningOnlyDecision -PayloadRaw $deniedPayload -CheckpointRaw $script:Preparation).
             hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+
+        It 'allows both registered MCP server spellings identically for <Operation>' -ForEach @(
+            @{ Operation = 'validate_orchestration_artifacts' }
+            @{ Operation = 'resolve_orchestration_topology' }
+            @{ Operation = 'resolve_provider_routing' }
+            @{ Operation = 'transition_prepared_orchestration' }
+        ) {
+            $hyphenPayload = @{
+                tool_name = "mcp__drm-copilot__$Operation"; tool_input = @{}
+            } | ConvertTo-Json -Compress
+            $underscorePayload = @{
+                tool_name = "mcp__drm_copilot__$Operation"; tool_input = @{}
+            } | ConvertTo-Json -Compress
+
+            $hyphen = Invoke-EpicPlanningDecisionProcess -PayloadRaw $hyphenPayload
+            $underscore = Invoke-EpicPlanningDecisionProcess -PayloadRaw $underscorePayload
+
+            $hyphen.ExitCode | Should -Be 0
+            $hyphen.Stdout | Should -BeNullOrEmpty
+            $hyphen.Stderr | Should -BeNullOrEmpty
+            $underscore.ExitCode | Should -Be $hyphen.ExitCode
+            $underscore.Stdout | Should -Be $hyphen.Stdout
+            $underscore.Stderr | Should -Be $hyphen.Stderr
+        }
+
+        It 'denies <Label> exactly without changing checkpoint bytes' -ForEach @(
+            @{ Label = 'malformed MCP id'; ToolName = 'mcp__drm_copilot_resolve_provider_routing'; ToolInput = @{}; Reason = "MCP tool 'mcp__drm_copilot_resolve_provider_routing' is outside the registered preparation lifecycle and semantic allowlist." }
+            @{ Label = 'unrelated MCP server'; ToolName = 'mcp__other__resolve_provider_routing'; ToolInput = @{}; Reason = "MCP tool 'mcp__other__resolve_provider_routing' is outside the registered preparation lifecycle and semantic allowlist." }
+            @{ Label = 'unregistered MCP operation'; ToolName = 'mcp__drm-copilot__collect_pr_context'; ToolInput = @{}; Reason = "MCP tool 'mcp__drm-copilot__collect_pr_context' is outside the registered preparation lifecycle and semantic allowlist." }
+            @{ Label = 'approximate MCP operation'; ToolName = 'mcp__drm_copilot__resolve_provider_routing_approximate'; ToolInput = @{}; Reason = "MCP tool 'mcp__drm_copilot__resolve_provider_routing_approximate' is outside the registered preparation lifecycle and semantic allowlist." }
+            @{ Label = 'shell edit'; ToolName = 'Bash'; ToolInput = @{ command = 'Set-Content src/service.ps1 unsafe' }; Reason = 'the Bash command is outside the preparation read, branch, commit, push, or validator allowlist.' }
+            @{ Label = 'production patch'; ToolName = 'apply_patch'; ToolInput = @{ command = "*** Begin Patch`n*** Update File: src/service.py`n*** End Patch" }; Reason = "preparation may not edit 'src/service.py'; only feature planning documents and orchestration/research artifacts are writable." }
+        ) {
+            $checkpointPath = Join-Path $script:RepoRoot 'artifacts/orchestration/orchestrator-state.json'
+            $before = [Convert]::ToBase64String([IO.File]::ReadAllBytes($checkpointPath))
+            $payload = @{ tool_name = $ToolName; tool_input = $ToolInput } |
+                ConvertTo-Json -Compress -Depth 10
+            $expected = [ordered]@{
+                hookSpecificOutput = [ordered]@{
+                    hookEventName            = 'PreToolUse'
+                    permissionDecision       = 'deny'
+                    permissionDecisionReason = "EPIC_PLANNING_ONLY_BLOCKED: $Reason"
+                }
+            } | ConvertTo-Json -Compress -Depth 5
+
+            $result = Invoke-EpicPlanningDecisionProcess -PayloadRaw $payload
+
+            $result.ExitCode | Should -Be 0
+            $result.Stdout | Should -Be $expected
+            $result.Stderr | Should -BeNullOrEmpty
+            [Convert]::ToBase64String([IO.File]::ReadAllBytes($checkpointPath)) |
+                Should -Be $before
         }
 
         It 'denies non-repository MCP tools during preparation' {

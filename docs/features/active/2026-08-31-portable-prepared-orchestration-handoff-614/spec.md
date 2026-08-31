@@ -337,7 +337,7 @@ unknown, and stops if the exact plan, lifecycle, or scheduler binding cannot be 
   and handoff history is monotonic and digest-linked.
 - [ ] AC3: Plan validation accepts only the pinned normalized repository-relative path and raw-byte
   hash; it rejects absolute paths, `..`, symlink escape, directory rediscovery, and stale content.
-- [ ] AC4: Claude-to-Codex and Codex-to-Claude adapters carry portable complexity, lifecycle, route,
+- [x] AC4: Claude-to-Codex and Codex-to-Claude adapters carry portable complexity, lifecycle, route,
   plan, and ownership semantics while retaining provider-specific model, reasoning, profile,
   topology, launch, and receipt evidence only in the expression that produced it.
 - [ ] AC5: A destination projection resumes the exact recorded transition and rejects replay of
@@ -346,7 +346,7 @@ unknown, and stops if the exact plan, lifecycle, or scheduler binding cannot be 
 - [ ] AC6: Parallel and epic child handoffs validate run/item, kickoff or manifest, parent checkpoint,
   cohort/wave, owner, and result bindings; an ordinary child can return its bounded result but cannot
   assume scheduler, barrier, fan-in, integration, cleanup, or parent-completion authority.
-- [ ] AC7: Hook and validator allowlists share one semantic MCP alias registry, accept both
+- [x] AC7: Hook and validator allowlists share one semantic MCP alias registry, accept both
   `mcp__drm-copilot__validate_orchestration_artifacts` and
   `mcp__drm_copilot__validate_orchestration_artifacts` as the same registered operation, and reject
   malformed identifiers, unrelated servers, and approximate or unregistered operations.

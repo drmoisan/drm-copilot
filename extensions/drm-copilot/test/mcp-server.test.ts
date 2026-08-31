@@ -22,39 +22,10 @@ jest.mock(
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
-
-function createMockService(): jest.Mocked<RepoAutomationService> {
-  return {
-    collectCommitContext: jest.fn(),
-    collectPrContext: jest.fn(),
-    runCodexNativeConverter: jest.fn(),
-    pushDownCopilotCustomizations: jest.fn(),
-    pushDownCodexAndAgentsCustomizations: jest.fn(),
-    pushDownClaudeCustomizations: jest.fn(),
-    newPotentialBugEntry: jest.fn(),
-    newPotentialEntry: jest.fn(),
-    linkParentChild: jest.fn(),
-    potentialToIssue: jest.fn(),
-    newActiveFeatureFolder: jest.fn(),
-    runPoshQCFormat: jest.fn(),
-    runPoshQCAnalyze: jest.fn(),
-    runPoshQCTest: jest.fn(),
-    runPoshQCAnalyzeAutofix: jest.fn(),
-    runPoshQCSuite: jest.fn(),
-    resolvePolicyAuditTemplateAsset: jest.fn(),
-    resolveExecuteHardLockPrompt: jest.fn(),
-    resolveAtomicPlanPrompt: jest.fn(),
-    validateOrchestrationArtifacts: jest.fn(),
-    renderSubagentTree: jest.fn(),
-    validateDiscoveryArtifacts: jest.fn(),
-    runDiscoveryInit: jest.fn(),
-    runDiscoveryRepoInventory: jest.fn(),
-    runDiscoveryDotnetAnalyzer: jest.fn(),
-    runDiscoveryVstoAnalyzer: jest.fn(),
-    runDiscoveryScenarioGeneration: jest.fn(),
-    runDiscoveryReport: jest.fn(),
-  };
-}
+import {
+  createMockService,
+  createPreparedTransitionCase,
+} from "./mcp-server-test-service";
 
 describe("repo automation MCP server", () => {
   let client: Client;
@@ -111,6 +82,9 @@ describe("repo automation MCP server", () => {
       "resolve_execute_hard_lock_prompt",
       "resolve_atomic_plan_prompt",
       "validate_orchestration_artifacts",
+      "resolve_orchestration_topology",
+      "resolve_provider_routing",
+      "transition_prepared_orchestration",
       "render_subagent_tree",
       "validate_discovery_artifacts",
       "run_discovery_init",
@@ -451,6 +425,22 @@ describe("repo automation MCP server", () => {
       bundled_source_path:
         "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
     });
+  });
+
+  it("dispatches a portable prepared-orchestration transition", async () => {
+    const fixture = createPreparedTransitionCase();
+    service.transitionPreparedOrchestration?.mockResolvedValue(fixture.result);
+
+    const result = await client.callTool({
+      name: "transition_prepared_orchestration",
+      arguments: fixture.arguments,
+    });
+
+    expect(service.transitionPreparedOrchestration).toHaveBeenCalledWith(
+      fixture.request,
+    );
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toMatchObject(fixture.expectedMcpResult);
   });
 
   it("dispatches resolve_execute_hard_lock_prompt through the shared service with injected output and quiet defaults, and surfaces artifacts", async () => {

@@ -14,6 +14,7 @@ from scripts.dev_tools.orchestration_handoff_contract import (
     Provider,
     SchedulerKind,
     history_entry_digest,
+    parse_semantic_mcp_identity,
 )
 from scripts.dev_tools.validate_orchestrator_state import (
     validate_orchestrator_state_text,
@@ -24,9 +25,21 @@ FIXTURES = ROOT / "tests" / "fixtures" / "orchestration-handoff" / "contract"
 SCHEMA = json.loads(
     (ROOT / "config" / "orchestration-handoff.schema.json").read_text(encoding="utf-8")
 )
+REGISTRY = json.loads(
+    (ROOT / "config" / "orchestration-handoff-registry.json").read_text(
+        encoding="utf-8"
+    )
+)
 JSON_SCHEMA = pytest.importorskip("jsonschema")
 VALIDATOR = JSON_SCHEMA.Draft202012Validator(SCHEMA)
 ZERO_SHA256 = "0" * 64
+
+
+@pytest.fixture(scope="module")
+def semantic_alias_cases() -> list[dict[str, Any]]:
+    return json.loads(
+        (FIXTURES / "semantic-mcp-alias-cases.json").read_text(encoding="utf-8")
+    )
 
 
 def _history_entry(source: Provider, destination: Provider) -> dict[str, object]:
@@ -169,6 +182,23 @@ def test_shared_positive_contract_fixture_is_valid(name: str) -> None:
     envelope = json.loads((FIXTURES / name).read_text(encoding="utf-8"))
     VALIDATOR.validate(envelope)
     assert validate_orchestrator_state_text(json.dumps(envelope)) == []
+
+
+def test_semantic_mcp_alias_parity_fixtures(
+    semantic_alias_cases: list[dict[str, Any]],
+) -> None:
+    for case in semantic_alias_cases:
+        identity = parse_semantic_mcp_identity(case["transport_id"], REGISTRY)
+        actual = {
+            "semantic_id": identity.semantic_id if identity else None,
+            "operation": identity.operation if identity else None,
+            "rejection_code": (None if identity else "SEMANTIC_MCP_IDENTITY_REJECTED"),
+        }
+        assert actual == {
+            "semantic_id": case["semantic_id"],
+            "operation": case["operation"],
+            "rejection_code": case["rejection_code"],
+        }, f"semantic identity parity failed for {case['transport_id']}"
 
 
 def test_valid_claude_to_codex_ordinary_envelope() -> None:

@@ -2,6 +2,10 @@ import { describe, expect, it } from "@jest/globals";
 
 import { toolDefinitions } from "../src/mcp-tool-definitions";
 import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
+import type {
+  PortableHandoffAuthorityResult,
+  TransitionPreparedOrchestrationResult,
+} from "../src/mcp-repo-automation-tool-definitions";
 import { workspaceRootProperty } from "../src/mcp-push-down-schema-properties";
 import { REPO_AUTOMATION_TOOLS } from "../src/repo-automation-tool-names";
 import {
@@ -224,6 +228,96 @@ describe("workspace_root required contract (AC-5)", () => {
 
   it("does not advertise a process.cwd() default in the workspace_root description", () => {
     expect(workspaceRootProperty.description).not.toContain("process.cwd()");
+  });
+});
+
+describe("portable handoff MCP definitions", () => {
+  const resolutionRequired = [
+    "workspace_root",
+    "handoff_envelope_path",
+    "expected_handoff_envelope_sha256",
+    "destination_provider",
+  ];
+
+  it.each(["resolve_orchestration_topology", "resolve_provider_routing"])(
+    "defines the exact read-only request for %s",
+    (toolName) => {
+      const definition = findRepoDefinition(toolName);
+      expect(definition?.inputSchema.required).toEqual(resolutionRequired);
+      expect(Object.keys(definition?.inputSchema.properties ?? {})).toEqual(
+        resolutionRequired,
+      );
+      expect(findBaseDefinition(toolName)).toEqual(definition);
+    },
+  );
+
+  it("defines the exact transition request and constrained values", () => {
+    const definition = findRepoDefinition("transition_prepared_orchestration");
+    const required = [
+      "workspace_root",
+      "source_checkpoint_path",
+      "expected_source_checkpoint_sha256",
+      "handoff_envelope_path",
+      "expected_handoff_envelope_sha256",
+      "destination_provider",
+      "mode",
+    ];
+    expect(definition?.inputSchema.required).toEqual(required);
+    expect(Object.keys(definition?.inputSchema.properties ?? {})).toEqual([
+      "workspace_root",
+      "handoff_envelope_path",
+      "expected_handoff_envelope_sha256",
+      "destination_provider",
+      "source_checkpoint_path",
+      "expected_source_checkpoint_sha256",
+      "mode",
+    ]);
+    const properties = definition?.inputSchema.properties as Record<
+      string,
+      { enum?: string[]; pattern?: string }
+    >;
+    expect(properties["destination_provider"]?.enum).toEqual([
+      "claude",
+      "codex",
+    ]);
+    expect(properties["mode"]?.enum).toEqual(["dry_run", "materialize"]);
+    expect(properties["expected_source_checkpoint_sha256"]?.pattern).toBe(
+      "^[a-f0-9]{64}$",
+    );
+    expect(findBaseDefinition("transition_prepared_orchestration")).toEqual(
+      definition,
+    );
+  });
+
+  it("types status, digests, primary code, and affected paths", () => {
+    const authority: PortableHandoffAuthorityResult = {
+      status: "blocked",
+      handoffId: null,
+      handoffEnvelopeSha256: "0".repeat(64),
+      primaryFailureCode: "HANDOFF_TOPOLOGY_RESOLVER_UNAVAILABLE",
+      affectedPaths: ["unrelated.csproj"],
+      unsupportedCapabilities: ["workspace-explicit-routing"],
+      resolution: null,
+    };
+    const transition: TransitionPreparedOrchestrationResult = {
+      status: "materialized",
+      handoffId: "handoff-614",
+      sourceCheckpointSha256: "0".repeat(64),
+      handoffEnvelopeSha256: "1".repeat(64),
+      handoffHistorySha256: "2".repeat(64),
+      requestedTransition: "atomic_execution",
+      destinationCheckpointPath:
+        "artifacts/orchestration/orchestrator-state.json",
+      destinationCheckpointSha256: "3".repeat(64),
+      primaryFailureCode: null,
+      affectedPaths: [],
+      unsupportedCapabilities: [],
+    };
+    expect(authority.primaryFailureCode).toBe(
+      "HANDOFF_TOPOLOGY_RESOLVER_UNAVAILABLE",
+    );
+    expect(transition.status).toBe("materialized");
+    expect(transition.destinationCheckpointSha256).toHaveLength(64);
   });
 });
 

@@ -74,7 +74,11 @@ def _failure_for(case: dict[str, object]) -> str | None:
 
 
 def test_shared_fixture_set_contains_only_verified_contract_cases() -> None:
-    expected = {*POSITIVE_FIXTURES, "invalid-contract-cases.json"}
+    expected = {
+        *POSITIVE_FIXTURES,
+        "invalid-contract-cases.json",
+        "semantic-mcp-alias-cases.json",
+    }
     assert {path.name for path in FIXTURES.glob("*.json")} == expected
 
 
