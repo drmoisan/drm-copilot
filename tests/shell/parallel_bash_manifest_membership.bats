@@ -16,9 +16,9 @@ setup() {
     LIB_DIR="${REPO_ROOT}/.claude/lib/bash"
     BUNDLE_DIR="${REPO_ROOT}/extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash"
     CORE_MANIFEST="${REPO_ROOT}/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
-    # The library is a nine-file module; a discovery below this floor means the
-    # tree moved rather than that the library shrank.
-    MINIMUM_LIB_FILE_COUNT=9
+    # The library is an eleven-file module; a discovery below this floor means
+    # the tree moved rather than that the library shrank.
+    MINIMUM_LIB_FILE_COUNT=11
 }
 
 # Echo every repository .claude/lib/bash shell file, one basename per line.
@@ -81,8 +81,8 @@ discover_lib_basenames() {
     done
 }
 
-@test "the three CLI entry points are present in both trees" {
-    for name in compute-cohorts.sh compute-concurrency-batches.sh validate-parallel-manifest.sh; do
+@test "the four CLI entry points are present in both trees" {
+    for name in compute-cohorts.sh compute-concurrency-batches.sh report-lane-assertion.sh validate-parallel-manifest.sh; do
         [ -f "${LIB_DIR}/${name}" ]
         [ -f "${BUNDLE_DIR}/${name}" ]
     done

@@ -1,0 +1,9 @@
+{
+  "name": "component_duplicate_member_split",
+  "notes": "A repeated member changes neither the distinct-component count the split finding reports nor the finding's own sorted member list.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/component-duplicate-member.md",
+  "manifest_text": "---\nparallel: lane-assertion-component-duplicate-member\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n  - issue_num: 202\n    feature_folder: docs/features/active/beta-202\n    kind: bug\n    state: admitted\nexpected_conflict_components:\n  - name: lane-duplicate\n    members:\n      - 101\n      - 101\n      - 202\n---\n\n# Parallel Run — lane-assertion-component-duplicate-member\n\nShared parity-corpus manifest for the lane-assertion diagnostic. Its asserted\nlane repeats the member 101. The repetition is kept rather than collapsed, so\nthe fixture pins that a duplicate changes neither the distinct-component count\nthe split finding reports nor the finding's own sorted member list.\n",
+  "edges": "",
+  "expected_stdout": "Lane assertion: 2 derived conflict component(s); 1 disagreement(s).\nADVISORY [expected_together_derived_apart] expected component 'lane-duplicate' was derived apart: its members occupy 2 distinct conflict components.\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0
+}

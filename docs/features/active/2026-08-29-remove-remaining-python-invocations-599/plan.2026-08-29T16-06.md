@@ -43,7 +43,7 @@ Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and 
 `Ubuntu` distribution, where `shfmt`, `shellcheck`, `bats`, and `kcov` are present at `/usr/bin`.
 Every bash command in this plan is therefore written in the form:
 
-`wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && <command>'`
+`wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && <command>'`
 
 **bats output form (observed this pass).** `bats` emits its pretty format only when stdout is a
 terminal. Every command in this plan is captured to an evidence artifact, so every `bats` run here
@@ -330,7 +330,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
 
 ### Phase 0 — Baseline Capture and Policy Reads
 
-- [ ] [P0-T1] Read the policy files in the order defined by `policy-compliance-order` and record the
+- [x] [P0-T1] Read the policy files in the order defined by `policy-compliance-order` and record the
       read in `evidence/baseline/phase0-instructions-read.<timestamp>.md`. Order: `CLAUDE.md`,
       `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/quality-tiers.md`, `.claude/rules/shell.md`, `.claude/rules/python.md`,
@@ -340,8 +340,8 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
   - Acceptance: the artifact exists and contains `Timestamp:`, `Policy Order:`, and the eleven file
     paths above listed in that exact order.
 
-- [ ] [P0-T2] Capture the bash format-and-lint baseline by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh check'`
+- [x] [P0-T2] Capture the bash format-and-lint baseline by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/baseline/bash-check.<timestamp>.md`.
   - Acceptance: the artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` that
     reproduces the command's stdout and stderr verbatim. `shell-qc.sh check` is read-only (it runs
@@ -352,8 +352,8 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     other result at this baseline is pre-existing drift and must be reported before Phase 1 begins,
     because P4-T1's attribution argument depends on this baseline being clean.
 
-- [ ] [P0-T3] Capture the bash coverage baseline by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test --coverage'`
+- [x] [P0-T3] Capture the bash coverage baseline by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/baseline/bash-coverage.<timestamp>.md`.
   - Acceptance: the artifact's `Output Summary:` records the numeric headline the run prints in the
     form produced by `scripts/bash/shell_qc_lib.sh:290-291`, `Bash coverage (lines): NN.N%`, with
@@ -365,13 +365,13 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     percentage and the case count will move. The no-regression comparison in P6-T14 is against the
     value this task actually records, and the gate in P6-T4 is the >= 85.0 floor.
 
-- [ ] [P0-T4] Capture the Python format baseline by running `poetry run black --check .` from the
+- [x] [P0-T4] Capture the Python format baseline by running `poetry run black --check .` from the
       worktree root and record it in `evidence/baseline/python-black-check.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim in
     `Output Summary:`. `--check` makes the command read-only, so the exit code is the discriminator
     and no file is rewritten before the baseline is taken.
 
-- [ ] [P0-T5] Capture the Python lint baseline by running `poetry run ruff check .` from the worktree
+- [x] [P0-T5] Capture the Python lint baseline by running `poetry run ruff check .` from the worktree
       root and record it in `evidence/baseline/python-ruff.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE: 0` and an `Output Summary:` whose stdout is exactly
     `All checks passed!`. That value was observed on this worktree against the clean tree before
@@ -383,12 +383,12 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     is expected here and is not a defect. The exit code plus the `All checks passed!` line are both
     recorded so the acceptance does not rest on the exit code alone.
 
-- [ ] [P0-T6] Capture the Python type-check baseline by running `poetry run pyright` from the
+- [x] [P0-T6] Capture the Python type-check baseline by running `poetry run pyright` from the
       worktree root and record it in `evidence/baseline/python-pyright.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the summary line the run prints,
     verbatim, in `Output Summary:`.
 
-- [ ] [P0-T7] Capture the Python coverage baseline over the reference module by running
+- [x] [P0-T7] Capture the Python coverage baseline over the reference module by running
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion.py --cov=scripts.dev_tools.parallel_lane_assertion --cov-report=term-missing -p no:cacheprovider`
       and record it in `evidence/baseline/python-lane-assertion-coverage.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE: 0`, the pytest pass count, and the numeric
@@ -397,7 +397,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     `--cov-report=term-missing` is supplied because the project `addopts` value at
     `pyproject.toml:115` provides an LCOV reporter only.
 
-- [ ] [P0-T8] Capture the bundle-mirror baseline by running
+- [x] [P0-T8] Capture the bundle-mirror baseline by running
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q -p no:cacheprovider`
       and record it in `evidence/baseline/python-pushdown-contracts.<timestamp>.md`.
   - Acceptance: the artifact records the observed `EXIT_CODE:` and the observed pytest summary line
@@ -419,21 +419,21 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
   - The durable, environment-independent mirror gate is the `cmp -s` loop in P5-T11; this baseline
     records the starting condition only.
 
-- [ ] [P0-T9] Capture the TypeScript format baseline by running
+- [x] [P0-T9] Capture the TypeScript format baseline by running
       `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-prettier-check.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
     `--check` makes the command read-only.
 
-- [ ] [P0-T10] Capture the TypeScript lint baseline by running `npm run lint` from
+- [x] [P0-T10] Capture the TypeScript lint baseline by running `npm run lint` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-eslint.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
 
-- [ ] [P0-T11] Capture the TypeScript type-check baseline by running `npm run typecheck` from
+- [x] [P0-T11] Capture the TypeScript type-check baseline by running `npm run typecheck` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-typecheck.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` and reproduces the command's output verbatim.
 
-- [ ] [P0-T12] Capture the TypeScript coverage baseline by running `npm run test:coverage` from
+- [x] [P0-T12] Capture the TypeScript coverage baseline by running `npm run test:coverage` from
       `extensions/drm-copilot` and record it in `evidence/baseline/ts-coverage.<timestamp>.md`.
   - Acceptance: the artifact records `EXIT_CODE:` as observed, the Jest `Tests:` line verbatim, and
     the four numeric percentages from the `text-summary` reporter block (Statements, Branches,
@@ -443,7 +443,7 @@ value. P3-T4 creates the pair and P3-T6 asserts the byte equality between them.
     at line 259 of that 260-line file, so a subset run reports 0% for every untested production file
     and fails thresholds for reasons unrelated to this feature.
 
-- [ ] [P0-T13] Capture the PowerShell no-Python-invocation regression baseline by running
+- [x] [P0-T13] Capture the PowerShell no-Python-invocation regression baseline by running
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 -CI"`
       from the worktree root and record it in
       `evidence/baseline/powershell-no-python-invocation.<timestamp>.md`.
@@ -460,7 +460,7 @@ Each task in this phase adds one function group to the library and the bats case
 then runs only those cases. No whole-tree bash test run occurs in this phase; see Ordering
 Constraint 1.
 
-- [ ] [P1-T1] Create `.claude/lib/bash/parallel-lane-assertion.sh` carrying the module header, the
+- [x] [P1-T1] Create `.claude/lib/bash/parallel-lane-assertion.sh` carrying the module header, the
       self-directory resolution and `source` of `.claude/lib/bash/parallel-manifest-validate.sh` in
       the form `.claude/lib/bash/compute-cohorts.sh:29-32` uses, the four class-token constants
       holding the exact strings `expected_together_derived_apart`,
@@ -470,7 +470,7 @@ Constraint 1.
       `the library declares the four finding-class tokens` that sources the library and asserts each
       constant's value.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the library declares the four finding-class tokens"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the library declares the four finding-class tokens"'`
     exits 0, and the captured output carries the TAP plan line `1..1`, exactly one line beginning
     `ok 1`, and no line beginning `not ok`.
   - Output-form note, observed this pass: bats emits its pretty format only when stdout is a
@@ -480,17 +480,17 @@ Constraint 1.
     33, 38, 43, 56, 73, and 84) and prints `1..6` followed by six `ok` lines on a captured run.
     Every bats acceptance in this plan is stated over TAP output for that reason.
 
-- [ ] [P1-T2] Add `pla_parse_edges` to `.claude/lib/bash/parallel-lane-assertion.sh`, splitting the
+- [x] [P1-T2] Add `pla_parse_edges` to `.claude/lib/bash/parallel-lane-assertion.sh`, splitting the
       `--edges` value on whitespace, partitioning each token on its first colon, dropping a token
       with no colon and a token whose endpoint falls outside the lexis `^-?(0|[1-9][0-9]*)$`, and
       preserving input order. Add the bats case `parse_edges keeps input order and drops malformed
       tokens` covering an empty value, a whitespace-only value, a token with no colon, a token with
       two colons, and a token with a non-integer endpoint.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "parse_edges"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "parse_edges"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T3] Add `pla_read_manifest_inputs` to `.claude/lib/bash/parallel-lane-assertion.sh`,
+- [x] [P1-T3] Add `pla_read_manifest_inputs` to `.claude/lib/bash/parallel-lane-assertion.sh`,
       consuming the node table already populated by `pm_parse_manifest` and reading
       `expected_conflict_components` through `yp_has`, `yp_type_of`, `yp_count_of`, and `yp_value_of`
       in the manner `.claude/lib/bash/parallel-manifest-validate.sh:203-237` already does, and
@@ -501,10 +501,10 @@ Constraint 1.
       ascending with `sort -n`. Add the bats case `read_manifest_inputs skips malformed entries
       without raising`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "read_manifest_inputs"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "read_manifest_inputs"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T4] Add `pla_derive_components` to `.claude/lib/bash/parallel-lane-assertion.sh`, seeding
+- [x] [P1-T4] Add `pla_derive_components` to `.claude/lib/bash/parallel-lane-assertion.sh`, seeding
       adjacency from every declared key so an isolated vertex survives, skipping an edge whose
       endpoints are equal or whose endpoint is not a declared key, building symmetric set-valued
       adjacency so direction and duplicates collapse, running BFS from each unvisited root in
@@ -513,10 +513,10 @@ Constraint 1.
       `derive_components partitions declared keys deterministically` covering an isolated vertex, a
       self-loop, an undeclared endpoint, and reversed plus duplicated edges.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "derive_components"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "derive_components"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T5] Add `pla_find_split_lanes`, `pla_find_merged_lanes`, and `pla_compare` to
+- [x] [P1-T5] Add `pla_find_split_lanes`, `pla_find_merged_lanes`, and `pla_compare` to
       `.claude/lib/bash/parallel-lane-assertion.sh`, emitting findings grouped by class in the fixed
       order split, merged, unknown-member, uncovered-item; visiting expected components in manifest
       order within the split class and derived components in derived order within the merged class;
@@ -526,10 +526,10 @@ Constraint 1.
       `compare emits findings in the fixed class order` covering one finding of each of the four
       classes and a repeated key across two expected components.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "compare emits findings"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "compare emits findings"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T6] Add `pla_format_report` to `.claude/lib/bash/parallel-lane-assertion.sh`, emitting the
+- [x] [P1-T6] Add `pla_format_report` to `.claude/lib/bash/parallel-lane-assertion.sh`, emitting the
       header `Lane assertion: {N} derived conflict component(s); {D} disagreement(s).`, one
       `ADVISORY [{kind}] {detail}.` line per finding using the four detail templates recorded in
       `spec.md`, and the closing line
@@ -541,26 +541,26 @@ Constraint 1.
       `format_report renders the header, findings, and closing line` covering an absent name, an
       empty-string name, and a two-member derived component.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "format_report"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "format_report"'`
     exits 0 with 0 failures.
 
-- [ ] [P1-T7] Verify `.claude/lib/bash/parallel-lane-assertion.sh` is inside the 500-line cap by
+- [x] [P1-T7] Verify `.claude/lib/bash/parallel-lane-assertion.sh` is inside the 500-line cap by
       running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/parallel-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the count in `evidence/qa-gates/bash-file-size.<timestamp>.md`.
   - Acceptance: the recorded line count is 500 or fewer. If it exceeds 500, split derivation from
     comparison-and-formatting along the `parallel-yaml-scan.sh` / `parallel-yaml-emit.sh` precedent
     named in `spec.md` and re-run this task.
 
-- [ ] [P1-T8] Verify the library is shellcheck-clean and shfmt-clean by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && shfmt -d .claude/lib/bash/parallel-lane-assertion.sh && shellcheck .claude/lib/bash/parallel-lane-assertion.sh'`
+- [x] [P1-T8] Verify the library is shellcheck-clean and shfmt-clean by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && shfmt -d .claude/lib/bash/parallel-lane-assertion.sh && shellcheck .claude/lib/bash/parallel-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-library-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty stdout. `shfmt -d` prints a unified diff and returns
     non-zero when the file needs reformatting, so both halves are read-only and falsifiable.
 
 ### Phase 2 — Entry point `.claude/lib/bash/report-lane-assertion.sh`
 
-- [ ] [P2-T1] Create `.claude/lib/bash/report-lane-assertion.sh` with `set -euo pipefail` as its
+- [x] [P2-T1] Create `.claude/lib/bash/report-lane-assertion.sh` with `set -euo pipefail` as its
       first executable line, self-directory resolution before sourcing
       `.claude/lib/bash/parallel-lane-assertion.sh`, a `pc_enforce_c_locale` call before any work in
       the manner `.claude/lib/bash/compute-cohorts.sh:34` uses, the usage text, `--manifest` and
@@ -581,7 +581,7 @@ Constraint 1.
     set that matches its enumeration. A single case asserting all three would leave P6-T17 marking
     a three-property criterion against a one-case set.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point"'`
     exits 0, and the captured output carries the TAP plan line `1..3`, exactly three lines beginning
     `ok`, and no line beginning `not ok`.
   - The filter selects exactly these three cases: no case name added by Phase 1 (P1-T1 through
@@ -591,25 +591,25 @@ Constraint 1.
     run matches more than three cases, so this acceptance is stated for the state of the suite at
     this task only and is not re-used later.
 
-- [ ] [P2-T2] Implement the exit-code contract in `.claude/lib/bash/report-lane-assertion.sh`: exit 2
+- [x] [P2-T2] Implement the exit-code contract in `.claude/lib/bash/report-lane-assertion.sh`: exit 2
       with usage text on stderr for an unknown flag or a missing `--manifest`; exit 0 with usage text
       on stdout for `--help`; exit 0 on every other path. Add the bats case
       `the entry point exits 2 only on a usage error` covering an unknown flag, a missing
       `--manifest`, and `--help`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point exits 2 only on a usage error"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "the entry point exits 2 only on a usage error"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T3] Add the bats case `the entry point rejects a --keys flag` to
+- [x] [P2-T3] Add the bats case `the entry point rejects a --keys flag` to
       `tests/shell/parallel_lane_assertion.bats`, invoking
       `bash .claude/lib/bash/report-lane-assertion.sh --keys "101 102" --manifest tests/fixtures/parallel_manifest_payload/parallel.md`
       and asserting exit status 2 with the usage text written to stderr, pinning that no `--keys`
       flag was added.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "rejects a --keys flag"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "rejects a --keys flag"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T4] Implement the manifest-unreadable path in
+- [x] [P2-T4] Implement the manifest-unreadable path in
       `.claude/lib/bash/report-lane-assertion.sh`, printing
       `Lane assertion: manifest unreadable ({detail}); no comparison made.` and exiting 0. Add the
       bats case `an unreadable manifest prints the unreadable line and exits 0`, which asserts the
@@ -619,10 +619,10 @@ Constraint 1.
       reproduce, so only the prefix is parity-scoped and the class is excluded from the shared
       corpus.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an unreadable manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an unreadable manifest"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T5] Implement the manifest-unparseable path in
+- [x] [P2-T5] Implement the manifest-unparseable path in
       `.claude/lib/bash/report-lane-assertion.sh`, printing
       `Lane assertion: manifest unparseable ({first M1 error}).` and exiting 0, reusing the M1
       message text that `pm_parse_manifest` appends to `PC_ERRORS` with `PM_CONTEXT` left at its
@@ -631,11 +631,11 @@ Constraint 1.
       fixture `tests/fixtures/parallel_lane_assertion_bash/not-a-mapping.md` and add the bats case
       `an unparseable manifest prints the M1 error and exits 0`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an unparseable manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an unparseable manifest"'`
     exits 0 with 0 failures, and the asserted output is exactly
     `Lane assertion: manifest unparseable (Parallel manifest frontmatter must be a mapping.).`
 
-- [ ] [P2-T6] Implement the out-of-subset path in `.claude/lib/bash/report-lane-assertion.sh`,
+- [x] [P2-T6] Implement the out-of-subset path in `.claude/lib/bash/report-lane-assertion.sh`,
       printing the distinct refusal line
       `Lane assertion: manifest outside the supported YAML subset ({detail}); no comparison made.`
       and exiting 0 when `pm_parse_manifest` returns status 2, using `PM_SUBSET_DETAIL` as the
@@ -654,11 +654,11 @@ Constraint 1.
       The independent, non-vacuous assertion that no corpus record carries an excluded `--edges`
       form is P3-T7, which runs against a populated corpus.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "an out-of-subset manifest"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "an out-of-subset manifest"'`
     exits 0 with 0 failures, and the asserted stdout begins with the literal
     `Lane assertion: manifest outside the supported YAML subset (` and the asserted exit status is 0.
 
-- [ ] [P2-T7] Add the bats case `the port drops an --edges endpoint outside the strict integer lexis`
+- [x] [P2-T7] Add the bats case `the port drops an --edges endpoint outside the strict integer lexis`
       to `tests/shell/parallel_lane_assertion.bats`, pinning divergence class 3. Using the
       checked-in manifest `tests/fixtures/parallel_manifest_payload/parallel.md`, which declares
       exactly `issue_num` 101 and 202, invoke the entry point once per excluded form —
@@ -677,27 +677,27 @@ Constraint 1.
       any file under `tests/fixtures/parallel_lane_assertion/` — is discharged by P3-T7, which runs
       against a populated corpus. P6-T17 maps that criterion to both task IDs.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "outside the strict integer lexis"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "outside the strict integer lexis"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T8] Add the bats case `no library file sources the diagnostic` to
+- [x] [P2-T8] Add the bats case `no library file sources the diagnostic` to
       `tests/shell/parallel_lane_assertion.bats`, asserting that no file under `.claude/lib/bash/`
       other than `report-lane-assertion.sh` sources `parallel-lane-assertion.sh`, and that no file
       under `.claude/lib/bash/` sources `report-lane-assertion.sh`, pinning that the diagnostic feeds
       no cohort, validation, or scheduling module.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
     exits 0 with 0 failures.
 
-- [ ] [P2-T9] Verify `.claude/lib/bash/report-lane-assertion.sh` is inside the 500-line cap and is
+- [x] [P2-T9] Verify `.claude/lib/bash/report-lane-assertion.sh` is inside the 500-line cap and is
       lint-clean by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/report-lane-assertion.sh && shfmt -d .claude/lib/bash/report-lane-assertion.sh && shellcheck .claude/lib/bash/report-lane-assertion.sh'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/report-lane-assertion.sh && shfmt -d .claude/lib/bash/report-lane-assertion.sh && shellcheck .claude/lib/bash/report-lane-assertion.sh'`
       and record the result in `evidence/qa-gates/bash-entry-point-lint.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the recorded line count is 500 or fewer, and the `shfmt -d` and
     `shellcheck` halves produce empty output.
 
-- [ ] [P2-T10] Run the whole bash unit suite once by
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats'`
+- [x] [P2-T10] Run the whole bash unit suite once by
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats'`
       and record the result in `evidence/regression-testing/bash-unit-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`; the recorded TAP output carries a plan line of `1..16` or a higher
     count; and it contains no line beginning `not ok`. Sixteen is the floor because Phases 1 and 2
@@ -714,7 +714,7 @@ Constraint 1.
 
 ### Phase 3 — Shared parity corpus and the two parity lanes
 
-- [ ] [P3-T1] Create the manifest fixtures
+- [x] [P3-T1] Create the manifest fixtures
       `tests/fixtures/parallel_lane_assertion/manifests/*.md` covering the assertion-free shapes: a
       manifest with two items declaring exactly `issue_num` 101 and 202 and no
       `expected_conflict_components` key, a manifest with an empty `items` list and no assertion, and
@@ -725,7 +725,7 @@ Constraint 1.
     stdout matches the extended regular expression
     `^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$`,
     verified by
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && rc=0; for f in tests/fixtures/parallel_lane_assertion/manifests/*.md; do bash .claude/lib/bash/report-lane-assertion.sh --manifest "$f" | head -n 1 | grep -Eq "^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$" || { echo "BAD HEADER: $f"; rc=1; }; done; exit $rc'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && rc=0; for f in tests/fixtures/parallel_lane_assertion/manifests/*.md; do bash .claude/lib/bash/report-lane-assertion.sh --manifest "$f" | head -n 1 | grep -Eq "^Lane assertion: [0-9]+ derived conflict component\(s\); [0-9]+ disagreement\(s\)\.$" || { echo "BAD HEADER: $f"; rc=1; }; done; exit $rc'`
     exiting 0 with no `BAD HEADER:` line in its output.
   - Why the exit status is not the discriminator: `.claude/lib/bash/report-lane-assertion.sh` exits
     0 on every non-usage path by design (Fixed Design Decision 4 and the spec's exit-code contract),
@@ -734,7 +734,7 @@ Constraint 1.
     valid one and can never fail. The header line is what distinguishes a fixture the diagnostic
     actually compared from one it refused.
 
-- [ ] [P3-T2] Create the manifest fixtures under
+- [x] [P3-T2] Create the manifest fixtures under
       `tests/fixtures/parallel_lane_assertion/manifests/` covering the component-shape edge cases: a
       component with `name` absent, a component with `name: ''`, a component whose members include a
       non-positive value, a component whose members include a boolean, a component whose members are
@@ -746,7 +746,7 @@ Constraint 1.
     on every non-usage path, so its exit status cannot distinguish a compared fixture from a
     refused one.
 
-- [ ] [P3-T3] Create the corpus records
+- [x] [P3-T3] Create the corpus records
       `tests/fixtures/parallel_lane_assertion/*.json` for the assertion-free and component-shape
       fixtures, each carrying `name`, `notes`, `manifest_path`, `manifest_text`, `edges`,
       `expected_stdout`, and `expected_status: 0`, with `expected_stdout` derived by running the
@@ -755,7 +755,7 @@ Constraint 1.
   - Acceptance: at least ten `*.json` records exist at depth 1 under
     `tests/fixtures/parallel_lane_assertion/`, and every record's `expected_status` is 0.
 
-- [ ] [P3-T4] Create the remaining corpus records covering the edge-derivation cases: a self-loop
+- [x] [P3-T4] Create the remaining corpus records covering the edge-derivation cases: a self-loop
       edge, an edge naming an undeclared key, reversed and duplicated edges, a token with no colon,
       a token with two colons, a token with a non-integer endpoint, an empty `edges` value, a
       whitespace-only `edges` value, a merged-class disagreement, a split-class disagreement, a
@@ -776,10 +776,10 @@ Constraint 1.
       equality.
   - Acceptance: the corpus holds at least 20 `*.json` records at depth 1 under
     `tests/fixtures/parallel_lane_assertion/`, verified by
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && find tests/fixtures/parallel_lane_assertion -maxdepth 1 -name "*.json" -type f | wc -l'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && find tests/fixtures/parallel_lane_assertion -maxdepth 1 -name "*.json" -type f | wc -l'`
     printing a value of 20 or greater.
 
-- [ ] [P3-T5] Create `tests/shell/parallel_lane_assertion_parity.bats` with a header declaring all
+- [x] [P3-T5] Create `tests/shell/parallel_lane_assertion_parity.bats` with a header declaring all
       five divergence classes — recording that class 3 has exactly four members and that whitespace
       inside an endpoint is a convergence case carried in the corpus, not a class-3 member — a
       `MINIMUM_FIXTURE_COUNT` constant set to 20, a case named
@@ -790,11 +790,11 @@ Constraint 1.
       as a subprocess per fixture and compares both `$output` against `expected_stdout` and `$status`
       against `expected_status`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`
     exits 0, its TAP plan line reports `1..3` or a higher count, and its output contains no line
     beginning `not ok`.
 
-- [ ] [P3-T6] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
+- [x] [P3-T6] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
       `every finding class appears in the corpus`, asserting that each of
       `expected_together_derived_apart`, `expected_apart_derived_together`, `member_names_no_item`,
       and `item_covered_by_no_component` appears in the `expected_stdout` of at least one corpus
@@ -808,11 +808,11 @@ Constraint 1.
       same `manifest_path` and carry byte-identical `expected_stdout` values, which is the
       convergence property `spec.md:566-575` requires.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`
     exits 0, its TAP plan line reports `1..7` or a higher count, and its output contains no line
     beginning `not ok`.
 
-- [ ] [P3-T7] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
+- [x] [P3-T7] Add to `tests/shell/parallel_lane_assertion_parity.bats` a case named
       `no corpus fixture carries an excluded edges endpoint form`, asserting that no colon-bearing
       token in any record's `edges` value has an endpoint matching any of the four excluded forms of
       divergence class 3: a leading zero followed by a further digit, a leading `+`, an underscore
@@ -832,11 +832,11 @@ Constraint 1.
     reason. A record-level exemption would be unnecessary and would weaken the check: it would allow
     a genuine class-3 form to sit inside an exempted record undetected.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats -f "excluded edges endpoint form"'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats -f "excluded edges endpoint form"'`
     exits 0, its TAP output carries a plan line of `1..1`, and it contains no line beginning
     `not ok`.
 
-- [ ] [P3-T8] Create `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` with the
+- [x] [P3-T8] Create `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` with the
       same five declared divergence classes in its module docstring, stated in the same corrected
       form as the bats lane header (class 3 has exactly four members; whitespace inside an endpoint
       is a convergence case carried in the corpus), a `MINIMUM_FIXTURE_COUNT`
@@ -851,18 +851,18 @@ Constraint 1.
     `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py -q -p no:cacheprovider`
     exits 0 and reports a pass count of at least 22.
 
-- [ ] [P3-T9] Verify the two parity lanes agree over the same corpus by running both in sequence:
+- [x] [P3-T9] Verify the two parity lanes agree over the same corpus by running both in sequence:
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py -q -p no:cacheprovider`
       then
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion_parity.bats'`,
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion_parity.bats'`,
       and record both in `evidence/regression-testing/parity-lanes.<timestamp>.md`.
   - Acceptance: both `EXIT_CODE:` values are 0, and the artifact records the pytest pass count and
     the bats case count.
 
 ### Phase 4 — Bundle mirror, pack manifest, payload-only proof, and TypeScript enumerations
 
-- [ ] [P4-T1] Format the new bash files by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
+- [x] [P4-T1] Format the new bash files by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record the result in `evidence/qa-gates/bash-format-preseal.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
     `AFTER=` values.
@@ -901,17 +901,17 @@ Constraint 1.
     records that baseline), so any divergence observed here is attributable to a file this feature
     created, not to pre-existing drift.
 
-- [ ] [P4-T2] Copy `.claude/lib/bash/parallel-lane-assertion.sh` and
+- [x] [P4-T2] Copy `.claude/lib/bash/parallel-lane-assertion.sh` and
       `.claude/lib/bash/report-lane-assertion.sh` byte-identically to
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh`
       and
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh`.
       No script performs this copy; research section 5.2 confirms the mirroring is manual.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/lib/bash/parallel-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh && cmp -s .claude/lib/bash/report-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/lib/bash/parallel-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh && cmp -s .claude/lib/bash/report-lane-assertion.sh extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/report-lane-assertion.sh'`
     exits 0.
 
-- [ ] [P4-T3] Add `".claude/lib/bash/parallel-lane-assertion.sh"` and
+- [x] [P4-T3] Add `".claude/lib/bash/parallel-lane-assertion.sh"` and
       `".claude/lib/bash/report-lane-assertion.sh"` to the `paths` array in
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, beside the
       nine existing `.claude/lib/bash/` entries at lines 137-145. This file is bundle-only and sits
@@ -923,7 +923,7 @@ Constraint 1.
     `git grep -n -F ".claude/lib/bash/parallel-lane-assertion.sh" -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
     returns exactly one match.
 
-- [ ] [P4-T4] Raise `MINIMUM_LIB_FILE_COUNT` in `tests/shell/parallel_bash_manifest_membership.bats`
+- [x] [P4-T4] Raise `MINIMUM_LIB_FILE_COUNT` in `tests/shell/parallel_bash_manifest_membership.bats`
       from 9 to 11 at line 21, and update the comment at lines 19-20, which currently reads
       "The library is a nine-file module", so the prose agrees with the constant. The replacement
       phrase is `eleven-file module`.
@@ -938,14 +938,14 @@ Constraint 1.
     returns exactly one match. Clauses (c) and (d) are what make the prose edit asserted rather than
     merely instructed; without them the comment could be left stale and the task would still pass.
 
-- [ ] [P4-T5] Update the case at `tests/shell/parallel_bash_manifest_membership.bats:84-89`, titled
+- [x] [P4-T5] Update the case at `tests/shell/parallel_bash_manifest_membership.bats:84-89`, titled
       "the three CLI entry points are present in both trees", so its title and its enumeration name
       all four entry points, adding `report-lane-assertion.sh` to the loop list at line 85. The
       replacement title is `the four CLI entry points are present in both trees`. The case is green
       without this change; it is updated because its title and list are documentation of the
       entry-point set and become stale otherwise.
   - Acceptance, all four clauses:
-    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_bash_manifest_membership.bats'`
+    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_bash_manifest_membership.bats'`
     exits 0, its TAP plan line reads `1..6`, and its output contains no line beginning `not ok`;
     (b) `git grep -c -F "report-lane-assertion.sh" -- tests/shell/parallel_bash_manifest_membership.bats`
     reports 1;
@@ -957,7 +957,7 @@ Constraint 1.
     Clauses (c) and (d) assert the title change, which the `ok` line alone would not distinguish
     from the unedited title on a run that passes either way.
 
-- [ ] [P4-T6] Add `".claude/lib/bash/report-lane-assertion.sh"` to the `it.each` enumeration at
+- [x] [P4-T6] Add `".claude/lib/bash/report-lane-assertion.sh"` to the `it.each` enumeration at
       `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts:237-245`,
       whose seven entries occupy lines 238-244, placing the new entry after
       `".claude/lib/bash/validate-parallel-manifest.sh"` at line 244.
@@ -975,7 +975,7 @@ Constraint 1.
   - The acceptance is stated over the `Tests:` summary rather than over an individual case name
     because Jest's default reporter prints per-case names only under `--verbose`.
 
-- [ ] [P4-T7] Add `.claude/lib/bash/report-lane-assertion.sh` to the seeded file map at
+- [x] [P4-T7] Add `.claude/lib/bash/report-lane-assertion.sh` to the seeded file map at
       `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts:144-148` and to the
       `core.json` stub `paths` array, which spans lines 154-163 and whose three existing
       `.claude/lib/bash/` entries occupy lines 158-160, then add the same path to the enumeration at
@@ -990,7 +990,7 @@ Constraint 1.
     `core.json` stub entry. This edit adds no new case, so a passed-count delta is not available and
     the enumeration is verified by the grep instead.
 
-- [ ] [P4-T8] Add to `tests/shell/parallel_payload_only.bats` a case named
+- [x] [P4-T8] Add to `tests/shell/parallel_payload_only.bats` a case named
       `the payload runs the lane-assertion diagnostic without Python on PATH` that invokes
       `report-lane-assertion.sh` from the bundle root through the existing `run_payload` helper under
       the four-shim `PATH`, passing
@@ -1006,7 +1006,7 @@ Constraint 1.
       which reads "Invokes the three published bash entry points from the bundle root", so that it
       reads `the four published bash entry points`.
   - Acceptance, all five clauses:
-    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_payload_only.bats'`
+    (a) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_payload_only.bats'`
     exits 0, its TAP plan line reads `1..11`, and its output contains no line beginning `not ok`.
     Eleven is one more than the ten `@test` blocks the file carries today at lines 45, 52, 58, 67,
     74, 80, 86, 92, 98, and 107;
@@ -1023,8 +1023,8 @@ Constraint 1.
     returns exactly one match. Clauses (c) through (e) are what make the two prose edits asserted;
     both regions are green either way, so a passing suite alone cannot evidence them.
 
-- [ ] [P4-T9] Run the whole bash test suite for the first time since Phase 0 by
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test'`
+- [x] [P4-T9] Run the whole bash test suite for the first time since Phase 0 by
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test'`
       and record the result in `evidence/regression-testing/bash-full-suite.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and 0 bats failures. This is the first whole-tree run after
     Phase 1 created a `.claude/lib/bash/` file, so it is the first point at which
@@ -1033,7 +1033,7 @@ Constraint 1.
 
 ### Phase 5 — Payload documentation edits and their bundle mirrors
 
-- [ ] [P5-T1] Edit `.claude/skills/epic-orchestrate/SKILL.md` to delete the CLI spelling at line 296
+- [x] [P5-T1] Edit `.claude/skills/epic-orchestrate/SKILL.md` to delete the CLI spelling at line 296
       and rewrite the surrounding sentence at lines 295-299 so the MCP form
       `mcp__drm-copilot__validate_orchestration_artifacts` with
       `artifact_type: "epic-orchestrator-state"` is the primary spelling and the completion-gate
@@ -1058,7 +1058,7 @@ Constraint 1.
     inside the rewritten passage at lines 295-299. That command returns exactly one match today, so
     the rise from one to two is the evidence that the completion-gate option was respelled as the
     MCP argument; and
-    (d) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/skills/epic-orchestrate/SKILL.md'`
+    (d) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/skills/epic-orchestrate/SKILL.md'`
     reports a line count of 310, which is the count it reports today, so the file length is unchanged
     and `require_complete=True` still sits at line 310 as clause (c) records. `wc -l <file>` prints
     the count followed by the path, so the asserted value is the count on that line, not the whole
@@ -1070,7 +1070,7 @@ Constraint 1.
     literal is present at line 297), so it cannot fail whatever the executor does. It is retained
     only in P5-T12, where it serves as a preservation check rather than a change check.
 
-- [ ] [P5-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` to delete the CLI spelling at lines
+- [x] [P5-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` to delete the CLI spelling at lines
       481-482 and rewrite lines 480-483 so only the MCP form remains and the completion-gate option
       reads as the MCP argument `require_complete`. Do not touch line 817 or the
       `#### CLI Invocation` heading at line 809.
@@ -1103,7 +1103,7 @@ Constraint 1.
     rewritten passage at lines 480-483. That command returns exactly one match today; and
     (d) `git grep -n -F "poetry run python -m scripts.dev_tools.parallel_drift_detection_cli" -- .claude/skills/parallel-orchestrate/SKILL.md`
     still returns exactly one match, at line 817; and
-    (e) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/skills/parallel-orchestrate/SKILL.md'`
+    (e) `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/skills/parallel-orchestrate/SKILL.md'`
     reports a line count of 1055, which is the count it reports today, so the file length is
     unchanged and line 817 still holds the drift-detection invocation that clause (d) and four
     acceptance criteria name. `wc -l <file>` prints the count followed by the path, so the asserted
@@ -1114,7 +1114,7 @@ Constraint 1.
     non-zero before any edit and the clause cannot fail. Clause (d) is the non-goal preservation
     check and is falsifiable in the other direction — an over-broad deletion would drop it to zero.
 
-- [ ] [P5-T3] Edit `.claude/skills/parallel-plan/SKILL.md` to replace the invocation at line 315 with
+- [x] [P5-T3] Edit `.claude/skills/parallel-plan/SKILL.md` to replace the invocation at line 315 with
       `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
       and to replace the parenthetical grant note at line 316, which today reads "(covered by the
       planner's existing `Bash(poetry run *)` grant)". Leave lines 322-329 and 569-573 semantically
@@ -1137,7 +1137,7 @@ Constraint 1.
     returns no match, where it returns exactly one match at line 316 today. Clause (c) asserts the
     grant note was actually rewritten rather than left beside the new invocation.
 
-- [ ] [P5-T4] Edit `.claude/agents/parallel-planner.md` to add
+- [x] [P5-T4] Edit `.claude/agents/parallel-planner.md` to add
       `"Bash(bash .claude/lib/bash/report-lane-assertion.sh*)"` to the `tools:` list at lines 5-20,
       beside the three existing entry-point grants at lines 17-19; to document the new entry point in
       the bash paragraph at lines 158-168; and to correct the two counts that paragraph carries.
@@ -1182,7 +1182,7 @@ Constraint 1.
     committed and is therefore not the discriminator. No criterion text is edited to accommodate
     this; P6-T17 forbids that.
 
-- [ ] [P5-T5] Edit `.claude/agents/parallel-orchestrator.md` lines 92-97 so the grant rationale names
+- [x] [P5-T5] Edit `.claude/agents/parallel-orchestrator.md` lines 92-97 so the grant rationale names
       only consumers that still exist after site 2 is deleted, and so its counts are internally
       consistent with that. Re-derived this pass, the paragraph today reads: line 92 opens with
       "The two `poetry run` grants remain for the repository-local paths that still need an
@@ -1220,37 +1220,37 @@ Constraint 1.
     escaping backticks inside a markdown code span. The two backtick-free tokens are each
     single-line and are asserted verbatim instead.
 
-- [ ] [P5-T6] Copy the edited `.claude/skills/epic-orchestrate/SKILL.md` to
+- [x] [P5-T6] Copy the edited `.claude/skills/epic-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T7] Copy the edited `.claude/skills/parallel-orchestrate/SKILL.md` to
+- [x] [P5-T7] Copy the edited `.claude/skills/parallel-orchestrate/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T8] Copy the edited `.claude/skills/parallel-plan/SKILL.md` to
+- [x] [P5-T8] Copy the edited `.claude/skills/parallel-plan/SKILL.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/skills/parallel-plan/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md'`
     exits 0.
 
-- [ ] [P5-T9] Copy the edited `.claude/agents/parallel-planner.md` to
+- [x] [P5-T9] Copy the edited `.claude/agents/parallel-planner.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-planner.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md'`
     exits 0.
 
-- [ ] [P5-T10] Copy the edited `.claude/agents/parallel-orchestrator.md` to
+- [x] [P5-T10] Copy the edited `.claude/agents/parallel-orchestrator.md` to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md`.
   - Acceptance:
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && cmp -s .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && cmp -s .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md'`
     exits 0.
 
-- [ ] [P5-T11] Verify the complete bundle mirror by running
+- [x] [P5-T11] Verify the complete bundle mirror by running
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q -p no:cacheprovider`
       and record the result in `evidence/regression-testing/pushdown-contracts.<timestamp>.md`.
   - Acceptance, part 1 (environment-conditional, same condition as P0-T8): `EXIT_CODE: 0` with the
@@ -1272,13 +1272,13 @@ Constraint 1.
     P3-T8 additionally creates a `.py` file in this run, which is one of the triggers for the
     Python batch-budget hook that writes `.claude/state/`.
   - Acceptance, part 2 (durable gate, no dependence on `.claude/state/`): run
-    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && rc=0; for f in .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md .claude/skills/parallel-plan/SKILL.md .claude/agents/parallel-planner.md .claude/agents/parallel-orchestrator.md; do cmp -s "$f" "extensions/drm-copilot/resources/claude-customizations/$f" || { echo "DIFFERS: $f"; rc=1; }; done; exit $rc'`
+    `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && rc=0; for f in .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md .claude/skills/parallel-plan/SKILL.md .claude/agents/parallel-planner.md .claude/agents/parallel-orchestrator.md; do cmp -s "$f" "extensions/drm-copilot/resources/claude-customizations/$f" || { echo "DIFFERS: $f"; rc=1; }; done; exit $rc'`
     and record it in the same artifact with `EXIT_CODE: 0` and empty stdout. Any `DIFFERS:` line is
     a blocking finding. The seven files are the two new bash files (P4-T2) and the five edited
     `.claude/**` files (P5-T6 through P5-T10). This loop is a byte comparison over a fixed,
     enumerated file list, so it is unaffected by `.claude/state/` and by any other untracked file.
 
-- [ ] [P5-T12] Verify the three in-scope invocation sites are closed and the two non-goal sites are
+- [x] [P5-T12] Verify the three in-scope invocation sites are closed and the two non-goal sites are
       untouched by running all three of
       `git grep -n -F "python -m scripts.dev_tools." -- .claude/skills/`,
       `git grep -n -F "poetry run python" -- .claude/skills/`, and
@@ -1318,8 +1318,8 @@ Constraint 1.
 The loop below runs in the order format, lint, type-check, test for each language. If any step fails
 or rewrites a file, restart that language's loop at its format step.
 
-- [ ] [P6-T1] Run the bash format step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
+- [x] [P6-T1] Run the bash format step:
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && digest() { bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | xargs sha256sum | sha256sum; }; echo "BEFORE=$(digest)"; rc=0; bash scripts/bash/shell-qc.sh format || rc=$?; echo "FORMAT_RC=${rc}"; echo "AFTER=$(digest)"; git status --porcelain -- .claude/lib/bash tests/shell scripts tools; exit "$rc"'`
       and record it in `evidence/qa-gates/final-bash-format.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, a recorded `FORMAT_RC=0`, and identical recorded `BEFORE=` and
     `AFTER=` values. That equality is the observation that distinguishes a clean run from a
@@ -1339,26 +1339,26 @@ or rewrites a file, restart that language's loop at its format step.
     run produces identical digests but does not re-mirror the file the first run rewrote, and the
     mirror guard is a byte comparison.
 
-- [ ] [P6-T2] Run the bash lint step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh check'`
+- [x] [P6-T2] Run the bash lint step:
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh check'`
       and record it in `evidence/qa-gates/final-bash-check.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and empty output.
 
-- [ ] [P6-T3] Confirm both new files are inside the shell-QC discovery set by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | grep -c -F -e .claude/lib/bash/parallel-lane-assertion.sh -e .claude/lib/bash/report-lane-assertion.sh'`
+- [x] [P6-T3] Confirm both new files are inside the shell-QC discovery set by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash -c "source scripts/bash/shell_qc_lib.sh; discover_shell_scripts" | grep -c -F -e .claude/lib/bash/parallel-lane-assertion.sh -e .claude/lib/bash/report-lane-assertion.sh'`
       and record it in `evidence/qa-gates/bash-discovery.<timestamp>.md`.
   - Acceptance: the command prints `2` and exits 0. `discover_shell_scripts`
     (`scripts/bash/shell_qc_lib.sh:75-102`) emits root-relative paths, so both new files appear with
     the spellings asserted here.
 
-- [ ] [P6-T4] Run the bash coverage step:
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bash scripts/bash/shell-qc.sh test --coverage'`
+- [x] [P6-T4] Run the bash coverage step:
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bash scripts/bash/shell-qc.sh test --coverage'`
       and record it in `evidence/qa-gates/final-bash-coverage.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, 0 bats failures, and an `Output Summary:` recording the numeric
     headline `Bash coverage (lines): NN.N%` with `NN.N` at least 85.0.
 
-- [ ] [P6-T5] Extract the per-file coverage rows for the two new bash files by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && grep -n -F -e parallel-lane-assertion.sh -e report-lane-assertion.sh artifacts/pester/kcov/cov.xml'`
+- [x] [P6-T5] Extract the per-file coverage rows for the two new bash files by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && grep -n -F -e parallel-lane-assertion.sh -e report-lane-assertion.sh artifacts/pester/kcov/cov.xml'`
       and record every matching line verbatim in
       `evidence/qa-gates/bash-new-file-coverage.<timestamp>.md`.
   - Acceptance: the command exits 0; the recorded output carries at least one line naming
@@ -1376,7 +1376,7 @@ or rewrites a file, restart that language's loop at its format step.
     pattern is the three directory roots `tools`, `scripts`, and `.claude/lib/bash` (`:335`), so no
     per-file exclusion mechanism exists on the bash path.
 
-- [ ] [P6-T6] Run the Python format step: `poetry run black .` from the worktree root, preceded and
+- [x] [P6-T6] Run the Python format step: `poetry run black .` from the worktree root, preceded and
       followed by `git status --porcelain`, and record it in
       `evidence/qa-gates/final-python-black.<timestamp>.md`.
   - Acceptance, all three clauses: `EXIT_CODE: 0`; the artifact records the two
@@ -1394,7 +1394,7 @@ or rewrites a file, restart that language's loop at its format step.
     whether or not black rewrote it. The listing identity clause is retained as supplementary
     context; the `reformatted ` absence is the load-bearing observation.
 
-- [ ] [P6-T7] Run the Python lint step: `poetry run ruff check .` from the worktree root, and record
+- [x] [P6-T7] Run the Python lint step: `poetry run ruff check .` from the worktree root, and record
       it in `evidence/qa-gates/final-python-ruff.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` and a recorded stdout of exactly `All checks passed!`, which is the
     success-case output observed on this worktree against the clean tree before planning.
@@ -1405,11 +1405,11 @@ or rewrites a file, restart that language's loop at its format step.
     task and is not a defect. The `All checks passed!` line is recorded alongside the exit code so
     the acceptance does not rest on the exit code alone.
 
-- [ ] [P6-T8] Run the Python type-check step: `poetry run pyright` from the worktree root, and record
+- [x] [P6-T8] Run the Python type-check step: `poetry run pyright` from the worktree root, and record
       it in `evidence/qa-gates/final-python-pyright.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, and the artifact reproduces the run's summary line verbatim.
 
-- [ ] [P6-T9] Run the Python coverage step:
+- [x] [P6-T9] Run the Python coverage step:
       `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py tests/scripts/dev_tools/test_parallel_lane_assertion.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py --cov=scripts.dev_tools.parallel_lane_assertion --cov-report=term-missing -p no:cacheprovider`
       and record it in `evidence/qa-gates/final-python-coverage.<timestamp>.md`.
   - Acceptance, part 1 (unconditional): the pytest pass count is recorded, and the numeric percentage
@@ -1438,7 +1438,7 @@ or rewrites a file, restart that language's loop at its format step.
     `black` does not remove the state file, and deleting the file is not a remedy because it
     regenerates the next time the hook fires within the session.
 
-- [ ] [P6-T10] Run the TypeScript format step from `extensions/drm-copilot` as two recorded
+- [x] [P6-T10] Run the TypeScript format step from `extensions/drm-copilot` as two recorded
       commands, in this order: first `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"`,
       then `npm run format`. Record both commands and their full output in
       `evidence/qa-gates/final-ts-format.<timestamp>.md`.
@@ -1457,12 +1457,12 @@ or rewrites a file, restart that language's loop at its format step.
     `prettier --write` rewrites it. The listing is identical on a clean run and on a repairing run
     for exactly the files at risk.
 
-- [ ] [P6-T11] Run the TypeScript lint and type-check steps: `npm run lint` then `npm run typecheck`
+- [x] [P6-T11] Run the TypeScript lint and type-check steps: `npm run lint` then `npm run typecheck`
       from `extensions/drm-copilot`, and record both in
       `evidence/qa-gates/final-ts-lint-typecheck.<timestamp>.md`.
   - Acceptance: both `EXIT_CODE:` values are 0.
 
-- [ ] [P6-T12] Run the TypeScript coverage step: `npm run test:coverage` from
+- [x] [P6-T12] Run the TypeScript coverage step: `npm run test:coverage` from
       `extensions/drm-copilot`, and record it in
       `evidence/qa-gates/final-ts-coverage.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the Jest `Tests:` line recorded verbatim with 0 failed, and the four
@@ -1479,7 +1479,7 @@ or rewrites a file, restart that language's loop at its format step.
     no-overlap confirmation. Matching the baseline exit code alone is not sufficient, because this
     feature edits two TypeScript test files (P4-T6 and P4-T7) and could itself be the cause.
 
-- [ ] [P6-T13] Run the PowerShell regression check:
+- [x] [P6-T13] Run the PowerShell regression check:
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 -CI"`
       from the worktree root, and record it in
       `evidence/qa-gates/final-powershell-no-python-invocation.<timestamp>.md`.
@@ -1491,7 +1491,7 @@ or rewrites a file, restart that language's loop at its format step.
     (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1:65-66`), so the
     two new bash files are outside its guarded tree.
 
-- [ ] [P6-T14] Write the coverage delta artifact
+- [x] [P6-T14] Write the coverage delta artifact
       `evidence/other/coverage-delta.<timestamp>.md`, reporting for each in-scope language the
       baseline value, the post-change value, and the new-code value.
   - Acceptance: the artifact records, for bash, the P0-T3 baseline percentage, the P6-T4 post-change
@@ -1513,7 +1513,7 @@ or rewrites a file, restart that language's loop at its format step.
   - Any decrease in any of the three language comparisons — bash, Python, or TypeScript — is a
     blocking finding.
 
-- [ ] [P6-T15] Verify the non-goals are untouched by running
+- [x] [P6-T15] Verify the non-goals are untouched by running
       `git diff --stat origin/main...HEAD -- .claude/rules/parallel-orchestration.md .claude/skills/parallel-remove/SKILL.md .claude/hooks/enforce-discovery-artifact-gate.ps1 .claude/hooks/validate-discovery-artifact-gate.ps1`
       together with
       `git status --porcelain -- .claude/rules .claude/skills/parallel-remove .claude/hooks`,
@@ -1523,13 +1523,13 @@ or rewrites a file, restart that language's loop at its format step.
     The status companion is required because a name-listing or stat diff against a ref cannot observe
     an untracked or unstaged edit.
 
-- [ ] [P6-T16] Verify that no file under `.claude/lib/bash/` other than the entry point sources the
+- [x] [P6-T16] Verify that no file under `.claude/lib/bash/` other than the entry point sources the
       diagnostic, and that the diagnostic feeds no scheduling module, by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && bats tests/shell/parallel_lane_assertion.bats -f "no library file sources the diagnostic"'`
       and record it in `evidence/qa-gates/no-production-consumer.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` with 0 failures.
 
-- [ ] [P6-T17] Reconcile every acceptance criterion in `spec.md` and `user-story.md` against the
+- [x] [P6-T17] Reconcile every acceptance criterion in `spec.md` and `user-story.md` against the
       evidence artifacts produced by this plan, record the mapping in
       `evidence/qa-gates/acceptance-criteria-reconciliation.<timestamp>.md`, **and check off the
       satisfied criteria in the source documents themselves** by changing `- [ ]` to `- [x]` on the
@@ -1613,7 +1613,7 @@ or rewrites a file, restart that language's loop at its format step.
       quotes for the two inner single-quoted arguments and escape the `$` in the awk range pattern as
       `\$` so bash leaves it literal for awk.
 
-- [ ] [P6-T18] Record the epic-owner action for the Known Residual in
+- [x] [P6-T18] Record the epic-owner action for the Known Residual in
       `evidence/other/known-residual.<timestamp>.md`: the epic manifest's broad leading indicator at
       manifest line 14 is not fully satisfied after this feature lands, because non-goals 1 and 2
       remain by deliberate decision, while the narrow indicator at manifest line 15 is fully
@@ -1622,8 +1622,8 @@ or rewrites a file, restart that language's loop at its format step.
     action is a manifest rewording owned by the epic owner, and states that no implementation change
     is made here.
 
-- [ ] [P6-T19] Verify the 500-line file cap over **all five files this feature creates** by running
-      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3f62591bf10aebf3 && wc -l .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh tests/shell/parallel_lane_assertion.bats tests/shell/parallel_lane_assertion_parity.bats tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py'`
+- [x] [P6-T19] Verify the 500-line file cap over **all five files this feature creates** by running
+      `wsl -d Ubuntu -e bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ab2cbeea5d3050501 && wc -l .claude/lib/bash/parallel-lane-assertion.sh .claude/lib/bash/report-lane-assertion.sh tests/shell/parallel_lane_assertion.bats tests/shell/parallel_lane_assertion_parity.bats tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py'`
       and recording every output line verbatim, including the `total` line, in
       `evidence/qa-gates/new-file-sizes.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`, the artifact carries one recorded line per file for all five files,
