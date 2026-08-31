@@ -146,6 +146,8 @@ export function seedTree(
         "#!/usr/bin/env bash\n",
       [`${SRC}/.claude/lib/bash/validate-parallel-manifest.sh`]:
         "#!/usr/bin/env bash\n",
+      [`${SRC}/.claude/lib/bash/report-lane-assertion.sh`]:
+        "#!/usr/bin/env bash\n",
       [`${SRC}/config/orchestration-routing.json`]: SOURCE_ROUTING,
       [`${SRC}/config/blast-radius.json`]: SOURCE_BLAST_RADIUS,
       [`${MANIFEST_DIR}/core.json`]: manifestJson({
@@ -158,6 +160,7 @@ export function seedTree(
           ".claude/lib/bash/compute-cohorts.sh",
           ".claude/lib/bash/compute-concurrency-batches.sh",
           ".claude/lib/bash/validate-parallel-manifest.sh",
+          ".claude/lib/bash/report-lane-assertion.sh",
           "config/orchestration-routing.json",
           "config/blast-radius.json",
         ],

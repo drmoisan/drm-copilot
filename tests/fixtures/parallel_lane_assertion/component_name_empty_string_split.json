@@ -1,0 +1,9 @@
+{
+  "name": "component_name_empty_string_split",
+  "notes": "An empty-string lane name is a present string, so the label is quoted rather than positional.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/component-name-empty-string.md",
+  "manifest_text": "---\nparallel: lane-assertion-component-name-empty-string\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n  - issue_num: 202\n    feature_folder: docs/features/active/beta-202\n    kind: bug\n    state: admitted\nexpected_conflict_components:\n  - name: ''\n    members:\n      - 101\n      - 202\n---\n\n# Parallel Run — lane-assertion-component-name-empty-string\n\nShared parity-corpus manifest for the lane-assertion diagnostic. Its single\nasserted lane carries an empty-string `name`, which is a present string and must\ntherefore be quoted in the label rather than falling back to the positional\nform. The two members share no edge, so the lane is derived apart and the label\nis rendered in a finding.\n",
+  "edges": "",
+  "expected_stdout": "Lane assertion: 2 derived conflict component(s); 1 disagreement(s).\nADVISORY [expected_together_derived_apart] expected component '' was derived apart: its members occupy 2 distinct conflict components.\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0
+}

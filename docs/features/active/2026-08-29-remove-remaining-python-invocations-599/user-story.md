@@ -116,35 +116,35 @@ statements are in the payload and they contradict each other.
 
 ## Acceptance Criteria
 
-- [ ] A planner at a destination with no Python interpreter can complete the mandatory seeding step:
+- [x] A planner at a destination with no Python interpreter can complete the mandatory seeding step:
       `tests/shell/parallel_payload_only.bats` passes and contains at least one case that invokes
       `.claude/lib/bash/report-lane-assertion.sh` from the bundle root under the four-shim `PATH`,
       asserting exit 0 and the expected report text.
-- [ ] The ported diagnostic produces the same report as the Python reference over a shared corpus:
+- [x] The ported diagnostic produces the same report as the Python reference over a shared corpus:
       `tests/shell/parallel_lane_assertion_parity.bats` and
       `tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` both pass over
       `tests/fixtures/parallel_lane_assertion/*.json`, each declaring and asserting a
       `MINIMUM_FIXTURE_COUNT` floor, with the bats lane also asserting `python3` is available so the
       suite cannot pass vacuously.
-- [ ] The corpus exercises the diagnostic's full reporting surface: a parity-lane case asserts each of
+- [x] The corpus exercises the diagnostic's full reporting surface: a parity-lane case asserts each of
       `expected_together_derived_apart`, `expected_apart_derived_together`, `member_names_no_item`, and
       `item_covered_by_no_component` appears in the `expected_stdout` of at least one fixture, and a
       further fixture covers a manifest carrying no `expected_conflict_components` key whose expected
       report lists every item as uncovered with 0 disagreements.
-- [ ] The advisory-only semantics are preserved and are pinned by tests, not only by prose: a
+- [x] The advisory-only semantics are preserved and are pinned by tests, not only by prose: a
       parity-lane case asserts `expected_status` is 0 for every fixture including at least one whose
       report contains an `ADVISORY` line, and a case in `tests/shell/parallel_lane_assertion.bats`
       asserts that no file under `.claude/lib/bash/` other than `report-lane-assertion.sh` sources
       `parallel-lane-assertion.sh` and that no file under `.claude/lib/bash/` sources
       `report-lane-assertion.sh`.
-- [ ] The planner's procedure and grants agree with each other:
+- [x] The planner's procedure and grants agree with each other:
       `git grep -n -F "parallel_lane_assertion" -- .claude/skills/parallel-plan/SKILL.md` returns no
       executable invocation, the same file carries the literal
       `bash .claude/lib/bash/report-lane-assertion.sh` in the seeding-procedure step, and
       `.claude/agents/parallel-planner.md` `tools:` contains
       `Bash(bash .claude/lib/bash/report-lane-assertion.sh*)` with the stale sentence at lines 185-186
       reconciled.
-- [ ] The orchestrator is offered only runnable spellings for checkpoint validation:
+- [x] The orchestrator is offered only runnable spellings for checkpoint validation:
       `git grep -n -F "python -m scripts.dev_tools." -- .claude/skills/` returns exactly **one** match,
       at `.claude/skills/parallel-orchestrate/SKILL.md:817` for the drift-detection CLI, down from
       **four** matches before this feature, so the drop from four to one is the evidence that all three
@@ -153,34 +153,34 @@ statements are in the payload and they contradict each other.
       `.claude/skills/parallel-remove/SKILL.md:112`, both of which are declared non-goals; and
       `git grep -c -F "mcp__drm-copilot__validate_orchestration_artifacts" -- .claude/skills/epic-orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md`
       reports a non-zero count for both files.
-- [ ] The grant rationale that named a deleted consumer no longer does:
+- [x] The grant rationale that named a deleted consumer no longer does:
       `git grep -n -F "checkpoint-validator CLI fallback" -- .claude/agents/parallel-orchestrator.md`
       returns no match.
-- [ ] Everything the maintainer must mirror is mirrored:
+- [x] Everything the maintainer must mirror is mirrored:
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes.
-- [ ] Both new files survive a manifest-scoped push-down:
+- [x] Both new files survive a manifest-scoped push-down:
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` lists
       `.claude/lib/bash/parallel-lane-assertion.sh` and `.claude/lib/bash/report-lane-assertion.sh` in
       its `paths` array, and `tests/shell/parallel_bash_manifest_membership.bats` passes with
       `MINIMUM_LIB_FILE_COUNT` raised from 9 to 11.
-- [ ] The entry-point enumerations that read as authoritative are current: both
+- [x] The entry-point enumerations that read as authoritative are current: both
       `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts:242-244` and
       `extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts:451-453` include
       `.claude/lib/bash/report-lane-assertion.sh`, and both suites pass.
-- [ ] The deliberate behavior difference is observable rather than indistinguishable from a defect:
+- [x] The deliberate behavior difference is observable rather than indistinguishable from a defect:
       `tests/shell/parallel_lane_assertion.bats` contains a case pinning that an `--edges` endpoint
       token bearing a leading zero, a leading `+`, an underscore digit separator, or a non-ASCII decimal
       digit causes the port to drop the edge token, and no such input appears in any file under
       `tests/fixtures/parallel_lane_assertion/`. Interior whitespace inside an endpoint is not in that
       enumeration: it is unreachable in both implementations, so the spec's Divergence class 3 covers it
       as a convergence fixture in the shared corpus instead.
-- [ ] The new modules meet the shell quality bar: `bash scripts/bash/shell-qc.sh check` exits 0, and
+- [x] The new modules meet the shell quality bar: `bash scripts/bash/shell-qc.sh check` exits 0, and
       `bash scripts/bash/shell-qc.sh test --coverage` reports bash line coverage >= 85% with per-file
       rows for both new files present in `artifacts/pester/kcov/cov.xml` and neither file excluded from
       measurement, with the run output recorded under
       `docs/features/active/2026-08-29-remove-remaining-python-invocations-599/evidence/qa-gates/`.
-- [ ] The non-goals stay untouched: `git diff --stat origin/main...HEAD` shows no changed line in
+- [x] The non-goals stay untouched: `git diff --stat origin/main...HEAD` shows no changed line in
       `.claude/rules/parallel-orchestration.md` or `.claude/skills/parallel-remove/SKILL.md`, the
       drift-detection invocation at `.claude/skills/parallel-orchestrate/SKILL.md:817` is unchanged, and
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with its

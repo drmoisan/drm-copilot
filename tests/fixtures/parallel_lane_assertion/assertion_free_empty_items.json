@@ -1,0 +1,9 @@
+{
+  "name": "assertion_free_empty_items",
+  "notes": "An empty items list derives an empty partition, so the header names zero derived components and zero disagreements.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/empty-items-no-assertion.md",
+  "manifest_text": "---\nparallel: lane-assertion-empty-items\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems: []\n---\n\n# Parallel Run — lane-assertion-empty-items\n\nShared parity-corpus manifest for the lane-assertion diagnostic. It declares no\nitem keys and carries no `expected_conflict_components` key, so the derived\npartition is empty and the report header names zero derived components and zero\ndisagreements. It pins the empty-graph boundary of the derivation.\n",
+  "edges": "",
+  "expected_stdout": "Lane assertion: 0 derived conflict component(s); 0 disagreement(s).\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0
+}
