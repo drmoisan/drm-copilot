@@ -7,6 +7,7 @@ import {
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
+import { HANDOFF_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-handoff";
 
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
@@ -412,6 +413,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
             "parallel-orchestrator-state",
             "parallel-planner-state",
             "parallel-kickoff",
+            "portable-orchestration-handoff",
           ],
           description: "The type of orchestration artifact to validate.",
         },
@@ -450,5 +452,6 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
+  ...HANDOFF_TOOL_DEFINITIONS,
   ...DISCOVERY_TOOL_DEFINITIONS,
 ];

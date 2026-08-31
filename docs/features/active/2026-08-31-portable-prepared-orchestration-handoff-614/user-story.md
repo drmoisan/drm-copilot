@@ -91,7 +91,7 @@ ecosystem must continue the same work.
 - [ ] A valid handoff archives the original source checkpoint bytes by raw SHA-256, preserves source
   receipts as immutable or opaque evidence, appends digest-linked history, and never synthesizes
   destination receipts for completed source-runtime work.
-- [ ] Claude-to-Codex and Codex-to-Claude adapters preserve logical complexity, route, lifecycle,
+- [x] Claude-to-Codex and Codex-to-Claude adapters preserve logical complexity, route, lifecycle,
   plan, and ownership semantics while each destination independently resolves model, reasoning,
   profile, topology, and launch evidence for new work only.
 - [ ] A completed preparation state advances to its recorded execution transition without replaying
@@ -100,7 +100,7 @@ ecosystem must continue the same work.
 - [ ] A parallel or epic child can be completed piecemeal by an ordinary destination orchestrator,
   but the parent scheduler retains cohort/wave ordering, barriers, fan-in, integration, cleanup, and
   overall completion authority.
-- [ ] Hook and validator allowlists resolve both supported `drm-copilot` MCP transport spellings to
+- [x] Hook and validator allowlists resolve both supported `drm-copilot` MCP transport spellings to
   the same registered semantic operation and reject malformed identifiers, unrelated tools, and
   unregistered operations.
 - [ ] A consumer repository can perform workspace-explicit validation, topology resolution, and

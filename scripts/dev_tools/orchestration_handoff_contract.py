@@ -1,11 +1,33 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from dataclasses import asdict, dataclass
-from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import TYPE_CHECKING, Final, Literal, cast
+
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    HandoffContractError,
+    normalize_repository_relative_path,
+    raw_sha256,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    SemanticMcpIdentity as SemanticMcpIdentity,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    parse_semantic_mcp_identity as parse_semantic_mcp_identity,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    raw_file_sha256 as raw_file_sha256,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    read_legacy_v1 as read_legacy_v1,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    resolve_pinned_plan_path as resolve_pinned_plan_path,
+)
+from scripts.dev_tools.orchestration_handoff_contract_support import (
+    validate_bounded_scheduler_return as _validate_bounded_scheduler_return,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -54,23 +76,18 @@ FAILURE_PRECEDENCE: Final = tuple(
 )
 
 
-class HandoffContractError(ValueError):
-    def __init__(self, field: str, message: str) -> None:
-        super().__init__(f"{field}: {message}")
-        self.field = field
-
-
 def _require(condition: bool, field: str, message: str = "is invalid") -> None:
     if not condition:
         raise HandoffContractError(field, message)
 
 
-def _require_text(value: str, field: str) -> None:
-    _require(bool(value.strip()), field, "must be a non-empty string")
+def _require_text(value: object, field: str) -> None:
+    valid = isinstance(value, str) and bool(value.strip())
+    _require(valid, field, "must be a non-empty string")
 
 
-def _require_sha256(value: str, field: str) -> None:
-    valid = SHA256_PATTERN.fullmatch(value) is not None
+def _require_sha256(value: object, field: str) -> None:
+    valid = isinstance(value, str) and SHA256_PATTERN.fullmatch(value) is not None
     _require(valid, field, "must be a lowercase SHA-256 digest")
 
 
@@ -85,32 +102,6 @@ def _require_unique(values: tuple[str, ...], field: str) -> None:
 class _ValidatedValue:
     def __post_init__(self) -> None:
         _validate_value(self)
-
-
-def normalize_repository_relative_path(value: str, *, field: str) -> str:
-    _require_text(value, field)
-    if "\\" in value or PurePosixPath(value).is_absolute():
-        raise HandoffContractError(field, "must be repository-relative POSIX syntax")
-    if PureWindowsPath(value).is_absolute():
-        raise HandoffContractError(field, "must not be an absolute Windows path")
-    parts = value.split("/")
-    if any(part in {"", ".", ".."} for part in parts):
-        raise HandoffContractError(field, "must be normalized and cannot traverse")
-    normalized = PurePosixPath(*parts).as_posix()
-    if normalized != value:
-        raise HandoffContractError(field, "must already be normalized")
-    return normalized
-
-
-def resolve_pinned_plan_path(workspace_root: Path, plan_path: str) -> Path:
-    normalized = normalize_repository_relative_path(plan_path, field="plan.path")
-    root = workspace_root.resolve(strict=True)
-    candidate = root.joinpath(*PurePosixPath(normalized).parts).resolve(strict=True)
-    if not candidate.is_relative_to(root):
-        raise HandoffContractError("plan.path", "resolves outside the workspace")
-    if not candidate.is_file():
-        raise HandoffContractError("plan.path", "must name one existing file")
-    return candidate
 
 
 @dataclass(frozen=True, slots=True)
@@ -271,12 +262,29 @@ def _validate_value(value: _ValidatedValue) -> None:
             _require_unique(entries, f"capabilities.{field}")
             _require(all(entry.strip() for entry in entries), f"capabilities.{field}")
     elif isinstance(value, SchedulerContext):
+        _require(
+            value.kind in {"ordinary", "parallel", "epic"}, "scheduler_context.kind"
+        )
         scheduled = tuple(asdict(value).values())[1:]
         if value.kind == "ordinary":
             has_parent_claim = any(item is not None for item in scheduled)
             _require(not has_parent_claim, "scheduler_context")
         else:
             _require(not any(item is None for item in scheduled), "scheduler_context")
+            for field in "run_id item_id".split():
+                _require_text(getattr(value, field), f"scheduler_context.{field}")
+            for field in "kickoff_or_manifest_path parent_checkpoint_path".split():
+                path = cast("str", getattr(value, field))
+                normalize_repository_relative_path(
+                    path, field=f"scheduler_context.{field}"
+                )
+            for field in "kickoff_or_manifest_sha256 parent_checkpoint_sha256".split():
+                _require_sha256(getattr(value, field), f"scheduler_context.{field}")
+            cohort = value.cohort_or_wave
+            valid_cohort = (isinstance(cohort, str) and bool(cohort.strip())) or (
+                isinstance(cohort, int) and not isinstance(cohort, bool)
+            )
+            _require(valid_cohort, "scheduler_context.cohort_or_wave")
             expected = {
                 "scheduler_owner": f"{value.kind}_orchestrator",
                 "child_execution_owner": "ordinary_orchestrator",
@@ -285,10 +293,6 @@ def _validate_value(value: _ValidatedValue) -> None:
             for field, expected_value in expected.items():
                 matches = getattr(value, field) == expected_value
                 _require(matches, f"scheduler_context.{field}")
-            for field in "kickoff_or_manifest_sha256 parent_checkpoint_sha256".split():
-                _require_sha256(
-                    cast("str", getattr(value, field)), f"scheduler_context.{field}"
-                )
     elif isinstance(value, HistoryEntry):
         _require(value.sequence > 0, "handoff_history.sequence")
         _require_provider(value.from_provider, "handoff_history.from_provider")
@@ -362,6 +366,29 @@ def validate_bindings(envelope: HandoffEnvelope, observed: Bindings) -> str | No
     return None
 
 
+def validate_return_to_scheduler(
+    envelope: HandoffEnvelope,
+    result: Bindings,
+    *,
+    child_checkpoint_sha256: str,
+    result_sha256: str,
+) -> str | None:
+    """Accept only the exact bounded result authorized by a scheduled child."""
+
+    scheduler = envelope.scheduler_context
+    fields = "run_id item_id parent_checkpoint_path parent_checkpoint_sha256 "
+    fields += "scheduler_owner child_execution_owner return_contract"
+    expected = {field: getattr(scheduler, field) for field in fields.split()}
+    return _validate_bounded_scheduler_return(
+        result,
+        scheduler_kind=scheduler.kind,
+        expected_bindings=expected,
+        plan_sha256=envelope.plan.sha256,
+        child_checkpoint_sha256=child_checkpoint_sha256,
+        result_sha256=result_sha256,
+    )
+
+
 def validate_semantic_contract(
     envelope: HandoffEnvelope,
     *,
@@ -427,35 +454,6 @@ def validate_semantic_contract(
     if not provider_routing_available:
         found.add("HANDOFF_PROVIDER_ROUTING_UNAVAILABLE")
     return select_primary_failure(found)
-
-
-def read_legacy_v1(
-    source_bytes: bytes,
-    *,
-    source_provider: Provider | None,
-    plan: PlanIdentity | None,
-    lifecycle: LifecycleState | None,
-    scheduler_context: SchedulerContext | None,
-) -> bytes:
-    checkpoint = json.loads(source_bytes)
-    _require(
-        isinstance(checkpoint, dict) and "schema_version" not in checkpoint,
-        "legacy.checkpoint",
-    )
-    _require(source_provider is not None, "legacy.source_provider", "must be explicit")
-    _require_provider(cast("str", source_provider), "legacy.source_provider")
-    facts = (("plan", plan), ("lifecycle", lifecycle), ("scheduler", scheduler_context))
-    for field, fact in facts:
-        _require(fact is not None, f"legacy.{field}", "must be explicitly proven")
-    return source_bytes
-
-
-def raw_sha256(content: bytes) -> str:
-    return hashlib.sha256(content).hexdigest()
-
-
-def raw_file_sha256(path: Path) -> str:
-    return raw_sha256(path.read_bytes())
 
 
 def history_entry_digest(entry: HistoryEntry) -> str:
