@@ -106,6 +106,7 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       ".claude/skills/policy-compliance-order/SKILL.md",
       ".claude/agent-memory/**",
       ".agents/skills/**",
+      "scripts/vscode/**",
     ],
     modules: {
       config: ["config/**"],
