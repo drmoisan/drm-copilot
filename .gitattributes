@@ -1,1 +1,3 @@
 * text=auto eol=lf
+tests/fixtures/orchestration-handoff/taskmaster-469/claude-to-codex/plan.2026-08-29T12-22.md -text -eol
+tests/fixtures/orchestration-handoff/taskmaster-469/codex-to-claude/plan.2026-08-29T12-22.md -text -eol
