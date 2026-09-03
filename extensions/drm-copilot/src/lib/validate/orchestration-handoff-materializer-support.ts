@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import * as path from "node:path";
 
+import type { HandoffPathBoundary } from "./orchestration-handoff-path-boundary";
+
 export function sha256(content: Uint8Array): string {
   return createHash("sha256").update(content).digest("hex");
 }
@@ -26,6 +28,24 @@ export function resolveWorkspaceFile(
   const root = toPosixPath(path.resolve(workspaceRoot)).replace(/\/+$/, "");
   const candidate = toPosixPath(path.resolve(workspaceRoot, repositoryPath));
   return candidate.startsWith(`${root}/`) ? candidate : null;
+}
+
+/** Compatibility boundary for callers that already provide isolated I/O seams. */
+export function createSyntacticHandoffPathBoundary(): HandoffPathBoundary {
+  const resolveWorkspaceRoot = (workspaceRoot: string): string | null => {
+    if (!path.isAbsolute(workspaceRoot)) return null;
+    return toPosixPath(path.resolve(workspaceRoot)).replace(/\/+$/, "");
+  };
+  const resolveTarget = (
+    canonicalWorkspaceRoot: string,
+    repositoryPath: string,
+  ): string | null =>
+    resolveWorkspaceFile(canonicalWorkspaceRoot, repositoryPath);
+  return {
+    resolveWorkspaceRoot,
+    resolveExistingTarget: resolveTarget,
+    resolveCreatableTarget: resolveTarget,
+  };
 }
 
 export function candidateFilePath(

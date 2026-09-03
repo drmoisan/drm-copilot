@@ -12,10 +12,11 @@ import type {
 } from "./orchestration-handoff-contract";
 import {
   candidateFilePath,
+  createSyntacticHandoffPathBoundary,
   porcelainAffectedPaths,
-  resolveWorkspaceFile,
   sha256,
 } from "./orchestration-handoff-materializer-support";
+import type { HandoffPathBoundary } from "./orchestration-handoff-path-boundary";
 import { projectDestinationCheckpoint } from "./orchestration-handoff-provider-adapters";
 
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
@@ -134,6 +135,7 @@ export interface HandoffClockBoundary {
 
 export interface HandoffMaterializerDependencies {
   readonly fileSystem: HandoffFileSystemBoundary;
+  readonly pathBoundary?: HandoffPathBoundary;
   readonly git: HandoffGitBoundary;
   readonly topology: HandoffTopologyBoundary;
   readonly routing: HandoffRoutingBoundary;
@@ -181,12 +183,20 @@ export class OrchestrationHandoffMaterializer {
   private async prepare(
     request: TransitionPreparedOrchestrationRequest,
   ): Promise<TransitionPreparation> {
-    const sourcePath = resolveWorkspaceFile(
+    const pathBoundary =
+      this.dependencies.pathBoundary ?? createSyntacticHandoffPathBoundary();
+    const canonicalWorkspaceRoot = pathBoundary.resolveWorkspaceRoot(
       request.workspaceRoot,
+    );
+    if (canonicalWorkspaceRoot === null) {
+      return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID");
+    }
+    const sourcePath = pathBoundary.resolveExistingTarget(
+      canonicalWorkspaceRoot,
       request.sourceCheckpointPath,
     );
-    const envelopePath = resolveWorkspaceFile(
-      request.workspaceRoot,
+    const envelopePath = pathBoundary.resolveExistingTarget(
+      canonicalWorkspaceRoot,
       request.handoffEnvelopePath,
     );
     if (sourcePath === null || envelopePath === null) {
@@ -258,15 +268,26 @@ export class OrchestrationHandoffMaterializer {
         handoffHistorySha256: lastHistoryEntry.entrySha256,
       });
     }
-    const archivePath = resolveWorkspaceFile(
-      request.workspaceRoot,
+    const archivePath = pathBoundary.resolveCreatableTarget(
+      canonicalWorkspaceRoot,
       envelope.source.archivePath,
     );
-    const destinationPath = resolveWorkspaceFile(
-      request.workspaceRoot,
+    const destinationPath = pathBoundary.resolveCreatableTarget(
+      canonicalWorkspaceRoot,
       envelope.destinationCheckpointPath,
     );
-    if (archivePath === null || destinationPath === null) {
+    const candidatePath = pathBoundary.resolveCreatableTarget(
+      canonicalWorkspaceRoot,
+      candidateFilePath(
+        envelope.destinationCheckpointPath,
+        request.expectedHandoffEnvelopeSha256,
+      ),
+    );
+    if (
+      archivePath === null ||
+      destinationPath === null ||
+      candidatePath === null
+    ) {
       return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID", {
         handoffId: envelope.handoffId,
         handoffHistorySha256: lastHistoryEntry.entrySha256,
@@ -321,7 +342,7 @@ export class OrchestrationHandoffMaterializer {
     let porcelainStatus: string;
     try {
       porcelainStatus = await this.dependencies.git.readPorcelainStatus(
-        request.workspaceRoot,
+        canonicalWorkspaceRoot,
       );
     } catch {
       return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
@@ -356,10 +377,7 @@ export class OrchestrationHandoffMaterializer {
       sourceBytes,
       archivePath,
       destinationPath,
-      candidatePath: candidateFilePath(
-        destinationPath,
-        request.expectedHandoffEnvelopeSha256,
-      ),
+      candidatePath,
       projectionBytes,
       projectionText,
     };

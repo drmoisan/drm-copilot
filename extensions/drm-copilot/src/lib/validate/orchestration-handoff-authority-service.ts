@@ -5,8 +5,7 @@ import type {
   PortableHandoffAuthorityResult,
   PortableHandoffReferenceRequest,
 } from "../../mcp-repo-automation-tool-definitions-handoff";
-import type { FileSystem } from "../file-system";
-import { toPosixPath } from "../file-system";
+import { RealFileSystem, toPosixPath, type FileSystem } from "../file-system";
 import {
   HandoffContractError,
   collectHandoffValidationFailures,
@@ -17,6 +16,10 @@ import type {
   HandoffEnvelope,
   HandoffFailureCode,
 } from "./orchestration-handoff-contract";
+import {
+  createNodeHandoffPathBoundary,
+  type HandoffPathBoundary,
+} from "./orchestration-handoff-path-boundary";
 
 export type PortableAuthorityKind = "topology" | "provider_routing";
 
@@ -37,17 +40,49 @@ const SUPPORTED_CAPABILITIES = [
   "scheduler-return:portable_child_result-v1",
 ] as const;
 
-function sha256(text: string): string {
-  return createHash("sha256").update(text, "utf8").digest("hex");
+function createDefaultPathBoundary(
+  fileSystem: FileSystem,
+): HandoffPathBoundary {
+  if (fileSystem instanceof RealFileSystem) {
+    return createNodeHandoffPathBoundary();
+  }
+  const resolveWorkspaceRoot = (workspaceRoot: string): string | null => {
+    if (!path.isAbsolute(workspaceRoot)) return null;
+    return toPosixPath(path.resolve(workspaceRoot)).replace(/\/+$/, "");
+  };
+  const resolveExistingTarget = (
+    canonicalWorkspaceRoot: string,
+    repositoryPath: string,
+  ): string | null => {
+    if (
+      repositoryPath.length === 0 ||
+      repositoryPath.includes("\\") ||
+      repositoryPath.includes(":") ||
+      path.posix.isAbsolute(repositoryPath) ||
+      path.posix.normalize(repositoryPath) !== repositoryPath ||
+      repositoryPath
+        .split("/")
+        .some((segment) => segment === "." || segment === "..")
+    ) {
+      return null;
+    }
+    const candidate = toPosixPath(
+      path.resolve(canonicalWorkspaceRoot, repositoryPath),
+    );
+    const root = toPosixPath(canonicalWorkspaceRoot).replace(/\/+$/, "");
+    return candidate.startsWith(`${root}/`) && fileSystem.isFile(candidate)
+      ? candidate
+      : null;
+  };
+  return {
+    resolveWorkspaceRoot,
+    resolveExistingTarget,
+    resolveCreatableTarget: () => null,
+  };
 }
 
-function resolveWorkspaceFile(
-  workspaceRoot: string,
-  repositoryPath: string,
-): string | null {
-  const root = toPosixPath(path.resolve(workspaceRoot)).replace(/\/+$/, "");
-  const candidate = toPosixPath(path.resolve(workspaceRoot, repositoryPath));
-  return candidate.startsWith(`${root}/`) ? candidate : null;
+function sha256(text: string): string {
+  return createHash("sha256").update(text, "utf8").digest("hex");
 }
 
 function blocked(
@@ -73,9 +108,11 @@ function blocked(
 function readEnvelope(
   fileSystem: FileSystem,
   request: PortableHandoffReferenceRequest,
+  pathBoundary: HandoffPathBoundary,
+  canonicalWorkspaceRoot: string,
 ): HandoffEnvelope | PortableHandoffAuthorityResult {
-  const envelopePath = resolveWorkspaceFile(
-    request.workspaceRoot,
+  const envelopePath = pathBoundary.resolveExistingTarget(
+    canonicalWorkspaceRoot,
     request.handoffEnvelopePath,
   );
   if (envelopePath === null) {
@@ -104,11 +141,12 @@ function readEnvelope(
 
 function observedPlanSha256(
   fileSystem: FileSystem,
-  request: PortableHandoffReferenceRequest,
   envelope: HandoffEnvelope,
+  pathBoundary: HandoffPathBoundary,
+  canonicalWorkspaceRoot: string,
 ): string | null {
-  const planPath = resolveWorkspaceFile(
-    request.workspaceRoot,
+  const planPath = pathBoundary.resolveExistingTarget(
+    canonicalWorkspaceRoot,
     envelope.plan.path,
   );
   if (planPath === null) return null;
@@ -152,8 +190,22 @@ export function resolvePortableHandoffAuthority(
   fileSystem: FileSystem,
   request: PortableHandoffReferenceRequest,
   kind: PortableAuthorityKind,
+  pathBoundary?: HandoffPathBoundary,
 ): PortableHandoffAuthorityResult {
-  const envelopeOrFailure = readEnvelope(fileSystem, request);
+  const effectivePathBoundary =
+    pathBoundary ?? createDefaultPathBoundary(fileSystem);
+  const canonicalWorkspaceRoot = effectivePathBoundary.resolveWorkspaceRoot(
+    request.workspaceRoot,
+  );
+  if (canonicalWorkspaceRoot === null) {
+    return blocked(request, "HANDOFF_PLAN_PATH_INVALID");
+  }
+  const envelopeOrFailure = readEnvelope(
+    fileSystem,
+    request,
+    effectivePathBoundary,
+    canonicalWorkspaceRoot,
+  );
   if ("status" in envelopeOrFailure) return envelopeOrFailure;
   const envelope = envelopeOrFailure;
   if (request.destinationProvider !== envelope.destinationProvider) {
@@ -161,7 +213,12 @@ export function resolvePortableHandoffAuthority(
       handoffId: envelope.handoffId,
     });
   }
-  const planSha256 = observedPlanSha256(fileSystem, request, envelope);
+  const planSha256 = observedPlanSha256(
+    fileSystem,
+    envelope,
+    effectivePathBoundary,
+    canonicalWorkspaceRoot,
+  );
   if (planSha256 === null) {
     return blocked(request, "HANDOFF_PLAN_PATH_INVALID", {
       handoffId: envelope.handoffId,
