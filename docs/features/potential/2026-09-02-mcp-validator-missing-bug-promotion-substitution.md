@@ -3,6 +3,7 @@
 - Date captured: 2026-09-02
 - Author: Dan Moisan
 - Status: Draft
+- Updated: 2026-09-03 -- a second, distinct instance of MCP/Python validator disagreement was found under `require_pr_creation_ready=true` (not just `require_complete=true`); see the "Second confirmed instance" addendum near the end of this file.
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -44,9 +45,11 @@ even though the checkpoint's `required_mcp_tools` and `mcp_call_receipts` both c
 ## Impact / Severity
 
 - [ ] Blocker
-- [ ] High
-- [x] Medium
+- [x] High
+- [ ] Medium
 - [ ] Low
+
+(Raised from Medium to High after the second confirmed instance below broadened the suspected defect from one narrow check to at least two independent gate modes.)
 
 ## Suspected Cause / Notes
 
@@ -61,6 +64,18 @@ Workaround used: treat the Python CLI as authoritative per the existing document
 - [x] Unit coverage areas: a TypeScript unit test constructing a bug-type checkpoint (mirroring the existing Python test fixtures for `_resolve_promotion_entry_tools`) and asserting the MCP/TS surface accepts it under `require_complete`.
 - [x] Integration scenario to retest: re-run `mcp__drm-copilot__validate_orchestration_artifacts` against the checkpoint that produced this report (issue #620's `artifacts/orchestration/orchestrator-state.json`, feature folder `docs/features/active/2026-09-01-blast-radius-mandate-reads-scripts-vscode-620/`) once fixed, and confirm it now passes.
 - [ ] Manual verification notes
+
+## Second confirmed instance (2026-09-03, issue #627)
+
+A second, structurally distinct false-negative was found in the same MCP tool, this time under `require_pr_creation_ready=true` rather than `require_complete=true`:
+
+- Called `mcp__drm-copilot__validate_orchestration_artifacts(artifact_type=orchestrator-state, require_pr_creation_ready=true)` against a checkpoint whose `step8_status` was `"pending"`. The MCP tool returned `ok: true` (zero errors).
+- Per `PR_CREATION_READY_STEP_KEYS`/`PR_CREATION_BLOCKING_STEP_STATUS` in `scripts/dev_tools/_orchestrator_state_pr_creation_readiness.py`, `step8_status == "pending"` must be rejected: `"Checkpoint PR-creation readiness validation failed: step8_status is pending."`
+- Delegating to `Agent(pr-author)` on the strength of that false "pass" then hit the independent `enforce-pr-author-skill.ps1` PreToolUse hook, which re-validates the checkpoint live (via its own `$Invoker` subprocess seam) and correctly denied `gh pr create` with `ORCHESTRATOR_STATE_PREFLIGHT_FAILED: ... step8_status is pending`. The hook-level fail-safe worked exactly as documented ("this is the local, hook-level enforcement mechanism that closes the bypass path"); the MCP tool's own pre-check did not.
+- Root cause not yet isolated to a specific line, but the pattern (MCP TypeScript surface returning a pass where the Python-authoritative logic -- and the independently-invoked hook, which is believed to shell out to the same Python validator -- would fail) matches the first instance above closely enough that both are plausibly caused by the same underlying gap in the TypeScript port's coverage of `_orchestrator_state_pr_creation_readiness.py`/`_orchestrator_state_routing.py`-equivalent logic, rather than being two unrelated bugs.
+- Workaround used again: re-ran the check via the authoritative Python CLI (`poetry run python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <path> --require-pr-creation-ready`), which correctly reported the error before the fix, and confirmed clean after correcting `step8_status`.
+
+This raises the severity assessment: the MCP tool is not just wrong on one narrow check (bug-type promotion substitution) but appears to under-validate at least two independent gate modes (`require_complete`, `require_pr_creation_ready`). A caller relying solely on the MCP tool's `ok: true` for either mode cannot trust that result without an independent Python-CLI cross-check, which defeats the purpose of exposing the gate as an MCP tool at all. Recommend broadening the proposed fix's test coverage (below) to include a `require_pr_creation_ready` parity suite, not just the `require_complete` bug-substitution case.
 
 ## Next Step
 
