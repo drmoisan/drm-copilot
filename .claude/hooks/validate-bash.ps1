@@ -78,6 +78,38 @@ function Get-BlockedPatternMatch {
     return $null
 }
 
+# File-reading commands Claude Code's Bash permission engine resolves against
+# Read() rules rather than Bash() prefix rules. Measured empirically (2026-09):
+# once one of these co-occurs with a preceding `cd` in the same command line
+# (chained via `&&` or `;`), the engine always requires manual approval -
+# regardless of any Read() or Bash() allow rule present, and regardless of
+# whether the read command's own path argument is relative or absolute. No
+# settings.json configuration can suppress that prompt; the only fix is to
+# never chain `cd` with one of these in the same command.
+$script:CdChainedReadCommandPattern = 'cd\s+\S.*?(&&|;)\s*(grep|cat|head|tail|less|more|awk|sed\s+-n)\b'
+
+function Get-CdChainedReadCommandMatch {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $Command
+    )
+
+    if (-not $Command) {
+        return $null
+    }
+
+    $match = [regex]::Match($Command, $script:CdChainedReadCommandPattern)
+    if (-not $match.Success) {
+        return $null
+    }
+
+    return $match.Groups[2].Value
+}
+
 function Get-BashBlockReason {
     [CmdletBinding()]
     [OutputType([string])]
@@ -89,11 +121,16 @@ function Get-BashBlockReason {
     )
 
     $pattern = Get-BlockedPatternMatch -Command $Command
-    if (-not $pattern) {
-        return $null
+    if ($pattern) {
+        return "Blocked dangerous command pattern detected: '$pattern'"
     }
 
-    return "Blocked dangerous command pattern detected: '$pattern'"
+    $readOp = Get-CdChainedReadCommandMatch -Command $Command
+    if ($readOp) {
+        return "Forbidden Bash pattern: 'cd ... && $readOp' (or ';'-chained). Claude Code's Bash permission engine cannot resolve a file-reading command ($readOp) against Read() rules once a preceding 'cd' has changed the working directory in the same command line - it always requires manual approval, regardless of any Read() or Bash() allow rule, and regardless of whether the path argument is relative or absolute. Rewrite as a single command using an absolute path instead of 'cd'-ing first, e.g. run $readOp directly against the absolute file path, with no leading 'cd'."
+    }
+
+    return $null
 }
 
 function Get-BashDenyDecision {
