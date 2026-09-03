@@ -14,6 +14,7 @@ import {
 } from "./orchestration-handoff-materializer";
 import { providerAdapterFor } from "./orchestration-handoff-provider-adapters";
 import { resolvePortableHandoffAuthority } from "./orchestration-handoff-authority-service";
+import { createNodeHandoffPathBoundary } from "./orchestration-handoff-path-boundary";
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -74,6 +75,7 @@ function buildDependencies(
   fileSystem: FileSystem,
   runner: CommandRunner,
 ): HandoffMaterializerDependencies {
+  const pathBoundary = createNodeHandoffPathBoundary();
   return {
     fileSystem: {
       readFile: (filePath) => fs.readFileSync(filePath),
@@ -87,6 +89,7 @@ function buildDependencies(
         fs.renameSync(candidatePath, destinationPath),
       removeFile: (filePath) => fs.unlinkSync(filePath),
     },
+    pathBoundary,
     git: {
       readPorcelainStatus: async (workspaceRoot) =>
         runner.run(["git", "status", "--porcelain=v1"], {
@@ -95,7 +98,12 @@ function buildDependencies(
     },
     topology: {
       resolve: async (request) =>
-        resolvePortableHandoffAuthority(fileSystem, request, "topology"),
+        resolvePortableHandoffAuthority(
+          fileSystem,
+          request,
+          "topology",
+          pathBoundary,
+        ),
     },
     routing: {
       resolve: async (request) =>
@@ -103,6 +111,7 @@ function buildDependencies(
           fileSystem,
           request,
           "provider_routing",
+          pathBoundary,
         ),
     },
     validator: { validateEnvelope, validateDestinationProjection },

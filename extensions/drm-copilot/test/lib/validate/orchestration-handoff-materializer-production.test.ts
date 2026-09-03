@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import * as path from "node:path";
 
 const mockReadFileSync = jest.fn();
@@ -6,6 +6,8 @@ const mockMkdirSync = jest.fn();
 const mockWriteFileSync = jest.fn();
 const mockRenameSync = jest.fn();
 const mockUnlinkSync = jest.fn();
+const mockRealpathSyncNative = jest.fn();
+const mockStatSync = jest.fn();
 
 jest.mock("node:fs", () => ({
   readFileSync: mockReadFileSync,
@@ -13,6 +15,8 @@ jest.mock("node:fs", () => ({
   writeFileSync: mockWriteFileSync,
   renameSync: mockRenameSync,
   unlinkSync: mockUnlinkSync,
+  realpathSync: { native: mockRealpathSyncNative },
+  statSync: mockStatSync,
 }));
 
 import type { FileSystem } from "../../../src/lib/file-system";
@@ -58,6 +62,14 @@ function validProjection(provider: "claude" | "codex") {
 }
 
 describe("production orchestration handoff materializer boundaries", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRealpathSyncNative.mockImplementation(
+      (targetPath: string) => targetPath,
+    );
+    mockStatSync.mockReturnValue({ isDirectory: () => true });
+  });
+
   it("delegates raw filesystem, Git, authority, and clock boundaries", async () => {
     // Arrange
     const fileSystem = createFileSystem(jest.fn(() => "missing"));
@@ -157,6 +169,40 @@ describe("production orchestration handoff materializer boundaries", () => {
     ).toEqual([]);
     expect(validator.validateDestinationProjection("{")).toHaveLength(1);
     expect(validator.validateDestinationProjection("[]")).toHaveLength(1);
+  });
+
+  it("shares the Node canonical path boundary with authority resolution", async () => {
+    // Arrange
+    const materializer = createProductionHandoffMaterializer(
+      createFileSystem(jest.fn(() => "missing")),
+      {
+        run: jest.fn(() => ({ stdout: "", stderr: "", code: 0 })),
+      },
+    );
+    const pathBoundary = materializer.dependencies.pathBoundary;
+    if (pathBoundary === undefined) {
+      throw new Error("Production path boundary must be configured.");
+    }
+    const resolveWorkspaceRoot = jest.spyOn(
+      pathBoundary,
+      "resolveWorkspaceRoot",
+    );
+    const reference = {
+      workspaceRoot: "C:/workspace",
+      handoffEnvelopePath: "artifacts/orchestration/handoff.json",
+      expectedHandoffEnvelopeSha256: "a".repeat(64),
+      destinationProvider: "codex",
+    } as const;
+
+    // Act
+    const canonicalRoot = pathBoundary.resolveWorkspaceRoot("C:/workspace");
+    await materializer.dependencies.topology.resolve(reference);
+
+    // Assert
+    expect(canonicalRoot).toBe("C:/workspace");
+    expect(resolveWorkspaceRoot).toHaveBeenCalledTimes(2);
+    expect(mockRealpathSyncNative).toHaveBeenCalled();
+    expect(mockStatSync).toHaveBeenCalledWith("C:/workspace");
   });
 
   it.each([
