@@ -285,6 +285,70 @@ These surfaced during preparation and are recorded rather than resolved. None bl
    nothing unless files there are force-added. Child H's general fix does close the far larger drop
    the gap's wording understated.
 
+## Execution Amendments
+
+These are binding additions to the prepared plans, established during planning but after the
+affected child's preflight cleared. `epic-orchestrator` hands each one to the named child at
+execution time. They are recorded here rather than by reopening a cleared plan, because amending a
+plan after clearance would invalidate the clearance measured against it.
+
+### EA-1 — Bash toolchain runs through the pwsh-wrapped form, never bare `wsl`
+
+Applies to children 630, 631, 632, and 904.
+
+`atomic-executor` holds Bash grants for `poetry run`, `npx`, `pwsh`, and `git`. A bare `wsl`
+invocation matches no grant and is denied wherever it runs, including from a worktree-isolated
+agent. Child 630 lost its entire baseline capture to this and reported the cause as an isolation
+guard; that diagnosis is wrong, and the delegation prompts that carried the bare form are the
+planner's error, not the children's. The working form is:
+
+```
+pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/<path> && bash scripts/bash/shell-qc.sh <check|format|test --coverage>'"
+```
+
+Verified on 2026-09-07 in three steps: bare `wsl` runs from a non-delegated context (Bats 1.13.0,
+ShellCheck 0.11.0, kcov 43); the wrapped form runs bats from a normal worktree; and the wrapped form
+run against the agent-isolated path
+`/mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a06652a3fd875c703` executed
+`tests/shell/test_cleanup_worktrees_cli.bats` to five passing tests. Pipe output through
+`tr -d '\0'` in Git Bash. Fallback when the wrapped form is refused: dispatch
+`.github/workflows/_shell-coverage.yml` with `gh workflow run --ref <branch>` and read the uploaded
+`cov.xml`; CI is canonical when local and CI disagree.
+
+### EA-2 — Child 545 must pin the false-allow direction of the merge-gate defect
+
+Applies to child 545.
+
+The withdrawn preparation for issue #591 established, before it was withdrawn, that the merge gate's
+whole-line PR-number extraction is not only a fail-closed defect. With parallel items `pr_number`
+501 at `ci_green` and 777 at `pr_open`, the command `cd /wt/501 && gh pr merge --merge 777` extracts
+`501`, matches the authorized item, and merges PR 777 — an unauthorized merge, not a blocked one. A
+second vector chains two merges and validates only the first.
+
+Child 545's AT-2 corrects exactly this extraction, so its code change closes both directions. But
+AT-2's test case uses a `cd` path component (`2026`) that matches no item, which exercises the
+fail-closed direction only. Add at least one Pester case in the false-allow shape: an extracted
+number that matches a *different* authorized item, asserting the merge is denied. Without it the
+epic ships a fix whose more dangerous direction is untested.
+
+The full analysis is retrievable from the withdrawn preparation branch
+`bug/epic-merge-gate-parses-pr-number-from-whole-command-line-591` at commit `3f6cdf46`, which is
+pushed to origin and is deliberately not merged into this integration branch.
+
+### EA-3 — Two recorded weaknesses are deferred, not fixed
+
+Neither is in any child's scope, and both are confirmed rather than suspected. File them as
+follow-ups; do not expand a child's scope to absorb them mid-execution.
+
+- `Test-ChildCheckpointAllowsEpicMerge` in `enforce-epic-merge-gate.ps1` declares only
+  `$Checkpoint`, its call site passes no PR number, and it is consulted first, before both
+  number-aware branches. A checkpoint with `epic_mode: true` and `step9_status: "passed"` therefore
+  authorizes merging any pull request. Correcting the extraction does not touch a path that ignores
+  the number.
+- The `.codex/` copies of the removal and merge gates carry the trigger defect but not the
+  extraction defect. Child 545 delivers the `.claude` side and both bundle copies; the `.codex`
+  hook family is recorded by children 635 and 545 as a deliberate boundary.
+
 ## Shared Design Constraints
 
 These apply to every child and are repeated in each child's preparation prompt.
