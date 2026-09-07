@@ -1450,11 +1450,11 @@ denies against a not-ready checkpoint.
 
 ## Acceptance Criteria
 
-- [ ] A regression test demonstrating the **over-match** direction exists and is recorded as
+- [x] A regression test demonstrating the **over-match** direction exists and is recorded as
       failing against the unfixed hooks: a heredoc prose mention of a governed token in a
       non-wrapper segment is asserted to allow, with fail-before output recorded under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/`.
-- [ ] A regression test demonstrating the **under-match** direction exists and is recorded as
+- [x] A regression test demonstrating the **under-match** direction exists and is recorded as
       failing against the unfixed hooks: `git -C ../x add .` against an explicitly not-ready
       checkpoint is asserted to deny, with fail-before output recorded under the same evidence
       path.
