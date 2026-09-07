@@ -41,6 +41,7 @@
 #   BRANCH|<name>|<state>
 #   COMMIT|<branch>|<sha>|<state>|<paths-csv>|<author>|<author-date>
 #   WORKTREE|<path>|<branch-or-DETACHED>|<flags>
+#   WORKTREE|<path>|DETACHED|<state>|<flags>   (detached registration; replaces the above)
 #   WARN|main-divergence|<local-sha>|<origin-sha>
 #   DIRTY|<worktree-path>|<status-porcelain-line>
 #   ACTION|<verb>|<target>|<result>   (apply mode only; emitted by the actions lib)
@@ -465,8 +466,11 @@ run_report() {
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
+		# A detached registration is emitted by report_detached_worktrees instead.
+		is_detached_candidate "$wflags" && continue
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
 	done <<<"$wlout"
+	report_detached_worktrees "$wlout" || rc=$?
 	while read -r name _; do
 		[[ -z $name ]] && continue
 		crc=0

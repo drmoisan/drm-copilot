@@ -64,6 +64,14 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   in `EQUIVALENT | CONTENT_ON_MAIN | EMPTY | UNIQUE | CONFLICT`. A `UNIQUE` COMMIT record
   is a cherry-pick candidate for editorial triage.
 - `WORKTREE|<path>|<branch-or-DETACHED>|<flags>` — worktree registrations.
+- `WORKTREE|<path>|DETACHED|<state>|<flags>` — a detached-HEAD worktree registration,
+  classified on its own HEAD SHA. This five-field record replaces the four-field record
+  above for a detached registration; it is not emitted in addition to it. `state` is one
+  of `MERGED_CLEAN | MERGED_CONTENT_NEUTRAL | MERGED_EQUIVALENT | NOT_MERGED |
+  HAS_UNIQUE_RESIDUALS | PROTECTED_CURRENT | ANCESTRY_ERROR`, where `ANCESTRY_ERROR` is
+  the fail-closed verdict for a hard git failure at any rung of the classification. The
+  fifth field carries the porcelain flag set unchanged, so the `locked` and `prunable`
+  markers are preserved in the record.
 - `WARN|main-divergence|<local-sha>|<origin-sha>` — local `main` differs from
   `origin/main` (advisory; classification still runs).
 - `DIRTY|<worktree-path>|<status-porcelain-line>` — a dirty worktree that blocked
@@ -127,6 +135,31 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    mechanics. Any worktree left standing afterward — reported `BLOCKED-DIRTY`, or whose
    branch classified `NOT_MERGED` or `HAS_UNIQUE_RESIDUALS` — is not abandoned; it moves
    to the Dirty Worktree Triage Procedure below.
+
+   A consolidation branch whose tip equals `main`, which is the state of
+   `documentationandmemories` between its creation off `main` and its first commit, is
+   reported `NOT_ANCESTOR` by a tip-equality pre-check that runs before any network fetch
+   and is therefore not delete-eligible; the post-merge cleanup described above is
+   unaffected, because a merged consolidation branch's tip differs from `main`, and an
+   empty or unresolvable tip on either side is reported `ANCESTRY_ERROR` rather than
+   treated as equality.
+
+   Detached-HEAD worktrees are handled on the same terms. Apply mode classifies each on
+   its own HEAD SHA, emits the five-field `WORKTREE|<path>|DETACHED|<state>|<flags>`
+   record from that verdict, and acts only on the delete-eligible states `MERGED_CLEAN`,
+   `MERGED_CONTENT_NEUTRAL`, and `MERGED_EQUIVALENT`. A delete-eligible detached worktree
+   is re-verified in the same process immediately before the destructive action and is
+   then removed without force. A locked one is skipped with the result token
+   `ACTION|worktree-remove|<path>|BLOCKED-LOCKED`; the locked test reads the porcelain
+   flags already in hand and precedes every git invocation, so no `git worktree remove`
+   command is issued for it. A prunable one is report-only: it produces its registration
+   record and no further line, with no removal and no prune. A dirty one reaches the same
+   non-forced removal path as a branch-backed worktree and is reported `BLOCKED-DIRTY`
+   with its accompanying `DIRTY|` lines.
+   In apply mode a blocked detached removal — `BLOCKED-DIRTY`, `BLOCKED-LOCKED`, or
+   `BLOCKED-REVERIFY` — sets a non-zero exit status, so a checkout holding dirty or locked
+   detached worktrees exits non-zero from `--apply` where the same checkout previously
+   exited 0.
 
 ## Nothing to Consolidate (Short Path)
 

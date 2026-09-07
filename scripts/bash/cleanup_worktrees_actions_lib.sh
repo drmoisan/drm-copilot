@@ -202,6 +202,26 @@ verify_consolidation_merged() {
 	# whose unique content was consolidated. Echoes MERGED_CLEAN / NOT_ANCESTOR /
 	# ANCESTRY_ERROR and returns 0 / 1 / 2 respectively.
 	local mrc=0
+	# Tip-equality pre-check, ahead of the best-effort fetch so no network call is made
+	# in the blocked case. A consolidation branch created at main and not yet committed
+	# to has a tip identical to main's; merge-base --is-ancestor answers 0 for that
+	# shape, which would wrongly present a zero-commit branch as delete-eligible. An
+	# empty or unresolvable tip on either side is a HARD FAILURE, never an equality
+	# match: two empty strings compare equal, so treating them as equality would block a
+	# genuinely merged branch. A commit-counting guard was rejected for this check: the
+	# count is also zero after the consolidation PR merges with a merge commit, which
+	# would permanently block the documented post-merge cleanup step.
+	local cons_tip main_tip ctrc=0 mtrc=0
+	cons_tip=$(cleanup_wt_git rev-parse "$CLEANUP_WT_CONSOLIDATION_BRANCH") || ctrc=$?
+	main_tip=$(cleanup_wt_git rev-parse main) || mtrc=$?
+	if ((ctrc != 0)) || ((mtrc != 0)) || [[ -z $cons_tip || -z $main_tip ]]; then
+		printf 'ANCESTRY_ERROR\n'
+		return 2
+	fi
+	if [[ $cons_tip == "$main_tip" ]]; then
+		printf 'NOT_ANCESTOR\n'
+		return 1
+	fi
 	cleanup_wt_git fetch origin main >/dev/null 2>&1 || true
 	cleanup_wt_git merge-base --is-ancestor "$CLEANUP_WT_CONSOLIDATION_BRANCH" main >/dev/null 2>&1 || mrc=$?
 	if ((mrc == 0)); then
@@ -343,9 +363,13 @@ run_apply() {
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
+		# A detached registration is handled by apply_detached_worktrees instead: it
+		# emits that registration's single WORKTREE record and owns its removal decision.
+		is_detached_candidate "$wflags" && continue
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
 		[[ -n $wbranch && $wbranch != DETACHED ]] && wt_of[$wbranch]=$wpath
 	done <<<"$wlout"
+	apply_detached_worktrees "$wlout" || rc=1
 	# Consolidation merge gate: unlock the consolidation branch's own deletion only
 	# when documentationandmemories is merged into main.
 	local consolidation_ok=1 vout

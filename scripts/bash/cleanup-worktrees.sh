@@ -22,6 +22,9 @@ source "$SCRIPT_DIR/cleanup_worktrees_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_actions_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
+# shellcheck source=scripts/bash/cleanup_worktrees_detached_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
 
 usage() {
 	# Print the wrapper usage/help text.
@@ -41,8 +44,21 @@ Commands:
 
 Report lines (pipe-delimited, LC_ALL=C ordered): BRANCH|<name>|<state>;
 COMMIT|<branch>|<sha>|<state>|<paths>|<author>|<date>;
-WORKTREE|<path>|<branch-or-DETACHED>|<flags>; WARN|main-divergence|<local>|<origin>;
+WORKTREE|<path>|<branch>|<flags> for a branch-backed worktree registration;
+WORKTREE|<path>|DETACHED|<state>|<flags> for a detached-HEAD worktree registration,
+which is classified on its own HEAD SHA and whose fifth field preserves the porcelain
+locked and prunable markers; WARN|main-divergence|<local>|<origin>;
 DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode).
+
+Branch and detached-worktree states: MERGED_CLEAN, MERGED_CONTENT_NEUTRAL,
+MERGED_EQUIVALENT, NOT_MERGED, HAS_UNIQUE_RESIDUALS, PROTECTED_CURRENT, and
+ANCESTRY_ERROR. The first three are the delete-eligible allowlist; ANCESTRY_ERROR is a
+hard git failure and never unlocks a destructive action.
+
+In apply mode a blocked detached removal sets a non-zero exit status. The blocked results
+are BLOCKED-DIRTY, BLOCKED-LOCKED, and BLOCKED-REVERIFY. A checkout holding dirty or
+locked detached worktrees therefore exits non-zero from --apply where it previously
+exited 0.
 
 Environment overrides:
   CLEANUP_WT_GIT_BIN            Path to the git binary; an empty or nonexistent value

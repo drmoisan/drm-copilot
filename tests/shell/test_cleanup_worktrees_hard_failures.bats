@@ -14,6 +14,7 @@ setup() {
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
+    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     chmod +x "${STUB}" 2>/dev/null || true
@@ -24,7 +25,7 @@ runin() { # runin <scenario> <function-invocation>
     # the named scenario. The stub logs argv to stderr; discard it so $output is the
     # function's stdout report lines only (bats `run` otherwise merges stderr).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; $2 2>/dev/null"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; source '${DLIB}'; $2 2>/dev/null"
 }
 
 # --- Fail-before-red set (assert post-fix behavior; red before Phase 3 fixes) ---

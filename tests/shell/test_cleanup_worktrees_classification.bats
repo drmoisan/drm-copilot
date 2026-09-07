@@ -9,6 +9,7 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     chmod +x "${STUB}" 2>/dev/null || true
@@ -18,12 +19,12 @@ cb() { # cb <scenario> <branch>  -> run classify_branch under that scenario
     # The git stub logs its argv to stderr; discard it so $output is the function's
     # stdout report lines only (bats `run` otherwise merges stderr into $output).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && classify_branch '$2' 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DLIB}' && classify_branch '$2' 2>/dev/null"
 }
 
 report() { # report <scenario> -> run the full report driver under that scenario
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && run_report 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DLIB}' && run_report 2>/dev/null"
 }
 
 @test "merged_no_worktree: MERGED_CLEAN and no worktree record for the branch" {
