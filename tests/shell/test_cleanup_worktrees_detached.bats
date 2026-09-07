@@ -113,6 +113,8 @@ runin() { # runin <scenario-dir> <invocation> -> run an arbitrary invocation und
     [[ "$output" == *"ACTION|worktree-remove|/repo-wt/det|BLOCKED-LOCKED"* ]]
     [[ "$output" != *"worktree remove"* ]]
     [[ "$output" != *"worktree prune"* ]]
+    # locked-exit-code-propagation: the locked path is the primary source of the documented apply-mode exit-code change, so the non-zero status is asserted here.
+    [ "$status" -ne 0 ]
 }
 
 @test "prunable detached worktree is report-only" {
@@ -163,5 +165,155 @@ runin() { # runin <scenario-dir> <invocation> -> run an arbitrary invocation und
     runin "${SCEN}/detached_unmerged" "reverify_detached_delete_eligible det00002 /repo-wt/det"
     [[ "$output" == *"BLOCKED-REVERIFY"* ]]
     [ "$status" -eq 1 ]
+    [[ "$output" != *"worktree remove"* ]]
+}
+
+@test "report emits MERGED_CONTENT_NEUTRAL for a content-neutral detached HEAD" {
+    # Ladder rung 2: the HEAD is not an ancestor of main (merge-base rc 1) but adds no net
+    # content versus main (diff --quiet rc 0). This is the first case in the suite to
+    # produce the MERGED_CONTENT_NEUTRAL verdict, which is on the delete-eligible allowlist.
+    report "${SCEN}/detached_content_neutral"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|MERGED_CONTENT_NEUTRAL|detached"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+}
+
+@test "apply removes a content-neutral detached worktree without force" {
+    # The first test in this repository to drive the destructive path from a
+    # MERGED_CONTENT_NEUTRAL verdict. The scenario carries no worktree-remove.rc, so the
+    # stub's removal exits 0 and remove_worktree_safe reports OK.
+    runin "${SCEN}/detached_content_neutral" run_apply
+    [[ "$output" == *"ACTION|worktree-remove|/repo-wt/det|OK"* ]]
+    [[ "$output" == *"worktree remove /repo-wt/det"* ]]
+    [[ "$output" != *"--force"* ]]
+    [[ "$output" != *"worktree prune"* ]]
+}
+
+@test "report emits MERGED_EQUIVALENT for a cherry-equivalent detached HEAD" {
+    # Ladder rung 3: a single patch-id-equivalent `- <sha>` cherry line leaves the residual
+    # list empty, so classify_cherry_equivalent returns the single MERGED_EQUIVALENT line.
+    report "${SCEN}/detached_equivalent"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|MERGED_EQUIVALENT|detached"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+}
+
+@test "apply removes a cherry-equivalent detached worktree without force" {
+    # The first test in this repository to drive the destructive path from a
+    # MERGED_EQUIVALENT verdict, the third and last entry on the delete-eligible allowlist.
+    runin "${SCEN}/detached_equivalent" run_apply
+    [[ "$output" == *"ACTION|worktree-remove|/repo-wt/det|OK"* ]]
+    [[ "$output" == *"worktree remove /repo-wt/det"* ]]
+    [[ "$output" != *"--force"* ]]
+    [[ "$output" != *"worktree prune"* ]]
+}
+
+@test "report emits HAS_UNIQUE_RESIDUALS for a partially incorporated detached HEAD" {
+    # Ladder rung 5: one residual `+` commit whose touched path holds a different blob on
+    # main is UNIQUE, and the `- <sha>` cherry line supplies the MINUS_PRESENT partial-merge
+    # signal that separates HAS_UNIQUE_RESIDUALS from NOT_MERGED.
+    report "${SCEN}/detached_unique_residuals"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|HAS_UNIQUE_RESIDUALS|detached"* ]]
+    # HAS_UNIQUE_RESIDUALS is not on the delete-eligible allowlist. The apply-mode run is
+    # what proves the non-eligible terminal blocks the destructive path, rather than the
+    # report line merely naming a state.
+    runin "${SCEN}/detached_unique_residuals" run_apply
+    [[ "$output" != *"ACTION|worktree-remove"* ]]
+    [[ "$output" != *"worktree remove"* ]]
+}
+
+@test "classify_detached_head returns MERGED_EQUIVALENT when every residual is content-on-main" {
+    # Ladder rung 4, the second MERGED_EQUIVALENT producer: the cherry rung leaves one
+    # residual `+` commit, and that commit's single touched path resolves to the same blob
+    # OID on the HEAD and on main, so the residual is CONTENT_ON_MAIN and the unique count
+    # stays at zero. Substring form, not equality, because the helper retains stderr and the
+    # stub writes one `stub-git: ` argv line per invocation.
+    runin "${SCEN}/detached_equivalent_residual" "classify_detached_head det00011 /repo-wt/det"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"MERGED_EQUIVALENT"* ]]
+    [[ "$output" != *"HAS_UNIQUE_RESIDUALS"* ]]
+}
+
+@test "a protection-set hard failure fails closed as ANCESTRY_ERROR" {
+    # compute_protected hard-fails (rev-parse --abbrev-ref HEAD exits 128). The guard must
+    # fire before the ancestry rung, so a weakened (empty) protected set can never let a
+    # candidate reach a delete-eligible verdict. The scenario deliberately carries no
+    # merge-base key for this HEAD, so reaching the ancestry rung at all would be visible.
+    runin "${SCEN}/detached_protection_error" "classify_detached_head det00012 /repo-wt/det"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_"* ]]
+    report "${SCEN}/detached_protection_error"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|ANCESTRY_ERROR|detached"* ]]
+    runin "${SCEN}/detached_protection_error" run_apply
+    [[ "$output" != *"worktree remove"* ]]
+    [ "$status" -ne 0 ]
+}
+
+@test "a content-neutral probe hard failure fails closed as ANCESTRY_ERROR" {
+    # `git diff --quiet main...<head>` exits 128, which classify_content_neutral reports as
+    # CONTENT_NEUTRAL_ERROR and classify_detached_head maps to ANCESTRY_ERROR, never to
+    # MERGED_CONTENT_NEUTRAL.
+    runin "${SCEN}/detached_content_neutral_error" "classify_detached_head det00013 /repo-wt/det"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_"* ]]
+    report "${SCEN}/detached_content_neutral_error"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|ANCESTRY_ERROR|detached"* ]]
+    runin "${SCEN}/detached_content_neutral_error" run_apply
+    [[ "$output" != *"worktree remove"* ]]
+    [ "$status" -ne 0 ]
+}
+
+@test "a cherry hard failure fails closed as ANCESTRY_ERROR" {
+    # `git cherry main <head>` exits 128, which classify_cherry_equivalent reports as
+    # CHERRY_ERROR and classify_detached_head maps to ANCESTRY_ERROR, never to
+    # MERGED_EQUIVALENT. A failed cherry read must not be mistaken for "all residuals
+    # equivalent".
+    runin "${SCEN}/detached_cherry_error" "classify_detached_head det00014 /repo-wt/det"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_"* ]]
+    report "${SCEN}/detached_cherry_error"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|ANCESTRY_ERROR|detached"* ]]
+    runin "${SCEN}/detached_cherry_error" run_apply
+    [[ "$output" != *"worktree remove"* ]]
+    [ "$status" -ne 0 ]
+}
+
+@test "a diff-tree hard failure fails closed as ANCESTRY_ERROR" {
+    # Direct invocation only. The stub answers `cherry` from one key per sha, so a single
+    # scenario cannot make both `cherry` and `diff-tree` fail for the same sha; det00015 is
+    # a second key set hosted inside the same directory and is deliberately absent from that
+    # scenario's worktree-list.out, which leaves /repo-wt/det2 merely unprotected.
+    # classify_cherry_equivalent reports the failed diff-tree probe as DIFF_TREE_ERROR, and
+    # classify_detached_head maps it to ANCESTRY_ERROR rather than to a droppable empty diff.
+    runin "${SCEN}/detached_cherry_error" "classify_detached_head det00015 /repo-wt/det2"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_"* ]]
+}
+
+@test "a residual ls-tree hard failure fails closed as ANCESTRY_ERROR" {
+    # The D-rung `git ls-tree main -- <path>` probe exits 128, which classify_residual_commit
+    # reports as RESIDUAL_ERROR and classify_detached_head maps to ANCESTRY_ERROR. A hard
+    # ls-tree failure must stay distinct from a path legitimately absent on main.
+    runin "${SCEN}/detached_residual_error" "classify_detached_head det00016 /repo-wt/det"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_"* ]]
+    report "${SCEN}/detached_residual_error"
+    [[ "$output" == *"WORKTREE|/repo-wt/det|DETACHED|ANCESTRY_ERROR|detached"* ]]
+    runin "${SCEN}/detached_residual_error" run_apply
+    [[ "$output" != *"worktree remove"* ]]
+    [ "$status" -ne 0 ]
+}
+
+@test "reverify_detached_delete_eligible blocks on a classification hard failure" {
+    # The hard-failure branch of the re-verification gate, which is distinct from the
+    # allowlist-miss branch covered by "reverify_detached_delete_eligible blocks on a
+    # flipped verdict": here classify_detached_head returns non-zero rather than returning 0
+    # with a non-eligible state token.
+    runin "${SCEN}/detached_content_neutral_error" "reverify_detached_delete_eligible det00013 /repo-wt/det"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"BLOCKED-REVERIFY"* ]]
     [[ "$output" != *"worktree remove"* ]]
 }

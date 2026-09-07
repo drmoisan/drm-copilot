@@ -69,4 +69,16 @@ setup() {
     run bash "${WRAPPER}" --help
     [ "$status" -eq 0 ]
     [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    # ac22-record-literal: AC22 names the five-field detached record itself, so the record literal is asserted in addition to its state vocabulary.
+    [[ "$output" == *"WORKTREE|<path>|DETACHED|<state>|<flags>"* ]]
+}
+
+@test "--help documents the apply-mode exit-code change for blocked detached removals" {
+    # A blocked detached removal makes apply mode exit non-zero where the same checkout
+    # previously exited 0. BLOCKED-REVERIFY is the asserted token because it is the one
+    # blocked result the usage text did not already name and it is bracket-free and
+    # single-line, so it survives reflow of the surrounding paragraph.
+    run bash "${WRAPPER}" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"BLOCKED-REVERIFY"* ]]
 }

@@ -147,6 +147,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    record and no further line, with no removal and no prune. A dirty one reaches the same
    non-forced removal path as a branch-backed worktree and is reported `BLOCKED-DIRTY`
    with its accompanying `DIRTY|` lines.
+   In apply mode a blocked detached removal — `BLOCKED-DIRTY`, `BLOCKED-LOCKED`, or
+   `BLOCKED-REVERIFY` — sets a non-zero exit status, so a checkout holding dirty or locked
+   detached worktrees exits non-zero from `--apply` where the same checkout previously
+   exited 0.
 
 ## Nothing to Consolidate (Short Path)
 

@@ -394,6 +394,18 @@ verifiable through the stub-driven bats suite.
 `## Problem Statement` come from the user-supplied 2026-09-06 run record and were not re-derived
 against this repository.
 
+**L5 — A detached HEAD contributes no `COMMIT|` record, so its unique work is invisible to
+consolidation triage.** `classify_detached_head` emits no `COMMIT|` record by design; Research
+Correction 4 records why reusing `classify_branch` is unsafe here, because it can fabricate
+SHA-keyed `COMMIT|` records that `cherry_pick_candidates` would misread. The consequence is that
+unique work held in a detached worktree classified `HAS_UNIQUE_RESIDUALS` or `NOT_MERGED` is
+correctly retained — no such state is on the delete-eligible allowlist and no removal is attempted —
+but is never surfaced to the consolidation and cherry-pick triage flow, which reads `COMMIT|...|UNIQUE`
+records in `scripts/bash/cleanup_worktrees_actions_lib.sh`. The omission therefore fails in the safe
+direction: the work is kept rather than deleted, and the cost is that an operator must find it
+manually rather than being handed it by the triage report. This is a follow-up candidate, not a
+defect in this child, and `COMMIT|` emission for detached HEADs is deliberately not implemented here.
+
 ---
 
 ## Acceptance Criteria

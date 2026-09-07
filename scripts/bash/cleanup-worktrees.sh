@@ -55,6 +55,11 @@ MERGED_EQUIVALENT, NOT_MERGED, HAS_UNIQUE_RESIDUALS, PROTECTED_CURRENT, and
 ANCESTRY_ERROR. The first three are the delete-eligible allowlist; ANCESTRY_ERROR is a
 hard git failure and never unlocks a destructive action.
 
+In apply mode a blocked detached removal sets a non-zero exit status. The blocked results
+are BLOCKED-DIRTY, BLOCKED-LOCKED, and BLOCKED-REVERIFY. A checkout holding dirty or
+locked detached worktrees therefore exits non-zero from --apply where it previously
+exited 0.
+
 Environment overrides:
   CLEANUP_WT_GIT_BIN            Path to the git binary; an empty or nonexistent value
                                is treated as missing (falls back to PATH git). This is
