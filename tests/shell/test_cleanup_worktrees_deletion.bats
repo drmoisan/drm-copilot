@@ -127,14 +127,26 @@ apply() { # apply <scenario-dir>
     [[ "$output" != *"branch -D documentationandmemories"* ]]
 }
 
-@test "apply mode allowlist is unaffected by a CHILD_OF short-circuit" {
-    # Outcome preservation, property (b): a branch that reached NOT_MERGED through the
-    # CHILD_OF short-circuit is gated by the same delete-eligible allowlist as one that
-    # reached it through the full ladder. NOT_MERGED is not on that allowlist, so no
-    # deletion ACTION of any result is emitted for it.
+@test "apply mode emits no deletion for a NOT_MERGED branch carrying a CHILD_OF record" {
+    # Outcome preservation, property (b). Under this fixture feature-child resolves
+    # NOT_MERGED through its own full ladder, so the assertion below is no longer
+    # satisfied by an inherited verdict; the CHILD_OF record beside it is additive and
+    # informational. NOT_MERGED is not on the delete-eligible allowlist, so no deletion
+    # ACTION of any result is emitted for the branch.
     apply "${SCEN}/child_of_not_merged"
     [[ "$output" == *"BRANCH|feature-child|NOT_MERGED"* ]]
     [[ "$output" == *"CHILD_OF|feature-child|feature-parent"* ]]
     [[ "$output" != *"ACTION|delete|feature-child|"* ]]
     [[ "$output" != *"branch -D feature-child"* ]]
+}
+
+@test "apply mode deletes a delete-eligible branch that is an ancestor of a NOT_MERGED branch" {
+    # The apply-mode expression of R-01's stated impact. feature-child is a git ancestor
+    # of the NOT_MERGED feature-parent, but its own rung-2 probe resolves it MERGED_CLEAN,
+    # which is on the delete-eligible allowlist. The pre-fix driver reported NOT_MERGED
+    # for this branch, so it was silently never deleted.
+    apply "${SCEN}/child_of_subject_merged_clean"
+    [[ "$output" == *"BRANCH|feature-child|MERGED_CLEAN"* ]]
+    [[ "$output" == *"ACTION|branch-delete|feature-child|OK"* ]]
+    [[ "$output" == *"BRANCH|feature-parent|NOT_MERGED"* ]]
 }

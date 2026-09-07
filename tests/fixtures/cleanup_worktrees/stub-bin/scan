@@ -2,7 +2,11 @@
 # Replaying filesystem-scan stub for the cleanup-worktrees bats suites, wired through
 # the CLEANUP_WT_SCAN_BIN seam. It never touches the real filesystem and writes nothing
 # to disk: it replays canned stdout and exit codes from the scenario directory named by
-# CLEANUP_WT_STUB_SCENARIO, exactly as the sibling git stub in this directory does.
+# CLEANUP_WT_STUB_SCENARIO, exactly as the sibling git stub in this directory does, and
+# echoes each invocation as a `stub-scan: <argv>` line to STDERR so tests can assert how
+# many scans ran. The invocation log is on stderr (not stdout) so a caller capturing the
+# scan's stdout via command substitution receives only the canned data; under bats `run`
+# the stderr log still merges into $output.
 #
 # Lookup contract (documented so scenario fixtures under
 # tests/fixtures/cleanup_worktrees/scenarios/<name>/ match exactly):
@@ -20,6 +24,9 @@
 # exits 0, which is the correct no-orphan/no-registration-loss shape for every scenario
 # authored before this seam existed.
 set -uo pipefail
+
+# Echo the full invocation to stderr so a caller can count scan invocations.
+printf 'stub-scan: %s\n' "$*" >&2
 
 scenario=${CLEANUP_WT_STUB_SCENARIO:-}
 
