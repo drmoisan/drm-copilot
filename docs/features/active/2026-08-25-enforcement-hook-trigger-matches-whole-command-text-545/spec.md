@@ -1485,7 +1485,7 @@ denies against a not-ready checkpoint.
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
       double quotes).
-- [x] **No existing denial is weakened.** Both existing decision suites pass with no assertion
+- [ ] **No existing denial is weakened.** Both existing decision suites pass with no assertion
       modified except the single reversed heredoc `It` on each side; the existing Claude gate suite
       denials (lines 112–149), the Codex `Test-ImplementationCommand` classification table
       (lines 348–358, including `git commit -m "wip"` returning `$true`), the #539 D4 rows 14a–14d
