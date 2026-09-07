@@ -70,11 +70,13 @@ Describe 'Invoke-MergeableConflictResolution' {
             return , $script:StageBase
         }
 
-        Mock Write-MergedFile { param([string] $Path, [string[]] $Line, [bool] $HasBom) }
+        # A no-op sink. No assertion inspects the arguments, so the mock declares
+        # no parameters and Pester binds the call through the real command's metadata.
+        Mock Write-MergedFile { }
 
+        # The stub answers with the scenario's lines whatever path it is handed,
+        # so it declares no parameters.
         Mock Read-ConflictedFile {
-            param([string] $Path)
-
             return [pscustomobject]@{ Bytes = [byte[]] @(); HasBom = $false; Line = $script:ConflictedLine }
         }
     }
@@ -217,6 +219,18 @@ Describe 'Byte-level seams' {
         # normalized on the way in.
         $file.HasBom | Should -BeFalse
         @($file.Line | Where-Object { -not $_.EndsWith("`r`n") }).Count | Should -Be 0
+    }
+
+    It 'returns $null for a file that is not valid UTF-8' {
+        # Arrange: a committed fixture carrying the byte 0xFF, which is not a
+        # legal UTF-8 start byte.
+
+        # Act: the real read, with the strict decoder the production path uses.
+        $file = Read-ConflictedFile -Path (Join-Path $script:FixtureRoot 'invalid-utf8.conflicted.csproj')
+
+        # Assert: the decoder fallback is reported as $null rather than a lossy
+        # rewrite, which is what the caller turns into an escalation.
+        $file | Should -BeNullOrEmpty
     }
 
     It 'assembles the merged bytes without writing under -WhatIf' {

@@ -54,7 +54,10 @@ function Invoke-GitExe {
         rather than an executable. A non-zero exit throws with the output.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    # The unary comma wraps the result so the pipeline does not unroll a
+    # one-element collection, which makes the emitted object an Object[]
+    # carrying strings rather than a bare string[]. Both are declared.
+    [OutputType([string[]], [System.Object[]])]
     param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]] $GitArgs)
 
     $output = & git @GitArgs 2>&1
@@ -201,10 +204,10 @@ function Invoke-MergeableConflictResolution {
                 HasBom = $file.HasBom
                 Line   = $outcome.Lines
                 Record = [ordered]@{
-                    path                     = $path
-                    entries_added_from_ours  = @($outcome.EntriesAddedFromOurs)
+                    path                      = $path
+                    entries_added_from_ours   = @($outcome.EntriesAddedFromOurs)
                     entries_added_from_theirs = @($outcome.EntriesAddedFromTheirs)
-                    version_resolutions      = @($outcome.VersionResolutions)
+                    version_resolutions       = @($outcome.VersionResolutions)
                 }
             })
     }

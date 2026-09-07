@@ -226,8 +226,10 @@ and `mcp_call_receipts[]` populated with the `parallel` route's required names f
 
 The checkpoint schema is owned by F3 and is defined once in
 `.claude/rules/parallel-orchestration.md`, enforced by
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and add no
-field to it. The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and
+add no field to it that the rule file does not declare.
+`mergeable_conflicts_resolved` is the one declared optional item field.
+The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
 full enumeration, the `merge_status` transition chain you write, and the arrays that are read-only
 to you. Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "parallel-orchestrator-state"`.

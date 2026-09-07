@@ -154,12 +154,12 @@ function ConvertTo-MergeOutcome {
     )
 
     return [pscustomobject]@{
-        Lines                 = $Line
-        EntriesAddedFromOurs  = $FromOurs
+        Lines                  = $Line
+        EntriesAddedFromOurs   = $FromOurs
         EntriesAddedFromTheirs = $FromTheirs
-        VersionResolutions    = $Resolution
-        Escalate              = -not [string]::IsNullOrEmpty($Reason)
-        EscalateReason        = if ([string]::IsNullOrEmpty($Reason)) { $null } else { $Reason }
+        VersionResolutions     = $Resolution
+        Escalate               = -not [string]::IsNullOrEmpty($Reason)
+        EscalateReason         = if ([string]::IsNullOrEmpty($Reason)) { $null } else { $Reason }
     }
 }
 

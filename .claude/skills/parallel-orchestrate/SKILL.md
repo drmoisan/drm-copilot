@@ -476,8 +476,10 @@ F8 need no amendment to these projection rules.
 
 This section is consumption documentation only. The checkpoint schema is owned by F3, defined once
 as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced by
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema; add no field to it
-and extend no enum in it.
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema;
+add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
+and extend no enum in it. `mergeable_conflicts_resolved` is the one declared optional item
+field.
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,

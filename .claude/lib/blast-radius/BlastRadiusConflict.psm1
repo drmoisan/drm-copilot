@@ -190,10 +190,25 @@ function Get-NonMergeablePathEntry {
     return @(Get-OrdinalSortedEntry -Entry $survivor.ToArray())
 }
 
-# Port of _smallest_path_overlap. Each overlapping pair is ordered before it is
-# recorded, so the minimum is taken over a set that does not depend on argument
-# order; that is what makes the reported detail symmetric.
 function Get-SmallestPathOverlap {
+    <#
+    .SYNOPSIS
+        Return the ordinally smallest overlapping path pair, or $null.
+
+    .DESCRIPTION
+        Port of _smallest_path_overlap. Each overlapping pair is ordered before
+        it is recorded, so the minimum is taken over a set that does not depend
+        on argument order; that is what makes the reported detail symmetric.
+
+    .PARAMETER PathA
+        First radius path collection. An empty collection is accepted.
+
+    .PARAMETER PathB
+        Second radius path collection. An empty collection is accepted.
+
+    .OUTPUTS
+        System.String. The smallest joined pair, or $null when nothing overlaps.
+    #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
@@ -225,9 +240,24 @@ function Get-SmallestPathOverlap {
     return (Get-OrdinalSmallestEntry -Entry $detail.ToArray())
 }
 
-# Port of _smallest_common. Two empty collections share nothing, so the result is
-# $null and the level contributes no reason.
 function Get-SmallestCommonEntry {
+    <#
+    .SYNOPSIS
+        Return the ordinally smallest entry present in both collections.
+
+    .DESCRIPTION
+        Port of _smallest_common. Two empty collections share nothing, so the
+        result is $null and the level contributes no reason.
+
+    .PARAMETER Left
+        First collection. An empty collection is accepted.
+
+    .PARAMETER Right
+        Second collection. An empty collection is accepted.
+
+    .OUTPUTS
+        System.String. The smallest common entry, or $null when there is none.
+    #>
     [CmdletBinding()]
     [OutputType([string])]
     param(

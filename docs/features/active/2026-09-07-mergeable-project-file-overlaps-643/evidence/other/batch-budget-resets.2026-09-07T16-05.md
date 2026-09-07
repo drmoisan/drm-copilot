@@ -94,3 +94,52 @@ to this exit code).
 
 No deviation from the [P5-T10] stated acceptance: the pre-reset `prodFiles` and
 `testFiles` arrays and the post-reset count of `0` are all as the task states.
+
+---
+
+## Reset 3 — Python runtime, scheduled reset point [P7-T2]
+
+Timestamp: 2026-09-07T18-05
+
+Command: `pwsh -NoProfile -Command 'Get-ChildItem -Path .claude/state -Filter "python-batch-budget.*.json" -ErrorAction SilentlyContinue | ForEach-Object { Write-Output ("PRE-RESET " + $_.FullName + " " + (Get-Content -Raw $_.FullName)); Remove-Item -LiteralPath $_.FullName -Force }'`
+
+EXIT_CODE: 0
+
+## Output Summary
+
+Exactly one state file was enumerated:
+
+`PRE-RESET C:\Users\DanMoisan\repos\drm-copilot-wt\2026-09-07T08-09\.claude\state\python-batch-budget.8af424ea-e8c4-4c97-b2f3-a930ca145a35.json`
+
+Pre-reset `prodFiles` (1 of 3), recorded verbatim:
+
+1. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/scripts/dev_tools/_blast_radius_mergeable.py`
+
+Pre-reset `testFiles` (2 of 3), recorded verbatim:
+
+1. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/tests/scripts/dev_tools/blast_radius_parity_test_support.py`
+2. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/tests/scripts/dev_tools/test_blast_radius_mergeable_paths.py`
+
+Pre-reset `prodCap` and `testCap`: 3 and 3.
+
+Post-reset observation command: `pwsh -NoProfile -Command "(Get-ChildItem -Path .claude/state -Filter 'python-batch-budget.*.json' -ErrorAction SilentlyContinue | Measure-Object).Count"`
+
+Post-reset state-file count: `0`
+
+Post-reset command exit code: 0 (recorded; C9 attaches no acceptance condition
+to this exit code).
+
+## Deviation from the [P7-T2] stated pre-reset arrays
+
+The task predicted a `testFiles` array of three paths, the third being
+`tests/scripts/dev_tools/test_parallel_drift_detection_conflicts.py`. The observed array carries two
+paths and does not carry that one. The cause is mechanical rather than a missing edit: the hooks
+count a distinct path only when the Write or Edit tool touches it, and the Phase 2 case added to
+`test_parallel_drift_detection_conflicts.py` was applied through a Bash-driven in-place edit, which
+the `Write|Edit` PreToolUse matcher does not observe. The file itself carries the added case; only
+its budget slot was never consumed.
+
+Consequently no list was at its cap at this point (`prodFiles` 1 of 3, `testFiles` 2 of 3). The reset
+was run regardless, exactly as the task schedules it, so that the subsequent Python test-module
+creations of Phase 7 begin from an empty budget. The observed arrays above are the record of what was
+actually enumerated.

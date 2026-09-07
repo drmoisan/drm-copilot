@@ -49,8 +49,8 @@ Removing both signals never weakens the relation below the path level: two items
 
 ## Acceptance Criteria
 
-- [ ] For a set of items whose only shared paths are project files matching the published `mergeable_paths` list, the operator observes an empty conflict-edge list in the run's projection.
-- [ ] Those items are placed in a single cohort and are launched together, rather than being serialized across cohorts.
+- [x] For a set of items whose only shared paths are project files matching the published `mergeable_paths` list, the operator observes an empty conflict-edge list in the run's projection.
+- [x] Those items are placed in a single cohort and are launched together, rather than being serialized across cohorts.
 - [x] Each item's declared blast radius still lists the project file it touches, so the operator can see the write and drift detection still reports an undeclared write.
 - [x] Two items in the same assembly, touching different files, produce no `module_overlap` edge; the destination module map the operator receives from push-down names no per-assembly module.
 - [x] The operator receives the behavior through a normal push-down: no manual edit to the consumer repository's `config/blast-radius.json` or cohort-barrier hook is required, and the behavior survives the next push-down.
@@ -59,7 +59,7 @@ Removing both signals never weakens the relation below the path level: two items
 - [x] When the conflict set contains any path outside the mergeable list, or any line the merge grammar does not recognise, the orchestrator escalates as it does today and names the paths that caused the escalation.
 - [x] After a resolution the orchestrator runs the formatter check and the analyzer build before re-confirming CI, and reverts the resolution and escalates if either fails.
 - [x] The resolution is cited where the operator reads run outcomes: the `## Mergeable Conflicts Resolved` section of the run status projection, the pull request body, the resolution commit message, and an evidence artifact under the run's evidence folder.
-- [ ] A run in which no project-file conflict occurs, or a destination whose truth table lacks the `mergeable_paths` key, behaves exactly as it does today; the operator sees no change in cohorts or escalations.
+- [x] A run in which no project-file conflict occurs, or a destination whose truth table lacks the `mergeable_paths` key, behaves exactly as it does today; the operator sees no change in cohorts or escalations.
 
 ## Non-Goals
 
