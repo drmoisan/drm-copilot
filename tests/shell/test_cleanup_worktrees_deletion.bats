@@ -81,3 +81,39 @@ apply() { # apply <scenario-dir>
     [[ "$output" == *"branch -D documentationandmemories"* ]]
     [[ "$output" == *"ACTION|branch-delete|documentationandmemories|OK"* ]]
 }
+
+@test "a zero-commit consolidation branch is never deleted" {
+    # The branch was created at main and has no commit of its own, so its tip equals
+    # main's tip. merge-base --is-ancestor answers 0 for that shape, which is why the
+    # tip-equality pre-check has to win before the ancestry rung is consulted.
+    apply "${DEL}/consolidated_zero_commit"
+    [[ "$output" == *"ACTION|delete|documentationandmemories|BLOCKED-CONSOLIDATION-UNMERGED"* ]]
+    [[ "$output" != *"branch -D documentationandmemories"* ]]
+    [[ "$output" != *"worktree remove /repo-wt/dm"* ]]
+}
+
+@test "verify_consolidation_merged returns NOT_ANCESTOR on tip equality" {
+    # Substring form, not equality: the stub writes one `stub-git: ` argv line to stderr
+    # for each of the two rev-parse invocations the tip-equality pre-check makes, and
+    # bats merges stderr into $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${DEL}/consolidated_zero_commit" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; verify_consolidation_merged"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"NOT_ANCESTOR"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+}
+
+@test "verify_consolidation_merged fails closed on an empty rev-parse" {
+    # merged_no_worktree supplies neither rev-parse.main.out nor
+    # rev-parse.documentationandmemories.out, so both tip captures resolve to the empty
+    # string under the stub. An unresolvable tip is a hard failure, not equality.
+    # Substring form, not equality: retaining stderr is what makes the negative argv
+    # assertion below meaningful, and the same retention puts `stub-git: ` lines into
+    # $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_no_worktree" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; verify_consolidation_merged"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+    [[ "$output" != *"branch -D documentationandmemories"* ]]
+}

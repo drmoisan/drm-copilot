@@ -61,3 +61,12 @@ setup() {
     [[ "$output" != *"WORKTREE|"* ]]
     [[ "$output" != *"Usage: cleanup-worktrees.sh"* ]]
 }
+
+@test "--help documents the detached worktree record" {
+    # The usage text must document the detached worktree record and its state
+    # vocabulary. ANCESTRY_ERROR is the asserted token because it is a bracket-free,
+    # single-line literal and therefore survives reflow of the surrounding paragraph.
+    run bash "${WRAPPER}" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+}
