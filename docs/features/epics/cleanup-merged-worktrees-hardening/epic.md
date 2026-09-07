@@ -2,13 +2,12 @@
 epic: cleanup-merged-worktrees-hardening
 integration_branch: epic/cleanup-merged-worktrees-hardening-integration
 created_at: 2026-09-06T21:55:00Z
-# LIVE MANIFEST. issue_num values in the 900 range are placeholders for children whose promotion
-# has not yet completed (904 for child F); it is back-filled with the real
-# GitHub issue number from its promotion receipt, together with its concrete active-folder
-# basename, before the kickoff artifact is written. Every other entry carries a real issue number
-# and a resolved feature_folder. Children A (630), E (545), and I (591) were promoted before this
-# epic was planned; 631, 632, 633, 634, and 635 were promoted during it. depends_on uses issue_num
-# values throughout.
+# RESOLVED MANIFEST. Every entry carries a real GitHub issue number and a resolved
+# feature_folder; no placeholder issue_num remains. Child F's authoring-time placeholder 904 was
+# back-filled to 637 with feature_folder
+# 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 from its promotion receipt.
+# Children A (630) and E (545) were promoted before this epic was planned; 631, 632, 633, 634,
+# 635, and 637 were promoted during it. depends_on uses issue_num values throughout.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A `/cleanup-merged-worktrees` run on a large checkout can be carried from report through apply, consolidation, and merge without hand-written scripts, manual consolidation commits, or hook workarounds. The 2026-09-06 TaskMaster run classified 45 branches and removed 7 worktrees correctly but left 30 detached worktrees invisible to apply mode, 14 dirty worktrees blocked with no verdict, and roughly 140 untracked lesson files to be consolidated by hand; every remaining manual step in that run is attributable to one of the nine gaps this epic closes.
@@ -44,8 +43,8 @@ features:
   - issue_num: 635
     feature_folder: 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635
     depends_on: [545]
-  - issue_num: 904
-    feature_folder: cleanup-worktrees-preserve-file-consolidation
+  - issue_num: 637
+    feature_folder: 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637
     depends_on: [635]
 ---
 
@@ -102,7 +101,7 @@ that does not yet accept the manifest.
 | H | 633 | 9b | TypeScript (`collect_pr_context`) | 0 |
 | G | 634 | 4 | skill text (consolidation merge is human-performed) | 0 |
 | D | 635 | 3, 9a | PowerShell hooks + skill text (removal manifest) | 1 |
-| F | 904 | 5 | bash + skill text (`PRESERVE` consolidation) | 2 |
+| F | 637 | 5 | bash + skill text (`PRESERVE` consolidation) | 2 |
 
 ### Gap 8 is one child, not three - a decomposition that was corrected twice
 
@@ -138,10 +137,15 @@ is delivered by child E alone, across the whole hook family, with one parser and
 pass.
 
 Two children created for the split were consequently withdrawn before fan-in: child I for issue
-#591 and child J for the removal gates. Neither is in the manifest and neither contributes a
-feature folder. Issue #591 remains open and is closed as superseded by #545 when this epic merges;
-child E's `issue.md` and `spec.md` both record that supersession, and its acceptance criteria
-require it.
+#591 and child J, whose own preparation promoted issue #636
+(`Bug: removal-gate-trigger-matches-whole-command-text`) before the withdrawal was known. Neither
+is in the manifest and neither contributes a feature folder; neither branch is merged into this
+integration branch.
+
+Issue #591 remains open and is closed as superseded by #545 when this epic merges; child E's
+`issue.md` and `spec.md` both record that supersession, and its acceptance criteria require it.
+Issue #636 was closed as superseded by #545 during planning, because child E's decision D11 brings
+both worktree-removal gates into #545's own scope, so #636 has no remaining scope of its own.
 
 ### Children A and E are already promoted
 
@@ -227,11 +231,11 @@ Computed by longest-path layering over the dependency DAG per the `epic-orchestr
 | --- | --- | --- |
 | 0 | 630 (A), 545 (E), 633 (H), 634 (G) | 4 |
 | 1 | 631 (B), 635 (D) | 2 |
-| 2 | 632 (C), 904 (F) | 2 |
+| 2 | 632 (C), 637 (F) | 2 |
 
 `wave(630) = wave(545) = wave(633) = wave(634) = 0` (empty `depends_on`);
 `wave(631) = 1 + wave(630) = 1`; `wave(635) = 1 + wave(545) = 1`;
-`wave(632) = 1 + wave(631) = 2`; `wave(904) = 1 + wave(635) = 2`. The graph is cycle-free and every
+`wave(632) = 1 + wave(631) = 2`; `wave(637) = 1 + wave(635) = 2`. The graph is cycle-free and every
 `depends_on` entry resolves. Verified against `scripts/dev_tools/epic_wave_computation.py`, the
 canonical implementation of the longest-path layering formula. No wave exceeds the
 `max_parallel_features` of four, so no wave is split into batches.
@@ -294,7 +298,7 @@ plan after clearance would invalidate the clearance measured against it.
 
 ### EA-1 — Bash toolchain runs through the pwsh-wrapped form, never bare `wsl`
 
-Applies to children 630, 631, 632, and 904.
+Applies to children 630, 631, 632, and 637.
 
 `atomic-executor` holds Bash grants for `poetry run`, `npx`, `pwsh`, and `git`. A bare `wsl`
 invocation matches no grant and is denied wherever it runs, including from a worktree-isolated
