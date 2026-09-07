@@ -7,7 +7,9 @@
 - **Status:** Ready for preflight
 - **Version:** 1.0
 - **Work Mode:** `full-bug` — `spec.md` is the authoritative acceptance-criteria source.
-- **Branch:** `bug/cleanup-worktrees-preserve-file-consolidation-637`
+- **Branch:** assigned at execution time by the epic orchestrator and not knowable at planning time.
+  `[P0-T2]` records the branch this plan actually runs on, verbatim, and every later task that needs
+  a branch name reads that recorded value.
 - **Requirements sources:** `docs/features/active/2026-09-07-cleanup-worktrees-preserve-file-consolidation-637/spec.md`
   (43 acceptance criteria, AC-01 through AC-43), `user-story.md`, `issue.md`,
   `research/2026-09-07-preserve-file-consolidation-research.md`.
@@ -34,7 +36,7 @@ bare `wsl` invocation matches no Bash grant available to the executor and is den
 runs. Two classes of command do not use this form and are each specified in their own paragraph
 below: every `git` invocation, and the Python push-down contract suite.
 
-    pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh check'"
+    pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"
 
 Substitute `format`, `test`, or `test --coverage` for `check` as the stage requires. When the output
 is read back in Git Bash it is piped through `tr -d '\0'` before parsing, because WSL output can
@@ -43,10 +45,34 @@ always the exit code of the `pwsh` invocation itself, never of a trailing filter
 a Windows-side `git` span the recorded `EXIT_CODE:` is the exit code of the single `git` invocation
 the task names as decisive, and every other invocation's exit code is recorded in
 `Output Summary:`, per the git-route rule below. Available in that environment: `bats` 1.13.0, `kcov` 43,
-`shfmt`, `shellcheck`. If the wrapped form is refused, dispatch
-`.github/workflows/_shell-coverage.yml` with
-`gh workflow run --ref bug/cleanup-worktrees-preserve-file-consolidation-637` and read the uploaded
-`cov.xml`. CI is canonical when local and CI disagree.
+`shfmt`, `shellcheck`. If the wrapped form is refused, `[P0-T2]` governs: record the refusal, leave
+`[P0-T2]` unchecked, and report to the orchestrator. The CI route
+`gh workflow run _shell-coverage.yml --ref <the branch name [P0-T2] recorded>` is available only
+for the coverage stage of `[P0-T5]` and `[P10-T6]`, read from the uploaded `cov.xml`, and only when
+the orchestrator authorizes it after that report. It is not a substitute for any targeted `bats`
+gate in this plan, because it produces no per-test TAP output. CI is canonical when local and CI
+disagree on a coverage value.
+
+**The `<WSLROOT>` token is a placeholder, not a path, and no span may be run with the placeholder
+text still in it.** This plan is authored in preparation mode and is executed later, in a separate
+run, in a worktree the epic orchestrator creates; that worktree's path is not knowable at planning
+time, so no absolute path to it is written into this plan. Every WSL span in this plan carries
+`<WSLROOT>` where the worktree root belongs, because a WSL span genuinely needs an absolute
+`/mnt/c/...` path and cannot rely on the executor's Windows working directory. `[P0-T2]` resolves
+that path at run time, records it verbatim in its artifact, and **the executor substitutes the
+recorded literal for every `<WSLROOT>` occurrence in a span before running that span.** The
+resolution is mechanical: `[P0-T2]` runs `git rev-parse --show-toplevel`, which prints the
+Windows-form worktree root, records that value as `ResolvedWindowsRoot:`, and derives the WSL literal
+by replacing the leading drive letter and its colon with `/mnt/` followed by the lower-cased drive
+letter, leaving the remaining forward-slash-separated segments unchanged. The derived value is
+recorded as `ResolvedWslRoot:` and is confirmed to exist by a probe span before any later span
+consumes it. If the derived path does not exist under `/mnt/c/`, or the probe span does not exit 0,
+the executor stops and reports rather than proceeding.
+
+Windows-side spans need no equivalent placeholder. Every `git` span in this plan runs with no `-C`
+operand so that it operates on the executor's own worktree through its working directory, and the
+`Set-Location` span carried by each of `[P0-T6]`, `[P8-T5]`, and `[P10-T8]` consumes the
+`ResolvedWindowsRoot:` value that `[P0-T2]` recorded.
 
 The route was observed to be refused inside an agent-isolated worktree on 2026-09-07; the refusal
 originated at the harness level rather than from a repository hook, and it is not established as a
@@ -57,22 +83,27 @@ toolchain shape because `.claude/settings.json` line 7 grants `Bash(pwsh *)` and
 `wsl` prefix, so an executor that is not isolation-guarded reaches the bash toolchain through this
 form and through no other.
 
-This worktree is a linked git worktree: its `.git` is a file whose content is
-`gitdir: C:/Users/DanMoisan/repos/drm-copilot/.git/worktrees/agent-a1dc348c3021379d8`. That value is
-a Windows-form path, and the admin-side `gitdir` file at
-`C:/Users/DanMoisan/repos/drm-copilot/.git/worktrees/agent-a1dc348c3021379d8/gitdir` is Windows-form
-in the same way. Git running inside WSL does not treat `C:/...` as absolute, so it resolves the
-value relative to the worktree directory, finds no repository, and exits with
-`fatal: not a git repository`. **No `git` invocation in this plan runs inside the `wsl -d Ubuntu`
-leg.** Every git observation runs on the Windows side as
-`git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 <subcommand>`,
-which matches the `Bash(git *)` grant at `.claude/settings.json` line 5; the wrapped form
-`pwsh -NoProfile -Command "git -C C:/... <subcommand>"` matches the `Bash(pwsh *)` grant at line 7
-and is the fallback. One git subcommand per invocation: a chained `git ... && git ...` line was
-refused on 2026-09-07 by a harness-level worktree-isolation guard as a form too complex to verify,
-while a single `git -C <absolute path> <subcommand>` executed. When a task needs more than one git
-observation, run one invocation per observation, record the decisive invocation in the artifact's
-`Command:` and `EXIT_CODE:` fields, and record every other invocation with its own exit code inside
+The execution worktree is a linked git worktree: its `.git` is a file whose single line is a
+`gitdir:` key followed by a Windows-form absolute path into the administrative repository, and the
+admin-side `gitdir` file it points at is Windows-form in the same way. Git running inside WSL does
+not treat a drive-lettered path as absolute, so it resolves the value relative to the worktree
+directory, finds no repository, and exits with `fatal: not a git repository`. **No `git` invocation
+in this plan runs inside the `wsl -d Ubuntu` leg.**
+
+Every git observation runs on the Windows side as `git` followed directly by its subcommand, with
+**no `-C` operand and no path operand naming the repository**, so that git resolves the repository
+from the executor's own working directory. That form matches the `Bash(git *)` grant at
+`.claude/settings.json` line 5. The `-C` form is deliberately not used: a `-C` operand redirects git
+out of the agent's own worktree, which is the shape the harness-level worktree-isolation guard
+objects to, and it would require an absolute path this plan cannot know at authoring time. The
+wrapped form `pwsh -NoProfile -Command "git <subcommand>"` matches the `Bash(pwsh *)` grant at line 7
+and is the fallback.
+
+One git subcommand per invocation: a chained `git ... && git ...` line was refused on 2026-09-07 by
+a harness-level worktree-isolation guard as a form too complex to verify, while a single
+`git <subcommand>` invocation executed. When a task needs more than one git observation, run one
+invocation per observation, record the decisive invocation in the artifact's `Command:` and
+`EXIT_CODE:` fields, and record every other invocation with its own exit code inside
 `Output Summary:`.
 
 The `bats` gates are unaffected by the preceding paragraph. They drive the checked-in stub at
@@ -116,8 +147,10 @@ Full-suite runs happen only in Phase 10. Phases 2 through 7 leave the suite inte
 fail-before tests authored in Phase 2 remain red until Phases 4, 6, and 7 respectively. No gate in
 those phases runs the whole suite, because such a gate would be unsatisfiable at the point it runs.
 
-If either pre-authorized split is taken, every subsequent gate command names both files in the same
-`bats` invocation, in the order
+Two splits are pre-authorized by `spec.md` D1 and are decided at `[P5-T9]`: a library split into
+`scripts/bash/cleanup_worktrees_preserve_eol_lib.sh` and a suite split into
+`tests/shell/test_cleanup_worktrees_preserve_eol.bats`. If either pre-authorized split is taken,
+every subsequent gate command names both files in the same `bats` invocation, in the order
 `tests/shell/test_cleanup_worktrees_preserve.bats tests/shell/test_cleanup_worktrees_preserve_eol.bats`,
 and the expected TAP plan line is the count of matching tests across both. The split and the
 affected task IDs are recorded in `evidence/other/library-split-decision.<timestamp>.md`. The split
@@ -130,11 +163,12 @@ or the suite by name enumerates both files.
 `shfmt -w` writes files in place and prints nothing on either a clean run or a repairing run, so its
 stdout carries no literal that distinguishes the two and its exit code is 0 in both cases. Every
 task in this plan that runs the format stage therefore states a **before-and-after tree
-observation**: `git status --porcelain` is captured immediately before and immediately after the
+observation**: a porcelain status listing, scoped to the roots the format stage can rewrite and
+spelled in full below, is captured immediately before and immediately after the
 format invocation and both captures are recorded in the artifact, and the acceptance condition is
 that the two captures are byte-identical.
 
-That comparison is corroborating rather than primary. `git status --porcelain` prints the same `??`
+That comparison is corroborating rather than primary. A porcelain listing prints the same `??`
 line for an untracked file and the same ` M` line for an already-modified file whether or not
 `shfmt -w` changed its bytes, so it discriminates only for files that are tracked and clean. The
 primary no-rewrite evidence is the pre-format `shfmt -d` observation recorded by `[P10-T1]`: a
@@ -142,8 +176,13 @@ pre-format run that printed no diff hunk establishes that the writer which follo
 to rewrite.
 
 Both porcelain captures run on the Windows side as
-`git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain`,
-per the git-route rule in `## Toolchain invocation shape`.
+`git status --porcelain -- scripts tools .claude/lib/bash`,
+per the git-route rule in `## Toolchain invocation shape`. The pathspec names the three roots
+`discover_shell_scripts` walks at `scripts/bash/shell_qc_lib.sh` line 85, which are the only paths
+`shfmt -w` can rewrite. Scoping is required, not cosmetic: an unscoped capture also observes the
+evidence artifact `[P10-T1]` writes between the two captures, and the two listings could then
+never be byte-identical. `tools` does not exist in this tree; `git status` exits 0 on a pathspec
+operand that matches nothing, so its inclusion is harmless and future-proof.
 
 Because the format stage rewrites tracked source, it is
 **not** run during Phase 0 baseline capture; its read-only counterpart `shfmt -d`, which is the
@@ -183,43 +222,60 @@ blanket waiver.
       `docs/features/active/2026-09-07-cleanup-worktrees-preserve-file-consolidation-637/evidence/baseline/phase0-instructions-read.md`.
       Acceptance: that file exists and carries a `Timestamp:` field, a `Policy Order:` field, and an
       explicit list naming all nine files above.
-- [ ] [P0-T2] Capture the route probe and the git baseline. This task runs four separate
-      invocations, in this order. The first is the route probe, which carries no git and establishes
-      whether the wrapped invocation reaches the bash toolchain in this environment:
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && pwd && bats --version'"`.
-      The remaining three are the git baseline spans, each run separately on the Windows side per
-      the git-route rule in `## Toolchain invocation shape`:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 rev-parse HEAD`;
+- [ ] [P0-T2] Resolve the execution roots, confirm the workspace, capture the route probe, and
+      capture the git baseline. This task runs six separate invocations, in this order.
+      **Span 1 — resolve the Windows root**, on the Windows side with no `-C` operand:
+      `git rev-parse --show-toplevel`. Record the printed value verbatim as `ResolvedWindowsRoot:`.
+      Derive the WSL literal from it by replacing the leading drive letter and its colon with `/mnt/`
+      followed by the lower-cased drive letter and leaving every remaining forward-slash-separated
+      segment unchanged, and record the derived value verbatim as `ResolvedWslRoot:`. Substitute that
+      recorded literal for `<WSLROOT>` in every later span of this plan before running it; no span
+      may be run with the placeholder text still in it.
+      **Span 2 — confirm the workspace**, on the Windows side:
+      `pwsh -NoProfile -Command "Test-Path -LiteralPath 'docs/features/active/2026-09-07-cleanup-worktrees-preserve-file-consolidation-637/spec.md','docs/features/active/2026-09-07-cleanup-worktrees-preserve-file-consolidation-637/plan.2026-09-07T01-26.md','scripts/bash/cleanup_worktrees_lib.sh'"`.
+      This span prints one line per path. If any printed line is not `True`, stop and report a
+      workspace mismatch to the orchestrator; do not proceed to any later task.
+      **Span 3 — the route probe**, which carries no git and establishes whether the wrapped
+      invocation reaches the bash toolchain in this environment and that the derived root exists:
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && pwd && bats --version'"`.
+      **Spans 4, 5, and 6 — the git baseline**, each run separately on the Windows side per the
+      git-route rule in `## Toolchain invocation shape`:
+      `git rev-parse HEAD`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 rev-parse --abbrev-ref HEAD`;
+      `git rev-parse --abbrev-ref HEAD`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain`.
+      `git status --porcelain`.
       Acceptance: `evidence/baseline/baseline-git-state.<timestamp>.md` exists with `Timestamp:`,
-      `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the printed working directory and
-      `bats` version from the route probe, the HEAD sha, the branch name
-      `bug/cleanup-worktrees-preserve-file-consolidation-637`, the full porcelain status text
-      (recorded as `clean` when empty), and the exit code of each of the four invocations
-      separately. The artifact's `Command:` and `EXIT_CODE:` record the route probe, which is the
-      decisive invocation for this task. If the wrapped invocation is refused rather than executed,
-      record the verbatim refusal text as `Output Summary:` with `EXIT_CODE: BLOCKED`, leave this
-      task unchecked, and report to the orchestrator that the plan's toolchain route is unavailable.
-      The `EXIT_CODE: BLOCKED` branch applies to the route probe span only. A non-zero result from a
-      Windows-side git span is not a route refusal and is recorded separately in `Output Summary:`.
-      Do not substitute an unwrapped `wsl` form, and do not record any later gate as passing without
-      an executed command.
+      `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the `ResolvedWindowsRoot:` value,
+      the `ResolvedWslRoot:` value, the three lines span 2 printed, the printed working directory and
+      `bats` version from the route probe, the HEAD sha, the branch name printed by span 5 recorded
+      verbatim, the full porcelain status text (recorded as `clean` when empty), and the exit code of
+      each of the six invocations separately. Each of the three lines span 2 printed is `True`, and
+      the working directory span 3 printed equals the recorded `ResolvedWslRoot:` value. The
+      artifact's `Command:` and `EXIT_CODE:` record the route probe, which is the decisive invocation
+      for this task. No assertion is made about what the branch name is: the execution branch is
+      assigned by the epic orchestrator and is recorded here rather than checked. If the derived
+      `ResolvedWslRoot:` path does not exist under `/mnt/c/`, or span 3 exits non-zero, stop and
+      report rather than proceeding. If the wrapped invocation is refused rather than executed,
+      record `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an `Output Summary:` whose first line is
+      `ROUTE REFUSED` followed by the verbatim refusal text, leave this task unchecked, and report to
+      the orchestrator that the plan's toolchain route is unavailable. The `ROUTE REFUSED` branch
+      applies to the route probe span only. A non-zero result from a Windows-side git span is not a
+      route refusal and is recorded separately in `Output Summary:`. Do not substitute an unwrapped
+      `wsl` form, and do not record any later gate as passing without an executed command.
 - [ ] [P0-T3] Capture the format-drift and lint baseline. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh check'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Acceptance: `evidence/baseline/baseline-shell-qc-check.<timestamp>.md` exists with
       `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` that states the exit code and
       records, separately, whether the `shfmt -d` stage printed any diff hunk and how many
       `shellcheck` findings were printed.
 - [ ] [P0-T4] Capture the bats baseline. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh test'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test'"`.
       Acceptance: `evidence/baseline/baseline-shell-qc-test.<timestamp>.md` exists with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the passing and failing test
       counts printed by the run.
 - [ ] [P0-T5] Capture the bash coverage baseline. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh test --coverage'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test --coverage'"`.
       The successful run prints one headline of the shape `Bash coverage (lines): NN.N%` and no
       branch column, because kcov measures line coverage only. Acceptance:
       `evidence/baseline/baseline-shell-qc-coverage.<timestamp>.md` exists with `Timestamp:`,
@@ -228,9 +284,23 @@ blanket waiver.
       recording whether the produced `artifacts/pester/kcov/cov.xml` carries a per-file entry whose
       `filename` names an existing `scripts/bash/*.sh` file together with a `line-rate` attribute,
       quoting one such entry verbatim when present.
+      The headline is produced by `print_coverage_summary` at `scripts/bash/shell_qc_lib.sh` lines
+      277-291, which formats the parsed line-rate unconditionally once it is past its own guard, and
+      which prints nothing at all when `extract_cobertura_line_rate` cannot read a `line-rate`
+      attribute from `cov.xml`. Two degraded outcomes therefore exist and each has a branch. If the
+      headline prints with an empty percent value, or if no headline is printed at all, record the
+      observed output verbatim, record `EXIT_CODE:` as observed, note that
+      `artifacts/pester/kcov/cov.xml` was unparseable, leave this task unchecked, and report to the
+      orchestrator that the coverage baseline is unavailable. `[P10-T7]`'s baseline value is mandatory
+      and no substitution is permitted for it.
 - [ ] [P0-T6] Capture the push-down parity baseline. Run
-      `pwsh -NoProfile -Command "poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`
-      from the worktree root. `.claude/rules/python.md` line 16 makes `poetry run pytest` the
+      `pwsh -NoProfile -Command "Set-Location -LiteralPath 'RESOLVED-WINDOWS-ROOT'; poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`,
+      substituting the `ResolvedWindowsRoot:` value that `[P0-T2]` recorded for the quoted
+      `RESOLVED-WINDOWS-ROOT` token before running the span. The `Set-Location` span states the
+      working directory explicitly rather than relying on an ambient one. `poetry` is not on the
+      cd-chained-read command list at `.claude/hooks/validate-bash.ps1` line 89, and `Set-Location`
+      is not the `cd` token that list matches, so an explicit directory change is permitted here.
+      `.claude/rules/python.md` line 16 makes `poetry run pytest` the
       repository-canonical spelling of the `python -m pytest` invocation AC-35 names. Acceptance:
       `evidence/baseline/baseline-pushdown-parity.<timestamp>.md` exists with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the summary line verbatim,
@@ -241,8 +311,28 @@ blanket waiver.
       `bash scripts/bash/shell-qc.sh format` is a write-mode command deliberately not executed at
       baseline, naming `shfmt -w` at `scripts/bash/shell_qc_lib.sh` line 222 as the writer, and
       copying the `shfmt -d` drift observation from the P0-T3 artifact as the baseline signal for
-      that stage. Acceptance: the file exists and carries `Timestamp:`, the rationale sentence, and
-      the copied drift observation.
+      that stage. Acceptance: the file exists and carries `Timestamp:`,
+      `Command: bash scripts/bash/shell-qc.sh format (deliberately not executed at baseline)`,
+      `EXIT_CODE: 0`, `ExpectedExitCode: 0`, and an `Output Summary:` carrying the rationale
+      sentence, the `shfmt -w` writer citation at `scripts/bash/shell_qc_lib.sh` line 222, and the
+      drift observation copied from the `[P0-T3]` artifact.
+- [ ] [P0-T8] Confirm the staging precondition. `[P1-T5]` and `[P9-T3]` each issue a `git add` that
+      is not a bookkeeping-exempt form under
+      `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` lines 229-270, so both
+      are governed by the preimplementation gate: `[P1-T5]`'s pathspec is under `tests/fixtures/`,
+      which is outside the five exempt orchestration-bookkeeping trees that helper enumerates, and
+      `[P9-T3]`'s `-A` is a dash-leading token on the `add` subcommand, which the helper's positively
+      modelled option table denies. Read `artifacts/orchestration/orchestrator-state.json` and record
+      its presence and readiness state. That file is gitignored and is read-only context for this
+      task; it is never staged and never committed by any task in this plan.
+      Acceptance: `evidence/baseline/baseline-staging-precondition.<timestamp>.md` exists and carries
+      `Timestamp:`,
+      `Command: (read-only inspection of artifacts/orchestration/orchestrator-state.json; no command executed)`,
+      `EXIT_CODE: 0`, `ExpectedExitCode: 0`, and an `Output Summary:`
+      recording whether the checkpoint file exists
+      and what readiness state it declares. If the checkpoint is absent or not ready, leave this task
+      unchecked and report to the orchestrator that `[P1-T5]` and `[P9-T3]` cannot execute; do not
+      proceed past Phase 1.
 
 ### Phase 1 — Test infrastructure: git stub cases, `.gitattributes` exception, fixtures, suite scaffold
 
@@ -263,7 +353,7 @@ blanket waiver.
 - [ ] [P1-T4] Append one line to `.gitattributes`, which is today exactly one line reading
       `* text=auto eol=lf`. The appended line is exactly:
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text`. Acceptance: run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- -text /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/.gitattributes && grep -c -F -- preserve/eol-crlf /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/.gitattributes && tail -n 1 /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/.gitattributes'"`;
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- -text <WSLROOT>/.gitattributes && grep -c -F -- preserve/eol-crlf <WSLROOT>/.gitattributes && tail -n 1 <WSLROOT>/.gitattributes'"`;
       exit code 0, both counts print `1`, and the printed final line equals the quoted line above
       character for character. The two search literals asserted are `-text` and
       `preserve/eol-crlf`; they are split so the command needs no nested quoting, and the `tail`
@@ -274,14 +364,14 @@ blanket waiver.
 - [ ] [P1-T5] Create the CRLF index fixture at
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`, every line terminated with a
       carriage return followed by a line feed. Acceptance: the file exists,
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain -- tests/fixtures/cleanup_worktrees/preserve/eol-crlf`
+      `git status --porcelain -- tests/fixtures/cleanup_worktrees/preserve/eol-crlf`
       lists it, and the byte sequence carriage-return-line-feed is present in the checked-out file.
       Then run, on the Windows side and one subcommand per invocation:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 add -- tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`,
+      `git add -- tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`,
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 rev-parse :tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`,
+      `git rev-parse :tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`,
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 hash-object --no-filters tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`.
+      `git hash-object --no-filters tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`.
       Acceptance: the `add` invocation exits 0, and both object-name invocations exit 0 and print the
       same 40-character object name, so the index blob is byte-identical to the CRLF working file.
       A worktree-against-index difference check is not a substitute here, because that comparison
@@ -320,7 +410,7 @@ blanket waiver.
       `tests/fixtures/cleanup_worktrees/preserve/stub-keys/` and asserting the replayed exit code
       and the `stub-git:` argv line. Acceptance: both test names appear in the file.
 - [ ] [P1-T9] Gate the stub-replay tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f replays tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f replays tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..2`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac32-stub-replays.<timestamp>.md` records `Timestamp:`, `Command:`,
       `EXIT_CODE:`, and an `Output Summary:` carrying the TAP plan line and the two `ok` lines.
@@ -330,7 +420,7 @@ blanket waiver.
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md` that a carriage return byte is
       present in the checked-out file. Acceptance: the test name appears in the file.
 - [ ] [P1-T11] Gate the CRLF fixture-integrity test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f carriage tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f carriage tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac20-crlf-fixture.<timestamp>.md` records the four required fields with
       the TAP plan line in `Output Summary:`. Satisfies **AC-20**.
@@ -361,19 +451,19 @@ blanket waiver.
       no command. Their fail-before evidence is recorded by P2-T3, P2-T4, and P2-T5, which carry the
       `[expect-fail]` tag and the artifacts. Acceptance: all three test names appear in the file.
 - [ ] [P2-T3] [expect-fail] Record fail-before evidence for the untracked-staging case. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f untracked tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f untracked tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code is non-zero, the TAP plan line printed is `1..1`, the output carries a
       `not ok 1` line, and
       `evidence/regression-testing/fail-before-untracked.<timestamp>.md` records `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and an `Output Summary:` carrying the
       `not ok 1` line.
 - [ ] [P2-T4] [expect-fail] Record fail-before evidence for the stale advisory line-ending case. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code is non-zero, the TAP plan line printed is `1..1`, the output carries a
       `not ok 1` line, and `evidence/regression-testing/fail-before-stale-eol.<timestamp>.md` records
       the four required fields plus `ExpectedExitCode: 1`.
 - [ ] [P2-T5] [expect-fail] Record fail-before evidence for the host-token hard-stop case. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f aborts tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f aborts tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code is non-zero, the TAP plan line printed is `1..1`, the output carries a
       `not ok 1` line, and `evidence/regression-testing/fail-before-host-token.<timestamp>.md`
       records the four required fields plus `ExpectedExitCode: 1`. Together with P2-T3 and P2-T4 this
@@ -390,9 +480,14 @@ blanket waiver.
 - [ ] [P3-T2] Add `preserve_resolve_jq` to `scripts/bash/cleanup_worktrees_preserve_lib.sh`. It
       resolves `CLEANUP_WT_JQ_BIN` when that value is non-empty and executable, otherwise
       `command -v jq`, and when neither resolves writes a diagnostic naming the tool to stderr and
-      returns 127, mirroring `cleanup_wt_git`'s resolution and 127 contract in
-      `scripts/bash/cleanup_worktrees_enumerate_lib.sh`. Acceptance: the function name
-      `preserve_resolve_jq` appears in the file and the 127 return is present in its body.
+      returns 127, mirroring `cleanup_wt_git`'s resolution and 127 contract at
+      `scripts/bash/cleanup_worktrees_enumerate_lib.sh` lines 34 through 54, whose own diagnostic at
+      line 53 reads `cleanup-worktrees: no git binary resolved (CLEANUP_WT_GIT_BIN=%s)` and whose
+      `return 127` sits at line 54. The diagnostic this task writes carries the single-line token
+      `no jq binary resolved`, which this task creates and which `[P3-T6]`'s AC-05 test asserts on
+      stderr. Acceptance: the function name `preserve_resolve_jq` appears in the file, the 127 return
+      is present in its body, and the token `no jq binary resolved` appears in the diagnostic it
+      writes to stderr.
 - [ ] [P3-T3] Add `preserve_read_manifest` to `scripts/bash/cleanup_worktrees_preserve_lib.sh`. It
       invokes the resolved `jq` once, emitting one tab-separated record per `preserved_files[]` entry
       in the fixed column order defined by `spec.md` D3, and requires the top-level `tool` to equal
@@ -423,40 +518,61 @@ blanket waiver.
       `a manifest with a wrong tool or schema_version is rejected and stages nothing`,
       `an absent or malformed host_token_scan refuses to stage the record`, and
       `each missing or out of vocabulary field skips the record and reports`, the last with one case
-      per field in the D4 table. The test `an unresolvable jq returns 127 and stages nothing` must be
+      per field in the D4 table. **Every test authored here drives a function that this phase
+      creates, so no Phase 3 gate depends on a function a later phase adds.** The function under test
+      for `an unresolvable jq returns 127 and stages nothing` is `preserve_resolve_jq`, which
+      `[P3-T2]` creates in this phase; the test calls it directly rather than through any driver.
+      `[P3-T10]` drives `preserve_read_manifest`, created by `[P3-T3]`. `[P3-T11]` drives
+      `preserve_validate_record`, created by `[P3-T4]` and extended by `[P3-T5]`. `[P3-T12]` drives
+      `preserve_validate_record`, created by `[P3-T4]`. `[P3-T8]` sources the library file and calls
+      no function at all.
+      The test `an unresolvable jq returns 127 and stages nothing` must be
       independent of whether a real `jq` is installed on the host. It sets `CLEANUP_WT_JQ_BIN` to a
       path that is not executable AND sets `PATH` to the checked-in fixture directory
       `tests/fixtures/cleanup_worktrees/preserve/no-jq`, which contains no `jq`. `command -v` is a
-      bash builtin, so the function under test needs no external tool on `PATH`, and `run_preserve`
-      returns 127 before it reaches any external command. Acceptance: all five test names appear in
-      the file.
+      bash builtin, so the function under test needs no external tool on `PATH`.
+      **The test asserts two things, not one: that the status is 127, and that stderr carries the
+      single-line token `no jq binary resolved` that `[P3-T2]` writes.** The second assertion is
+      required because bash returns 127 for `command not found`, so a failed source, a misspelled
+      function name, or a not-yet-existing function all produce 127 and would otherwise pass the test
+      without the resolution logic having run. A bash `command not found` 127 prints
+      `command not found` rather than that diagnostic, so the two sources of 127 are distinguishable
+      and the assertion can fail. Acceptance: all five test names appear in the file, and the AC-05
+      test body carries both the status-127 assertion and the `no jq binary resolved` stderr
+      assertion.
 - [ ] [P3-T7] Create the fixture groups these five tests drive under
       `tests/fixtures/cleanup_worktrees/preserve/`: `bad-schema/`, `bad-tool/`, `no-jq/`,
       `scan-malformed/`, and `field-matrix/` with one sub-scenario per D4 field. `no-jq/` contains no
-      executable named `jq` and is used as the `PATH` value for that test. Acceptance: each named
-      directory exists and carries its fixture manifest and canned `jq` stub output.
+      executable named `jq` and is used as the `PATH` value for that test. Acceptance: each of
+      `bad-schema/`, `bad-tool/`, `scan-malformed/`, and `field-matrix/` exists and carries its
+      fixture manifest and canned `jq` stub output. `no-jq/` exists and carries a single `.gitkeep`
+      file and no executable named `jq`; the placeholder file is required because git does not track
+      an empty directory and the fixture must survive a fresh checkout.
 - [ ] [P3-T8] Gate the source-guard test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f defines tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f defines tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac01-source-guard.<timestamp>.md` records the four required fields.
       Satisfies **AC-01**.
 - [ ] [P3-T9] Gate the unresolvable-`jq` test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f unresolvable tests/shell/test_cleanup_worktrees_preserve.bats'"`.
-      Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
-      `evidence/qa-gates/gate-ac05-jq-127.<timestamp>.md` records the four required fields.
-      Satisfies **AC-05**.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f unresolvable tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      The test this gate runs drives `preserve_resolve_jq`, which `[P3-T2]` creates in this phase,
+      and asserts both that the status is 127 and that stderr carries the single-line token
+      `no jq binary resolved`. Acceptance: exit code 0, the TAP plan line printed is `1..1`, no
+      `not ok` line appears, and `evidence/qa-gates/gate-ac05-jq-127.<timestamp>.md` records the four
+      required fields with an `Output Summary:` recording that the test asserted both the 127 status
+      and the presence of that diagnostic token on stderr. Satisfies **AC-05**.
 - [ ] [P3-T10] Gate the manifest-rejection test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f schema_version tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f schema_version tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac06-manifest-rejected.<timestamp>.md` records the four required
       fields. Satisfies **AC-06**.
 - [ ] [P3-T11] Gate the malformed-scan test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f malformed tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f malformed tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac26-scan-malformed.<timestamp>.md` records the four required fields.
       Satisfies **AC-26**.
 - [ ] [P3-T12] Gate the field-matrix test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f vocabulary tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f vocabulary tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac28-field-matrix.<timestamp>.md` records the four required fields.
       Satisfies **AC-28**.
@@ -470,10 +586,11 @@ blanket waiver.
       `PRESERVE|` records plus the `ACTION|preserve-stage|...` result records on an internal plan
       stream. Records are processed in `LC_ALL=C` order of the pair (`worktree_path`,
       `source_path`), not manifest array order. Acceptance: the function name `preserve_plan`
-      appears in the file, its body sorts under `LC_ALL=C` before iterating, and every git
-      invocation in `scripts/bash/cleanup_worktrees_preserve_lib.sh` goes through `cleanup_wt_git`;
-      the literal token `cleanup_wt_git` appears on each, and no bare `git ` invocation appears in
-      the file.
+      appears in the file, its body sorts under `LC_ALL=C` before iterating, and every line in
+      `scripts/bash/cleanup_worktrees_preserve_lib.sh` that contains the token `git ` also contains
+      the token `cleanup_wt_git`, so no git invocation bypasses the seam. The condition is stated
+      positively rather than as an absence of a bare `git ` because the token `cleanup_wt_git `
+      itself contains the substring `git `, which makes a bare-token absence search unable to fail.
 - [ ] [P4-T2] Emit `ACTION|preserve-stage|<target-path>|MISSING-SOURCE` from `preserve_plan` when the
       named source file does not exist in the named worktree: skip and report, contributing to exit
       1, never a hard stop. The source file is read with plain file I/O and never through git,
@@ -483,8 +600,18 @@ blanket waiver.
       `cleanup_wt_git -C <consolidation-worktree> check-ignore -q` reports the destination is
       ignored: do not copy, do not stage, contribute
       to exit 1. **No force flag is passed to the `cleanup_wt_git ... add` call under any
-      condition.** Acceptance: the result token `IGNORED-TARGET` appears in the file and neither
-      `-f` nor `--force` appears on any git invocation in the file.
+      condition.** Acceptance: the result token `IGNORED-TARGET` appears in the file, and no line in
+      `scripts/bash/cleanup_worktrees_preserve_lib.sh` containing the token `cleanup_wt_git` also
+      contains the token `--force` or the standalone word-bounded token `-f` as a git operand. The
+      gate is
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -n -F -- cleanup_wt_git <WSLROOT>/scripts/bash/cleanup_worktrees_preserve_lib.sh'"`
+      with each matched line inspected; the matched-line listing is recorded in `Output Summary:`.
+      A file-scoped search for `-f` alone is deliberately not used, because `[P4-T1]` and `[P4-T2]`
+      require existence checks ordinarily written with a `-f` file test, so such a search always
+      matches and could not fail. Record
+      `evidence/qa-gates/gate-no-force-flag.<timestamp>.md` with `Timestamp:`, `Command:`,
+      `EXIT_CODE:`, and an `Output Summary:` carrying every matched line verbatim with its line
+      number and the verdict for each.
 - [ ] [P4-T4] Add `preserve_commit_plan` to `scripts/bash/cleanup_worktrees_preserve_lib.sh` as the
       only writing function. It consumes the plan stream and performs exactly four kinds of
       operation: `mkdir -p` of the destination directory, a verbatim byte copy of the source to
@@ -524,7 +651,7 @@ blanket waiver.
       `artifacts/orchestration/cleanup-worktrees-manifest.json`, and the single-line token
       `CLEANUP_WT_JQ_BIN`, with no default. The record-shape list at lines 42-45 gains
       `PRESERVE|<worktree-path>|<source-path>|<verdict>`. Acceptance:
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- CLEANUP_WT_MANIFEST_PATH /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/scripts/bash/cleanup-worktrees.sh'"`
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- CLEANUP_WT_MANIFEST_PATH <WSLROOT>/scripts/bash/cleanup-worktrees.sh'"`
       prints a value of at least 1 and exits 0, and
       `evidence/qa-gates/gate-ac04-usage-manifest-override.<timestamp>.md` records `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and an `Output Summary:` carrying the printed count. The literal
@@ -571,25 +698,25 @@ blanket waiver.
       temporary file. Acceptance: the suite contains no `mktemp` call and no `BATS_TEST_TMPDIR`
       reference, and the `/dev` seam is used by at least one test.
 - [ ] [P4-T12] Gate the untracked-staging test that Phase 2 recorded failing. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f untracked tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f untracked tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac08-untracked-staged.<timestamp>.md` records the four required fields.
       Satisfies **AC-08**.
 - [ ] [P4-T13] Gate the dispatch and usage tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f dispatches tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f unknown tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f CLEANUP_WT_MANIFEST_PATH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f dispatches tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f unknown tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f CLEANUP_WT_MANIFEST_PATH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the three runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and `evidence/qa-gates/gate-ac02-ac03-ac04-dispatch.<timestamp>.md`
       records the four required fields with all three plan lines in `Output Summary:`. Satisfies
       **AC-02**, **AC-03**, and **AC-04**.
 - [ ] [P4-T14] Gate the precondition, ordering, and per-record outcome tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f MISSING-WORKTREE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f modified tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f LC_ALL tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f memory_index_line tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f MISSING-WORKTREE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f modified tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f LC_ALL tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f memory_index_line tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the four runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and
       `evidence/qa-gates/gate-ac07-ac09-ac10-ac12.<timestamp>.md` records the four required fields
       with all four plan lines in `Output Summary:`. Satisfies **AC-07**, **AC-09**, **AC-10**, and
       **AC-12**.
 - [ ] [P4-T15] Gate the missing-source, ignored-target, and exit-code tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f MISSING-SOURCE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ignored tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f distinguish tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f MISSING-SOURCE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ignored tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f distinguish tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the three runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and
       `evidence/qa-gates/gate-ac29-ac30-ac31-outcomes.<timestamp>.md` records the four required
@@ -630,25 +757,28 @@ blanket waiver.
       `a duplicate index entry is skipped and does not change the exit code`. Acceptance: all three
       test names appear in the file.
 - [ ] [P5-T6] Gate the verbatim-append test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f verbatim tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f verbatim tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac11-index-verbatim.<timestamp>.md` records the four required fields.
       Satisfies **AC-11**.
 - [ ] [P5-T7] Gate the index-creation test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f CREATED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f CREATED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac13-index-created.<timestamp>.md` records the four required fields.
       Satisfies **AC-13**.
 - [ ] [P5-T8] Gate the duplicate-index test. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f duplicate tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f duplicate tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac14-index-duplicate.<timestamp>.md` records the four required fields.
       Satisfies **AC-14**.
 - [ ] [P5-T9] Confirm the placement constraint still holds after this phase. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && wc -l scripts/bash/cleanup_worktrees_preserve_lib.sh tests/shell/test_cleanup_worktrees_preserve.bats'"`.
-      Acceptance: both printed line counts are 500 or fewer. Record
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && wc -l scripts/bash/cleanup_worktrees_preserve_lib.sh tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `wc -l` over two named files prints three lines: one count per file and a `total` line.
+      Acceptance: both printed per-file line counts are 500 or fewer. Record
       `evidence/qa-gates/gate-library-line-cap.<timestamp>.md` with `Timestamp:`, `Command:`,
-      `EXIT_CODE:`, and an `Output Summary:` carrying the printed line count, unconditionally. The
+      `EXIT_CODE:`, and an `Output Summary:` carrying all three printed lines — the count for
+      `scripts/bash/cleanup_worktrees_preserve_lib.sh`, the count for
+      `tests/shell/test_cleanup_worktrees_preserve.bats`, and the `total` line — unconditionally. The
       split-decision artifact is additional and is written only when the split is taken. If the
       library count exceeds 460, apply the pre-authorized split from `spec.md` D1 by moving
       `preserve_derive_line_ending`, `preserve_render_index_append`, and `preserve_index_has_entry`
@@ -665,7 +795,21 @@ blanket waiver.
       `[P6-T2]`, `[P6-T3]`, `[P6-T4]`, and `[P6-T5]` — targets
       `scripts/bash/cleanup_worktrees_preserve_eol_lib.sh` instead, and its acceptance searches that
       file. If the suite split is taken, `tests/shell/test_cleanup_worktrees_preserve_eol.bats` is
-      added to the file list of `[P9-T5]` and to the suite-wide acceptance of `[P4-T11]`.
+      named alongside `tests/shell/test_cleanup_worktrees_preserve.bats` in every later `bats` gate
+      command — `[P6-T8]`, `[P6-T9]`, `[P6-T10]`, `[P7-T10]`, `[P7-T11]`, `[P7-T12]` — and is added
+      to the file list of `[P9-T5]` and to the suite-wide acceptance of `[P4-T11]`.
+      `[P6-T7]` also targets `tests/shell/test_cleanup_worktrees_preserve_eol.bats` when the suite
+      split is taken, because all four tests it authors are line-ending tests and adding them to the
+      file the split just relieved would defeat the split; its acceptance then searches that file.
+      `[P7-T9]` is unaffected and continues to target
+      `tests/shell/test_cleanup_worktrees_preserve.bats`, because its tests are not line-ending
+      tests. When the library split is taken, `[P10-T7]` reads a `line-rate` for both
+      `scripts/bash/cleanup_worktrees_preserve_lib.sh` and
+      `scripts/bash/cleanup_worktrees_preserve_eol_lib.sh` and records the covered-to-valid ratio
+      across the two as the changed-code figure, and `[P3-T6]`'s test
+      `preserve library defines functions only and runs no work at source time` is extended to
+      source the second library as a second case, with `[P3-T8]` re-run and a fresh
+      `evidence/qa-gates/gate-ac01-source-guard.<timestamp>.md` written before Phase 6 continues.
 
 ### Phase 6 — Obligation (b): line-ending re-derivation, where the advisory value never wins
 
@@ -711,17 +855,17 @@ blanket waiver.
       `a stale advisory crlf value does not override an LF target` is expected to turn green in this
       phase and is gated in P6-T8. Acceptance: all four test names appear in the file.
 - [ ] [P6-T8] Gate the stale-advisory test that Phase 2 recorded failing. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac16-stale-advisory.<timestamp>.md` records the four required fields.
       Satisfies **AC-16**.
 - [ ] [P6-T9] Gate the unterminated-line and advisory-mismatch tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f unterminated tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ADVISORY-MISMATCH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f unterminated tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ADVISORY-MISMATCH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac15-ac17-eol.<timestamp>.md` records the four required
       fields with both plan lines in `Output Summary:`. Satisfies **AC-15** and **AC-17**.
 - [ ] [P6-T10] Gate the CRLF-target and mixed-endings tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f crlf[[:space:]]target tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f EOL-MIXED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f crlf[[:space:]]target tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f EOL-MIXED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac18-ac19-eol.<timestamp>.md` records the four required
       fields with both plan lines in `Output Summary:`. Satisfies **AC-18** and **AC-19**.
@@ -790,7 +934,7 @@ blanket waiver.
       `a host token match aborts the pass before any staging` is expected to turn green in this phase
       and is gated in P7-T10. Acceptance: all four test names appear in the file.
 - [ ] [P7-T10] Gate the host-token hard-stop test that Phase 2 recorded failing. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f aborts tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f aborts tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       The test itself asserts exit status 3 and that no `stub-git:` line in the output carries `add`
       as its subcommand operand. Because the stub echoes its whole argv at
       `tests/fixtures/cleanup_worktrees/stub-bin/git` line 45 and `preserve_commit_plan` always
@@ -802,17 +946,17 @@ blanket waiver.
       `evidence/qa-gates/gate-ac22-host-token-hard-stop.<timestamp>.md` records the four required
       fields. Satisfies **AC-22**.
 - [ ] [P7-T11] Gate the pattern-detection and revision-syntax tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f detected tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f revision tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f detected tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f revision tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac23-ac24-patterns.<timestamp>.md` records the four
       required fields with both plan lines in `Output Summary:`. Satisfies **AC-23** and **AC-24**.
 - [ ] [P7-T12] Gate the scan-scope and pattern-set-identifier tests. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bats -t -f reads tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f governs tests/shell/test_cleanup_worktrees_preserve.bats'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f reads tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f governs tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac25-ac27-scan-scope.<timestamp>.md` records the four
       required fields with both plan lines in `Output Summary:`. Satisfies **AC-25** and **AC-27**.
 - [ ] [P7-T13] Confirm the pattern-set identifier is present in the implementation. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- cleanup-wt-host-tokens-v1 /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/scripts/bash/cleanup_worktrees_preserve_lib.sh'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- cleanup-wt-host-tokens-v1 <WSLROOT>/scripts/bash/cleanup_worktrees_preserve_lib.sh'"`.
       The literal asserted is `cleanup-wt-host-tokens-v1`, which this work creates and which
       supersedes the example placeholder issue #635 carried. Acceptance: the printed count is at
       least 1, the command exits 0, and
@@ -834,7 +978,7 @@ blanket waiver.
       `## Report Line Contract` list carries exactly one more bullet than before and the six existing
       record shapes are byte-unchanged.
 - [ ] [P8-T2] Confirm the token is present in the skill text. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -n -F -- PRESERVE\| /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/.claude/skills/cleanup-merged-worktrees/SKILL.md && grep -n -E ^##[[:space:]] /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/.claude/skills/cleanup-merged-worktrees/SKILL.md'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -n -F -- PRESERVE\| <WSLROOT>/.claude/skills/cleanup-merged-worktrees/SKILL.md && grep -n -E ^##[[:space:]] <WSLROOT>/.claude/skills/cleanup-merged-worktrees/SKILL.md'"`.
       The literal asserted is `PRESERVE|`; the backslash in the command span escapes the pipe for
       the shell and is not part of the literal. Acceptance: exit code 0, at least one printed match
       whose line number falls between the `## Report Line Contract` heading line and the
@@ -848,15 +992,16 @@ blanket waiver.
       the mirrored hunk must be identical rather than merely equivalent. Acceptance: the mirror file
       carries the same appended bullet at the same position in its `## Report Line Contract` list.
 - [ ] [P8-T4] Verify byte identity of the pair. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && cmp .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md && md5sum .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && cmp .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md && md5sum .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md'"`.
       The two named files are the instances this condition is judged against; no other pair is
       admissible. Acceptance: exit code 0, `cmp` prints no `differ` line, the two printed md5 values
       are equal to one another, and
       `evidence/qa-gates/gate-ac34-pushdown-byte-identity.<timestamp>.md` records the four required
       fields with both md5 values in `Output Summary:`. Satisfies **AC-34**.
 - [ ] [P8-T5] Run the push-down contract suite. Run
-      `pwsh -NoProfile -Command "poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`
-      from the worktree root. Acceptance: exit code 0, the run prints a summary line containing the
+      `pwsh -NoProfile -Command "Set-Location -LiteralPath 'RESOLVED-WINDOWS-ROOT'; poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`,
+      substituting the `ResolvedWindowsRoot:` value that `[P0-T2]` recorded for the quoted
+      `RESOLVED-WINDOWS-ROOT` token before running the span. Acceptance: exit code 0, the run prints a summary line containing the
       word `passed` and no `failed` count, and
       `evidence/qa-gates/gate-ac35-pushdown-contracts.<timestamp>.md` records the four required
       fields with the summary line in `Output Summary:`. Satisfies **AC-35**.
@@ -871,9 +1016,9 @@ blanket waiver.
 
 - [ ] [P9-T1] Verify the contended library carries no diff. Run two separate Windows-side
       invocations, in this order:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`;
+      `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain -- scripts/bash/cleanup_worktrees_lib.sh`.
+      `git status --porcelain -- scripts/bash/cleanup_worktrees_lib.sh`.
       The ref `epic/cleanup-merged-worktrees-hardening-integration` exists as a local branch in this
       repository. Acceptance: both invocations exit 0, both print nothing, and
       `evidence/qa-gates/gate-ac36-lib-untouched.<timestamp>.md` records the four required fields
@@ -881,20 +1026,20 @@ blanket waiver.
       `Command:` and `EXIT_CODE:` record the `diff --stat` invocation. Satisfies **AC-36**.
 - [ ] [P9-T2] Verify the hooks tree carries no diff. Run two separate Windows-side invocations, in
       this order:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`;
+      `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain -- .claude/hooks`.
+      `git status --porcelain -- .claude/hooks`.
       Acceptance: both invocations exit 0, both print nothing, and
       `evidence/qa-gates/gate-ac37-hooks-untouched.<timestamp>.md` records the four required fields
       with both exit codes noted in `Output Summary:`. The artifact's `Command:` and `EXIT_CODE:`
       record the `diff --stat` invocation. Satisfies **AC-37**.
 - [ ] [P9-T3] Verify the 500-line cap per file. Run three separate Windows-side invocations, in this
       order:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 add -A`;
+      `git add -A`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain`;
+      `git status --porcelain`;
       then
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 diff --name-only epic/cleanup-merged-worktrees-hardening-integration`
+      `git diff --name-only epic/cleanup-merged-worktrees-hardening-integration`
       to produce the changed-file list, then run `wc -l` through the WSL leg on each non-Markdown
       entry of that list. The `git add -A` span is present because an anchored name-listing diff
       enumerates tracked changes only and would not otherwise see the files this work creates. Run
@@ -911,13 +1056,13 @@ blanket waiver.
       every measured entry reports 500 or fewer. Satisfies **AC-38**.
 - [ ] [P9-T4] Verify no coverage exclusion was added for a production path. Run, on the Windows
       side:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 diff epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/shell_qc_lib.sh scripts/bash/shell-qc.sh .github/workflows/_shell-coverage.yml`.
+      `git diff epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/shell_qc_lib.sh scripts/bash/shell-qc.sh .github/workflows/_shell-coverage.yml`.
       Acceptance: exit code 0, the diff prints no added line introducing an exclusion that matches
       any path under `scripts/`, and
       `evidence/qa-gates/gate-ac41-no-coverage-exclusion.<timestamp>.md` records the four required
       fields. Satisfies **AC-41**.
 - [ ] [P9-T5] Verify the no-temporary-file rule across the changed test surface. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -r -c -F -- mktemp /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/tests/shell/test_cleanup_worktrees_preserve.bats /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/tests/fixtures/cleanup_worktrees/preserve; grep -r -c -F -- BATS_TEST_TMPDIR /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/tests/shell/test_cleanup_worktrees_preserve.bats /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8/tests/fixtures/cleanup_worktrees/preserve'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -r -c -F -- mktemp <WSLROOT>/tests/shell/test_cleanup_worktrees_preserve.bats <WSLROOT>/tests/fixtures/cleanup_worktrees/preserve; grep -r -c -F -- BATS_TEST_TMPDIR <WSLROOT>/tests/shell/test_cleanup_worktrees_preserve.bats <WSLROOT>/tests/fixtures/cleanup_worktrees/preserve'"`.
       The two literals asserted are `mktemp` and `BATS_TEST_TMPDIR`. `grep` exits 1 when it selects
       no line, so the expected exit code of this task is 1, not 0. Acceptance: every printed count
       is `0`, and `evidence/qa-gates/gate-ac43-no-temp-files.<timestamp>.md` records the four
@@ -939,14 +1084,21 @@ The loop order is format, then check, then test, then test with coverage. **If a
 rewrites a file, restart the loop from `[P10-T1]`, not from the format stage.** `[P10-T1]` is
 re-run on every iteration because the acceptance of `[P10-T2]` and of `[P10-T5]` both cite the
 `[P10-T1]` pre-format `shfmt -d` observation as the no-rewrite evidence, and an artifact captured
-before the rewrite that triggered the restart describes a superseded tree. No stage may be recorded
-as `SKIPPED`.
+before the rewrite that triggered the restart describes a superseded tree. A format-stage rewrite
+also invalidates the `[P9-T3]` line-cap measurement, which was taken against the pre-format tree.
+When the loop restarts because the format stage rewrote a file, re-run `[P9-T3]` and write a fresh
+`evidence/qa-gates/gate-ac38-line-caps.<timestamp>.md` before `[P10-T5]` may be recorded. No stage
+may be recorded as `SKIPPED`.
 
 - [ ] [P10-T1] Capture the pre-format tree state and the pre-format drift signal. This task runs two
       separate spans. Span one, on the Windows side:
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain`.
+      `git status --porcelain -- scripts tools .claude/lib/bash`.
+      The pathspec scopes the capture to the three roots `discover_shell_scripts` walks at
+      `scripts/bash/shell_qc_lib.sh` line 85, which are the only paths the format stage can rewrite,
+      and it keeps the evidence artifact this task writes out of the listing that `[P10-T2]`
+      compares against.
       Span two, in the WSL leg:
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh check'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Record the full output of both. Acceptance:
       `evidence/qa-gates/final-qc-preformat-tree.<timestamp>.md` records `Timestamp:`, `Command:`,
       `EXIT_CODE:`, and an `Output Summary:` carrying the complete porcelain listing verbatim.
@@ -955,14 +1107,17 @@ as `SKIPPED`.
       `Command:` and `EXIT_CODE:` record the `check` span; the porcelain listing is recorded in
       `Output Summary:`. This task does not require exit 0; it is an observation.
 - [ ] [P10-T2] Run the format stage. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh format'"`,
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh format'"`,
       then immediately re-run span one of P10-T1, that is
-      `git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 status --porcelain`,
-      on the Windows side. `shfmt -w` prints nothing on a clean
+      `git status --porcelain -- scripts tools .claude/lib/bash`,
+      on the Windows side, with the same pathspec so that the two listings are comparable and
+      neither observes the evidence artifact `[P10-T1]` wrote between them. `shfmt -w` prints
+      nothing on a clean
       run and nothing on a repairing run, so the exit code and stdout do not distinguish the two.
       Acceptance: exit code 0; the P10-T1 artifact records that the pre-format `shfmt -d` stage
       printed no diff hunk, which is the discriminating proof that `shfmt -w` rewrote nothing,
-      because `git status --porcelain` prints the same `??` or ` M` line whether or not an untracked
+      because `git status --porcelain -- scripts tools .claude/lib/bash` prints the same `??` or
+      ` M` line whether or not an untracked
       or already-modified file's bytes changed; and the post-format porcelain listing is
       byte-identical to the pre-format listing, which covers tracked-and-clean files. If the
       pre-format `shfmt -d` stage printed a diff hunk, the format stage repaired pre-existing drift:
@@ -974,11 +1129,11 @@ as `SKIPPED`.
       required fields plus both porcelain listings and the exit code of each porcelain invocation.
       The artifact's `Command:` and `EXIT_CODE:` record the format invocation.
 - [ ] [P10-T3] Run the lint and format-diff stage. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh check'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Acceptance: exit code 0, the output carries no `shfmt` diff hunk and no `shellcheck` finding,
       and `evidence/qa-gates/final-qc-check.<timestamp>.md` records the four required fields.
 - [ ] [P10-T4] Run the full bats suite. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh test'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test'"`.
       This is the first task in the plan that runs the whole suite; every test the earlier phases
       authored is expected to be green by this point. Acceptance: exit code 0, the run reports zero
       failures, and `evidence/qa-gates/final-qc-test.<timestamp>.md` records the four required fields
@@ -988,9 +1143,11 @@ as `SKIPPED`.
       and P10-T4 each exited 0 within one uninterrupted loop iteration and that the format stage
       rewrote no file, citing the P10-T1 pre-format `shfmt -d` observation of no diff hunk as the
       evidence for the no-rewrite claim and the two byte-identical porcelain listings from P10-T2 as
-      the corroborating tracked-file observation. Satisfies **AC-39**.
+      the corroborating tracked-file observation. The artifact additionally carries `Timestamp:`,
+      `Command: (derivation only; no command executed)`, `EXIT_CODE: 0`, and an `Output Summary:`
+      restating the recorded values in one line. Satisfies **AC-39**.
 - [ ] [P10-T6] Run the coverage stage. Run
-      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a1dc348c3021379d8 && bash scripts/bash/shell-qc.sh test --coverage'"`.
+      `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test --coverage'"`.
       The successful run prints one headline of the shape `Bash coverage (lines): NN.N%` and no
       branch column; kcov measures line coverage only, so no bash branch-coverage gate exists and
       none is asserted. Acceptance: exit code 0, the headline is printed, its numeric value is at
@@ -1008,13 +1165,16 @@ as `SKIPPED`.
       the new library's own line rate as the ratio of its covered to its valid line elements read
       from the same cov.xml, state that derivation in the artifact, and if neither is available
       record `not available` with the reason. The baseline value, the post-change value, and the
-      signed delta remain mandatory and no substitution is permitted for them. If the post-change
-      value is below the baseline value, the verdict is remediation-required and this task stays
-      unchecked until a further test-adding pass restores it.
+      signed delta remain mandatory and no substitution is permitted for them. The artifact
+      additionally carries `Timestamp:`, `Command: (derivation only; no command executed)`,
+      `EXIT_CODE: 0`, and an `Output Summary:` restating the recorded values in one line. If the
+      post-change value is below the baseline value, the verdict is remediation-required and this
+      task stays unchecked until a further test-adding pass restores it.
 - [ ] [P10-T8] Re-run the push-down contract suite as the last gate, because Phase 8 edited a
       `.claude/**` file and later phases may have touched the bundle. Run
-      `pwsh -NoProfile -Command "poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`
-      from the worktree root. Acceptance: exit code 0, the summary line contains the word `passed`
+      `pwsh -NoProfile -Command "Set-Location -LiteralPath 'RESOLVED-WINDOWS-ROOT'; poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`,
+      substituting the `ResolvedWindowsRoot:` value that `[P0-T2]` recorded for the quoted
+      `RESOLVED-WINDOWS-ROOT` token before running the span. Acceptance: exit code 0, the summary line contains the word `passed`
       and no `failed` count, and `evidence/qa-gates/final-qc-pushdown.<timestamp>.md` records the
       four required fields.
 - [ ] [P10-T9] Reconcile the checklist. Verify that every `AC-nn` checkbox in
@@ -1029,6 +1189,9 @@ as `SKIPPED`.
       artifacts are all present and complete is checked off in `spec.md`, and that no criterion is
       checked off without them. Any identifier missing any of its artifacts is recorded as INCOMPLETE
       and blocks the verdict.
+      The artifact additionally carries `Timestamp:`, `Command: (derivation only; no command executed)`,
+      `EXIT_CODE: 0`, `ExpectedExitCode: 0`, and an `Output Summary:` recording the count of complete
+      identifiers, the count of INCOMPLETE identifiers, and the identifiers in the second group.
 
 ## Known deviations from the delegation brief, recorded rather than silently resolved
 
@@ -1041,3 +1204,12 @@ as `SKIPPED`.
   artifact under assertion is not executable: AC-21 asserts a `.gitattributes` line and AC-33
   asserts skill prose. Both are asserted with `grep -F` against a single-line token quoted verbatim
   in this plan's prose.
+- `spec.md` AC-22 specifies the assertion "the output carries no `stub-git: add` line". That literal
+  never appears in the stub's output whether or not the add ran, because the stub echoes its full
+  argv at `tests/fixtures/cleanup_worktrees/stub-bin/git` line 45 and strips `-C` and its path
+  operand only afterwards at line 79. `[P7-T10]` substitutes the extended regular expression
+  `stub-git: .*[[:space:]]add[[:space:]]`, which observes the same fact and can fail.
+- `spec.md` AC-30 specifies the assertion "contains no `--force`". No staging call is made on the
+  refusal path, so that search holds whatever the implementation does. `[P4-T10]` substitutes the
+  same `add`-operand regex, and the prohibition on `-f` and `--force` is asserted at source level by
+  `[P4-T3]`.
