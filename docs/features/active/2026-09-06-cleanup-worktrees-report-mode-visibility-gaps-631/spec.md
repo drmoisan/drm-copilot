@@ -412,7 +412,7 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
       corresponding configured remote (verified against a fixture using a name other than the
       literal `child`, to confirm the detection is general rather than hardcoded), and is absent
       when the remote exists, verified by a positive/negative bats pair.
-- [x] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
+- [ ] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
       `BRANCH|<branch>|NOT_MERGED` line when the branch is a git ancestor of another branch that
       resolves to exactly `NOT_MERGED`, and is absent (with the branch running the full ladder
       normally) when the ancestor resolves to `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`,
@@ -421,12 +421,12 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
 - [x] `WARN|registration-lost|<path>` is emitted for a worktree directory whose `.git` file
       points at a missing `.git/worktrees/<name>` entry, and is absent when the pointer resolves,
       verified by a positive/negative bats pair.
-- [x] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
+- [ ] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
       properties: (a) the report-mode `BRANCH|<branch>|NOT_MERGED` line's value is unchanged
       whether or not the short-circuit fires, and (b) the apply-mode allowlist decision for a
       `CHILD_OF`-short-circuited branch is unchanged (no deletion `ACTION` emitted for a
       `NOT_MERGED` branch, short-circuited or not).
-- [x] The `for-each-ref` stub key-specificity edit in
+- [ ] The `for-each-ref` stub key-specificity edit in
       `tests/fixtures/cleanup_worktrees/stub-bin/git` is backward compatible: the full existing
       bats suite passes unchanged immediately after that edit, before any new scenario fixtures
       are authored on top of it.
