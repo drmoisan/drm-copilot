@@ -411,11 +411,7 @@ export class OrchestrationHandoffMaterializer {
         throw new Error("Candidate validation failed.");
       }
     } catch {
-      try {
-        this.dependencies.fileSystem.removeFile(preparation.candidatePath);
-      } catch {
-        // The blocked result names the retained candidate for explicit cleanup.
-      }
+      this.discardCandidate(preparation.candidatePath);
       return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
         handoffId: preparation.result.handoffId,
         handoffHistorySha256: preparation.result.handoffHistorySha256,
@@ -428,12 +424,21 @@ export class OrchestrationHandoffMaterializer {
         preparation.destinationPath,
       );
     } catch {
+      this.discardCandidate(preparation.candidatePath);
       return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
         handoffId: preparation.result.handoffId,
         handoffHistorySha256: preparation.result.handoffHistorySha256,
-        affectedPaths: [preparation.destinationPath],
+        affectedPaths: [preparation.candidatePath],
       });
     }
     return { ...preparation.result, status: "materialized" };
+  }
+
+  private discardCandidate(candidatePath: string): void {
+    try {
+      this.dependencies.fileSystem.removeFile(candidatePath);
+    } catch {
+      // The blocked result names the retained candidate for explicit cleanup.
+    }
   }
 }

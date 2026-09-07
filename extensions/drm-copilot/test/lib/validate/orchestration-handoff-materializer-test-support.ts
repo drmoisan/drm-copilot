@@ -6,7 +6,10 @@ import type {
   HandoffFailureCode,
 } from "../../../src/lib/validate/orchestration-handoff-contract";
 import type { TransitionPreparedOrchestrationRequest } from "../../../src/mcp-repo-automation-tool-definitions-handoff";
-import type { HandoffMaterializerDependencies } from "../../../src/lib/validate/orchestration-handoff-materializer";
+import {
+  OrchestrationHandoffMaterializer,
+  type HandoffMaterializerDependencies,
+} from "../../../src/lib/validate/orchestration-handoff-materializer";
 
 /**
  * Caller-controlled independent expected context required by every portable
@@ -107,11 +110,14 @@ export function createEnvelope(sourceSha256: string): HandoffEnvelope {
 }
 
 export interface ScenarioOptions {
+  readonly candidateProjectionErrors?: readonly string[];
   readonly envelopeBytes?: Uint8Array;
+  readonly failReadFor?: (filePath: string) => boolean;
   readonly gitFailure?: boolean;
   readonly porcelainStatus?: string;
   readonly projectionErrors?: readonly string[];
   readonly readFailure?: boolean;
+  readonly removeFailure?: boolean;
   readonly replaceFailure?: boolean;
   readonly request?: Partial<TransitionPreparedOrchestrationRequest>;
   readonly routingFailure?: HandoffFailureCode;
@@ -120,6 +126,20 @@ export interface ScenarioOptions {
   readonly transformEnvelope?: (envelope: HandoffEnvelope) => HandoffEnvelope;
   readonly validationFailure?: HandoffFailureCode;
   readonly writeFailureAt?: "archive" | "candidate";
+}
+
+export function archivePathFor(sourceSha256: string): string {
+  return (
+    `C:/workspace/artifacts/orchestration/handoffs/sources/sha256/` +
+    `${sourceSha256}.json`
+  );
+}
+
+export function candidatePathFor(envelopeSha256: string): string {
+  return (
+    `C:/workspace/artifacts/orchestration/orchestrator-state` +
+    `.handoff-candidate-${envelopeSha256}.json`
+  );
 }
 
 export function createScenario(options: ScenarioOptions = {}) {
@@ -150,6 +170,9 @@ export function createScenario(options: ScenarioOptions = {}) {
     resolution: failure === undefined ? {} : null,
   });
   const readFile = jest.fn((filePath: string) => {
+    if (options.failReadFor?.(filePath) === true) {
+      throw new Error(`read failed: ${filePath}`);
+    }
     if (options.readFailure === true) throw new Error("read failed");
     const content = files.get(filePath);
     if (content === undefined) throw new Error(`missing: ${filePath}`);
@@ -185,13 +208,18 @@ export function createScenario(options: ScenarioOptions = {}) {
       files.delete(candidatePath);
     },
   );
+  const removeFile = jest.fn((filePath: string) => {
+    if (options.removeFailure === true) throw new Error("remove failed");
+    files.delete(filePath);
+  });
+  let projectionValidationCalls = 0;
   const dependencies: HandoffMaterializerDependencies = {
     fileSystem: {
       readFile,
       createDirectory: jest.fn(),
       writeFile,
       replaceFile,
-      removeFile: jest.fn(),
+      removeFile,
     },
     git: {
       readPorcelainStatus: jest.fn(async () => {
@@ -216,9 +244,16 @@ export function createScenario(options: ScenarioOptions = {}) {
             ? ["missing"]
             : [],
       })),
-      validateDestinationProjection: jest.fn(
-        () => options.projectionErrors ?? [],
-      ),
+      validateDestinationProjection: jest.fn((): readonly string[] => {
+        projectionValidationCalls += 1;
+        if (
+          options.candidateProjectionErrors !== undefined &&
+          projectionValidationCalls >= 2
+        ) {
+          return options.candidateProjectionErrors;
+        }
+        return options.projectionErrors ?? [];
+      }),
     },
     clock: { nowIso8601: jest.fn(() => "2026-08-31T08:00:00Z") },
   };
@@ -239,6 +274,7 @@ export function createScenario(options: ScenarioOptions = {}) {
     envelopeSha256,
     files,
     readFile,
+    removeFile,
     request,
     replaceFile,
     sourceBytes,
@@ -246,4 +282,19 @@ export function createScenario(options: ScenarioOptions = {}) {
     sourceSha256,
     writeFile,
   };
+}
+
+export async function materializedProjectionBytes(): Promise<Uint8Array> {
+  const scenario = createScenario({ request: { mode: "materialize" } });
+  const materializer = new OrchestrationHandoffMaterializer(
+    scenario.dependencies,
+  );
+  await materializer.transition(scenario.request);
+  const candidateWrite = scenario.writeFile.mock.calls[1];
+  if (candidateWrite === undefined) {
+    throw new Error(
+      "Expected a candidate write while building projection bytes.",
+    );
+  }
+  return candidateWrite[1];
 }

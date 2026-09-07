@@ -19,6 +19,7 @@ from scripts.dev_tools.orchestration_handoff_adapters import (
     record_first_destination_delegation,
 )
 from scripts.dev_tools.orchestration_handoff_contract import (
+    HandoffContractError,
     HandoffEnvelope,
     Provider,
     SchedulerContext,
@@ -54,6 +55,50 @@ SCHEDULED_CASES: tuple[tuple[SchedulerKind, str | int, tuple[str, ...]], ...] = 
     ("parallel", "cohort-1", PARALLEL_SCHEDULER_AUTHORITIES),
     ("epic", 1, EPIC_SCHEDULER_AUTHORITIES),
 )
+
+
+PROJECTION_REJECTION_FIELDS = (
+    "plan",
+    "lifecycle",
+    "scheduler_context",
+    "envelope_sha256",
+    "history_entry_sha256",
+)
+
+
+def _diverged_facts(
+    envelope: HandoffEnvelope,
+    field: str,
+) -> PortableProjectionFacts:
+    """Return projection facts whose single named field diverges from the envelope."""
+
+    divergent: dict[str, Any] = {
+        "plan": replace(envelope.plan, sha256="e" * 64),
+        "lifecycle": replace(
+            envelope.lifecycle,
+            route_intent="prepared_child_to_ordinary_execution",
+        ),
+        "scheduler_context": _scheduled_envelope(
+            "claude", "codex", "claude-to-codex-v1", "parallel", "cohort-1"
+        ).scheduler_context,
+        "envelope_sha256": "not-a-sha256-digest",
+        "history_entry_sha256": "f" * 64,
+    }
+    return replace(_projection_facts(envelope), **{field: divergent[field]})
+
+
+@pytest.mark.parametrize("field", PROJECTION_REJECTION_FIELDS)
+def test_projection_facts_diverging_from_the_envelope_are_rejected(
+    field: str,
+) -> None:
+    """Each projection-integrity guard raises with its documented field name."""
+
+    envelope = _ordinary_envelope("claude", "codex", "claude-to-codex-v1")
+
+    with pytest.raises(HandoffContractError) as raised:
+        ClaudeToCodexAdapter().project(envelope, _diverged_facts(envelope, field))
+
+    assert raised.value.field == f"projection.{field}"
 
 
 def _ordinary_envelope(

@@ -4,7 +4,11 @@ import type { HandoffFailureCode } from "../../../src/lib/validate/orchestration
 import { OrchestrationHandoffMaterializer } from "../../../src/lib/validate/orchestration-handoff-materializer";
 import {
   INDEPENDENT_CONTEXT,
+  archivePathFor,
+  candidatePathFor,
   createScenario,
+  encoder,
+  materializedProjectionBytes,
   sha256,
   type ScenarioOptions,
 } from "./orchestration-handoff-materializer-test-support";
@@ -257,6 +261,164 @@ describe("orchestration handoff materializer", () => {
     ).toBe(result.destinationCheckpointSha256);
     expect(scenario.writeFile).toHaveBeenCalledTimes(2);
     expect(scenario.replaceFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks when a pre-existing archive cannot be re-read", async () => {
+    // Arrange
+    const scenario = createScenario({
+      failReadFor: (filePath) => filePath.includes("/sources/sha256/"),
+      request: { mode: "materialize" },
+    });
+    const archivePath = archivePathFor(scenario.sourceSha256);
+    scenario.files.set(archivePath, scenario.sourceBytes);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([archivePath]);
+    expect(scenario.files.get(scenario.sourcePath)).toEqual(
+      scenario.sourceBytes,
+    );
+  });
+
+  it("blocks a pre-existing candidate whose digest differs from the projection", async () => {
+    // Arrange
+    const scenario = createScenario({ request: { mode: "materialize" } });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    scenario.files.set(candidatePath, encoder.encode("unrelated candidate"));
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([candidatePath]);
+    expect(scenario.files.get(scenario.sourcePath)).toEqual(
+      scenario.sourceBytes,
+    );
+  });
+
+  it("materializes when a pre-existing candidate already holds the projection bytes", async () => {
+    // Arrange
+    const projectionBytes = await materializedProjectionBytes();
+    const scenario = createScenario({ request: { mode: "materialize" } });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    scenario.files.set(candidatePath, projectionBytes);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("materialized");
+    expect(result.primaryFailureCode).toBeNull();
+    expect(scenario.replaceFile).toHaveBeenCalledTimes(1);
+    expect(
+      sha256(scenario.files.get(scenario.sourcePath) ?? new Uint8Array()),
+    ).toBe(result.destinationCheckpointSha256);
+  });
+
+  it("discards the candidate and blocks when re-validation rejects it", async () => {
+    // Arrange
+    const scenario = createScenario({
+      candidateProjectionErrors: ["candidate rejected"],
+      request: { mode: "materialize" },
+    });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([candidatePath]);
+    expect(scenario.removeFile).toHaveBeenCalledWith(candidatePath);
+    expect(scenario.files.has(candidatePath)).toBe(false);
+  });
+
+  it("discards the candidate and blocks when the candidate cannot be re-read", async () => {
+    // Arrange
+    const scenario = createScenario({
+      failReadFor: (filePath) => filePath.includes("handoff-candidate-"),
+      request: { mode: "materialize" },
+    });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([candidatePath]);
+    expect(scenario.removeFile).toHaveBeenCalledWith(candidatePath);
+    expect(scenario.files.has(candidatePath)).toBe(false);
+  });
+
+  it("blocks with the retained candidate when candidate removal also fails", async () => {
+    // Arrange
+    const scenario = createScenario({
+      candidateProjectionErrors: ["candidate rejected"],
+      removeFailure: true,
+      request: { mode: "materialize" },
+    });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([candidatePath]);
+    expect(scenario.removeFile).toHaveBeenCalledWith(candidatePath);
+    expect(scenario.files.has(candidatePath)).toBe(true);
+  });
+
+  it("discards the candidate and names it when the atomic replace fails", async () => {
+    // Arrange
+    const scenario = createScenario({
+      replaceFailure: true,
+      request: { mode: "materialize" },
+    });
+    const candidatePath = candidatePathFor(scenario.envelopeSha256);
+    const materializer = new OrchestrationHandoffMaterializer(
+      scenario.dependencies,
+    );
+
+    // Act
+    const result = await materializer.transition(scenario.request);
+
+    // Assert
+    expect(result.primaryFailureCode).toBe("HANDOFF_VALIDATOR_UNAVAILABLE");
+    expect(result.affectedPaths).toEqual([candidatePath]);
+    expect(scenario.removeFile).toHaveBeenCalledTimes(1);
+    expect(scenario.removeFile).toHaveBeenCalledWith(candidatePath);
+    expect(scenario.files.get(scenario.sourcePath)).toEqual(
+      scenario.sourceBytes,
+    );
   });
 });
 

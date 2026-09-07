@@ -11,6 +11,7 @@ import pytest
 
 import scripts.dev_tools.validate_orchestrator_state as state_validator
 from scripts.dev_tools.orchestration_handoff_contract import (
+    FAILURE_PRECEDENCE,
     HandoffContractError,
     HandoffEnvelope,
     validate_history_chain,
@@ -26,6 +27,7 @@ REGISTRY = json.loads(
     (ROOT / "config" / "orchestration-handoff-registry.json").read_text()
 )
 SUPPORTED_CAPABILITIES = tuple(REGISTRY["capabilities"]["supported"])
+REGISTRY_FAILURE_PRECEDENCE = tuple(REGISTRY["failure_precedence"])
 POSITIVE_FIXTURES = (
     "valid-ordinary-claude-to-codex.json",
     "valid-parallel-codex-to-claude.json",
@@ -98,3 +100,9 @@ def test_shared_negative_fixture_has_expected_failure(
     case: dict[str, object],
 ) -> None:
     assert _failure_for(case) == case["expected"]
+
+
+def test_failure_precedence_matches_the_shared_registry() -> None:
+    """The Python precedence tuple stays bound to the registry ordering."""
+
+    assert FAILURE_PRECEDENCE == REGISTRY_FAILURE_PRECEDENCE
