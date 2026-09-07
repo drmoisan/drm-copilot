@@ -2,12 +2,13 @@
 epic: cleanup-merged-worktrees-hardening
 integration_branch: epic/cleanup-merged-worktrees-hardening-integration
 created_at: 2026-09-06T21:55:00Z
-# AUTHORING-TIME MANIFEST. issue_num values in the 900 range are placeholders for children whose
-# promotion has not yet run; they are back-filled with the real GitHub issue numbers returned by
-# each child's promotion receipt before the kickoff artifact is written. Children A (630), E (545),
-# and I (591) carry real issue numbers because all three were promoted before this epic was
-# planned. feature_folder values for placeholder children are planned basename hints and are
-# replaced with the concrete active-folder basenames at fan-in. depends_on uses issue_num values.
+# LIVE MANIFEST. issue_num values in the 900 range are placeholders for children whose promotion
+# has not yet completed (904 for child F, 907 for child J); each is back-filled with the real
+# GitHub issue number from its promotion receipt, together with its concrete active-folder
+# basename, before the kickoff artifact is written. Every other entry carries a real issue number
+# and a resolved feature_folder. Children A (630), E (545), and I (591) were promoted before this
+# epic was planned; 631, 632, 633, 634, and 635 were promoted during it. depends_on uses issue_num
+# values throughout.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A `/cleanup-merged-worktrees` run on a large checkout can be carried from report through apply, consolidation, and merge without hand-written scripts, manual consolidation commits, or hook workarounds. The 2026-09-06 TaskMaster run classified 45 branches and removed 7 worktrees correctly but left 30 detached worktrees invisible to apply mode, 14 dirty worktrees blocked with no verdict, and roughly 140 untracked lesson files to be consolidated by hand; every remaining manual step in that run is attributable to one of the nine gaps this epic closes.
@@ -43,12 +44,15 @@ features:
   - issue_num: 591
     feature_folder: 2026-08-29-epic-merge-gate-parses-pr-number-from-whole-command-line
     depends_on: [545]
-  - issue_num: 903
-    feature_folder: cleanup-worktrees-sanctioned-removal-manifest
-    depends_on: [545]
+  - issue_num: 635
+    feature_folder: 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635
+    depends_on: []
   - issue_num: 904
     feature_folder: cleanup-worktrees-preserve-file-consolidation
-    depends_on: [903]
+    depends_on: [635]
+  - issue_num: 907
+    feature_folder: removal-gate-trigger-matches-whole-command-text
+    depends_on: [545, 635]
 ---
 
 # Epic: cleanup-merged-worktrees Hardening
@@ -98,16 +102,17 @@ that does not yet accept the manifest.
 | id | issue_num | gaps | surface | wave |
 | --- | --- | --- | --- | --- |
 | A | 630 | 1, 6 | bash (apply-mode safety) | 0 |
-| B | 901 | 7, 9c, 9d | bash (report-mode records) | 0 |
-| C | 902 | 2 | bash (dirt classifier, `--clear-disposable`) | 0 |
+| B | 631 | 7, 9c, 9d | bash (report-mode records) | 1 |
+| C | 632 | 2 | bash (dirt classifier, `--clear-disposable`) | 2 |
 | E | 545 | 8 (preimplementation-gate half) | PowerShell (shared command scanner) | 0 |
 | H | 633 | 9b | TypeScript (`collect_pr_context`) | 0 |
 | G | 634 | 4 | skill text (consolidation merge is human-performed) | 0 |
 | I | 591 | 8 (merge-gate half) | PowerShell hook (merge gate) | 1 |
-| D | 903 | 3, 9a | PowerShell hooks + skill text (removal manifest) | 1 |
-| F | 904 | 5 | bash + skill text (`PRESERVE` consolidation) | 2 |
+| J | 907 | 8 (removal-gate half) | PowerShell hooks (removal gates) | 1 |
+| D | 635 | 3, 9a | PowerShell hooks + skill text (removal manifest) | 0 |
+| F | 904 | 5 | bash + skill text (`PRESERVE` consolidation) | 1 |
 
-### Gap 8 is two children, not one — a corrected decomposition
+### Gap 8 is three children, not one — a corrected decomposition
 
 The first authoring of this manifest assigned gap 8 entirely to issue #545 and asserted that the
 merge-gate instance sat in an unpromoted potential entry. Child G's preparation established that
@@ -132,8 +137,22 @@ one child:
 - **Child I (#591)** is the merge-gate half of #545's own follow-up AC. It consumes the helper and
   fixes both defects in `Get-EpicMergeGateCommandPrNumber`: the trigger over-match that gap 8
   observed, and the whole-line PR-number extraction that #591 records.
-- **Child D (#903)** is the removal-gate half. It consumes the same helper for the trigger fix in
-  both removal gates, alongside the cleanup-manifest acceptance policy that gap 3 requires.
+- **Child J (#907)** is the removal-gate half. It consumes the same helper and replaces substring
+  trigger evaluation in `enforce-epic-worktree-removal-gate.ps1` and
+  `enforce-parallel-worktree-removal-gate.ps1`.
+
+Child J was added on 2026-09-07, after child D's preparation showed that nobody owned the
+removal-gate trigger. The first correction assigned that half to child D on the reasoning that D
+edits those two files anyway. D's approved `spec.md` shows why that does not work: its
+manifest-acceptance branch deliberately sits **below** the detection call site and it records the
+trigger guards as preserved untouched. Acceptance policy and trigger detection are separable
+concerns in the same file, and D scoped itself to the first. Splitting them across two children
+keeps each change reviewable and matches the boundary D itself drew.
+
+The removal-gate instance is not hypothetical. During its own preparation, child D's first commit
+attempt was denied with `EPIC_WORKTREE_REMOVAL_BLOCKED` because the hook's substring matcher found
+the gated command words inside the commit-message heredoc body. That is gap 8's failure mode,
+reproduced against the exact hooks child J fixes.
 
 ### Children A, E, and I are already promoted
 
@@ -161,22 +180,28 @@ None of the three re-runs issue promotion.
 Three edges are recorded, each derived from a real upstream contract, not from stylistic ordering
 and not from a file collision that a scope boundary already prevents.
 
-- **I depends on E, and D depends on E.** Both consume the shared `hook-command-scanner.ps1`
-  helper that child E introduces: the quote- and heredoc-aware per-segment scanner whose trigger
-  evaluation replaces raw-substring matching. Child I applies it to `enforce-epic-merge-gate.ps1`
-  and child D to the two removal gates. Neither child can author its trigger fix before the helper's
-  API exists. These are contract edges, not collision edges — child E's own acceptance criteria
-  require all three of those hook files to carry no diff in its change, so there is no overlap to
-  serialize.
-- **F depends on D.** Child F consumes the cleanup manifest that child D defines: the `PRESERVE`
-  verdicts F stages are read from the manifest record shape D establishes. F cannot author its
-  staging contract before that record shape exists.
+- **I depends on E, and J depends on E.** Both consume the shared `hook-command-scanner.ps1` helper
+  that child E introduces: the quote- and heredoc-aware per-segment scanner whose trigger evaluation
+  replaces raw-substring matching. Child I applies it to `enforce-epic-merge-gate.ps1` and child J
+  to the two removal gates. Neither can author its trigger fix before the helper's API exists. These
+  are contract edges, not collision edges — child E's own acceptance criteria require all three of
+  those hook files to carry no diff in its change, so there is no overlap to serialize.
+- **F depends on D.** Child F consumes the cleanup manifest that child D defines: the
+  `preserved_files[]` records F stages are read from the manifest record shape D establishes. F
+  cannot author its staging contract before that record shape exists.
+- **J depends on D.** Both edit the two removal gates. D's acceptance branch sits below the
+  detection call site and J replaces that call site, so the concerns are separable — but they are
+  separable regions of the same two files, and D consumes part of the epic hook's 81 lines of
+  headroom. D lands first so J re-measures against the file as D leaves it.
 
-**One edge was recorded at authoring time and has been withdrawn.** Child G was given
-`depends_on: [545]` on the assumption that it would add a fourth checkpoint shape to
-`enforce-epic-merge-gate.ps1`. Its preparation chose the other option gap 4 offers — documenting
-the consolidation merge as human-performed — so it touches no hook and no file any other child
-owns. The edge's entire basis was the hook edit that no longer happens, so child G is wave 0.
+**Two edges recorded at authoring time have been withdrawn.** Child G was given `depends_on: [545]`
+on the assumption that it would add a fourth checkpoint shape to `enforce-epic-merge-gate.ps1`. Its
+preparation chose the other option gap 4 offers — documenting the consolidation merge as
+human-performed — so it touches no hook and no file any other child owns. Child D was given the same
+edge on the assumption that it would consume child E's scanner. Its preparation established that its
+acceptance logic sits below the detection call site and consumes no part of the scanner's API, and D
+reported the edge as not load-bearing. In both cases the edge's entire basis was an assumption that
+preparation falsified, so both children are wave 0.
 
 **Two edges were added after preparation, on measured file contention rather than on contract.**
 The authoring-time decision to leave A, B, and C unordered rested on the assumption that placing
@@ -213,19 +238,22 @@ preserves four-way parallelism across the bash surface.
 Computed by longest-path layering over the dependency DAG per the `epic-orchestrate` skill
 (`wave(f) = 0` when `depends_on(f)` is empty, otherwise `1 + max(wave(d))`):
 
-| wave | features |
-| --- | --- |
-| 0 | 630 (A), 545 (E), 633 (H), 634 (G) |
-| 1 | 631 (B), 591 (I), 903 (D) |
-| 2 | 632 (C), 904 (F) |
+| wave | features | width |
+| --- | --- | --- |
+| 0 | 630 (A), 545 (E), 633 (H), 634 (G), 635 (D) | 5 |
+| 1 | 631 (B), 591 (I), 904 (F), 907 (J) | 4 |
+| 2 | 632 (C) | 1 |
 
-`wave(630) = wave(545) = wave(633) = wave(634) = 0` (empty `depends_on`);
+`wave(630) = wave(545) = wave(633) = wave(634) = wave(635) = 0` (empty `depends_on`);
 `wave(631) = 1 + wave(630) = 1`; `wave(591) = 1 + wave(545) = 1`;
-`wave(903) = 1 + wave(545) = 1`; `wave(632) = 1 + wave(631) = 2`;
-`wave(904) = 1 + wave(903) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
+`wave(904) = 1 + wave(635) = 1`; `wave(907) = 1 + max(wave(545), wave(635)) = 1`;
+`wave(632) = 1 + wave(631) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
 Verified against `scripts/dev_tools/epic_wave_computation.py`, the canonical implementation of the
-longest-path layering formula. Maximum wave width is four, which matches the epic's
-`max_parallel_features` of four, so no wave is split into batches.
+longest-path layering formula.
+
+Wave 0 is five features wide against a `max_parallel_features` of four, so `epic-orchestrator`
+schedules that wave in two batches. The cap is a concurrency limit, not a wave-width constraint, and
+splitting a wave into batches is ordinary scheduling rather than a manifest defect.
 
 ## Complexity Assessment
 
@@ -242,7 +270,8 @@ orchestrator's own model-selection step, not a substitute for it.
 | H | C2 | A filtering change in one TypeScript module's changed-files overview, with a matching test. Localized, with no contract consumed outside the PR-context bundle. |
 | G | C2 | Reassessed downward from C3 after preparation. The chosen option documents the consolidation merge as human-performed, so the change is confined to skill text and adds no enforcement surface. No floor signal applies to a documentation-only change. |
 | I | C3 | The `cross_module_contract_change` floor signal applies: it changes the trigger contract of a merge gate consumed across the epic and parallel orchestration surfaces, and corrects a fail-closed parse defect that denies correct commands. |
-| D | C3 | The `cross_module_contract_change` floor signal applies: this child defines the cleanup manifest record shape that the hook, the skill text, and child F all read, and additionally applies the shared scanner to both removal gates. The hooks must keep denying unmanifested epic/parallel removals, so the change widens an enforcement allow-side without widening it further than intended. |
+| D | C3 | The `cross_module_contract_change` floor signal applies: this child defines the cleanup manifest record shape that the hooks, the skill text, and child F all read. The hooks must keep denying unmanifested epic/parallel removals, so the change widens an enforcement allow-side without widening it further than intended. |
+| J | C3 | The `cross_module_contract_change` floor signal applies: it changes the trigger contract of the two worktree-removal gates, which govern every epic and parallel run, in both the false-positive and the latent-bypass direction. |
 | F | C3 | Stages never-committed files into a commit under three simultaneous constraints — `MEMORY.md` index-line carriage, per-file line-ending normalization, and host-token refusal. The `cross_module_contract_change` signal applies through its consumption of child D's manifest record shape. |
 
 ## Open Epic-Owner Decisions
