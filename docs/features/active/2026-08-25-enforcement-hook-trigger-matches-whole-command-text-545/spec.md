@@ -1481,17 +1481,17 @@ denies against a not-ready checkpoint.
       the promotion hook's four forbidden-token literals, its two `gh` expressions, and the
       pr-author hook's `gh pr create` / `gh pr edit` expressions are likewise byte-unchanged;
       verified by diff inspection recorded in the scope-and-size evidence artifact.
-- [ ] Every row of the D3 fail-closed table has at least one named Pester case per applicable side
+- [x] Every row of the D3 fail-closed table has at least one named Pester case per applicable side
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
       double quotes).
-- [ ] **No existing denial is weakened.** Both existing decision suites pass with no assertion
+- [x] **No existing denial is weakened.** Both existing decision suites pass with no assertion
       modified except the single reversed heredoc `It` on each side; the existing Claude gate suite
       denials (lines 112–149), the Codex `Test-ImplementationCommand` classification table
       (lines 348–358, including `git commit -m "wip"` returning `$true`), the #539 D4 rows 14a–14d
       chained relocating denials, the absolute-path suites, and the existing pr-author suites all
       pass unmodified.
-- [ ] The issue #539 exemption layer is unchanged: `Test-ExemptOrchestrationStagingCommand` and
+- [x] The issue #539 exemption layer is unchanged: `Test-ExemptOrchestrationStagingCommand` and
       `enforce-orchestration-preimplementation-gate-helpers.ps1` carry no functional edit, the
       exemption remains allow-side only, and it is consulted at the same point in the decision flow
       (D2 rule R5).
@@ -1523,7 +1523,7 @@ denies against a not-ready checkpoint.
       canonical/bundle pair member byte-identical, and
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes with the Claude
       pair content-equal; both pack-manifest assertions pass.
-- [ ] Recomputed pair-hash parity evidence (SHA-256 per pair member, line counts, and the method
+- [x] Recomputed pair-hash parity evidence (SHA-256 per pair member, line counts, and the method
       used) is recorded under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/other/`,
       computed at the final commit rather than carried forward from an earlier batch.
@@ -1534,16 +1534,16 @@ denies against a not-ready checkpoint.
       `hook-command-scanner.ps1` inside the coverage denominator on both sides; coverage evidence is
       produced by invoking the self-hosted PoshQC module directly (the MCP runner reads the
       installed extension's settings and cannot see newly added coverage entries).
-- [ ] **No Python is introduced anywhere in the change**:
+- [x] **No Python is introduced anywhere in the change**:
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with
       the new helper in its scan set, and no file added or modified by this change invokes a Python
       interpreter or adds a `.py` production file.
-- [ ] Issue #539's `spec.md` is annotated **additively** at all five locations listed in D8 (D4 rule
+- [x] Issue #539's `spec.md` is annotated **additively** at all five locations listed in D8 (D4 rule
       table row 14; deny-map rows at lines 150 and 153; design decision D8; and the Rollout &
       Follow-up deferral), each note citing issue #545, with **no existing sentence, table row, or
       decision text edited in place** — verified by reviewing the diff of that file for additions
       only.
-- [ ] **All nine in-scope hooks carry a diff, and each is delivered across its full copy set** (D11).
+- [x] **All nine in-scope hooks carry a diff, and each is delivered across its full copy set** (D11).
       `enforce-orchestration-preimplementation-gate.ps1`, `enforce-promotion-mcp-only.ps1`,
       `enforce-epic-merge-gate.ps1`, `enforce-epic-worktree-removal-gate.ps1`, and
       `validate-bash.ps1` are changed in all four locations each;
@@ -1559,7 +1559,7 @@ denies against a not-ready checkpoint.
       files: `mcp__drm-copilot__run_poshqc_format` → `mcp__drm-copilot__run_poshqc_analyze` →
       `mcp__drm-copilot__run_poshqc_test`, restarting from format on any failure or auto-fix, with
       final results recorded under `…-545/evidence/qa-gates/`.
-- [ ] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
+- [x] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
       `git -C <dir> add .` denies against a not-ready checkpoint, with results recorded under
       `…-545/evidence/qa-gates/`.
 - [x] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
@@ -1601,7 +1601,7 @@ denies against a not-ready checkpoint.
       `--force` today. The existing flag-after-path case at
       `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1` line 78 passes
       unmodified.
-- [ ] **`validate-bash.ps1` matching-primitive change is delivered and pinned (D11.3).** Named
+- [x] **`validate-bash.ps1` matching-primitive change is delivered and pinned (D11.3).** Named
       Pester cases assert AT-8 (`git push --force-with-lease origin HEAD` allows), AT-9
       (`git -C ../wt push --force origin HEAD` denies), and AT-10 (a `git commit` whose quoted
       message mentions the recursive-remove literal allows). All six denylist literals returned by
@@ -1636,12 +1636,12 @@ denies against a not-ready checkpoint.
       The three constant accessors `Get-CommandLineWrapperName`,
       `Get-CommandLineTransparentWrapperName`, and `Get-CommandLineGlobalOption` exist and are
       pinned by membership cases.
-- [ ] **`Test-CommandLineFlag` exists and is exercised by all three presence-only call sites.** Named
+- [x] **`Test-CommandLineFlag` exists and is exercised by all three presence-only call sites.** Named
       Pester cases assert that it distinguishes an absent flag from a valueless present flag, and
       that `--body` does not match `--body-file`. A criterion asserting only
       `Get-CommandLineFlagValue` would leave the `--merge`, `--body`, and `--force` call sites
       unserved.
-- [ ] **The two deferred follow-ups from D11.6 are filed as separate potential entries, not folded
+- [x] **The two deferred follow-ups from D11.6 are filed as separate potential entries, not folded
       in**: the `$script:SharedModuleNames` registration gap for
       `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1`, and runtime
       confirmation of the equals-joined disposition bypass in `enforce-parallel-abandon-gate.ps1`.
