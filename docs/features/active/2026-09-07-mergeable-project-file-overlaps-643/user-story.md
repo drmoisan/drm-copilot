@@ -51,7 +51,7 @@ Removing both signals never weakens the relation below the path level: two items
 
 - [ ] For a set of items whose only shared paths are project files matching the published `mergeable_paths` list, the operator observes an empty conflict-edge list in the run's projection.
 - [ ] Those items are placed in a single cohort and are launched together, rather than being serialized across cohorts.
-- [ ] Each item's declared blast radius still lists the project file it touches, so the operator can see the write and drift detection still reports an undeclared write.
+- [x] Each item's declared blast radius still lists the project file it touches, so the operator can see the write and drift detection still reports an undeclared write.
 - [ ] Two items in the same assembly, touching different files, produce no `module_overlap` edge; the destination module map the operator receives from push-down names no per-assembly module.
 - [ ] The operator receives the behavior through a normal push-down: no manual edit to the consumer repository's `config/blast-radius.json` or cohort-barrier hook is required, and the behavior survives the next push-down.
 - [ ] When a pull request cannot merge because of a conflict confined to project files, the orchestrator resolves it without re-delegating the item, and every entry present on either side is present in the merged file.

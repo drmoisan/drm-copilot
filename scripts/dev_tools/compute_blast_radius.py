@@ -46,6 +46,7 @@ from scripts.dev_tools._blast_radius_extraction import (
     normalize_lines,
 )
 from scripts.dev_tools._blast_radius_glob import concrete_entries
+from scripts.dev_tools._blast_radius_mergeable import config_mergeable_paths
 from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
@@ -66,6 +67,7 @@ __all__ = [
     "ConflictReason",
     "ConflictResult",
     "RadiusFinding",
+    "config_mergeable_paths",
     "conflicts",
     "derive_blast_radius",
     "extract_plan_paths",

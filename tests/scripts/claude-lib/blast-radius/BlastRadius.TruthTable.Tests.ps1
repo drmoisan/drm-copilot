@@ -252,6 +252,30 @@ Describe 'Committed blast-radius truth table shape' {
             @($entries | Where-Object { [string]::IsNullOrWhiteSpace($_) }) |
                 Should -BeNullOrEmpty
         }
+        It 'declares mergeable_paths as a list of non-empty strings' {
+            # Arrange: the mechanically-mergeable path class of issue #643 is a
+            # runtime-describing key, so both committed copies must declare the
+            # same five entries in the same order. Checking both copies here
+            # makes a drift between them visible at this level too.
+            $expected = @(
+                '**/*.csproj', '**/packages.config', '**/app.config',
+                '**/*.vbproj', '**/*.props'
+            )
+
+            # Assert: shape first, then position-by-position equality, so a
+            # reordering names the index that moved. A blank entry would throw
+            # at read time; a reordered list would defeat the byte-equality
+            # relation that holds the two copies together.
+            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
+                $entries = @($config['mergeable_paths'])
+                $entries.Count | Should -Be 5
+                @($entries | Where-Object { [string]::IsNullOrWhiteSpace($_) }) |
+                    Should -BeNullOrEmpty
+                for ($index = 0; $index -lt $expected.Count; $index++) {
+                    $entries[$index] | Should -BeExactly $expected[$index]
+                }
+            }
+        }
 
         It 'lists quality-tiers.yml as both a shared surface and a mandate read' {
             # Assert: the tier map is a genuine shared surface when an item really
