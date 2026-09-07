@@ -329,14 +329,14 @@ markdown sections), so no downstream contract is broken.
 
 ## Acceptance Criteria
 
-- [ ] The bucket-partition loop in `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` routes every non-renamed changed path into exactly one bucket (no path is silently dropped).
-- [ ] A regression test in `extensions/drm-copilot/test/lib/pr-context/collector-core.test.ts` demonstrates a previously-dropped path (e.g., under `.claude/skills/**` or a `.ts` source path) now lands in `bucketDocs`, and the test fails against the pre-fix code (fail-before evidence recorded).
-- [ ] A regression test in `extensions/drm-copilot/test/lib/pr-context/collector-output.test.ts` confirms the previously-dropped path now appears in the rendered "Changed files overview" section text.
-- [ ] The existing empty-bucket fixture in `collector-output-freshness.test.ts` (lines 74-76) continues to pass unmodified in behavior (all sections still render empty when there are no changed files).
-- [ ] Rename precedence, `.py`/`.ps1` core-bucket routing, and `docs/`/`.github`/`AGENTS` docs-bucket routing are all unchanged for paths that already matched those predicates before the fix (no regression, no double-bucketing).
-- [ ] `scripts/dev_tools/pr_context/collector.py` is explicitly left unmodified, and this spec's "Known Limitation" section documents the identical defect there plus a recommendation to file a follow-up bug.
-- [ ] Full TypeScript toolchain pass completed (Prettier -> ESLint -> `tsc` -> Jest with coverage) with `npm ci` run first in `extensions/drm-copilot`.
-- [ ] Line coverage >= 85% and branch coverage >= 75% maintained on changed files, with no production file excluded from coverage measurement.
+- [x] The bucket-partition loop in `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` routes every non-renamed changed path into exactly one bucket (no path is silently dropped).
+- [x] A regression test in `extensions/drm-copilot/test/lib/pr-context/collector-core.test.ts` demonstrates a previously-dropped path (e.g., under `.claude/skills/**` or a `.ts` source path) now lands in `bucketDocs`, and the test fails against the pre-fix code (fail-before evidence recorded).
+- [x] A regression test in `extensions/drm-copilot/test/lib/pr-context/collector-output.test.ts` confirms the previously-dropped path now appears in the rendered "Changed files overview" section text.
+- [x] The existing empty-bucket fixture in `collector-output-freshness.test.ts` (lines 74-76) continues to pass unmodified in behavior (all sections still render empty when there are no changed files).
+- [x] Rename precedence, `.py`/`.ps1` core-bucket routing, and `docs/`/`.github`/`AGENTS` docs-bucket routing are all unchanged for paths that already matched those predicates before the fix (no regression, no double-bucketing).
+- [x] `scripts/dev_tools/pr_context/collector.py` is explicitly left unmodified, and this spec's "Known Limitation" section documents the identical defect there plus a recommendation to file a follow-up bug.
+- [x] Full TypeScript toolchain pass completed (Prettier -> ESLint -> `tsc` -> Jest with coverage) with `npm ci` run first in `extensions/drm-copilot`.
+- [x] Line coverage >= 85% and branch coverage >= 75% maintained on changed files, with no production file excluded from coverage measurement.
 
 ## Risks & Mitigations
 

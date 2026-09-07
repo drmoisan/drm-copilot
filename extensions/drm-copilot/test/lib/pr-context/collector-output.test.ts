@@ -246,6 +246,31 @@ describe("buildSummaryText", () => {
     expect(text).toContain("NOTE: Unverified (GitHub unavailable)");
     expect(text).toContain("GitHub CLI unavailable: offline");
   });
+
+  it("renders a previously-dropped non-core/non-docs-prefixed path in the Changed files overview section", () => {
+    const text = buildSummaryText(
+      collected({
+        bucketDocs: [
+          [".claude/skills/example/SKILL.md", [1, 0]],
+          ["src/example.ts", [1, 0]],
+        ],
+      }),
+      new TreeFileSystem(),
+      "appendix.txt",
+      GENERATED_SECTION,
+    );
+
+    const overviewStart = text.indexOf("===== Changed files overview =====");
+    const nextSectionStart = text.indexOf("===== Issue digests =====");
+    expect(overviewStart).toBeGreaterThanOrEqual(0);
+    expect(nextSectionStart).toBeGreaterThan(overviewStart);
+    const skillIndex = text.indexOf(".claude/skills/example/SKILL.md");
+    const tsIndex = text.indexOf("src/example.ts");
+    expect(skillIndex).toBeGreaterThan(overviewStart);
+    expect(skillIndex).toBeLessThan(nextSectionStart);
+    expect(tsIndex).toBeGreaterThan(overviewStart);
+    expect(tsIndex).toBeLessThan(nextSectionStart);
+  });
 });
 
 describe("buildAppendixText", () => {

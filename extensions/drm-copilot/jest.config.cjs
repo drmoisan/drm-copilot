@@ -30,6 +30,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/pr-context/collector-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/pr-context/collector-output.ts": {
       lines: 85,
       branches: 75,

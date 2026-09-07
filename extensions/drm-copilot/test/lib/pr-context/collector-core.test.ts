@@ -334,6 +334,51 @@ describe("collectPrContext classification and buckets", () => {
     expect(result.bucketRenames.map(([p]) => p)).toContain("new.py");
     expect(result.bucketCore.map(([p]) => p)).toContain("src/app.py");
     expect(result.bucketDocs.map(([p]) => p)).toContain(CHANGED);
+    // No double-bucketing: a rename, a .py file, and a docs/-prefixed file
+    // each land in exactly one bucket, not additionally in the terminal else.
+    expect(result.bucketDocs.map(([p]) => p)).not.toContain("new.py");
+    expect(result.bucketRenames.map(([p]) => p)).not.toContain("src/app.py");
+    expect(result.bucketCore.map(([p]) => p)).not.toContain(CHANGED);
+  });
+
+  it("routes previously-dropped paths into bucketDocs (fail-before: current code drops them)", () => {
+    // Arrange: two paths that match none of the three existing bucket
+    // predicates (not a rename, not .py/.ps1, not docs/-.github-AGENTS).
+    const fs = seedFeatureTree();
+    const gh = ghHandler({ ghAvailable: true });
+    const runner = new ScriptRunner((args) => {
+      if (isGh(args)) {
+        return gh(args) ?? okResult("{}");
+      }
+      const sub = args.slice(1).join(" ");
+      if (sub.startsWith("diff --name-status")) {
+        return okResult(
+          `M\t.claude/skills/example/SKILL.md\nM\tsrc/example.ts\nM\t${CHANGED}`,
+        );
+      }
+      if (sub.startsWith("diff --numstat")) {
+        return okResult(
+          `1\t0\t.claude/skills/example/SKILL.md\n1\t0\tsrc/example.ts\n1\t0\t${CHANGED}`,
+        );
+      }
+      return gitHandler(args);
+    });
+
+    // Act
+    const result = collectPrContext({
+      base: "main",
+      head: "feature/docs",
+      repoRoot: ROOT,
+      includeUntracked: false,
+      fs,
+      runner,
+      whichGh: () => GH_PATH,
+    });
+
+    // Assert: both previously-dropped paths land in bucketDocs.
+    const docsPaths = result.bucketDocs.map(([p]) => p);
+    expect(docsPaths).toContain(".claude/skills/example/SKILL.md");
+    expect(docsPaths).toContain("src/example.ts");
   });
 });
 
