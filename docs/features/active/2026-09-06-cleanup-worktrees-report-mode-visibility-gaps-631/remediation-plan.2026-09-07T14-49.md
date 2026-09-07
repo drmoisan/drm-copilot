@@ -36,8 +36,14 @@ and any edit to `.claude/rules/**` or `.github/instructions/**`.
    P2-T7 extending its fixture so the branch resolves on its own ladder); and the `@test` block
    at line 195, the Finding R2 property-(a) test, which compares two different branches under
    two different fixtures (rewritten and retitled by P2-T9 into a same-branch, same-fixture value
-   comparison). The `@test` block count of that file does not decrease, and no `skip` call is
-   introduced anywhere.
+   comparison). A third block in the same file, the `@test` at line 172, is touched by P2-T11,
+   which rewrites comment text and the test title only and leaves every assertion in that block
+   byte-identical; P2-T11 likewise rewrites the `classify_all()` helper comment without touching
+   the helper's body. A fourth title-and-comment-only rewrite is performed by P2-T12 on the one
+   sibling file that carries the same narrative, `tests/shell/test_cleanup_worktrees_deletion.bats`:
+   the `@test` block at line 130 (re-derived this pass), whose four assertions at lines 136-139
+   remain byte-identical and remain valid after the fix. The `@test` block count of neither file
+   decreases, and no `skip` call is introduced anywhere.
 3. No `exclude` entry, coverage suppression, or lint suppression may be added to make a gate
    pass.
 4. No test may create a temporary file or a scratch git repository. All new coverage uses
@@ -77,13 +83,33 @@ the report-record shapes such as `ORPHAN_DIR|<path>|<size>`, and the Cobertura X
 
 The branch checked out in this worktree is locally aliased `local-work-631-r2`
 (`.git/worktrees/agent-a4a8d269a4cd47aef/HEAD` reads `ref: refs/heads/local-work-631-r2`,
-re-derived this pass), and its head commit is `02ce5eec8c7a8178e8ad4317b69d1c62afe0f284`
+re-derived this pass), and its head commit is `cd0787a23581a90c1d9c108984a33e5b6c579925`
 (the contents of `refs/heads/local-work-631-r2`, re-derived this pass). The canonical remote
-branch name for this cycle is `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`.
+branch name for this cycle is `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`. That
+one name is the only remote ref this plan names; no alternate or suffixed ref is introduced
+anywhere in it.
 
-Every push in this plan uses one explicit refspec,
-`git push --set-upstream origin local-work-631-r2:bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`,
-so the remote ref name is fixed in the plan text and no `gh workflow run --ref` value has to be
+**The branch is current as of commit `cd0787a2`.** That commit was pushed by the orchestrator as
+a corrective action: a concurrent agent worktree working the same issue pushed `fbb1e65b`, a
+direct linear descendant of the earlier tip `02ce5eec`, which was fast-forward-merged losslessly,
+after which the orchestrator reverted three prematurely checked acceptance-criterion boxes in
+`spec.md` and recorded the reversion at
+`docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/ac-checkoff-reversion.2026-09-07T18-30.md`.
+Local `refs/heads/local-work-631-r2` and the remote ref are therefore in sync at plan-authoring
+time. P0-T9's push is consequently a straightforward
+`git push origin local-work-631-r2:bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`
+from whatever local commit exists at that point in execution — a commit at or ahead of
+`cd0787a2` — and no force flag is needed under normal circumstances.
+
+Immediately before any push in this plan the executor runs
+`git fetch origin bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`; if the remote has
+advanced, the executor fast-forward-merges it with `git merge --ff-only FETCH_HEAD` rather than
+force-pushing, and if `git merge --ff-only` reports a genuine non-fast-forward divergence the
+executor stops and escalates to the orchestrator instead of force-pushing.
+
+Both pushes use the identical refspec `local-work-631-r2:bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`;
+P0-T9 adds `--set-upstream` so the local alias acquires tracking, and P12-T3 uses the plain form.
+Because the remote ref name is fixed in the plan text, no `gh workflow run --ref` value has to be
 derived at runtime. P0-T9 performs the first push; P12-T3 repeats it so the final dispatch sees
 the commits added by Phases 1 through 11.
 
@@ -161,26 +187,26 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
 
 ### Phase 0 — Policy Reads and Remediation Baseline Capture
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full. Acceptance: the file is listed in the P0-T6 artifact's
+- [x] [P0-T1] Read `CLAUDE.md` in full. Acceptance: the file is listed in the P0-T6 artifact's
       `Policy Order:` block; no file in the repository is modified by this task.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full, noting the 500-line file-size
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full, noting the 500-line file-size
       cap and the seven-stage toolchain loop. Acceptance: the file is listed in the P0-T6
       artifact's `Policy Order:` block.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full, noting the no-temporary-file
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full, noting the no-temporary-file
       rule, the Scenario Completeness list, and the Coverage Exclusion Policy. Acceptance: the
       file is listed in the P0-T6 artifact's `Policy Order:` block.
-- [ ] [P0-T4] Read `.claude/rules/quality-tiers.md` in full, noting the uniform 85% line-coverage
+- [x] [P0-T4] Read `.claude/rules/quality-tiers.md` in full, noting the uniform 85% line-coverage
       threshold and the bash branch-coverage exemption. Acceptance: the file is listed in the
       P0-T6 artifact's `Policy Order:` block.
-- [ ] [P0-T5] Read `.claude/rules/shell.md` in full, noting the four-stage bash order
+- [x] [P0-T5] Read `.claude/rules/shell.md` in full, noting the four-stage bash order
       (format, check, test, test --coverage) and the `Bash coverage (lines): NN.N%` summary
       line. Acceptance: the file is listed in the P0-T6 artifact's `Policy Order:` block.
-- [ ] [P0-T6] Write the policy-read evidence artifact at
+- [x] [P0-T6] Write the policy-read evidence artifact at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/remediation-baseline/phase0-instructions-read.2026-09-07T14-49.md`
       containing `Timestamp:`, `Policy Order:` (the five files of P0-T1 through P0-T5 in that
       order), and an explicit list of the files read. Acceptance: the file exists and contains
       all three field labels.
-- [ ] [P0-T7] Run `bash scripts/bash/shell-qc.sh format`. This is a write-mode command whose
+- [x] [P0-T7] Run `bash scripts/bash/shell-qc.sh format`. This is a write-mode command whose
       success-case output is empty (`run_format`, `scripts/bash/shell_qc_lib.sh:204-224`,
       returns shfmt's exit code and prints nothing when nothing was rewritten), so the exit code
       alone cannot distinguish a clean run from a repairing one. Immediately afterward run
@@ -190,15 +216,21 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` stating whether the
       porcelain output was empty. Acceptance: the artifact exists with all four fields and its
       `Output Summary:` names the porcelain result explicitly.
-- [ ] [P0-T8] Run `bash scripts/bash/shell-qc.sh check`. Record at
+- [x] [P0-T8] Run `bash scripts/bash/shell-qc.sh check`. Record at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/remediation-baseline/baseline-check.2026-09-07T14-49.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (shfmt diff count and
       shellcheck finding count). Acceptance: the artifact exists with all four fields.
 - [ ] [P0-T9] Commit the working tree (which includes `scripts/bash` and `tests/shell`) and push
       this branch with upstream tracking before any Route-rule dispatch task runs, because
-      `gh workflow run` resolves its `--ref` against the remote and the local branch alias
-      `local-work-631-r2` has no pushed upstream. Run `git add -A`; then
-      `git status --porcelain` and record its output; then
+      `gh workflow run` resolves its `--ref` against the remote, so the remote ref must carry the
+      tree the baseline was taken from. The remote ref already exists at `cd0787a2` (see "Branch
+      and Push Refs"), so this push advances it rather than creating it, and no force flag is
+      used. Run, in order: `git rev-parse HEAD` and record its output as the pre-commit SHA;
+      `git fetch origin bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2` followed by
+      `git merge --ff-only FETCH_HEAD` and record whether the merge advanced HEAD or reported
+      "Already up to date" (escalate to the orchestrator instead of force-pushing if the merge
+      reports a non-fast-forward divergence); `git add -A`; then `git status --porcelain` and
+      record its output; then
       `git commit -m "chore(631): checkpoint before remediation-cycle CI dispatch"` — this single
       `git commit` invocation is skipped when, and only when, the recorded porcelain output is
       empty, since there is then nothing to commit; this task and P12-T3 carry the only two
@@ -210,8 +242,12 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       every command and its output at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/remediation-baseline/branch-push-before-dispatch.2026-09-07T14-49.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` that states the
-      porcelain result and both SHAs. Acceptance: the artifact exists with all four fields, and
-      the SHA recorded for `HEAD` is byte-identical to the SHA recorded for
+      porcelain result, the pre-commit SHA, and both post-push SHAs. Acceptance: the artifact
+      exists with all four fields; it records the pre-commit SHA — the commit that was HEAD
+      immediately before this task's `git commit`, confirmed via the `git rev-parse HEAD` run at
+      the start of this task, which is expected to be `cd0787a2` or a later descendant of it and
+      is recorded as whatever value that command actually printed; and the SHA recorded for
+      `HEAD` after the push is byte-identical to the SHA recorded for
       `origin/bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`, so the remote ref the
       Route rule dispatches against carries exactly the tree the local baseline was taken from.
 - [ ] [P0-T10] Run `bash scripts/bash/shell-qc.sh test` under the Route rule above. Record at
@@ -263,10 +299,17 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       `merge-base.feature-merged.rc` = `0`, `merge-base.feature-merged.main.rc` = `0`,
       `merge-base.feature-unmerged.rc` = `1`, `merge-base.main.rc` = `1`.
       Under the stub's documented key scheme
-      (`tests/fixtures/cleanup_worktrees/stub-bin/git:133-149`, re-derived this pass) the bare
-      `merge-base.feature-merged.rc` key answers both the rung-2 ladder probe against `main`
-      and the pairwise `--is-ancestor feature-merged feature-unmerged` probe with exit 0, which
-      is precisely the ancestor-of-main-and-of-an-unmerged-branch shape Finding R1 names.
+      (`tests/fixtures/cleanup_worktrees/stub-bin/git:133-149`, re-derived this pass) the stub
+      prefers the pair key `merge-base.<tip>.<upstream>` whenever the scenario supplies one and
+      falls back to the bare `merge-base.<tip>` key otherwise (the preference test is at
+      `tests/fixtures/cleanup_worktrees/stub-bin/git:138-146`, re-derived this pass). The two
+      probes are therefore answered by two different keys: `merge-base.feature-merged.main.rc`
+      answers the rung-2 ladder probe `--is-ancestor feature-merged main`, because that pair key
+      exists in this fixture; and the bare `merge-base.feature-merged.rc` answers the pairwise
+      probe `--is-ancestor feature-merged feature-unmerged` through the fallback, because this
+      fixture supplies no `merge-base.feature-merged.feature-unmerged` key. Both keys are `0`, so
+      both probes exit 0, which is precisely the
+      ancestor-of-main-and-of-an-unmerged-branch shape Finding R1 names.
       Acceptance: the four `.rc` files exist with exactly those single-digit contents.
 - [ ] [P1-T3] Add the ladder fixture keys that resolve `feature-unmerged` to `NOT_MERGED` in
       `tests/fixtures/cleanup_worktrees/scenarios/child_of_delete_eligible/`:
@@ -315,9 +358,20 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
 - [ ] [P2-T1] Capture the pre-fix behavior of the new fixture without bats, which is unavailable
       locally: write the current library to the session scratchpad with
       `git show 02ce5eec8c7a8178e8ad4317b69d1c62afe0f284:scripts/bash/cleanup_worktrees_report_records_lib.sh > <scratchpad>/rrlib-prefix.sh`
-      (the SHA is pinned to this branch's head as re-derived this pass from
-      `refs/heads/local-work-631-r2`, rather than to the ambient `HEAD`, so the transcript is
-      taken from a fixed tree whatever P0-T9 has committed by the time this task runs), then run
+      (the SHA is pinned to a fixed commit rather than to the ambient `HEAD`, so the transcript is
+      taken from a fixed tree whatever P0-T9 has committed by the time this task runs, and
+      whatever P2-T3 later rewrites in the working tree). **Pin re-derivation, performed this
+      pass.** The branch head has since advanced from `02ce5eec` to `cd0787a2`, so the pin was
+      re-checked rather than carried forward. `scripts/bash/cleanup_worktrees_report_records_lib.sh`
+      is unchanged between the two commits: every citation this plan takes from that file still
+      resolves to the same line numbers and the same text in the current worktree — `inherit` at
+      lines 283, 347, 422; `short-circuit` at 284, 350, 424; `ancestor_targets` at 375, 396, 402,
+      415, 434 (5 occurrences); `advisory-only` and `show-toplevel` at 0 occurrences; and the
+      `CHILD_OF` header block at lines 27-30 — all re-derived this pass against the tree at
+      `cd0787a2`. The two intervening commits touched only `spec.md`, evidence artifacts, and
+      prior-plan checklist markers. `02ce5eec` therefore predates any fix to this file and remains
+      the correct commit to diff the PRE-FIX defect transcript against; it is retained unchanged.
+      Then run
       `env CLEANUP_WT_GIT_BIN=tests/fixtures/cleanup_worktrees/stub-bin/git CLEANUP_WT_STUB_SCENARIO=tests/fixtures/cleanup_worktrees/scenarios/child_of_delete_eligible bash -c "source scripts/bash/cleanup_worktrees_enumerate_lib.sh && source scripts/bash/cleanup_worktrees_lib.sh && source <scratchpad>/rrlib-prefix.sh && classify_all_branches 2>/dev/null"`.
       Record the full stdout at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/regression-testing/child-of-delete-eligible-fail-before.2026-09-07T14-49.md`
@@ -366,7 +420,12 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       code without altering any verdict; and the protected-branch exclusion now suppresses the
       advisory record for a protected branch rather than protecting its verdict. Acceptance:
       `grep -c 'inherit' scripts/bash/cleanup_worktrees_report_records_lib.sh` returns 0, where
-      the count is 3 before this task (lines 283, 347, 422).
+      the count is 3 before this phase (lines 283, 347, 422, re-derived this pass) and 1
+      immediately before this task, because P2-T3 runs earlier in this phase and deletes the
+      regions holding lines 347 and 422, leaving only line 283 inside
+      `cleanup_wt_protected_branches`, which is this task's own region. The phrasing matches the
+      sibling conditions in P2-T6 and P2-T11, which state their baselines before the phase for
+      the same reason.
 - [ ] [P2-T6] Update the file-header Report line contract block in
       `scripts/bash/cleanup_worktrees_report_records_lib.sh` (lines 27-30, re-derived this pass)
       so the `CHILD_OF` entry states three things: that the record is advisory only; that the
@@ -421,7 +480,15 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       verdict came from the branch's own ladder — the same proof style the sibling test at
       `tests/shell/test_cleanup_worktrees_classification.bats:181` already uses. Retain the three
       existing positive assertions on `BRANCH|feature-child|NOT_MERGED`,
-      `BRANCH|feature-parent|NOT_MERGED`, and `CHILD_OF|feature-child|feature-parent`. The block
+      `BRANCH|feature-parent|NOT_MERGED`, and `CHILD_OF|feature-child|feature-parent`. Also
+      replace the block's leading comment (lines 154-158, re-derived this pass), whose text at
+      line 155 states that `feature-child` "inherits NOT_MERGED without running the
+      cherry/diff-tree/rev-list rungs" and whose text at 156-158 states that the skipped rungs are
+      provable by their absence from the argv log, with a comment stating the advisory contract:
+      `feature-child` runs its own full ladder and resolves `NOT_MERGED` on its own, and the argv
+      log is read as positive proof that the ladder ran. This removes the only `inherit`
+      occurrence in this file that lies outside P2-T11's two regions, which is why P2-T11's
+      file-wide count of 0 is reachable. The block
       is rewritten, not removed: acceptance is that
       `grep -c '^@test ' tests/shell/test_cleanup_worktrees_classification.bats` returns 17,
       unchanged from P1-T4, and that the file contains no `skip` call.
@@ -451,6 +518,61 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       Acceptance: the post-fix stdout contains `BRANCH|feature-merged|MERGED_CLEAN` and
       `CHILD_OF|feature-merged|feature-unmerged`, and does not contain
       `BRANCH|feature-merged|NOT_MERGED`.
+- [ ] [P2-T11] Remove the residual `CHILD_OF`-inheritance narrative from the two remaining
+      regions of `tests/shell/test_cleanup_worktrees_classification.bats` that P2-T8 does not
+      touch, changing comments and one test title only and leaving every assertion in both
+      regions byte-identical. First region: the `classify_all()` helper's comment block, lines
+      29-35 inside the helper defined at lines 28-38 (re-derived this pass), whose text at line 30
+      says the helper exists "so the CHILD_OF short-circuit can be asserted on its own terms" and
+      whose text at line 35 says the merged argv log proves "the expensive ladder rungs were never
+      invoked for a short-circuited branch". Rewrite that comment block to state instead that the
+      helper deliberately suppresses no stderr because the stub's `stub-git:` argv log, which bats
+      merges into `$output`, is read as positive proof that a branch ran its own classification
+      ladder. Second region: the `@test` block at lines 172-184 (re-derived this pass). Retitle it
+      `child_of_merged_equivalent: feature-child runs its own ladder and no CHILD_OF is emitted`
+      and update its comments at lines 174, 180, and 182 so that none of the three describes
+      inheritance or a short-circuit: line 174 states that `feature-parent` resolves
+      `MERGED_EQUIVALENT` rather than `NOT_MERGED` so it is not an eligible `CHILD_OF` target;
+      line 180 states that the argv log positively shows `feature-child`'s own cherry rung ran;
+      line 182 states that no branch in this scenario has an eligible `NOT_MERGED` target, so no
+      `CHILD_OF` record is emitted, including for `main`. Do not change any assertion in either
+      region, and do not change the assertion at line 183. Acceptance:
+      `grep -c 'inherit' tests/shell/test_cleanup_worktrees_classification.bats` returns 0, where
+      the count is 3 before this phase — lines 155, 174, and 180, re-derived this pass against the
+      tree at `cd0787a2`, confirming the round-2 executor observation is still accurate — of which
+      line 155 is removed by P2-T8 and lines 174 and 180 by this task; and
+      `grep -c '^@test ' tests/shell/test_cleanup_worktrees_classification.bats` returns 17,
+      unchanged from P1-T4, P2-T8, and P2-T9. A blanket `short-circuit` count of 0 is deliberately
+      **not** asserted for this file: line 82 uses that term in the unrelated title
+      `content_neutral: MERGED_CONTENT_NEUTRAL via the diff --quiet short-circuit`, which names the
+      `diff --quiet` rung inside `classify_branch` and is out of scope for this cycle.
+- [ ] [P2-T12] Remove the same `CHILD_OF`-inheritance narrative from the one sibling test file
+      that carries it, `tests/shell/test_cleanup_worktrees_deletion.bats`, changing the test
+      title and its leading comment only and leaving every assertion in the block
+      byte-identical. The block is the `@test` at line 130 (re-derived this pass), whose title
+      reads `apply mode allowlist is unaffected by a CHILD_OF short-circuit` and whose comment at
+      lines 131-134 states that a branch "reached NOT_MERGED through the CHILD_OF short-circuit",
+      which is the mechanism Phases 2 and 3 remove. Retitle the block
+      `apply mode allowlist is unaffected by an advisory CHILD_OF record` and replace lines
+      131-134 with this exact comment text, preserving the file's existing four-space indent:
+
+          # Outcome preservation, property (b): feature-child resolves NOT_MERGED on its own
+          # ladder and carries an advisory CHILD_OF record alongside that unchanged verdict.
+          # The advisory record never reaches the delete-eligible allowlist, and NOT_MERGED is
+          # not on that allowlist either, so no deletion ACTION of any result is emitted.
+
+      Do not change the `apply "${SCEN}/child_of_not_merged"` invocation at line 135 or the four
+      assertions at lines 136-139, all of which remain valid after the fix:
+      `feature-child` still resolves `NOT_MERGED`, now on its own ladder via the P2-T7 fixture
+      keys, and `CHILD_OF|feature-child|feature-parent` is still emitted because `feature-parent`
+      resolves exactly `NOT_MERGED` and `merge-base --is-ancestor feature-child feature-parent`
+      exits 0. Acceptance:
+      `grep -c 'short-circuit' tests/shell/test_cleanup_worktrees_deletion.bats` returns 0, where
+      the count is 2 before this task (lines 130 and 132, re-derived this pass); and
+      `grep -c '^@test ' tests/shell/test_cleanup_worktrees_deletion.bats` returns 11, unchanged
+      from P1-T5 (10 blocks re-derived this pass plus the one P1-T5 appends). Because the block
+      count is unchanged, this task does not alter the 335 baseline count asserted by P0-T10 or
+      the 354 final count asserted by P12-T4.
 
 ### Phase 3 — R1 and R7 item 2: Specification, Skill Contract, and Usage-Text Amendment
 
@@ -508,14 +630,20 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/spec.md`
       that describes `CHILD_OF` as a classification short-circuit or a cost-reduction mechanism,
       so that none of them does. The regions, enumerated from a `grep -n 'short-circuit'` over
-      the file re-derived this pass, are: the `## Context` paragraph (line 13); the third
+      the file re-derived this pass, plus three regions that describe the mechanism without
+      carrying that literal (line 13, 224-226, and 262-263), are: the `## Context` paragraph
+      (line 13, which describes time spent "re-classifying branches that are already known to be
+      unmerged ancestors of another branch"); the third
       `Expected:` bullet (45-47); the third `Actual:` bullet (58-60); the `CHILD_OF` bullet of
       `### In scope` (87-89); the last bullet of `### Out of scope / non-goals` (105-107); the
       first Root Cause Analysis paragraph (118-127); `### Design summary (what changes where)`
       (150-156); the first bullet of `### Boundaries and invariants to preserve` (196-198); the
-      third bullet of `#### Files/modules to change` (224-226); `#### Data flow and validation
+      third bullet of `#### Files/modules to change` (224-226, which says apply mode "inherits the
+      `CHILD_OF` cost optimization with an unchanged outcome"); `#### Data flow and validation
       changes` (254-259); the first bullet of `#### Error handling and logging updates`
-      (262-263); the `CHILD_OF` bullet of `#### Inputs/outputs and formats` (289-291); the
+      (262-263, which states the pairwise-probe hard-failure mapping and must now describe the
+      advisory probe rather than an inference step); the `CHILD_OF` bullet of
+      `#### Inputs/outputs and formats` (289-291); the
       second bullet of `#### Required configuration keys and defaults` (297-304); the second
       bullet of `#### Backward-compatibility expectations` (306-315); `#### Performance
       constraints` (317-323); the first three `Required test cases` bullets (369-378); and the
@@ -799,7 +927,7 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       `tests/fixtures/cleanup_worktrees/scenarios/child_of_delete_eligible/`, which P1-T1 gives
       that exact key. Acceptance: the file's `^@test ` count is 17.
 - [ ] [P7-T3] Change `scan_helper_gitdir_target_exists` in
-      `scripts/bash/cleanup_worktrees_scan_helper.sh` (lines 72-99) to echo `NA` instead of `0`
+      `scripts/bash/cleanup_worktrees_scan_helper.sh` to echo `NA` instead of `0`
       when the pointer file cannot be resolved to a target — that is, when the `grep` capture
       returns non-zero or the extracted target is empty after stripping. A resolvable target
       keeps the existing `1`/`0` outcome. `scan_registration_loss` emits its record only when
@@ -808,9 +936,56 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       with no code change there, which makes
       "pointer present but unreadable" skipped silently as
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/spec.md:386-387`
-      requires. Acceptance: the function contains exactly one `printf '0\n'` call site, which is
-      the resolved-but-missing-target case, and the existing `@test` at
-      `tests/shell/test_cleanup_worktrees_scan_helper.bats:23` still asserts `/broken_wt|1|0|`.
+      requires.
+
+      **Locating the two comment regions this task also rewrites.** The function currently
+      occupies lines 72-99 and its docstring lines 73-75 (re-derived this pass), and the file's
+      header documentation of the `gitdir_target_exists` field currently occupies lines 20-23
+      (re-derived this pass). P5-T3 runs earlier and replaces header lines 24-26 with a
+      seven-line block, adding four lines, so by the time this task runs the function occupies
+      lines 76-103 and its docstring lines 77-79, while header lines 20-23 sit above P5-T3's edit
+      and are unshifted. Locate both regions by their content rather than by either line pin.
+
+      **First comment region — the function docstring.** The current text asserts the pre-fix
+      behavior ("else 0. A missing, unreadable, or malformed pointer file yields 0"), which this
+      task's code change makes false. Every other behavior-changing task in this plan pairs the
+      code change with its docstring; this one does the same. Replace the three docstring lines
+      with this exact text, preserving the file's existing single-tab indent on each line:
+
+          # Echo 1 when the worktree pointer file in <dir> names an existing gitdir target,
+          # 0 when the pointer resolves to a target that does not exist, and the literal NA
+          # when the pointer cannot be resolved at all (a missing, unreadable, or malformed
+          # pointer file: the unresolvable-pointer case). NA is emitted rather than 0 because
+          # scan_registration_loss records a loss only for a field that is exactly 0, so an
+          # unresolvable pointer is skipped silently instead of being reported as a
+          # registration loss it cannot substantiate. Never crashes.
+
+      **Second comment region — the header field contract.** Header lines 20-23 likewise still
+      say the field is "else 0" for an unresolved pointer. Replace those four lines with this
+      exact text, at column 0 as the surrounding header block already is:
+
+          #   gitdir_target_exists NA when has_gitfile is 0 (there is no pointer to resolve), and
+          #                        also NA when a pointer file is present but does not resolve
+          #                        (missing, unreadable, or malformed); 1 when the
+          #                        `gitdir: <target>` line's target exists (resolved relative to
+          #                        <path> when the target is not absolute); 0 when that target is
+          #                        named but does not exist.
+
+      The single-line literal this task introduces and its primary condition asserts is:
+      unresolvable-pointer
+
+      It is a single hyphenated token with no embedded spaces, so no comment reflow can split it
+      across two lines, and it appears in the docstring only, not in the header block, so its
+      count is exactly 1. Primary acceptance:
+      `grep -c 'unresolvable-pointer' scripts/bash/cleanup_worktrees_scan_helper.sh` returns 1,
+      where the count is 0 before this task (re-derived this pass over `scripts/bash/`).
+      Companion acceptance: the function contains exactly one `printf '0\n'` call site, which is
+      the resolved-but-missing-target case; and the existing `@test` block whose title is at
+      `tests/shell/test_cleanup_worktrees_scan_helper.bats:23` keeps its assertion
+      `[[ "$output" == *"/broken_wt|1|0|"?* ]]` at line 33 byte-identical (both re-derived this
+      pass). That assertion survives this change because `broken_wt`'s pointer file does resolve
+      to a named target that does not exist, which is the `0` case rather than the new `NA` case;
+      it also survives P5-T2, whose `NA` size field satisfies the trailing `?*`.
 - [ ] [P7-T4] Guard the `printf '%s\n' "$cb_out"` at
       `scripts/bash/cleanup_worktrees_actions_lib.sh:401` on non-empty `cb_out`, so a branch
       absent from the shared driver's output no longer emits a blank line; and treat an empty
@@ -905,23 +1080,46 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
 
 ### Phase 10 — R8: Prior-Plan Checklist Reconciliation and Deferred Plan-Mandated Artifacts
 
-- [ ] [P10-T1] In
-      `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`,
-      change the checkbox from `[ ]` to `[x]` for exactly these ten tasks, whose described tests
-      exist and pass: `[P1-T4]` (line 153), `[P1-T6]` (167), `[P1-T7]` (174), `[P3-T4]` (269),
-      `[P4-T4]` (301), `[P5-T4]` (327), `[P6-T4]` (406), `[P6-T5]` (421), `[P7-T4]` (522),
-      `[P7-T5]` (530). Leave `[P2-T3]` (231) unchecked at this task; it is closed by P10-T2.
-      Note in the plan's revision log that the remediation-inputs Finding R8 counts eleven
-      unchecked Phase 1-7 tasks, which is the ten above plus `[P2-T3]`, and that `[P2-T3]` is
-      handled separately because the same finding text names it as genuinely outstanding.
-      Acceptance:
+The eleven Phase 1-7 checkbox transitions that Finding R8 called for were performed by the
+concurrent commit `fbb1e65b`, which was fast-forward-merged into this branch before this plan
+round. Re-derived this pass against the tree at `cd0787a2`:
+`grep -c '^- \[ \] \[P[1-7]-' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+returns 0 and `grep -c '^- \[x\] \[P[1-7]-'` over the same file returns 33. P10-T1 and P10-T2 are
+therefore verification-and-substantiation tasks rather than transition tasks; writing them as
+transition tasks would leave conditions that cannot fail.
+
+- [ ] [P10-T1] Verify and record the prior-plan checklist state rather than transitioning it. Run
       `grep -c '^- \[ \] \[P[1-7]-' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
-      returns 1, the remaining `[P2-T3]` line, where the count is 11 before this task.
-- [ ] [P10-T2] Check off `[P2-T3]` in the same file once
+      and
+      `grep -c '^- \[x\] \[P[1-7]-' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+      and record both counts, together with the reconciliation narrative, at
+      `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/prior-plan-checklist-reconciliation.2026-09-07T14-49.md`
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. The narrative states: that
+      the remediation-inputs Finding R8 counted eleven unchecked Phase 1-7 tasks at `02ce5eec`;
+      that the concurrent commit `fbb1e65b` checked off all eleven before this remediation cycle
+      began; that ten of them (`[P1-T4]`, `[P1-T6]`, `[P1-T7]`, `[P3-T4]`, `[P4-T4]`, `[P5-T4]`,
+      `[P6-T4]`, `[P6-T5]`, `[P7-T4]`, `[P7-T5]`) are substantiated by tests that exist and pass;
+      and that the eleventh, `[P2-T3]` at line 231, is checked but cites only
+      `evidence/regression-testing/stub-git-backward-compat.2026-09-06T23-03.md`, which Finding R4
+      records as insufficient for that task's ordered requirement, so its substantiation is
+      supplied by Phase 8 of this cycle and recorded by P10-T2. Acceptance: the artifact exists
+      with all four fields, records the first count as 0 and the second as 33, and names all ten
+      substantiated task IDs plus `[P2-T3]`.
+- [ ] [P10-T2] Substantiate the already-checked `[P2-T3]` in
+      `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+      by appending to that task's text (line 231 onward) a sentence naming this cycle's ordered
+      backward-compatibility artifact as the evidence that closes it, in place of relying on the
+      2026-09-06T23-03 artifact alone. Do not change its `[x]` marker, which `fbb1e65b` already
+      set. The single-line literal this task introduces and this condition asserts is:
+      stub-git-backward-compat.2026-09-07T14-49.md
+
+      It is one dotted token with no embedded spaces, so no reflow can split it across two lines.
+      This task runs only after
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/regression-testing/stub-git-backward-compat.2026-09-07T14-49.md`
-      exists (Phase 8). Acceptance:
-      `grep -c '^- \[ \] \[P[1-7]-' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
-      returns 0.
+      exists (Phase 8, P8-T3). Acceptance:
+      `grep -c 'stub-git-backward-compat.2026-09-07T14-49.md' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+      returns 1, where the count is 0 before this task, re-derived this pass over the whole prior
+      plan file.
 - [ ] [P10-T3] Run `wc -l` over `scripts/bash/cleanup_worktrees_lib.sh`,
       `scripts/bash/cleanup_worktrees_report_records_lib.sh`,
       `scripts/bash/cleanup_worktrees_scan_helper.sh`,
@@ -930,8 +1128,16 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       `scripts/bash/cleanup-worktrees.sh` and record all six counts at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/file-size-cap-verification.2026-09-07T14-49.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: every recorded
-      count is at most 500, and the artifact states each count numerically. This closes the prior
-      plan's `[P10-T1]`.
+      count is at most 500, and the artifact states each count numerically. This re-establishes on
+      the post-remediation tree the file-size evidence the prior plan's `[P10-T1]` calls for.
+      Companion acceptance:
+      `grep -c '^- \[x\] \[P10-T1\]' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+      returns 1, and this task does not itself perform any checkbox transition (the concurrent
+      commit `fbb1e65b` already set it). No line number is pinned for this check: P10-T2 runs
+      earlier in this phase and appends a sentence inside the prior plan's own `[P2-T3]` block at
+      line 231 of that same file, which shifts every line below it downward, whereas the checkbox
+      marker and the task ID share one line, so this grep is both shift-immune and wrap-immune. It
+      returns 1 against the current tree, re-derived this pass.
 - [ ] [P10-T4] Record the AC11 generic-detection confirmation at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/ac11-generic-detection-confirmation.2026-09-07T14-49.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. The evidence is the output
@@ -941,8 +1147,16 @@ bounds and measures the residual cost the advisory record adds so the trade-off 
       (`scripts/bash/cleanup_worktrees_report_records_lib.sh:98-99`) and compares it against the
       configured remote set rather than any hardcoded name, and that no test asserts a fixed
       count of orphan directories or stale refs. Acceptance: the artifact exists with all four
-      fields and records zero hardcoded-`child` matches in the two production files. This closes
-      the prior plan's `[P10-T2]`.
+      fields and records zero hardcoded-`child` matches in the two production files. This
+      re-establishes on the post-remediation tree the generic-detection evidence the prior plan's
+      `[P10-T2]` calls for. Companion acceptance:
+      `grep -c '^- \[x\] \[P10-T2\]' docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/plan.2026-09-06T23-03.md`
+      returns 1, and this task does not itself perform any checkbox transition (the concurrent
+      commit `fbb1e65b` already set it). No line number is pinned for this check, for the same
+      reason stated in P10-T3: P10-T2's append inside the prior plan's own `[P2-T3]` block at line
+      231 of that same file shifts every line below it downward, while the checkbox marker and the
+      task ID share one line, so this grep is shift-immune and wrap-immune. It returns 1 against
+      the current tree, re-derived this pass.
 
 ### Phase 11 — R9: PR Autoclose Scope Determination
 
@@ -1000,20 +1214,30 @@ authorizes and bounds.
       shellcheck findings.
 - [ ] [P12-T3] Re-commit the working tree (which includes `scripts/bash` and `tests/shell`) and
       re-push the branch so the Route-rule dispatch in P12-T4 and P12-T5 runs against the commits
-      added by Phases 1 through 11, which the P0-T9 push predates. Run
-      `git add -A`; then `git status --porcelain` and record its output; then
+      added by Phases 1 through 11, which the P0-T9 push predates. Run, in order:
+      `git rev-parse HEAD` and record its output as the pre-commit SHA;
+      `git fetch origin bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2` followed by
+      `git merge --ff-only FETCH_HEAD` and record whether the merge advanced HEAD or reported
+      "Already up to date" (escalate to the orchestrator instead of force-pushing if the merge
+      reports a non-fast-forward divergence); `git add -A`; then `git status --porcelain` and
+      record its output; then
       `git commit -m "fix(631): remediation cycle 1 for report-mode visibility gaps"` — this
       single `git commit` invocation is skipped when, and only when, the recorded porcelain
       output is empty, which is the same explicitly authorized skip branch stated in P0-T9; then
-      `git push origin local-work-631-r2:bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`;
+      `git push origin local-work-631-r2:bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`
+      with no force flag;
       then `git rev-parse HEAD`,
       `git rev-parse origin/bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`, and
       `git diff --stat 6dff80ed4596bec088d548b23013e6077e32c484..HEAD`. Record every command and
       its output at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/branch-push-before-final-dispatch.2026-09-07T14-49.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact
-      exists with all four fields; the SHA recorded for `HEAD` is byte-identical to the SHA
-      recorded for `origin/bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`; and the
+      exists with all four fields; it records the pre-commit SHA — the commit that was HEAD
+      immediately before this task's `git commit`, confirmed via the `git rev-parse HEAD` run at
+      the start of this task, which is a descendant of `cd0787a2` and is recorded as whatever
+      value that command actually printed; the SHA recorded for `HEAD` after the push is
+      byte-identical to the SHA recorded for
+      `origin/bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`; and the
       recorded `git diff --stat` output, which is anchored to the base commit rather than to the
       index, names at least `scripts/bash/cleanup_worktrees_report_records_lib.sh` and
       `tests/shell/test_cleanup_worktrees_classification.bats`.
@@ -1060,7 +1284,15 @@ authorizes and bounds.
 - [ ] [P12-T9] Update the `## Acceptance Criteria` checkboxes in
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/spec.md`
       so each of the eleven criteria is either `[x]` with the evidence artifact path named
-      inline, or left `[ ]` with an explicit inline note recording it as unmet and why. This
+      inline, or left `[ ]` with an explicit inline note recording it as unmet and why. The
+      current state, re-derived this pass against the tree at `cd0787a2`, is eight `[x]` and three
+      `[ ]`: AC3 at line 415, AC5 at line 424, and AC6 at line 429 were reverted to `[ ]` by the
+      orchestrator's commit `cd0787a2` because a concurrent commit had checked them off without
+      adversarial verification (recorded at
+      `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/ac-checkoff-reversion.2026-09-07T18-30.md`).
+      Those three are exactly the criteria this cycle's Phases 2, 8, and 9 supply evidence for, and
+      they are the three this task decides. The eight already-`[x]` criteria are not re-opened;
+      this task adds the inline evidence-artifact path to any of them that lacks one. This
       task runs last because the artifacts it cites, in particular
       `.../evidence/qa-gates/final-test-coverage.2026-09-07T14-49.md` for AC9, do not exist
       until P12-T5 completes. Acceptance: no criterion is left `[ ]` without an inline unmet
