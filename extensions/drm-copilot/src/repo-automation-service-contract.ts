@@ -13,6 +13,13 @@ import {
   type RunDiscoveryScenarioGenerationInput,
   type ValidateDiscoveryArtifactsInput,
 } from "./repo-automation-execute-discovery";
+import type {
+  PortableHandoffAuthorityResult,
+  ResolveOrchestrationTopologyRequest,
+  ResolveProviderRoutingRequest,
+  TransitionPreparedOrchestrationRequest,
+  TransitionPreparedOrchestrationResult,
+} from "./mcp-repo-automation-tool-definitions-handoff";
 
 /**
  * Service contract declarations for {@link RepoAutomationService}.
@@ -155,6 +162,15 @@ export interface RepoAutomationService {
       readonly requireReadyForExecution?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult>;
+  resolveOrchestrationTopology?(
+    input: ResolveOrchestrationTopologyRequest,
+  ): Promise<PortableHandoffAuthorityResult>;
+  resolveProviderRouting?(
+    input: ResolveProviderRoutingRequest,
+  ): Promise<PortableHandoffAuthorityResult>;
+  transitionPreparedOrchestration?(
+    input: TransitionPreparedOrchestrationRequest,
+  ): Promise<TransitionPreparedOrchestrationResult>;
   renderSubagentTree(
     input: RenderSubagentTreeServiceInput,
   ): Promise<RepoAutomationExecutionResult>;

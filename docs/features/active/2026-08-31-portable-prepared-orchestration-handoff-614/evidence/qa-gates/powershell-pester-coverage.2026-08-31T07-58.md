@@ -1,0 +1,4 @@
+Timestamp: 2026-08-31T16:46:17-04:00
+Command: `mcp__drm_copilot__run_poshqc_test({"workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot-wt\\2026-08-31T07-29","scan_folders":["tests/scripts/codex-hooks"]})`
+EXIT_CODE: 0
+Output Summary: The repository-configured PoshQC/Pester run completed with 637/637 tests passing, 0 failures, and 0 errors. Repository PowerShell line coverage is 19.00% (1,491/7,848). Changed-script line coverage for the instrumented canonical `.codex/hooks/enforce-epic-planning-only.ps1` is 91.82% (146/159); the bundled resource mirror is byte-identical and is not separately instrumented by `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`. Pester branch coverage is explicitly exempt because the configured JaCoCo-compatible PowerShell coverage report exposes line/instruction/method counters and no branch counter.

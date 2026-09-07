@@ -6,14 +6,23 @@ import {
   it,
   jest,
 } from "@jest/globals";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import * as path from "node:path";
 
 import type { FileSystem } from "../src/lib/file-system";
+import type { CommandRunner } from "../src/lib/subprocess-runner";
+import type {
+  TransitionPreparedOrchestrationRequest,
+  TransitionPreparedOrchestrationResult,
+} from "../src/mcp-repo-automation-tool-definitions-handoff";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
 jest.mock("node:fs", () => ({
+  ...jest.requireActual<typeof import("node:fs")>("node:fs"),
   copyFileSync: jest.fn(),
   existsSync: jest.fn(),
   mkdirSync: jest.fn(),
@@ -23,17 +32,132 @@ jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
 }));
 
+import { dispatchRepoAutomationTool } from "../src/mcp-tools";
 import { createRepoAutomationService } from "../src/repo-automation-service";
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
+/**
+ * Absolute workspace root used by every case in this file, derived at run time
+ * rather than written as a drive-letter literal. A drive-letter literal is
+ * absolute on Windows and relative on POSIX, so the handoff handler and
+ * authority-service `path.isAbsolute` guards reject it on Linux. Resolving a
+ * relative virtual name yields a root that is absolute on both platforms and
+ * equal to what the production modules compute for the same input.
+ */
+const VIRTUAL_WORKSPACE_ROOT = path
+  .resolve("virtual-workspace")
+  .replaceAll("\\", "/");
+
 const VALID_PLAN = [
   "# Plan",
   "### Phase 0 — Setup",
   "- [ ] [P0-T1] First task",
 ].join("\n");
+
+const PORTABLE_HANDOFF_FIXTURE = readFileSync(
+  path.resolve(
+    __dirname,
+    "../../../tests/fixtures/orchestration-handoff/contract/valid-ordinary-claude-to-codex.json",
+  ),
+  "utf8",
+);
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function createPortableHandoffFiles(): {
+  readonly envelopePath: string;
+  readonly envelopeSha256: string;
+  readonly envelopeText: string;
+  readonly files: Readonly<Record<string, string>>;
+  readonly planPath: string;
+} {
+  const payload = JSON.parse(PORTABLE_HANDOFF_FIXTURE) as {
+    binding: { workspace_root: string };
+    plan: { path: string; sha256: string };
+  };
+  const workspaceRoot = VIRTUAL_WORKSPACE_ROOT;
+  const envelopePath = "artifacts/orchestration/handoff.json";
+  payload.binding.workspace_root = workspaceRoot;
+  payload.plan.sha256 = sha256(VALID_PLAN);
+  const envelopeText = JSON.stringify(payload);
+  return {
+    envelopePath,
+    envelopeSha256: sha256(envelopeText),
+    envelopeText,
+    files: {
+      [`${workspaceRoot}/${envelopePath}`]: envelopeText,
+      [`${workspaceRoot}/${payload.plan.path}`]: VALID_PLAN,
+    },
+    planPath: payload.plan.path,
+  };
+}
+
+function createIndependentContext(planPath: string) {
+  return {
+    expectedRepositoryId: "github.com/drmoisan/drm-copilot",
+    expectedWorkspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+    expectedBranch: "feature/portable-handoff-614",
+    expectedSourceHeadSha: "0".repeat(40),
+    allowedHeadRelationship: "equal_or_descendant",
+    expectedIssueNumber: 614,
+    expectedFeatureFolder: "docs/features/active/portable-handoff-614",
+    expectedWorkMode: "full-feature",
+    expectedPlanPath: planPath,
+    expectedPlanSha256: sha256(VALID_PLAN),
+  } as const;
+}
+
+/**
+ * Script the four read-only checkout observations and the ancestry check so the
+ * independent binding authority observes a destination checkout matching the
+ * expected context, without spawning a process.
+ */
+function createCheckoutRunner(): CommandRunner {
+  const observations: Readonly<Record<string, string>> = {
+    "rev-parse --show-toplevel": VIRTUAL_WORKSPACE_ROOT,
+    "remote get-url origin": "https://github.com/drmoisan/drm-copilot.git",
+    "branch --show-current": "feature/portable-handoff-614",
+    "rev-parse HEAD": "0".repeat(40),
+  };
+  return {
+    run: (args: readonly string[]) => {
+      const invocation = args.join(" ");
+      const observed = Object.keys(observations).find((subcommand) =>
+        invocation.endsWith(subcommand),
+      );
+      if (observed !== undefined) {
+        return { stdout: observations[observed] ?? "", stderr: "", code: 0 };
+      }
+      return {
+        stdout: "",
+        stderr: "",
+        code: invocation.includes("merge-base --is-ancestor") ? 0 : 1,
+      };
+    },
+  };
+}
+
+function toIndependentMcpArguments(
+  context: ReturnType<typeof createIndependentContext>,
+) {
+  return {
+    expected_repository_id: context.expectedRepositoryId,
+    expected_workspace_root: context.expectedWorkspaceRoot,
+    expected_branch: context.expectedBranch,
+    expected_source_head_sha: context.expectedSourceHeadSha,
+    allowed_head_relationship: context.allowedHeadRelationship,
+    expected_issue_number: context.expectedIssueNumber,
+    expected_feature_folder: context.expectedFeatureFolder,
+    expected_work_mode: context.expectedWorkMode,
+    expected_plan_path: context.expectedPlanPath,
+    expected_plan_sha256: context.expectedPlanSha256,
+  } as const;
+}
 
 /**
  * In-memory FileSystem fake mapping artifact paths to text. The
@@ -88,7 +212,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts validates in-process and preserves the summary", async () => {
     // Arrange: inject a filesystem returning a valid plan at the resolved path.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/plan.md": VALID_PLAN,
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/plan.md`]: VALID_PLAN,
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -98,7 +222,7 @@ describe("repo automation orchestration validation", () => {
 
     // Act
     const result = await service.validateOrchestrationArtifacts({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       invocationId: "validate_orchestration_artifacts",
       artifactType: "plan",
       artifactPath: "docs/plan.md",
@@ -114,7 +238,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts routes require-complete to the orchestrator-state path", async () => {
     // Arrange: a non-object orchestrator-state document under requireComplete.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/state.json": "[]",
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/state.json`]: "[]",
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -126,7 +250,7 @@ describe("repo automation orchestration validation", () => {
     // the method throws, surfacing the failure to the MCP handler.
     await expect(
       service.validateOrchestrationArtifacts({
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
         invocationId: "validate_orchestration_artifacts",
         artifactType: "orchestrator-state",
         artifactPath: "docs/state.json",
@@ -139,7 +263,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts throws when validation errors are present", async () => {
     // Arrange: a policy-audit document missing required headings.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/policy-audit.md": "incomplete document",
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/policy-audit.md`]: "incomplete document",
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -150,7 +274,7 @@ describe("repo automation orchestration validation", () => {
     // Act / Assert
     await expect(
       service.validateOrchestrationArtifacts({
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
         invocationId: "validate_orchestration_artifacts",
         artifactType: "policy-audit",
         artifactPath: "docs/policy-audit.md",
@@ -160,4 +284,171 @@ describe("repo automation orchestration validation", () => {
       "Validation failed for policy-audit artifact at 'docs/policy-audit.md':",
     );
   });
+
+  it("validates portable handoff artifacts without starting a Python process", async () => {
+    // Arrange: the shared contract fixture is rebound to this explicit
+    // workspace and its pinned plan digest is calculated from the plan bytes.
+    const fixture = createPortableHandoffFiles();
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+      fileSystem: new VirtualFileSystem({ ...fixture.files }),
+    });
+
+    // Act
+    const result = await service.validateOrchestrationArtifacts({
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      invocationId: "validate_orchestration_artifacts",
+      artifactType: "portable-orchestration-handoff",
+      artifactPath: fixture.envelopePath,
+      requireComplete: true,
+    });
+
+    // Assert
+    expect(result.summary).toBe(
+      `Validated portable-orchestration-handoff artifact at '${fixture.envelopePath}'.`,
+    );
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it("resolves portable topology and routing through typed read-only dispatch", async () => {
+    // Arrange
+    const fixture = createPortableHandoffFiles();
+    const service = createRepoAutomationService({
+      extensionRoot: "C:/extension",
+      output: { appendLine: appendLineMock },
+      fileSystem: new VirtualFileSystem({ ...fixture.files }),
+      runner: createCheckoutRunner(),
+    });
+    const request = {
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      handoffEnvelopePath: fixture.envelopePath,
+      expectedHandoffEnvelopeSha256: fixture.envelopeSha256,
+      destinationProvider: "codex",
+      ...createIndependentContext(fixture.planPath),
+    } as const;
+
+    // Act: exercise both the service contract and public MCP dispatch.
+    const topology = await service.resolveOrchestrationTopology?.(request);
+    const routing = await service.resolveProviderRouting?.(request);
+    const dispatch = await dispatchRepoAutomationTool(
+      "resolve_orchestration_topology",
+      {
+        workspace_root: request.workspaceRoot,
+        handoff_envelope_path: request.handoffEnvelopePath,
+        expected_handoff_envelope_sha256: request.expectedHandoffEnvelopeSha256,
+        destination_provider: request.destinationProvider,
+        ...toIndependentMcpArguments(request),
+      },
+      service,
+    );
+
+    // Assert: resolutions identify destination policy and expose no historical
+    // provider receipt content.
+    expect(topology).toMatchObject({
+      status: "validated",
+      primaryFailureCode: null,
+      resolution: {
+        kind: "destination_topology",
+        provider: "codex",
+        topology_policy: "codex_topology_policy",
+      },
+    });
+    expect(routing).toMatchObject({
+      status: "validated",
+      primaryFailureCode: null,
+      resolution: {
+        kind: "provider_routing",
+        provider: "codex",
+        routing_policy: "codex_model_policy",
+        source_evidence_mode: "opaque",
+      },
+    });
+    expect(dispatch).toMatchObject({
+      ok: true,
+      tool: "resolve_orchestration_topology",
+      status: "validated",
+      handoff_id: "handoff-614-claude-to-codex-ordinary",
+      primary_failure_code: null,
+      resolution: {
+        kind: "destination_topology",
+        provider: "codex",
+      },
+    });
+    expect(childProcessMock.spawn).not.toHaveBeenCalled();
+  });
+
+  it.each(["validated", "materialized", "blocked"] as const)(
+    "dispatches a deterministic %s prepared-orchestration result",
+    async (status) => {
+      // Arrange
+      const fixture = createPortableHandoffFiles();
+      const sourceSha256 = "a".repeat(64);
+      const destinationSha256 = "b".repeat(64);
+      const transition =
+        jest.fn<
+          (
+            input: TransitionPreparedOrchestrationRequest,
+          ) => Promise<TransitionPreparedOrchestrationResult>
+        >();
+      const service = createRepoAutomationService({
+        extensionRoot: "C:/extension",
+        output: { appendLine: appendLineMock },
+        fileSystem: new VirtualFileSystem({ ...fixture.files }),
+        handoffMaterializer: { transition },
+      });
+      const request = {
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+        sourceCheckpointPath: "artifacts/orchestration/orchestrator-state.json",
+        expectedSourceCheckpointSha256: sourceSha256,
+        handoffEnvelopePath: fixture.envelopePath,
+        expectedHandoffEnvelopeSha256: fixture.envelopeSha256,
+        destinationProvider: "codex",
+        mode: status === "materialized" ? "materialize" : "dry_run",
+        ...createIndependentContext(fixture.planPath),
+      } as const;
+      const blocked = status === "blocked";
+      transition.mockResolvedValue({
+        status,
+        handoffId: "handoff-614-claude-to-codex-ordinary",
+        sourceCheckpointSha256: sourceSha256,
+        handoffEnvelopeSha256: fixture.envelopeSha256,
+        handoffHistorySha256: "c".repeat(64),
+        requestedTransition: "prepared_to_atomic_execution",
+        destinationCheckpointPath: blocked
+          ? null
+          : request.sourceCheckpointPath,
+        destinationCheckpointSha256: blocked ? null : destinationSha256,
+        primaryFailureCode: blocked ? "HANDOFF_DIRTY_WORKTREE" : null,
+        affectedPaths: blocked ? ["src/dirty.ts"] : [],
+        unsupportedCapabilities: [],
+      });
+
+      // Act
+      const result = await dispatchRepoAutomationTool(
+        "transition_prepared_orchestration",
+        {
+          workspace_root: request.workspaceRoot,
+          source_checkpoint_path: request.sourceCheckpointPath,
+          expected_source_checkpoint_sha256: sourceSha256,
+          handoff_envelope_path: fixture.envelopePath,
+          expected_handoff_envelope_sha256: fixture.envelopeSha256,
+          destination_provider: "codex",
+          ...toIndependentMcpArguments(request),
+          mode: request.mode,
+        },
+        service,
+      );
+
+      // Assert
+      expect(transition).toHaveBeenCalledWith(request);
+      expect(result).toMatchObject({
+        ok: true,
+        status,
+        destination_checkpoint_sha256: blocked ? null : destinationSha256,
+        primary_failure_code: blocked ? "HANDOFF_DIRTY_WORKTREE" : null,
+      });
+      expect(childProcessMock.spawn).not.toHaveBeenCalled();
+    },
+  );
 });

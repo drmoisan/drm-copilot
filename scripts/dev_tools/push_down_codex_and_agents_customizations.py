@@ -65,6 +65,11 @@ PACK_MANIFEST_SUBDIR = "pack-manifests"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
 ROUTING_CONFIG_RELATIVE_PATH = Path("config/orchestration-routing.json")
+SHARED_CONFIG_RELATIVE_PATHS: tuple[Path, ...] = (
+    ROUTING_CONFIG_RELATIVE_PATH,
+    Path("config/orchestration-handoff-registry.json"),
+    Path("config/orchestration-handoff.schema.json"),
+)
 PUBLISHED_ROOT_FOLDERS: tuple[Path, ...] = (
     *ROOT_FOLDERS,
     ROUTING_CONFIG_RELATIVE_PATH.parent,
@@ -105,16 +110,20 @@ class _RoutingConfigFileSystem:
         bundle_root: Path,
     ) -> None:
         self._inner = inner
-        self._virtual_path = source_root / ROUTING_CONFIG_RELATIVE_PATH
-        self._virtual_root = self._virtual_path.parent
-        self._resource_path = bundle_root.parent / ROUTING_CONFIG_RELATIVE_PATH
+        self._virtual_paths = {
+            source_root / relative_path: bundle_root.parent / relative_path
+            for relative_path in SHARED_CONFIG_RELATIVE_PATHS
+        }
+        self._virtual_root = source_root / ROUTING_CONFIG_RELATIVE_PATH.parent
 
     def list_files(self, root: Path) -> list[Path]:
         """Return the virtual routing config only for the config root."""
 
         if root == self._virtual_root:
-            return (
-                [self._virtual_path] if self._inner.is_file(self._resource_path) else []
+            return sorted(
+                virtual_path
+                for virtual_path, resource_path in self._virtual_paths.items()
+                if self._inner.is_file(resource_path)
             )
         return self._inner.list_files(root)
 
@@ -126,15 +135,17 @@ class _RoutingConfigFileSystem:
     def is_file(self, path: Path) -> bool:
         """Resolve virtual routing-config file checks to the shared resource."""
 
-        if path == self._virtual_path:
-            return self._inner.is_file(self._resource_path)
+        resource_path = self._virtual_paths.get(path)
+        if resource_path is not None:
+            return self._inner.is_file(resource_path)
         return self._inner.is_file(path)
 
     def read_text(self, path: Path) -> str:
         """Read the virtual routing config from the shared resource."""
 
-        if path == self._virtual_path:
-            return self._inner.read_text(self._resource_path)
+        resource_path = self._virtual_paths.get(path)
+        if resource_path is not None:
+            return self._inner.read_text(resource_path)
         return self._inner.read_text(path)
 
     def write_text(self, path: Path, content: str) -> None:
