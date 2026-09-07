@@ -187,3 +187,98 @@ leaves most of the friction in place.
 
 Related: issue #539 (which recorded this as R2 and deliberately did not file it), PR #544, spec
 design decision D8, and D4 rule-table row 14.
+
+## Scope Amendment — 2026-09-06 (cleanup-merged-worktrees-hardening epic, child E)
+
+This issue is widened to cover the **gate-hook instances of the same defect class**. No second
+issue is opened for them.
+
+### Why the scope widened
+
+This issue is child E of the `cleanup-merged-worktrees-hardening` epic
+(`docs/features/epics/cleanup-merged-worktrees-hardening/epic.md`), where it is recorded as gap 8.
+The 2026-09-06 cleanup run observed the same defect in a second hook family. Recorded verbatim from
+that run's observations:
+
+> ### 8. Hook text-matching false positives
+>
+> The gate hooks match on the Bash command string, so a `printf` whose literal text mentioned the
+> gated gh subcommand was denied (`EPIC_MERGE_GATE_BLOCKED`) while writing a memory note. Match the
+> command word position (first token of a pipeline segment, after `gh`), not any substring.
+
+The defect is a single design property shared across the hook family — classification by regex over
+raw command text rather than by a parse of the command line — so fixing it once in a shared,
+tested command-word parser is cheaper and safer than fixing each hook separately. Splitting the
+family across two issues would leave two hooks asserting against two different matchers.
+
+### What this reverses
+
+The `spec.md` "Scope & Non-Goals" section previously listed these as out of scope, deferred to "a
+single follow-up candidate". That deferral is **withdrawn**; all five move into scope, joining the
+three hooks already in scope by decisions D5, D6, and D10:
+
+| Hook | Lines (2026-09-06) | Previous status |
+| --- | --- | --- |
+| `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` | 489 | in scope (originally filed) |
+| `.claude/hooks/enforce-promotion-mcp-only.ps1` | 274 | in scope (D5, D10) |
+| `.claude/hooks/enforce-pr-author-skill-helpers.ps1` | 228 | in scope (D6) |
+| `.claude/hooks/enforce-epic-merge-gate.ps1` | 451 | **out of scope -> in scope** |
+| `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` | 418 | **out of scope -> in scope** |
+| `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` | 280 | **out of scope -> in scope** |
+| `.claude/hooks/enforce-parallel-abandon-gate.ps1` | 256 | **out of scope -> in scope** |
+| `.claude/hooks/validate-bash.ps1` | 230 | **out of scope -> in scope** |
+| `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` | 104 | **newly discovered -> in scope** |
+
+The last row is a ninth defect site discovered during the 2026-09-06 re-derivation research. It
+appears in no prior scope list: `Test-EpicBaseBranchOverride` at line 67, deny code
+`EPIC_BASE_BRANCH_MISMATCH`. It is the same defect class and sits in the pr-author family already in
+scope by D6, so it is included here rather than deferred.
+
+Consequently the acceptance criterion "No out-of-scope hook is modified" and the criterion
+requiring "A single follow-up candidate is filed covering the out-of-scope family members" are both
+superseded by this amendment and are replaced in `spec.md`.
+
+### Issue #591 is superseded by this issue
+
+The merge-gate instance was separately captured on 2026-08-29 and promoted to **GitHub issue #591**
+("Bug: epic-merge-gate-parses-pr-number-from-whole-command-line",
+<https://github.com/drmoisan/drm-copilot/issues/591>). Its potential entry is at
+`docs/features/potential/promoted/2026-08-29-epic-merge-gate-parses-pr-number-from-whole-command-line.md`.
+
+Issue #591 is **OPEN**, has no active or completed feature folder, and no work has been done on it.
+Its content is folded into this issue and its fix is delivered here. #591 should be closed as
+superseded by #545 when this work merges.
+
+Correction to the epic manifest: `epic.md` describes that entry as an "unpromoted potential entry"
+located at `docs/features/potential/2026-08-29-...md`. Both details are inaccurate — the entry was
+already promoted to #591 and already sits under `docs/features/potential/promoted/`. The epic's
+instruction not to open a *second* issue for the merge-gate instance remains correct; only the
+recorded disposition changes, from "do not promote" to "record #591 as superseded".
+
+### The latent-bypass direction is a required deliverable, not an optional half
+
+A fix that only removes false positives leaves the more dangerous half of the defect open. This
+amendment records it as binding: acceptance requires at least one case per affected hook that the
+**current** hooks fail to classify and the **fixed** hooks do classify. The `git -C <dir> add .`
+case already recorded above is the canonical example; the gate hooks add
+`git -C <dir> worktree remove <path>` and the relocating `gh` spellings.
+
+### The shared parser is a contract two other epic children consume
+
+Children D and G of the same epic edit two of these hooks immediately after this work: child D adds
+cleanup-manifest acceptance to `enforce-epic-worktree-removal-gate.ps1`, and child G adds a
+consolidation-PR checkpoint shape to `enforce-epic-merge-gate.ps1`. Both depend on this child.
+
+Edits to those two hooks must therefore stay confined to the command-detection call site and its
+immediate helpers, and the shared parser's public function signatures must be documented explicitly
+in `spec.md` as the contract those children consume.
+
+### Fresh reproduction on the current tree
+
+The over-match direction reproduced again during this preparation run on 2026-09-06, at
+`be722eba`: writing the orchestrator checkpoint through a Bash heredoc was denied with
+`PROMOTION_MCP_ONLY_BLOCKED` because the JSON body named promotion tools as receipt *values*.
+Recorded at
+`evidence/other/live-reproduction-promotion-hook-overmatch.2026-09-06T23-35.md`.
+This confirms the defect is still live twelve days after the original filing and is not confined to
+the originally-filed hook.
