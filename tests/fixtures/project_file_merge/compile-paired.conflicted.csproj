@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Compile Include="Shared/Base1.cs" />
+<<<<<<< HEAD
+    <Compile Include="Ours/OursA.cs">
+      <DependentUpon>Base1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </Compile>
+    <Compile Include="Ours/OursB.cs">
+      <DependentUpon>Base1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </Compile>
+=======
+    <Compile Include="Theirs/TheirsA.cs">
+      <DependentUpon>Base1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </Compile>
+    <Compile Include="Theirs/TheirsB.cs">
+      <DependentUpon>Base1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </Compile>
+>>>>>>> origin/main
+    <Compile Include="Shared/Base2.cs" />
+  </ItemGroup>
+</Project>

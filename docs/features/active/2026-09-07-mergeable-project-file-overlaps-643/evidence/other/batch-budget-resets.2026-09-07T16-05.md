@@ -52,3 +52,45 @@ Post-reset state-file count: `0`
 Post-reset command exit code: 0 (recorded; C9 attaches no acceptance condition
 to this exit code because `Get-ChildItem` on a missing directory returns a
 non-zero code through `pwsh -Command` even when the enumeration is empty).
+
+---
+
+## Reset 2 — PowerShell, before [P5-T10]
+
+Timestamp: 2026-09-07T17-20
+
+Command: `pwsh -NoProfile -Command 'Get-ChildItem -Path .claude/state -Filter "powershell-batch-budget.*.json" -ErrorAction SilentlyContinue | ForEach-Object { Write-Output ("PRE-RESET " + $_.FullName + " " + (Get-Content -Raw $_.FullName)); Remove-Item -LiteralPath $_.FullName -Force }'`
+
+EXIT_CODE: 0
+
+Output Summary: One state file was enumerated and removed. Both lists were at
+their cap of 3 before the reset, so the next distinct production PowerShell file
+(the `pester.runsettings.psd1` edit of [P5-T12]) and the next distinct test file
+(`Resolve-MergeableConflict.Tests.ps1`, created by [P5-T10]) would both have been
+denied. The observed arrays match the [P5-T10] prediction.
+
+`PRE-RESET C:\Users\DanMoisan\repos\drm-copilot-wt\2026-09-07T08-09\.claude\state\powershell-batch-budget.8af424ea-e8c4-4c97-b2f3-a930ca145a35.json`
+
+Pre-reset `prodFiles` (3 of 3):
+
+1. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/.claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1`
+2. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/.claude/lib/project-file-merge/ProjectFileMerge.psm1`
+3. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/.claude/lib/project-file-merge/Resolve-MergeableConflict.ps1`
+
+Pre-reset `testFiles` (3 of 3):
+
+1. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/tests/scripts/claude-lib/blast-radius/BlastRadius.Conflict.Tests.ps1`
+2. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/tests/scripts/claude-lib/project-file-merge/ProjectFileMergeGrammar.Tests.ps1`
+3. `C:/Users/DanMoisan/repos/drm-copilot-wt/2026-09-07T08-09/tests/scripts/claude-lib/project-file-merge/ProjectFileMerge.Tests.ps1`
+
+Pre-reset `prodCap` and `testCap`: 3 and 3.
+
+Post-reset observation command: `pwsh -NoProfile -Command "(Get-ChildItem -Path .claude/state -Filter 'powershell-batch-budget.*.json' -ErrorAction SilentlyContinue | Measure-Object).Count"`
+
+Post-reset state-file count: `0`
+
+Post-reset command exit code: 0 (recorded; C9 attaches no acceptance condition
+to this exit code).
+
+No deviation from the [P5-T10] stated acceptance: the pre-reset `prodFiles` and
+`testFiles` arrays and the post-reset count of `0` are all as the task states.

@@ -172,6 +172,14 @@
             # BlastRadius.psm1. CodeCoverage.Path is an explicit per-file allow-list, so
             # the new module must be named here to be measured.
             '.claude/lib/blast-radius/BlastRadiusConflict.psm1'
+            # Issue #643 also added the merge library below: the line grammar, the
+            # keyed-union merge, and the entry script. The entry script is measured
+            # like the two modules because its Pester suite dot-sources it behind a
+            # guarded entry-point body, so every line it attributes was executed by a
+            # test rather than by a run of the step itself.
+            '.claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1'
+            '.claude/lib/project-file-merge/ProjectFileMerge.psm1'
+            '.claude/lib/project-file-merge/Resolve-MergeableConflict.ps1'
             # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
             # barrier and the worktree removal gate) and extended the invocation-origin
             # hook with the parallel-agent family; measured here so no new or changed

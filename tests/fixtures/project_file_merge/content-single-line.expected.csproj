@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Content Include="Shared/Base1.html" />
+    <Content Include="Ours/OursA.html" />
+    <Content Include="Ours/OursB.html" />
+    <Content Include="Theirs/TheirsA.html" />
+    <Content Include="Theirs/TheirsB.html" />
+    <Content Include="Shared/Base2.html" />
+  </ItemGroup>
+</Project>

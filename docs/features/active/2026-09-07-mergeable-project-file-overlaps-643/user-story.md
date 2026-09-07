@@ -53,12 +53,12 @@ Removing both signals never weakens the relation below the path level: two items
 - [ ] Those items are placed in a single cohort and are launched together, rather than being serialized across cohorts.
 - [x] Each item's declared blast radius still lists the project file it touches, so the operator can see the write and drift detection still reports an undeclared write.
 - [x] Two items in the same assembly, touching different files, produce no `module_overlap` edge; the destination module map the operator receives from push-down names no per-assembly module.
-- [ ] The operator receives the behavior through a normal push-down: no manual edit to the consumer repository's `config/blast-radius.json` or cohort-barrier hook is required, and the behavior survives the next push-down.
-- [ ] When a pull request cannot merge because of a conflict confined to project files, the orchestrator resolves it without re-delegating the item, and every entry present on either side is present in the merged file.
-- [ ] When the same package or binding-redirect entry appears on both sides at differing versions, the higher version is selected and the choice is reported to the operator.
-- [ ] When the conflict set contains any path outside the mergeable list, or any line the merge grammar does not recognise, the orchestrator escalates as it does today and names the paths that caused the escalation.
-- [ ] After a resolution the orchestrator runs the formatter check and the analyzer build before re-confirming CI, and reverts the resolution and escalates if either fails.
-- [ ] The resolution is cited where the operator reads run outcomes: the `## Mergeable Conflicts Resolved` section of the run status projection, the pull request body, the resolution commit message, and an evidence artifact under the run's evidence folder.
+- [x] The operator receives the behavior through a normal push-down: no manual edit to the consumer repository's `config/blast-radius.json` or cohort-barrier hook is required, and the behavior survives the next push-down.
+- [x] When a pull request cannot merge because of a conflict confined to project files, the orchestrator resolves it without re-delegating the item, and every entry present on either side is present in the merged file.
+- [x] When the same package or binding-redirect entry appears on both sides at differing versions, the higher version is selected and the choice is reported to the operator.
+- [x] When the conflict set contains any path outside the mergeable list, or any line the merge grammar does not recognise, the orchestrator escalates as it does today and names the paths that caused the escalation.
+- [x] After a resolution the orchestrator runs the formatter check and the analyzer build before re-confirming CI, and reverts the resolution and escalates if either fails.
+- [x] The resolution is cited where the operator reads run outcomes: the `## Mergeable Conflicts Resolved` section of the run status projection, the pull request body, the resolution commit message, and an evidence artifact under the run's evidence folder.
 - [ ] A run in which no project-file conflict occurs, or a destination whose truth table lacks the `mergeable_paths` key, behaves exactly as it does today; the operator sees no change in cohorts or escalations.
 
 ## Non-Goals
