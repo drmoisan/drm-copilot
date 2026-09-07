@@ -26,8 +26,10 @@ BeforeAll {
     $modulePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadius.psm1").Path
     Import-Module $modulePath -Force
 
-    # The relation reads no truth-table key today, so a minimal mapping suffices;
-    # it is still validated because the signature is frozen for consumers.
+    # The relation reads only mergeable_paths from the truth table. This minimal
+    # mapping omits that key deliberately, so every It below exercises the
+    # fail-closed absent-key path; the present-key cases live in the
+    # mechanically-mergeable Context further down.
     $script:TestConfig = @{ version = 1; over_breadth_fraction = 0.25 }
 
     # Build a radius record from the levels a test cares about, defaulting the
@@ -212,6 +214,59 @@ Describe 'Test-BlastRadiusConflict disjuncts in isolation' {
 
             # Assert: the smallest element keeps the detail argument-order stable.
             $result['reasons'][0]['detail'] | Should -Be 'alpha'
+        }
+    }
+
+    Context 'Mechanically-mergeable paths (issue #643)' {
+        BeforeAll {
+            # The five default patterns, so these tests exercise the present-key
+            # path the minimal mapping above omits.
+            $script:MergeableConfig = @{
+                version               = 1
+                over_breadth_fraction = 0.25
+                mergeable_paths       = @('**/*.csproj', '**/packages.config',
+                    '**/app.config', '**/*.vbproj', '**/*.props')
+            }
+        }
+
+        It 'reports no conflict for a csproj-only overlap' {
+            # Arrange / Act: two radii whose sole common entry is a project file.
+            $left = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/A.cs')
+            $right = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/B.cs')
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig
+
+            # Assert: a merge step reconciles the project file, so the pair is
+            # not in genuine contention and no reason is reported.
+            $result['conflict'] | Should -BeFalse
+            $result['reasons'].Count | Should -Be 0
+        }
+
+        It 'still reports path overlap for a declared glob entry' {
+            # Arrange: two glob entries, neither equal to a configured pattern.
+            $left = Get-TestRadius -Paths @('Proj/**')
+            $right = Get-TestRadius -Paths @('Proj/*.csproj')
+
+            # Act: evaluate the relation.
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig
+
+            # Assert: pattern subsumption is unsupported, so a glob is never
+            # mergeable and the genuine claim survives.
+            $result['conflict'] | Should -BeTrue
+            $result['reasons'].Count | Should -Be 1
+            $result['reasons'][0]['detail'] | Should -Be 'Proj/** ~ Proj/*.csproj'
+        }
+
+        It 'keeps the csproj in both radii paths' {
+            # Arrange / Act: the same csproj-only overlap as the first case,
+            # evaluated so the inputs can be re-read afterwards.
+            $left = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/A.cs')
+            $right = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/B.cs')
+            [void](Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig)
+
+            # Assert: the exclusion filters the comparison only. A radius record is
+            # never rewritten, so drift detection still sees every cited file.
+            $left['paths'] | Should -Contain 'QuickFiler.Test/QuickFiler.Test.csproj'
+            $right['paths'] | Should -Contain 'QuickFiler.Test/QuickFiler.Test.csproj'
         }
     }
 }

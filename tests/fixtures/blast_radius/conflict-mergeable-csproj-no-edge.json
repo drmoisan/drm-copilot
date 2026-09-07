@@ -1,0 +1,41 @@
+{
+  "description": "Mechanically-mergeable project-file overlap (issue #643). Both radii cite the same QuickFiler.Test.csproj alongside a source file of their own. The .csproj matches the configured **/*.csproj pattern, so it is dropped from both collections immediately before the smallest-path-overlap computation and the remaining source files are disjoint. The paths themselves are unchanged in the radius records; only the comparison sees the filtered collections.",
+  "input": {
+    "radius_a": {
+      "paths": ["QuickFiler.Test/QuickFiler.Test.csproj", "QuickFiler.Test/A.cs"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-09-07T09-00"
+    },
+    "radius_b": {
+      "paths": ["QuickFiler.Test/QuickFiler.Test.csproj", "QuickFiler.Test/B.cs"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-09-07T09-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": [],
+      "shared_surface_globs": [],
+      "mergeable_paths": [
+        "**/*.csproj",
+        "**/packages.config",
+        "**/app.config",
+        "**/*.vbproj",
+        "**/*.props"
+      ],
+      "modules": {
+        "config": ["config/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": false,
+    "reasons": []
+  }
+}

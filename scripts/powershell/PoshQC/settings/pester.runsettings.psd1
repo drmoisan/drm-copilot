@@ -167,6 +167,11 @@
             '.claude/lib/blast-radius/BlastRadius.psm1'
             '.claude/lib/blast-radius/BlastRadiusNormalization.psm1'
             '.claude/lib/blast-radius/BlastRadiusTokenShape.psm1'
+            # Issue #643 added the eighth file below. It holds the mechanically-mergeable
+            # path exclusion plus the two overlap helpers relocated out of
+            # BlastRadius.psm1. CodeCoverage.Path is an explicit per-file allow-list, so
+            # the new module must be named here to be measured.
+            '.claude/lib/blast-radius/BlastRadiusConflict.psm1'
             # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
             # barrier and the worktree removal gate) and extended the invocation-origin
             # hook with the parallel-agent family; measured here so no new or changed
