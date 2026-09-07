@@ -449,9 +449,10 @@ classify_branch() {
 
 run_report() {
 	# Report-mode driver: emit the deterministic report with no mutation of any kind.
-	# Emission order: WARN (freshness), then the pre-branch advisory scans (STALE_REF,
-	# ORPHAN_DIR, WARN|registration-lost — none depends on per-branch classification, so
-	# all three are colocated with the freshness warning), then WORKTREE registrations,
+	# Emission order: WARN (freshness), then the pre-branch advisory scans via the single
+	# run_report_scans call, which emits STALE_REF, ORPHAN_DIR, and WARN|registration-lost
+	# in that order from ONE filesystem scan (none depends on per-branch classification,
+	# so all three are colocated with the freshness warning), then WORKTREE registrations,
 	# then the per-branch BRANCH/CHILD_OF/COMMIT lines in enumerate_branches' LC_ALL=C
 	# order. Those come from classify_all_branches, the shared driver apply mode also
 	# uses, so both modes derive one identical classification. Returns the maximum return
@@ -471,9 +472,7 @@ run_report() {
 		return "$ebrc"
 	fi
 	check_main_freshness
-	scan_stale_refs || rc=$?
-	scan_orphan_dirs || rc=$?
-	scan_registration_loss || rc=$?
+	run_report_scans || rc=$?
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"

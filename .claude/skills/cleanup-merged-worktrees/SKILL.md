@@ -85,10 +85,11 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 - `STALE_REF|<refname>` — a `refs/remotes/<name>/*` ref whose `<name>` is not a
   configured remote, named in full ref form. Advisory only; no ref is ever pruned by
   this tool.
-- `CHILD_OF|<branch>|<ancestor>` — `branch` is a git ancestor of `ancestor`, which
-  itself resolved exactly `NOT_MERGED`. It is emitted alongside, never instead of, the
-  branch's own `BRANCH|<branch>|NOT_MERGED` line, and records why that verdict was
-  inherited rather than re-derived through the full ladder.
+- `CHILD_OF|<branch>|<ancestor>` — `branch` is a git ancestor of `ancestor`, and both
+  resolved exactly `NOT_MERGED` through their own full ladders. It is emitted alongside,
+  never instead of, the branch's own `BRANCH|<branch>|NOT_MERGED` line, and names the
+  containment relationship so an operator can see that the branch's work is not lost
+  when the named ancestor is retained.
 - `WARN|registration-lost|<path>` — a worktree directory whose `.git` pointer file names
   a gitdir target that no longer exists. Git commands run inside such a directory fail
   in confusing ways. Advisory only.

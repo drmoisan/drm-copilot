@@ -654,7 +654,7 @@ scenario needs.
       assertion would be unsatisfiable. Line 82 is the only occurrence of either token that survives
       in this file once P2-T6, P2-T7, and this task have landed; P2-T12 removes the two occurrences in
       `tests/shell/test_cleanup_worktrees_deletion.bats`, which is a different file.
-- [ ] [P2-T16] `[ORCHESTRATOR-RUN]` `[expect-fail]` Commit and push Phases 1 and 2, then dispatch
+- [x] [P2-T16] `[ORCHESTRATOR-RUN]` `[expect-fail]` Commit and push Phases 1 and 2, then dispatch
       `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`
       and read the completed run's log. Record the fail-before evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/regression-testing/fail-before-r01-r02-r04.2026-09-07T14-40.md`
@@ -963,14 +963,14 @@ scenario needs.
 
 ### Phase 7 — Final QA Loop, Size Cap, and Acceptance-Criteria Reconciliation
 
-- [ ] [P7-T1] `[ORCHESTRATOR-RUN]` Run `bash scripts/bash/shell-qc.sh format`, then immediately run
+- [x] [P7-T1] `[ORCHESTRATOR-RUN]` Run `bash scripts/bash/shell-qc.sh format`, then immediately run
       `git status --porcelain -- scripts/bash tests/shell tests/fixtures` and record its output
       verbatim, for the same write-mode reason stated in P0-T6. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-format.2026-09-07T14-40.md`
       with the four required fields. Acceptance: `EXIT_CODE: 0` and the porcelain observation is
       recorded. If the porcelain output shows this step rewrote any file, commit the rewrite and restart
       the loop from this task.
-- [ ] [P7-T2] `[ORCHESTRATOR-RUN]` Run `bash scripts/bash/shell-qc.sh check`. Record evidence at
+- [x] [P7-T2] `[ORCHESTRATOR-RUN]` Run `bash scripts/bash/shell-qc.sh check`. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-check.2026-09-07T14-40.md`
       with the four required fields; `Output Summary:` states the shfmt-diff and shellcheck results.
       Acceptance: `EXIT_CODE: 0`. If this step fails, fix and restart the loop from P7-T1.

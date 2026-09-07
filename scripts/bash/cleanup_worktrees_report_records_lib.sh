@@ -24,10 +24,14 @@
 #   STALE_REF|<refname>                      a refs/remotes/<name>/* ref whose <name> is
 #                                            not a configured remote. <refname> is the
 #                                            full ref form (refs/remotes/...).
-#   CHILD_OF|<branch>|<ancestor>             <branch> is a git ancestor of <ancestor>,
-#                                            which itself resolved exactly NOT_MERGED.
-#                                            Emitted alongside, never instead of, the
-#                                            branch's own BRANCH| line.
+#   CHILD_OF|<branch>|<ancestor>             advisory, informational: <branch> is a git
+#                                            ancestor of <ancestor>, and BOTH resolved
+#                                            exactly NOT_MERGED through their own
+#                                            unchanged ladders. Emitted alongside, never
+#                                            instead of, the branch's own BRANCH| line.
+#                                            It names a containment relationship only; no
+#                                            ladder rung is skipped for either branch and
+#                                            neither verdict is derived from the other.
 #   WARN|registration-lost|<path>            a worktree directory whose `.git` gitdir
 #                                            pointer names a target that does not exist.
 #
@@ -111,14 +115,17 @@ cleanup_wt_scan_roots() {
 	# Echo the worktree-tracking roots to scan, one per line.
 	#
 	# CLEANUP_WT_ORPHAN_ROOTS overrides the derivation with a colon-separated list.
-	# Otherwise the roots are `.claude/worktrees` (the agent worktree folder) and
-	# `<main-worktree-path>-wt` (the sibling worktree folder), where the main worktree
-	# path is the first `git worktree list --porcelain` stanza — the same derivation
-	# consolidation_worktree_path uses in cleanup_worktrees_actions_lib.sh.
+	# Otherwise BOTH roots derive from the main worktree path — the first
+	# `git worktree list --porcelain` stanza, the same derivation
+	# consolidation_worktree_path uses in cleanup_worktrees_actions_lib.sh. They are
+	# `<main-worktree-path>` joined with `.claude/worktrees` (the agent worktree folder)
+	# and `<main-worktree-path>-wt` (the sibling worktree folder), in that order.
 	#
-	# A parse_worktree_list hard failure drops only the derived second root; it is not
-	# fatal here, because these records are advisory and the callers' own git reads
-	# already fail closed on that condition. Always returns 0.
+	# Deriving both from one read means a parse_worktree_list hard failure emits no root
+	# at all, rather than a bare relative path that would be resolved against whatever
+	# the process's current working directory happened to be. cleanup_wt_scan_records
+	# returns 0 with no record for an empty root list, so the advisory records degrade to
+	# silence rather than to a misleading scan. Always returns 0.
 	local override=${CLEANUP_WT_ORPHAN_ROOTS:-}
 	if [[ -n $override ]]; then
 		local IFS=:
@@ -128,7 +135,6 @@ cleanup_wt_scan_roots() {
 		done
 		return 0
 	fi
-	printf '%s\n' ".claude/worktrees"
 	local out rc=0 first_record main_wt=""
 	out=$(parse_worktree_list) || rc=$?
 	if ((rc != 0)); then
@@ -137,6 +143,7 @@ cleanup_wt_scan_roots() {
 	first_record=${out%%$'\n'*}
 	main_wt=${first_record%%|*}
 	if [[ -n $main_wt ]]; then
+		printf '%s\n' "${main_wt}/.claude/worktrees"
 		printf '%s\n' "${main_wt}-wt"
 	fi
 	return 0
@@ -195,11 +202,24 @@ scan_orphan_dirs() {
 	# rather than dropped: size is best-effort and its absence is not a reason to hide a
 	# real orphan.
 	#
+	# Args: $1 = OPTIONAL pre-scanned records, in cleanup_wt_scan_records' output shape.
+	# When an argument is supplied it is used verbatim and no scan is performed, so a
+	# caller that already scanned (run_report_scans) does not scan a second time. The test
+	# is on the ARGUMENT COUNT, not on the value, so "records supplied and empty" is
+	# distinguishable from "no records supplied": an empty supplied value means the scan
+	# found nothing and this function emits nothing, while no argument at all means the
+	# function scans for itself. Direct callers may therefore keep calling it with no
+	# argument.
+	#
 	# Returns the scan's exit code on a hard scan failure (no record emitted), else 0.
 	local rc=0 recs wlout wlrc=0 record path has_gitfile size norm
-	recs=$(cleanup_wt_scan_records) || rc=$?
-	if ((rc != 0)); then
-		return "$rc"
+	if (($# > 0)); then
+		recs="$1"
+	else
+		recs=$(cleanup_wt_scan_records) || rc=$?
+		if ((rc != 0)); then
+			return "$rc"
+		fi
 	fi
 	if [[ -z $recs ]]; then
 		return 0
@@ -241,18 +261,29 @@ scan_registration_loss() {
 	# read-only; nothing here deletes a directory or prunes a registration.
 	#
 	# It consumes the same scan output and the same root resolution as scan_orphan_dirs,
-	# so the two records are always derived from one consistent view of the filesystem.
+	# and the mechanism that makes that true is the caller: run_report_scans performs one
+	# cleanup_wt_scan_records call and passes the SAME captured records to both functions,
+	# so the two records are always derived from one consistent view of the filesystem. A
+	# direct call with no argument scans for itself instead.
 	# Output is LC_ALL=C sorted. A record whose shape is unexpected (an empty path or a
 	# gitdir_target_exists field that is neither 0 nor 1, such as the NA a pointer-less
 	# directory carries) is skipped silently rather than reported or raised, mirroring
 	# check_main_freshness's never-blocking contract: this warning must never be the
 	# reason a report fails.
 	#
+	# Args: $1 = OPTIONAL pre-scanned records, in cleanup_wt_scan_records' output shape.
+	# The test is on the ARGUMENT COUNT, not on the value, so "records supplied and empty"
+	# is distinguishable from "no records supplied".
+	#
 	# Returns the scan's exit code on a hard scan failure (no record emitted), else 0.
 	local rc=0 recs record path has_gitfile target_exists
-	recs=$(cleanup_wt_scan_records) || rc=$?
-	if ((rc != 0)); then
-		return "$rc"
+	if (($# > 0)); then
+		recs="$1"
+	else
+		recs=$(cleanup_wt_scan_records) || rc=$?
+		if ((rc != 0)); then
+			return "$rc"
+		fi
 	fi
 	if [[ -z $recs ]]; then
 		return 0
@@ -272,87 +303,95 @@ scan_registration_loss() {
 	return 0
 }
 
-cleanup_wt_protected_branches() {
-	# Echo the branch names that classify_branch's rung-1 exclusion protects, one per
-	# line: the current branch, plus every branch checked out in a protected worktree
-	# path (the main worktree, and the current worktree).
+run_report_scans() {
+	# The sole report-mode entry point for the three advisory scans. It exists so that
+	# exactly ONE filesystem scan — and therefore exactly one `du` pass — occurs per
+	# report: scan_orphan_dirs and scan_registration_loss each scan for themselves when
+	# called directly, so a caller that invoked both would scan the tree twice and could
+	# derive its two records from two different views of it.
 	#
-	# This mirrors the rung-1 logic in classify_branch rather than reimplementing a
-	# policy: classify_all_branches must know which branches classify_branch would
-	# resolve to PROTECTED_CURRENT, because a protected branch's verdict is fixed by the
-	# exclusion and must never be replaced by an inherited NOT_MERGED. Without this the
-	# short-circuit would violate its own outcome-preservation invariant for exactly one
-	# case — a protected branch that happens to be a git ancestor of an unmerged branch,
-	# which `main` almost always is.
+	# Emission order is the documented one: STALE_REF, then ORPHAN_DIR, then
+	# WARN|registration-lost. scan_stale_refs consumes no scan records, so it runs in both
+	# branches below.
 	#
-	# Returns the underlying read's exit code on a hard failure, with no names emitted.
-	local cpout cprc=0 wlout wlrc=0 pline record wpath wbranch norm
-	cpout=$(compute_protected) || cprc=$?
-	if ((cprc != 0)); then
-		return "$cprc"
-	fi
-	local -A prot_path=()
-	while IFS= read -r pline; do
-		case "$pline" in
-		protected-branch\|*) printf '%s\n' "${pline#protected-branch|}" ;;
-		protected-path\|*) prot_path[${pline#protected-path|}]=1 ;;
-		esac
-	done <<<"$cpout"
-	wlout=$(parse_worktree_list) || wlrc=$?
-	if ((wlrc != 0)); then
-		return "$wlrc"
-	fi
-	while IFS= read -r record; do
-		[[ -z $record ]] && continue
-		IFS='|' read -r wpath _ wbranch _ <<<"$record"
-		[[ -z $wbranch || $wbranch == DETACHED ]] && continue
-		norm=$(normalize_wt_path "$wpath")
-		if [[ -n $norm && -n ${prot_path[$norm]:-} ]]; then
-			printf '%s\n' "$wbranch"
+	# Guarded parent-shell capture: a non-zero cleanup_wt_scan_records exit is observed
+	# here, emits no scan-derived record, and is returned, mirroring the hard-failure
+	# contract the two record functions already have.
+	#
+	# Args: none. Returns the maximum non-zero return code observed, else 0.
+	local rc=0 srrc=0 recs scanrc=0 orc=0 lrc=0
+	recs=$(cleanup_wt_scan_records) || scanrc=$?
+	if ((scanrc != 0)); then
+		scan_stale_refs || srrc=$?
+		if ((srrc > scanrc)); then
+			return "$srrc"
 		fi
-	done <<<"$wlout"
-	return 0
+		return "$scanrc"
+	fi
+	scan_stale_refs || srrc=$?
+	if ((srrc > rc)); then
+		rc=$srrc
+	fi
+	scan_orphan_dirs "$recs" || orc=$?
+	if ((orc > rc)); then
+		rc=$orc
+	fi
+	scan_registration_loss "$recs" || lrc=$?
+	if ((lrc > rc)); then
+		rc=$lrc
+	fi
+	return "$rc"
 }
 
 classify_all_branches() {
-	# Shared classification driver: classify every enumerated branch once, emitting the
-	# same BRANCH|/COMMIT| lines the per-branch ladder emits plus the CHILD_OF| record,
-	# and return the maximum per-branch return code observed.
+	# Shared classification driver: classify every enumerated branch once through the
+	# unchanged per-branch ladder, emit exactly the BRANCH|/COMMIT| lines that ladder
+	# produced, add the advisory CHILD_OF| record where one applies, and return the
+	# maximum per-branch return code observed.
+	#
+	# NO LADDER RUNG IS EVER SKIPPED, and no branch's verdict is ever derived from another
+	# branch's verdict. Ancestry determines a branch's state in neither direction:
+	#
+	#   - At rung 2, a branch merged into main by a merge commit is an ancestor of main
+	#     and therefore of every branch cut from a main that already contains it, while
+	#     resolving MERGED_CLEAN itself.
+	#   - At rung 3, a branch whose net diff against main is empty resolves
+	#     MERGED_CONTENT_NEUTRAL while still being an ancestor of an unmerged branch.
+	#   - At rung 5, classify_residual_commit decides each residual commit by comparing
+	#     the BRANCH TIP's blob against main's. Two branches in an ancestor relationship
+	#     have different tips, so the same residual commit can resolve CONTENT_ON_MAIN for
+	#     one and UNIQUE for the other. That rung is the last before the verdict and
+	#     cannot be derived from any ancestor's result under any topology.
+	#
+	# There is no sound cut point, so there is no cut. CHILD_OF is consequently an
+	# informational record about a containment relationship, not a licence to skip work,
+	# and the outcome-preservation invariant holds by construction: the BRANCH| line this
+	# function emits is the byte-identical line classify_branch produced.
 	#
 	# Two-phase contract:
 	#
-	#   1. Pairwise ancestry. For every ordered pair (X, Y) with X != Y, probe
+	#   1. Classification. Every enumerated branch is classified by one classify_branch
+	#      call. Its captured output is recorded verbatim and its state is read from the
+	#      first BRANCH| line's third field. rc rises to the maximum return observed.
+	#
+	#   2. Pairwise ancestry, restricted to the NOT_MERGED set. For every ordered pair
+	#      (X, Y) with X != Y where BOTH X and Y recorded exactly NOT_MERGED, probe
 	#      `git merge-base --is-ancestor <X> <Y>` with the exit code captured via
-	#      `|| rc=$?`. Exit 0 records Y as an ancestor-target of X; exit 1 records
-	#      nothing; any exit above 1 is a hard git failure, which emits
-	#      BRANCH|X|ANCESTRY_ERROR and excludes X from every later phase. There is no
-	#      silent "not an ancestor" fallback for a hard failure, matching the
-	#      ANCESTRY_ERROR convention documented in cleanup_worktrees_lib.sh.
+	#      `|| mrc=$?`. Exit 0 means X is an ancestor of Y and appends CHILD_OF|X|Y to X's
+	#      recorded lines, for the LC_ALL=C-first such Y so the record is deterministic
+	#      when X has several NOT_MERGED ancestor-targets. Exit 1 means "not an ancestor".
+	#      Any exit above 1 is a hard git failure: it emits no CHILD_OF record for that
+	#      pair, leaves X's already-correct BRANCH| line exactly as classify_branch
+	#      produced it — overwriting it would itself break the invariant above — and
+	#      raises rc to at least 2 so the failure surfaces in the exit status instead of
+	#      degrading silently to "not an ancestor". A hard failure of the ladder's OWN
+	#      rung-2 probe is a separate, unaffected case that classify_branch still maps to
+	#      BRANCH|<name>|ANCESTRY_ERROR.
 	#
-	#   2a. Independent branches (zero ancestor-targets) are classified by the unchanged
-	#       classify_branch, and their resolved state is read back from their BRANCH|
-	#       line.
-	#   2b. Deferred branches (one or more ancestor-targets) are then processed in
-	#       LC_ALL=C order. When X is not protected and any ancestor-target already
-	#       resolved to exactly NOT_MERGED, X is emitted as BRANCH|X|NOT_MERGED followed
-	#       by CHILD_OF|X|<that-target> and classify_branch is never invoked for X: a
-	#       branch contained in a branch that is not merged cannot itself be merged, so
-	#       the expensive cherry/diff-tree/ls-tree rungs would only re-derive a verdict
-	#       already implied. Otherwise X runs the full ladder normally.
-	#
-	#       The protection carve-out is required for outcome preservation, not an
-	#       optimization detail. classify_branch resolves a protected branch to
-	#       PROTECTED_CURRENT at rung 1, before ancestry is ever consulted, and `main`
-	#       is both protected and a git ancestor of every unmerged branch — so without
-	#       the carve-out `main` would inherit NOT_MERGED from the first unmerged branch
-	#       processed and the report would contradict the ladder it is meant to mirror.
-	#
-	# The short-circuit is one level deep by design: it fires only on a DIRECT
-	# ancestor-target whose state is already resolved. A branch whose only
-	# ancestor-targets are themselves deferred and unresolved falls through to the full
-	# ladder. That forgoes a deeper optimization but can never produce a wrong verdict,
-	# because the saving is cost-only: BRANCH|X|NOT_MERGED is exactly what the full
-	# ladder would have emitted.
+	# Restricting the probe to the NOT_MERGED set bounds its cost at k*(k-1) probes for k
+	# such branches rather than n*(n-1) for n branches, and `main` needs no special
+	# handling: classify_branch resolves it PROTECTED_CURRENT at rung 1, which is not
+	# NOT_MERGED, so it never enters the probe set.
 	#
 	# Output order is enumerate_branches' original LC_ALL=C order, regardless of the
 	# order in which the phases above resolved each branch, so the report is
@@ -372,34 +411,11 @@ classify_all_branches() {
 	if ((${#order[@]} == 0)); then
 		return 0
 	fi
-	local -A branch_state=() branch_out=() ancestor_targets=() probe_failed=()
+	local -A branch_state=() branch_out=()
 	local x y mrc
+	# Phase 1: the unchanged full ladder, once for every branch. No rung is skipped and
+	# no verdict is substituted, so each recorded line is the ladder's own.
 	for x in "${order[@]}"; do
-		local -a found=()
-		for y in "${order[@]}"; do
-			[[ $x == "$y" ]] && continue
-			mrc=0
-			cleanup_wt_git merge-base --is-ancestor "$x" "$y" >/dev/null 2>&1 || mrc=$?
-			if ((mrc == 0)); then
-				found+=("$y")
-			elif ((mrc > 1)); then
-				branch_out[$x]="BRANCH|$x|ANCESTRY_ERROR"
-				branch_state[$x]="ANCESTRY_ERROR"
-				probe_failed[$x]=1
-				if ((rc < 2)); then
-					rc=2
-				fi
-				break
-			fi
-		done
-		if [[ -z ${probe_failed[$x]:-} ]]; then
-			ancestor_targets[$x]="${found[*]:-}"
-		fi
-	done
-	# Phase 2a: the independent branches, via the unchanged full ladder.
-	for x in "${order[@]}"; do
-		[[ -n ${probe_failed[$x]:-} ]] && continue
-		[[ -n ${ancestor_targets[$x]:-} ]] && continue
 		crc=0
 		cbout=$(classify_branch "$x") || crc=$?
 		branch_out[$x]=$cbout
@@ -408,51 +424,48 @@ classify_all_branches() {
 			rc=$crc
 		fi
 	done
-	# Phase 2b: the deferred branches, in LC_ALL=C order.
-	local -a deferred=()
+	# Phase 2: pairwise ancestry, over the NOT_MERGED set only. A branch that resolved
+	# anything else is neither a subject nor a target, so `main` (PROTECTED_CURRENT) is
+	# excluded by its own verdict and needs no separate protection lookup.
+	local -a not_merged=()
 	for x in "${order[@]}"; do
-		[[ -n ${probe_failed[$x]:-} ]] && continue
-		[[ -z ${ancestor_targets[$x]:-} ]] && continue
-		deferred+=("$x")
+		if [[ ${branch_state[$x]:-} == "NOT_MERGED" ]]; then
+			not_merged+=("$x")
+		fi
 	done
-	if ((${#deferred[@]} > 0)); then
-		local sorted hit target pname
-		local -a target_list=()
-		# A protected branch's verdict is fixed by classify_branch's rung-1 exclusion and
-		# is never inheritable. On a hard failure of the protection read, leave the set
-		# empty so every deferred branch runs the full ladder, which surfaces the same
-		# failure as ANCESTRY_ERROR instead of hiding it behind a short-circuit.
-		local -A protected=()
-		while IFS= read -r pname; do
-			[[ -z $pname ]] && continue
-			protected[$pname]=1
-		done < <(cleanup_wt_protected_branches || true)
-		sorted=$(printf '%s\n' "${deferred[@]}" | LC_ALL=C sort)
-		while IFS= read -r x; do
-			[[ -z $x ]] && continue
+	if ((${#not_merged[@]} > 1)); then
+		local sorted hit
+		local -a probe=()
+		# LC_ALL=C order makes the recorded ancestor-target deterministic when a branch
+		# has more than one NOT_MERGED ancestor-target.
+		sorted=$(printf '%s\n' "${not_merged[@]}" | LC_ALL=C sort)
+		while IFS= read -r name; do
+			if [[ -n $name ]]; then
+				probe+=("$name")
+			fi
+		done <<<"$sorted"
+		for x in "${probe[@]}"; do
 			hit=""
-			read -r -a target_list <<<"${ancestor_targets[$x]}"
-			for target in "${target_list[@]:-}"; do
-				[[ -z $target ]] && continue
-				[[ -n ${protected[$x]:-} ]] && break
-				if [[ ${branch_state[$target]:-} == "NOT_MERGED" ]]; then
-					hit=$target
+			for y in "${probe[@]}"; do
+				if [[ $x == "$y" ]]; then
+					continue
+				fi
+				mrc=0
+				cleanup_wt_git merge-base --is-ancestor "$x" "$y" >/dev/null 2>&1 || mrc=$?
+				if ((mrc == 0)); then
+					hit=$y
 					break
+				fi
+				# A hard probe failure emits no record for this pair and never rewrites
+				# the branch's own verdict; it surfaces in the return code instead.
+				if ((mrc > 1)) && ((rc < 2)); then
+					rc=2
 				fi
 			done
 			if [[ -n $hit ]]; then
-				branch_out[$x]="BRANCH|$x|NOT_MERGED"$'\n'"CHILD_OF|$x|$hit"
-				branch_state[$x]="NOT_MERGED"
-				continue
+				branch_out[$x]="${branch_out[$x]:-}"$'\n'"CHILD_OF|$x|$hit"
 			fi
-			crc=0
-			cbout=$(classify_branch "$x") || crc=$?
-			branch_out[$x]=$cbout
-			branch_state[$x]=$(printf '%s\n' "$cbout" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
-			if ((crc > rc)); then
-				rc=$crc
-			fi
-		done <<<"$sorted"
+		done
 	fi
 	for x in "${order[@]}"; do
 		if [[ -n ${branch_out[$x]:-} ]]; then

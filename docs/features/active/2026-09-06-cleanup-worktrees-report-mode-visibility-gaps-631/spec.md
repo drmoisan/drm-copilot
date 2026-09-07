@@ -42,9 +42,10 @@ Expected:
   no worktree registration are reported as `ORPHAN_DIR|<path>|<size>`.
 - Stale `refs/remotes/child/*` refs left over from an epic run (with no corresponding remote
   named `child`) are reported as `STALE_REF|<refname>`.
-- A branch whose tip is already an ancestor of another `NOT_MERGED` branch is short-circuited
-  and reported as `CHILD_OF|<branch>|<ancestor>` instead of re-classifying every commit, reducing
-  report runtime without changing the classification outcome relative to full classification.
+- A branch whose tip is already an ancestor of another `NOT_MERGED` branch is reported as
+  `CHILD_OF|<branch>|<ancestor>` alongside its own unchanged `BRANCH|` line. The record is
+  informational: it names the containment relationship so an operator can see that the branch's
+  work is not lost when the named ancestor is retained.
 - A worktree whose on-disk `.git` file points at a missing `.git/worktrees/<name>` entry is
   reported as `WARN|registration-lost|<path>`.
 - Deletion of orphan directories and stale refs remains a manual, per-item confirmed action;
@@ -84,7 +85,7 @@ Exactly four additive report-mode record types, added to the existing `run_repor
   root with no `.git` file.
 - `STALE_REF|<refname>` (gap 7) — a `refs/remotes/<name>/*` ref whose `<name>` has no
   corresponding configured remote.
-- `CHILD_OF|<branch>|<ancestor>` (gap 9c) — a cost-only classification short-circuit, emitted
+- `CHILD_OF|<branch>|<ancestor>` (gap 9c) — an informational containment record, emitted
   alongside an unchanged `BRANCH|<branch>|NOT_MERGED` line, per the outcome-preservation
   invariant below.
 - `WARN|registration-lost|<path>` (gap 9d) — a detection line for a worktree whose `.git` file
@@ -157,23 +158,34 @@ small `run_report` call-site edit that replaces its inline loop.
 
 ### The `CHILD_OF` outcome-preservation invariant
 
-This is a hard invariant, not a design preference. Today, a branch `X` that is a full git
-ancestor of another unmerged branch `Y` runs the complete classification ladder — including the
-expensive per-commit `git cherry`/`diff-tree` rungs — and resolves to `BRANCH|X|NOT_MERGED`. The
-`CHILD_OF` short-circuit MUST preserve that exact `BRANCH|X|NOT_MERGED` outcome, and it applies
-**only** when `Y` resolves to exactly `NOT_MERGED` — not `HAS_UNIQUE_RESIDUALS`,
-`MERGED_EQUIVALENT`, `MERGED_CONTENT_NEUTRAL`, `MERGED_CLEAN`, or `ANCESTRY_ERROR`. The subset
-argument that justifies skipping the expensive rungs holds only in the `NOT_MERGED` case: if `Y`
-resolved to anything else, `X` being an ancestor of `Y` does not by itself determine `X`'s state,
-and skipping the ladder would risk a wrong verdict rather than merely a slower one.
+This is a hard invariant, not a design preference. A branch `X` that is a full git ancestor of
+another unmerged branch `Y` runs the complete classification ladder — including the expensive
+per-commit `git cherry`/`diff-tree` rungs — and reports whatever its own ladder resolves.
 
-The short-circuit changes classification **cost** only, never classification **outcome**. This
+Ancestry determines a branch's state in neither direction. The ladder's rung-5 residual test
+compares the branch tip's blob against `main`'s, and two branches in an ancestor relationship have
+different tips, so the same residual commit can resolve `CONTENT_ON_MAIN` for one and `UNIQUE` for
+the other. The earlier rungs are no better: a branch merged into `main` by a merge commit, a branch
+whose net diff against `main` is empty, and a branch whose content is already equivalent to `main`
+can each be a git ancestor of an unmerged branch while resolving `MERGED_CLEAN`,
+`MERGED_CONTENT_NEUTRAL`, and `MERGED_EQUIVALENT` respectively. No rung of the ladder is therefore
+derivable from an ancestor's verdict.
+
+`CHILD_OF` is consequently an informational
+record: it names the containment relationship between two branches that both resolved exactly
+`NOT_MERGED` through their own ladders, and no ladder rung is skipped for any branch. The
+`CHILD_OF|X|Y` record is emitted **only** when both `X` and `Y` resolve to exactly `NOT_MERGED` —
+not `HAS_UNIQUE_RESIDUALS`, `MERGED_EQUIVALENT`, `MERGED_CONTENT_NEUTRAL`, `MERGED_CLEAN`, or
+`ANCESTRY_ERROR`.
+
+The record is additive and changes no classification **outcome**. This
 must be provable for both report mode and apply mode:
 
-- Report mode: the `BRANCH|X|NOT_MERGED` line's value is byte-identical whether or not the
-  short-circuit fired; the only observable difference is the presence of an additive
-  `CHILD_OF|X|Y` line and the absence of the skipped rungs' side effects (none of which are
-  externally visible beyond the `BRANCH|` line itself).
+- Report mode: the `BRANCH|X|NOT_MERGED` line the shared driver emits is the byte-identical
+  line `classify_branch` produced for `X`, because the driver calls `classify_branch` for
+  every branch and never substitutes a verdict of its own. The only observable difference
+  between a branch that carries the record and one that does not is the presence of an
+  additive `CHILD_OF|X|Y` line.
 - Apply mode: `run_apply` (`cleanup_worktrees_actions_lib.sh:316-382`) does not parse
   `run_report`'s serialized text output. It calls `classify_branch` directly and extracts the
   allowlist-governing state with `state=$(printf '%s\n' "$cb_out" | awk -F'|'
@@ -187,11 +199,17 @@ must be provable for both report mode and apply mode:
   branch is therefore provably unaffected: `NOT_MERGED` was never in the allowlist before this
   change and is not moved into it by this change.
 
-A hard git failure during the new pairwise `merge-base --is-ancestor` probe (exit code greater
-than 1) maps `X` to `ANCESTRY_ERROR`, consistent with the file's documented convention that a
-hard failure of any enumeration/protection/cherry/diff-tree/ls-tree/rev-list read maps to
-`BRANCH|<name>|ANCESTRY_ERROR` (`cleanup_worktrees_lib.sh:36-38`). It must not silently fall
-through to "not an ancestor."
+The pairwise `merge-base --is-ancestor` probe runs **after** classification, so a hard git
+failure of that probe (exit code greater than 1) must not be mapped onto `X`'s verdict: doing so
+would overwrite an already-correct `BRANCH|` line and would itself break the invariant this
+section states. The delivered contract is instead that such a failure emits no `CHILD_OF` record
+for that pair, leaves the branch's own `BRANCH|` line exactly as `classify_branch` produced it,
+and raises the driver's return code to 2, so the failure surfaces in the exit status rather than
+degrading silently to "not an ancestor."
+
+A hard failure of the ladder's own rung-2 ancestry probe inside `classify_branch` is a separate,
+unaffected case. It still maps to `BRANCH|<name>|ANCESTRY_ERROR` under the fail-closed convention
+documented at `cleanup_worktrees_lib.sh:36-38`.
 
 ### Boundaries and invariants to preserve
 - `classify_branch`'s existing six-rung ladder is unchanged for every branch that is not
@@ -315,12 +333,15 @@ on their presence.
   unaffected by the report-line-contract text extension.
 
 #### Performance constraints (latency/throughput/memory)
-The `CHILD_OF` short-circuit is expected to reduce report-mode runtime for checkouts with
-multiple branches descending from a common unmerged integration branch, by skipping the O(commits)
-`git cherry`/`diff-tree` rungs for every branch identified as an ancestor of an already-resolved
-`NOT_MERGED` branch. No specific latency or throughput number is asserted as an acceptance
-criterion; the qualitative expectation (fewer expensive-rung invocations for short-circuited
-branches) is verified directly via argv-log assertions in the test suite (see Test Strategy).
+The delivered position is that no rung is skipped, because no sound cut point exists: a
+merged-ness verdict is not derivable from an ancestor's verdict at any rung of the ladder, as the
+outcome-preservation invariant section establishes. Every branch runs its own complete ladder, so
+the `CHILD_OF` record buys no classification-cost reduction and none is claimed for it.
+
+The cost the design does bound is the pairwise ancestry probe. It is restricted to branches that
+both resolved exactly `NOT_MERGED`, so it performs `k*(k-1)` probes for `k` such branches rather
+than `n*(n-1)` for `n` enumerated branches. No specific latency or throughput number is asserted
+as an acceptance criterion.
 
 ## Assumptions, Constraints, Dependencies
 - Assumptions (environment, data, access): the bash toolchain runs under WSL Ubuntu with `bats`
@@ -367,14 +388,20 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
   `CHILD_OF`.
 - Required test cases:
   - A `CHILD_OF` positive case: `X` is a verified ancestor of a `Y` that resolves `NOT_MERGED`,
-    asserting both `BRANCH|X|NOT_MERGED` and `CHILD_OF|X|Y` are present, and asserting via
-    argv-log assertions against the stub's `stub-git:` stderr lines that none of `X`'s
-    expensive-rung stub keys (`cherry.X`, `diff-tree.*`, `rev-list.X`) were invoked.
+    asserting both `BRANCH|X|NOT_MERGED` and `CHILD_OF|X|Y` are present, asserting via the
+    stub's `stub-git:` stderr lines that `X`'s own ladder ran (its `cherry.X` key was
+    invoked), and asserting that the `BRANCH|` line the shared driver emits for `X` equals
+    the line `classify_branch` produces for that same branch under that same fixture.
   - A `CHILD_OF` negative case: `X` is an ancestor of a `Y` that resolves
-    `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`, asserting the short-circuit does not apply and
-    `X` is fully classified via the normal ladder with no `CHILD_OF` line.
-  - An apply-mode test proving the allowlist decision for a `CHILD_OF`-short-circuited
-    `NOT_MERGED` branch is unchanged (no deletion `ACTION` emitted), directly exercising the
+    `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`, asserting that no `CHILD_OF` line is
+    emitted and that `X` reports the verdict its own ladder produced.
+  - Cut-point counterexamples against the three `child_of_subject_merged_clean`,
+    `child_of_subject_content_neutral`, and `child_of_subject_merged_equivalent` fixtures,
+    pinning that a subject resolving `MERGED_CLEAN`, `MERGED_CONTENT_NEUTRAL`, or
+    `MERGED_EQUIVALENT` reports that verdict even while it is a git ancestor of a
+    `NOT_MERGED` branch, and that no `CHILD_OF` record is emitted for it.
+  - An apply-mode test proving the allowlist decision for a `NOT_MERGED` branch carrying a
+    `CHILD_OF` record is unchanged (no deletion `ACTION` emitted), directly exercising the
     outcome-preservation invariant in apply mode.
   - Positive/negative pairs for `ORPHAN_DIR` (present when unregistered and `.git`-less;
     absent when registered), `STALE_REF` (present when the remote is missing; absent when the
@@ -416,16 +443,19 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
       `BRANCH|<branch>|NOT_MERGED` line when the branch is a git ancestor of another branch that
       resolves to exactly `NOT_MERGED`, and is absent (with the branch running the full ladder
       normally) when the ancestor resolves to `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`,
-      verified by a positive/negative bats pair that additionally asserts via argv-log checks
-      that the expensive-rung stub keys were not invoked in the positive case.
+      verified by a positive/negative bats pair whose positive case additionally asserts that the
+      subject's `BRANCH|` line equals the line its own ladder produces under the same fixture.
 - [x] `WARN|registration-lost|<path>` is emitted for a worktree directory whose `.git` file
       points at a missing `.git/worktrees/<name>` entry, and is absent when the pointer resolves,
       verified by a positive/negative bats pair.
 - [ ] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
-      properties: (a) the report-mode `BRANCH|<branch>|NOT_MERGED` line's value is unchanged
-      whether or not the short-circuit fires, and (b) the apply-mode allowlist decision for a
-      `CHILD_OF`-short-circuited branch is unchanged (no deletion `ACTION` emitted for a
-      `NOT_MERGED` branch, short-circuited or not).
+      properties: (a) for every branch, the `BRANCH|` line
+      `classify_all_branches` emits is byte-identical to the line `classify_branch` produces
+      for that same branch under that same fixture — the invariant holds by construction,
+      because the driver never substitutes a verdict of its own and `CHILD_OF` is an additive
+      informational record; and (b) apply mode emits no deletion `ACTION` for a `NOT_MERGED`
+      branch carrying a `CHILD_OF` record, and does emit one for a delete-eligible branch that
+      is a git ancestor of a `NOT_MERGED` branch.
 - [ ] The `for-each-ref` stub key-specificity edit in
       `tests/fixtures/cleanup_worktrees/stub-bin/git` is backward compatible: the full existing
       bats suite passes unchanged immediately after that edit, before any new scenario fixtures
