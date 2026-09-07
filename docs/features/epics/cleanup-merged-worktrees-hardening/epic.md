@@ -34,8 +34,8 @@ features:
   - issue_num: 545
     feature_folder: 2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545
     depends_on: []
-  - issue_num: 906
-    feature_folder: collect-pr-context-omits-claude-tree-from-overview
+  - issue_num: 633
+    feature_folder: 2026-09-06-collect-pr-context-omits-claude-tree-633
     depends_on: []
   - issue_num: 903
     feature_folder: cleanup-worktrees-sanctioned-removal-manifest
@@ -98,7 +98,7 @@ that does not yet accept the manifest.
 | B | 901 | 7, 9c, 9d | bash (report-mode records) | 0 |
 | C | 902 | 2 | bash (dirt classifier, `--clear-disposable`) | 0 |
 | E | 545 | 8 | PowerShell (command-word matching) | 0 |
-| H | 906 | 9b | TypeScript (`collect_pr_context`) | 0 |
+| H | 633 | 9b | TypeScript (`collect_pr_context`) | 0 |
 | D | 903 | 3, 9a | PowerShell hook + skill text (removal manifest) | 1 |
 | G | 905 | 4 | PowerShell hook + skill text (consolidation merge gate) | 1 |
 | F | 904 | 5 | bash + skill text (`PRESERVE` consolidation) | 2 |
@@ -153,11 +153,11 @@ Computed by longest-path layering over the dependency DAG per the `epic-orchestr
 
 | wave | features |
 | --- | --- |
-| 0 | 630 (A), 901 (B), 902 (C), 545 (E), 906 (H) |
+| 0 | 630 (A), 901 (B), 902 (C), 545 (E), 633 (H) |
 | 1 | 903 (D), 905 (G) |
 | 2 | 904 (F) |
 
-`wave(630) = wave(901) = wave(902) = wave(545) = wave(906) = 0` (empty `depends_on`);
+`wave(630) = wave(901) = wave(902) = wave(545) = wave(633) = 0` (empty `depends_on`);
 `wave(903) = 1 + wave(545) = 1`; `wave(905) = 1 + wave(545) = 1`;
 `wave(904) = 1 + wave(903) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
 
