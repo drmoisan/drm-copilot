@@ -1477,7 +1477,7 @@ denies against a not-ready checkpoint.
       named Pester cases asserting: `git -C <dir> add` classifies; `git --git-dir=<x> commit`
       classifies; `git --work-tree=<x> add` classifies; an unmodeled dash-leading token between
       `git` and the subcommand classifies; and `git log --grep add` does **not** classify.
-- [ ] The five trigger pattern strings in the preimplementation gate are **byte-unchanged**, and
+- [x] The five trigger pattern strings in the preimplementation gate are **byte-unchanged**, and
       so are the promotion hook's four forbidden-token literals, the promotion hook's
       `gh issue create` / `issue new` expression string, the promotion hook's
       `$ghApiIssuesPostPattern` declaration line, the six `validate-bash` denylist literals,
@@ -1496,7 +1496,7 @@ denies against a not-ready checkpoint.
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
       double quotes).
-- [ ] **No existing denial is weakened.** Both existing decision suites pass with no assertion
+- [x] **No existing denial is weakened.** Both existing decision suites pass with no assertion
       modified except the single reversed heredoc `It` on each side; the existing Claude gate suite
       denials (lines 112–149), the Codex `Test-ImplementationCommand` classification table
       (lines 348–358, including `git commit -m "wip"` returning `$true`), the #539 D4 rows 14a–14d

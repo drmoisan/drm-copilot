@@ -766,7 +766,7 @@ executable, no ambient state.
       `validate-bash.ps1` copies and the two changed test suites. A PowerShell path outside that
       six-file set blocks closure.
 
-- [ ] [P4-T6] Consume the orchestrator-supplied per-file coverage figures. **The executor runs no
+- [x] [P4-T6] Consume the orchestrator-supplied per-file coverage figures. **The executor runs no
       coverage command.**
 
       **Precondition, discharged by the orchestrator before this task is dispatched.** No task in
@@ -802,7 +802,7 @@ executable, no ambient state.
       task is `BLOCKED`, not `SKIPPED`: record the blocked state and stop; do not substitute an
       MCP-produced figure and do not record a placeholder.
 
-- [ ] [P4-T7] Record the coverage delta. Using the `[P0-T7]` baseline values (94.3182 and 100.0000)
+- [x] [P4-T7] Record the coverage delta. Using the `[P0-T7]` baseline values (94.3182 and 100.0000)
       and the `[P4-T6]` post-change values, write
       `evidence/qa-gates/final-coverage-delta.<capture-timestamp>.md`.
       **Acceptance:** the artifact carries a two-row table, one row per canonical copy, each with a
@@ -828,7 +828,7 @@ executable, no ambient state.
       the identified uncovered line and the proposed case in the artifact, reports the state to the
       orchestrator, and waits for a plan revision that carries the new counts.
 
-- [ ] [P4-T8] Check off the two acceptance criteria that this cycle closes, in
+- [x] [P4-T8] Check off the two acceptance criteria that this cycle closes, in
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`:
       change the criterion amended by `[P3-T1]`, whose first line begins
       `- [ ] The five trigger pattern strings`, from `- [ ]` to `- [x]`; and change the criterion at
@@ -854,7 +854,7 @@ executable, no ambient state.
       `[P3-T2]` for the byte-unchanged criterion. Do not perform this task before `[P4-T4]`,
       `[P4-T6]`, and `[P4-T7]` have all passed.
 
-- [ ] [P4-T9] Reconcile against the remediation exit condition and close batch C with a budget reset.
+- [x] [P4-T9] Reconcile against the remediation exit condition and close batch C with a budget reset.
       Run `rm -f .claude/state/powershell-batch-budget.worktree-agent-a478b73e41951af31-e3281c7b.json`
       and list `.claude/state/` afterwards. Write
       `evidence/qa-gates/final-qa-summary.<capture-timestamp>.md`.
