@@ -353,6 +353,37 @@ follow-ups; do not expand a child's scope to absorb them mid-execution.
   extraction defect. Child 545 delivers the `.claude` side and both bundle copies; the `.codex`
   hook family is recorded by children 635 and 545 as a deliberate boundary.
 
+### EA-4 — The bash toolchain is denied to a delegated executor, and that can halt Phase 0
+
+Applies to children 630, 631, 632, and 637. This amendment qualifies EA-1; it does not replace it.
+
+EA-1 records the pwsh-wrapped form as verified, and it is: the form was re-run at planning close
+from the `epic-planner` context and returned `WSL_OK` with `Bats 1.13.0`. What EA-1's verification
+did not establish is that a *delegated* agent can run it. Child 637's round-3 preflight reviewer
+probed the same wrapped form from inside an `atomic-executor` delegation in an isolated worktree
+and the harness guard denied it before execution. The two observations are consistent: the
+constraint is the delegate's grant surface, not the WSL path or the worktree location.
+
+Consequences for execution, each verified at planning close:
+
+- The CI fallback exists and is genuinely dispatchable. `.github/workflows/_shell-coverage.yml`
+  declares both `workflow_call` and `workflow_dispatch`, so `gh workflow run _shell-coverage.yml
+  --ref <branch>` is a valid invocation, and it runs `shell-qc check` and `shell-qc test
+  --coverage` on `ubuntu-latest`.
+- The CI fallback is aggregate-only. Its `upload-artifact` step publishes `artifacts/pester/kcov/**`
+  and nothing else, so there is no per-test TAP artifact. An acceptance condition that asserts a
+  named bats test's pass count must be read from the workflow run log, not from a downloaded
+  artifact. Child 637 counted roughly 30 targeted bats gates in this position; they are satisfiable
+  from the run log but not from an artifact.
+- Child 637's `[P0-T2]` already handles the local denial fail-closed, so the run halts rather than
+  recording a false baseline.
+
+Guidance for `epic-orchestrator`, in order of preference: prefer running the bash toolchain from
+the child `orchestrator`'s own context rather than delegating it to `atomic-executor`, since the
+grant surface differs between them; if that is also denied, dispatch the workflow and read the run
+log; treat CI as canonical when local and CI disagree. Do not let a child record a baseline it
+could not actually capture.
+
 ## Shared Design Constraints
 
 These apply to every child and are repeated in each child's preparation prompt.
