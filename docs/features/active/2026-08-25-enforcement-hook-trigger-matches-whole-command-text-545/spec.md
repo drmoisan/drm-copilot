@@ -1500,7 +1500,7 @@ denies against a not-ready checkpoint.
       `hook-command-scanner.ps1`, with named cases asserting that promotion tool names supplied as
       receipt *values* allow while a genuine promotion-script invocation, `gh issue create`,
       `gh issue new`, and a single-segment `gh api repos/<o>/<r>/issues -X POST` still deny.
-- [ ] `enforce-pr-author-skill-helpers.ps1` is changed in both Claude copies so that the
+- [x] `enforce-pr-author-skill-helpers.ps1` is changed in both Claude copies so that the
       `isPrCreate` / `isPrEdit` trigger decision evaluates against per-segment scan text and so that
       `gh --repo <o/r> pr create` and `gh -R <o/r> pr edit` classify; named cases assert that a
       quoted `--body-file` mention inside a JSON receipt value allows, and that every `PR_*` reason
@@ -1570,7 +1570,7 @@ denies against a not-ready checkpoint.
       `gh --repo drmoisan/drm-copilot issue list` still allows, asserted in the same file.
       (Concrete owner/repo values are used in place of the earlier angle-bracket placeholders so the
       asserted tokens are real literals.)
-- [ ] **AT-1, the mandatory latent-bypass case, denies.** A named Pester case drives
+- [x] **AT-1, the mandatory latent-bypass case, denies.** A named Pester case drives
       `Invoke-EpicWorktreeRemovalGateDecision` with the command text
       `git -C /repo/main worktree remove /repo/worktrees/item-a-101` against an epic checkpoint
       carrying no authorizing record, and asserts a deny decision whose reason begins with
@@ -1594,7 +1594,7 @@ denies against a not-ready checkpoint.
       regression is visible in one place. The existing pin at
       `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` line 140
       also passes unmodified.
-- [ ] **AT-7, the cross-runtime divergence, is closed.** Named Pester cases assert that
+- [x] **AT-7, the cross-runtime divergence, is closed.** Named Pester cases assert that
       `Get-ParallelWorktreeRemovalCommandPath` and `Get-EpicWorktreeRemovalCommandPath` both return
       `/repo/worktrees/item-a-101` for the command text
       `git worktree remove --force /repo/worktrees/item-a-101`, where both return the literal
@@ -1617,7 +1617,7 @@ denies against a not-ready checkpoint.
       including the order-independence case at line 62. **AT-12 may not be checked off until the
       equals-joined bypass is confirmed by an executed run**, per D11.6, because the finding is
       currently derived from `argparse` semantics rather than observed.
-- [ ] **`enforce-pr-author-skill.epic-base-branch.ps1` is fixed in both Claude copies.**
+- [x] **`enforce-pr-author-skill.epic-base-branch.ps1` is fixed in both Claude copies.**
       `Test-EpicBaseBranchOverride` evaluates its trigger through `Test-CommandLineInvocation`, and
       named Pester cases assert that a relocating `gh --repo drmoisan/drm-copilot pr create`
       spelling is classified in epic mode where it is skipped today, and that a quoted mention of
