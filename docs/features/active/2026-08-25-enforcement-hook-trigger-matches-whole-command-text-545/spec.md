@@ -1458,7 +1458,7 @@ denies against a not-ready checkpoint.
       failing against the unfixed hooks: `git -C ../x add .` against an explicitly not-ready
       checkpoint is asserted to deny, with fail-before output recorded under the same evidence
       path.
-- [ ] Both regression tests pass after the fix, on both the Claude and the Codex sides, with
+- [x] Both regression tests pass after the fix, on both the Claude and the Codex sides, with
       pass-after output recorded under the same evidence path.
 - [x] The scanner produces, for each segment, the five properties named in D2 Piece 1 (`RawText`,
       `MaskedText`, `Tokens`, `HasLiveSubstitution`, `Unbalanced`), and a named Pester case exists
@@ -1518,7 +1518,7 @@ denies against a not-ready checkpoint.
       (the `.claude/hooks/` and `.codex/hooks/` paths) in each of the two PoshQC coverage lists. The
       two coverage-list edits are **textually identical**, as
       `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` requires.
-- [ ] **Both parity mechanisms are green in the same change:** the Codex byte-identity `It` in
+- [x] **Both parity mechanisms are green in the same change:** the Codex byte-identity `It` in
       `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes with every Codex
       canonical/bundle pair member byte-identical, and
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes with the Claude
@@ -1527,10 +1527,10 @@ denies against a not-ready checkpoint.
       used) is recorded under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/other/`,
       computed at the final commit rather than carried forward from an earlier batch.
-- [ ] Every production, test, and reusable script file touched or added by this change is at or
+- [x] Every production, test, and reusable script file touched or added by this change is at or
       under **500 lines**, verified by the Codex contract suite's line-cap check and by an explicit
       line-count artifact under `…-545/evidence/qa-gates/`.
-- [ ] Pester **line coverage is >= 85%** on every changed or added production PowerShell file, with
+- [x] Pester **line coverage is >= 85%** on every changed or added production PowerShell file, with
       `hook-command-scanner.ps1` inside the coverage denominator on both sides; coverage evidence is
       produced by invoking the self-hosted PoshQC module directly (the MCP runner reads the
       installed extension's settings and cannot see newly added coverage entries).
@@ -1555,7 +1555,7 @@ denies against a not-ready checkpoint.
       follow-up candidate is filed for the merge-gate, worktree-removal, abandon-gate, or
       `validate-bash` instances, because D11 delivers all of them here. The pull-request body states
       the supersession and names issue #591.
-- [ ] The PoshQC toolchain passes clean in a single pass over all changed and added PowerShell
+- [x] The PoshQC toolchain passes clean in a single pass over all changed and added PowerShell
       files: `mcp__drm-copilot__run_poshqc_format` → `mcp__drm-copilot__run_poshqc_analyze` →
       `mcp__drm-copilot__run_poshqc_test`, restarting from format on any failure or auto-fix, with
       final results recorded under `…-545/evidence/qa-gates/`.
@@ -1588,7 +1588,7 @@ denies against a not-ready checkpoint.
       `Invoke-EpicMergeGateDecision` with a `printf` command whose double-quoted text mentions the
       gated `gh pr merge --merge` phrase and asserts an allow decision. The case is recorded failing
       (as a deny with `EPIC_MERGE_GATE_BLOCKED`) against the unfixed hook.
-- [ ] **AT-6, the wrapper deny pin, still denies.** `Test-ImplementationCommand` returns `$true` for
+- [x] **AT-6, the wrapper deny pin, still denies.** `Test-ImplementationCommand` returns `$true` for
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-hooks"`, asserted by a
       named case that runs in the **same suite** as AT-1 through AT-5 and AT-7 so a fail-open
       regression is visible in one place. The existing pin at

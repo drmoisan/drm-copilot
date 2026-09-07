@@ -26,7 +26,8 @@ through the three MCP PoshQC functions. Results were read from
 `artifacts/pester/pester-junit.xml`. No coverage figure was measured locally for the four newly
 registered files: the MCP test runner resolves its runsettings from the installed VS Code
 extension, which does not carry the `CodeCoverage.Path` entries [P4-T10] added, so it cannot report
-them. The ending percentages are pending the second CI dispatch of `.github/workflows/_poshqc.yml`.
+them. The ending percentages were supplied by the second CI dispatch of `.github/workflows/_poshqc.yml`,
+recorded under "Second-round coverage provenance" below.
 
 ## Output Summary
 
@@ -87,7 +88,7 @@ Two groups of test files were edited, so two resets were required and two were p
 ### 1. `.codex/hooks/validate-bash.ps1`
 
 - Starting percentage: **39.7260** (covered 29, missed 44)
-- Ending percentage: **PENDING the second CI measurement**
+- Ending percentage: **100.0000** (covered 73, missed 0) — CI run `34145103168` at commit `5903d0c7`
 - Test file: `tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1` (new, 329 lines)
 - Cases added: 37, all passing
 
@@ -136,7 +137,7 @@ Total previously-uncovered lines targeted: **44**, which is the whole missed set
 ### 2. `.codex/hooks/enforce-epic-worktree-removal-gate.ps1`
 
 - Starting percentage: **64.7059** (covered 44, missed 24)
-- Ending percentage: **PENDING the second CI measurement**
+- Ending percentage: **98.5294** (covered 67, missed 1) — CI run `34145103168` at commit `5903d0c7`
 - Test file: `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   (new, 251 lines)
 - Cases added: 20, all passing
@@ -173,7 +174,7 @@ remain uncovered.
 ### 3. `.codex/hooks/enforce-promotion-mcp-only.ps1`
 
 - Starting percentage: **66.1538** (covered 43, missed 22)
-- Ending percentage: **PENDING the second CI measurement**
+- Ending percentage: **100.0000** (covered 65, missed 0) — CI run `34145103168` at commit `5903d0c7`
 - Test file: `tests/scripts/codex-hooks/enforce-promotion-mcp-only-decision-surface.Tests.ps1`
   (new, 214 lines)
 - Cases added: 18, all passing
@@ -204,7 +205,7 @@ Total previously-uncovered lines targeted: **22**, which is the whole missed set
 ### 4. `.codex/hooks/enforce-epic-merge-gate.ps1`
 
 - Starting percentage: **76.1194** (covered 51, missed 16)
-- Ending percentage: **PENDING the second CI measurement**
+- Ending percentage: **98.5075** (covered 66, missed 1) — CI run `34145103168` at commit `5903d0c7`
 - Test file: `tests/scripts/codex-hooks/enforce-epic-merge-gate-decision-surface.Tests.ps1`
   (new, 161 lines)
 - Cases added: 13, all passing
@@ -236,7 +237,7 @@ or throw before either checkpoint can influence the outcome.
 ### 5. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`
 
 - Starting percentage: **84.9398** (covered 141, missed 25)
-- Ending percentage: **PENDING the second CI measurement**
+- Ending percentage: **98.7952** (covered 164, missed 2) — CI run `34145103168` at commit `5903d0c7`
 - Test file:
   `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-routing.Tests.ps1`
   (new, 205 lines)
@@ -270,11 +271,69 @@ the MCP runner reports it; the other four files in this task are not, which is w
 exists for them. This local number is a corroborating observation from a partial-folder run, not
 the ending figure the acceptance criterion requires.
 
+## Second-round coverage provenance
+
+Timestamp: 2026-09-07T16-59
+
+Command:
+
+```
+gh workflow run .github/workflows/_poshqc.yml    (dispatched by the orchestrator)
+gh run watch 34145103168
+```
+
+EXIT_CODE: 0
+
+TOOLCHAIN_SUBSTITUTION: `pwsh` is not invocable anywhere in this session, so the plan's
+self-hosted PoshQC command could not be run locally. The measurement route was a CI dispatch of
+`.github/workflows/_poshqc.yml`, which imports the same self-hosted
+`scripts/powershell/PoshQC/PoshQC.psm1` module the plan mandates. The figures below were supplied
+to this task by the orchestrator, which watched the run to completion with a zero exit status.
+
+| Provenance field | Value |
+|---|---|
+| Route | CI dispatch of `.github/workflows/_poshqc.yml` |
+| Run id | `34145103168` |
+| Run outcome | watched to completion, zero exit status |
+| Measured at commit | `5903d0c7` |
+| Overall line coverage | `95.4618` percent, covered `8414`, missed `400` |
+| Source element | the report-level `counter` element whose `type` is `LINE` |
+| First-round comparison | `94.0209` percent at commit `cc83c0c8`, covered `8287`, missed `527` |
+| Suite state | full Pester suite GREEN on the clean CI checkout with all 99 new cases included |
+| Per-file selection method | package-qualified, identical to the first round |
+
+### Ending percentages, all five remediated files
+
+| File | Before | After | Covered | Missed | At or above 85 |
+|---|---|---|---|---|---|
+| `.codex/hooks/validate-bash.ps1` | 39.7260 | **100.0000** | 73 | 0 | yes |
+| `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` | 64.7059 | **98.5294** | 67 | 1 | yes |
+| `.codex/hooks/enforce-promotion-mcp-only.ps1` | 66.1538 | **100.0000** | 65 | 0 | yes |
+| `.codex/hooks/enforce-epic-merge-gate.ps1` | 76.1194 | **98.5075** | 66 | 1 | yes |
+| `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` | 84.9398 | **98.7952** | 164 | 2 | yes |
+
+The three files that carried a deliberately untargeted line each ended with exactly the predicted
+residue: one missed line on the Codex epic worktree removal gate, one on the Codex epic merge gate,
+and two on the Codex preimplementation gate. That agreement between the prediction recorded above
+and the measured miss counts is the check that the added cases reached the lines they named.
+
+### Isolation check on the other thirteen targets
+
+The other thirteen coverage targets are unchanged from the figures recorded in
+`evidence/qa-gates/post-change-per-file-coverage.2026-09-07T16-25.md`, and their covered and missed
+counts are byte-identical across both runs. That confirms the suites added by this task changed
+only the intended files' measurements. All 18 targets now sit at or above 85 percent; the lowest is
+`.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` at 88.3117 percent. Zero rows are
+missing.
+
 ## Acceptance status
 
-This task's acceptance requires an ENDING percentage at or above 85 for each of the five files.
-That figure can only come from the second CI dispatch of `.github/workflows/_poshqc.yml` against
-the pushed branch, which the orchestrator performs after this delegation. **[P12-T9] is therefore
-recorded here as incomplete and is left unchecked in the plan.** The starting percentages, the case
-names, and the targeted line counts required by the task are all recorded above; only the ending
-column is outstanding.
+This task's acceptance requires an ENDING percentage at or above 85 for each of the five files that
+started below 85. All five ending percentages are recorded above and every one is at or above 85;
+the lowest of the five is `98.5075`. The starting percentages, the added case names, and the
+targeted line counts are recorded per file in the sections above. **[P12-T9] is complete.**
+
+No file that started at or above 85 required remediation, and this task therefore added no cases
+for any such file. The statement the task requires — that it states explicitly when no file started
+below 85 — is inapplicable here in the affirmative sense: five files did start below 85, they are
+the five enumerated above, and no sixth file did.
