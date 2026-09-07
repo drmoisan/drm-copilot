@@ -1,3 +1,9 @@
 * text=auto eol=lf
 tests/fixtures/orchestration-handoff/taskmaster-469/claude-to-codex/plan.2026-08-29T12-22.md -text -eol
 tests/fixtures/orchestration-handoff/taskmaster-469/codex-to-claude/plan.2026-08-29T12-22.md -text -eol
+
+# Issue #643: the single rule above, * text=auto eol=lf, would rewrite this
+# fixture's CRLF terminators to LF on commit. That makes the ProjectFileMerge
+# 'preserves CRLF terminators' case pass on an uncommitted worktree and fail on
+# every fresh checkout, including CI, so the pair is exempted from conversion.
+tests/fixtures/project_file_merge/crlf-*.csproj -text

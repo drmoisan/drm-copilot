@@ -101,8 +101,16 @@ UMBRELLA_MODULE_NAMES = (
 PAYLOAD_MODULE_NAMES = frozenset({"config"})
 
 # Keys that describe the runtime rather than a repository layout, so both
-# committed copies must carry identical values.
-BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
+# committed copies must carry identical values. ``mergeable_paths`` joins this
+# class because it describes the runtime too: it names the mechanically
+# mergeable path class of issue #643, whose members are project-file shapes a
+# merge step can reconcile, not paths of any one repository's layout.
+BYTE_EQUAL_KEYS = (
+    "version",
+    "over_breadth_fraction",
+    "mandate_reads",
+    "mergeable_paths",
+)
 
 # Class 2 key-to-assertion registry: each portable shared-surface key mapped to
 # the name of the test function that is supposed to consume it. Registering the

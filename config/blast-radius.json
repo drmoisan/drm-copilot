@@ -30,6 +30,13 @@
     ".agents/skills/**",
     "scripts/vscode/**"
   ],
+  "mergeable_paths": [
+    "**/*.csproj",
+    "**/packages.config",
+    "**/app.config",
+    "**/*.vbproj",
+    "**/*.props"
+  ],
   "modules": {
     "powershell-dev-tools": ["scripts/dev-tools/**"],
     "poshqc": ["scripts/powershell/**"],

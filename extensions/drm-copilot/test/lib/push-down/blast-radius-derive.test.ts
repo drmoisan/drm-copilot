@@ -185,12 +185,12 @@ describe("issue #472: destination scan", () => {
 
 describe("issue #472: interception and passthrough", () => {
   it("writes the derived document rather than the bundled bytes", () => {
-    // Arrange: a destination whose layout declares one project directory.
+    // Arrange: a destination whose layout declares one Go module.
     const seeded = buildInMemoryFileSystem({}, [DEST]);
     const lister = fakeLister({
       [DEST]: [entry("src", true)],
       [`${DEST}/src`]: [entry("App", true)],
-      [`${DEST}/src/App`]: [entry("App.csproj", false)],
+      [`${DEST}/src/App`]: [entry("go.mod", false)],
     });
 
     // Act
@@ -388,14 +388,14 @@ describe("issue #472: unreadable-directory tolerance", () => {
 
 describe("issue #472: idempotency", () => {
   it("writes a byte-identical document on a second push", () => {
-    // Arrange: the second push sees the trees the first push created. `.claude`
-    // is dot-prefixed and skipped; `config` derives to the same glob the payload
-    // module already carries.
+    // Arrange: the second push sees the trees the first push created, with one
+    // Go module beneath src. `.claude` is dot-prefixed and skipped; `config`
+    // derives to the same glob the payload module already carries.
     const seeded = buildInMemoryFileSystem({}, [DEST]);
     const layout: Record<string, ReadonlyArray<DirectoryEntry>> = {
       [DEST]: [entry("src", true)],
       [`${DEST}/src`]: [entry("App", true)],
-      [`${DEST}/src/App`]: [entry("App.csproj", false)],
+      [`${DEST}/src/App`]: [entry("go.mod", false)],
     };
     const decorated = decorate(seeded, fakeLister(layout));
 

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <EmbeddedResource Include="Shared/Base1.resx" />
+    <EmbeddedResource Include="Ours/OursA.resx">
+      <DependentUpon>Base1.resx</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ours/OursB.resx">
+      <DependentUpon>Base1.resx</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theirs/TheirsA.resx">
+      <DependentUpon>Base1.resx</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Theirs/TheirsB.resx">
+      <DependentUpon>Base1.resx</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Shared/Base2.resx" />
+  </ItemGroup>
+</Project>

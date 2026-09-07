@@ -27,7 +27,10 @@ BeforeAll {
 
     # Class 1 key names (issue #500, cycle 3 CR-3). Read by the 'declares equal
     # values for the runtime-describing keys in both copies' case.
-    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads')
+    # 'mergeable_paths' (issue #643) describes the runtime rather than a
+    # repository layout: it names project-file shapes a merge step can
+    # reconcile, so both committed copies must carry identical values.
+    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads', 'mergeable_paths')
 
     # Class 2 key-to-consumer-file registry (issue #500, cycle 4 R1). Both keys
     # are indexed by name in BlastRadius.TruthTable.Tests.ps1, not in this
