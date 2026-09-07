@@ -145,6 +145,20 @@ function Get-BlockedPatternMatch {
         itself, and the literals are tested in their existing declaration order. Because a
         quoted span is one token, 'git commit -m "why rm -rf is banned"' no longer matches.
 
+        Leg 1 has a second condition, the wrapper carve-out of D2 Piece 2 together with the two
+        other clauses under which the scanner selects raw scan text. A wrapper's quoted argument is
+        a nested command line rather than inert data, and ConvertTo-CommandLineToken collapses a
+        balanced quoted span into ONE token, so a multi-token literal can never form a contiguous
+        token run inside it. The same masking hides a literal carried inside a quoted span or a
+        heredoc that never closes. For a segment that is wrapper-led, that carries a live
+        substitution, or whose quoting or heredoc did not close, the scanner already selects
+        RawText as ScanText, and this leg reads that field with an Ordinal IndexOf, matching the
+        culture-insensitive String.Contains it replaced. The three disjuncts here are exactly the
+        three clauses of that ScanText selection, so no segment the scanner scans raw is left
+        unscanned by this leg. That is what keeps both 'bash -c "rm -rf /tmp/x"' and
+        'echo "rm -rf /tmp/x' denying. A segment matching none of the three is never scanned this
+        way, so 'git commit -m "docs: explain why rm -rf is banned"' still allows.
+
         Leg 2 (structural): a relocating spelling such as 'git -C ../wt push --force origin
         HEAD' contains no literal as a token run, so it is classified structurally instead.
 
@@ -178,6 +192,10 @@ function Get-BlockedPatternMatch {
         $patternTokens = [string[]]@($pattern -split '\s+' | Where-Object { $_ })
         foreach ($segment in $segments) {
             if (Test-BlockedPatternTokenRun -Token @($segment.Tokens) -PatternToken $patternTokens) {
+                return $pattern
+            }
+            if (($segment.IsWrapperLed -or $segment.HasLiveSubstitution -or $segment.Unbalanced) -and
+                $segment.ScanText.IndexOf($pattern, [System.StringComparison]::Ordinal) -ge 0) {
                 return $pattern
             }
         }

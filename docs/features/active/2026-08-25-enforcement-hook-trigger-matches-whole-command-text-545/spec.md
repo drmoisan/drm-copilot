@@ -1478,9 +1478,20 @@ denies against a not-ready checkpoint.
       classifies; `git --work-tree=<x> add` classifies; an unmodeled dash-leading token between
       `git` and the subcommand classifies; and `git log --grep add` does **not** classify.
 - [ ] The five trigger pattern strings in the preimplementation gate are **byte-unchanged**, and
-      the promotion hook's four forbidden-token literals, its two `gh` expressions, and the
-      pr-author hook's `gh pr create` / `gh pr edit` expressions are likewise byte-unchanged;
-      verified by diff inspection recorded in the scope-and-size evidence artifact.
+      so are the promotion hook's four forbidden-token literals, the promotion hook's
+      `gh issue create` / `issue new` expression string, the promotion hook's
+      `$ghApiIssuesPostPattern` declaration line, the six `validate-bash` denylist literals,
+      `$script:CdChainedReadCommandPattern`, and the two abandon token constants; verified by diff
+      inspection recorded in the scope-and-size evidence artifact. The pr-author hook's
+      `gh pr create` and `gh pr edit` expressions are **superseded** by the D12 call-site rewrite
+      table, which directs `enforce-pr-author-skill-helpers.ps1` lines 170–171 to
+      `Test-CommandLineInvocation` — a function taking no pattern operand — and by the acceptance
+      criterion covering `enforce-pr-author-skill.epic-base-branch.ps1` (at line 1620 before this
+      amendment, indexed AC-33 in the audit artifacts, whose numbered index records AC-31 as the
+      `validate-bash.ps1` matching-primitive criterion at line 1604), which requires
+      `Test-EpicBaseBranchOverride` to evaluate through that same function, so those three literals
+      are necessarily deleted and carry no byte-unchanged obligation. Supporting record:
+      `evidence/qa-gates/trigger-literals-byte-unchanged.2026-09-07T15-50.md` §4.
 - [x] Every row of the D3 fail-closed table has at least one named Pester case per applicable side
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
