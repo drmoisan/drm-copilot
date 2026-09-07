@@ -4,33 +4,42 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 
 - Integration branch: `epic/cleanup-merged-worktrees-hardening-integration`
 - Integration base commit: `a36b6dca7809e456f00c7d5b01eec5da49f7fca0`
-- Integration tip commit: `6dff80ed4596bec088d548b23013e6077e32c484`
+- Integration branch tip: `6dff80ed4596bec088d548b23013e6077e32c484`
 - Planning commit: `73b451c09bf39a706bb71245a0dde5ae0fbc4660`
 - Max parallel features: 4
 - Current wave: 0
-- Next step: `await_545_r4_and_631_r3_children_then_wave1_635`
-- Last updated: 2026-09-07T22:05:00Z
+- Next step: `await_relaunched_children_545_and_631_then_launch_635_and_632`
+- Last updated: 2026-09-07T23:56:00Z
 
 ## Wave Schedule
 
 | wave | features | width | status | started_at | completed_at |
 | --- | --- | --- | --- | --- | --- |
 | 0 | 545, 630, 633, 634 | 4 | running | 2026-09-07T10:52:00Z | - |
-| 1 | 631, 635 | 2 | pending | - | - |
+| 1 | 631, 635 | 2 | running | 2026-09-07T18:30:00Z | - |
 | 2 | 632, 637 | 2 | pending | - | - |
 
 ## Feature Status
 
-| feature_folder | issue_num | wave | merge_status | pr_url | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545 | 545 | 0 | worktree_created | - | - | 2026-09-07T10:52:00Z | - | - | - |
-| 2026-09-06-cleanup-worktrees-consolidation-pr-merge-gate-634 | 634 | 0 | merged | https://github.com/drmoisan/drm-copilot/pull/642 | 288ca2148d159bf2f7a1cbfff6bad3ee5c8d791b | 2026-09-07T10:52:00Z | 2026-09-07T11:34:01Z | 2026-09-07T11:46:36Z | - |
-| 2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630 | 630 | 0 | merged | https://github.com/drmoisan/drm-copilot/pull/644 | 6dff80ed4596bec088d548b23013e6077e32c484 | 2026-09-07T10:52:00Z | 2026-09-07T17:16:07Z | 2026-09-07T17:31:35Z | - |
-| 2026-09-06-collect-pr-context-omits-claude-tree-633 | 633 | 0 | merged | https://github.com/drmoisan/drm-copilot/pull/641 | 7ceac674f262eb8f30f5ae36299f4c98e23d9c1e | 2026-09-07T10:52:00Z | 2026-09-07T11:25:43Z | 2026-09-07T11:31:12Z | - |
-| 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631 | 631 | 1 | worktree_created | - | - | 2026-09-07T13:05:00Z | - | - | - |
-| 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | not_started | - | - | - | - | - | - |
-| 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | not_started | - | - | - | - | - | - |
-| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | not_started | - | - | - | - | - | - |
+| feature_folder | issue_num | wave | merge_status | branch | pr_url | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545 | 545 | 0 | worktree_created | `bug/enforcement-hook-trigger-matches-whole-command-text-545-r3` | - | - | 2026-09-07T10:52:00Z | - | - | - |
+| 2026-09-06-cleanup-worktrees-consolidation-pr-merge-gate-634 | 634 | 0 | merged | `bug/cleanup-worktrees-consolidation-pr-merge-gate-634` | https://github.com/drmoisan/drm-copilot/pull/642 | 288ca2148d159bf2f7a1cbfff6bad3ee5c8d791b | 2026-09-07T10:52:00Z | 2026-09-07T11:34:01Z | 2026-09-07T11:46:36Z | - |
+| 2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630 | 630 | 0 | merged | `bug/cleanup-worktrees-skips-detached-head-worktrees-630-r2` | https://github.com/drmoisan/drm-copilot/pull/644 | 6dff80ed4596bec088d548b23013e6077e32c484 | 2026-09-07T10:52:00Z | 2026-09-07T17:16:07Z | 2026-09-07T17:31:35Z | - |
+| 2026-09-06-collect-pr-context-omits-claude-tree-633 | 633 | 0 | merged | `bug/collect-pr-context-omits-claude-tree-633` | https://github.com/drmoisan/drm-copilot/pull/641 | 7ceac674f262eb8f30f5ae36299f4c98e23d9c1e | 2026-09-07T10:52:00Z | 2026-09-07T11:25:43Z | 2026-09-07T11:31:12Z | - |
+| 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631 | 631 | 1 | worktree_created | `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2` | - | - | 2026-09-07T18:30:00Z | - | - | - |
+| 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | not_started | - | - | - | - | - | - | - |
+| 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | not_started | - | - | - | - | - | - | - |
+| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | not_started | - | - | - | - | - | - | - |
+
+## In-Flight Children
+
+- **545** (`2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545`), wave 0
+  - Branch `bug/enforcement-hook-trigger-matches-whole-command-text-545-r3` at `459d245f893f3337d61496b2602830e381d1d7a3`
+  - Resume point: remediation cycle 2: R1 plan already committed; resume at R2 preflight
+- **631** (`2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631`), wave 1
+  - Branch `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2` at `ebe50907d5ef61a01afd6d5c3324fb62ea9c02e0`
+  - Resume point: remediation cycle 1 closed at ebe50907; resume at R4 re-audit (feature-review)
 
 ## Integration PR
 
@@ -45,12 +54,30 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | opened_at | - |
 | merged_at | - |
 
-## Notes
+## Interruptions
 
-- All eight children were prepared by `epic-planner` and resume at atomic execution from their committed `plan-path`. Plan blob hashes were re-verified against the `epic-kickoff.md` Integrity table at execution start; all eight match.
-- Binding execution amendments EA-1, EA-2, and EA-4 are carried in each affected child's delegation prompt because they postdate that child's plan clearance. EA-3 is non-binding and is filed as follow-up work rather than absorbed into any child's scope.
-- Issue #591 must remain OPEN through execution and is closed as superseded by #545 when this epic merges. Issue #636 is already closed as superseded. Neither withdrawn child's branch is merged into the integration branch.
-- `Agent(isolation: "worktree")` branches each child from `main`, not from the integration branch, so every delegation prompt carries an explicit BRANCH SETUP step. All four wave-0 children were verified to have re-based onto the integration lineage before executing.
-- Run interruption `RL-1`: an HTTP 429 API rate limit at approximately 2026-09-07T21:20Z terminated the `epic-orchestrator` fork and every live child. No child survived it. On resume, durable state was re-derived from `git worktree list --porcelain`, `git rev-parse` against origin refs, and `gh pr list`; the integration worktree was fast-forwarded `a36b6dca` -> `6dff80ed`. Child 545's uncommitted cycle-2 remediation plan was committed as `459d245f` and pushed before relaunch, and child 631's redundant agent branch `local-work-631-r2` at `9f0a3e6c` was verified an ancestor of the authoritative `ebe50907`, so no work was discarded. Exactly one child was relaunched per unfinished issue.
-- Child PR verification for the bash children runs through a `workflow_dispatch` of `.github/workflows/_shell-coverage.yml` against the child's head SHA, per EA-4 and the recorded `EPIC_CHILD_PRS_RUN_NO_REAL_CI` defect: `ci.yml` is base-gated to `main`/`development`, so a PR based on the integration branch triggers none of the nine reusable workflows. Children are instructed to poll a dispatched run to completion in-turn rather than end their turn waiting for a notification that will not arrive.
-- Known validator defect `EPIC_WAVE_BARRIER_FALSE_POSITIVE`: The wave-barrier ordering check applies no start guard: it emits EPIC_WAVE_BARRIER_VIOLATION whenever a dependency's merge_status is not merged/worktree_removed, regardless of whether the dependent feature has started. A freshly bootstrapped epic checkpoint therefore always reports one violation per dependency edge. Violations clear per-edge as each dependency merges, and reach zero at epic completion. Expected violations at kickoff for this epic: 4; observed 3 at 2026-09-07T22:05:00Z after 630 merged, matching the documented per-edge clearing progression. Not blocking: The epic SubagentStop gate does not run this check. .claude/hooks/validate-orchestrator-output.ps1 dispatches artifact_type epic-orchestrator-state to Test-OrchestratorCheckpointStructure (file exists, parses as JSON, object root) per decision PD-3, and never passes require_complete.
+### RATE_LIMIT_429_2026-09-07
+
+- Observed at: 2026-09-07T23:52:00Z
+- Two successive epic-orchestrator forks and every live child agent were terminated by API rate limits (HTTP 429). The second fork executed no action. All child agents from those forks are dead; none is a stall.
+- Recovery: Third launch re-derived durable ground truth from git worktree list --porcelain, git rev-parse on each child branch, gh pr list, and gh run list before any action. No in-memory notification was trusted.
+- Correction for 545: No manual commit-and-push rescue was needed or performed. The child pushed its cycle-2 remediation plan before it died. R1 of cycle 2 is complete; the resume point is R2 preflight, not R1 planning.
+- Correction for 631: The _shell-coverage success at 9f0a3e6c (run 34162347134) remains valid coverage evidence for ebe50907's code content.
+
+## Known Defects Observed During This Epic
+
+| id | severity | blocking | follow_up |
+| --- | --- | --- | --- |
+| EPIC_WAVE_BARRIER_FALSE_POSITIVE | validator-noise | False | to_be_filed_at_epic_completion |
+| PARALLEL_WORKTREE_REMOVAL_GATE_BLOCKS_EPIC_CLEANUP | blocking_for_epic_worktree_cleanup | - | to_be_filed_at_epic_completion |
+| EPIC_CHILD_PRS_RUN_NO_REAL_CI | high_confidence_verification_gap | - | to_be_filed_at_epic_completion |
+| UPSTREAM_CITATION_LINE_MISRESOLVES_DELEGATION_TARGET | blocking_for_every_dependent_feature | - | to_be_filed_at_epic_completion |
+
+The three current `EPIC_WAVE_BARRIER_VIOLATION` validator errors are the recorded `EPIC_WAVE_BARRIER_FALSE_POSITIVE` defect: the check has no start guard, so every unstarted feature with an unmerged dependency is reported. The count falls to zero as dependencies merge (4 at kickoff, 3 now).
+
+## Withdrawn Children
+
+| issue | state | disposition |
+| --- | --- | --- |
+| 591 | OPEN | Must stay open through execution; closed as superseded by #545 when this epic merges. Branch bug/epic-merge-gate-parses-pr-number-from-whole-command-line-591 at 3f6cdf46 is retained and must not be merged. |
+| 636 | CLOSED | Closed as superseded by #545 during planning. Branch bug/removal-gate-trigger-matches-whole-command-text-636 must not be merged. |
