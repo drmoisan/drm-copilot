@@ -11,6 +11,7 @@ import { readFileSync } from "node:fs";
 import * as path from "node:path";
 
 import type { FileSystem } from "../src/lib/file-system";
+import type { CommandRunner } from "../src/lib/subprocess-runner";
 import type {
   TransitionPreparedOrchestrationRequest,
   TransitionPreparedOrchestrationResult,
@@ -82,6 +83,68 @@ function createPortableHandoffFiles(): {
     },
     planPath: payload.plan.path,
   };
+}
+
+function createIndependentContext(planPath: string) {
+  return {
+    expectedRepositoryId: "github.com/drmoisan/drm-copilot",
+    expectedWorkspaceRoot: "C:/workspace",
+    expectedBranch: "feature/portable-handoff-614",
+    expectedSourceHeadSha: "0".repeat(40),
+    allowedHeadRelationship: "equal_or_descendant",
+    expectedIssueNumber: 614,
+    expectedFeatureFolder: "docs/features/active/portable-handoff-614",
+    expectedWorkMode: "full-feature",
+    expectedPlanPath: planPath,
+    expectedPlanSha256: sha256(VALID_PLAN),
+  } as const;
+}
+
+/**
+ * Script the four read-only checkout observations and the ancestry check so the
+ * independent binding authority observes a destination checkout matching the
+ * expected context, without spawning a process.
+ */
+function createCheckoutRunner(): CommandRunner {
+  const observations: Readonly<Record<string, string>> = {
+    "rev-parse --show-toplevel": "C:/workspace",
+    "remote get-url origin": "https://github.com/drmoisan/drm-copilot.git",
+    "branch --show-current": "feature/portable-handoff-614",
+    "rev-parse HEAD": "0".repeat(40),
+  };
+  return {
+    run: (args: readonly string[]) => {
+      const invocation = args.join(" ");
+      const observed = Object.keys(observations).find((subcommand) =>
+        invocation.endsWith(subcommand),
+      );
+      if (observed !== undefined) {
+        return { stdout: observations[observed] ?? "", stderr: "", code: 0 };
+      }
+      return {
+        stdout: "",
+        stderr: "",
+        code: invocation.includes("merge-base --is-ancestor") ? 0 : 1,
+      };
+    },
+  };
+}
+
+function toIndependentMcpArguments(
+  context: ReturnType<typeof createIndependentContext>,
+) {
+  return {
+    expected_repository_id: context.expectedRepositoryId,
+    expected_workspace_root: context.expectedWorkspaceRoot,
+    expected_branch: context.expectedBranch,
+    expected_source_head_sha: context.expectedSourceHeadSha,
+    allowed_head_relationship: context.allowedHeadRelationship,
+    expected_issue_number: context.expectedIssueNumber,
+    expected_feature_folder: context.expectedFeatureFolder,
+    expected_work_mode: context.expectedWorkMode,
+    expected_plan_path: context.expectedPlanPath,
+    expected_plan_sha256: context.expectedPlanSha256,
+  } as const;
 }
 
 /**
@@ -243,12 +306,14 @@ describe("repo automation orchestration validation", () => {
       extensionRoot: "C:/extension",
       output: { appendLine: appendLineMock },
       fileSystem: new VirtualFileSystem({ ...fixture.files }),
+      runner: createCheckoutRunner(),
     });
     const request = {
       workspaceRoot: "C:/workspace",
       handoffEnvelopePath: fixture.envelopePath,
       expectedHandoffEnvelopeSha256: fixture.envelopeSha256,
       destinationProvider: "codex",
+      ...createIndependentContext(fixture.planPath),
     } as const;
 
     // Act: exercise both the service contract and public MCP dispatch.
@@ -261,6 +326,7 @@ describe("repo automation orchestration validation", () => {
         handoff_envelope_path: request.handoffEnvelopePath,
         expected_handoff_envelope_sha256: request.expectedHandoffEnvelopeSha256,
         destination_provider: request.destinationProvider,
+        ...toIndependentMcpArguments(request),
       },
       service,
     );
@@ -327,6 +393,7 @@ describe("repo automation orchestration validation", () => {
         expectedHandoffEnvelopeSha256: fixture.envelopeSha256,
         destinationProvider: "codex",
         mode: status === "materialized" ? "materialize" : "dry_run",
+        ...createIndependentContext(fixture.planPath),
       } as const;
       const blocked = status === "blocked";
       transition.mockResolvedValue({
@@ -355,6 +422,7 @@ describe("repo automation orchestration validation", () => {
           handoff_envelope_path: fixture.envelopePath,
           expected_handoff_envelope_sha256: fixture.envelopeSha256,
           destination_provider: "codex",
+          ...toIndependentMcpArguments(request),
           mode: request.mode,
         },
         service,

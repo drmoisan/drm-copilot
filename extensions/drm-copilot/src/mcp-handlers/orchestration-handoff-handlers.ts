@@ -3,6 +3,7 @@ import * as path from "node:path";
 import type { RepoAutomationService } from "../repo-automation-service-contract";
 import type {
   PortableHandoffAuthorityResult,
+  PortableHandoffExpectedContext,
   PortableHandoffReferenceRequest,
   TransitionPreparedOrchestrationRequest,
   TransitionPreparedOrchestrationResult,
@@ -72,6 +73,79 @@ function requireSha256(
   return value;
 }
 
+function requireGitSha(
+  input: Readonly<Record<string, unknown>>,
+  key: string,
+): string {
+  const value = requireString(input, key);
+  if (!/^[a-f0-9]{40}$/.test(value)) {
+    throw new Error(`${key} must be a lowercase 40-character Git SHA.`);
+  }
+  return value;
+}
+
+function requirePositiveInteger(
+  input: Readonly<Record<string, unknown>>,
+  key: string,
+): number {
+  const value = input[key];
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
+    throw new Error(`${key} must be a positive integer.`);
+  }
+  return value;
+}
+
+/**
+ * Parse the caller-supplied expected context. Every value is read from the
+ * request only; no value is derived from an envelope, inferred from a name, or
+ * defaulted, so a malformed or omitted field fails before service invocation.
+ */
+function resolveExpectedContext(
+  input: Readonly<Record<string, unknown>>,
+): PortableHandoffExpectedContext {
+  const expectedWorkspaceRoot = requireString(input, "expected_workspace_root");
+  if (!path.isAbsolute(expectedWorkspaceRoot)) {
+    throw new Error("expected_workspace_root must be an absolute path.");
+  }
+  const allowedHeadRelationship = requireString(
+    input,
+    "allowed_head_relationship",
+  );
+  if (
+    allowedHeadRelationship !== "equal" &&
+    allowedHeadRelationship !== "equal_or_descendant"
+  ) {
+    throw new Error(
+      "allowed_head_relationship must be 'equal' or 'equal_or_descendant'.",
+    );
+  }
+  const expectedWorkMode = requireString(input, "expected_work_mode");
+  if (
+    expectedWorkMode !== "minor-audit" &&
+    expectedWorkMode !== "full-feature" &&
+    expectedWorkMode !== "full-bug"
+  ) {
+    throw new Error(
+      "expected_work_mode must be 'minor-audit', 'full-feature', or 'full-bug'.",
+    );
+  }
+  return {
+    expectedRepositoryId: requireString(input, "expected_repository_id"),
+    expectedWorkspaceRoot,
+    expectedBranch: requireString(input, "expected_branch"),
+    expectedSourceHeadSha: requireGitSha(input, "expected_source_head_sha"),
+    allowedHeadRelationship,
+    expectedIssueNumber: requirePositiveInteger(input, "expected_issue_number"),
+    expectedFeatureFolder: requireRepositoryPath(
+      input,
+      "expected_feature_folder",
+    ),
+    expectedWorkMode,
+    expectedPlanPath: requireRepositoryPath(input, "expected_plan_path"),
+    expectedPlanSha256: requireSha256(input, "expected_plan_sha256"),
+  };
+}
+
 function resolveReferenceInput(
   rawInput: unknown,
 ): PortableHandoffReferenceRequest {
@@ -92,6 +166,7 @@ function resolveReferenceInput(
       "expected_handoff_envelope_sha256",
     ),
     destinationProvider,
+    ...resolveExpectedContext(input),
   };
 }
 

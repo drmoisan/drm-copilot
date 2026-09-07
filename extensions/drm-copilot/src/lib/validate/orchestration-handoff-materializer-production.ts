@@ -14,6 +14,7 @@ import {
 } from "./orchestration-handoff-materializer";
 import { providerAdapterFor } from "./orchestration-handoff-provider-adapters";
 import { resolvePortableHandoffAuthority } from "./orchestration-handoff-authority-service";
+import { createGitCheckoutContext } from "./orchestration-handoff-checkout-context";
 import { createNodeHandoffPathBoundary } from "./orchestration-handoff-path-boundary";
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -76,6 +77,9 @@ function buildDependencies(
   runner: CommandRunner,
 ): HandoffMaterializerDependencies {
   const pathBoundary = createNodeHandoffPathBoundary();
+  // Both authorities share one read-only checkout observer built on the same
+  // injected local Git runner, so topology and routing agree on the checkout.
+  const checkoutContext = createGitCheckoutContext(runner);
   return {
     fileSystem: {
       readFile: (filePath) => fs.readFileSync(filePath),
@@ -103,6 +107,7 @@ function buildDependencies(
           request,
           "topology",
           pathBoundary,
+          checkoutContext,
         ),
     },
     routing: {
@@ -112,6 +117,7 @@ function buildDependencies(
           request,
           "provider_routing",
           pathBoundary,
+          checkoutContext,
         ),
     },
     validator: { validateEnvelope, validateDestinationProjection },

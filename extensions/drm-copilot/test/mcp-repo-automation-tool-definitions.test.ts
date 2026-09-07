@@ -232,11 +232,24 @@ describe("workspace_root required contract (AC-5)", () => {
 });
 
 describe("portable handoff MCP definitions", () => {
+  const independentContextRequired = [
+    "expected_repository_id",
+    "expected_workspace_root",
+    "expected_branch",
+    "expected_source_head_sha",
+    "allowed_head_relationship",
+    "expected_issue_number",
+    "expected_feature_folder",
+    "expected_work_mode",
+    "expected_plan_path",
+    "expected_plan_sha256",
+  ];
   const resolutionRequired = [
     "workspace_root",
     "handoff_envelope_path",
     "expected_handoff_envelope_sha256",
     "destination_provider",
+    ...independentContextRequired,
   ];
 
   it.each(["resolve_orchestration_topology", "resolve_provider_routing"])(
@@ -260,6 +273,7 @@ describe("portable handoff MCP definitions", () => {
       "handoff_envelope_path",
       "expected_handoff_envelope_sha256",
       "destination_provider",
+      ...independentContextRequired,
       "mode",
     ];
     expect(definition?.inputSchema.required).toEqual(required);
@@ -270,11 +284,12 @@ describe("portable handoff MCP definitions", () => {
       "destination_provider",
       "source_checkpoint_path",
       "expected_source_checkpoint_sha256",
+      ...independentContextRequired,
       "mode",
     ]);
     const properties = definition?.inputSchema.properties as Record<
       string,
-      { enum?: string[]; pattern?: string }
+      { enum?: string[]; minimum?: number; pattern?: string; type?: string }
     >;
     expect(properties["destination_provider"]?.enum).toEqual([
       "claude",
@@ -284,6 +299,17 @@ describe("portable handoff MCP definitions", () => {
     expect(properties["expected_source_checkpoint_sha256"]?.pattern).toBe(
       "^[a-f0-9]{64}$",
     );
+    expect(properties["expected_source_head_sha"]?.pattern).toBe(
+      "^[a-f0-9]{40}$",
+    );
+    expect(properties["allowed_head_relationship"]?.enum).toEqual([
+      "equal",
+      "equal_or_descendant",
+    ]);
+    expect(properties["expected_issue_number"]).toMatchObject({
+      type: "integer",
+      minimum: 1,
+    });
     expect(findBaseDefinition("transition_prepared_orchestration")).toEqual(
       definition,
     );

@@ -6,8 +6,52 @@ import {
   createPreparedTransitionCase,
 } from "../mcp-server-test-service";
 
+const INDEPENDENT_CONTEXT_ARGUMENTS = {
+  expected_repository_id: "github.com/drmoisan/drm-copilot",
+  expected_workspace_root: "C:/workspace",
+  expected_branch: "feature/portable-handoff-614",
+  expected_source_head_sha: "0".repeat(40),
+  allowed_head_relationship: "equal_or_descendant",
+  expected_issue_number: 614,
+  expected_feature_folder: "docs/features/active/portable-handoff-614",
+  expected_work_mode: "full-feature",
+  expected_plan_path: "docs/features/active/portable-handoff-614/plan.md",
+  expected_plan_sha256: "c".repeat(64),
+} as const;
+
+const INDEPENDENT_CONTEXT_REQUEST = {
+  expectedRepositoryId: INDEPENDENT_CONTEXT_ARGUMENTS.expected_repository_id,
+  expectedWorkspaceRoot: INDEPENDENT_CONTEXT_ARGUMENTS.expected_workspace_root,
+  expectedBranch: INDEPENDENT_CONTEXT_ARGUMENTS.expected_branch,
+  expectedSourceHeadSha: INDEPENDENT_CONTEXT_ARGUMENTS.expected_source_head_sha,
+  allowedHeadRelationship:
+    INDEPENDENT_CONTEXT_ARGUMENTS.allowed_head_relationship,
+  expectedIssueNumber: INDEPENDENT_CONTEXT_ARGUMENTS.expected_issue_number,
+  expectedFeatureFolder: INDEPENDENT_CONTEXT_ARGUMENTS.expected_feature_folder,
+  expectedWorkMode: INDEPENDENT_CONTEXT_ARGUMENTS.expected_work_mode,
+  expectedPlanPath: INDEPENDENT_CONTEXT_ARGUMENTS.expected_plan_path,
+  expectedPlanSha256: INDEPENDENT_CONTEXT_ARGUMENTS.expected_plan_sha256,
+} as const;
+
+function createCompleteTransitionCase() {
+  const fixture = createPreparedTransitionCase();
+  const request = { ...fixture.request, ...INDEPENDENT_CONTEXT_REQUEST };
+  return {
+    ...fixture,
+    arguments: { ...fixture.arguments, ...INDEPENDENT_CONTEXT_ARGUMENTS },
+    request,
+    referenceRequest: {
+      workspaceRoot: request.workspaceRoot,
+      handoffEnvelopePath: request.handoffEnvelopePath,
+      expectedHandoffEnvelopeSha256: request.expectedHandoffEnvelopeSha256,
+      destinationProvider: request.destinationProvider,
+      ...INDEPENDENT_CONTEXT_REQUEST,
+    },
+  };
+}
+
 function withOverride(key: string, value: unknown): Record<string, unknown> {
-  return { ...createPreparedTransitionCase().arguments, [key]: value };
+  return { ...createCompleteTransitionCase().arguments, [key]: value };
 }
 
 describe("portable orchestration handoff MCP handlers", () => {
@@ -73,6 +117,52 @@ describe("portable orchestration handoff MCP handlers", () => {
       "INVALID",
       "expected_source_checkpoint_sha256 must be a lowercase SHA-256 digest.",
     ],
+    [
+      "expected_repository_id",
+      " ",
+      "expected_repository_id must be a non-empty string.",
+    ],
+    [
+      "expected_workspace_root",
+      "workspace",
+      "expected_workspace_root must be an absolute path.",
+    ],
+    ["expected_branch", " ", "expected_branch must be a non-empty string."],
+    [
+      "expected_source_head_sha",
+      "invalid",
+      "expected_source_head_sha must be a lowercase 40-character Git SHA.",
+    ],
+    [
+      "allowed_head_relationship",
+      "ancestor",
+      "allowed_head_relationship must be 'equal' or 'equal_or_descendant'.",
+    ],
+    [
+      "expected_issue_number",
+      0,
+      "expected_issue_number must be a positive integer.",
+    ],
+    [
+      "expected_feature_folder",
+      "../feature",
+      "expected_feature_folder must be repository-relative POSIX syntax.",
+    ],
+    [
+      "expected_work_mode",
+      "full",
+      "expected_work_mode must be 'minor-audit', 'full-feature', or 'full-bug'.",
+    ],
+    [
+      "expected_plan_path",
+      "/plan.md",
+      "expected_plan_path must be repository-relative POSIX syntax.",
+    ],
+    [
+      "expected_plan_sha256",
+      "invalid",
+      "expected_plan_sha256 must be a lowercase SHA-256 digest.",
+    ],
     ["mode", "apply", "mode must be 'dry_run' or 'materialize'."],
   ])("rejects invalid %s input %#", async (key, value, message) => {
     await expect(
@@ -84,9 +174,25 @@ describe("portable orchestration handoff MCP handlers", () => {
     ).rejects.toThrow(message);
   });
 
+  it.each([
+    "resolve_orchestration_topology",
+    "resolve_provider_routing",
+    "transition_prepared_orchestration",
+  ] as const)("rejects omitted independent context for %s", async (tool) => {
+    for (const key of Object.keys(INDEPENDENT_CONTEXT_ARGUMENTS)) {
+      const input: Record<string, unknown> = {
+        ...createCompleteTransitionCase().arguments,
+      };
+      delete input[key];
+      await expect(
+        handlePortableHandoffTool(tool, input, createMockService()),
+      ).rejects.toThrow(key);
+    }
+  });
+
   it("returns deterministic unavailable results for optional service seams", async () => {
     // Arrange
-    const fixture = createPreparedTransitionCase();
+    const fixture = createCompleteTransitionCase();
     const service = createMockService();
     delete service.transitionPreparedOrchestration;
 
@@ -124,9 +230,9 @@ describe("portable orchestration handoff MCP handlers", () => {
     });
   });
 
-  it("dispatches available topology and routing service methods", async () => {
+  it("dispatches available topology, routing, and transition service methods", async () => {
     // Arrange
-    const fixture = createPreparedTransitionCase();
+    const fixture = createCompleteTransitionCase();
     const resolution = {
       status: "validated",
       handoffId: "handoff-614",
@@ -139,6 +245,7 @@ describe("portable orchestration handoff MCP handlers", () => {
     const service = Object.assign(createMockService(), {
       resolveOrchestrationTopology: jest.fn(async () => resolution),
       resolveProviderRouting: jest.fn(async () => resolution),
+      transitionPreparedOrchestration: jest.fn(async () => fixture.result),
     });
 
     // Act
@@ -152,11 +259,45 @@ describe("portable orchestration handoff MCP handlers", () => {
       fixture.arguments,
       service,
     );
+    const transition = await handlePortableHandoffTool(
+      "transition_prepared_orchestration",
+      fixture.arguments,
+      service,
+    );
 
     // Assert
     expect(topology).toMatchObject({ status: "validated" });
     expect(routing).toMatchObject({ status: "validated" });
+    expect(transition).toMatchObject({ status: "materialized" });
     expect(service.resolveOrchestrationTopology).toHaveBeenCalledTimes(1);
     expect(service.resolveProviderRouting).toHaveBeenCalledTimes(1);
+    expect(service.transitionPreparedOrchestration).toHaveBeenCalledTimes(1);
+    expect(service.resolveOrchestrationTopology).toHaveBeenCalledWith(
+      fixture.referenceRequest,
+    );
+    expect(service.resolveProviderRouting).toHaveBeenCalledWith(
+      fixture.referenceRequest,
+    );
+    expect(service.transitionPreparedOrchestration).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...fixture.request,
+        expectedRepositoryId:
+          INDEPENDENT_CONTEXT_ARGUMENTS.expected_repository_id,
+        expectedWorkspaceRoot:
+          INDEPENDENT_CONTEXT_ARGUMENTS.expected_workspace_root,
+        expectedBranch: INDEPENDENT_CONTEXT_ARGUMENTS.expected_branch,
+        expectedSourceHeadSha:
+          INDEPENDENT_CONTEXT_ARGUMENTS.expected_source_head_sha,
+        allowedHeadRelationship:
+          INDEPENDENT_CONTEXT_ARGUMENTS.allowed_head_relationship,
+        expectedIssueNumber:
+          INDEPENDENT_CONTEXT_ARGUMENTS.expected_issue_number,
+        expectedFeatureFolder:
+          INDEPENDENT_CONTEXT_ARGUMENTS.expected_feature_folder,
+        expectedWorkMode: INDEPENDENT_CONTEXT_ARGUMENTS.expected_work_mode,
+        expectedPlanPath: INDEPENDENT_CONTEXT_ARGUMENTS.expected_plan_path,
+        expectedPlanSha256: INDEPENDENT_CONTEXT_ARGUMENTS.expected_plan_sha256,
+      }),
+    );
   });
 });

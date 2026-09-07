@@ -18,6 +18,9 @@ from tests.scripts.dev_tools.push_down_customizations_test_support import (
 from tests.scripts.dev_tools.push_down_customizations_test_support import (
     write_manifest as _write_manifest,
 )
+from tests.scripts.dev_tools.push_down_handoff_test_support import (
+    assert_independent_context_guidance,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CODEX_BUNDLE_ROOT = (
@@ -398,3 +401,16 @@ def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() 
         epic_validator.index("if require_ready_for_execution:") :
     ]
     assert "validate_epic_planner_child_launch_bindings(features)" in ready_gate
+
+
+def test_codex_guidance_requires_independent_expected_context() -> None:
+    """Codex and agents guidance must demand caller-supplied context."""
+
+    assert_independent_context_guidance(
+        REPO_ROOT,
+        CODEX_BUNDLE_ROOT,
+        (
+            Path(".agents/skills/orchestrate/SKILL.md"),
+            Path(".agents/skills/repo-automation-adapter/SKILL.md"),
+        ),
+    )

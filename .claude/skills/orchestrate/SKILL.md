@@ -42,8 +42,19 @@ lifecycle, not as a new orchestration intake. Before any destination launch:
 1. Validate the envelope through the published, workspace-explicit handoff
    authority. Require exact repository, workspace, branch lineage, issue,
    feature folder, work mode, scheduler, capability, and transition bindings.
-2. Prove the plan using only the envelope's normalized repository-relative
-   path and raw-byte SHA-256. Do not rediscover, rename, or substitute a plan.
+   Supply the complete caller-controlled independent expected context on every
+   call to `resolve_orchestration_topology`, `resolve_provider_routing`, and
+   `transition_prepared_orchestration`: `expected_repository_id`,
+   `expected_workspace_root`, `expected_branch`, `expected_source_head_sha`,
+   `allowed_head_relationship`, `expected_issue_number`,
+   `expected_feature_folder`, `expected_work_mode`, `expected_plan_path`, and
+   `expected_plan_sha256`. Derive each value from the destination checkout and
+   the caller's own record. A call that omits a value, or that copies one from
+   the envelope under validation, is rejected before any service invocation.
+2. Prove the plan using only the independently expected repository-relative
+   path and raw-byte SHA-256 the caller supplied in `expected_plan_path` and
+   `expected_plan_sha256`. Do not rediscover, rename, or substitute a plan, and
+   do not read the plan identity from the envelope.
 3. Use `transition_prepared_orchestration` as the only authority that may
    materialize a provider-native destination checkpoint. Dry run validates and
    projects state without source archival or canonical-checkpoint replacement.

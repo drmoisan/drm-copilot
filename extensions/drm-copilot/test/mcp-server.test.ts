@@ -27,6 +27,19 @@ import {
   createPreparedTransitionCase,
 } from "./mcp-server-test-service";
 
+const INDEPENDENT_CONTEXT_ARGUMENTS = {
+  expected_repository_id: "github.com/drmoisan/drm-copilot",
+  expected_workspace_root: "C:/workspace",
+  expected_branch: "feature/portable-handoff-614",
+  expected_source_head_sha: "0".repeat(40),
+  allowed_head_relationship: "equal_or_descendant",
+  expected_issue_number: 614,
+  expected_feature_folder: "docs/features/active/portable-handoff-614",
+  expected_work_mode: "full-feature",
+  expected_plan_path: "docs/features/active/portable-handoff-614/plan.md",
+  expected_plan_sha256: "c".repeat(64),
+} as const;
+
 describe("repo automation MCP server", () => {
   let client: Client;
   let service: jest.Mocked<RepoAutomationService>;
@@ -433,11 +446,11 @@ describe("repo automation MCP server", () => {
 
     const result = await client.callTool({
       name: "transition_prepared_orchestration",
-      arguments: fixture.arguments,
+      arguments: { ...fixture.arguments, ...INDEPENDENT_CONTEXT_ARGUMENTS },
     });
 
     expect(service.transitionPreparedOrchestration).toHaveBeenCalledWith(
-      fixture.request,
+      expect.objectContaining(fixture.request),
     );
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject(fixture.expectedMcpResult);

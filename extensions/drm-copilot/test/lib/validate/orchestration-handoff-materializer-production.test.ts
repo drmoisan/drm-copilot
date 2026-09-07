@@ -46,6 +46,34 @@ function createFileSystem(readTextFile = jest.fn(() => validEnvelopeText)) {
   } satisfies FileSystem;
 }
 
+/**
+ * Caller-controlled independent expected context. Every portable handoff
+ * request must carry these values; the production boundary must forward them
+ * unchanged and must never derive them from the envelope under validation.
+ */
+const INDEPENDENT_CONTEXT = {
+  expectedRepositoryId: "github.com/drmoisan/drm-copilot",
+  expectedWorkspaceRoot: "C:/workspace",
+  expectedBranch: "feature/portable-handoff-614",
+  expectedSourceHeadSha: "0".repeat(40),
+  allowedHeadRelationship: "equal_or_descendant",
+  expectedIssueNumber: 614,
+  expectedFeatureFolder: "docs/features/active/portable-handoff-614",
+  expectedWorkMode: "full-feature",
+  expectedPlanPath: "docs/features/active/portable-handoff-614/plan.md",
+  expectedPlanSha256: "2".repeat(64),
+} as const;
+
+function createReference() {
+  return {
+    workspaceRoot: "C:/workspace",
+    handoffEnvelopePath: "artifacts/orchestration/handoff.json",
+    expectedHandoffEnvelopeSha256: "a".repeat(64),
+    destinationProvider: "codex",
+    ...INDEPENDENT_CONTEXT,
+  } as const;
+}
+
 function validProjection(provider: "claude" | "codex") {
   return JSON.stringify({
     provider,
@@ -81,12 +109,7 @@ describe("production orchestration handoff materializer boundaries", () => {
       fileSystem,
       runner,
     );
-    const reference = {
-      workspaceRoot: "C:/workspace",
-      handoffEnvelopePath: "artifacts/orchestration/handoff.json",
-      expectedHandoffEnvelopeSha256: "a".repeat(64),
-      destinationProvider: "codex",
-    } as const;
+    const reference = createReference();
 
     // Act
     expect(
@@ -187,12 +210,7 @@ describe("production orchestration handoff materializer boundaries", () => {
       pathBoundary,
       "resolveWorkspaceRoot",
     );
-    const reference = {
-      workspaceRoot: "C:/workspace",
-      handoffEnvelopePath: "artifacts/orchestration/handoff.json",
-      expectedHandoffEnvelopeSha256: "a".repeat(64),
-      destinationProvider: "codex",
-    } as const;
+    const reference = createReference();
 
     // Act
     const canonicalRoot = pathBoundary.resolveWorkspaceRoot("C:/workspace");
@@ -245,5 +263,109 @@ describe("production orchestration handoff materializer boundaries", () => {
         JSON.stringify(projection),
       ),
     ).toHaveLength(1);
+  });
+});
+
+describe("production independent checkout observation boundary", () => {
+  const observationCommands = [
+    "rev-parse --show-toplevel",
+    "remote get-url origin",
+    "branch --show-current",
+    "rev-parse HEAD",
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRealpathSyncNative.mockImplementation(
+      (targetPath: string) => targetPath,
+    );
+    mockStatSync.mockReturnValue({ isDirectory: () => true });
+  });
+
+  it("routes checkout observation through the injected command runner", async () => {
+    // Arrange
+    // Each observation query is scripted so the boundary reaches all four
+    // facts; a runner that fails the first query would stop the observation
+    // before the later queries could be routed through it at all.
+    const observationOutput: Readonly<Record<string, string>> = {
+      "rev-parse --show-toplevel": "C:/workspace",
+      "remote get-url origin": "https://github.com/drmoisan/drm-copilot.git",
+      "branch --show-current": "feature/portable-handoff-614",
+      "rev-parse HEAD": "0".repeat(40),
+    };
+    const run = jest.fn((args: readonly string[]) => {
+      const invocation = args.join(" ");
+      const observed = observationCommands.find((subcommand) =>
+        invocation.endsWith(subcommand),
+      );
+      return observed === undefined
+        ? { stdout: "", stderr: "", code: 1 }
+        : { stdout: observationOutput[observed] ?? "", stderr: "", code: 0 };
+    });
+    const materializer = createProductionHandoffMaterializer(
+      createFileSystem(),
+      { run },
+    );
+
+    // Act
+    await materializer.dependencies.topology.resolve(createReference());
+
+    // Assert
+    const invocations = run.mock.calls.map(([args]) =>
+      (args as readonly string[]).join(" "),
+    );
+    for (const subcommand of observationCommands) {
+      expect(invocations.some((call) => call.endsWith(subcommand))).toBe(true);
+    }
+    for (const invocation of invocations) {
+      expect(invocation).not.toMatch(/\b(fetch|ls-remote|pull|push|clone)\b/);
+    }
+  });
+
+  it.each(["dry_run", "materialize"] as const)(
+    "performs no write when the %s transition is blocked",
+    async (mode) => {
+      // Arrange
+      mockReadFileSync.mockReturnValue(Buffer.from("unexpected bytes"));
+      const materializer = createProductionHandoffMaterializer(
+        createFileSystem(),
+        { run: jest.fn(() => ({ stdout: "", stderr: "", code: 0 })) },
+      );
+
+      // Act
+      const result = await materializer.transition({
+        ...createReference(),
+        sourceCheckpointPath: "artifacts/orchestration/orchestrator-state.json",
+        expectedSourceCheckpointSha256: "b".repeat(64),
+        mode,
+      });
+
+      // Assert
+      expect(result.status).toBe("blocked");
+      expect(result.destinationCheckpointPath).toBeNull();
+      expect(result.destinationCheckpointSha256).toBeNull();
+      expect(mockMkdirSync).not.toHaveBeenCalled();
+      expect(mockWriteFileSync).not.toHaveBeenCalled();
+      expect(mockRenameSync).not.toHaveBeenCalled();
+      expect(mockUnlinkSync).not.toHaveBeenCalled();
+    },
+  );
+
+  it("blocks with an unavailable observation rather than trusting the envelope", async () => {
+    // Arrange
+    const materializer = createProductionHandoffMaterializer(
+      createFileSystem(),
+      { run: jest.fn(() => ({ stdout: "", stderr: "", code: 128 })) },
+    );
+
+    // Act
+    const result =
+      await materializer.dependencies.routing.resolve(createReference());
+
+    // Assert
+    expect(result.status).toBe("blocked");
+    expect(result.resolution).toBeNull();
+    expect(mockWriteFileSync).not.toHaveBeenCalled();
+    expect(mockRenameSync).not.toHaveBeenCalled();
   });
 });

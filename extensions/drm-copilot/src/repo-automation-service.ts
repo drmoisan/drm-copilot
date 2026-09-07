@@ -31,6 +31,10 @@ import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { buildValidateOrchestrationServiceCallInput } from "./lib/validate/build-validate-orchestration-service-call-input";
 import { resolvePortableHandoffAuthority } from "./lib/validate/orchestration-handoff-authority-service";
+import {
+  createGitCheckoutContext,
+  type HandoffCheckoutContext,
+} from "./lib/validate/orchestration-handoff-checkout-context";
 import { type OrchestrationHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer";
 import { createProductionHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer-production";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
@@ -112,6 +116,7 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     OrchestrationHandoffMaterializer,
     "transition"
   >;
+  private readonly checkoutContext: HandoffCheckoutContext;
   private readonly resolvePromptDeps: ResolvePromptServiceDeps;
   private readonly pushDownDeps: PushDownServiceDeps;
 
@@ -124,6 +129,8 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     this.handoffMaterializer =
       options.handoffMaterializer ??
       createProductionHandoffMaterializer(this.fileSystem, this.runner);
+    // Read-only checkout authority over the same injected local Git runner.
+    this.checkoutContext = createGitCheckoutContext(this.runner);
     this.resolvePromptDeps = {
       fileSystem: this.fileSystem,
       extensionRoot: this.extensionRoot,
@@ -397,7 +404,13 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   async resolveOrchestrationTopology(
     input: ResolveOrchestrationTopologyRequest,
   ): Promise<PortableHandoffAuthorityResult> {
-    return resolvePortableHandoffAuthority(this.fileSystem, input, "topology");
+    return resolvePortableHandoffAuthority(
+      this.fileSystem,
+      input,
+      "topology",
+      undefined,
+      this.checkoutContext,
+    );
   }
 
   async resolveProviderRouting(
@@ -407,6 +420,8 @@ class DefaultRepoAutomationService implements RepoAutomationService {
       this.fileSystem,
       input,
       "provider_routing",
+      undefined,
+      this.checkoutContext,
     );
   }
 

@@ -5,8 +5,30 @@ import { workspaceRootProperty } from "./mcp-push-down-schema-properties";
 export type PortableHandoffProvider = "claude" | "codex";
 export type PortableHandoffMode = "dry_run" | "materialize";
 export type PortableHandoffStatus = "validated" | "materialized" | "blocked";
+export type PortableHandoffHeadRelationship = "equal" | "equal_or_descendant";
+export type PortableHandoffWorkMode =
+  "minor-audit" | "full-feature" | "full-bug";
 
-export interface PortableHandoffReferenceRequest {
+/**
+ * Caller-supplied expected context that binds a portable handoff to a specific
+ * checkout. Every value is independent of the envelope under validation: the
+ * caller states what the destination checkout must be, and the authority proves
+ * the envelope against those values rather than against the envelope itself.
+ */
+export interface PortableHandoffExpectedContext {
+  readonly expectedRepositoryId: string;
+  readonly expectedWorkspaceRoot: string;
+  readonly expectedBranch: string;
+  readonly expectedSourceHeadSha: string;
+  readonly allowedHeadRelationship: PortableHandoffHeadRelationship;
+  readonly expectedIssueNumber: number;
+  readonly expectedFeatureFolder: string;
+  readonly expectedWorkMode: PortableHandoffWorkMode;
+  readonly expectedPlanPath: string;
+  readonly expectedPlanSha256: string;
+}
+
+export interface PortableHandoffReferenceRequest extends PortableHandoffExpectedContext {
   readonly workspaceRoot: string;
   readonly handoffEnvelopePath: string;
   readonly expectedHandoffEnvelopeSha256: string;
@@ -65,11 +87,69 @@ const destinationProviderProperty = {
   description: "Destination provider that will consume the portable handoff.",
 } as const;
 
+const gitShaProperty = {
+  type: "string",
+  pattern: "^[a-f0-9]{40}$",
+  description: "Expected lowercase 40-character Git commit SHA.",
+} as const;
+
+const nonEmptyStringProperty = {
+  type: "string",
+  minLength: 1,
+  description: "Required non-empty caller-supplied expected value.",
+} as const;
+
+const absolutePathProperty = {
+  type: "string",
+  pattern: "^(?:[A-Za-z]:[\\/]|/).+$",
+  description: "Required absolute path the caller independently expects.",
+} as const;
+
+const independentContextProperties = {
+  expected_repository_id: nonEmptyStringProperty,
+  expected_workspace_root: absolutePathProperty,
+  expected_branch: nonEmptyStringProperty,
+  expected_source_head_sha: gitShaProperty,
+  allowed_head_relationship: {
+    type: "string",
+    enum: ["equal", "equal_or_descendant"],
+    description:
+      "Allowed relationship between observed HEAD and expected HEAD.",
+  },
+  expected_issue_number: {
+    type: "integer",
+    minimum: 1,
+    description: "Issue number the caller independently expects.",
+  },
+  expected_feature_folder: repositoryRelativePathProperty,
+  expected_work_mode: {
+    type: "string",
+    enum: ["minor-audit", "full-feature", "full-bug"],
+    description: "Work mode the caller independently expects.",
+  },
+  expected_plan_path: repositoryRelativePathProperty,
+  expected_plan_sha256: sha256Property,
+} as const;
+
+const independentContextRequired = [
+  "expected_repository_id",
+  "expected_workspace_root",
+  "expected_branch",
+  "expected_source_head_sha",
+  "allowed_head_relationship",
+  "expected_issue_number",
+  "expected_feature_folder",
+  "expected_work_mode",
+  "expected_plan_path",
+  "expected_plan_sha256",
+] as const;
+
 const handoffReferenceProperties = {
   workspace_root: workspaceRootProperty,
   handoff_envelope_path: repositoryRelativePathProperty,
   expected_handoff_envelope_sha256: sha256Property,
   destination_provider: destinationProviderProperty,
+  ...independentContextProperties,
 } as const;
 
 const handoffReferenceRequired = [
@@ -77,6 +157,7 @@ const handoffReferenceRequired = [
   "handoff_envelope_path",
   "expected_handoff_envelope_sha256",
   "destination_provider",
+  ...independentContextRequired,
 ] as const;
 
 export const HANDOFF_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
@@ -109,9 +190,13 @@ export const HANDOFF_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
     inputSchema: {
       type: "object",
       properties: {
-        ...handoffReferenceProperties,
+        workspace_root: workspaceRootProperty,
+        handoff_envelope_path: repositoryRelativePathProperty,
+        expected_handoff_envelope_sha256: sha256Property,
+        destination_provider: destinationProviderProperty,
         source_checkpoint_path: repositoryRelativePathProperty,
         expected_source_checkpoint_sha256: sha256Property,
+        ...independentContextProperties,
         mode: {
           type: "string",
           enum: ["dry_run", "materialize"],
@@ -126,6 +211,7 @@ export const HANDOFF_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
         "handoff_envelope_path",
         "expected_handoff_envelope_sha256",
         "destination_provider",
+        ...independentContextRequired,
         "mode",
       ],
       additionalProperties: false,

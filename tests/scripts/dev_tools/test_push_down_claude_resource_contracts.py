@@ -1,10 +1,9 @@
 """Contract tests for bundled `.claude` customization resources.
 
-These tests require the bundled `.claude` payload to exist at
-`extensions/drm-copilot/resources/claude-customizations/`. The payload is
-present in the repository, so these tests are expected to pass. The
-byte-identical mirror assertion exempts the `.claude/agent-memory/**` subtree,
-which is distributed by scope rather than mirrored byte-for-byte.
+These tests require the bundled `.claude` payload at
+`extensions/drm-copilot/resources/claude-customizations/`, which exists in the
+repository, so they are expected to pass. The byte-identical mirror assertion
+exempts `.claude/agent-memory/**`, distributed by scope rather than mirrored.
 """
 
 from __future__ import annotations
@@ -15,6 +14,7 @@ import re
 from pathlib import Path
 
 from tests.scripts.dev_tools.push_down_handoff_test_support import (
+    assert_independent_context_guidance,
     assert_installed_consumer_authority,
 )
 
@@ -487,4 +487,14 @@ def test_claude_consumer_uses_published_typescript_handoff_authority() -> None:
         REPO_ROOT,
         BUNDLED_ROOT,
         Path(".claude/skills/orchestrate/SKILL.md"),
+    )
+
+
+def test_claude_orchestrate_requires_independent_expected_context() -> None:
+    """Claude guidance must demand caller-supplied expected context."""
+
+    assert_independent_context_guidance(
+        REPO_ROOT,
+        BUNDLED_ROOT,
+        (Path(".claude/skills/orchestrate/SKILL.md"),),
     )

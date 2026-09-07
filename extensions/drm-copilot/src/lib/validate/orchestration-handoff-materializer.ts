@@ -16,65 +16,16 @@ import {
   porcelainAffectedPaths,
   sha256,
 } from "./orchestration-handoff-materializer-support";
+import {
+  authorityFailure,
+  blockedResult,
+  toReferenceRequest,
+} from "./orchestration-handoff-materializer-request";
 import type { HandoffPathBoundary } from "./orchestration-handoff-path-boundary";
 import { projectDestinationCheckpoint } from "./orchestration-handoff-provider-adapters";
 
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
 const textEncoder = new TextEncoder();
-
-function toReferenceRequest(
-  request: TransitionPreparedOrchestrationRequest,
-): PortableHandoffReferenceRequest {
-  return {
-    workspaceRoot: request.workspaceRoot,
-    handoffEnvelopePath: request.handoffEnvelopePath,
-    expectedHandoffEnvelopeSha256: request.expectedHandoffEnvelopeSha256,
-    destinationProvider: request.destinationProvider,
-  };
-}
-
-function blockedResult(
-  request: TransitionPreparedOrchestrationRequest,
-  primaryFailureCode: HandoffFailureCode,
-  options: {
-    readonly handoffId?: string | null;
-    readonly handoffHistorySha256?: string | null;
-    readonly affectedPaths?: readonly string[];
-    readonly unsupportedCapabilities?: readonly string[];
-  } = {},
-): TransitionPreparedOrchestrationResult {
-  return {
-    status: "blocked",
-    handoffId: options.handoffId ?? null,
-    sourceCheckpointSha256: request.expectedSourceCheckpointSha256,
-    handoffEnvelopeSha256: request.expectedHandoffEnvelopeSha256,
-    handoffHistorySha256: options.handoffHistorySha256 ?? null,
-    requestedTransition: "prepared_to_atomic_execution",
-    destinationCheckpointPath: null,
-    destinationCheckpointSha256: null,
-    primaryFailureCode,
-    affectedPaths: options.affectedPaths ?? [],
-    unsupportedCapabilities: options.unsupportedCapabilities ?? [],
-  };
-}
-
-function authorityFailure(
-  request: TransitionPreparedOrchestrationRequest,
-  authority: PortableHandoffAuthorityResult,
-  handoffHistorySha256: string,
-): TransitionPreparedOrchestrationResult | null {
-  if (authority.status === "validated") return null;
-  return blockedResult(
-    request,
-    authority.primaryFailureCode ?? "HANDOFF_VALIDATOR_UNAVAILABLE",
-    {
-      handoffId: authority.handoffId,
-      handoffHistorySha256,
-      affectedPaths: authority.affectedPaths,
-      unsupportedCapabilities: authority.unsupportedCapabilities,
-    },
-  );
-}
 
 /** Raw-file operations required by the handoff transition write boundary. */
 export interface HandoffFileSystemBoundary {

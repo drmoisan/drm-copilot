@@ -6,6 +6,7 @@ import type {
   PortableHandoffReferenceRequest,
 } from "../../mcp-repo-automation-tool-definitions-handoff";
 import { RealFileSystem, toPosixPath, type FileSystem } from "../file-system";
+import { SubprocessRunner } from "../subprocess-runner";
 import {
   HandoffContractError,
   collectHandoffValidationFailures,
@@ -17,9 +18,17 @@ import type {
   HandoffFailureCode,
 } from "./orchestration-handoff-contract";
 import {
+  createGitCheckoutContext,
+  type CheckoutObservation,
+  type HandoffCheckoutContext,
+} from "./orchestration-handoff-checkout-context";
+import {
   createNodeHandoffPathBoundary,
   type HandoffPathBoundary,
 } from "./orchestration-handoff-path-boundary";
+
+/** Observed variant of {@link CheckoutObservation}, narrowed for comparison. */
+type ObservedCheckout = Extract<CheckoutObservation, { status: "observed" }>;
 
 export type PortableAuthorityKind = "topology" | "provider_routing";
 
@@ -139,15 +148,19 @@ function readEnvelope(
   }
 }
 
+/**
+ * Hash the plan the caller independently expects, never the plan the envelope
+ * names, so a rewritten envelope cannot redirect the hash that proves it.
+ */
 function observedPlanSha256(
   fileSystem: FileSystem,
-  envelope: HandoffEnvelope,
+  expectedPlanPath: string,
   pathBoundary: HandoffPathBoundary,
   canonicalWorkspaceRoot: string,
 ): string | null {
   const planPath = pathBoundary.resolveExistingTarget(
     canonicalWorkspaceRoot,
-    envelope.plan.path,
+    expectedPlanPath,
   );
   if (planPath === null) return null;
   try {
@@ -155,6 +168,67 @@ function observedPlanSha256(
   } catch {
     return null;
   }
+}
+
+/** Normalize a caller-supplied absolute path to the observed POSIX form. */
+function canonicalizeObservedPath(value: string): string {
+  return toPosixPath(value.trim()).replace(/(.)\/+$/, "$1");
+}
+
+/**
+ * Compare the independently observed checkout against the caller's expected
+ * context. Each disagreement selects its registry failure code directly, so an
+ * envelope that agrees with itself cannot mask a checkout that disagrees.
+ */
+function collectObservationFailures(
+  request: PortableHandoffReferenceRequest,
+  observation: ObservedCheckout,
+  headRelationshipValid: boolean,
+): readonly HandoffFailureCode[] {
+  const failures: HandoffFailureCode[] = [];
+  if (observation.repositoryId !== request.expectedRepositoryId) {
+    failures.push("HANDOFF_REPOSITORY_MISMATCH");
+  }
+  if (
+    canonicalizeObservedPath(observation.workspaceRoot) !==
+    canonicalizeObservedPath(request.expectedWorkspaceRoot)
+  ) {
+    failures.push("HANDOFF_WORKSPACE_MISMATCH");
+  }
+  if (observation.branch !== request.expectedBranch || !headRelationshipValid) {
+    failures.push("HANDOFF_BRANCH_LINEAGE_MISMATCH");
+  }
+  return failures;
+}
+
+/**
+ * Failures decidable before the plan is read. The destination-routing check
+ * consults this set so provider routing can never preempt an earlier binding
+ * failure that the registry orders ahead of it.
+ */
+function collectPrePlanFailures(
+  envelope: HandoffEnvelope,
+  request: PortableHandoffReferenceRequest,
+  observationFailures: readonly HandoffFailureCode[],
+): readonly HandoffFailureCode[] {
+  const failures: HandoffFailureCode[] = [...observationFailures];
+  if (request.expectedRepositoryId !== envelope.binding.repositoryId) {
+    failures.push("HANDOFF_REPOSITORY_MISMATCH");
+  }
+  if (request.expectedWorkspaceRoot !== envelope.binding.workspaceRoot) {
+    failures.push("HANDOFF_WORKSPACE_MISMATCH");
+  }
+  if (
+    request.expectedIssueNumber !== envelope.identity.issueNumber ||
+    request.expectedFeatureFolder !== envelope.identity.featureFolder ||
+    request.expectedWorkMode !== envelope.identity.workMode
+  ) {
+    failures.push("HANDOFF_ISSUE_FEATURE_MISMATCH");
+  }
+  if (request.expectedBranch !== envelope.binding.branch) {
+    failures.push("HANDOFF_BRANCH_LINEAGE_MISMATCH");
+  }
+  return failures;
 }
 
 function buildResolution(
@@ -191,6 +265,7 @@ export function resolvePortableHandoffAuthority(
   request: PortableHandoffReferenceRequest,
   kind: PortableAuthorityKind,
   pathBoundary?: HandoffPathBoundary,
+  checkoutContext?: HandoffCheckoutContext,
 ): PortableHandoffAuthorityResult {
   const effectivePathBoundary =
     pathBoundary ?? createDefaultPathBoundary(fileSystem);
@@ -200,6 +275,28 @@ export function resolvePortableHandoffAuthority(
   if (canonicalWorkspaceRoot === null) {
     return blocked(request, "HANDOFF_PLAN_PATH_INVALID");
   }
+  // The checkout is observed before the envelope is read, so the independent
+  // context is established without any input from the envelope it will prove.
+  const effectiveCheckoutContext =
+    checkoutContext ?? createGitCheckoutContext(new SubprocessRunner());
+  const observation = effectiveCheckoutContext.observe(
+    request.expectedWorkspaceRoot,
+  );
+  if (observation.status !== "observed") {
+    return blocked(request, "HANDOFF_VALIDATOR_UNAVAILABLE");
+  }
+  const headRelationshipValid =
+    effectiveCheckoutContext.isHeadRelationshipSatisfied({
+      workspaceRoot: request.expectedWorkspaceRoot,
+      expectedSourceHeadSha: request.expectedSourceHeadSha,
+      observedHeadSha: observation.headSha,
+      allowedHeadRelationship: request.allowedHeadRelationship,
+    });
+  const observationFailures = collectObservationFailures(
+    request,
+    observation,
+    headRelationshipValid,
+  );
   const envelopeOrFailure = readEnvelope(
     fileSystem,
     request,
@@ -208,14 +305,22 @@ export function resolvePortableHandoffAuthority(
   );
   if ("status" in envelopeOrFailure) return envelopeOrFailure;
   const envelope = envelopeOrFailure;
-  if (request.destinationProvider !== envelope.destinationProvider) {
+  const prePlanFailures = collectPrePlanFailures(
+    envelope,
+    request,
+    observationFailures,
+  );
+  if (
+    prePlanFailures.length === 0 &&
+    request.destinationProvider !== envelope.destinationProvider
+  ) {
     return blocked(request, "HANDOFF_PROVIDER_ROUTING_UNAVAILABLE", {
       handoffId: envelope.handoffId,
     });
   }
   const planSha256 = observedPlanSha256(
     fileSystem,
-    envelope,
+    request.expectedPlanPath,
     effectivePathBoundary,
     canonicalWorkspaceRoot,
   );
@@ -225,14 +330,14 @@ export function resolvePortableHandoffAuthority(
     });
   }
   const validation = collectHandoffValidationFailures(envelope, {
-    repositoryId: envelope.binding.repositoryId,
-    workspaceRoot: request.workspaceRoot,
-    branch: envelope.binding.branch,
-    sourceHeadRelationshipValid: true,
-    issueNumber: envelope.identity.issueNumber,
-    featureFolder: envelope.identity.featureFolder,
-    workMode: envelope.identity.workMode,
-    planPath: envelope.plan.path,
+    repositoryId: request.expectedRepositoryId,
+    workspaceRoot: request.expectedWorkspaceRoot,
+    branch: request.expectedBranch,
+    sourceHeadRelationshipValid: headRelationshipValid,
+    issueNumber: request.expectedIssueNumber,
+    featureFolder: request.expectedFeatureFolder,
+    workMode: request.expectedWorkMode,
+    planPath: request.expectedPlanPath,
     planSha256,
     expectedSchedulerContext: envelope.schedulerContext,
     requestedTransition: "prepared_to_atomic_execution",
@@ -242,10 +347,17 @@ export function resolvePortableHandoffAuthority(
     supportedVocabularies: ["portable-orchestration-handoff-core-v1"],
     validatorAvailable: true,
     topologyResolverAvailable: true,
-    providerRoutingAvailable: true,
+    providerRoutingAvailable:
+      request.destinationProvider === envelope.destinationProvider,
     evaluateDirtyWorktree: () => [],
   });
-  const primaryFailureCode = selectPrimaryHandoffFailure(validation.failures);
+  const primaryFailureCode = selectPrimaryHandoffFailure([
+    ...validation.failures,
+    ...observationFailures,
+    ...(planSha256 === request.expectedPlanSha256
+      ? []
+      : (["HANDOFF_PLAN_HASH_MISMATCH"] as const)),
+  ]);
   if (primaryFailureCode !== null) {
     return blocked(request, primaryFailureCode, {
       handoffId: envelope.handoffId,

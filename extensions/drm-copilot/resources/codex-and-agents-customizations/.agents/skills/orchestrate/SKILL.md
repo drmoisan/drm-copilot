@@ -47,10 +47,21 @@ orchestration intake. Before delegation:
 1. Validate the portable envelope through the published, workspace-explicit
    orchestration authority. Require the repository, workspace, branch lineage,
    issue, feature folder, work mode, scheduler context, capabilities, and exact
-   next transition to match the current checkout.
-2. Prove the plan from the envelope's normalized repository-relative path and
-   raw-byte SHA-256. Do not search for another plan, rewrite the path, follow a
-   symlink outside the repository, or substitute a newer plan.
+   next transition to match the current checkout. Supply the complete
+   caller-controlled independent expected context on every call to
+   `resolve_orchestration_topology`, `resolve_provider_routing`, and
+   `transition_prepared_orchestration`: `expected_repository_id`,
+   `expected_workspace_root`, `expected_branch`, `expected_source_head_sha`,
+   `allowed_head_relationship`, `expected_issue_number`,
+   `expected_feature_folder`, `expected_work_mode`, `expected_plan_path`, and
+   `expected_plan_sha256`. Derive each value from the destination checkout and
+   the caller's own record. A call that omits a value, or that copies one from
+   the envelope under validation, is rejected before any service invocation.
+2. Prove the plan from the independently expected repository-relative path and
+   raw-byte SHA-256 the caller supplied in `expected_plan_path` and
+   `expected_plan_sha256`. Do not search for another plan, rewrite the path,
+   follow a symlink outside the repository, substitute a newer plan, or read
+   the plan identity from the envelope.
 3. Use `transition_prepared_orchestration` as the only authority permitted to
    materialize the provider-native destination checkpoint. A dry run may
    validate and project the destination state but must not archive or replace
