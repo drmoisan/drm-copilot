@@ -439,7 +439,7 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
       corresponding configured remote (verified against a fixture using a name other than the
       literal `child`, to confirm the detection is general rather than hardcoded), and is absent
       when the remote exists, verified by a positive/negative bats pair.
-- [ ] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
+- [x] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
       `BRANCH|<branch>|NOT_MERGED` line when the branch is a git ancestor of another branch that
       resolves to exactly `NOT_MERGED`, and is absent (with the branch running the full ladder
       normally) when the ancestor resolves to `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`,
@@ -448,7 +448,7 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
 - [x] `WARN|registration-lost|<path>` is emitted for a worktree directory whose `.git` file
       points at a missing `.git/worktrees/<name>` entry, and is absent when the pointer resolves,
       verified by a positive/negative bats pair.
-- [ ] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
+- [x] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
       properties: (a) for every branch, the `BRANCH|` line
       `classify_all_branches` emits is byte-identical to the line `classify_branch` produces
       for that same branch under that same fixture — the invariant holds by construction,

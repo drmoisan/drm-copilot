@@ -953,7 +953,7 @@ scenario needs.
       are byte-identical, verified by reading the same line range in both; and a single-line token
       search of the mirrored file for the word `inherited` returns no match (it returns exactly one
       match today, at line 91, so the condition is failable).
-- [ ] [P6-T11] `[ORCHESTRATOR-RUN]` Run
+- [x] [P6-T11] `[ORCHESTRATOR-RUN]` Run
       `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts -q`
       (node ID verified in the predecessor plan's P9-T3 against
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py:106-131`). Record evidence at
@@ -974,7 +974,7 @@ scenario needs.
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-check.2026-09-07T14-40.md`
       with the four required fields; `Output Summary:` states the shfmt-diff and shellcheck results.
       Acceptance: `EXIT_CODE: 0`. If this step fails, fix and restart the loop from P7-T1.
-- [ ] [P7-T3] `[ORCHESTRATOR-RUN]` Commit and push Phases 3 through 6, then dispatch
+- [x] [P7-T3] `[ORCHESTRATOR-RUN]` Commit and push Phases 3 through 6, then dispatch
       `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`
       and read the completed run's log. Record the test evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-test.2026-09-07T14-40.md`
@@ -996,14 +996,14 @@ scenario needs.
       `run_report performs exactly one filesystem scan`. Acceptance: `EXIT_CODE: 0`, the `not ok` count
       is `0`, the total is not lower than the P0-T8 baseline count, and all twelve titles appear as
       `ok`. If this step fails, fix and restart the loop from P7-T1.
-- [ ] [P7-T4] `[ORCHESTRATOR-RUN]` From the same run log as P7-T3, record the coverage evidence at
+- [x] [P7-T4] `[ORCHESTRATOR-RUN]` From the same run log as P7-T3, record the coverage evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-test-coverage.2026-09-07T14-40.md`
       with the four required fields; `Output Summary:` must include the literal printed line
       `Bash coverage (lines): NN.N%` with its exact numeric value, state that value alongside the P0-T9
       baseline value for a no-regression comparison, and state that bash has no branch-coverage gate per
       `.claude/rules/quality-tiers.md`. Acceptance: `EXIT_CODE: 0` and the recorded percentage is at
       least 85.0. This satisfies AC9 together with P7-T1 through P7-T3.
-- [ ] [P7-T5] `[ORCHESTRATOR-RUN]` Run
+- [x] [P7-T5] `[ORCHESTRATOR-RUN]` Run
       `wc -l scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_scan_helper.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_deletion.bats tests/fixtures/cleanup_worktrees/stub-bin/scan`
       and record the exact printed counts at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/file-size-cap-verification.2026-09-07T14-40.md`
@@ -1013,14 +1013,14 @@ scenario needs.
       lines; both files end with a trailing newline, so `wc -l` reports one less than the last line
       number a `cat -n`-style reader displays). Record the post-remediation delta for each. Acceptance: every
       printed count is at most 500. This satisfies AC8.
-- [ ] [P7-T6] `[EXECUTOR]` Reconcile the acceptance-criteria checkboxes in `spec.md`. Check AC3 (as
+- [x] [P7-T6] `[EXECUTOR]` Reconcile the acceptance-criteria checkboxes in `spec.md`. Check AC3 (as
       amended by P6-T7) and AC5 (as amended by P6-T8), citing the P7-T3 evidence artifact for the
       passing test titles that verify each. Leave AC6 unchecked and add no text to it; instead record, in the Acceptance Criteria
       Status block written by P7-T7, that AC6 remains unchecked because R-07 is explicitly deferred
       from this remediation cycle. No other checkbox may change state. Acceptance: AC3's and AC5's
       checkboxes are `[x]`, AC6's is `[ ]`, and the other eight are byte-identical to their
       pre-remediation state.
-- [ ] [P7-T7] `[EXECUTOR]` Write the remediation closure record at
+- [x] [P7-T7] `[EXECUTOR]` Write the remediation closure record at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/remediation-closure.2026-09-07T14-40.md`
       containing `Timestamp:`, one section per remediation item addressed (R-01, R-02, R-04) naming the
       implementing tasks, the tests that verify it, and the evidence artifact that records the passing
