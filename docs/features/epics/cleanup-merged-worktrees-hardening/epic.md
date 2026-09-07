@@ -25,12 +25,12 @@ features:
   - issue_num: 630
     feature_folder: 2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630
     depends_on: []
-  - issue_num: 901
-    feature_folder: cleanup-worktrees-report-mode-visibility-gaps
-    depends_on: []
-  - issue_num: 902
-    feature_folder: cleanup-worktrees-dirt-classifier-and-clear-disposable
-    depends_on: []
+  - issue_num: 631
+    feature_folder: 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631
+    depends_on: [630]
+  - issue_num: 632
+    feature_folder: 2026-09-06-cleanup-worktrees-dirt-classifier-632
+    depends_on: [631]
   - issue_num: 545
     feature_folder: 2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545
     depends_on: []
@@ -178,6 +178,30 @@ and not from a file collision that a scope boundary already prevents.
 the consolidation merge as human-performed — so it touches no hook and no file any other child
 owns. The edge's entire basis was the hook edit that no longer happens, so child G is wave 0.
 
+**Two edges were added after preparation, on measured file contention rather than on contract.**
+The authoring-time decision to leave A, B, and C unordered rested on the assumption that placing
+each child's new function group in a separate file would keep their fan-in clean. Preparation showed
+that assumption to be only half right. Each of the three does put its new functions in its own
+sibling library — `cleanup_worktrees_detached_lib.sh`, `cleanup_worktrees_report_records_lib.sh`,
+and `cleanup_worktrees_dirt_lib.sh` — but each must also add call sites inside `run_report` in
+`scripts/bash/cleanup_worktrees_lib.sh`, which is measured at 479 lines against the 500-line cap in
+`.claude/rules/general-code-change.md`. Child C's preparation projected the file to 483 lines from
+its change alone, leaving 17 lines of headroom for two further children.
+
+Three children editing one function in a file with 21 lines of headroom produces both a textual
+three-way conflict and a collective cap breach. Neither is the incidental conflict that the
+`epic-orchestrate` merge-conflict remediation loop exists to absorb, and that loop blocks a child
+after three passes. So `631 depends_on 630` and `632 depends_on 631` are recorded as
+file-contention edges. They are the only edges in this manifest not derived from an upstream
+contract, and they are named as such so a later reader does not mistake them for one.
+
+The order is A, then B, then C. A goes first because it introduces the `WORKTREE|<path>|DETACHED|`
+record that B's `WARN|registration-lost|` sits beside, and because it is the only one of the three
+that also changes apply mode. Each child's plan carries a re-measure-at-execution-time task, so each
+observes the file as its predecessor left it rather than as it stood at planning time; child C's
+plan additionally carries an extraction contingency for the cap, which is the likely outcome once A
+and B have landed.
+
 No edge is recorded among A, B, C, and F for their shared use of the
 `scripts/bash/cleanup_worktrees_*_lib.sh` family. `cleanup_worktrees_lib.sh` is at 479 of the
 500-line cap, so each of those children adds its new function group in a new or clearly separated
@@ -191,13 +215,17 @@ Computed by longest-path layering over the dependency DAG per the `epic-orchestr
 
 | wave | features |
 | --- | --- |
-| 0 | 630 (A), 901 (B), 902 (C), 545 (E), 633 (H), 634 (G) |
-| 1 | 591 (I), 903 (D) |
-| 2 | 904 (F) |
+| 0 | 630 (A), 545 (E), 633 (H), 634 (G) |
+| 1 | 631 (B), 591 (I), 903 (D) |
+| 2 | 632 (C), 904 (F) |
 
-`wave(630) = wave(901) = wave(902) = wave(545) = wave(633) = wave(634) = 0` (empty `depends_on`);
-`wave(591) = 1 + wave(545) = 1`; `wave(903) = 1 + wave(545) = 1`;
+`wave(630) = wave(545) = wave(633) = wave(634) = 0` (empty `depends_on`);
+`wave(631) = 1 + wave(630) = 1`; `wave(591) = 1 + wave(545) = 1`;
+`wave(903) = 1 + wave(545) = 1`; `wave(632) = 1 + wave(631) = 2`;
 `wave(904) = 1 + wave(903) = 2`. The graph is cycle-free and every `depends_on` entry resolves.
+Verified against `scripts/dev_tools/epic_wave_computation.py`, the canonical implementation of the
+longest-path layering formula. Maximum wave width is four, which matches the epic's
+`max_parallel_features` of four, so no wave is split into batches.
 
 ## Complexity Assessment
 
