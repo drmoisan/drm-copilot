@@ -18,23 +18,32 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 report() { # report <scenario-dir> -> run the report driver under that scenario
     # Each source is joined to the next command by `&&`: an absent library must abort the
-    # chain before the driver call rather than degrade to a partial run.
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${DLIB}' && run_report"
+    # chain before the driver call rather than degrade to a partial run. run_report calls
+    # the report-record functions and the shared classification driver, so the sibling
+    # library must be sourced here (bats subshells source the libraries directly and never
+    # run the CLI wrapper) and the filesystem scan must route through the checked-in scan
+    # stub rather than reading the real .claude/worktrees tree.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="$1" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && run_report"
 }
 
 runin() { # runin <scenario-dir> <invocation> -> run an arbitrary invocation under it
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${DLIB}' && $2"
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="$1" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && $2"
 }
 
 @test "report emits one detached record with MERGED_CLEAN" {

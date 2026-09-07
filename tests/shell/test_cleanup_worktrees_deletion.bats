@@ -11,17 +11,25 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     DEL="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/deletion"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 apply() { # apply <scenario-dir>
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
+    # run_apply now calls the shared classification driver, so the sibling library must
+    # be sourced here (bats subshells source the libraries directly and never run the CLI
+    # wrapper) and the filesystem scan must route through the checked-in scan stub rather
+    # than reading the real .claude/worktrees tree.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
@@ -117,4 +125,16 @@ apply() { # apply <scenario-dir>
     [[ "$output" == *"ANCESTRY_ERROR"* ]]
     [[ "$output" != *"MERGED_CLEAN"* ]]
     [[ "$output" != *"branch -D documentationandmemories"* ]]
+}
+
+@test "apply mode allowlist is unaffected by a CHILD_OF short-circuit" {
+    # Outcome preservation, property (b): a branch that reached NOT_MERGED through the
+    # CHILD_OF short-circuit is gated by the same delete-eligible allowlist as one that
+    # reached it through the full ladder. NOT_MERGED is not on that allowlist, so no
+    # deletion ACTION of any result is emitted for it.
+    apply "${SCEN}/child_of_not_merged"
+    [[ "$output" == *"BRANCH|feature-child|NOT_MERGED"* ]]
+    [[ "$output" == *"CHILD_OF|feature-child|feature-parent"* ]]
+    [[ "$output" != *"ACTION|delete|feature-child|"* ]]
+    [[ "$output" != *"branch -D feature-child"* ]]
 }

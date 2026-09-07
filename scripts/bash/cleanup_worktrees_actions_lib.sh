@@ -378,23 +378,34 @@ run_apply() {
 		vout=$(verify_consolidation_merged) || true
 		[[ $vout == MERGED_CLEAN ]] && consolidation_ok=0
 	fi
-	local crc
+	# One shared classification pass for every branch, identical to the one report mode
+	# runs, so the two modes can never disagree about a branch's state. A non-zero driver
+	# return means at least one branch hard-failed; that propagates to rc here and the
+	# per-branch allowlist check below still gates every individual deletion.
+	local crc=0 all_out
+	all_out=$(classify_all_branches) || crc=$?
+	if ((crc != 0)); then
+		rc=1
+	fi
 	while read -r name _; do
 		[[ -z $name ]] && continue
 		if [[ $name == "$CLEANUP_WT_CONSOLIDATION_BRANCH" ]] && ((consolidation_ok != 0)); then
 			printf 'ACTION|delete|%s|BLOCKED-CONSOLIDATION-UNMERGED\n' "$name"
 			continue
 		fi
-		crc=0
-		cb_out=$(classify_branch "$name") || crc=$?
+		# Extract this branch's own lines from the shared driver's combined output. The
+		# name is the second pipe-delimited field of each of the three per-branch record
+		# types, so the filter is name-scoped and cannot pick up a sibling's records.
+		cb_out=$(printf '%s\n' "$all_out" | awk -F'|' -v n="$name" \
+			'($1 == "BRANCH" || $1 == "CHILD_OF" || $1 == "COMMIT") && $2 == n')
 		printf '%s\n' "$cb_out"
-		if ((crc != 0)); then
+		state=$(printf '%s\n' "$cb_out" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
+		if [[ $state == "ANCESTRY_ERROR" ]]; then
 			# A branch classification hard failure never triggers deletion (its state is an
 			# error state, not on the allowlist) and propagates a non-zero driver rc.
 			rc=1
 			continue
 		fi
-		state=$(printf '%s\n' "$cb_out" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
 		case "$state" in
 		MERGED_CLEAN | MERGED_CONTENT_NEUTRAL | MERGED_EQUIVALENT)
 			delete_candidate "$name" "${wt_of[$name]:-}" "$state" || rc=1

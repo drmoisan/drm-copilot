@@ -430,12 +430,12 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
       `tests/fixtures/cleanup_worktrees/stub-bin/git` is backward compatible: the full existing
       bats suite passes unchanged immediately after that edit, before any new scenario fixtures
       are authored on top of it.
-- [ ] The SKILL.md Report Line Contract section documents all four new record types, cross-
+- [x] The SKILL.md Report Line Contract section documents all four new record types, cross-
       referencing (not duplicating) the existing manual orphan-directory guidance in the Dirty
       Worktree Triage Procedure, and the edit is mirrored byte-identically into
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`,
       verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
-- [ ] `scripts/bash/cleanup_worktrees_lib.sh` remains at or under the 500-line cap in
+- [x] `scripts/bash/cleanup_worktrees_lib.sh` remains at or under the 500-line cap in
       `.claude/rules/general-code-change.md` after the `run_report` call-site edit.
 - [ ] The full toolchain loop (`shell-qc.sh format`, `check`, `test`, `test --coverage`) passes
       with line coverage >= 85%, with no bash branch-coverage gate, per

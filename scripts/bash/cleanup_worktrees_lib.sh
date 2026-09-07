@@ -45,6 +45,10 @@
 #   WARN|main-divergence|<local-sha>|<origin-sha>
 #   DIRTY|<worktree-path>|<status-porcelain-line>
 #   ACTION|<verb>|<target>|<result>   (apply mode only; emitted by the actions lib)
+#   ORPHAN_DIR|<path>|<size>          advisory, read-only records defined in
+#   STALE_REF|<refname>               cleanup_worktrees_report_records_lib.sh; none of
+#   CHILD_OF|<branch>|<ancestor>      these four unlocks a destructive action.
+#   WARN|registration-lost|<path>
 # Branch states: NOT_MERGED | MERGED_CLEAN | MERGED_CONTENT_NEUTRAL |
 #   MERGED_EQUIVALENT | HAS_UNIQUE_RESIDUALS | PROTECTED_CURRENT; ANCESTRY_ERROR is a
 #   hard failure. Per-commit states: EQUIVALENT | CONTENT_ON_MAIN | EMPTY | UNIQUE |
@@ -445,24 +449,31 @@ classify_branch() {
 
 run_report() {
 	# Report-mode driver: emit the deterministic report with no mutation of any kind.
-	# Emission order: WARN (freshness) first, then WORKTREE registrations, then the
-	# per-branch BRANCH/COMMIT lines with branches taken in enumerate_branches'
-	# LC_ALL=C order. Returns the maximum classify_branch return code (non-zero when
-	# any branch reported ANCESTRY_ERROR). A worktree-list OR enumerate-branches hard
-	# failure aborts the report before any line is emitted and returns git's non-zero
-	# exit code, so a git failure never resolves to a partial, misleading report.
-	local rc=0 crc name record wpath wbranch wflags wlout wlrc=0 ebout ebrc=0
+	# Emission order: WARN (freshness), then the pre-branch advisory scans (STALE_REF,
+	# ORPHAN_DIR, WARN|registration-lost — none depends on per-branch classification, so
+	# all three are colocated with the freshness warning), then WORKTREE registrations,
+	# then the per-branch BRANCH/CHILD_OF/COMMIT lines in enumerate_branches' LC_ALL=C
+	# order. Those come from classify_all_branches, the shared driver apply mode also
+	# uses, so both modes derive one identical classification. Returns the maximum return
+	# code observed. A worktree-list OR enumerate-branches hard failure aborts the report
+	# before any line is emitted and returns git's non-zero exit code, so a git failure
+	# never resolves to a partial, misleading report.
+	local rc=0 crc record wpath wbranch wflags wlout wlrc=0 ebrc=0
 	# Guarded parent-shell captures up front, before any output: a hard failure of either
-	# read aborts the report before any WARN/WORKTREE/BRANCH line.
+	# read aborts the report before any WARN/WORKTREE/BRANCH line. The branch list itself
+	# is re-read by classify_all_branches; this probe exists only for the early abort.
 	wlout=$(parse_worktree_list) || wlrc=$?
 	if ((wlrc != 0)); then
 		return "$wlrc"
 	fi
-	ebout=$(enumerate_branches) || ebrc=$?
+	enumerate_branches >/dev/null || ebrc=$?
 	if ((ebrc != 0)); then
 		return "$ebrc"
 	fi
 	check_main_freshness
+	scan_stale_refs || rc=$?
+	scan_orphan_dirs || rc=$?
+	scan_registration_loss || rc=$?
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
@@ -471,13 +482,10 @@ run_report() {
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
 	done <<<"$wlout"
 	report_detached_worktrees "$wlout" || rc=$?
-	while read -r name _; do
-		[[ -z $name ]] && continue
-		crc=0
-		classify_branch "$name" || crc=$?
-		if ((crc > rc)); then
-			rc=$crc
-		fi
-	done <<<"$ebout"
+	crc=0
+	classify_all_branches || crc=$?
+	if ((crc > rc)); then
+		rc=$crc
+	fi
 	return "$rc"
 }

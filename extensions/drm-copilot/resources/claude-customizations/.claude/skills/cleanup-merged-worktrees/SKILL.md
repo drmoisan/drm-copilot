@@ -77,6 +77,21 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 - `DIRTY|<worktree-path>|<status-porcelain-line>` — a dirty worktree that blocked
   removal.
 - `ACTION|<verb>|<target>|<result>` — apply-mode action results.
+- `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
+  no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
+  may be the literal `unknown`. The record is advisory: it reports the directory, and
+  nothing in apply mode acts on it. For the disposition, see the Dirty Worktree Triage
+  Procedure's step 7, which governs how an orphaned directory is handled.
+- `STALE_REF|<refname>` — a `refs/remotes/<name>/*` ref whose `<name>` is not a
+  configured remote, named in full ref form. Advisory only; no ref is ever pruned by
+  this tool.
+- `CHILD_OF|<branch>|<ancestor>` — `branch` is a git ancestor of `ancestor`, which
+  itself resolved exactly `NOT_MERGED`. It is emitted alongside, never instead of, the
+  branch's own `BRANCH|<branch>|NOT_MERGED` line, and records why that verdict was
+  inherited rather than re-derived through the full ladder.
+- `WARN|registration-lost|<path>` — a worktree directory whose `.git` pointer file names
+  a gitdir target that no longer exists. Git commands run inside such a directory fail
+  in confusing ways. Advisory only.
 
 ## End-to-End Workflow
 
