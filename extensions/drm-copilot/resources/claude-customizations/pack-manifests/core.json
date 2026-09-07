@@ -46,6 +46,8 @@
     ".claude/hooks/enforce-pr-author-skill-helpers.ps1",
     ".claude/hooks/enforce-prd-feature-before-planner.ps1",
     ".claude/hooks/enforce-promotion-mcp-only.ps1",
+    ".claude/hooks/hook-command-invocation.ps1",
+    ".claude/hooks/hook-command-scanner.ps1",
     ".claude/hooks/persist-session-id.ps1",
     ".claude/hooks/validate-bash.ps1",
     ".claude/hooks/validate-discovery-artifact-gate.ps1",

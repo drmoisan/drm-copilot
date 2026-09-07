@@ -1460,12 +1460,12 @@ denies against a not-ready checkpoint.
       path.
 - [ ] Both regression tests pass after the fix, on both the Claude and the Codex sides, with
       pass-after output recorded under the same evidence path.
-- [ ] The scanner produces, for each segment, the five properties named in D2 Piece 1 (`RawText`,
+- [x] The scanner produces, for each segment, the five properties named in D2 Piece 1 (`RawText`,
       `MaskedText`, `Tokens`, `HasLiveSubstitution`, `Unbalanced`), and a named Pester case exists
       for each heredoc rule in D2 Piece 1: `<<`, `<<-` with leading tabs, a quoted delimiter,
       multiple pending heredocs on one physical line, an unterminated body masking to end of text,
       `<<<` not treated as a heredoc, and a non-literal delimiter forcing a raw scan.
-- [ ] Scan-text selection follows the three ordered clauses of D2 Piece 2, and the wrapper
+- [x] Scan-text selection follows the three ordered clauses of D2 Piece 2, and the wrapper
       carve-out set is pinned by a named Pester case asserting its **exact** membership against the
       script-scope constant through the accessor `Get-CommandLineWrapperName`. The set contains the
       fourteen members listed in D2 Piece 2 unless the optional additions recorded in D11.4 are
@@ -1473,7 +1473,7 @@ denies against a not-ready checkpoint.
       specification and the constant state the same membership. The criterion is satisfied only when
       the asserted membership in the test, the constant in the code, and the list in D2 Piece 2 all
       agree.
-- [ ] The structural relocation classifier implements the six numbered steps of D2 Piece 3, with
+- [x] The structural relocation classifier implements the six numbered steps of D2 Piece 3, with
       named Pester cases asserting: `git -C <dir> add` classifies; `git --git-dir=<x> commit`
       classifies; `git --work-tree=<x> add` classifies; an unmodeled dash-leading token between
       `git` and the subcommand classifies; and `git log --grep add` does **not** classify.
@@ -1505,13 +1505,13 @@ denies against a not-ready checkpoint.
       `gh --repo <o/r> pr create` and `gh -R <o/r> pr edit` classify; named cases assert that a
       quoted `--body-file` mention inside a JSON receipt value allows, and that every `PR_*` reason
       code and receipt check is unchanged for genuine invocations.
-- [ ] The shared parser ships as exactly two dot-sourced `.ps1` files named
+- [x] The shared parser ships as exactly two dot-sourced `.ps1` files named
       `hook-command-scanner.ps1` and `hook-command-invocation.ps1`, each existing at
       `.claude/hooks/`, `.codex/hooks/`, and both bundle locations (eight files total), each
       defining functions only, reading no stdin, containing no `$env:CLAUDE_` reference, and at or
       under 500 lines. Neither is a `.psm1`, and no file is added under `.claude/lib/` by this
       change.
-- [ ] The registration set from D9 as amended by D11.2 is complete: **fourteen entries across five
+- [x] The registration set from D9 as amended by D11.2 is complete: **fourteen entries across five
       registry files** — one entry per helper in each of the two pack manifests, one array member per
       helper in `$script:SharedModuleNames` in
       `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, and two entries per helper
@@ -1628,7 +1628,7 @@ denies against a not-ready checkpoint.
       `.codex/hooks/enforce-epic-merge-gate.ps1` still contains no unanchored whole-text digit scan;
       its PR-number resolution goes through `Get-CommandLineOperand` and `Get-CommandLineFlagValue`
       only. Verified by diff inspection recorded in the scope-and-size evidence artifact.
-- [ ] **The D12 parser contract is documented and honoured.** The public signatures of
+- [x] **The D12 parser contract is documented and honoured.** The public signatures of
       `Read-CommandLineSegment`, `Test-CommandLineInvocation`, `Get-CommandLineOperand`,
       `Get-CommandLineFlagValue`, `Test-CommandLineFlag`, and `Test-CommandLineMention` in the
       delivered code match the param blocks, types, and return shapes stated in D12, verified by a
