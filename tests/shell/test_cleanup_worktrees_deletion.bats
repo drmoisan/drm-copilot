@@ -12,6 +12,7 @@ setup() {
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
+    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     DEL="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/deletion"
@@ -20,7 +21,7 @@ setup() {
 
 apply() { # apply <scenario-dir>
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; run_apply"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
