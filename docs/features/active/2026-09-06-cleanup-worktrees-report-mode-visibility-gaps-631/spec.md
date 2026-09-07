@@ -404,29 +404,29 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
   top of it, because that edit is shared by every existing scenario.
 
 ## Acceptance Criteria
-- [ ] `ORPHAN_DIR|<path>|<size>` is emitted for a directory under a known worktree-tracking root
+- [x] `ORPHAN_DIR|<path>|<size>` is emitted for a directory under a known worktree-tracking root
       that has no `.git` file and no entry in `parse_worktree_list`'s output, and is absent for a
       registered worktree directory, verified by a positive/negative bats pair against checked-in
       fixtures.
-- [ ] `STALE_REF|<refname>` is emitted for any `refs/remotes/<name>/*` ref whose `<name>` has no
+- [x] `STALE_REF|<refname>` is emitted for any `refs/remotes/<name>/*` ref whose `<name>` has no
       corresponding configured remote (verified against a fixture using a name other than the
       literal `child`, to confirm the detection is general rather than hardcoded), and is absent
       when the remote exists, verified by a positive/negative bats pair.
-- [ ] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
+- [x] `CHILD_OF|<branch>|<ancestor>` is emitted alongside an unchanged
       `BRANCH|<branch>|NOT_MERGED` line when the branch is a git ancestor of another branch that
       resolves to exactly `NOT_MERGED`, and is absent (with the branch running the full ladder
       normally) when the ancestor resolves to `HAS_UNIQUE_RESIDUALS` or `MERGED_EQUIVALENT`,
       verified by a positive/negative bats pair that additionally asserts via argv-log checks
       that the expensive-rung stub keys were not invoked in the positive case.
-- [ ] `WARN|registration-lost|<path>` is emitted for a worktree directory whose `.git` file
+- [x] `WARN|registration-lost|<path>` is emitted for a worktree directory whose `.git` file
       points at a missing `.git/worktrees/<name>` entry, and is absent when the pointer resolves,
       verified by a positive/negative bats pair.
-- [ ] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
+- [x] The `CHILD_OF` outcome-preservation invariant is verified as two separately-tested
       properties: (a) the report-mode `BRANCH|<branch>|NOT_MERGED` line's value is unchanged
       whether or not the short-circuit fires, and (b) the apply-mode allowlist decision for a
       `CHILD_OF`-short-circuited branch is unchanged (no deletion `ACTION` emitted for a
       `NOT_MERGED` branch, short-circuited or not).
-- [ ] The `for-each-ref` stub key-specificity edit in
+- [x] The `for-each-ref` stub key-specificity edit in
       `tests/fixtures/cleanup_worktrees/stub-bin/git` is backward compatible: the full existing
       bats suite passes unchanged immediately after that edit, before any new scenario fixtures
       are authored on top of it.
@@ -437,12 +437,12 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
       verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
 - [x] `scripts/bash/cleanup_worktrees_lib.sh` remains at or under the 500-line cap in
       `.claude/rules/general-code-change.md` after the `run_report` call-site edit.
-- [ ] The full toolchain loop (`shell-qc.sh format`, `check`, `test`, `test --coverage`) passes
+- [x] The full toolchain loop (`shell-qc.sh format`, `check`, `test`, `test --coverage`) passes
       with line coverage >= 85%, with no bash branch-coverage gate, per
       `.claude/rules/quality-tiers.md`.
-- [ ] No automatic deletion of orphan directories or stale refs is introduced; deletion remains a
+- [x] No automatic deletion of orphan directories or stale refs is introduced; deletion remains a
       manual, per-item confirmed action outside this feature's scope.
-- [ ] No acceptance criterion in this document, and no test authored to satisfy it, asserts a
+- [x] No acceptance criterion in this document, and no test authored to satisfy it, asserts a
       fixed numeric count (e.g., a specific number of orphan directories or stale refs) derived
       from the historical 2026-09-06 run observations; all detection logic is generic and
       parameterized.

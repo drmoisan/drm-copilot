@@ -150,7 +150,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       all four directories and their files exist as tracked content (confirmed via
       `git status --porcelain -- tests/fixtures/cleanup_worktrees/scan_roots` showing them staged
       or already committed, not untracked-and-ignored).
-- [ ] [P1-T4] Add `tests/shell/test_cleanup_worktrees_scan_helper.bats` (new file) with one
+- [x] [P1-T4] Add `tests/shell/test_cleanup_worktrees_scan_helper.bats` (new file) with one
       `@test "scan-dirs emits has_gitfile/target_exists/size for each candidate directory"` that
       runs `scripts/bash/cleanup_worktrees_scan_helper.sh scan-dirs tests/fixtures/cleanup_worktrees/scan_roots/basic`
       and asserts the output contains a line matching `no_git|0|NA|*`, a line matching
@@ -164,14 +164,14 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       invocation, replays `<scenario>/scan-dirs.out` to stdout and exits with
       `<scenario>/scan-dirs.rc` (default 0), emitting nothing with exit 0 when no scenario is
       configured. Acceptance: `bash -n tests/fixtures/cleanup_worktrees/stub-bin/scan` exits 0.
-- [ ] [P1-T6] Add `tests/shell/test_cleanup_worktrees_scan_seam.bats` (new file) with two
+- [x] [P1-T6] Add `tests/shell/test_cleanup_worktrees_scan_seam.bats` (new file) with two
       `@test` blocks: `"cleanup_wt_scan_bin honors an executable CLEANUP_WT_SCAN_BIN override"`
       (asserts the resolver echoes the override path when set and executable) and
       `"cleanup_wt_scan_bin falls back to the bundled scan helper when unset"` (asserts the
       resolver echoes a path ending in `cleanup_worktrees_scan_helper.sh` when
       `CLEANUP_WT_SCAN_BIN` is empty). Acceptance:
       `bats tests/shell/test_cleanup_worktrees_scan_seam.bats` exits 0 for both tests.
-- [ ] [P1-T7] Add a `classify_all()` bats helper to
+- [x] [P1-T7] Add a `classify_all()` bats helper to
       `tests/shell/test_cleanup_worktrees_classification.bats`, forward-declared here in Phase 1
       (an explicitly permitted placement, alongside Phase 6, for the round-3 defect requirement to
       specify Phase 6's direct-invocation mechanism for `classify_all_branches`) so Phase 6's
@@ -228,7 +228,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       Place it adjacent to the existing `fetch)` case. Acceptance:
       `bash -n tests/fixtures/cleanup_worktrees/stub-bin/git` exits 0; a `remote)` case precedes
       the `*)` default arm in the case statement.
-- [ ] [P2-T3] Immediately after P2-T1 (which now edits both the `for-each-ref)` case and the
+- [x] [P2-T3] Immediately after P2-T1 (which now edits both the `for-each-ref)` case and the
       `merge-base)` case) and P2-T2, and before any new scenario fixture directory is authored for
       STALE_REF/ORPHAN_DIR/WARN/CHILD_OF, run `bash scripts/bash/shell-qc.sh test` (full existing
       suite, all directories under `tests/shell` and `tests/bash`). Record evidence at
@@ -266,7 +266,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       `tests/fixtures/cleanup_worktrees/scenarios/stale_ref_absent/`, identical to
       `stale_ref_present/` except `remote.out` additionally lists `upstream` (two lines: `origin`,
       `upstream`), so no remote-tracking ref is stale. Acceptance: all listed files exist.
-- [ ] [P3-T4] Add `tests/shell/test_cleanup_worktrees_report_records.bats` (new file) with a
+- [x] [P3-T4] Add `tests/shell/test_cleanup_worktrees_report_records.bats` (new file) with a
       `setup()` block matching the pattern in
       `tests/shell/test_cleanup_worktrees_enumeration.bats:9-19`, plus two `@test` blocks:
       `"scan_stale_refs emits STALE_REF for a remote-tracking ref with no configured remote"`
@@ -298,7 +298,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       `tests/fixtures/cleanup_worktrees/scenarios/orphan_dir_absent/` with `scan-dirs.out`
       containing the line `/repo-wt/feat|1|1|64K` and a `worktree-list.out` that DOES list
       `/repo-wt/feat` as a registered worktree path. Acceptance: files exist.
-- [ ] [P4-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_report_records.bats`:
+- [x] [P4-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_report_records.bats`:
       `"scan_orphan_dirs emits ORPHAN_DIR for an unregistered, .git-less directory"` (under
       `orphan_dir_present`, asserts `$output` equals exactly
       `ORPHAN_DIR|.claude/worktrees/agent-old|128K`) and
@@ -324,7 +324,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
 - [x] [P5-T3] Add scenario fixture directory
       `tests/fixtures/cleanup_worktrees/scenarios/registration_lost_absent/` with `scan-dirs.out`
       containing the line `/repo-wt/intact|1|1|32K`. Acceptance: file exists.
-- [ ] [P5-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_report_records.bats`:
+- [x] [P5-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_report_records.bats`:
       `"scan_registration_loss emits WARN|registration-lost for a broken gitdir pointer"` (under
       `registration_lost_present`, asserts `$output` equals exactly
       `WARN|registration-lost|/repo-wt/half-gone`) and
@@ -403,7 +403,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       resolves it to `PROTECTED_CURRENT` rather than a spurious `CHILD_OF`-driven short-circuit).
       Acceptance: directory and files exist, including both named `merge-base.feature-child.*`
       files and `merge-base.main.rc`.
-- [ ] [P6-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_classification.bats`,
+- [x] [P6-T4] Append two `@test` blocks to `tests/shell/test_cleanup_worktrees_classification.bats`,
       each invoking the `classify_all()` helper added in P1-T7:
       `"child_of_not_merged: CHILD_OF short-circuit skips feature-child's expensive rungs"` (calls
       `classify_all child_of_not_merged`; asserts `$output` contains
@@ -418,7 +418,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       via its own full ladder, and does NOT contain any `CHILD_OF|` line — the scenario's
       `merge-base.main.rc` fixture from P6-T3 keeps `main` independent so it cannot itself be
       short-circuited into a spurious `CHILD_OF|main|...` line). Acceptance: both pass.
-- [ ] [P6-T5] Add scenario fixture directory
+- [x] [P6-T5] Add scenario fixture directory
       `tests/fixtures/cleanup_worktrees/scenarios/child_of_ancestry_probe_error/` where the new
       pairwise `merge-base --is-ancestor <feature-child-tip> <upstream-tip>` probe exits with rc
       128 for every upstream (`merge-base.feature-child.rc` = `128`, the bare fallback key from
@@ -519,7 +519,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       lines 374-379 unchanged. Acceptance: `bash -n scripts/bash/cleanup_worktrees_actions_lib.sh`
       exits 0; `run_apply` calls `classify_branch` at most once per branch in total, only via the
       shared driver.
-- [ ] [P7-T4] Append `@test "child_of_not_merged: report-mode BRANCH line is unchanged by the
+- [x] [P7-T4] Append `@test "child_of_not_merged: report-mode BRANCH line is unchanged by the
       short-circuit"` to `tests/shell/test_cleanup_worktrees_classification.bats`: runs
       `report child_of_not_merged` and asserts `$output` contains exactly
       `BRANCH|feature-child|NOT_MERGED`; separately runs `cb unmerged feature-unmerged` (the
@@ -527,7 +527,7 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
       `BRANCH|feature-unmerged|NOT_MERGED`; both assertions confirm the `BRANCH|<name>|NOT_MERGED`
       shape is byte-identical in form whether or not the short-circuit fired. Acceptance: passes.
       This satisfies AC5(a).
-- [ ] [P7-T5] Append `@test "apply mode allowlist is unaffected by a CHILD_OF short-circuit"` to
+- [x] [P7-T5] Append `@test "apply mode allowlist is unaffected by a CHILD_OF short-circuit"` to
       `tests/shell/test_cleanup_worktrees_deletion.bats`, using the existing `apply()` helper
       (`tests/shell/test_cleanup_worktrees_deletion.bats:21-24`) against
       `child_of_not_merged`: asserts `$output` contains `BRANCH|feature-child|NOT_MERGED` and
@@ -596,13 +596,13 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
 
 ### Phase 10 — File-Size Cap and Generic-Detection Verification
 
-- [ ] [P10-T1] After Phases 1-9 are complete, run
+- [x] [P10-T1] After Phases 1-9 are complete, run
       `wc -l scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup-worktrees.sh scripts/bash/cleanup_worktrees_scan_helper.sh`
       and record the exact printed counts at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/file-size-cap-verification.2026-09-06T23-03.md`
       with the four required fields. Acceptance: every one of the five printed counts is <= 500.
       This satisfies AC8.
-- [ ] [P10-T2] Record the AC11 generic-detection confirmation at
+- [x] [P10-T2] Record the AC11 generic-detection confirmation at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/other/ac11-generic-detection-confirmation.2026-09-06T23-03.md`,
       enumerating every new fixture scenario directory added in Phases 1 and 3-6
       (`orphan_dir_present`, `orphan_dir_absent`, `stale_ref_present`, `stale_ref_absent`,
@@ -617,28 +617,28 @@ per `.claude/rules/shell.md`. `shfmt`/`shellcheck` are also available directly o
 
 ### Phase 11 — Final QA Loop
 
-- [ ] [P11-T1] Run `bash scripts/bash/shell-qc.sh format`. Record evidence at
+- [x] [P11-T1] Run `bash scripts/bash/shell-qc.sh format`. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-format.2026-09-06T23-03.md`
       with the four required fields, including the `git status --porcelain -- scripts/bash tests/shell`
       tree observation as in P0-T6. Acceptance: `EXIT_CODE: 0`. If this step rewrites any file,
       restart the loop from this task.
-- [ ] [P11-T2] Run `bash scripts/bash/shell-qc.sh check`. Record evidence at
+- [x] [P11-T2] Run `bash scripts/bash/shell-qc.sh check`. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-check.2026-09-06T23-03.md`
       with the four required fields. Acceptance: `EXIT_CODE: 0`. If this step fails, restart the
       loop from P11-T1.
-- [ ] [P11-T3] Run `bash scripts/bash/shell-qc.sh test`. Record evidence at
+- [x] [P11-T3] Run `bash scripts/bash/shell-qc.sh test`. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-test.2026-09-06T23-03.md`
       with the four required fields, including the total bats test count and confirmation that it
       is not lower than the Phase 2 regression-gate count (P2-T3). Acceptance: `EXIT_CODE: 0`. If
       this step fails, restart the loop from P11-T1.
-- [ ] [P11-T4] Run `bash scripts/bash/shell-qc.sh test --coverage`. Record evidence at
+- [x] [P11-T4] Run `bash scripts/bash/shell-qc.sh test --coverage`. Record evidence at
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-test-coverage.2026-09-06T23-03.md`
       with the four required fields; `Output Summary:` must include the literal printed line
       `Bash coverage (lines): NN.N%` with a numeric value >= 85.0, and must state the value
       alongside the Phase 0 baseline value (P0-T9) for a no-regression comparison. Acceptance:
       `EXIT_CODE: 0` and the recorded percentage is >= 85.0. This satisfies AC9, together with
       P11-T1-T3.
-- [ ] [P11-T5] Confirm the full toolchain loop (P11-T1 through P11-T4) completed in a single pass
+- [x] [P11-T5] Confirm the full toolchain loop (P11-T1 through P11-T4) completed in a single pass
       with no restart triggered (i.e., no step in this phase rewrote a file or failed after the
       first attempt). Record this confirmation as the final line of
       `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/evidence/qa-gates/final-test-coverage.2026-09-06T23-03.md`
