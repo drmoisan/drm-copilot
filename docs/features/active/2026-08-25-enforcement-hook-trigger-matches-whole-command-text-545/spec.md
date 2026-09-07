@@ -1495,7 +1495,7 @@ denies against a not-ready checkpoint.
       `enforce-orchestration-preimplementation-gate-helpers.ps1` carry no functional edit, the
       exemption remains allow-side only, and it is consulted at the same point in the decision flow
       (D2 rule R5).
-- [ ] `enforce-promotion-mcp-only.ps1` is changed in all four copies so that its four-token
+- [x] `enforce-promotion-mcp-only.ps1` is changed in all four copies so that its four-token
       `IndexOf` scan and both `gh` expressions evaluate against per-segment scan text from
       `hook-command-scanner.ps1`, with named cases asserting that promotion tool names supplied as
       receipt *values* allow while a genuine promotion-script invocation, `gh issue create`,
@@ -1562,7 +1562,7 @@ denies against a not-ready checkpoint.
 - [ ] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
       `git -C <dir> add .` denies against a not-ready checkpoint, with results recorded under
       `…-545/evidence/qa-gates/`.
-- [ ] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
+- [x] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
       issue-creation spelling through the structural `gh` classifier of D2 Piece 3, per D10, so
       that `gh --repo drmoisan/drm-copilot issue create` and
       `gh -R drmoisan/drm-copilot issue new` are denied where they pass by non-match today; a named
