@@ -104,8 +104,17 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    `.claude/skills/pr-author/SKILL.md`, using `<N> = 396` for the body-file and receipt
    contract. This skill never authors or creates the PR itself.
 
-5. **Wait for merge and verify git-natively.** After the consolidation PR merges,
-   verify it with `git fetch` followed by
+5. **Wait for merge and verify git-natively.** The consolidation PR's merge is
+   **human-performed**: the operator merges it outside the agent session; this skill
+   never issues the merge itself. This is why: `gh pr merge` is absent from this skill's
+   `allowed-tools`; the project permission allow-list (`permissions.allow` in
+   `.claude/settings.json`) carries no `gh` entry; and `.claude/hooks/enforce-epic-merge-gate.ps1`
+   would deny the command with `EPIC_MERGE_GATE_BLOCKED` if it were attempted. At this
+   boundary the agent reports the consolidation pull request's URL or number to the
+   operator and stops. The ruleset on `main` sets `strict_required_status_checks_policy`,
+   so the branch must be up to date with `main` before the merge becomes available to the
+   operator; the wait for the merge is unbounded within a session. After the consolidation
+   PR merges, verify it with `git fetch` followed by
    `git merge-base --is-ancestor documentationandmemories main`. Exit 0 confirms every
    consolidated commit is now reachable from `main`; that is the only state that unlocks
    deletion of branches whose unique content was consolidated.
@@ -249,6 +258,11 @@ specific files or commit SHAs, before step 9 acts on any finding.
   worktree-tracking directory, without explicit per-item user confirmation — both are
   outside this skill's pre-approved tool surface regardless of how the triage verdict
   came out.
+- Never issue the consolidation merge command, and never write or edit an orchestration
+  checkpoint in order to satisfy `.claude/hooks/enforce-epic-merge-gate.ps1`. This
+  forecloses the specific evasion of writing an
+  `artifacts/orchestration/orchestrator-state.json` whose `epic_mode` and `step9_status`
+  fields the gate's child-feature accept shape would honour for any pull-request number.
 
 ## Cross-References
 
@@ -262,3 +276,8 @@ specific files or commit SHAs, before step 9 acts on any finding.
 - `.claude/skills/feature-promotion-lifecycle/SKILL.md` — the potential-entry-to-issue
   promotion path used by the Dirty Worktree Triage Procedure's step 9 for `PRESERVE`
   findings that describe unresolved product scope.
+- `.claude/hooks/enforce-epic-merge-gate.ps1` — the PreToolUse gate on the consolidation
+  merge command, backed by orchestration checkpoints. A cleanup run satisfies none of its
+  three checkpoint shapes: it is neither a per-feature orchestration, nor an epic
+  integration, nor a parallel run, so it writes none of the three checkpoints the gate
+  reads.
