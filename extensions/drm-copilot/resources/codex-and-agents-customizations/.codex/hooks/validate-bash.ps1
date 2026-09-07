@@ -14,6 +14,13 @@
 [CmdletBinding()]
 param()
 
+# Shared command-line parser (issue #545). The denylist comparison below runs against the
+# segment list rather than against the unsegmented command string, which is what keeps the
+# two runtimes on one implementation of the same concern. This copy has no cd-chained leg
+# and none is added.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 function Get-BlockedBashPattern {
     [CmdletBinding()]
     [OutputType([string[]])]
@@ -29,7 +36,98 @@ function Get-BlockedBashPattern {
     )
 }
 
+function Test-BlockedPatternTokenRun {
+    <#
+    .SYNOPSIS
+        Report whether a literal's token sequence occurs as a contiguous run in a token list.
+    .DESCRIPTION
+        Whole-token equality, element by element. This is the comparison primitive that
+        replaces String.Contains. It is what makes '--force-with-lease' stop matching the
+        literal 'git push --force': the two are different tokens, whereas one is a substring
+        of the other.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $PatternToken
+    )
+
+    if ($PatternToken.Count -eq 0 -or $Token.Count -lt $PatternToken.Count) {
+        return $false
+    }
+
+    for ($start = 0; $start -le $Token.Count - $PatternToken.Count; $start++) {
+        $matched = $true
+        for ($offset = 0; $offset -lt $PatternToken.Count; $offset++) {
+            if ($Token[$start + $offset] -ne $PatternToken[$offset]) {
+                $matched = $false
+                break
+            }
+        }
+        if ($matched) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Get-BlockedStructuralGitMatch {
+    <#
+    .SYNOPSIS
+        Report the denylist literal a segment's structural git invocation stands for, or $null.
+    .DESCRIPTION
+        The flag conjunction is required rather than optional. Classifying on the bare
+        subcommand would deny 'git push --force-with-lease origin HEAD', which spec Test
+        Strategy row AT-8 requires to allow, and would deny 'git reset --soft HEAD~1'.
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $SegmentText,
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token
+    )
+
+    if (Test-CommandLineInvocation -CommandText $SegmentText -CommandWord 'git' -SubcommandPath @('push')) {
+        if ($Token -contains '--force') { return 'git push --force' }
+        if ($Token -contains '-f') { return 'git push -f' }
+    }
+    if (Test-CommandLineInvocation -CommandText $SegmentText -CommandWord 'git' -SubcommandPath @('reset')) {
+        if ($Token -contains '--hard') { return 'git reset --hard' }
+    }
+
+    return $null
+}
+
 function Get-BlockedPatternMatch {
+    <#
+    .SYNOPSIS
+        Return the denylist literal a command matches, or $null.
+    .DESCRIPTION
+        The Codex sibling of the Claude copy's detector, with the same two legs in the same
+        order over the segment list produced by Read-CommandLineSegment.
+
+        Leg 1 (literal): each of the six byte-unchanged literals is split into its own
+        whitespace-delimited token sequence and reported as a match when that sequence occurs
+        as a CONTIGUOUS RUN inside a segment's Tokens, every element compared by whole-token
+        equality. The value returned is the literal string itself, in declaration order.
+
+        Leg 2 (structural): a relocating spelling such as 'git -C ../wt push --force origin
+        HEAD' contains no literal as a token run, so it is classified structurally instead.
+
+        Leg 1 is evaluated in full before any leg 2 evaluation, so 'git push origin --force'
+        returns the literal 'git push origin --force' rather than the leg 2 value.
+
+        Spec D11.3 rules that rule R2 governs the literal TEXT, not the comparison operator,
+        so all six literals stay byte-unchanged; only the comparison primitive changed.
+    .OUTPUTS
+        System.String or $null
+    #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
@@ -43,9 +141,21 @@ function Get-BlockedPatternMatch {
         return $null
     }
 
+    $segments = @(Read-CommandLineSegment -CommandText $Command)
+
     foreach ($pattern in (Get-BlockedBashPattern)) {
-        if ($Command.Contains($pattern)) {
-            return $pattern
+        $patternTokens = [string[]]@($pattern -split '\s+' | Where-Object { $_ })
+        foreach ($segment in $segments) {
+            if (Test-BlockedPatternTokenRun -Token @($segment.Tokens) -PatternToken $patternTokens) {
+                return $pattern
+            }
+        }
+    }
+
+    foreach ($segment in $segments) {
+        $structural = Get-BlockedStructuralGitMatch -SegmentText $segment.RawText -Token @($segment.Tokens)
+        if ($structural) {
+            return $structural
         }
     }
 

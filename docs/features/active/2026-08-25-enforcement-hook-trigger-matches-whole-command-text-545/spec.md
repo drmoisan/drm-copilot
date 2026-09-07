@@ -1578,13 +1578,13 @@ denies against a not-ready checkpoint.
       unfixed hook, with fail-before output under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/`,
       and passing after the fix in the same suite run.
-- [ ] **AT-2, the issue #591 operand mis-parse, is fixed.** A named Pester case drives
+- [x] **AT-2, the issue #591 operand mis-parse, is fixed.** A named Pester case drives
       `Get-EpicMergeGateCommandPrNumber` with the command text
       `cd C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688` and
       asserts the returned value is `688`, not `2026`. Two paired negatives pass in the same file:
       `gh pr merge --merge` with no number returns `$null`, and `gh pr merge 410 --merge` returns
       `410`.
-- [ ] **AT-4, the merge-gate over-match, allows.** A named Pester case drives
+- [x] **AT-4, the merge-gate over-match, allows.** A named Pester case drives
       `Invoke-EpicMergeGateDecision` with a `printf` command whose double-quoted text mentions the
       gated `gh pr merge --merge` phrase and asserts an allow decision. The case is recorded failing
       (as a deny with `EPIC_MERGE_GATE_BLOCKED`) against the unfixed hook.
@@ -1608,7 +1608,7 @@ denies against a not-ready checkpoint.
       `Get-BlockedBashPattern` are **byte-unchanged**, verified by diff inspection recorded in the
       scope-and-size evidence artifact, and the six existing denylist pins plus the eight existing
       `cd`-chain pins in `tests/scripts/claude-hooks/validate-bash.Tests.ps1` pass unmodified.
-- [ ] **`enforce-parallel-abandon-gate.ps1` is fixed in both Claude copies and pinned.** Named Pester
+- [x] **`enforce-parallel-abandon-gate.ps1` is fixed in both Claude copies and pinned.** Named Pester
       cases assert AT-11 (a `grep` whose quoted search term is the abandon disposition token is out
       of scope) and AT-12 (the equals-joined spelling of the disposition option is in scope). Both
       token literals remain in their current single-assignment form at lines 41 and 42, and
@@ -1624,7 +1624,7 @@ denies against a not-ready checkpoint.
       the `gh pr create` phrase no longer produces `EPIC_BASE_BRANCH_MISMATCH`. The 113-line existing
       suite `tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1` passes
       unmodified.
-- [ ] **The Codex merge gate does not acquire the Claude copy's defect.** After the change,
+- [x] **The Codex merge gate does not acquire the Claude copy's defect.** After the change,
       `.codex/hooks/enforce-epic-merge-gate.ps1` still contains no unanchored whole-text digit scan;
       its PR-number resolution goes through `Get-CommandLineOperand` and `Get-CommandLineFlagValue`
       only. Verified by diff inspection recorded in the scope-and-size evidence artifact.

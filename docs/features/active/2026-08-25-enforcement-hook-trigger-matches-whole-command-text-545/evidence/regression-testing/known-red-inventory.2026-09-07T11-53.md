@@ -126,6 +126,66 @@ Phases 2, 3, 4, 7, and 10 close no row of this inventory. Their batch toolchain 
 find the full set still red for the suites they touch, which is the correct expectation and not a
 failure signal.
 
+## Amendment 1 — rows appended at [P10-T2] on 2026-09-07T15-10
+
+Phase 10 writes its own regression tests before the fix that makes them pass, exactly as Phase 1 did,
+so it adds rows to this inventory rather than only closing them. The four rows below were observed
+failing against the unfixed `.claude/hooks/validate-bash.ps1` and are recorded in
+`evidence/regression-testing/fail-before-validate-bash.2026-09-07T15-10.md`.
+
+### From [P10-T2] — `tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1` (4 rows)
+
+| # | `It` name | Closed by phase | Closing task |
+| --- | --- | --- | --- |
+| 35 | `AT-8 allows git push --force-with-lease because --force-with-lease is not the token --force` | **10** | [P10-T3] |
+| 36 | `AT-9 denies a relocating git push --force carrying a directory global option` | **10** | [P10-T3] |
+| 37 | `AT-10 allows a commit message that quotes a dangerous pattern in prose` | **10** | [P10-T3] |
+| 38 | `allows a commit message whose quoted text contains a cd-then-read phrase` | **10** | [P10-T3] |
+
+The fifth case in that suite, `still denies a read command that is not adjacent to the cd segment`,
+**passed** against the unfixed hook and is deliberately NOT an inventory row. It is a preservation
+pin for existing non-adjacent reach that acceptance criterion 9 forbids narrowing.
+
+### Revised row count and closure schedule
+
+| After phase | Rows still red | Note |
+| --- | --- | --- |
+| 1 | 34 | original inventory |
+| 5 | 6 | 28 rows closed |
+| 6 | 4 | rows 3 and 5 close |
+| 8 | 2 | rows 1 and 6 close |
+| 9 | **0** | rows 2 and 4 close; observed at [P9-T11] |
+| 10 (at [P10-T2]) | **4** | rows 35 through 38 added |
+| 10 (at [P10-T3]) | **0** | rows 35 through 38 close |
+
+Total rows in this inventory after amendment 1: **38**.
+
+## Amendment 2 — rows appended at [P10-T14] on 2026-09-07T15-28
+
+The second Phase 10 regression-first suite adds three more rows. All three were observed failing
+against the unfixed `.claude/hooks/enforce-parallel-abandon-gate.ps1` and are recorded in
+`evidence/regression-testing/fail-before-parallel-abandon.2026-09-07T15-28.md`.
+
+### From [P10-T14] — `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1` (3 rows)
+
+| # | `It` name | Closed by phase | Closing task |
+| --- | --- | --- | --- |
+| 39 | `AT-11 takes a grep whose quoted search term is the disposition token out of scope` | **10** | [P10-T15] |
+| 40 | `AT-12 brings the equals-joined spelling of the disposition option into scope` | **10** | [P10-T15] |
+| 41 | `does not accept a confirmation marker that sits in a different segment from the disposition token` | **10** | [P10-T15] |
+
+### Revised row count and closure schedule
+
+| After phase or task | Rows still red | Note |
+| --- | --- | --- |
+| 9 | **0** | rows 2 and 4 close; observed at [P9-T11] |
+| 10, at [P10-T2] | 4 | rows 35 through 38 added |
+| 10, at [P10-T3] | **0** | rows 35 through 38 close; observed at [P10-T6] |
+| 10, at [P10-T14] | 3 | rows 39 through 41 added |
+| 10, at [P10-T15] | **0** | rows 39 through 41 close; observed at [P10-T16] |
+
+Total rows in this inventory after amendment 2: **41**.
+
 ## Appendix — pre-existing baseline failures, NOT part of this inventory
 
 The following two failures were observed on the unmodified baseline tree at HEAD
