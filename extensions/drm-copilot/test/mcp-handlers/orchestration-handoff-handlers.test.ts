@@ -2,13 +2,14 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import { handlePortableHandoffTool } from "../../src/mcp-handlers/orchestration-handoff-handlers";
 import {
+  VIRTUAL_WORKSPACE_ROOT,
   createMockService,
   createPreparedTransitionCase,
 } from "../mcp-server-test-service";
 
 const INDEPENDENT_CONTEXT_ARGUMENTS = {
   expected_repository_id: "github.com/drmoisan/drm-copilot",
-  expected_workspace_root: "C:/workspace",
+  expected_workspace_root: VIRTUAL_WORKSPACE_ROOT,
   expected_branch: "feature/portable-handoff-614",
   expected_source_head_sha: "0".repeat(40),
   allowed_head_relationship: "equal_or_descendant",

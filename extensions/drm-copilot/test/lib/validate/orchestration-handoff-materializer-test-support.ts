@@ -1,5 +1,6 @@
 import { jest } from "@jest/globals";
 import { createHash } from "node:crypto";
+import * as path from "node:path";
 
 import type {
   HandoffEnvelope,
@@ -12,13 +13,35 @@ import {
 } from "../../../src/lib/validate/orchestration-handoff-materializer";
 
 /**
+ * Absolute workspace root shared by every materializer scenario, derived at
+ * run time rather than written as a drive-letter literal. A drive-letter
+ * literal is absolute on Windows and relative on POSIX, so the production
+ * absolute-path predicates reject it on Linux. Resolving a relative
+ * virtual name yields a root that is absolute on both platforms, and
+ * normalizing the separator to a forward slash matches the POSIX-style paths
+ * the production modules compute.
+ */
+export const VIRTUAL_WORKSPACE_ROOT = path
+  .resolve("virtual-workspace")
+  .replaceAll("\\", "/");
+
+/**
+ * Joins a repository-relative path onto {@link VIRTUAL_WORKSPACE_ROOT} with a
+ * single forward slash, producing the same absolute path the production
+ * modules derive for that repository-relative input.
+ */
+export function workspacePath(repositoryPath: string): string {
+  return `${VIRTUAL_WORKSPACE_ROOT}/${repositoryPath}`;
+}
+
+/**
  * Caller-controlled independent expected context required by every portable
  * handoff request. The values are fixed constants so a test can assert that a
  * request forwards them unchanged rather than deriving them from the envelope.
  */
 export const INDEPENDENT_CONTEXT = {
   expectedRepositoryId: "github.com/drmoisan/drm-copilot",
-  expectedWorkspaceRoot: "C:/workspace",
+  expectedWorkspaceRoot: VIRTUAL_WORKSPACE_ROOT,
   expectedBranch: "feature/portable-handoff-614",
   expectedSourceHeadSha: "0".repeat(40),
   allowedHeadRelationship: "equal_or_descendant",
@@ -50,7 +73,7 @@ export function createEnvelope(sourceSha256: string): HandoffEnvelope {
     },
     binding: {
       repositoryId: "github.com/drmoisan/drm-copilot",
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       branch: "feature/portable-handoff-614",
       sourceHeadSha: "0".repeat(40),
       allowedHeadRelationship: "equal_or_descendant",
@@ -129,16 +152,15 @@ export interface ScenarioOptions {
 }
 
 export function archivePathFor(sourceSha256: string): string {
-  return (
-    `C:/workspace/artifacts/orchestration/handoffs/sources/sha256/` +
-    `${sourceSha256}.json`
+  return workspacePath(
+    `artifacts/orchestration/handoffs/sources/sha256/${sourceSha256}.json`,
   );
 }
 
 export function candidatePathFor(envelopeSha256: string): string {
-  return (
-    `C:/workspace/artifacts/orchestration/orchestrator-state` +
-    `.handoff-candidate-${envelopeSha256}.json`
+  return workspacePath(
+    `artifacts/orchestration/orchestrator-state` +
+      `.handoff-candidate-${envelopeSha256}.json`,
   );
 }
 
@@ -151,9 +173,10 @@ export function createScenario(options: ScenarioOptions = {}) {
   const envelopeSha256 = sha256(envelopeBytes);
   const baseEnvelope = createEnvelope(sourceSha256);
   const envelope = options.transformEnvelope?.(baseEnvelope) ?? baseEnvelope;
-  const sourcePath = `C:/workspace/${baseEnvelope.source.checkpointPath}`;
-  const envelopePath =
-    "C:/workspace/artifacts/orchestration/handoffs/handoff.json";
+  const sourcePath = workspacePath(baseEnvelope.source.checkpointPath);
+  const envelopePath = workspacePath(
+    "artifacts/orchestration/handoffs/handoff.json",
+  );
   const files = new Map<string, Uint8Array>([
     [sourcePath, sourceBytes],
     [envelopePath, envelopeBytes],
@@ -258,7 +281,7 @@ export function createScenario(options: ScenarioOptions = {}) {
     clock: { nowIso8601: jest.fn(() => "2026-08-31T08:00:00Z") },
   };
   const request: TransitionPreparedOrchestrationRequest = {
-    workspaceRoot: "C:/workspace",
+    workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
     sourceCheckpointPath: baseEnvelope.source.checkpointPath,
     expectedSourceCheckpointSha256: sourceSha256,
     handoffEnvelopePath: "artifacts/orchestration/handoffs/handoff.json",

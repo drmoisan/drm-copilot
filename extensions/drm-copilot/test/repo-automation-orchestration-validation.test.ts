@@ -39,6 +39,18 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
+/**
+ * Absolute workspace root used by every case in this file, derived at run time
+ * rather than written as a drive-letter literal. A drive-letter literal is
+ * absolute on Windows and relative on POSIX, so the handoff handler and
+ * authority-service `path.isAbsolute` guards reject it on Linux. Resolving a
+ * relative virtual name yields a root that is absolute on both platforms and
+ * equal to what the production modules compute for the same input.
+ */
+const VIRTUAL_WORKSPACE_ROOT = path
+  .resolve("virtual-workspace")
+  .replaceAll("\\", "/");
+
 const VALID_PLAN = [
   "# Plan",
   "### Phase 0 — Setup",
@@ -68,7 +80,7 @@ function createPortableHandoffFiles(): {
     binding: { workspace_root: string };
     plan: { path: string; sha256: string };
   };
-  const workspaceRoot = "C:/workspace";
+  const workspaceRoot = VIRTUAL_WORKSPACE_ROOT;
   const envelopePath = "artifacts/orchestration/handoff.json";
   payload.binding.workspace_root = workspaceRoot;
   payload.plan.sha256 = sha256(VALID_PLAN);
@@ -88,7 +100,7 @@ function createPortableHandoffFiles(): {
 function createIndependentContext(planPath: string) {
   return {
     expectedRepositoryId: "github.com/drmoisan/drm-copilot",
-    expectedWorkspaceRoot: "C:/workspace",
+    expectedWorkspaceRoot: VIRTUAL_WORKSPACE_ROOT,
     expectedBranch: "feature/portable-handoff-614",
     expectedSourceHeadSha: "0".repeat(40),
     allowedHeadRelationship: "equal_or_descendant",
@@ -107,7 +119,7 @@ function createIndependentContext(planPath: string) {
  */
 function createCheckoutRunner(): CommandRunner {
   const observations: Readonly<Record<string, string>> = {
-    "rev-parse --show-toplevel": "C:/workspace",
+    "rev-parse --show-toplevel": VIRTUAL_WORKSPACE_ROOT,
     "remote get-url origin": "https://github.com/drmoisan/drm-copilot.git",
     "branch --show-current": "feature/portable-handoff-614",
     "rev-parse HEAD": "0".repeat(40),
@@ -200,7 +212,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts validates in-process and preserves the summary", async () => {
     // Arrange: inject a filesystem returning a valid plan at the resolved path.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/plan.md": VALID_PLAN,
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/plan.md`]: VALID_PLAN,
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -210,7 +222,7 @@ describe("repo automation orchestration validation", () => {
 
     // Act
     const result = await service.validateOrchestrationArtifacts({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       invocationId: "validate_orchestration_artifacts",
       artifactType: "plan",
       artifactPath: "docs/plan.md",
@@ -226,7 +238,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts routes require-complete to the orchestrator-state path", async () => {
     // Arrange: a non-object orchestrator-state document under requireComplete.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/state.json": "[]",
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/state.json`]: "[]",
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -238,7 +250,7 @@ describe("repo automation orchestration validation", () => {
     // the method throws, surfacing the failure to the MCP handler.
     await expect(
       service.validateOrchestrationArtifacts({
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
         invocationId: "validate_orchestration_artifacts",
         artifactType: "orchestrator-state",
         artifactPath: "docs/state.json",
@@ -251,7 +263,7 @@ describe("repo automation orchestration validation", () => {
   it("validateOrchestrationArtifacts throws when validation errors are present", async () => {
     // Arrange: a policy-audit document missing required headings.
     const fileSystem = new VirtualFileSystem({
-      "C:/workspace/docs/policy-audit.md": "incomplete document",
+      [`${VIRTUAL_WORKSPACE_ROOT}/docs/policy-audit.md`]: "incomplete document",
     });
     const service = createRepoAutomationService({
       extensionRoot: "C:/extension",
@@ -262,7 +274,7 @@ describe("repo automation orchestration validation", () => {
     // Act / Assert
     await expect(
       service.validateOrchestrationArtifacts({
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
         invocationId: "validate_orchestration_artifacts",
         artifactType: "policy-audit",
         artifactPath: "docs/policy-audit.md",
@@ -285,7 +297,7 @@ describe("repo automation orchestration validation", () => {
 
     // Act
     const result = await service.validateOrchestrationArtifacts({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       invocationId: "validate_orchestration_artifacts",
       artifactType: "portable-orchestration-handoff",
       artifactPath: fixture.envelopePath,
@@ -309,7 +321,7 @@ describe("repo automation orchestration validation", () => {
       runner: createCheckoutRunner(),
     });
     const request = {
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       handoffEnvelopePath: fixture.envelopePath,
       expectedHandoffEnvelopeSha256: fixture.envelopeSha256,
       destinationProvider: "codex",
@@ -386,7 +398,7 @@ describe("repo automation orchestration validation", () => {
         handoffMaterializer: { transition },
       });
       const request = {
-        workspaceRoot: "C:/workspace",
+        workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
         sourceCheckpointPath: "artifacts/orchestration/orchestrator-state.json",
         expectedSourceCheckpointSha256: sourceSha256,
         handoffEnvelopePath: fixture.envelopePath,

@@ -5,6 +5,13 @@ Describe 'Codex epic preparation, wave, merge, and worktree gates' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
+        # Byte-identity cases read the checkpoint bytes from a committed
+        # fixture. The live checkpoint under /artifacts is gitignored, so it is
+        # absent in a fresh checkout and reading it fails on the CI runner.
+        $script:PreparationCheckpointFixture = Join-Path $script:RepoRoot 'tests/fixtures/codex-hooks/epic-planning-preparation-checkpoint.json'
+        if (-not (Test-Path -LiteralPath $script:PreparationCheckpointFixture -PathType Leaf)) {
+            throw "Preparation checkpoint fixture is missing: $script:PreparationCheckpointFixture"
+        }
         $script:PwshPath = (
             Get-Command pwsh -CommandType Application -ErrorAction Stop |
                 Select-Object -First 1
@@ -26,7 +33,7 @@ Describe 'Codex epic preparation, wave, merge, and worktree gates' {
 . $env:EPIC_PLANNING_HOOK_PATH
 $decision = Invoke-EpicPlanningOnlyDecision `
     -PayloadRaw $env:EPIC_PLANNING_PAYLOAD `
-    -CheckpointRaw '{"route_id":"preparation"}'
+    -CheckpointRaw (Get-Content -Raw -LiteralPath $env:EPIC_PLANNING_CHECKPOINT_PATH)
 if ($null -ne $decision) {
     $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 }
@@ -38,6 +45,7 @@ exit 0
             $startInfo.UseShellExecute = $false
             $startInfo.Environment['EPIC_PLANNING_HOOK_PATH'] = Join-Path $script:HookRoot 'enforce-epic-planning-only.ps1'
             $startInfo.Environment['EPIC_PLANNING_PAYLOAD'] = $PayloadRaw
+            $startInfo.Environment['EPIC_PLANNING_CHECKPOINT_PATH'] = $script:PreparationCheckpointFixture
 
             $process = [System.Diagnostics.Process]::Start($startInfo)
             $stdout = $process.StandardOutput.ReadToEnd()
@@ -271,7 +279,7 @@ exit 0
             @{ Label = 'shell edit'; ToolName = 'Bash'; ToolInput = @{ command = 'Set-Content src/service.ps1 unsafe' }; Reason = 'the Bash command is outside the preparation read, branch, commit, push, or validator allowlist.' }
             @{ Label = 'production patch'; ToolName = 'apply_patch'; ToolInput = @{ command = "*** Begin Patch`n*** Update File: src/service.py`n*** End Patch" }; Reason = "preparation may not edit 'src/service.py'; only feature planning documents and orchestration/research artifacts are writable." }
         ) {
-            $checkpointPath = Join-Path $script:RepoRoot 'artifacts/orchestration/orchestrator-state.json'
+            $checkpointPath = $script:PreparationCheckpointFixture
             $before = [Convert]::ToBase64String([IO.File]::ReadAllBytes($checkpointPath))
             $payload = @{ tool_name = $ToolName; tool_input = $ToolInput } |
                 ConvertTo-Json -Compress -Depth 10

@@ -22,6 +22,12 @@ jest.mock("node:fs", () => ({
 import type { FileSystem } from "../../../src/lib/file-system";
 import type { CommandRunner } from "../../../src/lib/subprocess-runner";
 import { createProductionHandoffMaterializer } from "../../../src/lib/validate/orchestration-handoff-materializer-production";
+import {
+  VIRTUAL_WORKSPACE_ROOT,
+  archivePathFor,
+  candidatePathFor,
+  createScenario,
+} from "./orchestration-handoff-materializer-test-support";
 
 const actualFileSystem =
   jest.requireActual<typeof import("node:fs")>("node:fs");
@@ -53,7 +59,7 @@ function createFileSystem(readTextFile = jest.fn(() => validEnvelopeText)) {
  */
 const INDEPENDENT_CONTEXT = {
   expectedRepositoryId: "github.com/drmoisan/drm-copilot",
-  expectedWorkspaceRoot: "C:/workspace",
+  expectedWorkspaceRoot: VIRTUAL_WORKSPACE_ROOT,
   expectedBranch: "feature/portable-handoff-614",
   expectedSourceHeadSha: "0".repeat(40),
   allowedHeadRelationship: "equal_or_descendant",
@@ -66,7 +72,7 @@ const INDEPENDENT_CONTEXT = {
 
 function createReference() {
   return {
-    workspaceRoot: "C:/workspace",
+    workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
     handoffEnvelopePath: "artifacts/orchestration/handoff.json",
     expectedHandoffEnvelopeSha256: "a".repeat(64),
     destinationProvider: "codex",
@@ -132,8 +138,9 @@ describe("production orchestration handoff materializer boundaries", () => {
       "destination",
     );
     materializer.dependencies.fileSystem.removeFile("candidate");
-    const porcelain =
-      await materializer.dependencies.git.readPorcelainStatus("C:/workspace");
+    const porcelain = await materializer.dependencies.git.readPorcelainStatus(
+      VIRTUAL_WORKSPACE_ROOT,
+    );
     const topology =
       await materializer.dependencies.topology.resolve(reference);
     const routing = await materializer.dependencies.routing.resolve(reference);
@@ -213,14 +220,16 @@ describe("production orchestration handoff materializer boundaries", () => {
     const reference = createReference();
 
     // Act
-    const canonicalRoot = pathBoundary.resolveWorkspaceRoot("C:/workspace");
+    const canonicalRoot = pathBoundary.resolveWorkspaceRoot(
+      VIRTUAL_WORKSPACE_ROOT,
+    );
     await materializer.dependencies.topology.resolve(reference);
 
     // Assert
-    expect(canonicalRoot).toBe("C:/workspace");
+    expect(canonicalRoot).toBe(VIRTUAL_WORKSPACE_ROOT);
     expect(resolveWorkspaceRoot).toHaveBeenCalledTimes(2);
     expect(mockRealpathSyncNative).toHaveBeenCalled();
-    expect(mockStatSync).toHaveBeenCalledWith("C:/workspace");
+    expect(mockStatSync).toHaveBeenCalledWith(VIRTUAL_WORKSPACE_ROOT);
   });
 
   it.each([
@@ -288,7 +297,7 @@ describe("production independent checkout observation boundary", () => {
     // facts; a runner that fails the first query would stop the observation
     // before the later queries could be routed through it at all.
     const observationOutput: Readonly<Record<string, string>> = {
-      "rev-parse --show-toplevel": "C:/workspace",
+      "rev-parse --show-toplevel": VIRTUAL_WORKSPACE_ROOT,
       "remote get-url origin": "https://github.com/drmoisan/drm-copilot.git",
       "branch --show-current": "feature/portable-handoff-614",
       "rev-parse HEAD": "0".repeat(40),
@@ -367,5 +376,48 @@ describe("production independent checkout observation boundary", () => {
     expect(result.resolution).toBeNull();
     expect(mockWriteFileSync).not.toHaveBeenCalled();
     expect(mockRenameSync).not.toHaveBeenCalled();
+  });
+});
+
+describe("portable handoff scenario workspace-root derivation", () => {
+  /**
+   * The scenario builder injects no path boundary, so the materializer
+   * installs the syntactic boundary, which rejects any workspace root that
+   * `path.isAbsolute` reports as relative. A drive-letter literal is relative
+   * on POSIX, so every registered path must instead be derived from a root
+   * that resolves to an absolute path on both platforms.
+   */
+  it("registers only paths under the derived absolute workspace root", () => {
+    // Arrange
+    const scenario = createScenario();
+    const prefix = `${VIRTUAL_WORKSPACE_ROOT}/`;
+    const registeredPaths = [
+      ...scenario.files.keys(),
+      archivePathFor(scenario.sourceSha256),
+      candidatePathFor(scenario.envelopeSha256),
+    ];
+
+    // Act
+    const remainders = registeredPaths.map((registered) =>
+      registered.startsWith(prefix)
+        ? registered.slice(prefix.length)
+        : registered,
+    );
+
+    // Assert
+    expect(VIRTUAL_WORKSPACE_ROOT).toBe(
+      path.resolve("virtual-workspace").replaceAll("\\", "/"),
+    );
+    expect(path.isAbsolute(VIRTUAL_WORKSPACE_ROOT)).toBe(true);
+    expect(scenario.request.workspaceRoot).toBe(VIRTUAL_WORKSPACE_ROOT);
+    expect(scenario.envelope.binding.workspaceRoot).toBe(
+      VIRTUAL_WORKSPACE_ROOT,
+    );
+    for (const registered of registeredPaths) {
+      expect(registered.startsWith(prefix)).toBe(true);
+    }
+    for (const remainder of remainders) {
+      expect(remainder).not.toContain(":");
+    }
   });
 });

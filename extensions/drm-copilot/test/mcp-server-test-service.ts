@@ -1,6 +1,36 @@
 import { jest } from "@jest/globals";
+import * as path from "node:path";
 
 import type { RepoAutomationService } from "../src/repo-automation-service";
+
+/**
+ * Absolute workspace root shared by every MCP fixture, derived at run time
+ * rather than written as a drive-letter literal. A drive-letter literal is
+ * absolute on Windows and relative on POSIX, so the handoff handler's
+ * `path.isAbsolute` guards reject it on Linux. Resolving a relative virtual
+ * name yields a root that is absolute on both platforms.
+ */
+export const VIRTUAL_WORKSPACE_ROOT = path
+  .resolve("virtual-workspace")
+  .replaceAll("\\", "/");
+
+/**
+ * Joins a repository-relative path onto {@link VIRTUAL_WORKSPACE_ROOT} with a
+ * single forward slash, producing the same absolute path the production
+ * modules derive for that repository-relative input.
+ */
+export function workspacePath(repositoryPath: string): string {
+  return `${VIRTUAL_WORKSPACE_ROOT}/${repositoryPath}`;
+}
+
+/**
+ * Artifact path reported by the Codex-and-agents push-down fixture. It is
+ * named here so the long composite literal lives in this module rather than in
+ * `mcp-server.test.ts`, which has little line headroom.
+ */
+export const PUSH_DOWN_CODEX_ARTIFACT_PATH = workspacePath(
+  "artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
+);
 
 /** Create a fully mocked MCP service while retaining optional handoff seams. */
 export function createMockService(): jest.Mocked<RepoAutomationService> {
@@ -43,7 +73,7 @@ export function createPreparedTransitionCase() {
   const envelopeSha256 = "b".repeat(64);
   const destinationSha256 = "c".repeat(64);
   const request = {
-    workspaceRoot: "C:/workspace",
+    workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
     sourceCheckpointPath: "artifacts/orchestration/orchestrator-state.json",
     expectedSourceCheckpointSha256: sourceSha256,
     handoffEnvelopePath: "artifacts/orchestration/handoffs/handoff.json",

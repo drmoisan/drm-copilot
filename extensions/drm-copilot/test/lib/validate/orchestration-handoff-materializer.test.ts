@@ -10,6 +10,7 @@ import {
   encoder,
   materializedProjectionBytes,
   sha256,
+  workspacePath,
   type ScenarioOptions,
 } from "./orchestration-handoff-materializer-test-support";
 
@@ -230,9 +231,7 @@ describe("orchestration handoff materializer", () => {
   it("atomically replaces the canonical checkpoint after candidate validation", async () => {
     // Arrange
     const scenario = createScenario({ request: { mode: "materialize" } });
-    const archivePath =
-      `C:/workspace/artifacts/orchestration/handoffs/sources/sha256/` +
-      `${scenario.sourceSha256}.json`;
+    const archivePath = archivePathFor(scenario.sourceSha256);
     scenario.files.set(archivePath, scenario.sourceBytes);
     const materializer = new OrchestrationHandoffMaterializer(
       scenario.dependencies,
@@ -247,12 +246,9 @@ describe("orchestration handoff materializer", () => {
     const destinationPath = replacement?.[1];
     expect(result.status).toBe("materialized");
     expect(scenario.files.get(archivePath)).toEqual(scenario.sourceBytes);
-    expect(candidatePath).toBe(
-      `C:/workspace/artifacts/orchestration/orchestrator-state` +
-        `.handoff-candidate-${scenario.envelopeSha256}.json`,
-    );
+    expect(candidatePath).toBe(candidatePathFor(scenario.envelopeSha256));
     expect(candidatePath?.slice(0, candidatePath.lastIndexOf("/"))).toBe(
-      "C:/workspace/artifacts/orchestration",
+      workspacePath("artifacts/orchestration"),
     );
     expect(destinationPath).toBe(scenario.sourcePath);
     expect(scenario.files.has(candidatePath ?? "")).toBe(false);

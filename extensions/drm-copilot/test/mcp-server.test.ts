@@ -23,13 +23,16 @@ import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import type { RepoAutomationService } from "../src/repo-automation-service";
 import {
+  PUSH_DOWN_CODEX_ARTIFACT_PATH,
+  VIRTUAL_WORKSPACE_ROOT,
   createMockService,
   createPreparedTransitionCase,
+  workspacePath,
 } from "./mcp-server-test-service";
 
 const INDEPENDENT_CONTEXT_ARGUMENTS = {
   expected_repository_id: "github.com/drmoisan/drm-copilot",
-  expected_workspace_root: "C:/workspace",
+  expected_workspace_root: VIRTUAL_WORKSPACE_ROOT,
   expected_branch: "feature/portable-handoff-614",
   expected_source_head_sha: "0".repeat(40),
   allowed_head_relationship: "equal_or_descendant",
@@ -112,10 +115,10 @@ describe("repo automation MCP server", () => {
   it("dispatches collect_pr_context through the shared service with an explicit base", async () => {
     service.collectPrContext.mockResolvedValue({
       tool: "collect_pr_context",
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       artifacts: [
-        "C:/workspace/artifacts/pr_context.summary.txt",
-        "C:/workspace/artifacts/pr_context.appendix.txt",
+        workspacePath("artifacts/pr_context.summary.txt"),
+        workspacePath("artifacts/pr_context.appendix.txt"),
       ],
       summary: "Collected PR context against base 'origin/main'.",
     });
@@ -123,23 +126,23 @@ describe("repo automation MCP server", () => {
     const result = await client.callTool({
       name: "collect_pr_context",
       arguments: {
-        workspace_root: "C:/workspace",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
         base: "origin/main",
       },
     });
 
     expect(service.collectPrContext).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       base: "origin/main",
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "collect_pr_context",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
       artifacts: [
-        "C:/workspace/artifacts/pr_context.summary.txt",
-        "C:/workspace/artifacts/pr_context.appendix.txt",
+        workspacePath("artifacts/pr_context.summary.txt"),
+        workspacePath("artifacts/pr_context.appendix.txt"),
       ],
     });
   });
@@ -148,7 +151,7 @@ describe("repo automation MCP server", () => {
     const result = await client.callTool({
       name: "collect_pr_context",
       arguments: {
-        workspace_root: "C:/workspace",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
       },
     });
 
@@ -157,7 +160,7 @@ describe("repo automation MCP server", () => {
     expect(result.structuredContent).toMatchObject({
       ok: false,
       tool: "collect_pr_context",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
       summary: "Field 'base' must be a string.",
     });
   });
@@ -184,10 +187,8 @@ describe("repo automation MCP server", () => {
   it("dispatches push_down_codex_and_agents_customizations through the shared service", async () => {
     service.pushDownCodexAndAgentsCustomizations.mockResolvedValue({
       tool: "push_down_codex_and_agents_customizations",
-      workspaceRoot: "C:/workspace",
-      artifacts: [
-        "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
-      ],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      artifacts: [PUSH_DOWN_CODEX_ARTIFACT_PATH],
       summary:
         "Pushed bundled Codex and agents customizations into the destination workspace.",
     });
@@ -195,28 +196,26 @@ describe("repo automation MCP server", () => {
     const result = await client.callTool({
       name: "push_down_codex_and_agents_customizations",
       arguments: {
-        workspace_root: "C:/workspace",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
       },
     });
 
     expect(service.pushDownCodexAndAgentsCustomizations).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "push_down_codex_and_agents_customizations",
-      workspace_root: "C:/workspace",
-      artifacts: [
-        "C:/workspace/artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
-      ],
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
+      artifacts: [PUSH_DOWN_CODEX_ARTIFACT_PATH],
     });
   });
 
   it("dispatches link_parent_child through the shared service with explicit issue numbers", async () => {
     service.linkParentChild.mockResolvedValue({
       tool: "link_parent_child",
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       summary:
         "Linked child issue #12 to parent issue #34 using the bundled workflow.",
     });
@@ -224,14 +223,14 @@ describe("repo automation MCP server", () => {
     const result = await client.callTool({
       name: "link_parent_child",
       arguments: {
-        workspace_root: "C:/workspace",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
         child_issue_number: "12",
         parent_issue_number: "34",
       },
     });
 
     expect(service.linkParentChild).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       childIssueNumber: "12",
       parentIssueNumber: "34",
     });
@@ -239,119 +238,115 @@ describe("repo automation MCP server", () => {
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "link_parent_child",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
   it("dispatches run_poshqc_suite through resolveRunPoshQCSuiteToolInput and forwards repeated scan_folders values to the repo-automation service", async () => {
     service.runPoshQCSuite.mockResolvedValue({
       tool: "run_poshqc_suite",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Ran the bundled PoshQC suite against 'C:/workspace' with 2 selected scan folder(s).",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran the bundled PoshQC suite against '${VIRTUAL_WORKSPACE_ROOT}' with 2 selected scan folder(s).`,
     });
 
     const result = await client.callTool({
       name: "run_poshqc_suite",
       arguments: {
-        workspace_root: "C:/workspace",
-        scan_folders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        scan_folders: [workspacePath("src"), workspacePath("tests/powershell")],
       },
     });
 
     expect(service.runPoshQCSuite).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      scanFolders: ["C:/workspace/src", "C:/workspace/tests/powershell"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      scanFolders: [workspacePath("src"), workspacePath("tests/powershell")],
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_suite",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
   it("dispatches run_poshqc_format through the shared service with scan folders", async () => {
     service.runPoshQCFormat.mockResolvedValue({
       tool: "run_poshqc_format",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Ran bundled PoshQC format against 'C:/workspace' with 1 selected scan folder(s).",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran bundled PoshQC format against '${VIRTUAL_WORKSPACE_ROOT}' with 1 selected scan folder(s).`,
     });
 
     const result = await client.callTool({
       name: "run_poshqc_format",
       arguments: {
-        workspace_root: "C:/workspace",
-        scan_folders: ["C:/workspace/src"],
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        scan_folders: [workspacePath("src")],
       },
     });
 
     expect(service.runPoshQCFormat).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      scanFolders: ["C:/workspace/src"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      scanFolders: [workspacePath("src")],
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_format",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
   it("dispatches run_poshqc_analyze through the shared service with scan folders", async () => {
     service.runPoshQCAnalyze.mockResolvedValue({
       tool: "run_poshqc_analyze",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Ran bundled PoshQC analyze against 'C:/workspace' with 1 selected scan folder(s).",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran bundled PoshQC analyze against '${VIRTUAL_WORKSPACE_ROOT}' with 1 selected scan folder(s).`,
     });
 
     const result = await client.callTool({
       name: "run_poshqc_analyze",
       arguments: {
-        workspace_root: "C:/workspace",
-        scan_folders: ["C:/workspace/src"],
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        scan_folders: [workspacePath("src")],
       },
     });
 
     expect(service.runPoshQCAnalyze).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      scanFolders: ["C:/workspace/src"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      scanFolders: [workspacePath("src")],
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_analyze",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
   it("dispatches run_poshqc_test through the shared service with scan folders", async () => {
     service.runPoshQCTest.mockResolvedValue({
       tool: "run_poshqc_test",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Ran bundled PoshQC test against 'C:/workspace' with 1 selected scan folder(s).",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran bundled PoshQC test against '${VIRTUAL_WORKSPACE_ROOT}' with 1 selected scan folder(s).`,
     });
 
     const result = await client.callTool({
       name: "run_poshqc_test",
       arguments: {
-        workspace_root: "C:/workspace",
-        scan_folders: ["C:/workspace/tests/powershell"],
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        scan_folders: [workspacePath("tests/powershell")],
       },
     });
 
     expect(service.runPoshQCTest).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      scanFolders: ["C:/workspace/tests/powershell"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      scanFolders: [workspacePath("tests/powershell")],
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_test",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
@@ -359,14 +354,14 @@ describe("repo automation MCP server", () => {
     // Arrange
     service.runPoshQCTest.mockResolvedValue({
       tool: "run_poshqc_test",
-      workspaceRoot: "C:/workspace",
-      summary: "Ran bundled PoshQC test against 'C:/workspace'.",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran bundled PoshQC test against '${VIRTUAL_WORKSPACE_ROOT}'.`,
     });
 
     // Act
     await client.callTool({
       name: "run_poshqc_test",
-      arguments: { workspace_root: "C:/workspace" },
+      arguments: { workspace_root: VIRTUAL_WORKSPACE_ROOT },
     });
 
     // Assert: the MCP dispatch path never creates an integrated terminal.
@@ -377,35 +372,34 @@ describe("repo automation MCP server", () => {
   it("dispatches run_poshqc_analyze_autofix through the shared service with scan folders", async () => {
     service.runPoshQCAnalyzeAutofix.mockResolvedValue({
       tool: "run_poshqc_analyze_autofix",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Ran bundled PoshQC analyze autofix against 'C:/workspace' with 1 selected scan folder(s).",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Ran bundled PoshQC analyze autofix against '${VIRTUAL_WORKSPACE_ROOT}' with 1 selected scan folder(s).`,
     });
 
     const result = await client.callTool({
       name: "run_poshqc_analyze_autofix",
       arguments: {
-        workspace_root: "C:/workspace",
-        scan_folders: ["C:/workspace/src"],
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        scan_folders: [workspacePath("src")],
       },
     });
 
     expect(service.runPoshQCAnalyzeAutofix).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      scanFolders: ["C:/workspace/src"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      scanFolders: [workspacePath("src")],
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "run_poshqc_analyze_autofix",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
     });
   });
 
   it("dispatches resolve_policy_audit_template_asset through the shared service with normalized inputs", async () => {
     service.resolvePolicyAuditTemplateAsset.mockResolvedValue({
       tool: "resolve_policy_audit_template_asset",
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       summary: "Resolved bundled policy-audit asset 'feature-audit-template'.",
       artifacts: [
         "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
@@ -418,22 +412,22 @@ describe("repo automation MCP server", () => {
     const result = await client.callTool({
       name: "resolve_policy_audit_template_asset",
       arguments: {
-        workspace_root: "C:/workspace",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
         asset: "feature-audit-template",
         target_path: "docs/policy-audit/feature-audit.md",
       },
     });
 
     expect(service.resolvePolicyAuditTemplateAsset).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
       asset: "feature-audit-template",
-      targetPath: "C:/workspace/docs/policy-audit/feature-audit.md",
+      targetPath: workspacePath("docs/policy-audit/feature-audit.md"),
     });
     expect(result.isError).toBe(false);
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "resolve_policy_audit_template_asset",
-      workspace_root: "C:/workspace",
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
       asset_id: "policy_audit.feature_audit_template",
       bundled_source_path:
         "C:/extension/resources/templates/policy_audit/feature-audit.yyyy-MM-ddTHH-mm.md",
@@ -459,23 +453,22 @@ describe("repo automation MCP server", () => {
   it("dispatches resolve_execute_hard_lock_prompt through the shared service with injected output and quiet defaults, and surfaces artifacts", async () => {
     service.resolveExecuteHardLockPrompt.mockResolvedValue({
       tool: "resolve_execute_hard_lock_prompt",
-      workspaceRoot: "C:/workspace",
-      summary:
-        "Resolved the execute hard-lock prompt for 'C:/workspace/docs/features/active/feature-123/plan.md'.",
-      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      summary: `Resolved the execute hard-lock prompt for '${workspacePath("docs/features/active/feature-123/plan.md")}'.`,
+      artifacts: [workspacePath("artifacts/hard_lock_prompt.txt")],
     });
 
     const result = await client.callTool({
       name: "resolve_execute_hard_lock_prompt",
       arguments: {
-        workspace_root: "C:/workspace",
-        target: "C:/workspace/docs/features/active/feature-123/plan.md",
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        target: workspacePath("docs/features/active/feature-123/plan.md"),
       },
     });
 
     expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
-      workspaceRoot: "C:/workspace",
-      target: "C:/workspace/docs/features/active/feature-123/plan.md",
+      workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
+      target: workspacePath("docs/features/active/feature-123/plan.md"),
       output: DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH,
       quiet: true,
     });
@@ -483,8 +476,8 @@ describe("repo automation MCP server", () => {
     expect(result.structuredContent).toMatchObject({
       ok: true,
       tool: "resolve_execute_hard_lock_prompt",
-      workspace_root: "C:/workspace",
-      artifacts: ["C:/workspace/artifacts/hard_lock_prompt.txt"],
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
+      artifacts: [workspacePath("artifacts/hard_lock_prompt.txt")],
     });
   });
 });
