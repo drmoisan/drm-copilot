@@ -89,3 +89,55 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"BLOCKED-REVERIFY"* ]]
 }
+
+@test "--clear-disposable without a mode argument prints usage to stderr and exits 2" {
+    # `2>&1 1>/dev/null` discards stdout and routes stderr to the captured stream, so
+    # this asserts the usage text reached STDERR specifically rather than merely
+    # appearing somewhere in the merged output. The flag is destructive and apply-mode
+    # only, so supplying it alone is a usage error rather than a silently ignored no-op:
+    # an operator who typed it expects clearing to happen.
+    run bash -c "CLEANUP_WT_GIT_BIN='${STUB}' CLEANUP_WT_SCAN_BIN='${SCAN}' CLEANUP_WT_STUB_SCENARIO='${SCEN}/merged_with_worktree' bash '${WRAPPER}' --clear-disposable 2>&1 1>/dev/null"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"Usage: cleanup-worktrees.sh"* ]]
+}
+
+@test "report --clear-disposable prints usage to stderr and exits 2" {
+    # Report mode performs no mutation of any kind, so pairing it with the clearing flag
+    # is the same usage error as supplying the flag with no mode at all.
+    #
+    # The stub seams are wired here for the same reason they are wired in the other
+    # scenario-driven tests: without them a wrapper that dispatched to report mode would
+    # read the machine's real repository, which is neither deterministic nor fast. With
+    # them, a wrapper that failed to reject this argument pair emits the stub argv log
+    # and no usage text, which is what makes the assertion below able to fail.
+    run bash -c "CLEANUP_WT_GIT_BIN='${STUB}' CLEANUP_WT_SCAN_BIN='${SCAN}' CLEANUP_WT_STUB_SCENARIO='${SCEN}/merged_with_worktree' bash '${WRAPPER}' report --clear-disposable 2>&1 1>/dev/null"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"Usage: cleanup-worktrees.sh"* ]]
+    [[ "$output" != *"stub-git:"* ]]
+}
+
+@test "--apply --clear-disposable and --clear-disposable --apply both dispatch to apply mode" {
+    # Precondition: the flag's behavior depends on the dirt library the wrapper sources,
+    # so its absence would make this test pass for the wrong reason.
+    [ -f "${DIRTLIB}" ]
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
+        bash "${WRAPPER}" --apply --clear-disposable
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"ACTION|worktree-remove|/repo-wt/feat|OK"* ]]
+    [[ "$output" != *"Usage: cleanup-worktrees.sh"* ]]
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
+        bash "${WRAPPER}" --clear-disposable --apply
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"ACTION|worktree-remove|/repo-wt/feat|OK"* ]]
+    [[ "$output" != *"Usage: cleanup-worktrees.sh"* ]]
+}
+
+@test "--help output documents the new flag and both new record prefixes" {
+    run bash "${WRAPPER}" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"--clear-disposable"* ]]
+    [[ "$output" == *"DIRTFILE|"* ]]
+    [[ "$output" == *"DIRTSUM|"* ]]
+}
