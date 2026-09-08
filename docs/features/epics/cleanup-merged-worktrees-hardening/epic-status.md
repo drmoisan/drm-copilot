@@ -4,19 +4,19 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 
 - Integration branch: `epic/cleanup-merged-worktrees-hardening-integration`
 - Integration base commit: `a36b6dca7809e456f00c7d5b01eec5da49f7fca0`
-- Integration branch tip: `d250cf72ee24139735e7f08b07d002ae0e4f1d00`
+- Integration branch tip: `0edc15e030d9a79307e1399e9658e95b2cd6066d`
 - Planning commit: `73b451c09bf39a706bb71245a0dde5ae0fbc4660`
 - Max parallel features: 4
 - Current wave: 2
-- Next step: `await_632_and_635_then_launch_637`
-- Last updated: 2026-09-08T03:52:00Z
+- Next step: `await_632_and_637_then_open_integration_pr`
+- Last updated: 2026-09-08T09:35:00Z
 
 ## Wave Schedule
 
 | wave | features | width | status | started_at | completed_at |
 | --- | --- | --- | --- | --- | --- |
 | 0 | 545, 630, 633, 634 | 4 | complete | 2026-09-07T10:52:00Z | 2026-09-08T03:50:00Z |
-| 1 | 631, 635 | 2 | running | 2026-09-07T18:30:00Z | - |
+| 1 | 631, 635 | 2 | complete | 2026-09-07T18:30:00Z | 2026-09-08T09:30:00Z |
 | 2 | 632, 637 | 2 | running | 2026-09-08T00:50:00Z | - |
 
 ## Feature Status
@@ -28,9 +28,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | 2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630 | 630 | 0 | merged | `bug/cleanup-worktrees-skips-detached-head-worktrees-630-r2` | https://github.com/drmoisan/drm-copilot/pull/644 | 6dff80ed4596bec088d548b23013e6077e32c484 | 2026-09-07T10:52:00Z | 2026-09-07T17:16:07Z | 2026-09-07T17:31:35Z | - |
 | 2026-09-06-collect-pr-context-omits-claude-tree-633 | 633 | 0 | merged | `bug/collect-pr-context-omits-claude-tree-633` | https://github.com/drmoisan/drm-copilot/pull/641 | 7ceac674f262eb8f30f5ae36299f4c98e23d9c1e | 2026-09-07T10:52:00Z | 2026-09-07T11:25:43Z | 2026-09-07T11:31:12Z | - |
 | 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631 | 631 | 1 | merged | `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r3` | https://github.com/drmoisan/drm-copilot/pull/650 | 4ffe680ebcebaabbba10faaa490e46a717686535 | 2026-09-07T13:05:00Z | 2026-09-08T00:30:00Z | 2026-09-08T00:37:39Z | - |
-| 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | worktree_created | `bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2` | - | - | 2026-09-08T03:52:00Z | - | - | - |
+| 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | merged | `bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2` | https://github.com/drmoisan/drm-copilot/pull/652 | 0edc15e030d9a79307e1399e9658e95b2cd6066d | 2026-09-08T03:52:00Z | 2026-09-08T09:15:00Z | 2026-09-08T09:25:21Z | - |
 | 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | worktree_created | `bug/cleanup-worktrees-dirt-classifier-632-r2` | - | - | 2026-09-08T00:50:00Z | - | - | - |
-| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | not_started | - | - | - | - | - | - | - |
+| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | worktree_created | `bug/cleanup-worktrees-preserve-file-consolidation-637-r2` | - | - | 2026-09-08T09:35:00Z | - | - | - |
 
 ## In-Flight Children
 
