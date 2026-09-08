@@ -974,7 +974,7 @@ required names; the atomic planner may add cases but must not rename these.
 - [x] **AC-24** `.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1` appears in the
       `CodeCoverage.Path` list of both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
       and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`.
-- [ ] **AC-25** Line coverage is >= 85% for `CleanupWorktreeManifest.psm1`,
+- [x] **AC-25** Line coverage is >= 85% for `CleanupWorktreeManifest.psm1`,
       `enforce-epic-worktree-removal-gate.ps1`, and `enforce-parallel-worktree-removal-gate.ps1`,
       verified through the self-hosted PoshQC invocation
       (`Import-Module ./scripts/powershell/PoshQC -Force; Invoke-PoshQCTest -Root . -SettingsPath ./scripts/powershell/PoshQC/settings/pester.runsettings.psd1`)

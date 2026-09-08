@@ -1698,7 +1698,7 @@ If any step fails or changes files, restart from P8-T1.
       ignores the `CodeCoverage.Path` entry P6-T3 added, as the 96-declared-against-88-emitted
       measurement in P0-T7's artifact demonstrates. (Satisfies AC-37, together with P8-T1 and
       P8-T3.)
-- [ ] [P8-T5] Capture the post-change coverage evidence through a `workflow_dispatch` of
+- [x] [P8-T5] Capture the post-change coverage evidence through a `workflow_dispatch` of
       `.github/workflows/_poshqc.yml` against the branch head and write
       `evidence/qa-gates/final-coverage.2026-09-06T23-09.md` with the four schema fields.
 
@@ -1784,7 +1784,7 @@ If any step fails or changes files, restart from P8-T1.
       `gh workflow run _poshqc.yml --ref bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2`
       `gh run list --workflow _poshqc.yml --branch bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2 --limit 1 --json databaseId,headSha,status,conclusion`
 
-- [ ] [P8-T6] Write the coverage delta comparison to
+- [x] [P8-T6] Write the coverage delta comparison to
       `evidence/qa-gates/coverage-delta.2026-09-06T23-09.md` with the four schema fields, reporting
       the baseline coverage values recorded by P0-T7, the post-change values recorded by P8-T5, and
       the new-file coverage for `CleanupWorktreeManifest.psm1`. Both input sources are the per-file
@@ -1801,7 +1801,7 @@ If any step fails or changes files, restart from P8-T1.
       states explicitly whether coverage regressed on either gate hook relative to the P0-T7
       baseline. A recorded regression on either hook is a blocking finding and the phase does not
       complete.
-- [ ] [P8-T7] Re-run the two Python delivery guards and the no-Python guard as a single closing
+- [x] [P8-T7] Re-run the two Python delivery guards and the no-Python guard as a single closing
       check and record `evidence/qa-gates/final-delivery-guards.2026-09-06T23-09.md` with the four
       schema fields.
 
@@ -1843,7 +1843,7 @@ If any step fails or changes files, restart from P8-T1.
       procedure in P3-T1 and record the reset in this task's artifact: Batch F's counter already
       holds the two `pester.runsettings.psd1` files, and the hook counts distinct paths cumulatively,
       so a remediation touching more than one mirror would be denied.
-- [ ] [P8-T8] Check off in `spec.md` each of `AC-01` through `AC-37` whose satisfying work has been
+- [x] [P8-T8] Check off in `spec.md` each of `AC-01` through `AC-37` whose satisfying work has been
       implemented and verified, changing only `- [ ]` to `- [x]` and leaving every criterion's text
       unchanged. Leave unchecked any criterion whose evidence is absent or incomplete. Do not add
       any criterion to `spec.md`. Work mode is `full-bug`, so `spec.md` is the resolved
@@ -1865,7 +1865,7 @@ If any step fails or changes files, restart from P8-T1.
 
       The executor reports the AC Status Summary defined in
       `.claude/skills/acceptance-criteria-tracking/SKILL.md` in its final completion report.
-- [ ] [P8-T9] Mirror the issue update to `evidence/issue-updates/issue-635.2026-09-06T23-09.md`
+- [x] [P8-T9] Mirror the issue update to `evidence/issue-updates/issue-635.2026-09-06T23-09.md`
       with `Timestamp:`, the exact text posted, and `PostedAs:` set to `comment` or `body` with the
       corresponding GitHub URL. If posting is blocked, write a `POSTING BLOCKED` header and the
       reason. Acceptance: the artifact exists and carries a `PostedAs:` line.
